@@ -35,7 +35,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .anyRequest()
           .authenticated();
 
-
     try {
       // Redirect to FOX for login if the request is unauthenticated.
       http.exceptionHandling()
