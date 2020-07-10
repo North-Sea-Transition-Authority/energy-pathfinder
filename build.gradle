@@ -1,0 +1,69 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'org.owasp:dependency-check-gradle:5.2.4'
+  }
+}
+
+plugins {
+  id 'org.springframework.boot' version '2.3.1.RELEASE'
+  id 'java'
+  id 'jacoco'
+  id 'checkstyle'
+  id 'war'
+}
+
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'org.owasp.dependencycheck'
+
+group = 'uk.co.fivium'
+version = System.getenv("DRONE_BRANCH") ? System.getenv("DRONE_BRANCH").replaceAll("[/\\-]", "_") : "LOCAL-SNAPSHOT"
+sourceCompatibility = '11'
+
+repositories {
+  mavenCentral()
+  maven {
+    url("http://nexus.fivium.local:8081/repository/maven-releases/")
+  }
+}
+
+dependencies {
+
+  providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+
+  implementation 'org.springframework.boot:spring-boot-starter'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+  implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+  compile 'org.flywaydb:flyway-core:5.2.1-FIVIUM'
+  compile 'com.oracle:ojdbc7:12.1.0.2'
+  compile 'org.springframework.session:spring-session-jdbc'
+
+  compile 'com.google.guava:guava:28.1-jre'
+  compile 'org.apache.commons:commons-lang3:3.9'
+
+  testCompile 'com.h2database:h2:1.4.197'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.security:spring-security-test'
+}
+
+checkstyle {
+  config = rootProject.resources.text.fromFile('ide/checkstyle.xml')
+  toolVersion '8.28'
+  ignoreFailures = false
+  maxWarnings = 0
+}
+
+dependencyCheck {
+  data {
+    // Point to a persisted volume in drone, to avoid having to re-download the whole CVE database each run.
+    // Comment this out to run locally
+    directory='/var/nvd-db'
+  }
+}
