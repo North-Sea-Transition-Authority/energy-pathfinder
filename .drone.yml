@@ -31,7 +31,7 @@ steps:
         from_secret: sonar_token
     commands:
       - chmod +x gradlew
-      - ./gradlew test checkstyleMain bootWar sonarqube
+      - ./gradlew test jacocoTestReport checkstyleMain bootWar sonarqube
 
 #  - name: publish-build-s3
 #    image: plugins/s3

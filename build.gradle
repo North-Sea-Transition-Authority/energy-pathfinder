@@ -61,6 +61,13 @@ checkstyle {
   maxWarnings = 0
 }
 
+tasks.jacocoTestReport {
+  reports {
+    xml.enabled(true)
+    html.enabled(false)
+  }
+}
+
 dependencyCheck {
   data {
     // Point to a persisted volume in drone, to avoid having to re-download the whole CVE database each run.
