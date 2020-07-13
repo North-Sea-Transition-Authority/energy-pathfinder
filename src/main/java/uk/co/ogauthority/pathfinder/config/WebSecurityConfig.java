@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.savedrequest.RequestCacheAwareFilter;
+import uk.co.ogauthority.pathfinder.auth.FoxLoginCallbackFilter;
 import uk.co.ogauthority.pathfinder.auth.FoxSessionFilter;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
 
@@ -19,11 +20,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   private static final Logger LOGGER = LoggerFactory.getLogger(WebSecurityConfig.class);
 
   private final FoxSessionFilter foxSessionFilter;
+  private final FoxLoginCallbackFilter foxLoginCallbackFilter;
   private final FoxUrlService foxUrlService;
 
   @Autowired
-  public WebSecurityConfig(FoxSessionFilter foxSessionFilter, FoxUrlService foxUrlService) {
+  public WebSecurityConfig(FoxSessionFilter foxSessionFilter,
+                           FoxLoginCallbackFilter foxLoginCallbackFilter,
+                           FoxUrlService foxUrlService) {
     this.foxSessionFilter = foxSessionFilter;
+    this.foxLoginCallbackFilter = foxLoginCallbackFilter;
     this.foxUrlService = foxUrlService;
   }
 
@@ -45,6 +50,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
               });
 
       http.addFilterBefore(foxSessionFilter, RequestCacheAwareFilter.class);
+
+      // The FoxLoginCallbackFilter must be hit before the FoxSessionFilter, otherwise the saved request is wiped
+      // when the session is cleared
+      http.addFilterBefore(foxLoginCallbackFilter, FoxSessionFilter.class);
+
     } catch (Exception e) {
       throw new RuntimeException("Failed to configure HttpSecurity", e);
     }

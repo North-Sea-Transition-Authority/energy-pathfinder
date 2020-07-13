@@ -37,7 +37,7 @@ public class UserSessionService {
   @Transactional(readOnly = true)
   public Optional<UserSession> getAndValidateSession(String sessionId, boolean loadUserAccount) {
     Optional<UserSession> optionalUserSession;
-    // TODO rework this to fetch privs via teams model once thats been migrated over
+    // TODO PAT-18 rework this to fetch privs via teams model once thats been migrated over
     if (loadUserAccount) {
       Stopwatch stopwatch = Stopwatch.createStarted();
       optionalUserSession = userSessionRepository.findAndLoadUserAccountById(sessionId);
