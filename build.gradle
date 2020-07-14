@@ -82,9 +82,10 @@ sonarqube {
     property("sonar.host.url", "https://sonarcloud.io")
     property("sonar.login", System.getenv("SONAR_TOKEN"))
     property("sonar.organization", "fivium")
-    if (System.getenv("DRONE_BRANCH").startsWith("feature")) {
+    if ("pull_request" == System.getenv("DRONE_BUILD_EVENT")) {
       property("sonar.pullrequest.branch", System.getenv("DRONE_BRANCH"))
       property("sonar.pullrequest.base", "develop")
+      property("sonar.pullrequest.key", System.getenv("DRONE_PULL_REQUEST"))
     } else {
       property("sonar.branch.name", System.getenv("DRONE_BRANCH"))
     }
