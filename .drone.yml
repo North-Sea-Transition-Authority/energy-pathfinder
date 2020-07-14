@@ -33,21 +33,21 @@ steps:
       - chmod +x gradlew
       - ./gradlew test jacocoTestReport checkstyleMain bootWar sonarqube
 
-#  - name: publish-build-s3
-#    image: plugins/s3
-#    settings:
-#      bucket: fivium-oga-pipelines-resources
-#      region: eu-west-2
-#      access_key:
-#        from_secret: drone_oga_s3_access_key
-#      secret_key:
-#        from_secret: drone_oga_s3_secret_key
-#      source: build/libs/*
-#      target: /builds/oga
-#      strip_prefix: build/libs/
-#    when:
-#      status: success
-#      branch: [ develop, release/*, master ]
+  - name: publish-build-s3
+    image: plugins/s3
+    settings:
+      bucket: fivium-pathfinder-resources
+      region: eu-west-2
+      access_key:
+        from_secret: drone_oga_s3_access_key
+      secret_key:
+        from_secret: drone_oga_s3_secret_key
+      source: build/libs/*
+      target: /builds/oga
+      strip_prefix: build/libs/
+    when:
+      status: success
+      branch: [ develop, release/*, master ]
 
   - name: vulnerability-scan-java
     image: openjdk:11-jdk-slim
