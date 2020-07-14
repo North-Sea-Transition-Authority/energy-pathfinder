@@ -70,7 +70,6 @@ steps:
   - name: sync-reports
     image: alpine
     commands:
-      - env
       - mkdir -p /var/webfiles/${DRONE_BUILD_NUMBER}
       - cp -r build/reports /var/webfiles/${DRONE_BUILD_NUMBER}
     volumes:
@@ -79,16 +78,16 @@ steps:
     when:
       status: [ success, failure ]
 
-#  - name: slack
-#    image: plugins/slack
-#    settings:
-#      webhook: https://hooks.slack.com/services/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
-#      channel: oga-pathfinder
-#      template: |
-#        *{{build.status}}* <{{build.link}}|Commit {{truncate build.commit 7}} on {{build.branch}} by ${DRONE_COMMIT_AUTHOR_NAME}>
-#        Reports published to: http://drone-assets.fivium.local:9090/pathfinder/{{build.number}}/
-#    when:
-#      status: [ success, failure ]
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook: https://hooks.slack.com/services/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
+      channel: oga-pathfinder
+      template: |
+        *{{build.status}}* <{{build.link}}|Commit {{truncate build.commit 7}} on {{build.branch}} by ${DRONE_COMMIT_AUTHOR_NAME}>
+        Reports published to: http://drone-assets.fivium.local:9090/pathfinder/{{build.number}}/
+    when:
+      status: [ success, failure ]
 
 volumes:
   - name: webfiles
