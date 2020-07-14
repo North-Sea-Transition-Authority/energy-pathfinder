@@ -82,10 +82,11 @@ sonarqube {
     property("sonar.host.url", "https://sonarcloud.io")
     property("sonar.login", System.getenv("SONAR_TOKEN"))
     property("sonar.organization", "fivium")
-    property("sonar.branch.name", System.getenv("DRONE_BRANCH"))
-    property("sonar.pullrequest.branch", System.getenv("DRONE_BRANCH"))
     if (System.getenv("DRONE_BRANCH").startsWith("feature")) {
+      property("sonar.pullrequest.branch", System.getenv("DRONE_BRANCH"))
       property("sonar.pullrequest.base", "develop")
+    } else {
+      property("sonar.branch.name", System.getenv("DRONE_BRANCH"))
     }
     property("sonar.exclusions", "src/test/**, src/main/resources/public/assets/**, fivium-design-system-core/**, src/main/resources/templates/fds/**, build/**")
     property("sonar.sources", "src")
