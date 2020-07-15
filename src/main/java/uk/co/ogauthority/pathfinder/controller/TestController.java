@@ -8,9 +8,9 @@ import uk.co.ogauthority.pathfinder.model.entity.UserAccount;
 @Controller
 public class TestController {
 
-  @GetMapping("/test")
+  @GetMapping("/session-info")
   public ModelAndView test(UserAccount userAccount) {
-    return new ModelAndView("test", "user", userAccount);
+    return new ModelAndView("test/sessionInfo", "user", userAccount);
   }
 
 }
