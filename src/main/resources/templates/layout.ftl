@@ -1,9 +1,11 @@
-<#import '/spring.ftl' as spring/>
+<#import '/spring.ftl' as spring>
 
-<#--Layout-->
+<#--FDS Layout-->
 <#include 'fds/objects/layouts/generic.ftl'>
 <#import 'fds/objects/grid/grid.ftl' as grid>
-<#import 'header.ftl' as pipelinesHeader>
+
+<#--Import statements-->
+<#import 'header.ftl' as applicationHeader>
 
 <#function springUrl url>
   <#local springUrl>
@@ -24,30 +26,43 @@
   oneHalfColumn=false
   oneThirdColumn=false
   twoThirdsColumn=false
+  twoThirdsOneThirdColumn=false
   oneQuarterColumn=false
+  twoThirdsOneThirdContent=""
   backLink=false
   backLinkUrl=""
   backLinkText="Back"
   breadcrumbs=false
-  phaseBanner=true
+  phaseBanner=false
   phaseBannerLink="#"
   topNavigation=false
   wrapperWidth=false
   masthead=false
-  headerIcon=true>
-
-  <@genericLayout htmlTitle=htmlTitle htmlAppTitle="OGA Pipelines">
+  headerLogo="GOVUK_CREST"
+  errorCheck=false
+  noIndex=false
+>
+  <@genericLayout htmlTitle=htmlTitle htmlAppTitle=service.serviceName errorCheck=errorCheck noIndex=noIndex>
 
     <#--Header-->
-    <@pipelinesHeader.header logoText="OGA" logoProductText="" headerNav=true serviceName="Pipelines"  topNavigation=topNavigation wrapperWidth=wrapperWidth headerIcon=headerIcon/>
+    <@applicationHeader.header
+      topNavigation=topNavigation
+      wrapperWidth=wrapperWidth
+      headerLogo=headerLogo
+      logoText=service.customerMnemonic
+      serviceName=service.serviceName
+      headerNav=true
+    />
 
     <#--Phase banner-->
     <#if phaseBanner>
-      <div class="govuk-phase-banner <#if wrapperWidth> govuk-width-container-wide<#else> govuk-width-container </#if>">
-        <p class="govuk-phase-banner__content">
-          <strong class="govuk-tag govuk-phase-banner__content__tag ">alpha</strong>
-          <span class="govuk-phase-banner__text">This is a new service – your <a class="govuk-link" href="${phaseBannerLink}">feedback</a> will help us to improve it.</span>
-        </p>
+      <div class="govuk-phase-banner__wrapper">
+        <div class="govuk-phase-banner<#if wrapperWidth> govuk-width-container-wide<#else> govuk-width-container</#if><#if topNavigation> govuk-phase-banner--no-border</#if>">
+          <p class="govuk-phase-banner__content">
+            <strong class="govuk-tag govuk-phase-banner__content__tag ">alpha</strong>
+            <span class="govuk-phase-banner__text">This is a new service – your <a class="govuk-link" href="${phaseBannerLink}">feedback</a> will help us to improve it.</span>
+          </p>
+        </div>
       </div>
     </#if>
 
@@ -73,30 +88,50 @@
     <main class="${mainClasses}" id="main-content" role="main">
       <#--Grid-->
       <#if fullWidthColumn>
-        <@grid.fullColumn>
-          <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
-          <#nested>
-        </@grid.fullColumn>
+        <@grid.gridRow>
+          <@grid.fullColumn>
+            <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
+            <#nested>
+          </@grid.fullColumn>
+        </@grid.gridRow>
       <#elseif oneHalfColumn>
-        <@grid.oneHalfColumn>
-          <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
-          <#nested>
-        </@grid.oneHalfColumn>
+        <@grid.gridRow>
+          <@grid.oneHalfColumn>
+            <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
+            <#nested>
+          </@grid.oneHalfColumn>
+        </@grid.gridRow>
       <#elseif oneThirdColumn>
-        <@grid.oneThirdColumn>
-          <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
-          <#nested>
-        </@grid.oneThirdColumn>
+        <@grid.gridRow>
+          <@grid.oneThirdColumn>
+            <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
+            <#nested>
+          </@grid.oneThirdColumn>
+        </@grid.gridRow>
       <#elseif twoThirdsColumn>
-        <@grid.twoThirdsColumn>
-          <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
-          <#nested>
-        </@grid.twoThirdsColumn>
+        <@grid.gridRow>
+          <@grid.twoThirdsColumn>
+            <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
+            <#nested>
+          </@grid.twoThirdsColumn>
+        </@grid.gridRow>
       <#elseif oneQuarterColumn>
-        <@grid.oneQuarterColumn>
-          <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
-          <#nested>
-        </@grid.oneQuarterColumn>
+        <@grid.gridRow>
+          <@grid.oneQuarterColumn>
+            <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
+            <#nested>
+          </@grid.oneQuarterColumn>
+        </@grid.gridRow>
+      <#elseif twoThirdsOneThirdColumn>
+        <@grid.gridRow>
+          <@grid.twoThirdsColumn>
+            <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
+            <#nested>
+          </@grid.twoThirdsColumn>
+          <@grid.oneThirdColumn>
+            ${twoThirdsOneThirdContent}
+          </@grid.oneThirdColumn>
+        </@grid.gridRow>
       <#else>
         <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
         <#nested>
@@ -109,6 +144,8 @@
 
     <#--Footer-->
     <@fdsFooter.footer wrapperWidth=wrapperWidth/>
+
+    <#--Custom scripts-->
 
   </@genericLayout>
 </#macro>

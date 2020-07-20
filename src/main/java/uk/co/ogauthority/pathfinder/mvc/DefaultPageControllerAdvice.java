@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import uk.co.ogauthority.pathfinder.auth.CurrentUserView;
+import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.model.entity.UserAccount;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
 
@@ -16,10 +17,13 @@ import uk.co.ogauthority.pathfinder.service.FoxUrlService;
 public class DefaultPageControllerAdvice {
 
   private final FoxUrlService foxUrlService;
+  private final ServiceProperties serviceProperties;
 
   @Autowired
-  public DefaultPageControllerAdvice(FoxUrlService foxUrlService) {
+  public DefaultPageControllerAdvice(FoxUrlService foxUrlService,
+                                     ServiceProperties serviceProperties) {
     this.foxUrlService = foxUrlService;
+    this.serviceProperties = serviceProperties;
   }
 
   @InitBinder
@@ -32,6 +36,7 @@ public class DefaultPageControllerAdvice {
   public void addCommonModelAttributes(Model model) {
     addCurrentUserView(model);
     addLogoutUrl(model);
+    addServiceSpecificAttributes(model);
   }
 
   private void addCurrentUserView(Model model) {
@@ -49,4 +54,7 @@ public class DefaultPageControllerAdvice {
     model.addAttribute("foxLogoutUrl", foxUrlService.getFoxLogoutUrl());
   }
 
+  private void addServiceSpecificAttributes(Model model) {
+    model.addAttribute("service", serviceProperties);
+  }
 }
