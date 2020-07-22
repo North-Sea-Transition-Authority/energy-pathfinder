@@ -6,14 +6,14 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.co.ogauthority.pathfinder.mvc.ResponseBufferSizeHandlerInterceptor;
-import uk.co.ogauthority.pathfinder.mvc.UserAccountArgumentResolver;
+import uk.co.ogauthority.pathfinder.mvc.argumentresolver.AuthenticatedUserAccountArgumentResolver;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
   @Override
   public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-    resolvers.add(new UserAccountArgumentResolver());
+    resolvers.add(new AuthenticatedUserAccountArgumentResolver());
   }
 
   @Override

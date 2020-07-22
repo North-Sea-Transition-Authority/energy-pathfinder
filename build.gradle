@@ -41,6 +41,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-freemarker'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
 
   compile 'org.flywaydb:flyway-core:5.2.1-FIVIUM'
   compile 'com.oracle:ojdbc7:12.1.0.2'
@@ -48,6 +49,7 @@ dependencies {
 
   compile 'com.google.guava:guava:28.1-jre'
   compile 'org.apache.commons:commons-lang3:3.9'
+  compile 'org.apache.commons:commons-collections4:4.4'
 
   testCompile 'com.h2database:h2:1.4.197'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'

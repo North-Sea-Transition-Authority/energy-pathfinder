@@ -1,0 +1,9 @@
+package uk.co.ogauthority.pathfinder.auth;
+
+public enum  UserPrivilege {
+  PATHFINDER_WORK_AREA,
+  PATHFINDER_REGULATOR_ADMIN,
+  PATHFINDER_REG_ORG_MANAGER,
+  PATHFINDER_ORG_ADMIN,
+  PATHFINDER_PROJECT_CREATE
+}

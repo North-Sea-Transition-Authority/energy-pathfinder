@@ -41,6 +41,7 @@ GRANT UNLIMITED TABLESPACE TO pathfinder_xx_flyway WITH ADMIN OPTION
 GRANT
   CREATE SESSION, 
   CREATE USER,
+  DROP ANY TABLE,
   CREATE ANY TABLE,
   CREATE TABLE, -- Not covered by above grant. They are different.
   CREATE ANY VIEW,
@@ -51,12 +52,16 @@ GRANT
   INSERT ANY TABLE, 
   UPDATE ANY TABLE,
   ALTER ANY TABLE,
+  DROP ANY INDEX,
   CREATE ANY SEQUENCE,
   SELECT ANY SEQUENCE,
   CREATE ANY PROCEDURE,
   GRANT ANY OBJECT PRIVILEGE
 TO pathfinder_xx_flyway WITH ADMIN OPTION
 / 
+
+GRANT EXECUTE ON decmgr.contact TO pathfinder_xx_flyway
+/
 ```
 This user must be created before the app runs for the first time on a new DB. All migrations will be run by this flyway user.
 

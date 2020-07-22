@@ -7,7 +7,7 @@ public class CurrentUserView {
   private final boolean isAuthenticated;
   private final String fullName;
 
-  public static CurrentUserView authenticated(UserAccount user) {
+  public static CurrentUserView authenticated(AuthenticatedUserAccount user) {
     return new CurrentUserView(true, user.getFullName());
   }
 

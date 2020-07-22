@@ -35,7 +35,7 @@
   breadcrumbs=false
   phaseBanner=false
   phaseBannerLink="#"
-  topNavigation=false
+  topNavigation=true
   wrapperWidth=false
   masthead=false
   headerLogo="GOVUK_CREST"

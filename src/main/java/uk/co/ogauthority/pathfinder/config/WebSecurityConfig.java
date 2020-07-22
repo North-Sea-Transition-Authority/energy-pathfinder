@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.savedrequest.RequestCacheAwareFilter;
 import uk.co.ogauthority.pathfinder.auth.FoxLoginCallbackFilter;
 import uk.co.ogauthority.pathfinder.auth.FoxSessionFilter;
+import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
 
 @Configuration
@@ -22,14 +23,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   private final FoxSessionFilter foxSessionFilter;
   private final FoxLoginCallbackFilter foxLoginCallbackFilter;
   private final FoxUrlService foxUrlService;
+  private final SystemAccessService systemAccessService;
 
   @Autowired
   public WebSecurityConfig(FoxSessionFilter foxSessionFilter,
                            FoxLoginCallbackFilter foxLoginCallbackFilter,
-                           FoxUrlService foxUrlService) {
+                           FoxUrlService foxUrlService,
+                           SystemAccessService systemAccessService) {
     this.foxSessionFilter = foxSessionFilter;
     this.foxLoginCallbackFilter = foxLoginCallbackFilter;
     this.foxUrlService = foxUrlService;
+    this.systemAccessService = systemAccessService;
   }
 
   @Override
@@ -37,6 +41,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     http
       .authorizeRequests()
+
+        .antMatchers("/work-area")
+          .hasAnyAuthority(systemAccessService.getWorkAreaGrantedAuthorities())
+
+        .antMatchers("/manage-teams", "/team-management", "/team-management/**")
+          .hasAnyAuthority(systemAccessService.getTeamAdministrationGrantedAuthorities())
+
+        .antMatchers("/session-info")
+          .permitAll()
+
         .anyRequest()
           .authenticated();
 

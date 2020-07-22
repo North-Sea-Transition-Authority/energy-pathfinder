@@ -1,20 +1,23 @@
 package uk.co.ogauthority.pathfinder.auth;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.security.core.context.SecurityContextHolder;
-import uk.co.ogauthority.pathfinder.model.entity.UserAccount;
-import uk.co.ogauthority.pathfinder.model.entity.UserSession;
-import uk.co.ogauthority.pathfinder.service.UserSessionService;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpSession;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpSession;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.security.core.context.SecurityContextHolder;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
+import uk.co.ogauthority.pathfinder.model.entity.UserSession;
+import uk.co.ogauthority.pathfinder.service.UserSessionService;
 
 public class FoxSessionFilterTest {
 
@@ -128,16 +131,16 @@ public class FoxSessionFilterTest {
   }
 
   private UserSession validSession() {
-    UserSession userSession = new UserSession(VALID_SESSION_ID);
-    userSession.setUserAccount(new UserAccount());
+    var userSession = new UserSession(VALID_SESSION_ID);
+    userSession.setAuthenticatedUserAccount(new AuthenticatedUserAccount(new WebUserAccount(1), List.of()));
     return userSession;
   }
 
   private AuthenticatedUserToken validUserToken() {
-    return AuthenticatedUserToken.create(VALID_SESSION_ID,  new UserAccount());
+    return AuthenticatedUserToken.create(VALID_SESSION_ID,  new AuthenticatedUserAccount(new WebUserAccount(1), List.of()));
   }
 
   private AuthenticatedUserToken expiredUserToken() {
-    return AuthenticatedUserToken.create("EXPIRED_CACHED_SESSION",  new UserAccount());
+    return AuthenticatedUserToken.create("EXPIRED_CACHED_SESSION",  new AuthenticatedUserAccount(new WebUserAccount(1), List.of()));
   }
 }
