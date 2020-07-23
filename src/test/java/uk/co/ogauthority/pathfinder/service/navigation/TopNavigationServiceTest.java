@@ -52,8 +52,8 @@ public class TopNavigationServiceTest {
     when(systemAccessServiceMock.canAccessWorkArea(workAreaOnlyUser)).thenReturn(true);
 
     List<TopNavigationItem> navigationItems = topNavigationService.getTopNavigationItems(workAreaOnlyUser);
-    assertThat(navigationItems.size()).isOne();
-    assertThat(navigationItems.get(0).getDisplayName().equals(TopNavigationService.WORK_AREA_TITLE));
+    assertThat(navigationItems).hasSize(1);
+    assertThat(navigationItems.get(0).getDisplayName()).isEqualTo(TopNavigationService.WORK_AREA_TITLE);
   }
 
   @Test
@@ -61,8 +61,8 @@ public class TopNavigationServiceTest {
     when(systemAccessServiceMock.canAccessTeamAdministration(teamAdministrationOnlyUser)).thenReturn(true);
 
     List<TopNavigationItem> navigationItems = topNavigationService.getTopNavigationItems(teamAdministrationOnlyUser);
-    assertThat(navigationItems.size()).isOne();
-    assertThat(navigationItems.get(0).getDisplayName().equals(TopNavigationService.MANAGE_TEAM_TITLE));
+    assertThat(navigationItems).hasSize(1);
+    assertThat(navigationItems.get(0).getDisplayName()).isEqualTo(TopNavigationService.MANAGE_TEAM_TITLE);
   }
 
   @Test
@@ -71,9 +71,12 @@ public class TopNavigationServiceTest {
     when(systemAccessServiceMock.canAccessTeamAdministration(regulatorAdminUser)).thenReturn(true);
 
     List<TopNavigationItem> navigationItems = topNavigationService.getTopNavigationItems(regulatorAdminUser);
-    assertThat(navigationItems.size()).isEqualTo(2);
-    assertThat(navigationItems.get(0).getDisplayName().equals(TopNavigationService.WORK_AREA_TITLE));
-    assertThat(navigationItems.get(1).getDisplayName().equals(TopNavigationService.MANAGE_TEAM_TITLE));
+    assertThat(navigationItems)
+        .extracting(TopNavigationItem::getDisplayName)
+        .containsExactly(
+            TopNavigationService.WORK_AREA_TITLE,
+            TopNavigationService.MANAGE_TEAM_TITLE
+        );
   }
 
 }
