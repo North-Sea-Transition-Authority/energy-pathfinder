@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.integration.energyportal.teams;
+package uk.co.ogauthority.pathfinder.integration.energyportal.team;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -334,6 +334,7 @@ public class PortalTeamAccessorIntegrationTest {
   @Transactional
   public void getAllPortalSystemPrivilegesForPerson_returnsExpectedSystemPrivs_whenPersonIsRoleWithPriv(){
     List<PortalSystemPrivilegeDto> privilegeDtoList = portalTeamAccessor.getAllPortalSystemPrivilegesForPerson(unscopedTeamMemberPerson_2Roles);
+    assertThat(privilegeDtoList.size()).isEqualTo(1);
     assertThat(privilegeDtoList).allMatch(dto -> {
 
       assertThat(dto.getRoleName() ).isEqualTo(ExampleTeamRole.ROLE_WITH_PRIVILEGE.name());
