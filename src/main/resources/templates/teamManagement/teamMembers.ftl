@@ -1,0 +1,83 @@
+<#include "../layout.ftl">
+
+<@defaultPage htmlTitle=teamName backLink=!showBreadcrumbs pageHeading=teamName topNavigation=showTopNav twoThirdsColumn=false breadcrumbs=showBreadcrumbs>
+
+  <#if allRoles??>
+    <@fdsDetails.summaryDetails summaryTitle="What can each role do?" >
+      <@fdsCheckAnswers.checkAnswers summaryListClass="">
+        <#list allRoles as propName, propValue>
+          <#assign description = propValue?keep_before("(") >
+          <@fdsCheckAnswers.checkAnswersRow keyText="${propName}" actionText="" actionUrl="" screenReaderActionText="">
+            ${description}
+          </@fdsCheckAnswers.checkAnswersRow>
+        </#list>
+      </@fdsCheckAnswers.checkAnswers>
+    </@fdsDetails.summaryDetails>
+  </#if>
+
+  <#if userCanManageAccess>
+    <@fdsAction.link linkText="Add user" linkUrl=springUrl(addUserUrl) linkClass="govuk-button govuk-button--blue" role=true/>
+  </#if>
+
+  <#list teamMemberViews>
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th class="govuk-table__header" scope="col">Name</th>
+        <th class="govuk-table__header" scope="col">Contact details</th>
+        <th class="govuk-table__header" scope="col">Roles</th>
+        <#if userCanManageAccess>
+          <th class="govuk-table__header" scope="col">Actions</th>
+        </#if>
+      </tr>
+      <tbody class="govuk-table__body">
+        <#items as teamMemberView>
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">
+              ${teamMemberView.fullName}
+            </td>
+            <td class="govuk-table__cell">
+              <ul class="govuk-list">
+                <li>${teamMemberView.emailAddress}</li>
+                <li>${teamMemberView.telephoneNo}</li>
+              </ul>
+            </td>
+            <td class="govuk-table__cell">
+              <#list teamMemberView.roleViews?sort_by("displaySequence") as roleView>
+                  ${roleView.title}
+                <br>
+              </#list>
+            </td>
+            <#if userCanManageAccess>
+              <td class="govuk-table__cell">
+                <ul class="govuk-list">
+                  <li>
+                    <@fdsAction.link
+                      linkUrl=springUrl(teamMemberView.editRoute)
+                      linkText="Edit"
+                      linkScreenReaderText="Edit ${teamMemberView.fullName} user"
+                      linkClass="govuk-link govuk-link--no-visited-state"
+                    />
+                  </li>
+                  <li>
+                    <@fdsAction.link
+                      linkUrl=springUrl(teamMemberView.removeRoute)
+                      linkText="Remove"
+                      linkScreenReaderText="Remove ${teamMemberView.fullName} user"
+                      linkClass="govuk-link govuk-link--no-visited-state"
+                    />
+                  </li>
+                </ul>
+              </td>
+            </#if>
+          </tr>
+        </#items>
+      </tbody>
+    </table>
+  </#list>
+
+  <#if backUrl??>
+    <@fdsAction.link linkText="Complete section" linkClass="govuk-button"  linkUrl=springUrl(backUrl)/>
+  </#if>
+
+</@defaultPage>

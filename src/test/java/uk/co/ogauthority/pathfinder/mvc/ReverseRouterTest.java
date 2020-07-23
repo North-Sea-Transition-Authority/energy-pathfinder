@@ -27,8 +27,7 @@ import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest // We need a WebApplicationContext to test the reverse router
-@Import({AbstractControllerTest.TestConfig.class})
-public class ReverseRouterTest {
+public class ReverseRouterTest extends AbstractControllerTest {
 
   @Before
   public void setUp() {
