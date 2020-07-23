@@ -42,13 +42,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http
       .authorizeRequests()
 
-        .antMatchers("/work-area")
+        .mvcMatchers("/work-area")
           .hasAnyAuthority(systemAccessService.getWorkAreaGrantedAuthorities())
 
-        .antMatchers("/manage-teams", "/team-management", "/team-management/**")
+        .mvcMatchers("/manage-teams", "/team-management", "/team-management/**")
           .hasAnyAuthority(systemAccessService.getTeamAdministrationGrantedAuthorities())
 
-        .antMatchers("/session-info")
+        .mvcMatchers("/session-info")
           .permitAll()
 
         .anyRequest()
