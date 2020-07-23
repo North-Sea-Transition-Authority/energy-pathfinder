@@ -334,7 +334,7 @@ public class PortalTeamAccessorIntegrationTest {
   @Transactional
   public void getAllPortalSystemPrivilegesForPerson_returnsExpectedSystemPrivs_whenPersonIsRoleWithPriv(){
     List<PortalSystemPrivilegeDto> privilegeDtoList = portalTeamAccessor.getAllPortalSystemPrivilegesForPerson(unscopedTeamMemberPerson_2Roles);
-    assertThat(privilegeDtoList.size()).isEqualTo(1);
+    assertThat(privilegeDtoList).isNotEmpty();
     assertThat(privilegeDtoList).allMatch(dto -> {
 
       assertThat(dto.getRoleName() ).isEqualTo(ExampleTeamRole.ROLE_WITH_PRIVILEGE.name());
