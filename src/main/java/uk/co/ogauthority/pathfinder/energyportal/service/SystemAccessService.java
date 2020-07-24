@@ -8,11 +8,15 @@ import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 @Service
 public class SystemAccessService {
 
-  public final Set<UserPrivilege> workAreaPrivileges = Set.of(
+  public static final Set<UserPrivilege> WORK_AREA_PRIVILEGES = Set.of(
       UserPrivilege.PATHFINDER_WORK_AREA
   );
 
-  public final Set<UserPrivilege> teamAdministrationPrivileges = Set.of(
+  public static final Set<UserPrivilege> CREATE_PROJECT_PRIVILEGES = Set.of(
+      UserPrivilege.PATHFINDER_PROJECT_CREATE
+  );
+
+  public static final Set<UserPrivilege> TEAM_ADMINISTRATION_PRIVILEGES = Set.of(
       UserPrivilege.PATHFINDER_REGULATOR_ADMIN,
       UserPrivilege.PATHFINDER_REG_ORG_MANAGER,
       UserPrivilege.PATHFINDER_ORG_ADMIN
@@ -22,23 +26,32 @@ public class SystemAccessService {
    * For use in WebSecurityConfig. In other instances call canAccessWorkArea
    */
   public String[] getWorkAreaGrantedAuthorities() {
-    return getGrantedAuthorities(workAreaPrivileges);
+    return getGrantedAuthorities(WORK_AREA_PRIVILEGES);
   }
 
   public boolean canAccessWorkArea(AuthenticatedUserAccount user) {
-    return hasRelevantPrivilege(user, workAreaPrivileges);
+    return hasRelevantPrivilege(user, WORK_AREA_PRIVILEGES);
   }
 
   /**
    * For use in WebSecurityConfig. In other instances call canAccessTeamAdministration
    */
   public String[] getTeamAdministrationGrantedAuthorities() {
-    return getGrantedAuthorities(teamAdministrationPrivileges);
+    return getGrantedAuthorities(TEAM_ADMINISTRATION_PRIVILEGES);
   }
 
   public boolean canAccessTeamAdministration(AuthenticatedUserAccount user) {
-    return hasRelevantPrivilege(user, teamAdministrationPrivileges);
+    return hasRelevantPrivilege(user, TEAM_ADMINISTRATION_PRIVILEGES);
   }
+
+  public String[] getCreateProjectGrantedAuthorities() {
+    return getGrantedAuthorities(CREATE_PROJECT_PRIVILEGES);
+  }
+
+  public boolean canCreateProject(AuthenticatedUserAccount user) {
+    return hasRelevantPrivilege(user, CREATE_PROJECT_PRIVILEGES);
+  }
+
 
   private String[] getGrantedAuthorities(Set<UserPrivilege> userPrivileges) {
     return userPrivileges.stream()
