@@ -15,7 +15,7 @@ public class StartProjectController {
   @GetMapping("/start-project")
   public ModelAndView startPage() {
     return new ModelAndView("project/startPage")
-        .addObject("buttonUrl", ReverseRouter.route(on(StartProjectController.class).startProject()));
+        .addObject("startActionUrl", ReverseRouter.route(on(StartProjectController.class).startProject()));
   }
 
   @PostMapping("/start-project")

@@ -4,7 +4,7 @@
 
 <@defaultPage htmlTitle=pageHeading pageHeading=pageHeading backLink=true>
 
-    <@fdsStartPage.startPage startActionText="Start project" startActionUrl=buttonUrl>
+    <@fdsStartPage.startPage startActionText="Start project" startActionUrl=startActionUrl>
 
       <p class="govuk-body">Pathfinder has been established to provide a real time look at energy projects in the UKCS.</p>
 

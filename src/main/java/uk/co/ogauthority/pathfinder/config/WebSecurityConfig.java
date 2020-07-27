@@ -49,7 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
           .hasAnyAuthority(systemAccessService.getTeamAdministrationGrantedAuthorities())
 
         .mvcMatchers("/start-project", "/project/**")
-        .hasAnyAuthority(systemAccessService.getCreateProjectGrantedAuthorities())
+          .hasAnyAuthority(systemAccessService.getCreateProjectGrantedAuthorities())
 
         .mvcMatchers("/session-info")
           .permitAll()
