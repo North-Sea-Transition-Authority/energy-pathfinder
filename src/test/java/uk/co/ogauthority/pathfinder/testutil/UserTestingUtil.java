@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
 import java.util.List;
+import java.util.Set;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
@@ -34,6 +35,10 @@ public class UserTestingUtil {
 
   public static AuthenticatedUserAccount getAuthenticatedUserAccount(List<UserPrivilege> privileges) {
     return getAuthenticatedUserAccount(getWebUserAccount(), privileges);
+  }
+
+  public static AuthenticatedUserAccount getAuthenticatedUserAccount(Set<UserPrivilege> privileges){
+    return new AuthenticatedUserAccount(getWebUserAccount(), privileges);
   }
 
   public static AuthenticatedUserAccount getAuthenticatedUserAccount(WebUserAccount webUserAccount,
