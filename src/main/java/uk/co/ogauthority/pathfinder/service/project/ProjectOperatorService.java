@@ -12,7 +12,7 @@ import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.teammanagement.TeamManagementService;
 
 /**
- * Service to manage the linking between ProjectDetails and Operators
+ * Service to manage the linking between ProjectDetails and Operators.
  */
 @Service
 public class ProjectOperatorService {
@@ -33,8 +33,6 @@ public class ProjectOperatorService {
 
   /**
    * Create a link between the projectDetails and the PortalOrganisationGroup.
-   * @param projectDetails
-   * @param webUserAccount
    * @return the projectOperator entity if user is a member of a single team
    */
   public ProjectOperator createProjectOperator(ProjectDetails projectDetails, AuthenticatedUserAccount webUserAccount) {

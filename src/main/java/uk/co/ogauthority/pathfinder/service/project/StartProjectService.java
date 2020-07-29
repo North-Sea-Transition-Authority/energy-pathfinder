@@ -10,7 +10,7 @@ import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectRepository;
 
 /**
- * Service to create the required entities for a functioning Project to exist
+ * Service to create the required entities for a functioning Project to exist.
  */
 @Service
 public class StartProjectService {
@@ -31,8 +31,6 @@ public class StartProjectService {
 
   /**
    * Create a draft project and projectOperator for the provided user.
-   * @param user
-   * @return
    */
   public ProjectDetails startProject(AuthenticatedUserAccount user) {
     var project = new Project();
