@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.entity.project.projectInformation;
+package uk.co.ogauthority.pathfinder.model.entity.project.projectinformation;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -1,7 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.enums.project;
 
 public enum FieldStage {
-
   DISCOVERY("Discovery", "Early phase before FDP approval"),
   DEVELOPMENT("Development", "FDP has been approved"),
   OPERATIONS("Operations", "Field now operational"),
