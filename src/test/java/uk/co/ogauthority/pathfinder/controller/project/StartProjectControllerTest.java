@@ -19,9 +19,9 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 @WebMvcTest(StartProjectController.class)
 public class StartProjectControllerTest extends AbstractControllerTest {
 
-  private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.CREATE_PROJECT_PRIVILEGES);
+  private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.CREATE_PROJECT_PRIVILEGES);
 
-  private final AuthenticatedUserAccount unAuthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
+  private static final AuthenticatedUserAccount unAuthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   @Test
   public void authenticatedUser_hasAccessToStartProject() throws Exception {

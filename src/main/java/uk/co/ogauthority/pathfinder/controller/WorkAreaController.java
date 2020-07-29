@@ -14,6 +14,6 @@ public class WorkAreaController {
   @GetMapping("/work-area")
   public ModelAndView getWorkArea() {
     return new ModelAndView("workArea")
-        .addObject("startProjectUrl", ReverseRouter.route(on(StartProjectController.class).startProject()));
+        .addObject("startProjectUrl", ReverseRouter.route(on(StartProjectController.class).startProject(null)));
   }
 }

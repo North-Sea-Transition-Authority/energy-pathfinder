@@ -1,0 +1,49 @@
+package uk.co.ogauthority.pathfinder.service.project;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetails;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
+import uk.co.ogauthority.pathfinder.repository.project.ProjectRepository;
+
+/**
+ * Service to create the required entities for a functioning Project to exist
+ */
+@Service
+public class StartProjectService {
+
+  private final ProjectRepository projectRepository;
+  private final ProjectDetailsRepository projectDetailsRepository;
+  private final ProjectOperatorService projectOperatorService;
+
+  @Autowired
+  public StartProjectService(ProjectRepository projectRepository,
+                             ProjectDetailsRepository projectDetailsRepository,
+                             ProjectOperatorService projectOperatorService) {
+    this.projectRepository = projectRepository;
+    this.projectDetailsRepository = projectDetailsRepository;
+    this.projectOperatorService = projectOperatorService;
+  }
+
+
+  /**
+   * Create a draft project and projectOperator for the provided user.
+   * @param user
+   * @return
+   */
+  public ProjectDetails startProject(AuthenticatedUserAccount user) {
+    var project = new Project();
+    var projectDetails = new ProjectDetails(project, ProjectStatus.DRAFT, user.getWuaId());
+    projectRepository.save(project);
+    projectDetailsRepository.save(projectDetails);
+    projectOperatorService.createProjectOperator(projectDetails, user);
+
+    //TODO PAT-130 audit
+    return projectDetails;
+  }
+
+
+}
