@@ -1,6 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.entity.project;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,6 +23,7 @@ public class ProjectDetails {
   @JoinColumn(name = "project_id")
   private Project project;
 
+  @Enumerated(EnumType.STRING)
   private ProjectStatus status;
 
   private Integer version;
@@ -33,7 +36,8 @@ public class ProjectDetails {
   public ProjectDetails() {
   }
 
-  public ProjectDetails(Project project, ProjectStatus status,
+  public ProjectDetails(Project project,
+                        ProjectStatus status,
                         Integer createdByWua) {
     this.project = project;
     this.status = status;

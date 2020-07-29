@@ -1,0 +1,27 @@
+package uk.co.ogauthority.pathfinder.model.enums.project;
+
+public enum FieldStage {
+
+  DISCOVERY("Discovery", "Early phase before FDP approval"),
+  DEVELOPMENT("Development", "FDP has been approved"),
+  OPERATIONS("Operations", "Field now operational"),
+  DECOMMISSIONING("Decommissioning", "Decommissioning planning commenced either pre / post COP"),
+  ENERGY_TRANSITION("Energy transition", "");
+
+  private final String displayName;
+
+  private final String description;
+
+  FieldStage(String displayName, String description) {
+    this.displayName = displayName;
+    this.description = description;
+  }
+
+  public String getDisplayName() {
+    return displayName;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+}

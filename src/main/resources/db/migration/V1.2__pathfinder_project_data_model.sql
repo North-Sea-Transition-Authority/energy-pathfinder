@@ -5,11 +5,11 @@ CREATE TABLE ${datasource.user}.projects (
 
 CREATE TABLE ${datasource.user}.project_details (
   id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  project_id NUMBER,
-  status VARCHAR2(4000),
-  version NUMBER,
-  is_current_version NUMBER,
-  created_by_wua NUMBER,
+  project_id NUMBER NOT NULL,
+  status VARCHAR2(4000) NOT NULL,
+  version NUMBER NOT NULL,
+  is_current_version NUMBER NOT NULL,
+  created_by_wua NUMBER NOT NULL,
   CONSTRAINT pd_project_fk FOREIGN KEY (project_id) REFERENCES ${datasource.user}.projects (id)
 ) TABLESPACE tbsdata;
 

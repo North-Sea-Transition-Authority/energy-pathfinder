@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetails;
@@ -32,6 +33,7 @@ public class StartProjectService {
   /**
    * Create a draft project and projectOperator for the provided user.
    */
+  @Transactional
   public ProjectDetails startProject(AuthenticatedUserAccount user) {
     var project = new Project();
     var projectDetails = new ProjectDetails(project, ProjectStatus.DRAFT, user.getWuaId());

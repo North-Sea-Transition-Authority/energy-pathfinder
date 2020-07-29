@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project;
 import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetails;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
@@ -35,6 +36,7 @@ public class ProjectOperatorService {
    * Create a link between the projectDetails and the PortalOrganisationGroup.
    * @return the projectOperator entity if user is a member of a single team
    */
+  @Transactional
   public ProjectOperator createProjectOperator(ProjectDetails projectDetails, AuthenticatedUserAccount webUserAccount) {
     var projectCreator = teamManagementService.getPerson(webUserAccount.getLinkedPerson().getId().asInt());
 
