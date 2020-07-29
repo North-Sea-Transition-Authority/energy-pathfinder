@@ -49,9 +49,7 @@ public class ProjectOperatorService {
     //TODO PAT-113 If multiple operators have user select
     if (organisationUnits.size() == 1) {
       var projectOperator = new ProjectOperator(projectDetails, organisationUnits.get(0).getPortalOrganisationGroup());
-      projectOperatorsRepository.save(projectOperator);
-
-      return projectOperator;
+      return projectOperatorsRepository.save(projectOperator);
     }
     return null;
   }

@@ -18,11 +18,15 @@ import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(TaskListController.class)
 public class TaskListControllerTest extends AbstractControllerTest {
+
+  @MockBean
+  private ProjectService projectService;
 
   @MockBean
   private BreadcrumbService breadcrumbService;
