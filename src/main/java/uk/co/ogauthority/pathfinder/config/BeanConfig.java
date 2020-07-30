@@ -2,8 +2,10 @@ package uk.co.ogauthority.pathfinder.config;
 
 import java.time.Clock;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import uk.co.ogauthority.pathfinder.auth.FoxLoginCallbackFilter;
 import uk.co.ogauthority.pathfinder.auth.FoxSessionFilter;
 
@@ -38,6 +40,14 @@ public class BeanConfig {
     FilterRegistrationBean<FoxLoginCallbackFilter> registration = new FilterRegistrationBean<>(foxLoginCallbackFilter);
     registration.setEnabled(false);
     return registration;
+  }
+
+  @Bean("messageSource")
+  public MessageSource messageSource() {
+    ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+    messageSource.setBasename("messages");
+    messageSource.setDefaultEncoding("UTF-8");
+    return messageSource;
   }
 
 }

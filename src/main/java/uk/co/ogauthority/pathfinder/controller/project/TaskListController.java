@@ -31,7 +31,9 @@ public class TaskListController {
   public ModelAndView viewTaskList(@PathVariable("projectId") Integer projectId) {
     var currentDetail = projectService.getLatestDetail(projectId);
     var modelAndView = new ModelAndView("project/taskList");
-    modelAndView.addObject("projectInformationUrl", ReverseRouter.route(on(ProjectInformationController.class).getProjectInformation(null, projectId)));
+    modelAndView.addObject("projectInformationUrl",
+        ReverseRouter.route(on(ProjectInformationController.class).getProjectInformation(null, projectId))
+    );
     breadcrumbService.fromWorkArea(modelAndView, "Task list");
     return modelAndView;
   }
