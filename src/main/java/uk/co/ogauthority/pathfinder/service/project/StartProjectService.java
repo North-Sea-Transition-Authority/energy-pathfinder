@@ -16,6 +16,9 @@ import uk.co.ogauthority.pathfinder.repository.project.ProjectRepository;
 @Service
 public class StartProjectService {
 
+  public static final Integer FIRST_VERSION = 1;
+  public static final boolean CURRENT_VERSION = true;
+
   private final ProjectRepository projectRepository;
   private final ProjectDetailsRepository projectDetailsRepository;
   private final ProjectOperatorService projectOperatorService;
@@ -36,7 +39,7 @@ public class StartProjectService {
   @Transactional
   public ProjectDetails startProject(AuthenticatedUserAccount user) {
     var project = new Project();
-    var projectDetails = new ProjectDetails(project, ProjectStatus.DRAFT, user.getWuaId());
+    var projectDetails = new ProjectDetails(project, ProjectStatus.DRAFT, user.getWuaId(), FIRST_VERSION, CURRENT_VERSION);
     projectRepository.save(project);
     projectDetailsRepository.save(projectDetails);
     projectOperatorService.createProjectOperator(projectDetails, user);

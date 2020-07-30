@@ -28,7 +28,7 @@ public class ProjectDetails {
 
   private Integer version;
 
-  private Boolean isCurrentVersion;
+  private boolean isCurrentVersion;
 
   private Integer createdByWua;
 
@@ -38,7 +38,9 @@ public class ProjectDetails {
 
   public ProjectDetails(Project project,
                         ProjectStatus status,
-                        Integer createdByWua) {
+                        Integer createdByWua,
+                        Integer version,
+                        boolean isCurrentVersion) {
     this.project = project;
     this.status = status;
     this.createdByWua = createdByWua;
@@ -70,11 +72,11 @@ public class ProjectDetails {
     this.version = version;
   }
 
-  public Boolean getIsCurrentVersion() {
+  public boolean getIsCurrentVersion() {
     return isCurrentVersion;
   }
 
-  public void setIsCurrentVersion(Boolean currentVersion) {
+  public void setIsCurrentVersion(boolean currentVersion) {
     isCurrentVersion = currentVersion;
   }
 

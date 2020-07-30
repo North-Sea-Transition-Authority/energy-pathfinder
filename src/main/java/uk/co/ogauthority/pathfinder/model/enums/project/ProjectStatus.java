@@ -5,7 +5,7 @@ public enum ProjectStatus {
   QA("QA"),
   PUBLISHED("Published");
 
-  private String displayName;
+  private final String displayName;
 
   ProjectStatus(String displayName) {
     this.displayName = displayName;

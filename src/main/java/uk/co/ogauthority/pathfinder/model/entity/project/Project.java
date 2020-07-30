@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.entity.project;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,10 +16,11 @@ public class Project {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  private LocalDateTime createdDatetime;
+  @Column(name = "created_datetime")
+  private Instant createdInstant;
 
   public Project() {
-    this.createdDatetime = LocalDateTime.now();
+    this.createdInstant = Instant.now();
   }
 
   public Integer getId() {
@@ -29,11 +31,11 @@ public class Project {
     this.id = id;
   }
 
-  public LocalDateTime getCreatedDatetime() {
-    return createdDatetime;
+  public Instant getCreatedInstant() {
+    return createdInstant;
   }
 
-  public void setCreatedDatetime(LocalDateTime createdDatetime) {
-    this.createdDatetime = createdDatetime;
+  public void setCreatedInstant(Instant createdDatetime) {
+    this.createdInstant = createdDatetime;
   }
 }
