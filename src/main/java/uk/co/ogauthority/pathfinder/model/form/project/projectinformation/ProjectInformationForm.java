@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.model.form.project.projectinformation;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Length;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 
 public class ProjectInformationForm {
@@ -15,6 +16,7 @@ public class ProjectInformationForm {
   @NotEmpty(message = "Enter a project title", groups = Full.class)
   private String projectTitle;
 
+  @Length(max = 4000, message = "Enter a maximum of 4000 characters")
   @NotEmpty(message = "Provide a summary of the project", groups = Full.class)
   private String projectSummary;
 
