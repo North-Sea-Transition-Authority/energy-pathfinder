@@ -3,7 +3,9 @@ package uk.co.ogauthority.pathfinder.controller.team;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -55,7 +57,7 @@ public class PortalTeamManagementController {
   public ModelAndView renderManageableTeams(AuthenticatedUserAccount currentUser, TeamType teamType) {
     var modelAndView = new ModelAndView("teamManagement/manageableTeams");
 
-    List<TeamView> teamViews = teamManagementService.getAllTeamsOfTypeUserCanManage(currentUser, teamType)
+    List<TeamView> teamViews = teamManagementService.getAllTeamsOfTypeUserCanView(currentUser, teamType)
         .stream()
         .map(team -> new TeamView(team,
             ReverseRouter.route(on(PortalTeamManagementController.class).renderTeamMembers(team.getId(), null)))
@@ -77,13 +79,18 @@ public class PortalTeamManagementController {
 
   @GetMapping("/teams/{resId}/member")
   public ModelAndView renderTeamMembers(@PathVariable Integer resId, AuthenticatedUserAccount currentUser) {
-    return withManageableTeam(resId, currentUser, (this::getTeamUsersModelAndView));
+    return withViewableTeam(resId, currentUser, (this::getTeamUsersModelAndView));
   }
 
-  private ModelAndView getTeamUsersModelAndView(Team team) {
+  private ModelAndView getTeamUsersModelAndView(Team team, AuthenticatedUserAccount user) {
     List<TeamMemberView> teamMemberViews = teamManagementService.getTeamMemberViewsForTeam(team).stream()
         .sorted(Comparator.comparing(TeamMemberView::getForename).thenComparing(TeamMemberView::getSurname))
         .collect(Collectors.toList());
+
+    var teamRoles = teamManagementService.getRolesForTeam(team)
+        .stream()
+        .sorted(Comparator.comparing(TeamRoleView::getDisplaySequence))
+        .collect(Collectors.toMap(TeamRoleView::getTitle, TeamRoleView::getDescription, (x,y) -> y, LinkedHashMap::new));
 
     return new ModelAndView("teamManagement/teamMembers")
         .addObject("teamId", team.getId())
@@ -93,10 +100,11 @@ public class PortalTeamManagementController {
             on(PortalTeamManagementController.class).renderAddUserToTeam(team.getId(), null, null)
         ))
         .addObject("showBreadcrumbs", false)
-        .addObject("userCanManageAccess", true)
-        .addObject("showTopNav", true);
+        .addObject("userCanManageAccess", teamManagementService.canManageTeam(team, user))
+        .addObject("showTopNav", true)
+        .addObject("additionalGuidanceText", team.getType().getTeamManagementGuidance())
+        .addObject("allRoles", teamRoles);
   }
-
 
   @GetMapping("/teams/{resId}/member/new")
   public ModelAndView renderAddUserToTeam(@PathVariable Integer resId,
@@ -157,7 +165,7 @@ public class PortalTeamManagementController {
         teamManagementService.removeTeamMember(person, team, currentUser);
       } catch (LastAdministratorException e) {
         return getRemoveTeamMemberModelAndView(team, person,
-            "This person cannot be removed from the team as they are currently the only person in the team administrator role.");
+            "This person cannot be removed from the team as they are currently the only person in the access manager role.");
       }
       return ReverseRouter.redirect(on(PortalTeamManagementController.class).renderTeamMembers(resId, null));
     });
@@ -235,6 +243,19 @@ public class PortalTeamManagementController {
     } else {
       throw new AccessDeniedException(String.format(
           "User with wua id %s attempted to manage resId %s but does not have the correct privileges", currentUser.getWuaId(), team.getId()
+      ));
+    }
+  }
+
+  private ModelAndView withViewableTeam(Integer resId,
+                                        AuthenticatedUserAccount currentUser,
+                                        BiFunction<Team, AuthenticatedUserAccount, ModelAndView> function) {
+    var team = teamManagementService.getTeamOrError(resId);
+    if (teamManagementService.canViewTeam(team, currentUser)) {
+      return function.apply(team, currentUser);
+    } else {
+      throw new AccessDeniedException(String.format(
+          "User with wua id %s attempted to view resId %s but does not have the correct privileges", currentUser.getWuaId(), team.getId()
       ));
     }
   }

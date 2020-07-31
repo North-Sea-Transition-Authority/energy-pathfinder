@@ -67,8 +67,14 @@ public class PortalTeamManagementControllerTest extends AbstractControllerTest {
   @Before
   public void teamManagementTestSetup() {
 
-    regulatorTeamAdmin = new AuthenticatedUserAccount(new WebUserAccount(1), List.of(UserPrivilege.PATHFINDER_REGULATOR_ADMIN));
-    organisationTeamAdmin = new AuthenticatedUserAccount(new WebUserAccount(2), List.of(UserPrivilege.PATHFINDER_ORG_ADMIN));
+    regulatorTeamAdmin = new AuthenticatedUserAccount(new WebUserAccount(1), List.of(
+        UserPrivilege.PATHFINDER_REGULATOR_ADMIN,
+        UserPrivilege.PATHFINDER_TEAM_VIEWER
+    ));
+    organisationTeamAdmin = new AuthenticatedUserAccount(new WebUserAccount(2), List.of(
+        UserPrivilege.PATHFINDER_ORG_ADMIN,
+        UserPrivilege.PATHFINDER_TEAM_VIEWER
+    ));
 
     regulatorTeamAdminPerson = new Person(1, "Regulator", "Admin", "reg@admin.org", "0");
     organisationTeamAdminPerson = new Person(2, "Organisation", "Admin", "org@admin.org", "0");
@@ -81,6 +87,9 @@ public class PortalTeamManagementControllerTest extends AbstractControllerTest {
 
     when(teamManagementService.canManageTeam(regulatorTeam, regulatorTeamAdmin)).thenReturn(true);
     when(teamManagementService.canManageTeam(regulatorTeam, organisationTeamAdmin)).thenReturn(false);
+
+    when(teamManagementService.canViewTeam(regulatorTeam, regulatorTeamAdmin)).thenReturn(true);
+    when(teamManagementService.canViewTeam(regulatorTeam, organisationTeamAdmin)).thenReturn(false);
 
     when(teamManagementService.getPerson(regulatorTeamAdminPerson.getId().asInt())).thenReturn(regulatorTeamAdminPerson);
     when(teamManagementService.getPerson(UNKNOWN_PERSON_ID)).thenThrow(new PathfinderEntityNotFoundException(""));
@@ -99,8 +108,8 @@ public class PortalTeamManagementControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  public void renderManageableTeams_whenMultipleTeamsCanBeManaged() throws Exception {
-    when(teamManagementService.getAllTeamsOfTypeUserCanManage(regulatorTeamAdmin, null))
+  public void renderManageableTeams_whenMultipleTeamsCanBeViewed() throws Exception {
+    when(teamManagementService.getAllTeamsOfTypeUserCanView(regulatorTeamAdmin, null))
         .thenReturn(List.of(regulatorTeam, organisationTeam));
 
     mockMvc.perform(get("/team-management")
@@ -109,8 +118,8 @@ public class PortalTeamManagementControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  public void renderManageableTeams_whenSingleTeamCanBeManaged() throws Exception {
-    when(teamManagementService.getAllTeamsOfTypeUserCanManage(regulatorTeamAdmin, null))
+  public void renderManageableTeams_whenSingleTeamCanBeViewed() throws Exception {
+    when(teamManagementService.getAllTeamsOfTypeUserCanView(regulatorTeamAdmin, null))
         .thenReturn(List.of(regulatorTeam));
 
     mockMvc.perform(get("/team-management")
@@ -119,8 +128,8 @@ public class PortalTeamManagementControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  public void renderManageableTeams_whenZeroTeamsCanBeManaged() throws Exception {
-    when(teamManagementService.getAllTeamsUserCanManage(regulatorTeamAdmin))
+  public void renderManageableTeams_whenZeroTeamsCanBeViewed() throws Exception {
+    when(teamManagementService.getAllTeamsUserCanView(regulatorTeamAdmin))
         .thenReturn(List.of());
 
     mockMvc.perform(get("/team-management")
@@ -129,7 +138,7 @@ public class PortalTeamManagementControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  public void renderTeamMembers_whenTeamFound_andUserCanManageTeam() throws Exception {
+  public void renderTeamMembers_whenTeamFound_andUserCanViewTeam() throws Exception {
     when(teamManagementService.getTeamMemberViewsForTeam(regulatorTeam))
         .thenReturn(List.of(regTeamAdminTeamUserView));
 
@@ -141,7 +150,7 @@ public class PortalTeamManagementControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  public void renderTeamMembers_whenTeamFound_andUserCannotManageTeam() throws Exception {
+  public void renderTeamMembers_whenTeamFound_andUserCannotViewTeam() throws Exception {
     mockMvc.perform(get("/team-management/teams/{resId}/member", regulatorTeam.getId())
         .with(authenticatedUserAndSession(organisationTeamAdmin)))
         .andExpect(status().isForbidden());

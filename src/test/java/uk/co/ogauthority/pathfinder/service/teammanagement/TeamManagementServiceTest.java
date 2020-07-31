@@ -10,6 +10,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -28,6 +30,7 @@ import uk.co.ogauthority.pathfinder.energyportal.repository.PersonRepository;
 import uk.co.ogauthority.pathfinder.energyportal.repository.WebUserAccountRepository;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.form.teammanagement.UserRolesForm;
+import uk.co.ogauthority.pathfinder.model.team.RegulatorRole;
 import uk.co.ogauthority.pathfinder.model.team.TeamType;
 import uk.co.ogauthority.pathfinder.model.teammanagement.TeamMemberView;
 import uk.co.ogauthority.pathfinder.model.teammanagement.TeamRoleView;
@@ -39,6 +42,7 @@ import uk.co.ogauthority.pathfinder.model.team.TeamMember;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
+import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TeamManagementServiceTest {
@@ -64,7 +68,8 @@ public class TeamManagementServiceTest {
   private AuthenticatedUserAccount organisationUser;
   private AuthenticatedUserAccount manageAnyOrgRegulatorUser;
   private AuthenticatedUserAccount manageRegTeamRegulatorUser;
-  private AuthenticatedUserAccount workareaOnlyUser;
+  private AuthenticatedUserAccount workAreaOnlyUser;
+  private AuthenticatedUserAccount teamViewerOnlyUser;
   private AuthenticatedUserAccount manageAllTeamsUser;
   private final WebUserAccount someWebUserAccount = new WebUserAccount(99);
   private UserRolesForm userRolesForm;
@@ -110,9 +115,9 @@ public class TeamManagementServiceTest {
     when(teamService.getAllUserPrivilegesForPerson(manageAllTeamsPerson))
         .thenReturn(List.of(UserPrivilege.PATHFINDER_REGULATOR_ADMIN, UserPrivilege.PATHFINDER_REG_ORG_MANAGER));
 
-    var workareaOnlyPerson = new Person(7, "workarea", "only", "workarea@only.com", "0");
-    workareaOnlyUser = new AuthenticatedUserAccount(new WebUserAccount(7, workareaOnlyPerson), List.of());
-    when(teamService.getAllUserPrivilegesForPerson(workareaOnlyPerson))
+    var workAreaOnlyPerson = new Person(7, "workarea", "only", "workarea@only.com", "0");
+    workAreaOnlyUser = new AuthenticatedUserAccount(new WebUserAccount(7, workAreaOnlyPerson), List.of());
+    when(teamService.getAllUserPrivilegesForPerson(workAreaOnlyPerson))
         .thenReturn(List.of(UserPrivilege.PATHFINDER_WORK_AREA));
 
     var portalOrganisationGroup1 = TeamTestingUtil.generateOrganisationGroup(111, "GROUP1", "GRP1");
@@ -121,6 +126,7 @@ public class TeamManagementServiceTest {
     var portalOrganisationGroup2 = TeamTestingUtil.generateOrganisationGroup(333, "GROUP2", "GRP2");
     organisationTeam2 = new OrganisationTeam(444, "team2", "team2", portalOrganisationGroup2);
 
+    teamViewerOnlyUser = UserTestingUtil.getAuthenticatedUserAccount(Set.of(UserPrivilege.PATHFINDER_TEAM_VIEWER));
 
     when(teamService.getRegulatorTeam()).thenReturn(regulatorTeam);
 
@@ -164,20 +170,23 @@ public class TeamManagementServiceTest {
 
   @Test
   public void getTeamMemberViewForTeamAndPerson_whenATeamMember_basicPersonPropertiesMappedAsExpected() {
-    var teamMemberView = teamManagementService.getTeamMemberViewForTeamAndPerson(regulatorTeam,
-        regulatorTeamAdminPerson).get();
-    assertTeamUserViewHasExpectedSimpleProperties(regulatorTeam, regulatorTeamAdminPerson, teamMemberView);
+    var teamMemberViewOptional = teamManagementService.getTeamMemberViewForTeamAndPerson(regulatorTeam,
+        regulatorTeamAdminPerson);
+
+    assertThat(teamMemberViewOptional).isPresent();
+    assertTeamUserViewHasExpectedSimpleProperties(regulatorTeam, regulatorTeamAdminPerson, teamMemberViewOptional.get());
 
   }
 
   @Test
   public void getTeamMemberViewForTeamAndPerson_whenATeamMember_memberRolesMappedAsExpected() {
 
-    var teamMemberView = teamManagementService.getTeamMemberViewForTeamAndPerson(regulatorTeam,
-        regulatorTeamAdminPerson).get();
+    var teamMemberViewOptional = teamManagementService.getTeamMemberViewForTeamAndPerson(regulatorTeam,
+        regulatorTeamAdminPerson);
 
     Role expectedRole = TeamTestingUtil.getTeamAdminRole();
-    assertTeamUserViewHasSingleRoleMappedAsExpected(expectedRole, teamMemberView);
+    assertThat(teamMemberViewOptional).isPresent();
+    assertTeamUserViewHasSingleRoleMappedAsExpected(expectedRole, teamMemberViewOptional.get());
   }
 
   @Test
@@ -245,7 +254,7 @@ public class TeamManagementServiceTest {
 
   @Test
   public void getAllTeamsUserCanManage_userCannotManageAnyTeams() {
-    assertThat(teamManagementService.getAllTeamsUserCanManage(workareaOnlyUser)).isEmpty();
+    assertThat(teamManagementService.getAllTeamsUserCanManage(workAreaOnlyUser)).isEmpty();
   }
 
   @Test
@@ -458,6 +467,325 @@ public class TeamManagementServiceTest {
   public void getAllTeamsOfTypeUserCanManage_userCanManageAllTeams_noRestriction() {
     List<Team> manageableTeams = teamManagementService.getAllTeamsOfTypeUserCanManage(manageAllTeamsUser, null);
     assertThat(manageableTeams).containsExactly(regulatorTeam, organisationTeam1, organisationTeam2);
+  }
+
+  @Test
+  public void canViewTeam_whenTeamAdministratorOfOrganisationTeam_canViewOrganisationTeam() {
+
+    var teamMember = new TeamMember(
+        organisationTeam1,
+        teamViewerOnlyUser.getLinkedPerson(),
+        Set.of(TeamTestingUtil.getTeamAdminRole())
+    );
+
+    when(teamService.getAllUserPrivilegesForPerson(teamViewerOnlyUser.getLinkedPerson()))
+        .thenReturn(List.of(UserPrivilege.PATHFINDER_TEAM_VIEWER, UserPrivilege.PATHFINDER_ORG_ADMIN));
+    when(teamService.getMembershipOfPersonInTeam(organisationTeam1, teamViewerOnlyUser.getLinkedPerson()))
+        .thenReturn(Optional.of(teamMember));
+
+    assertThat(teamManagementService.canViewTeam(organisationTeam1, teamViewerOnlyUser)).isTrue();
+  }
+
+  @Test
+  public void canViewTeam_whenMemberOfOrganisationTeamButNotTeamAdministrator_canViewOrganisationTeam() {
+
+    var notTeamAdministratorRole = TeamTestingUtil.generateRole("SOME_ROLE", 999);
+
+    var teamMember = new TeamMember(
+        organisationTeam1,
+        teamViewerOnlyUser.getLinkedPerson(),
+        Set.of(notTeamAdministratorRole)
+    );
+
+    when(teamService.getAllUserPrivilegesForPerson(teamViewerOnlyUser.getLinkedPerson()))
+        .thenReturn(List.of(UserPrivilege.PATHFINDER_TEAM_VIEWER));
+    when(teamService.getMembershipOfPersonInTeam(organisationTeam1, teamViewerOnlyUser.getLinkedPerson()))
+        .thenReturn(Optional.of(teamMember));
+
+    assertThat(teamManagementService.canViewTeam(organisationTeam1, teamViewerOnlyUser)).isTrue();
+  }
+
+  @Test
+  public void canViewTeam_whenTeamAdministratorOfRegulatorTeam_canViewRegulatorTeam() {
+
+    var teamMember = new TeamMember(
+        regulatorTeam,
+        teamViewerOnlyUser.getLinkedPerson(),
+        Set.of(TeamTestingUtil.getTeamAdminRole())
+    );
+
+    when(teamService.getAllUserPrivilegesForPerson(teamViewerOnlyUser.getLinkedPerson()))
+        .thenReturn(List.of(UserPrivilege.PATHFINDER_TEAM_VIEWER, UserPrivilege.PATHFINDER_REGULATOR_ADMIN));
+    when(teamService.getMembershipOfPersonInTeam(regulatorTeam, teamViewerOnlyUser.getLinkedPerson()))
+        .thenReturn(Optional.of(teamMember));
+
+    assertThat(teamManagementService.canViewTeam(regulatorTeam, teamViewerOnlyUser)).isTrue();
+  }
+
+  @Test
+  public void canViewTeam_whenMemberOfRegulatorTeamButNotTeamAdministrator_canViewRegulatorTeam() {
+
+    var notTeamAdministratorRole = TeamTestingUtil.generateRole("SOME_ROLE", 999);
+
+    var teamMember = new TeamMember(
+        regulatorTeam,
+        teamViewerOnlyUser.getLinkedPerson(),
+        Set.of(notTeamAdministratorRole)
+    );
+
+    when(teamService.getAllUserPrivilegesForPerson(teamViewerOnlyUser.getLinkedPerson()))
+        .thenReturn(List.of(UserPrivilege.PATHFINDER_TEAM_VIEWER));
+    when(teamService.getMembershipOfPersonInTeam(regulatorTeam, teamViewerOnlyUser.getLinkedPerson()))
+        .thenReturn(Optional.of(teamMember));
+
+    assertThat(teamManagementService.canViewTeam(regulatorTeam, teamViewerOnlyUser)).isTrue();
+  }
+
+  @Test
+  public void canViewTeam_whenOrganisationManagerOfRegulatorTeamButNotTeamAdministrator_canViewOrganisationTeams() {
+
+    when(teamService.getAllUserPrivilegesForPerson(teamViewerOnlyUser.getLinkedPerson()))
+        .thenReturn(List.of(UserPrivilege.PATHFINDER_TEAM_VIEWER, UserPrivilege.PATHFINDER_REG_ORG_MANAGER));
+
+    assertThat(teamManagementService.canViewTeam(organisationTeam1, teamViewerOnlyUser)).isTrue();
+  }
+
+  @Test
+  public void canViewTeam_whenNotInRegulatorTeam_cannotViewRegulatorTeam() {
+
+    when(teamService.getAllUserPrivilegesForPerson(workAreaOnlyUser.getLinkedPerson()))
+        .thenReturn(List.of(UserPrivilege.PATHFINDER_WORK_AREA));
+    when(teamService.getMembershipOfPersonInTeam(regulatorTeam, workAreaOnlyUser.getLinkedPerson()))
+        .thenReturn(Optional.empty());
+
+    assertThat(teamManagementService.canViewTeam(regulatorTeam, workAreaOnlyUser)).isFalse();
+  }
+
+  @Test
+  public void canViewTeam_whenNotInOrganisationTeam_cannotViewOrganisationTeam() {
+
+    when(teamService.getAllUserPrivilegesForPerson(workAreaOnlyUser.getLinkedPerson()))
+        .thenReturn(List.of(UserPrivilege.PATHFINDER_WORK_AREA));
+    when(teamService.getMembershipOfPersonInTeam(organisationTeam1, workAreaOnlyUser.getLinkedPerson()))
+        .thenReturn(Optional.empty());
+
+    assertThat(teamManagementService.canViewTeam(organisationTeam1, workAreaOnlyUser)).isFalse();
+  }
+
+  @Test
+  public void getAllTeamsUserCanView_whenMemberOfRegulatorTeam_canViewRegulatorTeam() {
+
+    when(teamService.getRegulatorTeamIfPersonInRole(
+        manageRegTeamRegulatorUser.getLinkedPerson(),
+        EnumSet.allOf(RegulatorRole.class)
+    )).thenReturn(Optional.of(regulatorTeam));
+
+    var viewableTeams = teamManagementService.getAllTeamsUserCanView(manageRegTeamRegulatorUser);
+
+    assertThat(viewableTeams).containsExactly(regulatorTeam);
+  }
+
+  @Test
+  public void getAllTeamsUserCanView_whenRegOrgManagerOfRegulatorTeam_canViewAllTeams() {
+
+    var regulatorOrganisationManager = UserTestingUtil.getAuthenticatedUserAccount(Set.of(
+        UserPrivilege.PATHFINDER_REG_ORG_MANAGER
+    ));
+
+    when(teamService.getRegulatorTeamIfPersonInRole(
+        regulatorOrganisationManager.getLinkedPerson(),
+        EnumSet.allOf(RegulatorRole.class)
+    )).thenReturn(Optional.of(regulatorTeam));
+    when(teamService.getAllOrganisationTeams()).thenReturn(List.of(organisationTeam1, organisationTeam2));
+
+    var viewableTeams = teamManagementService.getAllTeamsUserCanView(regulatorOrganisationManager);
+
+    assertThat(viewableTeams).containsExactly(regulatorTeam, organisationTeam1, organisationTeam2);
+  }
+
+  @Test
+  public void getAllTeamsUserCanView_whenMemberOfOrganisationTeam_canViewOrganisationTeam() {
+
+    when(teamService.getRegulatorTeamIfPersonInRole(
+        organisationUser.getLinkedPerson(),
+        EnumSet.allOf(RegulatorRole.class)
+    )).thenReturn(Optional.empty());
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(organisationUser.getLinkedPerson()))
+        .thenReturn(List.of(organisationTeam1));
+
+    var viewableTeams = teamManagementService.getAllTeamsUserCanView(organisationUser);
+
+    assertThat(viewableTeams).containsExactly(organisationTeam1);
+  }
+
+  @Test
+  public void getAllTeamsUserCanView_whenNotAMemberOfAnyTeam_cannotViewAnyTeam() {
+
+    when(teamService.getRegulatorTeamIfPersonInRole(
+        organisationUser.getLinkedPerson(),
+        EnumSet.allOf(RegulatorRole.class)
+    )).thenReturn(Optional.empty());
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(organisationUser.getLinkedPerson()))
+        .thenReturn(Collections.emptyList());
+
+    var viewableTeams = teamManagementService.getAllTeamsUserCanView(organisationUser);
+
+    assertThat(viewableTeams).isEmpty();
+  }
+
+  @Test
+  public void getAllTeamsOfTypeUserCanView_whenRegulatorTeamMemberAndRegulatorType_thenRegulatorTeam() {
+    when(teamService.getRegulatorTeamIfPersonInRole(
+        manageRegTeamRegulatorUser.getLinkedPerson(),
+        EnumSet.allOf(RegulatorRole.class)
+    )).thenReturn(Optional.of(regulatorTeam));
+
+    var viewableTeams = teamManagementService.getAllTeamsOfTypeUserCanView(manageRegTeamRegulatorUser, TeamType.REGULATOR);
+
+    assertThat(viewableTeams).containsExactly(regulatorTeam);
+
+  }
+
+  @Test
+  public void getAllTeamsOfTypeUserCanView_whenRegulatorTeamMemberAndOrganisationType_thenNoTeam() {
+    when(teamService.getRegulatorTeamIfPersonInRole(
+        manageRegTeamRegulatorUser.getLinkedPerson(),
+        EnumSet.allOf(RegulatorRole.class)
+    )).thenReturn(Optional.of(regulatorTeam));
+
+    var viewableTeams = teamManagementService.getAllTeamsOfTypeUserCanView(manageRegTeamRegulatorUser, TeamType.ORGANISATION);
+
+    assertThat(viewableTeams).isEmpty();
+
+  }
+
+  @Test
+  public void getAllTeamsOfTypeUserCanView_whenRegulatorTeamMemberAndNullType_thenRegulatorTeam() {
+    when(teamService.getRegulatorTeamIfPersonInRole(
+        manageRegTeamRegulatorUser.getLinkedPerson(),
+        EnumSet.allOf(RegulatorRole.class)
+    )).thenReturn(Optional.of(regulatorTeam));
+
+    var viewableTeams = teamManagementService.getAllTeamsOfTypeUserCanView(manageRegTeamRegulatorUser, null);
+
+    assertThat(viewableTeams).containsExactly(regulatorTeam);
+
+  }
+
+  @Test
+  public void getAllTeamsOfTypeUserCanView_whenRegOrgManagerAndOrganisationType_thenAllOrgTeams() {
+
+    var regulatorOrganisationManager = UserTestingUtil.getAuthenticatedUserAccount(Set.of(
+        UserPrivilege.PATHFINDER_REG_ORG_MANAGER
+    ));
+
+    when(teamService.getRegulatorTeamIfPersonInRole(
+        regulatorOrganisationManager.getLinkedPerson(),
+        EnumSet.allOf(RegulatorRole.class)
+    )).thenReturn(Optional.of(regulatorTeam));
+    when(teamService.getAllOrganisationTeams()).thenReturn(List.of(organisationTeam1, organisationTeam2));
+
+    var viewableTeams = teamManagementService.getAllTeamsOfTypeUserCanView(regulatorOrganisationManager, TeamType.ORGANISATION);
+
+    assertThat(viewableTeams).containsExactly(organisationTeam1, organisationTeam2);
+
+  }
+
+  @Test
+  public void getAllTeamsOfTypeUserCanView_whenRegOrgManagerAndRegulatorType_thenRegulatorTeam() {
+
+    var regulatorOrganisationManager = UserTestingUtil.getAuthenticatedUserAccount(Set.of(
+        UserPrivilege.PATHFINDER_REG_ORG_MANAGER
+    ));
+
+    when(teamService.getRegulatorTeamIfPersonInRole(
+        regulatorOrganisationManager.getLinkedPerson(),
+        EnumSet.allOf(RegulatorRole.class)
+    )).thenReturn(Optional.of(regulatorTeam));
+
+    var viewableTeams = teamManagementService.getAllTeamsOfTypeUserCanView(regulatorOrganisationManager, TeamType.REGULATOR);
+
+    assertThat(viewableTeams).containsExactly(regulatorTeam);
+
+  }
+
+  @Test
+  public void getAllTeamsOfTypeUserCanView_whenRegOrgManagerAndNullType_thenAllTeams() {
+
+    var regulatorOrganisationManager = UserTestingUtil.getAuthenticatedUserAccount(Set.of(
+        UserPrivilege.PATHFINDER_REG_ORG_MANAGER
+    ));
+
+    when(teamService.getRegulatorTeamIfPersonInRole(
+        regulatorOrganisationManager.getLinkedPerson(),
+        EnumSet.allOf(RegulatorRole.class)
+    )).thenReturn(Optional.of(regulatorTeam));
+    when(teamService.getAllOrganisationTeams()).thenReturn(List.of(organisationTeam1, organisationTeam2));
+
+    var viewableTeams = teamManagementService.getAllTeamsOfTypeUserCanView(regulatorOrganisationManager, null);
+
+    assertThat(viewableTeams).containsExactly(regulatorTeam, organisationTeam1, organisationTeam2);
+
+  }
+
+  @Test
+  public void getAllTeamsOfTypeUserCanView_whenOrganisationTeamMemberAndRegulatorType_thenNoTeam() {
+
+    var organisationUser = UserTestingUtil.getAuthenticatedUserAccount(Set.of(
+        UserPrivilege.PATHFINDER_ORG_ADMIN
+    ));
+
+    when(teamService.getRegulatorTeamIfPersonInRole(
+        organisationUser.getLinkedPerson(),
+        EnumSet.allOf(RegulatorRole.class)
+    )).thenReturn(Optional.empty());
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(organisationUser.getLinkedPerson()))
+        .thenReturn(List.of(organisationTeam1));
+
+    var viewableTeams = teamManagementService.getAllTeamsOfTypeUserCanView(organisationUser, TeamType.REGULATOR);
+
+    assertThat(viewableTeams).isEmpty();
+
+  }
+
+  @Test
+  public void getAllTeamsOfTypeUserCanView_whenOrganisationTeamMemberAndOrganisationType_thenOrganisationTeam() {
+
+    var organisationUser = UserTestingUtil.getAuthenticatedUserAccount(Set.of(
+        UserPrivilege.PATHFINDER_ORG_ADMIN
+    ));
+
+    when(teamService.getRegulatorTeamIfPersonInRole(
+        organisationUser.getLinkedPerson(),
+        EnumSet.allOf(RegulatorRole.class)
+    )).thenReturn(Optional.empty());
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(organisationUser.getLinkedPerson()))
+        .thenReturn(List.of(organisationTeam1));
+
+    var viewableTeams = teamManagementService.getAllTeamsOfTypeUserCanView(organisationUser, TeamType.ORGANISATION);
+
+    assertThat(viewableTeams).containsExactly(organisationTeam1);
+
+  }
+
+  @Test
+  public void getAllTeamsOfTypeUserCanView_whenOrganisationTeamMemberAndNullType_thenOrganisationTeam() {
+
+    var organisationUser = UserTestingUtil.getAuthenticatedUserAccount(Set.of(
+        UserPrivilege.PATHFINDER_ORG_ADMIN
+    ));
+
+    when(teamService.getRegulatorTeamIfPersonInRole(
+        organisationUser.getLinkedPerson(),
+        EnumSet.allOf(RegulatorRole.class)
+    )).thenReturn(Optional.empty());
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(organisationUser.getLinkedPerson()))
+        .thenReturn(List.of(organisationTeam1));
+
+    var viewableTeams = teamManagementService.getAllTeamsOfTypeUserCanView(organisationUser, null);
+
+    assertThat(viewableTeams).containsExactly(organisationTeam1);
+
   }
 
 }

@@ -43,6 +43,11 @@ public class TeamRoleView implements Checkable {
     return this.description;
   }
 
+  @Override
+  public Integer getDisplayOrder() {
+    return getDisplaySequence();
+  }
+
   public static TeamRoleView createTeamRoleViewFrom(Role role) {
     return new TeamRoleView(
         role.getName(),

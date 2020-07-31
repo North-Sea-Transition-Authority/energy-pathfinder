@@ -18,7 +18,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
-import uk.co.ogauthority.pathfinder.model.enums.team.ManageableTeamType;
+import uk.co.ogauthority.pathfinder.model.enums.team.ViewableTeamType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.team.ManageTeamService;
 
@@ -30,15 +30,15 @@ public class ManageTeamControllerTest extends AbstractControllerTest {
   private ManageTeamService manageTeamService;
 
   private final AuthenticatedUserAccount user = new AuthenticatedUserAccount(
-      new WebUserAccount(1), List.of(UserPrivilege.PATHFINDER_REGULATOR_ADMIN)
+      new WebUserAccount(1), List.of(UserPrivilege.PATHFINDER_TEAM_VIEWER)
   );
 
   @Test
   public void renderTeamTypes_allTeamTypesAvailable() throws Exception {
 
-    when(manageTeamService.getManageTeamTypesAndUrlsForUser(user)).thenReturn(Map.of(
-        ManageableTeamType.REGULATOR_TEAM, "regUrl",
-        ManageableTeamType.ORGANISATION_TEAMS, "orgUrl"
+    when(manageTeamService.getViewableTeamTypesAndUrlsForUser(user)).thenReturn(Map.of(
+        ViewableTeamType.REGULATOR_TEAM, "regUrl",
+        ViewableTeamType.ORGANISATION_TEAMS, "orgUrl"
     ));
 
     mockMvc.perform(get(ReverseRouter.route(on(ManageTeamController.class).renderTeamTypes(null)))
@@ -50,8 +50,8 @@ public class ManageTeamControllerTest extends AbstractControllerTest {
   @Test
   public void renderTeamTypes_oneTeamTypeAvailable() throws Exception {
 
-    when(manageTeamService.getManageTeamTypesAndUrlsForUser(user)).thenReturn(Map.of(
-        ManageableTeamType.REGULATOR_TEAM, "regUrl"
+    when(manageTeamService.getViewableTeamTypesAndUrlsForUser(user)).thenReturn(Map.of(
+        ViewableTeamType.REGULATOR_TEAM, "regUrl"
     ));
 
     mockMvc.perform(get(ReverseRouter.route(on(ManageTeamController.class).renderTeamTypes(null)))
@@ -64,7 +64,7 @@ public class ManageTeamControllerTest extends AbstractControllerTest {
   @Test
   public void renderTeamTypes_noTeamTypesAvailable() throws Exception {
 
-    when(manageTeamService.getManageTeamTypesAndUrlsForUser(user)).thenReturn(Map.of());
+    when(manageTeamService.getViewableTeamTypesAndUrlsForUser(user)).thenReturn(Map.of());
 
     mockMvc.perform(get(ReverseRouter.route(on(ManageTeamController.class).renderTeamTypes(null)))
         .with(authenticatedUserAndSession(user)))

@@ -1,5 +1,7 @@
 package uk.co.ogauthority.pathfinder.util;
 
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,6 +18,7 @@ public class ControllerUtils {
 
   public static Map<String, String> asCheckboxMap(List<? extends Checkable> items) {
     return items.stream()
-        .collect(Collectors.toMap(Checkable::getIdentifier, Checkable::getDisplayName));
+        .sorted(Comparator.comparing(Checkable::getDisplayOrder))
+        .collect(Collectors.toMap(Checkable::getIdentifier, Checkable::getDisplayName, (x,y) -> y, LinkedHashMap::new));
   }
 }

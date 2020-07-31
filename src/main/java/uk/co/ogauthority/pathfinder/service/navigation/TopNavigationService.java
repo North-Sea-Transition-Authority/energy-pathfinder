@@ -12,18 +12,23 @@ import uk.co.ogauthority.pathfinder.controller.team.ManageTeamController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.navigation.TopNavigationItem;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 
 @Service
 public class TopNavigationService {
 
   public static final String WORK_AREA_TITLE = "Work area";
   public static final String MANAGE_TEAM_TITLE = "Manage teams";
+  public static final String ORGANISATION_USERS_TITLE = "Organisation users";
 
   private final SystemAccessService systemAccessService;
+  private final TeamService teamService;
 
   @Autowired
-  public TopNavigationService(SystemAccessService systemAreaAccessService) {
+  public TopNavigationService(SystemAccessService systemAreaAccessService,
+                              TeamService teamService) {
     this.systemAccessService = systemAreaAccessService;
+    this.teamService = teamService;
   }
 
   public List<TopNavigationItem> getTopNavigationItems(AuthenticatedUserAccount user) {
@@ -35,13 +40,17 @@ public class TopNavigationService {
       );
     }
 
-    if (systemAccessService.canAccessTeamAdministration(user)) {
-      navigationItems.add(
-          new TopNavigationItem(MANAGE_TEAM_TITLE, ReverseRouter.route(on(ManageTeamController.class).renderTeamTypes(null)))
-      );
+    if (systemAccessService.canViewTeam(user)) {
+      navigationItems.add(getTeamManagementTopNavigationItem(user));
     }
 
     return navigationItems;
+  }
+
+  private TopNavigationItem getTeamManagementTopNavigationItem(AuthenticatedUserAccount user) {
+    var isMemberOfRegulatorTeam = teamService.isPersonMemberOfRegulatorTeam(user.getLinkedPerson());
+    var title = (isMemberOfRegulatorTeam ? MANAGE_TEAM_TITLE : ORGANISATION_USERS_TITLE);
+    return new TopNavigationItem(title, ReverseRouter.route(on(ManageTeamController.class).renderTeamTypes(null)));
   }
 
 }

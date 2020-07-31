@@ -9,7 +9,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 /**
  * Enumeration of categories available inside 'Manage teams' screen.
  */
-public enum ManageableTeamType {
+public enum ViewableTeamType {
 
   REGULATOR_TEAM(
       "OGA team",
@@ -30,7 +30,7 @@ public enum ManageableTeamType {
   private final String linkUrl;
   private final int displayOrder;
 
-  ManageableTeamType(String linkText, String linkHint, String linkUrl, int displayOrder) {
+  ViewableTeamType(String linkText, String linkHint, String linkUrl, int displayOrder) {
     this.linkText = linkText;
     this.linkHint = linkHint;
     this.linkUrl = linkUrl;

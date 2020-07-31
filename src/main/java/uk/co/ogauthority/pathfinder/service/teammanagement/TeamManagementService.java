@@ -27,6 +27,7 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.form.teammanagement.UserRolesForm;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationRole;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
+import uk.co.ogauthority.pathfinder.model.team.RegulatorRole;
 import uk.co.ogauthority.pathfinder.model.team.Role;
 import uk.co.ogauthority.pathfinder.model.team.Team;
 import uk.co.ogauthority.pathfinder.model.team.TeamMember;
@@ -155,6 +156,44 @@ public class TeamManagementService {
         .collect(Collectors.toList());
   }
 
+  /**
+   * Retrieve a list of teams that user has access to view.
+   * @param user The authenticated user to retrieve the teams for
+   * @return A list of teams that user has access to view
+   */
+  public List<Team> getAllTeamsUserCanView(AuthenticatedUserAccount user) {
+
+    List<Team> teams = new ArrayList<>();
+    List<? extends Team> organisationTeams;
+
+    teamService.getRegulatorTeamIfPersonInRole(
+        user.getLinkedPerson(),
+        EnumSet.allOf(RegulatorRole.class)
+    ).ifPresent(teams::add);
+
+    if (user.getUserPrivileges().contains(UserPrivilege.PATHFINDER_REG_ORG_MANAGER)) {
+      organisationTeams = teamService.getAllOrganisationTeams();
+    } else {
+      organisationTeams = teamService.getOrganisationTeamsPersonIsMemberOf(user.getLinkedPerson());
+    }
+
+    teams.addAll(organisationTeams);
+
+    return teams;
+  }
+
+  /**
+   * Retrieve a list of teams of teamType that user has access to view.
+   * @param user the authenticated user
+   * @param teamType The type of teams to retrieve
+   * @return A list of teams that the user can view
+   */
+  public List<Team> getAllTeamsOfTypeUserCanView(AuthenticatedUserAccount user, TeamType teamType) {
+    return getAllTeamsUserCanView(user)
+        .stream()
+        .filter(team -> team.getType().equals(teamType) || teamType == null)
+        .collect(Collectors.toList());
+  }
 
   /**
    * Populate the existing roles a person has for a given team.
@@ -281,17 +320,30 @@ public class TeamManagementService {
    * Checks if the given User has privileges to manage the given team.
    */
   public boolean canManageTeam(Team team, AuthenticatedUserAccount user) {
-    // This does a full reload of privs which is slow.
+    // This does a full reload of privileges which is slow.
     // Could use the ones cached against the AuthenticatedUserAccount if performance is an issue.
     List<UserPrivilege> userPrivileges = teamService.getAllUserPrivilegesForPerson(user.getLinkedPerson());
 
     if (canManageAnyOrgTeam(userPrivileges) && team.getType().equals(TeamType.ORGANISATION)) {
-      // If the logged in user is a regulator with the organisation manage priv then they can manage any organisation team
+      // If the logged in user is a regulator with the organisation manage privileges then they can manage any organisation team
       return true;
     } else {
       return teamService.getMembershipOfPersonInTeam(team, user.getLinkedPerson())
           .map(TeamMember::isTeamAdministrator)
           .orElse(false);
+    }
+  }
+
+  /**
+   * Checks if the given User has privileges to view the given team.
+   */
+  public boolean canViewTeam(Team team, AuthenticatedUserAccount user) {
+    List<UserPrivilege> userPrivileges = teamService.getAllUserPrivilegesForPerson(user.getLinkedPerson());
+
+    if (canManageAnyOrgTeam(userPrivileges) && team.getType().equals(TeamType.ORGANISATION)) {
+      return true;
+    } else {
+      return teamService.getMembershipOfPersonInTeam(team, user.getLinkedPerson()).isPresent();
     }
   }
 

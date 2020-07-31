@@ -3,16 +3,17 @@ package uk.co.ogauthority.pathfinder.service.team;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.team.PortalTeamManagementController;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
-import uk.co.ogauthority.pathfinder.model.enums.team.ManageableTeamType;
+import uk.co.ogauthority.pathfinder.model.enums.team.ViewableTeamType;
 import uk.co.ogauthority.pathfinder.model.team.RegulatorRole;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
@@ -23,13 +24,23 @@ public class ManageTeamService {
 
   @Autowired
   public ManageTeamService(TeamService teamService) {
-
     this.teamService = teamService;
   }
 
-  public Map<ManageableTeamType, String> getManageTeamTypesAndUrlsForUser(WebUserAccount user) {
+  public Map<ViewableTeamType, String> getViewableTeamTypesAndUrlsForUser(WebUserAccount user) {
+    var isUserInRegulatorTeam = teamService.isPersonMemberOfRegulatorTeam(user.getLinkedPerson());
+    return
+        (isUserInRegulatorTeam ? getViewableTeamTypesAndUrlsForRegulatorUser(user) : getViewableTeamTypesAndUrlsForOrganisationUser(user));
+  }
 
-    var teamTypeUrls = new HashMap<ManageableTeamType, String>();
+  /**
+   * Get the viewable regulator team types for the given user.
+   * @param user The authenticated user
+   * @return The team types user has access to view
+   */
+  private Map<ViewableTeamType, String> getViewableTeamTypesAndUrlsForRegulatorUser(WebUserAccount user) {
+
+    EnumMap<ViewableTeamType, String> teamTypeUrls = new EnumMap<>(ViewableTeamType.class);
 
     Set<RegulatorRole> userRegRoles = teamService
         .getMembershipOfPersonInTeam(teamService.getRegulatorTeam(), user.getLinkedPerson())
@@ -38,17 +49,18 @@ public class ManageTeamService {
             .collect(Collectors.toSet()))
         .orElse(Set.of());
 
-    if (userRegRoles.contains(RegulatorRole.ORGANISATION_MANAGER)) {
-      teamTypeUrls.put(ManageableTeamType.ORGANISATION_TEAMS, ManageableTeamType.ORGANISATION_TEAMS.getLinkUrl());
-    }
+    if (!userRegRoles.isEmpty()) {
 
-    if (userRegRoles.contains(RegulatorRole.TEAM_ADMINISTRATOR)) {
-
-      teamTypeUrls.put(ManageableTeamType.REGULATOR_TEAM,
+      // If you are in the regulator team you can access it
+      teamTypeUrls.put(ViewableTeamType.REGULATOR_TEAM,
           ReverseRouter.route(on(PortalTeamManagementController.class)
               .renderTeamMembers(teamService.getRegulatorTeam().getId(), null)));
 
-      return sortedMap(teamTypeUrls);
+      // if you are the organisation access manager then get all organisation teams
+      if (userRegRoles.contains(RegulatorRole.ORGANISATION_MANAGER)) {
+        var organisationEntry = getOrganisationTeamEntry();
+        teamTypeUrls.put(organisationEntry.getKey(), organisationEntry.getValue());
+      }
 
     }
 
@@ -56,11 +68,40 @@ public class ManageTeamService {
 
   }
 
-  private Map<ManageableTeamType, String> sortedMap(Map<ManageableTeamType, String> map) {
+  /**
+   * Get the viewable organisation team type for the given user.
+   * @param user The authenticated user
+   * @return The organisation team type that the user has access to view
+   */
+  private Map<ViewableTeamType, String> getViewableTeamTypesAndUrlsForOrganisationUser(WebUserAccount user) {
+
+    EnumMap<ViewableTeamType, String> teamTypeUrls = new EnumMap<>(ViewableTeamType.class);
+
+    var organisationTeams = teamService.getOrganisationTeamsPersonIsMemberOf(
+        user.getLinkedPerson()
+    );
+
+    if (!organisationTeams.isEmpty()) {
+      var organisationEntry = getOrganisationTeamEntry();
+      teamTypeUrls.put(organisationEntry.getKey(), organisationEntry.getValue());
+    }
+
+    return sortedMap(teamTypeUrls);
+  }
+
+  public boolean isPersonMemberOfRegulatorTeam(AuthenticatedUserAccount user) {
+    return teamService.isPersonMemberOfRegulatorTeam(user.getLinkedPerson());
+  }
+
+  private Map<ViewableTeamType, String> sortedMap(Map<ViewableTeamType, String> map) {
     return map.entrySet().stream()
         .sorted(Comparator.comparing(entry -> entry.getKey().getDisplayOrder()))
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
             (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+  }
+
+  private Map.Entry<ViewableTeamType, String> getOrganisationTeamEntry() {
+    return Map.entry(ViewableTeamType.ORGANISATION_TEAMS, ViewableTeamType.ORGANISATION_TEAMS.getLinkUrl());
   }
 
 }

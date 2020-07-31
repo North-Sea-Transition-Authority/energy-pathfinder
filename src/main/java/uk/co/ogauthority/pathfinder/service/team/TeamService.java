@@ -187,4 +187,8 @@ public class TeamService {
     return List.copyOf(portalPrivileges);
   }
 
+  public boolean isPersonMemberOfRegulatorTeam(Person person) {
+    return isPersonMemberOfTeam(person, getRegulatorTeam());
+  }
+
 }

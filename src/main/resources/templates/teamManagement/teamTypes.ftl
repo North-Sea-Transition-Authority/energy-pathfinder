@@ -1,6 +1,6 @@
 <#include '../layout.ftl'>
 
-<@defaultPage htmlTitle="Manage teams" pageHeading="Manage teams" topNavigation=true twoThirdsColumn=false>
+<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle topNavigation=true twoThirdsColumn=false>
   <div class="category-list">
     <#list teamTypes as teamType, url>
       <div class="category-list__item">

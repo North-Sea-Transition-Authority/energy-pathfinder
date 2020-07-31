@@ -9,4 +9,6 @@ public interface Checkable {
 
   String getDisplayName();
 
+  Integer getDisplayOrder();
+
 }

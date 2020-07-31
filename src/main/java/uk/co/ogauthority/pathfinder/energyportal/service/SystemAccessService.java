@@ -16,10 +16,8 @@ public class SystemAccessService {
       UserPrivilege.PATHFINDER_PROJECT_CREATE
   );
 
-  public static final Set<UserPrivilege> TEAM_ADMINISTRATION_PRIVILEGES = Set.of(
-      UserPrivilege.PATHFINDER_REGULATOR_ADMIN,
-      UserPrivilege.PATHFINDER_REG_ORG_MANAGER,
-      UserPrivilege.PATHFINDER_ORG_ADMIN
+  public static final Set<UserPrivilege> VIEW_TEAM_PRIVILEGES = Set.of(
+      UserPrivilege.PATHFINDER_TEAM_VIEWER
   );
 
   /**
@@ -34,14 +32,14 @@ public class SystemAccessService {
   }
 
   /**
-   * For use in WebSecurityConfig. In other instances call canAccessTeamAdministration
+   * For use in WebSecurityConfig. In other instances call canViewTeam
    */
-  public String[] getTeamAdministrationGrantedAuthorities() {
-    return getGrantedAuthorities(TEAM_ADMINISTRATION_PRIVILEGES);
+  public String[] getViewTeamGrantedAuthorities() {
+    return getGrantedAuthorities(VIEW_TEAM_PRIVILEGES);
   }
 
-  public boolean canAccessTeamAdministration(AuthenticatedUserAccount user) {
-    return hasRelevantPrivilege(user, TEAM_ADMINISTRATION_PRIVILEGES);
+  public boolean canViewTeam(AuthenticatedUserAccount user) {
+    return hasRelevantPrivilege(user, VIEW_TEAM_PRIVILEGES);
   }
 
   public String[] getCreateProjectGrantedAuthorities() {
@@ -51,7 +49,6 @@ public class SystemAccessService {
   public boolean canCreateProject(AuthenticatedUserAccount user) {
     return hasRelevantPrivilege(user, CREATE_PROJECT_PRIVILEGES);
   }
-
 
   private String[] getGrantedAuthorities(Set<UserPrivilege> userPrivileges) {
     return userPrivileges.stream()

@@ -11,14 +11,12 @@ public class SystemAccessServiceTest {
   private final SystemAccessService systemAccessService = new SystemAccessService();
 
   @Test
-  public void canAccessTeamAdministration() {
+  public void canViewTeam() {
     AuthTestingUtil.testPrivilegeBasedAuthenticationFunction(
         Set.of(
-            UserPrivilege.PATHFINDER_REG_ORG_MANAGER,
-            UserPrivilege.PATHFINDER_REGULATOR_ADMIN,
-            UserPrivilege.PATHFINDER_ORG_ADMIN
+            UserPrivilege.PATHFINDER_TEAM_VIEWER
         ),
-        systemAccessService::canAccessTeamAdministration
+        systemAccessService::canViewTeam
     );
   }
 
@@ -27,6 +25,14 @@ public class SystemAccessServiceTest {
     AuthTestingUtil.testPrivilegeBasedAuthenticationFunction(
         Set.of(UserPrivilege.PATHFINDER_WORK_AREA),
         systemAccessService::canAccessWorkArea
+    );
+  }
+
+  @Test
+  public void canCreateProject() {
+    AuthTestingUtil.testPrivilegeBasedAuthenticationFunction(
+        Set.of(UserPrivilege.PATHFINDER_PROJECT_CREATE),
+        systemAccessService::canCreateProject
     );
   }
 
