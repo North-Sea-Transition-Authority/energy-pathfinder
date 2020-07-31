@@ -7,7 +7,7 @@
     Timing/Schedule for work e.g. dates for FID, FDP approval, COP, Decommissioning Programme approval etc."
   >
   <#if errorList?has_content>
-      <@fdsError.errorSummary errorItems=errorList errorTitle="Errors"/>
+      <@fdsError.errorSummary errorItems=errorList />
   </#if>
 
   <@fdsForm.htmlForm>
@@ -19,9 +19,9 @@
     >
       <#list fieldStages as fieldStage>
         <#assign fieldStageName = fieldStage.name()/>
-        <#assign displayName = fieldStage.getDisplayName()/>
-        <#assign description = fieldStage.getDescription()/>
-        <#assign displayOrder = fieldStage.getDisplayOrder()/>
+        <#assign displayName = fieldStage.displayName/>
+        <#assign description = fieldStage.description/>
+        <#assign displayOrder = fieldStage.displayOrder/>
         <@fdsRadio.radioItem path="form.fieldStage" itemMap={fieldStageName: displayName + " - " + description} isFirstItem=displayOrder=1 />
       </#list>
     </@fdsRadio.radioGroup>

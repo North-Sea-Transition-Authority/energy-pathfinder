@@ -1,6 +1,6 @@
 CREATE TABLE ${datasource.user}.project_information (
   id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  project_details_id NUMBER,
+  project_details_id NUMBER NOT NULL,
   field_stage VARCHAR2(4000),
   project_title VARCHAR2(4000),
   project_summary CLOB,
