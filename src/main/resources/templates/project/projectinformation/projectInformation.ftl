@@ -14,7 +14,6 @@
     <@fdsRadio.radioGroup
       labelText="What is the field stage?"
       path="form.fieldStage"
-      hiddenContent=true
       fieldsetHeadingClass="govuk-fieldset__legend--l"
       fieldsetHeadingSize="h2"
     >
@@ -22,7 +21,8 @@
         <#assign fieldStageName = fieldStage.name()/>
         <#assign displayName = fieldStage.getDisplayName()/>
         <#assign description = fieldStage.getDescription()/>
-        <@fdsRadio.radioItem path="form.fieldStage" itemMap={fieldStageName: displayName + " - " + description} />
+        <#assign displayOrder = fieldStage.getDisplayOrder()/>
+        <@fdsRadio.radioItem path="form.fieldStage" itemMap={fieldStageName: displayName + " - " + description} isFirstItem=displayOrder=1 />
       </#list>
     </@fdsRadio.radioGroup>
 

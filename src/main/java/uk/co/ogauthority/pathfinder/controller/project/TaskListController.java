@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.controller.project;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import javax.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,29 +13,37 @@ import uk.co.ogauthority.pathfinder.controller.project.projectinformation.Projec
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 
 @Controller
 @RequestMapping("/project/{projectId}/tasks")
 public class TaskListController {
 
   private final ProjectService projectService;
+  private final ProjectInformationService projectInformationService;
   private final BreadcrumbService breadcrumbService;
 
   @Autowired
   public TaskListController(ProjectService projectService,
+                            ProjectInformationService projectInformationService,
                             BreadcrumbService breadcrumbService) {
     this.projectService = projectService;
+    this.projectInformationService = projectInformationService;
     this.breadcrumbService = breadcrumbService;
   }
 
   @GetMapping
   public ModelAndView viewTaskList(@PathVariable("projectId") Integer projectId) {
-    var currentDetail = projectService.getLatestDetail(projectId);
+    var currentDetail = projectService.getLatestDetail(projectId)
+        .orElseThrow(() -> new EntityNotFoundException(String.format("Unable to find project with id: %d", projectId)));
+
     var modelAndView = new ModelAndView("project/taskList");
     modelAndView.addObject("projectInformationUrl",
         ReverseRouter.route(on(ProjectInformationController.class).getProjectInformation(null, projectId))
     );
+    modelAndView.addObject("projectInformationCompleted", projectInformationService.isComplete(currentDetail));
     breadcrumbService.fromWorkArea(modelAndView, "Task list");
+
     return modelAndView;
   }
 

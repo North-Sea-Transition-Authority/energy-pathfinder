@@ -4,6 +4,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetails;
@@ -66,6 +67,14 @@ public class ProjectInformationService {
     }
 
     return bindingResult;
+  }
+
+
+  public boolean isComplete(ProjectDetails details) {
+    var form = getForm(details);
+    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult = validate(form, bindingResult, ValidationType.FULL);
+    return !bindingResult.hasErrors();
   }
 
 
