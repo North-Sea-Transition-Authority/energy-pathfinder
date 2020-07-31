@@ -8,31 +8,36 @@ import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUs
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(StartProjectController.class)
 public class StartProjectControllerTest extends AbstractControllerTest {
 
-  private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.CREATE_PROJECT_PRIVILEGES);
+  @MockBean
+  private StartProjectService startProjectService;
 
-  private final AuthenticatedUserAccount unAuthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
+  private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.CREATE_PROJECT_PRIVILEGES);
+
+  private static final AuthenticatedUserAccount unAuthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   @Test
   public void authenticatedUser_hasAccessToStartProject() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(on(StartProjectController.class).startPage()))
+    mockMvc.perform(get(ReverseRouter.route(on(StartProjectController.class).startPage(authenticatedUser)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
 
   @Test
   public void unAuthenticatedUser_cannotAccessStartProject() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(on(StartProjectController.class).startPage()))
+    mockMvc.perform(get(ReverseRouter.route(on(StartProjectController.class).startPage(unAuthenticatedUser)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }

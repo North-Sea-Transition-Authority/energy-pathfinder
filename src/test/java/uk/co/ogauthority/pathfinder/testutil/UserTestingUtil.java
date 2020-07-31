@@ -21,6 +21,16 @@ public class UserTestingUtil {
     return new Person(id, forename, surname, emailAddress, telephoneNo);
   }
 
+  public static Person getPerson(AuthenticatedUserAccount authenticatedUserAccount) {
+    return new Person(
+            authenticatedUserAccount.getWuaId(),
+            authenticatedUserAccount.getForename(),
+            authenticatedUserAccount.getSurname(),
+            authenticatedUserAccount.getEmailAddress(),
+            "1"
+        );
+  }
+
   public static WebUserAccount getWebUserAccount() {
     return getWebUserAccount(1, getPerson());
   }
