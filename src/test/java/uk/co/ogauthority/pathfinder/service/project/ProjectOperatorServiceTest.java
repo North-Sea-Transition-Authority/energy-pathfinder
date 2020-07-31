@@ -13,7 +13,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetails;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationRole;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
@@ -47,7 +47,7 @@ public class ProjectOperatorServiceTest {
       "Org Grp"
   ));
 
-  private final ProjectDetails projectDetails = ProjectUtil.getProjectDetails();
+  private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
 
   @Before
   public void setUp() throws Exception {
@@ -68,8 +68,8 @@ public class ProjectOperatorServiceTest {
         person,
         Collections.singletonList(OrganisationRole.PROJECT_SUBMITTER)
     )).thenReturn(Collections.singletonList(organisationTeam));
-    var projectOperator = projectOperatorService.createProjectOperator(projectDetails, authenticatedUser);
+    var projectOperator = projectOperatorService.createProjectOperator(projectDetail, authenticatedUser);
     assertThat(projectOperator.getOrganisationGroup()).isEqualTo(organisationTeam.getPortalOrganisationGroup());
-    assertThat(projectOperator.getProjectDetail()).isEqualTo(projectDetails);
+    assertThat(projectOperator.getProjectDetail()).isEqualTo(projectDetail);
   }
 }

@@ -13,7 +13,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 
 @Entity
 @Table(name = "project_details")
-public class ProjectDetails {
+public class ProjectDetail {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,14 +33,14 @@ public class ProjectDetails {
   private Integer createdByWua;
 
 
-  public ProjectDetails() {
+  public ProjectDetail() {
   }
 
-  public ProjectDetails(Project project,
-                        ProjectStatus status,
-                        Integer createdByWua,
-                        Integer version,
-                        boolean isCurrentVersion) {
+  public ProjectDetail(Project project,
+                       ProjectStatus status,
+                       Integer createdByWua,
+                       Integer version,
+                       boolean isCurrentVersion) {
     this.project = project;
     this.status = status;
     this.createdByWua = createdByWua;

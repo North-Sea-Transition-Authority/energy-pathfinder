@@ -3,7 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetails;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 
 /**
@@ -24,7 +24,7 @@ public class ProjectService {
    * @param projectId the id of the Project associated with the detail
    * @return
    */
-  public Optional<ProjectDetails> getLatestDetail(Integer projectId) {
+  public Optional<ProjectDetail> getLatestDetail(Integer projectId) {
     return projectDetailsRepository.findByProjectIdAndIsCurrentVersionIsTrue(projectId);
   }
 

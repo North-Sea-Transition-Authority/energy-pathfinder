@@ -27,7 +27,7 @@ import org.springframework.validation.ObjectError;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetails;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -51,8 +51,8 @@ public class ProjectInformationControllerTest extends AbstractControllerTest {
 
   @MockBean
   private ProjectInformationService projectInformationService;
-  
-  private ProjectDetails details = ProjectUtil.getProjectDetails();
+
+  private ProjectDetail details = ProjectUtil.getProjectDetails();
 
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(

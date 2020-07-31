@@ -19,7 +19,7 @@ public class ProjectOperator {
 
   @ManyToOne
   @JoinColumn(name = "project_details_id")
-  private ProjectDetails projectDetail;
+  private ProjectDetail projectDetail;
 
 
   @ManyToOne
@@ -29,17 +29,17 @@ public class ProjectOperator {
   public ProjectOperator() {
   }
 
-  public ProjectOperator(ProjectDetails projectDetail,
+  public ProjectOperator(ProjectDetail projectDetail,
                          PortalOrganisationGroup organisationGroup) {
     this.projectDetail = projectDetail;
     this.organisationGroup = organisationGroup;
   }
 
-  public ProjectDetails getProjectDetail() {
+  public ProjectDetail getProjectDetail() {
     return projectDetail;
   }
 
-  public void setProjectDetail(ProjectDetails projectDetail) {
+  public void setProjectDetail(ProjectDetail projectDetail) {
     this.projectDetail = projectDetail;
   }
 

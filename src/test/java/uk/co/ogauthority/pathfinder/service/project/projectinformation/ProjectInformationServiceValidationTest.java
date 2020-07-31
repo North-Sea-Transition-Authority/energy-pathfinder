@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetails;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
@@ -31,7 +31,7 @@ public class ProjectInformationServiceValidationTest {
 
   private ProjectInformationService projectInformationService;
 
-  private final ProjectDetails details = ProjectUtil.getProjectDetails();
+  private final ProjectDetail details = ProjectUtil.getProjectDetails();
 
   private ProjectInformation projectInformation;
 

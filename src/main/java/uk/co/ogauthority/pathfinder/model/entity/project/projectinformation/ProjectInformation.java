@@ -11,7 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetails;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 
 @Entity
@@ -24,7 +24,7 @@ public class ProjectInformation {
 
   @ManyToOne
   @JoinColumn(name = "project_details_id")
-  private ProjectDetails projectDetail;
+  private ProjectDetail projectDetail;
 
   @Enumerated(EnumType.STRING)
   private FieldStage fieldStage;
@@ -38,7 +38,7 @@ public class ProjectInformation {
   public ProjectInformation() {
   }
 
-  public ProjectInformation(ProjectDetails projectDetail,
+  public ProjectInformation(ProjectDetail projectDetail,
                             FieldStage fieldStage,
                             String projectTitle,
                             String projectSummary) {
@@ -52,11 +52,11 @@ public class ProjectInformation {
     return id;
   }
 
-  public ProjectDetails getProjectDetail() {
+  public ProjectDetail getProjectDetail() {
     return projectDetail;
   }
 
-  public void setProjectDetail(ProjectDetails projectDetail) {
+  public void setProjectDetail(ProjectDetail projectDetail) {
     this.projectDetail = projectDetail;
   }
 

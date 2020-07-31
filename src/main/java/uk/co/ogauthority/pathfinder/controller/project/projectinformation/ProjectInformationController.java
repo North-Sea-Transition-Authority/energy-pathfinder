@@ -2,6 +2,9 @@ package uk.co.ogauthority.pathfinder.controller.project.projectinformation;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Comparator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +83,9 @@ public class ProjectInformationController {
 
   private ModelAndView getProjectInformationModelAndView(Integer projectId) {
     var modelAndView = new ModelAndView("project/projectinformation/projectInformation")
-        .addObject("fieldStages", FieldStage.values());
+        .addObject("fieldStages",
+            Stream.of(FieldStage.values()).sorted(Comparator.comparing(FieldStage::getDisplayOrder)).collect(
+                Collectors.toList()));
 
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;

@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetails;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
@@ -27,7 +27,7 @@ public class ProjectInformationService {
   }
 
   @Transactional
-  public ProjectInformation createOrUpdate(ProjectDetails projectDetail, ProjectInformationForm form) {
+  public ProjectInformation createOrUpdate(ProjectDetail projectDetail, ProjectInformationForm form) {
     var projectInformationOpt = projectInformationRepository.findByProjectDetail(projectDetail);
     var projectInformation = projectInformationOpt.orElse(new ProjectInformation());
 
@@ -38,12 +38,12 @@ public class ProjectInformationService {
     return projectInformationRepository.save(projectInformation);
   }
 
-  public Optional<ProjectInformation> getProjectInformation(ProjectDetails projectDetails) {
-    return projectInformationRepository.findByProjectDetail(projectDetails);
+  public Optional<ProjectInformation> getProjectInformation(ProjectDetail projectDetail) {
+    return projectInformationRepository.findByProjectDetail(projectDetail);
   }
 
-  public ProjectInformationForm getForm(ProjectDetails projectDetails) {
-    return projectInformationRepository.findByProjectDetail(projectDetails)
+  public ProjectInformationForm getForm(ProjectDetail projectDetail) {
+    return projectInformationRepository.findByProjectDetail(projectDetail)
         .map(this::getForm).orElse(new ProjectInformationForm());
   }
 
@@ -70,7 +70,7 @@ public class ProjectInformationService {
   }
 
 
-  public boolean isComplete(ProjectDetails details) {
+  public boolean isComplete(ProjectDetail details) {
     var form = getForm(details);
     BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult = validate(form, bindingResult, ValidationType.FULL);

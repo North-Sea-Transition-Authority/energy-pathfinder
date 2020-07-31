@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetails;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectRepository;
@@ -37,9 +37,9 @@ public class StartProjectService {
    * Create a draft project and projectOperator for the provided user.
    */
   @Transactional
-  public ProjectDetails startProject(AuthenticatedUserAccount user) {
+  public ProjectDetail startProject(AuthenticatedUserAccount user) {
     var project = new Project();
-    var projectDetails = new ProjectDetails(project, ProjectStatus.DRAFT, user.getWuaId(), FIRST_VERSION, CURRENT_VERSION);
+    var projectDetails = new ProjectDetail(project, ProjectStatus.DRAFT, user.getWuaId(), FIRST_VERSION, CURRENT_VERSION);
     projectRepository.save(project);
     projectDetailsRepository.save(projectDetails);
     projectOperatorService.createProjectOperator(projectDetails, user);
