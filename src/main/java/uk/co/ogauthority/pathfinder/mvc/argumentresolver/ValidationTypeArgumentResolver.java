@@ -24,7 +24,7 @@ public class ValidationTypeArgumentResolver implements HandlerMethodArgumentReso
                                 NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
     String saveAndCompleteLater = webRequest.getParameter("Save and complete later");
-    String complete = webRequest.getParameter("Complete");
+    String complete = webRequest.getParameter("Save and complete");
 
     if (saveAndCompleteLater == null && complete == null) {
       throw new IllegalStateException("Cannot save and complete later or complete as both params are null.");
