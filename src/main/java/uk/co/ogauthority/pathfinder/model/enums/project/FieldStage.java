@@ -30,4 +30,8 @@ public enum FieldStage {
   public Integer getDisplayOrder() {
     return displayOrder;
   }
+
+  public String getNameAndDescription() {
+    return !description.equals("") ? displayName + " - " + description : displayName;
+  }
 }

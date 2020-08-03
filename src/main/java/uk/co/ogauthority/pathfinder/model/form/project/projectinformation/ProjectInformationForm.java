@@ -13,10 +13,10 @@ public class ProjectInformationForm {
   @NotNull(message = "Select a field stage", groups = Full.class)
   private FieldStage fieldStage;
 
+  @Length(max = 4000, message = "A project title can not be more than 4000 characters")
   @NotEmpty(message = "Enter a project title", groups = Full.class)
   private String projectTitle;
 
-  @Length(max = 4000, message = "A project summary can not be more than 4000 characters")
   @NotEmpty(message = "Provide a summary of the project", groups = Full.class)
   private String projectSummary;
 

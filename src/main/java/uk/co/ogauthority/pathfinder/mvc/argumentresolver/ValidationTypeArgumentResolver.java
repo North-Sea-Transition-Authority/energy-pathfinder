@@ -14,6 +14,9 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
  */
 public class ValidationTypeArgumentResolver implements HandlerMethodArgumentResolver {
 
+  public static final String SAVE_AND_COMPLETE_LATER = "Save and complete later";
+  public static final String COMPLETE = "Save and complete";
+
   @Override
   public boolean supportsParameter(MethodParameter parameter) {
     return parameter.getParameterType().equals(ValidationType.class);
@@ -23,8 +26,8 @@ public class ValidationTypeArgumentResolver implements HandlerMethodArgumentReso
   public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                 NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
-    String saveAndCompleteLater = webRequest.getParameter("Save and complete later");
-    String complete = webRequest.getParameter("Complete");
+    String saveAndCompleteLater = webRequest.getParameter(SAVE_AND_COMPLETE_LATER);
+    String complete = webRequest.getParameter(COMPLETE);
 
     if (saveAndCompleteLater == null && complete == null) {
       throw new IllegalStateException("Cannot save and complete later or complete as both params are null.");
