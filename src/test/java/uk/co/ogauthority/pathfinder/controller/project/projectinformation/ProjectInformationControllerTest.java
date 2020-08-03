@@ -31,6 +31,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
@@ -87,7 +88,7 @@ public class ProjectInformationControllerTest extends AbstractControllerTest {
   @Test
   public void saveProjectInformation_partialValidation() throws Exception {
     MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
-      add("Save and complete later", "Save and complete later");
+      add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
     }};
 
     var bindingResult = new BeanPropertyBindingResult(ProjectInformationForm.class, "form");
@@ -111,7 +112,7 @@ public class ProjectInformationControllerTest extends AbstractControllerTest {
   @Test
   public void saveProjectInformation_fullValidation() throws Exception {
     MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
-      add("Save and complete", "Save and complete");
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
 
     var bindingResult = new BeanPropertyBindingResult(ProjectInformationForm.class, "form");
@@ -134,7 +135,7 @@ public class ProjectInformationControllerTest extends AbstractControllerTest {
   @Test
   public void saveProjectInformation_fullValidation_valid() throws Exception {
     MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
-      add("Save and complete", "Save and complete");
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
       add("fieldStage", "DISCOVERY");
       add("projectTitle", "Project title");
       add("projectSummary", "Project summary");

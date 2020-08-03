@@ -22,7 +22,7 @@
 
       <@fdsTextInput.textInput path="form.projectTitle" labelText="What is the project title?" labelClass="govuk-label--m" inputClass="govuk-!-width-two-thirds"/>
       <@fdsTextarea.textarea path="form.projectSummary" labelText="Provide a summary of the project" labelClass="govuk-label--m" />
-      <@fdsDetails.summaryDetails summaryTitle="What should I include in the project summary?">
+      <@fdsDetails.summaryDetails summaryTitle="What should I provide for the summary of the project?">
         <p class="govuk-body">Provide a description of the project and future plans and include the following where appropriate:</p>
           <ul class="govuk-list govuk-list--bullet">
             <li>Location in UKCS and type of structure e.g. steel platform, FPSO, Subsea manifold etc.</li>
