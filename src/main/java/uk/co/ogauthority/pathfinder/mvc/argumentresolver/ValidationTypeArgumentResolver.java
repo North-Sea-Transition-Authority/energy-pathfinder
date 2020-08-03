@@ -14,8 +14,8 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
  */
 public class ValidationTypeArgumentResolver implements HandlerMethodArgumentResolver {
 
-  public static String SAVE_AND_COMPLETE_LATER = "Save and complete later";
-  public static String COMPLETE = "Save and complete";
+  public static final String SAVE_AND_COMPLETE_LATER = "Save and complete later";
+  public static final String COMPLETE = "Save and complete";
 
   @Override
   public boolean supportsParameter(MethodParameter parameter) {
