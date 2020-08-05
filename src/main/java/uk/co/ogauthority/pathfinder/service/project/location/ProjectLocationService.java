@@ -1,0 +1,125 @@
+package uk.co.ogauthority.pathfinder.service.project.location;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import javax.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
+import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
+import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
+import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+
+@Service
+public class ProjectLocationService {
+
+  private final ProjectLocationRepository projectLocationRepository;
+  private final DevUkFieldService fieldService;
+  private final SearchSelectorService searchSelectorService;
+  private final SpringValidatorAdapter validator;
+
+  @Autowired
+  public ProjectLocationService(ProjectLocationRepository projectLocationRepository,
+                                DevUkFieldService fieldService,
+                                SearchSelectorService searchSelectorService,
+                                SpringValidatorAdapter validator) {
+    this.projectLocationRepository = projectLocationRepository;
+    this.fieldService = fieldService;
+    this.searchSelectorService = searchSelectorService;
+    this.validator = validator;
+  }
+
+  @Transactional
+  public ProjectLocation createOrUpdate(ProjectDetail detail, ProjectLocationForm form) {
+    var projectLocation = findByProjectDetail(detail).orElse(new ProjectLocation(detail));
+
+    if (SearchSelectorService.isManualEntry(form.getField())) {
+      projectLocation.setManualFieldName(form.getField());
+      projectLocation.setField(null);
+    } else if (form.getField() != null) {
+      projectLocation.setField(fieldService.findById(Integer.parseInt(form.getField())));
+      projectLocation.setManualFieldName(null);
+    } else { //The form has no data so clear the existing values
+      projectLocation.setField(null);
+      projectLocation.setManualFieldName(null);
+    }
+
+    return projectLocationRepository.save(projectLocation);
+  }
+
+  public Optional<ProjectLocation> findByProjectDetail(ProjectDetail detail) {
+    return projectLocationRepository.findByProjectDetail(detail);
+  }
+
+
+  public ProjectLocationForm getForm(ProjectDetail detail) {
+    return findByProjectDetail(detail)
+        .map(this::getForm).orElse(new ProjectLocationForm());
+  }
+
+  /**
+   * If the projectLocation has a manual field name set it in the form.
+   * If the project location has a field set the id as a String.
+   * @param projectLocation ProjectLocation to turn into a form
+   * @return completed form object if ProjectLocation has any field data else a new form.
+   */
+  private ProjectLocationForm getForm(ProjectLocation projectLocation) {
+    if (projectLocation.getManualFieldName() != null) {
+      return new ProjectLocationForm(projectLocation.getManualFieldName());
+    } else if (projectLocation.getField() != null) {
+      return new ProjectLocationForm(projectLocation.getField().getFieldId().toString());
+    }
+    return new ProjectLocationForm();
+  }
+
+
+  /**
+   * Validate the projectLocationForm, no partial validation just all fields complete or all optional.
+   */
+  public BindingResult validate(ProjectLocationForm form,
+                                BindingResult bindingResult,
+                                ValidationType validationType) {
+    if (validationType.equals(ValidationType.FULL)) {
+      validator.validate(form, bindingResult, ProjectLocationForm.Full.class);
+    }
+
+    return bindingResult;
+  }
+
+
+  public boolean isComplete(ProjectDetail details) {
+    var form = getForm(details);
+    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult = validate(form, bindingResult, ValidationType.FULL);
+    return !bindingResult.hasErrors();
+  }
+
+  /**
+   * If there's data in the form turn it back into a format the searchselector can parse.
+   * @param form valid or invalid ProjectLocationForm
+   * @return id and display name of the search selector items empty map if there's no form data.
+   */
+  public Map<String, String> getPreSelectedLocation(ProjectLocationForm form) {
+    if (form.getField() != null) {
+      return SearchSelectorService.isManualEntry(form.getField())
+        ? searchSelectorService.buildPrePopulatedSelections(
+            Collections.singletonList(form.getField()),
+            Map.of(form.getField(), form.getField())
+          )
+        : searchSelectorService.buildPrePopulatedSelections(
+            Collections.singletonList(form.getField()),
+            Map.of(form.getField(), fieldService.findById(Integer.parseInt(form.getField())).getFieldName())
+          );
+
+    }
+    return Map.of();
+  }
+
+}

@@ -77,4 +77,7 @@ public class SearchSelectorService {
     return StringUtils.substring(s, SearchSelectable.FREE_TEXT_PREFIX.length());
   }
 
+  public static boolean isManualEntry(String s) {
+    return s != null && s.startsWith(SearchSelectable.FREE_TEXT_PREFIX);
+  }
 }

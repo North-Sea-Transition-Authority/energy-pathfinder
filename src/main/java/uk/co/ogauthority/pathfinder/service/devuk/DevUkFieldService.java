@@ -18,8 +18,7 @@ public class DevUkFieldService {
   }
 
   /**
-   * TODO find out if active correct term for status codes.
-   * Find the fields with statuses in 500, 600, 700 matching the search term
+   * Find the fields with statuses in 500, 600, 700 matching the search term.
    * @param fieldName a whole or partial fieldname
    * @return list of matching DevUkField entities
    */
