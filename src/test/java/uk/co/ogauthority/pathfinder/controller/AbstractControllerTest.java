@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -23,6 +24,7 @@ import uk.co.ogauthority.pathfinder.model.entity.UserSession;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
 import uk.co.ogauthority.pathfinder.service.UserSessionService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
+import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.navigation.TopNavigationService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 
@@ -52,6 +54,9 @@ public abstract class AbstractControllerTest {
   @MockBean
   protected ControllerHelperService controllerHelperService;
 
+  @MockBean
+  private BreadcrumbService breadcrumbService;
+
   @Before
   public void abstractControllerTestSetup() {
     mockMvc = MockMvcBuilders
@@ -65,6 +70,8 @@ public abstract class AbstractControllerTest {
     when(userSessionService.getAndValidateSession(any(), anyBoolean())).thenReturn(Optional.of(new UserSession()));
 
     when(controllerHelperService.checkErrorsAndRedirect(any(), any(), any())).thenCallRealMethod();
+    doCallRealMethod().when(breadcrumbService).fromTaskList(any(), any(), any());
+    doCallRealMethod().when(breadcrumbService).fromWorkArea(any(), any());
   }
 
   @TestConfiguration

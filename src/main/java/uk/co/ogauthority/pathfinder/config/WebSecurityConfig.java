@@ -54,9 +54,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .mvcMatchers("/session-info")
           .permitAll()
 
-        //TODO security for this endpoint
         .mvcMatchers("/api/**")
-        .permitAll()
+          .hasAnyAuthority(systemAccessService.getWorkAreaGrantedAuthorities())
 
         .anyRequest()
           .authenticated();

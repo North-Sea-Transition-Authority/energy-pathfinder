@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.controller.project;
 
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -20,8 +19,8 @@ import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -37,7 +36,8 @@ public class TaskListControllerTest extends AbstractControllerTest {
   private ProjectInformationService projectInformationService;
 
   @MockBean
-  private BreadcrumbService breadcrumbService;
+  private ProjectLocationService projectLocationService;
+
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.CREATE_PROJECT_PRIVILEGES);
 
@@ -48,7 +48,6 @@ public class TaskListControllerTest extends AbstractControllerTest {
 
   @Test
   public void authenticatedUser_hasAccessToTaskList() throws Exception {
-    doCallRealMethod().when(breadcrumbService).fromWorkArea(any(), any());
     when(projectService.getLatestDetail(any())).thenReturn(Optional.of(details));
 
     mockMvc.perform(get(ReverseRouter.route(on(TaskListController.class).viewTaskList(1)))
