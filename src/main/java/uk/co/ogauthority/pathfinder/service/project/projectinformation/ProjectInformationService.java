@@ -11,7 +11,6 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
-import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
 
 @Service
@@ -64,7 +63,7 @@ public class ProjectInformationService {
                                 BindingResult bindingResult,
                                 ValidationType validationType) {
     if (validationType.equals(ValidationType.FULL)) {
-      validator.validate(form, bindingResult, FullValidation.class);
+      validator.validate(form, bindingResult, ProjectInformationForm.Full.class);
     }
 
     return bindingResult;

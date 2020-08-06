@@ -19,7 +19,6 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
-import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -161,7 +160,7 @@ public class ProjectLocationServiceTest {
         ValidationType.FULL
     );
 
-    verify(validator, times(1)).validate(form, bindingResult, FullValidation.class);
+    verify(validator, times(1)).validate(form, bindingResult, ProjectLocationForm.Full.class);
   }
 
   @Test
