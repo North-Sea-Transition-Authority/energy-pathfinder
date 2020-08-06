@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.controller.project.location;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.rest.DevUkRestController;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -51,7 +51,7 @@ public class ProjectLocationController {
                                          @PathVariable("projectId") Integer projectId) {
     //TODO PAT-133 Fetch with context of project and user
     var details = projectService.getLatestDetail(projectId)
-        .orElseThrow(() -> new EntityNotFoundException(
+        .orElseThrow(() -> new PathfinderEntityNotFoundException(
             String.format("Unable to find project detail for project id  %d", projectId)));
 
     return getLocationModelAndView(projectId, locationService.getForm(details));
@@ -64,7 +64,7 @@ public class ProjectLocationController {
                                           BindingResult bindingResult,
                                           ValidationType validationType) {
     var details = projectService.getLatestDetail(projectId)
-        .orElseThrow(() -> new EntityNotFoundException(
+        .orElseThrow(() -> new PathfinderEntityNotFoundException(
             String.format("Unable to find project detail for project id  %d", projectId)));
     bindingResult = locationService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(bindingResult, getLocationModelAndView(projectId, form),

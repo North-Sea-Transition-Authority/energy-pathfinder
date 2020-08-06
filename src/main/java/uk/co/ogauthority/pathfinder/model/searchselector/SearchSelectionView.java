@@ -1,7 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.searchselector;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import org.apache.commons.collections4.ListUtils;
@@ -25,7 +24,7 @@ public class SearchSelectionView<T> {
   }
 
   public List<String> getManualEntries() {
-    return Collections.unmodifiableList(manualEntries);
+    return List.copyOf(manualEntries);
   }
 
   public List<T> getLinkedEntries() {

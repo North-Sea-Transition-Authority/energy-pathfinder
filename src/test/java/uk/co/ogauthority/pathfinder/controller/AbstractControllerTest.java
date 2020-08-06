@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -54,9 +53,6 @@ public abstract class AbstractControllerTest {
   @MockBean
   protected ControllerHelperService controllerHelperService;
 
-  @MockBean
-  private BreadcrumbService breadcrumbService;
-
   @Before
   public void abstractControllerTestSetup() {
     mockMvc = MockMvcBuilders
@@ -70,8 +66,6 @@ public abstract class AbstractControllerTest {
     when(userSessionService.getAndValidateSession(any(), anyBoolean())).thenReturn(Optional.of(new UserSession()));
 
     when(controllerHelperService.checkErrorsAndRedirect(any(), any(), any())).thenCallRealMethod();
-    doCallRealMethod().when(breadcrumbService).fromTaskList(any(), any(), any());
-    doCallRealMethod().when(breadcrumbService).fromWorkArea(any(), any());
   }
 
   @TestConfiguration
@@ -81,6 +75,9 @@ public abstract class AbstractControllerTest {
     public SystemAccessService systemAreaAccessService() {
       return new SystemAccessService();
     }
+
+    @Bean
+    public BreadcrumbService breadcrumbService() { return new BreadcrumbService(); }
 
     @Bean("messageSource")
     public MessageSource messageSource() {
