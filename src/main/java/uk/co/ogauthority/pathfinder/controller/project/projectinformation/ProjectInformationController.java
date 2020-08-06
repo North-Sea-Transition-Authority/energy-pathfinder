@@ -5,7 +5,6 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
@@ -54,7 +54,7 @@ public class ProjectInformationController {
                                             @PathVariable("projectId") Integer projectId) {
     //TODO PAT-133 Fetch with context of project and user
     var details = projectService.getLatestDetail(projectId)
-        .orElseThrow(() -> new EntityNotFoundException(
+        .orElseThrow(() -> new PathfinderEntityNotFoundException(
             String.format("Unable to find project detail for project id  %d", projectId)));
 
 
@@ -69,7 +69,7 @@ public class ProjectInformationController {
                                              BindingResult bindingResult,
                                              ValidationType validationType) {
     var details = projectService.getLatestDetail(projectId)
-        .orElseThrow(() -> new EntityNotFoundException(
+        .orElseThrow(() -> new PathfinderEntityNotFoundException(
             String.format("Unable to find project detail for project id  %d", projectId)));
 
     bindingResult = projectInformationService.validate(form, bindingResult, validationType);

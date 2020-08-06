@@ -4,11 +4,9 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.form.validation.FormValidation;
 
-public class ProjectInformationForm {
-
-  public interface Full {
-  }
+public class ProjectInformationForm implements FormValidation {
 
   @NotNull(message = "Select a field stage", groups = Full.class)
   private FieldStage fieldStage;

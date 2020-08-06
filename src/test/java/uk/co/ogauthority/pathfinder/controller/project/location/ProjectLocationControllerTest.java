@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.controller.project.projectinformation;
+package uk.co.ogauthority.pathfinder.controller.project.location;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -28,25 +28,24 @@ import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
+import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
-import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
+import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(ProjectInformationController.class)
-public class ProjectInformationControllerTest extends AbstractControllerTest {
-
+@WebMvcTest(ProjectLocationController.class)
+public class ProjectLocationControllerTest extends AbstractControllerTest {
   private static final Integer PROJECT_ID = 1;
 
   @MockBean
   private ProjectService projectService;
 
   @MockBean
-  private ProjectInformationService projectInformationService;
+  private ProjectLocationService projectLocationService;
 
   private ProjectDetail details = ProjectUtil.getProjectDetails();
 
@@ -63,91 +62,90 @@ public class ProjectInformationControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  public void authenticatedUser_hasAccessToProjectInformation() throws Exception {
-    when(projectInformationService.getForm(details)).thenReturn(new ProjectInformationForm());
+  public void authenticatedUser_hasAccessToProjectLocation() throws Exception {
+    when(projectLocationService.getForm(details)).thenReturn(new ProjectLocationForm());
     mockMvc.perform(get(ReverseRouter.route(
-        on(ProjectInformationController.class).getProjectInformation(authenticatedUser, PROJECT_ID)))
+        on(ProjectLocationController.class).getLocationDetails(authenticatedUser, PROJECT_ID)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
 
   @Test
-  public void unAuthenticatedUser_cannotAccessProjectInformation() throws Exception {
+  public void unAuthenticatedUser_cannotAccessProjecLocation() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(ProjectInformationController.class).getProjectInformation(unAuthenticatedUser, PROJECT_ID)))
+        on(ProjectLocationController.class).getLocationDetails(unAuthenticatedUser, PROJECT_ID)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }
 
   @Test
-  public void saveProjectInformation_partialValidation() throws Exception {
+  public void saveProjectLocation_partialValidation() throws Exception {
     MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
     }};
 
-    var bindingResult = new BeanPropertyBindingResult(ProjectInformationForm.class, "form");
-    when(projectInformationService.validate(any(), any(), any())).thenReturn(bindingResult);
+    var bindingResult = new BeanPropertyBindingResult(ProjectLocationForm.class, "form");
+    when(projectLocationService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(ProjectInformationController.class)
-            .saveProjectInformation(null, PROJECT_ID, null, null, null)
-          ))
-          .with(authenticatedUserAndSession(authenticatedUser))
-          .with(csrf())
-          .params(completeLaterParams))
-      .andExpect(status().is3xxRedirection());
+        post(ReverseRouter.route(on(ProjectLocationController.class)
+            .saveProjectLocation(null, PROJECT_ID, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeLaterParams))
+        .andExpect(status().is3xxRedirection());
 
-    verify(projectInformationService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(projectInformationService, times(1)).createOrUpdate(any(), any());
+    verify(projectLocationService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(projectLocationService, times(1)).createOrUpdate(any(), any());
   }
 
 
 
   @Test
-  public void saveProjectInformation_fullValidation_invalid() throws Exception {
+  public void saveProjectLocation_fullValidation_invalid() throws Exception {
     MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
 
-    var bindingResult = new BeanPropertyBindingResult(ProjectInformationForm.class, "form");
+    var bindingResult = new BeanPropertyBindingResult(ProjectLocationForm.class, "form");
     bindingResult.addError(new ObjectError("Error", "ErrorMessage"));
-    when(projectInformationService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(projectLocationService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(ProjectInformationController.class)
-            .saveProjectInformation(null, PROJECT_ID, null, null, null)
+        post(ReverseRouter.route(on(ProjectLocationController.class)
+            .saveProjectLocation(null, PROJECT_ID, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())
             .params(completeParams))
         .andExpect(status().is2xxSuccessful());
 
-    verify(projectInformationService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(projectInformationService, times(0)).createOrUpdate(any(), any());
+    verify(projectLocationService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(projectLocationService, times(0)).createOrUpdate(any(), any());
   }
 
   @Test
-  public void saveProjectInformation_fullValidation_valid() throws Exception {
+  public void saveProjectLocation_fullValidation_valid() throws Exception {
     MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
-      add("fieldStage", "DISCOVERY");
-      add("projectTitle", "Project title");
-      add("projectSummary", "Project summary");
+      add("fieldid", "123");
     }};
 
-    var bindingResult = new BeanPropertyBindingResult(ProjectInformationForm.class, "form");
-    when(projectInformationService.validate(any(), any(), any())).thenReturn(bindingResult);
+    var bindingResult = new BeanPropertyBindingResult(ProjectLocationForm.class, "form");
+    when(projectLocationService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(ProjectInformationController.class)
-            .saveProjectInformation(null, PROJECT_ID, null, null, null)
+        post(ReverseRouter.route(on(ProjectLocationController.class)
+            .saveProjectLocation(null, PROJECT_ID, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())
             .params(completeParams))
         .andExpect(status().is3xxRedirection());
 
-    verify(projectInformationService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(projectInformationService, times(1)).createOrUpdate(any(), any());
+    verify(projectLocationService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(projectLocationService, times(1)).createOrUpdate(any(), any());
   }
+
 }

@@ -23,6 +23,7 @@ import uk.co.ogauthority.pathfinder.model.entity.UserSession;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
 import uk.co.ogauthority.pathfinder.service.UserSessionService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
+import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.navigation.TopNavigationService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 
@@ -74,6 +75,9 @@ public abstract class AbstractControllerTest {
     public SystemAccessService systemAreaAccessService() {
       return new SystemAccessService();
     }
+
+    @Bean
+    public BreadcrumbService breadcrumbService() { return new BreadcrumbService(); }
 
     @Bean("messageSource")
     public MessageSource messageSource() {
