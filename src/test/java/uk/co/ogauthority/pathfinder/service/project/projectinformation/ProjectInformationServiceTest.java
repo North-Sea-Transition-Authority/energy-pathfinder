@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
+import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -115,6 +116,6 @@ public class ProjectInformationServiceTest {
         ValidationType.FULL
     );
 
-    verify(validator, times(1)).validate(form, bindingResult, ProjectInformationForm.Full.class);
+    verify(validator, times(1)).validate(form, bindingResult, FullValidation.class);
   }
 }

@@ -25,7 +25,6 @@ public class DevUkRestController {
   public DevUkRestController(DevUkFieldService devUkFieldService,
                              SearchSelectorService searchSelectorService) {
     this.devUkFieldService = devUkFieldService;
-
     this.searchSelectorService = searchSelectorService;
   }
 

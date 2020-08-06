@@ -80,7 +80,7 @@ public class ProjectLocationController {
     var modelAndView = new ModelAndView("project/location/location")
         .addObject("fieldsRestUrl", SearchSelectorService.route(on(DevUkRestController.class).searchFields(null)))
         .addObject("form", form)
-        .addObject("preselectedField", locationService.getPreSelectedLocation(form));
+        .addObject("preselectedField", locationService.getPreSelectedField(form));
 
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;

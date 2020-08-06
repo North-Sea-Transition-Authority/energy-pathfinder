@@ -10,7 +10,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import uk.co.ogauthority.pathfinder.controller.rest.DevUkRestController;
-import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkField;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.searchselector.ManualEntryAttribute;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
@@ -26,7 +25,7 @@ public class SearchSelectorServiceTest {
   @Test
   public void search_NoMatch() {
     var searchableResults = List.of(
-        new DevUkField(1, "fieldname", 600)
+        new SearchItem(1, "fieldname")
     );
     var result = searchSelectorService.search("should not match", searchableResults);
     assertThat(result).isEmpty();
@@ -40,11 +39,11 @@ public class SearchSelectorServiceTest {
   }
   @Test
   public void search_Match() {
-    var devUkField = new DevUkField(1, "fieldname", 600);
-    var searchableResults = List.of(devUkField);
+    var searchItem = new SearchItem(1, "fieldname");
+    var searchableResults = List.of(searchItem);
     var result = searchSelectorService.search("fie", searchableResults);
     assertThat(result).extracting(RestSearchItem::getId)
-        .containsExactly(String.valueOf(devUkField.getFieldId()));
+        .containsExactly(String.valueOf(searchItem.getId()));
   }
 
 
@@ -97,5 +96,29 @@ public class SearchSelectorServiceTest {
     var notManualEntry = "123";
     assertThat(SearchSelectorService.isManualEntry(manualEntry)).isTrue();
     assertThat(SearchSelectorService.isManualEntry(notManualEntry)).isFalse();
+  }
+
+  private static class SearchItem implements SearchSelectable {
+    private final Integer id;
+    private final String name;
+
+    public SearchItem(Integer id,
+                      String name) {
+      this.id = id;
+      this.name = name;
+    }
+
+    public Integer getId() { return id; }
+    public String getName() { return name; }
+
+    @Override
+    public String getSelectionId() {
+      return id.toString();
+    }
+
+    @Override
+    public String getSelectionText() {
+      return name;
+    }
   }
 }

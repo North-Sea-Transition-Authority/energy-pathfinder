@@ -104,8 +104,8 @@ public class ProjectInformationControllerTest extends AbstractControllerTest {
 
 
   @Test
-  public void saveProjectInformation_fullValidation() throws Exception {
-    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
+  public void saveProjectInformation_fullValidation_invalid() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
 
@@ -119,7 +119,7 @@ public class ProjectInformationControllerTest extends AbstractControllerTest {
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())
-            .params(completeLaterParams))
+            .params(completeParams))
         .andExpect(status().is2xxSuccessful());
 
     verify(projectInformationService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
@@ -128,7 +128,7 @@ public class ProjectInformationControllerTest extends AbstractControllerTest {
 
   @Test
   public void saveProjectInformation_fullValidation_valid() throws Exception {
-    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
       add("fieldStage", "DISCOVERY");
       add("projectTitle", "Project title");
@@ -144,7 +144,7 @@ public class ProjectInformationControllerTest extends AbstractControllerTest {
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())
-            .params(completeLaterParams))
+            .params(completeParams))
         .andExpect(status().is3xxRedirection());
 
     verify(projectInformationService, times(1)).validate(any(), any(), eq(ValidationType.FULL));

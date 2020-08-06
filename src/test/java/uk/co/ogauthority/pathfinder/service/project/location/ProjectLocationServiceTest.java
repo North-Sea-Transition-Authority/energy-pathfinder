@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
+import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -160,7 +161,7 @@ public class ProjectLocationServiceTest {
         ValidationType.FULL
     );
 
-    verify(validator, times(1)).validate(form, bindingResult, ProjectLocationForm.Full.class);
+    verify(validator, times(1)).validate(form, bindingResult, FullValidation.class);
   }
 
   @Test
@@ -168,7 +169,7 @@ public class ProjectLocationServiceTest {
     when(searchSelectorService.buildPrePopulatedSelections(any(), any())).thenCallRealMethod();
     when(searchSelectorService.removePrefix(any())).thenCallRealMethod();
     var form = ProjectLocationUtil.getCompletedForm_manualField();
-    var preSelectedLocation = projectLocationService.getPreSelectedLocation(form);
+    var preSelectedLocation = projectLocationService.getPreSelectedField(form);
     assertThat(preSelectedLocation).containsOnly(
       entry(ProjectLocationUtil.MANUAL_FIELD_NAME, ProjectLocationUtil.MANUAL_FIELD_NAME_NO_PREFIX)
     );
@@ -179,7 +180,7 @@ public class ProjectLocationServiceTest {
     when(searchSelectorService.buildPrePopulatedSelections(any(), any())).thenCallRealMethod();
     when(fieldService.findById(ProjectLocationUtil.FIELD_ID)).thenReturn(ProjectLocationUtil.FIELD);
     var form = ProjectLocationUtil.getCompletedForm_withField();
-    var preSelectedLocation = projectLocationService.getPreSelectedLocation(form);
+    var preSelectedLocation = projectLocationService.getPreSelectedField(form);
     assertThat(preSelectedLocation).containsOnly(
         entry(ProjectLocationUtil.FIELD_ID.toString(), ProjectLocationUtil.FIELD_NAME)
     );
@@ -187,7 +188,7 @@ public class ProjectLocationServiceTest {
 
   @Test
   public void getPreSelectedLocation_emptyForm() {
-    var preSelectedLocation = projectLocationService.getPreSelectedLocation(new ProjectLocationForm());
+    var preSelectedLocation = projectLocationService.getPreSelectedField(new ProjectLocationForm());
     assertThat(preSelectedLocation).isEmpty();
   }
 }

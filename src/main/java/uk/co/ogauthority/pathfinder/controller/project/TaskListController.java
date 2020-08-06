@@ -46,11 +46,13 @@ public class TaskListController {
     modelAndView.addObject("projectInformationUrl",
         ReverseRouter.route(on(ProjectInformationController.class).getProjectInformation(null, projectId))
     );
+    modelAndView.addObject("projectInformationText", ProjectInformationController.PAGE_NAME);
     modelAndView.addObject("projectInformationCompleted", projectInformationService.isComplete(currentDetail));
 
     modelAndView.addObject("locationUrl",
         ReverseRouter.route(on(ProjectLocationController.class).getLocationDetails(null, projectId))
     );
+    modelAndView.addObject("projectLocationText", ProjectLocationController.PAGE_NAME);
     modelAndView.addObject("projectLocationCompleted", projectLocationService.isComplete(currentDetail));
     breadcrumbService.fromWorkArea(modelAndView, "Task list");
 
