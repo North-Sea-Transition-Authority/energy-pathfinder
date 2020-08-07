@@ -37,7 +37,7 @@ public class SearchSelectorService {
                                              ManualEntryAttribute manualEntryAttribute) {
     if (!StringUtils.isBlank(searchQuery)) {
       var entryExists = resultList.stream()
-          .anyMatch(restSearchItem -> restSearchItem.getText().toLowerCase().equals(searchQuery.toLowerCase()));
+          .anyMatch(restSearchItem -> restSearchItem.getText().equalsIgnoreCase(searchQuery));
       if (!entryExists) {
         if (manualEntryAttribute.equals(ManualEntryAttribute.WITH_FREE_TEXT_PREFIX)) {
           resultList.add(0, new RestSearchItem(SearchSelectable.FREE_TEXT_PREFIX + searchQuery, searchQuery));

@@ -18,10 +18,8 @@ public class PortalTeamTypeRolePriv {
   private PortalTeamTypeRolePrivId portalTeamTypeRolePrivId;
 
   @ManyToOne
-  @JoinColumns({
-      @JoinColumn(name = "role_name", referencedColumnName = "role_name", insertable = false, updatable = false),
-      @JoinColumn(name = "res_type", referencedColumnName = "res_type", insertable = false, updatable = false),
-  })
+  @JoinColumn(name = "role_name", referencedColumnName = "role_name", insertable = false, updatable = false)
+  @JoinColumn(name = "res_type", referencedColumnName = "res_type", insertable = false, updatable = false)
   private PortalTeamTypeRole portalTeamTypeRole;
 
   // Maps entry in EmbeddedId so must be marked not updatable and not insertable
