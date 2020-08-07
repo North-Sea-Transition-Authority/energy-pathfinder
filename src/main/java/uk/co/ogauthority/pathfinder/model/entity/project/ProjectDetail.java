@@ -48,6 +48,10 @@ public class ProjectDetail {
     this.isCurrentVersion = true;
   }
 
+  public Integer getId() {
+    return id;
+  }
+
   public Project getProject() {
     return project;
   }
