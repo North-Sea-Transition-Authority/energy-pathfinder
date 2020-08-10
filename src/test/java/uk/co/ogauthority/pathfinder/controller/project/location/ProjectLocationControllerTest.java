@@ -18,36 +18,36 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.ObjectError;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
+import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
-import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(ProjectLocationController.class)
-public class ProjectLocationControllerTest extends AbstractControllerTest {
+@WebMvcTest(controllers = ProjectLocationController.class, includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ProjectContextService.class))
+public class ProjectLocationControllerTest extends ProjectContextAbstractControllerTest {
   private static final Integer PROJECT_ID = 1;
 
-  @MockBean
-  private ProjectService projectService;
 
   @MockBean
   private ProjectLocationService projectLocationService;
 
-  private ProjectDetail details = ProjectUtil.getProjectDetails();
+  private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
@@ -58,14 +58,16 @@ public class ProjectLocationControllerTest extends AbstractControllerTest {
 
   @Before
   public void setUp() throws Exception {
-    when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(details));
+    when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(detail));
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(false);
   }
 
   @Test
   public void authenticatedUser_hasAccessToProjectLocation() throws Exception {
-    when(projectLocationService.getForm(details)).thenReturn(new ProjectLocationForm());
+    when(projectLocationService.getForm(detail)).thenReturn(new ProjectLocationForm());
     mockMvc.perform(get(ReverseRouter.route(
-        on(ProjectLocationController.class).getLocationDetails(authenticatedUser, PROJECT_ID)))
+        on(ProjectLocationController.class).getLocationDetails(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -73,7 +75,7 @@ public class ProjectLocationControllerTest extends AbstractControllerTest {
   @Test
   public void unAuthenticatedUser_cannotAccessProjecLocation() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(ProjectLocationController.class).getLocationDetails(unAuthenticatedUser, PROJECT_ID)))
+        on(ProjectLocationController.class).getLocationDetails(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -89,7 +91,7 @@ public class ProjectLocationControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectLocationController.class)
-            .saveProjectLocation(null, PROJECT_ID, null, null, null)
+            .saveProjectLocation(PROJECT_ID, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())
@@ -114,7 +116,7 @@ public class ProjectLocationControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectLocationController.class)
-            .saveProjectLocation(null, PROJECT_ID, null, null, null)
+            .saveProjectLocation(PROJECT_ID, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())
@@ -137,7 +139,7 @@ public class ProjectLocationControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectLocationController.class)
-            .saveProjectLocation(null, PROJECT_ID, null, null, null)
+            .saveProjectLocation(PROJECT_ID, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())

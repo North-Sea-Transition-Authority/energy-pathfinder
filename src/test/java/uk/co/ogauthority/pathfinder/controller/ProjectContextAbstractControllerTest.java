@@ -7,12 +7,14 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.context.support.SimpleThreadScope;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -25,11 +27,13 @@ import uk.co.ogauthority.pathfinder.service.UserSessionService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.navigation.TopNavigationService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 
-@Import(AbstractControllerTest.TestConfig.class)
-public abstract class AbstractControllerTest {
+@Import({ProjectContextAbstractControllerTest.TestConfig.class})
+public abstract class ProjectContextAbstractControllerTest {
 
   protected MockMvc mockMvc;
 
@@ -54,11 +58,18 @@ public abstract class AbstractControllerTest {
   @MockBean
   protected ControllerHelperService controllerHelperService;
 
-  @MockBean
+  @Autowired
   protected ProjectContextService projectContextService;
 
+  @MockBean
+  protected ProjectService projectService;
+
+  @MockBean
+  protected ProjectOperatorService projectOperatorService;
+
+
   @Before
-  public void abstractControllerTestSetup() {
+  public void  projectContextAbstractControllerTestSetUp() {
     mockMvc = MockMvcBuilders
         .webAppContextSetup(context)
         .apply(SecurityMockMvcConfigurers.springSecurity())
@@ -83,6 +94,14 @@ public abstract class AbstractControllerTest {
     @Bean
     public BreadcrumbService breadcrumbService() { return new BreadcrumbService(); }
 
+    // for controllers using session scoped attributes
+    @Bean
+    public CustomScopeConfigurer customScopeConfigurer() {
+      CustomScopeConfigurer configurer = new CustomScopeConfigurer();
+      configurer.addScope("session", new SimpleThreadScope());
+      return configurer;
+    }
+
     @Bean("messageSource")
     public MessageSource messageSource() {
       ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
@@ -91,5 +110,4 @@ public abstract class AbstractControllerTest {
       return messageSource;
     }
   }
-
 }

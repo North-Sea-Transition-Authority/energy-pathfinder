@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,8 +30,10 @@ public class ProjectOperatorServiceTest {
 
   @Mock
   private TeamService teamService;
+
   @Mock
   private TeamManagementService teamManagementService;
+
   @Mock
   private ProjectOperatorsRepository projectOperatorsRepository;
 
@@ -47,7 +50,12 @@ public class ProjectOperatorServiceTest {
       "Org Grp"
   ));
 
-  private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
+  private final ProjectDetail detail = ProjectUtil.getProjectDetails();
+
+  private final ProjectOperator projectOperator = new ProjectOperator(
+      detail,
+      organisationTeam.getPortalOrganisationGroup()
+  );
 
   @Before
   public void setUp() throws Exception {
@@ -68,8 +76,41 @@ public class ProjectOperatorServiceTest {
         person,
         Collections.singletonList(OrganisationRole.PROJECT_SUBMITTER)
     )).thenReturn(Collections.singletonList(organisationTeam));
-    var projectOperator = projectOperatorService.createProjectOperator(projectDetail, authenticatedUser);
+    var projectOperator = projectOperatorService.createProjectOperator(detail, authenticatedUser);
     assertThat(projectOperator.getOrganisationGroup()).isEqualTo(organisationTeam.getPortalOrganisationGroup());
-    assertThat(projectOperator.getProjectDetail()).isEqualTo(projectDetail);
+    assertThat(projectOperator.getProjectDetail()).isEqualTo(detail);
+  }
+
+  @Test
+  public void isUserInProjectTeamOrRegulator_inProjectTeam() {
+    when(teamManagementService.getPerson(authenticatedUser.getLinkedPerson().getId().asInt())).thenReturn(person);
+    when(teamService.isPersonMemberOfRegulatorTeam(person)).thenReturn(false);
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(person)).thenReturn(Collections.singletonList(organisationTeam));
+    when(projectOperatorsRepository.findByProjectDetail(detail)).thenReturn(Optional.of(projectOperator));
+    assertThat(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).isTrue();
+
+  }
+
+  @Test
+  public void isUserInProjectTeamOrRegulator_whenRegulator() {
+    when(teamService.isPersonMemberOfRegulatorTeam(any())).thenReturn(true);
+    assertThat(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).isTrue();
+  }
+
+  @Test
+  public void isUserInProjectTeamOrRegulator_whenNotInTeam() {
+    when(teamManagementService.getPerson(authenticatedUser.getLinkedPerson().getId().asInt())).thenReturn(person);
+    when(teamService.isPersonMemberOfRegulatorTeam(person)).thenReturn(false);
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(person)).thenReturn(Collections.singletonList(
+        TeamTestingUtil.getOrganisationTeam(
+            TeamTestingUtil.generateOrganisationGroup(
+                2,
+                "DifferentGrp",
+                "DiffGrp"
+            )
+        )
+    ));
+    when(projectOperatorsRepository.findByProjectDetail(detail)).thenReturn(Optional.of(projectOperator));
+    assertThat(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).isFalse();
   }
 }
