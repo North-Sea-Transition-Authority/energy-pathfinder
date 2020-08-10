@@ -1,6 +1,6 @@
 <#include '../layout.ftl'>
 
-<@defaultPage htmlTitle="Select Team" pageHeading="Select a team" topNavigation=true twoThirdsColumn=false backLink=true>
+<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle topNavigation=true twoThirdsColumn=false backLink=true>
   <table class="govuk-table">
     <thead class="govuk-table__head">
     <tr class="govuk-table__row">
@@ -20,8 +20,8 @@
           <td class="govuk-table__cell">
               <@fdsAction.link
               linkUrl=springUrl(team.getSelectRoute())
-              linkText="Manage team"
-              linkScreenReaderText="Manage ${team.name} team"
+              linkText=manageActionTitle
+              linkScreenReaderText="${manageActionTitle} - ${team.name}"
               linkClass="govuk-link govuk-link--no-visited-state"/>
           </td>
         </tr>
