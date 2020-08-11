@@ -9,12 +9,12 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 /**
  * Annotation to be used in conjunction with
  * {@link uk.co.ogauthority.pathfinder.mvc.argumentresolver.ProjectContextArgumentResolver} on controller
- * methods to restrict processing of the method to applications at a specific status.
+ * methods to restrict processing of the method to a project at a specific set of statuses.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface ProjectStatusCheck {
 
-  ProjectStatus status();
+  ProjectStatus[] status() default {};
 
 }

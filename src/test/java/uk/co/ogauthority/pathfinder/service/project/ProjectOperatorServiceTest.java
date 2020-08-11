@@ -18,7 +18,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationRole;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
-import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorsRepository;
+import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.teammanagement.TeamManagementService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -35,7 +35,7 @@ public class ProjectOperatorServiceTest {
   private TeamManagementService teamManagementService;
 
   @Mock
-  private ProjectOperatorsRepository projectOperatorsRepository;
+  private ProjectOperatorRepository projectOperatorRepository;
 
   private ProjectOperatorService projectOperatorService;
 
@@ -62,10 +62,10 @@ public class ProjectOperatorServiceTest {
     projectOperatorService = new ProjectOperatorService(
         teamService,
         teamManagementService,
-        projectOperatorsRepository
+        projectOperatorRepository
     );
 
-    when(projectOperatorsRepository.save(any(ProjectOperator.class)))
+    when(projectOperatorRepository.save(any(ProjectOperator.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
@@ -86,7 +86,7 @@ public class ProjectOperatorServiceTest {
     when(teamManagementService.getPerson(authenticatedUser.getLinkedPerson().getId().asInt())).thenReturn(person);
     when(teamService.isPersonMemberOfRegulatorTeam(person)).thenReturn(false);
     when(teamService.getOrganisationTeamsPersonIsMemberOf(person)).thenReturn(Collections.singletonList(organisationTeam));
-    when(projectOperatorsRepository.findByProjectDetail(detail)).thenReturn(Optional.of(projectOperator));
+    when(projectOperatorRepository.findByProjectDetail(detail)).thenReturn(Optional.of(projectOperator));
     assertThat(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).isTrue();
 
   }
@@ -110,7 +110,7 @@ public class ProjectOperatorServiceTest {
             )
         )
     ));
-    when(projectOperatorsRepository.findByProjectDetail(detail)).thenReturn(Optional.of(projectOperator));
+    when(projectOperatorRepository.findByProjectDetail(detail)).thenReturn(Optional.of(projectOperator));
     assertThat(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).isFalse();
   }
 }

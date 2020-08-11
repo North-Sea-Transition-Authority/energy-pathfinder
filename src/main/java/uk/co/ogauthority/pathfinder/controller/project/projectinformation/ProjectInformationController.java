@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
@@ -29,6 +30,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectIn
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
+@ProjectFormPagePermissionCheck
 @RequestMapping("/project/{projectId}/project-information")
 public class ProjectInformationController {
 

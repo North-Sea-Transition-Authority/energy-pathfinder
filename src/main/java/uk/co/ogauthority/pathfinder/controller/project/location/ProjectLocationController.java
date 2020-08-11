@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.DevUkRestController;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -27,6 +28,7 @@ import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
+@ProjectFormPagePermissionCheck
 @RequestMapping("/project/{projectId}/location")
 public class ProjectLocationController {
   public static final String PAGE_NAME = "Location";

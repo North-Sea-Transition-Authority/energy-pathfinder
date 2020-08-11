@@ -7,7 +7,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 
 @Repository
-public interface ProjectOperatorsRepository extends CrudRepository<ProjectOperator, Integer> {
+public interface ProjectOperatorRepository extends CrudRepository<ProjectOperator, Integer> {
 
   Optional<ProjectOperator> findByProjectDetail(ProjectDetail detail);
 

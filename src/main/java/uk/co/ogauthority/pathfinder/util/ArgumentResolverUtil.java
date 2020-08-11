@@ -1,16 +1,21 @@
 package uk.co.ogauthority.pathfinder.util;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.HandlerMapping;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 
 public class ArgumentResolverUtil {
 
@@ -55,15 +60,37 @@ public class ArgumentResolverUtil {
   /**
    * Get method level status check or default to controller level if none specified.
    */
-  public static ProjectStatus getProjectStatusCheck(MethodParameter methodParameter) {
+  public static Set<ProjectStatus> getProjectStatusCheck(MethodParameter methodParameter) {
 
-    var methodLevelStatus = Optional.ofNullable(methodParameter.getMethodAnnotation(ProjectStatusCheck.class))
-        .map(ProjectStatusCheck::status);
+    var methodLevelPermissions = Optional.ofNullable(
+        methodParameter.getMethodAnnotation(ProjectStatusCheck.class))
+        .map(p -> Arrays.stream(p.status()).collect(Collectors.toSet()))
+        .orElse(Set.of());
 
-    return methodLevelStatus.orElseGet(
-        () -> Optional.ofNullable(methodParameter.getContainingClass().getAnnotation(ProjectStatusCheck.class))
-            .map(ProjectStatusCheck::status)
-            .orElse(null));
+    if (!methodLevelPermissions.isEmpty()) {
+      return methodLevelPermissions;
+    }
 
+    return Optional.ofNullable(
+        methodParameter.getContainingClass().getAnnotation(ProjectStatusCheck.class))
+        .map(p -> Arrays.stream(p.status()).collect(Collectors.toSet()))
+        .orElse(Set.of());
+
+  }
+
+  public static Set<ProjectPermission> getProjectFormPagePermissionCheck(MethodParameter methodParameter) {
+    var methodLevelPermissions = Optional.ofNullable(
+        methodParameter.getMethodAnnotation(ProjectFormPagePermissionCheck.class))
+        .map(p -> Arrays.stream(p.permissions()).collect(Collectors.toSet()))
+        .orElse(Set.of());
+
+    if (!methodLevelPermissions.isEmpty()) {
+      return methodLevelPermissions;
+    }
+
+    return Optional.ofNullable(
+        methodParameter.getContainingClass().getAnnotation(ProjectFormPagePermissionCheck.class))
+        .map(p -> Arrays.stream(p.permissions()).collect(Collectors.toSet()))
+        .orElse(Set.of());
   }
 }

@@ -9,7 +9,7 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationRole;
-import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorsRepository;
+import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.teammanagement.TeamManagementService;
 
@@ -21,15 +21,15 @@ public class ProjectOperatorService {
 
   private final TeamService teamService;
   private final TeamManagementService teamManagementService;
-  private final ProjectOperatorsRepository projectOperatorsRepository;
+  private final ProjectOperatorRepository projectOperatorRepository;
 
   @Autowired
   public ProjectOperatorService(TeamService teamService,
                                 TeamManagementService teamManagementService,
-                                ProjectOperatorsRepository projectOperatorsRepository) {
+                                ProjectOperatorRepository projectOperatorRepository) {
     this.teamService = teamService;
     this.teamManagementService = teamManagementService;
-    this.projectOperatorsRepository = projectOperatorsRepository;
+    this.projectOperatorRepository = projectOperatorRepository;
   }
 
 
@@ -51,7 +51,7 @@ public class ProjectOperatorService {
     //TODO PAT-113 If multiple operators have user select
     if (organisationTeams.size() == 1) {
       var projectOperator = new ProjectOperator(detail, organisationTeams.get(0).getPortalOrganisationGroup());
-      return projectOperatorsRepository.save(projectOperator);
+      return projectOperatorRepository.save(projectOperator);
     }
     return null;
   }
@@ -69,7 +69,7 @@ public class ProjectOperatorService {
 
     var userTeams = teamService.getOrganisationTeamsPersonIsMemberOf(person);
 
-    var projectOperator = projectOperatorsRepository.findByProjectDetail(detail)
+    var projectOperator = projectOperatorRepository.findByProjectDetail(detail)
         .orElseThrow(
             () -> new PathfinderEntityNotFoundException(
                 String.format("Project Operator not found for detail with id: %d", detail.getId())

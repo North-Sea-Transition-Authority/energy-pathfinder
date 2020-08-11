@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +39,9 @@ public class ProjectContextServiceTest {
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       SystemAccessService.CREATE_PROJECT_PRIVILEGES);
+  private static final AuthenticatedUserAccount unAuthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
+
+  private final Set<ProjectPermission> projectPermissions = Set.of(ProjectPermission.EDIT, ProjectPermission.SUBMIT);
 
   @Before
   public void setUp() throws Exception {
@@ -45,16 +49,16 @@ public class ProjectContextServiceTest {
         projectService,
         projectOperatorService
     );
+    detail.setStatus(ProjectStatus.DRAFT);
   }
 
   @Test
   public void getProjectContext() {
 
-    var context = projectContextService.getProjectContext(detail, authenticatedUser);
+    var context = projectContextService.getProjectContext(detail, authenticatedUser, projectPermissions);
     assertThat(context.getProjectDetails()).isEqualTo(detail);
     assertThat(context.getUserAccount()).isEqualTo(authenticatedUser);
     assertThat(context.getProjectPermissions()).containsExactlyInAnyOrder(
-        ProjectPermission.VIEW_TASK_LIST,
         ProjectPermission.EDIT,
         ProjectPermission.SUBMIT
     );
@@ -62,12 +66,12 @@ public class ProjectContextServiceTest {
 
   @Test
   public void projectStatusMatches_whenMatch() {
-    assertThat(projectContextService.projectStatusMatches(detail, ProjectStatus.DRAFT)).isTrue();
+    assertThat(projectContextService.projectStatusMatches(detail, Set.of(ProjectStatus.DRAFT))).isTrue();
   }
 
   @Test
   public void projectStatusMatches_whenNotMatched() {
-    assertThat(projectContextService.projectStatusMatches(detail, ProjectStatus.QA)).isFalse();
+    assertThat(projectContextService.projectStatusMatches(detail, Set.of(ProjectStatus.QA))).isFalse();
   }
 
   @Test
@@ -88,12 +92,12 @@ public class ProjectContextServiceTest {
     var context = projectContextService.buildProjectContext(
         detail,
         authenticatedUser,
-        ProjectStatus.DRAFT
+        Set.of(ProjectStatus.DRAFT),
+        projectPermissions
         );
     assertThat(context.getProjectDetails()).isEqualTo(detail);
     assertThat(context.getUserAccount()).isEqualTo(authenticatedUser);
     assertThat(context.getProjectPermissions()).containsExactlyInAnyOrder(
-        ProjectPermission.VIEW_TASK_LIST,
         ProjectPermission.EDIT,
         ProjectPermission.SUBMIT
     );
@@ -105,7 +109,8 @@ public class ProjectContextServiceTest {
     projectContextService.buildProjectContext(
         detail,
         authenticatedUser,
-        ProjectStatus.DRAFT
+        Set.of(ProjectStatus.DRAFT),
+        projectPermissions
     );
   }
 
@@ -115,7 +120,32 @@ public class ProjectContextServiceTest {
     projectContextService.buildProjectContext(
         detail,
         authenticatedUser,
-        ProjectStatus.QA
+        Set.of(ProjectStatus.QA),
+        projectPermissions
     );
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  public void buildProjectContext_whenNoPermissions() {
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(true);
+    var context = projectContextService.buildProjectContext(
+        detail,
+        unAuthenticatedUser,
+        Set.of(ProjectStatus.DRAFT),
+        projectPermissions
+    );
+  }
+
+  @Test
+  public void getUserProjectPermissions_withMatch() {
+    assertThat(projectContextService.getUserProjectPermissions(authenticatedUser)).containsExactlyInAnyOrder(
+        ProjectPermission.EDIT,
+        ProjectPermission.SUBMIT
+    );
+  }
+
+  @Test
+  public void getUserProjectPermissions_withNoMatch() {
+    assertThat(projectContextService.getUserProjectPermissions(unAuthenticatedUser)).isEmpty();
   }
 }

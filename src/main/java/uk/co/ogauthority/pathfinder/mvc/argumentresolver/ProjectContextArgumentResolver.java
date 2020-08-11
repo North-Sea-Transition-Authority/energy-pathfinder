@@ -27,17 +27,21 @@ public class ProjectContextArgumentResolver implements HandlerMethodArgumentReso
   }
 
   @Override
-  public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+  public Object resolveArgument(MethodParameter parameter,
+                                ModelAndViewContainer mavContainer,
+                                NativeWebRequest webRequest,
+                                WebDataBinderFactory binderFactory) throws Exception {
     var user = ArgumentResolverUtil.getAuthenticatedUser();
     var projectId = ArgumentResolverUtil.resolveIdFromRequest(webRequest, ArgumentResolverUtil.PROJECT_ID_PARAM);
     var detail = projectContextService.getProjectDetailsOrError(projectId);
     var statusCheck = ArgumentResolverUtil.getProjectStatusCheck(parameter);
+    var permissionCheck = ArgumentResolverUtil.getProjectFormPagePermissionCheck(parameter);
 
     return projectContextService.buildProjectContext(
         detail,
         user,
-        statusCheck
+        statusCheck,
+        permissionCheck
     );
 
   }

@@ -57,6 +57,7 @@ public class TaskListControllerTest extends ProjectContextAbstractControllerTest
 
   @Test
   public void unAuthenticatedUser_cannotAccessTaskList() throws Exception {
+    when(projectService.getLatestDetail(any())).thenReturn(Optional.of(details));
     mockMvc.perform(get(ReverseRouter.route(on(TaskListController.class).viewTaskList(1, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
