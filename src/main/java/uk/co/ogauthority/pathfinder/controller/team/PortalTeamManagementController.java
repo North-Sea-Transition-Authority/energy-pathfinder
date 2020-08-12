@@ -55,7 +55,8 @@ public class PortalTeamManagementController {
    */
   @GetMapping("")
   public ModelAndView renderManageableTeams(AuthenticatedUserAccount currentUser, TeamType teamType) {
-    var modelAndView = new ModelAndView("teamManagement/manageableTeams");
+
+    var modelAndView = getManageableTeamsModelAndView(teamType);
 
     List<TeamView> teamViews = teamManagementService.getAllTeamsOfTypeUserCanView(currentUser, teamType)
         .stream()
@@ -74,6 +75,20 @@ public class PortalTeamManagementController {
           "User with wuaId %s cannot manage any teams", currentUser.getWuaId()
       ));
     }
+    return modelAndView;
+  }
+
+  private ModelAndView getManageableTeamsModelAndView(TeamType teamType) {
+    var modelAndView = new ModelAndView("teamManagement/manageableTeams");
+
+    var isManagingOrganisationTeam = (teamType != null && teamType.equals(TeamType.ORGANISATION));
+
+    var pageTitle = isManagingOrganisationTeam ? "Select organisation" : "Select a team";
+    modelAndView.addObject("pageTitle", pageTitle);
+
+    var manageActionTitle = isManagingOrganisationTeam ? "Manage organisation" : "Manage team";
+    modelAndView.addObject("manageActionTitle", manageActionTitle);
+
     return modelAndView;
   }
 

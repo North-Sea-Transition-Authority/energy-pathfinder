@@ -52,8 +52,8 @@ public class ProjectInformationController {
   @GetMapping
   public ModelAndView getProjectInformation(@PathVariable("projectId") Integer projectId,
                                             ProjectContext projectContext) {
-    return getProjectInformationModelAndView(projectId)
-        .addObject("form", projectInformationService.getForm(projectContext.getProjectDetails()));
+    var form = projectInformationService.getForm(projectContext.getProjectDetails());
+    return getProjectInformationModelAndView(projectId, form);
   }
 
   @PostMapping
@@ -63,7 +63,10 @@ public class ProjectInformationController {
                                              ValidationType validationType,
                                              ProjectContext projectContext) {
     bindingResult = projectInformationService.validate(form, bindingResult, validationType);
-    return controllerHelperService.checkErrorsAndRedirect(bindingResult, getProjectInformationModelAndView(projectId),
+    return controllerHelperService.checkErrorsAndRedirect(
+        bindingResult,
+        getProjectInformationModelAndView(projectId, form),
+        form,
         () -> {
           projectInformationService.createOrUpdate(projectContext.getProjectDetails(), form);
 
@@ -71,8 +74,9 @@ public class ProjectInformationController {
         });
   }
 
-  private ModelAndView getProjectInformationModelAndView(Integer projectId) {
+  private ModelAndView getProjectInformationModelAndView(Integer projectId, ProjectInformationForm form) {
     var modelAndView = new ModelAndView("project/projectinformation/projectInformation")
+        .addObject("form", form)
         .addObject("fieldStages",
             Stream.of(FieldStage.values()).sorted(Comparator.comparing(FieldStage::getDisplayOrder)).collect(
                 Collectors.toList()));

@@ -44,8 +44,8 @@ public class ProjectDetail {
     this.project = project;
     this.status = status;
     this.createdByWua = createdByWua;
-    this.version = 1;
-    this.isCurrentVersion = true;
+    this.version = version;
+    this.isCurrentVersion = isCurrentVersion;
   }
 
   public Integer getId() {

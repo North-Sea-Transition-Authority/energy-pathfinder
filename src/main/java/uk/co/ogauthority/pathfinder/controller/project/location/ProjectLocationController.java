@@ -59,7 +59,10 @@ public class ProjectLocationController {
                                           ValidationType validationType,
                                           ProjectContext projectContext) {
     bindingResult = locationService.validate(form, bindingResult, validationType);
-    return controllerHelperService.checkErrorsAndRedirect(bindingResult, getLocationModelAndView(projectId, form),
+    return controllerHelperService.checkErrorsAndRedirect(
+        bindingResult,
+        getLocationModelAndView(projectId, form),
+        form,
         () -> {
           locationService.createOrUpdate(projectContext.getProjectDetails(), form);
 

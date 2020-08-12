@@ -1,12 +1,15 @@
 package uk.co.ogauthority.pathfinder.service.controller;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -36,10 +39,11 @@ public class ControllerHelperService {
    */
   public ModelAndView checkErrorsAndRedirect(BindingResult bindingResult,
                                              ModelAndView modelAndView,
+                                             Object form,
                                              Supplier<ModelAndView> ifValid) {
 
     if (bindingResult.hasErrors()) {
-      addFieldValidationErrors(modelAndView, bindingResult);
+      addFieldValidationErrors(modelAndView, bindingResult, form);
       return modelAndView;
     }
 
@@ -51,13 +55,16 @@ public class ControllerHelperService {
    * Adds field validation errors to a model and view.
    * @param modelAndView The model and view which failed validation
    * @param bindingResult The result of the submitted form containing the list of validation errors
+   * @param form The submitted form object
    */
-  private void addFieldValidationErrors(ModelAndView modelAndView, BindingResult bindingResult) {
+  private void addFieldValidationErrors(ModelAndView modelAndView, BindingResult bindingResult, Object form) {
 
     List<ErrorItem> errorList = new ArrayList<>();
-    IntStream.range(0, bindingResult.getFieldErrors().size()).forEach(index -> {
+    List<FieldError> fieldErrors = getFieldErrorsInFormFieldOrder(form, bindingResult);
 
-      var fieldError = bindingResult.getFieldErrors().get(index);
+    IntStream.range(0, fieldErrors.size()).forEach(index -> {
+
+      var fieldError = fieldErrors.get(index);
 
       // try to get a message from the custom message store for the error, fallback to default message
       String errorMessage = messageSource.getMessage(
@@ -89,6 +96,31 @@ public class ControllerHelperService {
             .filter(code -> code.contains("typeMismatch.java."))
             .findFirst());
 
+  }
+
+  /**
+   * Helper method to ensure that the FieldErrors are returned in the same
+   * order as the fields on the form object.
+   * @param form The form that the validation has run against
+   * @param bindingResult The result of the submitted form containing the list of validation errors
+   * @return a list of FieldError objects sorted in the same order as the fields declared on the form
+   */
+  private List<FieldError> getFieldErrorsInFormFieldOrder(Object form, BindingResult bindingResult) {
+
+    List<FieldError> errorList = new ArrayList<>();
+
+    if (form != null && bindingResult != null && bindingResult.hasErrors()) {
+      var formFields = Arrays.stream(form.getClass().getDeclaredFields())
+          .map(Field::getName)
+          .collect(Collectors.toList());
+
+      errorList.addAll(bindingResult.getFieldErrors());
+      errorList.sort(Comparator.comparing(fieldError -> formFields.indexOf(fieldError.getField())));
+    } else if (form == null && bindingResult != null) {
+      errorList = bindingResult.getFieldErrors();
+    }
+
+    return errorList;
   }
 
 }

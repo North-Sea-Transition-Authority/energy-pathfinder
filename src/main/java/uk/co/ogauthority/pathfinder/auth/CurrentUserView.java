@@ -1,7 +1,5 @@
 package uk.co.ogauthority.pathfinder.auth;
 
-import uk.co.ogauthority.pathfinder.model.entity.UserAccount;
-
 public class CurrentUserView {
 
   private final boolean isAuthenticated;

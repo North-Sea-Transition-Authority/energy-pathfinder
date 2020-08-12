@@ -69,6 +69,6 @@ public class DevUkField implements SearchSelectable {
 
   @Override
   public String getSelectionText() {
-    return fieldName;
+    return getFieldName();
   }
 }
