@@ -31,6 +31,6 @@ public class StartProjectController {
   @PostMapping("/start-project")
   public ModelAndView startProject(AuthenticatedUserAccount user) {
     var projectDetail = startProjectService.startProject(user);
-    return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectDetail.getProject().getId()));
+    return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectDetail.getProject().getId(), null));
   }
 }

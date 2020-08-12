@@ -29,7 +29,7 @@ public class BreadcrumbService {
 
   private Map<String, String> taskList(Integer projectId) {
     var map = workArea();
-    String route = ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId));
+    String route = ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId, null));
     map.put(route, "Task list");
     return map;
   }

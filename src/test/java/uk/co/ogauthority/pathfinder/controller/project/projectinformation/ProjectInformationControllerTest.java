@@ -18,37 +18,37 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.ObjectError;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
+import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
-import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(ProjectInformationController.class)
-public class ProjectInformationControllerTest extends AbstractControllerTest {
+@WebMvcTest(value = ProjectInformationController.class, includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ProjectContextService.class))
+public class ProjectInformationControllerTest extends ProjectContextAbstractControllerTest {
 
   private static final Integer PROJECT_ID = 1;
 
-  @MockBean
-  private ProjectService projectService;
 
   @MockBean
   private ProjectInformationService projectInformationService;
 
-  private ProjectDetail details = ProjectUtil.getProjectDetails();
+  private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
@@ -56,17 +56,18 @@ public class ProjectInformationControllerTest extends AbstractControllerTest {
 
   private static final AuthenticatedUserAccount unAuthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
-
   @Before
   public void setUp() throws Exception {
-    when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(details));
+    when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(detail));
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(false);
   }
 
   @Test
   public void authenticatedUser_hasAccessToProjectInformation() throws Exception {
-    when(projectInformationService.getForm(details)).thenReturn(new ProjectInformationForm());
+    when(projectInformationService.getForm(detail)).thenReturn(new ProjectInformationForm());
     mockMvc.perform(get(ReverseRouter.route(
-        on(ProjectInformationController.class).getProjectInformation(authenticatedUser, PROJECT_ID)))
+        on(ProjectInformationController.class).getProjectInformation(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -74,7 +75,7 @@ public class ProjectInformationControllerTest extends AbstractControllerTest {
   @Test
   public void unAuthenticatedUser_cannotAccessProjectInformation() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(ProjectInformationController.class).getProjectInformation(unAuthenticatedUser, PROJECT_ID)))
+        on(ProjectInformationController.class).getProjectInformation(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -90,7 +91,7 @@ public class ProjectInformationControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectInformationController.class)
-            .saveProjectInformation(null, PROJECT_ID, null, null, null)
+            .saveProjectInformation(PROJECT_ID, null, null, null, null)
           ))
           .with(authenticatedUserAndSession(authenticatedUser))
           .with(csrf())
@@ -115,7 +116,7 @@ public class ProjectInformationControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectInformationController.class)
-            .saveProjectInformation(null, PROJECT_ID, null, null, null)
+            .saveProjectInformation(PROJECT_ID, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())
@@ -140,7 +141,7 @@ public class ProjectInformationControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectInformationController.class)
-            .saveProjectInformation(null, PROJECT_ID, null, null, null)
+            .saveProjectInformation(PROJECT_ID, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())

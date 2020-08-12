@@ -13,24 +13,23 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
+import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(TaskListController.class)
-public class TaskListControllerTest extends AbstractControllerTest {
-
-  @MockBean
-  private ProjectService projectService;
+@WebMvcTest(value = TaskListController.class, includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ProjectContextService.class))
+public class TaskListControllerTest extends ProjectContextAbstractControllerTest {
 
   @MockBean
   private ProjectInformationService projectInformationService;
@@ -49,15 +48,17 @@ public class TaskListControllerTest extends AbstractControllerTest {
   @Test
   public void authenticatedUser_hasAccessToTaskList() throws Exception {
     when(projectService.getLatestDetail(any())).thenReturn(Optional.of(details));
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(details, authenticatedUser)).thenReturn(true);
 
-    mockMvc.perform(get(ReverseRouter.route(on(TaskListController.class).viewTaskList(1)))
+    mockMvc.perform(get(ReverseRouter.route(on(TaskListController.class).viewTaskList(1, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
 
   @Test
   public void unAuthenticatedUser_cannotAccessTaskList() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(on(TaskListController.class).viewTaskList(1)))
+    when(projectService.getLatestDetail(any())).thenReturn(Optional.of(details));
+    mockMvc.perform(get(ReverseRouter.route(on(TaskListController.class).viewTaskList(1, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }

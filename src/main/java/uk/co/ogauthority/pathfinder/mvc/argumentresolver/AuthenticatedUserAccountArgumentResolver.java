@@ -6,7 +6,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.util.SecurityUtil;
+import uk.co.ogauthority.pathfinder.util.ArgumentResolverUtil;
 
 public class AuthenticatedUserAccountArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -18,8 +18,7 @@ public class AuthenticatedUserAccountArgumentResolver implements HandlerMethodAr
   @Override
   public AuthenticatedUserAccount resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-    return SecurityUtil.getAuthenticatedUserFromSecurityContext()
-        .orElseThrow(() -> new RuntimeException("Failed to get AuthenticatedUserAccount from current authentication context"));
+    return ArgumentResolverUtil.getAuthenticatedUser();
   }
 
 }
