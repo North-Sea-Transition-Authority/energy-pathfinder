@@ -65,7 +65,7 @@ public abstract class AbstractControllerTest {
 
     when(userSessionService.getAndValidateSession(any(), anyBoolean())).thenReturn(Optional.of(new UserSession()));
 
-    when(controllerHelperService.checkErrorsAndRedirect(any(), any(), any())).thenCallRealMethod();
+    when(controllerHelperService.checkErrorsAndRedirect(any(), any(), any(), any())).thenCallRealMethod();
   }
 
   @TestConfiguration

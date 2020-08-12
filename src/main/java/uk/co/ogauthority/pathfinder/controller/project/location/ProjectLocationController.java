@@ -67,7 +67,10 @@ public class ProjectLocationController {
         .orElseThrow(() -> new PathfinderEntityNotFoundException(
             String.format("Unable to find project detail for project id  %d", projectId)));
     bindingResult = locationService.validate(form, bindingResult, validationType);
-    return controllerHelperService.checkErrorsAndRedirect(bindingResult, getLocationModelAndView(projectId, form),
+    return controllerHelperService.checkErrorsAndRedirect(
+        bindingResult,
+        getLocationModelAndView(projectId, form),
+        form,
         () -> {
           locationService.createOrUpdate(details, form);
 

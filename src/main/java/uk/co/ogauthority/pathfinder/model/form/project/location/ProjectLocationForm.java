@@ -1,11 +1,11 @@
 package uk.co.ogauthority.pathfinder.model.form.project.location;
 
 import javax.validation.constraints.NotEmpty;
-import uk.co.ogauthority.pathfinder.model.form.validation.FormValidation;
+import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
-public class ProjectLocationForm implements FormValidation {
+public class ProjectLocationForm {
 
-  @NotEmpty(message = "Select a field", groups = Full.class)
+  @NotEmpty(message = "Select a field", groups = FullValidation.class)
   private String field;
 
   public ProjectLocationForm() {

@@ -4,23 +4,22 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
-import uk.co.ogauthority.pathfinder.model.form.validation.FormValidation;
+import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
-public class ProjectInformationForm implements FormValidation {
+public class ProjectInformationForm {
 
-  @NotNull(message = "Select a field stage", groups = Full.class)
+  @NotNull(message = "Select a field stage", groups = FullValidation.class)
   private FieldStage fieldStage;
 
   @Length(max = 4000, message = "A project title can not be more than 4000 characters")
-  @NotEmpty(message = "Enter a project title", groups = Full.class)
+  @NotEmpty(message = "Enter a project title", groups = FullValidation.class)
   private String projectTitle;
 
-  @NotEmpty(message = "Provide a summary of the project", groups = Full.class)
+  @NotEmpty(message = "Provide a summary of the project", groups = FullValidation.class)
   private String projectSummary;
 
   public ProjectInformationForm() {
   }
-
 
   public FieldStage getFieldStage() {
     return fieldStage;

@@ -14,7 +14,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -22,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationF
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -39,7 +39,7 @@ public class ProjectLocationServiceTest {
   private SearchSelectorService searchSelectorService;
 
   @Mock
-  private SpringValidatorAdapter validator;
+  private ValidationService validationService;
 
   private ProjectLocationService projectLocationService;
 
@@ -48,12 +48,12 @@ public class ProjectLocationServiceTest {
   private ProjectLocation projectLocation;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     projectLocationService = new ProjectLocationService(
         projectLocationRepository,
         fieldService,
         searchSelectorService,
-        validator
+        validationService
     );
 
     when(projectLocationRepository.save(any(ProjectLocation.class)))
@@ -141,12 +141,15 @@ public class ProjectLocationServiceTest {
 
   @Test
   public void validate_partial() {
+    var form = new ProjectLocationForm();
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+
     projectLocationService.validate(
-        new ProjectLocationForm(),
-        null,
+        form,
+        bindingResult,
         ValidationType.PARTIAL
     );
-    verify(validator, times(0)).validate(any(), any(), any());
+    verify(validationService, times(1)).validate(form, bindingResult, ValidationType.PARTIAL);
   }
 
   @Test
@@ -160,7 +163,7 @@ public class ProjectLocationServiceTest {
         ValidationType.FULL
     );
 
-    verify(validator, times(1)).validate(form, bindingResult, ProjectLocationForm.Full.class);
+    verify(validationService, times(1)).validate(form, bindingResult, ValidationType.FULL);
   }
 
   @Test

@@ -57,9 +57,8 @@ public class ProjectInformationController {
         .orElseThrow(() -> new PathfinderEntityNotFoundException(
             String.format("Unable to find project detail for project id  %d", projectId)));
 
-
-    return getProjectInformationModelAndView(projectId)
-        .addObject("form", projectInformationService.getForm(details));
+    var form = projectInformationService.getForm(details);
+    return getProjectInformationModelAndView(projectId, form);
   }
 
   @PostMapping
@@ -73,7 +72,10 @@ public class ProjectInformationController {
             String.format("Unable to find project detail for project id  %d", projectId)));
 
     bindingResult = projectInformationService.validate(form, bindingResult, validationType);
-    return controllerHelperService.checkErrorsAndRedirect(bindingResult, getProjectInformationModelAndView(projectId),
+    return controllerHelperService.checkErrorsAndRedirect(
+        bindingResult,
+        getProjectInformationModelAndView(projectId, form),
+        form,
         () -> {
           projectInformationService.createOrUpdate(details, form);
 
@@ -81,8 +83,9 @@ public class ProjectInformationController {
         });
   }
 
-  private ModelAndView getProjectInformationModelAndView(Integer projectId) {
+  private ModelAndView getProjectInformationModelAndView(Integer projectId, ProjectInformationForm form) {
     var modelAndView = new ModelAndView("project/projectinformation/projectInformation")
+        .addObject("form", form)
         .addObject("fieldStages",
             Stream.of(FieldStage.values()).sorted(Comparator.comparing(FieldStage::getDisplayOrder)).collect(
                 Collectors.toList()));

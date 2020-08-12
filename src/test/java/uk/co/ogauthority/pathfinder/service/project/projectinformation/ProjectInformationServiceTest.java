@@ -13,12 +13,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
+import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -29,7 +29,7 @@ public class ProjectInformationServiceTest {
   private ProjectInformationRepository projectInformationRepository;
 
   @Mock
-  private SpringValidatorAdapter validator;
+  private ValidationService validationService;
 
   private ProjectInformationService projectInformationService;
 
@@ -38,10 +38,10 @@ public class ProjectInformationServiceTest {
   private ProjectInformation projectInformation;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     projectInformationService = new ProjectInformationService(
         projectInformationRepository,
-        validator
+        validationService
     );
 
     when(projectInformationRepository.save(any(ProjectInformation.class)))
@@ -96,12 +96,15 @@ public class ProjectInformationServiceTest {
 
   @Test
   public void validate_partial() {
+    var form = new ProjectInformationForm();
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+
     projectInformationService.validate(
-        new ProjectInformationForm(),
-        null,
+        form,
+        bindingResult,
         ValidationType.PARTIAL
     );
-    verify(validator, times(0)).validate(any(), any(), any());
+    verify(validationService, times(1)).validate(form, bindingResult, ValidationType.PARTIAL);
   }
 
   @Test
@@ -115,6 +118,6 @@ public class ProjectInformationServiceTest {
         ValidationType.FULL
     );
 
-    verify(validator, times(1)).validate(form, bindingResult, ProjectInformationForm.Full.class);
+    verify(validationService, times(1)).validate(form, bindingResult, ValidationType.FULL);
   }
 }

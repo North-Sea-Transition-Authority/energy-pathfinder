@@ -6,24 +6,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
+import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
 public class ProjectInformationService {
 
   private final ProjectInformationRepository projectInformationRepository;
-  private final SpringValidatorAdapter validator;
+  private final ValidationService validationService;
 
   @Autowired
   public ProjectInformationService(ProjectInformationRepository projectInformationRepository,
-                                   SpringValidatorAdapter validator) {
+                                   ValidationService validationService) {
     this.projectInformationRepository = projectInformationRepository;
-    this.validator = validator;
+    this.validationService = validationService;
   }
 
   @Transactional
@@ -62,11 +62,7 @@ public class ProjectInformationService {
   public BindingResult validate(ProjectInformationForm form,
                                 BindingResult bindingResult,
                                 ValidationType validationType) {
-    if (validationType.equals(ValidationType.FULL)) {
-      validator.validate(form, bindingResult, ProjectInformationForm.Full.class);
-    }
-
-    return bindingResult;
+    return validationService.validate(form, bindingResult, validationType);
   }
 
 
