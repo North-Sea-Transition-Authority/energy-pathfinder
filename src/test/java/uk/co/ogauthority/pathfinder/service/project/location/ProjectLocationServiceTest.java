@@ -53,8 +53,8 @@ public class ProjectLocationServiceTest {
         projectLocationRepository,
         fieldService,
         searchSelectorService,
-        validationService
-    );
+        validationService,
+        validator);
 
     when(projectLocationRepository.save(any(ProjectLocation.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
