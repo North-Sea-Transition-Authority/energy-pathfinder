@@ -18,15 +18,16 @@ public class TwoFieldDateInputValidator implements SmartValidator {
 
   private static final String MONTH = "month";
   private static final String YEAR = "year";
+  public static final String VALID_DATE_ERROR = " must be a valid date";
 
-  private static final String MONTH_INVALID_CODE = MONTH + FieldValidationErrorCodes.INVALID.getCode();
-  private static final String YEAR_INVALID_CODE = YEAR + FieldValidationErrorCodes.INVALID.getCode();
+  public static final String MONTH_INVALID_CODE = MONTH + FieldValidationErrorCodes.INVALID.getCode();
+  public static final String YEAR_INVALID_CODE = YEAR + FieldValidationErrorCodes.INVALID.getCode();
 
-  private static final String MONTH_AFTER_DATE_CODE = MONTH + FieldValidationErrorCodes.AFTER_SOME_DATE.getCode();
-  private static final String YEAR_AFTER_DATE_CODE = YEAR + FieldValidationErrorCodes.AFTER_SOME_DATE.getCode();
+  public static final String MONTH_AFTER_DATE_CODE = MONTH + FieldValidationErrorCodes.AFTER_SOME_DATE.getCode();
+  public static final String YEAR_AFTER_DATE_CODE = YEAR + FieldValidationErrorCodes.AFTER_SOME_DATE.getCode();
 
-  private static final String MONTH_BEFORE_DATE_CODE = MONTH + FieldValidationErrorCodes.BEFORE_SOME_DATE.getCode();
-  private static final String YEAR_BEFORE_DATE_CODE = YEAR + FieldValidationErrorCodes.BEFORE_SOME_DATE.getCode();
+  public static final String MONTH_BEFORE_DATE_CODE = MONTH + FieldValidationErrorCodes.BEFORE_SOME_DATE.getCode();
+  public static final String YEAR_BEFORE_DATE_CODE = YEAR + FieldValidationErrorCodes.BEFORE_SOME_DATE.getCode();
 
   @Override
   public boolean supports(Class<?> clazz) {
@@ -75,7 +76,7 @@ public class TwoFieldDateInputValidator implements SmartValidator {
       errors.rejectValue(
           YEAR,
           YEAR_INVALID_CODE,
-          inputLabel.getLabel() + " must be a valid date");
+          inputLabel.getLabel() + VALID_DATE_ERROR);
     } else {
       // only do additional validation when the date is valid
       afterDateHint.ifPresent(hint -> validateAfterDate(errors, twoFieldDateInput, inputLabel, hint));

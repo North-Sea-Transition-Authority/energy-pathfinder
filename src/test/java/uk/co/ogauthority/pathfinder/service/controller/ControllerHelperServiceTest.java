@@ -121,6 +121,34 @@ public class ControllerHelperServiceTest {
   }
 
   @Test
+  public void checkErrorsAndRedirect_errorListOrderSameAsForm_ignoreSubField() {
+    var form = new SubFieldTestForm();
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult.rejectValue("thirdField.month", "thirdField.invalid", "NotNull");
+    bindingResult.rejectValue("secondField", "secondField.invalid", "NotNull");
+    bindingResult.rejectValue("firstField.year", "firstField.invalid", "NotNull");
+
+    var result = controllerHelperService.checkErrorsAndRedirect(
+        bindingResult,
+        failedModelAndView,
+        form,
+        () -> passedModelAndView
+    );
+
+    @SuppressWarnings("unchecked")
+    var errorItemList = (List<ErrorItem>) result.getModel().get("errorList");
+
+    assertThat(errorItemList)
+        .extracting(ErrorItem::getDisplayOrder, ErrorItem::getFieldName, ErrorItem::getErrorMessage)
+        .containsExactly(
+            tuple(0, "firstField.year", "NotNull"),
+            tuple(1, "secondField", "NotNull"),
+            tuple(2, "thirdField.month", "NotNull")
+        );
+  }
+
+  @Test
   public void checkErrorsAndRedirect_errorListOrder_whenNoErrors_thenNullErrorList() {
     var form = new FieldOrderTestForm();
 
