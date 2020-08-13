@@ -53,11 +53,15 @@ public class ValidatorTestingUtil {
   }
 
   public static String over4000Chars() {
-    return StringUtils.repeat("a", 4001);
+    return getStringOfLength(4001);
   }
 
   public static String exactly4000chars() {
-    return StringUtils.repeat("a", 4000);
+    return getStringOfLength(4000);
+  }
+
+  public static String getStringOfLength(Integer length) {
+    return StringUtils.repeat("a", length);
   }
 
 }

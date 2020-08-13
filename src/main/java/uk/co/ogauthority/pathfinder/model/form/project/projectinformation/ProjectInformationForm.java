@@ -2,16 +2,17 @@ package uk.co.ogauthority.pathfinder.model.form.project.projectinformation;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.Length;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
+import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
+import uk.co.ogauthority.pathfinder.model.form.validation.lengthrestrictedstring.LengthRestrictedString;
 
 public class ProjectInformationForm {
 
   @NotNull(message = "Select a field stage", groups = FullValidation.class)
   private FieldStage fieldStage;
 
-  @Length(max = 4000, message = "A project title can not be more than 4000 characters")
+  @LengthRestrictedString(messagePrefix = "The project title", groups = {FullValidation.class, PartialValidation.class})
   @NotEmpty(message = "Enter a project title", groups = FullValidation.class)
   private String projectTitle;
 
