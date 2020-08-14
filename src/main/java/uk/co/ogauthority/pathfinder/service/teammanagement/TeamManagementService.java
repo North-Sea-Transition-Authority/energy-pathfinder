@@ -230,7 +230,7 @@ public class TeamManagementService {
     boolean settingAdminRole = selectedRoles.stream().anyMatch(Role::isTeamAdministratorRole);
 
     if (isAlreadyTeamMember && isPersonLastTeamAdmin(team, person) && !settingAdminRole) {
-      throw new LastAdministratorException("Operation would result in 0 team administrators");
+      throw new LastAdministratorException("Operation would result in 0 access managers");
     }
 
     if (isAlreadyTeamMember) {

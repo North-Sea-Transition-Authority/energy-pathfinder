@@ -24,7 +24,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.ObjectError;
+import org.springframework.validation.FieldError;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
@@ -111,7 +111,7 @@ public class ProjectLocationControllerTest extends ProjectContextAbstractControl
     }};
 
     var bindingResult = new BeanPropertyBindingResult(ProjectLocationForm.class, "form");
-    bindingResult.addError(new ObjectError("Error", "ErrorMessage"));
+    bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
     when(projectLocationService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(

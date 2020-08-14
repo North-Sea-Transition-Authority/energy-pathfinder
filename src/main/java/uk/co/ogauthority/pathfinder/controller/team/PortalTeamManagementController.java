@@ -30,6 +30,8 @@ import uk.co.ogauthority.pathfinder.model.teammanagement.TeamMemberView;
 import uk.co.ogauthority.pathfinder.model.teammanagement.TeamRoleView;
 import uk.co.ogauthority.pathfinder.model.teammanagement.TeamView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.FoxUrlService;
+import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.teammanagement.AddUserToTeamFormValidator;
 import uk.co.ogauthority.pathfinder.service.teammanagement.LastAdministratorException;
 import uk.co.ogauthority.pathfinder.service.teammanagement.TeamManagementService;
@@ -41,12 +43,18 @@ public class PortalTeamManagementController {
 
   private final TeamManagementService teamManagementService;
   private final AddUserToTeamFormValidator addUserToTeamFormValidator;
+  private final FoxUrlService foxUrlService;
+  private final ControllerHelperService controllerHelperService;
 
   @Autowired
   public PortalTeamManagementController(TeamManagementService teamManagementService,
-                                        AddUserToTeamFormValidator addUserToTeamFormValidator) {
+                                        AddUserToTeamFormValidator addUserToTeamFormValidator,
+                                        FoxUrlService foxUrlService,
+                                        ControllerHelperService controllerHelperService) {
     this.teamManagementService = teamManagementService;
     this.addUserToTeamFormValidator = addUserToTeamFormValidator;
+    this.foxUrlService = foxUrlService;
+    this.controllerHelperService = controllerHelperService;
   }
 
   /**
@@ -130,12 +138,13 @@ public class PortalTeamManagementController {
 
   private ModelAndView getAddUserToTeamModelAndView(Team team) {
     return new ModelAndView("teamManagement/addUserToTeam")
-        .addObject("groupName", "team")
+        .addObject("groupName", team.getName())
         .addObject("teamId", team.getId())
         .addObject("showTopNav", true)
         .addObject("cancelUrl", ReverseRouter.route(
             on(PortalTeamManagementController.class).renderTeamMembers(team.getId(), null))
-        );
+        )
+        .addObject("portalRegistrationUrl", foxUrlService.getFoxRegistrationUrl());
   }
 
   @PostMapping("/teams/{resId}/member/new")
@@ -147,16 +156,18 @@ public class PortalTeamManagementController {
       userForm.setResId(resId);
       addUserToTeamFormValidator.validate(userForm, result);
 
-      if (result.hasErrors()) {
-        return getAddUserToTeamModelAndView(team);
-      } else {
-        var person = teamManagementService.getPersonByEmailAddressOrLoginId(userForm.getUserIdentifier())
-            .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format(
-                "No person found with email/loginId %s. This should have been caught by form validation.", userForm.getUserIdentifier())
-            ));
-        return ReverseRouter.redirect(on(PortalTeamManagementController.class)
-            .renderMemberRoles(team.getId(), person.getId().asInt(), null, null));
-      }
+      return controllerHelperService.checkErrorsAndRedirect(
+        result,
+        getAddUserToTeamModelAndView(team),
+        userForm,
+        () -> {
+          var person = teamManagementService.getPersonByEmailAddressOrLoginId(userForm.getUserIdentifier())
+              .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format(
+                  "No person found with email/loginId %s. This should have been caught by form validation.", userForm.getUserIdentifier())
+              ));
+          return ReverseRouter.redirect(on(PortalTeamManagementController.class)
+              .renderMemberRoles(team.getId(), person.getId().asInt(), null, null));
+        });
     });
   }
 
@@ -223,17 +234,24 @@ public class PortalTeamManagementController {
     return withManageableTeam(resId, currentUser, team -> {
       var person = teamManagementService.getPerson(personId);
 
-      if (result.hasErrors()) {
-        return getMemberRolesModelAndView(team, person, form);
-      }
-
-      try {
-        teamManagementService.updateUserRoles(person, team, form, currentUser);
-        return ReverseRouter.redirect(on(PortalTeamManagementController.class).renderTeamMembers(resId, null));
-      } catch (LastAdministratorException e) {
-        result.rejectValue("userRoles", "userRoles.invalid", "You cannot remove the last administrator from a team");
-        return getMemberRolesModelAndView(team, person, form);
-      }
+      return controllerHelperService.checkErrorsAndRedirect(
+        result,
+        getMemberRolesModelAndView(team, person, form),
+        form,
+        () -> {
+          try {
+            teamManagementService.updateUserRoles(person, team, form, currentUser);
+            return ReverseRouter.redirect(on(PortalTeamManagementController.class).renderTeamMembers(resId, null));
+          } catch (LastAdministratorException e) {
+            // TODO PAT-160 to ensure this happens in a validator so error summary is populated correctly
+            result.rejectValue(
+                "userRoles",
+                "userRoles.invalid",
+                "You cannot remove the last access manager from a team"
+            );
+            return getMemberRolesModelAndView(team, person, form);
+          }
+        });
     });
   }
 

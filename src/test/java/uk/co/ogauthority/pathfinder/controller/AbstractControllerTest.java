@@ -52,9 +52,6 @@ public abstract class AbstractControllerTest {
   protected TopNavigationService topNavigationService;
 
   @MockBean
-  protected ControllerHelperService controllerHelperService;
-
-  @MockBean
   protected ProjectContextService projectContextService;
 
   @Before
@@ -66,10 +63,10 @@ public abstract class AbstractControllerTest {
 
     when(foxUrlService.getFoxLoginUrl()).thenReturn("test-login-url");
     when(foxUrlService.getFoxLogoutUrl()).thenReturn("test-logout-url");
+    when(foxUrlService.getFoxRegistrationUrl()).thenReturn("test-registration-url");
 
     when(userSessionService.getAndValidateSession(any(), anyBoolean())).thenReturn(Optional.of(new UserSession()));
 
-    when(controllerHelperService.checkErrorsAndRedirect(any(), any(), any(), any())).thenCallRealMethod();
   }
 
   @TestConfiguration
@@ -90,6 +87,9 @@ public abstract class AbstractControllerTest {
       messageSource.setDefaultEncoding("UTF-8");
       return messageSource;
     }
+
+    @Bean
+    public ControllerHelperService controllerHelperService() { return new ControllerHelperService(messageSource()); }
   }
 
 }
