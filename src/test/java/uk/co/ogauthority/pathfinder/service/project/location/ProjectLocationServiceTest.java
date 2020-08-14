@@ -97,6 +97,29 @@ public class ProjectLocationServiceTest {
   }
 
   @Test
+  public void createOrUpdate_existingLocation_dateNotSetWhenLinkedQuestionIsFalse() {
+    var form = ProjectLocationUtil.getCompletedForm_manualField();
+    form.setApprovedFieldDevelopmentPlan(false);
+    projectLocation = ProjectLocationUtil.getProjectLocation_withField(details);
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(
+        Optional.of(
+            projectLocation
+        ));
+
+    //before call fdp date set
+    assertThat(projectLocation.getApprovedFieldDevelopmentPlan()).isTrue();
+    assertThat(projectLocation.getApprovedFdpDate()).isNotNull();
+
+    //update with new form details
+    projectLocation = projectLocationService.createOrUpdate(details, form);
+
+    //after call fdp date null
+    assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
+    assertThat(projectLocation.getApprovedFieldDevelopmentPlan()).isFalse();
+    assertThat(projectLocation.getApprovedFdpDate()).isNull();
+  }
+
+  @Test
   public void createOrUpdate_existingLocation_manualToField() {
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(
         Optional.of(

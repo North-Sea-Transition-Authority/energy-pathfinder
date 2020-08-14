@@ -12,13 +12,16 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.OnOrA
 import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.OnOrBeforeDateHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.TwoFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
+import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
 @Component
 public class TwoFieldDateInputValidator implements SmartValidator {
 
   private static final String MONTH = "month";
   private static final String YEAR = "year";
+  public static final String DEFAULT_INPUT_LABEL_TEXT = "Date";
   public static final String VALID_DATE_ERROR = " must be a valid date";
+  public static final String EMPTY_DATE_ERROR = "Enter %s ";
 
   public static final String MONTH_INVALID_CODE = MONTH + FieldValidationErrorCodes.INVALID.getCode();
   public static final String YEAR_INVALID_CODE = YEAR + FieldValidationErrorCodes.INVALID.getCode();
@@ -47,7 +50,7 @@ public class TwoFieldDateInputValidator implements SmartValidator {
         .filter(hint -> hint.getClass().equals(FormInputLabel.class))
         .map(hint -> ((FormInputLabel) hint))
         .findFirst()
-        .orElse(new FormInputLabel("Date"));
+        .orElse(new FormInputLabel(DEFAULT_INPUT_LABEL_TEXT));
 
     var twoFieldDateInput = (TwoFieldDateInput) o;
 
@@ -71,20 +74,30 @@ public class TwoFieldDateInputValidator implements SmartValidator {
         .map(hint -> ((AfterDateHint) hint))
         .findFirst();
 
-    if (twoFieldDateInput.createDate().isEmpty()) {
+    //Check the date exists
+    if (twoFieldDateInput.getMonth() == null && twoFieldDateInput.getYear() == null) {
       errors.rejectValue(MONTH, MONTH_INVALID_CODE, "");
       errors.rejectValue(
           YEAR,
           YEAR_INVALID_CODE,
-          inputLabel.getLabel() + VALID_DATE_ERROR);
-    } else {
-      // only do additional validation when the date is valid
-      afterDateHint.ifPresent(hint -> validateAfterDate(errors, twoFieldDateInput, inputLabel, hint));
-      beforeDateHint.ifPresent(hint -> validateBeforeDate(errors, twoFieldDateInput, inputLabel, hint));
-      onOrAfterDateHint.ifPresent(hint -> validateOnOrAfterDate(errors, twoFieldDateInput, inputLabel, hint));
-      onOrBeforeDateHint.ifPresent(hint -> validateOnOrBeforeDate(errors, twoFieldDateInput, inputLabel, hint));
+          String.format(EMPTY_DATE_ERROR, StringDisplayUtil.getPrefixForVowelOrConsonant(inputLabel.getLabel()) +
+              inputLabel.getLabel())
+      );
+    } else { //If it exists check it meets all requirements.
+      if (twoFieldDateInput.createDate().isEmpty()) {
+        errors.rejectValue(MONTH, MONTH_INVALID_CODE, "");
+        errors.rejectValue(
+            YEAR,
+            YEAR_INVALID_CODE,
+            inputLabel.getLabel() + VALID_DATE_ERROR);
+      } else {
+        // only do additional validation when the date is valid
+        afterDateHint.ifPresent(hint -> validateAfterDate(errors, twoFieldDateInput, inputLabel, hint));
+        beforeDateHint.ifPresent(hint -> validateBeforeDate(errors, twoFieldDateInput, inputLabel, hint));
+        onOrAfterDateHint.ifPresent(hint -> validateOnOrAfterDate(errors, twoFieldDateInput, inputLabel, hint));
+        onOrBeforeDateHint.ifPresent(hint -> validateOnOrBeforeDate(errors, twoFieldDateInput, inputLabel, hint));
+      }
     }
-
   }
 
   // There must be a cleaner way than this to avoid adding new methods per hint type.

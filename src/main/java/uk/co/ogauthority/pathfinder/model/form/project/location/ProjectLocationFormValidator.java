@@ -12,8 +12,8 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 @Component
 public class ProjectLocationFormValidator implements SmartValidator {
 
-  public static final FormInputLabel APPROVED_FDP_LABEL = new FormInputLabel("Approved Field Development Plan");
-  public static final FormInputLabel APPROVED_DECOM_LABEL = new FormInputLabel("Approved Decommissioning Program");
+  public static final FormInputLabel APPROVED_FDP_LABEL = new FormInputLabel("Approved Field Development Plan date");
+  public static final FormInputLabel APPROVED_DECOM_LABEL = new FormInputLabel("Approved Decommissioning Program date");
   private final TwoFieldDateInputValidator twoFieldDateInputValidator;
 
   @Autowired

@@ -34,7 +34,7 @@ public class TwoFieldDateInputValidatorTest {
   }
 
   @Test
-  public void validate_noHints_invalid_date() {
+  public void validate_noHints_invalid_emptyDate() {
     var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
     ValidationUtils.invokeValidator(validator, twoFieldDateInput, errors, new Object[0]);
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
@@ -47,14 +47,34 @@ public class TwoFieldDateInputValidatorTest {
 
     assertThat(fieldErrorMessages).containsExactly(
         entry("month", Set.of("")),
-        entry("year", Set.of("Date must be a valid date"))
+        entry("year", Set.of(String.format(TwoFieldDateInputValidator.EMPTY_DATE_ERROR, "a "+ TwoFieldDateInputValidator.DEFAULT_INPUT_LABEL_TEXT)))
     );
   }
 
   @Test
-  public void validate_inputLabelHint_invalidDate() {
+  public void validate_noHints_invalid_date() {
+    twoFieldDateInput = new TwoFieldDateInput(13, -1);
     var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
-    Object[] hints = {new FormInputLabel("Work start date")};
+    ValidationUtils.invokeValidator(validator, twoFieldDateInput, errors, new Object[0]);
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).containsExactly(
+        entry("month", Set.of("month.invalid")),
+        entry("year", Set.of("year.invalid"))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("month", Set.of("")),
+        entry("year", Set.of(TwoFieldDateInputValidator.DEFAULT_INPUT_LABEL_TEXT + TwoFieldDateInputValidator.VALID_DATE_ERROR))
+    );
+  }
+
+  @Test
+  public void validate_inputLabelHint_invalidDate_emptyDate() {
+    var label = new FormInputLabel("Work start date");
+    var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
+    Object[] hints = {label};
     ValidationUtils.invokeValidator(validator, twoFieldDateInput, errors, hints);
 
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
@@ -62,7 +82,24 @@ public class TwoFieldDateInputValidatorTest {
 
     assertThat(fieldErrorMessages).containsExactly(
         entry("month", Set.of("")),
-        entry("year", Set.of("Work start date must be a valid date"))
+        entry("year", Set.of(String.format(TwoFieldDateInputValidator.EMPTY_DATE_ERROR, "a "+label.getLabel())))
+    );
+  }
+
+  @Test
+  public void validate_inputLabelHint_invalidDate_invalidDate() {
+    var label = new FormInputLabel("Work start date");
+    twoFieldDateInput = new TwoFieldDateInput(-1, 22);
+    var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
+    Object[] hints = {label};
+    ValidationUtils.invokeValidator(validator, twoFieldDateInput, errors, hints);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("month", Set.of("")),
+        entry("year", Set.of(label.getLabel() + TwoFieldDateInputValidator.VALID_DATE_ERROR))
     );
   }
 

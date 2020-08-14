@@ -14,7 +14,7 @@ import javax.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PositiveWholeNumber {
 
-  String message() default "{messagePrefix} must be a whole number with no decimal places";
+  String message() default "{messagePrefix} must be a positive whole number with no decimal places";
 
   Class<?>[] groups() default {};
 

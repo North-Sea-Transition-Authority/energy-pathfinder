@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import javax.transaction.Transactional;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -58,11 +59,20 @@ public class ProjectLocationService {
 
     projectLocation.setFieldType(form.getFieldType());
     projectLocation.setWaterDepth(form.getWaterDepth());
-    projectLocation.setApprovedDecomProgram(form.getApprovedDecomProgram());
-    projectLocation.setApprovedDecomProgramDate(form.getApprovedDecomProgramDate().createDateOrNull());
 
     projectLocation.setApprovedFieldDevelopmentPlan(form.getApprovedFieldDevelopmentPlan());
-    projectLocation.setApprovedFdpDate(form.getApprovedFdpDate().createDateOrNull());
+    projectLocation.setApprovedFdpDate(
+        BooleanUtils.isTrue(form.getApprovedFieldDevelopmentPlan())
+            ? form.getApprovedFdpDate().createDateOrNull()
+            : null
+    );
+
+    projectLocation.setApprovedDecomProgram(form.getApprovedDecomProgram());
+    projectLocation.setApprovedDecomProgramDate(
+        BooleanUtils.isTrue(form.getApprovedDecomProgram())
+            ? form.getApprovedDecomProgramDate().createDateOrNull()
+            : null
+    );
 
     return projectLocationRepository.save(projectLocation);
   }
@@ -112,7 +122,10 @@ public class ProjectLocationService {
   public BindingResult validate(ProjectLocationForm form,
                                 BindingResult bindingResult,
                                 ValidationType validationType) {
-    projectLocationFormValidator.validate(form, bindingResult);
+    if (validationType.equals(ValidationType.FULL)) {
+      projectLocationFormValidator.validate(form, bindingResult);
+    }
+
     return validationService.validate(form, bindingResult, validationType);
   }
 
