@@ -23,6 +23,8 @@ import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectLocationFormValidatorTest {
 
+  public static final TwoFieldDateInput BAD_TWO_FIELD_DATE = new TwoFieldDateInput(-1, 22);
+
   @Mock
   private TwoFieldDateInputValidator twoFieldDateInputValidator;
 
@@ -48,7 +50,7 @@ public class ProjectLocationFormValidatorTest {
   }
 
   @Test
-  public void validate_answeredTrueButMissingDate_isInvalid() {
+  public void validate_answeredTrueButMissingDate() {
     var form = ProjectLocationUtil.getCompletedForm_manualField();
     form.setApprovedFdpDate(new TwoFieldDateInput(null, null));
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -66,12 +68,39 @@ public class ProjectLocationFormValidatorTest {
 
     assertThat(fieldErrorMessages).containsExactly(
         entry("approvedFdpDate.month", Set.of("")),
-        entry("approvedFdpDate.year", Set.of(ProjectLocationFormValidator.APPROVED_FDP_LABEL.getLabel() + TwoFieldDateInputValidator.VALID_DATE_ERROR))
+        entry("approvedFdpDate.year", Set.of(
+            String.format(TwoFieldDateInputValidator.EMPTY_DATE_ERROR, "an "+ ProjectLocationFormValidator.APPROVED_FDP_LABEL.getLabel()))
+        )
     );
   }
 
   @Test
-  public void validate_answeredTrueToBoth_bothDatesMissing_isInvalid() {
+  public void validate_answeredTrueButMissingDate_isInvalid() {
+    var form = ProjectLocationUtil.getCompletedForm_manualField();
+    form.setApprovedFdpDate(BAD_TWO_FIELD_DATE);
+    var errors = new BeanPropertyBindingResult(form, "form");
+
+    ValidationUtils.invokeValidator(validator, form, errors);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors.size()).isGreaterThan(0);
+    assertThat(fieldErrors).containsExactly(
+        entry("approvedFdpDate.month", Set.of(TwoFieldDateInputValidator.MONTH_INVALID_CODE)),
+        entry("approvedFdpDate.year", Set.of(TwoFieldDateInputValidator.YEAR_INVALID_CODE))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("approvedFdpDate.month", Set.of("")),
+        entry("approvedFdpDate.year", Set.of(
+            ProjectLocationFormValidator.APPROVED_FDP_LABEL.getLabel() + TwoFieldDateInputValidator.VALID_DATE_ERROR)
+        )
+    );
+  }
+
+  @Test
+  public void validate_answeredTrueToBoth_bothDatesMissing() {
     var form = ProjectLocationUtil.getCompletedForm_manualField();
     form.setApprovedFdpDate(new TwoFieldDateInput(null, null));
     form.setApprovedDecomProgram(true);
@@ -92,9 +121,46 @@ public class ProjectLocationFormValidatorTest {
 
     assertThat(fieldErrorMessages).contains(
         entry("approvedFdpDate.month", Set.of("")),
-        entry("approvedFdpDate.year", Set.of(ProjectLocationFormValidator.APPROVED_FDP_LABEL.getLabel() + TwoFieldDateInputValidator.VALID_DATE_ERROR)),
+        entry("approvedFdpDate.year", Set.of(
+            String.format(TwoFieldDateInputValidator.EMPTY_DATE_ERROR, "an "+ ProjectLocationFormValidator.APPROVED_FDP_LABEL.getLabel()))
+        ),
         entry("approvedDecomProgramDate.month", Set.of("")),
-        entry("approvedDecomProgramDate.year", Set.of(ProjectLocationFormValidator.APPROVED_DECOM_LABEL.getLabel() + TwoFieldDateInputValidator.VALID_DATE_ERROR))
+        entry("approvedDecomProgramDate.year", Set.of(
+            String.format(TwoFieldDateInputValidator.EMPTY_DATE_ERROR, "an " + ProjectLocationFormValidator.APPROVED_DECOM_LABEL.getLabel()))
+        )
+    );
+  }
+
+  @Test
+  public void validate_answeredTrueToBoth_bothDatesMissing_areInvalid() {
+    var form = ProjectLocationUtil.getCompletedForm_manualField();
+    form.setApprovedFdpDate(BAD_TWO_FIELD_DATE);
+    form.setApprovedDecomProgram(true);
+    form.setApprovedDecomProgramDate(BAD_TWO_FIELD_DATE);
+    var errors = new BeanPropertyBindingResult(form, "form");
+
+    ValidationUtils.invokeValidator(validator, form, errors);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors.size()).isGreaterThan(0);
+    assertThat(fieldErrors).contains(
+        entry("approvedFdpDate.month", Set.of(TwoFieldDateInputValidator.MONTH_INVALID_CODE)),
+        entry("approvedFdpDate.year", Set.of(TwoFieldDateInputValidator.YEAR_INVALID_CODE)),
+        entry("approvedDecomProgramDate.month", Set.of(TwoFieldDateInputValidator.MONTH_INVALID_CODE)),
+        entry("approvedDecomProgramDate.year", Set.of(TwoFieldDateInputValidator.YEAR_INVALID_CODE))
+    );
+
+    assertThat(fieldErrorMessages).contains(
+        entry("approvedFdpDate.month", Set.of("")),
+        entry("approvedFdpDate.year", Set.of(
+            ProjectLocationFormValidator.APPROVED_FDP_LABEL.getLabel() + TwoFieldDateInputValidator.VALID_DATE_ERROR)
+        ),
+        entry("approvedDecomProgramDate.month", Set.of("")),
+        entry("approvedDecomProgramDate.year", Set.of(
+            ProjectLocationFormValidator.APPROVED_DECOM_LABEL.getLabel() + TwoFieldDateInputValidator.VALID_DATE_ERROR)
+        )
     );
   }
 }
