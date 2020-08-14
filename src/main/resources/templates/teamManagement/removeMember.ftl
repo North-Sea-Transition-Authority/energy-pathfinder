@@ -42,6 +42,12 @@
       </tr>
       </tbody>
     </table>
-    <@fdsAction.submitButtons primaryButtonText="Remove" secondaryLinkText="Cancel" linkSecondaryAction=true linkSecondaryActionUrl=springUrl(cancelUrl)/>
+    <@fdsAction.submitButtons
+      primaryButtonText="Remove"
+      primaryButtonClass="govuk-button govuk-button--warning"
+      secondaryLinkText="Cancel"
+      linkSecondaryAction=true
+      linkSecondaryActionUrl=springUrl(cancelUrl)
+    />
   </@fdsForm.htmlForm>
 </@defaultPage>
