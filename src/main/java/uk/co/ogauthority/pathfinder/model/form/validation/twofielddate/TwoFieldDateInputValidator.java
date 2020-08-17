@@ -8,6 +8,7 @@ import org.springframework.validation.SmartValidator;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
 import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.AfterDateHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.BeforeDateHint;
+import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.EmptyDateAcceptableHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.OnOrAfterDateHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.OnOrBeforeDateHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.TwoFieldDateInput;
@@ -74,8 +75,13 @@ public class TwoFieldDateInputValidator implements SmartValidator {
         .map(hint -> ((AfterDateHint) hint))
         .findFirst();
 
-    //Check the date exists
-    if (twoFieldDateInput.getMonth() == null && twoFieldDateInput.getYear() == null) {
+    Optional<EmptyDateAcceptableHint> emptyDateAcceptableHint = Arrays.stream(objects)
+        .filter(hint -> hint.getClass().equals(EmptyDateAcceptableHint.class))
+        .map(hint -> ((EmptyDateAcceptableHint) hint))
+        .findFirst();
+
+    //If there's no EmptyDateAcceptableHint then check the date exists
+    if ((twoFieldDateInput.getMonth() == null && twoFieldDateInput.getYear() == null) && emptyDateAcceptableHint.isEmpty()) {
       errors.rejectValue(MONTH, MONTH_INVALID_CODE, "");
       errors.rejectValue(
           YEAR,
@@ -83,7 +89,8 @@ public class TwoFieldDateInputValidator implements SmartValidator {
           String.format(EMPTY_DATE_ERROR, StringDisplayUtil.getPrefixForVowelOrConsonant(inputLabel.getLabel()) +
               inputLabel.getLabel())
       );
-    } else { //If it exists check it meets all requirements.
+    //If a date exists check it meets all requirements.
+    } else if (twoFieldDateInput.getMonth() != null && twoFieldDateInput.getYear() != null) {
       if (twoFieldDateInput.createDate().isEmpty()) {
         errors.rejectValue(MONTH, MONTH_INVALID_CODE, "");
         errors.rejectValue(

@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.EmptyDateAcceptableHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.TwoFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
@@ -124,6 +125,8 @@ public class ProjectLocationService {
                                 ValidationType validationType) {
     if (validationType.equals(ValidationType.FULL)) {
       projectLocationFormValidator.validate(form, bindingResult);
+    } else {
+      projectLocationFormValidator.validate(form, bindingResult, new EmptyDateAcceptableHint());
     }
 
     return validationService.validate(form, bindingResult, validationType);

@@ -15,6 +15,7 @@ import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
 import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.AfterDateHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.BeforeDateHint;
+import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.EmptyDateAcceptableHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.OnOrAfterDateHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.OnOrBeforeDateHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.TwoFieldDateInput;
@@ -84,6 +85,18 @@ public class TwoFieldDateInputValidatorTest {
         entry("month", Set.of("")),
         entry("year", Set.of(String.format(TwoFieldDateInputValidator.EMPTY_DATE_ERROR, "a "+label.getLabel())))
     );
+  }
+
+  @Test
+  public void validate_inputLabelHint_emptyDate_emptyDateAcceptableHint() {
+    var label = new FormInputLabel("Work start date");
+    var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
+    Object[] hints = {label, new EmptyDateAcceptableHint()};
+    ValidationUtils.invokeValidator(validator, twoFieldDateInput, errors, hints);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+
+    assertThat(fieldErrors).isEmpty();
   }
 
   @Test

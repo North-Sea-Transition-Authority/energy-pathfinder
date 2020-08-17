@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.ValidationUtils;
+import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.EmptyDateAcceptableHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.TwoFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.validation.twofielddate.TwoFieldDateInputValidator;
@@ -43,6 +44,18 @@ public class ProjectLocationFormValidatorTest {
     var errors = new BeanPropertyBindingResult(form, "form");
 
     ValidationUtils.invokeValidator(validator, form, errors);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+
+    assertThat(fieldErrors).isEmpty();
+  }
+
+  @Test
+  public void validate_answeredTrueButMissingDate_withEmptyDateAcceptableHint() {
+    var form = ProjectLocationUtil.getCompletedForm_manualField();
+    var errors = new BeanPropertyBindingResult(form, "form");
+
+    ValidationUtils.invokeValidator(validator, form, errors, new EmptyDateAcceptableHint());
 
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
 

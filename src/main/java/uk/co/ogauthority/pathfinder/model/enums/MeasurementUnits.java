@@ -1,16 +1,16 @@
 package uk.co.ogauthority.pathfinder.model.enums;
 
 public enum MeasurementUnits {
-  METRES("metre", "metres", "(metres)");
+  METRES("metre", "metres", "in metres");
 
   private final String singular;
   private final String plural;
-  private final String suffix;
+  private final String screenReaderSuffix;
 
-  MeasurementUnits(String singular, String plural, String suffix) {
+  MeasurementUnits(String singular, String plural, String screenReaderSuffix) {
     this.singular = singular;
     this.plural = plural;
-    this.suffix = suffix;
+    this.screenReaderSuffix = screenReaderSuffix;
   }
 
   public String getSingular() {
@@ -21,7 +21,7 @@ public enum MeasurementUnits {
     return plural;
   }
 
-  public String getSuffix() {
-    return suffix;
+  public String getScreenReaderSuffix() {
+    return screenReaderSuffix;
   }
 }

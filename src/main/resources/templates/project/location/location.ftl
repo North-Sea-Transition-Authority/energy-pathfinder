@@ -8,7 +8,7 @@
     <@fdsForm.htmlForm>
       <@fdsSearchSelector.searchSelectorRest path="form.field" selectorMinInputLength=3  labelText="Which field is the project related to?" restUrl=springUrl(fieldsRestUrl)  preselectedItems=preselectedField!{} />
       <@fdsSelect.select path="form.fieldType" labelText="Field type" options=fieldTypeMap/>
-      <@fdsTextInput.textInput path="form.waterDepth" labelText="What is the water depth? " + waterDepthUnit.suffix inputClass="govuk-input--width-4" />
+      <@fdsTextInput.textInput path="form.waterDepth" labelText="What is the water depth? " suffix=waterDepthUnit.plural suffixScreenReaderPrompt=waterDepthUnit.screenReaderSuffix inputClass="govuk-input--width-4" />
       <@fdsRadio.radioGroup path="form.approvedFieldDevelopmentPlan" labelText="Do you have an approved Field Development Plan (FDP)?" fieldsetHeadingClass="govuk-fieldset__legend" hiddenContent=true>
         <@fdsRadio.radioYes path="form.approvedFieldDevelopmentPlan">
           <@fdsNumberInput.twoNumberInputs pathOne="form.approvedFdpDate.month" pathTwo="form.approvedFdpDate.year" nestingPath="form.approvedFieldDevelopmentPlan" fieldsetHeadingClass="govuk-fieldset__legend" labelText="What is the FDP approval date?" formId="approvedFdpDate-month-year">
