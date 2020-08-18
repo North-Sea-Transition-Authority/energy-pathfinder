@@ -62,8 +62,8 @@ public class ProjectOperatorServiceTest {
     projectOperatorService = new ProjectOperatorService(
         teamService,
         teamManagementService,
-        projectOperatorRepository,
-        portalOrganisationAccessor);
+        projectOperatorRepository
+    );
 
     when(projectOperatorRepository.save(any(ProjectOperator.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);

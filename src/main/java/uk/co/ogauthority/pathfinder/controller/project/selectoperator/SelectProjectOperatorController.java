@@ -13,13 +13,12 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
-import uk.co.ogauthority.pathfinder.controller.rest.OrganisationGroupRestController;
+import uk.co.ogauthority.pathfinder.model.enums.TopNavigationType;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.SelectOperatorForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.project.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
-import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 
 /**
  * A controller for users who are in multiple teams to use to select which team a project is for prior to creation.
@@ -27,7 +26,9 @@ import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService
 @Controller
 @RequestMapping("/project-operator-select")
 public class SelectProjectOperatorController {
+
   private static final String PRIMARY_BUTTON_TEXT = "Start project";
+
   private final StartProjectService startProjectService;
   private final SelectOperatorService selectOperatorService;
   private final ControllerHelperService controllerHelperService;
@@ -59,7 +60,7 @@ public class SelectProjectOperatorController {
         () -> {
           var projectDetail = startProjectService.startProject(
               user,
-              selectOperatorService.getOrganisationGroupOrError(Integer.valueOf(form.getOrganisationGroup()))
+              selectOperatorService.getOrganisationGroupOrError(user, Integer.valueOf(form.getOrganisationGroup()))
           );
 
           return ReverseRouter.redirect(
@@ -68,15 +69,12 @@ public class SelectProjectOperatorController {
         });
   }
 
-  //TODO can this go in a util to be shared with the other controller?? Take cancel url, button text and the form as params?
   private ModelAndView getSelectOperatorModelAndView(SelectOperatorForm form) {
-    return new ModelAndView("project/selectoperator/selectOperator")
-        .addObject("form", form)
-        .addObject("preselectedOperator", selectOperatorService.getPreSelectedOrgGroup(form))
-        .addObject("primaryButtonText", PRIMARY_BUTTON_TEXT)
-        .addObject("cancelUrl", ReverseRouter.route(on(StartProjectController.class).startPage(null)))
-        .addObject("operatorsRestUrl", SearchSelectorService.route(on(OrganisationGroupRestController.class)
-            .searchFields(null, null))
-        );
+    return selectOperatorService.getSelectOperatorModelAndView(
+        form,
+        ReverseRouter.route(on(StartProjectController.class).startPage(null)),
+        PRIMARY_BUTTON_TEXT,
+        TopNavigationType.BACKLINK
+    );
   }
 }

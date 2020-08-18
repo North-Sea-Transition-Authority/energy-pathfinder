@@ -1,6 +1,6 @@
 <#include '../../layout.ftl'>
 
-<@defaultPage htmlTitle="Select an operator" backLink=true twoThirdsColumn=true>
+<@defaultPage htmlTitle="Select an operator" backLink=backLink breadcrumbs=breadCrumbs twoThirdsColumn=true>
   <#if errorList?has_content>
     <@fdsError.errorSummary errorItems=errorList />
   </#if>

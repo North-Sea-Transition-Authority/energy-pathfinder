@@ -43,7 +43,7 @@ public class StartProjectService {
     var projectDetails = new ProjectDetail(project, ProjectStatus.DRAFT, user.getWuaId(), FIRST_VERSION, CURRENT_VERSION);
     projectRepository.save(project);
     projectDetailsRepository.save(projectDetails);
-    projectOperatorService.createProjectOperator(projectDetails, organisationGroup);
+    projectOperatorService.createOrUpdateProjectOperator(projectDetails, organisationGroup);
 
     //TODO PAT-130 audit
     return projectDetails;

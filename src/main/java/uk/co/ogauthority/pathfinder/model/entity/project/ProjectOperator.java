@@ -29,10 +29,14 @@ public class ProjectOperator {
   public ProjectOperator() {
   }
 
-  public ProjectOperator(ProjectDetail projectDetail,
+  public ProjectOperator(ProjectDetail detail,
                          PortalOrganisationGroup organisationGroup) {
-    this.projectDetail = projectDetail;
+    this.projectDetail = detail;
     this.organisationGroup = organisationGroup;
+  }
+
+  public ProjectOperator(ProjectDetail detail) {
+    this.projectDetail = detail;
   }
 
   public ProjectDetail getProjectDetail() {
