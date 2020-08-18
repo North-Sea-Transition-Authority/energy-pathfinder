@@ -1,10 +1,13 @@
 package uk.co.ogauthority.pathfinder.service.project;
 
 import java.util.Collections;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
@@ -22,14 +25,17 @@ public class ProjectOperatorService {
   private final TeamService teamService;
   private final TeamManagementService teamManagementService;
   private final ProjectOperatorRepository projectOperatorRepository;
+  private final PortalOrganisationAccessor portalOrganisationAccessor;
 
   @Autowired
   public ProjectOperatorService(TeamService teamService,
                                 TeamManagementService teamManagementService,
-                                ProjectOperatorRepository projectOperatorRepository) {
+                                ProjectOperatorRepository projectOperatorRepository,
+                                PortalOrganisationAccessor portalOrganisationAccessor) {
     this.teamService = teamService;
     this.teamManagementService = teamManagementService;
     this.projectOperatorRepository = projectOperatorRepository;
+    this.portalOrganisationAccessor = portalOrganisationAccessor;
   }
 
 
@@ -38,6 +44,7 @@ public class ProjectOperatorService {
    *
    * @return the projectOperator entity if user is a member of a single team
    */
+  //TODO remove
   @Transactional
   public ProjectOperator createProjectOperator(ProjectDetail detail, AuthenticatedUserAccount user) {
     var projectCreator = teamManagementService.getPerson(user.getLinkedPerson().getId().asInt());
@@ -54,6 +61,18 @@ public class ProjectOperatorService {
       return projectOperatorRepository.save(projectOperator);
     }
     return null;
+  }
+
+  /**
+   * Create a ProjectOperator for the specified detail and org group.
+   * @param detail Detail to link to Org Group.
+   * @param organisationGroup Org Group to create for.
+   * @return new ProjectOperator for the specified detail and org group.
+   */
+  @Transactional
+  public ProjectOperator createProjectOperator(ProjectDetail detail, PortalOrganisationGroup organisationGroup) {
+    var projectOperator = new ProjectOperator(detail, organisationGroup);
+    return projectOperatorRepository.save(projectOperator);
   }
 
   /**
@@ -81,5 +100,9 @@ public class ProjectOperatorService {
       );
   }
 
+
+  public Optional<ProjectOperator> getProjectOperatorByProjectDetail(ProjectDetail detail) {
+    return projectOperatorRepository.findByProjectDetail(detail);
+  }
 
 }

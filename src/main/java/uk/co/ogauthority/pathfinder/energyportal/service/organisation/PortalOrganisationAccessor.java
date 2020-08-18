@@ -141,6 +141,10 @@ public class PortalOrganisationAccessor {
     return IterableUtils.toList(organisationGroupRepository.findAllById(organisationGroupId));
   }
 
+  public Optional<PortalOrganisationGroup> getOrganisationGroupById(Integer id) {
+    return organisationGroupRepository.findById(id);
+  }
+
   /**
    * Returns a list of organisation units which belong to organisation groups in the provided list.
    */
