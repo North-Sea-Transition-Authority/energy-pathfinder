@@ -90,7 +90,7 @@ public class TwoFieldDateInputValidator implements SmartValidator {
               inputLabel.getLabel())
       );
     //If a date exists check it meets all requirements.
-    } else if (twoFieldDateInput.getMonth() != null && twoFieldDateInput.getYear() != null) {
+    } else if (twoFieldDateInput.getMonth() != null || twoFieldDateInput.getYear() != null) {
       if (twoFieldDateInput.createDate().isEmpty()) {
         errors.rejectValue(MONTH, MONTH_INVALID_CODE, "");
         errors.rejectValue(
