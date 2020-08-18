@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import javax.transaction.Transactional;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -11,7 +12,10 @@ import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.EmptyDateAcceptableHint;
+import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.TwoFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
+import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -24,16 +28,19 @@ public class ProjectLocationService {
   private final DevUkFieldService fieldService;
   private final SearchSelectorService searchSelectorService;
   private final ValidationService validationService;
+  private final ProjectLocationFormValidator projectLocationFormValidator;
 
   @Autowired
   public ProjectLocationService(ProjectLocationRepository projectLocationRepository,
                                 DevUkFieldService fieldService,
                                 SearchSelectorService searchSelectorService,
-                                ValidationService validationService) {
+                                ValidationService validationService,
+                                ProjectLocationFormValidator projectLocationFormValidator) {
     this.projectLocationRepository = projectLocationRepository;
     this.fieldService = fieldService;
     this.searchSelectorService = searchSelectorService;
     this.validationService = validationService;
+    this.projectLocationFormValidator = projectLocationFormValidator;
   }
 
   @Transactional
@@ -50,6 +57,23 @@ public class ProjectLocationService {
       projectLocation.setField(null);
       projectLocation.setManualFieldName(null);
     }
+
+    projectLocation.setFieldType(form.getFieldType());
+    projectLocation.setWaterDepth(form.getWaterDepth());
+
+    projectLocation.setApprovedFieldDevelopmentPlan(form.getApprovedFieldDevelopmentPlan());
+    projectLocation.setApprovedFdpDate(
+        BooleanUtils.isTrue(form.getApprovedFieldDevelopmentPlan())
+            ? form.getApprovedFdpDate().createDateOrNull()
+            : null
+    );
+
+    projectLocation.setApprovedDecomProgram(form.getApprovedDecomProgram());
+    projectLocation.setApprovedDecomProgramDate(
+        BooleanUtils.isTrue(form.getApprovedDecomProgram())
+            ? form.getApprovedDecomProgramDate().createDateOrNull()
+            : null
+    );
 
     return projectLocationRepository.save(projectLocation);
   }
@@ -71,21 +95,40 @@ public class ProjectLocationService {
    * @return completed form object if ProjectLocation has any field data else a new form.
    */
   private ProjectLocationForm getForm(ProjectLocation projectLocation) {
+    var form = new ProjectLocationForm();
+
     if (projectLocation.getManualFieldName() != null) {
-      return new ProjectLocationForm(projectLocation.getManualFieldName());
+      form.setField(projectLocation.getManualFieldName());
     } else if (projectLocation.getField() != null) {
-      return new ProjectLocationForm(projectLocation.getField().getFieldId().toString());
+      form.setField(projectLocation.getField().getFieldId().toString());
     }
-    return new ProjectLocationForm();
+
+    form.setFieldType(projectLocation.getFieldType());
+    form.setWaterDepth(projectLocation.getWaterDepth());
+
+    form.setApprovedDecomProgram(projectLocation.getApprovedDecomProgram());
+    form.setApprovedDecomProgramDate(new TwoFieldDateInput(projectLocation.getApprovedDecomProgramDate()));
+
+    form.setApprovedFieldDevelopmentPlan(projectLocation.getApprovedFieldDevelopmentPlan());
+    form.setApprovedFdpDate(new TwoFieldDateInput(projectLocation.getApprovedFdpDate()));
+
+    return form;
   }
 
 
   /**
-   * Validate the projectLocationForm, no partial validation just all fields complete or all optional.
+   * Validate the projectLocationForm, calls custom validator first.
+   * Validates dates if FDP or Decom program questions are true.
    */
   public BindingResult validate(ProjectLocationForm form,
                                 BindingResult bindingResult,
                                 ValidationType validationType) {
+    if (validationType.equals(ValidationType.FULL)) {
+      projectLocationFormValidator.validate(form, bindingResult);
+    } else {
+      projectLocationFormValidator.validate(form, bindingResult, new EmptyDateAcceptableHint());
+    }
+
     return validationService.validate(form, bindingResult, validationType);
   }
 

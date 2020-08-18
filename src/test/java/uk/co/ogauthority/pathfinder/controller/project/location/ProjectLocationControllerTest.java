@@ -131,7 +131,6 @@ public class ProjectLocationControllerTest extends ProjectContextAbstractControl
   public void saveProjectLocation_fullValidation_valid() throws Exception {
     MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
-      add("fieldid", "123");
     }};
 
     var bindingResult = new BeanPropertyBindingResult(ProjectLocationForm.class, "form");

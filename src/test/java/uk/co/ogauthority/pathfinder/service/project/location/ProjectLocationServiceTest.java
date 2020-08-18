@@ -17,7 +17,9 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.TwoFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
+import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -41,6 +43,9 @@ public class ProjectLocationServiceTest {
   @Mock
   private ValidationService validationService;
 
+  @Mock
+  ProjectLocationFormValidator projectLocationFormValidator;
+
   private ProjectLocationService projectLocationService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -53,8 +58,8 @@ public class ProjectLocationServiceTest {
         projectLocationRepository,
         fieldService,
         searchSelectorService,
-        validationService
-    );
+        validationService,
+        projectLocationFormValidator);
 
     when(projectLocationRepository.save(any(ProjectLocation.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
@@ -66,6 +71,7 @@ public class ProjectLocationServiceTest {
     projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationUtil.getCompletedForm_manualField());
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
     assertThat(projectLocation.getManualFieldName()).isEqualTo(ProjectLocationUtil.MANUAL_FIELD_NAME);
+    checkCommonFieldsMatch(projectLocation);
   }
 
   @Test
@@ -75,6 +81,7 @@ public class ProjectLocationServiceTest {
     projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationUtil.getCompletedForm_withField());
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
     assertThat(projectLocation.getField()).isEqualTo(ProjectLocationUtil.FIELD);
+    checkCommonFieldsMatch(projectLocation);
   }
 
   @Test
@@ -86,6 +93,30 @@ public class ProjectLocationServiceTest {
     projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationUtil.getCompletedForm_manualField());
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
     assertThat(projectLocation.getManualFieldName()).isEqualTo(ProjectLocationUtil.MANUAL_FIELD_NAME);
+    checkCommonFieldsMatch(projectLocation);
+  }
+
+  @Test
+  public void createOrUpdate_existingLocation_dateNotSetWhenLinkedQuestionIsFalse() {
+    var form = ProjectLocationUtil.getCompletedForm_manualField();
+    form.setApprovedFieldDevelopmentPlan(false);
+    projectLocation = ProjectLocationUtil.getProjectLocation_withField(details);
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(
+        Optional.of(
+            projectLocation
+        ));
+
+    //before call fdp date set
+    assertThat(projectLocation.getApprovedFieldDevelopmentPlan()).isTrue();
+    assertThat(projectLocation.getApprovedFdpDate()).isNotNull();
+
+    //update with new form details
+    projectLocation = projectLocationService.createOrUpdate(details, form);
+
+    //after call fdp date null
+    assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
+    assertThat(projectLocation.getApprovedFieldDevelopmentPlan()).isFalse();
+    assertThat(projectLocation.getApprovedFdpDate()).isNull();
   }
 
   @Test
@@ -98,6 +129,7 @@ public class ProjectLocationServiceTest {
     projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationUtil.getCompletedForm_withField());
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
     assertThat(projectLocation.getField()).isEqualTo(ProjectLocationUtil.FIELD);
+    checkCommonFieldsMatch(projectLocation);
   }
 
   @Test
@@ -106,30 +138,37 @@ public class ProjectLocationServiceTest {
         Optional.of(
             ProjectLocationUtil.getProjectLocation_withManualField(details)
         ));
-    projectLocation = projectLocationService.createOrUpdate(details, new ProjectLocationForm());
+    projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationUtil.getBlankForm());
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
     assertThat(projectLocation.getField()).isNull();
     assertThat(projectLocation.getManualFieldName()).isNull();
+    assertThat(projectLocation.getFieldType()).isNull();
+    assertThat(projectLocation.getWaterDepth()).isNull();
+    assertThat(projectLocation.getApprovedFieldDevelopmentPlan()).isNull();
+    assertThat(projectLocation.getApprovedFdpDate()).isNull();
+    assertThat(projectLocation.getApprovedDecomProgram()).isNull();
   }
 
   @Test
   public void getForm_existingLocation_manualEntry() {
+    projectLocation = ProjectLocationUtil.getProjectLocation_withManualField(details);
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(
-        Optional.of(
-            ProjectLocationUtil.getProjectLocation_withManualField(details)
-        ));
+        Optional.of(projectLocation)
+    );
     var form = projectLocationService.getForm(details);
     assertThat(form.getField()).isEqualTo(ProjectLocationUtil.MANUAL_FIELD_NAME);
+    checkCommonFormFieldsMatch(projectLocation, form);
   }
 
   @Test
   public void getForm_existingLocation_withField() {
+    projectLocation = ProjectLocationUtil.getProjectLocation_withField(details);
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(
-        Optional.of(
-            ProjectLocationUtil.getProjectLocation_withField(details)
-        ));
+        Optional.of(projectLocation)
+    );
     var form = projectLocationService.getForm(details);
     assertThat(form.getField()).isEqualTo(ProjectLocationUtil.FIELD_ID.toString());
+    checkCommonFormFieldsMatch(projectLocation, form);
   }
 
   @Test
@@ -137,6 +176,11 @@ public class ProjectLocationServiceTest {
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
     var form = projectLocationService.getForm(details);
     assertThat(form.getField()).isNull();
+    assertThat(form.getFieldType()).isNull();
+    assertThat(form.getWaterDepth()).isNull();
+    assertThat(form.getApprovedFieldDevelopmentPlan()).isNull();
+    assertThat(form.getApprovedFdpDate()).isNull();
+    assertThat(form.getApprovedDecomProgram()).isNull();
   }
 
   @Test
@@ -192,5 +236,22 @@ public class ProjectLocationServiceTest {
   public void getPreSelectedLocation_emptyForm() {
     var preSelectedLocation = projectLocationService.getPreSelectedField(new ProjectLocationForm());
     assertThat(preSelectedLocation).isEmpty();
+  }
+
+  private void checkCommonFieldsMatch(ProjectLocation projectLocation) {
+    assertThat(projectLocation.getFieldType()).isEqualTo(ProjectLocationUtil.FIELD_TYPE);
+    assertThat(projectLocation.getWaterDepth()).isEqualTo(ProjectLocationUtil.WATER_DEPTH);
+    assertThat(projectLocation.getApprovedFieldDevelopmentPlan()).isEqualTo(ProjectLocationUtil.APPROVED_FDP_PLAN);
+    assertThat(projectLocation.getApprovedFdpDate()).isEqualTo(ProjectLocationUtil.APPROVED_FDP_DATE);
+    assertThat(projectLocation.getApprovedDecomProgram()).isEqualTo(ProjectLocationUtil.APPROVED_DECOM_PROGRAM);
+  }
+
+  private void checkCommonFormFieldsMatch(ProjectLocation projectLocation, ProjectLocationForm form) {
+    assertThat(form.getFieldType()).isEqualTo(projectLocation.getFieldType());
+    assertThat(form.getWaterDepth()).isEqualTo(projectLocation.getWaterDepth());
+    assertThat(form.getApprovedFieldDevelopmentPlan()).isEqualTo(projectLocation.getApprovedFieldDevelopmentPlan());
+    assertThat(form.getApprovedFdpDate()).isEqualTo(new TwoFieldDateInput(projectLocation.getApprovedFdpDate()));
+    assertThat(form.getApprovedDecomProgram()).isEqualTo(projectLocation.getApprovedDecomProgram());
+    assertThat(form.getApprovedDecomProgramDate()).isEqualTo(new TwoFieldDateInput(projectLocation.getApprovedDecomProgramDate()));
   }
 }

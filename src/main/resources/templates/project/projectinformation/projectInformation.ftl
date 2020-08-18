@@ -9,8 +9,7 @@
     <@fdsRadio.radioGroup
       labelText="What is the field stage?"
       path="form.fieldStage"
-      fieldsetHeadingClass="govuk-fieldset__legend--l"
-      fieldsetHeadingSize="h2"
+      fieldsetHeadingClass="govuk-fieldset__legend"
     >
       <#list fieldStages as fieldStage>
         <#assign fieldStageName = fieldStage.name()/>
@@ -20,8 +19,8 @@
       </#list>
     </@fdsRadio.radioGroup>
 
-      <@fdsTextInput.textInput path="form.projectTitle" labelText="What is the project title?" labelClass="govuk-label--m" inputClass="govuk-!-width-two-thirds"/>
-      <@fdsTextarea.textarea path="form.projectSummary" labelText="Provide a summary of the project" labelClass="govuk-label--m" />
+      <@fdsTextInput.textInput path="form.projectTitle" labelText="What is the project title?" labelClass="govuk-label " inputClass="govuk-!-width-two-thirds"/>
+      <@fdsTextarea.textarea path="form.projectSummary" labelText="Provide a summary of the project" labelClass="govuk-label " />
       <@fdsDetails.summaryDetails summaryTitle="What should I provide for the summary of the project?">
         <p class="govuk-body">Provide a description of the project and future plans and include the following where appropriate:</p>
           <ul class="govuk-list govuk-list--bullet">

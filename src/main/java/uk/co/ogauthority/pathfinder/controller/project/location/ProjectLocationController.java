@@ -16,7 +16,9 @@ import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.DevUkRestController;
+import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -75,7 +77,9 @@ public class ProjectLocationController {
     var modelAndView = new ModelAndView("project/location/location")
         .addObject("fieldsRestUrl", SearchSelectorService.route(on(DevUkRestController.class).searchFields(null)))
         .addObject("form", form)
-        .addObject("preselectedField", locationService.getPreSelectedField(form));
+        .addObject("fieldTypeMap", FieldType.getAllAsMap())
+        .addObject("preselectedField", locationService.getPreSelectedField(form))
+        .addObject("waterDepthUnit", MeasurementUnits.METRES);
 
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;
