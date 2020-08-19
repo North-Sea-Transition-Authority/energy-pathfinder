@@ -27,7 +27,7 @@ import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
 @RequestMapping("/project-operator-select")
 public class SelectProjectOperatorController {
 
-  private static final String PRIMARY_BUTTON_TEXT = "Start project";
+  public static final String PRIMARY_BUTTON_TEXT = "Start project";
 
   private final StartProjectService startProjectService;
   private final SelectOperatorService selectOperatorService;

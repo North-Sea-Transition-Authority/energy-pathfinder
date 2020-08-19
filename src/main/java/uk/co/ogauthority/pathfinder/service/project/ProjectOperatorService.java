@@ -11,7 +11,6 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
-import uk.co.ogauthority.pathfinder.service.teammanagement.TeamManagementService;
 
 /**
  * Service to manage the linking between ProjectDetails and Operators.
@@ -20,15 +19,12 @@ import uk.co.ogauthority.pathfinder.service.teammanagement.TeamManagementService
 public class ProjectOperatorService {
 
   private final TeamService teamService;
-  private final TeamManagementService teamManagementService;
   private final ProjectOperatorRepository projectOperatorRepository;
 
   @Autowired
   public ProjectOperatorService(TeamService teamService,
-                                TeamManagementService teamManagementService,
                                 ProjectOperatorRepository projectOperatorRepository) {
     this.teamService = teamService;
-    this.teamManagementService = teamManagementService;
     this.projectOperatorRepository = projectOperatorRepository;
   }
 
@@ -54,7 +50,7 @@ public class ProjectOperatorService {
    * @return true if the user provided is in the Organisation Group the project is linked to. True always if regulator.
    */
   public boolean isUserInProjectTeamOrRegulator(ProjectDetail detail, AuthenticatedUserAccount user) {
-    var person = teamManagementService.getPerson(user.getLinkedPerson().getId().asInt());
+    var person = user.getLinkedPerson();
 
     if (teamService.isPersonMemberOfRegulatorTeam(person)) {
       return true;

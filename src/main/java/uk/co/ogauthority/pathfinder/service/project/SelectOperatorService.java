@@ -51,10 +51,7 @@ public class SelectOperatorService {
    * @return the PortalOrganisationGroup with the given id
    */
   public PortalOrganisationGroup getOrganisationGroupOrError(AuthenticatedUserAccount user, Integer orgGrpId) {
-    var orgGroup =  portalOrganisationAccessor.getOrganisationGroupById(orgGrpId)
-        .orElseThrow(() -> new PathfinderEntityNotFoundException(
-            String.format("unable to find organisation group with id %d", orgGrpId))
-        );
+    var orgGroup =  getOrganisationGroupOrError(orgGrpId);
 
     if (!projectOperatorService.canUserAccessOrgGroup(user, orgGroup)) {
       throw new AccessDeniedException(

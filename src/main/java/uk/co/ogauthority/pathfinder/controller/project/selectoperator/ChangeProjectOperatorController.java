@@ -30,7 +30,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 @RequestMapping("/project/{projectId}/operator")
 public class ChangeProjectOperatorController {
   public static final String PAGE_NAME = "Select operator";
-  private static final String PRIMARY_BUTTON_TEXT = "Save and continue";
+  public static final String PRIMARY_BUTTON_TEXT = "Save and continue";
 
   private final SelectOperatorService selectOperatorService;
   private final ControllerHelperService controllerHelperService;

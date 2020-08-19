@@ -49,6 +49,4 @@ public class StartProjectService {
     return projectDetails;
   }
 
-  //TODO startProject but which takes an org group
-
 }
