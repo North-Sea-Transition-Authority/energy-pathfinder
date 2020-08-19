@@ -115,7 +115,9 @@ public class ControllerHelperService {
           .collect(Collectors.toList());
 
       errorList.addAll(bindingResult.getFieldErrors());
-      errorList.sort(Comparator.comparing(fieldError -> formFields.indexOf(fieldError.getField())));
+      errorList.sort(Comparator.comparing(// match on field names but ditch any sub fields as we won't match those
+          fieldError -> formFields.indexOf(fieldError.getField().split("\\.")[0]))
+      );
     } else if (form == null && bindingResult != null) {
       errorList = bindingResult.getFieldErrors();
     }
