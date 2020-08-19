@@ -49,7 +49,7 @@ public class TaskListController {
 
     var modelAndView = new ModelAndView("project/taskList");
     modelAndView.addObject("changeOperatorUrl",
-        ReverseRouter.route(on(ChangeProjectOperatorController.class).changeOperator(projectId, null)));
+        ReverseRouter.route(on(ChangeProjectOperatorController.class).changeOperator(null, projectId, null)));
     modelAndView.addObject("changeOperatorName", ChangeProjectOperatorController.PAGE_NAME);
     modelAndView.addObject("changeOperatorCompleted", selectOperatorService.isComplete(
         projectContext.getProjectDetails())

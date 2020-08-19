@@ -48,12 +48,14 @@ public class ChangeProjectOperatorController {
 
 
   @GetMapping
-  public ModelAndView changeOperator(@PathVariable("projectId") Integer projectId,
+  public ModelAndView changeOperator(AuthenticatedUserAccount user,
+                                     @PathVariable("projectId") Integer projectId,
                                      ProjectContext projectContext
   ) {
     return getSelectOperatorModelAndView(
         selectOperatorService.getForm(projectContext.getProjectDetails()),
-        projectId
+        projectId,
+        user
     );
   }
 
@@ -67,7 +69,7 @@ public class ChangeProjectOperatorController {
     bindingResult = selectOperatorService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getSelectOperatorModelAndView(form, projectId),
+        getSelectOperatorModelAndView(form, projectId, user),
         form,
         () -> {
           var portalOrganisationGroup = selectOperatorService.getOrganisationGroupOrError(
@@ -80,12 +82,13 @@ public class ChangeProjectOperatorController {
         });
   }
 
-  private ModelAndView getSelectOperatorModelAndView(SelectOperatorForm form, Integer projectId) {
+  private ModelAndView getSelectOperatorModelAndView(SelectOperatorForm form, Integer projectId, AuthenticatedUserAccount user) {
     var modelAndView =  selectOperatorService.getSelectOperatorModelAndView(
         form,
         ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId, null)),
         PRIMARY_BUTTON_TEXT,
-        TopNavigationType.BREADCRUMBS
+        TopNavigationType.BREADCRUMBS,
+        user
     );
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;

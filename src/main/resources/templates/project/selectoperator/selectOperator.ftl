@@ -6,7 +6,13 @@
   </#if>
 
   <@fdsForm.htmlForm>
-      <@fdsSearchSelector.searchSelectorRest path="form.organisationGroup" labelText="Select an operator for the project" restUrl=springUrl(operatorsRestUrl)  preselectedItems=preselectedOperator!{} />
+      <#if userIsInSingleTeam>
+        <@fdsWarning.warning>
+          You are only in one team so cannot change the operator the project is for.
+        </@fdsWarning.warning>
+      </#if>
+
+      <@fdsSearchSelector.searchSelectorRest path="form.organisationGroup" labelText="Select an operator for the project" selectorMinInputLength=0 restUrl=springUrl(operatorsRestUrl)  preselectedItems=preselectedOperator!{} />
 
       <@fdsAction.submitButtons
         primaryButtonText=primaryButtonText

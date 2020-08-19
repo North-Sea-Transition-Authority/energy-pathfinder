@@ -32,43 +32,6 @@ public class ProjectOperatorService {
     this.projectOperatorRepository = projectOperatorRepository;
   }
 
-
-  //  /**
-  //   * Create a link between the projectDetails and the PortalOrganisationGroup.
-  //   *
-  //   * @return the projectOperator entity if user is a member of a single team
-  //   */
-  //  //TODO remove
-  //  @Transactional
-  //  public ProjectOperator createProjectOperator(ProjectDetail detail, AuthenticatedUserAccount user) {
-  //    var projectCreator = teamManagementService.getPerson(user.getLinkedPerson().getId().asInt());
-  //
-  //    //TODO PAT-113 / PAT-133 - only limit if user is an Operator user
-  //    var organisationTeams = teamService.getOrganisationTeamListIfPersonInRole(
-  //        projectCreator,
-  //        Collections.singletonList(OrganisationRole.PROJECT_SUBMITTER)
-  //    );
-  //
-  //    //TODO PAT-113 If multiple operators have user select
-  //    if (organisationTeams.size() == 1) {
-  //      var projectOperator = new ProjectOperator(detail, organisationTeams.get(0).getPortalOrganisationGroup());
-  //      return projectOperatorRepository.save(projectOperator);
-  //    }
-  //    return null;
-  //  }
-  //
-  //  /**
-  //   * Create a ProjectOperator for the specified detail and org group.
-  //   * @param detail Detail to link to Org Group.
-  //   * @param organisationGroup Org Group to create for.
-  //   * @return new ProjectOperator for the specified detail and org group.
-  //   */
-  //  @Transactional
-  //  public ProjectOperator createProjectOperator(ProjectDetail detail, PortalOrganisationGroup organisationGroup) {
-  //    var projectOperator = new ProjectOperator(detail, organisationGroup);
-  //    return projectOperatorRepository.save(projectOperator);
-  //  }
-
   /**
    * Create a ProjectOperator for the specified detail and org group.
    * If one exists already for that detail update the operator
@@ -119,6 +82,10 @@ public class ProjectOperatorService {
 
   public Optional<ProjectOperator> getProjectOperatorByProjectDetail(ProjectDetail detail) {
     return projectOperatorRepository.findByProjectDetail(detail);
+  }
+
+  public boolean isUserInMultipleTeams(AuthenticatedUserAccount user) {
+    return teamService.getOrganisationTeamsPersonIsMemberOf(user.getLinkedPerson()).size() > 1;
   }
 
 }

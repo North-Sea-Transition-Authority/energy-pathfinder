@@ -135,7 +135,8 @@ public class SelectOperatorService {
   public ModelAndView getSelectOperatorModelAndView(SelectOperatorForm form,
                                                     String cancelUrl,
                                                     String primaryButtonText,
-                                                    TopNavigationType topNavigationType) {
+                                                    TopNavigationType topNavigationType,
+                                                    AuthenticatedUserAccount user) {
     return new ModelAndView("project/selectoperator/selectOperator")
         .addObject("form", form)
         .addObject("preselectedOperator", getPreSelectedOrgGroup(form))
@@ -143,6 +144,7 @@ public class SelectOperatorService {
         .addObject("cancelUrl", cancelUrl)
         .addObject("backLink", topNavigationType.equals(TopNavigationType.BACKLINK))
         .addObject("breadCrumbs", topNavigationType.equals(TopNavigationType.BREADCRUMBS))
+        .addObject("userIsInSingleTeam", !projectOperatorService.isUserInMultipleTeams(user))
         .addObject("operatorsRestUrl", SearchSelectorService.route(on(OrganisationGroupRestController.class)
             .searchFields(null, null))
         );

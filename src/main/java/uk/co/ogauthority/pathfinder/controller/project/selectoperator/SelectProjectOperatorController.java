@@ -45,7 +45,7 @@ public class SelectProjectOperatorController {
 
   @GetMapping
   public ModelAndView selectOperator(AuthenticatedUserAccount user) {
-    return getSelectOperatorModelAndView(new SelectOperatorForm());
+    return getSelectOperatorModelAndView(new SelectOperatorForm(), user);
   }
 
   @PostMapping
@@ -55,7 +55,7 @@ public class SelectProjectOperatorController {
     bindingResult = selectOperatorService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getSelectOperatorModelAndView(form),
+        getSelectOperatorModelAndView(form, user),
         form,
         () -> {
           var projectDetail = startProjectService.startProject(
@@ -69,12 +69,13 @@ public class SelectProjectOperatorController {
         });
   }
 
-  private ModelAndView getSelectOperatorModelAndView(SelectOperatorForm form) {
+  private ModelAndView getSelectOperatorModelAndView(SelectOperatorForm form, AuthenticatedUserAccount user) {
     return selectOperatorService.getSelectOperatorModelAndView(
         form,
         ReverseRouter.route(on(StartProjectController.class).startPage(null)),
         PRIMARY_BUTTON_TEXT,
-        TopNavigationType.BACKLINK
+        TopNavigationType.BACKLINK,
+        user
     );
   }
 }

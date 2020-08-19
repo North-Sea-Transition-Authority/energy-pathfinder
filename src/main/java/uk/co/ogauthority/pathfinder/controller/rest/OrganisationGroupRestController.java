@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,7 +34,7 @@ public class OrganisationGroupRestController {
 
   @GetMapping("/user-organisation")
   @ResponseBody
-  public RestSearchResult searchFields(@RequestParam("term") String searchTerm,
+  public RestSearchResult searchFields(@Nullable @RequestParam("term") String searchTerm,
                                        AuthenticatedUserAccount user) {
     var searchableList = teamService.getOrganisationGroupsByPersonRoleAndNameLike(
         user.getLinkedPerson(),
