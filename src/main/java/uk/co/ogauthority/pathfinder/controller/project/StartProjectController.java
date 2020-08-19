@@ -15,7 +15,7 @@ import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
 public class StartProjectController {
 
 
-  private StartProjectService startProjectService;
+  private final StartProjectService startProjectService;
 
   @Autowired
   public StartProjectController(StartProjectService startProjectService) {
