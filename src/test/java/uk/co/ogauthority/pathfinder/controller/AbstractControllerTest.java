@@ -20,6 +20,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.UserSession;
+import uk.co.ogauthority.pathfinder.mvc.error.ErrorService;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
 import uk.co.ogauthority.pathfinder.service.UserSessionService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
@@ -53,6 +54,9 @@ public abstract class AbstractControllerTest {
 
   @MockBean
   protected ProjectContextService projectContextService;
+
+  @MockBean
+  protected ErrorService errorService;
 
   @Before
   public void abstractControllerTestSetup() {

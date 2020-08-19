@@ -17,8 +17,8 @@ import uk.co.ogauthority.pathfinder.service.team.TeamService;
 public class StartProjectController {
 
 
-  private StartProjectService startProjectService;
-  private TeamService teamService;
+  private final StartProjectService startProjectService;
+  private final TeamService teamService;
 
   @Autowired
   public StartProjectController(StartProjectService startProjectService,
