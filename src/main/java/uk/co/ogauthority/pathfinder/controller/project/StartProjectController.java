@@ -24,9 +24,8 @@ public class StartProjectController {
 
   @GetMapping("/start-project")
   public ModelAndView startPage(AuthenticatedUserAccount user) {
-    throw new NullPointerException("testing");
-    //    return new ModelAndView("project/startPage")
-    //        .addObject("startActionUrl", ReverseRouter.route(on(StartProjectController.class).startProject(user)));
+    return new ModelAndView("project/startPage")
+        .addObject("startActionUrl", ReverseRouter.route(on(StartProjectController.class).startProject(user)));
   }
 
   @PostMapping("/start-project")

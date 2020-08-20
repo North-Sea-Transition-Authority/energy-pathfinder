@@ -28,12 +28,12 @@ public class StartProjectControllerTest extends AbstractControllerTest {
 
   private static final AuthenticatedUserAccount unAuthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
-//  @Test
-//  public void authenticatedUser_hasAccessToStartProject() throws Exception {
-//    mockMvc.perform(get(ReverseRouter.route(on(StartProjectController.class).startPage(authenticatedUser)))
-//        .with(authenticatedUserAndSession(authenticatedUser)))
-//        .andExpect(status().isOk());
-//  }
+  @Test
+  public void authenticatedUser_hasAccessToStartProject() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(on(StartProjectController.class).startPage(authenticatedUser)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isOk());
+  }
 
   @Test
   public void unAuthenticatedUser_cannotAccessStartProject() throws Exception {
