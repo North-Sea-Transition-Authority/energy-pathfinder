@@ -12,9 +12,11 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationController;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
+import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProjectOperatorController;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
@@ -26,16 +28,19 @@ import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectIn
 public class TaskListController {
 
   private final ProjectInformationService projectInformationService;
-  private final BreadcrumbService breadcrumbService;
   private final ProjectLocationService projectLocationService;
+  private final SelectOperatorService selectOperatorService;
+  private final BreadcrumbService breadcrumbService;
 
   @Autowired
   public TaskListController(ProjectInformationService projectInformationService,
                             BreadcrumbService breadcrumbService,
-                            ProjectLocationService projectLocationService) {
+                            ProjectLocationService projectLocationService,
+                            SelectOperatorService selectOperatorService) {
     this.projectInformationService = projectInformationService;
     this.breadcrumbService = breadcrumbService;
     this.projectLocationService = projectLocationService;
+    this.selectOperatorService = selectOperatorService;
   }
 
   @GetMapping
@@ -43,6 +48,13 @@ public class TaskListController {
                                    ProjectContext projectContext) {
 
     var modelAndView = new ModelAndView("project/taskList");
+    modelAndView.addObject("changeOperatorUrl",
+        ReverseRouter.route(on(ChangeProjectOperatorController.class).changeOperator(null, projectId, null)));
+    modelAndView.addObject("changeOperatorName", ChangeProjectOperatorController.PAGE_NAME);
+    modelAndView.addObject("changeOperatorCompleted", selectOperatorService.isComplete(
+        projectContext.getProjectDetails())
+    );
+
     modelAndView.addObject("projectInformationUrl",
         ReverseRouter.route(on(ProjectInformationController.class).getProjectInformation(projectId, null))
     );

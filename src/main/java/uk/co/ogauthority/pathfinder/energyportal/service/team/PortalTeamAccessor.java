@@ -25,6 +25,7 @@ import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeam;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeamTypeRole;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeamUsagePurpose;
 import uk.co.ogauthority.pathfinder.energyportal.repository.team.PortalTeamRepository;
+import uk.co.ogauthority.pathfinder.model.team.TeamType;
 
 
 @Service
@@ -162,16 +163,10 @@ public class PortalTeamAccessor {
    */
   public List<PortalTeamDto> getTeamsWherePersonMemberOfTeamTypeAndHasRoleMatching(Person person, String portalTeamType,
                                                                                    Collection<String> roleNames) {
-    List<PortalTeamTypeRole> roles = entityManager.createQuery("" +
-            "SELECT pttr " +
-            "FROM PortalTeamType ptt " +
-            "JOIN PortalTeamTypeRole pttr ON pttr.portalTeamType = ptt " +
-            "WHERE ptt.type = :portalTeamType " +
-            "AND pttr.name IN :roleNames ",
-        PortalTeamTypeRole.class)
-        .setParameter("portalTeamType", portalTeamType)
-        .setParameter("roleNames", roleNames)
-        .getResultList();
+    List<PortalTeamTypeRole> roles = getPortalTeamTypeRoles(
+        portalTeamType,
+        roleNames
+    );
 
     return entityManager.createQuery("" +
             // Distinct required to remove duplicates caused by using the PortalTeamTypeRole entity as root
@@ -193,6 +188,57 @@ public class PortalTeamAccessor {
         .setParameter("usagePurpose", PortalTeamUsagePurpose.PRIMARY_DATA)
         .setParameter("portalTeamTypeRoles", roles)
         .setParameter("personId", person.getId().asInt())
+        .getResultList();
+  }
+
+  /**
+   * Get teams of a given type where the specified Person is a member, they have a role with matching name in that team
+   * and the team name matches the search term.
+   */
+  public List<PortalTeamDto> getTeamsWherePersonMemberOfTeamWithNameLikeAndOrganisationHasRoleMatching(Person person,
+                                                                                                       Collection<String> roleNames,
+                                                                                                       String searchTerm) {
+    List<PortalTeamTypeRole> roles = getPortalTeamTypeRoles(
+        TeamType.ORGANISATION.getPortalTeamType(),
+        roleNames
+    );
+
+    return entityManager.createQuery("" +
+            // Distinct required to remove duplicates caused by using the PortalTeamTypeRole entity as root
+            "SELECT DISTINCT new uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto( " +
+            "  pt.resId, pt.name, pt.description, pt.portalTeamType.type, ptu.uref " +
+            ") " +
+            "FROM PortalTeamTypeRole pttr " +
+            "JOIN PortalTeamType ptt ON ptt = pttr.portalTeamType " +
+            "JOIN PortalTeam pt ON pt.portalTeamType = ptt " +
+            "JOIN PortalTeamMember ptm ON ptm.portalTeam = pt " +
+            "JOIN PortalTeamMemberRole ptmr ON ptmr.portalTeamMember = ptm " +
+            "LEFT JOIN PortalTeamUsage ptu ON ptu.portalTeam = pt " +
+            "JOIN PortalOrganisationGroup pog ON pog.urefValue = ptu.uref " +
+            "WHERE ptt.type = :portalTeamType " +
+            "AND ptm.personId = :personId " +
+            "AND (ptu.purpose = :usagePurpose OR ptu IS NULL) " +
+            "AND ptmr.portalTeamTypeRole IN :portalTeamTypeRoles " +
+            "AND LOWER(pog.name) LIKE LOWER(concat('%',:searchTerm, '%')) ",
+            PortalTeamDto.class)
+        .setParameter("portalTeamType", TeamType.ORGANISATION.getPortalTeamType())
+        .setParameter("usagePurpose", PortalTeamUsagePurpose.PRIMARY_DATA)
+        .setParameter("portalTeamTypeRoles", roles)
+        .setParameter("personId", person.getId().asInt())
+        .setParameter("searchTerm", searchTerm)
+        .getResultList();
+  }
+
+  private List<PortalTeamTypeRole> getPortalTeamTypeRoles(String portalTeamType, Collection<String> roleNames) {
+    return entityManager.createQuery("" +
+            "SELECT pttr " +
+            "FROM PortalTeamType ptt " +
+            "JOIN PortalTeamTypeRole pttr ON pttr.portalTeamType = ptt " +
+            "WHERE ptt.type = :portalTeamType " +
+            "AND pttr.name IN :roleNames ",
+        PortalTeamTypeRole.class)
+        .setParameter("portalTeamType", portalTeamType)
+        .setParameter("roleNames", roleNames)
         .getResultList();
   }
 

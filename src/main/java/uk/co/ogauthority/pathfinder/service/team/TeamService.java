@@ -11,6 +11,7 @@ import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.team.PortalTeamAccessor;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationRole;
@@ -111,13 +112,7 @@ public class TeamService {
    * Returns the Organisation Teams where the person is a member and has any of the provided roles
    */
   public List<OrganisationTeam> getOrganisationTeamListIfPersonInRole(Person person, Collection<OrganisationRole> roles) {
-    if (roles.isEmpty()) {
-      throw new IllegalArgumentException("Cannot check membership when no roles specified");
-    }
-
-    List<String> portalRoleNames = roles.stream()
-        .map(OrganisationRole::getPortalTeamRoleName)
-        .collect(Collectors.toList());
+    List<String> portalRoleNames = getPortalRoleNames(roles);
 
     List<PortalTeamDto> orgTeamList = portalTeamAccessor.getTeamsWherePersonMemberOfTeamTypeAndHasRoleMatching(
         person,
@@ -126,6 +121,32 @@ public class TeamService {
     );
 
     return teamDtoFactory.createOrganisationTeamList(orgTeamList);
+  }
+
+  public List<PortalOrganisationGroup> getOrganisationGroupsByPersonRoleAndNameLike(Person person,
+                                                                                    Collection<OrganisationRole> roles,
+                                                                                    String searchTerm) {
+    List<String> portalRoleNames = getPortalRoleNames(roles);
+
+    List<PortalTeamDto> orgTeamList = portalTeamAccessor.getTeamsWherePersonMemberOfTeamWithNameLikeAndOrganisationHasRoleMatching(
+        person,
+        portalRoleNames,
+        searchTerm
+    );
+
+    return teamDtoFactory.createOrganisationTeamList(orgTeamList).stream().map(
+        OrganisationTeam::getPortalOrganisationGroup).collect(Collectors.toList()
+    );
+  }
+
+  private List<String> getPortalRoleNames(Collection<OrganisationRole> roles) {
+    if (roles.isEmpty()) {
+      throw new IllegalArgumentException("Cannot check membership when no roles specified");
+    }
+
+    return roles.stream()
+        .map(OrganisationRole::getPortalTeamRoleName)
+        .collect(Collectors.toList());
   }
 
   private RegulatorTeam createRegulatorTeamOrError(List<PortalTeamDto> teams) {

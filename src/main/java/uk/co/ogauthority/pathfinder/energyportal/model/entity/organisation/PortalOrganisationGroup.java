@@ -3,12 +3,15 @@ package uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation;
 import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import org.hibernate.annotations.Immutable;
+import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
 
 
-@Entity(name = "portal_organisation_groups")
+@Entity
+@Table(name = "portal_organisation_groups")
 @Immutable
-public class PortalOrganisationGroup {
+public class PortalOrganisationGroup implements SearchSelectable {
 
   public static final String UREF_TYPE = "++REGOGRGRP";
 
@@ -55,5 +58,15 @@ public class PortalOrganisationGroup {
   @Override
   public int hashCode() {
     return Objects.hash(orgGrpId, name, shortName, urefValue);
+  }
+
+  @Override
+  public String getSelectionId() {
+    return orgGrpId.toString();
+  }
+
+  @Override
+  public String getSelectionText() {
+    return name;
   }
 }
