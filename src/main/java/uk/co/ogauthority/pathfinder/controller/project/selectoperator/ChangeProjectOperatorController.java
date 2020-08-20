@@ -17,7 +17,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.model.enums.TopNavigationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
-import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.SelectOperatorForm;
+import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
@@ -29,7 +29,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 @ProjectFormPagePermissionCheck
 @RequestMapping("/project/{projectId}/operator")
 public class ChangeProjectOperatorController {
-  public static final String PAGE_NAME = "Select operator";
+  public static final String PAGE_NAME = "Project operator";
   public static final String PRIMARY_BUTTON_TEXT = "Save and continue";
 
   private final SelectOperatorService selectOperatorService;
@@ -54,8 +54,7 @@ public class ChangeProjectOperatorController {
   ) {
     return getSelectOperatorModelAndView(
         selectOperatorService.getForm(projectContext.getProjectDetails()),
-        projectId,
-        user
+        projectId
     );
   }
 
@@ -64,12 +63,12 @@ public class ChangeProjectOperatorController {
   public ModelAndView saveProjectOperator(AuthenticatedUserAccount user,
                                           @PathVariable("projectId") Integer projectId,
                                           ProjectContext projectContext,
-                                          @ModelAttribute("form") SelectOperatorForm form,
+                                          @ModelAttribute("form") ProjectOperatorForm form,
                                           BindingResult bindingResult) {
     bindingResult = selectOperatorService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getSelectOperatorModelAndView(form, projectId, user),
+        getSelectOperatorModelAndView(form, projectId),
         form,
         () -> {
           var portalOrganisationGroup = selectOperatorService.getOrganisationGroupOrError(
@@ -82,13 +81,12 @@ public class ChangeProjectOperatorController {
         });
   }
 
-  private ModelAndView getSelectOperatorModelAndView(SelectOperatorForm form, Integer projectId, AuthenticatedUserAccount user) {
+  private ModelAndView getSelectOperatorModelAndView(ProjectOperatorForm form, Integer projectId) {
     var modelAndView =  selectOperatorService.getSelectOperatorModelAndView(
         form,
         ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId, null)),
         PRIMARY_BUTTON_TEXT,
-        TopNavigationType.BREADCRUMBS,
-        user
+        TopNavigationType.BREADCRUMBS
     );
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;

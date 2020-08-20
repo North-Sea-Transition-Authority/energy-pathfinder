@@ -128,9 +128,8 @@ public class TeamService {
                                                                                     String searchTerm) {
     List<String> portalRoleNames = getPortalRoleNames(roles);
 
-    List<PortalTeamDto> orgTeamList = portalTeamAccessor.getTeamsWherePersonMemberOfTeamWithNameLikeAndAndHasRoleMatching(
+    List<PortalTeamDto> orgTeamList = portalTeamAccessor.getTeamsWherePersonMemberOfTeamWithNameLikeAndOrganisationHasRoleMatching(
         person,
-        TeamType.ORGANISATION.getPortalTeamType(),
         portalRoleNames,
         searchTerm
     );

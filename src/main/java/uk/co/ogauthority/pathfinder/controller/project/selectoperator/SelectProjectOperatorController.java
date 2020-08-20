@@ -14,7 +14,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.model.enums.TopNavigationType;
-import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.SelectOperatorForm;
+import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.project.SelectOperatorService;
@@ -27,7 +27,7 @@ import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
 @RequestMapping("/project-operator-select")
 public class SelectProjectOperatorController {
 
-  public static final String PRIMARY_BUTTON_TEXT = "Start project";
+  public static final String PRIMARY_BUTTON_TEXT = "Save and continue";
 
   private final StartProjectService startProjectService;
   private final SelectOperatorService selectOperatorService;
@@ -45,17 +45,17 @@ public class SelectProjectOperatorController {
 
   @GetMapping
   public ModelAndView selectOperator(AuthenticatedUserAccount user) {
-    return getSelectOperatorModelAndView(new SelectOperatorForm(), user);
+    return getSelectOperatorModelAndView(new ProjectOperatorForm());
   }
 
   @PostMapping
   public ModelAndView startProject(AuthenticatedUserAccount user,
-                                   @ModelAttribute("form") SelectOperatorForm form,
+                                   @ModelAttribute("form") ProjectOperatorForm form,
                                    BindingResult bindingResult) {
     bindingResult = selectOperatorService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getSelectOperatorModelAndView(form, user),
+        getSelectOperatorModelAndView(form),
         form,
         () -> {
           var projectDetail = startProjectService.startProject(
@@ -69,13 +69,12 @@ public class SelectProjectOperatorController {
         });
   }
 
-  private ModelAndView getSelectOperatorModelAndView(SelectOperatorForm form, AuthenticatedUserAccount user) {
+  private ModelAndView getSelectOperatorModelAndView(ProjectOperatorForm form) {
     return selectOperatorService.getSelectOperatorModelAndView(
         form,
         ReverseRouter.route(on(StartProjectController.class).startPage(null)),
         PRIMARY_BUTTON_TEXT,
-        TopNavigationType.BACKLINK,
-        user
+        TopNavigationType.BACKLINK
     );
   }
 }

@@ -25,6 +25,7 @@ import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeam;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeamTypeRole;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeamUsagePurpose;
 import uk.co.ogauthority.pathfinder.energyportal.repository.team.PortalTeamRepository;
+import uk.co.ogauthority.pathfinder.model.team.TeamType;
 
 
 @Service
@@ -194,12 +195,11 @@ public class PortalTeamAccessor {
    * Get teams of a given type where the specified Person is a member, they have a role with matching name in that team
    * and the team name matches the search term.
    */
-  public List<PortalTeamDto> getTeamsWherePersonMemberOfTeamWithNameLikeAndAndHasRoleMatching(Person person,
-                                                                                              String portalTeamType,
-                                                                                              Collection<String> roleNames,
-                                                                                              String searchTerm) {
+  public List<PortalTeamDto> getTeamsWherePersonMemberOfTeamWithNameLikeAndOrganisationHasRoleMatching(Person person,
+                                                                                                       Collection<String> roleNames,
+                                                                                                       String searchTerm) {
     List<PortalTeamTypeRole> roles = getPortalTeamTypeRoles(
-        portalTeamType,
+        TeamType.ORGANISATION.getPortalTeamType(),
         roleNames
     );
 
@@ -221,7 +221,7 @@ public class PortalTeamAccessor {
             "AND ptmr.portalTeamTypeRole IN :portalTeamTypeRoles " +
             "AND LOWER(pog.name) LIKE LOWER(concat('%',:searchTerm, '%')) ",
             PortalTeamDto.class)
-        .setParameter("portalTeamType", portalTeamType)
+        .setParameter("portalTeamType", TeamType.ORGANISATION.getPortalTeamType())
         .setParameter("usagePurpose", PortalTeamUsagePurpose.PRIMARY_DATA)
         .setParameter("portalTeamTypeRoles", roles)
         .setParameter("personId", person.getId().asInt())

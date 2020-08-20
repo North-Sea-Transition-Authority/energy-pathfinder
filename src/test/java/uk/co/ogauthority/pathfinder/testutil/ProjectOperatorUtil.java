@@ -3,7 +3,7 @@ package uk.co.ogauthority.pathfinder.testutil;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
-import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.SelectOperatorForm;
+import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 
 public class ProjectOperatorUtil {
 
@@ -24,8 +24,8 @@ public class ProjectOperatorUtil {
     );
   }
 
-  public static SelectOperatorForm getCompleteForm() {
-    return new SelectOperatorForm(ORG_GROUP_ID.toString());
+  public static ProjectOperatorForm getCompleteForm() {
+    return new ProjectOperatorForm(ORG_GROUP_ID.toString());
   }
 
 

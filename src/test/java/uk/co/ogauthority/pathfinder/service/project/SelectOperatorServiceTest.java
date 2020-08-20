@@ -23,7 +23,7 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.SelectOperatorForm;
+import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorUtil;
@@ -102,7 +102,7 @@ public class SelectOperatorServiceTest {
 
   @Test
   public void validate() {
-    var form = new SelectOperatorForm();
+    var form = new ProjectOperatorForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
     selectOperatorService.validate(

@@ -19,7 +19,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.enums.TopNavigationType;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.SelectOperatorForm;
+import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
@@ -80,7 +80,7 @@ public class SelectOperatorService {
     return projectOperatorService.createOrUpdateProjectOperator(detail, organisationGroup);
   }
 
-  public BindingResult validate(SelectOperatorForm form,
+  public BindingResult validate(ProjectOperatorForm form,
                                 BindingResult bindingResult) {
     return validationService.validate(form, bindingResult, ValidationType.FULL);
   }
@@ -90,9 +90,9 @@ public class SelectOperatorService {
    * @param detail detail to build the form for.
    * @return form with detail's associated organisationGroup.
    */
-  public SelectOperatorForm getForm(ProjectDetail detail) {
+  public ProjectOperatorForm getForm(ProjectDetail detail) {
     var projectOperator = getProjectOperatorOrError(detail);
-    return new SelectOperatorForm(projectOperator.getOrganisationGroup().getOrgGrpId().toString());
+    return new ProjectOperatorForm(projectOperator.getOrganisationGroup().getOrgGrpId().toString());
   }
 
   public boolean isComplete(ProjectDetail detail) {
@@ -104,10 +104,10 @@ public class SelectOperatorService {
 
   /**
    * If there's data in the form turn it back into a format the searchSelector can parse.
-   * @param form valid or invalid SelectOperatorForm
+   * @param form valid or invalid ProjectOperatorForm
    * @return id and display name of the search selector items empty map if there's no form data.
    */
-  public Map<String, String> getPreSelectedOrgGroup(SelectOperatorForm form) {
+  public Map<String, String> getPreSelectedOrgGroup(ProjectOperatorForm form) {
     if (form.getOrganisationGroup() != null) {
       return  searchSelectorService.buildPrePopulatedSelections(
           Collections.singletonList(form.getOrganisationGroup()),
@@ -124,16 +124,15 @@ public class SelectOperatorService {
   /**
    * Build the model and view for the selectOperator template.
    * Add breadcrumbs in the controller if they're required.
-   * @param form a SelectOperator form (with operator if updating)
+   * @param form a ProjectOperator form (with operator if updating)
    * @param cancelUrl the url to go back to if user clicks cancel
    * @param primaryButtonText primary button text
    * @return the completed model and view
    */
-  public ModelAndView getSelectOperatorModelAndView(SelectOperatorForm form,
+  public ModelAndView getSelectOperatorModelAndView(ProjectOperatorForm form,
                                                     String cancelUrl,
                                                     String primaryButtonText,
-                                                    TopNavigationType topNavigationType,
-                                                    AuthenticatedUserAccount user) {
+                                                    TopNavigationType topNavigationType) {
     return new ModelAndView("project/selectoperator/selectOperator")
         .addObject("form", form)
         .addObject("preselectedOperator", getPreSelectedOrgGroup(form))
@@ -141,7 +140,6 @@ public class SelectOperatorService {
         .addObject("cancelUrl", cancelUrl)
         .addObject("backLink", topNavigationType.equals(TopNavigationType.BACKLINK))
         .addObject("breadCrumbs", topNavigationType.equals(TopNavigationType.BREADCRUMBS))
-        .addObject("userIsInSingleTeam", !projectOperatorService.isUserInMultipleTeams(user))
         .addObject("operatorsRestUrl", SearchSelectorService.route(on(OrganisationGroupRestController.class)
             .searchFields(null, null))
         );
@@ -151,7 +149,7 @@ public class SelectOperatorService {
     return projectOperatorService.getProjectOperatorByProjectDetail(detail)
         .orElseThrow(() -> new PathfinderEntityNotFoundException(
             String.format(
-                "Unable to create SelectOperatorForm no ProjectOperator found for detail id: %d", detail.getId()
+                "No ProjectOperator found for detail id: %d", detail.getId()
             )
         ));
   }

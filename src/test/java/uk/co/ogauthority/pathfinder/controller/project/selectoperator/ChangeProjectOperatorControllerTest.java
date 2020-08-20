@@ -29,7 +29,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.SelectOperatorForm;
+import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
@@ -58,9 +58,8 @@ public class ChangeProjectOperatorControllerTest extends ProjectContextAbstractC
         any(),
         any(),
         any(),
-        any(),
         any()
-    )).thenReturn(new ModelAndView("test/sessionInfo")); //Just return a model and view that needs no params.
+    )).thenReturn(new ModelAndView("test/blankTemplate")); //Just return a model and view that needs no params.
   }
 
   @Test
@@ -75,7 +74,7 @@ public class ChangeProjectOperatorControllerTest extends ProjectContextAbstractC
       add("organisationGroup", "1");
     }};
 
-    var bindingResult = new BeanPropertyBindingResult(SelectOperatorForm.class, "form");
+    var bindingResult = new BeanPropertyBindingResult(ProjectOperatorForm.class, "form");
     when(selectOperatorService.validate(any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
@@ -96,7 +95,7 @@ public class ChangeProjectOperatorControllerTest extends ProjectContextAbstractC
       add(ChangeProjectOperatorController.PRIMARY_BUTTON_TEXT, ChangeProjectOperatorController.PRIMARY_BUTTON_TEXT);
     }};
 
-    var bindingResult = new BeanPropertyBindingResult(SelectOperatorForm.class, "form");
+    var bindingResult = new BeanPropertyBindingResult(ProjectOperatorForm.class, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
     when(selectOperatorService.validate(any(), any())).thenReturn(bindingResult);
 

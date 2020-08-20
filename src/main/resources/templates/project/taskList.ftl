@@ -2,7 +2,7 @@
 
 <@defaultPage htmlTitle="Pathfinder project task list" pageHeading="Pathfinder project" breadcrumbs=true>
     <@fdsTaskList.taskList>
-        <@fdsTaskList.taskListSection sectionNumber="1" sectionHeadingText="Select operator" >
+        <@fdsTaskList.taskListSection sectionNumber="1" sectionHeadingText="Project operator" >
             <@fdsTaskList.taskListItem itemUrl=springUrl(changeOperatorUrl) itemText=changeOperatorName completed=changeOperatorCompleted useNotCompletedLabels=true />
         </@fdsTaskList.taskListSection>
         <@fdsTaskList.taskListSection sectionNumber="2" sectionHeadingText="Prepare project" >
