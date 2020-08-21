@@ -28,13 +28,17 @@ public class ProjectInformationService {
 
   @Transactional
   public ProjectInformation createOrUpdate(ProjectDetail projectDetail, ProjectInformationForm form) {
-    var projectInformationOpt = projectInformationRepository.findByProjectDetail(projectDetail);
-    var projectInformation = projectInformationOpt.orElse(new ProjectInformation());
+    var projectInformation = projectInformationRepository.findByProjectDetail(projectDetail)
+        .orElse(new ProjectInformation());
 
     projectInformation.setProjectDetail(projectDetail);
     projectInformation.setFieldStage(form.getFieldStage());
     projectInformation.setProjectTitle(form.getProjectTitle());
     projectInformation.setProjectSummary(form.getProjectSummary());
+    projectInformation.setContactName(form.getName());
+    projectInformation.setPhoneNumber(form.getPhoneNumber());
+    projectInformation.setJobTitle(form.getJobTitle());
+    projectInformation.setEmailAddress(form.getEmailAddress());
     return projectInformationRepository.save(projectInformation);
   }
 
@@ -52,6 +56,10 @@ public class ProjectInformationService {
     form.setFieldStage(projectInformation.getFieldStage());
     form.setProjectTitle(projectInformation.getProjectTitle());
     form.setProjectSummary(projectInformation.getProjectSummary());
+    form.setName(projectInformation.getContactName());
+    form.setPhoneNumber(projectInformation.getPhoneNumber());
+    form.setJobTitle(projectInformation.getJobTitle());
+    form.setEmailAddress(projectInformation.getEmailAddress());
 
     return form;
   }

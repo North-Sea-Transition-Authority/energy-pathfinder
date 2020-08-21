@@ -29,6 +29,12 @@
             <li>Timing/Schedule for work e.g. dates for FID, FDP approval, COP, Decommissioning Programme approval etc.</li>
           </ul>
       </@fdsDetails.summaryDetails>
+      <@fdsFieldset.fieldset legendHeading="Contact details" legendHeadingSize="h2" >
+          <@fdsTextInput.textInput path="form.name" labelText="Name" labelClass="govuk-label " inputClass="govuk-!-width-two-thirds"/>
+          <@fdsTextInput.textInput path="form.phoneNumber" labelText="Telephone number" hintText="Enter a UK telephone or mobile number" labelClass="govuk-label " inputClass="govuk-!-width-two-thirds"/>
+          <@fdsTextInput.textInput path="form.jobTitle" labelText="Job title" labelClass="govuk-label " inputClass="govuk-!-width-two-thirds"/>
+          <@fdsTextInput.textInput path="form.emailAddress" labelText="Email address" labelClass="govuk-label " inputClass="govuk-!-width-two-thirds"/>
+      </@fdsFieldset.fieldset>
       <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
   </@fdsForm.htmlForm>
 </@defaultPage>
