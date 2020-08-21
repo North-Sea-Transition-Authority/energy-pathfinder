@@ -10,12 +10,20 @@ public class ProjectInformationUtil {
   public static final String PROJECT_TITLE = "PROJECT TITLE";
   public static final String PROJECT_SUMMARY = "SUMMARY";
   public static final FieldStage FIELD_STAGE = FieldStage.DECOMMISSIONING;
+  public static final String CONTACT_NAME = "Jane Doe";
+  public static final String PHONE_NUMBER = "01303 123 456";
+  public static final String JOB_TITLE = "Big Boss";
+  public static final String EMAIL = "a@b.co";
 
   public static ProjectInformation getProjectInformation_withCompleteDetails(ProjectDetail details) {
     return new ProjectInformation(details,
         FIELD_STAGE,
         PROJECT_TITLE,
-        PROJECT_SUMMARY
+        PROJECT_SUMMARY,
+        CONTACT_NAME,
+        PHONE_NUMBER,
+        JOB_TITLE,
+        EMAIL
         );
   }
 
@@ -24,6 +32,10 @@ public class ProjectInformationUtil {
     form.setProjectSummary(PROJECT_SUMMARY);
     form.setProjectTitle(PROJECT_TITLE);
     form.setFieldStage(FIELD_STAGE);
+    form.setName(CONTACT_NAME);
+    form.setPhoneNumber(PHONE_NUMBER);
+    form.setJobTitle(JOB_TITLE);
+    form.setEmailAddress(EMAIL);
 
     return form;
   }

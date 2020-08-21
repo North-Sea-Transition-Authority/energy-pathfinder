@@ -57,18 +57,28 @@ public class ProjectInformationServiceTest {
     assertThat(projectInformation.getFieldStage()).isEqualTo(ProjectInformationUtil.FIELD_STAGE);
     assertThat(projectInformation.getProjectTitle()).isEqualTo(ProjectInformationUtil.PROJECT_TITLE);
     assertThat(projectInformation.getProjectSummary()).isEqualTo(ProjectInformationUtil.PROJECT_SUMMARY);
+    assertThat(projectInformation.getContactName()).isEqualTo(ProjectInformationUtil.CONTACT_NAME);
+    assertThat(projectInformation.getPhoneNumber()).isEqualTo(ProjectInformationUtil.PHONE_NUMBER);
+    assertThat(projectInformation.getJobTitle()).isEqualTo(ProjectInformationUtil.JOB_TITLE);
+    assertThat(projectInformation.getEmailAddress()).isEqualTo(ProjectInformationUtil.EMAIL);
   }
 
   @Test
   public void createOrUpdate_existingDetail() {
     when(projectInformationRepository.findByProjectDetail(details))
         .thenReturn(Optional.of(ProjectInformationUtil.getProjectInformation_withCompleteDetails(details)));
-    projectInformation = projectInformationService.createOrUpdate(details, ProjectInformationUtil.getCompleteForm());
+    var form = ProjectInformationUtil.getCompleteForm();
+    form.setName("New name");
+    projectInformation = projectInformationService.createOrUpdate(details, form);
 
     assertThat(projectInformation.getProjectDetail()).isEqualTo(details);
     assertThat(projectInformation.getFieldStage()).isEqualTo(ProjectInformationUtil.FIELD_STAGE);
     assertThat(projectInformation.getProjectTitle()).isEqualTo(ProjectInformationUtil.PROJECT_TITLE);
     assertThat(projectInformation.getProjectSummary()).isEqualTo(ProjectInformationUtil.PROJECT_SUMMARY);
+    assertThat(projectInformation.getContactName()).isEqualTo("New name");
+    assertThat(projectInformation.getPhoneNumber()).isEqualTo(ProjectInformationUtil.PHONE_NUMBER);
+    assertThat(projectInformation.getJobTitle()).isEqualTo(ProjectInformationUtil.JOB_TITLE);
+    assertThat(projectInformation.getEmailAddress()).isEqualTo(ProjectInformationUtil.EMAIL);
   }
 
   @Test
@@ -79,6 +89,10 @@ public class ProjectInformationServiceTest {
     assertThat(form.getFieldStage()).isNull();
     assertThat(form.getProjectTitle()).isNull();
     assertThat(form.getProjectSummary()).isNull();
+    assertThat(form.getName()).isNull();
+    assertThat(form.getPhoneNumber()).isNull();
+    assertThat(form.getJobTitle()).isNull();
+    assertThat(form.getEmailAddress()).isNull();
   }
 
   @Test
@@ -91,6 +105,10 @@ public class ProjectInformationServiceTest {
     assertThat(form.getFieldStage()).isEqualTo(projectInformation.getFieldStage());
     assertThat(form.getProjectTitle()).isEqualTo(projectInformation.getProjectTitle());
     assertThat(form.getProjectSummary()).isEqualTo(projectInformation.getProjectSummary());
+    assertThat(form.getName()).isEqualTo(projectInformation.getContactName());
+    assertThat(form.getPhoneNumber()).isEqualTo(projectInformation.getPhoneNumber());
+    assertThat(form.getJobTitle()).isEqualTo(projectInformation.getJobTitle());
+    assertThat(form.getEmailAddress()).isEqualTo(projectInformation.getEmailAddress());
   }
 
 

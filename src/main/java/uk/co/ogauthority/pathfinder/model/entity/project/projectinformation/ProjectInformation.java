@@ -35,17 +35,33 @@ public class ProjectInformation {
   @Column(name = "project_summary", columnDefinition = "CLOB")
   private String projectSummary;
 
+  private String contactName;
+
+  private String phoneNumber;
+
+  private String jobTitle;
+
+  private String emailAddress;
+
   public ProjectInformation() {
   }
 
   public ProjectInformation(ProjectDetail projectDetail,
                             FieldStage fieldStage,
                             String projectTitle,
-                            String projectSummary) {
+                            String projectSummary,
+                            String contactName,
+                            String phoneNumber,
+                            String jobTitle,
+                            String emailAddress) {
     this.projectDetail = projectDetail;
     this.fieldStage = fieldStage;
     this.projectTitle = projectTitle;
     this.projectSummary = projectSummary;
+    this.contactName = contactName;
+    this.phoneNumber = phoneNumber;
+    this.jobTitle = jobTitle;
+    this.emailAddress = emailAddress;
   }
 
   public Integer getId() {
@@ -82,5 +98,37 @@ public class ProjectInformation {
 
   public void setProjectSummary(String projectSummary) {
     this.projectSummary = projectSummary;
+  }
+
+  public String getContactName() {
+    return contactName;
+  }
+
+  public void setContactName(String contactName) {
+    this.contactName = contactName;
+  }
+
+  public String getPhoneNumber() {
+    return phoneNumber;
+  }
+
+  public void setPhoneNumber(String phoneNumber) {
+    this.phoneNumber = phoneNumber;
+  }
+
+  public String getJobTitle() {
+    return jobTitle;
+  }
+
+  public void setJobTitle(String jobTitle) {
+    this.jobTitle = jobTitle;
+  }
+
+  public String getEmailAddress() {
+    return emailAddress;
+  }
+
+  public void setEmailAddress(String emailAddress) {
+    this.emailAddress = emailAddress;
   }
 }
