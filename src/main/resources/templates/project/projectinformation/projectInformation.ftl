@@ -19,7 +19,7 @@
       </#list>
     </@fdsRadio.radioGroup>
 
-      <@fdsTextInput.textInput path="form.projectTitle" labelText="What is the project title?" inputClass="govuk-!-width-two-thirds"/>
+      <@fdsTextInput.textInput path="form.projectTitle" labelText="What is the project title?"/>
       <@fdsTextarea.textarea path="form.projectSummary" labelText="Provide a summary of the project"  />
       <@fdsDetails.summaryDetails summaryTitle="What should I provide for the summary of the project?">
         <p class="govuk-body">Provide a description of the project and future plans and include the following where appropriate:</p>
@@ -30,10 +30,10 @@
           </ul>
       </@fdsDetails.summaryDetails>
       <@fdsFieldset.fieldset legendHeading="Contact details" legendHeadingSize="h2" >
-          <@fdsTextInput.textInput path="form.name" labelText="Name" labelClass="govuk-label " inputClass="govuk-!-width-two-thirds"/>
-          <@fdsTextInput.textInput path="form.phoneNumber" labelText="Telephone number" hintText="Enter a UK telephone or mobile number" labelClass="govuk-label " inputClass="govuk-!-width-two-thirds"/>
-          <@fdsTextInput.textInput path="form.jobTitle" labelText="Job title" labelClass="govuk-label " inputClass="govuk-!-width-two-thirds"/>
-          <@fdsTextInput.textInput path="form.emailAddress" labelText="Email address" labelClass="govuk-label " inputClass="govuk-!-width-two-thirds"/>
+          <@fdsTextInput.textInput path="form.name" labelText="Name" labelClass="govuk-label " />
+          <@fdsTextInput.textInput path="form.phoneNumber" labelText="Telephone number" hintText="Enter a UK telephone or mobile number" labelClass="govuk-label " />
+          <@fdsTextInput.textInput path="form.jobTitle" labelText="Job title" labelClass="govuk-label " />
+          <@fdsTextInput.textInput path="form.emailAddress" labelText="Email address" labelClass="govuk-label " />
       </@fdsFieldset.fieldset>
       <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
   </@fdsForm.htmlForm>

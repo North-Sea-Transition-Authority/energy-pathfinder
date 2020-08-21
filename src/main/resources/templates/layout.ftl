@@ -25,7 +25,7 @@
   fullWidthColumn=false
   oneHalfColumn=false
   oneThirdColumn=false
-  twoThirdsColumn=false
+  twoThirdsColumn=true
   twoThirdsOneThirdColumn=false
   oneQuarterColumn=false
   twoThirdsOneThirdContent=""
