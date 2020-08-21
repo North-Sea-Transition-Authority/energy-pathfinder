@@ -191,6 +191,7 @@ public class TeamManagementService {
   public List<Team> getAllTeamsOfTypeUserCanView(AuthenticatedUserAccount user, TeamType teamType) {
     return getAllTeamsUserCanView(user)
         .stream()
+        .sorted(Comparator.comparing(team -> team.getName().toLowerCase()))
         .filter(team -> team.getType().equals(teamType) || teamType == null)
         .collect(Collectors.toList());
   }

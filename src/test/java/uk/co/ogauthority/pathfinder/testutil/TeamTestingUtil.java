@@ -30,6 +30,15 @@ public class TeamTestingUtil {
     return new OrganisationTeam(200, "ORG_TEAM_NAME", "ORG_TEAM_DESCRIPTION", organisationGroup);
   }
 
+  public static OrganisationTeam getOrganisationTeam(int id, String organisationTeamName) {
+    var organisationGroup = generateOrganisationGroup(
+        1,
+        "ORG_GRP_NAME",
+        "ORG_GRP_SHORT_NAME"
+    );
+    return new OrganisationTeam(id, organisationTeamName, "ORG_TEAM_DESCRIPTION", organisationGroup);
+  }
+
   public static Role getTeamAdminRole() {
     return new Role(
         Role.TEAM_ADMINISTRATOR_ROLE_NAME,
@@ -115,7 +124,7 @@ public class TeamTestingUtil {
       FieldUtils.writeField(portalOrganisationGroup, "orgGrpId", orgGrpId, true);
       FieldUtils.writeField(portalOrganisationGroup, "name", name, true);
       FieldUtils.writeField(portalOrganisationGroup, "shortName", shortName, true);
-      FieldUtils.writeField(portalOrganisationGroup, "urefValue", String.valueOf(orgGrpId) + "++REGORGGRP", true);
+      FieldUtils.writeField(portalOrganisationGroup, "urefValue", orgGrpId + "++REGORGGRP", true);
     } catch (IllegalAccessException e) {
       e.printStackTrace();
     }

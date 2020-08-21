@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 public enum TeamType {
   REGULATOR("PATHFINDER_REGULATOR_TEAM", StringUtils.EMPTY),
   ORGANISATION("PATHFINDER_ORGANISATION_TEAM",
-      "The users listed below have access to all view Pathfinder projects for " +
+      "The users listed below have access to view all Pathfinder projects for " +
       "your organisation. The roles a user has determines the actions they can carry " +
       "out on behalf of your organisation."
   );

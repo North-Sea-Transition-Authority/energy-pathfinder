@@ -788,4 +788,32 @@ public class TeamManagementServiceTest {
 
   }
 
+  @Test
+  public void getAllTeamsOfTypeUserCanView_isSortedByTeamNameAsc() {
+    var organisationAdministrator = UserTestingUtil.getAuthenticatedUserAccount(Set.of(
+        UserPrivilege.PATHFINDER_ORG_ADMIN
+    ));
+
+    when(teamService.getRegulatorTeamIfPersonInRole(
+        organisationAdministrator.getLinkedPerson(),
+        EnumSet.allOf(RegulatorRole.class)
+    )).thenReturn(Optional.of(regulatorTeam));
+
+    var organisationTeamA = TeamTestingUtil.getOrganisationTeam(1, "A ORGANISATION");
+    var organisationTeamC = TeamTestingUtil.getOrganisationTeam(2, "c organisation");
+    var organisationTeamB = TeamTestingUtil.getOrganisationTeam(3, "B ORGANISATION");
+
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(organisationAdministrator.getLinkedPerson()))
+        .thenReturn(List.of(organisationTeamC, organisationTeamB, organisationTeamA));
+
+    var viewableTeams = teamManagementService.getAllTeamsOfTypeUserCanView(
+        organisationAdministrator,
+        TeamType.ORGANISATION
+    );
+
+    assertThat(viewableTeams).containsExactly(organisationTeamA, organisationTeamB, organisationTeamC);
+  }
+
+
+
 }
