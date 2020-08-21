@@ -13,7 +13,7 @@ import javax.validation.Payload;
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidPhoneNumber {
-  String message() default "{messagePrefix} must be a valid phone number";
+  String message() default "{messagePrefix} must be a valid UK telephone or mobile number. For example: 020 7947 6330";
 
   Class<?>[] groups() default {};
 

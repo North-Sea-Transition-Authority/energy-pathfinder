@@ -31,7 +31,7 @@
       </@fdsDetails.summaryDetails>
       <@fdsFieldset.fieldset legendHeading="Contact details">
           <@fdsTextInput.textInput path="form.name" labelText="Name" labelClass="govuk-label " inputClass="govuk-!-width-two-thirds"/>
-          <@fdsTextInput.textInput path="form.phoneNumber" labelText="Telephone number" labelClass="govuk-label " inputClass="govuk-!-width-two-thirds"/>
+          <@fdsTextInput.textInput path="form.phoneNumber" labelText="Telephone number" hintText="Enter a UK telephone or mobile number" labelClass="govuk-label " inputClass="govuk-!-width-two-thirds"/>
           <@fdsTextInput.textInput path="form.jobTitle" labelText="Job title" labelClass="govuk-label " inputClass="govuk-!-width-two-thirds"/>
           <@fdsTextInput.textInput path="form.emailAddress" labelText="Email address" labelClass="govuk-label " inputClass="govuk-!-width-two-thirds"/>
       </@fdsFieldset.fieldset>
