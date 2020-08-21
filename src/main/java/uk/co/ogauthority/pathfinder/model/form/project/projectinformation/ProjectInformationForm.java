@@ -26,7 +26,7 @@ public class ProjectInformationForm {
   private String name;
 
   @NotEmpty(message = "Enter a telephone number", groups = FullValidation.class)
-  @ValidPhoneNumber(messagePrefix = "The contact phone number", groups = {FullValidation.class, PartialValidation.class})
+  @ValidPhoneNumber(messagePrefix = "The contact telephone number", groups = {FullValidation.class, PartialValidation.class})
   private String phoneNumber;
 
   @LengthRestrictedString(messagePrefix = "The contact job title", groups = {FullValidation.class, PartialValidation.class})
