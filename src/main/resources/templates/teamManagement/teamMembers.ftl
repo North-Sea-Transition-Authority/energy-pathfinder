@@ -61,7 +61,7 @@
                     <@fdsAction.link
                       linkUrl=springUrl(teamMemberView.editRoute)
                       linkText="Edit"
-                      linkScreenReaderText="Edit ${teamMemberView.fullName} user"
+                      linkScreenReaderText="${teamMemberView.fullName} user"
                       linkClass="govuk-link govuk-link--no-visited-state"
                     />
                   </li>
@@ -69,7 +69,7 @@
                     <@fdsAction.link
                       linkUrl=springUrl(teamMemberView.removeRoute)
                       linkText="Remove"
-                      linkScreenReaderText="Remove ${teamMemberView.fullName} user"
+                      linkScreenReaderText="${teamMemberView.fullName} user"
                       linkClass="govuk-link govuk-link--no-visited-state"
                     />
                   </li>
