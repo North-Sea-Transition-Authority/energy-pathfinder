@@ -24,9 +24,9 @@
     <@fdsDetails.summaryDetails summaryTitle="What should I provide for the summary of the project?">
       <p class="govuk-body">Provide a description of the project and future plans and include the following where appropriate:</p>
         <ul class="govuk-list govuk-list--bullet">
-          <li>Location in UKCS and type of structure e.g. steel platform, FPSO, Subsea manifold etc.</li>
-          <li>Current stage of project e.g. Pre-Feed, COP etc.</li>
-          <li>Timing/Schedule for work e.g. dates for FID, FDP approval, COP, Decommissioning Programme approval etc.</li>
+          <li>location in UKCS and type of structure, for example: steel platform, FPSO, Subsea manifold</li>
+          <li>current stage of project, for example: Pre-Feed, COP</li>
+          <li>timing / schedule for work, for example: dates for FID, FDP approval, COP, Decommissioning Programme approval</li>
         </ul>
     </@fdsDetails.summaryDetails>
     <@contactDetails.contactDetails/>
