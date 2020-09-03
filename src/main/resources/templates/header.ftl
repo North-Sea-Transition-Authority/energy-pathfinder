@@ -594,7 +594,7 @@
                     c0.3-0.8,1.2-1.1,2-0.9c0.8,0.2,1.1,1.2,0.9,2C97.6,60.9,97.5,61,97.5,61.2 M100.9,55.7c-0.3,0.7-1.1,0.9-1.8,0.6
                     c-0.6-0.5-0.6-1.4-0.1-1.9c0.3-0.7,1.1-0.9,1.8-0.6C101.4,54.2,101.4,55.1,100.9,55.7"/>
                 </g>
-                <image src="<@spring.url '/assets/static/images/beis/beis-logo-white-crest.png'/>" class="govuk-header__logotype-crown-fallback-image"></image>
+                <image src="<@spring.url '/assets/static/images/beis/beis-logo-white-crest.png'/>" alt="" class="govuk-header__logotype-crown-fallback-image"></image>
               </svg>
             <#elseif headerLogo == "GOVUK_CROWN">
               <svg role="presentation" focusable="false" class="govuk-header__logotype-crown" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 132 97" height="30" width="36">
