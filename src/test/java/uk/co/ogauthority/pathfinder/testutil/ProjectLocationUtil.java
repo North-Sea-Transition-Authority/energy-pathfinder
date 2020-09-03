@@ -5,7 +5,7 @@ import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkField;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
-import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.TwoFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
 
@@ -54,8 +54,8 @@ public class ProjectLocationUtil {
 
   public static ProjectLocationForm getBlankForm() {
     var form = new ProjectLocationForm();
-    form.setApprovedFdpDate(new TwoFieldDateInput(null, null));
-    form.setApprovedDecomProgramDate(new TwoFieldDateInput(null, null));
+    form.setApprovedFdpDate(new ThreeFieldDateInput(null, null, null));
+    form.setApprovedDecomProgramDate(new ThreeFieldDateInput(null, null, null));
     return form;
   }
 
@@ -72,8 +72,8 @@ public class ProjectLocationUtil {
     form.setFieldType(FIELD_TYPE);
     form.setWaterDepth(WATER_DEPTH);
     form.setApprovedFieldDevelopmentPlan(APPROVED_FDP_PLAN);
-    form.setApprovedFdpDate(new TwoFieldDateInput(APPROVED_FDP_DATE));
+    form.setApprovedFdpDate(new ThreeFieldDateInput(APPROVED_FDP_DATE));
     form.setApprovedDecomProgram(APPROVED_DECOM_PROGRAM);
-    form.setApprovedDecomProgramDate(new TwoFieldDateInput(null, null));
+    form.setApprovedDecomProgramDate(new ThreeFieldDateInput(null, null, null));
   }
 }

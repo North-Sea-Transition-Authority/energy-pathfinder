@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput;
+package uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint;
 
 import java.time.LocalDate;
 

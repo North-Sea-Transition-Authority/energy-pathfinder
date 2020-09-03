@@ -3,7 +3,7 @@ package uk.co.ogauthority.pathfinder.testutil;
 import java.time.LocalDate;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.TenderFunction;
-import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.TwoFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
 
@@ -35,7 +35,7 @@ public class UpcomingTenderUtil {
 
   private static void setUpcomingTenderFields(UpcomingTenderForm form) {
     form.setDescriptionOfWork(DESCRIPTION_OF_WORK);
-    form.setEstimatedTenderDate(new TwoFieldDateInput(ESTIMATED_TENDER_DATE));
+    form.setEstimatedTenderDate(new ThreeFieldDateInput(ESTIMATED_TENDER_DATE));
     form.setContractBand(CONTRACT_BAND);
     form.setName(CONTACT_NAME);
     form.setPhoneNumber(PHONE_NUMBER);

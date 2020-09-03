@@ -49,7 +49,7 @@ public class ValidationServiceTest {
     validationService.validate(form, bindingResult, ValidationType.FULL);
     var fieldErrors = ValidatorTestingUtil.extractErrors(bindingResult);
 
-    assertThat(fieldErrors).containsExactly(
+    assertThat(fieldErrors).containsOnly(
         entry("field1", Set.of("NotNull")),
         entry("field2", Set.of("NotNull"))
     );

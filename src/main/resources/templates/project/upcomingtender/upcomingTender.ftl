@@ -8,11 +8,14 @@
   <@fdsForm.htmlForm>
     <@fdsSearchSelector.searchSelectorRest path="form.tenderFunction" selectorMinInputLength=0 labelText="What function is the tender for?" restUrl=springUrl(tenderRestUrl)  preselectedItems=preselectedTender!{} />
     <@fdsTextarea.textarea path="form.descriptionOfWork" labelText="Provide a detailed description of the work"/>
-    <@fdsNumberInput.twoNumberInputs pathOne="form.estimatedTenderDate.month" pathTwo="form.estimatedTenderDate.year" fieldsetHeadingClass="govuk-fieldset__legend--s" labelText="Estimated tender date" formId="estimatedTenderDate-month-year">
-        <@fdsNumberInput.numberInputItem path="form.estimatedTenderDate.month" labelText="Month" inputClass="govuk-input--width-2"/>
-        <@fdsNumberInput.numberInputItem path="form.estimatedTenderDate.year" labelText="Year" inputClass="govuk-input--width-4"/>
-    </@fdsNumberInput.twoNumberInputs>
-
+    <@fdsDateInput.dateInput
+      dayPath="form.estimatedTenderDate.day"
+      monthPath="form.estimatedTenderDate.month"
+      yearPath="form.estimatedTenderDate.year"
+      labelText="Estimated tender date?"
+      formId="estimatedTenderDate-day-month-year"
+      fieldsetHeadingClass="govuk-fieldset__legend--s"
+    />
     <@fdsRadio.radio
       labelText="Contract band"
       path="form.contractBand"
@@ -20,7 +23,6 @@
       fieldsetHeadingClass="govuk-fieldset__legend--s"
       optionalLabel=true
     />
-
     <@contactDetails.contactDetails legendHeading="Tender contact details"/>
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
   </@fdsForm.htmlForm>

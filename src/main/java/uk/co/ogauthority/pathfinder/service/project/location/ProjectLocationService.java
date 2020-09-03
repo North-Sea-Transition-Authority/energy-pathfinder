@@ -12,10 +12,10 @@ import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.EmptyDateAcceptableHint;
-import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.TwoFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
+import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -107,10 +107,10 @@ public class ProjectLocationService {
     form.setWaterDepth(projectLocation.getWaterDepth());
 
     form.setApprovedDecomProgram(projectLocation.getApprovedDecomProgram());
-    form.setApprovedDecomProgramDate(new TwoFieldDateInput(projectLocation.getApprovedDecomProgramDate()));
+    form.setApprovedDecomProgramDate(new ThreeFieldDateInput(projectLocation.getApprovedDecomProgramDate()));
 
     form.setApprovedFieldDevelopmentPlan(projectLocation.getApprovedFieldDevelopmentPlan());
-    form.setApprovedFdpDate(new TwoFieldDateInput(projectLocation.getApprovedFdpDate()));
+    form.setApprovedFdpDate(new ThreeFieldDateInput(projectLocation.getApprovedFdpDate()));
 
     return form;
   }
@@ -123,15 +123,14 @@ public class ProjectLocationService {
   public BindingResult validate(ProjectLocationForm form,
                                 BindingResult bindingResult,
                                 ValidationType validationType) {
-    if (validationType.equals(ValidationType.FULL)) {
-      projectLocationFormValidator.validate(form, bindingResult);
-    } else {
-      projectLocationFormValidator.validate(form, bindingResult, new EmptyDateAcceptableHint());
-    }
-
+    var projectLocationValidationHint = createProjectLocationValidationHint(validationType);
+    projectLocationFormValidator.validate(form, bindingResult, projectLocationValidationHint);
     return validationService.validate(form, bindingResult, validationType);
   }
 
+  private ProjectLocationValidationHint createProjectLocationValidationHint(ValidationType validationType) {
+    return new ProjectLocationValidationHint(validationType);
+  }
 
   public boolean isComplete(ProjectDetail details) {
     var form = getForm(details);

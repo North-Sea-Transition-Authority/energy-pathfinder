@@ -2,7 +2,7 @@ package uk.co.ogauthority.pathfinder.model.form.project.upcomingtender;
 
 import javax.validation.constraints.NotEmpty;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
-import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.TwoFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.email.ValidEmail;
@@ -17,7 +17,7 @@ public class UpcomingTenderForm {
   @NotEmpty(message = "Enter a description of the work", groups = FullValidation.class)
   private String descriptionOfWork;
 
-  private TwoFieldDateInput estimatedTenderDate;
+  private ThreeFieldDateInput estimatedTenderDate;
 
   private ContractBand contractBand;
 
@@ -56,12 +56,11 @@ public class UpcomingTenderForm {
     this.descriptionOfWork = descriptionOfWork;
   }
 
-  public TwoFieldDateInput getEstimatedTenderDate() {
+  public ThreeFieldDateInput getEstimatedTenderDate() {
     return estimatedTenderDate;
   }
 
-  public void setEstimatedTenderDate(
-      TwoFieldDateInput estimatedTenderDate) {
+  public void setEstimatedTenderDate(ThreeFieldDateInput estimatedTenderDate) {
     this.estimatedTenderDate = estimatedTenderDate;
   }
 
