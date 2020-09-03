@@ -9,7 +9,8 @@ public enum FieldValidationErrorCodes {
   MAX_LENGTH_EXCEEDED(".maxLengthExceeded"),
   REQUIRED(".required"),
   OUT_OF_TARGET_RANGE(".outOfTargetRange"),
-  NOT_UNIQUE(".notUnique");
+  NOT_UNIQUE(".notUnique"),
+  MIN_LENGTH_NOT_MET(".minLengthNotMet");
 
   private final String code;
 

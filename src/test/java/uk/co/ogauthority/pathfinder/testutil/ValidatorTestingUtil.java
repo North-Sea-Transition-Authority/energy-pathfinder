@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,7 +39,11 @@ public class ValidatorTestingUtil {
   public static Map<String, Set<String>> extractErrors(BindingResult bindingResult) {
 
     return bindingResult.getFieldErrors().stream()
-        .collect(Collectors.groupingBy(FieldError::getField, Collectors.mapping(FieldError::getCode, Collectors.toSet())));
+        .collect(Collectors.groupingBy(
+            FieldError::getField,
+            LinkedHashMap::new,
+            Collectors.mapping(FieldError::getCode, Collectors.toSet())
+        ));
 
   }
 
@@ -48,7 +53,11 @@ public class ValidatorTestingUtil {
   public static Map<String, Set<String>> extractErrorMessages(BindingResult bindingResult) {
 
     return bindingResult.getFieldErrors().stream()
-        .collect(Collectors.groupingBy(FieldError::getField, Collectors.mapping(FieldError::getDefaultMessage, Collectors.toSet())));
+        .collect(Collectors.groupingBy(
+            FieldError::getField,
+            LinkedHashMap::new,
+            Collectors.mapping(FieldError::getDefaultMessage, Collectors.toSet())
+        ));
 
   }
 

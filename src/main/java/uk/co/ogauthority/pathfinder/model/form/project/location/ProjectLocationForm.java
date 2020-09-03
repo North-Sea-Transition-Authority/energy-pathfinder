@@ -3,7 +3,7 @@ package uk.co.ogauthority.pathfinder.model.form.project.location;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
-import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.TwoFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.positivewholenumber.PositiveWholeNumber;
@@ -23,12 +23,12 @@ public class ProjectLocationForm {
   @NotNull(message = "Select yes if you have an approved Field Development Plan", groups = FullValidation.class)
   private Boolean approvedFieldDevelopmentPlan;
 
-  private TwoFieldDateInput approvedFdpDate;
+  private ThreeFieldDateInput approvedFdpDate;
 
   @NotNull(message = "Select yes if you have an approved Decommissioning Programme", groups = FullValidation.class)
   private Boolean approvedDecomProgram;
 
-  private TwoFieldDateInput approvedDecomProgramDate;
+  private ThreeFieldDateInput approvedDecomProgramDate;
 
   public ProjectLocationForm() {
   }
@@ -70,11 +70,11 @@ public class ProjectLocationForm {
     this.approvedFieldDevelopmentPlan = approvedFieldDevelopmentPlan;
   }
 
-  public TwoFieldDateInput getApprovedFdpDate() {
+  public ThreeFieldDateInput getApprovedFdpDate() {
     return approvedFdpDate;
   }
 
-  public void setApprovedFdpDate(TwoFieldDateInput approvedFdpDate) {
+  public void setApprovedFdpDate(ThreeFieldDateInput approvedFdpDate) {
     this.approvedFdpDate = approvedFdpDate;
   }
 
@@ -86,11 +86,11 @@ public class ProjectLocationForm {
     this.approvedDecomProgram = approvedDecomProgram;
   }
 
-  public TwoFieldDateInput getApprovedDecomProgramDate() {
+  public ThreeFieldDateInput getApprovedDecomProgramDate() {
     return approvedDecomProgramDate;
   }
 
-  public void setApprovedDecomProgramDate(TwoFieldDateInput approvedDecomProgramDate) {
+  public void setApprovedDecomProgramDate(ThreeFieldDateInput approvedDecomProgramDate) {
     this.approvedDecomProgramDate = approvedDecomProgramDate;
   }
 }

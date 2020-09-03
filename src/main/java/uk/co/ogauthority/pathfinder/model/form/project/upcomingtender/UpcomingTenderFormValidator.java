@@ -8,21 +8,21 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
-import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.AfterDateHint;
-import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.EmptyDateAcceptableHint;
-import uk.co.ogauthority.pathfinder.model.form.validation.twofielddate.TwoFieldDateInputValidator;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.AfterDateHint;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.EmptyDateAcceptableHint;
+import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 
 @Component
 public class UpcomingTenderFormValidator implements SmartValidator {
 
   public static final FormInputLabel ESTIMATED_TENDER_LABEL = new FormInputLabel("Estimated tender date");
-  public static final String DATE_ERROR_LABEL = "the current date";
-  private final TwoFieldDateInputValidator twoFieldDateInputValidator;
+  public static final String DATE_ERROR_LABEL = "today's date";
+  private final DateInputValidator dateInputValidator;
 
   @Autowired
-  public UpcomingTenderFormValidator(TwoFieldDateInputValidator twoFieldDateInputValidator) {
-    this.twoFieldDateInputValidator = twoFieldDateInputValidator;
+  public UpcomingTenderFormValidator(DateInputValidator dateInputValidator) {
+    this.dateInputValidator = dateInputValidator;
   }
 
   @Override
@@ -43,7 +43,7 @@ public class UpcomingTenderFormValidator implements SmartValidator {
 
     ValidationUtil.invokeNestedValidator(
         errors,
-        twoFieldDateInputValidator,
+        dateInputValidator,
         "estimatedTenderDate",
         form.getEstimatedTenderDate(),
         ESTIMATED_TENDER_LABEL,

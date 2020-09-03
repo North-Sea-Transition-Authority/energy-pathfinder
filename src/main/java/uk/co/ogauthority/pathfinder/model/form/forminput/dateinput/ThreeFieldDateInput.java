@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput;
+package uk.co.ogauthority.pathfinder.model.form.forminput.dateinput;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.time.DateTimeException;
@@ -9,31 +9,48 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents a two field date commonly used on forms and provides access to common operations that might be applied to that date.
+ * Represents a three field date commonly used on forms and provides access to common operations that might be
+ * applied to that date.
  * e.g testing if a given date is before or after etc.
  */
-public class TwoFieldDateInput {
-  private static final Logger LOGGER = LoggerFactory.getLogger(TwoFieldDateInput.class);
+public class ThreeFieldDateInput implements DateInput {
 
-  private static final int DEFAULT_DAY = 1;
+  private static final Logger LOGGER = LoggerFactory.getLogger(ThreeFieldDateInput.class);
 
+  private String day;
   private String month;
   private String year;
 
-  public TwoFieldDateInput() {
+  public ThreeFieldDateInput() {
   }
 
-  public TwoFieldDateInput(LocalDate localDate) {
+  public ThreeFieldDateInput(LocalDate localDate) {
     this.year = localDate != null ? String.valueOf(localDate.getYear()) : null;
     this.month = localDate != null ? String.valueOf(localDate.getMonthValue()) : null;
+    this.day = localDate != null ? String.valueOf(localDate.getDayOfMonth()) : null;
   }
 
   @VisibleForTesting
-  public TwoFieldDateInput(Integer year, Integer month) {
+  public ThreeFieldDateInput(Integer year, Integer month, Integer day) {
     this.year = year != null ? String.valueOf(year) : null;
     this.month = month != null ? String.valueOf(month) : null;
+    this.day = day != null ? String.valueOf(day) : null;
   }
 
+  @Override
+  public String getDay() {
+    return day;
+  }
+
+  public void setDay(String day) {
+    this.day = day;
+  }
+
+  public void setDay(int day) {
+    this.day = String.valueOf(day);
+  }
+
+  @Override
   public String getMonth() {
     return month;
   }
@@ -46,6 +63,7 @@ public class TwoFieldDateInput {
     this.month = String.valueOf(month);
   }
 
+  @Override
   public String getYear() {
     return year;
   }
@@ -58,15 +76,22 @@ public class TwoFieldDateInput {
     this.year = String.valueOf(year);
   }
 
+  @Override
+  public DateInputType getType() {
+    return DateInputType.THREE_FIELD;
+  }
+
+  @Override
   public LocalDate createDateOrNull() {
     return this.createDate()
         .orElse(null);
   }
 
+  @Override
   public Optional<LocalDate> createDate() {
 
     try {
-      var createdDate = LocalDate.of(Integer.valueOf(year), Integer.valueOf(month), DEFAULT_DAY);
+      var createdDate = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day));
       return Optional.of(createdDate);
     } catch (NumberFormatException e) {
       LOGGER.debug("Could not convert date values to valid numbers. " + this.toString(), e);
@@ -77,26 +102,25 @@ public class TwoFieldDateInput {
     }
   }
 
+  @Override
   public boolean isBefore(LocalDate testDate) {
-    var testableDate = testDate.withDayOfMonth(DEFAULT_DAY);
-
     return this.createDate()
-        .filter(date -> date.isBefore(testableDate))
+        .filter(date -> date.isBefore(testDate))
         .isPresent();
 
   }
 
+  @Override
   public boolean isAfter(LocalDate testDate) {
-    var testableDate = testDate.withDayOfMonth(DEFAULT_DAY);
     return this.createDate()
-        .filter(date -> date.isAfter(testableDate))
+        .filter(date -> date.isAfter(testDate))
         .isPresent();
   }
 
-  public boolean isInSameMonth(LocalDate testDate) {
-    var testableDate = testDate.withDayOfMonth(DEFAULT_DAY);
+  @Override
+  public boolean isEqualTo(LocalDate testDate) {
     return this.createDate()
-        .filter(date -> date.equals(testableDate))
+        .filter(date -> date.equals(testDate))
         .isPresent();
   }
 
@@ -108,20 +132,22 @@ public class TwoFieldDateInput {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TwoFieldDateInput that = (TwoFieldDateInput) o;
-    return Objects.equals(month, that.month)
+    ThreeFieldDateInput that = (ThreeFieldDateInput) o;
+    return Objects.equals(day, that.day)
+        && Objects.equals(month, that.month)
         && Objects.equals(year, that.year);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(month, year);
+    return Objects.hash(day, month, year);
   }
 
   @Override
   public String toString() {
-    return "TwoFieldDateInput{" +
-        "month='" + month + '\'' +
+    return "ThreeFieldDateInput{" +
+        "day='" + day + '\'' +
+        ", month='" + month + '\'' +
         ", year='" + year + '\'' +
         '}';
   }

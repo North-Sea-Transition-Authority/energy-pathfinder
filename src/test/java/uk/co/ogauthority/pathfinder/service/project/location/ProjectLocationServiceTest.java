@@ -17,7 +17,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.TwoFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
@@ -250,8 +250,8 @@ public class ProjectLocationServiceTest {
     assertThat(form.getFieldType()).isEqualTo(projectLocation.getFieldType());
     assertThat(form.getWaterDepth()).isEqualTo(projectLocation.getWaterDepth());
     assertThat(form.getApprovedFieldDevelopmentPlan()).isEqualTo(projectLocation.getApprovedFieldDevelopmentPlan());
-    assertThat(form.getApprovedFdpDate()).isEqualTo(new TwoFieldDateInput(projectLocation.getApprovedFdpDate()));
+    assertThat(form.getApprovedFdpDate()).isEqualTo(new ThreeFieldDateInput(projectLocation.getApprovedFdpDate()));
     assertThat(form.getApprovedDecomProgram()).isEqualTo(projectLocation.getApprovedDecomProgram());
-    assertThat(form.getApprovedDecomProgramDate()).isEqualTo(new TwoFieldDateInput(projectLocation.getApprovedDecomProgramDate()));
+    assertThat(form.getApprovedDecomProgramDate()).isEqualTo(new ThreeFieldDateInput(projectLocation.getApprovedDecomProgramDate()));
   }
 }

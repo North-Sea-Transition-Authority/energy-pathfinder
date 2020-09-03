@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.co.ogauthority.pathfinder.model.form.forminput.twofielddateinput.TwoFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.TwoFieldDateInput;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TwoFieldDateInputTest {
@@ -122,29 +122,26 @@ public class TwoFieldDateInputTest {
         .isFalse();
   }
 
-
-
   @Test
-  public void isInSameMonth_whenInvalidDate() {
-    assertThat(twoFieldDateInput.isInSameMonth(LocalDate.now())).isFalse();
+  public void isEqualTo_whenInvalidDate() {
+    assertThat(twoFieldDateInput.isEqualTo(LocalDate.now())).isFalse();
   }
 
   @Test
-  public void isInSameMonth_whenValidDate_andDateIsSameYearMonth() {
+  public void isEqualTo_whenValidDate_andDateIsSameYearMonth() {
     twoFieldDateInput.setYear(LocalDate.now().getYear());
     twoFieldDateInput.setMonth(LocalDate.now().getMonthValue());
 
-    assertThat(twoFieldDateInput.isInSameMonth(LocalDate.now()))
+    assertThat(twoFieldDateInput.isEqualTo(LocalDate.now()))
         .isTrue();
   }
 
-
   @Test
-  public void isInSameMonth_whenValidDate_andDateIsMonthsBefore() {
+  public void isEqualTo_whenValidDate_andDateIsMonthsBefore() {
     twoFieldDateInput.setYear(LocalDate.now().getYear());
     twoFieldDateInput.setMonth(LocalDate.now().getMonthValue());
 
-    assertThat(twoFieldDateInput.isInSameMonth(LocalDate.now().plus(1, ChronoUnit.MONTHS)))
+    assertThat(twoFieldDateInput.isEqualTo(LocalDate.now().plus(1, ChronoUnit.MONTHS)))
         .isFalse();
   }
 
@@ -153,7 +150,7 @@ public class TwoFieldDateInputTest {
     twoFieldDateInput.setYear(LocalDate.now().getYear());
     twoFieldDateInput.setMonth(LocalDate.now().getMonthValue());
 
-    assertThat(twoFieldDateInput.isInSameMonth(LocalDate.now().minus(1, ChronoUnit.MONTHS)))
+    assertThat(twoFieldDateInput.isEqualTo(LocalDate.now().minus(1, ChronoUnit.MONTHS)))
         .isFalse();
   }
 }

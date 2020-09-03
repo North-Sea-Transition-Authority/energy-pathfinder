@@ -12,20 +12,30 @@
 
         <@fdsRadio.radioGroup path="form.approvedFieldDevelopmentPlan" labelText="Do you have an approved Field Development Plan (FDP)?" fieldsetHeadingClass="govuk-fieldset__legend--s" hiddenContent=true>
         <@fdsRadio.radioYes path="form.approvedFieldDevelopmentPlan">
-          <@fdsNumberInput.twoNumberInputs pathOne="form.approvedFdpDate.month" pathTwo="form.approvedFdpDate.year" nestingPath="form.approvedFieldDevelopmentPlan" fieldsetHeadingClass="govuk-fieldset__legend--s" labelText="What is the FDP approval date?" formId="approvedFdpDate-month-year">
-            <@fdsNumberInput.numberInputItem path="form.approvedFdpDate.month" labelText="Month" inputClass="govuk-input--width-2"/>
-            <@fdsNumberInput.numberInputItem path="form.approvedFdpDate.year" labelText="Year" inputClass="govuk-input--width-4"/>
-          </@fdsNumberInput.twoNumberInputs>
+          <@fdsDateInput.dateInput
+              dayPath="form.approvedFdpDate.day"
+              monthPath="form.approvedFdpDate.month"
+              yearPath="form.approvedFdpDate.year"
+              labelText="What is the FDP approval date?"
+              formId="approvedFdpDate-day-month-year"
+              fieldsetHeadingClass="govuk-fieldset__legend--s"
+              nestingPath="form.approvedFieldDevelopmentPlan"
+          />
         </@fdsRadio.radioYes>
         <@fdsRadio.radioNo path="form.approvedFieldDevelopmentPlan"/>
       </@fdsRadio.radioGroup>
 
-      <@fdsRadio.radioGroup path="form.approvedDecomProgram" labelText="Do you have an approved Decomissioning Program (DP)?" fieldsetHeadingClass="govuk-fieldset__legend--s" hiddenContent=true>
+      <@fdsRadio.radioGroup path="form.approvedDecomProgram" labelText="Do you have an approved Decommissioning Program (DP)?" fieldsetHeadingClass="govuk-fieldset__legend--s" hiddenContent=true>
         <@fdsRadio.radioYes path="form.approvedDecomProgram">
-          <@fdsNumberInput.twoNumberInputs pathOne="form.approvedDecomProgramDate.month" pathTwo="form.approvedDecomProgramDate.year" nestingPath="form.approvedDecomProgram" fieldsetHeadingClass="govuk-fieldset__legend--s" labelText="What is the DP approval date?" formId="approvedDecomProgramDate-month-year">
-            <@fdsNumberInput.numberInputItem path="form.approvedDecomProgramDate.month" labelText="Month" inputClass="govuk-input--width-2"/>
-            <@fdsNumberInput.numberInputItem path="form.approvedDecomProgramDate.year" labelText="Year" inputClass="govuk-input--width-4"/>
-          </@fdsNumberInput.twoNumberInputs>
+          <@fdsDateInput.dateInput
+            dayPath="form.approvedDecomProgramDate.day"
+            monthPath="form.approvedDecomProgramDate.month"
+            yearPath="form.approvedDecomProgramDate.year"
+            labelText="What is the DP approval date?"
+            formId="approvedDecomProgramDate-day-month-year"
+            fieldsetHeadingClass="govuk-fieldset__legend--s"
+            nestingPath="form.approvedDecomProgram"
+          />
         </@fdsRadio.radioYes>
         <@fdsRadio.radioNo path="form.approvedDecomProgram"/>
       </@fdsRadio.radioGroup>
