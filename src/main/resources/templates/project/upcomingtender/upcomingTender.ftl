@@ -13,16 +13,13 @@
         <@fdsNumberInput.numberInputItem path="form.estimatedTenderDate.year" labelText="Year" inputClass="govuk-input--width-4"/>
     </@fdsNumberInput.twoNumberInputs>
 
-    <@fdsRadio.radioGroup
+    <@fdsRadio.radio
       labelText="Contract band"
       path="form.contractBand"
+      radioItems=contractBands
       fieldsetHeadingClass="govuk-fieldset__legend--s"
       optionalLabel=true
-    >
-      <#list contractBands as band>
-        <@fdsRadio.radioItem path="form.contractBand" itemMap={band.name() : band.getDisplayName()} isFirstItem=band.getDisplayOrder()=1 />
-      </#list>
-    </@fdsRadio.radioGroup>
+    />
 
     <@contactDetails.contactDetails legendHeading="Tender contact details"/>
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>

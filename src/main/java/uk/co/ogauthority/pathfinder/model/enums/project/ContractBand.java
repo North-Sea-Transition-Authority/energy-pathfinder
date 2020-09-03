@@ -1,22 +1,25 @@
 package uk.co.ogauthority.pathfinder.model.enums.project;
 
+import java.util.Arrays;
+import java.util.Map;
+import uk.co.ogauthority.pathfinder.util.StreamUtil;
+
 public enum ContractBand {
-  LESS_THAN_25M("Less than £25 million", 1),
-  GREATER_THAN_OR_EQUAL_TO_25M("£25 million or more", 2);
+  LESS_THAN_25M("Less than £25 million"),
+  GREATER_THAN_OR_EQUAL_TO_25M("£25 million or more");
 
   private final String displayName;
-  private final Integer displayOrder;
 
-  ContractBand(String displayName, Integer displayOrder) {
+  ContractBand(String displayName) {
     this.displayName = displayName;
-    this.displayOrder = displayOrder;
   }
 
   public String getDisplayName() {
     return displayName;
   }
 
-  public Integer getDisplayOrder() {
-    return displayOrder;
+  public static Map<String, String> getAllAsMap() {
+    return Arrays.stream(values())
+        .collect(StreamUtil.toLinkedHashMap(Enum::name, ContractBand::getDisplayName));
   }
 }

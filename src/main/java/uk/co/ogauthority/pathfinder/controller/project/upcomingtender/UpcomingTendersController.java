@@ -2,9 +2,6 @@ package uk.co.ogauthority.pathfinder.controller.project.upcomingtender;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-import java.util.Comparator;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -95,9 +92,7 @@ public class UpcomingTendersController {
     var modelAndView = new ModelAndView("project/upcomingtender/upcomingTender")
         .addObject("tenderRestUrl", SearchSelectorService.route(on(TenderFunctionRestController.class).searchTenderFunctions(null)))
         .addObject("form", form)
-        .addObject("contractBands",
-            Stream.of(ContractBand.values()).sorted(Comparator.comparing(ContractBand::getDisplayOrder)).collect(
-                Collectors.toList()));
+        .addObject("contractBands", ContractBand.getAllAsMap());
     breadcrumbService.fromUpcomingTenders(projectId, modelAndView, PAGE_NAME_SINGULAR);
     return modelAndView;
   }
