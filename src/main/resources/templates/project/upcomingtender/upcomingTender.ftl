@@ -12,7 +12,7 @@
       dayPath="form.estimatedTenderDate.day"
       monthPath="form.estimatedTenderDate.month"
       yearPath="form.estimatedTenderDate.year"
-      labelText="Estimated tender date?"
+      labelText="Estimated tender date"
       formId="estimatedTenderDate-day-month-year"
       fieldsetHeadingClass="govuk-fieldset__legend--s"
     />
