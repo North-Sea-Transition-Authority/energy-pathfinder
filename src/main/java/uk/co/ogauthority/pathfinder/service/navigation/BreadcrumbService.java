@@ -8,10 +8,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
+import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
 @Service
 public class BreadcrumbService {
+
+
+  public void fromUpcomingTenders(Integer projectId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, upcomingTenders(projectId), thisPage);
+  }
+
+  private Map<String, String> upcomingTenders(Integer projectId) {
+    var map = taskList(projectId);
+    String route = ReverseRouter.route(on(UpcomingTendersController.class).viewTenders(projectId, null));
+    map.put(route, UpcomingTendersController.PAGE_NAME);
+    return map;
+  }
 
   public void fromWorkArea(ModelAndView modelAndView, String thisPage) {
     addAttrs(modelAndView, workArea(), thisPage);

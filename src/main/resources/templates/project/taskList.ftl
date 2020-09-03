@@ -8,6 +8,7 @@
         <@fdsTaskList.taskListSection sectionNumber="2" sectionHeadingText="Prepare project" >
             <@fdsTaskList.taskListItem itemUrl=springUrl(projectInformationUrl) itemText=projectInformationText completed=projectInformationCompleted useNotCompletedLabels=true />
             <@fdsTaskList.taskListItem itemUrl=springUrl(locationUrl) itemText=projectLocationText completed=projectLocationCompleted useNotCompletedLabels=true />
+            <@fdsTaskList.taskListItem itemUrl=springUrl(upcomingTendersUrl) itemText=upcomingTendersText completed=false useNotCompletedLabels=true />
         </@fdsTaskList.taskListSection>
     </@fdsTaskList.taskList>
 </@defaultPage>

@@ -13,6 +13,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusC
 import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationController;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
 import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProjectOperatorController;
+import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
@@ -66,6 +67,11 @@ public class TaskListController {
     );
     modelAndView.addObject("projectLocationText", ProjectLocationController.PAGE_NAME);
     modelAndView.addObject("projectLocationCompleted", projectLocationService.isComplete(projectContext.getProjectDetails()));
+
+    modelAndView.addObject("upcomingTendersUrl",
+        ReverseRouter.route(on(UpcomingTendersController.class).viewTenders(projectId, null))
+    );
+    modelAndView.addObject("upcomingTendersText", UpcomingTendersController.PAGE_NAME);
     breadcrumbService.fromWorkArea(modelAndView, "Task list");
 
     return modelAndView;

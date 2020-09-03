@@ -6,6 +6,7 @@
 
 <#--Import statements-->
 <#import 'header.ftl' as applicationHeader>
+<#import 'project/macros/contactDetails.ftl' as contactDetails>
 
 <#function springUrl url>
   <#local springUrl>

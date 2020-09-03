@@ -10,10 +10,10 @@ public class ProjectInformationUtil {
   public static final String PROJECT_TITLE = "PROJECT TITLE";
   public static final String PROJECT_SUMMARY = "SUMMARY";
   public static final FieldStage FIELD_STAGE = FieldStage.DECOMMISSIONING;
-  public static final String CONTACT_NAME = "Jane Doe";
-  public static final String PHONE_NUMBER = "01303 123 456";
-  public static final String JOB_TITLE = "Big Boss";
-  public static final String EMAIL = "a@b.co";
+  public static final String CONTACT_NAME = ContactDetailsUtil.CONTACT_NAME;
+  public static final String PHONE_NUMBER = ContactDetailsUtil.PHONE_NUMBER;
+  public static final String JOB_TITLE = ContactDetailsUtil.JOB_TITLE;
+  public static final String EMAIL = ContactDetailsUtil.EMAIL;
 
   public static ProjectInformation getProjectInformation_withCompleteDetails(ProjectDetail details) {
     return new ProjectInformation(details,

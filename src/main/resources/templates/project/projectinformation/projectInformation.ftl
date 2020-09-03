@@ -18,22 +18,18 @@
         <@fdsRadio.radioItem path="form.fieldStage" itemMap={fieldStageName: displayName} isFirstItem=displayOrder=1 />
       </#list>
     </@fdsRadio.radioGroup>
-      <@fdsTextInput.textInput path="form.projectTitle" labelText="What is the project title?"/>
-      <@fdsTextarea.textarea path="form.projectSummary" labelText="Provide a summary of the project"  />
-      <@fdsDetails.summaryDetails summaryTitle="What should I provide for the summary of the project?">
-        <p class="govuk-body">Provide a description of the project and future plans and include the following where appropriate:</p>
-          <ul class="govuk-list govuk-list--bullet">
-            <li>location in UKCS and type of structure, for example: steel platform, FPSO, Subsea manifold</li>
-            <li>current stage of project, for example: Pre-Feed, COP</li>
-            <li>timing / schedule for work, for example: dates for FID, FDP approval, COP, Decommissioning Programme approval</li>
-          </ul>
-      </@fdsDetails.summaryDetails>
-      <@fdsFieldset.fieldset legendHeading="Contact details" legendHeadingSize="h2" >
-          <@fdsTextInput.textInput path="form.name" labelText="Name" labelClass="govuk-label " />
-          <@fdsTextInput.textInput path="form.phoneNumber" labelText="Telephone number" hintText="Enter a UK telephone or mobile number" labelClass="govuk-label " />
-          <@fdsTextInput.textInput path="form.jobTitle" labelText="Job title" labelClass="govuk-label " />
-          <@fdsTextInput.textInput path="form.emailAddress" labelText="Email address" labelClass="govuk-label " />
-      </@fdsFieldset.fieldset>
-      <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
+
+    <@fdsTextInput.textInput path="form.projectTitle" labelText="What is the project title?"/>
+    <@fdsTextarea.textarea path="form.projectSummary" labelText="Provide a summary of the project"  />
+    <@fdsDetails.summaryDetails summaryTitle="What should I provide for the summary of the project?">
+      <p class="govuk-body">Provide a description of the project and future plans and include the following where appropriate:</p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>location in UKCS and type of structure, for example: steel platform, FPSO, Subsea manifold</li>
+          <li>current stage of project, for example: Pre-Feed, COP</li>
+          <li>timing / schedule for work, for example: dates for FID, FDP approval, COP, Decommissioning Programme approval</li>
+        </ul>
+    </@fdsDetails.summaryDetails>
+    <@contactDetails.contactDetails/>
+    <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
   </@fdsForm.htmlForm>
 </@defaultPage>
