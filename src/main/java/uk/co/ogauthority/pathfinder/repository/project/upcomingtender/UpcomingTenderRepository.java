@@ -9,8 +9,6 @@ import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.Upcoming
 @Repository
 public interface UpcomingTenderRepository extends CrudRepository<UpcomingTender, Integer> {
 
-  List<UpcomingTender> findByProjectDetail(ProjectDetail detail);
-
-
+  List<UpcomingTender> findByProjectDetailOrderByIdAsc(ProjectDetail detail);
 
 }

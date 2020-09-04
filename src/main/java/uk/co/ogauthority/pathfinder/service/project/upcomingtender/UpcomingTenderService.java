@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
@@ -70,6 +71,23 @@ public class UpcomingTenderService {
     }
 
     return validationService.validate(form, bindingResult, validationType);
+  }
+
+  public boolean isValid(UpcomingTender upcomingTender, ValidationType validationType) {
+    var form = new UpcomingTenderForm();// TODO use actual getForm method
+    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult = validate(form, bindingResult, validationType);
+    return !bindingResult.hasErrors();
+  }
+
+  private UpcomingTenderForm getForm(UpcomingTender upcomingTender) {
+    return null;
+  }
+
+
+  //TODO Think about the ordering using id - relies on vendor specific implemenation of generated ids.... is that really a problem?
+  public List<UpcomingTender> getUpcomingTendersForDetail(ProjectDetail detail) {
+    return upcomingTenderRepository.findByProjectDetailOrderByIdAsc(detail);
   }
 
   /**

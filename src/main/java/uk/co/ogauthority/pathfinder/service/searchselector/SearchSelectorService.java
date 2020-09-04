@@ -73,7 +73,7 @@ public class SearchSelectorService {
     return results;
   }
 
-  public String removePrefix(String s) {
+  public static String removePrefix(String s) {
     return StringUtils.substring(s, SearchSelectable.FREE_TEXT_PREFIX.length());
   }
 

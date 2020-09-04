@@ -53,6 +53,10 @@ public class UpcomingTender {
   public UpcomingTender() {
   }
 
+  public Integer getId() {
+    return id;
+  }
+
   public UpcomingTender(ProjectDetail projectDetail) {
     this.projectDetail = projectDetail;
   }

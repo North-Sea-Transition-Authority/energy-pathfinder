@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.controller.project.upcomingtender;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,12 +21,15 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
+import uk.co.ogauthority.pathfinder.model.view.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
+import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderSummaryService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
@@ -39,21 +43,53 @@ public class UpcomingTendersController {
   private final BreadcrumbService breadcrumbService;
   private final ControllerHelperService controllerHelperService;
   private final UpcomingTenderService upcomingTenderService;
+  private final UpcomingTenderSummaryService upcomingTenderSummaryService;
 
 
   @Autowired
   public UpcomingTendersController(BreadcrumbService breadcrumbService,
                                    ControllerHelperService controllerHelperService,
-                                   UpcomingTenderService upcomingTenderService) {
+                                   UpcomingTenderService upcomingTenderService,
+                                   UpcomingTenderSummaryService upcomingTenderSummaryService) {
     this.breadcrumbService = breadcrumbService;
     this.controllerHelperService = controllerHelperService;
     this.upcomingTenderService = upcomingTenderService;
+    this.upcomingTenderSummaryService = upcomingTenderSummaryService;
   }
 
   @GetMapping
   public ModelAndView viewTenders(@PathVariable("projectId") Integer projectId,
                                   ProjectContext projectContext) {
-    return getViewTendersModelAndView(projectId, projectContext);
+    return getViewTendersModelAndView(
+        projectId,
+        projectContext,
+        upcomingTenderSummaryService.getSummaryViews(projectContext.getProjectDetails()),
+        ValidationResult.NOT_VALIDATED
+    );
+  }
+
+  @PostMapping
+  public ModelAndView saveTenders(@PathVariable("projectId") Integer projectId,
+                                  ProjectContext projectContext) {
+    var tenderViews = upcomingTenderSummaryService.getValidatedSummaryViews(
+        projectContext.getProjectDetails()
+    );
+    //TODO This type of check could be turned into a method in the ControllerHelperService if we keep using it for
+    // Summaries / validation that doesn't rely on a binding result
+    var validationResult = tenderViews.stream().anyMatch(utv -> !utv.isValid())
+        ? ValidationResult.INVALID
+        : ValidationResult.VALID;
+
+    if (validationResult.equals(ValidationResult.INVALID)) {
+      return getViewTendersModelAndView(
+          projectId,
+          projectContext,
+          tenderViews,
+          validationResult
+      );
+    }
+
+    return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
   }
 
   @GetMapping("/upcoming-tender")
@@ -76,14 +112,22 @@ public class UpcomingTendersController {
         form,
         () -> {
           upcomingTenderService.createUpcomingTender(projectContext.getProjectDetails(), form);
-          return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
+          return ReverseRouter.redirect(on(UpcomingTendersController.class).viewTenders(projectId, null));
         }
     );
   }
 
-  private ModelAndView getViewTendersModelAndView(Integer projectId, ProjectContext projectContext) {
+  private ModelAndView getViewTendersModelAndView(
+      Integer projectId,
+      ProjectContext projectContext,
+      List<UpcomingTenderView> tenderViews,
+      ValidationResult validationResult
+  ) {
     var modelAndView = new ModelAndView("project/upcomingtender/tenderSummary")
-        .addObject("addTenderUrl", ReverseRouter.route(on(UpcomingTendersController.class).addUpcomingTender(projectId, null)));
+        .addObject("addTenderUrl", ReverseRouter.route(on(UpcomingTendersController.class).addUpcomingTender(projectId, null)))
+        .addObject("tenderViews", tenderViews)
+        .addObject("isValid", validationResult.equals(ValidationResult.VALID))
+        .addObject("backToTaskListUrl", ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId, null)));
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;
   }

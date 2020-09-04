@@ -38,6 +38,7 @@ public class UpcomingTenderForm {
   private String emailAddress;
 
   public UpcomingTenderForm() {
+    this.estimatedTenderDate = new ThreeFieldDateInput(null);
   }
 
   public String getTenderFunction() {
