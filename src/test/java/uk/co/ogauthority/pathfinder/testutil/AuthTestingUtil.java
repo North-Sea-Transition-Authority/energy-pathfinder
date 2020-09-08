@@ -11,14 +11,17 @@ import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 
 public class AuthTestingUtil {
 
+  private AuthTestingUtil() {
+    throw new IllegalStateException("AuthTestingUtil is a utility class and should not be instantiated");
+  }
+
   /**
    * Check that the given testFunction returns true only when at least one of the requiredPrivs is passed to it, otherwise it should return false.
    */
   public static void testPrivilegeBasedAuthenticationFunction(Set<UserPrivilege> requiredPrivs, Function<AuthenticatedUserAccount, Boolean> testFunction) {
 
     // No privileges
-    assertThat(testFunction.apply(new AuthenticatedUserAccount(new WebUserAccount(1), List.of())))
-        .isEqualTo(false);
+    assertThat(testFunction.apply(new AuthenticatedUserAccount(new WebUserAccount(1), List.of()))).isFalse();
 
     // Single privilege
     for (UserPrivilege privilege : UserPrivilege.values()) {

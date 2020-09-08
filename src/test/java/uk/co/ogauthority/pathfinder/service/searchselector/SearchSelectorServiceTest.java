@@ -13,6 +13,7 @@ import uk.co.ogauthority.pathfinder.controller.rest.DevUkRestController;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.searchselector.ManualEntryAttribute;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
+import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 
 public class SearchSelectorServiceTest {
   private SearchSelectorService searchSelectorService;
@@ -51,7 +52,7 @@ public class SearchSelectorServiceTest {
   public void addManualEntry() {
     var searchableResults = searchSelectorService.addManualEntry("free_text", new ArrayList<>());
     assertThat(searchableResults).extracting(RestSearchItem::getId)
-        .containsExactly(SearchSelectable.FREE_TEXT_PREFIX + "free_text");
+        .containsExactly(SearchSelectablePrefix.FREE_TEXT_PREFIX + "free_text");
   }
 
   @Test
@@ -63,7 +64,7 @@ public class SearchSelectorServiceTest {
 
   @Test
   public void buildPrepopulatedSelections() {
-    var prefix = SearchSelectable.FREE_TEXT_PREFIX;
+    var prefix = SearchSelectablePrefix.FREE_TEXT_PREFIX;
     var selections = List.of(prefix + "Test", "1", "2");
     var resolvedMap = new HashMap<String, String>(){{
       put("1", "One");
@@ -79,7 +80,7 @@ public class SearchSelectorServiceTest {
 
   @Test
   public void removePrefix() {
-    var str = SearchSelectable.FREE_TEXT_PREFIX + "Test";
+    var str = SearchSelectablePrefix.FREE_TEXT_PREFIX + "Test";
     assertThat(searchSelectorService.removePrefix(str)).isEqualTo("Test");
   }
 
@@ -92,7 +93,7 @@ public class SearchSelectorServiceTest {
 
   @Test
   public void isManualEntry() {
-    var manualEntry = SearchSelectable.FREE_TEXT_PREFIX + "manual_Entry";
+    var manualEntry = SearchSelectablePrefix.FREE_TEXT_PREFIX + "manual_Entry";
     var notManualEntry = "123";
     assertThat(SearchSelectorService.isManualEntry(manualEntry)).isTrue();
     assertThat(SearchSelectorService.isManualEntry(notManualEntry)).isFalse();

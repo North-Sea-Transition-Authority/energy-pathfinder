@@ -68,9 +68,12 @@ public class ReverseRouterTest extends AbstractControllerTest {
     assertThat(route).isEqualTo("/parent/map_parent_id/child/method_child_id");
 
     // Should throw exception if we don't allow variables from the request
+
+    var methodCall = on(TestController.class).testMethod("method_child_id");
+    Map<String, Object> uriVariables = Collections.emptyMap();
+
     assertThatThrownBy(
-        () -> ReverseRouter.route(on(TestController.class).testMethod("method_child_id"), Collections.emptyMap(),
-            false))
+        () -> ReverseRouter.route(methodCall, uriVariables,false))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("Map has no value");
   }

@@ -24,7 +24,7 @@ public class BreadCrumbServiceTest {
     var modelAndView = new ModelAndView();
     breadcrumbService.fromWorkArea(modelAndView, "New page");
     assertThat(modelAndView.getModel()).containsOnlyKeys("crumbList", "currentPage");
-    assertThat(modelAndView.getModel().get("currentPage")).isEqualTo("New page");
+    assertThat(modelAndView.getModel()).containsEntry("currentPage", "New page");
     var breadcrumbMap = (Map<String, String>) modelAndView.getModel().get("crumbList");
     assertThat(breadcrumbMap).containsValue("Work area");
   }

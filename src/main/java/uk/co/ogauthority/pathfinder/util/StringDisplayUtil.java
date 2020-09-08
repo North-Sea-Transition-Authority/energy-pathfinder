@@ -1,6 +1,11 @@
 package uk.co.ogauthority.pathfinder.util;
 
 public class StringDisplayUtil {
+
+  private StringDisplayUtil() {
+    throw new IllegalStateException("StringDisplayUtil is a utility class and should not be instantiated");
+  }
+
   /**
    * Appends "s" to the end of a string if count is not equal to 1.
    *

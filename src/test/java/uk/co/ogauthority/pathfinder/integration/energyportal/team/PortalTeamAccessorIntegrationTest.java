@@ -106,7 +106,7 @@ public class PortalTeamAccessorIntegrationTest {
   @Transactional
   public void findPortalTeamById_whenTeamNotFound() {
     Optional<PortalTeamDto> portalTeamDto = portalTeamAccessor.findPortalTeamById(UNKNOWN_RES_ID);
-    assertThat(portalTeamDto.isPresent()).isFalse();
+    assertThat(portalTeamDto).isNotPresent();
   }
 
   @Test
@@ -334,15 +334,14 @@ public class PortalTeamAccessorIntegrationTest {
   @Transactional
   public void getAllPortalSystemPrivilegesForPerson_returnsExpectedSystemPrivs_whenPersonIsRoleWithPriv(){
     List<PortalSystemPrivilegeDto> privilegeDtoList = portalTeamAccessor.getAllPortalSystemPrivilegesForPerson(unscopedTeamMemberPerson_2Roles);
-    assertThat(privilegeDtoList).isNotEmpty();
-    assertThat(privilegeDtoList).allMatch(dto -> {
-
-      assertThat(dto.getRoleName() ).isEqualTo(ExampleTeamRole.ROLE_WITH_PRIVILEGE.name());
-      assertThat(dto.getGrantedPrivilege() ).isEqualTo(ExampleTeamRole.ROLE_WITH_PRIVILEGE.getExampleRolePrivilege());
-      assertThat(dto.getPortalTeamType() ).isEqualTo(UNSCOPED_TEAM_PORTAL_TYPE);
-      return true;
-    });
-
+    assertThat(privilegeDtoList)
+        .isNotEmpty()
+        .allMatch(dto -> {
+            assertThat(dto.getRoleName()).isEqualTo(ExampleTeamRole.ROLE_WITH_PRIVILEGE.name());
+            assertThat(dto.getGrantedPrivilege()).isEqualTo(ExampleTeamRole.ROLE_WITH_PRIVILEGE.getExampleRolePrivilege());
+            assertThat(dto.getPortalTeamType()).isEqualTo(UNSCOPED_TEAM_PORTAL_TYPE);
+            return true;
+        });
   }
 
   @Test

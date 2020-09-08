@@ -58,7 +58,7 @@ public class TeamServiceTest {
   private OrganisationTeam organisationTeam2;
   private PortalTeamDto organisationTeamAsPortalTeamDto1;
   private PortalTeamDto organisationTeamAsPortalTeamDto2;
-  private WebUserAccount someWebUserAccount = new WebUserAccount(99);
+  private final WebUserAccount someWebUserAccount = new WebUserAccount(99);
 
   @Before
   public void setup() {
@@ -147,7 +147,7 @@ public class TeamServiceTest {
 
   @Test
   public void getMembershipOfPersonInTeam_emptyOptionalWhenNotATeamMember() {
-    assertThat(teamService.getMembershipOfPersonInTeam(regulatorTeam, organisationPerson).isPresent()).isFalse();
+    assertThat(teamService.getMembershipOfPersonInTeam(regulatorTeam, organisationPerson)).isNotPresent();
   }
 
   @Test

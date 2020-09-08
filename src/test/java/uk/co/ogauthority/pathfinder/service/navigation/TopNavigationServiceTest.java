@@ -54,7 +54,7 @@ public class TopNavigationServiceTest {
   @Test
   public void getTopNavigationItems_whenNoPrivileges_thenNoNavItems() {
     List<TopNavigationItem> navigationItems = topNavigationService.getTopNavigationItems(unprivilegedUser);
-    assertThat(navigationItems.isEmpty());
+    assertThat(navigationItems).isEmpty();
   }
 
   @Test

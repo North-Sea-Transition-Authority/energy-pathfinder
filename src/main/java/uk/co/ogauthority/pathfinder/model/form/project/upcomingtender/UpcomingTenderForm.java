@@ -37,9 +37,6 @@ public class UpcomingTenderForm {
   @ValidEmail(messagePrefix = "The contact email", groups = {FullValidation.class, PartialValidation.class})
   private String emailAddress;
 
-  public UpcomingTenderForm() {
-  }
-
   public String getTenderFunction() {
     return tenderFunction;
   }

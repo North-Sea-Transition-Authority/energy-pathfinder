@@ -10,6 +10,10 @@ import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
 public class ValidationUtil {
 
+  private ValidationUtil() {
+    throw new IllegalStateException("ValidationUtil is a utility class and should not be instantiated");
+  }
+
   /**
    * invoke validator on a nested object while safely pushing and popping the nested object path.
    */

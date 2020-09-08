@@ -37,9 +37,6 @@ public class ProjectInformationForm {
   @ValidEmail(messagePrefix = "The contact email", groups = {FullValidation.class, PartialValidation.class})
   private String emailAddress;
 
-  public ProjectInformationForm() {
-  }
-
   public FieldStage getFieldStage() {
     return fieldStage;
   }

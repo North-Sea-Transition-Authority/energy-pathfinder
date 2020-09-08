@@ -78,7 +78,7 @@ public class ProjectLocationFormValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors.size()).isGreaterThan(0);
+    assertThat(fieldErrors.size()).isPositive();
     assertThat(fieldErrors).containsExactly(
         entry("approvedFdpDate.day", Set.of(DateInputValidator.DAY_INVALID_CODE)),
         entry("approvedFdpDate.month", Set.of(DateInputValidator.MONTH_INVALID_CODE)),
@@ -106,7 +106,7 @@ public class ProjectLocationFormValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors.size()).isGreaterThan(0);
+    assertThat(fieldErrors.size()).isPositive();
     assertThat(fieldErrors).containsExactly(
         entry("approvedFdpDate.day", Set.of(DateInputValidator.DAY_INVALID_CODE)),
         entry("approvedFdpDate.month", Set.of(DateInputValidator.MONTH_INVALID_CODE)),
@@ -135,7 +135,7 @@ public class ProjectLocationFormValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors.size()).isGreaterThan(0);
+    assertThat(fieldErrors.size()).isPositive();
     assertThat(fieldErrors).contains(
         entry("approvedFdpDate.day", Set.of(DateInputValidator.DAY_INVALID_CODE)),
         entry("approvedFdpDate.month", Set.of(DateInputValidator.MONTH_INVALID_CODE)),
@@ -173,7 +173,7 @@ public class ProjectLocationFormValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors.size()).isGreaterThan(0);
+    assertThat(fieldErrors.size()).isPositive();
     assertThat(fieldErrors).contains(
         entry("approvedFdpDate.day", Set.of(DateInputValidator.DAY_INVALID_CODE)),
         entry("approvedFdpDate.month", Set.of(DateInputValidator.MONTH_INVALID_CODE)),

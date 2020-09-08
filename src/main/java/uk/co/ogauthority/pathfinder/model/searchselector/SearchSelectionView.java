@@ -15,7 +15,7 @@ public class SearchSelectionView<T> {
     linkedEntries = new ArrayList<>();
 
     for (String s : entries) {
-      if (s.startsWith(SearchSelectable.FREE_TEXT_PREFIX)) {
+      if (s.startsWith(SearchSelectablePrefix.FREE_TEXT_PREFIX)) {
         manualEntries.add(s);
       } else {
         linkedEntries.add(builder.apply(s));
