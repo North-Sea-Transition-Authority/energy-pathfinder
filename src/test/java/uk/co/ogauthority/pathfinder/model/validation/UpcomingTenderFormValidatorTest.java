@@ -97,7 +97,7 @@ public class UpcomingTenderFormValidatorTest {
 
     assertThat(fieldErrorMessages).contains(
         entry("estimatedTenderDate.day", Set.of(
-            UpcomingTenderFormValidator.ESTIMATED_TENDER_LABEL.getLabel() + " must be after " + UpcomingTenderFormValidator.DATE_ERROR_LABEL)
+            UpcomingTenderFormValidator.ESTIMATED_TENDER_LABEL.getInitCappedLabel() + " must be after " + UpcomingTenderFormValidator.DATE_ERROR_LABEL)
         ),
         entry("estimatedTenderDate.month", Set.of("")),
         entry("estimatedTenderDate.year", Set.of(""))

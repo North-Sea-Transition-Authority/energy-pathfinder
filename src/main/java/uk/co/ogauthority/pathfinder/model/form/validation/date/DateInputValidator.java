@@ -106,7 +106,7 @@ public class DateInputValidator implements SmartValidator {
             DAY_INVALID_CODE,
             MONTH_INVALID_CODE,
             YEAR_INVALID_CODE,
-            inputLabel.getLabel() + VALID_DATE_ERROR
+            inputLabel.getInitCappedLabel() + VALID_DATE_ERROR
         );
       } else {
         // only do additional validation when the date is valid
@@ -170,7 +170,7 @@ public class DateInputValidator implements SmartValidator {
           DAY_AFTER_DATE_CODE,
           MONTH_AFTER_DATE_CODE,
           YEAR_AFTER_DATE_CODE,
-          inputLabel.getLabel() + " must be the same as or after " + afterDateLabel
+          inputLabel.getInitCappedLabel() + " must be the same as or after " + afterDateLabel
       );
     }
   }
@@ -188,7 +188,7 @@ public class DateInputValidator implements SmartValidator {
           DAY_BEFORE_DATE_CODE,
           MONTH_BEFORE_DATE_CODE,
           YEAR_BEFORE_DATE_CODE,
-          inputLabel.getLabel() + " must be the same as or before " + beforeDateLabel
+          inputLabel.getInitCappedLabel() + " must be the same as or before " + beforeDateLabel
       );
     }
   }
@@ -206,7 +206,7 @@ public class DateInputValidator implements SmartValidator {
           DAY_AFTER_DATE_CODE,
           MONTH_AFTER_DATE_CODE,
           YEAR_AFTER_DATE_CODE,
-          inputLabel.getLabel() + " must be after " + afterDateLabel
+          inputLabel.getInitCappedLabel() + " must be after " + afterDateLabel
       );
     }
   }
@@ -224,7 +224,7 @@ public class DateInputValidator implements SmartValidator {
           DAY_BEFORE_DATE_CODE,
           MONTH_BEFORE_DATE_CODE,
           YEAR_BEFORE_DATE_CODE,
-          inputLabel.getLabel() + " must be before " + beforeDateLabel
+          inputLabel.getInitCappedLabel() + " must be before " + beforeDateLabel
       );
     }
   }
@@ -242,7 +242,7 @@ public class DateInputValidator implements SmartValidator {
           DAY + errorCode,
           MONTH + errorCode,
           YEAR + errorCode,
-          inputLabel.getLabel() + " must have a four character year"
+          inputLabel.getInitCappedLabel() + " must have a four character year"
       );
     }
   }
