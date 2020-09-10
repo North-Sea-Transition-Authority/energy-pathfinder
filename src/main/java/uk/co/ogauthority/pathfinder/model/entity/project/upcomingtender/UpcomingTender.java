@@ -15,10 +15,11 @@ import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.TenderFunction;
+import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
 
 @Entity
 @Table(name = "upcoming_tenders")
-public class UpcomingTender {
+public class UpcomingTender implements ContactDetailCapture {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -113,6 +114,7 @@ public class UpcomingTender {
     this.contactName = contactName;
   }
 
+  @Override
   public String getPhoneNumber() {
     return phoneNumber;
   }
@@ -121,6 +123,7 @@ public class UpcomingTender {
     this.phoneNumber = phoneNumber;
   }
 
+  @Override
   public String getJobTitle() {
     return jobTitle;
   }
@@ -129,11 +132,17 @@ public class UpcomingTender {
     this.jobTitle = jobTitle;
   }
 
+  @Override
   public String getEmailAddress() {
     return emailAddress;
   }
 
   public void setEmailAddress(String emailAddress) {
     this.emailAddress = emailAddress;
+  }
+
+  @Override
+  public String getName() {
+    return getContactName();
   }
 }

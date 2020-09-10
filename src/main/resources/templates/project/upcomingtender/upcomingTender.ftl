@@ -23,7 +23,7 @@
       fieldsetHeadingClass="govuk-fieldset__legend--s"
       optionalLabel=true
     />
-    <@contactDetails.contactDetails legendHeading="Tender contact details"/>
+    <@contactDetails.standardContactDetails path="form.contactDetail" legendHeading="Tender contact details"/>
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
   </@fdsForm.htmlForm>
 </@defaultPage>

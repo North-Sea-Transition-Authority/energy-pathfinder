@@ -32,10 +32,14 @@ public class ProjectInformationUtil {
     form.setProjectSummary(PROJECT_SUMMARY);
     form.setProjectTitle(PROJECT_TITLE);
     form.setFieldStage(FIELD_STAGE);
-    form.setName(CONTACT_NAME);
-    form.setPhoneNumber(PHONE_NUMBER);
-    form.setJobTitle(JOB_TITLE);
-    form.setEmailAddress(EMAIL);
+
+    var contactDetailForm = ContactDetailsUtil.createContactDetailForm(
+        CONTACT_NAME,
+        PHONE_NUMBER,
+        JOB_TITLE,
+        EMAIL
+    );
+    form.setContactDetail(contactDetailForm);
 
     return form;
   }

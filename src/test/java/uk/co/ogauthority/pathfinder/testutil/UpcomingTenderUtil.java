@@ -37,10 +37,14 @@ public class UpcomingTenderUtil {
     form.setDescriptionOfWork(DESCRIPTION_OF_WORK);
     form.setEstimatedTenderDate(new ThreeFieldDateInput(ESTIMATED_TENDER_DATE));
     form.setContractBand(CONTRACT_BAND);
-    form.setName(CONTACT_NAME);
-    form.setPhoneNumber(PHONE_NUMBER);
-    form.setJobTitle(JOB_TITLE);
-    form.setEmailAddress(EMAIL);
+
+    var contactDetailForm = ContactDetailsUtil.createContactDetailForm(
+        CONTACT_NAME,
+        PHONE_NUMBER,
+        JOB_TITLE,
+        EMAIL
+    );
+    form.setContactDetail(contactDetailForm);
   }
 
 

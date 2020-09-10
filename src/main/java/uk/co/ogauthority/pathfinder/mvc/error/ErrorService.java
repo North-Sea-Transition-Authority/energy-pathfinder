@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
-import uk.co.ogauthority.pathfinder.model.enums.contact.ContactDetail;
+import uk.co.ogauthority.pathfinder.model.enums.contact.ServiceContactDetail;
 
 @Service
 public class ErrorService {
@@ -43,7 +43,7 @@ public class ErrorService {
   }
 
   private void addContactDetails(ModelAndView modelAndView) {
-    modelAndView.addObject("technicalSupportContact", ContactDetail.TECHNICAL_SUPPORT);
+    modelAndView.addObject("technicalSupportContact", ServiceContactDetail.TECHNICAL_SUPPORT);
   }
 
   private void addServiceProperties(ModelAndView modelAndView) {

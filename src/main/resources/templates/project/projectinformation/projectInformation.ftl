@@ -29,7 +29,7 @@
           <li>timing / schedule for work, for example: dates for FID, FDP approval, COP, Decommissioning Programme approval</li>
         </ul>
     </@fdsDetails.summaryDetails>
-    <@contactDetails.contactDetails/>
+    <@contactDetails.standardContactDetails path="form.contactDetail"/>
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
   </@fdsForm.htmlForm>
 </@defaultPage>

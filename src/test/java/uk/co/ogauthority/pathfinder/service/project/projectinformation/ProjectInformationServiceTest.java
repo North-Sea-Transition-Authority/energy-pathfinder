@@ -68,7 +68,7 @@ public class ProjectInformationServiceTest {
     when(projectInformationRepository.findByProjectDetail(details))
         .thenReturn(Optional.of(ProjectInformationUtil.getProjectInformation_withCompleteDetails(details)));
     var form = ProjectInformationUtil.getCompleteForm();
-    form.setName("New name");
+    form.getContactDetail().setName("New name");
     projectInformation = projectInformationService.createOrUpdate(details, form);
 
     assertThat(projectInformation.getProjectDetail()).isEqualTo(details);
@@ -89,10 +89,7 @@ public class ProjectInformationServiceTest {
     assertThat(form.getFieldStage()).isNull();
     assertThat(form.getProjectTitle()).isNull();
     assertThat(form.getProjectSummary()).isNull();
-    assertThat(form.getName()).isNull();
-    assertThat(form.getPhoneNumber()).isNull();
-    assertThat(form.getJobTitle()).isNull();
-    assertThat(form.getEmailAddress()).isNull();
+    assertThat(form.getContactDetail()).isNull();
   }
 
   @Test
@@ -105,10 +102,12 @@ public class ProjectInformationServiceTest {
     assertThat(form.getFieldStage()).isEqualTo(projectInformation.getFieldStage());
     assertThat(form.getProjectTitle()).isEqualTo(projectInformation.getProjectTitle());
     assertThat(form.getProjectSummary()).isEqualTo(projectInformation.getProjectSummary());
-    assertThat(form.getName()).isEqualTo(projectInformation.getContactName());
-    assertThat(form.getPhoneNumber()).isEqualTo(projectInformation.getPhoneNumber());
-    assertThat(form.getJobTitle()).isEqualTo(projectInformation.getJobTitle());
-    assertThat(form.getEmailAddress()).isEqualTo(projectInformation.getEmailAddress());
+
+    var contactDetailForm = form.getContactDetail();
+    assertThat(contactDetailForm.getName()).isEqualTo(projectInformation.getContactName());
+    assertThat(contactDetailForm.getPhoneNumber()).isEqualTo(projectInformation.getPhoneNumber());
+    assertThat(contactDetailForm.getJobTitle()).isEqualTo(projectInformation.getJobTitle());
+    assertThat(contactDetailForm.getEmailAddress()).isEqualTo(projectInformation.getEmailAddress());
   }
 
 
