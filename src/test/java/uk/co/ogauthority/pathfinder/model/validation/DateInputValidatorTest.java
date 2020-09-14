@@ -30,12 +30,14 @@ public class DateInputValidatorTest {
   private DateInputValidator validator;
   private TwoFieldDateInput twoFieldDateInput;
   private ThreeFieldDateInput threeFieldDateInput;
+  private FormInputLabel formInputLabel;
 
   @Before
   public void setup() {
     validator = new DateInputValidator();
     twoFieldDateInput = new TwoFieldDateInput();
     threeFieldDateInput = new ThreeFieldDateInput();
+    formInputLabel = new FormInputLabel("Some date");
   }
 
   @Test
@@ -118,32 +120,32 @@ public class DateInputValidatorTest {
 
   @Test
   public void validate_twoFieldWithInputLabelHint_invalidDate_emptyDate() {
-    var label = new FormInputLabel("Work start date");
+
     var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
-    Object[] hints = {label};
+    Object[] hints = {formInputLabel};
     ValidationUtils.invokeValidator(validator, twoFieldDateInput, errors, hints);
 
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
 
     assertThat(fieldErrorMessages).containsExactly(
-        entry("month", Set.of(String.format(DateInputValidator.EMPTY_DATE_ERROR, "a "+label.getLabel()))),
+        entry("month", Set.of(String.format(DateInputValidator.EMPTY_DATE_ERROR, "a "+formInputLabel.getLabel()))),
         entry("year", Set.of(""))
     );
   }
 
   @Test
   public void validate_threeFieldWithInputLabelHint_invalidDate_emptyDate() {
-    var label = new FormInputLabel("Work start date");
+
     var errors = new BeanPropertyBindingResult(threeFieldDateInput, "form");
-    Object[] hints = {label};
+    Object[] hints = {formInputLabel};
     ValidationUtils.invokeValidator(validator, threeFieldDateInput, errors, hints);
 
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
 
     assertThat(fieldErrorMessages).containsExactly(
-        entry("day", Set.of(String.format(DateInputValidator.EMPTY_DATE_ERROR, "a "+label.getLabel()))),
+        entry("day", Set.of(String.format(DateInputValidator.EMPTY_DATE_ERROR, "a "+formInputLabel.getLabel()))),
         entry("month", Set.of("")),
         entry("year", Set.of(""))
     );
@@ -151,9 +153,9 @@ public class DateInputValidatorTest {
 
   @Test
   public void validate_twoFieldWithInputLabelHint_emptyDate_emptyDateAcceptableHint() {
-    var label = new FormInputLabel("Work start date");
+
     var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
-    Object[] hints = {label, new EmptyDateAcceptableHint()};
+    Object[] hints = {formInputLabel, new EmptyDateAcceptableHint()};
     ValidationUtils.invokeValidator(validator, twoFieldDateInput, errors, hints);
 
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
@@ -163,9 +165,9 @@ public class DateInputValidatorTest {
 
   @Test
   public void validate_threeFieldWithInputLabelHint_emptyDate_emptyDateAcceptableHint() {
-    var label = new FormInputLabel("Work start date");
+
     var errors = new BeanPropertyBindingResult(threeFieldDateInput, "form");
-    Object[] hints = {label, new EmptyDateAcceptableHint()};
+    Object[] hints = {formInputLabel, new EmptyDateAcceptableHint()};
     ValidationUtils.invokeValidator(validator, threeFieldDateInput, errors, hints);
 
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
@@ -175,34 +177,34 @@ public class DateInputValidatorTest {
 
   @Test
   public void validate_twoFieldWithInputLabelHint_invalidDate_invalidDate() {
-    var label = new FormInputLabel("Work start date");
+
     twoFieldDateInput = new TwoFieldDateInput(-1, 22);
     var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
-    Object[] hints = {label};
+    Object[] hints = {formInputLabel};
     ValidationUtils.invokeValidator(validator, twoFieldDateInput, errors, hints);
 
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
 
     assertThat(fieldErrorMessages).containsExactly(
-        entry("month", Set.of(label.getLabel() + DateInputValidator.VALID_DATE_ERROR)),
+        entry("month", Set.of(formInputLabel.getLabel() + DateInputValidator.VALID_DATE_ERROR)),
         entry("year", Set.of(""))
     );
   }
 
   @Test
   public void validate_threeFieldWithInputLabelHint_invalidDate_invalidDate() {
-    var label = new FormInputLabel("Work start date");
+
     threeFieldDateInput = new ThreeFieldDateInput(-1, 22, 1);
     var errors = new BeanPropertyBindingResult(threeFieldDateInput, "form");
-    Object[] hints = {label};
+    Object[] hints = {formInputLabel};
     ValidationUtils.invokeValidator(validator, threeFieldDateInput, errors, hints);
 
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
 
     assertThat(fieldErrorMessages).containsExactly(
-        entry("day", Set.of(label.getLabel() + DateInputValidator.VALID_DATE_ERROR)),
+        entry("day", Set.of(formInputLabel.getLabel() + DateInputValidator.VALID_DATE_ERROR)),
         entry("month", Set.of("")),
         entry("year", Set.of(""))
     );
@@ -211,10 +213,11 @@ public class DateInputValidatorTest {
   @Test
   public void validate_twoFieldWithInputLabelHint_beforeDateHint_afterDateHint_invalidDate() {
     var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
+
     Object[] hints = {
-        new FormInputLabel("Some date"),
-        new BeforeDateHint(LocalDate.of(2020, 12, 31), "Before date"),
-        new AfterDateHint(LocalDate.of(2020, 1, 1), "After date")
+        formInputLabel,
+        new BeforeDateHint(formInputLabel, LocalDate.of(2020, 12, 31), "Before date"),
+        new AfterDateHint(formInputLabel, LocalDate.of(2020, 1, 1), "After date")
 
     };
 
@@ -233,9 +236,9 @@ public class DateInputValidatorTest {
   public void validate_threeFieldWithInputLabelHint_beforeDateHint_afterDateHint_invalidDate() {
     var errors = new BeanPropertyBindingResult(threeFieldDateInput, "form");
     Object[] hints = {
-        new FormInputLabel("Some date"),
-        new BeforeDateHint(LocalDate.of(2020, 12, 31), "Before date"),
-        new AfterDateHint(LocalDate.of(2020, 1, 1), "After date")
+        formInputLabel,
+        new BeforeDateHint(formInputLabel, LocalDate.of(2020, 12, 31), "Before date"),
+        new AfterDateHint(formInputLabel, LocalDate.of(2020, 1, 1), "After date")
 
     };
 
@@ -257,10 +260,11 @@ public class DateInputValidatorTest {
     twoFieldDateInput.setYear(2020);
 
     var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
+
     Object[] hints = {
-        new FormInputLabel("Some date"),
-        new BeforeDateHint(LocalDate.of(2020, 12, 31), "Before date"),
-        new AfterDateHint(LocalDate.of(2020, 1, 1), "After date")
+        formInputLabel,
+        new BeforeDateHint(formInputLabel, LocalDate.of(2020, 12, 31), "Before date"),
+        new AfterDateHint(formInputLabel, LocalDate.of(2020, 1, 1), "After date")
 
     };
 
@@ -278,10 +282,11 @@ public class DateInputValidatorTest {
     threeFieldDateInput.setYear(2020);
 
     var errors = new BeanPropertyBindingResult(threeFieldDateInput, "form");
+
     Object[] hints = {
-        new FormInputLabel("Some date"),
-        new BeforeDateHint(LocalDate.of(2020, 12, 31), "Before date"),
-        new AfterDateHint(LocalDate.of(2020, 1, 1), "After date")
+        formInputLabel,
+        new BeforeDateHint(formInputLabel, LocalDate.of(2020, 12, 31), "Before date"),
+        new AfterDateHint(formInputLabel, LocalDate.of(2020, 1, 1), "After date")
 
     };
 
@@ -298,10 +303,11 @@ public class DateInputValidatorTest {
     twoFieldDateInput.setYear(2019);
 
     var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
+
     Object[] hints = {
-        new FormInputLabel("Some date"),
-        new BeforeDateHint(LocalDate.of(2020, 12, 31), "Before date"),
-        new AfterDateHint(LocalDate.of(2020, 1, 1), "After date")
+        formInputLabel,
+        new BeforeDateHint(formInputLabel, LocalDate.of(2020, 12, 31), "Before date"),
+        new AfterDateHint(formInputLabel, LocalDate.of(2020, 1, 1), "After date")
 
     };
     ValidationUtils.invokeValidator(validator, twoFieldDateInput, errors, hints);
@@ -328,10 +334,11 @@ public class DateInputValidatorTest {
     threeFieldDateInput.setYear(2019);
 
     var errors = new BeanPropertyBindingResult(threeFieldDateInput, "form");
+
     Object[] hints = {
-        new FormInputLabel("Some date"),
-        new BeforeDateHint(LocalDate.of(2020, 12, 31), "Before date"),
-        new AfterDateHint(LocalDate.of(2020, 1, 1), "After date")
+        formInputLabel,
+        new BeforeDateHint(formInputLabel, LocalDate.of(2020, 12, 31), "Before date"),
+        new AfterDateHint(formInputLabel, LocalDate.of(2020, 1, 1), "After date")
 
     };
     ValidationUtils.invokeValidator(validator, threeFieldDateInput, errors, hints);
@@ -359,10 +366,11 @@ public class DateInputValidatorTest {
     twoFieldDateInput.setYear(2021);
 
     var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
+
     Object[] hints = {
-        new FormInputLabel("Some date"),
-        new BeforeDateHint(LocalDate.of(2020, 12, 31), "Before date"),
-        new AfterDateHint(LocalDate.of(2020, 1, 1), "After date")
+        formInputLabel,
+        new BeforeDateHint(formInputLabel, LocalDate.of(2020, 12, 31), "Before date"),
+        new AfterDateHint(formInputLabel, LocalDate.of(2020, 1, 1), "After date")
 
     };
     ValidationUtils.invokeValidator(validator, twoFieldDateInput, errors, hints);
@@ -390,9 +398,9 @@ public class DateInputValidatorTest {
 
     var errors = new BeanPropertyBindingResult(threeFieldDateInput, "form");
     Object[] hints = {
-        new FormInputLabel("Some date"),
-        new BeforeDateHint(LocalDate.of(2020, 12, 31), "Before date"),
-        new AfterDateHint(LocalDate.of(2020, 1, 1), "After date")
+        formInputLabel,
+        new BeforeDateHint(formInputLabel, LocalDate.of(2020, 12, 31), "Before date"),
+        new AfterDateHint(formInputLabel, LocalDate.of(2020, 1, 1), "After date")
 
     };
     ValidationUtils.invokeValidator(validator, threeFieldDateInput, errors, hints);
@@ -421,8 +429,8 @@ public class DateInputValidatorTest {
 
     var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
     Object[] hints = {
-        new FormInputLabel("Some date"),
-        new OnOrBeforeDateHint(LocalDate.of(2020, 12, 31), "On/Before date"),
+        formInputLabel,
+        new OnOrBeforeDateHint(formInputLabel, LocalDate.of(2020, 12, 31), "On/Before date"),
 
     };
     ValidationUtils.invokeValidator(validator, twoFieldDateInput, errors, hints);
@@ -450,8 +458,8 @@ public class DateInputValidatorTest {
 
     var errors = new BeanPropertyBindingResult(threeFieldDateInput, "form");
     Object[] hints = {
-        new FormInputLabel("Some date"),
-        new OnOrBeforeDateHint(LocalDate.of(2020, 12, 31), "On/Before date"),
+        formInputLabel,
+        new OnOrBeforeDateHint(formInputLabel, LocalDate.of(2020, 12, 31), "On/Before date"),
 
     };
     ValidationUtils.invokeValidator(validator, threeFieldDateInput, errors, hints);
@@ -480,8 +488,8 @@ public class DateInputValidatorTest {
 
     var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
     Object[] hints = {
-        new FormInputLabel("Some date"),
-        new OnOrBeforeDateHint(LocalDate.of(2020, 12, 31), "On/Before date"),
+        formInputLabel,
+        new OnOrBeforeDateHint(formInputLabel, LocalDate.of(2020, 12, 31), "On/Before date"),
 
     };
     ValidationUtils.invokeValidator(validator, twoFieldDateInput, errors, hints);
@@ -500,8 +508,8 @@ public class DateInputValidatorTest {
 
     var errors = new BeanPropertyBindingResult(threeFieldDateInput, "form");
     Object[] hints = {
-        new FormInputLabel("Some date"),
-        new OnOrBeforeDateHint(LocalDate.of(2020, 12, 31), "On/Before date"),
+        formInputLabel,
+        new OnOrBeforeDateHint(formInputLabel, LocalDate.of(2020, 12, 31), "On/Before date"),
 
     };
     ValidationUtils.invokeValidator(validator, threeFieldDateInput, errors, hints);
@@ -519,8 +527,8 @@ public class DateInputValidatorTest {
 
     var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
     Object[] hints = {
-        new FormInputLabel("Some date"),
-        new OnOrAfterDateHint(LocalDate.of(2021, 12, 31), "On/After date"),
+        formInputLabel,
+        new OnOrAfterDateHint(formInputLabel, LocalDate.of(2021, 12, 31), "On/After date"),
 
     };
     ValidationUtils.invokeValidator(validator, twoFieldDateInput, errors, hints);
@@ -548,8 +556,8 @@ public class DateInputValidatorTest {
 
     var errors = new BeanPropertyBindingResult(threeFieldDateInput, "form");
     Object[] hints = {
-        new FormInputLabel("Some date"),
-        new OnOrAfterDateHint(LocalDate.of(2021, 12, 31), "On/After date"),
+        formInputLabel,
+        new OnOrAfterDateHint(formInputLabel, LocalDate.of(2021, 12, 31), "On/After date"),
 
     };
     ValidationUtils.invokeValidator(validator, threeFieldDateInput, errors, hints);
@@ -579,8 +587,8 @@ public class DateInputValidatorTest {
 
     var errors = new BeanPropertyBindingResult(threeFieldDateInput, "form");
     Object[] hints = {
-        new FormInputLabel("Some date"),
-        new OnOrAfterDateHint(LocalDate.of(2020, 12, 31), "On/After date"),
+        formInputLabel,
+        new OnOrAfterDateHint(formInputLabel, LocalDate.of(2020, 12, 31), "On/After date"),
 
     };
     ValidationUtils.invokeValidator(validator, threeFieldDateInput, errors, hints);
@@ -597,8 +605,8 @@ public class DateInputValidatorTest {
 
     var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
     Object[] hints = {
-        new FormInputLabel("Some date"),
-        new OnOrAfterDateHint(LocalDate.of(2020, 12, 31), "On/After date"),
+        formInputLabel,
+        new OnOrAfterDateHint(formInputLabel, LocalDate.of(2020, 12, 31), "On/After date"),
 
     };
     ValidationUtils.invokeValidator(validator, twoFieldDateInput, errors, hints);
@@ -609,7 +617,7 @@ public class DateInputValidatorTest {
   }
 
   @Test
-  public void validateHasFourCharYearHint_whenThreeFieldAndNotFourCharYear_thenFail() {
+  public void validateHasFourNumberYearHint_whenThreeFieldAndNotFourNumberYear_thenFail() {
 
     threeFieldDateInput.setDay("01");
     threeFieldDateInput.setMonth("01");
@@ -617,9 +625,7 @@ public class DateInputValidatorTest {
     threeFieldDateInput.setYear(INVALID_YEAR);
 
     var errors = new BeanPropertyBindingResult(threeFieldDateInput, "form");
-    Object[] hints = {
-        new FormInputLabel("Some date")
-    };
+    Object[] hints = {formInputLabel};
 
     ValidationUtils.invokeValidator(validator, threeFieldDateInput, errors, hints);
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
@@ -634,23 +640,21 @@ public class DateInputValidatorTest {
     );
 
     assertThat(fieldErrorMessages).containsExactly(
-        entry("day", Set.of("Some date must have a four character year")),
+        entry("day", Set.of(DateInputValidator.getIncorrectYearFormatErrorMessage(formInputLabel))),
         entry("month", Set.of("")),
         entry("year", Set.of(""))
     );
   }
 
   @Test
-  public void validateHasFourCharYearHint_whenThreeFieldAndFourCharYear_thenPass() {
+  public void validateHasFourNumberYearHint_whenThreeFieldAndFourNumberYear_thenPass() {
     threeFieldDateInput.setDay("01");
     threeFieldDateInput.setMonth("01");
     final var VALID_YEAR = "2020";
     threeFieldDateInput.setYear(VALID_YEAR);
 
     var errors = new BeanPropertyBindingResult(threeFieldDateInput, "form");
-    Object[] hints = {
-        new FormInputLabel("Some date")
-    };
+    Object[] hints = {formInputLabel};
 
     ValidationUtils.invokeValidator(validator, threeFieldDateInput, errors, hints);
 
@@ -660,16 +664,14 @@ public class DateInputValidatorTest {
   }
 
   @Test
-  public void validateHasFourCharYearHint_whenTwoFieldAndNotFourCharYear_thenFail() {
+  public void validateHasFourNumberYearHint_whenTwoFieldAndNotFourNumberYear_thenFail() {
 
     twoFieldDateInput.setMonth("01");
     final var INVALID_YEAR = "20";
     twoFieldDateInput.setYear(INVALID_YEAR);
 
     var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
-    Object[] hints = {
-        new FormInputLabel("Some date")
-    };
+    Object[] hints = {formInputLabel};
 
     ValidationUtils.invokeValidator(validator, twoFieldDateInput, errors, hints);
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
@@ -683,21 +685,19 @@ public class DateInputValidatorTest {
     );
 
     assertThat(fieldErrorMessages).containsExactly(
-        entry("month", Set.of("Some date must have a four character year")),
+        entry("month", Set.of(DateInputValidator.getIncorrectYearFormatErrorMessage(formInputLabel))),
         entry("year", Set.of(""))
     );
   }
 
   @Test
-  public void validateHasFourCharYearHint_whenTwoFieldAndFourCharYear_thenPass() {
+  public void validateHasFourNumberYearHint_whenTwoFieldAndFourNumberYear_thenPass() {
     twoFieldDateInput.setMonth("01");
     final var VALID_YEAR = "2020";
     twoFieldDateInput.setYear(VALID_YEAR);
 
     var errors = new BeanPropertyBindingResult(twoFieldDateInput, "form");
-    Object[] hints = {
-        new FormInputLabel("Some date")
-    };
+    Object[] hints = {formInputLabel};
 
     ValidationUtils.invokeValidator(validator, twoFieldDateInput, errors, hints);
 

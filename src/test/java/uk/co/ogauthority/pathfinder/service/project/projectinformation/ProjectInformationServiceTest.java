@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +17,12 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarter;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
+import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
@@ -31,6 +37,9 @@ public class ProjectInformationServiceTest {
   @Mock
   private ValidationService validationService;
 
+  @Mock
+  private ProjectInformationFormValidator projectInformationFormValidator;
+
   private ProjectInformationService projectInformationService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -41,7 +50,8 @@ public class ProjectInformationServiceTest {
   public void setUp() {
     projectInformationService = new ProjectInformationService(
         projectInformationRepository,
-        validationService
+        validationService,
+        projectInformationFormValidator
     );
 
     when(projectInformationRepository.save(any(ProjectInformation.class)))
@@ -82,6 +92,120 @@ public class ProjectInformationServiceTest {
   }
 
   @Test
+  public void createOrUpdate_whenDiscoveryFieldStage_thenFirstProductionSaved() {
+
+    var form = ProjectInformationUtil.getCompleteForm();
+    form.setFieldStage(FieldStage.DISCOVERY);
+
+    var persistedQuarterYearInput = new QuarterYearInput(Quarter.Q1, "2020");
+    var notPersistedQuarterYearInput = new QuarterYearInput(Quarter.Q2, "2021");
+    form.setDiscoveryFirstProductionDate(persistedQuarterYearInput);
+
+    // the following should not be persisted
+    form.setDevelopmentFirstProductionDate(notPersistedQuarterYearInput);
+    form.setDecomWorkStartDate(notPersistedQuarterYearInput);
+    form.setProductionCessationDate(new ThreeFieldDateInput(LocalDate.now()));
+
+    when(projectInformationRepository.findByProjectDetail(details))
+        .thenReturn(Optional.of(ProjectInformationUtil.getProjectInformation_withCompleteDetails(details)));
+
+    projectInformation = projectInformationService.createOrUpdate(details, form);
+
+    assertThat(projectInformation.getFieldStage()).isEqualTo(FieldStage.DISCOVERY);
+    assertThat(projectInformation.getFirstProductionDateQuarter()).isEqualTo(persistedQuarterYearInput.getQuarter());
+    assertThat(projectInformation.getFirstProductionDateYear()).isEqualTo(Integer.parseInt(persistedQuarterYearInput.getYear()));
+    assertThat(projectInformation.getDecomWorkStartDateQuarter()).isNull();
+    assertThat(projectInformation.getDecomWorkStartDateYear()).isNull();
+    assertThat(projectInformation.getProductionCessationDate()).isNull();
+  }
+
+  @Test
+  public void createOrUpdate_whenDevelopmentFieldStage_thenFirstProductionSaved() {
+
+    var form = ProjectInformationUtil.getCompleteForm();
+    form.setFieldStage(FieldStage.DEVELOPMENT);
+
+    var persistedQuarterYearInput = new QuarterYearInput(Quarter.Q1, "2020");
+    var notPersistedQuarterYearInput = new QuarterYearInput(Quarter.Q2, "2021");
+    form.setDevelopmentFirstProductionDate(persistedQuarterYearInput);
+
+    // the following should not be persisted
+    form.setDiscoveryFirstProductionDate(notPersistedQuarterYearInput);
+    form.setDecomWorkStartDate(notPersistedQuarterYearInput);
+    form.setProductionCessationDate(new ThreeFieldDateInput(LocalDate.now()));
+
+    when(projectInformationRepository.findByProjectDetail(details))
+        .thenReturn(Optional.of(ProjectInformationUtil.getProjectInformation_withCompleteDetails(details)));
+
+    projectInformation = projectInformationService.createOrUpdate(details, form);
+
+    assertThat(projectInformation.getFieldStage()).isEqualTo(FieldStage.DEVELOPMENT);
+    assertThat(projectInformation.getFirstProductionDateQuarter()).isEqualTo(persistedQuarterYearInput.getQuarter());
+    assertThat(projectInformation.getFirstProductionDateYear()).isEqualTo(Integer.parseInt(persistedQuarterYearInput.getYear()));
+    assertThat(projectInformation.getDecomWorkStartDateQuarter()).isNull();
+    assertThat(projectInformation.getDecomWorkStartDateYear()).isNull();
+    assertThat(projectInformation.getProductionCessationDate()).isNull();
+  }
+
+  @Test
+  public void createOrUpdate_whenDecommissioningFieldStage_thenHiddenFieldsSaved() {
+
+    var form = ProjectInformationUtil.getCompleteForm();
+    form.setFieldStage(FieldStage.DECOMMISSIONING);
+
+    var persistedQuarterYearInput = new QuarterYearInput(Quarter.Q1, "2020");
+    var notPersistedQuarterYearInput = new QuarterYearInput(Quarter.Q2, "2021");
+    var persistedThreeFieldDateInput = new ThreeFieldDateInput(LocalDate.now());
+
+    form.setDecomWorkStartDate(persistedQuarterYearInput);
+    form.setProductionCessationDate(persistedThreeFieldDateInput);
+
+    // the following should not be persisted
+    form.setDiscoveryFirstProductionDate(notPersistedQuarterYearInput);
+    form.setDevelopmentFirstProductionDate(notPersistedQuarterYearInput);
+
+    when(projectInformationRepository.findByProjectDetail(details))
+        .thenReturn(Optional.of(ProjectInformationUtil.getProjectInformation_withCompleteDetails(details)));
+
+    projectInformation = projectInformationService.createOrUpdate(details, form);
+
+    assertThat(projectInformation.getFieldStage()).isEqualTo(FieldStage.DECOMMISSIONING);
+    assertThat(projectInformation.getDecomWorkStartDateQuarter()).isEqualTo(persistedQuarterYearInput.getQuarter());
+    assertThat(projectInformation.getDecomWorkStartDateYear()).isEqualTo(Integer.parseInt(persistedQuarterYearInput.getYear()));
+    assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
+    assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
+    assertThat(projectInformation.getProductionCessationDate()).isEqualTo(persistedThreeFieldDateInput.createDateOrNull());
+  }
+
+  @Test
+  public void createOrUpdate_whenNoFieldStage_thenAllHiddenFieldsEmpty() {
+
+    var form = ProjectInformationUtil.getCompleteForm();
+    form.setFieldStage(null);
+
+    var notPersistedQuarterYearInput = new QuarterYearInput(Quarter.Q2, "2021");
+    var notPersistedThreeFieldDateInput = new ThreeFieldDateInput(LocalDate.now());
+
+    // the following should not be persisted
+    form.setDiscoveryFirstProductionDate(notPersistedQuarterYearInput);
+    form.setDevelopmentFirstProductionDate(notPersistedQuarterYearInput);
+    form.setDecomWorkStartDate(notPersistedQuarterYearInput);
+    form.setProductionCessationDate(notPersistedThreeFieldDateInput);
+
+    when(projectInformationRepository.findByProjectDetail(details))
+        .thenReturn(Optional.of(ProjectInformationUtil.getProjectInformation_withCompleteDetails(details)));
+
+    projectInformation = projectInformationService.createOrUpdate(details, form);
+
+    assertThat(projectInformation.getFieldStage()).isNull();
+    assertThat(projectInformation.getDecomWorkStartDateQuarter()).isNull();
+    assertThat(projectInformation.getDecomWorkStartDateYear()).isNull();
+    assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
+    assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
+    assertThat(projectInformation.getProductionCessationDate()).isNull();
+  }
+
+  @Test
   public void getForm_noExistingDetail() {
     when(projectInformationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
     ProjectInformationForm form = projectInformationService.getForm(details);
@@ -110,6 +234,124 @@ public class ProjectInformationServiceTest {
     assertThat(contactDetailForm.getEmailAddress()).isEqualTo(projectInformation.getEmailAddress());
   }
 
+  @Test
+  public void getForm_whenDiscoveryFieldStage_thenFirstProductionDatePopulated() {
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
+    projectInformation.setFieldStage(FieldStage.DISCOVERY);
+
+    var persistedFirstProductionDate = new QuarterYearInput(Quarter.Q1, "2020");
+    projectInformation.setFirstProductionDateQuarter(persistedFirstProductionDate.getQuarter());
+    projectInformation.setFirstProductionDateYear(Integer.parseInt(persistedFirstProductionDate.getYear()));
+
+    // The following should not be populated to the forms
+    var invalidPersistedDecomWorkStartDate = new QuarterYearInput(Quarter.Q2, "2021");
+    projectInformation.setDecomWorkStartDateQuarter(invalidPersistedDecomWorkStartDate.getQuarter());
+    projectInformation.setDecomWorkStartDateYear(Integer.parseInt(invalidPersistedDecomWorkStartDate.getYear()));
+    projectInformation.setProductionCessationDate(LocalDate.now());
+
+    when(projectInformationRepository.findByProjectDetail(details))
+        .thenReturn(Optional.of(projectInformation));
+
+    ProjectInformationForm form = projectInformationService.getForm(details);
+
+    assertThat(form.getFieldStage()).isEqualTo(FieldStage.DISCOVERY);
+    assertThat(form.getDiscoveryFirstProductionDate()).isEqualTo(persistedFirstProductionDate);
+
+    assertThat(form.getDevelopmentFirstProductionDate()).isNull();
+    assertThat(form.getDecomWorkStartDate()).isNull();
+    assertThat(form.getProductionCessationDate()).isNull();
+  }
+
+  @Test
+  public void getForm_whenDevelopmentFieldStage_thenFirstProductionDatePopulated() {
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
+    projectInformation.setFieldStage(FieldStage.DEVELOPMENT);
+
+    var persistedFirstProductionDate = new QuarterYearInput(Quarter.Q1, "2020");
+    projectInformation.setFirstProductionDateQuarter(persistedFirstProductionDate.getQuarter());
+    projectInformation.setFirstProductionDateYear(Integer.parseInt(persistedFirstProductionDate.getYear()));
+
+    // The following should not be populated to the forms
+    var invalidPersistedDecomWorkStartDate = new QuarterYearInput(Quarter.Q2, "2021");
+    projectInformation.setDecomWorkStartDateQuarter(invalidPersistedDecomWorkStartDate.getQuarter());
+    projectInformation.setDecomWorkStartDateYear(Integer.parseInt(invalidPersistedDecomWorkStartDate.getYear()));
+    projectInformation.setProductionCessationDate(LocalDate.now());
+
+    when(projectInformationRepository.findByProjectDetail(details))
+        .thenReturn(Optional.of(projectInformation));
+
+    ProjectInformationForm form = projectInformationService.getForm(details);
+
+    assertThat(form.getFieldStage()).isEqualTo(FieldStage.DEVELOPMENT);
+    assertThat(form.getDevelopmentFirstProductionDate()).isEqualTo(persistedFirstProductionDate);
+
+    assertThat(form.getDiscoveryFirstProductionDate()).isNull();
+    assertThat(form.getDecomWorkStartDate()).isNull();
+    assertThat(form.getProductionCessationDate()).isNull();
+  }
+
+  @Test
+  public void getForm_whenDecommissioningFieldStage_thenHiddenFieldsPopulated() {
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
+    projectInformation.setFieldStage(FieldStage.DECOMMISSIONING);
+
+    var persistedDecomWorkStartDate = new QuarterYearInput(Quarter.Q1, "2020");
+    projectInformation.setDecomWorkStartDateQuarter(persistedDecomWorkStartDate.getQuarter());
+    projectInformation.setDecomWorkStartDateYear(Integer.parseInt(persistedDecomWorkStartDate.getYear()));
+
+    var persistedProductionCessationDate = LocalDate.now();
+    projectInformation.setProductionCessationDate(persistedProductionCessationDate);
+
+    // The following should not be populated to the forms
+    var invalidPersistedFirstProductionDate = new QuarterYearInput(Quarter.Q2, "2021");
+    projectInformation.setFirstProductionDateQuarter(invalidPersistedFirstProductionDate.getQuarter());
+    projectInformation.setFirstProductionDateYear(Integer.parseInt(invalidPersistedFirstProductionDate.getYear()));
+
+    when(projectInformationRepository.findByProjectDetail(details))
+        .thenReturn(Optional.of(projectInformation));
+
+    ProjectInformationForm form = projectInformationService.getForm(details);
+
+    assertThat(form.getFieldStage()).isEqualTo(FieldStage.DECOMMISSIONING);
+    assertThat(form.getDecomWorkStartDate()).isEqualTo(persistedDecomWorkStartDate);
+    assertThat(form.getProductionCessationDate()).isEqualTo(new ThreeFieldDateInput(persistedProductionCessationDate));
+
+    assertThat(form.getDevelopmentFirstProductionDate()).isNull();
+    assertThat(form.getDiscoveryFirstProductionDate()).isNull();
+  }
+
+  @Test
+  public void getForm_whenNoFieldStage_thenNoHiddenFieldsPopulated() {
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
+    projectInformation.setFieldStage(null);
+
+    // The following should not be populated to the forms
+    var invalidPersistedDecomWorkStartDate = new QuarterYearInput(Quarter.Q1, "2020");
+    projectInformation.setDecomWorkStartDateQuarter(invalidPersistedDecomWorkStartDate.getQuarter());
+    projectInformation.setDecomWorkStartDateYear(Integer.parseInt(invalidPersistedDecomWorkStartDate.getYear()));
+
+    var invalidPersistedProductionCessationDate = LocalDate.now();
+    projectInformation.setProductionCessationDate(invalidPersistedProductionCessationDate);
+
+    var invalidPersistedFirstProductionDate = new QuarterYearInput(Quarter.Q2, "2021");
+    projectInformation.setFirstProductionDateQuarter(invalidPersistedFirstProductionDate.getQuarter());
+    projectInformation.setFirstProductionDateYear(Integer.parseInt(invalidPersistedFirstProductionDate.getYear()));
+
+    when(projectInformationRepository.findByProjectDetail(details))
+        .thenReturn(Optional.of(projectInformation));
+
+    ProjectInformationForm form = projectInformationService.getForm(details);
+
+    assertThat(form.getFieldStage()).isNull();
+    assertThat(form.getDecomWorkStartDate()).isNull();
+    assertThat(form.getProductionCessationDate()).isNull();
+    assertThat(form.getDevelopmentFirstProductionDate()).isNull();
+    assertThat(form.getDiscoveryFirstProductionDate()).isNull();
+  }
 
   @Test
   public void validate_partial() {

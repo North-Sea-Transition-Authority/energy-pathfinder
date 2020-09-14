@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.projectinformation;
 
+import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -14,6 +15,7 @@ import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarter;
 
 @Entity
 @Table(name = "project_information")
@@ -43,6 +45,18 @@ public class ProjectInformation implements ContactDetailCapture {
   private String jobTitle;
 
   private String emailAddress;
+
+  @Enumerated(EnumType.STRING)
+  private Quarter firstProductionDateQuarter;
+
+  private Integer firstProductionDateYear;
+
+  @Enumerated(EnumType.STRING)
+  private Quarter decomWorkStartDateQuarter;
+
+  private Integer decomWorkStartDateYear;
+
+  private LocalDate productionCessationDate;
 
   public ProjectInformation() {
   }
@@ -141,4 +155,44 @@ public class ProjectInformation implements ContactDetailCapture {
     return getContactName();
   }
 
+
+  public Quarter getFirstProductionDateQuarter() {
+    return firstProductionDateQuarter;
+  }
+
+  public void setFirstProductionDateQuarter(Quarter firstProductionDateQuarter) {
+    this.firstProductionDateQuarter = firstProductionDateQuarter;
+  }
+
+  public Integer getFirstProductionDateYear() {
+    return firstProductionDateYear;
+  }
+
+  public void setFirstProductionDateYear(Integer firstProductionDateYear) {
+    this.firstProductionDateYear = firstProductionDateYear;
+  }
+
+  public Quarter getDecomWorkStartDateQuarter() {
+    return decomWorkStartDateQuarter;
+  }
+
+  public void setDecomWorkStartDateQuarter(Quarter decomWorkStartDateQuarter) {
+    this.decomWorkStartDateQuarter = decomWorkStartDateQuarter;
+  }
+
+  public Integer getDecomWorkStartDateYear() {
+    return decomWorkStartDateYear;
+  }
+
+  public void setDecomWorkStartDateYear(Integer decomWorkStartDateYear) {
+    this.decomWorkStartDateYear = decomWorkStartDateYear;
+  }
+
+  public LocalDate getProductionCessationDate() {
+    return productionCessationDate;
+  }
+
+  public void setProductionCessationDate(LocalDate productionCessationDate) {
+    this.productionCessationDate = productionCessationDate;
+  }
 }

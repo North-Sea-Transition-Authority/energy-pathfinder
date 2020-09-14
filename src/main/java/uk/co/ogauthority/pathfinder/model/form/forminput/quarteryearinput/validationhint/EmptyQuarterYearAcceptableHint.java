@@ -1,8 +1,8 @@
-package uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint;
+package uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.validationhint;
 
 import uk.co.ogauthority.pathfinder.model.form.validation.ValidationHint;
 
-public class EmptyDateAcceptableHint implements ValidationHint {
+public class EmptyQuarterYearAcceptableHint implements ValidationHint {
 
   @Override
   public boolean isValid(Object objectToTest) {

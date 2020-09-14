@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.DateHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.EmptyDateAcceptableHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.OnOrBeforeDateHint;
 
@@ -19,9 +20,16 @@ public final class ProjectLocationValidationHint {
 
   public ProjectLocationValidationHint(ValidationType validationType) {
 
-    final var onOrBeforeTodayHint = new OnOrBeforeDateHint(LocalDate.now(), "today's date");
-    this.fdpApprovalDateHint = onOrBeforeTodayHint;
-    this.decomProgramApprovalDateHint = onOrBeforeTodayHint;
+    this.fdpApprovalDateHint = new OnOrBeforeDateHint(
+        APPROVED_FDP_LABEL,
+        LocalDate.now(),
+        DateHint.TODAY_DATE_LABEL
+    );
+    this.decomProgramApprovalDateHint = new OnOrBeforeDateHint(
+        APPROVED_DECOM_LABEL,
+        LocalDate.now(),
+        DateHint.TODAY_DATE_LABEL
+    );
 
     this.emptyDateAcceptableHint = new EmptyDateAcceptableHint();
 
