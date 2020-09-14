@@ -11,7 +11,7 @@
           <span class="govuk-visually-hidden">Error:</span>${tenderName} is incomplete
         </span>
       </#if>
-        <@fdsAction.link linkText="Change" linkUrl="#" linkScreenReaderText=tenderName />
+        <@fdsAction.link linkText=view.getEditLink().getLinkText() linkUrl=springUrl(view.getEditLink().url) linkScreenReaderText=tenderName />
         <@fdsAction.link linkText="Remove" linkUrl="#" linkScreenReaderText=tenderName />
         <#if view.getTenderFunction()?has_content>
           <@fdsCheckAnswers.checkAnswersRow keyText="Tender function" actionText="" actionUrl="" screenReaderActionText="">

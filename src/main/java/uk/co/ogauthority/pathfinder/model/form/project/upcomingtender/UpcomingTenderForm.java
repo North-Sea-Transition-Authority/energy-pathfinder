@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.model.form.project.upcomingtender;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
@@ -17,6 +18,7 @@ public class UpcomingTenderForm {
 
   private ThreeFieldDateInput estimatedTenderDate;
 
+  @NotNull(message = "Select a contract band", groups = FullValidation.class)
   private ContractBand contractBand;
 
   @Valid

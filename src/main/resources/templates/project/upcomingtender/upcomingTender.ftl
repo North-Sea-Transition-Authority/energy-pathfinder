@@ -6,7 +6,7 @@
   </#if>
 
   <@fdsForm.htmlForm>
-    <@fdsSearchSelector.searchSelectorRest path="form.tenderFunction" selectorMinInputLength=0 labelText="What function is the tender for?" restUrl=springUrl(tenderRestUrl)  preselectedItems=preselectedTender!{} />
+    <@fdsSearchSelector.searchSelectorRest path="form.tenderFunction" selectorMinInputLength=0 labelText="What function is the tender for?" restUrl=springUrl(tenderRestUrl)  preselectedItems=preSelectedFunction!{} />
     <@fdsTextarea.textarea path="form.descriptionOfWork" labelText="Provide a detailed description of the work"/>
     <@fdsDateInput.dateInput
       dayPath="form.estimatedTenderDate.day"
@@ -21,7 +21,6 @@
       path="form.contractBand"
       radioItems=contractBands
       fieldsetHeadingClass="govuk-fieldset__legend--s"
-      optionalLabel=true
     />
     <@contactDetails.standardContactDetails path="form.contactDetail" legendHeading="Tender contact details"/>
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>

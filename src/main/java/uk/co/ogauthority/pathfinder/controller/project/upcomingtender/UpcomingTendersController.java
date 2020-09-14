@@ -117,6 +117,34 @@ public class UpcomingTendersController {
     );
   }
 
+  @GetMapping("/upcoming-tender/{upcomingTenderId}/edit")
+  public ModelAndView editUpcomingTender(@PathVariable("projectId") Integer projectId,
+                                         @PathVariable("upcomingTenderId") Integer upcomingTenderId,
+                                        ProjectContext projectContext) {
+    var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
+    return getUpcomingTenderModelAndView(projectId, upcomingTenderService.getForm(upcomingTender));
+  }
+
+  @PostMapping("/upcoming-tender/{upcomingTenderId}/edit")
+  public ModelAndView updateUpcomingTender(@PathVariable("projectId") Integer projectId,
+                                           @PathVariable("upcomingTenderId") Integer upcomingTenderId,
+                                           @Valid @ModelAttribute("form") UpcomingTenderForm form,
+                                           BindingResult bindingResult,
+                                           ValidationType validationType,
+                                           ProjectContext projectContext) {
+    var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
+    bindingResult = upcomingTenderService.validate(form, bindingResult, validationType);
+    return controllerHelperService.checkErrorsAndRedirect(
+        bindingResult,
+        getUpcomingTenderModelAndView(projectId, form),
+        form,
+        () -> {
+          upcomingTenderService.updateUpcomingTender(upcomingTender, form);
+          return ReverseRouter.redirect(on(UpcomingTendersController.class).viewTenders(projectId, null));
+        }
+    );
+  }
+
   private ModelAndView getViewTendersModelAndView(
       Integer projectId,
       ProjectContext projectContext,
@@ -136,6 +164,7 @@ public class UpcomingTendersController {
     var modelAndView = new ModelAndView("project/upcomingtender/upcomingTender")
         .addObject("tenderRestUrl", SearchSelectorService.route(on(TenderFunctionRestController.class).searchTenderFunctions(null)))
         .addObject("form", form)
+        .addObject("preSelectedFunction", upcomingTenderService.getPreSelectedFunction(form))
         .addObject("contractBands", ContractBand.getAllAsMap());
     breadcrumbService.fromUpcomingTenders(projectId, modelAndView, PAGE_NAME_SINGULAR);
     return modelAndView;

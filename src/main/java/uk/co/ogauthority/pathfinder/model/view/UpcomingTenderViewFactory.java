@@ -1,30 +1,50 @@
 package uk.co.ogauthority.pathfinder.model.view;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
+import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
-import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class UpcomingTenderViewFactory {
 
   public static UpcomingTenderView createUpComingTenderView(UpcomingTender upcomingTender, Integer displayOrder) {
-    //TODO replace with getters / setters to avoid code smell
-    return new UpcomingTenderView(
-        displayOrder,
-        upcomingTender.getId(),
-        upcomingTender.getProjectDetail().getProject().getId(),
+    var projectId = upcomingTender.getProjectDetail().getProject().getId();
+    var tender = new UpcomingTenderView(
+            displayOrder,
+            upcomingTender.getId(),
+            projectId
+        );
+
+    tender.setTenderFunction(
         upcomingTender.getTenderFunction() != null
-            ? upcomingTender.getTenderFunction().getDisplayName()
-            : SearchSelectorService.removePrefix(upcomingTender.getManualTenderFunction()),
-        upcomingTender.getDescriptionOfWork(),
-        DateUtil.formatDate(upcomingTender.getEstimatedTenderDate()),
-        upcomingTender.getContractBand() != null
-            ? upcomingTender.getContractBand().getDisplayName()
-            : "",
-        upcomingTender.getContactName(),
-        upcomingTender.getPhoneNumber(),
-        upcomingTender.getJobTitle(),
-        upcomingTender.getEmailAddress()
+          ? upcomingTender.getTenderFunction().getDisplayName()
+          : upcomingTender.getManualTenderFunction()
     );
+    tender.setDescriptionOfWork(upcomingTender.getDescriptionOfWork());
+    tender.setEstimatedTenderDate(DateUtil.formatDate(upcomingTender.getEstimatedTenderDate()));
+    tender.setContractBand(
+        upcomingTender.getContractBand() != null
+          ? upcomingTender.getContractBand().getDisplayName()
+          : ""
+    );
+    tender.setContactName(upcomingTender.getContactName());
+    tender.setPhoneNumber(upcomingTender.getPhoneNumber());
+    tender.setJobTitle(upcomingTender.getJobTitle());
+    tender.setEmailAddress(upcomingTender.getEmailAddress());
+    tender.setEditLink(
+        new SummaryLink(
+            SummaryLinkText.EDIT.getDisplayName(),
+            ReverseRouter.route(on(UpcomingTendersController.class).editUpcomingTender(
+                projectId,
+                upcomingTender.getId(),
+                null
+            ))
+        )
+    );
+
+    return tender;
   }
 
   public static UpcomingTenderView createUpComingTenderView(

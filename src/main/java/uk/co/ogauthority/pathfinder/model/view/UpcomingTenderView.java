@@ -24,8 +24,9 @@ public class UpcomingTenderView {
 
   private String emailAddress;
 
-  //TODO add action links
-  //Own class for actionLinks edit/delete?
+  private SummaryLink editLink;
+
+  private SummaryLink deleteLink;
 
   private Boolean isValid;
 
@@ -33,27 +34,11 @@ public class UpcomingTenderView {
   public UpcomingTenderView(
       Integer displayOrder,
       Integer id,
-      Integer projectId,
-      String tenderFunction,
-      String descriptionOfWork,
-      String estimatedTenderDate,
-      String contractBand,
-      String contactName,
-      String phoneNumber,
-      String jobTitle,
-      String emailAddress
+      Integer projectId
   ) {
     this.displayOrder = displayOrder;
     this.id = id;
     this.projectId = projectId;
-    this.tenderFunction = tenderFunction;
-    this.descriptionOfWork = descriptionOfWork;
-    this.estimatedTenderDate = estimatedTenderDate;
-    this.contractBand = contractBand;
-    this.contactName = contactName;
-    this.phoneNumber = phoneNumber;
-    this.jobTitle = jobTitle;
-    this.emailAddress = emailAddress;
   }
 
   public Integer getDisplayOrder() {
@@ -150,5 +135,21 @@ public class UpcomingTenderView {
 
   public void setIsValid(Boolean isValid) {
     this.isValid = isValid;
+  }
+
+  public SummaryLink getEditLink() {
+    return editLink;
+  }
+
+  public void setEditLink(SummaryLink editLink) {
+    this.editLink = editLink;
+  }
+
+  public SummaryLink getDeleteLink() {
+    return deleteLink;
+  }
+
+  public void setDeleteLink(SummaryLink deleteLink) {
+    this.deleteLink = deleteLink;
   }
 }
