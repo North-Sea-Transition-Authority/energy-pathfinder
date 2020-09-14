@@ -1,11 +1,13 @@
 package uk.co.ogauthority.pathfinder.model.form.validation.date;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.DateInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.DateInputType;
@@ -164,6 +166,12 @@ public class DateInputValidator implements SmartValidator {
 
   public static String getIncorrectYearFormatErrorMessage(FormInputLabel inputLabel) {
     return inputLabel.getInitCappedLabel() + " must have a four number year. For example 2020";
+  }
+
+  public static void addEmptyDateAcceptableHint(ValidationType validationType, List<Object> validationHints) {
+    if (validationType.equals(ValidationType.PARTIAL)) {
+      validationHints.add(new EmptyDateAcceptableHint());
+    }
   }
 
 }

@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender;
+package uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract;
 
 import java.time.LocalDate;
 import javax.persistence.Column;
@@ -18,8 +18,8 @@ import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
 
 @Entity
-@Table(name = "upcoming_tenders")
-public class UpcomingTender implements ContactDetailCapture {
+@Table(name = "awarded_contracts")
+public class AwardedContract implements ContactDetailCapture {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,16 +29,18 @@ public class UpcomingTender implements ContactDetailCapture {
   @JoinColumn(name = "project_details_id")
   private ProjectDetail projectDetail;
 
-  @Enumerated(EnumType.STRING)
-  private Function tenderFunction;
+  private String contractorName;
 
-  private String manualTenderFunction;
+  @Enumerated(EnumType.STRING)
+  private Function contractFunction;
+
+  private String manualContractFunction;
 
   @Lob
   @Column(name = "description_of_work", columnDefinition = "CLOB")
   private String descriptionOfWork;
 
-  private LocalDate estimatedTenderDate;
+  private LocalDate dateAwarded;
 
   @Enumerated(EnumType.STRING)
   private ContractBand contractBand;
@@ -51,10 +53,9 @@ public class UpcomingTender implements ContactDetailCapture {
 
   private String emailAddress;
 
-  public UpcomingTender() {
-  }
+  public AwardedContract() {}
 
-  public UpcomingTender(ProjectDetail projectDetail) {
+  public AwardedContract(ProjectDetail projectDetail) {
     this.projectDetail = projectDetail;
   }
 
@@ -66,20 +67,28 @@ public class UpcomingTender implements ContactDetailCapture {
     this.projectDetail = projectDetail;
   }
 
-  public Function getTenderFunction() {
-    return tenderFunction;
+  public String getContractorName() {
+    return contractorName;
   }
 
-  public void setTenderFunction(Function tenderFunction) {
-    this.tenderFunction = tenderFunction;
+  public void setContractorName(String contractorName) {
+    this.contractorName = contractorName;
   }
 
-  public String getManualTenderFunction() {
-    return manualTenderFunction;
+  public Function getContractFunction() {
+    return contractFunction;
   }
 
-  public void setManualTenderFunction(String manualTenderFunction) {
-    this.manualTenderFunction = manualTenderFunction;
+  public void setContractFunction(Function contractFunction) {
+    this.contractFunction = contractFunction;
+  }
+
+  public String getManualContractFunction() {
+    return manualContractFunction;
+  }
+
+  public void setManualContractFunction(String manualContractFunction) {
+    this.manualContractFunction = manualContractFunction;
   }
 
   public String getDescriptionOfWork() {
@@ -90,12 +99,12 @@ public class UpcomingTender implements ContactDetailCapture {
     this.descriptionOfWork = descriptionOfWork;
   }
 
-  public LocalDate getEstimatedTenderDate() {
-    return estimatedTenderDate;
+  public LocalDate getDateAwarded() {
+    return dateAwarded;
   }
 
-  public void setEstimatedTenderDate(LocalDate estimatedTenderDate) {
-    this.estimatedTenderDate = estimatedTenderDate;
+  public void setDateAwarded(LocalDate dateAwarded) {
+    this.dateAwarded = dateAwarded;
   }
 
   public ContractBand getContractBand() {
@@ -114,27 +123,12 @@ public class UpcomingTender implements ContactDetailCapture {
     this.contactName = contactName;
   }
 
-  @Override
-  public String getPhoneNumber() {
-    return phoneNumber;
-  }
-
   public void setPhoneNumber(String phoneNumber) {
     this.phoneNumber = phoneNumber;
   }
 
-  @Override
-  public String getJobTitle() {
-    return jobTitle;
-  }
-
   public void setJobTitle(String jobTitle) {
     this.jobTitle = jobTitle;
-  }
-
-  @Override
-  public String getEmailAddress() {
-    return emailAddress;
   }
 
   public void setEmailAddress(String emailAddress) {
@@ -144,5 +138,20 @@ public class UpcomingTender implements ContactDetailCapture {
   @Override
   public String getName() {
     return getContactName();
+  }
+
+  @Override
+  public String getPhoneNumber() {
+    return phoneNumber;
+  }
+
+  @Override
+  public String getJobTitle() {
+    return jobTitle;
+  }
+
+  @Override
+  public String getEmailAddress() {
+    return emailAddress;
   }
 }

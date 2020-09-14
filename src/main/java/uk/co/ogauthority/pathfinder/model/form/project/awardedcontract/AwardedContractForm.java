@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.form.project.upcomingtender;
+package uk.co.ogauthority.pathfinder.model.form.project.awardedcontract;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -7,16 +7,22 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
+import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
+import uk.co.ogauthority.pathfinder.model.form.validation.lengthrestrictedstring.LengthRestrictedString;
 
-public class UpcomingTenderForm {
+public class AwardedContractForm {
 
-  @NotEmpty(message = "Select a tender function", groups = FullValidation.class)
-  private String tenderFunction;
+  @NotEmpty(message = "Enter a contractor name", groups = FullValidation.class)
+  @LengthRestrictedString(messagePrefix = "The contractor name", groups = {FullValidation.class, PartialValidation.class})
+  private String contractorName;
+
+  @NotEmpty(message = "Select a function for the contract", groups = FullValidation.class)
+  private String contractFunction;
 
   @NotEmpty(message = "Enter a description of the work", groups = FullValidation.class)
   private String descriptionOfWork;
 
-  private ThreeFieldDateInput estimatedTenderDate;
+  private ThreeFieldDateInput dateAwarded;
 
   @NotNull(message = "Select a contract band", groups = FullValidation.class)
   private ContractBand contractBand;
@@ -24,12 +30,20 @@ public class UpcomingTenderForm {
   @Valid
   private ContactDetailForm contactDetail;
 
-  public String getTenderFunction() {
-    return tenderFunction;
+  public String getContractorName() {
+    return contractorName;
   }
 
-  public void setTenderFunction(String tenderFunction) {
-    this.tenderFunction = tenderFunction;
+  public void setContractorName(String contractorName) {
+    this.contractorName = contractorName;
+  }
+
+  public String getContractFunction() {
+    return contractFunction;
+  }
+
+  public void setContractFunction(String contractFunction) {
+    this.contractFunction = contractFunction;
   }
 
   public String getDescriptionOfWork() {
@@ -40,12 +54,12 @@ public class UpcomingTenderForm {
     this.descriptionOfWork = descriptionOfWork;
   }
 
-  public ThreeFieldDateInput getEstimatedTenderDate() {
-    return estimatedTenderDate;
+  public ThreeFieldDateInput getDateAwarded() {
+    return dateAwarded;
   }
 
-  public void setEstimatedTenderDate(ThreeFieldDateInput estimatedTenderDate) {
-    this.estimatedTenderDate = estimatedTenderDate;
+  public void setDateAwarded(ThreeFieldDateInput dateAwarded) {
+    this.dateAwarded = dateAwarded;
   }
 
   public ContractBand getContractBand() {

@@ -25,7 +25,7 @@ public class ProjectLocationUtil {
   public static ProjectLocation getProjectLocation_withManualField(ProjectDetail details) {
     var projectLocation = new ProjectLocation(
         details,
-        MANUAL_FIELD_NAME
+        MANUAL_FIELD_NAME_NO_PREFIX
     );
     setCommonFields(projectLocation);
     return projectLocation;

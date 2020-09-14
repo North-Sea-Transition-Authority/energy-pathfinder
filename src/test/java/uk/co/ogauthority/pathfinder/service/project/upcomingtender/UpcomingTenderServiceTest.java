@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.service.project.upcomingtender;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,12 +15,12 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.enums.project.TenderFunction;
+import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderFormValidator;
-import uk.co.ogauthority.pathfinder.model.searchselector.ManualEntryAttribute;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -32,9 +31,6 @@ public class UpcomingTenderServiceTest {
 
   @Mock
   private UpcomingTenderRepository upcomingTenderRepository;
-
-  @Mock
-  private SearchSelectorService searchSelectorService;
 
   @Mock
   private ValidationService validationService;
@@ -48,18 +44,20 @@ public class UpcomingTenderServiceTest {
 
   @Before
   public void setUp() {
+
+    SearchSelectorService searchSelectorService = new SearchSelectorService();
+    FunctionService functionService = new FunctionService(searchSelectorService);
+
     upcomingTenderService = new UpcomingTenderService(
         upcomingTenderRepository,
-        searchSelectorService,
         validationService,
-        upcomingTenderFormValidator
+        upcomingTenderFormValidator,
+        functionService,
+        searchSelectorService
     );
 
     when(upcomingTenderRepository.save(any(UpcomingTender.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
-    when(searchSelectorService.search(any(), any())).thenCallRealMethod();
-    when(searchSelectorService.addManualEntry(any(String.class), anyList())).thenCallRealMethod();
-    when(searchSelectorService.addManualEntry(any(String.class), anyList(), any(ManualEntryAttribute.class))).thenCallRealMethod();
   }
 
 
@@ -119,9 +117,9 @@ public class UpcomingTenderServiceTest {
 
   @Test
   public void findTenderFunctionsLikeWithManualEntry() {
-    var results = upcomingTenderService.findTenderFunctionsLikeWithManualEntry(TenderFunction.FACILITIES_OFFSHORE.getDisplayName());
+    var results = upcomingTenderService.findTenderFunctionsLikeWithManualEntry(Function.FACILITIES_OFFSHORE.getDisplayName());
     assertThat(results.size()).isEqualTo(1);
-    assertThat(results.get(0).getId()).isEqualTo(TenderFunction.FACILITIES_OFFSHORE.name());
+    assertThat(results.get(0).getId()).isEqualTo(Function.FACILITIES_OFFSHORE.name());
   }
 
   @Test

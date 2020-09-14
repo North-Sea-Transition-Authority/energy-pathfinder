@@ -2,13 +2,13 @@ package uk.co.ogauthority.pathfinder.testutil;
 
 import java.time.LocalDate;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
-import uk.co.ogauthority.pathfinder.model.enums.project.TenderFunction;
+import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 
 public class UpcomingTenderUtil {
-  public static final TenderFunction TENDER_FUNCTION = TenderFunction.DRILLING;
+  public static final Function TENDER_FUNCTION = Function.DRILLING;
   public static final String MANUAL_TENDER_FUNCTION = SearchSelectablePrefix.FREE_TEXT_PREFIX + "function";
   public static final String DESCRIPTION_OF_WORK = "work description";
   public static final LocalDate ESTIMATED_TENDER_DATE = LocalDate.now().plusMonths(1L);

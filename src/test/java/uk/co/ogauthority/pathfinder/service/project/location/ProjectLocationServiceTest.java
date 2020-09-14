@@ -63,6 +63,8 @@ public class ProjectLocationServiceTest {
 
     when(projectLocationRepository.save(any(ProjectLocation.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
+
+    when(searchSelectorService.removePrefix(any())).thenCallRealMethod();
   }
 
   @Test
@@ -70,7 +72,7 @@ public class ProjectLocationServiceTest {
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
     projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationUtil.getCompletedForm_manualField());
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
-    assertThat(projectLocation.getManualFieldName()).isEqualTo(ProjectLocationUtil.MANUAL_FIELD_NAME);
+    assertThat(projectLocation.getManualFieldName()).isEqualTo(ProjectLocationUtil.MANUAL_FIELD_NAME_NO_PREFIX);
     checkCommonFieldsMatch(projectLocation);
   }
 
@@ -92,7 +94,7 @@ public class ProjectLocationServiceTest {
         ));
     projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationUtil.getCompletedForm_manualField());
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
-    assertThat(projectLocation.getManualFieldName()).isEqualTo(ProjectLocationUtil.MANUAL_FIELD_NAME);
+    assertThat(projectLocation.getManualFieldName()).isEqualTo(ProjectLocationUtil.MANUAL_FIELD_NAME_NO_PREFIX);
     checkCommonFieldsMatch(projectLocation);
   }
 

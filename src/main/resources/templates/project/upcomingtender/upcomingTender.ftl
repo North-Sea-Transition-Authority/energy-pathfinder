@@ -21,7 +21,6 @@
       path="form.contractBand"
       radioItems=contractBands
       fieldsetHeadingClass="govuk-fieldset__legend--s"
-      optionalLabel=true
     />
     <@contactDetails.standardContactDetails path="form.contactDetail" legendHeading="Tender contact details"/>
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
