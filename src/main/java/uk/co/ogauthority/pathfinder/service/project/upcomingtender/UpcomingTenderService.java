@@ -15,7 +15,8 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.enums.project.TenderFunction;
+import uk.co.ogauthority.pathfinder.model.enums.project.Function;
+import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
@@ -23,6 +24,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhin
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
@@ -30,19 +32,22 @@ import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 public class UpcomingTenderService {
 
   private final UpcomingTenderRepository upcomingTenderRepository;
-  private final SearchSelectorService searchSelectorService;
   private final ValidationService validationService;
   private final UpcomingTenderFormValidator upcomingTenderFormValidator;
+  private final FunctionService functionService;
+  private final SearchSelectorService searchSelectorService;
 
   @Autowired
   public UpcomingTenderService(UpcomingTenderRepository upcomingTenderRepository,
-                               SearchSelectorService searchSelectorService,
                                ValidationService validationService,
-                               UpcomingTenderFormValidator upcomingTenderFormValidator) {
+                               UpcomingTenderFormValidator upcomingTenderFormValidator,
+                               FunctionService functionService,
+                               SearchSelectorService searchSelectorService) {
     this.upcomingTenderRepository = upcomingTenderRepository;
-    this.searchSelectorService = searchSelectorService;
     this.validationService = validationService;
     this.upcomingTenderFormValidator = upcomingTenderFormValidator;
+    this.functionService = functionService;
+    this.searchSelectorService = searchSelectorService;
   }
 
 
@@ -154,18 +159,11 @@ public class UpcomingTenderService {
    * @return return matching results plus manual entry
    */
   public List<RestSearchItem> findTenderFunctionsLikeWithManualEntry(String searchTerm) {
-    List<RestSearchItem> results = searchSelectorService.search(
-        searchTerm,
-        Arrays.asList(TenderFunction.values().clone())
-      )
-        .stream().sorted(Comparator.comparing(RestSearchItem::getText))
-        .collect(Collectors.toList());
-    searchSelectorService.addManualEntry(searchTerm, results);
-    return results;
+    return functionService.findFunctionsLikeWithManualEntry(searchTerm, FunctionType.UPCOMING_TENDER);
   }
 
-  private TenderFunction getFunctionFromString(String s) {
-    return TenderFunction.valueOf(s);
+  private Function getFunctionFromString(String s) {
+    return Function.valueOf(s);
   }
 
 }

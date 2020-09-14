@@ -3,6 +3,9 @@ package uk.co.ogauthority.pathfinder.testutil;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarter;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 
 public class ProjectInformationUtil {
@@ -16,15 +19,17 @@ public class ProjectInformationUtil {
   public static final String EMAIL = ContactDetailsUtil.EMAIL;
 
   public static ProjectInformation getProjectInformation_withCompleteDetails(ProjectDetail details) {
-    return new ProjectInformation(details,
-        FIELD_STAGE,
-        PROJECT_TITLE,
-        PROJECT_SUMMARY,
-        CONTACT_NAME,
-        PHONE_NUMBER,
-        JOB_TITLE,
-        EMAIL
-        );
+    var projectInformation = new ProjectInformation();
+    projectInformation.setProjectDetail(details);
+    projectInformation.setFieldStage(FIELD_STAGE);
+    projectInformation.setProjectTitle(PROJECT_TITLE);
+    projectInformation.setProjectSummary(PROJECT_SUMMARY);
+    projectInformation.setContactName(CONTACT_NAME);
+    projectInformation.setPhoneNumber(PHONE_NUMBER);
+    projectInformation.setJobTitle(JOB_TITLE);
+    projectInformation.setEmailAddress(EMAIL);
+
+    return projectInformation;
   }
 
   public static ProjectInformationForm getCompleteForm() {
@@ -40,6 +45,10 @@ public class ProjectInformationUtil {
         EMAIL
     );
     form.setContactDetail(contactDetailForm);
+    form.setDevelopmentFirstProductionDate(new QuarterYearInput(null, null));
+    form.setDiscoveryFirstProductionDate(new QuarterYearInput(null, null));
+    form.setDecomWorkStartDate(new QuarterYearInput(Quarter.Q1, "2020"));
+    form.setProductionCessationDate(new ThreeFieldDateInput(2020, 1, 1));
 
     return form;
   }

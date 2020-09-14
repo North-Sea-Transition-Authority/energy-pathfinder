@@ -1,21 +1,22 @@
 package uk.co.ogauthority.pathfinder.model.form.validation.date;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.DateInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.DateInputType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.AfterDateHint;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.BeforeDateHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.EmptyDateAcceptableHint;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.OnOrAfterDateHint;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.OnOrBeforeDateHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
+import uk.co.ogauthority.pathfinder.model.form.validation.ValidationHint;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 
 @Component
 public class DateInputValidator implements SmartValidator {
@@ -31,9 +32,9 @@ public class DateInputValidator implements SmartValidator {
   public static final String MONTH_INVALID_CODE = MONTH + FieldValidationErrorCodes.INVALID.getCode();
   public static final String YEAR_INVALID_CODE = YEAR + FieldValidationErrorCodes.INVALID.getCode();
 
-  public static final String DAY_AFTER_DATE_CODE = DAY + FieldValidationErrorCodes.AFTER_SOME_DATE.getCode();
-  public static final String MONTH_AFTER_DATE_CODE = MONTH + FieldValidationErrorCodes.AFTER_SOME_DATE.getCode();
-  public static final String YEAR_AFTER_DATE_CODE = YEAR + FieldValidationErrorCodes.AFTER_SOME_DATE.getCode();
+  public static final String DAY_AFTER_DATE_CODE = DAY + AfterDateHint.AFTER_DATE_CODE;
+  public static final String MONTH_AFTER_DATE_CODE = MONTH + AfterDateHint.AFTER_DATE_CODE;
+  public static final String YEAR_AFTER_DATE_CODE = YEAR + AfterDateHint.AFTER_DATE_CODE;
 
   public static final String DAY_BEFORE_DATE_CODE = DAY + FieldValidationErrorCodes.BEFORE_SOME_DATE.getCode();
   public static final String MONTH_BEFORE_DATE_CODE = MONTH + FieldValidationErrorCodes.BEFORE_SOME_DATE.getCode();
@@ -52,7 +53,6 @@ public class DateInputValidator implements SmartValidator {
   @Override
   public void validate(Object o, Errors errors, Object... objects) {
 
-    // should be be small list of hints so this repeated looping over whole list is probably harmless
     var inputLabel = Arrays.stream(objects)
         .filter(hint -> hint.getClass().equals(FormInputLabel.class))
         .map(hint -> ((FormInputLabel) hint))
@@ -60,26 +60,6 @@ public class DateInputValidator implements SmartValidator {
         .orElse(new FormInputLabel(DEFAULT_INPUT_LABEL_TEXT));
 
     var dateInput = (DateInput) o;
-
-    Optional<OnOrBeforeDateHint> onOrBeforeDateHint = Arrays.stream(objects)
-        .filter(hint -> hint.getClass().equals(OnOrBeforeDateHint.class))
-        .map(hint -> ((OnOrBeforeDateHint) hint))
-        .findFirst();
-
-    Optional<BeforeDateHint> beforeDateHint = Arrays.stream(objects)
-        .filter(hint -> hint.getClass().equals(BeforeDateHint.class))
-        .map(hint -> ((BeforeDateHint) hint))
-        .findFirst();
-
-    Optional<OnOrAfterDateHint> onOrAfterDateHint = Arrays.stream(objects)
-        .filter(hint -> hint.getClass().equals(OnOrAfterDateHint.class))
-        .map(hint -> ((OnOrAfterDateHint) hint))
-        .findFirst();
-
-    Optional<AfterDateHint> afterDateHint = Arrays.stream(objects)
-        .filter(hint -> hint.getClass().equals(AfterDateHint.class))
-        .map(hint -> ((AfterDateHint) hint))
-        .findFirst();
 
     Optional<EmptyDateAcceptableHint> emptyDateAcceptableHint = Arrays.stream(objects)
         .filter(hint -> hint.getClass().equals(EmptyDateAcceptableHint.class))
@@ -110,11 +90,22 @@ public class DateInputValidator implements SmartValidator {
         );
       } else {
         // only do additional validation when the date is valid
-        afterDateHint.ifPresent(hint -> validateAfterDate(errors, dateInput, inputLabel, hint));
-        beforeDateHint.ifPresent(hint -> validateBeforeDate(errors, dateInput, inputLabel, hint));
-        onOrAfterDateHint.ifPresent(hint -> validateOnOrAfterDate(errors, dateInput, inputLabel, hint));
-        onOrBeforeDateHint.ifPresent(hint -> validateOnOrBeforeDate(errors, dateInput, inputLabel, hint));
-        validateHasFourCharYear(errors, dateInput, inputLabel);
+        ValidationUtil.extractImplementedValidationHints(objects)
+            .stream()
+            .map(hint -> (ValidationHint) hint)
+            .filter(hint -> !hint.isValid(dateInput))
+            .forEach(hint ->
+                addDateErrors(
+                    errors,
+                    dateInput,
+                    DAY + hint.getCode(),
+                    MONTH + hint.getCode(),
+                    YEAR + hint.getCode(),
+                    hint.getErrorMessage()
+                )
+          );
+
+        validateHasFourNumberYear(errors, dateInput, inputLabel);
       }
     }
   }
@@ -151,88 +142,10 @@ public class DateInputValidator implements SmartValidator {
     errors.rejectValue(YEAR, yearCode, "");
   }
 
-  // There must be a cleaner way than this to avoid adding new methods per hint type.
-  // Maybe put the check on the date hints them selves and loop over any that exist?
-  // Revisit if any more get added
-  // Things to look at, moving error code onto hint, moving message format string to hint,
-  // can we move check itself to hint without having to add explicit input object classes to the generic date hints?
-  // ^would that be better or worse than what we have? ie treating hints as validation strategies
-  private void validateOnOrAfterDate(Errors errors,
-                                     DateInput dateInput,
-                                     FormInputLabel inputLabel,
-                                     OnOrAfterDateHint testOnOrAfterDate) {
-    if (!(dateInput.isAfter(testOnOrAfterDate.getDate()) || dateInput.isEqualTo(testOnOrAfterDate.getDate()))) {
-      var afterDateLabel = testOnOrAfterDate.getDateLabel();
-
-      addDateErrors(
-          errors,
-          dateInput,
-          DAY_AFTER_DATE_CODE,
-          MONTH_AFTER_DATE_CODE,
-          YEAR_AFTER_DATE_CODE,
-          inputLabel.getInitCappedLabel() + " must be the same as or after " + afterDateLabel
-      );
-    }
-  }
-
-  private void validateOnOrBeforeDate(Errors errors,
-                                      DateInput dateInput,
-                                      FormInputLabel inputLabel,
-                                      OnOrBeforeDateHint testOnOrBeforeDate) {
-    if (!(dateInput.isBefore(testOnOrBeforeDate.getDate()) || dateInput.isEqualTo(testOnOrBeforeDate.getDate()))) {
-      var beforeDateLabel = testOnOrBeforeDate.getDateLabel();
-
-      addDateErrors(
-          errors,
-          dateInput,
-          DAY_BEFORE_DATE_CODE,
-          MONTH_BEFORE_DATE_CODE,
-          YEAR_BEFORE_DATE_CODE,
-          inputLabel.getInitCappedLabel() + " must be the same as or before " + beforeDateLabel
-      );
-    }
-  }
-
-  private void validateAfterDate(Errors errors,
-                                 DateInput dateInput,
-                                 FormInputLabel inputLabel,
-                                 AfterDateHint testAfterDate) {
-    if (!dateInput.isAfter(testAfterDate.getDate())) {
-      var afterDateLabel = testAfterDate.getDateLabel();
-
-      addDateErrors(
-          errors,
-          dateInput,
-          DAY_AFTER_DATE_CODE,
-          MONTH_AFTER_DATE_CODE,
-          YEAR_AFTER_DATE_CODE,
-          inputLabel.getInitCappedLabel() + " must be after " + afterDateLabel
-      );
-    }
-  }
-
-  private void validateBeforeDate(Errors errors,
-                                  DateInput dateInput,
-                                  FormInputLabel inputLabel,
-                                  BeforeDateHint beforeDateHint) {
-    if (!dateInput.isBefore(beforeDateHint.getDate())) {
-      var beforeDateLabel = beforeDateHint.getDateLabel();
-
-      addDateErrors(
-          errors,
-          dateInput,
-          DAY_BEFORE_DATE_CODE,
-          MONTH_BEFORE_DATE_CODE,
-          YEAR_BEFORE_DATE_CODE,
-          inputLabel.getInitCappedLabel() + " must be before " + beforeDateLabel
-      );
-    }
-  }
-
-  private void validateHasFourCharYear(Errors errors,
-                                       DateInput dateInput,
-                                       FormInputLabel inputLabel) {
-    if (dateInput.getYear().length() != 4) {
+  private void validateHasFourNumberYear(Errors errors,
+                                         DateInput dateInput,
+                                         FormInputLabel inputLabel) {
+    if (isYearInInvalidFormat(dateInput.getYear())) {
 
       var errorCode = FieldValidationErrorCodes.MIN_LENGTH_NOT_MET.getCode();
 
@@ -242,8 +155,22 @@ public class DateInputValidator implements SmartValidator {
           DAY + errorCode,
           MONTH + errorCode,
           YEAR + errorCode,
-          inputLabel.getInitCappedLabel() + " must have a four character year"
+          getIncorrectYearFormatErrorMessage(inputLabel)
       );
+    }
+  }
+
+  public static boolean isYearInInvalidFormat(String year) {
+    return (year.length() != 4);
+  }
+
+  public static String getIncorrectYearFormatErrorMessage(FormInputLabel inputLabel) {
+    return inputLabel.getInitCappedLabel() + " must have a four number year. For example 2020";
+  }
+
+  public static void addEmptyDateAcceptableHint(ValidationType validationType, List<Object> validationHints) {
+    if (validationType.equals(ValidationType.PARTIAL)) {
+      validationHints.add(new EmptyDateAcceptableHint());
     }
   }
 

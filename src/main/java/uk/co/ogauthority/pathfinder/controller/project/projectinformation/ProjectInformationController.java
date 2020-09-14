@@ -2,9 +2,6 @@ package uk.co.ogauthority.pathfinder.controller.project.projectinformation;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-import java.util.Comparator;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,6 +18,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusC
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarter;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
@@ -77,9 +75,12 @@ public class ProjectInformationController {
   private ModelAndView getProjectInformationModelAndView(Integer projectId, ProjectInformationForm form) {
     var modelAndView = new ModelAndView("project/projectinformation/projectInformation")
         .addObject("form", form)
-        .addObject("fieldStages",
-            Stream.of(FieldStage.values()).sorted(Comparator.comparing(FieldStage::getDisplayOrder)).collect(
-                Collectors.toList()));
+        .addObject("discoveryFieldStage", FieldStage.getEntryAsMap(FieldStage.DISCOVERY))
+        .addObject("developmentFieldStage", FieldStage.getEntryAsMap(FieldStage.DEVELOPMENT))
+        .addObject("operationsFieldStage", FieldStage.getEntryAsMap(FieldStage.OPERATIONS))
+        .addObject("decommissioningFieldStage", FieldStage.getEntryAsMap(FieldStage.DECOMMISSIONING))
+        .addObject("energyTransitionFieldStage", FieldStage.getEntryAsMap(FieldStage.ENERGY_TRANSITION))
+        .addObject("quarters", Quarter.getAllAsMap());
 
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;

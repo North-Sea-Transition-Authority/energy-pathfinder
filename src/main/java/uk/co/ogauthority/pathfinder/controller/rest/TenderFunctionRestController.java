@@ -20,7 +20,6 @@ public class TenderFunctionRestController {
     this.upcomingTenderService = upcomingTenderService;
   }
 
-
   @GetMapping("/function")
   public RestSearchResult searchTenderFunctions(@Nullable @RequestParam("term") String searchTerm) {
     return new RestSearchResult(upcomingTenderService.findTenderFunctionsLikeWithManualEntry(searchTerm));

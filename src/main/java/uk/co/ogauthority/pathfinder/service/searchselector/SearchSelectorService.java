@@ -85,5 +85,4 @@ public class SearchSelectorService {
   public static String getValueWithManualEntryPrefix(String value) {
     return SearchSelectablePrefix.FREE_TEXT_PREFIX  + value;
   }
-
 }

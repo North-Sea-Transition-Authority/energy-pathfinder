@@ -99,6 +99,13 @@ public class SearchSelectorServiceTest {
     assertThat(SearchSelectorService.isManualEntry(notManualEntry)).isFalse();
   }
 
+  @Test
+  public void getValueWithManualEntryPrefix() {
+    var manualEntry = "manual entry";
+    var result = SearchSelectorService.getValueWithManualEntryPrefix(manualEntry);
+    assertThat(result).isEqualTo(SearchSelectablePrefix.FREE_TEXT_PREFIX + manualEntry);
+  }
+
   private static class SearchItem implements SearchSelectable {
     private final Integer id;
     private final String name;

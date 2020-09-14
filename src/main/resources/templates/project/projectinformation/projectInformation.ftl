@@ -2,21 +2,44 @@
 
 <@defaultPage htmlTitle="Project information" pageHeading="Project information" breadcrumbs=true>
   <#if errorList?has_content>
-      <@fdsError.errorSummary errorItems=errorList />
+    <@fdsError.errorSummary errorItems=errorList />
   </#if>
 
   <@fdsForm.htmlForm>
     <@fdsRadio.radioGroup
       labelText="What is the field stage?"
       path="form.fieldStage"
+      hiddenContent=true
       fieldsetHeadingClass="govuk-fieldset__legend--s"
     >
-      <#list fieldStages as fieldStage>
-        <#assign fieldStageName = fieldStage.name()/>
-        <#assign displayName = fieldStage.getNameAndDescription()/>
-        <#assign displayOrder = fieldStage.displayOrder/>
-        <@fdsRadio.radioItem path="form.fieldStage" itemMap={fieldStageName: displayName} isFirstItem=displayOrder=1 />
-      </#list>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=discoveryFieldStage isFirstItem=true>
+        <@firstProductionDate path="form.discoveryFirstProductionDate" nestingPath="form.fieldStage"/>
+      </@fdsRadio.radioItem>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=developmentFieldStage>
+        <@firstProductionDate path="form.developmentFirstProductionDate" nestingPath="form.fieldStage"/>
+      </@fdsRadio.radioItem>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=operationsFieldStage/>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=decommissioningFieldStage>
+        <@quarterYear.standardQuarterYearInput
+          quarterYearInputPath="form.decomWorkStartDate"
+          legendHeading="What is the decommissioning work start date?"
+          quarterOptions=quarters
+          formId="decomWorkStartDate"
+          hintText="If you don’t know the exact date, provide an estimated date"
+          nestingPath="form.fieldStage"
+        />
+        <@fdsDateInput.dateInput
+          dayPath="form.productionCessationDate.day"
+          monthPath="form.productionCessationDate.month"
+          yearPath="form.productionCessationDate.year"
+          labelText="What is the production cessation date?"
+          formId="productionCessationDate-day-month-year"
+          fieldsetHeadingClass="govuk-fieldset__legend--s"
+          nestingPath="form.fieldStage"
+          optionalLabel=true
+        />
+      </@fdsRadio.radioItem>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=energyTransitionFieldStage/>
     </@fdsRadio.radioGroup>
 
     <@fdsTextInput.textInput path="form.projectTitle" labelText="What is the project title?"/>
@@ -33,3 +56,14 @@
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
   </@fdsForm.htmlForm>
 </@defaultPage>
+
+<#macro firstProductionDate path nestingPath>
+  <@quarterYear.standardQuarterYearInput
+    quarterYearInputPath=path
+    legendHeading="What is the first production date?"
+    quarterOptions=quarters
+    formId="firstProductionDate"
+    hintText="If you do not know the exact date, provide an estimated date"
+    nestingPath=nestingPath
+  />
+</#macro>

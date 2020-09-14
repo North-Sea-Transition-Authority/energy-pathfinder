@@ -9,6 +9,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.AfterDateHint;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.DateHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.EmptyDateAcceptableHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
@@ -17,7 +18,7 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 public class UpcomingTenderFormValidator implements SmartValidator {
 
   public static final FormInputLabel ESTIMATED_TENDER_LABEL = new FormInputLabel("estimated tender date");
-  public static final String DATE_ERROR_LABEL = "today's date";
+  public static final String DATE_ERROR_LABEL = DateHint.TODAY_DATE_LABEL;
   private final DateInputValidator dateInputValidator;
 
   @Autowired
@@ -39,7 +40,7 @@ public class UpcomingTenderFormValidator implements SmartValidator {
         .findFirst();
 
     //always ensure the date is in the future
-    var dateHint = new AfterDateHint(LocalDate.now(), DATE_ERROR_LABEL);
+    var dateHint = new AfterDateHint(ESTIMATED_TENDER_LABEL, LocalDate.now(), DATE_ERROR_LABEL);
 
     ValidationUtil.invokeNestedValidator(
         errors,

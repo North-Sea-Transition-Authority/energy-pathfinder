@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationController;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
 import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProjectOperatorController;
@@ -49,6 +50,9 @@ public class TaskListController {
                                    ProjectContext projectContext) {
 
     var modelAndView = new ModelAndView("project/taskList");
+
+    breadcrumbService.fromWorkArea(modelAndView, "Task list");
+
     modelAndView.addObject("changeOperatorUrl",
         ReverseRouter.route(on(ChangeProjectOperatorController.class).changeOperator(null, projectId, null)));
     modelAndView.addObject("changeOperatorName", ChangeProjectOperatorController.PAGE_NAME);
@@ -72,7 +76,11 @@ public class TaskListController {
         ReverseRouter.route(on(UpcomingTendersController.class).viewTenders(projectId, null))
     );
     modelAndView.addObject("upcomingTendersText", UpcomingTendersController.PAGE_NAME);
-    breadcrumbService.fromWorkArea(modelAndView, "Task list");
+
+    modelAndView.addObject("awardedContractsUrl",
+        ReverseRouter.route(on(AwardedContractController.class).viewAwardedContracts(projectId, null))
+    );
+    modelAndView.addObject("awardedContractsText", AwardedContractController.PAGE_NAME);
 
     return modelAndView;
   }

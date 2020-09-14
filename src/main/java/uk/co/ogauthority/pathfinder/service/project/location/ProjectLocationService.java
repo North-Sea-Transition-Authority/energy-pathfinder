@@ -48,7 +48,7 @@ public class ProjectLocationService {
     var projectLocation = findByProjectDetail(detail).orElse(new ProjectLocation(detail));
 
     if (SearchSelectorService.isManualEntry(form.getField())) {
-      projectLocation.setManualFieldName(form.getField());
+      projectLocation.setManualFieldName(searchSelectorService.removePrefix(form.getField()));
       projectLocation.setField(null);
     } else if (form.getField() != null) {
       projectLocation.setField(fieldService.findById(Integer.parseInt(form.getField())));
@@ -98,7 +98,7 @@ public class ProjectLocationService {
     var form = new ProjectLocationForm();
 
     if (projectLocation.getManualFieldName() != null) {
-      form.setField(projectLocation.getManualFieldName());
+      form.setField(SearchSelectorService.getValueWithManualEntryPrefix(projectLocation.getManualFieldName()));
     } else if (projectLocation.getField() != null) {
       form.setField(projectLocation.getField().getFieldId().toString());
     }

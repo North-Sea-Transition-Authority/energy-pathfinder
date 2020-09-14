@@ -2,10 +2,13 @@ package uk.co.ogauthority.pathfinder.model.form.project.location;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.DateHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.EmptyDateAcceptableHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.OnOrBeforeDateHint;
+import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 
 public final class ProjectLocationValidationHint {
 
@@ -14,16 +17,20 @@ public final class ProjectLocationValidationHint {
 
   private final OnOrBeforeDateHint fdpApprovalDateHint;
   private final OnOrBeforeDateHint decomProgramApprovalDateHint;
-  private final EmptyDateAcceptableHint emptyDateAcceptableHint;
   private final ValidationType validationType;
 
   public ProjectLocationValidationHint(ValidationType validationType) {
 
-    final var onOrBeforeTodayHint = new OnOrBeforeDateHint(LocalDate.now(), "today's date");
-    this.fdpApprovalDateHint = onOrBeforeTodayHint;
-    this.decomProgramApprovalDateHint = onOrBeforeTodayHint;
-
-    this.emptyDateAcceptableHint = new EmptyDateAcceptableHint();
+    this.fdpApprovalDateHint = new OnOrBeforeDateHint(
+        APPROVED_FDP_LABEL,
+        LocalDate.now(),
+        DateHint.TODAY_DATE_LABEL
+    );
+    this.decomProgramApprovalDateHint = new OnOrBeforeDateHint(
+        APPROVED_DECOM_LABEL,
+        LocalDate.now(),
+        DateHint.TODAY_DATE_LABEL
+    );
 
     this.validationType = validationType;
   }
@@ -50,9 +57,7 @@ public final class ProjectLocationValidationHint {
     return hints.toArray();
   }
 
-  private void addEmptyDateAcceptableHint(ArrayList<Object> validationHints) {
-    if (validationType.equals(ValidationType.PARTIAL)) {
-      validationHints.add(emptyDateAcceptableHint);
-    }
+  private void addEmptyDateAcceptableHint(List<Object> validationHints) {
+    DateInputValidator.addEmptyDateAcceptableHint(validationType, validationHints);
   }
 }

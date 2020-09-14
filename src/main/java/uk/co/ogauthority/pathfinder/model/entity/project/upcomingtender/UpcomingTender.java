@@ -14,7 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
-import uk.co.ogauthority.pathfinder.model.enums.project.TenderFunction;
+import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
 
 @Entity
@@ -30,7 +30,7 @@ public class UpcomingTender implements ContactDetailCapture {
   private ProjectDetail projectDetail;
 
   @Enumerated(EnumType.STRING)
-  private TenderFunction tenderFunction;
+  private Function tenderFunction;
 
   private String manualTenderFunction;
 
@@ -70,11 +70,11 @@ public class UpcomingTender implements ContactDetailCapture {
     this.projectDetail = projectDetail;
   }
 
-  public TenderFunction getTenderFunction() {
+  public Function getTenderFunction() {
     return tenderFunction;
   }
 
-  public void setTenderFunction(TenderFunction tenderFunction) {
+  public void setTenderFunction(Function tenderFunction) {
     this.tenderFunction = tenderFunction;
   }
 
