@@ -44,6 +44,18 @@ public class UpcomingTenderViewFactory {
         )
     );
 
+    tender.setDeleteLink(
+        new SummaryLink(
+            SummaryLinkText.DELETE.getDisplayName(),
+            ReverseRouter.route(on(UpcomingTendersController.class).deleteUpcomingTenderConfirm(
+                projectId,
+                upcomingTender.getId(),
+                displayOrder,
+                null
+            ))
+        )
+    );
+
     return tender;
   }
 

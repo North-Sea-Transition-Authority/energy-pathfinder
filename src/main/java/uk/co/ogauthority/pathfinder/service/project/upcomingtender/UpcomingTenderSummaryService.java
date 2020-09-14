@@ -34,6 +34,10 @@ public class UpcomingTenderSummaryService {
     );
   }
 
+  public UpcomingTenderView getUpcomingTenderView(UpcomingTender upcomingTender, Integer displayOrder) {
+    return UpcomingTenderViewFactory.createUpComingTenderView(upcomingTender, displayOrder);
+  }
+
   /**
    * Create views for each tender in the list, validate depending on validation type.
    * @param upcomingTenders List of Tenders

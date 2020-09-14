@@ -1,11 +1,8 @@
 package uk.co.ogauthority.pathfinder.service.project.upcomingtender;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,6 +81,11 @@ public class UpcomingTenderService {
     upcomingTender.setEmailAddress(contactDetailForm.getEmailAddress());
   }
 
+  @Transactional
+  public void delete(UpcomingTender upcomingTender) {
+    upcomingTenderRepository.delete(upcomingTender);
+  }
+
   public UpcomingTender getOrError(Integer upcomingTenderId) {
     return upcomingTenderRepository.findById(upcomingTenderId).orElseThrow(() ->
         new PathfinderEntityNotFoundException(
@@ -114,10 +116,10 @@ public class UpcomingTenderService {
   public UpcomingTenderForm getForm(UpcomingTender upcomingTender) {
     var form = new UpcomingTenderForm();
 
-    if (upcomingTender.getManualTenderFunction() != null) {
-      form.setTenderFunction(SearchSelectorService.getValueWithManualEntryPrefix(upcomingTender.getManualTenderFunction()));
-    } else {
+    if (upcomingTender.getTenderFunction() != null) {
       form.setTenderFunction(upcomingTender.getTenderFunction().name());
+    } else if (upcomingTender.getManualTenderFunction() != null) {
+      form.setTenderFunction(SearchSelectorService.getValueWithManualEntryPrefix(upcomingTender.getManualTenderFunction()));
     }
 
     form.setEstimatedTenderDate(new ThreeFieldDateInput(upcomingTender.getEstimatedTenderDate()));

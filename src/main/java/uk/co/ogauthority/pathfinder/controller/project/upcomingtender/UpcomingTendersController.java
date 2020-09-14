@@ -39,6 +39,7 @@ public class UpcomingTendersController {
 
   public static final String PAGE_NAME = "Upcoming tenders";
   public static final String PAGE_NAME_SINGULAR = "Upcoming tender";
+  public static final String REMOVE_PAGE_NAME = "Remove upcoming tender";
 
   private final BreadcrumbService breadcrumbService;
   private final ControllerHelperService controllerHelperService;
@@ -120,7 +121,7 @@ public class UpcomingTendersController {
   @GetMapping("/upcoming-tender/{upcomingTenderId}/edit")
   public ModelAndView editUpcomingTender(@PathVariable("projectId") Integer projectId,
                                          @PathVariable("upcomingTenderId") Integer upcomingTenderId,
-                                        ProjectContext projectContext) {
+                                         ProjectContext projectContext) {
     var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
     return getUpcomingTenderModelAndView(projectId, upcomingTenderService.getForm(upcomingTender));
   }
@@ -143,6 +144,30 @@ public class UpcomingTendersController {
           return ReverseRouter.redirect(on(UpcomingTendersController.class).viewTenders(projectId, null));
         }
     );
+  }
+
+  @GetMapping("/upcoming-tender/{upcomingTenderId}/delete/{displayOrder}")
+  public ModelAndView deleteUpcomingTenderConfirm(@PathVariable("projectId") Integer projectId,
+                                                  @PathVariable("upcomingTenderId") Integer upcomingTenderId,
+                                                  @PathVariable("displayOrder") Integer displayOrder,
+                                                  ProjectContext projectContext) {
+    var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
+
+    var modelAndView = new ModelAndView("project/upcomingtender/removeUpcomingTender")
+          .addObject("view", upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, displayOrder))
+          .addObject("cancelUrl", ReverseRouter.route(on(UpcomingTendersController.class).viewTenders(projectId, null)));
+    breadcrumbService.fromUpcomingTenders(projectId, modelAndView, REMOVE_PAGE_NAME);
+    return modelAndView;
+  }
+
+  @PostMapping("/upcoming-tender/{upcomingTenderId}/delete/{displayOrder}")
+  public ModelAndView deleteUpcomingTender(@PathVariable("projectId") Integer projectId,
+                                           @PathVariable("upcomingTenderId") Integer upcomingTenderId,
+                                           @PathVariable("displayOrder") Integer displayOrder,
+                                           ProjectContext projectContext) {
+    var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
+    upcomingTenderService.delete(upcomingTender);
+    return ReverseRouter.redirect(on(UpcomingTendersController.class).viewTenders(projectId, null));
   }
 
   private ModelAndView getViewTendersModelAndView(
