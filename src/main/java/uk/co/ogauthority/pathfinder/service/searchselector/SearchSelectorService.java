@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.searchselector.ManualEntryAttribute;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
+import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
 /**
@@ -40,7 +41,7 @@ public class SearchSelectorService {
           .anyMatch(restSearchItem -> restSearchItem.getText().equalsIgnoreCase(searchQuery));
       if (!entryExists) {
         if (manualEntryAttribute.equals(ManualEntryAttribute.WITH_FREE_TEXT_PREFIX)) {
-          resultList.add(0, new RestSearchItem(SearchSelectable.FREE_TEXT_PREFIX + searchQuery, searchQuery));
+          resultList.add(0, new RestSearchItem(SearchSelectablePrefix.FREE_TEXT_PREFIX + searchQuery, searchQuery));
         } else {
           resultList.add(0, new RestSearchItem(searchQuery, searchQuery));
         }
@@ -64,7 +65,7 @@ public class SearchSelectorService {
                                                          Map<String, String> resolvedLinkedEntryMap) {
     var results = new LinkedHashMap<String, String>();
     for (String s : selections) {
-      if (s.startsWith(SearchSelectable.FREE_TEXT_PREFIX)) {
+      if (s.startsWith(SearchSelectablePrefix.FREE_TEXT_PREFIX)) {
         results.put(s, removePrefix(s));
       } else {
         results.put(s, resolvedLinkedEntryMap.get(s));
@@ -74,10 +75,10 @@ public class SearchSelectorService {
   }
 
   public static String removePrefix(String s) {
-    return StringUtils.substring(s, SearchSelectable.FREE_TEXT_PREFIX.length());
+    return StringUtils.substring(s, SearchSelectablePrefix.FREE_TEXT_PREFIX.length());
   }
 
   public static boolean isManualEntry(String s) {
-    return s != null && s.startsWith(SearchSelectable.FREE_TEXT_PREFIX);
+    return s != null && s.startsWith(SearchSelectablePrefix.FREE_TEXT_PREFIX);
   }
 }

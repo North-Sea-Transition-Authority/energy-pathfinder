@@ -16,7 +16,7 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 @Component
 public class UpcomingTenderFormValidator implements SmartValidator {
 
-  public static final FormInputLabel ESTIMATED_TENDER_LABEL = new FormInputLabel("Estimated tender date");
+  public static final FormInputLabel ESTIMATED_TENDER_LABEL = new FormInputLabel("estimated tender date");
   public static final String DATE_ERROR_LABEL = "today's date";
   private final DateInputValidator dateInputValidator;
 

@@ -20,7 +20,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.TenderFunction;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.ManualEntryAttribute;
-import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
+import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -129,6 +129,6 @@ public class UpcomingTenderServiceTest {
     var manualEntry = "manual entry";
     var results = upcomingTenderService.findTenderFunctionsLikeWithManualEntry(manualEntry);
     assertThat(results.size()).isEqualTo(1);
-    assertThat(results.get(0).getId()).isEqualTo(SearchSelectable.FREE_TEXT_PREFIX+manualEntry);
+    assertThat(results.get(0).getId()).isEqualTo(SearchSelectablePrefix.FREE_TEXT_PREFIX+manualEntry);
   }
 }

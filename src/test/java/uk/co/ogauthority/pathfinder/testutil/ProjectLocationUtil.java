@@ -7,14 +7,14 @@ import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocatio
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
-import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
+import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 
 public class ProjectLocationUtil {
   public static final Integer FIELD_ID = 1;
   public static final String FIELD_NAME = "FieldName";
   public static final Integer FIELD_STATUS = 500;
   public static final DevUkField FIELD = new DevUkField(FIELD_ID, FIELD_NAME, FIELD_STATUS);
-  public static final String MANUAL_FIELD_NAME = SearchSelectable.FREE_TEXT_PREFIX + "ManualFieldName";
+  public static final String MANUAL_FIELD_NAME = SearchSelectablePrefix.FREE_TEXT_PREFIX + "ManualFieldName";
   public static final String MANUAL_FIELD_NAME_NO_PREFIX = "ManualFieldName";
   public static final FieldType FIELD_TYPE = FieldType.CARBON_STORAGE;
   public static final Integer WATER_DEPTH = 90;

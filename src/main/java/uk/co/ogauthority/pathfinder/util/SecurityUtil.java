@@ -10,6 +10,10 @@ public class SecurityUtil {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SecurityUtil.class);
 
+  private SecurityUtil() {
+    throw new IllegalStateException("SecurityUtil is a utility class and should not be instantiated");
+  }
+
   public static Optional<AuthenticatedUserAccount> getAuthenticatedUserFromSecurityContext() {
     var authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication == null) {

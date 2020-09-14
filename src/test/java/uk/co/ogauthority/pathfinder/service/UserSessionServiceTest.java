@@ -59,7 +59,7 @@ public class UserSessionServiceTest {
   public void testGetAndValidateSession_withUserAccountLoad() {
     Optional<UserSession> optionalValidSession = userSessionService.getAndValidateSession(validSession.getId(), true);
     assertThat(optionalValidSession).isPresent();
-    assertThat(optionalValidSession.map(UserSession::getId).get()).isEqualTo(validSession.getId());
+    assertThat(optionalValidSession.map(UserSession::getId).get()).contains(validSession.getId());
 
     Optional<UserSession> optionalExpiredSession = userSessionService.getAndValidateSession(expiredSession.getId(), true);
     assertThat(optionalExpiredSession).isEmpty();
@@ -75,7 +75,7 @@ public class UserSessionServiceTest {
   public void testGetAndValidateSession_noUserAccountLoad() {
     Optional<UserSession> optionalValidSession = userSessionService.getAndValidateSession(validSession.getId(), false);
     assertThat(optionalValidSession).isPresent();
-    assertThat(optionalValidSession.map(UserSession::getId).get()).isEqualTo(validSession.getId());
+    assertThat(optionalValidSession.map(UserSession::getId).get()).contains(validSession.getId());
 
     Optional<UserSession> optionalExpiredSession = userSessionService.getAndValidateSession(expiredSession.getId(), false);
     assertThat(optionalExpiredSession).isEmpty();

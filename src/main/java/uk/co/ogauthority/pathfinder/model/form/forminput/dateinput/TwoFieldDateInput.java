@@ -83,10 +83,10 @@ public class TwoFieldDateInput implements DateInput {
       var createdDate = LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), DEFAULT_DAY);
       return Optional.of(createdDate);
     } catch (NumberFormatException e) {
-      LOGGER.debug("Could not convert date values to valid numbers. " + this.toString(), e);
+      LOGGER.debug(String.format("Could not convert date values to valid numbers. %s", this.toString()), e);
       return Optional.empty();
     } catch (DateTimeException e) {
-      LOGGER.debug("Could not convert date values to valid date. " + this.toString(), e);
+      LOGGER.debug(String.format("Could not convert date values to valid date. %s", this.toString()), e);
       return Optional.empty();
     }
   }

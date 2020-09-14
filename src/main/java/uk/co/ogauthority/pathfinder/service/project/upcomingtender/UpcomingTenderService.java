@@ -53,10 +53,12 @@ public class UpcomingTenderService {
     upcomingTender.setDescriptionOfWork(form.getDescriptionOfWork());
     upcomingTender.setEstimatedTenderDate(form.getEstimatedTenderDate().createDateOrNull());
     upcomingTender.setContractBand(form.getContractBand());
-    upcomingTender.setContactName(form.getName());
-    upcomingTender.setPhoneNumber(form.getPhoneNumber());
-    upcomingTender.setJobTitle(form.getJobTitle());
-    upcomingTender.setEmailAddress(form.getEmailAddress());
+
+    var contactDetailForm = form.getContactDetail();
+    upcomingTender.setContactName(contactDetailForm.getName());
+    upcomingTender.setPhoneNumber(contactDetailForm.getPhoneNumber());
+    upcomingTender.setJobTitle(contactDetailForm.getJobTitle());
+    upcomingTender.setEmailAddress(contactDetailForm.getEmailAddress());
 
     return upcomingTenderRepository.save(upcomingTender);
   }

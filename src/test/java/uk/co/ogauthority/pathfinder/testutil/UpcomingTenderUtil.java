@@ -5,11 +5,11 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.TenderFunction;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
-import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
+import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 
 public class UpcomingTenderUtil {
   public static final TenderFunction TENDER_FUNCTION = TenderFunction.DRILLING;
-  public static final String MANUAL_TENDER_FUNCTION = SearchSelectable.FREE_TEXT_PREFIX + "function";
+  public static final String MANUAL_TENDER_FUNCTION = SearchSelectablePrefix.FREE_TEXT_PREFIX + "function";
   public static final String DESCRIPTION_OF_WORK = "work description";
   public static final LocalDate ESTIMATED_TENDER_DATE = LocalDate.now().plusMonths(1L);
   public static final ContractBand CONTRACT_BAND = ContractBand.GREATER_THAN_OR_EQUAL_TO_25M;
@@ -37,10 +37,14 @@ public class UpcomingTenderUtil {
     form.setDescriptionOfWork(DESCRIPTION_OF_WORK);
     form.setEstimatedTenderDate(new ThreeFieldDateInput(ESTIMATED_TENDER_DATE));
     form.setContractBand(CONTRACT_BAND);
-    form.setName(CONTACT_NAME);
-    form.setPhoneNumber(PHONE_NUMBER);
-    form.setJobTitle(JOB_TITLE);
-    form.setEmailAddress(EMAIL);
+
+    var contactDetailForm = ContactDetailsUtil.createContactDetailForm(
+        CONTACT_NAME,
+        PHONE_NUMBER,
+        JOB_TITLE,
+        EMAIL
+    );
+    form.setContactDetail(contactDetailForm);
   }
 
 

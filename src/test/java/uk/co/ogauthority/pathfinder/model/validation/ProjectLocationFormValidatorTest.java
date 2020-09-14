@@ -78,7 +78,7 @@ public class ProjectLocationFormValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors.size()).isGreaterThan(0);
+    assertThat(fieldErrors.size()).isPositive();
     assertThat(fieldErrors).containsExactly(
         entry("approvedFdpDate.day", Set.of(DateInputValidator.DAY_INVALID_CODE)),
         entry("approvedFdpDate.month", Set.of(DateInputValidator.MONTH_INVALID_CODE)),
@@ -87,7 +87,7 @@ public class ProjectLocationFormValidatorTest {
 
     assertThat(fieldErrorMessages).containsExactly(
         entry("approvedFdpDate.day", Set.of(
-            String.format(DateInputValidator.EMPTY_DATE_ERROR, "an "+ ProjectLocationFormValidator.APPROVED_FDP_LABEL.getLabel()))
+            String.format(DateInputValidator.EMPTY_DATE_ERROR, "an "+ ProjectLocationValidationHint.APPROVED_FDP_LABEL.getLabel()))
         ),
         entry("approvedFdpDate.month", Set.of("")),
         entry("approvedFdpDate.year", Set.of(""))
@@ -106,7 +106,7 @@ public class ProjectLocationFormValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors.size()).isGreaterThan(0);
+    assertThat(fieldErrors.size()).isPositive();
     assertThat(fieldErrors).containsExactly(
         entry("approvedFdpDate.day", Set.of(DateInputValidator.DAY_INVALID_CODE)),
         entry("approvedFdpDate.month", Set.of(DateInputValidator.MONTH_INVALID_CODE)),
@@ -115,7 +115,7 @@ public class ProjectLocationFormValidatorTest {
 
     assertThat(fieldErrorMessages).containsExactly(
         entry("approvedFdpDate.day", Set.of(
-            ProjectLocationFormValidator.APPROVED_FDP_LABEL.getLabel() + DateInputValidator.VALID_DATE_ERROR)
+            ProjectLocationValidationHint.APPROVED_FDP_LABEL.getInitCappedLabel() + DateInputValidator.VALID_DATE_ERROR)
         ),
         entry("approvedFdpDate.month", Set.of("")),
         entry("approvedFdpDate.year", Set.of(""))
@@ -135,7 +135,7 @@ public class ProjectLocationFormValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors.size()).isGreaterThan(0);
+    assertThat(fieldErrors.size()).isPositive();
     assertThat(fieldErrors).contains(
         entry("approvedFdpDate.day", Set.of(DateInputValidator.DAY_INVALID_CODE)),
         entry("approvedFdpDate.month", Set.of(DateInputValidator.MONTH_INVALID_CODE)),
@@ -147,12 +147,12 @@ public class ProjectLocationFormValidatorTest {
 
     assertThat(fieldErrorMessages).contains(
         entry("approvedFdpDate.day", Set.of(
-            String.format(DateInputValidator.EMPTY_DATE_ERROR, "an "+ ProjectLocationFormValidator.APPROVED_FDP_LABEL.getLabel()))
+            String.format(DateInputValidator.EMPTY_DATE_ERROR, "an "+ ProjectLocationValidationHint.APPROVED_FDP_LABEL.getLabel()))
         ),
         entry("approvedFdpDate.month", Set.of("")),
         entry("approvedFdpDate.year", Set.of("")),
         entry("approvedDecomProgramDate.day", Set.of(
-            String.format(DateInputValidator.EMPTY_DATE_ERROR, "an " + ProjectLocationFormValidator.APPROVED_DECOM_LABEL.getLabel()))
+            String.format(DateInputValidator.EMPTY_DATE_ERROR, "an " + ProjectLocationValidationHint.APPROVED_DECOM_LABEL.getLabel()))
         ),
         entry("approvedDecomProgramDate.month", Set.of("")),
         entry("approvedDecomProgramDate.year", Set.of(""))
@@ -173,7 +173,7 @@ public class ProjectLocationFormValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors.size()).isGreaterThan(0);
+    assertThat(fieldErrors.size()).isPositive();
     assertThat(fieldErrors).contains(
         entry("approvedFdpDate.day", Set.of(DateInputValidator.DAY_INVALID_CODE)),
         entry("approvedFdpDate.month", Set.of(DateInputValidator.MONTH_INVALID_CODE)),
@@ -185,11 +185,11 @@ public class ProjectLocationFormValidatorTest {
 
     assertThat(fieldErrorMessages).contains(
         entry("approvedFdpDate.day", Set.of(
-            ProjectLocationFormValidator.APPROVED_FDP_LABEL.getLabel() + DateInputValidator.VALID_DATE_ERROR)),
+            ProjectLocationValidationHint.APPROVED_FDP_LABEL.getInitCappedLabel() + DateInputValidator.VALID_DATE_ERROR)),
         entry("approvedFdpDate.month", Set.of("")),
         entry("approvedFdpDate.year", Set.of("")),
         entry("approvedDecomProgramDate.day", Set.of(
-            ProjectLocationFormValidator.APPROVED_DECOM_LABEL.getLabel() + DateInputValidator.VALID_DATE_ERROR)
+            ProjectLocationValidationHint.APPROVED_DECOM_LABEL.getInitCappedLabel() + DateInputValidator.VALID_DATE_ERROR)
         ),
         entry("approvedDecomProgramDate.month", Set.of("")),
         entry("approvedDecomProgramDate.year", Set.of("")
@@ -218,7 +218,7 @@ public class ProjectLocationFormValidatorTest {
 
     assertThat(fieldErrorMessages).containsExactly(
         entry("approvedFdpDate.day", Set.of(
-            ProjectLocationFormValidator.APPROVED_FDP_LABEL.getLabel() + " must be the same as or before today's date")),
+            ProjectLocationValidationHint.APPROVED_FDP_LABEL.getInitCappedLabel() + " must be the same as or before today's date")),
         entry("approvedFdpDate.month", Set.of("")),
         entry("approvedFdpDate.year", Set.of(""))
     );
@@ -277,7 +277,7 @@ public class ProjectLocationFormValidatorTest {
 
     assertThat(fieldErrorMessages).containsExactly(
         entry("approvedDecomProgramDate.day", Set.of(
-            ProjectLocationFormValidator.APPROVED_DECOM_LABEL.getLabel() + " must be the same as or before today's date")),
+            ProjectLocationValidationHint.APPROVED_DECOM_LABEL.getInitCappedLabel() + " must be the same as or before today's date")),
         entry("approvedDecomProgramDate.month", Set.of("")),
         entry("approvedDecomProgramDate.year", Set.of(""))
     );

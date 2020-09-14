@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.enums.contact;
 
-public enum ContactDetail {
+public enum ServiceContactDetail {
 
   TECHNICAL_SUPPORT(
       "UKOP service desk",
@@ -17,7 +17,7 @@ public enum ContactDetail {
 
   private final String description;
 
-  ContactDetail(String displayName, String emailAddress, String phoneNumber, String description) {
+  ServiceContactDetail(String displayName, String emailAddress, String phoneNumber, String description) {
     this.displayName = displayName;
     this.emailAddress = emailAddress;
     this.phoneNumber = phoneNumber;

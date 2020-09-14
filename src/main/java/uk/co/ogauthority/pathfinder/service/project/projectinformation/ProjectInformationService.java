@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -35,10 +36,13 @@ public class ProjectInformationService {
     projectInformation.setFieldStage(form.getFieldStage());
     projectInformation.setProjectTitle(form.getProjectTitle());
     projectInformation.setProjectSummary(form.getProjectSummary());
-    projectInformation.setContactName(form.getName());
-    projectInformation.setPhoneNumber(form.getPhoneNumber());
-    projectInformation.setJobTitle(form.getJobTitle());
-    projectInformation.setEmailAddress(form.getEmailAddress());
+
+    var contactDetailForm = form.getContactDetail();
+    projectInformation.setContactName(contactDetailForm.getName());
+    projectInformation.setPhoneNumber(contactDetailForm.getPhoneNumber());
+    projectInformation.setJobTitle(contactDetailForm.getJobTitle());
+    projectInformation.setEmailAddress(contactDetailForm.getEmailAddress());
+
     return projectInformationRepository.save(projectInformation);
   }
 
@@ -56,10 +60,7 @@ public class ProjectInformationService {
     form.setFieldStage(projectInformation.getFieldStage());
     form.setProjectTitle(projectInformation.getProjectTitle());
     form.setProjectSummary(projectInformation.getProjectSummary());
-    form.setName(projectInformation.getContactName());
-    form.setPhoneNumber(projectInformation.getPhoneNumber());
-    form.setJobTitle(projectInformation.getJobTitle());
-    form.setEmailAddress(projectInformation.getEmailAddress());
+    form.setContactDetail(new ContactDetailForm(projectInformation));
 
     return form;
   }

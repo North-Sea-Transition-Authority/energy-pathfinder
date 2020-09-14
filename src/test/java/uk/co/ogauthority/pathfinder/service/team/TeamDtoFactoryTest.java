@@ -211,8 +211,9 @@ public class TeamDtoFactoryTest {
             "unknown privilege")
     ));
 
-    assertThat(privs).hasSize(1);
-    assertThat(privs).containsExactly(UserPrivilege.PATHFINDER_WORK_AREA);
+    assertThat(privs)
+        .hasSize(1)
+        .containsExactly(UserPrivilege.PATHFINDER_WORK_AREA);
   }
 
 }

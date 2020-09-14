@@ -13,10 +13,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
 
 @Entity
 @Table(name = "project_information")
-public class ProjectInformation {
+public class ProjectInformation implements ContactDetailCapture {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -108,6 +109,7 @@ public class ProjectInformation {
     this.contactName = contactName;
   }
 
+  @Override
   public String getPhoneNumber() {
     return phoneNumber;
   }
@@ -116,6 +118,7 @@ public class ProjectInformation {
     this.phoneNumber = phoneNumber;
   }
 
+  @Override
   public String getJobTitle() {
     return jobTitle;
   }
@@ -124,6 +127,7 @@ public class ProjectInformation {
     this.jobTitle = jobTitle;
   }
 
+  @Override
   public String getEmailAddress() {
     return emailAddress;
   }
@@ -131,4 +135,10 @@ public class ProjectInformation {
   public void setEmailAddress(String emailAddress) {
     this.emailAddress = emailAddress;
   }
+
+  @Override
+  public String getName() {
+    return getContactName();
+  }
+
 }

@@ -9,8 +9,8 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhin
 
 public final class ProjectLocationValidationHint {
 
-  public static final FormInputLabel APPROVED_FDP_LABEL = new FormInputLabel("Approved Field Development Plan date");
-  public static final FormInputLabel APPROVED_DECOM_LABEL = new FormInputLabel("Approved Decommissioning Program date");
+  public static final FormInputLabel APPROVED_FDP_LABEL = new FormInputLabel("approved Field Development Plan date");
+  public static final FormInputLabel APPROVED_DECOM_LABEL = new FormInputLabel("approved Decommissioning Program date");
 
   private final OnOrBeforeDateHint fdpApprovalDateHint;
   private final OnOrBeforeDateHint decomProgramApprovalDateHint;

@@ -256,7 +256,7 @@ public class TeamManagementService {
    */
   public void removeTeamMember(Person person,
                                Team team,
-                               WebUserAccount actionPerformedBy) throws LastAdministratorException {
+                               WebUserAccount actionPerformedBy) {
 
     if (isPersonMemberOfTeam(person, team)) {
       if (isPersonLastTeamAdmin(team, person)) {
@@ -297,7 +297,9 @@ public class TeamManagementService {
       if (selectableRolesForTeamMappedByName.containsKey(roleName)) {
         selectedRoles.add(selectableRolesForTeamMappedByName.get(roleName));
       } else {
-        LOGGER.error("Form contains roleNames not applicable for team resId: " + team.getId());
+        if (LOGGER.isErrorEnabled()) {
+          LOGGER.error(String.format("Form contains roleNames not applicable for team resId: %s", team.getId()));
+        }
       }
     }
 

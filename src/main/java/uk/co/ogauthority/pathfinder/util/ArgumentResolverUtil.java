@@ -21,6 +21,10 @@ public class ArgumentResolverUtil {
 
   public static final String PROJECT_ID_PARAM = "projectId";
 
+  private ArgumentResolverUtil() {
+    throw new IllegalStateException("ArgumentResolverUtil is a utility class and should not be instantiated");
+  }
+
   private static Map<String, String> getPathVariables(NativeWebRequest nativeWebRequest) {
 
     @SuppressWarnings("unchecked")

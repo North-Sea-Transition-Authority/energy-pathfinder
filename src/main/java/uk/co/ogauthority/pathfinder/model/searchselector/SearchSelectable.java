@@ -6,8 +6,6 @@ package uk.co.ogauthority.pathfinder.model.searchselector;
  */
 public interface SearchSelectable {
 
-  String FREE_TEXT_PREFIX = "FT_";
-
   String getSelectionId();
 
   String getSelectionText();

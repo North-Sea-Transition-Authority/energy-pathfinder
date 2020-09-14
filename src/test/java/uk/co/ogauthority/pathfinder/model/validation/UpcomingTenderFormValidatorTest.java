@@ -88,7 +88,7 @@ public class UpcomingTenderFormValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors.size()).isGreaterThan(0);
+    assertThat(fieldErrors.size()).isPositive();
     assertThat(fieldErrors).contains(
         entry("estimatedTenderDate.day", Set.of(DateInputValidator.DAY_AFTER_DATE_CODE)),
         entry("estimatedTenderDate.month", Set.of(DateInputValidator.MONTH_AFTER_DATE_CODE)),
@@ -97,7 +97,7 @@ public class UpcomingTenderFormValidatorTest {
 
     assertThat(fieldErrorMessages).contains(
         entry("estimatedTenderDate.day", Set.of(
-            UpcomingTenderFormValidator.ESTIMATED_TENDER_LABEL.getLabel() + " must be after " + UpcomingTenderFormValidator.DATE_ERROR_LABEL)
+            UpcomingTenderFormValidator.ESTIMATED_TENDER_LABEL.getInitCappedLabel() + " must be after " + UpcomingTenderFormValidator.DATE_ERROR_LABEL)
         ),
         entry("estimatedTenderDate.month", Set.of("")),
         entry("estimatedTenderDate.year", Set.of(""))

@@ -1,10 +1,32 @@
 <#include '../../layout.ftl'>
 
-<#macro contactDetails legendHeading="Contact details">
-    <@fdsFieldset.fieldset legendHeading=legendHeading legendHeadingSize="h2" >
-        <@fdsTextInput.textInput path="form.name" labelText="Name"/>
-        <@fdsTextInput.textInput path="form.phoneNumber" labelText="Telephone number" hintText="Enter a UK telephone or mobile number"/>
-        <@fdsTextInput.textInput path="form.jobTitle" labelText="Job title"/>
-        <@fdsTextInput.textInput path="form.emailAddress" labelText="Email address"/>
-    </@fdsFieldset.fieldset>
+<#macro standardContactDetails path legendHeading="Contact details">
+  <@customContactDetails
+    namePath="${path + '.name'}"
+    phoneNumberPath="${path + '.phoneNumber'}"
+    jobTitlePath="${path + '.jobTitle'}"
+    emailAddressPath="${path + '.emailAddress'}"
+    legendHeading=legendHeading
+  />
+</#macro>
+
+<#macro
+  customContactDetails
+  namePath
+  phoneNumberPath
+  jobTitlePath
+  emailAddressPath
+  legendHeading="Contact details"
+  legendHeadingSize="h2"
+  nameLabelText="Name"
+  phoneNumberLabelText="Telephone number"
+  jobTitleLabelText="Job title"
+  emailAddressLabelText="Email address"
+>
+  <@fdsFieldset.fieldset legendHeading=legendHeading legendHeadingSize=legendHeadingSize>
+    <@fdsTextInput.textInput path=namePath labelText=nameLabelText/>
+    <@fdsTextInput.textInput path=phoneNumberPath labelText=phoneNumberLabelText hintText="Enter a UK telephone or mobile number"/>
+    <@fdsTextInput.textInput path=jobTitlePath labelText=jobTitleLabelText/>
+    <@fdsTextInput.textInput path=emailAddressPath labelText=emailAddressLabelText/>
+  </@fdsFieldset.fieldset>
 </#macro>
