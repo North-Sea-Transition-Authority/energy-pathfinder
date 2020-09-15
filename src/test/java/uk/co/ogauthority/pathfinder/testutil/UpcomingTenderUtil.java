@@ -1,11 +1,15 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
 import java.time.LocalDate;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
+import uk.co.ogauthority.pathfinder.model.view.UpcomingTenderView;
+import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class UpcomingTenderUtil {
   public static final Function TENDER_FUNCTION = Function.DRILLING;
@@ -17,6 +21,10 @@ public class UpcomingTenderUtil {
   public static final String PHONE_NUMBER = ContactDetailsUtil.PHONE_NUMBER;
   public static final String JOB_TITLE = ContactDetailsUtil.JOB_TITLE;
   public static final String EMAIL = ContactDetailsUtil.EMAIL;
+
+  public static final Integer DISPLAY_ORDER = 1;
+  public static final Integer ID = 1;
+  public static final Integer PROJECT_ID = 1;
 
 
   public static UpcomingTenderForm getCompleteForm() {
@@ -31,6 +39,48 @@ public class UpcomingTenderUtil {
     form.setTenderFunction(MANUAL_TENDER_FUNCTION);
     setUpcomingTenderFields(form);
     return form;
+  }
+
+
+  public static UpcomingTender getUpcomingTender(ProjectDetail detail) {
+    var tender = new UpcomingTender(detail);
+    tender.setTenderFunction(TENDER_FUNCTION);
+    setUpcomingTenderFields(tender);
+    return tender;
+  }
+
+  public static UpcomingTender getUpcomingTender_manualEntry(ProjectDetail detail) {
+    var tender = new UpcomingTender(detail);
+    tender.setManualTenderFunction(MANUAL_TENDER_FUNCTION);
+    setUpcomingTenderFields(tender);
+    return tender;
+  }
+
+  public static UpcomingTenderView getView(Integer displayOrder, boolean isValid) {
+    var view = new UpcomingTenderView(
+        displayOrder,
+        ID,
+        PROJECT_ID
+    );
+    view.setIsValid(isValid);
+    view.setTenderFunction(TENDER_FUNCTION.getDisplayName());
+    view.setEstimatedTenderDate(DateUtil.formatDate(ESTIMATED_TENDER_DATE));
+    view.setContractBand(CONTRACT_BAND.getDisplayName());
+    view.setContactName(CONTACT_NAME);
+    view.setPhoneNumber(PHONE_NUMBER);
+    view.setJobTitle(JOB_TITLE);
+    view.setEmailAddress(EMAIL);
+    return view;
+  }
+
+  private static void setUpcomingTenderFields(UpcomingTender tender) {
+    tender.setDescriptionOfWork(DESCRIPTION_OF_WORK);
+    tender.setEstimatedTenderDate(ESTIMATED_TENDER_DATE);
+    tender.setContractBand(CONTRACT_BAND);
+    tender.setContactName(CONTACT_NAME);
+    tender.setPhoneNumber(PHONE_NUMBER);
+    tender.setJobTitle(JOB_TITLE);
+    tender.setEmailAddress(EMAIL);
   }
 
   private static void setUpcomingTenderFields(UpcomingTenderForm form) {

@@ -15,50 +15,52 @@
       </#if>
     </#if>
 
-    <#if view.getTenderFunction()?has_content>
       <@fdsCheckAnswers.checkAnswersRow keyText="Tender function" actionText="" actionUrl="" screenReaderActionText="">
+        <#if view.getTenderFunction()?has_content>
           ${view.getTenderFunction()}
+        </#if>
       </@fdsCheckAnswers.checkAnswersRow>
-    </#if>
 
-    <#if view.getDescriptionOfWork()?has_content>
       <@fdsCheckAnswers.checkAnswersRow keyText="Description of work" actionText="" actionUrl="" screenReaderActionText="">
+        <#if view.getDescriptionOfWork()?has_content>
           ${view.getDescriptionOfWork()}
+        </#if>
       </@fdsCheckAnswers.checkAnswersRow>
-    </#if>
 
-    <#if view.getEstimatedTenderDate()?has_content>
       <@fdsCheckAnswers.checkAnswersRow keyText="Estimated tender date" actionText="" actionUrl="" screenReaderActionText="">
+        <#if view.getEstimatedTenderDate()?has_content>
           ${view.getEstimatedTenderDate()}
+        </#if>
       </@fdsCheckAnswers.checkAnswersRow>
-    </#if>
 
-    <#if view.getContractBand()?has_content>
       <@fdsCheckAnswers.checkAnswersRow keyText="Contract band" actionText="" actionUrl="" screenReaderActionText="">
+        <#if view.getContractBand()?has_content>
           ${view.getContractBand()}
+        </#if>
       </@fdsCheckAnswers.checkAnswersRow>
-    </#if>
 
-    <#if view.getContactName()?has_content>
       <@fdsCheckAnswers.checkAnswersRow keyText="Name" actionText="" actionUrl="" screenReaderActionText="">
+        <#if view.getContactName()?has_content>
           ${view.getContactName()}
+        </#if>
       </@fdsCheckAnswers.checkAnswersRow>
-    </#if>
-    <#if view.getPhoneNumber()?has_content>
-      <@fdsCheckAnswers.checkAnswersRow keyText="Phone number" actionText="" actionUrl="" screenReaderActionText="">
-          ${view.getPhoneNumber()}
-      </@fdsCheckAnswers.checkAnswersRow>
-    </#if>
-    <#if view.getJobTitle()?has_content >
-      <@fdsCheckAnswers.checkAnswersRow keyText="Job title" actionText="" actionUrl="" screenReaderActionText="">
-          ${view.getJobTitle()}
-      </@fdsCheckAnswers.checkAnswersRow>
-    </#if>
 
-    <#if view.getEmailAddress()?has_content >
-      <@fdsCheckAnswers.checkAnswersRow keyText="Email address" actionText="" actionUrl="" screenReaderActionText="">
-          ${view.getEmailAddress()}
+      <@fdsCheckAnswers.checkAnswersRow keyText="Phone number" actionText="" actionUrl="" screenReaderActionText="">
+        <#if view.getPhoneNumber()?has_content>
+          ${view.getPhoneNumber()}
+        </#if>
       </@fdsCheckAnswers.checkAnswersRow>
-    </#if>
+
+      <@fdsCheckAnswers.checkAnswersRow keyText="Job title" actionText="" actionUrl="" screenReaderActionText="">
+        <#if view.getJobTitle()?has_content >
+          ${view.getJobTitle()}
+        </#if>
+      </@fdsCheckAnswers.checkAnswersRow>
+
+      <@fdsCheckAnswers.checkAnswersRow keyText="Email address" actionText="" actionUrl="" screenReaderActionText="">
+        <#if view.getEmailAddress()?has_content >
+          ${view.getEmailAddress()}
+        </#if>
+      </@fdsCheckAnswers.checkAnswersRow>
   </@fdsCheckAnswers.checkAnswers>
 </#macro>

@@ -29,6 +29,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -37,6 +38,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderSummaryService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
@@ -44,6 +46,8 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 public class UpcomingTenderControllerTest extends ProjectContextAbstractControllerTest {
 
   private static final Integer PROJECT_ID = 1;
+  private static final Integer UPCOMING_TENDER_ID = 1;
+  private static final Integer DISPLAY_ORDER = 1;
 
   @MockBean
   private UpcomingTenderService upcomingTenderService;
@@ -59,9 +63,13 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
   private static final AuthenticatedUserAccount unAuthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
+  private final UpcomingTender upcomingTender = UpcomingTenderUtil.getUpcomingTender(detail);
+
   @Before
   public void setUp() throws Exception {
     when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(detail));
+    when(upcomingTenderService.getOrError(UPCOMING_TENDER_ID)).thenReturn(upcomingTender);
+    when(upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, DISPLAY_ORDER)).thenCallRealMethod();
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(false);
   }
@@ -95,6 +103,39 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
   public void unAuthenticatedUser_cannotAccessUpcomingTenderSummary() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
         on(UpcomingTendersController.class).viewTenders(PROJECT_ID, null)))
+        .with(authenticatedUserAndSession(unAuthenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void authenticatedUser_hasAccessToUpcomingTenderDelete() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(UpcomingTendersController.class).deleteUpcomingTenderConfirm(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  public void unAuthenticatedUser_cannotAccessUpcomingTenderDelete() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(UpcomingTendersController.class).deleteUpcomingTenderConfirm(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)))
+        .with(authenticatedUserAndSession(unAuthenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void authenticatedUser_hasAccessToUpcomingTenderEdit() throws Exception {
+    when(upcomingTenderService.getForm(upcomingTender)).thenCallRealMethod();
+    mockMvc.perform(get(ReverseRouter.route(
+        on(UpcomingTendersController.class).editUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, null)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  public void unAuthenticatedUser_cannotAccessUpcomingTenderEdit() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(UpcomingTendersController.class).editUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -164,5 +205,72 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
     verify(upcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
     verify(upcomingTenderService, times(1)).createUpcomingTender(any(), any());
+  }
+
+  @Test
+  public void updateUpcomingTender_partialValidation() throws Exception {
+    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
+    }};
+
+    var bindingResult = new BeanPropertyBindingResult(UpcomingTenderForm.class, "form");
+    when(upcomingTenderService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(UpcomingTendersController.class)
+            .updateUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, null, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeLaterParams))
+        .andExpect(status().is3xxRedirection());
+
+    verify(upcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(upcomingTenderService, times(1)).updateUpcomingTender(any(), any());
+  }
+
+  @Test
+  public void updateUpcomingTender_fullValidation_invalid() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    var bindingResult = new BeanPropertyBindingResult(UpcomingTenderForm.class, "form");
+    bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
+    when(upcomingTenderService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(UpcomingTendersController.class)
+            .updateUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, null, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().is2xxSuccessful());
+
+    verify(upcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(upcomingTenderService, times(0)).updateUpcomingTender(any(), any());
+  }
+
+  @Test
+  public void updateUpcomingTender_fullValidation_valid() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    var bindingResult = new BeanPropertyBindingResult(UpcomingTenderForm.class, "form");
+    when(upcomingTenderService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(UpcomingTendersController.class)
+            .updateUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, null, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().is3xxRedirection());
+
+    verify(upcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(upcomingTenderService, times(1)).updateUpcomingTender(any(), any());
   }
 }
