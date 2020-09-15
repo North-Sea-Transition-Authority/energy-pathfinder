@@ -51,7 +51,6 @@ public class UpcomingTenderService {
   @Transactional
   public UpcomingTender createUpcomingTender(ProjectDetail detail, UpcomingTenderForm form) {
     var upcomingTender = new UpcomingTender(detail);
-
     setCommonFields(upcomingTender, form);
     return upcomingTenderRepository.save(upcomingTender);
   }

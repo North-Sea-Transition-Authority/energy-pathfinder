@@ -35,6 +35,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
+import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderSummaryService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -46,6 +47,9 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
   @MockBean
   private UpcomingTenderService upcomingTenderService;
+
+  @MockBean
+  private UpcomingTenderSummaryService upcomingTenderSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
