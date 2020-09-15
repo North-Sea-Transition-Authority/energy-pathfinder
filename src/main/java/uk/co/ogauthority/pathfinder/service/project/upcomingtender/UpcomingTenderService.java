@@ -112,6 +112,11 @@ public class UpcomingTenderService {
     return !bindingResult.hasErrors();
   }
 
+  public boolean isComplete(ProjectDetail detail) {
+    return getUpcomingTendersForDetail(detail).stream()
+        .noneMatch(ut -> !isValid(ut, ValidationType.FULL));
+  }
+
   public UpcomingTenderForm getForm(UpcomingTender upcomingTender) {
     var form = new UpcomingTenderForm();
 

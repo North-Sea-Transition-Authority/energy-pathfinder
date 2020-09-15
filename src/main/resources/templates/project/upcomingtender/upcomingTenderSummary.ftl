@@ -3,12 +3,16 @@
 <#macro upcomingTenderSummary view tenderName="Upcoming tender" showValidationAndActions=false>
   <@fdsCheckAnswers.checkAnswers >
     <#if showValidationAndActions>
+      <div class="summary-list__actions">
+        <@fdsAction.link linkText=view.getEditLink().getLinkText() linkUrl=springUrl(view.getEditLink().url) linkScreenReaderText=tenderName />
+        <@fdsAction.link linkText=view.getDeleteLink().getLinkText() linkUrl=springUrl(view.getDeleteLink().url) linkScreenReaderText=tenderName />
+      </div>
       <#if view.isValid()?has_content && !view.isValid()>
-        <span class="govuk-error-message">
-        <span class="govuk-visually-hidden">Error:</span>${tenderName} is incomplete</span>
+        <#assign errorId = "upcoming-tender-" + view.getDisplayOrder()/>
+        <span class="govuk-error-message" id=${errorId} >
+          <span class="govuk-visually-hidden">Error:</span>${tenderName} is incomplete
+        </span>
       </#if>
-      <@fdsAction.link linkText=view.getEditLink().getLinkText() linkUrl=springUrl(view.getEditLink().url) linkScreenReaderText=tenderName />
-      <@fdsAction.link linkText=view.getDeleteLink().getLinkText() linkUrl=springUrl(view.getDeleteLink().url) linkScreenReaderText=tenderName />
     </#if>
 
     <#if view.getTenderFunction()?has_content>

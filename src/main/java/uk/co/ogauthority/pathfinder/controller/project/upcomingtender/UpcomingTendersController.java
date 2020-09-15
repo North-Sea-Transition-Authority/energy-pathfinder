@@ -180,6 +180,11 @@ public class UpcomingTendersController {
         .addObject("addTenderUrl", ReverseRouter.route(on(UpcomingTendersController.class).addUpcomingTender(projectId, null)))
         .addObject("tenderViews", tenderViews)
         .addObject("isValid", validationResult.equals(ValidationResult.VALID))
+        .addObject("errorSummary",
+            validationResult.equals(ValidationResult.INVALID)
+              ? upcomingTenderSummaryService.getErrors(tenderViews)
+              : null
+        )
         .addObject("backToTaskListUrl", ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId, null)));
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;
