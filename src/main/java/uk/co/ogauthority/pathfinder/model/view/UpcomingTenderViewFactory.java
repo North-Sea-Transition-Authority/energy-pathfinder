@@ -9,6 +9,10 @@ import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class UpcomingTenderViewFactory {
 
+  public UpcomingTenderViewFactory() {
+    throw new IllegalStateException("UpcomingTenderViewFactory is a utility class and should not be instantiated");
+  }
+
   public static UpcomingTenderView createUpComingTenderView(UpcomingTender upcomingTender, Integer displayOrder) {
     var projectId = upcomingTender.getProjectDetail().getProject().getId();
     var tender = new UpcomingTenderView(
@@ -27,7 +31,7 @@ public class UpcomingTenderViewFactory {
     tender.setContractBand(
         upcomingTender.getContractBand() != null
           ? upcomingTender.getContractBand().getDisplayName()
-          : ""
+          : null
     );
     tender.setContactName(upcomingTender.getContactName());
     tender.setPhoneNumber(upcomingTender.getPhoneNumber());

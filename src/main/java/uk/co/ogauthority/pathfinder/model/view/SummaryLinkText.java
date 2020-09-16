@@ -2,7 +2,7 @@ package uk.co.ogauthority.pathfinder.model.view;
 
 public enum SummaryLinkText {
   EDIT("Change"),
-  DELETE("Delete");
+  DELETE("Remove");
 
   private final String displayName;
 
