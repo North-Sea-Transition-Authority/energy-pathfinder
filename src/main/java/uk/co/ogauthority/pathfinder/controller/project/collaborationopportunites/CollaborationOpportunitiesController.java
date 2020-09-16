@@ -58,17 +58,17 @@ public class CollaborationOpportunitiesController {
 
   @GetMapping("/collaboration-opportunity")
   public ModelAndView addCollaborationOpportunity(@PathVariable("projectId") Integer projectId,
-                                        ProjectContext projectContext) {
+                                                  ProjectContext projectContext) {
     return getCollaborationOpportunityModelAndView(projectId, new CollaborationOpportunityForm());
   }
 
 
   @PostMapping("/collaboration-opportunity")
   public ModelAndView saveCollaborationOpportunity(@PathVariable("projectId") Integer projectId,
-                                         @Valid @ModelAttribute("form") CollaborationOpportunityForm form,
-                                         BindingResult bindingResult,
-                                         ValidationType validationType,
-                                         ProjectContext projectContext) {
+                                                   @Valid @ModelAttribute("form") CollaborationOpportunityForm form,
+                                                   BindingResult bindingResult,
+                                                   ValidationType validationType,
+                                                   ProjectContext projectContext) {
     bindingResult = collaborationOpportunitiesService.validate(form, bindingResult, validationType);
 
     return controllerHelperService.checkErrorsAndRedirect(
@@ -95,10 +95,14 @@ public class CollaborationOpportunitiesController {
 
   private ModelAndView getCollaborationOpportunityModelAndView(Integer projectId, CollaborationOpportunityForm form) {
     var modelAndView = new ModelAndView("project/collaborationopportunities/collaborationOpportunity")
-        .addObject("tenderRestUrl", SearchSelectorService.route(on(CollaborationOpportunityRestController.class).searchFunctions(null)))
+        .addObject(
+            "collaborationFunctionRestUrl",
+            SearchSelectorService.route(on(CollaborationOpportunityRestController.class).searchFunctions(null))
+        )
         .addObject("form", form)
+        .addObject("preselectedCollaboration", collaborationOpportunitiesService.getPreSelectedCollaborationFunction(form))
         .addObject("contractBands", ContractBand.getAllAsMap());
-    breadcrumbService.fromUpcomingTenders(projectId, modelAndView, PAGE_NAME_SINGULAR);
+    breadcrumbService.fromCollaborationOpportunities(projectId, modelAndView, PAGE_NAME_SINGULAR);
     return modelAndView;
   }
 }

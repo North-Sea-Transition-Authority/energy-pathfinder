@@ -1,6 +1,8 @@
 package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,5 +80,25 @@ public class CollaborationOpportunitiesService {
 
   public List<RestSearchItem> findFunctionsLikeWithManualEntry(String searchTerm) {
     return functionService.findFunctionsLikeWithManualEntry(searchTerm, FunctionType.COLLABORATION_OPPORTUNITY);
+  }
+
+  public Map<String, String> getPreSelectedCollaborationFunction(CollaborationOpportunityForm form) {
+
+    Map<String, String> preSelectedMap = Map.of();
+    var function = form.getFunction();
+
+    if (function != null) {
+      return SearchSelectorService.isManualEntry(form.getFunction())
+        ? searchSelectorService.buildPrePopulatedSelections(
+            Collections.singletonList(form.getFunction()),
+            Map.of(form.getFunction(), form.getFunction())
+          )
+        : searchSelectorService.buildPrePopulatedSelections(
+            Collections.singletonList(form.getFunction()),
+            Map.of(form.getFunction(), Function.valueOf(form.getFunction()).getDisplayName())
+          );
+    }
+
+    return preSelectedMap;
   }
 }

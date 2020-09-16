@@ -6,7 +6,7 @@
     </#if>
 
     <@fdsForm.htmlForm>
-        <@fdsSearchSelector.searchSelectorRest path="form.function" selectorMinInputLength=0 labelText="What function is the collaboration opportunity for?" restUrl=springUrl(tenderRestUrl)  preselectedItems=preselectedTender!{} />
+        <@fdsSearchSelector.searchSelectorRest path="form.function" selectorMinInputLength=0 labelText="What function is the collaboration opportunity for?" restUrl=springUrl(collaborationFunctionRestUrl)  preselectedItems=preselectedCollaboration!{} />
         <@fdsTextarea.textarea path="form.descriptionOfWork" labelText="Provide a detailed description of the work"/>
         <@fdsDateInput.dateInput
           dayPath="form.estimatedServiceDate.day"
