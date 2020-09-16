@@ -115,35 +115,39 @@ public class CollaborationOpportunity implements ContactDetailCapture {
     return contactName;
   }
 
-  public String getName() {
-    return contactName;
-  }
-
   public void setContactName(String contactName) {
     this.contactName = contactName;
-  }
-
-  public String getPhoneNumber() {
-    return phoneNumber;
   }
 
   public void setPhoneNumber(String phoneNumber) {
     this.phoneNumber = phoneNumber;
   }
 
-  public String getJobTitle() {
-    return jobTitle;
-  }
-
   public void setJobTitle(String jobTitle) {
     this.jobTitle = jobTitle;
   }
 
-  public String getEmailAddress() {
-    return emailAddress;
-  }
-
   public void setEmailAddress(String emailAddress) {
     this.emailAddress = emailAddress;
+  }
+
+  @Override
+  public String getName() {
+    return contactName;
+  }
+
+  @Override
+  public String getPhoneNumber() {
+    return phoneNumber;
+  }
+
+  @Override
+  public String getJobTitle() {
+    return jobTitle;
+  }
+
+  @Override
+  public String getEmailAddress() {
+    return emailAddress;
   }
 }
