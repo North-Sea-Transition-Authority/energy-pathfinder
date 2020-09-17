@@ -25,7 +25,7 @@
 >
   <@fdsFieldset.fieldset legendHeading=legendHeading legendHeadingSize=legendHeadingSize>
     <@fdsTextInput.textInput path=namePath labelText=nameLabelText/>
-    <@fdsTextInput.textInput path=phoneNumberPath labelText=phoneNumberLabelText hintText="Enter a UK telephone or mobile number"/>
+    <@fdsTextInput.textInput path=phoneNumberPath labelText=phoneNumberLabelText hintText="Enter a telephone or mobile number, if entering an international number provide the country code"/>
     <@fdsTextInput.textInput path=jobTitlePath labelText=jobTitleLabelText/>
     <@fdsTextInput.textInput path=emailAddressPath labelText=emailAddressLabelText/>
   </@fdsFieldset.fieldset>
