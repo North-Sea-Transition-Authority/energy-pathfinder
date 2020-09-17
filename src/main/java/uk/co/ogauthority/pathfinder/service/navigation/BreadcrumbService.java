@@ -9,6 +9,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
+import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
@@ -23,6 +24,17 @@ public class BreadcrumbService {
     var map = taskList(projectId);
     String route = ReverseRouter.route(on(UpcomingTendersController.class).viewTenders(projectId, null));
     map.put(route, UpcomingTendersController.PAGE_NAME);
+    return map;
+  }
+
+  public void fromCollaborationOpportunities(Integer projectId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, collaborationOpportunities(projectId), thisPage);
+  }
+
+  private Map<String, String> collaborationOpportunities(Integer projectId) {
+    var map = taskList(projectId);
+    String route = ReverseRouter.route(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null));
+    map.put(route, CollaborationOpportunitiesController.PAGE_NAME);
     return map;
   }
 

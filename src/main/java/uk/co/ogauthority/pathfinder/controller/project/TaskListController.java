@@ -11,6 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
+import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationController;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
 import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProjectOperatorController;
@@ -87,6 +88,11 @@ public class TaskListController {
         ReverseRouter.route(on(AwardedContractController.class).viewAwardedContracts(projectId, null))
     );
     modelAndView.addObject("awardedContractsText", AwardedContractController.PAGE_NAME);
+
+    modelAndView.addObject("collaborationOpportunitiesUrl",
+        ReverseRouter.route(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null))
+    );
+    modelAndView.addObject("collaborationOpportunitiesText", CollaborationOpportunitiesController.PAGE_NAME);
 
     return modelAndView;
   }
