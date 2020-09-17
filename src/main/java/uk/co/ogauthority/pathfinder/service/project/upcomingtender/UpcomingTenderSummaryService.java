@@ -10,7 +10,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.Upcoming
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.model.view.UpcomingTenderView;
-import uk.co.ogauthority.pathfinder.model.view.UpcomingTenderViewFactory;
+import uk.co.ogauthority.pathfinder.model.view.UpcomingTenderViewUtil;
 
 @Service
 public class UpcomingTenderSummaryService {
@@ -39,7 +39,7 @@ public class UpcomingTenderSummaryService {
   }
 
   public UpcomingTenderView getUpcomingTenderView(UpcomingTender upcomingTender, Integer displayOrder) {
-    return UpcomingTenderViewFactory.createUpComingTenderView(upcomingTender, displayOrder);
+    return UpcomingTenderViewUtil.createUpComingTenderView(upcomingTender, displayOrder);
   }
 
   public List<ErrorItem> getErrors(List<UpcomingTenderView> views) {
@@ -64,8 +64,8 @@ public class UpcomingTenderSummaryService {
       var displayOrder = i + 1;
 
       views.add(validationType.equals(ValidationType.NO_VALIDATION)
-          ? UpcomingTenderViewFactory.createUpComingTenderView(upcomingTenders.get(i), displayOrder)
-          : UpcomingTenderViewFactory.createUpComingTenderView(
+          ? UpcomingTenderViewUtil.createUpComingTenderView(upcomingTenders.get(i), displayOrder)
+          : UpcomingTenderViewUtil.createUpComingTenderView(
               upcomingTenders.get(i),
               displayOrder,
               upcomingTenderService.isValid(upcomingTenders.get(i), validationType))

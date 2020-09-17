@@ -7,9 +7,9 @@ import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.Upcoming
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
-public class UpcomingTenderViewFactory {
+public class UpcomingTenderViewUtil {
 
-  public UpcomingTenderViewFactory() {
+  public UpcomingTenderViewUtil() {
     throw new IllegalStateException("UpcomingTenderViewFactory is a utility class and should not be instantiated");
   }
 
