@@ -42,6 +42,8 @@ public class UpcomingTenderServiceTest {
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
 
+  private final UpcomingTender upcomingTender = UpcomingTenderUtil.getUpcomingTender(details);
+
   @Before
   public void setUp() {
 
@@ -79,6 +81,44 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
+  public void updateUpcomingTender() {
+    var form = UpcomingTenderUtil.getCompleteForm();
+    form.setTenderFunction(Function.DRILLING.name());
+    var existingUpcomingTender = upcomingTender;
+    upcomingTenderService.updateUpcomingTender(existingUpcomingTender, form);
+    assertThat(existingUpcomingTender.getProjectDetail()).isEqualTo(details);
+    assertThat(existingUpcomingTender.getTenderFunction()).isEqualTo(Function.DRILLING);
+    checkCommonFields(form, existingUpcomingTender);
+  }
+
+  @Test
+  public void updateUpcomingTender_manualFunction() {
+    var form = UpcomingTenderUtil.getCompleteForm();
+    form.setTenderFunction(null);
+    form.setTenderFunction(UpcomingTenderUtil.MANUAL_TENDER_FUNCTION);
+    var existingUpcomingTender = upcomingTender;
+    upcomingTenderService.updateUpcomingTender(existingUpcomingTender, form);
+    assertThat(existingUpcomingTender.getProjectDetail()).isEqualTo(details);
+    assertThat(existingUpcomingTender.getManualTenderFunction()).isEqualTo(SearchSelectorService.removePrefix(UpcomingTenderUtil.MANUAL_TENDER_FUNCTION));
+    checkCommonFields(form, existingUpcomingTender);
+  }
+
+  @Test
+  public void getForm() {
+    var form = upcomingTenderService.getForm(upcomingTender);
+    assertThat(form.getTenderFunction()).isEqualTo(upcomingTender.getTenderFunction().name());
+    checkCommonFormFields(form, upcomingTender);
+  }
+
+  @Test
+  public void getForm_manualEntry() {
+    var manualEntryTender = UpcomingTenderUtil.getUpcomingTender_manualEntry(details);
+    var form = upcomingTenderService.getForm(manualEntryTender);
+    assertThat(form.getTenderFunction()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(manualEntryTender.getManualTenderFunction()));
+    checkCommonFormFields(form, upcomingTender);
+  }
+
+  @Test
   public void validate_partial() {
     var form = new UpcomingTenderForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
@@ -113,6 +153,16 @@ public class UpcomingTenderServiceTest {
     assertThat(newUpcomingTender.getPhoneNumber()).isEqualTo(UpcomingTenderUtil.PHONE_NUMBER);
     assertThat(newUpcomingTender.getJobTitle()).isEqualTo(UpcomingTenderUtil.JOB_TITLE);
     assertThat(newUpcomingTender.getEmailAddress()).isEqualTo(UpcomingTenderUtil.EMAIL);
+  }
+
+  private void checkCommonFormFields(UpcomingTenderForm form, UpcomingTender upcomingTender) {
+    assertThat(form.getDescriptionOfWork()).isEqualTo(upcomingTender.getDescriptionOfWork());
+    assertThat(form.getEstimatedTenderDate().createDateOrNull()).isEqualTo(upcomingTender.getEstimatedTenderDate());
+    assertThat(form.getContractBand()).isEqualTo(upcomingTender.getContractBand());
+    assertThat(form.getContactDetail().getName()).isEqualTo(upcomingTender.getContactName());
+    assertThat(form.getContactDetail().getPhoneNumber()).isEqualTo(upcomingTender.getPhoneNumber());
+    assertThat(form.getContactDetail().getJobTitle()).isEqualTo(upcomingTender.getJobTitle());
+    assertThat(form.getContactDetail().getEmailAddress()).isEqualTo(upcomingTender.getEmailAddress());
   }
 
   @Test

@@ -107,7 +107,7 @@ public class AwardedContractService {
     awardedContract.setContractorName(form.getContractorName());
 
     if (SearchSelectorService.isManualEntry(form.getContractFunction())) {
-      awardedContract.setManualContractFunction(searchSelectorService.removePrefix(form.getContractFunction()));
+      awardedContract.setManualContractFunction(SearchSelectorService.removePrefix(form.getContractFunction()));
     } else if (form.getContractFunction() != null) {
       awardedContract.setContractFunction(Function.valueOf(form.getContractFunction()));
     } else {

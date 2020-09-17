@@ -48,7 +48,7 @@ public class ProjectLocationService {
     var projectLocation = findByProjectDetail(detail).orElse(new ProjectLocation(detail));
 
     if (SearchSelectorService.isManualEntry(form.getField())) {
-      projectLocation.setManualFieldName(searchSelectorService.removePrefix(form.getField()));
+      projectLocation.setManualFieldName(SearchSelectorService.removePrefix(form.getField()));
       projectLocation.setField(null);
     } else if (form.getField() != null) {
       projectLocation.setField(fieldService.findById(Integer.parseInt(form.getField())));

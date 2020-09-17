@@ -6,7 +6,7 @@
   </#if>
 
   <@fdsForm.htmlForm>
-    <@fdsSearchSelector.searchSelectorRest path="form.tenderFunction" selectorMinInputLength=0 labelText="What function is the tender for?" restUrl=springUrl(tenderRestUrl)  preselectedItems=preselectedTender!{} />
+    <@fdsSearchSelector.searchSelectorRest path="form.tenderFunction" selectorMinInputLength=0 labelText="What function is the tender for?" restUrl=springUrl(tenderRestUrl)  preselectedItems=preSelectedFunction!{} />
     <@fdsTextarea.textarea path="form.descriptionOfWork" labelText="Provide a detailed description of the work"/>
     <@fdsDateInput.dateInput
       dayPath="form.estimatedTenderDate.day"

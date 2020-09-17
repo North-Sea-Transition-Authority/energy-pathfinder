@@ -63,8 +63,6 @@ public class ProjectLocationServiceTest {
 
     when(projectLocationRepository.save(any(ProjectLocation.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
-
-    when(searchSelectorService.removePrefix(any())).thenCallRealMethod();
   }
 
   @Test
@@ -215,7 +213,6 @@ public class ProjectLocationServiceTest {
   @Test
   public void getPreSelectedLocation_manualEntry() {
     when(searchSelectorService.buildPrePopulatedSelections(any(), any())).thenCallRealMethod();
-    when(searchSelectorService.removePrefix(any())).thenCallRealMethod();
     var form = ProjectLocationUtil.getCompletedForm_manualField();
     var preSelectedLocation = projectLocationService.getPreSelectedField(form);
     assertThat(preSelectedLocation).containsOnly(

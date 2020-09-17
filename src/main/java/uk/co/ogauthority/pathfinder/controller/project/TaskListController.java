@@ -22,6 +22,7 @@ import uk.co.ogauthority.pathfinder.service.project.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
+import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
@@ -32,17 +33,20 @@ public class TaskListController {
   private final ProjectInformationService projectInformationService;
   private final ProjectLocationService projectLocationService;
   private final SelectOperatorService selectOperatorService;
+  private final UpcomingTenderService upcomingTenderService;
   private final BreadcrumbService breadcrumbService;
 
   @Autowired
   public TaskListController(ProjectInformationService projectInformationService,
                             BreadcrumbService breadcrumbService,
                             ProjectLocationService projectLocationService,
-                            SelectOperatorService selectOperatorService) {
+                            SelectOperatorService selectOperatorService,
+                            UpcomingTenderService upcomingTenderService) {
     this.projectInformationService = projectInformationService;
     this.breadcrumbService = breadcrumbService;
     this.projectLocationService = projectLocationService;
     this.selectOperatorService = selectOperatorService;
+    this.upcomingTenderService = upcomingTenderService;
   }
 
   @GetMapping
@@ -76,6 +80,8 @@ public class TaskListController {
         ReverseRouter.route(on(UpcomingTendersController.class).viewTenders(projectId, null))
     );
     modelAndView.addObject("upcomingTendersText", UpcomingTendersController.PAGE_NAME);
+    modelAndView.addObject("upcomingTendersCompleted", upcomingTenderService.isComplete(
+        projectContext.getProjectDetails()));
 
     modelAndView.addObject("awardedContractsUrl",
         ReverseRouter.route(on(AwardedContractController.class).viewAwardedContracts(projectId, null))
