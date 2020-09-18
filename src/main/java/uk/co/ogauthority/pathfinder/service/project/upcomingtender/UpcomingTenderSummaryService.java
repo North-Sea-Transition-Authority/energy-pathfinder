@@ -9,8 +9,8 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
-import uk.co.ogauthority.pathfinder.model.view.UpcomingTenderView;
-import uk.co.ogauthority.pathfinder.model.view.UpcomingTenderViewUtil;
+import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
+import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderViewUtil;
 
 @Service
 public class UpcomingTenderSummaryService {

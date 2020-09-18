@@ -8,7 +8,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
-import uk.co.ogauthority.pathfinder.model.view.UpcomingTenderView;
+import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class UpcomingTenderUtil {

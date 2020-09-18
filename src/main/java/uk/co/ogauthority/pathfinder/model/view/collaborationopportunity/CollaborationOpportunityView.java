@@ -1,6 +1,8 @@
-package uk.co.ogauthority.pathfinder.model.view;
+package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity;
 
-public class UpcomingTenderView {
+import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
+
+public class CollaborationOpportunityView {
 
   private Integer displayOrder;
 
@@ -8,13 +10,11 @@ public class UpcomingTenderView {
 
   private Integer projectId;
 
-  private String tenderFunction;
+  private String function;
 
   private String descriptionOfWork;
 
-  private String estimatedTenderDate;
-
-  private String contractBand;
+  private String estimatedServiceDate;
 
   private String contactName;
 
@@ -30,11 +30,9 @@ public class UpcomingTenderView {
 
   private Boolean isValid;
 
-
-  public UpcomingTenderView(
-      Integer displayOrder,
-      Integer id,
-      Integer projectId
+  public CollaborationOpportunityView(Integer displayOrder,
+                                      Integer id,
+                                      Integer projectId
   ) {
     this.displayOrder = displayOrder;
     this.id = id;
@@ -65,12 +63,12 @@ public class UpcomingTenderView {
     this.projectId = projectId;
   }
 
-  public String getTenderFunction() {
-    return tenderFunction;
+  public String getFunction() {
+    return function;
   }
 
-  public void setTenderFunction(String tenderFunction) {
-    this.tenderFunction = tenderFunction;
+  public void setFunction(String function) {
+    this.function = function;
   }
 
   public String getDescriptionOfWork() {
@@ -81,20 +79,12 @@ public class UpcomingTenderView {
     this.descriptionOfWork = descriptionOfWork;
   }
 
-  public String getEstimatedTenderDate() {
-    return estimatedTenderDate;
+  public String getEstimatedServiceDate() {
+    return estimatedServiceDate;
   }
 
-  public void setEstimatedTenderDate(String estimatedTenderDate) {
-    this.estimatedTenderDate = estimatedTenderDate;
-  }
-
-  public String getContractBand() {
-    return contractBand;
-  }
-
-  public void setContractBand(String contractBand) {
-    this.contractBand = contractBand;
+  public void setEstimatedServiceDate(String estimatedServiceDate) {
+    this.estimatedServiceDate = estimatedServiceDate;
   }
 
   public String getContactName() {
@@ -129,14 +119,6 @@ public class UpcomingTenderView {
     this.emailAddress = emailAddress;
   }
 
-  public Boolean isValid() {
-    return isValid;
-  }
-
-  public void setIsValid(Boolean isValid) {
-    this.isValid = isValid;
-  }
-
   public SummaryLink getEditLink() {
     return editLink;
   }
@@ -151,5 +133,13 @@ public class UpcomingTenderView {
 
   public void setDeleteLink(SummaryLink deleteLink) {
     this.deleteLink = deleteLink;
+  }
+
+  public Boolean isValid() {
+    return isValid;
+  }
+
+  public void setIsValid(Boolean valid) {
+    isValid = valid;
   }
 }
