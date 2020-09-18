@@ -29,12 +29,16 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContract;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractForm;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
+import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -50,6 +54,9 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
 
   @MockBean
   private AwardedContractService awardedContractService;
+
+  @MockBean
+  private AwardedContractSummaryService awardedContractSummaryService;
 
   private ProjectDetail projectDetail;
 
@@ -409,5 +416,131 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
 
     verify(awardedContractService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
     verify(awardedContractService, times(0)).updateAwardedContract(eq(AWARDED_CONTRACT_ID), any(), any());
+  }
+
+  @Test
+  public void removeAwardedContractConfirmation_authenticated_thenValid() throws Exception {
+
+    var awardedContractView = AwardedContractViewUtil.from(
+        AwardedContractTestUtil.createAwardedContract(),
+        1
+    );
+
+    when(awardedContractSummaryService.getAwardedContractView(AWARDED_CONTRACT_ID, projectDetail, 1))
+        .thenReturn(awardedContractView);
+
+    mockMvc.perform(
+        get(ReverseRouter.route(on(AwardedContractController.class)
+            .removeAwardedContractConfirmation(PROJECT_ID, AWARDED_CONTRACT_ID, 1, null))
+        )
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  public void removeAwardedContractConfirmation_unauthenticated_thenInvalid() throws Exception {
+    mockMvc.perform(
+        get(ReverseRouter.route(on(AwardedContractController.class)
+            .removeAwardedContractConfirmation(PROJECT_ID, AWARDED_CONTRACT_ID, 1, null))
+        )
+        .with(authenticatedUserAndSession(unauthenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void removeAwardedContract_unauthenticated_thenInvalid() throws Exception {
+    mockMvc.perform(
+        post(ReverseRouter.route(on(AwardedContractController.class)
+            .removeAwardedContract(PROJECT_ID, AWARDED_CONTRACT_ID, 1, null))
+        )
+        .with(authenticatedUserAndSession(unauthenticatedUser)))
+        .andExpect(status().isForbidden());
+
+    verify(awardedContractService, times(0)).deleteAwardedContract(any());
+  }
+
+  @Test
+  public void removeAwardedContract_authenticated_thenValid() throws Exception {
+
+    AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
+    awardedContract.setProjectDetail(projectDetail);
+
+    when(awardedContractService.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail))
+        .thenReturn(awardedContract);
+
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(AwardedContractController.class)
+            .removeAwardedContract(
+                PROJECT_ID,
+                AWARDED_CONTRACT_ID,
+                1,
+                null
+            ))
+        )
+        .with(authenticatedUserAndSession(authenticatedUser))
+        .with(csrf())
+        .params(params))
+        .andExpect(status().is3xxRedirection());
+
+    verify(awardedContractService, times(1)).deleteAwardedContract(awardedContract);
+  }
+
+  @Test
+  public void saveAwardedContractSummary_authenticatedAndAllValid_thenRedirect() throws Exception {
+
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    when(awardedContractSummaryService.areAllAwardedContractsValid(any())).thenReturn(true);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(AwardedContractController.class)
+            .saveAwardedContractSummary(PROJECT_ID, null))
+        )
+        .with(authenticatedUserAndSession(authenticatedUser))
+        .with(csrf())
+        .params(params))
+        .andExpect(status().is3xxRedirection());
+  }
+
+  @Test
+  public void saveAwardedContractSummary_authenticatedAndAllInvalid_thenStayOnSummary() throws Exception {
+
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    when(awardedContractSummaryService.areAllAwardedContractsValid(any())).thenReturn(false);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(AwardedContractController.class)
+            .saveAwardedContractSummary(PROJECT_ID, null))
+        )
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(params))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  public void saveAwardedContractSummary_unauthenticated_thenInvalid() throws Exception {
+
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(AwardedContractController.class)
+            .saveAwardedContractSummary(PROJECT_ID, null))
+        )
+            .with(authenticatedUserAndSession(unauthenticatedUser))
+            .with(csrf())
+            .params(params))
+        .andExpect(status().isForbidden());
   }
 }

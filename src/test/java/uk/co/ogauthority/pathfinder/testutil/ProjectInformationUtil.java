@@ -13,10 +13,10 @@ public class ProjectInformationUtil {
   public static final String PROJECT_TITLE = "PROJECT TITLE";
   public static final String PROJECT_SUMMARY = "SUMMARY";
   public static final FieldStage FIELD_STAGE = FieldStage.DECOMMISSIONING;
-  public static final String CONTACT_NAME = ContactDetailsUtil.CONTACT_NAME;
-  public static final String PHONE_NUMBER = ContactDetailsUtil.PHONE_NUMBER;
-  public static final String JOB_TITLE = ContactDetailsUtil.JOB_TITLE;
-  public static final String EMAIL = ContactDetailsUtil.EMAIL;
+  public static final String CONTACT_NAME = ContactDetailsTestUtil.CONTACT_NAME;
+  public static final String PHONE_NUMBER = ContactDetailsTestUtil.PHONE_NUMBER;
+  public static final String JOB_TITLE = ContactDetailsTestUtil.JOB_TITLE;
+  public static final String EMAIL = ContactDetailsTestUtil.EMAIL;
 
   public static ProjectInformation getProjectInformation_withCompleteDetails(ProjectDetail details) {
     var projectInformation = new ProjectInformation();
@@ -38,7 +38,7 @@ public class ProjectInformationUtil {
     form.setProjectTitle(PROJECT_TITLE);
     form.setFieldStage(FIELD_STAGE);
 
-    var contactDetailForm = ContactDetailsUtil.createContactDetailForm(
+    var contactDetailForm = ContactDetailsTestUtil.createContactDetailForm(
         CONTACT_NAME,
         PHONE_NUMBER,
         JOB_TITLE,

@@ -15,10 +15,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.ValidationUtils;
-import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
-import uk.co.ogauthority.pathfinder.testutil.AwardedContractUtil;
+import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -41,7 +40,7 @@ public class AwardedContractFormValidatorTest {
 
   @Test
   public void validate_completeForm_thenValid() {
-    var form = AwardedContractUtil.createAwardedContractForm();
+    var form = AwardedContractTestUtil.createAwardedContractForm();
     var errors = new BeanPropertyBindingResult(form, "form");
 
     ValidationUtils.invokeValidator(awardedContractFormValidator, form, errors, awardedContractValidationHint);
@@ -53,7 +52,7 @@ public class AwardedContractFormValidatorTest {
 
   @Test
   public void validate_noDateAwarded_thenValid() {
-    var form = AwardedContractUtil.createAwardedContractForm();
+    var form = AwardedContractTestUtil.createAwardedContractForm();
     form.setDateAwarded(new ThreeFieldDateInput(null, null, null));
 
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -67,7 +66,7 @@ public class AwardedContractFormValidatorTest {
 
   @Test
   public void validate_partialDateAwarded_thenInvalid() {
-    var form = AwardedContractUtil.createAwardedContractForm();
+    var form = AwardedContractTestUtil.createAwardedContractForm();
     form.setDateAwarded(new ThreeFieldDateInput(2020, null, null));
 
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -94,7 +93,7 @@ public class AwardedContractFormValidatorTest {
 
   @Test
   public void validate_pastDateAwarded_thenValid() {
-    var form = AwardedContractUtil.createAwardedContractForm();
+    var form = AwardedContractTestUtil.createAwardedContractForm();
     form.setDateAwarded(new ThreeFieldDateInput(LocalDate.now().minusYears(1)));
 
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -108,7 +107,7 @@ public class AwardedContractFormValidatorTest {
 
   @Test
   public void validate_todayDateAwarded_thenValid() {
-    var form = AwardedContractUtil.createAwardedContractForm();
+    var form = AwardedContractTestUtil.createAwardedContractForm();
     form.setDateAwarded(new ThreeFieldDateInput(LocalDate.now()));
 
     var errors = new BeanPropertyBindingResult(form, "form");

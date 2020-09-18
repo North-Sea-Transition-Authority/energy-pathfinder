@@ -8,21 +8,23 @@ import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractForm;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractView;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractViewUtil;
 
-public class AwardedContractUtil {
+public class AwardedContractTestUtil {
 
   public static final String CONTRACTOR_NAME = "My first contractor";
   public static final Function CONTRACT_FUNCTION = Function.LOGISTICS;
   public static final String DESCRIPTION_OF_WORK = "Description of work";
   public static final LocalDate DATE_AWARDED = LocalDate.now();
   public static final ContractBand CONTRACT_BAND = ContractBand.GREATER_THAN_OR_EQUAL_TO_25M;
-  public static final String CONTACT_NAME = ContactDetailsUtil.CONTACT_NAME;
-  public static final String PHONE_NUMBER = ContactDetailsUtil.PHONE_NUMBER;
-  public static final String JOB_TITLE = ContactDetailsUtil.JOB_TITLE;
-  public static final String EMAIL_ADDRESS = ContactDetailsUtil.EMAIL;
+  public static final String CONTACT_NAME = ContactDetailsTestUtil.CONTACT_NAME;
+  public static final String PHONE_NUMBER = ContactDetailsTestUtil.PHONE_NUMBER;
+  public static final String JOB_TITLE = ContactDetailsTestUtil.JOB_TITLE;
+  public static final String EMAIL_ADDRESS = ContactDetailsTestUtil.EMAIL;
 
-  private AwardedContractUtil() {
-    throw new IllegalStateException("AwardedContractUtil is a utility class and should not be instantiated");
+  private AwardedContractTestUtil() {
+    throw new IllegalStateException("AwardedContractTestUtil is a utility class and should not be instantiated");
   }
 
   public static AwardedContract createAwardedContract(
@@ -125,5 +127,9 @@ public class AwardedContractUtil {
         EMAIL_ADDRESS,
         JOB_TITLE
     );
+  }
+
+  public static AwardedContractView createAwardedContractView(Integer displayOrder) {
+    return AwardedContractViewUtil.from(createAwardedContract(), displayOrder);
   }
 }

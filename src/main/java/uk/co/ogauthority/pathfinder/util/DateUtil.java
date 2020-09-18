@@ -7,8 +7,8 @@ import java.util.Locale;
 
 public class DateUtil {
 
-  public DateUtil() {
-    throw new AssertionError();
+  private DateUtil() {
+    throw new IllegalStateException("DateUtil is a utility class and should not be instantiated");
   }
 
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy");

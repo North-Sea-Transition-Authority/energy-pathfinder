@@ -27,7 +27,7 @@ import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.AwardedCo
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
-import uk.co.ogauthority.pathfinder.testutil.AwardedContractUtil;
+import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -76,7 +76,7 @@ public class AwardedContractServiceTest {
 
   @Test
   public void getForm() {
-    var awardedContract = AwardedContractUtil.createAwardedContract();
+    var awardedContract = AwardedContractTestUtil.createAwardedContract();
     final Integer awardedContractId = 1;
     final ProjectDetail projectDetail = awardedContract.getProjectDetail();
 
@@ -88,11 +88,18 @@ public class AwardedContractServiceTest {
   }
 
   @Test
+  public void getForm_whenEntityProvided() {
+    var awardedContract = AwardedContractTestUtil.createAwardedContract();
+    var form = awardedContractService.getForm(awardedContract);
+    checkCommonFields(form, awardedContract);
+  }
+
+  @Test
   public void getForm_withManualEntryFunction() {
     final String manualEntryFunction = "My new function";
     final String manualEntryFunctionWithPrefix = SearchSelectorService.getValueWithManualEntryPrefix(manualEntryFunction);
 
-    var awardedContract = AwardedContractUtil.createAwardedContract_withManualEntryFunction(manualEntryFunction);
+    var awardedContract = AwardedContractTestUtil.createAwardedContract_withManualEntryFunction(manualEntryFunction);
 
     when(awardedContractRepository.findByIdAndProjectDetail(any(), any())).thenReturn(Optional.of(awardedContract));
 
@@ -161,7 +168,7 @@ public class AwardedContractServiceTest {
 
   @Test
   public void createAwardedContract() {
-    var form = AwardedContractUtil.createAwardedContractForm();
+    var form = AwardedContractTestUtil.createAwardedContractForm();
     var projectDetail = ProjectUtil.getProjectDetails();
 
     var awardedContract = awardedContractService.createAwardedContract(projectDetail, form);
@@ -174,7 +181,7 @@ public class AwardedContractServiceTest {
 
   @Test
   public void createAwardedContract_withManualContractFunction() {
-    var form = AwardedContractUtil.createAwardedContractForm();
+    var form = AwardedContractTestUtil.createAwardedContractForm();
 
     var manualEntryFunction = SearchSelectablePrefix.FREE_TEXT_PREFIX + "my new function";
     form.setContractFunction(manualEntryFunction);
@@ -196,7 +203,7 @@ public class AwardedContractServiceTest {
 
   @Test
   public void updateAwardedContract() {
-    var form = AwardedContractUtil.createAwardedContractForm();
+    var form = AwardedContractTestUtil.createAwardedContractForm();
     var projectDetail = ProjectUtil.getProjectDetails();
     var awardedContract = new AwardedContract(projectDetail);
 
@@ -211,7 +218,7 @@ public class AwardedContractServiceTest {
 
   @Test
   public void updateAwardedContract_withManualContractFunction() {
-    var form = AwardedContractUtil.createAwardedContractForm();
+    var form = AwardedContractTestUtil.createAwardedContractForm();
 
     var manualEntryFunction = SearchSelectablePrefix.FREE_TEXT_PREFIX + "my new function";
     form.setContractFunction(manualEntryFunction);
@@ -229,7 +236,7 @@ public class AwardedContractServiceTest {
 
   @Test
   public void getPreSelectedContractFunction_noManualEntry() {
-    var form = AwardedContractUtil.createAwardedContractForm();
+    var form = AwardedContractTestUtil.createAwardedContractForm();
     var function = Function.DRILLING;
     form.setContractFunction(function.name());
 
@@ -241,7 +248,7 @@ public class AwardedContractServiceTest {
 
   @Test
   public void getPreSelectedContractFunction_withManualEntry() {
-    var form = AwardedContractUtil.createAwardedContractForm();
+    var form = AwardedContractTestUtil.createAwardedContractForm();
     var function = SearchSelectablePrefix.FREE_TEXT_PREFIX + "my new function";
     form.setContractFunction(function);
 
@@ -251,4 +258,10 @@ public class AwardedContractServiceTest {
     );
   }
 
+  @Test
+  public void deleteAwardedContract() {
+    var awardedContract = AwardedContractTestUtil.createAwardedContract();
+    awardedContractService.deleteAwardedContract(awardedContract);
+    verify(awardedContractRepository, times(1)).delete(awardedContract);
+  }
 }
