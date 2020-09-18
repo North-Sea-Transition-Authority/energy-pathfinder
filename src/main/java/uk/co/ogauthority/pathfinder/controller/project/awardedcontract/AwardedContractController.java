@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.controller.project.awardedcontract;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.ContractFunctionRestController;
@@ -19,12 +21,15 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractForm;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
@@ -34,24 +39,31 @@ public class AwardedContractController {
 
   public static final String PAGE_NAME = "Awarded contracts";
   public static final String PAGE_NAME_SINGULAR = "Awarded contract";
+  public static final String REMOVE_PAGE_NAME = "Remove awarded contract";
 
   private final BreadcrumbService breadcrumbService;
   private final AwardedContractService awardedContractService;
   private final ControllerHelperService controllerHelperService;
+  private final AwardedContractSummaryService awardedContractSummaryService;
 
   @Autowired
   public AwardedContractController(BreadcrumbService breadcrumbService,
                                    AwardedContractService awardedContractService,
-                                   ControllerHelperService controllerHelperService) {
+                                   ControllerHelperService controllerHelperService,
+                                   AwardedContractSummaryService awardedContractSummaryService) {
     this.breadcrumbService = breadcrumbService;
     this.awardedContractService = awardedContractService;
     this.controllerHelperService = controllerHelperService;
+    this.awardedContractSummaryService = awardedContractSummaryService;
   }
 
   @GetMapping
   public ModelAndView viewAwardedContracts(@PathVariable("projectId") Integer projectId,
-                                          ProjectContext projectContext) {
-    return getAwardedContractsSummaryModelAndView(projectId, projectContext);
+                                           ProjectContext projectContext) {
+    var awardedContractViews = awardedContractSummaryService.getAwardedContractViews(
+        projectContext.getProjectDetails()
+    );
+    return getAwardedContractsSummaryModelAndView(projectId, awardedContractViews, ValidationResult.NOT_VALIDATED);
   }
 
   @GetMapping("/awarded-contract")
@@ -68,6 +80,19 @@ public class AwardedContractController {
     return getAwardedContractModelAndView(projectId, form);
   }
 
+  @GetMapping("/awarded-contract/{awardedContractId}/remove/{displayOrder}")
+  public ModelAndView removeAwardedContractConfirmation(@PathVariable("projectId") Integer projectId,
+                                                        @PathVariable("awardedContractId") Integer awardedProjectId,
+                                                        @PathVariable("displayOrder") Integer displayOrder,
+                                                        ProjectContext projectContext) {
+    var awardedContractView = awardedContractSummaryService.getAwardedContractView(
+        awardedProjectId,
+        projectContext.getProjectDetails(),
+        displayOrder
+    );
+    return removeAwardedContractModelAndView(projectId, awardedContractView);
+  }
+
   @PostMapping("/awarded-contract")
   public ModelAndView saveAwardedContract(@PathVariable("projectId") Integer projectId,
                                           @Valid @ModelAttribute("form") AwardedContractForm form,
@@ -81,7 +106,7 @@ public class AwardedContractController {
         form,
         () -> {
           awardedContractService.createAwardedContract(projectContext.getProjectDetails(), form);
-          return getAwardedContractSummaryRedirect(projectId, projectContext);
+          return getAwardedContractSummaryRedirect(projectId);
         }
     );
   }
@@ -100,15 +125,57 @@ public class AwardedContractController {
         form,
         () -> {
           awardedContractService.updateAwardedContract(awardedProjectId, projectContext.getProjectDetails(), form);
-          return getAwardedContractSummaryRedirect(projectId, projectContext);
+          return getAwardedContractSummaryRedirect(projectId);
         }
     );
   }
 
-  private ModelAndView getAwardedContractsSummaryModelAndView(Integer projectId, ProjectContext projectContext) {
-    var modelAndView = new ModelAndView("project/awardedcontract/awardedContractSummary")
+  @PostMapping("/awarded-contract/{awardedContractId}/remove/{displayOrder}")
+  public ModelAndView removeAwardedContract(@PathVariable("projectId") Integer projectId,
+                                            @PathVariable("awardedContractId") Integer awardedProjectId,
+                                            @PathVariable("displayOrder") Integer displayOrder,
+                                            ProjectContext projectContext) {
+    var awardedContract = awardedContractService.getAwardedContract(
+        awardedProjectId,
+        projectContext.getProjectDetails()
+    );
+    awardedContractService.deleteAwardedContract(awardedContract);
+    return getAwardedContractSummaryRedirect(projectId);
+  }
+
+  @PostMapping
+  public ModelAndView saveAwardedContractSummary(@PathVariable("projectId") Integer projectId,
+                                                 ProjectContext projectContext) {
+
+    var awardedContractViews = awardedContractSummaryService.getValidatedAwardedContractViews(
+        projectContext.getProjectDetails()
+    );
+
+    var validationResult = awardedContractSummaryService.areAllAwardedContractsValid(
+        awardedContractViews
+    ) ? ValidationResult.VALID : ValidationResult.INVALID;
+
+    return validationResult.equals(ValidationResult.VALID)
+        ? ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null))
+        : getAwardedContractsSummaryModelAndView(projectId, awardedContractViews, validationResult);
+  }
+
+  private ModelAndView getAwardedContractsSummaryModelAndView(Integer projectId,
+                                                              List<AwardedContractView> awardedContractViews,
+                                                              ValidationResult validationResult) {
+    var modelAndView = new ModelAndView("project/awardedcontract/awardedContractsSummary")
+        .addObject("pageTitle", PAGE_NAME)
+        .addObject("awardedContractViews", awardedContractViews)
         .addObject("addAwardedContractUrl",
-            ReverseRouter.route(on(AwardedContractController.class).addAwardedContract(projectId, projectContext))
+            ReverseRouter.route(on(AwardedContractController.class).addAwardedContract(projectId, null))
+        )
+        .addObject("backToTaskListUrl",
+            ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId, null))
+        )
+        .addObject("errorList",
+            validationResult.equals(ValidationResult.INVALID)
+                ? awardedContractSummaryService.getAwardedContractViewErrors(awardedContractViews)
+                : null
         );
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;
@@ -129,13 +196,27 @@ public class AwardedContractController {
     return modelAndView;
   }
 
-  private ModelAndView getAwardedContractSummaryRedirect(Integer projectId, ProjectContext projectContext) {
-    return ReverseRouter.redirect(on(AwardedContractController.class).viewAwardedContracts(projectId, projectContext));
+  private ModelAndView removeAwardedContractModelAndView(Integer projectId, AwardedContractView awardedContractView) {
+    var modelAndView = new ModelAndView("project/awardedcontract/removeAwardedContract")
+        .addObject("awardedContractView", awardedContractView)
+        .addObject("cancelUrl", getAwardedContractSummaryUrl(projectId));
+
+    breadcrumbService.fromAwardedContracts(projectId, modelAndView, REMOVE_PAGE_NAME);
+
+    return modelAndView;
+  }
+
+  private ModelAndView getAwardedContractSummaryRedirect(Integer projectId) {
+    return ReverseRouter.redirect(on(AwardedContractController.class).viewAwardedContracts(projectId, null));
   }
 
   private String getContractFunctionSearchUrl() {
     return SearchSelectorService.route(
         on(ContractFunctionRestController.class).searchContractFunctions(null)
     );
+  }
+
+  private String getAwardedContractSummaryUrl(Integer projectId) {
+    return ReverseRouter.route(on(AwardedContractController.class).viewAwardedContracts(projectId, null));
   }
 }

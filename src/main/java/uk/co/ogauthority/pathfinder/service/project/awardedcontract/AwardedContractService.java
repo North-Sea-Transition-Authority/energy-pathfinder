@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -48,6 +49,10 @@ public class AwardedContractService {
 
   public AwardedContractForm getForm(Integer awardedContractId, ProjectDetail projectDetail) {
     var awardedContract = getAwardedContract(awardedContractId, projectDetail);
+    return getForm(awardedContract);
+  }
+
+  public AwardedContractForm getForm(AwardedContract awardedContract) {
     var awardedContractForm = new AwardedContractForm();
     awardedContractForm.setContractorName(awardedContract.getContractorName());
 
@@ -108,8 +113,10 @@ public class AwardedContractService {
 
     if (SearchSelectorService.isManualEntry(form.getContractFunction())) {
       awardedContract.setManualContractFunction(SearchSelectorService.removePrefix(form.getContractFunction()));
+      awardedContract.setContractFunction(null);
     } else if (form.getContractFunction() != null) {
       awardedContract.setContractFunction(Function.valueOf(form.getContractFunction()));
+      awardedContract.setManualContractFunction(null);
     } else {
       awardedContract.setContractFunction(null);
       awardedContract.setManualContractFunction(null);
@@ -150,7 +157,11 @@ public class AwardedContractService {
     return preSelectedMap;
   }
 
-  private AwardedContract getAwardedContract(Integer awardedContractId, ProjectDetail projectDetail) {
+  public List<AwardedContract> getAwardedContracts(ProjectDetail projectDetail) {
+    return awardedContractRepository.findByProjectDetailOrderByIdAsc(projectDetail);
+  }
+
+  public AwardedContract getAwardedContract(Integer awardedContractId, ProjectDetail projectDetail) {
     return awardedContractRepository.findByIdAndProjectDetail(awardedContractId, projectDetail)
         .orElseThrow(() -> new PathfinderEntityNotFoundException(
             String.format(
@@ -159,6 +170,26 @@ public class AwardedContractService {
                 projectDetail != null ? projectDetail.getId() : "null"
             )
         ));
+  }
+
+  @Transactional
+  public void deleteAwardedContract(AwardedContract awardedContract) {
+    awardedContractRepository.delete(awardedContract);
+  }
+
+  public boolean isValid(AwardedContract awardedContract, ValidationType validationType) {
+    var form = getForm(awardedContract);
+    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult = validate(form, bindingResult, validationType);
+    return !bindingResult.hasErrors();
+  }
+
+  public boolean isComplete(ProjectDetail projectDetail) {
+    var awardedContracts = getAwardedContracts(projectDetail);
+    return !awardedContracts.isEmpty()
+        && awardedContracts
+        .stream()
+        .allMatch(awardedContract -> isValid(awardedContract, ValidationType.FULL));
   }
 
 }

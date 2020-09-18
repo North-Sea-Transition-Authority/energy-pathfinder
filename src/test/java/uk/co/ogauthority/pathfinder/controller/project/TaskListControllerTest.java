@@ -22,6 +22,7 @@ import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.SelectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
@@ -45,12 +46,14 @@ public class TaskListControllerTest extends ProjectContextAbstractControllerTest
   @MockBean
   private UpcomingTenderService upcomingTenderService;
 
+  @MockBean
+  private AwardedContractService awardedContractService;
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.CREATE_PROJECT_PRIVILEGES);
 
   private static final AuthenticatedUserAccount unAuthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
-  private ProjectDetail details = ProjectUtil.getProjectDetails();
+  private final ProjectDetail details = ProjectUtil.getProjectDetails();
 
 
   @Test

@@ -2,15 +2,15 @@ package uk.co.ogauthority.pathfinder.testutil;
 
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 
-public class ContactDetailsUtil {
+public class ContactDetailsTestUtil {
 
   public static final String CONTACT_NAME = "Jane Doe";
   public static final String PHONE_NUMBER = "01303 123 456";
   public static final String JOB_TITLE = "Big Boss";
   public static final String EMAIL = "a@b.co";
 
-  private ContactDetailsUtil() {
-    throw new IllegalStateException("ContactDetailsUtil is a utility class and should not be instantiated");
+  private ContactDetailsTestUtil() {
+    throw new IllegalStateException("ContactDetailsTestUtil is a utility class and should not be instantiated");
   }
 
   public static ContactDetailForm createContactDetailForm() {

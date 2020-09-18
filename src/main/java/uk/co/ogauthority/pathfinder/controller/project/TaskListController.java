@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.SelectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
@@ -36,17 +37,20 @@ public class TaskListController {
   private final SelectOperatorService selectOperatorService;
   private final UpcomingTenderService upcomingTenderService;
   private final BreadcrumbService breadcrumbService;
+  private final AwardedContractService awardedContractService;
 
   @Autowired
   public TaskListController(ProjectInformationService projectInformationService,
                             BreadcrumbService breadcrumbService,
                             ProjectLocationService projectLocationService,
                             SelectOperatorService selectOperatorService,
-                            UpcomingTenderService upcomingTenderService) {
+                            UpcomingTenderService upcomingTenderService,
+                            AwardedContractService awardedContractService) {
     this.projectInformationService = projectInformationService;
     this.breadcrumbService = breadcrumbService;
     this.projectLocationService = projectLocationService;
     this.selectOperatorService = selectOperatorService;
+    this.awardedContractService = awardedContractService;
     this.upcomingTenderService = upcomingTenderService;
   }
 
@@ -55,27 +59,27 @@ public class TaskListController {
                                    ProjectContext projectContext) {
 
     var modelAndView = new ModelAndView("project/taskList");
+    var projectDetails = projectContext.getProjectDetails();
 
     breadcrumbService.fromWorkArea(modelAndView, "Task list");
 
     modelAndView.addObject("changeOperatorUrl",
         ReverseRouter.route(on(ChangeProjectOperatorController.class).changeOperator(null, projectId, null)));
     modelAndView.addObject("changeOperatorName", ChangeProjectOperatorController.PAGE_NAME);
-    modelAndView.addObject("changeOperatorCompleted", selectOperatorService.isComplete(
-        projectContext.getProjectDetails())
+    modelAndView.addObject("changeOperatorCompleted", selectOperatorService.isComplete(projectDetails)
     );
 
     modelAndView.addObject("projectInformationUrl",
         ReverseRouter.route(on(ProjectInformationController.class).getProjectInformation(projectId, null))
     );
     modelAndView.addObject("projectInformationText", ProjectInformationController.PAGE_NAME);
-    modelAndView.addObject("projectInformationCompleted", projectInformationService.isComplete(projectContext.getProjectDetails()));
+    modelAndView.addObject("projectInformationCompleted", projectInformationService.isComplete(projectDetails));
 
     modelAndView.addObject("locationUrl",
         ReverseRouter.route(on(ProjectLocationController.class).getLocationDetails(projectId, null))
     );
     modelAndView.addObject("projectLocationText", ProjectLocationController.PAGE_NAME);
-    modelAndView.addObject("projectLocationCompleted", projectLocationService.isComplete(projectContext.getProjectDetails()));
+    modelAndView.addObject("projectLocationCompleted", projectLocationService.isComplete(projectDetails));
 
     modelAndView.addObject("upcomingTendersUrl",
         ReverseRouter.route(on(UpcomingTendersController.class).viewTenders(projectId, null))
@@ -88,6 +92,7 @@ public class TaskListController {
         ReverseRouter.route(on(AwardedContractController.class).viewAwardedContracts(projectId, null))
     );
     modelAndView.addObject("awardedContractsText", AwardedContractController.PAGE_NAME);
+    modelAndView.addObject("awardedContractsCompleted", awardedContractService.isComplete(projectDetails));
 
     modelAndView.addObject("collaborationOpportunitiesUrl",
         ReverseRouter.route(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null))

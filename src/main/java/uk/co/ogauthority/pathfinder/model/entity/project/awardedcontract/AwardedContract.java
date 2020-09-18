@@ -59,6 +59,10 @@ public class AwardedContract implements ContactDetailCapture {
     this.projectDetail = projectDetail;
   }
 
+  public Integer getId() {
+    return id;
+  }
+
   public ProjectDetail getProjectDetail() {
     return projectDetail;
   }
