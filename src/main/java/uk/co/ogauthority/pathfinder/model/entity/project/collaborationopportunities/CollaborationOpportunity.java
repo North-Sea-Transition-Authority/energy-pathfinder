@@ -13,7 +13,6 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
 
@@ -40,9 +39,6 @@ public class CollaborationOpportunity implements ContactDetailCapture {
   private String descriptionOfWork;
 
   private LocalDate estimatedServiceDate;
-
-  @Enumerated(EnumType.STRING)
-  private ContractBand contractBand;
 
   private String contactName;
 
@@ -101,14 +97,6 @@ public class CollaborationOpportunity implements ContactDetailCapture {
 
   public void setEstimatedServiceDate(LocalDate estimatedTenderDate) {
     this.estimatedServiceDate = estimatedTenderDate;
-  }
-
-  public ContractBand getContractBand() {
-    return contractBand;
-  }
-
-  public void setContractBand(ContractBand contractBand) {
-    this.contractBand = contractBand;
   }
 
   public String getContactName() {

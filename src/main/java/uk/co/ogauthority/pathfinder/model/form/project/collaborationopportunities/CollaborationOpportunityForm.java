@@ -2,8 +2,6 @@ package uk.co.ogauthority.pathfinder.model.form.project.collaborationopportuniti
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
@@ -17,9 +15,6 @@ public class CollaborationOpportunityForm {
   private String descriptionOfWork;
 
   private ThreeFieldDateInput estimatedServiceDate;
-
-  @NotNull(message = "Select a contract band", groups = FullValidation.class)
-  private ContractBand contractBand;
 
   @Valid
   private ContactDetailForm contactDetail;
@@ -46,14 +41,6 @@ public class CollaborationOpportunityForm {
 
   public void setEstimatedServiceDate(ThreeFieldDateInput estimatedServiceDate) {
     this.estimatedServiceDate = estimatedServiceDate;
-  }
-
-  public ContractBand getContractBand() {
-    return contractBand;
-  }
-
-  public void setContractBand(ContractBand contractBand) {
-    this.contractBand = contractBand;
   }
 
   public ContactDetailForm getContactDetail() {

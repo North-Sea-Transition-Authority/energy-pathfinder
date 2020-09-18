@@ -16,12 +16,6 @@
           formId="estimatedServiceDate-day-month-year"
           fieldsetHeadingClass="govuk-fieldset__legend--s"
         />
-        <@fdsRadio.radio
-          labelText="Contract band"
-          path="form.contractBand"
-          radioItems=contractBands
-          fieldsetHeadingClass="govuk-fieldset__legend--s"
-        />
         <@contactDetails.standardContactDetails path="form.contactDetail" legendHeading="Opportunity contact details"/>
         <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
     </@fdsForm.htmlForm>
