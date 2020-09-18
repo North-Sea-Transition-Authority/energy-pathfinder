@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
@@ -36,6 +37,7 @@ public class TaskListController {
   private final ProjectLocationService projectLocationService;
   private final SelectOperatorService selectOperatorService;
   private final UpcomingTenderService upcomingTenderService;
+  private final CollaborationOpportunitiesService collaborationOpportunitiesService;
   private final BreadcrumbService breadcrumbService;
   private final AwardedContractService awardedContractService;
 
@@ -45,11 +47,13 @@ public class TaskListController {
                             ProjectLocationService projectLocationService,
                             SelectOperatorService selectOperatorService,
                             UpcomingTenderService upcomingTenderService,
+                            CollaborationOpportunitiesService collaborationOpportunitiesService,
                             AwardedContractService awardedContractService) {
     this.projectInformationService = projectInformationService;
     this.breadcrumbService = breadcrumbService;
     this.projectLocationService = projectLocationService;
     this.selectOperatorService = selectOperatorService;
+    this.collaborationOpportunitiesService = collaborationOpportunitiesService;
     this.awardedContractService = awardedContractService;
     this.upcomingTenderService = upcomingTenderService;
   }
@@ -98,6 +102,8 @@ public class TaskListController {
         ReverseRouter.route(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null))
     );
     modelAndView.addObject("collaborationOpportunitiesText", CollaborationOpportunitiesController.PAGE_NAME);
+    modelAndView.addObject("collaborationOpportunitiesCompleted", collaborationOpportunitiesService.isComplete(
+        projectContext.getProjectDetails()));
 
     return modelAndView;
   }

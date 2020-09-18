@@ -1,6 +1,6 @@
 <#include '../../layout.ftl'/>
 
-<#macro collaborationOpportunitySummary view opportunityName="Collaboartion opportunity" showValidationAndActions=false>
+<#macro collaborationOpportunitySummary view opportunityName="Collaboration opportunity" showValidationAndActions=false>
   <@fdsCheckAnswers.checkAnswers >
     <#if showValidationAndActions>
       <div class="summary-list__actions">

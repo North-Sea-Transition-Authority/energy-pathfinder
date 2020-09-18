@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -58,6 +59,19 @@ public class CollaborationOpportunitiesService {
     }
 
     return validationService.validate(form, bindingResult, validationType);
+  }
+
+  public boolean isValid(CollaborationOpportunity opportunity, ValidationType validationType) {
+    var form = getForm(opportunity);
+    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult = validate(form, bindingResult, validationType);
+    return !bindingResult.hasErrors();
+  }
+
+  public boolean isComplete(ProjectDetail detail) {
+    var opportunities =  getOpportunitiesForDetail(detail);
+    return !opportunities.isEmpty() && opportunities.stream()
+        .allMatch(ut -> isValid(ut, ValidationType.FULL));
   }
 
   @Transactional

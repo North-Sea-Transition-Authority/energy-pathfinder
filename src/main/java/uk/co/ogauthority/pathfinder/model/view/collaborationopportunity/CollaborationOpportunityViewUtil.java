@@ -3,7 +3,6 @@ package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
-import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
@@ -52,7 +51,7 @@ public class CollaborationOpportunityViewUtil {
     view.setDeleteLink(
         new SummaryLink(
             SummaryLinkText.DELETE.getDisplayName(),
-            ReverseRouter.route(on(UpcomingTendersController.class).deleteUpcomingTenderConfirm(
+            ReverseRouter.route(on(CollaborationOpportunitiesController.class).deleteCollaborationOpportunityConfirm(
                 projectId,
                 opportunity.getId(),
                 displayOrder,

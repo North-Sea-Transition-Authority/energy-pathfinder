@@ -29,6 +29,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderSummaryService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Controller
@@ -185,7 +186,7 @@ public class UpcomingTendersController {
               ? upcomingTenderSummaryService.getErrors(tenderViews)
               : null
         )
-        .addObject("backToTaskListUrl", ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId, null)));
+        .addObject("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectId));
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;
   }
