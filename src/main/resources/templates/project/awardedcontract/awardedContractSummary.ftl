@@ -1,10 +1,45 @@
 <#include '../../layout.ftl'>
 
-<@defaultPage htmlTitle="Awarded contracts" pageHeading="Awarded contracts" breadcrumbs=true>
-  <@fdsAction.link
-    linkText="Add awarded contract"
-    linkUrl=springUrl(addAwardedContractUrl)
-    role=true
-    linkClass="govuk-button govuk-button--blue"
-  />
-</@defaultPage>
+<#macro awardedContractSummary awardedContractView showHeader=true showActions=true>
+  <#assign contractHeading = "Awarded contract " + awardedContractView.displayOrder />
+  <div class="summary-list__item">
+    <#if showHeader>
+      <h2 id="awarded-contract-${awardedContractView.displayOrder}" class="govuk-heading-l summary-list__heading">
+        ${contractHeading}
+      </h2>
+    </#if>
+    <@fdsCheckAnswers.checkAnswers>
+      <#if showActions>
+        <div class="summary-list__actions">
+          <#list awardedContractView.summaryLinks as summaryLink>
+            <@fdsAction.link
+              linkText=summaryLink.linkText
+              linkUrl=springUrl(summaryLink.url)
+              linkScreenReaderText=contractHeading
+            />
+          </#list>
+        </div>
+      </#if>
+      <#if awardedContractView.valid?has_content && !awardedContractView.valid>
+        <span class="govuk-error-message">
+          <span class="govuk-visually-hidden">Error:</span>${contractHeading} is incomplete
+        </span>
+      </#if>
+      <@summaryAnswerRow prompt="Contractor name" value=awardedContractView.contractorName!"" />
+      <@summaryAnswerRow prompt="Contract function" value=awardedContractView.contractFunction!"" />
+      <@summaryAnswerRow prompt="Description of work" value=awardedContractView.descriptionOfWork!"" />
+      <@summaryAnswerRow prompt="Date awarded" value=awardedContractView.dateAwarded!"" />
+      <@summaryAnswerRow prompt="Contract band" value=awardedContractView.contractBand!"" />
+      <@summaryAnswerRow prompt="Contact name" value=awardedContractView.contactDetailView.name!"" />
+      <@summaryAnswerRow prompt="Phone number" value=awardedContractView.contactDetailView.phoneNumber!"" />
+      <@summaryAnswerRow prompt="Job title" value=awardedContractView.contactDetailView.jobTitle!"" />
+      <@summaryAnswerRow prompt="Email address" value=awardedContractView.contactDetailView.emailAddress!"" />
+    </@fdsCheckAnswers.checkAnswers>
+  </div>
+</#macro>
+
+<#macro summaryAnswerRow prompt value>
+  <@fdsCheckAnswers.checkAnswersRow keyText=prompt actionText="" actionUrl="" screenReaderActionText="">
+    ${value}
+  </@fdsCheckAnswers.checkAnswersRow>
+</#macro>

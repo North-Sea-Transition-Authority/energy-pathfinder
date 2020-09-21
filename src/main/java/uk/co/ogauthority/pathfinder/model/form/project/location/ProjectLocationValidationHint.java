@@ -6,7 +6,6 @@ import java.util.List;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.DateHint;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.EmptyDateAcceptableHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.OnOrBeforeDateHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 

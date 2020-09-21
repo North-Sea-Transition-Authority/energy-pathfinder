@@ -17,10 +17,10 @@ public class UpcomingTenderUtil {
   public static final String DESCRIPTION_OF_WORK = "work description";
   public static final LocalDate ESTIMATED_TENDER_DATE = LocalDate.now().plusMonths(1L);
   public static final ContractBand CONTRACT_BAND = ContractBand.GREATER_THAN_OR_EQUAL_TO_25M;
-  public static final String CONTACT_NAME = ContactDetailsUtil.CONTACT_NAME;
-  public static final String PHONE_NUMBER = ContactDetailsUtil.PHONE_NUMBER;
-  public static final String JOB_TITLE = ContactDetailsUtil.JOB_TITLE;
-  public static final String EMAIL = ContactDetailsUtil.EMAIL;
+  public static final String CONTACT_NAME = ContactDetailsTestUtil.CONTACT_NAME;
+  public static final String PHONE_NUMBER = ContactDetailsTestUtil.PHONE_NUMBER;
+  public static final String JOB_TITLE = ContactDetailsTestUtil.JOB_TITLE;
+  public static final String EMAIL = ContactDetailsTestUtil.EMAIL;
 
   public static final Integer DISPLAY_ORDER = 1;
   public static final Integer ID = 1;
@@ -88,7 +88,7 @@ public class UpcomingTenderUtil {
     form.setEstimatedTenderDate(new ThreeFieldDateInput(ESTIMATED_TENDER_DATE));
     form.setContractBand(CONTRACT_BAND);
 
-    var contactDetailForm = ContactDetailsUtil.createContactDetailForm(
+    var contactDetailForm = ContactDetailsTestUtil.createContactDetailForm(
         CONTACT_NAME,
         PHONE_NUMBER,
         JOB_TITLE,

@@ -9,7 +9,12 @@
       <@fdsTaskList.taskListItem itemUrl=springUrl(projectInformationUrl) itemText=projectInformationText completed=projectInformationCompleted useNotCompletedLabels=true />
       <@fdsTaskList.taskListItem itemUrl=springUrl(locationUrl) itemText=projectLocationText completed=projectLocationCompleted useNotCompletedLabels=true />
       <@fdsTaskList.taskListItem itemUrl=springUrl(upcomingTendersUrl) itemText=upcomingTendersText completed=upcomingTendersCompleted useNotCompletedLabels=true />
-      <@fdsTaskList.taskListItem itemUrl=springUrl(awardedContractsUrl) itemText=awardedContractsText completed=false useNotCompletedLabels=true />
+      <@fdsTaskList.taskListItem
+        itemUrl=springUrl(awardedContractsUrl)
+        itemText=awardedContractsText
+        completed=awardedContractsCompleted
+        useNotCompletedLabels=true
+      />
       <@fdsTaskList.taskListItem itemUrl=springUrl(collaborationOpportunitiesUrl) itemText=collaborationOpportunitiesText completed=false useNotCompletedLabels=true />
     </@fdsTaskList.taskListSection>
   </@fdsTaskList.taskList>
