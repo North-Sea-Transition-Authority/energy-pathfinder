@@ -14,7 +14,6 @@
           yearPath="form.estimatedServiceDate.year"
           labelText="Estimated service date"
           formId="estimatedServiceDate-day-month-year"
-          fieldsetHeadingClass="govuk-fieldset__legend--s"
         />
         <@contactDetails.standardContactDetails path="form.contactDetail" legendHeading="Opportunity contact details"/>
         <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>

@@ -10,7 +10,7 @@
       <@fdsSelect.select path="form.fieldType" labelText="Field type" options=fieldTypeMap/>
       <@fdsTextInput.textInput path="form.waterDepth" labelText="What is the water depth? " suffix=waterDepthUnit.plural suffixScreenReaderPrompt=waterDepthUnit.screenReaderSuffix inputClass="govuk-input--width-4" />
 
-        <@fdsRadio.radioGroup path="form.approvedFieldDevelopmentPlan" labelText="Do you have an approved Field Development Plan (FDP)?" fieldsetHeadingClass="govuk-fieldset__legend--s" hiddenContent=true>
+        <@fdsRadio.radioGroup path="form.approvedFieldDevelopmentPlan" labelText="Do you have an approved Field Development Plan (FDP)?" hiddenContent=true>
         <@fdsRadio.radioYes path="form.approvedFieldDevelopmentPlan">
           <@fdsDateInput.dateInput
               dayPath="form.approvedFdpDate.day"
@@ -18,14 +18,13 @@
               yearPath="form.approvedFdpDate.year"
               labelText="What is the FDP approval date?"
               formId="approvedFdpDate-day-month-year"
-              fieldsetHeadingClass="govuk-fieldset__legend--s"
               nestingPath="form.approvedFieldDevelopmentPlan"
           />
         </@fdsRadio.radioYes>
         <@fdsRadio.radioNo path="form.approvedFieldDevelopmentPlan"/>
       </@fdsRadio.radioGroup>
 
-      <@fdsRadio.radioGroup path="form.approvedDecomProgram" labelText="Do you have an approved Decommissioning Program (DP)?" fieldsetHeadingClass="govuk-fieldset__legend--s" hiddenContent=true>
+      <@fdsRadio.radioGroup path="form.approvedDecomProgram" labelText="Do you have an approved Decommissioning Program (DP)?" hiddenContent=true>
         <@fdsRadio.radioYes path="form.approvedDecomProgram">
           <@fdsDateInput.dateInput
             dayPath="form.approvedDecomProgramDate.day"
@@ -33,7 +32,6 @@
             yearPath="form.approvedDecomProgramDate.year"
             labelText="What is the DP approval date?"
             formId="approvedDecomProgramDate-day-month-year"
-            fieldsetHeadingClass="govuk-fieldset__legend--s"
             nestingPath="form.approvedDecomProgram"
           />
         </@fdsRadio.radioYes>

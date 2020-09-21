@@ -10,7 +10,6 @@
       labelText="What is the field stage?"
       path="form.fieldStage"
       hiddenContent=true
-      fieldsetHeadingClass="govuk-fieldset__legend--s"
     >
       <@fdsRadio.radioItem path="form.fieldStage" itemMap=discoveryFieldStage isFirstItem=true>
         <@firstProductionDate path="form.discoveryFirstProductionDate" nestingPath="form.fieldStage"/>
@@ -34,7 +33,6 @@
           yearPath="form.productionCessationDate.year"
           labelText="What is the production cessation date?"
           formId="productionCessationDate-day-month-year"
-          fieldsetHeadingClass="govuk-fieldset__legend--s"
           nestingPath="form.fieldStage"
           optionalLabel=true
         />
