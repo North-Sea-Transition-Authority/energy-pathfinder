@@ -1,8 +1,9 @@
 package uk.co.ogauthority.pathfinder.model.view.upcomingtender;
 
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
+import uk.co.ogauthority.pathfinder.util.summary.SummaryItem;
 
-public class UpcomingTenderView {
+public class UpcomingTenderView implements SummaryItem {
 
   private Integer displayOrder;
 
@@ -41,10 +42,6 @@ public class UpcomingTenderView {
     this.displayOrder = displayOrder;
     this.id = id;
     this.projectId = projectId;
-  }
-
-  public Integer getDisplayOrder() {
-    return displayOrder;
   }
 
   public void setDisplayOrder(Integer displayOrder) {
@@ -131,10 +128,6 @@ public class UpcomingTenderView {
     this.emailAddress = emailAddress;
   }
 
-  public Boolean isValid() {
-    return isValid;
-  }
-
   public void setIsValid(Boolean isValid) {
     this.isValid = isValid;
   }
@@ -153,5 +146,15 @@ public class UpcomingTenderView {
 
   public void setDeleteLink(SummaryLink deleteLink) {
     this.deleteLink = deleteLink;
+  }
+
+  @Override
+  public Integer getDisplayOrder() {
+    return displayOrder;
+  }
+
+  @Override
+  public Boolean isValid() {
+    return isValid;
   }
 }

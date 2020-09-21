@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -12,6 +12,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityView;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityViewUtil;
+import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Service
@@ -46,33 +47,11 @@ public class CollaborationOpportunitiesSummaryService {
   }
 
   public List<ErrorItem> getErrors(List<CollaborationOpportunityView> views) {
-    if (views.isEmpty()) {
-      return Collections.singletonList(
-        new ErrorItem(
-          1,
-          EMPTY_LIST_ERROR,
-          EMPTY_LIST_ERROR
-        )
-      );
-    }
-
-    return views.stream().filter(v -> !v.isValid()).map(v ->
-        new ErrorItem(
-            v.getDisplayOrder(),
-            String.format(ERROR_FIELD_NAME, v.getDisplayOrder()),
-            String.format(ERROR_MESSAGE, v.getDisplayOrder())
-        )
-    ).collect(Collectors.toList());
+    return SummaryUtil.getErrors(new ArrayList<>(views), EMPTY_LIST_ERROR, ERROR_FIELD_NAME, ERROR_MESSAGE);
   }
 
   public ValidationResult validateViews(List<CollaborationOpportunityView> views) {
-    if (views.isEmpty()) {
-      return ValidationResult.INVALID;
-    }
-
-    return views.stream().anyMatch(v -> !v.isValid())
-      ? ValidationResult.INVALID
-      : ValidationResult.VALID;
+    return SummaryUtil.validateViews(new ArrayList<>(views));
   }
 
   public List<CollaborationOpportunityView> createCollaborationOpportunityViews(

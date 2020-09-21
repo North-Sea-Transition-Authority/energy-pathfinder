@@ -1,8 +1,9 @@
 package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity;
 
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
+import uk.co.ogauthority.pathfinder.util.summary.SummaryItem;
 
-public class CollaborationOpportunityView {
+public class CollaborationOpportunityView implements SummaryItem {
 
   private Integer displayOrder;
 
@@ -37,10 +38,6 @@ public class CollaborationOpportunityView {
     this.displayOrder = displayOrder;
     this.id = id;
     this.projectId = projectId;
-  }
-
-  public Integer getDisplayOrder() {
-    return displayOrder;
   }
 
   public void setDisplayOrder(Integer displayOrder) {
@@ -135,11 +132,17 @@ public class CollaborationOpportunityView {
     this.deleteLink = deleteLink;
   }
 
-  public Boolean isValid() {
-    return isValid;
-  }
-
   public void setIsValid(Boolean valid) {
     isValid = valid;
+  }
+
+  @Override
+  public Integer getDisplayOrder() {
+    return displayOrder;
+  }
+
+  @Override
+  public Boolean isValid() {
+    return isValid;
   }
 }
