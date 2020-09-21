@@ -76,11 +76,8 @@ public class UpcomingTendersController {
     var tenderViews = upcomingTenderSummaryService.getValidatedSummaryViews(
         projectContext.getProjectDetails()
     );
-    //TODO This type of check could be turned into a method in the ControllerHelperService if we keep using it for
-    // Summaries / validation that doesn't rely on a binding result
-    var validationResult = tenderViews.stream().anyMatch(utv -> !utv.isValid())
-        ? ValidationResult.INVALID
-        : ValidationResult.VALID;
+
+    var validationResult = upcomingTenderSummaryService.validateViews(tenderViews);
 
     if (validationResult.equals(ValidationResult.INVALID)) {
       return getViewTendersModelAndView(

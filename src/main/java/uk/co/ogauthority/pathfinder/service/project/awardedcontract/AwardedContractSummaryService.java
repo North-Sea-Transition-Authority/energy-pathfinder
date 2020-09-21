@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.project.awardedcontract;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -10,12 +11,14 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractView;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractViewUtil;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Service
 public class AwardedContractSummaryService {
 
   public static final String ERROR_FIELD_NAME = "awarded-contract-%d";
   public static final String ERROR_MESSAGE = "Awarded contract %d is incomplete";
+  public static final String EMPTY_LIST_ERROR = "You must add at least one awarded contract";
 
   private final AwardedContractService awardedContractService;
 
@@ -40,6 +43,16 @@ public class AwardedContractSummaryService {
   }
 
   public List<ErrorItem> getAwardedContractViewErrors(List<AwardedContractView> awardedContractViews) {
+    if (awardedContractViews.isEmpty()) {
+      return Collections.singletonList(
+          new ErrorItem(
+              1,
+              EMPTY_LIST_ERROR,
+              EMPTY_LIST_ERROR
+          )
+      );
+    }
+
     return awardedContractViews
         .stream()
         .filter(awardedContractView -> !awardedContractView.isValid())
@@ -53,10 +66,14 @@ public class AwardedContractSummaryService {
         .collect(Collectors.toList());
   }
 
-  public boolean areAllAwardedContractsValid(List<AwardedContractView> awardedContractViews) {
-    return awardedContractViews
-        .stream()
-        .allMatch(AwardedContractView::isValid);
+  public ValidationResult validateViews(List<AwardedContractView> views) {
+    if (views.isEmpty()) {
+      return ValidationResult.INVALID;
+    }
+
+    return views.stream().anyMatch(acv -> !acv.isValid())
+        ? ValidationResult.INVALID
+        : ValidationResult.VALID;
   }
 
   private List<AwardedContractView> constructAwardedContractViews(ProjectDetail projectDetail,

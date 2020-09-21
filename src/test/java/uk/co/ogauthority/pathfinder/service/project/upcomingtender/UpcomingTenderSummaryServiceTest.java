@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -92,6 +93,15 @@ public class UpcomingTenderSummaryServiceTest {
     assertThat(errors.get(1).getDisplayOrder()).isEqualTo(3);
     assertThat(errors.get(1).getFieldName()).isEqualTo(String.format(UpcomingTenderSummaryService.ERROR_FIELD_NAME, 3));
     assertThat(errors.get(1).getErrorMessage()).isEqualTo(String.format(UpcomingTenderSummaryService.ERROR_MESSAGE, 3));
+  }
+
+  @Test
+  public void getErrors_emptyList() {
+    var errors = upcomingTenderSummaryService.getErrors(Collections.emptyList());
+    assertThat(errors.size()).isEqualTo(1);
+    assertThat(errors.get(0).getDisplayOrder()).isEqualTo(1);
+    assertThat(errors.get(0).getFieldName()).isEqualTo(UpcomingTenderSummaryService.EMPTY_LIST_ERROR);
+    assertThat(errors.get(0).getErrorMessage()).isEqualTo(UpcomingTenderSummaryService.EMPTY_LIST_ERROR);
   }
 
   private void checkCommonFields(UpcomingTenderView view, UpcomingTender tender) {

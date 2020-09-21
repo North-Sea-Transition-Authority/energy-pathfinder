@@ -70,7 +70,7 @@ public class CollaborationOpportunitiesSummaryService {
       return ValidationResult.INVALID;
     }
 
-    return views.stream().anyMatch(utv -> !utv.isValid())
+    return views.stream().anyMatch(v -> !v.isValid())
       ? ValidationResult.INVALID
       : ValidationResult.VALID;
   }

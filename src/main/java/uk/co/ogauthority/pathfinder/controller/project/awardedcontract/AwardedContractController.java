@@ -152,9 +152,7 @@ public class AwardedContractController {
         projectContext.getProjectDetails()
     );
 
-    var validationResult = awardedContractSummaryService.areAllAwardedContractsValid(
-        awardedContractViews
-    ) ? ValidationResult.VALID : ValidationResult.INVALID;
+    var validationResult = awardedContractSummaryService.validateViews(awardedContractViews);
 
     return validationResult.equals(ValidationResult.VALID)
         ? ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null))
