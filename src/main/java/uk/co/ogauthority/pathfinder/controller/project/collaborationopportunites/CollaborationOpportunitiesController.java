@@ -16,7 +16,6 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.CollaborationOpportunityRestController;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -100,8 +99,7 @@ public class CollaborationOpportunitiesController {
             SearchSelectorService.route(on(CollaborationOpportunityRestController.class).searchFunctions(null))
         )
         .addObject("form", form)
-        .addObject("preselectedCollaboration", collaborationOpportunitiesService.getPreSelectedCollaborationFunction(form))
-        .addObject("contractBands", ContractBand.getAllAsMap());
+        .addObject("preselectedCollaboration", collaborationOpportunitiesService.getPreSelectedCollaborationFunction(form));
     breadcrumbService.fromCollaborationOpportunities(projectId, modelAndView, PAGE_NAME_SINGULAR);
     return modelAndView;
   }

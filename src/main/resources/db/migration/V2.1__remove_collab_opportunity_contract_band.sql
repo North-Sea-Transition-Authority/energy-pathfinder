@@ -1,0 +1,1 @@
+ALTER TABLE ${datasource.user}.collaboration_opportunities DROP COLUMN contract_band;

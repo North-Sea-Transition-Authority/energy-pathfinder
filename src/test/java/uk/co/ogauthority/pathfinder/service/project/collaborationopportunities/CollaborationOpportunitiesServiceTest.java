@@ -107,7 +107,6 @@ public class CollaborationOpportunitiesServiceTest {
   private void checkCommonFields(CollaborationOpportunityForm form, CollaborationOpportunity collaborationOpportunity) {
     assertThat(collaborationOpportunity.getDescriptionOfWork()).isEqualTo(CollaborationOpportunityUtil.DESCRIPTION_OF_WORK);
     assertThat(collaborationOpportunity.getEstimatedServiceDate()).isEqualTo(form.getEstimatedServiceDate().createDateOrNull());
-    assertThat(collaborationOpportunity.getContractBand()).isEqualTo(CollaborationOpportunityUtil.CONTRACT_BAND);
     assertThat(collaborationOpportunity.getContactName()).isEqualTo(CollaborationOpportunityUtil.CONTACT_NAME);
     assertThat(collaborationOpportunity.getPhoneNumber()).isEqualTo(CollaborationOpportunityUtil.PHONE_NUMBER);
     assertThat(collaborationOpportunity.getJobTitle()).isEqualTo(CollaborationOpportunityUtil.JOB_TITLE);
