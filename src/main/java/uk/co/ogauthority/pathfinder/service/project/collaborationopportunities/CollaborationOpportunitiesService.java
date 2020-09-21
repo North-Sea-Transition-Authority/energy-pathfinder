@@ -61,13 +61,12 @@ public class CollaborationOpportunitiesService {
   public CollaborationOpportunity createCollaborationOpportunity(ProjectDetail detail, CollaborationOpportunityForm form) {
     var opportunity = new CollaborationOpportunity(detail);
     if (SearchSelectorService.isManualEntry(form.getFunction())) {
-      opportunity.setManualFunction(searchSelectorService.removePrefix(form.getFunction()));
+      opportunity.setManualFunction(SearchSelectorService.removePrefix(form.getFunction()));
     } else if (form.getFunction() != null) {
       opportunity.setFunction(Function.valueOf(form.getFunction()));
     }
     opportunity.setDescriptionOfWork(form.getDescriptionOfWork());
     opportunity.setEstimatedServiceDate(form.getEstimatedServiceDate().createDateOrNull());
-    opportunity.setContractBand(form.getContractBand());
 
     var contactDetailForm = form.getContactDetail();
     opportunity.setContactName(contactDetailForm.getName());

@@ -15,11 +15,6 @@
           labelText="Estimated service date"
           formId="estimatedServiceDate-day-month-year"
         />
-        <@fdsRadio.radio
-          labelText="Contract band"
-          path="form.contractBand"
-          radioItems=contractBands
-        />
         <@contactDetails.standardContactDetails path="form.contactDetail" legendHeading="Opportunity contact details"/>
         <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
     </@fdsForm.htmlForm>
