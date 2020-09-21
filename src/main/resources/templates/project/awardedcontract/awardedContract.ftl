@@ -21,14 +21,12 @@
       yearPath="form.dateAwarded.year"
       labelText="Date contract awarded"
       formId="dateAwarded-day-month-year"
-      fieldsetHeadingClass="govuk-fieldset__legend--s"
       optionalLabel=true
     />
     <@fdsRadio.radio
       labelText="Contract band"
       path="form.contractBand"
       radioItems=contractBands
-      fieldsetHeadingClass="govuk-fieldset__legend--s"
     />
     <@contactDetails.standardContactDetails path="form.contactDetail" legendHeading="Contract contact details"/>
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
