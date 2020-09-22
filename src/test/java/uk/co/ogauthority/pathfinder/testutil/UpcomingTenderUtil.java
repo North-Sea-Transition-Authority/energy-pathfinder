@@ -9,6 +9,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDat
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.model.view.UpcomingTenderView;
+import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class UpcomingTenderUtil {
@@ -66,10 +67,14 @@ public class UpcomingTenderUtil {
     view.setTenderFunction(TENDER_FUNCTION.getDisplayName());
     view.setEstimatedTenderDate(DateUtil.formatDate(ESTIMATED_TENDER_DATE));
     view.setContractBand(CONTRACT_BAND.getDisplayName());
-    view.setContactName(CONTACT_NAME);
-    view.setPhoneNumber(PHONE_NUMBER);
-    view.setJobTitle(JOB_TITLE);
-    view.setEmailAddress(EMAIL);
+
+    ContactDetailView contactDetailView = new ContactDetailView();
+    contactDetailView.setName(CONTACT_NAME);
+    contactDetailView.setPhoneNumber(PHONE_NUMBER);
+    contactDetailView.setJobTitle(JOB_TITLE);
+    contactDetailView.setEmailAddress(EMAIL);
+    view.setContactDetailView(contactDetailView);
+
     return view;
   }
 

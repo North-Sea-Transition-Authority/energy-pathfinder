@@ -59,7 +59,6 @@ public abstract class ProjectContextAbstractControllerTest {
   @MockBean
   protected ProjectOperatorService projectOperatorService;
 
-
   @Before
   public void  projectContextAbstractControllerTestSetUp() {
     mockMvc = MockMvcBuilders

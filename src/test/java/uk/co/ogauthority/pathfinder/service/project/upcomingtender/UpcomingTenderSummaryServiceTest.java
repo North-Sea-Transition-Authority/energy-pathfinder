@@ -34,7 +34,7 @@ public class UpcomingTenderSummaryServiceTest {
   private final UpcomingTender manualEntryUpcomingTender = UpcomingTenderUtil.getUpcomingTender_manualEntry(details);
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     upcomingTenderSummaryService = new UpcomingTenderSummaryService(upcomingTenderService);
     when(upcomingTenderService.getUpcomingTendersForDetail(details)).thenReturn(
         List.of(upcomingTender, manualEntryUpcomingTender)
@@ -98,10 +98,13 @@ public class UpcomingTenderSummaryServiceTest {
     assertThat(view.getDescriptionOfWork()).isEqualTo(tender.getDescriptionOfWork());
     assertThat(view.getEstimatedTenderDate()).isEqualTo(DateUtil.formatDate(tender.getEstimatedTenderDate()));
     assertThat(view.getContractBand()).isEqualTo(tender.getContractBand().getDisplayName());
-    assertThat(view.getContactName()).isEqualTo(tender.getContactName());
-    assertThat(view.getPhoneNumber()).isEqualTo(tender.getPhoneNumber());
-    assertThat(view.getJobTitle()).isEqualTo(tender.getJobTitle());
-    assertThat(view.getEmailAddress()).isEqualTo(tender.getEmailAddress());
+
+    var contactDetailView = view.getContactDetailView();
+    assertThat(contactDetailView.getName()).isEqualTo(tender.getContactName());
+    assertThat(contactDetailView.getPhoneNumber()).isEqualTo(tender.getPhoneNumber());
+    assertThat(contactDetailView.getJobTitle()).isEqualTo(tender.getJobTitle());
+    assertThat(contactDetailView.getEmailAddress()).isEqualTo(tender.getEmailAddress());
+
     assertThat(view.getEditLink().getLinkText()).isEqualTo(SummaryLinkText.EDIT.getDisplayName());
     assertThat(view.getDeleteLink().getLinkText()).isEqualTo(SummaryLinkText.DELETE.getDisplayName());
   }

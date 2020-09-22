@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.entity.project;
 
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -31,7 +32,6 @@ public class ProjectDetail {
   private boolean isCurrentVersion;
 
   private Integer createdByWua;
-
 
   public ProjectDetail() {
   }
@@ -90,5 +90,27 @@ public class ProjectDetail {
 
   public void setCreatedByWua(Integer createdByWua) {
     this.createdByWua = createdByWua;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    ProjectDetail projectDetail = (ProjectDetail) o;
+    return id.equals(projectDetail.id)
+        && Objects.equals(project, projectDetail.project)
+        && status == projectDetail.status
+        && Objects.equals(version, projectDetail.version)
+        && Objects.equals(isCurrentVersion, projectDetail.isCurrentVersion)
+        && Objects.equals(createdByWua, projectDetail.createdByWua);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, project, status, version, isCurrentVersion, createdByWua);
   }
 }

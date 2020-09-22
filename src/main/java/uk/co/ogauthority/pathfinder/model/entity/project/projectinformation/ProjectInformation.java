@@ -58,27 +58,6 @@ public class ProjectInformation implements ContactDetailCapture {
 
   private LocalDate productionCessationDate;
 
-  public ProjectInformation() {
-  }
-
-  public ProjectInformation(ProjectDetail projectDetail,
-                            FieldStage fieldStage,
-                            String projectTitle,
-                            String projectSummary,
-                            String contactName,
-                            String phoneNumber,
-                            String jobTitle,
-                            String emailAddress) {
-    this.projectDetail = projectDetail;
-    this.fieldStage = fieldStage;
-    this.projectTitle = projectTitle;
-    this.projectSummary = projectSummary;
-    this.contactName = contactName;
-    this.phoneNumber = phoneNumber;
-    this.jobTitle = jobTitle;
-    this.emailAddress = emailAddress;
-  }
-
   public Integer getId() {
     return id;
   }

@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.entity.project;
 
 import java.time.Instant;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -37,5 +38,23 @@ public class Project {
 
   public void setCreatedInstant(Instant createdDatetime) {
     this.createdInstant = createdDatetime;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Project project = (Project) o;
+    return Objects.equals(id, project.id)
+        && Objects.equals(createdInstant, project.createdInstant);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, createdInstant);
   }
 }
