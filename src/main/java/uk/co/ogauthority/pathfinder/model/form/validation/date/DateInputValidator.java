@@ -103,7 +103,7 @@ public class DateInputValidator implements SmartValidator {
                     YEAR + hint.getCode(),
                     hint.getErrorMessage()
                 )
-            );
+          );
 
         validateHasFourNumberYear(errors, dateInput, inputLabel);
       }
