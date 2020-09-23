@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.form.project.location;
 
+import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
@@ -29,6 +30,8 @@ public class ProjectLocationForm {
   private Boolean approvedDecomProgram;
 
   private ThreeFieldDateInput approvedDecomProgramDate;
+
+  private List<String> licenceBlocks;
 
   public ProjectLocationForm() {
   }
@@ -92,5 +95,13 @@ public class ProjectLocationForm {
 
   public void setApprovedDecomProgramDate(ThreeFieldDateInput approvedDecomProgramDate) {
     this.approvedDecomProgramDate = approvedDecomProgramDate;
+  }
+
+  public List<String> getLicenceBlocks() {
+    return licenceBlocks;
+  }
+
+  public void setLicenceBlocks(List<String> licenceBlocks) {
+    this.licenceBlocks = licenceBlocks;
   }
 }

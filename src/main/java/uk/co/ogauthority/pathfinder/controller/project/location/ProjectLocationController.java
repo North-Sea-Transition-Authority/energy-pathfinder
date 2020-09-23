@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.controller.project.location;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +17,7 @@ import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.DevUkRestController;
+import uk.co.ogauthority.pathfinder.model.addtolist.AddToListDemo;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
@@ -54,6 +56,12 @@ public class ProjectLocationController {
     return getLocationModelAndView(projectId, locationService.getForm(projectContext.getProjectDetails()));
   }
 
+  @GetMapping("/add-to-list-test")
+  public ModelAndView addToListTest(@PathVariable("projectId") Integer projectId,
+                                    ProjectContext projectContext) {
+    return getAddToListTest(projectId, new ProjectLocationForm());
+  }
+
   @PostMapping
   public ModelAndView saveProjectLocation(@PathVariable("projectId") Integer projectId,
                                           @Valid @ModelAttribute("form") ProjectLocationForm form,
@@ -83,5 +91,14 @@ public class ProjectLocationController {
 
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;
+  }
+
+  public ModelAndView getAddToListTest(Integer projectId, ProjectLocationForm form) {
+    return new ModelAndView("test/addToListTest")
+        .addObject("licenceBlockUrl", SearchSelectorService.route(on(DevUkRestController.class).searchFields(null)))
+        .addObject("alreadyAdded",
+          List.of(new AddToListDemo("997", "CLAIRE"), new AddToListDemo("123", "EXAMPLE"))
+        )
+        .addObject("form", form);
   }
 }
