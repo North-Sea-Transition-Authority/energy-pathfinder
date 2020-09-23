@@ -1,11 +1,10 @@
-package uk.co.ogauthority.pathfinder.model.view.awardedcontract;
+package uk.co.ogauthority.pathfinder.model.view.upcomingtender;
 
-import java.util.List;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryItem;
 
-public class AwardedContractView implements SummaryItem {
+public class UpcomingTenderView implements SummaryItem {
 
   private Integer displayOrder;
 
@@ -13,23 +12,32 @@ public class AwardedContractView implements SummaryItem {
 
   private Integer projectId;
 
-  private String contractorName;
-
-  private String contractFunction;
+  private String tenderFunction;
 
   private String descriptionOfWork;
 
-  private String dateAwarded;
+  private String estimatedTenderDate;
 
   private String contractBand;
 
   private ContactDetailView contactDetailView;
 
-  List<SummaryLink> summaryLinks;
+  private SummaryLink editLink;
 
-  private boolean isValid;
+  private SummaryLink deleteLink;
+
+  private Boolean isValid;
 
 
+  public UpcomingTenderView(
+      Integer displayOrder,
+      Integer id,
+      Integer projectId
+  ) {
+    this.displayOrder = displayOrder;
+    this.id = id;
+    this.projectId = projectId;
+  }
 
   public void setDisplayOrder(Integer displayOrder) {
     this.displayOrder = displayOrder;
@@ -51,20 +59,12 @@ public class AwardedContractView implements SummaryItem {
     this.projectId = projectId;
   }
 
-  public String getContractorName() {
-    return contractorName;
+  public String getTenderFunction() {
+    return tenderFunction;
   }
 
-  public void setContractorName(String contractorName) {
-    this.contractorName = contractorName;
-  }
-
-  public String getContractFunction() {
-    return contractFunction;
-  }
-
-  public void setContractFunction(String contractFunction) {
-    this.contractFunction = contractFunction;
+  public void setTenderFunction(String tenderFunction) {
+    this.tenderFunction = tenderFunction;
   }
 
   public String getDescriptionOfWork() {
@@ -75,12 +75,12 @@ public class AwardedContractView implements SummaryItem {
     this.descriptionOfWork = descriptionOfWork;
   }
 
-  public String getDateAwarded() {
-    return dateAwarded;
+  public String getEstimatedTenderDate() {
+    return estimatedTenderDate;
   }
 
-  public void setDateAwarded(String dateAwarded) {
-    this.dateAwarded = dateAwarded;
+  public void setEstimatedTenderDate(String estimatedTenderDate) {
+    this.estimatedTenderDate = estimatedTenderDate;
   }
 
   public String getContractBand() {
@@ -99,25 +99,33 @@ public class AwardedContractView implements SummaryItem {
     this.contactDetailView = contactDetailView;
   }
 
-  public List<SummaryLink> getSummaryLinks() {
-    return summaryLinks;
+  public void setIsValid(Boolean isValid) {
+    this.isValid = isValid;
   }
 
-  public void setSummaryLinks(List<SummaryLink> summaryLinks) {
-    this.summaryLinks = summaryLinks;
+  public SummaryLink getEditLink() {
+    return editLink;
   }
 
-  public void setValid(boolean valid) {
-    isValid = valid;
+  public void setEditLink(SummaryLink editLink) {
+    this.editLink = editLink;
   }
 
-  @Override
-  public Boolean isValid() {
-    return isValid;
+  public SummaryLink getDeleteLink() {
+    return deleteLink;
+  }
+
+  public void setDeleteLink(SummaryLink deleteLink) {
+    this.deleteLink = deleteLink;
   }
 
   @Override
   public Integer getDisplayOrder() {
     return displayOrder;
+  }
+
+  @Override
+  public Boolean isValid() {
+    return isValid;
   }
 }

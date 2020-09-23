@@ -21,7 +21,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
-import uk.co.ogauthority.pathfinder.model.view.UpcomingTenderView;
+import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
@@ -29,6 +29,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderSummaryService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Controller
@@ -75,11 +76,8 @@ public class UpcomingTendersController {
     var tenderViews = upcomingTenderSummaryService.getValidatedSummaryViews(
         projectContext.getProjectDetails()
     );
-    //TODO This type of check could be turned into a method in the ControllerHelperService if we keep using it for
-    // Summaries / validation that doesn't rely on a binding result
-    var validationResult = tenderViews.stream().anyMatch(utv -> !utv.isValid())
-        ? ValidationResult.INVALID
-        : ValidationResult.VALID;
+
+    var validationResult = upcomingTenderSummaryService.validateViews(tenderViews);
 
     if (validationResult.equals(ValidationResult.INVALID)) {
       return getViewTendersModelAndView(
@@ -185,7 +183,7 @@ public class UpcomingTendersController {
               ? upcomingTenderSummaryService.getErrors(tenderViews)
               : null
         )
-        .addObject("backToTaskListUrl", ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId, null)));
+        .addObject("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectId));
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;
   }

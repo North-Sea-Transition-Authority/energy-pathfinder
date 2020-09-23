@@ -41,6 +41,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(
@@ -496,7 +497,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
 
-    when(awardedContractSummaryService.areAllAwardedContractsValid(any())).thenReturn(true);
+    when(awardedContractSummaryService.validateViews(any())).thenReturn(ValidationResult.VALID);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(AwardedContractController.class)
@@ -515,7 +516,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
 
-    when(awardedContractSummaryService.areAllAwardedContractsValid(any())).thenReturn(false);
+    when(awardedContractSummaryService.validateViews(any())).thenReturn(ValidationResult.INVALID);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(AwardedContractController.class)
