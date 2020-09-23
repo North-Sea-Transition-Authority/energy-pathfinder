@@ -14,20 +14,14 @@
       </#if>
     </#if>
 
-    <@summaryAnswerRow prompt="Tender function" value=view.getTenderFunction()!"" />
-    <@summaryAnswerRow prompt="Description of work" value=view.getDescriptionOfWork()!"" />
-    <@summaryAnswerRow prompt="Estimated tender date" value=view.getEstimatedTenderDate()!"" />
-    <@summaryAnswerRow prompt="Contract band" value=view.getContractBand()!"" />
-    <@summaryAnswerRow prompt="Name" value=view.getContactName()!"" />
-    <@summaryAnswerRow prompt="Phone number" value=view.getPhoneNumber()!"" />
-    <@summaryAnswerRow prompt="Job title" value=view.getJobTitle()!"" />
-    <@summaryAnswerRow prompt="Email address" value=view.getEmailAddress()!"" />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Tender function" value=view.tenderFunction!"" />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Description of work" value=view.descriptionOfWork!"" />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Estimated tender date" value=view.estimatedTenderDate!"" />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Contract band" value=view.contractBand!"" />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Name" value=view.contactDetailView.name!"" />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Phone number" value=view.contactDetailView.phoneNumber!"" />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Job title" value=view.contactDetailView.jobTitle!"" />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Email address" value=view.contactDetailView.emailAddress!"" />
 
   </@fdsCheckAnswers.checkAnswers>
-</#macro>
-
-<#macro summaryAnswerRow prompt value>
-  <@fdsCheckAnswers.checkAnswersRow keyText=prompt actionText="" actionUrl="" screenReaderActionText="">
-    ${value}
-  </@fdsCheckAnswers.checkAnswersRow>
 </#macro>

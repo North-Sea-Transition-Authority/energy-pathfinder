@@ -121,7 +121,7 @@ public class CollaborationOpportunity implements ContactDetailCapture {
 
   @Override
   public String getName() {
-    return contactName;
+    return getContactName();
   }
 
   @Override

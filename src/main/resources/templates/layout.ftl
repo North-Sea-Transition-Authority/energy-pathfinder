@@ -8,6 +8,7 @@
 <#import 'header.ftl' as applicationHeader>
 <#import 'project/macros/contactDetails.ftl' as contactDetails>
 <#import 'project/macros/quarterYearInput.ftl' as quarterYear>
+<#import 'project/macros/checkAnswers.ftl' as checkAnswers>
 
 <#function springUrl url>
   <#local springUrl>

@@ -4,6 +4,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
+import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -11,7 +12,7 @@ import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class UpcomingTenderViewUtil {
 
-  public UpcomingTenderViewUtil() {
+  private UpcomingTenderViewUtil() {
     throw new IllegalStateException("UpcomingTenderViewFactory is a utility class and should not be instantiated");
   }
 
@@ -35,10 +36,14 @@ public class UpcomingTenderViewUtil {
           ? upcomingTender.getContractBand().getDisplayName()
           : null
     );
-    tender.setContactName(upcomingTender.getContactName());
-    tender.setPhoneNumber(upcomingTender.getPhoneNumber());
-    tender.setJobTitle(upcomingTender.getJobTitle());
-    tender.setEmailAddress(upcomingTender.getEmailAddress());
+
+    ContactDetailView contactDetailView = new ContactDetailView();
+    contactDetailView.setName(upcomingTender.getName());
+    contactDetailView.setPhoneNumber(upcomingTender.getPhoneNumber());
+    contactDetailView.setEmailAddress(upcomingTender.getEmailAddress());
+    contactDetailView.setJobTitle(upcomingTender.getJobTitle());
+    tender.setContactDetailView(contactDetailView);
+
     tender.setEditLink(
         new SummaryLink(
             SummaryLinkText.EDIT.getDisplayName(),
