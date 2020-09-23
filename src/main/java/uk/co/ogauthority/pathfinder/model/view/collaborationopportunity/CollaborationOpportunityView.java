@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity;
 
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
+import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryItem;
 
 public class CollaborationOpportunityView implements SummaryItem {
@@ -17,13 +18,7 @@ public class CollaborationOpportunityView implements SummaryItem {
 
   private String estimatedServiceDate;
 
-  private String contactName;
-
-  private String phoneNumber;
-
-  private String jobTitle;
-
-  private String emailAddress;
+  private ContactDetailView contactDetailView;
 
   private SummaryLink editLink;
 
@@ -84,36 +79,12 @@ public class CollaborationOpportunityView implements SummaryItem {
     this.estimatedServiceDate = estimatedServiceDate;
   }
 
-  public String getContactName() {
-    return contactName;
+  public ContactDetailView getContactDetailView() {
+    return contactDetailView;
   }
 
-  public void setContactName(String contactName) {
-    this.contactName = contactName;
-  }
-
-  public String getPhoneNumber() {
-    return phoneNumber;
-  }
-
-  public void setPhoneNumber(String phoneNumber) {
-    this.phoneNumber = phoneNumber;
-  }
-
-  public String getJobTitle() {
-    return jobTitle;
-  }
-
-  public void setJobTitle(String jobTitle) {
-    this.jobTitle = jobTitle;
-  }
-
-  public String getEmailAddress() {
-    return emailAddress;
-  }
-
-  public void setEmailAddress(String emailAddress) {
-    this.emailAddress = emailAddress;
+  public void setContactDetailView(ContactDetailView contactDetailView) {
+    this.contactDetailView = contactDetailView;
   }
 
   public SummaryLink getEditLink() {

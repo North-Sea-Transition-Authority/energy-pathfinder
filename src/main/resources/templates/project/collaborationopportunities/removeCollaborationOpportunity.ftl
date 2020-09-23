@@ -9,11 +9,11 @@
 
     <@fdsForm.htmlForm>
         <@fdsAction.submitButtons
-        primaryButtonText="Remove"
-        primaryButtonClass="govuk-button govuk-button--warning"
-        secondaryLinkText="Cancel"
-        linkSecondaryAction=true
-        linkSecondaryActionUrl=springUrl(cancelUrl)
+          primaryButtonText="Remove"
+          primaryButtonClass="govuk-button govuk-button--warning"
+          secondaryLinkText="Cancel"
+          linkSecondaryAction=true
+          linkSecondaryActionUrl=springUrl(cancelUrl)
         />
     </@fdsForm.htmlForm>
 </@defaultPage>

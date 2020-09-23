@@ -97,10 +97,10 @@ public class CollaborationOpportunitiesSummaryServiceTest {
   private void checkCommonFields(CollaborationOpportunityView view, CollaborationOpportunity opportunity) {
     assertThat(view.getDescriptionOfWork()).isEqualTo(opportunity.getDescriptionOfWork());
     assertThat(view.getEstimatedServiceDate()).isEqualTo(DateUtil.formatDate(opportunity.getEstimatedServiceDate()));
-    assertThat(view.getContactName()).isEqualTo(opportunity.getContactName());
-    assertThat(view.getPhoneNumber()).isEqualTo(opportunity.getPhoneNumber());
-    assertThat(view.getJobTitle()).isEqualTo(opportunity.getJobTitle());
-    assertThat(view.getEmailAddress()).isEqualTo(opportunity.getEmailAddress());
+    assertThat(view.getContactDetailView().getName()).isEqualTo(opportunity.getContactName());
+    assertThat(view.getContactDetailView().getPhoneNumber()).isEqualTo(opportunity.getPhoneNumber());
+    assertThat(view.getContactDetailView().getJobTitle()).isEqualTo(opportunity.getJobTitle());
+    assertThat(view.getContactDetailView().getEmailAddress()).isEqualTo(opportunity.getEmailAddress());
     assertThat(view.getEditLink().getLinkText()).isEqualTo(SummaryLinkText.EDIT.getDisplayName());
     assertThat(view.getDeleteLink().getLinkText()).isEqualTo(SummaryLinkText.DELETE.getDisplayName());
   }

@@ -1,10 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.view.upcomingtender;
 
-import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
+import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryItem;
-
-public class UpcomingTenderView {
 
 public class UpcomingTenderView implements SummaryItem {
 

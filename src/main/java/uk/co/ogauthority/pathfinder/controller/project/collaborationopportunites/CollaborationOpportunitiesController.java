@@ -120,7 +120,7 @@ public class CollaborationOpportunitiesController {
   @GetMapping("/collaboration-opportunity/{opportunityId}/edit")
   public ModelAndView editCollaborationOpportunity(@PathVariable("projectId") Integer projectId,
                                                    @PathVariable("opportunityId") Integer opportunityId,
-                                                  ProjectContext projectContext) {
+                                                   ProjectContext projectContext) {
     var opportunity = collaborationOpportunitiesService.getOrError(opportunityId);
     return getCollaborationOpportunityModelAndView(projectId, collaborationOpportunitiesService.getForm(opportunity));
   }

@@ -6,11 +6,13 @@ import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
+import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class CollaborationOpportunityViewUtil {
-  public CollaborationOpportunityViewUtil() {
+
+  private CollaborationOpportunityViewUtil() {
     throw new IllegalStateException("CollaborationOpportunityViewUtil is a utility class and should not be instantiated");
   }
 
@@ -33,10 +35,13 @@ public class CollaborationOpportunityViewUtil {
     );
     view.setDescriptionOfWork(opportunity.getDescriptionOfWork());
     view.setEstimatedServiceDate(DateUtil.formatDate(opportunity.getEstimatedServiceDate()));
-    view.setContactName(opportunity.getContactName());
-    view.setPhoneNumber(opportunity.getPhoneNumber());
-    view.setJobTitle(opportunity.getJobTitle());
-    view.setEmailAddress(opportunity.getEmailAddress());
+    ContactDetailView contactDetailView = new ContactDetailView();
+    contactDetailView.setName(opportunity.getName());
+    contactDetailView.setPhoneNumber(opportunity.getPhoneNumber());
+    contactDetailView.setEmailAddress(opportunity.getEmailAddress());
+    contactDetailView.setJobTitle(opportunity.getJobTitle());
+    view.setContactDetailView(contactDetailView);
+
     view.setEditLink(
         new SummaryLink(
             SummaryLinkText.EDIT.getDisplayName(),

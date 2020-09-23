@@ -8,6 +8,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDat
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityView;
+import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
@@ -61,10 +62,12 @@ public class CollaborationOpportunityTestUtil {
     view.setIsValid(isValid);
     view.setFunction(FUNCTION.getDisplayName());
     view.setEstimatedServiceDate(DateUtil.formatDate(ESTIMATED_SERVICE_DATE));
-    view.setContactName(CONTACT_NAME);
-    view.setPhoneNumber(PHONE_NUMBER);
-    view.setJobTitle(JOB_TITLE);
-    view.setEmailAddress(EMAIL);
+    var contactDetailsView = new ContactDetailView();
+    contactDetailsView.setName(CONTACT_NAME);
+    contactDetailsView.setPhoneNumber(PHONE_NUMBER);
+    contactDetailsView.setJobTitle(JOB_TITLE);
+    contactDetailsView.setEmailAddress(EMAIL);
+    view.setContactDetailView(contactDetailsView);
     return view;
   }
 

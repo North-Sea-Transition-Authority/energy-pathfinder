@@ -8,6 +8,12 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 public class SummaryUtil {
 
+  public static final Integer DEFAULT_DISPLAY_ORDER = 1;
+
+  private SummaryUtil() {
+    throw new IllegalStateException("SummaryUtil is a utility class and should not be instantiated");
+  }
+
   public static List<ErrorItem> getErrors(
                                           List<SummaryItem> views,
                                           String emptyListError,
@@ -16,7 +22,7 @@ public class SummaryUtil {
     if (views.isEmpty()) {
       return Collections.singletonList(
           new ErrorItem(
-              1,
+              DEFAULT_DISPLAY_ORDER,
               emptyListError,
               emptyListError
           )
