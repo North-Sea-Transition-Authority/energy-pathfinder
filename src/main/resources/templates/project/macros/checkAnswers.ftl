@@ -1,7 +1,9 @@
 <#include '../../layout.ftl'/>
 
-<#macro summaryAnswerRow prompt value>
+<#macro checkAnswersRowNoActions prompt value>
   <@fdsCheckAnswers.checkAnswersRow keyText=prompt actionText="" actionUrl="" screenReaderActionText="">
-    ${value}
+    <#if value?has_content>
+      ${value}
+    </#if>
   </@fdsCheckAnswers.checkAnswersRow>
 </#macro>

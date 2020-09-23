@@ -25,15 +25,15 @@
           <span class="govuk-visually-hidden">Error:</span>${contractHeading} is incomplete
         </span>
       </#if>
-      <@summaryAnswer.summaryAnswerRow prompt="Contractor name" value=awardedContractView.contractorName!"" />
-      <@summaryAnswer.summaryAnswerRow prompt="Contract function" value=awardedContractView.contractFunction!"" />
-      <@summaryAnswer.summaryAnswerRow prompt="Description of work" value=awardedContractView.descriptionOfWork!"" />
-      <@summaryAnswer.summaryAnswerRow prompt="Date awarded" value=awardedContractView.dateAwarded!"" />
-      <@summaryAnswer.summaryAnswerRow prompt="Contract band" value=awardedContractView.contractBand!"" />
-      <@summaryAnswer.summaryAnswerRow prompt="Contact name" value=awardedContractView.contactDetailView.name!"" />
-      <@summaryAnswer.summaryAnswerRow prompt="Phone number" value=awardedContractView.contactDetailView.phoneNumber!"" />
-      <@summaryAnswer.summaryAnswerRow prompt="Job title" value=awardedContractView.contactDetailView.jobTitle!"" />
-      <@summaryAnswer.summaryAnswerRow prompt="Email address" value=awardedContractView.contactDetailView.emailAddress!"" />
+      <@checkAnswers.checkAnswersRowNoActions prompt="Contractor name" value=awardedContractView.contractorName!"" />
+      <@checkAnswers.checkAnswersRowNoActions prompt="Contract function" value=awardedContractView.contractFunction!"" />
+      <@checkAnswers.checkAnswersRowNoActions prompt="Description of work" value=awardedContractView.descriptionOfWork!"" />
+      <@checkAnswers.checkAnswersRowNoActions prompt="Date awarded" value=awardedContractView.dateAwarded!"" />
+      <@checkAnswers.checkAnswersRowNoActions prompt="Contract band" value=awardedContractView.contractBand!"" />
+      <@checkAnswers.checkAnswersRowNoActions prompt="Contact name" value=awardedContractView.contactDetailView.name!"" />
+      <@checkAnswers.checkAnswersRowNoActions prompt="Phone number" value=awardedContractView.contactDetailView.phoneNumber!"" />
+      <@checkAnswers.checkAnswersRowNoActions prompt="Job title" value=awardedContractView.contactDetailView.jobTitle!"" />
+      <@checkAnswers.checkAnswersRowNoActions prompt="Email address" value=awardedContractView.contactDetailView.emailAddress!"" />
     </@fdsCheckAnswers.checkAnswers>
   </div>
 </#macro>
