@@ -42,6 +42,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http
       .authorizeRequests()
 
+        .mvcMatchers("/actuator/health")
+          .permitAll()
+
         .mvcMatchers("/work-area")
           .hasAnyAuthority(systemAccessService.getWorkAreaGrantedAuthorities())
 
