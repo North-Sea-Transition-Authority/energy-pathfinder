@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.controller.project.location;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,11 +16,13 @@ import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.DevUkRestController;
-import uk.co.ogauthority.pathfinder.model.addtolist.AddToListDemo;
+import uk.co.ogauthority.pathfinder.controller.rest.LicenceBlocksRestController;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
@@ -53,13 +54,11 @@ public class ProjectLocationController {
   @GetMapping
   public ModelAndView getLocationDetails(@PathVariable("projectId") Integer projectId,
                                          ProjectContext projectContext) {
-    return getLocationModelAndView(projectId, locationService.getForm(projectContext.getProjectDetails()));
-  }
-
-  @GetMapping("/add-to-list-test")
-  public ModelAndView addToListTest(@PathVariable("projectId") Integer projectId,
-                                    ProjectContext projectContext) {
-    return getAddToListTest(projectId, new ProjectLocationForm());
+    return getLocationModelAndView(
+        projectContext.getProjectDetails(),
+        projectId,
+        locationService.getForm(projectContext.getProjectDetails())
+    );
   }
 
   @PostMapping
@@ -71,7 +70,7 @@ public class ProjectLocationController {
     bindingResult = locationService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getLocationModelAndView(projectId, form),
+        getLocationModelAndView(projectContext.getProjectDetails(), projectId, form),
         form,
         () -> {
           locationService.createOrUpdate(projectContext.getProjectDetails(), form);
@@ -81,24 +80,18 @@ public class ProjectLocationController {
   }
 
 
-  public ModelAndView getLocationModelAndView(Integer projectId, ProjectLocationForm form) {
+  public ModelAndView getLocationModelAndView(ProjectDetail detail, Integer projectId, ProjectLocationForm form) {
     var modelAndView = new ModelAndView("project/location/location")
         .addObject("fieldsRestUrl", SearchSelectorService.route(on(DevUkRestController.class).searchFields(null)))
+        .addObject("blocksRestUrl", SearchSelectorService.route(on(LicenceBlocksRestController.class).searchLicenceBlocks(null)))
         .addObject("form", form)
         .addObject("fieldTypeMap", FieldType.getAllAsMap())
+        .addObject("ukcsAreaMap", UkcsArea.getAllAsMap())
+        .addObject("alreadyAddedBlocks", locationService.getUnvalidatedBlockViewsForLocation(detail))
         .addObject("preselectedField", locationService.getPreSelectedField(form))
         .addObject("waterDepthUnit", MeasurementUnits.METRES);
 
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;
-  }
-
-  public ModelAndView getAddToListTest(Integer projectId, ProjectLocationForm form) {
-    return new ModelAndView("test/addToListTest")
-        .addObject("licenceBlockUrl", SearchSelectorService.route(on(DevUkRestController.class).searchFields(null)))
-        .addObject("alreadyAdded",
-          List.of(new AddToListDemo("997", "CLAIRE"), new AddToListDemo("123", "EXAMPLE"))
-        )
-        .addObject("form", form);
   }
 }

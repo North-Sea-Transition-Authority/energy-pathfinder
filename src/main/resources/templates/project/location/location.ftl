@@ -37,7 +37,17 @@
         </@fdsRadio.radioYes>
         <@fdsRadio.radioNo path="form.approvedDecomProgram"/>
       </@fdsRadio.radioGroup>
-
+      <@fdsSelect.select path="form.ukcsArea" labelText="What UKCS area is this project located in?" options=ukcsAreaMap/>
+      <@fdsAddToList.addToList
+        path="form.licenceBlocks"
+        alreadyAdded=alreadyAddedBlocks
+        title="Licence blocks"
+        itemName="Licence block"
+        noItemText="No licence blocks added"
+        addToListId="licence-block-table"
+        selectorLabelText="Add a licence block"
+        restUrl=springUrl(blocksRestUrl)
+      />
       <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
     </@fdsForm.htmlForm>
 </@defaultPage>

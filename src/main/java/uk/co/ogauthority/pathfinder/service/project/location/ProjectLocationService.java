@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project.location;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.transaction.Transactional;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -16,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDat
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationValidationHint;
+import uk.co.ogauthority.pathfinder.model.view.projectlocation.ProjectLocationBlockView;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -29,18 +32,21 @@ public class ProjectLocationService {
   private final SearchSelectorService searchSelectorService;
   private final ValidationService validationService;
   private final ProjectLocationFormValidator projectLocationFormValidator;
+  private final ProjectLocationBlocksService projectLocationBlocksService;
 
   @Autowired
   public ProjectLocationService(ProjectLocationRepository projectLocationRepository,
                                 DevUkFieldService fieldService,
                                 SearchSelectorService searchSelectorService,
                                 ValidationService validationService,
-                                ProjectLocationFormValidator projectLocationFormValidator) {
+                                ProjectLocationFormValidator projectLocationFormValidator,
+                                ProjectLocationBlocksService projectLocationBlocksService) {
     this.projectLocationRepository = projectLocationRepository;
     this.fieldService = fieldService;
     this.searchSelectorService = searchSelectorService;
     this.validationService = validationService;
     this.projectLocationFormValidator = projectLocationFormValidator;
+    this.projectLocationBlocksService = projectLocationBlocksService;
   }
 
   @Transactional
@@ -74,12 +80,22 @@ public class ProjectLocationService {
             ? form.getApprovedDecomProgramDate().createDateOrNull()
             : null
     );
+    projectLocation.setUkcsArea(form.getUkcsArea());
+    projectLocationBlocksService.createOrUpdateBlocks(form.getLicenceBlocks(), projectLocation);
 
     return projectLocationRepository.save(projectLocation);
   }
 
   public Optional<ProjectLocation> findByProjectDetail(ProjectDetail detail) {
     return projectLocationRepository.findByProjectDetail(detail);
+  }
+
+  public ProjectLocation getOrError(ProjectDetail detail) {
+    return findByProjectDetail(detail).orElseThrow(
+        () -> new PathfinderEntityNotFoundException(
+            String.format("Unable to find ProjectLocation for projectDetail with id: %d", detail.getId())
+        )
+    );
   }
 
 
@@ -111,10 +127,11 @@ public class ProjectLocationService {
 
     form.setApprovedFieldDevelopmentPlan(projectLocation.getApprovedFieldDevelopmentPlan());
     form.setApprovedFdpDate(new ThreeFieldDateInput(projectLocation.getApprovedFdpDate()));
+    form.setUkcsArea(projectLocation.getUkcsArea());
+    projectLocationBlocksService.addBlocksToForm(form, projectLocation);
 
     return form;
   }
-
 
   /**
    * Validate the projectLocationForm, calls custom validator first.
@@ -158,6 +175,10 @@ public class ProjectLocationService {
 
     }
     return Map.of();
+  }
+
+  public List<ProjectLocationBlockView> getUnvalidatedBlockViewsForLocation(ProjectDetail detail) {
+    return projectLocationBlocksService.getBlockViewsForLocation(getOrError(detail), ValidationType.NO_VALIDATION);
   }
 
 }

@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkField;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
+import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 
 @Entity
 @Table(name = "project_locations")
@@ -47,6 +48,9 @@ public class ProjectLocation {
   private Boolean approvedDecomProgram;
 
   private LocalDate approvedDecomProgramDate;
+
+  @Enumerated(EnumType.STRING)
+  private UkcsArea ukcsArea;
 
   public ProjectLocation() {
   }
@@ -139,5 +143,13 @@ public class ProjectLocation {
 
   public void setApprovedDecomProgramDate(LocalDate approvedDecomProgramDate) {
     this.approvedDecomProgramDate = approvedDecomProgramDate;
+  }
+
+  public UkcsArea getUkcsArea() {
+    return ukcsArea;
+  }
+
+  public void setUkcsArea(UkcsArea ukcsArea) {
+    this.ukcsArea = ukcsArea;
   }
 }

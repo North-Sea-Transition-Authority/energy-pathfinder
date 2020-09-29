@@ -46,6 +46,9 @@ public class ProjectLocationServiceTest {
   @Mock
   ProjectLocationFormValidator projectLocationFormValidator;
 
+  @Mock
+  ProjectLocationBlocksService projectLocationBlocksService;
+
   private ProjectLocationService projectLocationService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -59,7 +62,9 @@ public class ProjectLocationServiceTest {
         fieldService,
         searchSelectorService,
         validationService,
-        projectLocationFormValidator);
+        projectLocationFormValidator,
+        projectLocationBlocksService
+    );
 
     when(projectLocationRepository.save(any(ProjectLocation.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);

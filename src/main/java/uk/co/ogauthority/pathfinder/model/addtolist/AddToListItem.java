@@ -5,4 +5,6 @@ public interface AddToListItem {
   String getId();
 
   String getName();
+
+  Boolean isValid();
 }
