@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.view.projectlocation;
 
 import uk.co.ogauthority.pathfinder.model.addtolist.AddToListItem;
+import uk.co.ogauthority.pathfinder.model.entity.portal.LicenceBlock;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
 
 public class ProjectLocationBlockView implements AddToListItem {
@@ -17,12 +18,20 @@ public class ProjectLocationBlockView implements AddToListItem {
     this.isValid = isValid;
   }
 
+
+
   public ProjectLocationBlockView(String compositeKey,
                                   String blockReference,
                                   Boolean isValid
   ) {
     this.compositeKey = compositeKey;
     this.blockReference = blockReference;
+    this.isValid = isValid;
+  }
+
+  public ProjectLocationBlockView(LicenceBlock licenceBlock, Boolean isValid) {
+    this.compositeKey = licenceBlock.getCompositeKey();
+    this.blockReference = licenceBlock.getBlockReference();
     this.isValid = isValid;
   }
 

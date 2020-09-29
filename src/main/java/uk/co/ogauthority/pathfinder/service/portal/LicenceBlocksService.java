@@ -24,8 +24,15 @@ public class LicenceBlocksService {
       );
   }
 
-
   public List<LicenceBlock> findAllByCompositeKeyIn(List<String> ids) {
     return licenceBlocksRepository.findAllByCompositeKeyIn(ids);
+  }
+
+  public List<LicenceBlock> findAllByCompositeKeyInOrdered(List<String> ids) {
+    return licenceBlocksRepository.findAllByCompositeKeyInOrderByBlockReference(ids);
+  }
+
+  public boolean blockExists(String compositeKey) {
+    return licenceBlocksRepository.existsByCompositeKey(compositeKey);
   }
 }

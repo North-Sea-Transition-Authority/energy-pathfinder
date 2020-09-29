@@ -132,6 +132,7 @@ public class ProjectLocationBlock {
         getBlockReference(),
         getQuadrantNumber(),
         getBlockNumber(),
+        getBlockSuffix() != null ? getBlockSuffix() : "",
         getPlmId().toString()
     );
   }

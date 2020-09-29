@@ -32,8 +32,10 @@ public class ProjectLocationForm {
 
   private ThreeFieldDateInput approvedDecomProgramDate;
 
+  @NotNull(message = "Select a UKCS area", groups = FullValidation.class)
   private UkcsArea ukcsArea;
 
+  @NotEmpty(message = "Select at least one licence block", groups = FullValidation.class)
   private List<String> licenceBlocks;
 
   public ProjectLocationForm() {

@@ -17,7 +17,6 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.DevUkRestController;
 import uk.co.ogauthority.pathfinder.controller.rest.LicenceBlocksRestController;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
@@ -54,11 +53,7 @@ public class ProjectLocationController {
   @GetMapping
   public ModelAndView getLocationDetails(@PathVariable("projectId") Integer projectId,
                                          ProjectContext projectContext) {
-    return getLocationModelAndView(
-        projectContext.getProjectDetails(),
-        projectId,
-        locationService.getForm(projectContext.getProjectDetails())
-    );
+    return getLocationModelAndView(projectId, locationService.getForm(projectContext.getProjectDetails()));
   }
 
   @PostMapping
@@ -70,7 +65,7 @@ public class ProjectLocationController {
     bindingResult = locationService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getLocationModelAndView(projectContext.getProjectDetails(), projectId, form),
+        getLocationModelAndView(projectId, form),
         form,
         () -> {
           locationService.createOrUpdate(projectContext.getProjectDetails(), form);
@@ -80,14 +75,14 @@ public class ProjectLocationController {
   }
 
 
-  public ModelAndView getLocationModelAndView(ProjectDetail detail, Integer projectId, ProjectLocationForm form) {
+  public ModelAndView getLocationModelAndView(Integer projectId, ProjectLocationForm form) {
     var modelAndView = new ModelAndView("project/location/location")
         .addObject("fieldsRestUrl", SearchSelectorService.route(on(DevUkRestController.class).searchFields(null)))
         .addObject("blocksRestUrl", SearchSelectorService.route(on(LicenceBlocksRestController.class).searchLicenceBlocks(null)))
         .addObject("form", form)
         .addObject("fieldTypeMap", FieldType.getAllAsMap())
         .addObject("ukcsAreaMap", UkcsArea.getAllAsMap())
-        .addObject("alreadyAddedBlocks", locationService.getUnvalidatedBlockViewsForLocation(detail))
+        .addObject("alreadyAddedBlocks", locationService.getUnvalidatedBlockViewsFromForm(form))
         .addObject("preselectedField", locationService.getPreSelectedField(form))
         .addObject("waterDepthUnit", MeasurementUnits.METRES);
 

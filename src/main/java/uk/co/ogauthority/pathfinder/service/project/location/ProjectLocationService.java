@@ -181,4 +181,8 @@ public class ProjectLocationService {
     return projectLocationBlocksService.getBlockViewsForLocation(getOrError(detail), ValidationType.NO_VALIDATION);
   }
 
+  public List<ProjectLocationBlockView> getUnvalidatedBlockViewsFromForm(ProjectLocationForm form) {
+    return projectLocationBlocksService.getBlockViewsFromForm(form, ValidationType.NO_VALIDATION);
+  }
+
 }

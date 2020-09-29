@@ -17,13 +17,16 @@ import uk.co.ogauthority.pathfinder.service.portal.LicenceBlocksService;
 public class ProjectLocationBlocksService {
 
   private final LicenceBlocksService licenceBlocksService;
+  private final LicenceBlockValidatorService licenceBlockValidatorService;
   private final ProjectLocationBlockRepository projectLocationBlockRepository;
 
   @Autowired
   public ProjectLocationBlocksService(LicenceBlocksService licenceBlocksService,
+                                      LicenceBlockValidatorService licenceBlockValidatorService,
                                       ProjectLocationBlockRepository projectLocationBlockRepository
   ) {
     this.licenceBlocksService = licenceBlocksService;
+    this.licenceBlockValidatorService = licenceBlockValidatorService;
     this.projectLocationBlockRepository = projectLocationBlockRepository;
   }
 
@@ -82,14 +85,31 @@ public class ProjectLocationBlocksService {
         .collect(Collectors.toList()));
   }
 
-  //Get as AddToList object - unvalidated / validated
+  public List<ProjectLocationBlockView> getBlockViewsFromForm(ProjectLocationForm form, ValidationType validationType) {
+    return licenceBlocksService.findAllByCompositeKeyInOrdered(form.getLicenceBlocks()).stream()
+        .map(plb -> new ProjectLocationBlockView(
+            plb,
+            isBlockReferenceValid(plb.getCompositeKey(), validationType)
+        )).collect(Collectors.toList());
+  }
+
+
   public List<ProjectLocationBlockView> getBlockViewsForLocation(ProjectLocation projectLocation, ValidationType validationType) {
     return projectLocationBlockRepository.findAllByProjectLocationOrderByBlockReference(projectLocation).stream()
         .map(plb -> new ProjectLocationBlockView(
             plb,
-            validationType.equals(ValidationType.FULL)//TODO actually call validation
-              ? false
-              : true
+            isBlockReferenceValid(plb.getCompositeKey(), validationType)
         )).collect(Collectors.toList());
+  }
+
+  /**
+   * Validate the licence block exists in the portal if the validation type is FULL.
+   * @param compositeKey key to search for
+   * @param validationType validation type - FULL if validating
+   * @return true if the validationType is FULL and the block exists in the portal data.
+   *       True if validationType is not FULL. False otherwise.
+   */
+  private boolean isBlockReferenceValid(String compositeKey, ValidationType validationType) {
+    return !validationType.equals(ValidationType.FULL) || licenceBlockValidatorService.existsInPortalData(compositeKey);
   }
 }

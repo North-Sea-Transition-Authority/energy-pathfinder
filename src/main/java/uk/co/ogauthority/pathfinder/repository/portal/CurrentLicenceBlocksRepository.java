@@ -12,4 +12,8 @@ public interface CurrentLicenceBlocksRepository extends CrudRepository<LicenceBl
   List<LicenceBlock> findAllByBlockLocationAndBlockReferenceContainingIgnoreCase(BlockLocation blockLocation, String searchTerm);
 
   List<LicenceBlock> findAllByCompositeKeyIn(List<String> ids);
+
+  List<LicenceBlock> findAllByCompositeKeyInOrderByBlockReference(List<String> ids);
+
+  boolean existsByCompositeKey(String compositeKey);
 }
