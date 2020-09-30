@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.enums;
 
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
+import uk.co.ogauthority.pathfinder.model.form.validation.MandatoryUploadValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
 
 /**
@@ -13,7 +14,8 @@ public enum ValidationType {
 
   FULL("Save and complete", FullValidation.class),
   PARTIAL("Save and complete later", PartialValidation.class),
-  NO_VALIDATION("", null);
+  NO_VALIDATION("", null),
+  MANDATORY_UPLOAD("", MandatoryUploadValidation.class);
 
   private final String buttonText;
 

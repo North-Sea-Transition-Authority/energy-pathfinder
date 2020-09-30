@@ -9,6 +9,7 @@
 <#import 'project/macros/contactDetails.ftl' as contactDetails>
 <#import 'project/macros/quarterYearInput.ftl' as quarterYear>
 <#import 'project/macros/checkAnswers.ftl' as checkAnswers>
+<#import 'project/macros/fileUpload.ftl' as fileUpload>
 
 <#function springUrl url>
   <#local springUrl>

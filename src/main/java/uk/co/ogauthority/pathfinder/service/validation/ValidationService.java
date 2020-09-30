@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.validation;
 
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
@@ -19,7 +20,18 @@ public class ValidationService {
   public BindingResult validate(Object form,
                                 BindingResult bindingResult,
                                 ValidationType validationType) {
-    validator.validate(form, bindingResult, validationType.getValidationClass());
+    return validate(form, bindingResult, Set.of(validationType));
+  }
+
+  public BindingResult validate(Object form,
+                                BindingResult bindingResult,
+                                Set<ValidationType> validationTypes) {
+    var hints = validationTypes
+        .stream()
+        .map(ValidationType::getValidationClass)
+        .toArray();
+
+    validator.validate(form, bindingResult, hints);
     return bindingResult;
   }
 }

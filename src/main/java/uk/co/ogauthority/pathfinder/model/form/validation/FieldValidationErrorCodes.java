@@ -10,7 +10,8 @@ public enum FieldValidationErrorCodes {
   REQUIRED(".required"),
   OUT_OF_TARGET_RANGE(".outOfTargetRange"),
   NOT_UNIQUE(".notUnique"),
-  MIN_LENGTH_NOT_MET(".minLengthNotMet");
+  MIN_LENGTH_NOT_MET(".minLengthNotMet"),
+  EXCEEDED_MAXIMUM_FILE_UPLOAD_LIMIT(".exceedsMaximumFileUploadLimit");
 
   private final String code;
 

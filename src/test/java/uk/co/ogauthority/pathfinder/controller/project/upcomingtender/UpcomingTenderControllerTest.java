@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
+import java.util.Collections;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,8 +33,10 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
+import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
+import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderSummaryService;
@@ -55,6 +58,9 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
   @MockBean
   private UpcomingTenderSummaryService upcomingTenderSummaryService;
 
+  @MockBean
+  ProjectDetailFileService projectDetailFileService;
+
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
 
@@ -66,10 +72,17 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
   private final UpcomingTender upcomingTender = UpcomingTenderUtil.getUpcomingTender(detail);
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(detail));
     when(upcomingTenderService.getOrError(UPCOMING_TENDER_ID)).thenReturn(upcomingTender);
-    when(upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, DISPLAY_ORDER)).thenCallRealMethod();
+
+    var upcomingTenderView = UpcomingTenderViewUtil.createUpComingTenderView(
+        upcomingTender,
+        DISPLAY_ORDER,
+        Collections.emptyList()
+    );
+    when(upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, DISPLAY_ORDER)).thenReturn(upcomingTenderView);
+
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(false);
   }
@@ -125,7 +138,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
   @Test
   public void authenticatedUser_hasAccessToUpcomingTenderEdit() throws Exception {
-    when(upcomingTenderService.getForm(upcomingTender)).thenCallRealMethod();
+    when(upcomingTenderService.getForm(upcomingTender)).thenReturn(UpcomingTenderUtil.getCompleteForm());
     mockMvc.perform(get(ReverseRouter.route(
         on(UpcomingTendersController.class).editUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
@@ -159,7 +172,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
         .andExpect(status().is3xxRedirection());
 
     verify(upcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(upcomingTenderService, times(1)).createUpcomingTender(any(), any());
+    verify(upcomingTenderService, times(1)).createUpcomingTender(any(), any(), any());
   }
 
   @Test
@@ -182,7 +195,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
         .andExpect(status().is2xxSuccessful());
 
     verify(upcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(upcomingTenderService, times(0)).createUpcomingTender(any(), any());
+    verify(upcomingTenderService, times(0)).createUpcomingTender(any(), any(), any());
   }
 
   @Test
@@ -204,7 +217,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
         .andExpect(status().is3xxRedirection());
 
     verify(upcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(upcomingTenderService, times(1)).createUpcomingTender(any(), any());
+    verify(upcomingTenderService, times(1)).createUpcomingTender(any(), any(), any());
   }
 
   @Test
@@ -226,7 +239,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
         .andExpect(status().is3xxRedirection());
 
     verify(upcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(upcomingTenderService, times(1)).updateUpcomingTender(any(), any());
+    verify(upcomingTenderService, times(1)).updateUpcomingTender(any(), any(), any());
   }
 
   @Test
@@ -249,7 +262,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
         .andExpect(status().is2xxSuccessful());
 
     verify(upcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(upcomingTenderService, times(0)).updateUpcomingTender(any(), any());
+    verify(upcomingTenderService, times(0)).updateUpcomingTender(any(), any(), any());
   }
 
   @Test
@@ -271,6 +284,6 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
         .andExpect(status().is3xxRedirection());
 
     verify(upcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(upcomingTenderService, times(1)).updateUpcomingTender(any(), any());
+    verify(upcomingTenderService, times(1)).updateUpcomingTender(any(), any(), any());
   }
 }

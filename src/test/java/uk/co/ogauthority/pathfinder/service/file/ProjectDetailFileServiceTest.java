@@ -281,7 +281,7 @@ public class ProjectDetailFileServiceTest {
         FileLinkStatus.ALL)
     ).thenReturn(List.of(fileView));
 
-    var result = projectDetailFileService.getFilesLinkedToForm(
+    var result = projectDetailFileService.getFileViewsLinkedToForm(
         form,
         projectDetail,
         ProjectDetailFilePurpose.PLACEHOLDER
@@ -344,6 +344,16 @@ public class ProjectDetailFileServiceTest {
 
     verify(projectDetailFileRepository, times(1)).deleteAll(eq(List.of(file1, file2, file3)));
 
+  }
+
+  @Test
+  public void removeProjectDetailFiles() {
+    var file1 = new ProjectDetailFile();
+    var file2 = new ProjectDetailFile();
+
+    projectDetailFileService.removeProjectDetailFiles(List.of(file1, file2));
+    
+    verify(projectDetailFileRepository).deleteAll(List.of(file1, file2));
   }
 
 }

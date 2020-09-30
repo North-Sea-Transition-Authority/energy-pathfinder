@@ -21,6 +21,14 @@
       radioItems=contractBands
     />
     <@contactDetails.standardContactDetails path="form.contactDetail" legendHeading="Tender contact details"/>
+    <@fileUpload.fileUploadWithFieldSet
+      id="upcoming-tender-file-upload-id"
+      path="form.uploadedFileWithDescriptionForms"
+      legendHeading="Tender document"
+      fieldsetHint="Optionally add a document to provide additional information for the supply chain"
+      legendHeadingSize="h2"
+      multipleFileUpload=false
+    />
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
   </@fdsForm.htmlForm>
 </@defaultPage>

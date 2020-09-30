@@ -6,25 +6,33 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
+import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
+import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTenderFileLink;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
+import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
+import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UpcomingTenderServiceTest {
@@ -38,11 +46,19 @@ public class UpcomingTenderServiceTest {
   @Mock
   private UpcomingTenderFormValidator upcomingTenderFormValidator;
 
+  @Mock
+  private UpcomingTenderFileLinkService upcomingTenderFileLinkService;
+
+  @Mock
+  private ProjectDetailFileService projectDetailFileService;
+
   private UpcomingTenderService upcomingTenderService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
 
   private final UpcomingTender upcomingTender = UpcomingTenderUtil.getUpcomingTender(details);
+
+  private final AuthenticatedUserAccount authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount();
 
   @Before
   public void setUp() {
@@ -55,7 +71,9 @@ public class UpcomingTenderServiceTest {
         validationService,
         upcomingTenderFormValidator,
         functionService,
-        searchSelectorService
+        searchSelectorService,
+        projectDetailFileService,
+        upcomingTenderFileLinkService
     );
 
     when(upcomingTenderRepository.save(any(UpcomingTender.class)))
@@ -66,7 +84,11 @@ public class UpcomingTenderServiceTest {
   @Test
   public void createUpcomingTender() {
     var form = UpcomingTenderUtil.getCompleteForm();
-    var newUpcomingTender = upcomingTenderService.createUpcomingTender(details, form);
+    var newUpcomingTender = upcomingTenderService.createUpcomingTender(
+        details,
+        form,
+        authenticatedUserAccount
+    );
     assertThat(newUpcomingTender.getProjectDetail()).isEqualTo(details);
     assertThat(newUpcomingTender.getTenderFunction()).isEqualTo(UpcomingTenderUtil.TENDER_FUNCTION);
     checkCommonFields(form, newUpcomingTender);
@@ -75,7 +97,11 @@ public class UpcomingTenderServiceTest {
   @Test
   public void createUpcomingTender_manualFunction() {
     var form = UpcomingTenderUtil.getCompletedForm_manualEntry();
-    var newUpcomingTender = upcomingTenderService.createUpcomingTender(details, form);
+    var newUpcomingTender = upcomingTenderService.createUpcomingTender(
+        details,
+        form,
+        authenticatedUserAccount
+    );
     assertThat(newUpcomingTender.getProjectDetail()).isEqualTo(details);
     checkCommonFields(form, newUpcomingTender);
   }
@@ -85,7 +111,11 @@ public class UpcomingTenderServiceTest {
     var form = UpcomingTenderUtil.getCompleteForm();
     form.setTenderFunction(Function.DRILLING.name());
     var existingUpcomingTender = upcomingTender;
-    upcomingTenderService.updateUpcomingTender(existingUpcomingTender, form);
+    upcomingTenderService.updateUpcomingTender(
+        existingUpcomingTender,
+        form,
+        authenticatedUserAccount
+    );
     assertThat(existingUpcomingTender.getProjectDetail()).isEqualTo(details);
     assertThat(existingUpcomingTender.getTenderFunction()).isEqualTo(Function.DRILLING);
     checkCommonFields(form, existingUpcomingTender);
@@ -97,7 +127,7 @@ public class UpcomingTenderServiceTest {
     form.setTenderFunction(null);
     form.setTenderFunction(UpcomingTenderUtil.MANUAL_TENDER_FUNCTION);
     var existingUpcomingTender = upcomingTender;
-    upcomingTenderService.updateUpcomingTender(existingUpcomingTender, form);
+    upcomingTenderService.updateUpcomingTender(existingUpcomingTender, form, authenticatedUserAccount);
     assertThat(existingUpcomingTender.getProjectDetail()).isEqualTo(details);
     assertThat(existingUpcomingTender.getManualTenderFunction()).isEqualTo(SearchSelectorService.removePrefix(UpcomingTenderUtil.MANUAL_TENDER_FUNCTION));
     checkCommonFields(form, existingUpcomingTender);
@@ -116,6 +146,37 @@ public class UpcomingTenderServiceTest {
     var form = upcomingTenderService.getForm(manualEntryTender);
     assertThat(form.getTenderFunction()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(manualEntryTender.getManualTenderFunction()));
     checkCommonFormFields(form, upcomingTender);
+  }
+
+  @Test
+  public void getForm_withFile() {
+
+    var uploadedFileView = UploadedFileUtil.createUploadedFileView();
+    var upcomingTenderLink = new UpcomingTenderFileLink();
+    upcomingTenderLink.setProjectDetailFile(new ProjectDetailFile());
+    upcomingTenderLink.setUpcomingTender(upcomingTender);
+
+    when(upcomingTenderFileLinkService.getAllByUpcomingTender(upcomingTender)).thenReturn(List.of(upcomingTenderLink));
+    when(projectDetailFileService.getUploadedFileView(any(), any(), any(), any())).thenReturn(uploadedFileView);
+
+    var form = upcomingTenderService.getForm(upcomingTender);
+    checkCommonFormFields(form, upcomingTender);
+    assertThat(form.getUploadedFileWithDescriptionForms()).hasSize(1);
+
+    var fileForm = form.getUploadedFileWithDescriptionForms().get(0);
+    assertThat(fileForm.getUploadedFileId()).isEqualTo(uploadedFileView.getFileId());
+
+  }
+
+  @Test
+  public void getForm_withoutFile() {
+
+    when(upcomingTenderFileLinkService.getAllByUpcomingTender(upcomingTender)).thenReturn(List.of());
+
+    var form = upcomingTenderService.getForm(upcomingTender);
+    checkCommonFormFields(form, upcomingTender);
+    assertThat(form.getUploadedFileWithDescriptionForms()).isEmpty();
+
   }
 
   @Test
@@ -178,5 +239,43 @@ public class UpcomingTenderServiceTest {
     var results = upcomingTenderService.findTenderFunctionsLikeWithManualEntry(manualEntry);
     assertThat(results.size()).isEqualTo(1);
     assertThat(results.get(0).getId()).isEqualTo(SearchSelectablePrefix.FREE_TEXT_PREFIX+manualEntry);
+  }
+
+  @Test
+  public void deleteUpcomingTenderFile_whenTemporaryFileStatus_dontRemoveFileLink() {
+
+    var fileId = "fileId";
+    var projectDetail = ProjectUtil.getProjectDetails();
+    var authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount();
+
+    var projectDetailFile = new ProjectDetailFile();
+    projectDetailFile.setFileLinkStatus(FileLinkStatus.TEMPORARY);
+
+    when(projectDetailFileService.getProjectDetailFileByProjectDetailAndFileId(any(), any())).thenReturn(projectDetailFile);
+
+    upcomingTenderService.deleteUpcomingTenderFile(fileId, projectDetail, authenticatedUserAccount);
+
+    verify(upcomingTenderFileLinkService, times(0)).removeUpcomingTenderFileLink(projectDetailFile);
+    verify(projectDetailFileService, times(1)).processFileDeletion(projectDetailFile, authenticatedUserAccount);
+
+  }
+
+  @Test
+  public void deleteUpcomingTenderFile_whenFullFileStatus_thenRemoveFileLink() {
+
+    var fileId = "fileId";
+    var projectDetail = ProjectUtil.getProjectDetails();
+    var authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount();
+
+    var projectDetailFile = new ProjectDetailFile();
+    projectDetailFile.setFileLinkStatus(FileLinkStatus.FULL);
+
+    when(projectDetailFileService.getProjectDetailFileByProjectDetailAndFileId(any(), any())).thenReturn(projectDetailFile);
+
+    upcomingTenderService.deleteUpcomingTenderFile(fileId, projectDetail, authenticatedUserAccount);
+
+    verify(upcomingTenderFileLinkService, times(1)).removeUpcomingTenderFileLink(projectDetailFile);
+    verify(projectDetailFileService, times(1)).processFileDeletion(projectDetailFile, authenticatedUserAccount);
+
   }
 }

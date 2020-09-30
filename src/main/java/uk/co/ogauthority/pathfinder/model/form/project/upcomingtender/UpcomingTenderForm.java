@@ -6,9 +6,10 @@ import javax.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadMultipleFilesWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
-public class UpcomingTenderForm {
+public class UpcomingTenderForm extends UploadMultipleFilesWithDescriptionForm {
 
   @NotEmpty(message = "Select a tender function", groups = FullValidation.class)
   private String tenderFunction;

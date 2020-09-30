@@ -191,7 +191,7 @@ public class AwardedContractServiceTest {
     var awardedContract = awardedContractService.createAwardedContract(projectDetail, form);
 
     checkCommonFields(form, awardedContract);
-    assertThat(awardedContract.getManualContractFunction()).isEqualTo(searchSelectorService.removePrefix(manualEntryFunction));
+    assertThat(awardedContract.getManualContractFunction()).isEqualTo(SearchSelectorService.removePrefix(manualEntryFunction));
     assertThat(awardedContract.getContractFunction()).isNull();
   }
 
@@ -230,7 +230,7 @@ public class AwardedContractServiceTest {
     var savedAwardedContract = awardedContractService.updateAwardedContract(1, projectDetail, form);
 
     checkCommonFields(form, savedAwardedContract);
-    assertThat(savedAwardedContract.getManualContractFunction()).isEqualTo(searchSelectorService.removePrefix(manualEntryFunction));
+    assertThat(savedAwardedContract.getManualContractFunction()).isEqualTo(SearchSelectorService.removePrefix(manualEntryFunction));
     assertThat(savedAwardedContract.getContractFunction()).isNull();
   }
 
@@ -254,7 +254,7 @@ public class AwardedContractServiceTest {
 
     var preSelectedMap = awardedContractService.getPreSelectedContractFunction(form);
     assertThat(preSelectedMap).containsExactly(
-        entry(form.getContractFunction(), searchSelectorService.removePrefix(form.getContractFunction()))
+        entry(form.getContractFunction(), SearchSelectorService.removePrefix(form.getContractFunction()))
     );
   }
 

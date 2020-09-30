@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
+import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -25,6 +26,9 @@ public class UpcomingTenderSummaryServiceTest {
 
   @Mock
   private UpcomingTenderService upcomingTenderService;
+
+  @Mock
+  private UpcomingTenderFileLinkService upcomingTenderFileLinkService;
 
   private UpcomingTenderSummaryService upcomingTenderSummaryService;
 
@@ -36,7 +40,7 @@ public class UpcomingTenderSummaryServiceTest {
 
   @Before
   public void setUp() {
-    upcomingTenderSummaryService = new UpcomingTenderSummaryService(upcomingTenderService);
+    upcomingTenderSummaryService = new UpcomingTenderSummaryService(upcomingTenderService, upcomingTenderFileLinkService);
     when(upcomingTenderService.getUpcomingTendersForDetail(details)).thenReturn(
         List.of(upcomingTender, manualEntryUpcomingTender)
     );
@@ -102,6 +106,45 @@ public class UpcomingTenderSummaryServiceTest {
     assertThat(errors.get(0).getDisplayOrder()).isEqualTo(1);
     assertThat(errors.get(0).getFieldName()).isEqualTo(UpcomingTenderSummaryService.EMPTY_LIST_ERROR);
     assertThat(errors.get(0).getErrorMessage()).isEqualTo(UpcomingTenderSummaryService.EMPTY_LIST_ERROR);
+  }
+
+  @Test
+  public void getSummaryViews_withFileUpload() {
+
+    var uploadedFileView = UploadedFileUtil.createUploadedFileView();
+    when(upcomingTenderFileLinkService.getFileUploadViewsLinkedToUpcomingTender(any())).thenReturn(List.of(uploadedFileView));
+
+    when(upcomingTenderService.getUpcomingTendersForDetail(details)).thenReturn(List.of(upcomingTender));
+
+    var views = upcomingTenderSummaryService.getSummaryViews(details);
+    assertThat(views.size()).isEqualTo(1);
+
+    var view = views.get(0);
+    checkCommonFields(view, upcomingTender);
+    assertThat(view.getUploadedFileViews()).hasSize(1);
+
+    var resultingFile = view.getUploadedFileViews().get(0);
+    assertThat(resultingFile.getFileId()).isEqualTo(uploadedFileView.getFileId());
+    assertThat(resultingFile.getFileDescription()).isEqualTo(uploadedFileView.getFileDescription());
+    assertThat(resultingFile.getFileName()).isEqualTo(uploadedFileView.getFileName());
+    assertThat(resultingFile.getFileSize()).isEqualTo(uploadedFileView.getFileSize());
+    assertThat(resultingFile.getFileUploadedTime()).isEqualTo(uploadedFileView.getFileUploadedTime());
+    assertThat(resultingFile.getFileUrl()).isEqualTo(uploadedFileView.getFileUrl());
+  }
+
+  @Test
+  public void getSummaryViews_withoutFileUpload() {
+
+    when(upcomingTenderFileLinkService.getFileUploadViewsLinkedToUpcomingTender(any())).thenReturn(List.of());
+
+    when(upcomingTenderService.getUpcomingTendersForDetail(details)).thenReturn(List.of(upcomingTender));
+
+    var views = upcomingTenderSummaryService.getSummaryViews(details);
+    assertThat(views.size()).isEqualTo(1);
+
+    var view = views.get(0);
+    checkCommonFields(view, upcomingTender);
+    assertThat(view.getUploadedFileViews()).isEmpty();
   }
 
   private void checkCommonFields(UpcomingTenderView view, UpcomingTender tender) {

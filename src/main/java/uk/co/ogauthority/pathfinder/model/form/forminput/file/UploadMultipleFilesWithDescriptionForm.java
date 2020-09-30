@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
+import uk.co.ogauthority.pathfinder.model.form.validation.MandatoryUploadValidation;
 
 public abstract class UploadMultipleFilesWithDescriptionForm {
 
   @Valid
-  // Full validation implies that the list requires at least one element
-  @NotEmpty(groups = {FullValidation.class}, message = "You must upload at least one file")
+  // MandatoryUploadValidation implies that the list requires at least one element
+  @NotEmpty(groups = {MandatoryUploadValidation.class}, message = "You must upload at least one file")
   List<UploadFileWithDescriptionForm> uploadedFileWithDescriptionForms;
 
   public UploadMultipleFilesWithDescriptionForm() {

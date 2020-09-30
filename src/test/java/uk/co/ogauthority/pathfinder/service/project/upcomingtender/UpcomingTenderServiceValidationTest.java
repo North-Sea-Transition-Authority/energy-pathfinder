@@ -1,26 +1,33 @@
 package uk.co.ogauthority.pathfinder.service.project.upcomingtender;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import javax.validation.Validation;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
+import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
+import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UpcomingTenderServiceValidationTest {
@@ -37,6 +44,12 @@ public class UpcomingTenderServiceValidationTest {
   @Mock
   private FunctionService functionService;
 
+  @Mock
+  private ProjectDetailFileService projectDetailFileService;
+
+  @Mock
+  private UpcomingTenderFileLinkService upcomingTenderFileLinkService;
+
   private UpcomingTenderService upcomingTenderService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -50,7 +63,9 @@ public class UpcomingTenderServiceValidationTest {
         validationService,
         upcomingTenderFormValidator,
         functionService,
-        searchSelectorService
+        searchSelectorService,
+        projectDetailFileService,
+        upcomingTenderFileLinkService
     );
   }
 
@@ -79,5 +94,62 @@ public class UpcomingTenderServiceValidationTest {
     var upcomingTender = UpcomingTenderUtil.getUpcomingTender(details);
     upcomingTender.setJobTitle(null);
     assertThat(upcomingTenderService.isValid(upcomingTender, ValidationType.FULL)).isFalse();
+  }
+
+  @Test
+  public void isValid_fullFormWithPartialDocument_thenInvalid() {
+    var form = UpcomingTenderUtil.getCompleteForm();
+    var uploadedFileForm = UploadedFileUtil.createUploadFileWithDescriptionForm();
+    uploadedFileForm.setUploadedFileDescription(null);
+
+    form.setUploadedFileWithDescriptionForms(List.of(uploadedFileForm));
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+
+    upcomingTenderService.validate(form, bindingResult, ValidationType.FULL);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(bindingResult);
+
+    assertThat(fieldErrors).contains(
+        entry("uploadedFileWithDescriptionForms[0].uploadedFileDescription", Set.of("NotEmpty"))
+    );
+
+    assertThat(fieldErrorMessages).contains(
+        entry("uploadedFileWithDescriptionForms[0].uploadedFileDescription", Set.of("Enter a file description"))
+    );
+  }
+
+  @Test
+  public void isValid_fullFormWithCompleteDocument_thenValid() {
+    var form = UpcomingTenderUtil.getCompleteForm();
+    var uploadedFileForm = UploadedFileUtil.createUploadFileWithDescriptionForm();
+    form.setUploadedFileWithDescriptionForms(List.of(uploadedFileForm));
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+
+    upcomingTenderService.validate(form, bindingResult, ValidationType.FULL);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(bindingResult);
+
+    assertThat(fieldErrors).isEmpty();
+    assertThat(fieldErrorMessages).isEmpty();
+  }
+
+  @Test
+  public void isValid_fullFormWithNoDocument_thenValid() {
+    var form = UpcomingTenderUtil.getCompleteForm();
+    form.setUploadedFileWithDescriptionForms(List.of());
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+
+    upcomingTenderService.validate(form, bindingResult, ValidationType.FULL);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(bindingResult);
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(bindingResult);
+
+    assertThat(fieldErrors).isEmpty();
+    assertThat(fieldErrorMessages).isEmpty();
   }
 }

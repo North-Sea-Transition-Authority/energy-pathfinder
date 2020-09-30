@@ -1,7 +1,9 @@
 package uk.co.ogauthority.pathfinder.model.view.upcomingtender;
 
+import java.util.List;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
+import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryItem;
 
 public class UpcomingTenderView implements SummaryItem {
@@ -22,12 +24,13 @@ public class UpcomingTenderView implements SummaryItem {
 
   private ContactDetailView contactDetailView;
 
+  private List<UploadedFileView> uploadedFileViews;
+
   private SummaryLink editLink;
 
   private SummaryLink deleteLink;
 
   private Boolean isValid;
-
 
   public UpcomingTenderView(
       Integer displayOrder,
@@ -127,5 +130,14 @@ public class UpcomingTenderView implements SummaryItem {
   @Override
   public Boolean isValid() {
     return isValid;
+  }
+
+  public List<UploadedFileView> getUploadedFileViews() {
+    return uploadedFileViews;
+  }
+
+  public void setUploadedFileViews(
+      List<UploadedFileView> uploadedFileViews) {
+    this.uploadedFileViews = uploadedFileViews;
   }
 }
