@@ -9,13 +9,17 @@ import java.util.HashMap;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.controller.rest.DevUkRestController;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.searchselector.ManualEntryAttribute;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 
+@RunWith(MockitoJUnitRunner.class)
 public class SearchSelectorServiceTest {
+
   private SearchSelectorService searchSelectorService;
 
   @Before
@@ -81,7 +85,7 @@ public class SearchSelectorServiceTest {
   @Test
   public void removePrefix() {
     var str = SearchSelectablePrefix.FREE_TEXT_PREFIX + "Test";
-    assertThat(searchSelectorService.removePrefix(str)).isEqualTo("Test");
+    assertThat(SearchSelectorService.removePrefix(str)).isEqualTo("Test");
   }
 
   @Test

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,9 +48,9 @@ public class ProjectDetailFileService {
    * @param purpose to get files for
    * @return list of files with populated descriptions
    */
-  public List<UploadedFileView> getFilesLinkedToForm(UploadMultipleFilesWithDescriptionForm uploadForm,
-                                                     ProjectDetail projectDetail,
-                                                     ProjectDetailFilePurpose purpose) {
+  public List<UploadedFileView> getFileViewsLinkedToForm(UploadMultipleFilesWithDescriptionForm uploadForm,
+                                                         ProjectDetail projectDetail,
+                                                         ProjectDetailFilePurpose purpose) {
 
     Map<String, UploadFileWithDescriptionForm> fileIdToFormMap = getFileIdToFormMap(uploadForm);
 
@@ -65,7 +66,7 @@ public class ProjectDetailFileService {
   }
 
   /**
-   * Populate a file upload form with fully linked application files which have a specific purpose.
+   * Populate a file upload form with fully linked project files which have a specific purpose.
    *
    * @param uploadForm to populate
    * @param projectDetail we are getting files for
@@ -75,7 +76,7 @@ public class ProjectDetailFileService {
                              ProjectDetail projectDetail,
                              ProjectDetailFilePurpose purpose) {
 
-    List<UploadFileWithDescriptionForm> fileFormViewList = getUploadedFileViews(
+    List<UploadFileWithDescriptionForm> fileFormList = getUploadedFileViews(
         projectDetail,
         purpose,
         FileLinkStatus.FULL
@@ -84,7 +85,7 @@ public class ProjectDetailFileService {
         .map(fileUploadService::createUploadFileWithDescriptionFormFromView)
         .collect(Collectors.toList());
 
-    uploadForm.setUploadedFileWithDescriptionForms(fileFormViewList);
+    uploadForm.setUploadedFileWithDescriptionForms(fileFormList);
 
   }
 
@@ -125,11 +126,11 @@ public class ProjectDetailFileService {
    * @param user updating the files
    */
   @Transactional
-  public void updateFiles(UploadMultipleFilesWithDescriptionForm uploadForm,
-                          ProjectDetail projectDetail,
-                          ProjectDetailFilePurpose purpose,
-                          FileUpdateMode updateMode,
-                          WebUserAccount user) {
+  public List<ProjectDetailFile> updateFiles(UploadMultipleFilesWithDescriptionForm uploadForm,
+                                             ProjectDetail projectDetail,
+                                             ProjectDetailFilePurpose purpose,
+                                             FileUpdateMode updateMode,
+                                             WebUserAccount user) {
 
     Map<String, UploadFileWithDescriptionForm> uploadedFileIdToFormMap = getFileIdToFormMap(uploadForm);
 
@@ -156,15 +157,17 @@ public class ProjectDetailFileService {
 
     });
 
-    projectDetailFileRepository.saveAll(filesToUpdate);
+    var persistedFiles = projectDetailFileRepository.saveAll(filesToUpdate);
 
     if (updateMode.equals(FileUpdateMode.DELETE_UNLINKED_FILES)) {
       deleteProjectDetailFileLinksAndUploadedFiles(filesToRemove, user);
     }
 
+    return StreamSupport.stream(persistedFiles.spliterator(), false).collect(Collectors.toList());
+
   }
 
-  private Map<String, UploadFileWithDescriptionForm> getFileIdToFormMap(
+  public Map<String, UploadFileWithDescriptionForm> getFileIdToFormMap(
       UploadMultipleFilesWithDescriptionForm uploadForm) {
     return uploadForm.getUploadedFileWithDescriptionForms().stream()
         .collect(Collectors.toMap(UploadFileWithDescriptionForm::getUploadedFileId, f -> f));
@@ -239,7 +242,7 @@ public class ProjectDetailFileService {
   }
 
   /**
-   * Delete an individual file for an application.
+   * Delete an individual file for a project.
    *
    * @param projectDetailFile file being deleted
    * @param user deleting file
@@ -313,5 +316,10 @@ public class ProjectDetailFileService {
 
     projectDetailFileRepository.deleteAll(filesToCleanup);
 
+  }
+
+  @Transactional
+  public void removeProjectDetailFiles(List<ProjectDetailFile> projectDetailFilesToRemove) {
+    projectDetailFileRepository.deleteAll(projectDetailFilesToRemove);
   }
 }

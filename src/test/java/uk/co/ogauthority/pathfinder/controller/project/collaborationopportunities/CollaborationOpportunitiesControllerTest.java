@@ -30,12 +30,15 @@ import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerT
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
+import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -43,11 +46,18 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 @WebMvcTest(value = CollaborationOpportunitiesController.class, includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ProjectContextService.class))
 public class CollaborationOpportunitiesControllerTest extends ProjectContextAbstractControllerTest {
   private static final Integer PROJECT_ID = 1;
+  private static final Integer COLLABORATION_OPPORTUNITY_ID = 1;
+  private static final Integer DISPLAY_ORDER = 1;
 
   @MockBean
   private CollaborationOpportunitiesService collaborationOpportunitiesService;
 
+  @MockBean
+  private CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService;
+
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
+
+  private final CollaborationOpportunity opportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
 
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
@@ -60,6 +70,8 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
     when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(detail));
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(false);
+    when(collaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID)).thenReturn(opportunity);
+    when(collaborationOpportunitiesSummaryService.getView(opportunity, DISPLAY_ORDER)).thenCallRealMethod();
   }
 
   @Test
@@ -90,6 +102,39 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
   public void unAuthenticatedUser_cannotAccessCollaborationOpportunitySummary() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
         on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(PROJECT_ID, null)))
+        .with(authenticatedUserAndSession(unAuthenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void authenticatedUser_hasAccessToCollaborationOpportunityDelete() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(CollaborationOpportunitiesController.class).deleteCollaborationOpportunityConfirm(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, DISPLAY_ORDER, null)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  public void unAuthenticatedUser_cannotAccessCollaborationOpportunityDelete() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(CollaborationOpportunitiesController.class).deleteCollaborationOpportunityConfirm(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, DISPLAY_ORDER, null)))
+        .with(authenticatedUserAndSession(unAuthenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void authenticatedUser_hasAccessToCollaborationOpportunityEdit() throws Exception {
+    when(collaborationOpportunitiesService.getForm(opportunity)).thenCallRealMethod();
+    mockMvc.perform(get(ReverseRouter.route(
+        on(CollaborationOpportunitiesController.class).editCollaborationOpportunity(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, null)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  public void unAuthenticatedUser_cannotAccessCollaborationOpportunityEdit() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(CollaborationOpportunitiesController.class).editCollaborationOpportunity(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -161,6 +206,71 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
     verify(collaborationOpportunitiesService, times(1)).createCollaborationOpportunity(any(), any());
   }
 
+  @Test
+  public void updateCollaborationOpportunity_partialValidation() throws Exception {
+    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
+    }};
 
+    var bindingResult = new BeanPropertyBindingResult(CollaborationOpportunityForm.class, "form");
+    when(collaborationOpportunitiesService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(CollaborationOpportunitiesController.class)
+            .updateCollaborationOpportunity(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, null, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeLaterParams))
+        .andExpect(status().is3xxRedirection());
+
+    verify(collaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(collaborationOpportunitiesService, times(1)).updateCollaborationOpportunity(any(), any());
+  }
+
+  @Test
+  public void updateCollaborationOpportunity_fullValidation_invalid() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    var bindingResult = new BeanPropertyBindingResult(CollaborationOpportunityForm.class, "form");
+    bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
+    when(collaborationOpportunitiesService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(CollaborationOpportunitiesController.class)
+            .updateCollaborationOpportunity(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, null, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().is2xxSuccessful());
+
+    verify(collaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(collaborationOpportunitiesService, times(0)).updateCollaborationOpportunity(any(), any());
+  }
+
+  @Test
+  public void updateCollaborationOpportunity_fullValidation_valid() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    var bindingResult = new BeanPropertyBindingResult(CollaborationOpportunityForm.class, "form");
+    when(collaborationOpportunitiesService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(CollaborationOpportunitiesController.class)
+            .updateCollaborationOpportunity(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, null, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().is3xxRedirection());
+
+    verify(collaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(collaborationOpportunitiesService, times(1)).updateCollaborationOpportunity(any(), any());
+  }
 
 }

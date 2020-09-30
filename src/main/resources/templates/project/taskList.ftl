@@ -15,7 +15,7 @@
         completed=awardedContractsCompleted
         useNotCompletedLabels=true
       />
-      <@fdsTaskList.taskListItem itemUrl=springUrl(collaborationOpportunitiesUrl) itemText=collaborationOpportunitiesText completed=false useNotCompletedLabels=true />
+      <@fdsTaskList.taskListItem itemUrl=springUrl(collaborationOpportunitiesUrl) itemText=collaborationOpportunitiesText completed=collaborationOpportunitiesCompleted useNotCompletedLabels=true />
     </@fdsTaskList.taskListSection>
   </@fdsTaskList.taskList>
 </@defaultPage>

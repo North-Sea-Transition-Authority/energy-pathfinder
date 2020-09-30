@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.project.awardedcontract;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -10,12 +11,15 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractView;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractViewUtil;
+import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Service
 public class AwardedContractSummaryService {
 
   public static final String ERROR_FIELD_NAME = "awarded-contract-%d";
   public static final String ERROR_MESSAGE = "Awarded contract %d is incomplete";
+  public static final String EMPTY_LIST_ERROR = "You must add at least one awarded contract";
 
   private final AwardedContractService awardedContractService;
 
@@ -40,23 +44,11 @@ public class AwardedContractSummaryService {
   }
 
   public List<ErrorItem> getAwardedContractViewErrors(List<AwardedContractView> awardedContractViews) {
-    return awardedContractViews
-        .stream()
-        .filter(awardedContractView -> !awardedContractView.isValid())
-        .map(awardedContractView ->
-            new ErrorItem(
-                awardedContractView.getDisplayOrder(),
-                String.format(ERROR_FIELD_NAME, awardedContractView.getDisplayOrder()),
-                String.format(ERROR_MESSAGE, awardedContractView.getDisplayOrder())
-            )
-        )
-        .collect(Collectors.toList());
+    return SummaryUtil.getErrors(new ArrayList<>(awardedContractViews), EMPTY_LIST_ERROR, ERROR_FIELD_NAME, ERROR_MESSAGE);
   }
 
-  public boolean areAllAwardedContractsValid(List<AwardedContractView> awardedContractViews) {
-    return awardedContractViews
-        .stream()
-        .allMatch(AwardedContractView::isValid);
+  public ValidationResult validateViews(List<AwardedContractView> views) {
+    return SummaryUtil.validateViews(new ArrayList<>(views));
   }
 
   private List<AwardedContractView> constructAwardedContractViews(ProjectDetail projectDetail,

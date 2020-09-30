@@ -29,6 +29,7 @@ import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContr
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Controller
@@ -151,9 +152,7 @@ public class AwardedContractController {
         projectContext.getProjectDetails()
     );
 
-    var validationResult = awardedContractSummaryService.areAllAwardedContractsValid(
-        awardedContractViews
-    ) ? ValidationResult.VALID : ValidationResult.INVALID;
+    var validationResult = awardedContractSummaryService.validateViews(awardedContractViews);
 
     return validationResult.equals(ValidationResult.VALID)
         ? ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null))
@@ -170,7 +169,7 @@ public class AwardedContractController {
             ReverseRouter.route(on(AwardedContractController.class).addAwardedContract(projectId, null))
         )
         .addObject("backToTaskListUrl",
-            ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId, null))
+            ControllerUtils.getBackToTaskListUrl(projectId)
         )
         .addObject("errorList",
             validationResult.equals(ValidationResult.INVALID)

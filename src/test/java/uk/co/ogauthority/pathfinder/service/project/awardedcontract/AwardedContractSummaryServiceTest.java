@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project.awardedcontract;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AwardedContractSummaryServiceTest {
@@ -154,10 +156,10 @@ public class AwardedContractSummaryServiceTest {
     var awardedContractView2 = AwardedContractTestUtil.createAwardedContractView(2);
     awardedContractView2.setValid(true);
 
-    var allValid = awardedContractSummaryService.areAllAwardedContractsValid(
+    var allValid = awardedContractSummaryService.validateViews(
         List.of(awardedContractView1, awardedContractView2)
     );
-    assertThat(allValid).isTrue();
+    assertThat(allValid).isEqualTo(ValidationResult.VALID);
   }
 
   @Test
@@ -169,9 +171,18 @@ public class AwardedContractSummaryServiceTest {
     var awardedContractView2 = AwardedContractTestUtil.createAwardedContractView(2);
     awardedContractView2.setValid(false);
 
-    var allValid = awardedContractSummaryService.areAllAwardedContractsValid(
+    var allValid = awardedContractSummaryService.validateViews(
         List.of(awardedContractView1, awardedContractView2)
     );
-    assertThat(allValid).isFalse();
+    assertThat(allValid).isEqualTo(ValidationResult.INVALID);
+  }
+
+  @Test
+  public void getErrors_emptyList() {
+    var errors = awardedContractSummaryService.getAwardedContractViewErrors(Collections.emptyList());
+    assertThat(errors.size()).isEqualTo(1);
+    assertThat(errors.get(0).getDisplayOrder()).isEqualTo(1);
+    assertThat(errors.get(0).getFieldName()).isEqualTo(AwardedContractSummaryService.EMPTY_LIST_ERROR);
+    assertThat(errors.get(0).getErrorMessage()).isEqualTo(AwardedContractSummaryService.EMPTY_LIST_ERROR);
   }
 }

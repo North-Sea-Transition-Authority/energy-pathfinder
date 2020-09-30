@@ -70,7 +70,7 @@ public abstract class PathfinderFileUploadController {
             null,
             null
         )),
-        projectDetailFileService.getFilesLinkedToForm(uploadForm, projectDetail, purpose)
+        projectDetailFileService.getFileViewsLinkedToForm(uploadForm, projectDetail, purpose)
     );
   }
 

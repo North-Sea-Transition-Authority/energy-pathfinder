@@ -1,24 +1,18 @@
 package uk.co.ogauthority.pathfinder.model.form.project.upcomingtender;
 
-import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
-import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.AfterDateHint;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.DateHint;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.EmptyDateAcceptableHint;
+import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
+import uk.co.ogauthority.pathfinder.util.file.FileUploadUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 
 @Component
 public class UpcomingTenderFormValidator implements SmartValidator {
 
-  public static final FormInputLabel ESTIMATED_TENDER_LABEL = new FormInputLabel("estimated tender date");
-  public static final String DATE_ERROR_LABEL = DateHint.TODAY_DATE_LABEL;
   private final DateInputValidator dateInputValidator;
 
   @Autowired
@@ -34,22 +28,28 @@ public class UpcomingTenderFormValidator implements SmartValidator {
   @Override
   public void validate(Object target, Errors errors, Object... validationHints) {
     var form = (UpcomingTenderForm) target;
-    Optional<EmptyDateAcceptableHint> emptyDateAcceptableHint = Arrays.stream(validationHints)
-        .filter(hint -> hint.getClass().equals(EmptyDateAcceptableHint.class))
-        .map(hint -> ((EmptyDateAcceptableHint) hint))
-        .findFirst();
 
-    //always ensure the date is in the future
-    var dateHint = new AfterDateHint(ESTIMATED_TENDER_LABEL, LocalDate.now(), DATE_ERROR_LABEL);
+    UpcomingTenderValidationHint upcomingTenderValidationHint = Arrays.stream(validationHints)
+        .filter(hint -> hint.getClass().equals(UpcomingTenderValidationHint.class))
+        .map(hint -> ((UpcomingTenderValidationHint) hint))
+        .findFirst()
+        .orElseThrow(
+            () -> new ActionNotAllowedException("Expected UpcomingTenderValidationHint validation hint to be provided")
+        );
 
     ValidationUtil.invokeNestedValidator(
         errors,
         dateInputValidator,
         "estimatedTenderDate",
         form.getEstimatedTenderDate(),
-        ESTIMATED_TENDER_LABEL,
-        emptyDateAcceptableHint.isPresent() ? emptyDateAcceptableHint.get() : new Object[0],
-        dateHint
+        upcomingTenderValidationHint.getEstimatedTenderDateHint()
+    );
+
+    FileUploadUtil.validateMaxFileLimit(
+        form,
+        errors,
+        upcomingTenderValidationHint.getFileUploadLimit(),
+        UpcomingTenderValidationHint.TOO_MANY_FILES_ERROR_MESSAGE
     );
   }
 

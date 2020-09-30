@@ -3,12 +3,17 @@ package uk.co.ogauthority.pathfinder.service.project.upcomingtender;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.config.file.FileDeleteResult;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -17,10 +22,12 @@ import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.EmptyDateAcceptableHint;
+import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderFormValidator;
+import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -33,31 +40,46 @@ public class UpcomingTenderService {
   private final UpcomingTenderFormValidator upcomingTenderFormValidator;
   private final FunctionService functionService;
   private final SearchSelectorService searchSelectorService;
+  private final ProjectDetailFileService projectDetailFileService;
+  private final UpcomingTenderFileLinkService upcomingTenderFileLinkService;
 
   @Autowired
   public UpcomingTenderService(UpcomingTenderRepository upcomingTenderRepository,
                                ValidationService validationService,
                                UpcomingTenderFormValidator upcomingTenderFormValidator,
                                FunctionService functionService,
-                               SearchSelectorService searchSelectorService) {
+                               SearchSelectorService searchSelectorService,
+                               ProjectDetailFileService projectDetailFileService,
+                               UpcomingTenderFileLinkService upcomingTenderFileLinkService) {
     this.upcomingTenderRepository = upcomingTenderRepository;
     this.validationService = validationService;
     this.upcomingTenderFormValidator = upcomingTenderFormValidator;
     this.functionService = functionService;
     this.searchSelectorService = searchSelectorService;
+    this.projectDetailFileService = projectDetailFileService;
+    this.upcomingTenderFileLinkService = upcomingTenderFileLinkService;
   }
 
-
   @Transactional
-  public UpcomingTender createUpcomingTender(ProjectDetail detail, UpcomingTenderForm form) {
+  public UpcomingTender createUpcomingTender(ProjectDetail detail,
+                                             UpcomingTenderForm form,
+                                             AuthenticatedUserAccount userAccount) {
     var upcomingTender = new UpcomingTender(detail);
     setCommonFields(upcomingTender, form);
-    return upcomingTenderRepository.save(upcomingTender);
+    upcomingTender = upcomingTenderRepository.save(upcomingTender);
+
+    upcomingTenderFileLinkService.updateUpcomingTenderFileLinks(upcomingTender, form, userAccount);
+
+    return upcomingTender;
   }
 
   @Transactional
-  public UpcomingTender updateUpcomingTender(UpcomingTender upcomingTender, UpcomingTenderForm form) {
+  public UpcomingTender updateUpcomingTender(UpcomingTender upcomingTender,
+                                             UpcomingTenderForm form,
+                                             AuthenticatedUserAccount userAccount) {
+    upcomingTenderFileLinkService.updateUpcomingTenderFileLinks(upcomingTender, form, userAccount);
     setCommonFields(upcomingTender, form);
+
     return upcomingTenderRepository.save(upcomingTender);
   }
 
@@ -82,6 +104,7 @@ public class UpcomingTenderService {
 
   @Transactional
   public void delete(UpcomingTender upcomingTender) {
+    upcomingTenderFileLinkService.removeUpcomingTenderFileLinks(upcomingTender);
     upcomingTenderRepository.delete(upcomingTender);
   }
 
@@ -96,12 +119,7 @@ public class UpcomingTenderService {
   public BindingResult validate(UpcomingTenderForm form,
                                 BindingResult bindingResult,
                                 ValidationType validationType) {
-    if (validationType.equals(ValidationType.FULL)) {
-      upcomingTenderFormValidator.validate(form, bindingResult);
-    } else {
-      upcomingTenderFormValidator.validate(form, bindingResult, new EmptyDateAcceptableHint());
-    }
-
+    upcomingTenderFormValidator.validate(form, bindingResult, new UpcomingTenderValidationHint(validationType));
     return validationService.validate(form, bindingResult, validationType);
   }
 
@@ -131,7 +149,51 @@ public class UpcomingTenderService {
     form.setDescriptionOfWork(upcomingTender.getDescriptionOfWork());
     form.setContractBand(upcomingTender.getContractBand());
     form.setContactDetail(new ContactDetailForm(upcomingTender));
+    form.setUploadedFileWithDescriptionForms(getUploadedFilesFormsByUpcomingTender(upcomingTender));
+
     return form;
+  }
+
+  /**
+   * Remove an uploaded upcoming tender file.
+   * @param fileId The file id to remove
+   * @param projectDetail the project detail the file is linked to
+   * @param webUserAccount the logged in user
+   * @return a FileDeleteResult to indicate a success or failure of the removal
+   */
+  public FileDeleteResult deleteUpcomingTenderFile(String fileId,
+                                                   ProjectDetail projectDetail,
+                                                   WebUserAccount webUserAccount) {
+    var file = projectDetailFileService.getProjectDetailFileByProjectDetailAndFileId(
+        projectDetail,
+        fileId
+    );
+
+    if (file.getFileLinkStatus().equals(FileLinkStatus.FULL)) {
+      // if fully linked we need to remove the upcoming tender file link
+      upcomingTenderFileLinkService.removeUpcomingTenderFileLink(file);
+    }
+
+    return projectDetailFileService.processFileDeletion(file, webUserAccount);
+  }
+
+  private List<UploadFileWithDescriptionForm> getUploadedFilesFormsByUpcomingTender(UpcomingTender upcomingTender) {
+    return upcomingTenderFileLinkService.getAllByUpcomingTender(upcomingTender)
+        .stream()
+        .map(upcomingTenderFileLink -> {
+          var uploadedFileView = projectDetailFileService.getUploadedFileView(
+              upcomingTender.getProjectDetail(),
+              upcomingTenderFileLink.getProjectDetailFile().getFileId(),
+              UpcomingTenderFileLinkService.FILE_PURPOSE,
+              FileLinkStatus.FULL
+          );
+          return new UploadFileWithDescriptionForm(
+              uploadedFileView.getFileId(),
+              uploadedFileView.getFileDescription(),
+              uploadedFileView.getFileUploadedTime()
+          );
+        })
+        .collect(Collectors.toList());
   }
 
   public List<UpcomingTender> getUpcomingTendersForDetail(ProjectDetail detail) {

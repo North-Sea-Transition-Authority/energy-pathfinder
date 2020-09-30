@@ -5,6 +5,7 @@ import java.util.Objects;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
+import uk.co.ogauthority.pathfinder.model.form.validation.MandatoryUploadValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
 
 /**
@@ -12,13 +13,17 @@ import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
  */
 public class UploadFileWithDescriptionForm {
 
-  @NotNull(groups = { FullValidation.class, PartialValidation.class })
+  @NotNull(groups = { FullValidation.class, PartialValidation.class, MandatoryUploadValidation.class })
   private String uploadedFileId;
 
-  @NotEmpty(message = "File must have a description", groups = { FullValidation.class, PartialValidation.class })
+  @NotEmpty(message = "Enter a file description", groups = {
+      FullValidation.class,
+      PartialValidation.class,
+      MandatoryUploadValidation.class
+  })
   private String uploadedFileDescription;
 
-  @NotNull(groups = { FullValidation.class, PartialValidation.class })
+  @NotNull(groups = { FullValidation.class, PartialValidation.class, MandatoryUploadValidation.class })
   private Instant uploadedFileInstant;
 
   public UploadFileWithDescriptionForm() {

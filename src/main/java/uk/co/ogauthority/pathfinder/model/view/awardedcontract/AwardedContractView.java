@@ -3,8 +3,9 @@ package uk.co.ogauthority.pathfinder.model.view.awardedcontract;
 import java.util.List;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
+import uk.co.ogauthority.pathfinder.util.summary.SummaryItem;
 
-public class AwardedContractView {
+public class AwardedContractView implements SummaryItem {
 
   private Integer displayOrder;
 
@@ -28,9 +29,7 @@ public class AwardedContractView {
 
   private boolean isValid;
 
-  public Integer getDisplayOrder() {
-    return displayOrder;
-  }
+
 
   public void setDisplayOrder(Integer displayOrder) {
     this.displayOrder = displayOrder;
@@ -108,11 +107,17 @@ public class AwardedContractView {
     this.summaryLinks = summaryLinks;
   }
 
-  public boolean isValid() {
+  public void setValid(boolean valid) {
+    isValid = valid;
+  }
+
+  @Override
+  public Boolean isValid() {
     return isValid;
   }
 
-  public void setValid(boolean valid) {
-    isValid = valid;
+  @Override
+  public Integer getDisplayOrder() {
+    return displayOrder;
   }
 }

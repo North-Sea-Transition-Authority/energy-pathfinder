@@ -16,6 +16,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
@@ -23,7 +24,7 @@ import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
-import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityUtil;
+import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -41,6 +42,8 @@ public class CollaborationOpportunitiesServiceTest {
   private CollaborationOpportunitiesService collaborationOpportunitiesService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
+
+  private final CollaborationOpportunity opportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity(details);
 
   @Before
   public void setUp() {
@@ -62,19 +65,56 @@ public class CollaborationOpportunitiesServiceTest {
 
   @Test
   public void createCollaborationOpportunity() {
-    var form = CollaborationOpportunityUtil.getCompleteForm();
+    var form = CollaborationOpportunityTestUtil.getCompleteForm();
     var newCollaborationOpportunity = collaborationOpportunitiesService.createCollaborationOpportunity(details, form);
     assertThat(newCollaborationOpportunity.getProjectDetail()).isEqualTo(details);
-    assertThat(newCollaborationOpportunity.getFunction()).isEqualTo(CollaborationOpportunityUtil.FUNCTION);
+    assertThat(newCollaborationOpportunity.getFunction()).isEqualTo(CollaborationOpportunityTestUtil.FUNCTION);
     checkCommonFields(form, newCollaborationOpportunity);
   }
 
   @Test
   public void createCollaborationOpportunity_manualFunction() {
-    var form = CollaborationOpportunityUtil.getCompletedForm_manualEntry();
+    var form = CollaborationOpportunityTestUtil.getCompletedForm_manualEntry();
     var opportunity = collaborationOpportunitiesService.createCollaborationOpportunity(details, form);
     assertThat(opportunity.getProjectDetail()).isEqualTo(details);
     checkCommonFields(form, opportunity);
+  }
+
+  @Test
+  public void updateCollaborationOpportunity() {
+    var form = CollaborationOpportunityTestUtil.getCompleteForm();
+    form.setFunction(Function.DRILLING.name());
+    var existingOpportunity = opportunity;
+    collaborationOpportunitiesService.updateCollaborationOpportunity(existingOpportunity, form);
+    assertThat(existingOpportunity.getProjectDetail()).isEqualTo(details);
+    assertThat(existingOpportunity.getFunction()).isEqualTo(Function.DRILLING);
+    checkCommonFields(form, existingOpportunity);
+  }
+
+  @Test
+  public void updateCollaborationOpportunity_manualFunction() {
+    var form = CollaborationOpportunityTestUtil.getCompleteForm();
+    form.setFunction(CollaborationOpportunityTestUtil.MANUAL_FUNCTION);
+    var existingOpportunity = opportunity;
+    collaborationOpportunitiesService.updateCollaborationOpportunity(existingOpportunity, form);
+    assertThat(existingOpportunity.getProjectDetail()).isEqualTo(details);
+    assertThat(existingOpportunity.getManualFunction()).isEqualTo(SearchSelectorService.removePrefix(CollaborationOpportunityTestUtil.MANUAL_FUNCTION));
+    checkCommonFields(form, existingOpportunity);
+  }
+
+  @Test
+  public void getForm() {
+    var form = collaborationOpportunitiesService.getForm(opportunity);
+    assertThat(form.getFunction()).isEqualTo(opportunity.getFunction().name());
+    checkCommonFormFields(form, opportunity);
+  }
+
+  @Test
+  public void getFormManualEntry() {
+    var manualEntryOpportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity_manualEntry(details);
+    var form = collaborationOpportunitiesService.getForm(manualEntryOpportunity);
+    assertThat(form.getFunction()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(manualEntryOpportunity.getManualFunction()));
+    checkCommonFormFields(form, manualEntryOpportunity);
   }
 
   @Test
@@ -92,7 +132,7 @@ public class CollaborationOpportunitiesServiceTest {
 
   @Test
   public void validate_full() {
-    var form = CollaborationOpportunityUtil.getCompleteForm();
+    var form = CollaborationOpportunityTestUtil.getCompleteForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
     collaborationOpportunitiesService.validate(
@@ -105,12 +145,21 @@ public class CollaborationOpportunitiesServiceTest {
   }
 
   private void checkCommonFields(CollaborationOpportunityForm form, CollaborationOpportunity collaborationOpportunity) {
-    assertThat(collaborationOpportunity.getDescriptionOfWork()).isEqualTo(CollaborationOpportunityUtil.DESCRIPTION_OF_WORK);
+    assertThat(collaborationOpportunity.getDescriptionOfWork()).isEqualTo(CollaborationOpportunityTestUtil.DESCRIPTION_OF_WORK);
     assertThat(collaborationOpportunity.getEstimatedServiceDate()).isEqualTo(form.getEstimatedServiceDate().createDateOrNull());
-    assertThat(collaborationOpportunity.getContactName()).isEqualTo(CollaborationOpportunityUtil.CONTACT_NAME);
-    assertThat(collaborationOpportunity.getPhoneNumber()).isEqualTo(CollaborationOpportunityUtil.PHONE_NUMBER);
-    assertThat(collaborationOpportunity.getJobTitle()).isEqualTo(CollaborationOpportunityUtil.JOB_TITLE);
-    assertThat(collaborationOpportunity.getEmailAddress()).isEqualTo(CollaborationOpportunityUtil.EMAIL);
+    assertThat(collaborationOpportunity.getContactName()).isEqualTo(CollaborationOpportunityTestUtil.CONTACT_NAME);
+    assertThat(collaborationOpportunity.getPhoneNumber()).isEqualTo(CollaborationOpportunityTestUtil.PHONE_NUMBER);
+    assertThat(collaborationOpportunity.getJobTitle()).isEqualTo(CollaborationOpportunityTestUtil.JOB_TITLE);
+    assertThat(collaborationOpportunity.getEmailAddress()).isEqualTo(CollaborationOpportunityTestUtil.EMAIL);
+  }
+
+  private void checkCommonFormFields(CollaborationOpportunityForm form, CollaborationOpportunity collaborationOpportunity) {
+    assertThat(form.getDescriptionOfWork()).isEqualTo(collaborationOpportunity.getDescriptionOfWork());
+    assertThat(form.getEstimatedServiceDate()).isEqualTo(new ThreeFieldDateInput(collaborationOpportunity.getEstimatedServiceDate()));
+    assertThat(form.getContactDetail().getName()).isEqualTo(collaborationOpportunity.getContactName());
+    assertThat(form.getContactDetail().getPhoneNumber()).isEqualTo(collaborationOpportunity.getPhoneNumber());
+    assertThat(form.getContactDetail().getJobTitle()).isEqualTo(collaborationOpportunity.getJobTitle());
+    assertThat(form.getContactDetail().getEmailAddress()).isEqualTo(collaborationOpportunity.getEmailAddress());
   }
 
   @Test

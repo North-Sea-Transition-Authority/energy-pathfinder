@@ -5,6 +5,8 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,30 +14,40 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.config.file.FileDeleteResult;
+import uk.co.ogauthority.pathfinder.config.file.FileUploadResult;
+import uk.co.ogauthority.pathfinder.controller.file.PathfinderFileUploadController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.TenderFunctionRestController;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
-import uk.co.ogauthority.pathfinder.model.view.UpcomingTenderView;
+import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
+import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
+import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderFileLinkService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderSummaryService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
 @RequestMapping("/project/{projectId}/tenders")
-public class UpcomingTendersController {
+public class UpcomingTendersController extends PathfinderFileUploadController {
 
   public static final String PAGE_NAME = "Upcoming tenders";
   public static final String PAGE_NAME_SINGULAR = "Upcoming tender";
@@ -51,7 +63,9 @@ public class UpcomingTendersController {
   public UpcomingTendersController(BreadcrumbService breadcrumbService,
                                    ControllerHelperService controllerHelperService,
                                    UpcomingTenderService upcomingTenderService,
-                                   UpcomingTenderSummaryService upcomingTenderSummaryService) {
+                                   UpcomingTenderSummaryService upcomingTenderSummaryService,
+                                   ProjectDetailFileService projectDetailFileService) {
+    super(projectDetailFileService);
     this.breadcrumbService = breadcrumbService;
     this.controllerHelperService = controllerHelperService;
     this.upcomingTenderService = upcomingTenderService;
@@ -75,11 +89,8 @@ public class UpcomingTendersController {
     var tenderViews = upcomingTenderSummaryService.getValidatedSummaryViews(
         projectContext.getProjectDetails()
     );
-    //TODO This type of check could be turned into a method in the ControllerHelperService if we keep using it for
-    // Summaries / validation that doesn't rely on a binding result
-    var validationResult = tenderViews.stream().anyMatch(utv -> !utv.isValid())
-        ? ValidationResult.INVALID
-        : ValidationResult.VALID;
+
+    var validationResult = upcomingTenderSummaryService.validateViews(tenderViews);
 
     if (validationResult.equals(ValidationResult.INVALID)) {
       return getViewTendersModelAndView(
@@ -96,7 +107,7 @@ public class UpcomingTendersController {
   @GetMapping("/upcoming-tender")
   public ModelAndView addUpcomingTender(@PathVariable("projectId") Integer projectId,
                                         ProjectContext projectContext) {
-    return getUpcomingTenderModelAndView(projectId, new UpcomingTenderForm());
+    return getUpcomingTenderModelAndView(projectContext.getProjectDetails(), new UpcomingTenderForm());
   }
 
 
@@ -109,10 +120,14 @@ public class UpcomingTendersController {
     bindingResult = upcomingTenderService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getUpcomingTenderModelAndView(projectId, form),
+        getUpcomingTenderModelAndView(projectContext.getProjectDetails(), form),
         form,
         () -> {
-          upcomingTenderService.createUpcomingTender(projectContext.getProjectDetails(), form);
+          upcomingTenderService.createUpcomingTender(
+              projectContext.getProjectDetails(),
+              form,
+              projectContext.getUserAccount()
+          );
           return ReverseRouter.redirect(on(UpcomingTendersController.class).viewTenders(projectId, null));
         }
     );
@@ -123,7 +138,10 @@ public class UpcomingTendersController {
                                          @PathVariable("upcomingTenderId") Integer upcomingTenderId,
                                          ProjectContext projectContext) {
     var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
-    return getUpcomingTenderModelAndView(projectId, upcomingTenderService.getForm(upcomingTender));
+    return getUpcomingTenderModelAndView(
+        projectContext.getProjectDetails(),
+        upcomingTenderService.getForm(upcomingTender)
+    );
   }
 
   @PostMapping("/upcoming-tender/{upcomingTenderId}/edit")
@@ -137,10 +155,10 @@ public class UpcomingTendersController {
     bindingResult = upcomingTenderService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getUpcomingTenderModelAndView(projectId, form),
+        getUpcomingTenderModelAndView(projectContext.getProjectDetails(), form),
         form,
         () -> {
-          upcomingTenderService.updateUpcomingTender(upcomingTender, form);
+          upcomingTenderService.updateUpcomingTender(upcomingTender, form, projectContext.getUserAccount());
           return ReverseRouter.redirect(on(UpcomingTendersController.class).viewTenders(projectId, null));
         }
     );
@@ -170,6 +188,45 @@ public class UpcomingTendersController {
     return ReverseRouter.redirect(on(UpcomingTendersController.class).viewTenders(projectId, null));
   }
 
+  @PostMapping("/upcoming-tender/files/upload")
+  @ResponseBody
+  public FileUploadResult handleUpload(@PathVariable("projectId") Integer projectId,
+                                       @RequestParam("file") MultipartFile file,
+                                       ProjectContext projectContext) {
+
+    return projectDetailFileService.processInitialUpload(
+        file,
+        projectContext.getProjectDetails(),
+        UpcomingTenderFileLinkService.FILE_PURPOSE,
+        projectContext.getUserAccount()
+    );
+
+  }
+
+  @GetMapping("/upcoming-tender/files/download/{fileId}")
+  @ResponseBody
+  public ResponseEntity<Resource> handleDownload(@PathVariable("projectId") Integer projectId,
+                                                 @PathVariable("fileId") String fileId,
+                                                 ProjectContext projectContext) {
+    var file = projectDetailFileService.getProjectDetailFileByProjectDetailAndFileId(
+        projectContext.getProjectDetails(),
+        fileId
+    );
+    return serveFile(file);
+  }
+
+  @PostMapping("/upcoming-tender/files/delete/{fileId}")
+  @ResponseBody
+  public FileDeleteResult handleDelete(@PathVariable("projectId") Integer projectId,
+                                       @PathVariable("fileId") String fileId,
+                                       ProjectContext projectContext) {
+    return upcomingTenderService.deleteUpcomingTenderFile(
+        fileId,
+        projectContext.getProjectDetails(),
+        projectContext.getUserAccount()
+    );
+  }
+
   private ModelAndView getViewTendersModelAndView(
       Integer projectId,
       ProjectContext projectContext,
@@ -185,18 +242,25 @@ public class UpcomingTendersController {
               ? upcomingTenderSummaryService.getErrors(tenderViews)
               : null
         )
-        .addObject("backToTaskListUrl", ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId, null)));
+        .addObject("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectId));
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;
   }
 
-  private ModelAndView getUpcomingTenderModelAndView(Integer projectId, UpcomingTenderForm form) {
-    var modelAndView = new ModelAndView("project/upcomingtender/upcomingTender")
-        .addObject("tenderRestUrl", SearchSelectorService.route(on(TenderFunctionRestController.class).searchTenderFunctions(null)))
+  private ModelAndView getUpcomingTenderModelAndView(ProjectDetail projectDetail, UpcomingTenderForm form) {
+    var modelAndView = createModelAndView(
+        "project/upcomingtender/upcomingTender",
+        projectDetail,
+        UpcomingTenderFileLinkService.FILE_PURPOSE,
+        form
+    )
+        .addObject("tenderRestUrl", SearchSelectorService.route(
+            on(TenderFunctionRestController.class).searchTenderFunctions(null)
+        ))
         .addObject("form", form)
         .addObject("preSelectedFunction", upcomingTenderService.getPreSelectedFunction(form))
         .addObject("contractBands", ContractBand.getAllAsMap());
-    breadcrumbService.fromUpcomingTenders(projectId, modelAndView, PAGE_NAME_SINGULAR);
+    breadcrumbService.fromUpcomingTenders(projectDetail.getProject().getId(), modelAndView, PAGE_NAME_SINGULAR);
     return modelAndView;
   }
 }
