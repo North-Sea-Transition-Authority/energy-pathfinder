@@ -55,21 +55,27 @@ public class ProjectLocationBlocksService {
 
     var blocksToAdd = licenceBlocksService.findAllByCompositeKeyIn(licenceBlockIds);
 
-    //delete any that no longer exist...
-    blocksToRemove.forEach(projectLocationBlockRepository::delete);
+    //delete any that no longer exist
+    if (!blocksToRemove.isEmpty()) {
+      projectLocationBlockRepository.deleteAll(blocksToRemove);
+    }
 
-    //Create blocks for the newly added ones
-    blocksToAdd.forEach(b ->
-        projectLocationBlockRepository.save(new ProjectLocationBlock(
-          projectLocation,
-          b.getPlmId(),
-          b.getBlockReference(),
-          b.getBlockNumber(),
-          b.getQuadrantNumber(),
-          b.getSuffix(),
-          b.getBlockLocation()
-        ))
-    );
+    if (!blocksToAdd.isEmpty()) {
+      //Create blocks for the newly added ones
+      projectLocationBlockRepository.saveAll(
+          blocksToAdd.stream().map(b ->
+              new ProjectLocationBlock(
+                  projectLocation,
+                  b.getPlmId(),
+                  b.getBlockReference(),
+                  b.getBlockNumber(),
+                  b.getQuadrantNumber(),
+                  b.getSuffix(),
+                  b.getBlockLocation()
+              ))
+              .collect(Collectors.toList())
+      );
+    }
   }
 
 
@@ -78,11 +84,11 @@ public class ProjectLocationBlocksService {
    * @param form form to populate with licenceBlock ids
    * @param projectLocation location to get blocks for
    */
-  public void addBlocksToForm(ProjectLocationForm form, ProjectLocation projectLocation) {
-    //get blocks from ids
+  public ProjectLocationForm addBlocksToForm(ProjectLocationForm form, ProjectLocation projectLocation) {
     var existingBlocks = projectLocationBlockRepository.findAllByProjectLocation(projectLocation);
     form.setLicenceBlocks(existingBlocks.stream().map(ProjectLocationBlock::getCompositeKey)
         .collect(Collectors.toList()));
+    return form;
   }
 
   public List<ProjectLocationBlockView> getBlockViewsFromForm(ProjectLocationForm form, ValidationType validationType) {

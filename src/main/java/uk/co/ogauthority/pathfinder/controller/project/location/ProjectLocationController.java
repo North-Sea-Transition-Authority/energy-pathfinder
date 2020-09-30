@@ -68,7 +68,8 @@ public class ProjectLocationController {
         getLocationModelAndView(projectId, form),
         form,
         () -> {
-          locationService.createOrUpdate(projectContext.getProjectDetails(), form);
+          var projectLocation = locationService.createOrUpdate(projectContext.getProjectDetails(), form);
+          locationService.createOrUpdateBlocks(form.getLicenceBlocks(), projectLocation);
 
           return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
         });

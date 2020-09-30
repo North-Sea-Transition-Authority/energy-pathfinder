@@ -19,9 +19,9 @@ public class LicenceBlockValidatorService {
 
 
   /**
-   * Return true if the block composite id matches current offshore licence block data.
+   * Return true if the block composite id matches current licence block data.
    * @param compositeKey key to search for
-   * @return true if the block composite id matches current offshore licence block data.
+   * @return true if the block composite id matches current licence block data.
    */
   public boolean existsInPortalData(String compositeKey) {
     return licenceBlocksService.blockExists(compositeKey);

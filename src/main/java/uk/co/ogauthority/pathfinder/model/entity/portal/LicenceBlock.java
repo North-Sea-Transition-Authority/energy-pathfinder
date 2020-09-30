@@ -38,7 +38,6 @@ public class LicenceBlock implements SearchSelectable {
   public LicenceBlock() {
   }
 
-
   public String getCompositeKey() {
     return compositeKey;
   }
@@ -65,6 +64,34 @@ public class LicenceBlock implements SearchSelectable {
 
   public BlockLocation getBlockLocation() {
     return blockLocation;
+  }
+
+  public void setCompositeKey(String compositeKey) {
+    this.compositeKey = compositeKey;
+  }
+
+  public void setPlmId(Integer plmId) {
+    this.plmId = plmId;
+  }
+
+  public void setBlockReference(String blockReference) {
+    this.blockReference = blockReference;
+  }
+
+  public void setBlockNumber(String blockNumber) {
+    this.blockNumber = blockNumber;
+  }
+
+  public void setQuadrantNumber(String quadrantNumber) {
+    this.quadrantNumber = quadrantNumber;
+  }
+
+  public void setSuffix(String suffix) {
+    this.suffix = suffix;
+  }
+
+  public void setBlockLocation(BlockLocation blockLocation) {
+    this.blockLocation = blockLocation;
   }
 
   @Override

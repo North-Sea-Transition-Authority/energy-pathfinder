@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.form.project.location;
 
+import java.util.Collections;
 import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -36,7 +37,7 @@ public class ProjectLocationForm {
   private UkcsArea ukcsArea;
 
   @NotEmpty(message = "Select at least one licence block", groups = FullValidation.class)
-  private List<String> licenceBlocks;
+  private List<String> licenceBlocks = Collections.emptyList();
 
   public ProjectLocationForm() {
   }

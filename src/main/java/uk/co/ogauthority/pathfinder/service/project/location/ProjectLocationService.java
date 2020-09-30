@@ -81,9 +81,12 @@ public class ProjectLocationService {
             : null
     );
     projectLocation.setUkcsArea(form.getUkcsArea());
-    projectLocationBlocksService.createOrUpdateBlocks(form.getLicenceBlocks(), projectLocation);
 
     return projectLocationRepository.save(projectLocation);
+  }
+
+  public void createOrUpdateBlocks(List<String> licenceBlockIds, ProjectLocation projectLocation) {
+    projectLocationBlocksService.createOrUpdateBlocks(licenceBlockIds, projectLocation);
   }
 
   public Optional<ProjectLocation> findByProjectDetail(ProjectDetail detail) {
