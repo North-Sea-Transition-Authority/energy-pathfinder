@@ -114,7 +114,7 @@ public class ProjectLocationBlockServiceTest {
     verify(projectLocationBlockRepository, times(1)).saveAll(any());
   }
 
-//TODO PAT-TKTK  Now that saveAll is being used this will need to be updated to account for that.
+//TODO PAT-220  Now that saveAll is being used this will need to be updated to account for that.
 //  @Test
 //  public void createOrUpdateBlocks_verifySave() {
 //    when(projectLocationBlockRepository.findAllByProjectLocation(projectLocation)).thenReturn(Collections.emptyList());
