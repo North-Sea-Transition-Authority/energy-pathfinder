@@ -24,7 +24,8 @@ public class ProjectLocationBlock {
   @JoinColumn(name = "project_location_id")
   private ProjectLocation projectLocation;
 
-  private Integer plmId;
+  @Column(name = "plm_id")
+  private Integer pedLicenceId;
 
   @Column(name = "block_ref")
   private String blockReference;
@@ -46,7 +47,7 @@ public class ProjectLocationBlock {
   }
 
   public ProjectLocationBlock(ProjectLocation projectLocation,
-                              Integer plmId,
+                              Integer pedLicenceId,
                               String blockReference,
                               String blockNumber,
                               String quadrantNumber,
@@ -54,7 +55,7 @@ public class ProjectLocationBlock {
                               BlockLocation blockLocation
   ) {
     this.projectLocation = projectLocation;
-    this.plmId = plmId;
+    this.pedLicenceId = pedLicenceId;
     this.blockReference = blockReference;
     this.blockNumber = blockNumber;
     this.quadrantNumber = quadrantNumber;
@@ -74,12 +75,12 @@ public class ProjectLocationBlock {
     this.projectLocation = projectLocation;
   }
 
-  public Integer getPlmId() {
-    return plmId;
+  public Integer getPedLicenceId() {
+    return pedLicenceId;
   }
 
-  public void setPlmId(Integer plmId) {
-    this.plmId = plmId;
+  public void setPedLicenceId(Integer plmId) {
+    this.pedLicenceId = plmId;
   }
 
   public String getBlockReference() {
@@ -133,7 +134,7 @@ public class ProjectLocationBlock {
         getQuadrantNumber(),
         getBlockNumber(),
         getBlockSuffix() != null ? getBlockSuffix() : "",
-        getPlmId().toString()
+        getPedLicenceId().toString()
     );
   }
 }

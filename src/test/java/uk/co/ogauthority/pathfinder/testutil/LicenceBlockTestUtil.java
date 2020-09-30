@@ -56,7 +56,7 @@ public class LicenceBlockTestUtil {
   }
 
   private static void setCommonFields(LicenceBlock block) {
-    block.setPlmId(PLM_ID);
+    block.setPedLicenceId(PLM_ID);
     block.setBlockNumber(BLOCK_NUMBER);
     block.setQuadrantNumber(QUADRANT_NUMBER);
     block.setSuffix(BLOCK_SUFFIX);

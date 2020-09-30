@@ -18,7 +18,8 @@ public class LicenceBlock implements SearchSelectable {
   @Id
   private String compositeKey;
 
-  private Integer plmId;
+  @Column(name = "plm_id")
+  private Integer pedLicenceId;
 
   @Column(name = "block_ref")
   private String blockReference;
@@ -35,15 +36,12 @@ public class LicenceBlock implements SearchSelectable {
   @Column(name = "location")
   private BlockLocation blockLocation;
 
-  public LicenceBlock() {
-  }
-
   public String getCompositeKey() {
     return compositeKey;
   }
 
-  public Integer getPlmId() {
-    return plmId;
+  public Integer getPedLicenceId() {
+    return pedLicenceId;
   }
 
   public String getBlockReference() {
@@ -70,8 +68,8 @@ public class LicenceBlock implements SearchSelectable {
     this.compositeKey = compositeKey;
   }
 
-  public void setPlmId(Integer plmId) {
-    this.plmId = plmId;
+  public void setPedLicenceId(Integer plmId) {
+    this.pedLicenceId = plmId;
   }
 
   public void setBlockReference(String blockReference) {

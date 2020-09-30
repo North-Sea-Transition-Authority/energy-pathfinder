@@ -66,7 +66,7 @@ public class ProjectLocationBlocksService {
           blocksToAdd.stream().map(b ->
               new ProjectLocationBlock(
                   projectLocation,
-                  b.getPlmId(),
+                  b.getPedLicenceId(),
                   b.getBlockReference(),
                   b.getBlockNumber(),
                   b.getQuadrantNumber(),
