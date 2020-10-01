@@ -16,6 +16,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.CollaborationOpportunitiesRepository;
+import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -37,13 +38,19 @@ public class CollaborationOpportunityServiceValidationTest {
   @Mock
   private FunctionService functionService;
 
+  @Mock
+  private CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService;
+
+  @Mock
+  private ProjectDetailFileService projectDetailFileService;
+
   private CollaborationOpportunitiesService collaborationOpportunitiesService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
 
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     var validator = new SpringValidatorAdapter(Validation.buildDefaultValidatorFactory().getValidator());
     var validationService = new ValidationService(validator);
     collaborationOpportunitiesService = new CollaborationOpportunitiesService(
@@ -51,7 +58,9 @@ public class CollaborationOpportunityServiceValidationTest {
         functionService,
         validationService,
         collaborationOpportunityFormValidator,
-        collaborationOpportunitiesRepository
+        collaborationOpportunitiesRepository,
+        collaborationOpportunityFileLinkService,
+        projectDetailFileService
     );
   }
 

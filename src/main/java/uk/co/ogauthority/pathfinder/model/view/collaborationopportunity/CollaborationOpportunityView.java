@@ -1,7 +1,9 @@
 package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity;
 
+import java.util.List;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
+import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryItem;
 
 public class CollaborationOpportunityView implements SummaryItem {
@@ -19,6 +21,8 @@ public class CollaborationOpportunityView implements SummaryItem {
   private String estimatedServiceDate;
 
   private ContactDetailView contactDetailView;
+
+  private List<UploadedFileView> uploadedFileViews;
 
   private SummaryLink editLink;
 
@@ -105,6 +109,15 @@ public class CollaborationOpportunityView implements SummaryItem {
 
   public void setIsValid(Boolean valid) {
     isValid = valid;
+  }
+
+  public List<UploadedFileView> getUploadedFileViews() {
+    return uploadedFileViews;
+  }
+
+  public void setUploadedFileViews(
+      List<UploadedFileView> uploadedFileViews) {
+    this.uploadedFileViews = uploadedFileViews;
   }
 
   @Override

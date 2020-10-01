@@ -2,11 +2,13 @@ package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.List;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
+import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
@@ -19,7 +21,8 @@ public class CollaborationOpportunityViewUtil {
 
   public static CollaborationOpportunityView createView(
       CollaborationOpportunity opportunity,
-      Integer displayOrder
+      Integer displayOrder,
+      List<UploadedFileView> uploadedFileViews
   ) {
     var projectId = opportunity.getProjectDetail().getProject().getId();
     var view = new CollaborationOpportunityView(
@@ -41,6 +44,8 @@ public class CollaborationOpportunityViewUtil {
     contactDetailView.setEmailAddress(opportunity.getEmailAddress());
     contactDetailView.setJobTitle(opportunity.getJobTitle());
     view.setContactDetailView(contactDetailView);
+
+    view.setUploadedFileViews(uploadedFileViews);
 
     view.setEditLink(
         new SummaryLink(
@@ -71,9 +76,10 @@ public class CollaborationOpportunityViewUtil {
   public static CollaborationOpportunityView createView(
       CollaborationOpportunity opportunity,
       Integer displayOrder,
+      List<UploadedFileView> uploadedFileViews,
       Boolean isValid
   ) {
-    var view = createView(opportunity, displayOrder);
+    var view = createView(opportunity, displayOrder, uploadedFileViews);
     view.setIsValid(isValid);
     return view;
   }

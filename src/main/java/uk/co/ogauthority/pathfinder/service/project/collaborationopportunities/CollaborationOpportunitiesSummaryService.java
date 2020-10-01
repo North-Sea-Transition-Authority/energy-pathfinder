@@ -22,10 +22,13 @@ public class CollaborationOpportunitiesSummaryService {
   public static final String ERROR_MESSAGE = "Collaboration opportunity %d is incomplete";
 
   private final CollaborationOpportunitiesService collaborationOpportunitiesService;
+  private final CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService;
 
   @Autowired
-  public CollaborationOpportunitiesSummaryService(CollaborationOpportunitiesService collaborationOpportunitiesService) {
+  public CollaborationOpportunitiesSummaryService(CollaborationOpportunitiesService collaborationOpportunitiesService,
+                                                  CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService) {
     this.collaborationOpportunitiesService = collaborationOpportunitiesService;
+    this.collaborationOpportunityFileLinkService = collaborationOpportunityFileLinkService;
   }
 
   public List<CollaborationOpportunityView> getSummaryViews(ProjectDetail detail) {
@@ -43,7 +46,17 @@ public class CollaborationOpportunitiesSummaryService {
   }
 
   public CollaborationOpportunityView getView(CollaborationOpportunity opportunity, Integer displayOrder) {
-    return CollaborationOpportunityViewUtil.createView(opportunity, displayOrder);
+    var uploadedFileViews =
+        collaborationOpportunityFileLinkService.getFileUploadViewsLinkedToOpportunity(opportunity);
+    return CollaborationOpportunityViewUtil.createView(opportunity, displayOrder, uploadedFileViews);
+  }
+
+  private CollaborationOpportunityView getView(CollaborationOpportunity opportunity,
+                                              Integer displayOrder,
+                                              boolean isValid) {
+    var uploadedFileViews =
+        collaborationOpportunityFileLinkService.getFileUploadViewsLinkedToOpportunity(opportunity);
+    return CollaborationOpportunityViewUtil.createView(opportunity, displayOrder, uploadedFileViews, isValid);
   }
 
   public List<ErrorItem> getErrors(List<CollaborationOpportunityView> views) {
@@ -65,8 +78,8 @@ public class CollaborationOpportunitiesSummaryService {
           var displayIndex = index + 1;
 
           return validationType.equals(ValidationType.NO_VALIDATION)
-              ? CollaborationOpportunityViewUtil.createView(opportunity, displayIndex)
-              : CollaborationOpportunityViewUtil.createView(
+              ? getView(opportunity, displayIndex)
+              : getView(
                   opportunity,
                   displayIndex,
                   collaborationOpportunitiesService.isValid(opportunity, validationType)

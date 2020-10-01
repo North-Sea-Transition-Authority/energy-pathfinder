@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
+import java.util.Collections;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,8 +34,10 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
+import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
+import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
@@ -55,6 +58,9 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
   @MockBean
   private CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService;
 
+  @MockBean
+  protected ProjectDetailFileService projectDetailFileService;
+
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
   private final CollaborationOpportunity opportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
@@ -66,12 +72,18 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
   private static final AuthenticatedUserAccount unAuthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(detail));
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(false);
     when(collaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID)).thenReturn(opportunity);
-    when(collaborationOpportunitiesSummaryService.getView(opportunity, DISPLAY_ORDER)).thenCallRealMethod();
+
+    var collaborationOpportunityView = CollaborationOpportunityViewUtil.createView(
+        opportunity,
+        DISPLAY_ORDER,
+        Collections.emptyList()
+    );
+    when(collaborationOpportunitiesSummaryService.getView(opportunity, DISPLAY_ORDER)).thenReturn(collaborationOpportunityView);
   }
 
   @Test
@@ -124,7 +136,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
 
   @Test
   public void authenticatedUser_hasAccessToCollaborationOpportunityEdit() throws Exception {
-    when(collaborationOpportunitiesService.getForm(opportunity)).thenCallRealMethod();
+    when(collaborationOpportunitiesService.getForm(opportunity)).thenReturn(CollaborationOpportunityTestUtil.getCompleteForm());
     mockMvc.perform(get(ReverseRouter.route(
         on(CollaborationOpportunitiesController.class).editCollaborationOpportunity(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
@@ -158,7 +170,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
         .andExpect(status().is3xxRedirection());
 
     verify(collaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(collaborationOpportunitiesService, times(1)).createCollaborationOpportunity(any(), any());
+    verify(collaborationOpportunitiesService, times(1)).createCollaborationOpportunity(any(), any(), any());
   }
 
   @Test
@@ -181,7 +193,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
         .andExpect(status().is2xxSuccessful());
 
     verify(collaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(collaborationOpportunitiesService, times(0)).createCollaborationOpportunity(any(), any());
+    verify(collaborationOpportunitiesService, times(0)).createCollaborationOpportunity(any(), any(), any());
   }
 
   @Test
@@ -203,7 +215,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
         .andExpect(status().is3xxRedirection());
 
     verify(collaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(collaborationOpportunitiesService, times(1)).createCollaborationOpportunity(any(), any());
+    verify(collaborationOpportunitiesService, times(1)).createCollaborationOpportunity(any(), any(), any());
   }
 
   @Test
@@ -225,7 +237,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
         .andExpect(status().is3xxRedirection());
 
     verify(collaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(collaborationOpportunitiesService, times(1)).updateCollaborationOpportunity(any(), any());
+    verify(collaborationOpportunitiesService, times(1)).updateCollaborationOpportunity(any(), any(), any());
   }
 
   @Test
@@ -248,7 +260,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
         .andExpect(status().is2xxSuccessful());
 
     verify(collaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(collaborationOpportunitiesService, times(0)).updateCollaborationOpportunity(any(), any());
+    verify(collaborationOpportunitiesService, times(0)).updateCollaborationOpportunity(any(), any(), any());
   }
 
   @Test
@@ -270,7 +282,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
         .andExpect(status().is3xxRedirection());
 
     verify(collaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(collaborationOpportunitiesService, times(1)).updateCollaborationOpportunity(any(), any());
+    verify(collaborationOpportunitiesService, times(1)).updateCollaborationOpportunity(any(), any(), any());
   }
 
 }

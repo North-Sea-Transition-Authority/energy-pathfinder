@@ -27,6 +27,9 @@ public class CollaborationOpportunitiesSummaryServiceTest {
   @Mock
   private CollaborationOpportunitiesService collaborationOpportunitiesService;
 
+  @Mock
+  private CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService;
+
   private CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -36,9 +39,10 @@ public class CollaborationOpportunitiesSummaryServiceTest {
   private final CollaborationOpportunity manualEntryOpportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity_manualEntry(detail);
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     collaborationOpportunitiesSummaryService = new CollaborationOpportunitiesSummaryService(
-        collaborationOpportunitiesService
+        collaborationOpportunitiesService,
+        collaborationOpportunityFileLinkService
     );
     when(collaborationOpportunitiesService.getOpportunitiesForDetail(detail)).thenReturn(
         List.of(opportunity, manualEntryOpportunity)

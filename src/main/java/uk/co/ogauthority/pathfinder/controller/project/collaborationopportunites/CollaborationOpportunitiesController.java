@@ -5,6 +5,8 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,21 +14,29 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
+import uk.co.ogauthority.pathfinder.config.file.FileDeleteResult;
+import uk.co.ogauthority.pathfinder.config.file.FileUploadResult;
+import uk.co.ogauthority.pathfinder.controller.file.PathfinderFileUploadController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.CollaborationOpportunityRestController;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
+import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesSummaryService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunityFileLinkService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
@@ -36,12 +46,14 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
 @RequestMapping("/project/{projectId}/collaboration-opportunities")
-public class CollaborationOpportunitiesController extends ProjectFormPageController {
+public class CollaborationOpportunitiesController extends PathfinderFileUploadController {
 
   public static final String PAGE_NAME = "Collaboration opportunities";
   public static final String PAGE_NAME_SINGULAR = "Collaboration opportunity";
   public static final String REMOVE_PAGE_NAME = "Remove collaboration opportunity";
 
+  private final BreadcrumbService breadcrumbService;
+  private final ControllerHelperService controllerHelperService;
   private final CollaborationOpportunitiesService collaborationOpportunitiesService;
   private final CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService;
 
@@ -50,8 +62,11 @@ public class CollaborationOpportunitiesController extends ProjectFormPageControl
   public CollaborationOpportunitiesController(BreadcrumbService breadcrumbService,
                                               ControllerHelperService controllerHelperService,
                                               CollaborationOpportunitiesService collaborationOpportunitiesService,
-                                              CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService) {
-    super(breadcrumbService, controllerHelperService);
+                                              CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService,
+                                              ProjectDetailFileService projectDetailFileService) {
+    super(projectDetailFileService);
+    this.breadcrumbService = breadcrumbService;
+    this.controllerHelperService = controllerHelperService;
     this.collaborationOpportunitiesService = collaborationOpportunitiesService;
     this.collaborationOpportunitiesSummaryService = collaborationOpportunitiesSummaryService;
   }
@@ -92,7 +107,10 @@ public class CollaborationOpportunitiesController extends ProjectFormPageControl
   @GetMapping("/collaboration-opportunity")
   public ModelAndView addCollaborationOpportunity(@PathVariable("projectId") Integer projectId,
                                                   ProjectContext projectContext) {
-    return getCollaborationOpportunityModelAndView(projectId, new CollaborationOpportunityForm());
+    return getCollaborationOpportunityModelAndView(
+        projectContext.getProjectDetails(),
+        new CollaborationOpportunityForm()
+    );
   }
 
 
@@ -106,10 +124,14 @@ public class CollaborationOpportunitiesController extends ProjectFormPageControl
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getCollaborationOpportunityModelAndView(projectId, form),
+        getCollaborationOpportunityModelAndView(projectContext.getProjectDetails(), form),
         form,
         () -> {
-          collaborationOpportunitiesService.createCollaborationOpportunity(projectContext.getProjectDetails(), form);
+          collaborationOpportunitiesService.createCollaborationOpportunity(
+              projectContext.getProjectDetails(),
+              form,
+              projectContext.getUserAccount()
+          );
           return ReverseRouter.redirect(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null));
         }
     );
@@ -120,7 +142,10 @@ public class CollaborationOpportunitiesController extends ProjectFormPageControl
                                                    @PathVariable("opportunityId") Integer opportunityId,
                                                    ProjectContext projectContext) {
     var opportunity = collaborationOpportunitiesService.getOrError(opportunityId);
-    return getCollaborationOpportunityModelAndView(projectId, collaborationOpportunitiesService.getForm(opportunity));
+    return getCollaborationOpportunityModelAndView(
+        projectContext.getProjectDetails(),
+        collaborationOpportunitiesService.getForm(opportunity)
+    );
   }
 
 
@@ -136,10 +161,14 @@ public class CollaborationOpportunitiesController extends ProjectFormPageControl
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getCollaborationOpportunityModelAndView(projectId, form),
+        getCollaborationOpportunityModelAndView(projectContext.getProjectDetails(), form),
         form,
         () -> {
-          collaborationOpportunitiesService.updateCollaborationOpportunity(opportunity, form);
+          collaborationOpportunitiesService.updateCollaborationOpportunity(
+              opportunity,
+              form,
+              projectContext.getUserAccount()
+          );
           return ReverseRouter.redirect(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null));
         }
     );
@@ -171,6 +200,44 @@ public class CollaborationOpportunitiesController extends ProjectFormPageControl
     return ReverseRouter.redirect(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null));
   }
 
+  @PostMapping("/collaboration-opportunity/files/upload")
+  @ResponseBody
+  public FileUploadResult handleUpload(@PathVariable("projectId") Integer projectId,
+                                       @RequestParam("file") MultipartFile file,
+                                       ProjectContext projectContext) {
+
+    return projectDetailFileService.processInitialUpload(
+        file,
+        projectContext.getProjectDetails(),
+        CollaborationOpportunityFileLinkService.FILE_PURPOSE,
+        projectContext.getUserAccount()
+    );
+
+  }
+
+  @GetMapping("/collaboration-opportunity/files/download/{fileId}")
+  @ResponseBody
+  public ResponseEntity<Resource> handleDownload(@PathVariable("projectId") Integer projectId,
+                                                 @PathVariable("fileId") String fileId,
+                                                 ProjectContext projectContext) {
+    var file = projectDetailFileService.getProjectDetailFileByProjectDetailAndFileId(
+        projectContext.getProjectDetails(),
+        fileId
+    );
+    return serveFile(file);
+  }
+
+  @PostMapping("/collaboration-opportunity/files/delete/{fileId}")
+  @ResponseBody
+  public FileDeleteResult handleDelete(@PathVariable("projectId") Integer projectId,
+                                       @PathVariable("fileId") String fileId,
+                                       ProjectContext projectContext) {
+    return collaborationOpportunitiesService.deleteCollaborationOpportunityFile(
+        fileId,
+        projectContext.getProjectDetails(),
+        projectContext.getUserAccount()
+    );
+  }
 
   private ModelAndView getViewCollaborationOpportunitiesModelAndView(
       Integer projectId,
@@ -195,15 +262,25 @@ public class CollaborationOpportunitiesController extends ProjectFormPageControl
     return modelAndView;
   }
 
-  private ModelAndView getCollaborationOpportunityModelAndView(Integer projectId, CollaborationOpportunityForm form) {
-    var modelAndView = new ModelAndView("project/collaborationopportunities/collaborationOpportunity")
+  private ModelAndView getCollaborationOpportunityModelAndView(ProjectDetail projectDetail, CollaborationOpportunityForm form) {
+    var modelAndView = createModelAndView(
+        "project/collaborationopportunities/collaborationOpportunity",
+        projectDetail,
+        CollaborationOpportunityFileLinkService.FILE_PURPOSE,
+        form
+    )
         .addObject(
             "collaborationFunctionRestUrl",
             SearchSelectorService.route(on(CollaborationOpportunityRestController.class).searchFunctions(null))
         )
         .addObject("form", form)
         .addObject("preselectedCollaboration", collaborationOpportunitiesService.getPreSelectedCollaborationFunction(form));
-    breadcrumbService.fromCollaborationOpportunities(projectId, modelAndView, PAGE_NAME_SINGULAR);
+
+    breadcrumbService.fromCollaborationOpportunities(
+        projectDetail.getProject().getId(),
+        modelAndView,
+        PAGE_NAME_SINGULAR
+    );
     return modelAndView;
   }
 }

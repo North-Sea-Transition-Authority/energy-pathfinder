@@ -4,9 +4,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadMultipleFilesWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
-public class CollaborationOpportunityForm {
+public class CollaborationOpportunityForm extends UploadMultipleFilesWithDescriptionForm {
 
   @NotEmpty(message = "Select a collaboration opportunity function", groups = FullValidation.class)
   private String function;
