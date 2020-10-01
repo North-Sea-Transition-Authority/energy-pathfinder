@@ -15,14 +15,7 @@
         </div>
       </#list>
     <#else>
-      <@fdsInsetText.insetText>
-        <p>
-          Your project requires at least one collaboration opportunity as you advised they would be provided in the 'Set up your project' section.
-        </p>
-        <p>
-          <@fdsAction.link linkText="Change your project set up" linkUrl=""/>
-        </p>
-      </@fdsInsetText.insetText>
+      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="collaboration opportunity" linkUrl=""/>
     </#if>
     <@fdsAction.link linkText="Add collaboration opportunity" linkUrl=springUrl(addCollaborationOpportunityUrl) linkClass="govuk-button govuk-button--blue"/>
     <@fdsForm.htmlForm>

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
@@ -28,22 +29,20 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
 @RequestMapping("/project/{projectId}/operator")
-public class ChangeProjectOperatorController {
+public class ChangeProjectOperatorController extends ProjectFormPageController {
+
   public static final String PAGE_NAME = "Project operator";
   public static final String PRIMARY_BUTTON_TEXT = "Save and continue";
 
   private final SelectOperatorService selectOperatorService;
-  private final ControllerHelperService controllerHelperService;
-  private final BreadcrumbService breadcrumbService;
 
   @Autowired
   public ChangeProjectOperatorController(
       SelectOperatorService selectOperatorService,
       ControllerHelperService controllerHelperService,
       BreadcrumbService breadcrumbService) {
+    super(breadcrumbService, controllerHelperService);
     this.selectOperatorService = selectOperatorService;
-    this.controllerHelperService = controllerHelperService;
-    this.breadcrumbService = breadcrumbService;
   }
 
 

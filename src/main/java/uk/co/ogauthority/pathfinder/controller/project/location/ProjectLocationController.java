@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
@@ -34,20 +35,17 @@ import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
 @RequestMapping("/project/{projectId}/location")
-public class ProjectLocationController {
+public class ProjectLocationController extends ProjectFormPageController {
   public static final String PAGE_NAME = "Location";
 
-  private final BreadcrumbService breadcrumbService;
   private final ProjectLocationService locationService;
-  private final ControllerHelperService controllerHelperService;
 
   @Autowired
   public ProjectLocationController(BreadcrumbService breadcrumbService,
                                    ProjectLocationService locationService,
                                    ControllerHelperService controllerHelperService) {
-    this.breadcrumbService = breadcrumbService;
+    super(breadcrumbService, controllerHelperService);
     this.locationService = locationService;
-    this.controllerHelperService = controllerHelperService;
   }
 
   @GetMapping

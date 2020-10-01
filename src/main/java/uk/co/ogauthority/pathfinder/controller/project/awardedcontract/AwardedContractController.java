@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
@@ -36,15 +37,13 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
 @RequestMapping("/project/{projectId}/awarded-contracts")
-public class AwardedContractController {
+public class AwardedContractController extends ProjectFormPageController {
 
   public static final String PAGE_NAME = "Awarded contracts";
   public static final String PAGE_NAME_SINGULAR = "Awarded contract";
   public static final String REMOVE_PAGE_NAME = "Remove awarded contract";
 
-  private final BreadcrumbService breadcrumbService;
   private final AwardedContractService awardedContractService;
-  private final ControllerHelperService controllerHelperService;
   private final AwardedContractSummaryService awardedContractSummaryService;
 
   @Autowired
@@ -52,9 +51,8 @@ public class AwardedContractController {
                                    AwardedContractService awardedContractService,
                                    ControllerHelperService controllerHelperService,
                                    AwardedContractSummaryService awardedContractSummaryService) {
-    this.breadcrumbService = breadcrumbService;
+    super(breadcrumbService, controllerHelperService);
     this.awardedContractService = awardedContractService;
-    this.controllerHelperService = controllerHelperService;
     this.awardedContractSummaryService = awardedContractSummaryService;
   }
 

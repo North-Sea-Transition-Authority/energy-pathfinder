@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.ValidationUtils;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.AfterDateHint;
@@ -704,6 +706,22 @@ public class DateInputValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
 
     assertThat(fieldErrors).isEmpty();
+  }
+
+  @Test
+  public void addEmptyQuarterYearAcceptableHint_whenPartial_thenEmptyQuarterYearAcceptableHintAdded() {
+    var hints = new ArrayList<>();
+    DateInputValidator.addEmptyDateAcceptableHint(ValidationType.PARTIAL, hints);
+    assertThat(hints).hasSize(1);
+    var hint = hints.get(0);
+    assertThat(hint).isInstanceOf(EmptyDateAcceptableHint.class);
+  }
+
+  @Test
+  public void addEmptyQuarterYearAcceptableHint_whenFull_thenEmptyQuarterYearAcceptableHintNotAdded() {
+    var hints = new ArrayList<>();
+    DateInputValidator.addEmptyDateAcceptableHint(ValidationType.FULL, hints);
+    assertThat(hints).isEmpty();
   }
 
 }

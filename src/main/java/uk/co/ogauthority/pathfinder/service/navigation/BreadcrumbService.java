@@ -10,6 +10,7 @@ import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
+import uk.co.ogauthority.pathfinder.controller.project.decommissionedwell.DecommissionedWellController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
@@ -46,6 +47,20 @@ public class BreadcrumbService {
     var map = taskList(projectId);
     String route = ReverseRouter.route(on(AwardedContractController.class).viewAwardedContracts(projectId, null));
     map.put(route, AwardedContractController.PAGE_NAME);
+    return map;
+  }
+
+  public void fromDecommissionedWells(Integer projectId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, decommissionedWells(projectId), thisPage);
+  }
+
+  private Map<String, String> decommissionedWells(Integer projectId) {
+    var map = taskList(projectId);
+    String route = ReverseRouter.route(on(DecommissionedWellController.class).viewWellsToBeDecommissioned(
+        projectId,
+        null
+    ));
+    map.put(route, DecommissionedWellController.SUMMARY_PAGE_NAME);
     return map;
   }
 

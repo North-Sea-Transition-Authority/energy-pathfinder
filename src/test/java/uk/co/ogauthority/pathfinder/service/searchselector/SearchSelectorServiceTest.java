@@ -110,6 +110,160 @@ public class SearchSelectorServiceTest {
     assertThat(result).isEqualTo(SearchSelectablePrefix.FREE_TEXT_PREFIX + manualEntry);
   }
 
+  @Test
+  public void searchWithManualEntry_whenFromList() {
+
+    var searchItem = new SearchItem(1, "value1");
+    var searchableResults = List.of(searchItem);
+
+    var result = searchSelectorService.searchWithManualEntry("value1", searchableResults);
+    assertThat(result).extracting(RestSearchItem::getId)
+        .containsExactly(String.valueOf(searchItem.getId()));
+  }
+
+  @Test
+  public void searchWithManualEntry_whenManualEntry() {
+
+    var searchItem = new SearchItem(1, "value1");
+    var searchableResults = List.of(searchItem);
+
+    final String searchTerm = "value2";
+    var result = searchSelectorService.searchWithManualEntry(searchTerm, searchableResults);
+    assertThat(result).extracting(RestSearchItem::getId)
+        .containsExactly(SearchSelectablePrefix.FREE_TEXT_PREFIX + searchTerm);
+  }
+
+  @Test
+  public void searchWithManualEntry_resultsAreOrdered() {
+
+    var searchItem1 = new SearchItem(1, "value2");
+    var searchItem2 = new SearchItem(2, "value1");
+    var searchableResults = List.of(searchItem1, searchItem2);
+
+    final String searchTerm = "value";
+    var result = searchSelectorService.searchWithManualEntry(searchTerm, searchableResults);
+    assertThat(result).extracting(RestSearchItem::getId)
+        .containsExactly(
+            SearchSelectablePrefix.FREE_TEXT_PREFIX + searchTerm,
+            String.valueOf(searchItem2.getId()),
+            String.valueOf(searchItem1.getId()));
+  }
+
+  @Test
+  public void getManualOrStandardSelection_whenBothNull_thenNull() {
+    var result = searchSelectorService.getManualOrStandardSelection(null, null);
+    assertThat(result).isNull();
+  }
+
+  @Test
+  public void getManualOrStandardSelection_whenManualEntry_thenValueWithPrefix() {
+    var manualSelection = "manual entry";
+    var result = searchSelectorService.getManualOrStandardSelection(manualSelection, null);
+    assertThat(result).isEqualTo(SearchSelectablePrefix.FREE_TEXT_PREFIX + manualSelection);
+  }
+
+  @Test
+  public void getManualOrStandardSelection_whenFromList_thenValueWithPrefix() {
+    var searchItem = new SearchItem(1, "value");
+    var result = searchSelectorService.getManualOrStandardSelection(null, searchItem);
+    assertThat(result).isEqualTo(searchItem.getSelectionId());
+  }
+
+  @Test
+  public void mapSearchSelectorFormEntryToEntity_whenFromList_thenSetFromListField() {
+
+    final SearchSelectableTestEnum selectedValue = SearchSelectableTestEnum.VALUE_1;
+    var entity = new SearchSelectableTestEntity();
+
+    searchSelectorService.mapSearchSelectorFormEntryToEntity(
+        selectedValue.getSelectionId(),
+        SearchSelectableTestEnum.values(),
+        entity::setManualEntry,
+        entity::setFromListValue
+    );
+    assertThat(entity.getFromListValue()).isEqualTo(selectedValue);
+    assertThat(entity.getManualEntry()).isNull();
+  }
+
+  @Test
+  public void mapSearchSelectorFormEntryToEntity_whenManualEntry_thenSetManualEntryField() {
+
+    final String selectedValue = "manual entry";
+    var entity = new SearchSelectableTestEntity();
+
+    searchSelectorService.mapSearchSelectorFormEntryToEntity(
+        SearchSelectablePrefix.FREE_TEXT_PREFIX + selectedValue,
+        SearchSelectableTestEnum.values(),
+        entity::setManualEntry,
+        entity::setFromListValue
+    );
+    assertThat(entity.getFromListValue()).isNull();
+    assertThat(entity.getManualEntry()).isEqualTo(selectedValue);
+  }
+
+  @Test
+  public void mapSearchSelectorFormEntryToEntity_whenNull_thenSetNeither() {
+
+    var entity = new SearchSelectableTestEntity();
+
+    searchSelectorService.mapSearchSelectorFormEntryToEntity(
+        null,
+        SearchSelectableTestEnum.values(),
+        entity::setManualEntry,
+        entity::setFromListValue
+    );
+    assertThat(entity.getFromListValue()).isNull();
+    assertThat(entity.getManualEntry()).isNull();
+  }
+
+  @Test
+  public void getPreSelectedSearchSelectorValue_whenValueIsNull() {
+    var result = searchSelectorService.getPreSelectedSearchSelectorValue(
+        null,
+        SearchSelectableTestEnum.values()
+    );
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void getPreSelectedSearchSelectorValue_whenValueIsManualEntry() {
+    final String entry = "manual entry";
+    final String formValue = SearchSelectablePrefix.FREE_TEXT_PREFIX + entry;
+
+    var result = searchSelectorService.getPreSelectedSearchSelectorValue(
+        formValue,
+        SearchSelectableTestEnum.values()
+    );
+    assertThat(result).containsExactly(
+        entry(formValue, entry)
+    );
+  }
+
+  @Test
+  public void getPreSelectedSearchSelectorValue_whenValueIsFromList() {
+    final SearchSelectableTestEnum entry = SearchSelectableTestEnum.VALUE_1;
+    final String formValue = entry.getSelectionId();
+
+    var result = searchSelectorService.getPreSelectedSearchSelectorValue(
+        formValue,
+        SearchSelectableTestEnum.values()
+    );
+    assertThat(result).containsExactly(
+        entry(formValue, entry.getSelectionText())
+    );
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void getPreSelectedSearchSelectorValue_whenValueIsNotManualAndNotInList() {
+
+    final String formValue = "NOT MANUAL AND NOT IN LIST";
+
+    searchSelectorService.getPreSelectedSearchSelectorValue(
+        formValue,
+        SearchSelectableTestEnum.values()
+    );
+  }
+
   private static class SearchItem implements SearchSelectable {
     private final Integer id;
     private final String name;

@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.model.form.validation.quarteryear;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
+import java.util.ArrayList;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,6 +12,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ValidationUtils;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarter;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
@@ -88,7 +90,7 @@ public class QuarterYearInputValidatorTest {
     );
 
     assertThat(fieldErrorMessages).containsExactly(
-        entry("quarter", Set.of(formInputLabel.getLabel() + QuarterYearInputValidator.VALID_QUARTER_YEAR_ERROR)),
+        entry("quarter", Set.of(String.format(formInputLabel.getLabel(), QuarterYearInputValidator.VALID_QUARTER_YEAR_ERROR))),
         entry("year",  Set.of(""))
     );
   }
@@ -110,7 +112,7 @@ public class QuarterYearInputValidatorTest {
     );
 
     assertThat(fieldErrorMessages).containsExactly(
-        entry("quarter", Set.of(formInputLabel.getLabel() + QuarterYearInputValidator.VALID_QUARTER_YEAR_ERROR)),
+        entry("quarter", Set.of(String.format(formInputLabel.getLabel(), QuarterYearInputValidator.VALID_QUARTER_YEAR_ERROR))),
         entry("year",  Set.of(""))
     );
   }
@@ -148,6 +150,22 @@ public class QuarterYearInputValidatorTest {
         entry("quarter", Set.of(DateInputValidator.getIncorrectYearFormatErrorMessage(formInputLabel))),
         entry("year",  Set.of(""))
     );
+  }
+
+  @Test
+  public void addEmptyQuarterYearAcceptableHint_whenPartial_thenEmptyQuarterYearAcceptableHintAdded() {
+    var hints = new ArrayList<>();
+    QuarterYearInputValidator.addEmptyQuarterYearAcceptableHint(ValidationType.PARTIAL, hints);
+    assertThat(hints).hasSize(1);
+    var hint = hints.get(0);
+    assertThat(hint).isInstanceOf(EmptyQuarterYearAcceptableHint.class);
+  }
+
+  @Test
+  public void addEmptyQuarterYearAcceptableHint_whenFull_thenEmptyQuarterYearAcceptableHintNotAdded() {
+    var hints = new ArrayList<>();
+    QuarterYearInputValidator.addEmptyQuarterYearAcceptableHint(ValidationType.FULL, hints);
+    assertThat(hints).isEmpty();
   }
 
 }

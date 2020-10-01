@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
@@ -35,14 +36,12 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
 @RequestMapping("/project/{projectId}/collaboration-opportunities")
-public class CollaborationOpportunitiesController {
+public class CollaborationOpportunitiesController extends ProjectFormPageController {
 
   public static final String PAGE_NAME = "Collaboration opportunities";
   public static final String PAGE_NAME_SINGULAR = "Collaboration opportunity";
   public static final String REMOVE_PAGE_NAME = "Remove collaboration opportunity";
 
-  private final BreadcrumbService breadcrumbService;
-  private final ControllerHelperService controllerHelperService;
   private final CollaborationOpportunitiesService collaborationOpportunitiesService;
   private final CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService;
 
@@ -52,8 +51,7 @@ public class CollaborationOpportunitiesController {
                                               ControllerHelperService controllerHelperService,
                                               CollaborationOpportunitiesService collaborationOpportunitiesService,
                                               CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService) {
-    this.breadcrumbService = breadcrumbService;
-    this.controllerHelperService = controllerHelperService;
+    super(breadcrumbService, controllerHelperService);
     this.collaborationOpportunitiesService = collaborationOpportunitiesService;
     this.collaborationOpportunitiesSummaryService = collaborationOpportunitiesSummaryService;
   }

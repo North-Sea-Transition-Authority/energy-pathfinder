@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,13 +89,13 @@ public class CollaborationOpportunitiesService {
   }
 
   private void setCommonFields(CollaborationOpportunity opportunity, CollaborationOpportunityForm form) {
-    if (SearchSelectorService.isManualEntry(form.getFunction())) {
-      opportunity.setManualFunction(SearchSelectorService.removePrefix(form.getFunction()));
-      opportunity.setFunction(null);
-    } else if (form.getFunction() != null) {
-      opportunity.setFunction(Function.valueOf(form.getFunction()));
-      opportunity.setManualFunction(null);
-    }
+    searchSelectorService.mapSearchSelectorFormEntryToEntity(
+        form.getFunction(),
+        Function.values(),
+        opportunity::setManualFunction,
+        opportunity::setFunction
+    );
+
     opportunity.setDescriptionOfWork(form.getDescriptionOfWork());
     opportunity.setEstimatedServiceDate(form.getEstimatedServiceDate().createDateOrNull());
 
@@ -121,23 +120,7 @@ public class CollaborationOpportunitiesService {
   }
 
   public Map<String, String> getPreSelectedCollaborationFunction(CollaborationOpportunityForm form) {
-
-    Map<String, String> preSelectedMap = Map.of();
-    var function = form.getFunction();
-
-    if (function != null) {
-      return SearchSelectorService.isManualEntry(form.getFunction())
-        ? searchSelectorService.buildPrePopulatedSelections(
-            Collections.singletonList(form.getFunction()),
-            Map.of(form.getFunction(), form.getFunction())
-          )
-        : searchSelectorService.buildPrePopulatedSelections(
-            Collections.singletonList(form.getFunction()),
-            Map.of(form.getFunction(), Function.valueOf(form.getFunction()).getDisplayName())
-          );
-    }
-
-    return preSelectedMap;
+    return searchSelectorService.getPreSelectedSearchSelectorValue(form.getFunction(), Function.values());
   }
 
   public CollaborationOpportunity getOrError(Integer opportunityId) {

@@ -1,8 +1,10 @@
 package uk.co.ogauthority.pathfinder.model.form.validation.quarteryear;
 
+import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.validationhint.EmptyQuarterYearAcceptableHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
@@ -19,7 +21,7 @@ public class QuarterYearInputValidator implements SmartValidator {
   public static final String QUARTER_INVALID_CODE = QUARTER + FieldValidationErrorCodes.INVALID.getCode();
   public static final String YEAR_INVALID_CODE = YEAR + FieldValidationErrorCodes.INVALID.getCode();
   public static final String EMPTY_QUARTER_YEAR_ERROR = "Enter %s ";
-  public static final String VALID_QUARTER_YEAR_ERROR = " must have a valid quarter and year";
+  public static final String VALID_QUARTER_YEAR_ERROR = "%s must have a valid quarter and year";
 
   @Override
   public boolean supports(Class<?> clazz) {
@@ -63,7 +65,7 @@ public class QuarterYearInputValidator implements SmartValidator {
             errors,
             QUARTER_INVALID_CODE,
             YEAR_INVALID_CODE,
-            formInputLabel.getInitCappedLabel() + VALID_QUARTER_YEAR_ERROR
+            String.format(formInputLabel.getInitCappedLabel(), VALID_QUARTER_YEAR_ERROR)
         );
       } else {
 
@@ -92,6 +94,12 @@ public class QuarterYearInputValidator implements SmartValidator {
           );
         }
       }
+    }
+  }
+
+  public static void addEmptyQuarterYearAcceptableHint(ValidationType validationType, List<Object> validationHints) {
+    if (validationType.equals(ValidationType.PARTIAL)) {
+      validationHints.add(new EmptyQuarterYearAcceptableHint());
     }
   }
 

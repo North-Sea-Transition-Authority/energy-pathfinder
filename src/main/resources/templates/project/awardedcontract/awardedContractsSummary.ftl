@@ -11,15 +11,7 @@
         <@awardedContractSummary.awardedContractSummary awardedContractView=awardedContractView />
       </#list>
       <#else>
-        <@fdsInsetText.insetText>
-          <p>
-            Your project requires at least one awarded contract as you advised they would be provided in the
-            'Set up your project' section.
-          </p>
-          <p>
-            <@fdsAction.link linkText="Change your project set up" linkUrl=""/>
-          </p>
-        </@fdsInsetText.insetText>
+        <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="awarded contract" linkUrl=""/>
     </#if>
   </div>
   <@fdsAction.link

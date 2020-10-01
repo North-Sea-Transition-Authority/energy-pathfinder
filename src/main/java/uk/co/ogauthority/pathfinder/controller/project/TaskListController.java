@@ -12,6 +12,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
+import uk.co.ogauthority.pathfinder.controller.project.decommissionedwell.DecommissionedWellController;
 import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationController;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
 import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProjectOperatorController;
@@ -104,6 +105,12 @@ public class TaskListController {
     modelAndView.addObject("collaborationOpportunitiesText", CollaborationOpportunitiesController.PAGE_NAME);
     modelAndView.addObject("collaborationOpportunitiesCompleted", collaborationOpportunitiesService.isComplete(
         projectContext.getProjectDetails()));
+
+    modelAndView.addObject("decommissionedWellsUrl",
+        ReverseRouter.route(on(DecommissionedWellController.class).viewWellsToBeDecommissioned(projectId, null))
+    );
+    modelAndView.addObject("decommissionedWellsText", DecommissionedWellController.SUMMARY_PAGE_NAME);
+    modelAndView.addObject("decommissionedWellsCompleted", false);
 
     return modelAndView;
   }

@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.project.upcomingtender;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -84,13 +83,14 @@ public class UpcomingTenderService {
   }
 
   private void setCommonFields(UpcomingTender upcomingTender, UpcomingTenderForm form) {
-    if (SearchSelectorService.isManualEntry(form.getTenderFunction())) {
-      upcomingTender.setManualTenderFunction(SearchSelectorService.removePrefix(form.getTenderFunction()));
-      upcomingTender.setTenderFunction(null);
-    } else if (form.getTenderFunction() != null) {
-      upcomingTender.setTenderFunction(getFunctionFromString(form.getTenderFunction()));
-      upcomingTender.setManualTenderFunction(null);
-    }
+
+    searchSelectorService.mapSearchSelectorFormEntryToEntity(
+        form.getTenderFunction(),
+        Function.values(),
+        upcomingTender::setManualTenderFunction,
+        upcomingTender::setTenderFunction
+    );
+
     upcomingTender.setDescriptionOfWork(form.getDescriptionOfWork());
     upcomingTender.setEstimatedTenderDate(form.getEstimatedTenderDate().createDateOrNull());
     upcomingTender.setContractBand(form.getContractBand());
@@ -206,19 +206,7 @@ public class UpcomingTenderService {
    * @return id and display name of the search selector items empty map if there's no form data.
    */
   public Map<String, String> getPreSelectedFunction(UpcomingTenderForm form) {
-    if (form.getTenderFunction() != null) {
-      return SearchSelectorService.isManualEntry(form.getTenderFunction())
-          ? searchSelectorService.buildPrePopulatedSelections(
-              Collections.singletonList(form.getTenderFunction()),
-              Map.of(form.getTenderFunction(), form.getTenderFunction())
-            )
-          : searchSelectorService.buildPrePopulatedSelections(
-              Collections.singletonList(form.getTenderFunction()),
-              Map.of(form.getTenderFunction(), getFunctionFromString(form.getTenderFunction()).getDisplayName())
-            );
-
-    }
-    return Map.of();
+    return searchSelectorService.getPreSelectedSearchSelectorValue(form.getTenderFunction(), Function.values());
   }
 
 
@@ -230,9 +218,4 @@ public class UpcomingTenderService {
   public List<RestSearchItem> findTenderFunctionsLikeWithManualEntry(String searchTerm) {
     return functionService.findFunctionsLikeWithManualEntry(searchTerm, FunctionType.UPCOMING_TENDER);
   }
-
-  private Function getFunctionFromString(String s) {
-    return Function.valueOf(s);
-  }
-
 }

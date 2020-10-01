@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.project.awardedcontract;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.transaction.Transactional;
@@ -111,16 +110,12 @@ public class AwardedContractService {
 
     awardedContract.setContractorName(form.getContractorName());
 
-    if (SearchSelectorService.isManualEntry(form.getContractFunction())) {
-      awardedContract.setManualContractFunction(SearchSelectorService.removePrefix(form.getContractFunction()));
-      awardedContract.setContractFunction(null);
-    } else if (form.getContractFunction() != null) {
-      awardedContract.setContractFunction(Function.valueOf(form.getContractFunction()));
-      awardedContract.setManualContractFunction(null);
-    } else {
-      awardedContract.setContractFunction(null);
-      awardedContract.setManualContractFunction(null);
-    }
+    searchSelectorService.mapSearchSelectorFormEntryToEntity(
+        form.getContractFunction(),
+        Function.values(),
+        awardedContract::setManualContractFunction,
+        awardedContract::setContractFunction
+    );
 
     awardedContract.setDescriptionOfWork(form.getDescriptionOfWork());
     awardedContract.setDateAwarded(form.getDateAwarded().createDateOrNull());
@@ -136,25 +131,7 @@ public class AwardedContractService {
   }
 
   public Map<String, String> getPreSelectedContractFunction(AwardedContractForm form) {
-
-    Map<String, String> preSelectedMap = Map.of();
-    var contractFunction = form.getContractFunction();
-
-    if (contractFunction != null) {
-      if (SearchSelectorService.isManualEntry(contractFunction)) {
-        preSelectedMap = searchSelectorService.buildPrePopulatedSelections(
-            Collections.singletonList(contractFunction),
-            Map.of(contractFunction, contractFunction)
-        );
-      } else {
-        preSelectedMap = searchSelectorService.buildPrePopulatedSelections(
-            Collections.singletonList(contractFunction),
-            Map.of(contractFunction, Function.valueOf(contractFunction).getDisplayName())
-        );
-      }
-    }
-
-    return preSelectedMap;
+    return searchSelectorService.getPreSelectedSearchSelectorValue(form.getContractFunction(), Function.values());
   }
 
   public List<AwardedContract> getAwardedContracts(ProjectDetail projectDetail) {

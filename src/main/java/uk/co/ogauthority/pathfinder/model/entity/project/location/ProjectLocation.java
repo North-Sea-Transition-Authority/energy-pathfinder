@@ -26,7 +26,7 @@ public class ProjectLocation {
   private Integer id;
 
   @OneToOne
-  @JoinColumn(name = "project_details_id")
+  @JoinColumn(name = "project_detail_id")
   private ProjectDetail projectDetail;
 
   @ManyToOne

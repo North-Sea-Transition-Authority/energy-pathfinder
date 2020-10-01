@@ -26,7 +26,7 @@ public class UpcomingTender implements ContactDetailCapture {
   private Integer id;
 
   @ManyToOne
-  @JoinColumn(name = "project_details_id")
+  @JoinColumn(name = "project_detail_id")
   private ProjectDetail projectDetail;
 
   @Enumerated(EnumType.STRING)

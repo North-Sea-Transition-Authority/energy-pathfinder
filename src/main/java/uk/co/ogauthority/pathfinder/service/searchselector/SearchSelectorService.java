@@ -1,9 +1,13 @@
 package uk.co.ogauthority.pathfinder.service.searchselector;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -28,6 +32,19 @@ public class SearchSelectorService {
                 .contains(StringUtils.defaultIfBlank(searchQuery, "").toLowerCase()))
         .map(item -> new RestSearchItem(item.getSelectionId(), item.getSelectionText()))
         .collect(Collectors.toList());
+  }
+
+  public List<RestSearchItem> searchWithManualEntry(String searchQuery,
+                                                    Collection<? extends SearchSelectable> selectableList) {
+    var restSearchResults = search(searchQuery, selectableList);
+    addManualEntry(searchQuery, restSearchResults);
+
+    restSearchResults = restSearchResults
+        .stream()
+        .sorted(Comparator.comparing(RestSearchItem::getText))
+        .collect(Collectors.toList());
+
+    return restSearchResults;
   }
 
   public List<RestSearchItem> addManualEntry(String searchQuery, List<RestSearchItem> resultList) {
@@ -85,4 +102,81 @@ public class SearchSelectorService {
   public static String getValueWithManualEntryPrefix(String value) {
     return SearchSelectablePrefix.FREE_TEXT_PREFIX  + value;
   }
+
+  public String getManualOrStandardSelection(String manualSelection, SearchSelectable standardSelection) {
+    String output = null;
+    if (manualSelection != null) {
+      output = getValueWithManualEntryPrefix(manualSelection);
+    } else if (standardSelection != null) {
+      output = standardSelection.getSelectionId();
+    }
+    return output;
+  }
+
+  /**
+   * Utility method to map a search selector form field to either the manual entry of from list
+   * fields in an entity.
+   * @param formValue The value from the form search selector
+   * @param listOptions The list options the user could have selected from
+   * @param entityManualEntryField the manual entry field setter on the entity to call if manual entry value
+   * @param entityFromListField the from list field setter on the entity to call if from list value
+   * @param <T> A class which implements search selectable
+   */
+  public <T extends SearchSelectable> void mapSearchSelectorFormEntryToEntity(String formValue,
+                                                                              T[] listOptions,
+                                                                              Consumer<String> entityManualEntryField,
+                                                                              Consumer<T> entityFromListField) {
+    // if we have a manual entry value
+    if (SearchSelectorService.isManualEntry(formValue)) {
+      entityManualEntryField.accept(SearchSelectorService.removePrefix(formValue));
+      entityFromListField.accept(null);
+    } else if (formValue != null) {
+      // if we have a non null entry from the list
+      entityFromListField.accept(getEnumValue(formValue, listOptions));
+      entityManualEntryField.accept(null);
+    } else {
+      // we have no value at all
+      entityFromListField.accept(null);
+      entityManualEntryField.accept(null);
+    }
+  }
+
+  /**
+   * Method to return a pre-selected search selector value (manual entry or from list).
+   * @param searchSelectorValue the value of the search selector form field
+   * @param listOptions the from list options that could have been selected
+   * @param <T> A class which implements search selectable
+   * @return A map of the pre-selected search selector value (either manual entry of from list)
+   */
+  public <T extends SearchSelectable> Map<String, String> getPreSelectedSearchSelectorValue(String searchSelectorValue,
+                                                                                            T[] listOptions) {
+
+    Map<String, String> preSelectedMap = Map.of();
+
+    if (searchSelectorValue != null) {
+      if (SearchSelectorService.isManualEntry(searchSelectorValue)) {
+        preSelectedMap = buildPrePopulatedSelections(
+            Collections.singletonList(searchSelectorValue),
+            Map.of(searchSelectorValue, searchSelectorValue)
+        );
+      } else {
+        preSelectedMap = buildPrePopulatedSelections(
+            Collections.singletonList(searchSelectorValue),
+            Map.of(searchSelectorValue, getEnumValue(searchSelectorValue, listOptions).getSelectionText())
+        );
+      }
+    }
+
+    return preSelectedMap;
+  }
+
+  private <T extends SearchSelectable> T getEnumValue(String searchSelectorValue, T[] listOptions) {
+    return Arrays.stream(listOptions)
+        .filter(value -> value.getSelectionId().equals(searchSelectorValue))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(String.format(
+            "Could not find matching enum value for form value %s", searchSelectorValue
+        )));
+  }
+
 }

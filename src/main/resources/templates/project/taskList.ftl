@@ -16,6 +16,12 @@
         useNotCompletedLabels=true
       />
       <@fdsTaskList.taskListItem itemUrl=springUrl(collaborationOpportunitiesUrl) itemText=collaborationOpportunitiesText completed=collaborationOpportunitiesCompleted useNotCompletedLabels=true />
+      <@fdsTaskList.taskListItem
+        itemUrl=springUrl(decommissionedWellsUrl)
+        itemText=decommissionedWellsText
+        completed=decommissionedWellsCompleted
+        useNotCompletedLabels=true
+      />
     </@fdsTaskList.taskListSection>
   </@fdsTaskList.taskList>
 </@defaultPage>
