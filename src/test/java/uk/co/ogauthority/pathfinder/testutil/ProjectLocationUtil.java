@@ -1,10 +1,13 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkField;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
+import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
@@ -21,6 +24,8 @@ public class ProjectLocationUtil {
   public static final Boolean APPROVED_FDP_PLAN = true;
   public static final LocalDate APPROVED_FDP_DATE = LocalDate.now().withDayOfMonth(1);
   public static final Boolean APPROVED_DECOM_PROGRAM = false;
+  public static final UkcsArea UKCS_AREA =  UkcsArea.WOS;
+  public static final List<String> LICENCE_BLOCKS = List.of("12/34", "12/56");
 
   public static ProjectLocation getProjectLocation_withManualField(ProjectDetail details) {
     var projectLocation = new ProjectLocation(
@@ -56,6 +61,7 @@ public class ProjectLocationUtil {
     var form = new ProjectLocationForm();
     form.setApprovedFdpDate(new ThreeFieldDateInput(null, null, null));
     form.setApprovedDecomProgramDate(new ThreeFieldDateInput(null, null, null));
+    form.setLicenceBlocks(Collections.emptyList());
     return form;
   }
 
@@ -66,6 +72,7 @@ public class ProjectLocationUtil {
     projectLocation.setApprovedFdpDate(APPROVED_FDP_DATE);
     projectLocation.setApprovedDecomProgram(APPROVED_DECOM_PROGRAM);
     projectLocation.setApprovedDecomProgramDate(null);
+    projectLocation.setUkcsArea(UKCS_AREA);
   }
 
   private static void setCommonFields(ProjectLocationForm form) {
@@ -75,5 +82,7 @@ public class ProjectLocationUtil {
     form.setApprovedFdpDate(new ThreeFieldDateInput(APPROVED_FDP_DATE));
     form.setApprovedDecomProgram(APPROVED_DECOM_PROGRAM);
     form.setApprovedDecomProgramDate(new ThreeFieldDateInput(null, null, null));
+    form.setUkcsArea(UKCS_AREA);
+    form.setLicenceBlocks(LICENCE_BLOCKS);
   }
 }

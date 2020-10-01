@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDat
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationValidationHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
+import uk.co.ogauthority.pathfinder.service.project.location.LicenceBlockValidatorService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 
@@ -31,11 +32,14 @@ public class ProjectLocationFormValidatorTest {
   @Mock
   private DateInputValidator dateInputValidator;
 
+  @Mock
+  private LicenceBlockValidatorService licenceBlockValidatorService;
+
   private ProjectLocationFormValidator validator;
 
   @Before
   public void setUp() {
-    validator = new ProjectLocationFormValidator(dateInputValidator);
+    validator = new ProjectLocationFormValidator(dateInputValidator, licenceBlockValidatorService);
     doCallRealMethod().when(dateInputValidator).validate(any(), any(), any());
     when(dateInputValidator.supports(any())).thenReturn(true);
   }

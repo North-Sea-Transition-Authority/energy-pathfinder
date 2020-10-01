@@ -8,16 +8,20 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
 import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
+import uk.co.ogauthority.pathfinder.service.project.location.LicenceBlockValidatorService;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 
 @Component
 public class ProjectLocationFormValidator implements SmartValidator {
 
   private final DateInputValidator dateInputValidator;
+  private final LicenceBlockValidatorService licenceBlockValidatorService;
 
   @Autowired
-  public ProjectLocationFormValidator(DateInputValidator dateInputValidator) {
+  public ProjectLocationFormValidator(DateInputValidator dateInputValidator,
+                                      LicenceBlockValidatorService licenceBlockValidatorService) {
     this.dateInputValidator = dateInputValidator;
+    this.licenceBlockValidatorService = licenceBlockValidatorService;
   }
 
   @Override
@@ -51,6 +55,10 @@ public class ProjectLocationFormValidator implements SmartValidator {
           projectLocationValidationHint.getDecomProgramApprovalDateValidationHints()
       );
     }
+
+    //validate selected blocks exist in portal data
+    licenceBlockValidatorService.addErrorsForInvalidBlocks(form.getLicenceBlocks(), errors, "licenceBlocks");
+
   }
 
   @Override

@@ -7,6 +7,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +26,7 @@ import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationR
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -46,6 +49,9 @@ public class ProjectLocationServiceTest {
   @Mock
   ProjectLocationFormValidator projectLocationFormValidator;
 
+  @Mock
+  ProjectLocationBlocksService projectLocationBlocksService;
+
   private ProjectLocationService projectLocationService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -59,8 +65,9 @@ public class ProjectLocationServiceTest {
         fieldService,
         searchSelectorService,
         validationService,
-        projectLocationFormValidator);
-
+        projectLocationFormValidator,
+        projectLocationBlocksService
+    );
     when(projectLocationRepository.save(any(ProjectLocation.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
@@ -237,12 +244,40 @@ public class ProjectLocationServiceTest {
     assertThat(preSelectedLocation).isEmpty();
   }
 
+  @Test
+  public void getUnvalidatedBlockViewsForLocation() {
+    //Just a wrapper call really - logic tested in ProjectLocationBlockServiceTest.
+    projectLocation = ProjectLocationUtil.getProjectLocation_withField(details);
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectLocation));
+    when(projectLocationBlocksService.getBlockViewsForLocation(projectLocation, ValidationType.NO_VALIDATION))
+        .thenReturn(Collections.singletonList(LicenceBlockTestUtil.getBlockView(true)));
+    var blocks = projectLocationService.getUnvalidatedBlockViewsForLocation(details);
+    assertThat(blocks.size()).isEqualTo(1);
+    assertThat(blocks.get(0).getBlockReference()).isEqualTo(LicenceBlockTestUtil.BLOCK_REFERENCE);
+  }
+
+  @Test
+  public void getUnvalidatedBlockViewsFromForm() {
+    //Just a wrapper call really - logic tested in ProjectLocationBlockServiceTest.
+    projectLocation = ProjectLocationUtil.getProjectLocation_withField(details);
+    when(projectLocationBlocksService.getBlockViewsFromForm(any(), any()))
+        .thenReturn(Collections.singletonList(LicenceBlockTestUtil.getBlockView(true)));
+    var blocks = projectLocationService.getUnvalidatedBlockViewsFromForm(ProjectLocationUtil.getCompletedForm_withField());
+    assertThat(blocks.size()).isEqualTo(1);
+    assertThat(blocks.get(0).getBlockReference()).isEqualTo(LicenceBlockTestUtil.BLOCK_REFERENCE);
+  }
+
   private void checkCommonFieldsMatch(ProjectLocation projectLocation) {
     assertThat(projectLocation.getFieldType()).isEqualTo(ProjectLocationUtil.FIELD_TYPE);
     assertThat(projectLocation.getWaterDepth()).isEqualTo(ProjectLocationUtil.WATER_DEPTH);
     assertThat(projectLocation.getApprovedFieldDevelopmentPlan()).isEqualTo(ProjectLocationUtil.APPROVED_FDP_PLAN);
     assertThat(projectLocation.getApprovedFdpDate()).isEqualTo(ProjectLocationUtil.APPROVED_FDP_DATE);
     assertThat(projectLocation.getApprovedDecomProgram()).isEqualTo(ProjectLocationUtil.APPROVED_DECOM_PROGRAM);
+    assertThat(projectLocation.getUkcsArea()).isEqualTo(ProjectLocationUtil.UKCS_AREA);
+  }
+
+  private void assertAddOrUpdateBlocksCalled(ProjectLocation projectLocation, List<String> licenceBlocks) {
+    verify(projectLocationBlocksService, times(1)).createOrUpdateBlocks(licenceBlocks, projectLocation);
   }
 
   private void checkCommonFormFieldsMatch(ProjectLocation projectLocation, ProjectLocationForm form) {
@@ -252,5 +287,6 @@ public class ProjectLocationServiceTest {
     assertThat(form.getApprovedFdpDate()).isEqualTo(new ThreeFieldDateInput(projectLocation.getApprovedFdpDate()));
     assertThat(form.getApprovedDecomProgram()).isEqualTo(projectLocation.getApprovedDecomProgram());
     assertThat(form.getApprovedDecomProgramDate()).isEqualTo(new ThreeFieldDateInput(projectLocation.getApprovedDecomProgramDate()));
+    assertThat(form.getUkcsArea()).isEqualTo(projectLocation.getUkcsArea());
   }
 }
