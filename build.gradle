@@ -23,6 +23,12 @@ group = 'uk.co.fivium'
 version = System.getenv("DRONE_BRANCH") ? System.getenv("DRONE_BRANCH").replaceAll("[/\\-]", "_") : "LOCAL-SNAPSHOT"
 sourceCompatibility = '11'
 
+tasks {
+  bootJar {
+    archiveFileName.set("${rootProject.name}.jar")
+  }
+}
+
 repositories {
   mavenCentral()
   maven {
