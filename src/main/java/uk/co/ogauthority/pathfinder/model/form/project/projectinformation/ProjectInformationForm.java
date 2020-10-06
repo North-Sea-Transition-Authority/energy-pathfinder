@@ -13,6 +13,13 @@ import uk.co.ogauthority.pathfinder.model.form.validation.lengthrestrictedstring
 
 public class ProjectInformationForm {
 
+  @LengthRestrictedString(messagePrefix = "The project title", groups = {FullValidation.class, PartialValidation.class})
+  @NotEmpty(message = "Enter a project title", groups = FullValidation.class)
+  private String projectTitle;
+
+  @NotEmpty(message = "Provide a summary of the project", groups = FullValidation.class)
+  private String projectSummary;
+
   @NotNull(message = "Select a field stage", groups = FullValidation.class)
   private FieldStage fieldStage;
 
@@ -23,13 +30,6 @@ public class ProjectInformationForm {
   private QuarterYearInput decomWorkStartDate;
 
   private ThreeFieldDateInput productionCessationDate;
-
-  @LengthRestrictedString(messagePrefix = "The project title", groups = {FullValidation.class, PartialValidation.class})
-  @NotEmpty(message = "Enter a project title", groups = FullValidation.class)
-  private String projectTitle;
-
-  @NotEmpty(message = "Provide a summary of the project", groups = FullValidation.class)
-  private String projectSummary;
 
   @Valid
   private ContactDetailForm contactDetail;
