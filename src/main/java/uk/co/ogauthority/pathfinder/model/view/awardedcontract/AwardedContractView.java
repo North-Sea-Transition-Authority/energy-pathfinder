@@ -111,9 +111,13 @@ public class AwardedContractView implements SummaryItem {
     isValid = valid;
   }
 
+  public Boolean getValid() {
+    return isValid;
+  }
+
   @Override
   public Boolean isValid() {
-    return isValid;
+    return getValid();
   }
 
   @Override
