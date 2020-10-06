@@ -165,7 +165,12 @@ public class DateInputValidator implements SmartValidator {
   }
 
   public static String getIncorrectYearFormatErrorMessage(FormInputLabel inputLabel) {
-    return inputLabel.getInitCappedLabel() + " must have a four number year. For example 2020";
+    return getIncorrectYearFormatErrorMessage(inputLabel.getInitCappedLabel());
+  }
+
+  //TODO use this instead of the inputLabel one to prefix with min / max year label too
+  public static String getIncorrectYearFormatErrorMessage(String label) {
+    return label + " must have a four number year. For example 2020";
   }
 
   public static void addEmptyDateAcceptableHint(ValidationType validationType, List<Object> validationHints) {
