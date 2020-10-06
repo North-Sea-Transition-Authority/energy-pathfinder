@@ -100,6 +100,7 @@ public class ProjectLocationControllerTest extends ProjectContextAbstractControl
 
     verify(projectLocationService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
     verify(projectLocationService, times(1)).createOrUpdate(any(), any());
+    verify(projectLocationService, times(1)).createOrUpdateBlocks(any(), any());
   }
 
 
@@ -125,6 +126,7 @@ public class ProjectLocationControllerTest extends ProjectContextAbstractControl
 
     verify(projectLocationService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
     verify(projectLocationService, times(0)).createOrUpdate(any(), any());
+    verify(projectLocationService, times(0)).createOrUpdateBlocks(any(), any());
   }
 
   @Test
@@ -147,6 +149,7 @@ public class ProjectLocationControllerTest extends ProjectContextAbstractControl
 
     verify(projectLocationService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
     verify(projectLocationService, times(1)).createOrUpdate(any(), any());
+    verify(projectLocationService, times(1)).createOrUpdateBlocks(any(), any());
   }
 
 }

@@ -115,7 +115,7 @@ public class ProjectLocationBlocksService {
    * @return true if the validationType is FULL and the block exists in the portal data.
    *       True if validationType is not FULL. False otherwise.
    */
-  private boolean isBlockReferenceValid(String compositeKey, ValidationType validationType) {
+  public boolean isBlockReferenceValid(String compositeKey, ValidationType validationType) {
     return !validationType.equals(ValidationType.FULL) || licenceBlockValidatorService.existsInPortalData(compositeKey);
   }
 }
