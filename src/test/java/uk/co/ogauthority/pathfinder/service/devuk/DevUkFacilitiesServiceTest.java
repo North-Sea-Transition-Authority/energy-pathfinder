@@ -33,13 +33,14 @@ public class DevUkFacilitiesServiceTest {
   @Test
   public void searchFacilitiesWithNameContainingWithManualEntry_entryAdded() {
     var searchTerm = "fac";
+    var facility = DevUkTestUtil.getDevUkFacility();
     when(devUkFacilitiesRepository.findAllByFacilityNameContainingIgnoreCase(searchTerm)).thenReturn(
-        Collections.singletonList(DevUkTestUtil.getDevUkFacility())
+        Collections.singletonList(facility)
     );
     var results = devUkFacilitiesService.searchFacilitiesWithNameContainingWithManualEntry(searchTerm);
     assertThat(results.size()).isEqualTo(2);
-    assertThat(results.get(0).getText()).isEqualToIgnoringCase(searchTerm);
-    assertThat(results.get(1).getText()).isEqualToIgnoringCase(DevUkTestUtil.FACILITY_NAME);
+    assertThat(results.get(0).getText()).isEqualToIgnoringCase(facility.getFacilityName());
+    assertThat(results.get(1).getText()).isEqualToIgnoringCase(searchTerm);
   }
 
   @Test

@@ -24,7 +24,7 @@ public class DevUkFieldService {
   }
 
   /**
-   * Find the fields with statuses in 500, 600, 700 matching the search term.
+   * Find the fields with statuses in ACTIVE_STATUS_LIST matching the search term.
    * @param fieldName a whole or partial fieldname
    * @return list of matching DevUkField entities
    */
@@ -33,7 +33,7 @@ public class DevUkFieldService {
   }
 
   /**
-   * Find the fields with statuses in 500, 600, 700 matching the search term.
+   * Find the fields with statuses in ACTIVE_STATUS_LIST matching the search term.
    * Include the searchTerm param as a manual entry
    * @param fieldName a whole or partial fieldname
    * @return list of matching DevUkField entities

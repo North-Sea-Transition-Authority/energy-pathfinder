@@ -33,11 +33,11 @@ public class DevUkFacility implements SearchSelectable {
 
   @Override
   public String getSelectionId() {
-    return String.valueOf(id);
+    return String.valueOf(getId());
   }
 
   @Override
   public String getSelectionText() {
-    return facilityName;
+    return getFacilityName();
   }
 }

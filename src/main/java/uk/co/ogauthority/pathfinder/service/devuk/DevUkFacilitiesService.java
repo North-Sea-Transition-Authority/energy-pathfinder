@@ -1,8 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.devuk;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkFacility;
@@ -25,18 +23,10 @@ public class DevUkFacilitiesService {
 
   public List<RestSearchItem> searchFacilitiesWithNameContainingWithManualEntry(String searchTerm) {
     var searchableList = findByNameContaining(searchTerm);
-    List<RestSearchItem> results = searchSelectorService.search(searchTerm, searchableList)
-        .stream()
-        .sorted(Comparator.comparing(RestSearchItem::getText))
-        .collect(Collectors.toList());
-
-    return searchSelectorService.addManualEntry(
-        searchTerm,
-        results
-    );
+    return searchSelectorService.searchWithManualEntry(searchTerm, searchableList);
   }
 
-  public List<DevUkFacility> findByNameContaining(String searchTerm) {
+  private List<DevUkFacility> findByNameContaining(String searchTerm) {
     return devUkFacilitiesRepository.findAllByFacilityNameContainingIgnoreCase(searchTerm);
   }
 
