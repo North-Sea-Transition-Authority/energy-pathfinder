@@ -33,7 +33,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectIn
 @RequestMapping("/project/{projectId}/project-information")
 public class ProjectInformationController extends ProjectFormPageController {
 
-  public static final String PAGE_NAME = "Project information";
+  public static final String PAGE_NAME = "Project information & contact details";
 
   private final ProjectInformationService projectInformationService;
 
@@ -73,6 +73,7 @@ public class ProjectInformationController extends ProjectFormPageController {
   private ModelAndView getProjectInformationModelAndView(Integer projectId, ProjectInformationForm form) {
     var modelAndView = new ModelAndView("project/projectinformation/projectInformation")
         .addObject("form", form)
+        .addObject("pageName", PAGE_NAME)
         .addObject("discoveryFieldStage", FieldStage.getEntryAsMap(FieldStage.DISCOVERY))
         .addObject("developmentFieldStage", FieldStage.getEntryAsMap(FieldStage.DEVELOPMENT))
         .addObject("operationsFieldStage", FieldStage.getEntryAsMap(FieldStage.OPERATIONS))
