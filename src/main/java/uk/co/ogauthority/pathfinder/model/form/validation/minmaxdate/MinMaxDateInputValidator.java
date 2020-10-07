@@ -22,7 +22,7 @@ public class MinMaxDateInputValidator implements SmartValidator {
   public static final String MAX_YEAR_TEXT = "maximum";
   public static final String DEFAULT_INPUT_LABEL_TEXT = "Minimum and maximum years";
   public static final String ENTER_BOTH_YEARS_ERROR = "%s requires a %s and %s year";
-  public static final String MIN_BEFORE_MAX_YEAR_ERROR = "%s's %s year must be before the %s year";
+  public static final String MIN_BEFORE_MAX_YEAR_ERROR = "%s's %s year must be before or the same as the %s year";
   public static final String MAX_YEAR_IN_FUTURE_ERROR = "%s's %s year must be in the future";
 
   @Override
@@ -53,13 +53,13 @@ public class MinMaxDateInputValidator implements SmartValidator {
         .map(hint -> ((MaxYearMustBeInFutureHint) hint))
         .findFirst();
 
-    //Just one valid year is permitted if doing partial validation
+    //Can fill in either of the year fields (or none) if doing partial validation
     if (emptyMinMaxDateAcceptableHint.isPresent()) {
       if (minMaxDateInput.getMinYear() != null) {
         rejectIfInvalidYear(errors, MIN_YEAR, inputLabel, yearLabels.getMinYearLabel(), minMaxDateInput.getMinYear());
       }
 
-      if (minMaxDateInput.getMaxYear() != null && isInvalidYear(minMaxDateInput.getMaxYear())) {
+      if (minMaxDateInput.getMaxYear() != null) {
         rejectIfInvalidYear(errors, MAX_YEAR, inputLabel, yearLabels.getMaxYearLabel(), minMaxDateInput.getMaxYear());
       }
     } else { //Full validation
@@ -84,7 +84,7 @@ public class MinMaxDateInputValidator implements SmartValidator {
     }
     //do for both partial and full
     //check min year is before max year
-    if (bothDatesArePresentAndValid(minMaxDateInput) && !minMaxDateInput.minIsBeforeMax()) {
+    if (bothDatesArePresentAndValid(minMaxDateInput) && !minMaxDateInput.minIsBeforeOrEqualToMax()) {
       errors.rejectValue(
           MIN_YEAR,
           getInvalidErrorCode(MIN_YEAR),
