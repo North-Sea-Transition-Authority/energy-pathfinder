@@ -253,6 +253,16 @@ public class MinMaxDateInputValidatorTest {
     );
   }
 
+  @Test
+  public void fullValidationValidDates_yearsAreTheSame_valid() {
+    input = new MinMaxDateInput("2020", "2020");
+    var errors = new BeanPropertyBindingResult(input, "form");
+    Object[] hints = {inputLabel};
+    ValidationUtils.invokeValidator(validator, input, errors, hints);
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    assertThat(fieldErrors).isEmpty();
+  }
+
 
   @Test
   public void fullValidationBothDates_valid() {

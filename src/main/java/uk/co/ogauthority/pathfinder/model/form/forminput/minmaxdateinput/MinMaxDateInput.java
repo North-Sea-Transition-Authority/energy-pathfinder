@@ -39,14 +39,14 @@ public class MinMaxDateInput {
   }
 
   /**
-   * Check if the minYear is < maxYear.
-   * @return true if min is less than max. False if otherwise or neither are a valid year
+   * Check if the minYear is <= maxYear.
+   * @return true if min is less than or equal to max. False if otherwise or neither are a valid year
    */
-  public boolean minIsBeforeMax() {
+  public boolean minIsBeforeOrEqualToMax() {
     try {
       var min = Integer.parseInt(getMinYear());
       var max = Integer.parseInt(getMaxYear());
-      return min < max;
+      return min <= max;
     } catch (NumberFormatException e) {
       return false;
     }
