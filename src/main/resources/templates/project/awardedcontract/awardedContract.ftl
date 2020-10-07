@@ -21,7 +21,6 @@
       yearPath="form.dateAwarded.year"
       labelText="Date contract awarded"
       formId="dateAwarded-day-month-year"
-      optionalLabel=true
     />
     <@fdsRadio.radio
       labelText="Contract band"

@@ -15,10 +15,12 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.ValidationUtils;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
+import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AwardedContractFormValidatorTest {
@@ -33,7 +35,7 @@ public class AwardedContractFormValidatorTest {
   @Before
   public void setup() {
     awardedContractFormValidator = new AwardedContractFormValidator(dateInputValidator);
-    awardedContractValidationHint = new AwardedContractValidationHint();
+    awardedContractValidationHint = new AwardedContractValidationHint(ValidationType.FULL);
     doCallRealMethod().when(dateInputValidator).validate(any(), any(), any());
     when(dateInputValidator.supports(any())).thenReturn(true);
   }
@@ -51,12 +53,44 @@ public class AwardedContractFormValidatorTest {
   }
 
   @Test
-  public void validate_noDateAwarded_thenValid() {
+  public void validate_whenFullValidationAndNoDateAwarded_thenInvalid() {
     var form = AwardedContractTestUtil.createAwardedContractForm();
     form.setDateAwarded(new ThreeFieldDateInput(null, null, null));
 
     var errors = new BeanPropertyBindingResult(form, "form");
 
+    ValidationUtils.invokeValidator(awardedContractFormValidator, form, errors, awardedContractValidationHint);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).containsExactly(
+        entry("dateAwarded.day", Set.of(DateInputValidator.DAY_INVALID_CODE)),
+        entry("dateAwarded.month", Set.of(DateInputValidator.MONTH_INVALID_CODE)),
+        entry("dateAwarded.year", Set.of(DateInputValidator.YEAR_INVALID_CODE))
+    );
+
+    final String dateAwardedLabel = AwardedContractValidationHint.DATE_AWARDED_LABEL.getLabel();
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("dateAwarded.day", Set.of(String.format(
+              DateInputValidator.EMPTY_DATE_ERROR,
+              StringDisplayUtil.getPrefixForVowelOrConsonant(dateAwardedLabel) + dateAwardedLabel
+            ))
+        ),
+        entry("dateAwarded.month", Set.of("")),
+        entry("dateAwarded.year", Set.of(""))
+    );
+  }
+
+  @Test
+  public void validate_whenPartialValidationAndNoDateAwarded_thenValid() {
+    var form = AwardedContractTestUtil.createAwardedContractForm();
+    form.setDateAwarded(new ThreeFieldDateInput(null, null, null));
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+
+    awardedContractValidationHint = new AwardedContractValidationHint(ValidationType.PARTIAL);
     ValidationUtils.invokeValidator(awardedContractFormValidator, form, errors, awardedContractValidationHint);
 
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);

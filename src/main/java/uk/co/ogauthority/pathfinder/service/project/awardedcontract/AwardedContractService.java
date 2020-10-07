@@ -86,7 +86,7 @@ public class AwardedContractService {
   public BindingResult validate(AwardedContractForm form,
                                 BindingResult bindingResult,
                                 ValidationType validationType) {
-    var awardedContractValidationHint = new AwardedContractValidationHint();
+    var awardedContractValidationHint = new AwardedContractValidationHint(validationType);
     awardedContractFormValidator.validate(form, bindingResult, awardedContractValidationHint);
     return validationService.validate(form, bindingResult, validationType);
   }
