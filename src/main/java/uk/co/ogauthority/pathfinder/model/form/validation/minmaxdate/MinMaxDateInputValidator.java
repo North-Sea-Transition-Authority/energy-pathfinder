@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.model.form.validation.minmaxdate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -14,6 +15,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.validat
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 
+@Component
 public class MinMaxDateInputValidator implements SmartValidator {
 
   public static final String MIN_YEAR = "minYear";
