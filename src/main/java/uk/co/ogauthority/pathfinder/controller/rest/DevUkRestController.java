@@ -7,28 +7,36 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchResult;
+import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
-import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 
 @RestController
 @RequestMapping("/api/devuk")
 public class DevUkRestController {
 
   private final DevUkFieldService devUkFieldService;
-  private final SearchSelectorService searchSelectorService;
+  private final DevUkFacilitiesService devUkFacilitiesService;
 
   @Autowired
   public DevUkRestController(DevUkFieldService devUkFieldService,
-                             SearchSelectorService searchSelectorService) {
+                             DevUkFacilitiesService devUkFacilitiesService) {
     this.devUkFieldService = devUkFieldService;
-    this.searchSelectorService = searchSelectorService;
+    this.devUkFacilitiesService = devUkFacilitiesService;
   }
 
   @GetMapping("/fields")
   @ResponseBody
   public RestSearchResult searchFields(@RequestParam("term") String searchTerm) {
-    var searchableList = devUkFieldService.findActiveByFieldName(searchTerm);
-    return new RestSearchResult(searchSelectorService.searchWithManualEntry(searchTerm, searchableList));
+    return new RestSearchResult(devUkFieldService.findActiveByFieldNameWithManualEntry(searchTerm));
+  }
+
+  @GetMapping("/facilities")
+  @ResponseBody
+  public RestSearchResult searchFacilitiesWithManualEntry(@RequestParam("term") String searchTerm) {
+    return new RestSearchResult(devUkFacilitiesService.searchFacilitiesWithNameContainingWithManualEntry(
+        searchTerm
+      )
+    );
   }
 
 }
