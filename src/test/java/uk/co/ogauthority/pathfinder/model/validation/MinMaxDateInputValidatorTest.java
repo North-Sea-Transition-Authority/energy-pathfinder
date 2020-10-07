@@ -16,6 +16,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.validationhint.EmptyMinMaxDateAcceptableHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.validationhint.MaxYearMustBeInFutureHint;
+import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.validationhint.MinMaxYearLabelsHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.model.form.validation.minmaxdate.MinMaxDateInputValidator;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
@@ -78,7 +79,32 @@ public class MinMaxDateInputValidatorTest {
     assertThat(fieldErrorMessages).containsExactly(
         entry(
             MinMaxDateInputValidator.MIN_YEAR,
-            Set.of(DateInputValidator.getIncorrectYearFormatErrorMessage(inputLabel))
+            Set.of(DateInputValidator.getIncorrectYearFormatErrorMessage(
+                inputLabel.getInitCappedLabel() + " " + MinMaxDateInputValidator.MIN_YEAR_TEXT)
+            )
+        )
+    );
+  }
+
+  @Test
+  public void partialValidationSingleInvalidDate_customLabel_inValid() {
+    input = new MinMaxDateInput("zzz", null);
+    var errors = new BeanPropertyBindingResult(input, "form");
+    Object[] hints = {inputLabel, new EmptyMinMaxDateAcceptableHint(), new MinMaxYearLabelsHint("earliest", "latest")};
+    ValidationUtils.invokeValidator(validator, input, errors, hints);
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).containsExactly(
+        entry(MinMaxDateInputValidator.MIN_YEAR, Set.of("minYear.invalid"))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry(
+            MinMaxDateInputValidator.MIN_YEAR,
+            Set.of(DateInputValidator.getIncorrectYearFormatErrorMessage(
+                inputLabel.getInitCappedLabel() + " " + "earliest")
+            )
         )
     );
   }
@@ -99,7 +125,11 @@ public class MinMaxDateInputValidatorTest {
     assertThat(fieldErrorMessages).containsExactly(
         entry(
             MinMaxDateInputValidator.MIN_YEAR,
-            Set.of(String.format(MinMaxDateInputValidator.ENTER_BOTH_YEARS_ERROR, inputLabel.getInitCappedLabel()))
+            Set.of(String.format(
+                MinMaxDateInputValidator.ENTER_BOTH_YEARS_ERROR, inputLabel.getInitCappedLabel(),
+                MinMaxDateInputValidator.MIN_YEAR_TEXT,
+                MinMaxDateInputValidator.MAX_YEAR_TEXT
+            ))
         )
     );
   }
@@ -120,7 +150,55 @@ public class MinMaxDateInputValidatorTest {
     assertThat(fieldErrorMessages).containsExactly(
         entry(
             MinMaxDateInputValidator.MIN_YEAR,
-            Set.of(DateInputValidator.getIncorrectYearFormatErrorMessage(inputLabel))
+            Set.of(DateInputValidator.getIncorrectYearFormatErrorMessage(
+                inputLabel.getInitCappedLabel() + " " + MinMaxDateInputValidator.MIN_YEAR_TEXT
+            ))
+        )
+    );
+  }
+
+  @Test
+  public void fullValidationInvalidMinDate_invalid() {
+    input = new MinMaxDateInput("zzz", "2021");
+    var errors = new BeanPropertyBindingResult(input, "form");
+    Object[] hints = {inputLabel};
+    ValidationUtils.invokeValidator(validator, input, errors, hints);
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).containsExactly(
+        entry(MinMaxDateInputValidator.MIN_YEAR, Set.of("minYear.invalid"))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry(
+            MinMaxDateInputValidator.MIN_YEAR,
+            Set.of(DateInputValidator.getIncorrectYearFormatErrorMessage(
+                inputLabel.getInitCappedLabel() + " " + MinMaxDateInputValidator.MIN_YEAR_TEXT
+            ))
+        )
+    );
+  }
+
+  @Test
+  public void fullValidationInvalidMaxDate_invalid() {
+    input = new MinMaxDateInput("2020", "zzz");
+    var errors = new BeanPropertyBindingResult(input, "form");
+    Object[] hints = {inputLabel};
+    ValidationUtils.invokeValidator(validator, input, errors, hints);
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).containsExactly(
+        entry(MinMaxDateInputValidator.MAX_YEAR, Set.of("maxYear.invalid"))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry(
+            MinMaxDateInputValidator.MAX_YEAR,
+            Set.of(DateInputValidator.getIncorrectYearFormatErrorMessage(
+                inputLabel.getInitCappedLabel() + " " + MinMaxDateInputValidator.MAX_YEAR_TEXT
+            ))
         )
     );
   }
@@ -141,7 +219,12 @@ public class MinMaxDateInputValidatorTest {
     assertThat(fieldErrorMessages).containsExactly(
         entry(
             MinMaxDateInputValidator.MIN_YEAR,
-            Set.of(String.format(MinMaxDateInputValidator.MIN_BEFORE_MAX_YEAR_ERROR, inputLabel.getInitCappedLabel()))
+            Set.of(String.format(
+                MinMaxDateInputValidator.MIN_BEFORE_MAX_YEAR_ERROR,
+                inputLabel.getInitCappedLabel(),
+                MinMaxDateInputValidator.MIN_YEAR_TEXT,
+                MinMaxDateInputValidator.MAX_YEAR_TEXT
+            ))
         )
     );
   }
@@ -162,7 +245,10 @@ public class MinMaxDateInputValidatorTest {
     assertThat(fieldErrorMessages).containsExactly(
         entry(
             MinMaxDateInputValidator.MIN_YEAR,
-            Set.of(String.format(MinMaxDateInputValidator.MAX_YEAR_IN_FUTURE_ERROR, inputLabel.getInitCappedLabel()))
+            Set.of(String.format(
+                MinMaxDateInputValidator.MAX_YEAR_IN_FUTURE_ERROR, inputLabel.getInitCappedLabel(),
+                MinMaxDateInputValidator.MAX_YEAR_TEXT
+            ))
         )
     );
   }
