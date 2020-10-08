@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.model.form.validation.minmaxdate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -13,7 +14,9 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.validat
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.validationhint.MinMaxYearLabelsHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
+import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
+@Component
 public class MinMaxDateInputValidator implements SmartValidator {
 
   public static final String MIN_YEAR = "minYear";
@@ -21,7 +24,7 @@ public class MinMaxDateInputValidator implements SmartValidator {
   public static final String MIN_YEAR_TEXT = "minimum";
   public static final String MAX_YEAR_TEXT = "maximum";
   public static final String DEFAULT_INPUT_LABEL_TEXT = "Minimum and maximum years";
-  public static final String ENTER_BOTH_YEARS_ERROR = "%s requires a %s and %s year";
+  public static final String ENTER_BOTH_YEARS_ERROR = "%s requires %s %s and %s year";
   public static final String MIN_BEFORE_MAX_YEAR_ERROR = "%s's %s year must be before or the same as the %s year";
   public static final String MAX_YEAR_IN_FUTURE_ERROR = "%s's %s year must be in the future";
 
@@ -66,9 +69,10 @@ public class MinMaxDateInputValidator implements SmartValidator {
 
       //check values present
       if (!bothDatesArePresent(minMaxDateInput)) {
+        var field = minMaxDateInput.getMinYear() != null ? MAX_YEAR : MIN_YEAR;
         errors.rejectValue(
-            MIN_YEAR,
-            getInvalidErrorCode(MIN_YEAR),
+            field,
+            getInvalidErrorCode(field),
             getBothYearsRequiredErrorMessage(inputLabel, yearLabels)
         );
       }
@@ -99,8 +103,8 @@ public class MinMaxDateInputValidator implements SmartValidator {
         (minMaxDateInput.getMaxYear() != null && !minMaxDateInput.maxYearIsInFuture())
     ) {
       errors.rejectValue(
-          MIN_YEAR,
-          getInvalidErrorCode(MIN_YEAR),
+          MAX_YEAR,
+          getInvalidErrorCode(MAX_YEAR),
           getMaxYearMustBeInFutureErrorMessage(inputLabel, yearLabels)
       );
     }
@@ -132,6 +136,7 @@ public class MinMaxDateInputValidator implements SmartValidator {
     return String.format(
         ENTER_BOTH_YEARS_ERROR,
         inputLabel.getInitCappedLabel(),
+        StringDisplayUtil.getPrefixForVowelOrConsonant(yearLabels.getMinYearLabel()),
         yearLabels.getMinYearLabel(),
         yearLabels.getMaxYearLabel()
     );
