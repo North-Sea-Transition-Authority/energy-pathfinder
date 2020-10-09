@@ -45,7 +45,9 @@ public class FileDownloadUtil {
           fileData.getBinaryStream()
       );
     } catch (SQLException e) {
-      LOGGER.error("Failed to fetch file " + fileName + " from the database", e);
+      if (LOGGER.isErrorEnabled()) {
+        LOGGER.error(String.format("Failed to fetch file %s from the database. Exception: %s", fileName, e));
+      }
       return null;
     }
   }

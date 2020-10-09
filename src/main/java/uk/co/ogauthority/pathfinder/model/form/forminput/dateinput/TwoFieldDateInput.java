@@ -12,13 +12,10 @@ import org.slf4j.LoggerFactory;
  * Represents a two field date commonly used on forms and provides access to common operations that might be applied to that date.
  * e.g testing if a given date is before or after etc.
  */
-public class TwoFieldDateInput implements DateInput {
+public class TwoFieldDateInput extends DateInputCommonAccessor implements DateInput {
   private static final Logger LOGGER = LoggerFactory.getLogger(TwoFieldDateInput.class);
 
   private static final int DEFAULT_DAY = 1;
-
-  private String month;
-  private String year;
 
   public TwoFieldDateInput() {
   }
@@ -42,32 +39,6 @@ public class TwoFieldDateInput implements DateInput {
   @Override
   public String getDay() {
     return String.valueOf(DEFAULT_DAY);
-  }
-
-  @Override
-  public String getMonth() {
-    return month;
-  }
-
-  public void setMonth(String month) {
-    this.month = month;
-  }
-
-  public void setMonth(int month) {
-    this.month = String.valueOf(month);
-  }
-
-  @Override
-  public String getYear() {
-    return year;
-  }
-
-  public void setYear(String year) {
-    this.year = year;
-  }
-
-  public void setYear(int year) {
-    this.year = String.valueOf(year);
   }
 
   @Override

@@ -1,18 +1,12 @@
 package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity;
 
 import java.util.List;
+import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
-import uk.co.ogauthority.pathfinder.util.summary.SummaryItem;
 
-public class CollaborationOpportunityView implements SummaryItem {
-
-  private Integer displayOrder;
-
-  private Integer id;
-
-  private Integer projectId;
+public class CollaborationOpportunityView extends ProjectSummaryItem {
 
   private String function;
 
@@ -28,34 +22,12 @@ public class CollaborationOpportunityView implements SummaryItem {
 
   private SummaryLink deleteLink;
 
-  private Boolean isValid;
-
   public CollaborationOpportunityView(Integer displayOrder,
                                       Integer id,
                                       Integer projectId
   ) {
     this.displayOrder = displayOrder;
     this.id = id;
-    this.projectId = projectId;
-  }
-
-  public void setDisplayOrder(Integer displayOrder) {
-    this.displayOrder = displayOrder;
-  }
-
-  public Integer getId() {
-    return id;
-  }
-
-  public void setId(Integer id) {
-    this.id = id;
-  }
-
-  public Integer getProjectId() {
-    return projectId;
-  }
-
-  public void setProjectId(Integer projectId) {
     this.projectId = projectId;
   }
 
@@ -107,10 +79,6 @@ public class CollaborationOpportunityView implements SummaryItem {
     this.deleteLink = deleteLink;
   }
 
-  public void setIsValid(Boolean valid) {
-    isValid = valid;
-  }
-
   public List<UploadedFileView> getUploadedFileViews() {
     return uploadedFileViews;
   }
@@ -118,15 +86,5 @@ public class CollaborationOpportunityView implements SummaryItem {
   public void setUploadedFileViews(
       List<UploadedFileView> uploadedFileViews) {
     this.uploadedFileViews = uploadedFileViews;
-  }
-
-  @Override
-  public Integer getDisplayOrder() {
-    return displayOrder;
-  }
-
-  @Override
-  public Boolean isValid() {
-    return isValid;
   }
 }

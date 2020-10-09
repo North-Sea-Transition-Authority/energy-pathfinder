@@ -58,10 +58,11 @@ public class ProjectDetailFileService {
         .filter(fileView -> fileIdToFormMap.containsKey(fileView.getFileId()))
         .collect(Collectors.toList());
 
-    return formFileViewList.stream()
-        .peek(fileView -> fileView.setFileDescription(
-            fileIdToFormMap.get(fileView.getFileId()).getUploadedFileDescription()))
-        .collect(Collectors.toList());
+    formFileViewList
+        .forEach(fileView -> fileView.setFileDescription(
+            fileIdToFormMap.get(fileView.getFileId()).getUploadedFileDescription()));
+
+    return formFileViewList;
 
   }
 
@@ -206,11 +207,13 @@ public class ProjectDetailFileService {
                                                      ProjectDetailFilePurpose purpose,
                                                      FileLinkStatus fileLinkStatus) {
 
-    return projectDetailFileRepository.findAllAsFileViewByProjectDetailAndPurposeAndFileLinkStatus(
-        projectDetail, purpose, fileLinkStatus).stream()
-        .peek(ufv -> ufv.setFileUrl(getDownloadUrl(projectDetail, purpose, ufv.getFileId())))
-        .collect(Collectors.toList());
+    var uploadedFileViews = projectDetailFileRepository.findAllAsFileViewByProjectDetailAndPurposeAndFileLinkStatus(
+        projectDetail, purpose, fileLinkStatus);
 
+    uploadedFileViews
+        .forEach(ufv -> ufv.setFileUrl(getDownloadUrl(projectDetail, purpose, ufv.getFileId())));
+
+    return uploadedFileViews;
   }
 
   /**

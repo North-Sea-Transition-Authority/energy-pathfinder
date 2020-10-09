@@ -7,7 +7,7 @@
         <@fdsAction.link linkText=view.getEditLink().getLinkText() linkUrl=springUrl(view.getEditLink().url) linkScreenReaderText=opportunityName />
         <@fdsAction.link linkText=view.getDeleteLink().getLinkText() linkUrl=springUrl(view.getDeleteLink().url) linkScreenReaderText=opportunityName />
       </div>
-      <#if view.isValid()?has_content && !view.isValid()>
+      <#if view.valid?has_content && !view.valid>
         <span class="govuk-error-message">
           <span class="govuk-visually-hidden">Error:</span>${opportunityName} is incomplete
         </span>

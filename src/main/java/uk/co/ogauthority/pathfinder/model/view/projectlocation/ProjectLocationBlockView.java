@@ -6,11 +6,11 @@ import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocatio
 
 public class ProjectLocationBlockView implements AddToListItem {
 
-  public String compositeKey;
+  private String compositeKey;
 
-  public String blockReference;
+  private String blockReference;
 
-  public Boolean isValid;
+  private Boolean isValid;
 
   public ProjectLocationBlockView(ProjectLocationBlock projectLocationBlock, Boolean isValid) {
     this.compositeKey = projectLocationBlock.getCompositeKey();
