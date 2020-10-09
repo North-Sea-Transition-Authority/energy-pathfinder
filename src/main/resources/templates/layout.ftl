@@ -11,6 +11,7 @@
 <#import 'project/macros/checkAnswers.ftl' as checkAnswers>
 <#import 'project/macros/fileUpload.ftl' as fileUpload>
 <#import 'project/macros/setupProjectGuidance.ftl' as setupProjectGuidance>
+<#import 'project/macros/twoNumberInput.ftl' as twoNumberInput>
 
 <#function springUrl url>
   <#local springUrl>

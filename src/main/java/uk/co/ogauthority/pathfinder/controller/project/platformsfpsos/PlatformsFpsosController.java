@@ -85,7 +85,7 @@ public class PlatformsFpsosController extends ProjectFormPageController {
         .addObject("preselectedStructure", platformsFpsosService.getPreselectedStructure(form))
         .addObject("substructureRemovalPremiseMap", SubstructureRemovalPremise.getAllAsMap())
         .addObject("futurePlansMap", FuturePlans.getAllAsMap());
-    breadcrumbService.fromUpcomingTenders(projectId, modelAndView, FORM_PAGE_NAME);
+    breadcrumbService.fromPlatformsFpsos(projectId, modelAndView, FORM_PAGE_NAME);
     return modelAndView;
   }
 
