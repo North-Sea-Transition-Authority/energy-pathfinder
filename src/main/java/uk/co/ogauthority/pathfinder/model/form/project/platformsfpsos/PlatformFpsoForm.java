@@ -11,7 +11,7 @@ import uk.co.ogauthority.pathfinder.model.form.validation.positivewholenumber.Po
 
 public class PlatformFpsoForm {
 
-  @NotEmpty(message = "Select a structure", groups = FullValidation.class)
+  @NotEmpty(message = "Select a platform or FPSO", groups = FullValidation.class)
   private String structure;
 
   @NotNull(message = "Enter a topside / FPSO mass", groups = FullValidation.class)

@@ -53,13 +53,13 @@ public class MinMaxDateInput {
   }
 
   /**
-   * Check if the maxYear is in the future.
-   * @return true if maxYear is in the future, false if not or if maxYear is an invalid number
+   * Check if the maxYear is equal to the current year or in the future.
+   * @return true if maxYear is the current year or in the future, false if not or if maxYear is an invalid number
    */
   public boolean maxYearIsInFuture() {
     try {
       var max = Integer.parseInt(getMaxYear());
-      return max > LocalDate.now().getYear();
+      return max >= LocalDate.now().getYear();
     } catch (NumberFormatException e) {
       return false;
     }

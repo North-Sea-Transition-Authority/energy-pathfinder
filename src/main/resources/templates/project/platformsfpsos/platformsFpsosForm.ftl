@@ -7,14 +7,14 @@
     </#if>
 
     <@fdsForm.htmlForm>
-      <@fdsSearchSelector.searchSelectorRest path="form.structure" selectorMinInputLength=3  labelText="Structure" restUrl=springUrl(facilitiesUrl)  preselectedItems=preselectedStructure!{} />
+      <@fdsSearchSelector.searchSelectorRest path="form.structure" selectorMinInputLength=3  labelText="Platform or FPSO" restUrl=springUrl(facilitiesUrl)  preselectedItems=preselectedStructure!{} />
       <@fdsTextInput.textInput path="form.topsideFpsoMass" labelText="Topside / FPSO mass " suffix=mtUnit.plural suffixScreenReaderPrompt=mtUnit.screenReaderSuffix inputClass="govuk-input--width-4" />
       <@minMaxDateInput
         minFormPath="form.topsideRemovalYears.minYear"
         maxFormPath="form.topsideRemovalYears.maxYear"
-        labelText="Topsides / FPSO removal"
-        altMinLabel="Earliest year"
-        altMaxLabel="Latest year"
+        labelText="Provide the period over which the topsides / FPSO removal takes place"
+        altMinLabel="Earliest start year"
+        altMaxLabel="Latest completion year"
         formId="topsides-fpso-removal"
       />
 
@@ -25,9 +25,9 @@
           <@minMaxDateInput
             minFormPath="form.substructureRemovalYears.minYear"
             maxFormPath="form.substructureRemovalYears.maxYear"
-            labelText="Substructure removal"
-            altMinLabel="Earliest year"
-            altMaxLabel="Latest year"
+            labelText="Provide the period over which the substructure removal takes place"
+            altMinLabel="Earliest start year"
+            altMaxLabel="Latest completion year"
             formId="substructure-removal"
           />
         </@fdsRadio.radioYes>

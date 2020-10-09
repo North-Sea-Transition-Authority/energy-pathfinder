@@ -26,7 +26,7 @@ public class MinMaxDateInputValidator implements SmartValidator {
   public static final String DEFAULT_INPUT_LABEL_TEXT = "Minimum and maximum years";
   public static final String ENTER_BOTH_YEARS_ERROR = "%s requires %s %s and %s year";
   public static final String MIN_BEFORE_MAX_YEAR_ERROR = "%s's %s year must be before or the same as the %s year";
-  public static final String MAX_YEAR_IN_FUTURE_ERROR = "%s's %s year must be in the future";
+  public static final String MAX_YEAR_IN_FUTURE_ERROR = "%s's %s year must be the current year or in the future";
 
   @Override
   public void validate(Object target, Errors errors, Object... validationHints) {

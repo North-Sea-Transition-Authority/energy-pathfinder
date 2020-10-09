@@ -3,8 +3,8 @@
   <@twoNumberInput.twoNumberInputs
     pathOne=minFormPath
     pathTwo=maxFormPath
-    pathOneLabelText="Earliest year"
-    pathTwoLabelText="Latest year"
+    pathOneLabelText=altMinLabel
+    pathTwoLabelText=altMaxLabel
     formId=formId
     nestingPath=nestedPath
     labelText=labelText/>

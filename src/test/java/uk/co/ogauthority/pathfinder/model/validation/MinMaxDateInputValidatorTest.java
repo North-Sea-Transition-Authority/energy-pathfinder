@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.model.validation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Set;
 import org.junit.Before;
@@ -288,7 +289,7 @@ public class MinMaxDateInputValidatorTest {
 
   @Test
   public void fullValidationValidDates_maxDateNotInFutureWithHint_invalid() {
-    input = new MinMaxDateInput("2019", "2020");
+    input = new MinMaxDateInput("2019", String.valueOf(LocalDate.now().minusYears(1L).getYear()));
     var errors = new BeanPropertyBindingResult(input, "form");
     Object[] hints = {inputLabel, new MaxYearMustBeInFutureHint()};
     ValidationUtils.invokeValidator(validator, input, errors, hints);
@@ -313,6 +314,16 @@ public class MinMaxDateInputValidatorTest {
   @Test
   public void fullValidationValidDates_yearsAreTheSame_valid() {
     input = new MinMaxDateInput("2020", "2020");
+    var errors = new BeanPropertyBindingResult(input, "form");
+    Object[] hints = {inputLabel, new MaxYearMustBeInFutureHint()};
+    ValidationUtils.invokeValidator(validator, input, errors, hints);
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    assertThat(fieldErrors).isEmpty();
+  }
+
+  @Test
+  public void fullValidationValidDates_maxYearIsCurrentYear_maxYearInFutureValidationHint_valid() {
+    input = new MinMaxDateInput("2020", String.valueOf(LocalDate.now().getYear()));
     var errors = new BeanPropertyBindingResult(input, "form");
     Object[] hints = {inputLabel};
     ValidationUtils.invokeValidator(validator, input, errors, hints);
