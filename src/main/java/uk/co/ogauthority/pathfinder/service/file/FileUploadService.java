@@ -175,7 +175,7 @@ public class FileUploadService {
       deleteFile(file, lastUpdatedByWua);
       return FileDeleteResult.generateSuccessfulFileDeleteResult(file.getFileId());
     } catch (Exception e) {
-      LOGGER.error("Failed to delete file: " + file.getFileName(), e);
+      LOGGER.error(String.format("Failed to delete file: %s. Exception: %s", file.getFileName(), e));
       return FileDeleteResult.generateFailedFileDeleteResult(file.getFileId());
     }
   }

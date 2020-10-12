@@ -1,18 +1,12 @@
 package uk.co.ogauthority.pathfinder.model.view.upcomingtender;
 
 import java.util.List;
+import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
-import uk.co.ogauthority.pathfinder.util.summary.SummaryItem;
 
-public class UpcomingTenderView implements SummaryItem {
-
-  private Integer displayOrder;
-
-  private Integer id;
-
-  private Integer projectId;
+public class UpcomingTenderView extends ProjectSummaryItem {
 
   private String tenderFunction;
 
@@ -30,8 +24,6 @@ public class UpcomingTenderView implements SummaryItem {
 
   private SummaryLink deleteLink;
 
-  private Boolean isValid;
-
   public UpcomingTenderView(
       Integer displayOrder,
       Integer id,
@@ -39,26 +31,6 @@ public class UpcomingTenderView implements SummaryItem {
   ) {
     this.displayOrder = displayOrder;
     this.id = id;
-    this.projectId = projectId;
-  }
-
-  public void setDisplayOrder(Integer displayOrder) {
-    this.displayOrder = displayOrder;
-  }
-
-  public Integer getId() {
-    return id;
-  }
-
-  public void setId(Integer id) {
-    this.id = id;
-  }
-
-  public Integer getProjectId() {
-    return projectId;
-  }
-
-  public void setProjectId(Integer projectId) {
     this.projectId = projectId;
   }
 
@@ -102,10 +74,6 @@ public class UpcomingTenderView implements SummaryItem {
     this.contactDetailView = contactDetailView;
   }
 
-  public void setIsValid(Boolean isValid) {
-    this.isValid = isValid;
-  }
-
   public SummaryLink getEditLink() {
     return editLink;
   }
@@ -120,16 +88,6 @@ public class UpcomingTenderView implements SummaryItem {
 
   public void setDeleteLink(SummaryLink deleteLink) {
     this.deleteLink = deleteLink;
-  }
-
-  @Override
-  public Integer getDisplayOrder() {
-    return displayOrder;
-  }
-
-  @Override
-  public Boolean isValid() {
-    return isValid;
   }
 
   public List<UploadedFileView> getUploadedFileViews() {

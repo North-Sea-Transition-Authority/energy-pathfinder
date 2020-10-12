@@ -109,11 +109,11 @@ public class AwardedContractSummaryServiceTest {
   @Test
   public void getAwardedContractViewErrors_whenErrors() {
     var awardedContractView1 = AwardedContractTestUtil.createAwardedContractView(1);
-    awardedContractView1.setValid(true);
+    awardedContractView1.setIsValid(true);
 
     final var displayOrderOfInvalidView = 2;
     var awardedContractView2 = AwardedContractTestUtil.createAwardedContractView(displayOrderOfInvalidView);
-    awardedContractView2.setValid(false);
+    awardedContractView2.setIsValid(false);
     
     var errorItems = awardedContractSummaryService.getAwardedContractViewErrors(
         List.of(awardedContractView1, awardedContractView2)
@@ -135,10 +135,10 @@ public class AwardedContractSummaryServiceTest {
   public void getAwardedContractViewErrors_whenNoErrors() {
 
     var awardedContractView1 = AwardedContractTestUtil.createAwardedContractView(1);
-    awardedContractView1.setValid(true);
+    awardedContractView1.setIsValid(true);
 
     var awardedContractView2 = AwardedContractTestUtil.createAwardedContractView(2);
-    awardedContractView2.setValid(true);
+    awardedContractView2.setIsValid(true);
 
     var errorItems = awardedContractSummaryService.getAwardedContractViewErrors(
         List.of(awardedContractView1, awardedContractView2)
@@ -151,10 +151,10 @@ public class AwardedContractSummaryServiceTest {
   public void areAllAwardedContractsValid_whenValid_thenTrue() {
 
     var awardedContractView1 = AwardedContractTestUtil.createAwardedContractView(1);
-    awardedContractView1.setValid(true);
+    awardedContractView1.setIsValid(true);
 
     var awardedContractView2 = AwardedContractTestUtil.createAwardedContractView(2);
-    awardedContractView2.setValid(true);
+    awardedContractView2.setIsValid(true);
 
     var allValid = awardedContractSummaryService.validateViews(
         List.of(awardedContractView1, awardedContractView2)
@@ -166,10 +166,10 @@ public class AwardedContractSummaryServiceTest {
   public void areAllAwardedContractsValid_whenInvalid_thenFalse() {
 
     var awardedContractView1 = AwardedContractTestUtil.createAwardedContractView(1);
-    awardedContractView1.setValid(true);
+    awardedContractView1.setIsValid(true);
 
     var awardedContractView2 = AwardedContractTestUtil.createAwardedContractView(2);
-    awardedContractView2.setValid(false);
+    awardedContractView2.setIsValid(false);
 
     var allValid = awardedContractSummaryService.validateViews(
         List.of(awardedContractView1, awardedContractView2)

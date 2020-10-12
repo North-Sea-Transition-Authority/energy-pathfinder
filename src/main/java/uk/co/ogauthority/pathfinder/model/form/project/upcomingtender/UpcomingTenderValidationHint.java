@@ -13,6 +13,7 @@ public final class UpcomingTenderValidationHint {
   public static final String TOO_MANY_FILES_ERROR_MESSAGE = "You can only provide one tender document";
   public static final FormInputLabel ESTIMATED_TENDER_LABEL = new FormInputLabel("estimated tender date");
   public static final String DATE_ERROR_LABEL = DateHint.TODAY_DATE_LABEL;
+  private static final Integer FILE_UPLOAD_LIMIT = 1;
 
   private final ValidationType validationType;
   private final AfterDateHint estimatedTenderDateHint;
@@ -27,7 +28,7 @@ public final class UpcomingTenderValidationHint {
   }
 
   public Integer getFileUploadLimit() {
-    return 1;
+    return FILE_UPLOAD_LIMIT;
   }
 
   public Object[] getEstimatedTenderDateHint() {

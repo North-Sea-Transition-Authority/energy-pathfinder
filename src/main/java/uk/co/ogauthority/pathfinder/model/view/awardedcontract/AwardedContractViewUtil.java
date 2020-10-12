@@ -52,7 +52,7 @@ public class AwardedContractViewUtil {
 
     awardedContractView.setSummaryLinks(summaryLinks);
 
-    awardedContractView.setValid(isValid);
+    awardedContractView.setIsValid(isValid);
 
     return awardedContractView;
   }
