@@ -31,7 +31,7 @@ public class PlatformFpsoValidationHint {
     hints.add(TOPSIDES_YEAR_LABELS);
     hints.add(TOPSIDES_MAX_YEAR_HINT);
 
-    addEmptyDateAcceptableHint(hints);
+    addEmptyMinMaxDateAcceptableHint(hints);
 
     return hints.toArray();
   }
@@ -42,7 +42,7 @@ public class PlatformFpsoValidationHint {
     hints.add(SUBSTRUCTURE_YEAR_LABELS);
     hints.add(SUBSTRUCTURE_MAX_YEAR_HINT);
 
-    addEmptyDateAcceptableHint(hints);
+    addEmptyMinMaxDateAcceptableHint(hints);
 
     return hints.toArray();
   }
@@ -51,7 +51,7 @@ public class PlatformFpsoValidationHint {
     return validationType;
   }
 
-  private void addEmptyDateAcceptableHint(List<Object> validationHints) {
+  private void addEmptyMinMaxDateAcceptableHint(List<Object> validationHints) {
     MinMaxDateInputValidator.addEmptyMinMaxDateAcceptableHint(validationType, validationHints);
   }
 

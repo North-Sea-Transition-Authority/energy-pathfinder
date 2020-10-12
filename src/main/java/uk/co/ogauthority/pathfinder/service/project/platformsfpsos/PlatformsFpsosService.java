@@ -55,6 +55,9 @@ public class PlatformsFpsosService {
     } else if (form.getStructure() != null) {
       platformFpso.setStructure(devUkFacilitiesService.getOrError(Integer.parseInt(form.getStructure())));
       platformFpso.setManualStructureName(null);
+    } else {
+      platformFpso.setManualStructureName(null);
+      platformFpso.setStructure(null);
     }
     platformFpso.setTopsideFpsoMass(form.getTopsideFpsoMass());
     platformFpso.setEarliestRemovalYear(form.getTopsideRemovalYears().getMinYear());
