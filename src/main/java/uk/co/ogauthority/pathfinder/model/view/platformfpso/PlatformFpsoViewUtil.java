@@ -1,8 +1,13 @@
 package uk.co.ogauthority.pathfinder.model.view.platformfpso;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
+import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
+import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
 public class PlatformFpsoViewUtil {
 
@@ -27,7 +32,7 @@ public class PlatformFpsoViewUtil {
     );
 
     view.setTopsideFpsoMass(platformFpso.getTopsideFpsoMass() != null
-        ? platformFpso.getTopsideFpsoMass().toString()
+        ? getMass(platformFpso.getTopsideFpsoMass())
         : ""
     );
     view.setTopsideRemovalYears(
@@ -39,7 +44,7 @@ public class PlatformFpsoViewUtil {
         : ""
     );
     view.setSubstructureRemovalMass(platformFpso.getSubstructureRemovalMass() != null
-        ? platformFpso.getSubstructureRemovalMass().toString()
+        ? getMass(platformFpso.getSubstructureRemovalMass())
         : ""
     );
     view.setSubstructureRemovalYears(getYears(
@@ -53,25 +58,23 @@ public class PlatformFpsoViewUtil {
     view.setEditLink(
         new SummaryLink(
             SummaryLinkText.EDIT.getDisplayName(),
-            "#"
-//            ReverseRouter.route(on(UpcomingTendersController.class).editUpcomingTender(
-//                projectId,
-//                platformFpso.getId(),
-//                null
-//            )
-          )
+            ReverseRouter.route(on(PlatformsFpsosController.class).editPlatformFpso(
+                projectId,
+                platformFpso.getId(),
+                null
+            ))
+        )
     );
 
     view.setDeleteLink(
         new SummaryLink(
             SummaryLinkText.DELETE.getDisplayName(),
-"#"
-//            ReverseRouter.route(on(UpcomingTendersController.class).deleteUpcomingTenderConfirm(
-//                projectId,
-//                platformFpso.getId(),
-//                displayOrder,
-//                null
-//            ))
+            ReverseRouter.route(on(PlatformsFpsosController.class).deletePlatformFpsoConfirm(
+                projectId,
+                platformFpso.getId(),
+                displayOrder,
+                null
+            ))
         )
     );
     return view;
@@ -92,6 +95,10 @@ public class PlatformFpsoViewUtil {
     var min = minYear != null ? minYear : "Not set";
     var max = maxYear != null ? maxYear : "Not set";
     return String.format("Earliest start year: %s / Latest completion year: %s", min, max);
+  }
+
+  private static String getMass(Integer mass) {
+    return String.format("%d %s", mass, MeasurementUnits.METRIC_TONNE.getPlural());
   }
 
 }

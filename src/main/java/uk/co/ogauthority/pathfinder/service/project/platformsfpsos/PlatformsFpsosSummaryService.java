@@ -13,6 +13,7 @@ import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.model.view.platformfpso.PlatformFpsoView;
 import uk.co.ogauthority.pathfinder.model.view.platformfpso.PlatformFpsoViewUtil;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Service
 public class PlatformsFpsosSummaryService {
@@ -77,5 +78,9 @@ public class PlatformsFpsosSummaryService {
           );
         })
         .collect(Collectors.toList());
+  }
+
+  public ValidationResult validateViews(List<PlatformFpsoView> views) {
+    return SummaryUtil.validateViews(new ArrayList<>(views));
   }
 }

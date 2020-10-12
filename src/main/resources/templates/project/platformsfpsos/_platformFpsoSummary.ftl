@@ -17,7 +17,10 @@
     <@checkAnswers.checkAnswersRowNoActions prompt="Platform or FPSO" value=view.platformFpso!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="Topside / FPSO removal mass" value=view.topsideFpsoMass!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="Topside removal years" value=view.topsideRemovalYears!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Substructures expected to be removed" value=view.substructuresExpectedToBeRemoved?string("Yes", "No")!"" />
+    <@checkAnswers.checkAnswersRowNoActions
+      prompt="Substructures expected to be removed"
+      value=view.substructuresExpectedToBeRemoved?has_content?then(view.substructuresExpectedToBeRemoved?string("Yes", "No"), "")
+    />
     <#if view.substructuresExpectedToBeRemoved?has_content && view.substructuresExpectedToBeRemoved>
         <@checkAnswers.checkAnswersRowNoActions prompt="Substructure removal premise" value=view.substructureRemovalPremise!"" />
         <@checkAnswers.checkAnswersRowNoActions prompt="Substructure removal mass" value=view.substructureRemovalMass!"" />

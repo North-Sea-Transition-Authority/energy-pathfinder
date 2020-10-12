@@ -25,6 +25,7 @@ import uk.co.ogauthority.pathfinder.service.project.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
+import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
@@ -42,6 +43,7 @@ public class TaskListController {
   private final CollaborationOpportunitiesService collaborationOpportunitiesService;
   private final BreadcrumbService breadcrumbService;
   private final AwardedContractService awardedContractService;
+  private final PlatformsFpsosService platformsFpsosService;
 
   @Autowired
   public TaskListController(ProjectInformationService projectInformationService,
@@ -50,7 +52,8 @@ public class TaskListController {
                             SelectOperatorService selectOperatorService,
                             UpcomingTenderService upcomingTenderService,
                             CollaborationOpportunitiesService collaborationOpportunitiesService,
-                            AwardedContractService awardedContractService) {
+                            AwardedContractService awardedContractService,
+                            PlatformsFpsosService platformsFpsosService) {
     this.projectInformationService = projectInformationService;
     this.breadcrumbService = breadcrumbService;
     this.projectLocationService = projectLocationService;
@@ -58,6 +61,7 @@ public class TaskListController {
     this.collaborationOpportunitiesService = collaborationOpportunitiesService;
     this.awardedContractService = awardedContractService;
     this.upcomingTenderService = upcomingTenderService;
+    this.platformsFpsosService = platformsFpsosService;
   }
 
   @GetMapping
@@ -117,7 +121,7 @@ public class TaskListController {
         ReverseRouter.route(on(PlatformsFpsosController.class).viewPlatformFpso(projectId, null))
     );
     modelAndView.addObject("platformsFpsosText", PlatformsFpsosController.SUMMARY_PAGE_NAME);
-    modelAndView.addObject("platformsFpsosCompleted", false);
+    modelAndView.addObject("platformsFpsosCompleted", platformsFpsosService.isComplete(projectDetails));
 
     return modelAndView;
   }

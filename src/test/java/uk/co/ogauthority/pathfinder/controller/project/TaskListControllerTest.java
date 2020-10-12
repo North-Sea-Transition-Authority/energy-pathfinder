@@ -25,6 +25,7 @@ import uk.co.ogauthority.pathfinder.service.project.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
+import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
@@ -52,6 +53,9 @@ public class TaskListControllerTest extends ProjectContextAbstractControllerTest
 
   @MockBean
   private CollaborationOpportunitiesService collaborationOpportunitiesService;
+
+  @MockBean
+  private PlatformsFpsosService platformsFpsosService;
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.CREATE_PROJECT_PRIVILEGES);
 
