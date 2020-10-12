@@ -22,6 +22,12 @@
         completed=decommissionedWellsCompleted
         useNotCompletedLabels=true
       />
+      <@fdsTaskList.taskListItem
+        itemUrl=springUrl(platformsFpsosUrl)
+        itemText=platformsFpsosText
+        completed=platformsFpsosCompleted
+        useNotCompletedLabels=true
+      />
     </@fdsTaskList.taskListSection>
   </@fdsTaskList.taskList>
 </@defaultPage>

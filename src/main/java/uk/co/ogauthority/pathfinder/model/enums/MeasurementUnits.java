@@ -1,7 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.enums;
 
 public enum MeasurementUnits {
-  METRES("metre", "metres", "in metres");
+  METRES("metre", "metres", "in metres"),
+  METRIC_TONNE("metric tonne", "metric tonnes", "in metric tonnes");
 
   private final String singular;
   private final String plural;

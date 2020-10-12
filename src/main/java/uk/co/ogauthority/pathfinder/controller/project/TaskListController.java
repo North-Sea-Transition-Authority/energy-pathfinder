@@ -14,6 +14,7 @@ import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedCo
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedwell.DecommissionedWellController;
 import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationController;
+import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
 import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProjectOperatorController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
@@ -111,6 +112,12 @@ public class TaskListController {
     );
     modelAndView.addObject("decommissionedWellsText", DecommissionedWellController.SUMMARY_PAGE_NAME);
     modelAndView.addObject("decommissionedWellsCompleted", false);
+
+    modelAndView.addObject("platformsFpsosUrl",
+        ReverseRouter.route(on(PlatformsFpsosController.class).viewPlatformFpso(projectId, null))
+    );
+    modelAndView.addObject("platformsFpsosText", PlatformsFpsosController.SUMMARY_PAGE_NAME);
+    modelAndView.addObject("platformsFpsosCompleted", false);
 
     return modelAndView;
   }

@@ -1,8 +1,10 @@
 package uk.co.ogauthority.pathfinder.service.devuk;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkFacility;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.repository.devuk.DevUkFacilitiesRepository;
@@ -28,6 +30,16 @@ public class DevUkFacilitiesService {
 
   private List<DevUkFacility> findByNameContaining(String searchTerm) {
     return devUkFacilitiesRepository.findAllByFacilityNameContainingIgnoreCase(searchTerm);
+  }
+
+  public DevUkFacility getOrError(Integer facilityId) {
+    return findById(facilityId).orElseThrow(
+        () -> new PathfinderEntityNotFoundException(String.format("unable to find facility with ID %d", facilityId))
+    );
+  }
+
+  public Optional<DevUkFacility> findById(Integer facilityId) {
+    return devUkFacilitiesRepository.findById(facilityId);
   }
 
 }
