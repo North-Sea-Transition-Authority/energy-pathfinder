@@ -1,11 +1,13 @@
 package uk.co.ogauthority.pathfinder.service.project.platformsfpsos;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
@@ -81,6 +83,10 @@ public class PlatformsFpsosService {
     return platformFpso;
   }
 
+  public List<PlatformFpso> getPlatformsFpsosForDetail(ProjectDetail detail) {
+    return platformFpsoRepository.findAllByProjectDetailOrderByIdAsc(detail);
+  }
+
 
   public BindingResult validate(PlatformFpsoForm form,
                                 BindingResult bindingResult,
@@ -94,6 +100,13 @@ public class PlatformsFpsosService {
   public PlatformFpsoForm getForm() {
     //TODO PAT-224 fetch from from entity
     return new PlatformFpsoForm();
+  }
+
+  public Boolean isValid(PlatformFpso platformFpso, ValidationType validationType) {
+    var form = getForm();
+    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult = validate(form, bindingResult, validationType);
+    return !bindingResult.hasErrors();
   }
 
   public Map<String, String> getPreselectedStructure(PlatformFpsoForm form) {

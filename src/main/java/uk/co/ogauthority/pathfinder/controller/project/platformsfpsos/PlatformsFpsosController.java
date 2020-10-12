@@ -15,6 +15,7 @@ import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.DevUkRestController;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -25,6 +26,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
+import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 
@@ -38,18 +40,21 @@ public class PlatformsFpsosController extends ProjectFormPageController {
   public static final String FORM_PAGE_NAME = "Platform or FPSO";
 
   private final PlatformsFpsosService platformsFpsosService;
+  private final PlatformsFpsosSummaryService platformsFpsosSummaryService;
 
   public PlatformsFpsosController(BreadcrumbService breadcrumbService,
                                   ControllerHelperService controllerHelperService,
-                                  PlatformsFpsosService platformsFpsosService) {
+                                  PlatformsFpsosService platformsFpsosService,
+                                  PlatformsFpsosSummaryService platformsFpsosSummaryService) {
     super(breadcrumbService, controllerHelperService);
     this.platformsFpsosService = platformsFpsosService;
+    this.platformsFpsosSummaryService = platformsFpsosSummaryService;
   }
 
   @GetMapping("")
   public ModelAndView viewPlatformFpso(@PathVariable("projectId") Integer projectId,
                                        ProjectContext projectContext) {
-    return getViewPlatformsFpsosModelAndView(projectId);
+    return getViewPlatformsFpsosModelAndView(projectContext.getProjectDetails(), projectId);
   }
 
   @GetMapping("/add")
@@ -77,6 +82,10 @@ public class PlatformsFpsosController extends ProjectFormPageController {
     );
   }
 
+  //edit
+
+  //delete
+
   private ModelAndView getPlatformFpsoFormModelAndView(Integer projectId, PlatformFpsoForm form) {
     var modelAndView = new ModelAndView("project/platformsfpsos/platformsFpsosForm")
         .addObject("form", form)
@@ -89,8 +98,9 @@ public class PlatformsFpsosController extends ProjectFormPageController {
     return modelAndView;
   }
 
-  private ModelAndView getViewPlatformsFpsosModelAndView(Integer projectId) {
+  private ModelAndView getViewPlatformsFpsosModelAndView(ProjectDetail detail, Integer projectId) {
     var modelAndView = new ModelAndView("project/platformsfpsos/platformsFpsosSummary")
+        .addObject("views", platformsFpsosSummaryService.getSummaryViews(detail))
         .addObject("addPlatformFpsoUrl", ReverseRouter.route(on(PlatformsFpsosController.class).addPlatformFpso(projectId, null)));
     breadcrumbService.fromTaskList(projectId, modelAndView, SUMMARY_PAGE_NAME);
     return modelAndView;
