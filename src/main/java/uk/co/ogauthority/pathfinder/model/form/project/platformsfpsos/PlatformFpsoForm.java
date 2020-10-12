@@ -33,7 +33,7 @@ public class PlatformFpsoForm {
   @NotEmpty(message = "Enter an FPSO type", groups = FullValidation.class)
   private String fpsoType;
 
-  @NotEmpty(message = "Enter some FPSO dimensions", groups = FullValidation.class)
+  @NotEmpty(message = "Enter the FPSO dimensions", groups = FullValidation.class)
   private String fpsoDimensions;
 
   @NotNull(message = "Select the future plans", groups = FullValidation.class)
