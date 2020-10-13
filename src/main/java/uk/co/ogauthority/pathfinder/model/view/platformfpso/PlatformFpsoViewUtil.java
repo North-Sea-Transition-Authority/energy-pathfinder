@@ -91,13 +91,13 @@ public class PlatformFpsoViewUtil {
     return view;
   }
 
-  private static String getYears(String minYear, String maxYear) {
+  public static String getYears(String minYear, String maxYear) {
     var min = minYear != null ? minYear : "Not set";
     var max = maxYear != null ? maxYear : "Not set";
     return String.format("Earliest start year: %s / Latest completion year: %s", min, max);
   }
 
-  private static String getMass(Integer mass) {
+  public static String getMass(Integer mass) {
     return String.format("%d %s", mass, MeasurementUnits.METRIC_TONNE.getPlural());
   }
 
