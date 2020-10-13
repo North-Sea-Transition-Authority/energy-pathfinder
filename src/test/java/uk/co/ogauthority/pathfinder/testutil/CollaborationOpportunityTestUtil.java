@@ -4,13 +4,12 @@ import java.time.LocalDate;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityView;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
-import uk.co.ogauthority.pathfinder.util.DateUtil;
+import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
 public class CollaborationOpportunityTestUtil {
   public static final Integer ID = 1;
@@ -18,6 +17,7 @@ public class CollaborationOpportunityTestUtil {
   public static final Function FUNCTION = Function.DRILLING;
   public static final String MANUAL_FUNCTION = SearchSelectablePrefix.FREE_TEXT_PREFIX + "function";
   public static final String DESCRIPTION_OF_WORK = "work description";
+  public static final Boolean URGENT_RESPONSE_NEEDED = true;
   public static final LocalDate ESTIMATED_SERVICE_DATE = LocalDate.now().plusMonths(1L);
   public static final String CONTACT_NAME = ContactDetailsTestUtil.CONTACT_NAME;
   public static final String PHONE_NUMBER = ContactDetailsTestUtil.PHONE_NUMBER;
@@ -42,7 +42,7 @@ public class CollaborationOpportunityTestUtil {
 
   private static void setCommonFields(CollaborationOpportunityForm form) {
     form.setDescriptionOfWork(DESCRIPTION_OF_WORK);
-    form.setEstimatedServiceDate(new ThreeFieldDateInput(ESTIMATED_SERVICE_DATE));
+    form.setUrgentResponseNeeded(URGENT_RESPONSE_NEEDED);
 
     var contactDetailForm = ContactDetailsTestUtil.createContactDetailForm(
         CONTACT_NAME,
@@ -61,7 +61,7 @@ public class CollaborationOpportunityTestUtil {
     );
     view.setIsValid(isValid);
     view.setFunction(FUNCTION.getDisplayName());
-    view.setEstimatedServiceDate(DateUtil.formatDate(ESTIMATED_SERVICE_DATE));
+    view.setUrgentResponseNeeded(StringDisplayUtil.yesNoFromBoolean(URGENT_RESPONSE_NEEDED));
     var contactDetailsView = new ContactDetailView();
     contactDetailsView.setName(CONTACT_NAME);
     contactDetailsView.setPhoneNumber(PHONE_NUMBER);
@@ -87,7 +87,7 @@ public class CollaborationOpportunityTestUtil {
 
   private static void setCommonFields(CollaborationOpportunity opportunity) {
     opportunity.setDescriptionOfWork(DESCRIPTION_OF_WORK);
-    opportunity.setEstimatedServiceDate(ESTIMATED_SERVICE_DATE);
+    opportunity.setUrgentResponseNeeded(URGENT_RESPONSE_NEEDED);
     opportunity.setContactName(CONTACT_NAME);
     opportunity.setPhoneNumber(PHONE_NUMBER);
     opportunity.setJobTitle(JOB_TITLE);

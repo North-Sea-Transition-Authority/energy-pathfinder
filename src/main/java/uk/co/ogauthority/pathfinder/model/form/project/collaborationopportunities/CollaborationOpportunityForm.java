@@ -2,8 +2,8 @@ package uk.co.ogauthority.pathfinder.model.form.project.collaborationopportuniti
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadMultipleFilesWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
@@ -15,7 +15,8 @@ public class CollaborationOpportunityForm extends UploadMultipleFilesWithDescrip
   @NotEmpty(message = "Enter a description of the work", groups = FullValidation.class)
   private String descriptionOfWork;
 
-  private ThreeFieldDateInput estimatedServiceDate;
+  @NotNull(message = "Select if an urgent response is required", groups = FullValidation.class)
+  private Boolean urgentResponseNeeded;
 
   @Valid
   private ContactDetailForm contactDetail;
@@ -36,12 +37,12 @@ public class CollaborationOpportunityForm extends UploadMultipleFilesWithDescrip
     this.descriptionOfWork = descriptionOfWork;
   }
 
-  public ThreeFieldDateInput getEstimatedServiceDate() {
-    return estimatedServiceDate;
+  public Boolean getUrgentResponseNeeded() {
+    return urgentResponseNeeded;
   }
 
-  public void setEstimatedServiceDate(ThreeFieldDateInput estimatedServiceDate) {
-    this.estimatedServiceDate = estimatedServiceDate;
+  public void setUrgentResponseNeeded(Boolean urgentResponseNeeded) {
+    this.urgentResponseNeeded = urgentResponseNeeded;
   }
 
   public ContactDetailForm getContactDetail() {

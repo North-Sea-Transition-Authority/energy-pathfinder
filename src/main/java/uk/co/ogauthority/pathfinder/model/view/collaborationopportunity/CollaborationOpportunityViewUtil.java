@@ -10,7 +10,7 @@ import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.util.DateUtil;
+import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
 public class CollaborationOpportunityViewUtil {
 
@@ -37,7 +37,7 @@ public class CollaborationOpportunityViewUtil {
             : opportunity.getManualFunction()
     );
     view.setDescriptionOfWork(opportunity.getDescriptionOfWork());
-    view.setEstimatedServiceDate(DateUtil.formatDate(opportunity.getEstimatedServiceDate()));
+    view.setUrgentResponseNeeded(StringDisplayUtil.yesNoFromBoolean(opportunity.getUrgentResponseNeeded()));
     ContactDetailView contactDetailView = new ContactDetailView();
     contactDetailView.setName(opportunity.getName());
     contactDetailView.setPhoneNumber(opportunity.getPhoneNumber());
