@@ -12,7 +12,7 @@ public class StringDisplayUtilTest {
 
   @Test
   public void yesNoFromBoolean_nullIsEmptyString() {
-    assertThat(StringDisplayUtil.yesNoFromBoolean(null)).isEqualTo("");
+    assertThat(StringDisplayUtil.yesNoFromBoolean(null)).isEmpty();
   }
 
   @Test

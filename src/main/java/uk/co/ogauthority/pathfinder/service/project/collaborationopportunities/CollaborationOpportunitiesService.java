@@ -63,7 +63,7 @@ public class CollaborationOpportunitiesService {
   public BindingResult validate(CollaborationOpportunityForm form,
                                 BindingResult bindingResult,
                                 ValidationType validationType) {
-    var collaborationOpportunityValidationHint = new CollaborationOpportunityValidationHint(validationType);
+    var collaborationOpportunityValidationHint = new CollaborationOpportunityValidationHint();
     collaborationOpportunityFormValidator.validate(form, bindingResult, collaborationOpportunityValidationHint);
     return validationService.validate(form, bindingResult, validationType);
   }
