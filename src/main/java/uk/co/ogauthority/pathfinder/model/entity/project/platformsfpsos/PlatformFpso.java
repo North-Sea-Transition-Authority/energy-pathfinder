@@ -83,6 +83,10 @@ public class PlatformFpso {
     this.manualStructureName = manualStructureName;
   }
 
+  public Integer getId() {
+    return id;
+  }
+
   public ProjectDetail getProjectDetail() {
     return projectDetail;
   }
