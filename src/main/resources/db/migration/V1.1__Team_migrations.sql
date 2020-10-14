@@ -36,7 +36,7 @@ DECLARE
 
   BEGIN
 
-    l_organisation_role_map('SYSTEM_USER') := bpmmgr.varchar2_list_type('RESOURCE_COORDINATOR', 'PROJECT_SUBMITTER');
+    l_organisation_role_map('SYSTEM_USER') := bpmmgr.varchar2_list_type('PROJECT_SUBMITTER');
 
     RETURN l_organisation_role_map;
 
