@@ -17,6 +17,7 @@ import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationC
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
 import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProjectOperatorController;
+import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.SubseaInfrastructureController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -122,6 +123,12 @@ public class TaskListController {
     );
     modelAndView.addObject("platformsFpsosText", PlatformsFpsosController.SUMMARY_PAGE_NAME);
     modelAndView.addObject("platformsFpsosCompleted", platformsFpsosService.isComplete(projectDetails));
+
+    modelAndView.addObject("subseaInfrastructureUrl",
+        ReverseRouter.route(on(SubseaInfrastructureController.class).getSubseaStructures(projectId, null))
+    );
+    modelAndView.addObject("subseaInfrastructureText", SubseaInfrastructureController.SUMMARY_PAGE_NAME);
+    modelAndView.addObject("subseaInfrastructureCompleted", false);
 
     return modelAndView;
   }

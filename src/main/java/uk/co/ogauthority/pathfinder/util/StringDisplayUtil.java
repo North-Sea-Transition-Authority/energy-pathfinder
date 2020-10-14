@@ -38,6 +38,10 @@ public class StringDisplayUtil {
     return isConsonant(str.toLowerCase().charAt(0)) ? A : AN;
   }
 
+  public static String getValueAsStringOrNull(Integer value) {
+    return (value != null) ? String.valueOf(value) : null;
+  }
+
   private static boolean isConsonant(char c) {
     switch (c) {
       case 'a':

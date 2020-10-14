@@ -12,6 +12,7 @@ import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedCo
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedwell.DecommissionedWellController;
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
+import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.SubseaInfrastructureController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
@@ -76,6 +77,17 @@ public class BreadcrumbService {
         null
     ));
     map.put(route, PlatformsFpsosController.SUMMARY_PAGE_NAME);
+    return map;
+  }
+
+  public void fromSubseaInfrastructure(Integer projectId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, subseaInfrastructure(projectId), thisPage);
+  }
+
+  private Map<String, String> subseaInfrastructure(Integer projectId) {
+    var map = taskList(projectId);
+    String route = ReverseRouter.route(on(SubseaInfrastructureController.class).getSubseaStructures(projectId, null));
+    map.put(route, SubseaInfrastructureController.SUMMARY_PAGE_NAME);
     return map;
   }
 

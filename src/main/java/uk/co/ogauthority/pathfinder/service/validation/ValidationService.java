@@ -1,6 +1,9 @@
 package uk.co.ogauthority.pathfinder.service.validation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
@@ -20,18 +23,34 @@ public class ValidationService {
   public BindingResult validate(Object form,
                                 BindingResult bindingResult,
                                 ValidationType validationType) {
-    return validate(form, bindingResult, Set.of(validationType));
+    return validate(form, bindingResult, validationType, new ArrayList<>());
+  }
+
+  public BindingResult validate(Object form,
+                                BindingResult bindingResult,
+                                ValidationType validationType,
+                                List<Object> validationHints) {
+    return validate(form, bindingResult, Set.of(validationType), validationHints);
   }
 
   public BindingResult validate(Object form,
                                 BindingResult bindingResult,
                                 Set<ValidationType> validationTypes) {
-    var hints = validationTypes
+    return validate(form, bindingResult, validationTypes, new ArrayList<>());
+  }
+
+  public BindingResult validate(Object form,
+                                BindingResult bindingResult,
+                                Set<ValidationType> validationTypes,
+                                List<Object> validationHints) {
+    var validationTypeClasses = validationTypes
         .stream()
         .map(ValidationType::getValidationClass)
-        .toArray();
+        .collect(Collectors.toList());
 
-    validator.validate(form, bindingResult, hints);
+    validationHints.addAll(validationTypeClasses);
+
+    validator.validate(form, bindingResult, validationHints.toArray());
     return bindingResult;
   }
 }

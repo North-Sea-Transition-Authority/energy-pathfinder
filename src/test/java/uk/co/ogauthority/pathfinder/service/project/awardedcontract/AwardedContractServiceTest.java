@@ -42,14 +42,12 @@ public class AwardedContractServiceTest {
   @Mock
   private AwardedContractFormValidator awardedContractFormValidator;
 
-  private SearchSelectorService searchSelectorService;
-
   private AwardedContractService awardedContractService;
 
   @Before
   public void setup() {
 
-    searchSelectorService = new SearchSelectorService();
+    SearchSelectorService searchSelectorService = new SearchSelectorService();
     FunctionService functionService = new FunctionService(searchSelectorService);
 
     awardedContractService = new AwardedContractService(

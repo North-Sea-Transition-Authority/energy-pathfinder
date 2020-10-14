@@ -123,7 +123,7 @@ public class SearchSelectorService {
    * @param <T> A class which implements search selectable
    */
   public <T extends SearchSelectable> void mapSearchSelectorFormEntryToEntity(String formValue,
-                                                                              T[] listOptions,
+                                                                              List<T> listOptions,
                                                                               Consumer<String> entityManualEntryField,
                                                                               Consumer<T> entityFromListField) {
     // if we have a manual entry value
@@ -132,13 +132,25 @@ public class SearchSelectorService {
       entityFromListField.accept(null);
     } else if (formValue != null) {
       // if we have a non null entry from the list
-      entityFromListField.accept(getEnumValue(formValue, listOptions));
+      entityFromListField.accept(getListValue(formValue, listOptions));
       entityManualEntryField.accept(null);
     } else {
       // we have no value at all
       entityFromListField.accept(null);
       entityManualEntryField.accept(null);
     }
+  }
+
+  public <T extends SearchSelectable> void mapSearchSelectorFormEntryToEntity(String formValue,
+                                                                              T[] listOptions,
+                                                                              Consumer<String> entityManualEntryField,
+                                                                              Consumer<T> entityFromListField) {
+    mapSearchSelectorFormEntryToEntity(
+        formValue,
+        Arrays.asList(listOptions),
+        entityManualEntryField,
+        entityFromListField
+    );
   }
 
   /**
@@ -149,7 +161,7 @@ public class SearchSelectorService {
    * @return A map of the pre-selected search selector value (either manual entry of from list)
    */
   public <T extends SearchSelectable> Map<String, String> getPreSelectedSearchSelectorValue(String searchSelectorValue,
-                                                                                            T[] listOptions) {
+                                                                                            List<T> listOptions) {
 
     Map<String, String> preSelectedMap = Map.of();
 
@@ -162,7 +174,7 @@ public class SearchSelectorService {
       } else {
         preSelectedMap = buildPrePopulatedSelections(
             Collections.singletonList(searchSelectorValue),
-            Map.of(searchSelectorValue, getEnumValue(searchSelectorValue, listOptions).getSelectionText())
+            Map.of(searchSelectorValue, getListValue(searchSelectorValue, listOptions).getSelectionText())
         );
       }
     }
@@ -170,12 +182,18 @@ public class SearchSelectorService {
     return preSelectedMap;
   }
 
-  private <T extends SearchSelectable> T getEnumValue(String searchSelectorValue, T[] listOptions) {
-    return Arrays.stream(listOptions)
+  public <T extends SearchSelectable> Map<String, String> getPreSelectedSearchSelectorValue(String searchSelectorValue,
+                                                                                            T[] listOptions) {
+    return getPreSelectedSearchSelectorValue(searchSelectorValue, Arrays.asList(listOptions));
+  }
+
+  private <T extends SearchSelectable> T getListValue(String searchSelectorValue, List<T> listOptions) {
+    return listOptions
+        .stream()
         .filter(value -> value.getSelectionId().equals(searchSelectorValue))
         .findFirst()
         .orElseThrow(() -> new IllegalArgumentException(String.format(
-            "Could not find matching enum value for form value %s", searchSelectorValue
+            "Could not find matching list value for form value %s", searchSelectorValue
         )));
   }
 

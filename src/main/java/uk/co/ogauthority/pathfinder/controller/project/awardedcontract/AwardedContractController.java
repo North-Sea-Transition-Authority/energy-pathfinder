@@ -112,7 +112,7 @@ public class AwardedContractController extends ProjectFormPageController {
 
   @PostMapping("/awarded-contract/{awardedContractId}")
   public ModelAndView saveAwardedContract(@PathVariable("projectId") Integer projectId,
-                                          @PathVariable("awardedContractId") Integer awardedProjectId,
+                                          @PathVariable("awardedContractId") Integer awardedContractId,
                                           @Valid @ModelAttribute("form") AwardedContractForm form,
                                           BindingResult bindingResult,
                                           ValidationType validationType,
@@ -123,7 +123,7 @@ public class AwardedContractController extends ProjectFormPageController {
         getAwardedContractModelAndView(projectId, form),
         form,
         () -> {
-          awardedContractService.updateAwardedContract(awardedProjectId, projectContext.getProjectDetails(), form);
+          awardedContractService.updateAwardedContract(awardedContractId, projectContext.getProjectDetails(), form);
           return getAwardedContractSummaryRedirect(projectId);
         }
     );

@@ -28,6 +28,12 @@
         completed=platformsFpsosCompleted
         useNotCompletedLabels=true
       />
+      <@fdsTaskList.taskListItem
+        itemUrl=springUrl(subseaInfrastructureUrl)
+        itemText=subseaInfrastructureText
+        completed=subseaInfrastructureCompleted
+        useNotCompletedLabels=true
+      />
     </@fdsTaskList.taskListSection>
   </@fdsTaskList.taskList>
 </@defaultPage>

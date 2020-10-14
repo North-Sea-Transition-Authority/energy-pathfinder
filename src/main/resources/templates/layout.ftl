@@ -12,6 +12,7 @@
 <#import 'project/macros/fileUpload.ftl' as fileUpload>
 <#import 'project/macros/setupProjectGuidance.ftl' as setupProjectGuidance>
 <#import 'project/macros/twoNumberInput.ftl' as twoNumberInput>
+<#import 'project/macros/minMaxDateInput.ftl' as minMaxDate>
 
 <#function springUrl url>
   <#local springUrl>

@@ -3,7 +3,7 @@ package uk.co.ogauthority.pathfinder.service.searchselector;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
-public class SearchSelectableTestEntity {
+public class SearchSelectableTestEntityWithEnum {
 
   @Enumerated(EnumType.STRING)
   private SearchSelectableTestEnum fromListValue;

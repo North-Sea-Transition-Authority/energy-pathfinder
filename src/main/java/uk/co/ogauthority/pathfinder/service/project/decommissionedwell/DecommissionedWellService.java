@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.decommissionedwell.Decomm
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedwell.DecommissionedWellRepository;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
 @Service
 public class DecommissionedWellService {
@@ -156,7 +157,7 @@ public class DecommissionedWellService {
     form.setNumberToBeDecommissioned(decommissionedWell.getNumberToBeDecommissioned());
     form.setPlugAbandonmentDate(new QuarterYearInput(
         decommissionedWell.getPlugAbandonmentDateQuarter(),
-        String.valueOf(decommissionedWell.getPlugAbandonmentDateYear())
+        StringDisplayUtil.getValueAsStringOrNull(decommissionedWell.getPlugAbandonmentDateYear())
     ));
     form.setPlugAbandonmentDateType(decommissionedWell.getPlugAbandonmentDateType());
 
