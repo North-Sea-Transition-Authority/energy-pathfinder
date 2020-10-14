@@ -34,7 +34,7 @@ public class LicenceBlocksService {
 
 
   public List<LicenceBlock> findCurrentByReference(String blockReference) {
-    return licenceBlocksRepository.findAllByBlockLocationAndBlockReferenceContainingIgnoreCase(
+    return licenceBlocksRepository.findAllByBlockLocationAndBlockReferenceContainingIgnoreCaseOrderBySortKeyAsc(
         BlockLocation.OFFSHORE,
         blockReference
       );

@@ -9,7 +9,10 @@ import uk.co.ogauthority.pathfinder.model.enums.portal.BlockLocation;
 @Repository
 public interface CurrentLicenceBlocksRepository extends CrudRepository<LicenceBlock, String> {
 
-  List<LicenceBlock> findAllByBlockLocationAndBlockReferenceContainingIgnoreCase(BlockLocation blockLocation, String searchTerm);
+  List<LicenceBlock> findAllByBlockLocationAndBlockReferenceContainingIgnoreCaseOrderBySortKeyAsc(
+      BlockLocation blockLocation,
+      String searchTerm
+  );
 
   List<LicenceBlock> findAllByCompositeKeyIn(List<String> ids);
 
