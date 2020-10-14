@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities;
 
-import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -38,7 +37,7 @@ public class CollaborationOpportunity implements ContactDetailCapture {
   @Column(name = "description_of_work", columnDefinition = "CLOB")
   private String descriptionOfWork;
 
-  private LocalDate estimatedServiceDate;
+  private Boolean urgentResponseNeeded;
 
   private String contactName;
 
@@ -91,12 +90,12 @@ public class CollaborationOpportunity implements ContactDetailCapture {
     this.descriptionOfWork = descriptionOfWork;
   }
 
-  public LocalDate getEstimatedServiceDate() {
-    return estimatedServiceDate;
+  public Boolean getUrgentResponseNeeded() {
+    return urgentResponseNeeded;
   }
 
-  public void setEstimatedServiceDate(LocalDate estimatedTenderDate) {
-    this.estimatedServiceDate = estimatedTenderDate;
+  public void setUrgentResponseNeeded(Boolean urgentResponseNeeded) {
+    this.urgentResponseNeeded = urgentResponseNeeded;
   }
 
   public String getContactName() {

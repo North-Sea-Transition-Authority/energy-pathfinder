@@ -24,7 +24,7 @@ public class DateInputValidator implements SmartValidator {
   private static final String DAY = "day";
   private static final String MONTH = "month";
   private static final String YEAR = "year";
-  public static final String DEFAULT_INPUT_LABEL_TEXT = "Date";
+  public static final String DEFAULT_INPUT_LABEL_TEXT = "date";
   public static final String VALID_DATE_ERROR = " must be a valid date";
   public static final String EMPTY_DATE_ERROR = "Enter %s ";
 

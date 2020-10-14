@@ -20,7 +20,6 @@ import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormValidator;
@@ -64,7 +63,7 @@ public class CollaborationOpportunitiesService {
   public BindingResult validate(CollaborationOpportunityForm form,
                                 BindingResult bindingResult,
                                 ValidationType validationType) {
-    var collaborationOpportunityValidationHint = new CollaborationOpportunityValidationHint(validationType);
+    var collaborationOpportunityValidationHint = new CollaborationOpportunityValidationHint();
     collaborationOpportunityFormValidator.validate(form, bindingResult, collaborationOpportunityValidationHint);
     return validationService.validate(form, bindingResult, validationType);
   }
@@ -121,7 +120,7 @@ public class CollaborationOpportunitiesService {
     );
 
     opportunity.setDescriptionOfWork(form.getDescriptionOfWork());
-    opportunity.setEstimatedServiceDate(form.getEstimatedServiceDate().createDateOrNull());
+    opportunity.setUrgentResponseNeeded(form.getUrgentResponseNeeded());
 
     var contactDetailForm = form.getContactDetail();
     opportunity.setContactName(contactDetailForm.getName());
@@ -166,7 +165,7 @@ public class CollaborationOpportunitiesService {
       form.setFunction(SearchSelectorService.getValueWithManualEntryPrefix(opportunity.getManualFunction()));
     }
 
-    form.setEstimatedServiceDate(new ThreeFieldDateInput(opportunity.getEstimatedServiceDate()));
+    form.setUrgentResponseNeeded(opportunity.getUrgentResponseNeeded());
     form.setDescriptionOfWork(opportunity.getDescriptionOfWork());
     form.setContactDetail(new ContactDetailForm(opportunity));
     form.setUploadedFileWithDescriptionForms(getUploadedFilesFormsByCollaborationOpportunity(opportunity));

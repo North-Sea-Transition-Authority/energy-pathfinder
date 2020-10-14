@@ -20,7 +20,7 @@ import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.Collabor
 import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
-import uk.co.ogauthority.pathfinder.util.DateUtil;
+import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CollaborationOpportunitiesSummaryServiceTest {
@@ -100,7 +100,7 @@ public class CollaborationOpportunitiesSummaryServiceTest {
 
   private void checkCommonFields(CollaborationOpportunityView view, CollaborationOpportunity opportunity) {
     assertThat(view.getDescriptionOfWork()).isEqualTo(opportunity.getDescriptionOfWork());
-    assertThat(view.getEstimatedServiceDate()).isEqualTo(DateUtil.formatDate(opportunity.getEstimatedServiceDate()));
+    assertThat(view.getUrgentResponseNeeded()).isEqualTo(StringDisplayUtil.yesNoFromBoolean(opportunity.getUrgentResponseNeeded()));
     assertThat(view.getContactDetailView().getName()).isEqualTo(opportunity.getContactName());
     assertThat(view.getContactDetailView().getPhoneNumber()).isEqualTo(opportunity.getPhoneNumber());
     assertThat(view.getContactDetailView().getJobTitle()).isEqualTo(opportunity.getJobTitle());

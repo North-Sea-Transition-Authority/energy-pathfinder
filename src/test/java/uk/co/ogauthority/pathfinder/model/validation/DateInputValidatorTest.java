@@ -16,18 +16,20 @@ import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.TwoFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.AfterDateHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.BeforeDateHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.EmptyDateAcceptableHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.OnOrAfterDateHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.OnOrBeforeDateHint;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.TwoFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DateInputValidatorTest {
+
+  private static final FormInputLabel LABEL = new FormInputLabel(DateInputValidator.DEFAULT_INPUT_LABEL_TEXT);
 
   private DateInputValidator validator;
   private TwoFieldDateInput twoFieldDateInput;
@@ -94,7 +96,7 @@ public class DateInputValidatorTest {
     );
 
     assertThat(fieldErrorMessages).containsExactly(
-        entry("month", Set.of(DateInputValidator.DEFAULT_INPUT_LABEL_TEXT + DateInputValidator.VALID_DATE_ERROR)),
+        entry("month", Set.of(LABEL.getInitCappedLabel()+ DateInputValidator.VALID_DATE_ERROR)),
         entry("year", Set.of(""))
     );
   }
@@ -114,7 +116,7 @@ public class DateInputValidatorTest {
     );
 
     assertThat(fieldErrorMessages).containsExactly(
-        entry("day", Set.of(DateInputValidator.DEFAULT_INPUT_LABEL_TEXT + DateInputValidator.VALID_DATE_ERROR)),
+        entry("day", Set.of(LABEL.getInitCappedLabel() + DateInputValidator.VALID_DATE_ERROR)),
         entry("month", Set.of("")),
         entry("year", Set.of(""))
     );

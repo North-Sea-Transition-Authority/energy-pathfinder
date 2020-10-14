@@ -12,7 +12,7 @@ public class CollaborationOpportunityView extends ProjectSummaryItem {
 
   private String descriptionOfWork;
 
-  private String estimatedServiceDate;
+  private String urgentResponseNeeded;
 
   private ContactDetailView contactDetailView;
 
@@ -47,12 +47,12 @@ public class CollaborationOpportunityView extends ProjectSummaryItem {
     this.descriptionOfWork = descriptionOfWork;
   }
 
-  public String getEstimatedServiceDate() {
-    return estimatedServiceDate;
+  public String getUrgentResponseNeeded() {
+    return urgentResponseNeeded;
   }
 
-  public void setEstimatedServiceDate(String estimatedServiceDate) {
-    this.estimatedServiceDate = estimatedServiceDate;
+  public void setUrgentResponseNeeded(String urgentResponseNeeded) {
+    this.urgentResponseNeeded = urgentResponseNeeded;
   }
 
   public ContactDetailView getContactDetailView() {

@@ -8,13 +8,10 @@
   <@fdsForm.htmlForm>
     <@fdsSearchSelector.searchSelectorRest path="form.function" selectorMinInputLength=0 labelText="What function is the collaboration opportunity for?" restUrl=springUrl(collaborationFunctionRestUrl)  preselectedItems=preselectedCollaboration!{} />
     <@fdsTextarea.textarea path="form.descriptionOfWork" labelText="Provide a detailed description of the work"/>
-    <@fdsDateInput.dateInput
-      dayPath="form.estimatedServiceDate.day"
-      monthPath="form.estimatedServiceDate.month"
-      yearPath="form.estimatedServiceDate.year"
-      labelText="Estimated service date"
-      formId="estimatedServiceDate-day-month-year"
-    />
+    <@fdsRadio.radioGroup path="form.urgentResponseNeeded" labelText="Is an urgent response required from the supply chain?">
+      <@fdsRadio.radioYes path="form.urgentResponseNeeded"/>
+      <@fdsRadio.radioNo path="form.urgentResponseNeeded"/>
+    </@fdsRadio.radioGroup>
     <@contactDetails.standardContactDetails path="form.contactDetail" legendHeading="Opportunity contact details"/>
     <@fileUpload.fileUploadWithFieldSet
       id="collaboration-opportunity-file-upload-id"

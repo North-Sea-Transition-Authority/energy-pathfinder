@@ -34,6 +34,7 @@ public final class UpcomingTenderValidationHint {
   public Object[] getEstimatedTenderDateHint() {
     var hints = new ArrayList<>();
     hints.add(estimatedTenderDateHint);
+    hints.add(ESTIMATED_TENDER_LABEL);
     DateInputValidator.addEmptyDateAcceptableHint(validationType, hints);
     return hints.toArray();
   }

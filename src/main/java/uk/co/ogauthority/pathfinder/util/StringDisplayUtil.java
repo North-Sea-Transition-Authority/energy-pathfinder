@@ -2,8 +2,20 @@ package uk.co.ogauthority.pathfinder.util;
 
 public class StringDisplayUtil {
 
+  public static final String YES = "Yes";
+  public static final String NO = "No";
+  public static final String A = "a ";
+  public static final String AN = "an ";
+
   private StringDisplayUtil() {
     throw new IllegalStateException("StringDisplayUtil is a utility class and should not be instantiated");
+  }
+
+  public static String yesNoFromBoolean(Boolean b) {
+    if (b != null) {
+      return b ? YES : NO;
+    }
+    return "";
   }
 
   /**
@@ -23,7 +35,7 @@ public class StringDisplayUtil {
    * @return 'a ' or 'an ' depending on the first letter of str
    */
   public static String getPrefixForVowelOrConsonant(String str) {
-    return isConsonant(str.toLowerCase().charAt(0)) ? "a " : "an ";
+    return isConsonant(str.toLowerCase().charAt(0)) ? A : AN;
   }
 
   private static boolean isConsonant(char c) {

@@ -17,7 +17,6 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
@@ -167,16 +166,16 @@ public class CollaborationOpportunitiesServiceTest {
 
   private void checkCommonFields(CollaborationOpportunityForm form, CollaborationOpportunity collaborationOpportunity) {
     assertThat(collaborationOpportunity.getDescriptionOfWork()).isEqualTo(CollaborationOpportunityTestUtil.DESCRIPTION_OF_WORK);
-    assertThat(collaborationOpportunity.getEstimatedServiceDate()).isEqualTo(form.getEstimatedServiceDate().createDateOrNull());
-    assertThat(collaborationOpportunity.getContactName()).isEqualTo(CollaborationOpportunityTestUtil.CONTACT_NAME);
-    assertThat(collaborationOpportunity.getPhoneNumber()).isEqualTo(CollaborationOpportunityTestUtil.PHONE_NUMBER);
-    assertThat(collaborationOpportunity.getJobTitle()).isEqualTo(CollaborationOpportunityTestUtil.JOB_TITLE);
-    assertThat(collaborationOpportunity.getEmailAddress()).isEqualTo(CollaborationOpportunityTestUtil.EMAIL);
+    assertThat(collaborationOpportunity.getUrgentResponseNeeded()).isEqualTo(form.getUrgentResponseNeeded());
+    assertThat(collaborationOpportunity.getContactName()).isEqualTo(form.getContactDetail().getName());
+    assertThat(collaborationOpportunity.getPhoneNumber()).isEqualTo(form.getContactDetail().getPhoneNumber());
+    assertThat(collaborationOpportunity.getJobTitle()).isEqualTo(form.getContactDetail().getJobTitle());
+    assertThat(collaborationOpportunity.getEmailAddress()).isEqualTo(form.getContactDetail().getEmailAddress());
   }
 
   private void checkCommonFormFields(CollaborationOpportunityForm form, CollaborationOpportunity collaborationOpportunity) {
     assertThat(form.getDescriptionOfWork()).isEqualTo(collaborationOpportunity.getDescriptionOfWork());
-    assertThat(form.getEstimatedServiceDate()).isEqualTo(new ThreeFieldDateInput(collaborationOpportunity.getEstimatedServiceDate()));
+    assertThat(form.getUrgentResponseNeeded()).isEqualTo(collaborationOpportunity.getUrgentResponseNeeded());
     assertThat(form.getContactDetail().getName()).isEqualTo(collaborationOpportunity.getContactName());
     assertThat(form.getContactDetail().getPhoneNumber()).isEqualTo(collaborationOpportunity.getPhoneNumber());
     assertThat(form.getContactDetail().getJobTitle()).isEqualTo(collaborationOpportunity.getJobTitle());
