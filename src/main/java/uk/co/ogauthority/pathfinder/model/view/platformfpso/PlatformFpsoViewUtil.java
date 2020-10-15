@@ -97,9 +97,10 @@ public class PlatformFpsoViewUtil {
    * @return formatted year string
    */
   public static String getYearText(String year, String earliestOrLatestString) {
-    return year != null
-      ? String.format(earliestOrLatestString, year)
-      : YEAR_NOT_SET_TEXT;
+    return String.format(earliestOrLatestString, year != null
+      ?  year
+      : YEAR_NOT_SET_TEXT
+    );
   }
 
   public static String getMass(Integer mass) {
