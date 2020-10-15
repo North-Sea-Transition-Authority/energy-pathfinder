@@ -9,7 +9,9 @@ public class PlatformFpsoView extends ProjectSummaryItem {
 
   private String topsideFpsoMass;
 
-  private String topsideRemovalYears;
+  private String topsideRemovalEarliestYear;
+
+  private String topsideRemovalLatestYear;
 
   private Boolean substructuresExpectedToBeRemoved;
 
@@ -17,7 +19,9 @@ public class PlatformFpsoView extends ProjectSummaryItem {
 
   private String substructureRemovalMass;
 
-  private String substructureRemovalYears;
+  private String substructureRemovalEarliestYear;
+
+  private String substructureRemovalLatestYear;
 
   private String fpsoType;
 
@@ -56,12 +60,20 @@ public class PlatformFpsoView extends ProjectSummaryItem {
     this.topsideFpsoMass = topsideFpsoMass;
   }
 
-  public String getTopsideRemovalYears() {
-    return topsideRemovalYears;
+  public String getTopsideRemovalEarliestYear() {
+    return topsideRemovalEarliestYear;
   }
 
-  public void setTopsideRemovalYears(String topsideRemovalYears) {
-    this.topsideRemovalYears = topsideRemovalYears;
+  public void setTopsideRemovalEarliestYear(String topsideRemovalEarliestYear) {
+    this.topsideRemovalEarliestYear = topsideRemovalEarliestYear;
+  }
+
+  public String getTopsideRemovalLatestYear() {
+    return topsideRemovalLatestYear;
+  }
+
+  public void setTopsideRemovalLatestYear(String topsideRemovalLatestYear) {
+    this.topsideRemovalLatestYear = topsideRemovalLatestYear;
   }
 
   public Boolean getSubstructuresExpectedToBeRemoved() {
@@ -88,12 +100,20 @@ public class PlatformFpsoView extends ProjectSummaryItem {
     this.substructureRemovalMass = substructureRemovalMass;
   }
 
-  public String getSubstructureRemovalYears() {
-    return substructureRemovalYears;
+  public String getSubstructureRemovalEarliestYear() {
+    return substructureRemovalEarliestYear;
   }
 
-  public void setSubstructureRemovalYears(String substructureRemovalYears) {
-    this.substructureRemovalYears = substructureRemovalYears;
+  public void setSubstructureRemovalEarliestYear(String substructureRemovalEarliestYear) {
+    this.substructureRemovalEarliestYear = substructureRemovalEarliestYear;
+  }
+
+  public String getSubstructureRemovalLatestYear() {
+    return substructureRemovalLatestYear;
+  }
+
+  public void setSubstructureRemovalLatestYear(String substructureRemovalLatestYear) {
+    this.substructureRemovalLatestYear = substructureRemovalLatestYear;
   }
 
   public String getFpsoType() {
