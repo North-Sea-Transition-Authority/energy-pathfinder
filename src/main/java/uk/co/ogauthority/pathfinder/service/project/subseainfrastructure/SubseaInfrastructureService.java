@@ -1,10 +1,12 @@
 package uk.co.ogauthority.pathfinder.service.project.subseainfrastructure;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -156,6 +158,28 @@ public class SubseaInfrastructureService {
     return subseaInfrastructureRepository.save(subseaInfrastructure);
   }
 
+  public List<SubseaInfrastructure> getSubseaInfrastructures(ProjectDetail projectDetail) {
+    return subseaInfrastructureRepository.findByProjectDetailOrderByIdAsc(projectDetail);
+  }
+
+  public boolean isValid(SubseaInfrastructure subseaInfrastructure, ValidationType validationType) {
+    var form = getForm(subseaInfrastructure);
+    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult = validate(form, bindingResult, validationType);
+    return !bindingResult.hasErrors();
+  }
+
+  @Transactional
+  public void deleteSubseaInfrastructure(SubseaInfrastructure subseaInfrastructure) {
+    subseaInfrastructureRepository.delete(subseaInfrastructure);
+  }
+
+  public boolean isComplete(ProjectDetail projectDetail) {
+    var subseaInfrastructures = getSubseaInfrastructures(projectDetail);
+    return !subseaInfrastructures.isEmpty() && subseaInfrastructures.stream()
+        .allMatch(subseaInfrastructure -> isValid(subseaInfrastructure, ValidationType.FULL));
+  }
+
   private void setCommonEntityFields(SubseaInfrastructure subseaInfrastructure,
                                      ProjectDetail projectDetail,
                                      SubseaInfrastructureForm form) {
@@ -200,6 +224,15 @@ public class SubseaInfrastructureService {
     }
   }
 
+  public SubseaInfrastructure getSubseaInfrastructure(Integer subseaInfrastructureId, ProjectDetail projectDetail) {
+    return subseaInfrastructureRepository.findByIdAndProjectDetail(subseaInfrastructureId, projectDetail)
+        .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format(
+            "Could not find SubseaInfrastructure with ID %d for ProjectDetail with ID %s",
+            subseaInfrastructureId,
+            projectDetail.getId()
+        )));
+  }
+
   private void clearInfrastructureTypeConditionalEntityFields(SubseaInfrastructure subseaInfrastructure) {
     clearConcreteMattressEntityFields(subseaInfrastructure);
     clearSubseaStructureEntityFields(subseaInfrastructure);
@@ -239,15 +272,6 @@ public class SubseaInfrastructureService {
     subseaInfrastructure.setTotalEstimatedOtherMass(form.getTotalEstimatedMass());
     clearConcreteMattressEntityFields(subseaInfrastructure);
     clearSubseaStructureEntityFields(subseaInfrastructure);
-  }
-
-  private SubseaInfrastructure getSubseaInfrastructure(Integer subseaInfrastructureId, ProjectDetail projectDetail) {
-    return subseaInfrastructureRepository.findByIdAndProjectDetail(subseaInfrastructureId, projectDetail)
-        .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format(
-            "Could not find SubseaInfrastructure with ID %d and ProjectDetail with ID %s",
-            subseaInfrastructureId,
-            projectDetail.getId()
-        )));
   }
 
   private void setInfrastructureTypeFormFields(SubseaInfrastructureForm form,

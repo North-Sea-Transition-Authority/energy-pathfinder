@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
+import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
@@ -22,12 +24,15 @@ import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.Sub
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureType;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaStructureMass;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.SubseaInfrastructureForm;
+import uk.co.ogauthority.pathfinder.model.view.subseainfrastructure.SubseaInfrastructureView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.subseainfrastructure.SubseaInfrastructureService;
+import uk.co.ogauthority.pathfinder.service.project.subseainfrastructure.SubseaInfrastructureSummaryService;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
@@ -37,21 +42,43 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
 
   public static final String SUMMARY_PAGE_NAME = "Subsea infrastructure";
   private static final String FORM_PAGE_NAME = "Subsea infrastructure to be decommissioned";
+  public static final String REMOVE_PAGE_NAME = "Remove subsea infrastructure";
 
   private final SubseaInfrastructureService subseaInfrastructureService;
+  private final SubseaInfrastructureSummaryService subseaInfrastructureSummaryService;
 
   @Autowired
   public SubseaInfrastructureController(BreadcrumbService breadcrumbService,
                                         ControllerHelperService controllerHelperService,
-                                        SubseaInfrastructureService subseaInfrastructureService) {
+                                        SubseaInfrastructureService subseaInfrastructureService,
+                                        SubseaInfrastructureSummaryService subseaInfrastructureSummaryService) {
     super(breadcrumbService, controllerHelperService);
     this.subseaInfrastructureService = subseaInfrastructureService;
+    this.subseaInfrastructureSummaryService = subseaInfrastructureSummaryService;
   }
 
   @GetMapping
   public ModelAndView getSubseaStructures(@PathVariable Integer projectId,
                                           ProjectContext projectContext) {
-    return getSubseaStructuresSummaryModelAndView(projectId);
+    var subseaInfrastructureViews = subseaInfrastructureSummaryService.getSubseaInfrastructureSummaryViews(
+        projectContext.getProjectDetails()
+    );
+    return getSubseaStructuresSummaryModelAndView(projectId, subseaInfrastructureViews, ValidationResult.NOT_VALIDATED);
+  }
+
+  @PostMapping
+  public ModelAndView saveSubseaStructures(@PathVariable("projectId") Integer projectId,
+                                           ProjectContext projectContext) {
+    var subseaInfrastructureViews =
+        subseaInfrastructureSummaryService.getValidatedSubseaInfrastructureSummaryViews(
+            projectContext.getProjectDetails()
+        );
+
+    var validationResult = subseaInfrastructureSummaryService.validateViews(subseaInfrastructureViews);
+
+    return validationResult.equals(ValidationResult.VALID)
+        ? ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null))
+        : getSubseaStructuresSummaryModelAndView(projectId, subseaInfrastructureViews, validationResult);
   }
 
   @GetMapping("/subsea-infrastructure")
@@ -109,7 +136,38 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
     );
   }
 
-  private ModelAndView getSubseaStructuresSummaryModelAndView(Integer projectId) {
+  @GetMapping("/subsea-infrastructure/{subseaInfrastructureId}/remove/{displayOrder}")
+  public ModelAndView removeSubseaInfrastructuresConfirmation(@PathVariable("projectId") Integer projectId,
+                                                              @PathVariable("subseaInfrastructureId") Integer subseaInfrastructureId,
+                                                              @PathVariable("displayOrder") Integer displayOrder,
+                                                              ProjectContext projectContext) {
+    var subseaInfrastructureView = subseaInfrastructureSummaryService.getSubseaInfrastructureSummaryView(
+        subseaInfrastructureId,
+        projectContext.getProjectDetails(),
+        displayOrder
+    );
+
+    return removeSubseaInfrastructureModelAndView(projectId, subseaInfrastructureView);
+  }
+
+  @PostMapping("/subsea-infrastructure/{subseaInfrastructureId}/remove/{displayOrder}")
+  public ModelAndView removeSubseaInfrastructure(@PathVariable("projectId") Integer projectId,
+                                                 @PathVariable("subseaInfrastructureId") Integer subseaInfrastructureId,
+                                                 @PathVariable("displayOrder") Integer displayOrder,
+                                                 ProjectContext projectContext) {
+    var subseaInfrastructureView = subseaInfrastructureService.getSubseaInfrastructure(
+        subseaInfrastructureId,
+        projectContext.getProjectDetails()
+    );
+
+    subseaInfrastructureService.deleteSubseaInfrastructure(subseaInfrastructureView);
+
+    return getSubseaInfrastructureSummaryRedirect(projectId);
+  }
+
+  private ModelAndView getSubseaStructuresSummaryModelAndView(Integer projectId,
+                                                              List<SubseaInfrastructureView> subseaInfrastructureViews,
+                                                              ValidationResult validationResult) {
     var modelAndView = new ModelAndView("project/subseainfrastructure/subseaInfrastructuresSummary")
         .addObject("pageTitle", SUMMARY_PAGE_NAME)
         .addObject("addSubseaInfrastructureUrl",
@@ -117,6 +175,12 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
         )
         .addObject("backToTaskListUrl",
             ControllerUtils.getBackToTaskListUrl(projectId)
+        )
+        .addObject("subseaInfrastructureViews", subseaInfrastructureViews)
+        .addObject("errorList",
+            validationResult.equals(ValidationResult.INVALID)
+                ? subseaInfrastructureSummaryService.getSubseaInfrastructureViewErrors(subseaInfrastructureViews)
+                : null
         );
 
     breadcrumbService.fromTaskList(projectId, modelAndView, SUMMARY_PAGE_NAME);
@@ -151,5 +215,20 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
 
   private ModelAndView getSubseaInfrastructureSummaryRedirect(Integer projectId) {
     return ReverseRouter.redirect(on(SubseaInfrastructureController.class).getSubseaStructures(projectId, null));
+  }
+
+  private String getSubseaInfrastructureSummaryUrl(Integer projectId) {
+    return ReverseRouter.route(on(SubseaInfrastructureController.class).getSubseaStructures(projectId, null));
+  }
+
+  private ModelAndView removeSubseaInfrastructureModelAndView(Integer projectId, SubseaInfrastructureView subseaInfrastructureView) {
+    var modelAndView = new ModelAndView("project/subseainfrastructure/removeSubseaInfrastructure")
+        .addObject("subseaInfrastructureView", subseaInfrastructureView)
+        .addObject("cancelUrl", getSubseaInfrastructureSummaryUrl(projectId))
+        .addObject("pageName", REMOVE_PAGE_NAME);
+
+    breadcrumbService.fromSubseaInfrastructure(projectId, modelAndView, REMOVE_PAGE_NAME);
+
+    return modelAndView;
   }
 }

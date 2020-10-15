@@ -28,6 +28,7 @@ import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationServ
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
+import uk.co.ogauthority.pathfinder.service.project.subseainfrastructure.SubseaInfrastructureService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -37,22 +38,25 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 public class TaskListControllerTest extends ProjectContextAbstractControllerTest {
 
   @MockBean
-  private ProjectInformationService projectInformationService;
+  ProjectInformationService projectInformationService;
 
   @MockBean
-  private ProjectLocationService projectLocationService;
+  ProjectLocationService projectLocationService;
 
   @MockBean
-  private SelectOperatorService selectOperatorService;
+  SelectOperatorService selectOperatorService;
 
   @MockBean
-  private UpcomingTenderService upcomingTenderService;
+  UpcomingTenderService upcomingTenderService;
 
   @MockBean
-  private AwardedContractService awardedContractService;
+  AwardedContractService awardedContractService;
 
   @MockBean
-  private CollaborationOpportunitiesService collaborationOpportunitiesService;
+  CollaborationOpportunitiesService collaborationOpportunitiesService;
+
+  @MockBean
+  SubseaInfrastructureService subseaInfrastructureService;
 
   @MockBean
   private PlatformsFpsosService platformsFpsosService;

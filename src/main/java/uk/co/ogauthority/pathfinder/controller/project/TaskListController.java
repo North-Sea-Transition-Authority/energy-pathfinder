@@ -29,6 +29,7 @@ import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationServ
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
+import uk.co.ogauthority.pathfinder.service.project.subseainfrastructure.SubseaInfrastructureService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 
 @Controller
@@ -45,6 +46,7 @@ public class TaskListController {
   private final BreadcrumbService breadcrumbService;
   private final AwardedContractService awardedContractService;
   private final PlatformsFpsosService platformsFpsosService;
+  private final SubseaInfrastructureService subseaInfrastructureService;
 
   @Autowired
   public TaskListController(ProjectInformationService projectInformationService,
@@ -54,7 +56,8 @@ public class TaskListController {
                             UpcomingTenderService upcomingTenderService,
                             CollaborationOpportunitiesService collaborationOpportunitiesService,
                             AwardedContractService awardedContractService,
-                            PlatformsFpsosService platformsFpsosService) {
+                            PlatformsFpsosService platformsFpsosService,
+                            SubseaInfrastructureService subseaInfrastructureService) {
     this.projectInformationService = projectInformationService;
     this.breadcrumbService = breadcrumbService;
     this.projectLocationService = projectLocationService;
@@ -63,6 +66,7 @@ public class TaskListController {
     this.awardedContractService = awardedContractService;
     this.upcomingTenderService = upcomingTenderService;
     this.platformsFpsosService = platformsFpsosService;
+    this.subseaInfrastructureService = subseaInfrastructureService;
   }
 
   @GetMapping
@@ -128,7 +132,9 @@ public class TaskListController {
         ReverseRouter.route(on(SubseaInfrastructureController.class).getSubseaStructures(projectId, null))
     );
     modelAndView.addObject("subseaInfrastructureText", SubseaInfrastructureController.SUMMARY_PAGE_NAME);
-    modelAndView.addObject("subseaInfrastructureCompleted", false);
+    modelAndView.addObject("subseaInfrastructureCompleted", subseaInfrastructureService.isComplete(
+        projectDetails
+    ));
 
     return modelAndView;
   }

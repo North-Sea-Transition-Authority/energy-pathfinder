@@ -1,9 +1,18 @@
 <#include '../../layout.ftl'/>
 
 <#macro checkAnswersRowNoActions prompt value>
-  <@fdsCheckAnswers.checkAnswersRow keyText=prompt actionText="" actionUrl="" screenReaderActionText="">
+  <@checkAnswersRowNoActionsWithNested prompt=prompt>
     <#if value?has_content>
       ${value}
+    </#if>
+  </@checkAnswersRowNoActionsWithNested>
+</#macro>
+
+<#macro checkAnswersRowNoActionsWithNested prompt>
+  <#local nested><#nested/></#local>
+  <@fdsCheckAnswers.checkAnswersRow keyText=prompt actionText="" actionUrl="" screenReaderActionText="">
+    <#if nested?has_content>
+      ${nested}
     </#if>
   </@fdsCheckAnswers.checkAnswersRow>
 </#macro>

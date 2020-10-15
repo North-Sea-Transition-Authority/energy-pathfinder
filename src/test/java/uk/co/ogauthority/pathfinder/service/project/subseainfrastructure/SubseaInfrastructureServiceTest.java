@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.subseainfrastructure.SubseaInfrastructure;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -571,6 +572,60 @@ public class SubseaInfrastructureServiceTest {
 
     assertThatHiddenEntityFieldsAreNotPopulated(persistedSubseaInfrastructure);
     checkCommonSubseaInfrastructureEntityFields(persistedSubseaInfrastructure, form);
+  }
+
+  @Test
+  public void getSubseaInfrastructures_whenExist_thenReturnList() {
+    var subseaInfrastructure1 = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withSubseaStructure();
+    var subseaInfrastructure2 = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withConcreteMattresses();
+
+    when(subseaInfrastructureRepository.findByProjectDetailOrderByIdAsc(projectDetail))
+        .thenReturn(List.of(subseaInfrastructure1, subseaInfrastructure2));
+
+    var subseaInfrastructures = subseaInfrastructureService.getSubseaInfrastructures(projectDetail);
+    assertThat(subseaInfrastructures).containsExactly(subseaInfrastructure1, subseaInfrastructure2);
+  }
+
+  @Test
+  public void getSubseaInfrastructures_whenNoneExist_thenEmptyList() {
+
+    when(subseaInfrastructureRepository.findByProjectDetailOrderByIdAsc(projectDetail))
+        .thenReturn(List.of());
+
+    var subseaInfrastructures = subseaInfrastructureService.getSubseaInfrastructures(projectDetail);
+    assertThat(subseaInfrastructures).isEmpty();
+  }
+
+  @Test
+  public void deleteSubseaInfrastructure() {
+    var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withSubseaStructure();
+    subseaInfrastructureService.deleteSubseaInfrastructure(subseaInfrastructure);
+    verify(subseaInfrastructureRepository, times(1)).delete(subseaInfrastructure);
+  }
+
+  @Test
+  public void getSubseaInfrastructure_whenExists_thenReturn() {
+
+    var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withManualFacility();
+
+    when(subseaInfrastructureRepository.findByIdAndProjectDetail(SUBSEA_INFRASTRUCTURE_ID, projectDetail)).thenReturn(
+        Optional.of(subseaInfrastructure)
+    );
+
+    var result = subseaInfrastructureService.getSubseaInfrastructure(SUBSEA_INFRASTRUCTURE_ID, projectDetail);
+
+    assertThat(result.getId()).isEqualTo(subseaInfrastructure.getId());
+    assertThat(result.getProjectDetail().getId()).isEqualTo(subseaInfrastructure.getProjectDetail().getId());
+  }
+
+  @Test(expected = PathfinderEntityNotFoundException.class)
+  public void getSubseaInfrastructure_whenNotFound_thenException() {
+
+    when(subseaInfrastructureRepository.findByIdAndProjectDetail(SUBSEA_INFRASTRUCTURE_ID, projectDetail)).thenReturn(
+        Optional.empty()
+    );
+
+    subseaInfrastructureService.getSubseaInfrastructure(SUBSEA_INFRASTRUCTURE_ID, projectDetail);
   }
 
 }

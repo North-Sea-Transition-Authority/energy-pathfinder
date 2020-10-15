@@ -13,6 +13,7 @@
 <#import 'project/macros/setupProjectGuidance.ftl' as setupProjectGuidance>
 <#import 'project/macros/twoNumberInput.ftl' as twoNumberInput>
 <#import 'project/macros/minMaxDateInput.ftl' as minMaxDate>
+<#import 'project/macros/summaryViewWrapper.ftl' as summaryViewWrapper>
 
 <#function springUrl url>
   <#local springUrl>

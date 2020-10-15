@@ -1,7 +1,19 @@
 <#include '../../layout.ftl'>
+<#import 'subseaInfrastructureSummary.ftl' as subseaInfrastructureSummary>
 
 <@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true>
-  <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="subsea infrastructure" linkUrl=""/>
+  <#if errorList?has_content>
+    <@fdsError.errorSummary errorItems=errorList />
+  </#if>
+  <div class="summary-list">
+    <#if subseaInfrastructureViews?has_content>
+      <#list subseaInfrastructureViews as subseaInfrastructureView>
+        <@subseaInfrastructureSummary.subseaInfrastructureSummary subseaInfrastructureView=subseaInfrastructureView />
+      </#list>
+      <#else>
+        <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="subsea infrastructure" linkUrl=""/>
+    </#if>
+  </div>
   <@fdsAction.link
     linkText="Add subsea infrastructure"
     linkUrl=springUrl(addSubseaInfrastructureUrl)

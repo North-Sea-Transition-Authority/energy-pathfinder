@@ -35,7 +35,9 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.subseainfrastructure.SubseaInfrastructureService;
+import uk.co.ogauthority.pathfinder.service.project.subseainfrastructure.SubseaInfrastructureSummaryService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.SubseaInfrastructureTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
@@ -47,9 +49,13 @@ public class SubseaInfrastructureControllerTest extends ProjectContextAbstractCo
 
   private static final Integer PROJECT_ID = 1;
   private static final Integer SUBSEA_INFRASTRUCTURE_ID = 10;
+  private static final Integer DISPLAY_ORDER = 2;
 
   @MockBean
   private SubseaInfrastructureService subseaInfrastructureService;
+
+  @MockBean
+  SubseaInfrastructureSummaryService subseaInfrastructureSummaryService;
 
   private ProjectDetail projectDetail;
 
@@ -268,6 +274,93 @@ public class SubseaInfrastructureControllerTest extends ProjectContextAbstractCo
 
     verify(subseaInfrastructureService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
     verify(subseaInfrastructureService, times(0)).createSubseaInfrastructure(any(), any());
+  }
+
+  @Test
+  public void removeSubseaInfrastructuresConfirmation_whenUnauthenticated_thenNoAccess() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(SubseaInfrastructureController.class).removeSubseaInfrastructuresConfirmation(
+            PROJECT_ID,
+            SUBSEA_INFRASTRUCTURE_ID,
+            DISPLAY_ORDER,
+            null
+        )))
+        .with(authenticatedUserAndSession(unauthenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void removeSubseaInfrastructuresConfirmation_whenAuthenticated_thenAccess() throws Exception {
+
+    when(subseaInfrastructureSummaryService.getSubseaInfrastructureSummaryView(
+        SUBSEA_INFRASTRUCTURE_ID,
+        projectDetail,
+        DISPLAY_ORDER
+    )).thenReturn(
+        SubseaInfrastructureTestUtil.createSubseaInfrastructureView()
+    );
+
+    mockMvc.perform(get(ReverseRouter.route(
+        on(SubseaInfrastructureController.class).removeSubseaInfrastructuresConfirmation(
+            PROJECT_ID,
+            SUBSEA_INFRASTRUCTURE_ID,
+            DISPLAY_ORDER,
+            null
+        )))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  public void removeSubseaInfrastructure_whenAuthenticated_thenAccess() throws Exception {
+
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withDevUkFacility();
+
+    when(subseaInfrastructureService.getSubseaInfrastructure(any(), any())).thenReturn(
+        subseaInfrastructure
+    );
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(SubseaInfrastructureController.class)
+            .removeSubseaInfrastructure(PROJECT_ID, SUBSEA_INFRASTRUCTURE_ID, DISPLAY_ORDER, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().is3xxRedirection());
+
+    verify(subseaInfrastructureService, times(1)).deleteSubseaInfrastructure(subseaInfrastructure);
+
+  }
+
+  @Test
+  public void removeSubseaInfrastructure_whenUnauthenticated_thenNoAccess() throws Exception {
+
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withDevUkFacility();
+
+    when(subseaInfrastructureService.getSubseaInfrastructure(any(), any())).thenReturn(
+        subseaInfrastructure
+    );
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(SubseaInfrastructureController.class)
+            .removeSubseaInfrastructure(PROJECT_ID, SUBSEA_INFRASTRUCTURE_ID, DISPLAY_ORDER, null)
+        ))
+            .with(authenticatedUserAndSession(unauthenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().isForbidden());
+
+    verify(subseaInfrastructureService, times(0)).deleteSubseaInfrastructure(subseaInfrastructure);
+
   }
 
 }

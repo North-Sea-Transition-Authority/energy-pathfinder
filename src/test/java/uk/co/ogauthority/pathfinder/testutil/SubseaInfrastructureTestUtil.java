@@ -10,6 +10,8 @@ import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.Conc
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.OtherSubseaStructureForm;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.SubseaInfrastructureForm;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.SubseaStructureForm;
+import uk.co.ogauthority.pathfinder.model.view.subseainfrastructure.SubseaInfrastructureView;
+import uk.co.ogauthority.pathfinder.model.view.subseainfrastructure.SubseaInfrastructureViewUtil;
 
 public class SubseaInfrastructureTestUtil {
 
@@ -70,6 +72,18 @@ public class SubseaInfrastructureTestUtil {
     setInfrastructureTypeHiddenFormFields(form);
 
     return form;
+  }
+
+  public static SubseaInfrastructureView createSubseaInfrastructureView() {
+    var subseaInfrastructure = createSubseaInfrastructure_withDevUkFacility();
+    return SubseaInfrastructureViewUtil.from(subseaInfrastructure, 1, true);
+  }
+
+  public static SubseaInfrastructureView createSubseaInfrastructureView(Integer displayOrder, boolean isValid) {
+    var subseaInfrastructureView = createSubseaInfrastructureView();
+    subseaInfrastructureView.setDisplayOrder(displayOrder);
+    subseaInfrastructureView.setIsValid(isValid);
+    return subseaInfrastructureView;
   }
 
   private static void setInfrastructureTypeHiddenFormFields(SubseaInfrastructureForm form) {
