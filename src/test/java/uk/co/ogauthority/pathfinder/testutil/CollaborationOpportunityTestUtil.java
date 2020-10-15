@@ -1,8 +1,10 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
 import java.time.LocalDate;
+import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityFileLink;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
@@ -83,6 +85,21 @@ public class CollaborationOpportunityTestUtil {
     opportunity.setManualFunction(SearchSelectorService.removePrefix(MANUAL_FUNCTION));
     setCommonFields(opportunity);
     return opportunity;
+  }
+
+  public static CollaborationOpportunityFileLink createCollaborationOpportunityFileLink(CollaborationOpportunity collaborationOpportunity,
+                                                                                        ProjectDetailFile projectDetailFile) {
+    var collaborationFileLink = new CollaborationOpportunityFileLink();
+    collaborationFileLink.setCollaborationOpportunity(collaborationOpportunity);
+    collaborationFileLink.setProjectDetailFile(projectDetailFile);
+    return collaborationFileLink;
+  }
+
+  public static CollaborationOpportunityFileLink createCollaborationOpportunityFileLink() {
+    return createCollaborationOpportunityFileLink(
+        getCollaborationOpportunity(ProjectUtil.getProjectDetails()),
+        new ProjectDetailFile()
+    );
   }
 
   private static void setCommonFields(CollaborationOpportunity opportunity) {
