@@ -45,7 +45,7 @@
         itemName="Licence block"
         noItemText="No licence blocks added"
         addToListId="licence-block-table"
-        selectorLabelText="Add a licence block"
+        selectorLabelText="Which licence blocks is this project located in?"
         restUrl=springUrl(blocksRestUrl)
       />
       <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>

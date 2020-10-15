@@ -42,7 +42,7 @@ public class LicenceBlockServiceTest {
 
   @Test
   public void findCurrentByReference() {
-    when(currentLicenceBlocksRepository.findAllByBlockLocationAndBlockReferenceContainingIgnoreCase(any(), anyString())).thenReturn(
+    when(currentLicenceBlocksRepository.findAllByBlockLocationAndBlockReferenceContainingIgnoreCaseOrderBySortKeyAsc(any(), anyString())).thenReturn(
         Collections.singletonList(LicenceBlockTestUtil.getBlock())
     );
     var blocks = licenceBlockService.findCurrentByReference(LicenceBlockTestUtil.BLOCK_REFERENCE);
@@ -77,7 +77,7 @@ public class LicenceBlockServiceTest {
 
   @Test
   public void searchLicenceBlocksWithReferenceContaining() {
-    when(currentLicenceBlocksRepository.findAllByBlockLocationAndBlockReferenceContainingIgnoreCase(any(), any())).thenReturn(
+    when(currentLicenceBlocksRepository.findAllByBlockLocationAndBlockReferenceContainingIgnoreCaseOrderBySortKeyAsc(any(), any())).thenReturn(
         BLOCKS
     );
     var searchItems = licenceBlockService.searchLicenceBlocksWithReferenceContaining("12");

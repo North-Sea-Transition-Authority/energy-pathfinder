@@ -3,6 +3,7 @@ GRANT SELECT ON pedmgr.ped_licences TO ${datasource.user};
 GRANT SELECT ON pedmgr.ped_current_data_points TO ${datasource.user};
 GRANT SELECT ON pedmgr.ped_current_licence_blocks TO ${datasource.user};
 GRANT SELECT ON pedmgr.xview_ped_ld_current TO ${datasource.user};
+GRANT EXECUTE ON pedmgr.ped_utils TO ${datasource.user};
 
 CREATE OR REPLACE VIEW ${datasource.user}.ped_licences AS
 SELECT
@@ -25,6 +26,7 @@ SELECT
 , b.suffix
 , b.plm_id
 , b.location
+, sort_key
 FROM (
   SELECT
     pclb.block_ref || pclb.quadrant_no || TO_CHAR(pclb.block_no) || pclb.suffix || pl.plm_id composite_key
@@ -34,6 +36,7 @@ FROM (
   , pclb.suffix
   , pl.plm_id
   , pclb.location
+  , pedmgr.ped_utils.block_ref_sort_key(pclb.block_ref) sort_key
   FROM pedmgr.ped_current_licence_blocks pclb
   JOIN ${datasource.user}.ped_licences pl
   ON pl.licence_type = pclb.licence_type AND pl.licence_number = pclb.licence_no

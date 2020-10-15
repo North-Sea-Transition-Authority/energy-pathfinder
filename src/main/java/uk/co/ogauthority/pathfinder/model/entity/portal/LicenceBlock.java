@@ -36,6 +36,8 @@ public class LicenceBlock implements SearchSelectable {
   @Column(name = "location")
   private BlockLocation blockLocation;
 
+  private String sortKey;
+
   public String getCompositeKey() {
     return compositeKey;
   }
@@ -90,6 +92,10 @@ public class LicenceBlock implements SearchSelectable {
 
   public void setBlockLocation(BlockLocation blockLocation) {
     this.blockLocation = blockLocation;
+  }
+
+  public String getSortKey() {
+    return sortKey;
   }
 
   @Override
