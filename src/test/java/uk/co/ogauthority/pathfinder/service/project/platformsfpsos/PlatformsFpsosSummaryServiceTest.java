@@ -103,13 +103,17 @@ public class PlatformsFpsosSummaryServiceTest {
 
   private void checkCommonFields(PlatformFpsoView view, PlatformFpso platformFpso) {
     assertThat(view.getTopsideFpsoMass()).isEqualTo(PlatformFpsoViewUtil.getMass(platformFpso.getTopsideFpsoMass()));
-    assertThat(view.getTopsideRemovalYears()).isEqualTo(PlatformFpsoViewUtil.getYears(platformFpso.getEarliestRemovalYear(), platformFpso.getLatestRemovalYear()));
+    assertThat(view.getTopsideRemovalEarliestYear()).isEqualTo(PlatformFpsoViewUtil.getYearText(platformFpso.getEarliestRemovalYear(), PlatformFpsoViewUtil.EARLIEST_YEAR_TEXT));
+    assertThat(view.getTopsideRemovalLatestYear()).isEqualTo(PlatformFpsoViewUtil.getYearText(platformFpso.getLatestRemovalYear(), PlatformFpsoViewUtil.LATEST_YEAR_TEXT));
     assertThat(view.getSubstructuresExpectedToBeRemoved()).isEqualTo(platformFpso.getSubstructuresExpectedToBeRemoved());
     if (platformFpso.getSubstructuresExpectedToBeRemoved()) {
       assertThat(view.getSubstructureRemovalPremise()).isEqualTo(platformFpso.getSubstructureRemovalPremise().getDisplayName());
       assertThat(view.getSubstructureRemovalMass()).isEqualTo(PlatformFpsoViewUtil.getMass(platformFpso.getSubstructureRemovalMass()));
-      assertThat(view.getSubstructureRemovalYears()).isEqualTo(
-          PlatformFpsoViewUtil.getYears(platformFpso.getSubStructureRemovalEarliestYear(), platformFpso.getSubStructureRemovalLatestYear())
+      assertThat(view.getSubstructureRemovalEarliestYear()).isEqualTo(
+          PlatformFpsoViewUtil.getYearText(platformFpso.getSubStructureRemovalEarliestYear(), PlatformFpsoViewUtil.EARLIEST_YEAR_TEXT)
+      );
+      assertThat(view.getSubstructureRemovalLatestYear()).isEqualTo(
+          PlatformFpsoViewUtil.getYearText(platformFpso.getSubStructureRemovalLatestYear(), PlatformFpsoViewUtil.LATEST_YEAR_TEXT)
       );
     }
     assertThat(view.getFpsoType()).isEqualTo(platformFpso.getFpsoType());

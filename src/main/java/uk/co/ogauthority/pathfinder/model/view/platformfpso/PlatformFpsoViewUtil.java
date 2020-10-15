@@ -10,6 +10,9 @@ import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
 public class PlatformFpsoViewUtil {
+  public static final String YEAR_NOT_SET_TEXT = "Not set";
+  public static final String EARLIEST_YEAR_TEXT = "Earliest start year: %s";
+  public static final String LATEST_YEAR_TEXT = "Latest completion year: %s";
 
   private PlatformFpsoViewUtil() {
     throw new IllegalStateException("PlatformFpsoViewUtil is a utility class and should not be instantiated.");
@@ -35,9 +38,8 @@ public class PlatformFpsoViewUtil {
         ? getMass(platformFpso.getTopsideFpsoMass())
         : ""
     );
-    view.setTopsideRemovalYears(
-        getYears(platformFpso.getEarliestRemovalYear(), platformFpso.getLatestRemovalYear())
-    );
+    view.setTopsideRemovalEarliestYear(getYearText(platformFpso.getEarliestRemovalYear(), EARLIEST_YEAR_TEXT));
+    view.setTopsideRemovalLatestYear(getYearText(platformFpso.getLatestRemovalYear(), LATEST_YEAR_TEXT));
     view.setSubstructuresExpectedToBeRemoved(platformFpso.getSubstructuresExpectedToBeRemoved());
     view.setSubstructureRemovalPremise(platformFpso.getSubstructureRemovalPremise() != null
         ? platformFpso.getSubstructureRemovalPremise().getDisplayName()
@@ -47,11 +49,8 @@ public class PlatformFpsoViewUtil {
         ? getMass(platformFpso.getSubstructureRemovalMass())
         : ""
     );
-    view.setSubstructureRemovalYears(getYears(
-        platformFpso.getSubStructureRemovalEarliestYear(),
-        platformFpso.getSubStructureRemovalLatestYear()
-      )
-    );
+    view.setSubstructureRemovalEarliestYear(getYearText(platformFpso.getSubStructureRemovalEarliestYear(), EARLIEST_YEAR_TEXT));
+    view.setSubstructureRemovalLatestYear(getYearText(platformFpso.getSubStructureRemovalLatestYear(), LATEST_YEAR_TEXT));
     view.setFpsoType(platformFpso.getFpsoType());
     view.setFpsoDimensions(platformFpso.getFpsoDimensions());
     view.setFuturePlans(platformFpso.getFuturePlans() != null ? platformFpso.getFuturePlans().getDisplayName() : "");
@@ -91,10 +90,16 @@ public class PlatformFpsoViewUtil {
     return view;
   }
 
-  public static String getYears(String minYear, String maxYear) {
-    var min = minYear != null ? minYear : "Not set";
-    var max = maxYear != null ? maxYear : "Not set";
-    return String.format("Earliest start year: %s / Latest completion year: %s", min, max);
+  /**
+   * Get the placeholder not set string or format the year provided into the earliest or latest string.
+   * @param year year to format into earliestOrLatestString
+   * @param earliestOrLatestString either EARLIEST_YEAR_TEXT or LATEST_YEAR_TEXT
+   * @return formatted year string
+   */
+  public static String getYearText(String year, String earliestOrLatestString) {
+    return year != null
+      ? String.format(earliestOrLatestString, year)
+      : YEAR_NOT_SET_TEXT;
   }
 
   public static String getMass(Integer mass) {

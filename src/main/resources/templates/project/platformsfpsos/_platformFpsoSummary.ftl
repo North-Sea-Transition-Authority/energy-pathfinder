@@ -16,15 +16,23 @@
 
     <@checkAnswers.checkAnswersRowNoActions prompt="Platform or FPSO" value=view.platformFpso!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="Topside / FPSO removal mass" value=view.topsideFpsoMass!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Topside removal years" value=view.topsideRemovalYears!"" />
+    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Topside removal years">
+      ${view.topsideRemovalEarliestYear!""}
+      <br/>
+        ${view.topsideRemovalLatestYear!""}
+    </@checkAnswers.checkAnswersRowNoActionsWithNested>
     <@checkAnswers.checkAnswersRowNoActions
       prompt="Substructures expected to be removed"
       value=view.substructuresExpectedToBeRemoved?has_content?then(view.substructuresExpectedToBeRemoved?string("Yes", "No"), "")
     />
     <#if view.substructuresExpectedToBeRemoved?has_content && view.substructuresExpectedToBeRemoved>
-        <@checkAnswers.checkAnswersRowNoActions prompt="Substructure removal premise" value=view.substructureRemovalPremise!"" />
-        <@checkAnswers.checkAnswersRowNoActions prompt="Substructure removal mass" value=view.substructureRemovalMass!"" />
-        <@checkAnswers.checkAnswersRowNoActions prompt="Substructure removal years" value=view.substructureRemovalYears!"" />
+      <@checkAnswers.checkAnswersRowNoActions prompt="Substructure removal premise" value=view.substructureRemovalPremise!"" />
+      <@checkAnswers.checkAnswersRowNoActions prompt="Substructure removal mass" value=view.substructureRemovalMass!"" />
+      <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Substructure removal years">
+        ${view.substructureRemovalEarliestYear!""}
+        <br/>
+        ${view.substructureRemovalLatestYear!""}
+      </@checkAnswers.checkAnswersRowNoActionsWithNested>
     </#if>
     <@checkAnswers.checkAnswersRowNoActions prompt="FPSO type" value=view.fpsoType!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="FPSO dimensions" value=view.fpsoDimensions!"" />
