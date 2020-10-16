@@ -10,11 +10,12 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.validationhint.EmptyMinMaxDateAcceptableHint;
-import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.validationhint.MaxYearMustBeInFutureHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.validationhint.MinMaxYearLabelsHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
+import uk.co.ogauthority.pathfinder.model.form.validation.ValidationHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 
 @Component
 public class MinMaxDateInputValidator implements SmartValidator {
@@ -26,7 +27,6 @@ public class MinMaxDateInputValidator implements SmartValidator {
   public static final String DEFAULT_INPUT_LABEL_TEXT = "Minimum and maximum years";
   public static final String ENTER_BOTH_YEARS_ERROR = "%s requires %s %s and %s year";
   public static final String MIN_BEFORE_MAX_YEAR_ERROR = "%s's %s year must be before or the same as the %s year";
-  public static final String MAX_YEAR_IN_FUTURE_ERROR = "%s's %s year must be the current year or in the future";
 
   @Override
   public void validate(Object target, Errors errors, Object... validationHints) {
@@ -45,15 +45,10 @@ public class MinMaxDateInputValidator implements SmartValidator {
         .findFirst()
         .orElse(new MinMaxYearLabelsHint(MIN_YEAR_TEXT, MAX_YEAR_TEXT));
 
-    //Check validation hint
+    //Check for emptyMinMaxDateAcceptable hint
     Optional<EmptyMinMaxDateAcceptableHint> emptyMinMaxDateAcceptableHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(EmptyMinMaxDateAcceptableHint.class))
         .map(hint -> ((EmptyMinMaxDateAcceptableHint) hint))
-        .findFirst();
-
-    Optional<MaxYearMustBeInFutureHint> maxYearMustBeInFutureHint = Arrays.stream(validationHints)
-        .filter(hint -> hint.getClass().equals(MaxYearMustBeInFutureHint.class))
-        .map(hint -> ((MaxYearMustBeInFutureHint) hint))
         .findFirst();
 
     //Can fill in either of the year fields (or none) if doing partial validation
@@ -96,19 +91,17 @@ public class MinMaxDateInputValidator implements SmartValidator {
       );
     }
 
-
-    //check max year is in future
-    if (maxYearMustBeInFutureHint.isPresent()
-        &&
-        (minMaxDateInput.getMaxYear() != null && !minMaxDateInput.maxYearIsInFuture())
-    ) {
-      errors.rejectValue(
-          MAX_YEAR,
-          getInvalidErrorCode(MAX_YEAR),
-          getMaxYearMustBeInFutureErrorMessage(inputLabel, yearLabels)
-      );
-    }
-
+    ValidationUtil.extractImplementedValidationHints(validationHints)
+        .stream()
+        .map(hint -> (ValidationHint) hint)
+        .filter(hint -> !hint.isValid(minMaxDateInput))
+        .forEach(hint ->
+            errors.rejectValue(
+                getFieldFromErrorCode(hint.getCode()),
+                hint.getCode(),
+                hint.getErrorMessage()
+            )
+        );
 
   }
 
@@ -151,10 +144,6 @@ public class MinMaxDateInputValidator implements SmartValidator {
     );
   }
 
-  private String getMaxYearMustBeInFutureErrorMessage(FormInputLabel inputLabel, MinMaxYearLabelsHint yearLabels) {
-    return String.format(MAX_YEAR_IN_FUTURE_ERROR, inputLabel.getInitCappedLabel(), yearLabels.getMaxYearLabel());
-  }
-
   private String getInvalidErrorCode(String prefix) {
     return prefix + FieldValidationErrorCodes.INVALID.getCode();
   }
@@ -190,6 +179,15 @@ public class MinMaxDateInputValidator implements SmartValidator {
     } catch (NumberFormatException e) {
       return true;
     }
+  }
+
+  /**
+   * Decide if the error code should be linked to the MIN_YEAR or MAX_YEAR field.
+   * @param errorCode an error code from a min max year validation hint
+   * @return the field to attach the code and message to
+   */
+  private String getFieldFromErrorCode(String errorCode) {
+    return errorCode.contains(MAX_YEAR) ? MAX_YEAR : MIN_YEAR;
   }
 
   public static void addEmptyMinMaxDateAcceptableHint(ValidationType validationType, List<Object> validationHints) {

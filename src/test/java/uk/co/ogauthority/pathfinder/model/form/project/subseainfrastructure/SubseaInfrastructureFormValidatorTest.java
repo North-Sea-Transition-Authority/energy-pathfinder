@@ -16,6 +16,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.validationhint.MaxYearMustBeInFutureHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
 import uk.co.ogauthority.pathfinder.model.form.validation.minmaxdate.MinMaxDateInputValidator;
 import uk.co.ogauthority.pathfinder.testutil.SubseaInfrastructureTestUtil;
@@ -161,7 +162,7 @@ public class SubseaInfrastructureFormValidatorTest {
             SubseaInfrastructureValidationHint.DECOM_YEAR_LABELS.getMaxYearLabel())
         )),
         entry("decommissioningDate.maxYear", Set.of(String.format(
-            MinMaxDateInputValidator.MAX_YEAR_IN_FUTURE_ERROR,
+            MaxYearMustBeInFutureHint.MAX_YEAR_IN_FUTURE_ERROR,
             SubseaInfrastructureValidationHint.DECOM_DATE_LABEL.getInitCappedLabel(),
             SubseaInfrastructureValidationHint.DECOM_YEAR_LABELS.getMaxYearLabel())
         ))
