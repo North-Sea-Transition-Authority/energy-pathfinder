@@ -188,4 +188,12 @@ public class ProjectLocationService {
     return projectLocationBlocksService.getBlockViewsFromForm(form, ValidationType.NO_VALIDATION);
   }
 
+  public List<ProjectLocationBlockView> getValidatedBlockViewsForLocation(ProjectDetail detail) {
+    return projectLocationBlocksService.getBlockViewsForLocation(getOrError(detail), ValidationType.FULL);
+  }
+
+  public List<ProjectLocationBlockView> getValidatedBlockViewsFromForm(ProjectLocationForm form) {
+    return projectLocationBlocksService.getBlockViewsFromForm(form, ValidationType.FULL);
+  }
+
 }

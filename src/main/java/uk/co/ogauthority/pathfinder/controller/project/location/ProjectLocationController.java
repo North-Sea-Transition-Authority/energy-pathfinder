@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.controller.project.location;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,6 +25,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
+import uk.co.ogauthority.pathfinder.model.view.projectlocation.ProjectLocationBlockView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
@@ -51,7 +53,11 @@ public class ProjectLocationController extends ProjectFormPageController {
   @GetMapping
   public ModelAndView getLocationDetails(@PathVariable("projectId") Integer projectId,
                                          ProjectContext projectContext) {
-    return getLocationModelAndView(projectId, locationService.getForm(projectContext.getProjectDetails()));
+    return getLocationModelAndView(
+        projectId,
+        locationService.getForm(projectContext.getProjectDetails()),
+        locationService.getValidatedBlockViewsForLocation(projectContext.getProjectDetails())
+    );
   }
 
   @PostMapping
@@ -63,7 +69,7 @@ public class ProjectLocationController extends ProjectFormPageController {
     bindingResult = locationService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getLocationModelAndView(projectId, form),
+        getLocationModelAndView(projectId, form, locationService.getValidatedBlockViewsFromForm(form)),
         form,
         () -> {
           var projectLocation = locationService.createOrUpdate(projectContext.getProjectDetails(), form);
@@ -74,14 +80,14 @@ public class ProjectLocationController extends ProjectFormPageController {
   }
 
 
-  public ModelAndView getLocationModelAndView(Integer projectId, ProjectLocationForm form) {
+  public ModelAndView getLocationModelAndView(Integer projectId, ProjectLocationForm form, List<ProjectLocationBlockView> blockViews) {
     var modelAndView = new ModelAndView("project/location/location")
         .addObject("fieldsRestUrl", SearchSelectorService.route(on(DevUkRestController.class).searchFields(null)))
         .addObject("blocksRestUrl", SearchSelectorService.route(on(LicenceBlocksRestController.class).searchLicenceBlocks(null)))
         .addObject("form", form)
         .addObject("fieldTypeMap", FieldType.getAllAsMap())
         .addObject("ukcsAreaMap", UkcsArea.getAllAsMap())
-        .addObject("alreadyAddedBlocks", locationService.getUnvalidatedBlockViewsFromForm(form))
+        .addObject("alreadyAddedBlocks", blockViews) //locationService.getValidatedBlockViewsFromForm(form))
         .addObject("preselectedField", locationService.getPreSelectedField(form))
         .addObject("waterDepthUnit", MeasurementUnits.METRES);
 

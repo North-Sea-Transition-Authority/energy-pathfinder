@@ -92,10 +92,10 @@ public class ProjectLocationBlocksService {
   }
 
   public List<ProjectLocationBlockView> getBlockViewsFromForm(ProjectLocationForm form, ValidationType validationType) {
-    return licenceBlocksService.findAllByCompositeKeyInOrdered(form.getLicenceBlocks()).stream()
-        .map(plb -> new ProjectLocationBlockView(
-            plb,
-            isBlockReferenceValid(plb.getCompositeKey(), validationType)
+    return licenceBlocksService.findAllByCompositeKeyInOrdered(form.getLicenceBlocks()).stream() //TODO this will only return ones which exist in the portal
+        .map(plb -> new ProjectLocationBlockView(                                                //Will have to manually add any missing ones in from the projectLocationBlocks table
+             plb,
+             isBlockReferenceValid(plb.getCompositeKey(), validationType)
         )).collect(Collectors.toList());
   }
 
@@ -103,8 +103,8 @@ public class ProjectLocationBlocksService {
   public List<ProjectLocationBlockView> getBlockViewsForLocation(ProjectLocation projectLocation, ValidationType validationType) {
     return projectLocationBlockRepository.findAllByProjectLocationOrderByBlockReference(projectLocation).stream()
         .map(plb -> new ProjectLocationBlockView(
-            plb,
-            isBlockReferenceValid(plb.getCompositeKey(), validationType)
+             plb,
+             isBlockReferenceValid(plb.getCompositeKey(), validationType)
         )).collect(Collectors.toList());
   }
 
