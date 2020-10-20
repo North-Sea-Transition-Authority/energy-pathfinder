@@ -1,9 +1,11 @@
 package uk.co.ogauthority.pathfinder.service.project.location;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -184,16 +186,57 @@ public class ProjectLocationService {
     return projectLocationBlocksService.getBlockViewsForLocation(getOrError(detail), ValidationType.NO_VALIDATION);
   }
 
-  public List<ProjectLocationBlockView> getUnvalidatedBlockViewsFromForm(ProjectLocationForm form) {
-    return projectLocationBlocksService.getBlockViewsFromForm(form, ValidationType.NO_VALIDATION);
+  public List<ProjectLocationBlockView> getUnvalidatedBlockViewsFromForm(ProjectLocationForm form, ProjectDetail detail) {
+    return getBlockViewsFromForm(form, detail, ValidationType.NO_VALIDATION);
   }
 
   public List<ProjectLocationBlockView> getValidatedBlockViewsForLocation(ProjectDetail detail) {
-    return projectLocationBlocksService.getBlockViewsForLocation(getOrError(detail), ValidationType.FULL);
+    var location = findByProjectDetail(detail);
+    return  location.isPresent()
+        ? projectLocationBlocksService.getBlockViewsForLocation(location.get(), ValidationType.FULL)
+        : Collections.emptyList();
   }
 
-  public List<ProjectLocationBlockView> getValidatedBlockViewsFromForm(ProjectLocationForm form) {
-    return projectLocationBlocksService.getBlockViewsFromForm(form, ValidationType.FULL);
+  public List<ProjectLocationBlockView> getValidatedBlockViewsFromForm(ProjectLocationForm form, ProjectDetail detail) {
+    return getBlockViewsFromForm(form, detail, ValidationType.FULL);
+  }
+
+  private List<ProjectLocationBlockView> getBlockViewsFromForm(ProjectLocationForm form,
+                                                               ProjectDetail detail,
+                                                               ValidationType validationType
+  ) {
+    var views =  projectLocationBlocksService.getBlockViewsFromForm(form, validationType);
+
+    if (views.size() != form.getLicenceBlocks().size()) {
+      getMissingPortalBlockViewsFromForm(form, detail, views, validationType);
+    }
+
+    return views;
+  }
+
+  /**
+   * If a block is now invalid it won't have been found in the portal data (licensing hard deletes them).
+   * Find the corresponding block(s) from ProjectLocationLicenceBlocks and add it (them)
+   * @param form Project location form (with more licence block keys than found in the portal data).
+   * @param detail project detail.
+   * @param views the views from the respective projectDetails' ProjectLocationLicenceBlocks
+   */
+  private void getMissingPortalBlockViewsFromForm(ProjectLocationForm form,
+                                                  ProjectDetail detail,
+                                                  List<ProjectLocationBlockView> views,
+                                                  ValidationType validationType
+  ) {
+    var location = findByProjectDetail(detail);
+    var missingViews = form.getLicenceBlocks().stream() //find out which ones are missing
+        // (this will also avoid looking for duplicates)
+        .filter(ref -> views.stream().noneMatch(view -> view.getCompositeKey().equals(ref)))
+        .collect(Collectors.toList());
+
+    views.addAll(location.isPresent()
+        ? projectLocationBlocksService.getBlockViewsByProjectLocationAndCompositeKeyIn(location.get(), missingViews, validationType)
+        : Collections.emptyList()
+    );
+    views.sort(Comparator.comparing(ProjectLocationBlockView::getBlockReference));
   }
 
 }

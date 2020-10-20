@@ -50,6 +50,11 @@
         selectorHintText="For example 44/15"
         restUrl=springUrl(blocksRestUrl)
       />
+      <@fdsDetails.summaryDetails summaryTitle="Why might a licence block be invalid?">
+        <p class="govuk-body">
+          If a licence block has been changed or deleted in PETS since it was first added to your Pathfinder project it's reference here may no longer be up to date and will need to be changed or removed.
+        </p>
+      </@fdsDetails.summaryDetails>
       <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
     </@fdsForm.htmlForm>
 </@defaultPage>

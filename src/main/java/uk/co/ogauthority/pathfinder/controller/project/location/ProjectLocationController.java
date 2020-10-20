@@ -69,7 +69,11 @@ public class ProjectLocationController extends ProjectFormPageController {
     bindingResult = locationService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getLocationModelAndView(projectId, form, locationService.getValidatedBlockViewsFromForm(form)),
+        getLocationModelAndView(projectId, form, locationService.getValidatedBlockViewsFromForm(
+            form,
+            projectContext.getProjectDetails()
+          )
+        ),
         form,
         () -> {
           var projectLocation = locationService.createOrUpdate(projectContext.getProjectDetails(), form);
@@ -87,7 +91,7 @@ public class ProjectLocationController extends ProjectFormPageController {
         .addObject("form", form)
         .addObject("fieldTypeMap", FieldType.getAllAsMap())
         .addObject("ukcsAreaMap", UkcsArea.getAllAsMap())
-        .addObject("alreadyAddedBlocks", blockViews) //locationService.getValidatedBlockViewsFromForm(form))
+        .addObject("alreadyAddedBlocks", blockViews)
         .addObject("preselectedField", locationService.getPreSelectedField(form))
         .addObject("waterDepthUnit", MeasurementUnits.METRES);
 

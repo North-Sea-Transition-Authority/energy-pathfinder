@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +29,7 @@ import uk.co.ogauthority.pathfinder.model.view.projectlocation.ProjectLocationBl
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationBlockRepository;
 import uk.co.ogauthority.pathfinder.service.portal.LicenceBlocksService;
 import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
-import uk.co.ogauthority.pathfinder.testutil.ProjectLocationUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -59,7 +60,7 @@ public class ProjectLocationBlockServiceTest {
 
   private static final ProjectDetail DETAIL = ProjectUtil.getProjectDetails();
 
-  private static final ProjectLocation PROJECT_LOCATION = ProjectLocationUtil.getProjectLocation_withField(DETAIL);
+  private static final ProjectLocation PROJECT_LOCATION = ProjectLocationTestUtil.getProjectLocation_withField(DETAIL);
 
   public static final List<ProjectLocationBlock> PROJECT_LOCATION_BLOCKS = List.of(
       LicenceBlockTestUtil.getProjectLocationBlock(PROJECT_LOCATION, BLOCK_REF_1),
@@ -246,6 +247,43 @@ public class ProjectLocationBlockServiceTest {
     assertBlockViewMatchesProjectLocationBlock(blockViews.get(0), PROJECT_LOCATION_BLOCKS.get(0), false);
     assertBlockViewMatchesProjectLocationBlock(blockViews.get(1), PROJECT_LOCATION_BLOCKS.get(1), true);
     assertBlockViewMatchesProjectLocationBlock(blockViews.get(2), PROJECT_LOCATION_BLOCKS.get(2), false);
+  }
+
+  @Test
+  public void getBlockViewsByProjectLocationAndCompositeKeyIn_allFound() {
+    when(projectLocationBlockRepository.findAllByProjectLocation(PROJECT_LOCATION)).thenReturn(
+        PROJECT_LOCATION_BLOCKS
+    );
+    when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(0).getCompositeKey())).thenReturn(true);
+    when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(1).getCompositeKey())).thenReturn(true);
+    when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(2).getCompositeKey())).thenReturn(false);
+    var form = new ProjectLocationForm();
+    var blockViews = projectLocationBlocksService.getBlockViewsByProjectLocationAndCompositeKeyIn(
+        PROJECT_LOCATION,
+        PROJECT_LOCATION_BLOCKS.stream().map(ProjectLocationBlock::getCompositeKey).collect(Collectors.toList()),
+        ValidationType.FULL
+    );
+    assertThat(blockViews.size()).isEqualTo(3);
+    assertBlockViewMatchesBlock(blockViews.get(0), BLOCKS.get(0), true);
+    assertBlockViewMatchesBlock(blockViews.get(1), BLOCKS.get(1), true);
+    assertBlockViewMatchesBlock(blockViews.get(2), BLOCKS.get(2), false);
+  }
+
+  @Test
+  public void getBlockViewsByProjectLocationAndCompositeKeyIn_oneNotFound() {
+    when(projectLocationBlockRepository.findAllByProjectLocation(PROJECT_LOCATION)).thenReturn(
+        PROJECT_LOCATION_BLOCKS
+    );
+    when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(0).getCompositeKey())).thenReturn(true);
+    when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(2).getCompositeKey())).thenReturn(false);
+    var blockViews = projectLocationBlocksService.getBlockViewsByProjectLocationAndCompositeKeyIn(
+        PROJECT_LOCATION,
+        List.of(PROJECT_LOCATION_BLOCKS.get(0).getCompositeKey(), PROJECT_LOCATION_BLOCKS.get(2).getCompositeKey()),
+        ValidationType.FULL
+    );
+    assertThat(blockViews.size()).isEqualTo(2);
+    assertBlockViewMatchesBlock(blockViews.get(0), BLOCKS.get(0), true);
+    assertBlockViewMatchesBlock(blockViews.get(1), BLOCKS.get(2), false);
   }
 
   @Test
