@@ -11,6 +11,7 @@ import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedwell.DecommissionedWellController;
+import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedRigController;
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.SubseaInfrastructureController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
@@ -88,6 +89,17 @@ public class BreadcrumbService {
     var map = taskList(projectId);
     String route = ReverseRouter.route(on(SubseaInfrastructureController.class).getSubseaStructures(projectId, null));
     map.put(route, SubseaInfrastructureController.SUMMARY_PAGE_NAME);
+    return map;
+  }
+
+  public void fromIntegrateRig(Integer projectId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, integratedRig(projectId), thisPage);
+  }
+
+  private Map<String, String> integratedRig(Integer projectId) {
+    var map = taskList(projectId);
+    String route = ReverseRouter.route(on(IntegratedRigController.class).getIntegratedRigs(projectId, null));
+    map.put(route, IntegratedRigController.SUMMARY_PAGE_NAME);
     return map;
   }
 

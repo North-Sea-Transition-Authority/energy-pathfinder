@@ -13,6 +13,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusC
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedwell.DecommissionedWellController;
+import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedRigController;
 import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationController;
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
@@ -135,6 +136,12 @@ public class TaskListController {
     modelAndView.addObject("subseaInfrastructureCompleted", subseaInfrastructureService.isComplete(
         projectDetails
     ));
+
+    modelAndView.addObject("integratedRigUrl",
+        ReverseRouter.route(on(IntegratedRigController.class).getIntegratedRigs(projectId, null))
+    );
+    modelAndView.addObject("integratedRigText", IntegratedRigController.SUMMARY_PAGE_NAME);
+    modelAndView.addObject("integratedRigCompleted", false); // TODO: PAT-210
 
     return modelAndView;
   }

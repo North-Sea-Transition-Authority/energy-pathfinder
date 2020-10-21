@@ -8,7 +8,7 @@
   <@fdsForm.htmlForm>
     <@fdsSearchSelector.searchSelectorRest
       path="form.structure"
-      selectorMinInputLength=0
+      selectorMinInputLength=1
       labelText="What structure does this subsea infrastructure belong to?"
       restUrl=springUrl(facilitiesRestUrl)
       preselectedItems=preSelectedFacilityMap!{}
