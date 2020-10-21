@@ -54,7 +54,7 @@ public class IntegratedRigController extends ProjectFormPageController {
 
   @GetMapping("/integrated-rig")
   public ModelAndView addIntegratedRig(@PathVariable("projectId") Integer projectId,
-                                              ProjectContext projectContext) {
+                                       ProjectContext projectContext) {
     return getIntegratedRigModelAndView(projectId, new IntegratedRigForm());
   }
 
