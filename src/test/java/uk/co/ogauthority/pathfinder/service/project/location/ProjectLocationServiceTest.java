@@ -257,6 +257,38 @@ public class ProjectLocationServiceTest {
   }
 
   @Test
+  public void getUnValidatedBlockViewsForLocation_noneLinked() {
+    //Just a wrapper call really - logic tested in ProjectLocationBlockServiceTest.
+    projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(details);
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectLocation));
+    var blocks = projectLocationService.getUnvalidatedBlockViewsForLocation(details);
+    assertThat(blocks).isEmpty();
+  }
+
+  @Test
+  public void getUnValidatedBlockViewsForLocation_noProjectLocation() {
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
+    var blocks = projectLocationService.getUnvalidatedBlockViewsForLocation(details);
+    assertThat(blocks).isEmpty();
+  }
+
+  @Test
+  public void getValidatedBlockViewsForLocation_noneLinked() {
+    //Just a wrapper call really - logic tested in ProjectLocationBlockServiceTest.
+    projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(details);
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectLocation));
+    var blocks = projectLocationService.getValidatedBlockViewsForLocation(details);
+    assertThat(blocks).isEmpty();
+  }
+
+  @Test
+  public void getValidatedBlockViewsForLocation_noProjectLocation() {
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
+    var blocks = projectLocationService.getValidatedBlockViewsForLocation(details);
+    assertThat(blocks).isEmpty();
+  }
+
+  @Test
   public void getValidatedBlockViewsForLocation() {
     projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(details);
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectLocation));

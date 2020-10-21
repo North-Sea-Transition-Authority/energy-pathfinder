@@ -183,7 +183,7 @@ public class ProjectLocationService {
   }
 
   public List<ProjectLocationBlockView> getUnvalidatedBlockViewsForLocation(ProjectDetail detail) {
-    return projectLocationBlocksService.getBlockViewsForLocation(getOrError(detail), ValidationType.NO_VALIDATION);
+    return getBlockViewsForLocation(detail, ValidationType.NO_VALIDATION);
   }
 
   public List<ProjectLocationBlockView> getUnvalidatedBlockViewsFromForm(ProjectLocationForm form, ProjectDetail detail) {
@@ -191,9 +191,13 @@ public class ProjectLocationService {
   }
 
   public List<ProjectLocationBlockView> getValidatedBlockViewsForLocation(ProjectDetail detail) {
+    return getBlockViewsForLocation(detail, ValidationType.FULL);
+  }
+
+  private List<ProjectLocationBlockView> getBlockViewsForLocation(ProjectDetail detail, ValidationType validationType) {
     var location = findByProjectDetail(detail);
     return  location.isPresent()
-        ? projectLocationBlocksService.getBlockViewsForLocation(location.get(), ValidationType.FULL)
+        ? projectLocationBlocksService.getBlockViewsForLocation(location.get(), validationType)
         : Collections.emptyList();
   }
 
@@ -226,17 +230,18 @@ public class ProjectLocationService {
                                                   List<ProjectLocationBlockView> views,
                                                   ValidationType validationType
   ) {
-    var location = findByProjectDetail(detail);
-    var missingViews = form.getLicenceBlocks().stream() //find out which ones are missing
-        // (this will also avoid looking for duplicates)
-        .filter(ref -> views.stream().noneMatch(view -> view.getCompositeKey().equals(ref)))
-        .collect(Collectors.toList());
+    findByProjectDetail(detail).ifPresent(location -> {
+      var missingViews = form.getLicenceBlocks().stream() //find out which ones are missing
+          // (this will also avoid looking for duplicates)
+          .filter(ref -> views.stream().noneMatch(view -> view.getCompositeKey().equals(ref)))
+          .collect(Collectors.toList());
 
-    views.addAll(location.isPresent()
-        ? projectLocationBlocksService.getBlockViewsByProjectLocationAndCompositeKeyIn(location.get(), missingViews, validationType)
-        : Collections.emptyList()
-    );
-    views.sort(Comparator.comparing(ProjectLocationBlockView::getBlockReference));
+      views.addAll(
+          projectLocationBlocksService.getBlockViewsByProjectLocationAndCompositeKeyIn(location, missingViews, validationType)
+      );
+      views.sort(Comparator.comparing(ProjectLocationBlockView::getBlockReference));
+    });
+
   }
 
 }

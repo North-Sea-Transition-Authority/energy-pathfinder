@@ -40,5 +40,4 @@ FROM (
   FROM pedmgr.ped_current_licence_blocks pclb
   JOIN ${datasource.user}.ped_licences pl
   ON pl.licence_type = pclb.licence_type AND pl.licence_number = pclb.licence_no
-  WHERE pclb.block_ref != '44/11b' --TODO Remove
 ) b;
