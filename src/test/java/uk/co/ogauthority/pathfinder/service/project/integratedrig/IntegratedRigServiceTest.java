@@ -138,5 +138,4 @@ public class IntegratedRigServiceTest {
     assertThat(persistedIntegratedRig.getManualFacility()).isEqualTo(SearchSelectorService.removePrefix(manualEntryFacility));
     checkCommonIntegratedRigEntityFields(persistedIntegratedRig, form);
   }
-
 }

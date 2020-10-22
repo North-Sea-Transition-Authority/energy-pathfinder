@@ -24,6 +24,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
+import uk.co.ogauthority.pathfinder.service.project.integratedrig.IntegratedRigService;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
@@ -57,6 +58,9 @@ public class TaskListControllerTest extends ProjectContextAbstractControllerTest
 
   @MockBean
   SubseaInfrastructureService subseaInfrastructureService;
+
+  @MockBean
+  IntegratedRigService integratedRigService;
 
   @MockBean
   private PlatformsFpsosService platformsFpsosService;
