@@ -1,9 +1,9 @@
 package uk.co.ogauthority.pathfinder.service.project.integratedrig;
 
 import java.util.Map;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.integratedrig.IntegratedRig;
@@ -47,7 +47,6 @@ public class IntegratedRigService {
     return validationService.validate(form, bindingResult, validationType);
   }
 
-  @Transactional
   public IntegratedRig createIntegratedRig(ProjectDetail projectDetail, IntegratedRigForm form) {
     var integratedRig = new IntegratedRig();
     return createOrUpdateIntegratedRig(integratedRig, projectDetail, form);
