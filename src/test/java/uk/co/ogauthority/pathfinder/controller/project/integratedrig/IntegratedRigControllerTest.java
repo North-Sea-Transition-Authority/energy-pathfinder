@@ -8,10 +8,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +41,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 import uk.co.ogauthority.pathfinder.testutil.IntegratedRigTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(
@@ -90,6 +93,70 @@ public class IntegratedRigControllerTest extends ProjectContextAbstractControlle
         on(IntegratedRigController.class).getIntegratedRigs(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void saveIntegratedRigs_whenUnauthenticated_thenNoAccess() throws Exception {
+    var integratedRigViews = List.of(
+        IntegratedRigTestUtil.createIntegratedRigView(),
+        IntegratedRigTestUtil.createIntegratedRigView()
+    );
+
+    when(integratedRigSummaryService.getValidatedIntegratedRigSummaryViews(projectDetail)).thenReturn(integratedRigViews);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(IntegratedRigController.class)
+            .saveIntegratedRigs(PROJECT_ID, null)
+        ))
+            .with(authenticatedUserAndSession(unauthenticatedUser))
+            .with(csrf()))
+        .andExpect(status().isForbidden());
+
+    verify(integratedRigSummaryService, times(0)).validateViews(any());
+  }
+
+  @Test
+  public void saveIntegratedRigs_whenValid_thenRedirect() throws Exception {
+    var integratedRigViews = List.of(
+        IntegratedRigTestUtil.createIntegratedRigView(),
+        IntegratedRigTestUtil.createIntegratedRigView()
+    );
+
+    when(integratedRigSummaryService.getValidatedIntegratedRigSummaryViews(projectDetail)).thenReturn(integratedRigViews);
+    when(integratedRigSummaryService.validateViews(integratedRigViews)).thenReturn(ValidationResult.VALID);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(IntegratedRigController.class)
+            .saveIntegratedRigs(PROJECT_ID, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf()))
+        .andExpect(status().is3xxRedirection());
+
+    verify(integratedRigSummaryService, times(1)).validateViews(any());
+  }
+
+  @Test
+  public void saveIntegratedRigs_whenInvalid_thenReturnErrors() throws Exception {
+    var integratedRigViews = List.of(
+        IntegratedRigTestUtil.createIntegratedRigView(),
+        IntegratedRigTestUtil.createIntegratedRigView()
+    );
+
+    when(integratedRigSummaryService.getValidatedIntegratedRigSummaryViews(projectDetail)).thenReturn(integratedRigViews);
+    when(integratedRigSummaryService.validateViews(integratedRigViews)).thenReturn(ValidationResult.INVALID);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(IntegratedRigController.class)
+            .saveIntegratedRigs(PROJECT_ID, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf()))
+        .andExpect(status().isOk())
+        .andExpect(model().attributeExists("errorList"));
+
+    verify(integratedRigSummaryService, times(1)).validateViews(any());
+    verify(integratedRigSummaryService, times(1)).getIntegratedRigViewErrors(any());
   }
 
   @Test
@@ -274,6 +341,154 @@ public class IntegratedRigControllerTest extends ProjectContextAbstractControlle
 
     verify(integratedRigService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
     verify(integratedRigService, times(0)).createIntegratedRig(any(), any());
+  }
+
+  @Test
+  public void updateIntegratedRig_whenUnauthenticatedPartialSave_thenNoAccess() throws Exception {
+    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
+    }};
+
+    var form = new IntegratedRigForm();
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    when(integratedRigService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(IntegratedRigController.class)
+            .updateIntegratedRig(PROJECT_ID, INTEGRATED_RIG_ID, form, bindingResult, ValidationType.PARTIAL, null)
+        ))
+            .with(authenticatedUserAndSession(unauthenticatedUser))
+            .with(csrf())
+            .params(completeLaterParams))
+        .andExpect(status().isForbidden());
+
+    verify(integratedRigService, times(0)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(integratedRigService, times(0)).updateIntegratedRig(any(), any(), any());
+  }
+
+  @Test
+  public void updateIntegratedRig_whenUnauthenticatedFullSave_thenNoAccess() throws Exception {
+    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
+    }};
+
+    var form = new IntegratedRigForm();
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    when(integratedRigService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(IntegratedRigController.class)
+            .updateIntegratedRig(PROJECT_ID, INTEGRATED_RIG_ID, form, bindingResult, ValidationType.FULL, null)
+        ))
+            .with(authenticatedUserAndSession(unauthenticatedUser))
+            .with(csrf())
+            .params(completeLaterParams))
+        .andExpect(status().isForbidden());
+
+    verify(integratedRigService, times(0)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(integratedRigService, times(0)).updateIntegratedRig(any(), any(), any());
+  }
+
+  @Test
+  public void updateIntegratedRig_whenValidFormAndPartialSave_thenCreate() throws Exception {
+    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
+    }};
+
+    var form = new IntegratedRigForm();
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    when(integratedRigService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(IntegratedRigController.class)
+            .updateIntegratedRig(PROJECT_ID, INTEGRATED_RIG_ID, form, bindingResult, ValidationType.PARTIAL, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeLaterParams))
+        .andExpect(status().is3xxRedirection());
+
+    verify(integratedRigService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(integratedRigService, times(1)).updateIntegratedRig(any(), any(), any());
+  }
+
+  @Test
+  public void updateIntegratedRig_whenValidFormAndFullSave_thenCreate() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    var form = new IntegratedRigForm();
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    when(integratedRigService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(IntegratedRigController.class)
+            .updateIntegratedRig(PROJECT_ID, INTEGRATED_RIG_ID, form, bindingResult, ValidationType.FULL, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().is3xxRedirection());
+
+    verify(integratedRigService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(integratedRigService, times(1)).updateIntegratedRig(any(), any(), any());
+  }
+
+  @Test
+  public void updateIntegratedRig_whenInvalidFormAndFullSave_thenNoCreate() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    var form = new IntegratedRigForm();
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
+
+    when(integratedRigService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(IntegratedRigController.class)
+            .updateIntegratedRig(PROJECT_ID, INTEGRATED_RIG_ID, form, bindingResult, ValidationType.FULL, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().isOk());
+
+    verify(integratedRigService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(integratedRigService, times(0)).updateIntegratedRig(any(), any(), any());
+  }
+
+  @Test
+  public void updateIntegratedRig_whenInvalidFormAndPartialSave_thenNoCreate() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    var form = new IntegratedRigForm();
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
+
+    when(integratedRigService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(IntegratedRigController.class)
+            .updateIntegratedRig(PROJECT_ID, INTEGRATED_RIG_ID, form, bindingResult, ValidationType.FULL, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().isOk());
+
+    verify(integratedRigService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(integratedRigService, times(0)).updateIntegratedRig(any(), any(), any());
   }
 
   @Test
