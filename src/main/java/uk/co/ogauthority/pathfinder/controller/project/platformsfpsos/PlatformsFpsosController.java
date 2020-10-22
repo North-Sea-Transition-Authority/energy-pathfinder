@@ -17,7 +17,6 @@ import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.DevUkRestController;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -61,7 +60,6 @@ public class PlatformsFpsosController extends ProjectFormPageController {
   public ModelAndView viewPlatformFpso(@PathVariable("projectId") Integer projectId,
                                        ProjectContext projectContext) {
     return getViewPlatformsFpsosModelAndView(
-        projectContext.getProjectDetails(),
         projectId,
         platformsFpsosSummaryService.getSummaryViews(projectContext.getProjectDetails()),
         ValidationResult.NOT_VALIDATED
@@ -76,7 +74,6 @@ public class PlatformsFpsosController extends ProjectFormPageController {
 
     if (validationResult.equals(ValidationResult.INVALID)) {
       return getViewPlatformsFpsosModelAndView(
-          projectContext.getProjectDetails(),
           projectId,
           views,
           validationResult
@@ -177,8 +174,7 @@ public class PlatformsFpsosController extends ProjectFormPageController {
     return modelAndView;
   }
 
-  private ModelAndView getViewPlatformsFpsosModelAndView(ProjectDetail detail,
-                                                         Integer projectId,
+  private ModelAndView getViewPlatformsFpsosModelAndView(Integer projectId,
                                                          List<PlatformFpsoView> views,
                                                          ValidationResult validationResult
 

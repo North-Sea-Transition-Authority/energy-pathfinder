@@ -5,29 +5,16 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarter;
 
 @Entity
 @Table(name = "project_information")
-public class ProjectInformation implements ContactDetailCapture {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
-  @ManyToOne
-  @JoinColumn(name = "project_detail_id")
-  private ProjectDetail projectDetail;
+public class ProjectInformation extends ProjectDetailEntity implements ContactDetailCapture {
 
   @Enumerated(EnumType.STRING)
   private FieldStage fieldStage;
@@ -57,18 +44,6 @@ public class ProjectInformation implements ContactDetailCapture {
   private Integer decomWorkStartDateYear;
 
   private LocalDate productionCessationDate;
-
-  public Integer getId() {
-    return id;
-  }
-
-  public ProjectDetail getProjectDetail() {
-    return projectDetail;
-  }
-
-  public void setProjectDetail(ProjectDetail projectDetail) {
-    this.projectDetail = projectDetail;
-  }
 
   public FieldStage getFieldStage() {
     return fieldStage;
@@ -133,7 +108,6 @@ public class ProjectInformation implements ContactDetailCapture {
   public String getName() {
     return getContactName();
   }
-
 
   public Quarter getFirstProductionDateQuarter() {
     return firstProductionDateQuarter;

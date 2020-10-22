@@ -4,29 +4,19 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkFacility;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.FuturePlans;
 import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.SubstructureRemovalPremise;
 
 @Entity
 @Table(name = "platforms_fpsos")
-public class PlatformFpso {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
-  @ManyToOne
-  @JoinColumn(name = "project_detail_id")
-  private ProjectDetail projectDetail;
+public class PlatformFpso extends ProjectDetailEntity {
 
   @ManyToOne
   @JoinColumn(name = "facility_id")
@@ -81,18 +71,6 @@ public class PlatformFpso {
   public PlatformFpso(ProjectDetail projectDetail, String manualStructureName) {
     this.projectDetail = projectDetail;
     this.manualStructureName = manualStructureName;
-  }
-
-  public Integer getId() {
-    return id;
-  }
-
-  public ProjectDetail getProjectDetail() {
-    return projectDetail;
-  }
-
-  public void setProjectDetail(ProjectDetail projectDetail) {
-    this.projectDetail = projectDetail;
   }
 
   public DevUkFacility getStructure() {

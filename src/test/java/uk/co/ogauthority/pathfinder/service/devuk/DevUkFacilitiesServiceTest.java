@@ -174,8 +174,7 @@ public class DevUkFacilitiesServiceTest {
     when(devUkFacilitiesRepository.findById(facilityId)).thenReturn(Optional.of(facility));
 
     var result = devUkFacilitiesService.findById(facilityId);
-    assertThat(result).isPresent();
-    assertThat(result.get()).isEqualTo(facility);
+    assertThat(result).contains(facility);
   }
 
   @Test

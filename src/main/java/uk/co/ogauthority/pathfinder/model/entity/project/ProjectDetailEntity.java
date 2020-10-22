@@ -12,11 +12,11 @@ public abstract class ProjectDetailEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
+  protected Integer id;
 
   @ManyToOne
   @JoinColumn(name = "project_detail_id")
-  private ProjectDetail projectDetail;
+  protected ProjectDetail projectDetail;
 
   public Integer getId() {
     return id;

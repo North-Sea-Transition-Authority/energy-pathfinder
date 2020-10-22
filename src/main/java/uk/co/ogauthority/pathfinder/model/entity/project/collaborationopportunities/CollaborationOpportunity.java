@@ -4,29 +4,16 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
 
 @Entity
 @Table(name = "collaboration_opportunities")
-public class CollaborationOpportunity implements ContactDetailCapture {
-
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
-  @ManyToOne
-  @JoinColumn(name = "project_detail_id")
-  private ProjectDetail projectDetail;
+public class CollaborationOpportunity extends ProjectDetailEntity implements ContactDetailCapture {
 
   @Enumerated(EnumType.STRING)
   private Function function;
@@ -51,18 +38,6 @@ public class CollaborationOpportunity implements ContactDetailCapture {
   }
 
   public CollaborationOpportunity(ProjectDetail projectDetail) {
-    this.projectDetail = projectDetail;
-  }
-
-  public Integer getId() {
-    return id;
-  }
-
-  public ProjectDetail getProjectDetail() {
-    return projectDetail;
-  }
-
-  public void setProjectDetail(ProjectDetail projectDetail) {
     this.projectDetail = projectDetail;
   }
 

@@ -3,13 +3,8 @@ package uk.co.ogauthority.pathfinder.model.entity.project.decommissionedwell;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 import uk.co.ogauthority.pathfinder.model.enums.project.InputEntryType;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedwell.DecommissionedWellType;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedwell.WellMechanicalStatus;
@@ -18,15 +13,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarte
 
 @Entity
 @Table(name = "decommissioned_wells")
-public class DecommissionedWell {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
-  @ManyToOne
-  @JoinColumn(name = "project_detail_id")
-  private ProjectDetail projectDetail;
+public class DecommissionedWell extends ProjectDetailEntity {
 
   @Enumerated(EnumType.STRING)
   private DecommissionedWellType type;
@@ -52,14 +39,6 @@ public class DecommissionedWell {
   private WellMechanicalStatus mechanicalStatus;
 
   private String manualMechanicalStatus;
-
-  public ProjectDetail getProjectDetail() {
-    return projectDetail;
-  }
-
-  public void setProjectDetail(ProjectDetail projectDetail) {
-    this.projectDetail = projectDetail;
-  }
 
   public DecommissionedWellType getType() {
     return type;
