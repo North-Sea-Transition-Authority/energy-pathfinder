@@ -209,7 +209,7 @@ public class IntegratedRigController extends ProjectFormPageController {
   }
 
   private ModelAndView removeIntegratedRigModelAndView(Integer projectId, IntegratedRigView integratedRigView) {
-    var modelAndView = new ModelAndView("project/integratedRig/removeIntegratedRig")
+    var modelAndView = new ModelAndView("project/integratedrig/removeIntegratedRig")
         .addObject("integratedRigView", integratedRigView)
         .addObject("cancelUrl", getIntegratedRigSummaryUrl(projectId))
         .addObject("pageName", REMOVE_PAGE_NAME);

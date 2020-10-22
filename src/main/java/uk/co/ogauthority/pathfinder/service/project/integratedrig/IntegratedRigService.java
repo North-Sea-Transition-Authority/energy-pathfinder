@@ -79,7 +79,6 @@ public class IntegratedRigService {
     return createOrUpdateIntegratedRig(integratedRig, projectDetail, form);
   }
 
-  @Transactional
   public IntegratedRig updateIntegratedRig(Integer integratedRigId,
                                            ProjectDetail projectDetail,
                                            IntegratedRigForm form) {
