@@ -128,7 +128,7 @@ public class SubseaInfrastructureServiceTest {
     }
   }
 
-  private void assertCorrectionValidation(SubseaInfrastructureForm form, ValidationType validationType, List<Object> hintClass) {
+  private void assertCorrectValidation(SubseaInfrastructureForm form, ValidationType validationType, List<Object> hintClass) {
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
@@ -292,56 +292,56 @@ public class SubseaInfrastructureServiceTest {
   public void validate_whenConcreteTypeAndPartial() {
     var form = new SubseaInfrastructureForm();
     form.setInfrastructureType(SubseaInfrastructureType.CONCRETE_MATTRESSES);
-    assertCorrectionValidation(form, ValidationType.PARTIAL, List.of(ConcreteMattressPartialValidation.class));
+    assertCorrectValidation(form, ValidationType.PARTIAL, List.of(ConcreteMattressPartialValidation.class));
   }
 
   @Test
   public void validate_whenConcreteTypeAndFull() {
     var form = new SubseaInfrastructureForm();
     form.setInfrastructureType(SubseaInfrastructureType.CONCRETE_MATTRESSES);
-    assertCorrectionValidation(form, ValidationType.FULL, List.of(ConcreteMattressFullValidation.class));
+    assertCorrectValidation(form, ValidationType.FULL, List.of(ConcreteMattressFullValidation.class));
   }
 
   @Test
   public void validate_whenSubseaStructureTypeAndPartial() {
     var form = new SubseaInfrastructureForm();
     form.setInfrastructureType(SubseaInfrastructureType.SUBSEA_STRUCTURE);
-    assertCorrectionValidation(form, ValidationType.PARTIAL, List.of(SubseaStructurePartialValidation.class));
+    assertCorrectValidation(form, ValidationType.PARTIAL, List.of(SubseaStructurePartialValidation.class));
   }
 
   @Test
   public void validate_whenSubseaStructureTypeAndFull() {
     var form = new SubseaInfrastructureForm();
     form.setInfrastructureType(SubseaInfrastructureType.SUBSEA_STRUCTURE);
-    assertCorrectionValidation(form, ValidationType.FULL, List.of(SubseaStructureFullValidation.class));
+    assertCorrectValidation(form, ValidationType.FULL, List.of(SubseaStructureFullValidation.class));
   }
 
   @Test
   public void validate_whenOtherInfrastructureTypeAndPartial() {
     var form = new SubseaInfrastructureForm();
     form.setInfrastructureType(SubseaInfrastructureType.OTHER);
-    assertCorrectionValidation(form, ValidationType.PARTIAL, List.of(OtherSubseaStructurePartialValidation.class));
+    assertCorrectValidation(form, ValidationType.PARTIAL, List.of(OtherSubseaStructurePartialValidation.class));
   }
 
   @Test
   public void validate_whenOtherInfrastructureTypeAndFull() {
     var form = new SubseaInfrastructureForm();
     form.setInfrastructureType(SubseaInfrastructureType.OTHER);
-    assertCorrectionValidation(form, ValidationType.FULL, List.of(OtherSubseaStructureFullValidation.class));
+    assertCorrectValidation(form, ValidationType.FULL, List.of(OtherSubseaStructureFullValidation.class));
   }
 
   @Test
   public void validate_whenNoTypeSetAndPartial() {
     var form = new SubseaInfrastructureForm();
     form.setInfrastructureType(null);
-    assertCorrectionValidation(form, ValidationType.PARTIAL, List.of());
+    assertCorrectValidation(form, ValidationType.PARTIAL, List.of());
   }
 
   @Test
   public void validate_whenNoTypeSetAndFull() {
     var form = new SubseaInfrastructureForm();
     form.setInfrastructureType(null);
-    assertCorrectionValidation(form, ValidationType.FULL, List.of());
+    assertCorrectValidation(form, ValidationType.FULL, List.of());
   }
 
   @Test

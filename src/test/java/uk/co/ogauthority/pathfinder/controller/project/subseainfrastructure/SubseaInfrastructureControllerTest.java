@@ -154,8 +154,8 @@ public class SubseaInfrastructureControllerTest extends ProjectContextAbstractCo
 
   @Test
   public void createSubseaInfrastructure_whenUnauthenticatedFullSave_thenNoAccess() throws Exception {
-    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
-      add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
 
     var form = new SubseaInfrastructureForm();
@@ -169,7 +169,7 @@ public class SubseaInfrastructureControllerTest extends ProjectContextAbstractCo
         ))
             .with(authenticatedUserAndSession(unauthenticatedUser))
             .with(csrf())
-            .params(completeLaterParams))
+            .params(completeParams))
         .andExpect(status().isForbidden());
 
     verify(subseaInfrastructureService, times(0)).validate(any(), any(), eq(ValidationType.FULL));
@@ -252,8 +252,8 @@ public class SubseaInfrastructureControllerTest extends ProjectContextAbstractCo
 
   @Test
   public void createSubseaInfrastructure_whenInvalidFormAndPartialSave_thenNoCreate() throws Exception {
-    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
-      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
     }};
 
     var form = new SubseaInfrastructureForm();
@@ -265,14 +265,14 @@ public class SubseaInfrastructureControllerTest extends ProjectContextAbstractCo
 
     mockMvc.perform(
         post(ReverseRouter.route(on(SubseaInfrastructureController.class)
-            .createSubseaInfrastructure(PROJECT_ID, form, bindingResult, ValidationType.FULL, null)
+            .createSubseaInfrastructure(PROJECT_ID, form, bindingResult, ValidationType.PARTIAL, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())
-            .params(completeParams))
+            .params(completeLaterParams))
         .andExpect(status().isOk());
 
-    verify(subseaInfrastructureService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(subseaInfrastructureService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
     verify(subseaInfrastructureService, times(0)).createSubseaInfrastructure(any(), any());
   }
 

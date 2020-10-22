@@ -100,7 +100,7 @@ public class IntegratedRigController extends ProjectFormPageController {
         .addObject("integratedRigStatuses", IntegratedRigStatus.getAllAsMap())
         .addObject("integratedRigIntentionsToReactivate", IntegratedRigIntentionToReactivate.getAllAsMap());
 
-    breadcrumbService.fromIntegrateRig(projectId, modelAndView, FORM_PAGE_NAME);
+    breadcrumbService.fromIntegratedRig(projectId, modelAndView, FORM_PAGE_NAME);
 
     return modelAndView;
   }

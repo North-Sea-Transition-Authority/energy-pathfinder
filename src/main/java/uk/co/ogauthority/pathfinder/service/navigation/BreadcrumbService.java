@@ -92,7 +92,7 @@ public class BreadcrumbService {
     return map;
   }
 
-  public void fromIntegrateRig(Integer projectId, ModelAndView modelAndView, String thisPage) {
+  public void fromIntegratedRig(Integer projectId, ModelAndView modelAndView, String thisPage) {
     addAttrs(modelAndView, integratedRig(projectId), thisPage);
   }
 

@@ -127,8 +127,8 @@ public class IntegratedRigControllerTest extends ProjectContextAbstractControlle
 
   @Test
   public void createIntegratedRig_whenUnauthenticatedFullSave_thenNoAccess() throws Exception {
-    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
-      add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
 
     var form = new IntegratedRigForm();
@@ -142,7 +142,7 @@ public class IntegratedRigControllerTest extends ProjectContextAbstractControlle
         ))
             .with(authenticatedUserAndSession(unauthenticatedUser))
             .with(csrf())
-            .params(completeLaterParams))
+            .params(completeParams))
         .andExpect(status().isForbidden());
 
     verify(integratedRigService, times(0)).validate(any(), any(), eq(ValidationType.FULL));
@@ -225,8 +225,8 @@ public class IntegratedRigControllerTest extends ProjectContextAbstractControlle
 
   @Test
   public void createIntegratedRig_whenInvalidFormAndPartialSave_thenNoCreate() throws Exception {
-    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
-      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
     }};
 
     var form = new IntegratedRigForm();
@@ -238,14 +238,14 @@ public class IntegratedRigControllerTest extends ProjectContextAbstractControlle
 
     mockMvc.perform(
         post(ReverseRouter.route(on(IntegratedRigController.class)
-            .createIntegratedRig(PROJECT_ID, form, bindingResult, ValidationType.FULL, null)
+            .createIntegratedRig(PROJECT_ID, form, bindingResult, ValidationType.PARTIAL, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())
-            .params(completeParams))
+            .params(completeLaterParams))
         .andExpect(status().isOk());
 
-    verify(integratedRigService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(integratedRigService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
     verify(integratedRigService, times(0)).createIntegratedRig(any(), any());
   }
 }

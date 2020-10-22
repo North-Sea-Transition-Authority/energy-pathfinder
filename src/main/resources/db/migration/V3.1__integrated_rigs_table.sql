@@ -5,7 +5,7 @@ CREATE TABLE ${datasource.user}.integrated_rigs (
 , manual_facility VARCHAR2(4000)
 , name VARCHAR2(4000)
 , status VARCHAR2(4000)
-, intention_to_reactivate VARCHAR2(400)
+, intention_to_reactivate VARCHAR2(4000)
 , CONSTRAINT int_rig_project_detail_fk FOREIGN KEY (project_detail_id) REFERENCES ${datasource.user}.project_details (id)
 ) TABLESPACE tbsdata;
 

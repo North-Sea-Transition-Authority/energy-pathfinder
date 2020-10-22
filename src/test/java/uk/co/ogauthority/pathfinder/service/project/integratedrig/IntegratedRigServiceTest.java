@@ -64,7 +64,7 @@ public class IntegratedRigServiceTest {
     assertThat(integratedRig.getIntentionToReactivate()).isEqualTo(form.getIntentionToReactivate());
   }
 
-  private void assertCorrectionValidation(IntegratedRigForm form, ValidationType validationType) {
+  private void assertCorrectValidation(IntegratedRigForm form, ValidationType validationType) {
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
@@ -95,13 +95,13 @@ public class IntegratedRigServiceTest {
   @Test
   public void validate_whenPartial() {
     var form = new IntegratedRigForm();
-    assertCorrectionValidation(form, ValidationType.PARTIAL);
+    assertCorrectValidation(form, ValidationType.PARTIAL);
   }
 
   @Test
   public void validate_whenFull() {
     var form = new IntegratedRigForm();
-    assertCorrectionValidation(form, ValidationType.FULL);
+    assertCorrectValidation(form, ValidationType.FULL);
   }
 
   @Test
