@@ -11,7 +11,10 @@ public final class SubseaInfrastructureValidationHint {
 
   public static final FormInputLabel DECOM_DATE_LABEL = new FormInputLabel("decommissioning date");
   public static final MinMaxYearLabelsHint DECOM_YEAR_LABELS = new MinMaxYearLabelsHint("earliest", "latest");
-  public static final MaxYearMustBeInFutureHint DECOM_MAX_YEAR_HINT = new MaxYearMustBeInFutureHint();
+  public static final MaxYearMustBeInFutureHint DECOM_MAX_YEAR_HINT = new MaxYearMustBeInFutureHint(
+      DECOM_DATE_LABEL,
+      DECOM_YEAR_LABELS
+  );
 
   private final ValidationType validationType;
 

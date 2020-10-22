@@ -291,7 +291,10 @@ public class MinMaxDateInputValidatorTest {
   public void fullValidationValidDates_maxDateNotInFutureWithHint_invalid() {
     input = new MinMaxDateInput("2019", String.valueOf(LocalDate.now().minusYears(1L).getYear()));
     var errors = new BeanPropertyBindingResult(input, "form");
-    Object[] hints = {inputLabel, new MaxYearMustBeInFutureHint()};
+    Object[] hints = {inputLabel, new MaxYearMustBeInFutureHint(
+        inputLabel,
+        new MinMaxYearLabelsHint(MinMaxDateInputValidator.MIN_YEAR_TEXT, MinMaxDateInputValidator.MAX_YEAR_TEXT)
+    )};
     ValidationUtils.invokeValidator(validator, input, errors, hints);
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
@@ -304,7 +307,7 @@ public class MinMaxDateInputValidatorTest {
         entry(
             MinMaxDateInputValidator.MAX_YEAR,
             Set.of(String.format(
-                MinMaxDateInputValidator.MAX_YEAR_IN_FUTURE_ERROR, inputLabel.getInitCappedLabel(),
+                MaxYearMustBeInFutureHint.MAX_YEAR_IN_FUTURE_ERROR, inputLabel.getInitCappedLabel(),
                 MinMaxDateInputValidator.MAX_YEAR_TEXT
             ))
         )
@@ -315,7 +318,10 @@ public class MinMaxDateInputValidatorTest {
   public void fullValidationValidDates_yearsAreTheSame_valid() {
     input = new MinMaxDateInput("2020", "2020");
     var errors = new BeanPropertyBindingResult(input, "form");
-    Object[] hints = {inputLabel, new MaxYearMustBeInFutureHint()};
+    Object[] hints = {inputLabel, new MaxYearMustBeInFutureHint(
+        inputLabel,
+        new MinMaxYearLabelsHint(MinMaxDateInputValidator.MIN_YEAR_TEXT, MinMaxDateInputValidator.MAX_YEAR_TEXT)
+    )};
     ValidationUtils.invokeValidator(validator, input, errors, hints);
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     assertThat(fieldErrors).isEmpty();

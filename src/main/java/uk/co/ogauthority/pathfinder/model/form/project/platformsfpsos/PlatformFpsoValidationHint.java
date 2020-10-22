@@ -16,8 +16,14 @@ public class PlatformFpsoValidationHint {
   public static final MinMaxYearLabelsHint TOPSIDES_YEAR_LABELS = new MinMaxYearLabelsHint("earliest", "latest");
   public static final MinMaxYearLabelsHint SUBSTRUCTURE_YEAR_LABELS = new MinMaxYearLabelsHint("earliest", "latest");
 
-  public static final MaxYearMustBeInFutureHint TOPSIDES_MAX_YEAR_HINT = new MaxYearMustBeInFutureHint();
-  public static final MaxYearMustBeInFutureHint SUBSTRUCTURE_MAX_YEAR_HINT = new MaxYearMustBeInFutureHint();
+  public static final MaxYearMustBeInFutureHint TOPSIDES_MAX_YEAR_HINT = new MaxYearMustBeInFutureHint(
+      TOPSIDES_REMOVAL_LABEL,
+      TOPSIDES_YEAR_LABELS
+  );
+  public static final MaxYearMustBeInFutureHint SUBSTRUCTURE_MAX_YEAR_HINT = new MaxYearMustBeInFutureHint(
+      SUBSTRUCTURE_REMOVAL_LABEL,
+      SUBSTRUCTURE_YEAR_LABELS
+  );
 
   private final ValidationType validationType;
 
