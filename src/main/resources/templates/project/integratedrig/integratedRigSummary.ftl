@@ -1,20 +1,16 @@
 <#include '../../layout.ftl'>
 
-<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true>
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
-  <@fdsAction.link
-    linkText="Add integrated rig"
-    linkUrl=springUrl(addIntegratedRigUrl)
-    linkClass="govuk-button govuk-button--blue"
-  />
-  <@fdsForm.htmlForm>
-    <@fdsAction.submitButtons
-      primaryButtonText="Save and complete"
-      secondaryLinkText="Back to task list"
-      linkSecondaryAction=true
-      linkSecondaryActionUrl=springUrl(backToTaskListUrl)
-    />
-  </@fdsForm.htmlForm>
-</@defaultPage>
+<#macro integratedRigSummary integratedRigView showHeader=true showActions=true>
+  <@summaryViewWrapper.summaryViewItemWrapper
+    idPrefix="integrated-rig"
+    headingPrefix="Integrated rig"
+    summaryView=integratedRigView
+    showHeader=showHeader
+    showActions=showActions
+  >
+    <@checkAnswers.checkAnswersRowNoActions prompt="Structure" value=integratedRigView.structure!"" />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Name" value=integratedRigView.name!"" />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Integrated rig status" value=integratedRigView.status!"" />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Intention to reactivate" value=integratedRigView.intentionToReactivate!"" />
+  </@summaryViewWrapper.summaryViewItemWrapper>
+</#macro>

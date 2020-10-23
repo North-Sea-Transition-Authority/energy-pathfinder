@@ -8,10 +8,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +41,7 @@ import uk.co.ogauthority.pathfinder.service.project.subseainfrastructure.SubseaI
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.SubseaInfrastructureTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(
@@ -93,6 +96,70 @@ public class SubseaInfrastructureControllerTest extends ProjectContextAbstractCo
   }
 
   @Test
+  public void saveSubseaStructures_whenUnauthenticated_thenNoAccess() throws Exception {
+    var subseaInfrastructureViews = List.of(
+        SubseaInfrastructureTestUtil.createSubseaInfrastructureView(),
+        SubseaInfrastructureTestUtil.createSubseaInfrastructureView()
+    );
+
+    when(subseaInfrastructureSummaryService.getValidatedSubseaInfrastructureSummaryViews(projectDetail)).thenReturn(subseaInfrastructureViews);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(SubseaInfrastructureController.class)
+            .saveSubseaStructures(PROJECT_ID, null)
+        ))
+            .with(authenticatedUserAndSession(unauthenticatedUser))
+            .with(csrf()))
+        .andExpect(status().isForbidden());
+
+    verify(subseaInfrastructureSummaryService, times(0)).validateViews(any());
+  }
+
+  @Test
+  public void saveSubseaStructures_whenValid_thenRedirect() throws Exception {
+    var subseaInfrastructureViews = List.of(
+        SubseaInfrastructureTestUtil.createSubseaInfrastructureView(),
+        SubseaInfrastructureTestUtil.createSubseaInfrastructureView()
+    );
+
+    when(subseaInfrastructureSummaryService.getValidatedSubseaInfrastructureSummaryViews(projectDetail)).thenReturn(subseaInfrastructureViews);
+    when(subseaInfrastructureSummaryService.validateViews(subseaInfrastructureViews)).thenReturn(ValidationResult.VALID);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(SubseaInfrastructureController.class)
+            .saveSubseaStructures(PROJECT_ID, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf()))
+        .andExpect(status().is3xxRedirection());
+
+    verify(subseaInfrastructureSummaryService, times(1)).validateViews(any());
+  }
+
+  @Test
+  public void saveSubseaStructures_whenInvalid_thenReturnErrors() throws Exception {
+    var subseaInfrastructureViews = List.of(
+        SubseaInfrastructureTestUtil.createSubseaInfrastructureView(),
+        SubseaInfrastructureTestUtil.createSubseaInfrastructureView()
+    );
+
+    when(subseaInfrastructureSummaryService.getValidatedSubseaInfrastructureSummaryViews(projectDetail)).thenReturn(subseaInfrastructureViews);
+    when(subseaInfrastructureSummaryService.validateViews(subseaInfrastructureViews)).thenReturn(ValidationResult.INVALID);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(SubseaInfrastructureController.class)
+            .saveSubseaStructures(PROJECT_ID, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf()))
+        .andExpect(status().isOk())
+        .andExpect(model().attributeExists("errorList"));
+
+    verify(subseaInfrastructureSummaryService, times(1)).validateViews(any());
+    verify(subseaInfrastructureSummaryService, times(1)).getSubseaInfrastructureViewErrors(any());
+  }
+
+  @Test
   public void addSubseaInfrastructure_whenAuthenticated_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
         on(SubseaInfrastructureController.class).addSubseaInfrastructure(PROJECT_ID, null)))
@@ -126,6 +193,154 @@ public class SubseaInfrastructureControllerTest extends ProjectContextAbstractCo
         on(SubseaInfrastructureController.class).getSubseaInfrastructure(PROJECT_ID, SUBSEA_INFRASTRUCTURE_ID, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void updateSubseaInfrastructure_whenUnauthenticatedPartialSave_thenNoAccess() throws Exception {
+    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
+    }};
+
+    var form = new SubseaInfrastructureForm();
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    when(subseaInfrastructureService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(SubseaInfrastructureController.class)
+            .updateSubseaInfrastructure(PROJECT_ID, SUBSEA_INFRASTRUCTURE_ID, form, bindingResult, ValidationType.PARTIAL, null)
+        ))
+            .with(authenticatedUserAndSession(unauthenticatedUser))
+            .with(csrf())
+            .params(completeLaterParams))
+        .andExpect(status().isForbidden());
+
+    verify(subseaInfrastructureService, times(0)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(subseaInfrastructureService, times(0)).updateSubseaInfrastructure(any(), any(), any());
+  }
+
+  @Test
+  public void updateSubseaInfrastructure_whenUnauthenticatedFullSave_thenNoAccess() throws Exception {
+    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
+    }};
+
+    var form = new SubseaInfrastructureForm();
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    when(subseaInfrastructureService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(SubseaInfrastructureController.class)
+            .updateSubseaInfrastructure(PROJECT_ID, SUBSEA_INFRASTRUCTURE_ID, form, bindingResult, ValidationType.FULL, null)
+        ))
+            .with(authenticatedUserAndSession(unauthenticatedUser))
+            .with(csrf())
+            .params(completeLaterParams))
+        .andExpect(status().isForbidden());
+
+    verify(subseaInfrastructureService, times(0)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(subseaInfrastructureService, times(0)).updateSubseaInfrastructure(any(), any(), any());
+  }
+
+  @Test
+  public void updateSubseaInfrastructure_whenValidFormAndPartialSave_thenCreate() throws Exception {
+    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
+    }};
+
+    var form = new SubseaInfrastructureForm();
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    when(subseaInfrastructureService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(SubseaInfrastructureController.class)
+            .updateSubseaInfrastructure(PROJECT_ID, SUBSEA_INFRASTRUCTURE_ID, form, bindingResult, ValidationType.PARTIAL, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeLaterParams))
+        .andExpect(status().is3xxRedirection());
+
+    verify(subseaInfrastructureService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(subseaInfrastructureService, times(1)).updateSubseaInfrastructure(any(), any(), any());
+  }
+
+  @Test
+  public void updateSubseaInfrastructure_whenValidFormAndFullSave_thenCreate() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    var form = new SubseaInfrastructureForm();
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    when(subseaInfrastructureService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(SubseaInfrastructureController.class)
+            .updateSubseaInfrastructure(PROJECT_ID, SUBSEA_INFRASTRUCTURE_ID, form, bindingResult, ValidationType.FULL, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().is3xxRedirection());
+
+    verify(subseaInfrastructureService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(subseaInfrastructureService, times(1)).updateSubseaInfrastructure(any(), any(), any());
+  }
+
+  @Test
+  public void updateSubseaInfrastructure_whenInvalidFormAndFullSave_thenNoCreate() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    var form = new SubseaInfrastructureForm();
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
+
+    when(subseaInfrastructureService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(SubseaInfrastructureController.class)
+            .updateSubseaInfrastructure(PROJECT_ID, SUBSEA_INFRASTRUCTURE_ID, form, bindingResult, ValidationType.FULL, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().isOk());
+
+    verify(subseaInfrastructureService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(subseaInfrastructureService, times(0)).updateSubseaInfrastructure(any(), any(), any());
+  }
+
+  @Test
+  public void updateSubseaInfrastructure_whenInvalidFormAndPartialSave_thenNoCreate() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    var form = new SubseaInfrastructureForm();
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
+
+    when(subseaInfrastructureService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(SubseaInfrastructureController.class)
+            .updateSubseaInfrastructure(PROJECT_ID, SUBSEA_INFRASTRUCTURE_ID, form, bindingResult, ValidationType.FULL, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().isOk());
+
+    verify(subseaInfrastructureService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(subseaInfrastructureService, times(0)).updateSubseaInfrastructure(any(), any(), any());
   }
 
   @Test

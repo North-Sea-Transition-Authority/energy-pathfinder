@@ -1,10 +1,13 @@
 package uk.co.ogauthority.pathfinder.service.project.integratedrig;
 
+import java.util.List;
 import java.util.Map;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.integratedrig.IntegratedRig;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -33,6 +36,30 @@ public class IntegratedRigService {
     this.validationService = validationService;
   }
 
+  public IntegratedRigForm getForm(Integer integratedRigId, ProjectDetail projectDetail) {
+    var integratedRig = getIntegratedRig(integratedRigId, projectDetail);
+    return getForm(integratedRig);
+  }
+
+  private IntegratedRigForm getForm(IntegratedRig integratedRig) {
+    var form = new IntegratedRigForm();
+
+    String structure = null;
+
+    if (integratedRig.getFacility() != null) {
+      structure = integratedRig.getFacility().getSelectionId();
+    } else if (integratedRig.getManualFacility() != null) {
+      structure = SearchSelectorService.getValueWithManualEntryPrefix(integratedRig.getManualFacility());
+    }
+
+    form.setStructure(structure);
+    form.setName(integratedRig.getName());
+    form.setStatus(integratedRig.getStatus());
+    form.setIntentionToReactivate(integratedRig.getIntentionToReactivate());
+
+    return form;
+  }
+
   public String getFacilityRestUrl() {
     return devUkFacilitiesService.getFacilitiesRestUrl();
   }
@@ -52,12 +79,41 @@ public class IntegratedRigService {
     return createOrUpdateIntegratedRig(integratedRig, projectDetail, form);
   }
 
+  public IntegratedRig updateIntegratedRig(Integer integratedRigId,
+                                           ProjectDetail projectDetail,
+                                           IntegratedRigForm form) {
+    var integratedRig = getIntegratedRig(integratedRigId, projectDetail);
+    return createOrUpdateIntegratedRig(integratedRig, projectDetail, form);
+  }
+
   @Transactional
   IntegratedRig createOrUpdateIntegratedRig(IntegratedRig integratedRig,
                                             ProjectDetail projectDetail,
                                             IntegratedRigForm form) {
     setCommonEntityFields(integratedRig, projectDetail, form);
     return integratedRigRepository.save(integratedRig);
+  }
+
+  public List<IntegratedRig> getIntegratedRigs(ProjectDetail projectDetail) {
+    return integratedRigRepository.findByProjectDetailOrderByIdAsc(projectDetail);
+  }
+
+  public boolean isValid(IntegratedRig integratedRig, ValidationType validationType) {
+    var form = getForm(integratedRig);
+    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult = validate(form, bindingResult, validationType);
+    return !bindingResult.hasErrors();
+  }
+
+  @Transactional
+  public void deleteIntegratedRig(IntegratedRig integratedRig) {
+    integratedRigRepository.delete(integratedRig);
+  }
+
+  public boolean isComplete(ProjectDetail projectDetail) {
+    var integratedRigs = getIntegratedRigs(projectDetail);
+    return !integratedRigs.isEmpty() && integratedRigs.stream()
+        .allMatch(integratedRig -> isValid(integratedRig, ValidationType.FULL));
   }
 
   private void setCommonEntityFields(IntegratedRig integratedRig,
@@ -75,5 +131,14 @@ public class IntegratedRigService {
     integratedRig.setName(form.getName());
     integratedRig.setStatus(form.getStatus());
     integratedRig.setIntentionToReactivate(form.getIntentionToReactivate());
+  }
+
+  public IntegratedRig getIntegratedRig(Integer integratedRigId, ProjectDetail projectDetail) {
+    return integratedRigRepository.findByIdAndProjectDetail(integratedRigId, projectDetail)
+        .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format(
+            "Could not find IntegratedRig with ID %d for ProjectDetail with ID %s",
+            integratedRigId,
+            projectDetail.getId()
+        )));
   }
 }

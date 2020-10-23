@@ -7,12 +7,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.integratedrig.IntegratedRig;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -28,6 +30,8 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IntegratedRigServiceTest {
+
+  private static final Integer INTEGRATED_RIG_ID = 1;
 
   private IntegratedRigService integratedRigService;
 
@@ -57,6 +61,13 @@ public class IntegratedRigServiceTest {
     when(integratedRigRepository.save(any(IntegratedRig.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
+  private void checkCommonIntegratedRigFormFields(IntegratedRigForm form,
+                                                  IntegratedRig integratedRig) {
+    assertThat(form.getName()).isEqualTo(integratedRig.getName());
+    assertThat(form.getStatus()).isEqualTo(integratedRig.getStatus());
+    assertThat(form.getIntentionToReactivate()).isEqualTo(integratedRig.getIntentionToReactivate());
+  }
+
   private void checkCommonIntegratedRigEntityFields(IntegratedRig integratedRig,
                                                     IntegratedRigForm form) {
     assertThat(integratedRig.getName()).isEqualTo(form.getName());
@@ -75,6 +86,36 @@ public class IntegratedRigServiceTest {
     );
 
     verify(validationService, times(1)).validate(form, bindingResult, validationType);
+  }
+
+  @Test
+  public void getForm_withStructureFromList() {
+    var integratedRig = IntegratedRigTestUtil.createIntegratedRig_withDevUkFacility();
+
+    when(integratedRigRepository.findByIdAndProjectDetail(INTEGRATED_RIG_ID, projectDetail))
+        .thenReturn(Optional.of(integratedRig));
+
+    var form = integratedRigService.getForm(INTEGRATED_RIG_ID, projectDetail);
+
+    checkCommonIntegratedRigFormFields(form, integratedRig);
+
+    assertThat(form.getStructure()).isEqualTo(String.valueOf(integratedRig.getFacility().getId()));
+  }
+
+  @Test
+  public void getForm_withManualEntryStructure() {
+    var integratedRig = IntegratedRigTestUtil.createIntegratedRig_withManualFacility();
+
+    when(integratedRigRepository.findByIdAndProjectDetail(INTEGRATED_RIG_ID, projectDetail))
+        .thenReturn(Optional.of(integratedRig));
+
+    var form = integratedRigService.getForm(INTEGRATED_RIG_ID, projectDetail);
+
+    checkCommonIntegratedRigFormFields(form, integratedRig);
+
+    assertThat(form.getStructure()).isEqualTo(
+        SearchSelectablePrefix.FREE_TEXT_PREFIX + integratedRig.getManualFacility()
+    );
   }
 
   @Test
@@ -139,4 +180,104 @@ public class IntegratedRigServiceTest {
     checkCommonIntegratedRigEntityFields(persistedIntegratedRig, form);
   }
 
+  @Test
+  public void updateIntegratedRig_whenFacilityFromDevUk() {
+
+    final var devUkFacilityId = 123;
+    final var devUkFacility = DevUkTestUtil.getDevUkFacility(devUkFacilityId, "test");
+
+    var form = IntegratedRigTestUtil.createIntegratedRigForm();
+    form.setStructure(String.valueOf(devUkFacilityId));
+
+    when(devUkFacilitiesService.getFacilityAsList(form.getStructure())).thenReturn(List.of(devUkFacility));
+
+    when(integratedRigRepository.findByIdAndProjectDetail(INTEGRATED_RIG_ID, projectDetail))
+        .thenReturn(Optional.of(new IntegratedRig()));
+
+    var persistedIntegratedRig = integratedRigService.updateIntegratedRig(
+        INTEGRATED_RIG_ID,
+        projectDetail,
+        form
+    );
+
+    assertThat(persistedIntegratedRig.getFacility()).isEqualTo(devUkFacility);
+    assertThat(persistedIntegratedRig.getManualFacility()).isNull();
+    checkCommonIntegratedRigEntityFields(persistedIntegratedRig, form);
+  }
+
+  @Test
+  public void updateIntegratedRig_whenFacilityIsManual() {
+
+    final var manualEntryFacility = SearchSelectablePrefix.FREE_TEXT_PREFIX + "my manual facility";
+
+    var form = IntegratedRigTestUtil.createIntegratedRigForm();
+    form.setStructure(manualEntryFacility);
+
+    when(integratedRigRepository.findByIdAndProjectDetail(INTEGRATED_RIG_ID, projectDetail))
+        .thenReturn(Optional.of(new IntegratedRig()));
+
+    var persistedIntegratedRig = integratedRigService.updateIntegratedRig(
+        INTEGRATED_RIG_ID,
+        projectDetail,
+        form
+    );
+
+    assertThat(persistedIntegratedRig.getFacility()).isNull();
+    assertThat(persistedIntegratedRig.getManualFacility()).isEqualTo(SearchSelectorService.removePrefix(manualEntryFacility));
+    checkCommonIntegratedRigEntityFields(persistedIntegratedRig, form);
+  }
+
+  @Test
+  public void getIntegratedRigs_whenExist_thenReturnList() {
+    var integratedRig1 = IntegratedRigTestUtil.createIntegratedRig_withDevUkFacility();
+    var integratedRig2 = IntegratedRigTestUtil.createIntegratedRig_withManualFacility();
+
+    when(integratedRigRepository.findByProjectDetailOrderByIdAsc(projectDetail))
+        .thenReturn(List.of(integratedRig1, integratedRig2));
+
+    var integratedRigs = integratedRigService.getIntegratedRigs(projectDetail);
+    assertThat(integratedRigs).containsExactly(integratedRig1, integratedRig2);
+  }
+
+  @Test
+  public void getIntegratedRigs_whenNoneExist_thenEmptyList() {
+
+    when(integratedRigRepository.findByProjectDetailOrderByIdAsc(projectDetail))
+        .thenReturn(List.of());
+
+    var integratedRigs = integratedRigService.getIntegratedRigs(projectDetail);
+    assertThat(integratedRigs).isEmpty();
+  }
+
+  @Test
+  public void deleteIntegratedRig() {
+    var integratedRig = IntegratedRigTestUtil.createIntegratedRig_withDevUkFacility();
+    integratedRigService.deleteIntegratedRig(integratedRig);
+    verify(integratedRigRepository, times(1)).delete(integratedRig);
+  }
+
+  @Test
+  public void getIntegratedRig_whenExists_thenReturn() {
+
+    var integratedRig = IntegratedRigTestUtil.createIntegratedRig_withManualFacility();
+
+    when(integratedRigRepository.findByIdAndProjectDetail(INTEGRATED_RIG_ID, projectDetail)).thenReturn(
+        Optional.of(integratedRig)
+    );
+
+    var result = integratedRigService.getIntegratedRig(INTEGRATED_RIG_ID, projectDetail);
+
+    assertThat(result.getId()).isEqualTo(integratedRig.getId());
+    assertThat(result.getProjectDetail().getId()).isEqualTo(integratedRig.getProjectDetail().getId());
+  }
+
+  @Test(expected = PathfinderEntityNotFoundException.class)
+  public void getIntegratedRig_whenNotFound_thenException() {
+
+    when(integratedRigRepository.findByIdAndProjectDetail(INTEGRATED_RIG_ID, projectDetail)).thenReturn(
+        Optional.empty()
+    );
+
+    integratedRigService.getIntegratedRig(INTEGRATED_RIG_ID, projectDetail);
+  }
 }
