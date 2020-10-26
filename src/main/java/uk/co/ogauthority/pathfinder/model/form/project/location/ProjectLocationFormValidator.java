@@ -57,7 +57,7 @@ public class ProjectLocationFormValidator implements SmartValidator {
     }
 
     //validate selected blocks exist in portal data
-    licenceBlockValidatorService.addErrorsForInvalidBlocks(form.getLicenceBlocks(), errors, "licenceBlocks");
+    licenceBlockValidatorService.addErrorsForInvalidBlocks(form.getLicenceBlocks(), errors, "licenceBlocksSelect");
 
   }
 

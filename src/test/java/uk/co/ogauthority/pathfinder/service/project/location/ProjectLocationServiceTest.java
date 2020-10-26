@@ -27,7 +27,7 @@ import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
-import uk.co.ogauthority.pathfinder.testutil.ProjectLocationUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -75,19 +75,19 @@ public class ProjectLocationServiceTest {
   @Test
   public void createOrUpdate_newLocation_manualEntry() {
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
-    projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationUtil.getCompletedForm_manualField());
+    projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationTestUtil.getCompletedForm_manualField());
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
-    assertThat(projectLocation.getManualFieldName()).isEqualTo(ProjectLocationUtil.MANUAL_FIELD_NAME_NO_PREFIX);
+    assertThat(projectLocation.getManualFieldName()).isEqualTo(ProjectLocationTestUtil.MANUAL_FIELD_NAME_NO_PREFIX);
     checkCommonFieldsMatch(projectLocation);
   }
 
   @Test
   public void createOrUpdate_newLocation() {
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
-    when(fieldService.findById(ProjectLocationUtil.FIELD_ID)).thenReturn(ProjectLocationUtil.FIELD);
-    projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationUtil.getCompletedForm_withField());
+    when(fieldService.findById(ProjectLocationTestUtil.FIELD_ID)).thenReturn(ProjectLocationTestUtil.FIELD);
+    projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationTestUtil.getCompletedForm_withField());
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
-    assertThat(projectLocation.getField()).isEqualTo(ProjectLocationUtil.FIELD);
+    assertThat(projectLocation.getField()).isEqualTo(ProjectLocationTestUtil.FIELD);
     checkCommonFieldsMatch(projectLocation);
   }
 
@@ -95,19 +95,19 @@ public class ProjectLocationServiceTest {
   public void createOrUpdate_existingLocation_fieldToManual() {
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(
         Optional.of(
-            ProjectLocationUtil.getProjectLocation_withField(details)
+            ProjectLocationTestUtil.getProjectLocation_withField(details)
         ));
-    projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationUtil.getCompletedForm_manualField());
+    projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationTestUtil.getCompletedForm_manualField());
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
-    assertThat(projectLocation.getManualFieldName()).isEqualTo(ProjectLocationUtil.MANUAL_FIELD_NAME_NO_PREFIX);
+    assertThat(projectLocation.getManualFieldName()).isEqualTo(ProjectLocationTestUtil.MANUAL_FIELD_NAME_NO_PREFIX);
     checkCommonFieldsMatch(projectLocation);
   }
 
   @Test
   public void createOrUpdate_existingLocation_dateNotSetWhenLinkedQuestionIsFalse() {
-    var form = ProjectLocationUtil.getCompletedForm_manualField();
+    var form = ProjectLocationTestUtil.getCompletedForm_manualField();
     form.setApprovedFieldDevelopmentPlan(false);
-    projectLocation = ProjectLocationUtil.getProjectLocation_withField(details);
+    projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(details);
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(
         Optional.of(
             projectLocation
@@ -130,12 +130,12 @@ public class ProjectLocationServiceTest {
   public void createOrUpdate_existingLocation_manualToField() {
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(
         Optional.of(
-            ProjectLocationUtil.getProjectLocation_withManualField(details)
+            ProjectLocationTestUtil.getProjectLocation_withManualField(details)
         ));
-    when(fieldService.findById(ProjectLocationUtil.FIELD_ID)).thenReturn(ProjectLocationUtil.FIELD);
-    projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationUtil.getCompletedForm_withField());
+    when(fieldService.findById(ProjectLocationTestUtil.FIELD_ID)).thenReturn(ProjectLocationTestUtil.FIELD);
+    projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationTestUtil.getCompletedForm_withField());
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
-    assertThat(projectLocation.getField()).isEqualTo(ProjectLocationUtil.FIELD);
+    assertThat(projectLocation.getField()).isEqualTo(ProjectLocationTestUtil.FIELD);
     checkCommonFieldsMatch(projectLocation);
   }
 
@@ -143,9 +143,9 @@ public class ProjectLocationServiceTest {
   public void createOrUpdate_existingLocation_blankForm() {
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(
         Optional.of(
-            ProjectLocationUtil.getProjectLocation_withManualField(details)
+            ProjectLocationTestUtil.getProjectLocation_withManualField(details)
         ));
-    projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationUtil.getBlankForm());
+    projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationTestUtil.getBlankForm());
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
     assertThat(projectLocation.getField()).isNull();
     assertThat(projectLocation.getManualFieldName()).isNull();
@@ -158,23 +158,23 @@ public class ProjectLocationServiceTest {
 
   @Test
   public void getForm_existingLocation_manualEntry() {
-    projectLocation = ProjectLocationUtil.getProjectLocation_withManualField(details);
+    projectLocation = ProjectLocationTestUtil.getProjectLocation_withManualField(details);
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(
         Optional.of(projectLocation)
     );
     var form = projectLocationService.getForm(details);
-    assertThat(form.getField()).isEqualTo(ProjectLocationUtil.MANUAL_FIELD_NAME);
+    assertThat(form.getField()).isEqualTo(ProjectLocationTestUtil.MANUAL_FIELD_NAME);
     checkCommonFormFieldsMatch(projectLocation, form);
   }
 
   @Test
   public void getForm_existingLocation_withField() {
-    projectLocation = ProjectLocationUtil.getProjectLocation_withField(details);
+    projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(details);
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(
         Optional.of(projectLocation)
     );
     var form = projectLocationService.getForm(details);
-    assertThat(form.getField()).isEqualTo(ProjectLocationUtil.FIELD_ID.toString());
+    assertThat(form.getField()).isEqualTo(ProjectLocationTestUtil.FIELD_ID.toString());
     checkCommonFormFieldsMatch(projectLocation, form);
   }
 
@@ -205,7 +205,7 @@ public class ProjectLocationServiceTest {
 
   @Test
   public void validate_full() {
-    var form = ProjectLocationUtil.getCompletedForm_withField();
+    var form = ProjectLocationTestUtil.getCompletedForm_withField();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
     projectLocationService.validate(
@@ -220,21 +220,21 @@ public class ProjectLocationServiceTest {
   @Test
   public void getPreSelectedLocation_manualEntry() {
     when(searchSelectorService.buildPrePopulatedSelections(any(), any())).thenCallRealMethod();
-    var form = ProjectLocationUtil.getCompletedForm_manualField();
+    var form = ProjectLocationTestUtil.getCompletedForm_manualField();
     var preSelectedLocation = projectLocationService.getPreSelectedField(form);
     assertThat(preSelectedLocation).containsOnly(
-      entry(ProjectLocationUtil.MANUAL_FIELD_NAME, ProjectLocationUtil.MANUAL_FIELD_NAME_NO_PREFIX)
+      entry(ProjectLocationTestUtil.MANUAL_FIELD_NAME, ProjectLocationTestUtil.MANUAL_FIELD_NAME_NO_PREFIX)
     );
   }
 
   @Test
   public void getPreSelectedLocation_withField() {
     when(searchSelectorService.buildPrePopulatedSelections(any(), any())).thenCallRealMethod();
-    when(fieldService.findById(ProjectLocationUtil.FIELD_ID)).thenReturn(ProjectLocationUtil.FIELD);
-    var form = ProjectLocationUtil.getCompletedForm_withField();
+    when(fieldService.findById(ProjectLocationTestUtil.FIELD_ID)).thenReturn(ProjectLocationTestUtil.FIELD);
+    var form = ProjectLocationTestUtil.getCompletedForm_withField();
     var preSelectedLocation = projectLocationService.getPreSelectedField(form);
     assertThat(preSelectedLocation).containsOnly(
-        entry(ProjectLocationUtil.FIELD_ID.toString(), ProjectLocationUtil.FIELD_NAME)
+        entry(ProjectLocationTestUtil.FIELD_ID.toString(), ProjectLocationTestUtil.FIELD_NAME)
     );
   }
 
@@ -247,7 +247,7 @@ public class ProjectLocationServiceTest {
   @Test
   public void getUnvalidatedBlockViewsForLocation() {
     //Just a wrapper call really - logic tested in ProjectLocationBlockServiceTest.
-    projectLocation = ProjectLocationUtil.getProjectLocation_withField(details);
+    projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(details);
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectLocation));
     when(projectLocationBlocksService.getBlockViewsForLocation(projectLocation, ValidationType.NO_VALIDATION))
         .thenReturn(Collections.singletonList(LicenceBlockTestUtil.getBlockView(true)));
@@ -257,23 +257,99 @@ public class ProjectLocationServiceTest {
   }
 
   @Test
-  public void getUnvalidatedBlockViewsFromForm() {
+  public void getUnValidatedBlockViewsForLocation_noneLinked() {
     //Just a wrapper call really - logic tested in ProjectLocationBlockServiceTest.
-    projectLocation = ProjectLocationUtil.getProjectLocation_withField(details);
-    when(projectLocationBlocksService.getBlockViewsFromForm(any(), any()))
+    projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(details);
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectLocation));
+    var blocks = projectLocationService.getUnvalidatedBlockViewsForLocation(details);
+    assertThat(blocks).isEmpty();
+  }
+
+  @Test
+  public void getUnValidatedBlockViewsForLocation_noProjectLocation() {
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
+    var blocks = projectLocationService.getUnvalidatedBlockViewsForLocation(details);
+    assertThat(blocks).isEmpty();
+  }
+
+  @Test
+  public void getValidatedBlockViewsForLocation_noneLinked() {
+    //Just a wrapper call really - logic tested in ProjectLocationBlockServiceTest.
+    projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(details);
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectLocation));
+    var blocks = projectLocationService.getValidatedBlockViewsForLocation(details);
+    assertThat(blocks).isEmpty();
+  }
+
+  @Test
+  public void getValidatedBlockViewsForLocation_noProjectLocation() {
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
+    var blocks = projectLocationService.getValidatedBlockViewsForLocation(details);
+    assertThat(blocks).isEmpty();
+  }
+
+  @Test
+  public void getValidatedBlockViewsForLocation() {
+    projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(details);
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectLocation));
+
+    when(projectLocationBlocksService.getBlockViewsForLocation(projectLocation, ValidationType.FULL))
         .thenReturn(Collections.singletonList(LicenceBlockTestUtil.getBlockView(true)));
-    var blocks = projectLocationService.getUnvalidatedBlockViewsFromForm(ProjectLocationUtil.getCompletedForm_withField());
+
+    var blocks = projectLocationService.getValidatedBlockViewsForLocation(details);
     assertThat(blocks.size()).isEqualTo(1);
     assertThat(blocks.get(0).getBlockReference()).isEqualTo(LicenceBlockTestUtil.BLOCK_REFERENCE);
   }
 
+  @Test
+  public void getUnvalidatedBlockViewsFromForm() {
+    //Just a wrapper call really - logic tested in ProjectLocationBlockServiceTest.
+    projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(details);
+    when(projectLocationBlocksService.getBlockViewsFromForm(any(), any()))
+        .thenReturn(Collections.singletonList(LicenceBlockTestUtil.getBlockView(true)));
+    var blocks = projectLocationService.getUnvalidatedBlockViewsFromForm(ProjectLocationTestUtil.getCompletedForm_withField(), details);
+    assertThat(blocks.size()).isEqualTo(1);
+    assertThat(blocks.get(0).getBlockReference()).isEqualTo(LicenceBlockTestUtil.BLOCK_REFERENCE);
+  }
+
+  @Test
+  public void getValidatedBlockViewsFromForm() {
+    projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(details);
+    when(projectLocationBlocksService.getBlockViewsFromForm(any(), any()))
+        .thenReturn(Collections.singletonList(LicenceBlockTestUtil.getBlockView(true)));
+    when(projectLocationRepository.findByProjectDetail(any())).thenReturn(Optional.of(projectLocation));
+    var blocks = projectLocationService.getValidatedBlockViewsFromForm(ProjectLocationTestUtil.getCompletedForm_withField(), details);
+    assertThat(blocks.size()).isEqualTo(1);
+    assertThat(blocks.get(0).getBlockReference()).isEqualTo(LicenceBlockTestUtil.BLOCK_REFERENCE);
+  }
+
+  @Test
+  public void getValidatedBlockViewsFromForm_notAllReturnedFromPortal() {
+    var form = ProjectLocationTestUtil.getCompletedForm_withField();
+    var returnedBlockView = LicenceBlockTestUtil.getBlockView(true);
+    returnedBlockView.setCompositeKey(ProjectLocationTestUtil.LICENCE_BLOCKS.get(0)); //One returned block
+
+    projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(details);
+    when(projectLocationBlocksService.getBlockViewsFromForm(any(), any()))
+        .thenReturn(Collections.singletonList(returnedBlockView));
+    when(projectLocationRepository.findByProjectDetail(any())).thenReturn(Optional.of(projectLocation));
+
+    var blocks = projectLocationService.getValidatedBlockViewsFromForm(form, details);
+
+    verify(projectLocationBlocksService, times(1)) //The second licenceBlock id will be missing from the original result set,
+        // expect one call to fetch it from Pathfinder data
+        .getBlockViewsByProjectLocationAndCompositeKeyIn(projectLocation, List.of(ProjectLocationTestUtil.LICENCE_BLOCKS.get(1)), ValidationType.FULL);
+    assertThat(blocks.size()).isEqualTo(1);
+    assertThat(blocks.get(0).getBlockReference()).isEqualTo(returnedBlockView.getBlockReference());
+  }
+
   private void checkCommonFieldsMatch(ProjectLocation projectLocation) {
-    assertThat(projectLocation.getFieldType()).isEqualTo(ProjectLocationUtil.FIELD_TYPE);
-    assertThat(projectLocation.getWaterDepth()).isEqualTo(ProjectLocationUtil.WATER_DEPTH);
-    assertThat(projectLocation.getApprovedFieldDevelopmentPlan()).isEqualTo(ProjectLocationUtil.APPROVED_FDP_PLAN);
-    assertThat(projectLocation.getApprovedFdpDate()).isEqualTo(ProjectLocationUtil.APPROVED_FDP_DATE);
-    assertThat(projectLocation.getApprovedDecomProgram()).isEqualTo(ProjectLocationUtil.APPROVED_DECOM_PROGRAM);
-    assertThat(projectLocation.getUkcsArea()).isEqualTo(ProjectLocationUtil.UKCS_AREA);
+    assertThat(projectLocation.getFieldType()).isEqualTo(ProjectLocationTestUtil.FIELD_TYPE);
+    assertThat(projectLocation.getWaterDepth()).isEqualTo(ProjectLocationTestUtil.WATER_DEPTH);
+    assertThat(projectLocation.getApprovedFieldDevelopmentPlan()).isEqualTo(ProjectLocationTestUtil.APPROVED_FDP_PLAN);
+    assertThat(projectLocation.getApprovedFdpDate()).isEqualTo(ProjectLocationTestUtil.APPROVED_FDP_DATE);
+    assertThat(projectLocation.getApprovedDecomProgram()).isEqualTo(ProjectLocationTestUtil.APPROVED_DECOM_PROGRAM);
+    assertThat(projectLocation.getUkcsArea()).isEqualTo(ProjectLocationTestUtil.UKCS_AREA);
   }
 
   private void assertAddOrUpdateBlocksCalled(ProjectLocation projectLocation, List<String> licenceBlocks) {
