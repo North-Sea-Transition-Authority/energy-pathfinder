@@ -3,7 +3,7 @@ package uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.InfrastructureStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.validation.concretemattress.ConcreteMattressFullValidation;
@@ -23,7 +23,7 @@ public class SubseaInfrastructureForm {
   private String description;
 
   @NotNull(message = "Select the status of the structure", groups = FullValidation.class)
-  private SubseaInfrastructureStatus status;
+  private InfrastructureStatus status;
 
   @NotNull(message = "Select the type of subsea infrastructure", groups = FullValidation.class)
   private SubseaInfrastructureType infrastructureType;
@@ -58,12 +58,12 @@ public class SubseaInfrastructureForm {
     this.description = description;
   }
 
-  public SubseaInfrastructureStatus getStatus() {
+  public InfrastructureStatus getStatus() {
     return status;
   }
 
   public void setStatus(
-      SubseaInfrastructureStatus status) {
+      InfrastructureStatus status) {
     this.status = status;
   }
 

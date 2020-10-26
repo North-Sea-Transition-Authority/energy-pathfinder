@@ -10,6 +10,7 @@ import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
+import uk.co.ogauthority.pathfinder.controller.project.decommissionedpipeline.DecommissionedPipelineController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedwell.DecommissionedWellController;
 import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedRigController;
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
@@ -100,6 +101,17 @@ public class BreadcrumbService {
     var map = taskList(projectId);
     String route = ReverseRouter.route(on(IntegratedRigController.class).getIntegratedRigs(projectId, null));
     map.put(route, IntegratedRigController.SUMMARY_PAGE_NAME);
+    return map;
+  }
+
+  public void fromDecommissionedPipelines(Integer projectId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, decommissionedPipeline(projectId), thisPage);
+  }
+
+  private Map<String, String> decommissionedPipeline(Integer projectId) {
+    var map = taskList(projectId);
+    String route = ReverseRouter.route(on(DecommissionedPipelineController.class).getPipelinesToBeDecommissioned(projectId, null));
+    map.put(route, DecommissionedPipelineController.SUMMARY_PAGE_NAME);
     return map;
   }
 
