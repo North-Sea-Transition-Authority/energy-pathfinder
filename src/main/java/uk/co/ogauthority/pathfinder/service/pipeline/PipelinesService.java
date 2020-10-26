@@ -59,14 +59,14 @@ public class PipelinesService {
     return pipelines;
   }
 
-  public Optional<Pipeline> findById(Integer pipelineId) {
-    return pipelinesRepository.findById(pipelineId);
-  }
-
   public Pipeline getPipelineByIdOrError(Integer pipelineId) {
     return findById(pipelineId)
         .orElseThrow(() -> new PathfinderEntityNotFoundException(
             String.format("Pipeline with id %d was not found.", pipelineId)));
+  }
+
+  public Optional<Pipeline> findById(Integer pipelineId) {
+    return pipelinesRepository.findById(pipelineId);
   }
 
   private List<Pipeline> findByNameContaining(String searchTerm) {

@@ -21,7 +21,7 @@ public class DecommissionedPipelineForm {
   @NotNull(message = "Select the status of the pipeline", groups = FullValidation.class)
   private InfrastructureStatus status;
 
-  private MinMaxDateInput decommissioningYears;
+  private MinMaxDateInput decommissioningDate;
 
   @NotNull(message = "Select the pipeline removal premise", groups = FullValidation.class)
   private PipelineRemovalPremise removalPremise;
@@ -50,13 +50,13 @@ public class DecommissionedPipelineForm {
     this.status = status;
   }
 
-  public MinMaxDateInput getDecommissioningYears() {
-    return decommissioningYears;
+  public MinMaxDateInput getDecommissioningDate() {
+    return decommissioningDate;
   }
 
-  public void setDecommissioningYears(
-      MinMaxDateInput decommissioningYears) {
-    this.decommissioningYears = decommissioningYears;
+  public void setDecommissioningDate(
+      MinMaxDateInput decommissioningDate) {
+    this.decommissioningDate = decommissioningDate;
   }
 
   public PipelineRemovalPremise getRemovalPremise() {

@@ -77,8 +77,8 @@ public class DecommissionedPipelineService {
 
     decommissionedPipeline.setMaterialType(form.getMaterialType());
     decommissionedPipeline.setStatus(form.getStatus());
-    decommissionedPipeline.setEarliestRemovalYear(form.getDecommissioningYears().getMinYear());
-    decommissionedPipeline.setLatestRemovalYear(form.getDecommissioningYears().getMaxYear());
+    decommissionedPipeline.setEarliestRemovalYear(form.getDecommissioningDate().getMinYear());
+    decommissionedPipeline.setLatestRemovalYear(form.getDecommissioningDate().getMaxYear());
     decommissionedPipeline.setRemovalPremise(form.getRemovalPremise());
   }
 }

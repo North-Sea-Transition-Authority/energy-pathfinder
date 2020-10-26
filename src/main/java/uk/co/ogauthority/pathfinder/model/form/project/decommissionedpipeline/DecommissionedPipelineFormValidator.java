@@ -34,8 +34,8 @@ public class DecommissionedPipelineFormValidator implements SmartValidator {
     ValidationUtil.invokeNestedValidator(
         errors,
         minMaxDateInputValidator,
-        "decommissioningYears",
-        form.getDecommissioningYears(),
+        "decommissioningDate",
+        form.getDecommissioningDate(),
         decommissionedPipelineValidationHint.getDecommissioningDateHints()
     );
   }

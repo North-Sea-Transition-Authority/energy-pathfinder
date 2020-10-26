@@ -17,8 +17,8 @@
     <@fdsTextInput.textInput path="form.materialType" labelText="What is the material type of the pipeline?"/>
     <@fdsRadio.radio path="form.status" labelText="What is the status of the pipeline?" radioItems=pipelineStatuses/>
     <@minMaxDateInput
-      minFormPath="form.decommissioningYears.minYear"
-      maxFormPath="form.decommissioningYears.maxYear"
+      minFormPath="form.decommissioningDate.minYear"
+      maxFormPath="form.decommissioningDate.maxYear"
       labelText="Provide the period over which the pipeline will be decommissioned"
       altMinLabel="Earliest year"
       altMaxLabel="Latest year"
