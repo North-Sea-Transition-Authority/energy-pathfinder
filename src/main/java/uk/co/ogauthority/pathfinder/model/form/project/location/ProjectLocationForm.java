@@ -39,6 +39,9 @@ public class ProjectLocationForm {
   @NotEmpty(message = "Select at least one licence block", groups = FullValidation.class)
   private List<String> licenceBlocks = Collections.emptyList();
 
+  //Just here for the add to list selector
+  private String licenceBlocksSelect;
+
   public ProjectLocationForm() {
   }
 
@@ -117,5 +120,13 @@ public class ProjectLocationForm {
 
   public void setUkcsArea(UkcsArea ukcsArea) {
     this.ukcsArea = ukcsArea;
+  }
+
+  public String getLicenceBlocksSelect() {
+    return licenceBlocksSelect;
+  }
+
+  public void setLicenceBlocksSelect(String licenceBlocksSelect) {
+    this.licenceBlocksSelect = licenceBlocksSelect;
   }
 }

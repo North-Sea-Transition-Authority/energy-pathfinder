@@ -12,7 +12,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDat
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 
-public class ProjectLocationUtil {
+public class ProjectLocationTestUtil {
   public static final Integer FIELD_ID = 1;
   public static final String FIELD_NAME = "FieldName";
   public static final Integer FIELD_STATUS = 500;

@@ -94,6 +94,17 @@ public class ProjectLocationBlocksService {
   public List<ProjectLocationBlockView> getBlockViewsFromForm(ProjectLocationForm form, ValidationType validationType) {
     return licenceBlocksService.findAllByCompositeKeyInOrdered(form.getLicenceBlocks()).stream()
         .map(plb -> new ProjectLocationBlockView(
+             plb,
+             isBlockReferenceValid(plb.getCompositeKey(), validationType)
+        )).collect(Collectors.toList());
+  }
+
+  public List<ProjectLocationBlockView> getBlockViewsByProjectLocationAndCompositeKeyIn(ProjectLocation location,
+                                                                                        List<String> compositeKeys,
+                                                                                        ValidationType validationType) {
+    return projectLocationBlockRepository.findAllByProjectLocation(location).stream()
+        .filter(plb -> compositeKeys.contains(plb.getCompositeKey()))
+        .map(plb -> new ProjectLocationBlockView(
             plb,
             isBlockReferenceValid(plb.getCompositeKey(), validationType)
         )).collect(Collectors.toList());
@@ -103,8 +114,8 @@ public class ProjectLocationBlocksService {
   public List<ProjectLocationBlockView> getBlockViewsForLocation(ProjectLocation projectLocation, ValidationType validationType) {
     return projectLocationBlockRepository.findAllByProjectLocationOrderByBlockReference(projectLocation).stream()
         .map(plb -> new ProjectLocationBlockView(
-            plb,
-            isBlockReferenceValid(plb.getCompositeKey(), validationType)
+             plb,
+             isBlockReferenceValid(plb.getCompositeKey(), validationType)
         )).collect(Collectors.toList());
   }
 

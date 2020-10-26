@@ -21,7 +21,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationF
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationValidationHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.service.project.location.LicenceBlockValidatorService;
-import uk.co.ogauthority.pathfinder.testutil.ProjectLocationUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -46,7 +46,7 @@ public class ProjectLocationFormValidatorTest {
 
   @Test
   public void validate_completeForm_isValid() {
-    var form = ProjectLocationUtil.getCompletedForm_manualField();
+    var form = ProjectLocationTestUtil.getCompletedForm_manualField();
     var errors = new BeanPropertyBindingResult(form, "form");
     var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
 
@@ -59,7 +59,7 @@ public class ProjectLocationFormValidatorTest {
 
   @Test
   public void validate_answeredTrueButMissingDate_withEmptyDateAcceptableHint() {
-    var form = ProjectLocationUtil.getCompletedForm_manualField();
+    var form = ProjectLocationTestUtil.getCompletedForm_manualField();
     var errors = new BeanPropertyBindingResult(form, "form");
     var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.PARTIAL);
 
@@ -72,7 +72,7 @@ public class ProjectLocationFormValidatorTest {
 
   @Test
   public void validate_answeredTrueButMissingDate() {
-    var form = ProjectLocationUtil.getCompletedForm_manualField();
+    var form = ProjectLocationTestUtil.getCompletedForm_manualField();
     form.setApprovedFdpDate(new ThreeFieldDateInput(null, null, null));
     var errors = new BeanPropertyBindingResult(form, "form");
     var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
@@ -100,7 +100,7 @@ public class ProjectLocationFormValidatorTest {
 
   @Test
   public void validate_answeredTrueButMissingDate_isInvalid() {
-    var form = ProjectLocationUtil.getCompletedForm_manualField();
+    var form = ProjectLocationTestUtil.getCompletedForm_manualField();
     form.setApprovedFdpDate(BAD_THREE_FIELD_DATE);
     var errors = new BeanPropertyBindingResult(form, "form");
     var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
@@ -128,7 +128,7 @@ public class ProjectLocationFormValidatorTest {
 
   @Test
   public void validate_answeredTrueToBoth_bothDatesMissing() {
-    var form = ProjectLocationUtil.getCompletedForm_manualField();
+    var form = ProjectLocationTestUtil.getCompletedForm_manualField();
     form.setApprovedFdpDate(new ThreeFieldDateInput(null, null, null));
     form.setApprovedDecomProgram(true);
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -165,7 +165,7 @@ public class ProjectLocationFormValidatorTest {
 
   @Test
   public void validate_answeredTrueToBoth_bothDatesMissing_areInvalid() {
-    var form = ProjectLocationUtil.getCompletedForm_manualField();
+    var form = ProjectLocationTestUtil.getCompletedForm_manualField();
     form.setApprovedFdpDate(BAD_THREE_FIELD_DATE);
     form.setApprovedDecomProgram(true);
     form.setApprovedDecomProgramDate(BAD_THREE_FIELD_DATE);
@@ -203,7 +203,7 @@ public class ProjectLocationFormValidatorTest {
 
   @Test
   public void validate_fdpApprovalDateCannotBeInFuture_whenInFuture_thenFail() {
-    var form = ProjectLocationUtil.getCompletedForm_withField();
+    var form = ProjectLocationTestUtil.getCompletedForm_withField();
     form.setApprovedFdpDate(new ThreeFieldDateInput(LocalDate.now().plusYears(1)));
 
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -230,7 +230,7 @@ public class ProjectLocationFormValidatorTest {
 
   @Test
   public void validate_fdpApprovalDateCannotBeInFuture_whenTheSameAs_thenPass() {
-    var form = ProjectLocationUtil.getCompletedForm_withField();
+    var form = ProjectLocationTestUtil.getCompletedForm_withField();
     form.setApprovedFdpDate(new ThreeFieldDateInput(LocalDate.now()));
 
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -245,7 +245,7 @@ public class ProjectLocationFormValidatorTest {
 
   @Test
   public void validate_fdpApprovalDateCannotBeInFuture_whenBefore_thenPass() {
-    var form = ProjectLocationUtil.getCompletedForm_withField();
+    var form = ProjectLocationTestUtil.getCompletedForm_withField();
     form.setApprovedFieldDevelopmentPlan(true);
     form.setApprovedFdpDate(new ThreeFieldDateInput(LocalDate.now().minusYears(1)));
 
@@ -261,7 +261,7 @@ public class ProjectLocationFormValidatorTest {
 
   @Test
   public void validate_decomProgramApprovalCannotBeInFuture_whenInFuture_thenFail() {
-    var form = ProjectLocationUtil.getCompletedForm_withField();
+    var form = ProjectLocationTestUtil.getCompletedForm_withField();
     form.setApprovedDecomProgram(true);
     form.setApprovedDecomProgramDate(new ThreeFieldDateInput(LocalDate.now().plusYears(1)));
 
@@ -289,7 +289,7 @@ public class ProjectLocationFormValidatorTest {
 
   @Test
   public void validate_decomProgramApprovalCannotBeInFuture_whenTheSameAs_thenPass() {
-    var form = ProjectLocationUtil.getCompletedForm_withField();
+    var form = ProjectLocationTestUtil.getCompletedForm_withField();
     form.setApprovedDecomProgramDate(new ThreeFieldDateInput(LocalDate.now()));
 
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -304,7 +304,7 @@ public class ProjectLocationFormValidatorTest {
 
   @Test
   public void validate_decomProgramApprovalDateCannotBeInFuture_whenBefore_thenPass() {
-    var form = ProjectLocationUtil.getCompletedForm_withField();
+    var form = ProjectLocationTestUtil.getCompletedForm_withField();
     form.setApprovedDecomProgramDate(new ThreeFieldDateInput(LocalDate.now().minusYears(1)));
 
     var errors = new BeanPropertyBindingResult(form, "form");

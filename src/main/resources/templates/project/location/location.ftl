@@ -44,10 +44,17 @@
         title="Licence blocks"
         itemName="Licence block"
         noItemText="No licence blocks added"
+        invalidItemText="This licence block is invalid"
         addToListId="licence-block-table"
         selectorLabelText="Which licence blocks is this project located in?"
+        selectorHintText="For example 44/15"
         restUrl=springUrl(blocksRestUrl)
       />
+      <@fdsDetails.summaryDetails summaryTitle="Why is a block not allowed on my project?">
+        <p class="govuk-body">
+          You can only include blocks on your project that exist on a production licence. If a block has been wholly or partially relinquished since it was added to your Pathfinder project it will need to be removed
+        </p>
+      </@fdsDetails.summaryDetails>
       <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
     </@fdsForm.htmlForm>
 </@defaultPage>

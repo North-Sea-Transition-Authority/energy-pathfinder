@@ -8,7 +8,7 @@ import uk.co.ogauthority.pathfinder.service.portal.LicenceBlocksService;
 
 @Service
 public class LicenceBlockValidatorService {
-  public static final String BLOCK_NOT_FOUND = "This block is no longer valid";
+  public static final String BLOCK_NOT_FOUND = "A licence block is no longer valid";
 
   private final LicenceBlocksService licenceBlocksService;
 
@@ -28,16 +28,14 @@ public class LicenceBlockValidatorService {
   }
 
   /**
-   * Add an error to the provided fieldId if the block linked to it does not exist.
+   * Add an error to the provided fieldId if any of the blocks linked to it do not exist.
    * @param licenceBlocks list of licenceBlock composite keys
    * @param errors errors to update
    * @param fieldId id of field to add the error to
    */
   public void addErrorsForInvalidBlocks(List<String> licenceBlocks, Errors errors, String fieldId) {
-    licenceBlocks.forEach(ck -> {
-      if (!existsInPortalData(ck)) {
-        errors.rejectValue(fieldId, fieldId + ".notPresent", BLOCK_NOT_FOUND);
-      }
-    });
+    if (licenceBlocks.stream().anyMatch(ck -> !existsInPortalData(ck))) {
+      errors.rejectValue(fieldId, fieldId + ".notPresent", BLOCK_NOT_FOUND);
+    }
   }
 }
