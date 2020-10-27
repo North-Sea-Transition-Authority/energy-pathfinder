@@ -28,6 +28,7 @@ import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
+import uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline.DecommissionedPipelineService;
 import uk.co.ogauthority.pathfinder.service.project.integratedrig.IntegratedRigService;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
@@ -52,6 +53,7 @@ public class TaskListController {
   private final PlatformsFpsosService platformsFpsosService;
   private final SubseaInfrastructureService subseaInfrastructureService;
   private final IntegratedRigService integratedRigService;
+  private final DecommissionedPipelineService decommissionedPipelineService;
 
   @Autowired
   public TaskListController(ProjectInformationService projectInformationService,
@@ -63,7 +65,8 @@ public class TaskListController {
                             AwardedContractService awardedContractService,
                             PlatformsFpsosService platformsFpsosService,
                             SubseaInfrastructureService subseaInfrastructureService,
-                            IntegratedRigService integratedRigService) {
+                            IntegratedRigService integratedRigService,
+                            DecommissionedPipelineService decommissionedPipelineService) {
     this.projectInformationService = projectInformationService;
     this.breadcrumbService = breadcrumbService;
     this.projectLocationService = projectLocationService;
@@ -74,6 +77,7 @@ public class TaskListController {
     this.platformsFpsosService = platformsFpsosService;
     this.subseaInfrastructureService = subseaInfrastructureService;
     this.integratedRigService = integratedRigService;
+    this.decommissionedPipelineService = decommissionedPipelineService;
   }
 
   @GetMapping
@@ -155,7 +159,9 @@ public class TaskListController {
         ReverseRouter.route(on(DecommissionedPipelineController.class).getPipelines(projectId, null))
     );
     modelAndView.addObject("decommissionedPipelinesText", DecommissionedPipelineController.TASK_LIST_NAME);
-    modelAndView.addObject("decommissionedPipelinesCompleted", false); // TODO: PAT-269
+    modelAndView.addObject("decommissionedPipelinesCompleted", decommissionedPipelineService.isComplete(
+        projectDetails
+    ));
 
     modelAndView.addObject("reviewAndSubmitLink",
         ReverseRouter.route(on(SubmitProjectController.class).getProjectSummary(projectId, null))
