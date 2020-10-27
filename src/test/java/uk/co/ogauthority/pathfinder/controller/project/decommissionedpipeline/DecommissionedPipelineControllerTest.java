@@ -34,6 +34,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.De
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline.DecommissionedPipelineService;
+import uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline.DecommissionedPipelineSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -49,6 +50,9 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
 
   @MockBean
   private DecommissionedPipelineService decommissionedPipelineService;
+
+  @MockBean
+  private DecommissionedPipelineSummaryService decommissionedPipelineSummaryService;
 
   private ProjectDetail projectDetail;
 
