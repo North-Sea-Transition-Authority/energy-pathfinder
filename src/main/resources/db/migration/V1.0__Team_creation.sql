@@ -41,11 +41,6 @@ BEGIN
     , cog.name org_name
     FROM decmgr.current_organisation_groups cog
     WHERE cog.org_grp_type = 'REG'
-    AND EXISTS (
-      SELECT 1
-      FROM decmgr.current_org_grp_organisations cogo
-      WHERE cogo.org_grp_id = cog.id
-    )
     -- Only create if a team doesn't already exist
     AND NOT EXISTS (
       SELECT 1
