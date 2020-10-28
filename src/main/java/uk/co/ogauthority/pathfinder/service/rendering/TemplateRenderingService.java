@@ -25,7 +25,8 @@ public class TemplateRenderingService {
     this.freemarkerConfig = freemarkerConfig;
   }
 
-  public String render(String template, Map<String, Object> viewModel,
+  public String render(String template,
+                       Map<String, Object> viewModel,
                        boolean addSpringRequestSupport) throws TemplateRenderingException {
 
     // This is a bit of a hack to get access to spring.ftl macros to work if they are included in the template.

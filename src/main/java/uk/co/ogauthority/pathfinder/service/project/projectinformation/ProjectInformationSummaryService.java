@@ -18,7 +18,7 @@ import uk.co.ogauthority.pathfinder.util.DateUtil;
 public class ProjectInformationSummaryService implements ProjectSectionSummaryService {
   public static final String TEMPLATE_PATH = "project/projectinformation/projectInformationSummary.ftl";
   public static final String PAGE_NAME = ProjectInformationController.PAGE_NAME;
-  public static final String SECTION_ID = "#projectInformation";
+  public static final String SECTION_ID = "projectInformation";
   public static final SidebarSectionLink SECTION_LINK = SidebarSectionLink.createAnchorLink(
       PAGE_NAME,
       SECTION_ID
@@ -35,10 +35,10 @@ public class ProjectInformationSummaryService implements ProjectSectionSummarySe
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
     Map<String, Object> summaryModel = new HashMap<>();
+    summaryModel.put("sectionTitle", PAGE_NAME);
+    summaryModel.put("sectionId", SECTION_ID);
     projectInformationService.getProjectInformation(detail).ifPresent(
         projectInformation -> {
-          summaryModel.put("sectionTitle", PAGE_NAME);
-          summaryModel.put("sectionId", SECTION_ID);
           summaryModel.put("projectTitle", projectInformation.getProjectTitle());
           summaryModel.put("projectSummary", projectInformation.getProjectSummary());
           summaryModel.put("fieldStage", projectInformation.getFieldStage() != null
@@ -68,7 +68,7 @@ public class ProjectInformationSummaryService implements ProjectSectionSummarySe
 
 
     return new ProjectSectionSummary(
-      List.of(SECTION_LINK),
+        List.of(SECTION_LINK),
         TEMPLATE_PATH,
         summaryModel,
         DISPLAY_ORDER

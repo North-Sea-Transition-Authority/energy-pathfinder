@@ -2,11 +2,11 @@
 <#include '../../layout.ftl'/>
 
 <#macro renderSidebarLink sidebarLink>
-    <#local linkUrl = sidebarLink.isAnchorLink?then(sidebarLink.link, springUrl(sidebarLink.link))>
+  <#local linkUrl = sidebarLink.isAnchorLink?then(sidebarLink.link, springUrl(sidebarLink.link))>
 
-    <@fdsSubNavigation.subNavigationSectionItem
+  <@fdsSubNavigation.subNavigationSectionItem
     linkName=sidebarLink.displayText
     currentItemHref="#top"
-    linkAction=linkUrl />
-
+    linkAction=linkUrl
+  />
 </#macro>

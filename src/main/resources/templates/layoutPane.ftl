@@ -15,7 +15,7 @@
   errorCheck=false
   noIndex=false>
 
-  <@genericLayout htmlTitle=htmlTitle htmlAppTitle="Fivium Design System" errorCheck=errorCheck noIndex=noIndex>
+  <@genericLayout htmlTitle=htmlTitle htmlAppTitle=service.serviceName errorCheck=errorCheck noIndex=noIndex>
     <div class="fds-pane fds-pane--enabled" id="top">
         <#--Header goes below me-->
         <#--Header-->

@@ -15,7 +15,8 @@ public class ProjectSectionSummary {
   public ProjectSectionSummary(
       List<SidebarSectionLink> sidebarSectionLinks,
       String templatePath,
-      Map<String, Object> templateModel, int displayOrder) {
+      Map<String, Object> templateModel,
+      int displayOrder) {
     this.sidebarSectionLinks = sidebarSectionLinks;
     this.templatePath = templatePath;
     this.templateModel = templateModel;

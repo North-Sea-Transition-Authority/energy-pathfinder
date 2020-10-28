@@ -32,7 +32,7 @@ public final class SidebarSectionLink {
   }
 
   public static SidebarSectionLink createAnchorLink(String displayText, String link) {
-    return new SidebarSectionLink(true, link, displayText);
+    return new SidebarSectionLink(true, "#" + link, displayText);
   }
 
   public static SidebarSectionLink createExternalLink(String displayText, String link) {

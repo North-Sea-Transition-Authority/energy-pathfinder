@@ -10,7 +10,7 @@ public class DateUtil {
     throw new IllegalStateException("DateUtil is a utility class and should not be instantiated");
   }
 
-  private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+  public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy");
 
   public static String formatDate(LocalDate localDate) {
     return localDate != null
