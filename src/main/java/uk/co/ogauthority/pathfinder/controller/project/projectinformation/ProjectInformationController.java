@@ -75,10 +75,15 @@ public class ProjectInformationController extends ProjectFormPageController {
         .addObject("form", form)
         .addObject("pageName", PAGE_NAME)
         .addObject("discoveryFieldStage", FieldStage.getEntryAsMap(FieldStage.DISCOVERY))
+        .addObject("discoveryFieldStageDescription", FieldStage.DISCOVERY.getDescription())
         .addObject("developmentFieldStage", FieldStage.getEntryAsMap(FieldStage.DEVELOPMENT))
+        .addObject("developmentFieldStageDescription", FieldStage.DEVELOPMENT.getDescription())
         .addObject("operationsFieldStage", FieldStage.getEntryAsMap(FieldStage.OPERATIONS))
+        .addObject("operationsFieldStageDescription", FieldStage.OPERATIONS.getDescription())
         .addObject("decommissioningFieldStage", FieldStage.getEntryAsMap(FieldStage.DECOMMISSIONING))
+        .addObject("decommissioningFieldStageDescription", FieldStage.DECOMMISSIONING.getDescription())
         .addObject("energyTransitionFieldStage", FieldStage.getEntryAsMap(FieldStage.ENERGY_TRANSITION))
+        .addObject("energyTransitionFieldStageDescription", FieldStage.ENERGY_TRANSITION.getDescription())
         .addObject("quarters", Quarter.getAllAsMap());
 
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);

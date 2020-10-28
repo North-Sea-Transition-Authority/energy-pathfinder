@@ -5,19 +5,21 @@
     <@fdsError.singleErrorSummary errorMessage=error/>
   </#if>
   <@fdsForm.htmlForm>
-    <@fdsCheckAnswers.checkAnswers summaryListId="remove-member">
-      <@checkAnswers.checkAnswersRowNoActions prompt="Full name" value=teamMember.fullName!""/>
-      <@checkAnswers.checkAnswersRowNoActions prompt="Email address" value=teamMember.emailAddress!""/>
-      <@checkAnswers.checkAnswersRowNoActions prompt="Telephone number" value=teamMember.telephoneNo!""/>
+    <@fdsCheckAnswers.checkAnswersWrapper summaryListId="remove-member">
+      <@fdsCheckAnswers.checkAnswers>
+        <@checkAnswers.checkAnswersRowNoActions prompt="Full name" value=teamMember.fullName!""/>
+        <@checkAnswers.checkAnswersRowNoActions prompt="Email address" value=teamMember.emailAddress!""/>
+        <@checkAnswers.checkAnswersRowNoActions prompt="Telephone number" value=teamMember.telephoneNo!""/>
 
-      <#assign roles>
-        <#list teamMember.roleViews?sort_by("displaySequence") as role>
-          ${role.title}<#if role_has_next>,</#if>
-        </#list>
-      </#assign>
-      <@checkAnswers.checkAnswersRowNoActions prompt="Roles" value=roles/>
+        <#assign roles>
+          <#list teamMember.roleViews?sort_by("displaySequence") as role>
+            ${role.title}<#if role_has_next>,</#if>
+          </#list>
+        </#assign>
+        <@checkAnswers.checkAnswersRowNoActions prompt="Roles" value=roles/>
 
-    </@fdsCheckAnswers.checkAnswers>
+      </@fdsCheckAnswers.checkAnswers>
+    </@fdsCheckAnswers.checkAnswersWrapper>
 
     <@fdsAction.submitButtons
       primaryButtonText="Remove"

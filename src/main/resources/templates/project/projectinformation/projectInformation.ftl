@@ -23,14 +23,14 @@
       path="form.fieldStage"
       hiddenContent=true
     >
-      <@fdsRadio.radioItem path="form.fieldStage" itemMap=discoveryFieldStage isFirstItem=true>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=discoveryFieldStage itemHintText=discoveryFieldStageDescription isFirstItem=true>
         <@firstProductionDate path="form.discoveryFirstProductionDate" nestingPath="form.fieldStage"/>
       </@fdsRadio.radioItem>
-      <@fdsRadio.radioItem path="form.fieldStage" itemMap=developmentFieldStage>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=developmentFieldStage itemHintText=developmentFieldStageDescription>
         <@firstProductionDate path="form.developmentFirstProductionDate" nestingPath="form.fieldStage"/>
       </@fdsRadio.radioItem>
-      <@fdsRadio.radioItem path="form.fieldStage" itemMap=operationsFieldStage/>
-      <@fdsRadio.radioItem path="form.fieldStage" itemMap=decommissioningFieldStage>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=operationsFieldStage itemHintText=operationsFieldStageDescription/>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=decommissioningFieldStage itemHintText=decommissioningFieldStageDescription>
         <@quarterYear.standardQuarterYearInput
           quarterYearInputPath="form.decomWorkStartDate"
           legendHeading="What is the decommissioning work start date?"
@@ -49,7 +49,7 @@
           optionalLabel=true
         />
       </@fdsRadio.radioItem>
-      <@fdsRadio.radioItem path="form.fieldStage" itemMap=energyTransitionFieldStage/>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=energyTransitionFieldStage itemHintText=energyTransitionFieldStageDescription/>
     </@fdsRadio.radioGroup>
 
     <@contactDetails.standardContactDetails path="form.contactDetail"/>

@@ -27,11 +27,7 @@ public enum FieldStage {
     return description;
   }
 
-  public String getNameAndDescription() {
-    return !description.equals("") ? displayName + " - " + description : displayName;
-  }
-
   public static Map<String, String> getEntryAsMap(FieldStage fieldStage) {
-    return Collections.singletonMap(fieldStage.name(), fieldStage.getNameAndDescription());
+    return Collections.singletonMap(fieldStage.name(), fieldStage.getDisplayName());
   }
 }

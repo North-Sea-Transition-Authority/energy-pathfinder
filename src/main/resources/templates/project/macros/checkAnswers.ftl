@@ -10,22 +10,22 @@
 
 <#macro checkAnswersRowNoActionsWithNested prompt>
   <#local nested><#nested/></#local>
-  <@fdsCheckAnswers.checkAnswersRow keyText=prompt actionText="" actionUrl="" screenReaderActionText="">
+  <@fdsCheckAnswers.checkAnswersRowNoAction keyText=prompt>
     <#if nested?has_content>
       ${nested}
     </#if>
-  </@fdsCheckAnswers.checkAnswersRow>
+  </@fdsCheckAnswers.checkAnswersRowNoAction>
 </#macro>
 
 <#macro checkAnswersUploadedFileViewNoActions uploadedFileView>
-  <@fdsCheckAnswers.checkAnswersRow keyText="Document" actionText="" actionUrl="" screenReaderActionText="">
+  <@fdsCheckAnswers.checkAnswersRowNoAction keyText="Document">
     <#if uploadedFileView?has_content>
       <@fdsAction.link linkText=uploadedFileView.fileName linkUrl=springUrl(uploadedFileView.fileUrl) />
     </#if>
-  </@fdsCheckAnswers.checkAnswersRow>
-  <@fdsCheckAnswers.checkAnswersRow keyText="Document description" actionText="" actionUrl="" screenReaderActionText="">
+  </@fdsCheckAnswers.checkAnswersRowNoAction>
+  <@fdsCheckAnswers.checkAnswersRowNoAction keyText="Document description">
     <#if uploadedFileView?has_content>
       ${uploadedFileView.fileDescription}
     </#if>
-  </@fdsCheckAnswers.checkAnswersRow>
+  </@fdsCheckAnswers.checkAnswersRowNoAction>
 </#macro>
