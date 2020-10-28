@@ -31,6 +31,7 @@ public class SearchSelectorService {
                 .toLowerCase()
                 .contains(StringUtils.defaultIfBlank(searchQuery, "").toLowerCase()))
         .map(item -> new RestSearchItem(item.getSelectionId(), item.getSelectionText()))
+        .sorted(Comparator.comparing(RestSearchItem::getText))
         .collect(Collectors.toList());
   }
 

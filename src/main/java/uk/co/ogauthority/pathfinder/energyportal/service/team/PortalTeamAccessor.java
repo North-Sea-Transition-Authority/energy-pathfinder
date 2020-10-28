@@ -13,6 +13,7 @@ import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.exception.team.PortalTeamNotFoundException;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalRoleDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalSystemPrivilegeDto;
@@ -21,6 +22,7 @@ import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamMember
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.PersonId;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeam;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeamTypeRole;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeamUsagePurpose;
@@ -339,6 +341,67 @@ public class PortalTeamAccessor {
         PortalSystemPrivilegeDto.class)
         .setParameter("personId", person.getId().asInt())
         .getResultList();
+
+  }
+
+  public Optional<PortalTeamDto> findPortalTeamByOrganisationGroup(PortalOrganisationGroup portalOrganisationGroup) {
+    try {
+      return Optional.of(entityManager.createQuery("" +
+              "SELECT new uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto(" +
+              "  pt.resId, pt.name, pt.description, ptt.type, ptu.uref " +
+              ") " +
+              "FROM PortalTeam pt " +
+              "JOIN PortalTeamType ptt ON pt.portalTeamType = ptt " +
+              "LEFT JOIN PortalTeamUsage ptu ON ptu.portalTeam = pt " +
+              "LEFT JOIN PortalOrganisationGroup pog ON pog.urefValue = ptu.uref " +
+              "WHERE ptt.type = :portalTeamType " +
+              "AND pog.orgGrpId = :organisationGroupId",
+          PortalTeamDto.class)
+          .setParameter("portalTeamType", TeamType.ORGANISATION.getPortalTeamType())
+          .setParameter("organisationGroupId", portalOrganisationGroup.getOrgGrpId())
+          .getSingleResult());
+    } catch (NoResultException e) {
+      return Optional.empty();
+    }
+  }
+
+  @Transactional
+  public Integer createOrganisationGroupTeam(PortalOrganisationGroup organisationGroup,
+                                             AuthenticatedUserAccount user) {
+
+    final var teamType = TeamType.ORGANISATION;
+    final var portalTeamType = teamType.getPortalTeamType();
+    final var resourceTypeDisplayName = teamType.getPortalTeamTypeDisplayName();
+    final var resourceDescription = String.format("%s - %s", resourceTypeDisplayName, organisationGroup.getName());
+    final var organisationUref = organisationGroup.getUrefValue();
+    final var webUserAccountId = user.getWuaId();
+
+    try {
+      return portalTeamRepository.createTeam(
+          portalTeamType,
+          resourceTypeDisplayName,
+          resourceDescription,
+          organisationUref,
+          webUserAccountId
+      );
+    } catch (Exception e) {
+
+      var message = String.format(
+          "Error creating organisation group team with " +
+              "p_resource_type: %s, " +
+              "p_resource_name: %s, " +
+              "p_resource_description: %s, " +
+              "p_uref: %s, " +
+              "p_requesting_wua_id: %s",
+          portalTeamType,
+          resourceTypeDisplayName,
+          resourceDescription,
+          organisationUref,
+          webUserAccountId
+      );
+
+      throw new RuntimeException(message, e);
+    }
 
   }
 }

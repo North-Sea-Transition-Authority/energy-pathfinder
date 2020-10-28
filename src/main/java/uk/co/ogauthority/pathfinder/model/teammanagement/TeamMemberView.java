@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.model.teammanagement;
 
 import java.util.Set;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
+import uk.co.ogauthority.pathfinder.model.form.useraction.UserAction;
 
 /**
  * View of single team member for team management screen.
@@ -13,26 +14,26 @@ public class TeamMemberView {
   private final String emailAddress;
   private final String telephoneNo;
 
-  private final String editRoute;
-  private final String removeRoute;
+  private final UserAction editAction;
+  private final UserAction removeAction;
   private final Set<TeamRoleView> roleViews;
 
-  public TeamMemberView(Person person, String editRoute, String removeRoute, Set<TeamRoleView> teamRoleViews) {
+  public TeamMemberView(Person person, UserAction editAction, UserAction removeAction, Set<TeamRoleView> teamRoleViews) {
     this.forename = person.getForename();
     this.surname = person.getSurname();
     this.emailAddress = person.getEmailAddress();
     this.telephoneNo = person.getTelephoneNo();
     this.roleViews = teamRoleViews;
-    this.editRoute = editRoute;
-    this.removeRoute = removeRoute;
+    this.editAction = editAction;
+    this.removeAction = removeAction;
   }
 
-  public String getEditRoute() {
-    return editRoute;
+  public UserAction getEditAction() {
+    return editAction;
   }
 
-  public String getRemoveRoute() {
-    return removeRoute;
+  public UserAction getRemoveAction() {
+    return removeAction;
   }
 
   public String getForename() {

@@ -13,13 +13,16 @@ import org.springframework.web.servlet.HandlerMapping;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
+import uk.co.ogauthority.pathfinder.controller.team.annotation.TeamManagementPermissionCheck;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.service.team.teammanagementcontext.TeamManagementPermission;
 
 public class ArgumentResolverUtil {
 
   public static final String PROJECT_ID_PARAM = "projectId";
+  public static final String RESOURCE_ID_PARAM = "resId";
 
   private ArgumentResolverUtil() {
     throw new IllegalStateException("ArgumentResolverUtil is a utility class and should not be instantiated");
@@ -53,6 +56,11 @@ public class ArgumentResolverUtil {
       throw new PathfinderEntityNotFoundException(String.format("Requests must have numeric IDs: %s - %s",
           requestParam, pathVariables.get(requestParam)));
     }
+  }
+
+  public static boolean doesRequestContainParam(NativeWebRequest nativeWebRequest, String requestParam) {
+    Map<String, String> pathVariables = getPathVariables(nativeWebRequest);
+    return (pathVariables.get(requestParam) != null);
   }
 
   public static AuthenticatedUserAccount getAuthenticatedUser() {
@@ -95,6 +103,22 @@ public class ArgumentResolverUtil {
     return Optional.ofNullable(
         methodParameter.getContainingClass().getAnnotation(ProjectFormPagePermissionCheck.class))
         .map(p -> Arrays.stream(p.permissions()).collect(Collectors.toSet()))
+        .orElse(Set.of());
+  }
+
+  public static Set<TeamManagementPermission> getTeamManagementPermissionCheck(MethodParameter methodParameter) {
+    var methodLevelPermissions = Optional.ofNullable(
+        methodParameter.getMethodAnnotation(TeamManagementPermissionCheck.class))
+        .map(permissionCheck -> Arrays.stream(permissionCheck.permissions()).collect(Collectors.toSet()))
+        .orElse(Set.of());
+
+    if (!methodLevelPermissions.isEmpty()) {
+      return methodLevelPermissions;
+    }
+
+    return Optional.ofNullable(
+        Objects.requireNonNull(methodParameter.getMethod()).getAnnotation(TeamManagementPermissionCheck.class))
+        .map(permissionCheck -> Arrays.stream(permissionCheck.permissions()).collect(Collectors.toSet()))
         .orElse(Set.of());
   }
 }

@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.Porta
 import uk.co.ogauthority.pathfinder.energyportal.repository.organisation.PortalOrganisationGroupRepository;
 import uk.co.ogauthority.pathfinder.energyportal.repository.organisation.PortalOrganisationUnitDetailRepository;
 import uk.co.ogauthority.pathfinder.energyportal.repository.organisation.PortalOrganisationUnitRepository;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.dto.organisation.OrganisationUnitDetailDto;
 import uk.co.ogauthority.pathfinder.model.dto.organisation.OrganisationUnitId;
 
@@ -151,6 +152,22 @@ public class PortalOrganisationAccessor {
   public List<PortalOrganisationUnit> getOrganisationUnitsForOrganisationGroupsIn(
       List<PortalOrganisationGroup> organisationGroups) {
     return organisationUnitRepository.findByPortalOrganisationGroupIn(organisationGroups);
+  }
+
+  public List<PortalOrganisationGroup> findOrganisationGroupsWhereNameContains(String searchTerm) {
+    return organisationGroupRepository.findByNameContainingIgnoreCase(searchTerm);
+  }
+
+  /**
+   * Get the PortalOrganisationGroup for the specified id, error if it does not exist.
+   * @param orgGrpId id of the PortalOrganisationGroup
+   * @return the PortalOrganisationGroup with the specified id
+   */
+  public PortalOrganisationGroup getOrganisationGroupOrError(Integer orgGrpId) {
+    return getOrganisationGroupById(orgGrpId)
+        .orElseThrow(() -> new PathfinderEntityNotFoundException(
+            String.format("unable to find organisation group with id %d", orgGrpId))
+        );
   }
 
 }

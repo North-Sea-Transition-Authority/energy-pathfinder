@@ -7,16 +7,21 @@ import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.repository.team.PortalTeamRepository;
 import uk.co.ogauthority.pathfinder.energyportal.service.team.PortalTeamAccessor;
+import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PortalTeamAccessorTest {
@@ -34,6 +39,7 @@ public class PortalTeamAccessorTest {
 
   private PortalTeamAccessor portalTeamAccessor;
 
+  private AuthenticatedUserAccount authenticatedUserAccount;
 
   @Before
   public void setup() {
@@ -41,6 +47,7 @@ public class PortalTeamAccessorTest {
 
     targetPerson = new Person(1, "fname", "sname", "email", "0");
     actionPerformedBy = new WebUserAccount(9);
+    authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount(Set.of(UserPrivilege.PATHFINDER_REG_ORG_MANAGER));
   }
 
 
@@ -80,5 +87,17 @@ public class PortalTeamAccessorTest {
     Collection<String> roles = Arrays.asList("ROLE1", "ROLE2");
     portalTeamAccessor.addPersonToTeamWithRoles(TEAM_RES_ID, targetPerson, roles, actionPerformedBy);
 
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void createOrganisationGroupTeam_caughtExceptionIsRethrown() {
+    doThrow(new NullPointerException()).when(portalTeamRepository).createTeam(any(), any(), any(), any(), any());
+    portalTeamAccessor.createOrganisationGroupTeam(new PortalOrganisationGroup(), authenticatedUserAccount);
+  }
+
+  @Test
+  public void createOrganisationGroupTeam_verifyRepositoryInteraction() {
+    portalTeamAccessor.createOrganisationGroupTeam(new PortalOrganisationGroup(), authenticatedUserAccount);
+    verify(portalTeamRepository, times(1)).createTeam(any(), any(), any(), any(), any());
   }
 }

@@ -30,6 +30,8 @@ import uk.co.ogauthority.pathfinder.energyportal.repository.PersonRepository;
 import uk.co.ogauthority.pathfinder.energyportal.repository.WebUserAccountRepository;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.form.teammanagement.UserRolesForm;
+import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
+import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.model.team.RegulatorRole;
 import uk.co.ogauthority.pathfinder.model.team.TeamType;
 import uk.co.ogauthority.pathfinder.model.teammanagement.TeamMemberView;
@@ -60,6 +62,7 @@ public class TeamManagementServiceTest {
   private Role regTeamAdminRole;
   private Role regTeamSomeOtherRole;
   private TeamMember regulatorPersonRegulatorTeamMember;
+  private TeamMember otherRegulatorPersonTeamMember;
   private OrganisationTeam organisationTeam1;
   private OrganisationTeam organisationTeam2;
   private Person regulatorTeamAdminPerson;
@@ -96,6 +99,7 @@ public class TeamManagementServiceTest {
     regulatorPersonRegulatorTeamMember = new TeamMember(regulatorTeam, regulatorTeamAdminPerson, Set.of(regTeamAdminRole));
 
     otherRegulatorPerson = new Person(2, "other reg", "person", "otherreg@person.com", "0");
+    otherRegulatorPersonTeamMember = new TeamMember(regulatorTeam, otherRegulatorPerson, Set.of(regTeamSomeOtherRole));
 
     organisationPerson = new Person(3, "org", "person", "org@person.com", "0");
     organisationUser = new AuthenticatedUserAccount(new WebUserAccount(3, organisationPerson), List.of());
@@ -165,13 +169,20 @@ public class TeamManagementServiceTest {
 
   @Test
   public void getTeamMemberViewForTeamAndPerson_whenNotATeamMember() {
-    assertThat(teamManagementService.getTeamMemberViewForTeamAndPerson(regulatorTeam, organisationPerson)).isEmpty();
+    assertThat(teamManagementService.getTeamMemberViewForTeamAndPerson(
+        regulatorTeam,
+        organisationPerson,
+        organisationUser
+    )).isEmpty();
   }
 
   @Test
   public void getTeamMemberViewForTeamAndPerson_whenATeamMember_basicPersonPropertiesMappedAsExpected() {
-    var teamMemberViewOptional = teamManagementService.getTeamMemberViewForTeamAndPerson(regulatorTeam,
-        regulatorTeamAdminPerson);
+    var teamMemberViewOptional = teamManagementService.getTeamMemberViewForTeamAndPerson(
+        regulatorTeam,
+        regulatorTeamAdminPerson,
+        manageRegTeamRegulatorUser
+    );
 
     assertThat(teamMemberViewOptional).isPresent();
     assertTeamUserViewHasExpectedSimpleProperties(regulatorTeam, regulatorTeamAdminPerson, teamMemberViewOptional.get());
@@ -181,8 +192,11 @@ public class TeamManagementServiceTest {
   @Test
   public void getTeamMemberViewForTeamAndPerson_whenATeamMember_memberRolesMappedAsExpected() {
 
-    var teamMemberViewOptional = teamManagementService.getTeamMemberViewForTeamAndPerson(regulatorTeam,
-        regulatorTeamAdminPerson);
+    var teamMemberViewOptional = teamManagementService.getTeamMemberViewForTeamAndPerson(
+        regulatorTeam,
+        regulatorTeamAdminPerson,
+        manageRegTeamRegulatorUser
+    );
 
     Role expectedRole = TeamTestingUtil.getTeamAdminRole();
     assertThat(teamMemberViewOptional).isPresent();
@@ -192,7 +206,10 @@ public class TeamManagementServiceTest {
   @Test
   public void getTeamMemberViewsForTeam_whenSingleTeamMemberIsAdmin() {
     Role expectedRole = TeamTestingUtil.getTeamAdminRole();
-    List<TeamMemberView> teamMemberViewsForTeam = teamManagementService.getTeamMemberViewsForTeam(regulatorTeam);
+    List<TeamMemberView> teamMemberViewsForTeam = teamManagementService.getTeamMemberViewsForTeam(
+        regulatorTeam,
+        manageRegTeamRegulatorUser
+    );
 
     assertThat(teamMemberViewsForTeam).hasSize(1);
     assertTeamUserViewHasSingleRoleMappedAsExpected(expectedRole, teamMemberViewsForTeam.get(0));
@@ -280,7 +297,12 @@ public class TeamManagementServiceTest {
     when(teamService.getMembershipOfPersonInTeam(organisationTeam1, regulatorTeamAdminPerson))
         .thenReturn(Optional.empty());
 
-    teamManagementService.populateExistingRoles(regulatorTeamAdminPerson, organisationTeam1, userRolesForm);
+    teamManagementService.populateExistingRoles(
+        regulatorTeamAdminPerson,
+        organisationTeam1,
+        userRolesForm,
+        manageRegTeamRegulatorUser
+    );
     assertThat(userRolesForm.getUserRoles()).isEmpty();
   }
 
@@ -290,7 +312,12 @@ public class TeamManagementServiceTest {
         .thenReturn(Optional.of(new TeamMember(regulatorTeam,
             regulatorTeamAdminPerson, Set.of(regTeamAdminRole, regTeamSomeOtherRole))));
 
-    teamManagementService.populateExistingRoles(regulatorTeamAdminPerson, regulatorTeam, userRolesForm);
+    teamManagementService.populateExistingRoles(
+        regulatorTeamAdminPerson,
+        regulatorTeam,
+        userRolesForm,
+        manageRegTeamRegulatorUser
+    );
     // Expect order to match role display sequence
     assertThat(userRolesForm.getUserRoles()).containsExactly(regTeamAdminRole.getName(),
         regTeamSomeOtherRole.getName());
@@ -429,8 +456,8 @@ public class TeamManagementServiceTest {
     assertThat(teamUserView.getForename()).isEqualTo(person.getForename());
     assertThat(teamUserView.getSurname()).isEqualTo(person.getSurname());
     assertThat(teamUserView.getFullName()).isEqualTo(person.getForename() + " " + person.getSurname());
-    assertThat(teamUserView.getEditRoute()).isEqualTo(expectedEditRoute);
-    assertThat(teamUserView.getRemoveRoute()).isEqualTo(expectedRemoveRoute);
+    assertThat(teamUserView.getEditAction().getUrl()).isEqualTo(expectedEditRoute);
+    assertThat(teamUserView.getRemoveAction().getUrl()).isEqualTo(expectedRemoveRoute);
   }
 
   @Test
@@ -814,6 +841,75 @@ public class TeamManagementServiceTest {
     assertThat(viewableTeams).containsExactly(organisationTeamA, organisationTeamB, organisationTeamC);
   }
 
+  @Test
+  public void canManageAnyOrgTeam_whenOrganisationAccessManager_thenTrue() {
+    final var regulatorOrganisationManagerPrivilege = UserPrivilege.PATHFINDER_REG_ORG_MANAGER;
+    final var user = UserTestingUtil.getAuthenticatedUserAccount(
+        Set.of(regulatorOrganisationManagerPrivilege)
+    );
+    when(teamService.getAllUserPrivilegesForPerson(user.getLinkedPerson()))
+        .thenReturn(List.of(regulatorOrganisationManagerPrivilege));
 
+    assertThat(teamManagementService.canManageAnyOrgTeam(user)).isTrue();
+  }
+
+  @Test
+  public void canManageAnyOrgTeam_whenNotOrganisationAccessManager_thenFalse() {
+    final var regulatorOrganisationManagerPrivilege = UserPrivilege.PATHFINDER_WORK_AREA;
+    final var user = UserTestingUtil.getAuthenticatedUserAccount(
+        Set.of(regulatorOrganisationManagerPrivilege)
+    );
+    when(teamService.getAllUserPrivilegesForPerson(user.getLinkedPerson()))
+        .thenReturn(List.of(regulatorOrganisationManagerPrivilege));
+
+    assertThat(teamManagementService.canManageAnyOrgTeam(user)).isFalse();
+  }
+
+  @Test
+  public void constructAddMemberAction_whenTeamAdmin_thenEnabled() {
+
+    final var team = regulatorTeam;
+    final var accessManagerPrivilege = UserPrivilege.PATHFINDER_REGULATOR_ADMIN;
+    final var user = UserTestingUtil.getAuthenticatedUserAccount();
+
+    when(teamService.getAllUserPrivilegesForPerson(user.getLinkedPerson()))
+        .thenReturn(List.of(accessManagerPrivilege));
+
+    when(teamService.getMembershipOfPersonInTeam(team, user.getLinkedPerson()))
+        .thenReturn(Optional.of(regulatorPersonRegulatorTeamMember));
+
+    var result = teamManagementService.constructAddMemberAction(team, user);
+
+    assertConstructAddMemberActionCommonFields((LinkButton) result, team);
+    assertThat(result.getEnabled()).isTrue();
+  }
+
+  @Test
+  public void constructAddMemberAction_whenNotTeamAdmin_thenDisabled() {
+
+    final var team = regulatorTeam;
+    final var nonAccessManagerPrivilege = UserPrivilege.PATHFINDER_WORK_AREA;
+    final var user = UserTestingUtil.getAuthenticatedUserAccount();
+
+    when(teamService.getAllUserPrivilegesForPerson(user.getLinkedPerson()))
+        .thenReturn(List.of(nonAccessManagerPrivilege));
+
+    when(teamService.getMembershipOfPersonInTeam(team, user.getLinkedPerson()))
+        .thenReturn(Optional.of(otherRegulatorPersonTeamMember));
+
+    var result = teamManagementService.constructAddMemberAction(team, user);
+
+    assertConstructAddMemberActionCommonFields((LinkButton) result, team);
+    assertThat(result.getEnabled()).isFalse();
+  }
+
+  private void assertConstructAddMemberActionCommonFields(LinkButton linkButton, Team team) {
+    assertThat(linkButton.getPrompt()).isEqualTo(TeamManagementService.ADD_USER_ACTION_PROMPT);
+    assertThat(linkButton.getUrl()).isEqualTo(
+        ReverseRouter.route(on(PortalTeamManagementController.class)
+        .renderAddUserToTeam(team.getId(), null, null)
+    ));
+    assertThat(linkButton.getButtonType()).isEqualTo(ButtonType.BLUE);
+  }
 
 }

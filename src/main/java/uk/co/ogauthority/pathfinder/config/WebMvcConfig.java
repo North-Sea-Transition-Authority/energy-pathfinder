@@ -9,16 +9,20 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.co.ogauthority.pathfinder.mvc.ResponseBufferSizeHandlerInterceptor;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.AuthenticatedUserAccountArgumentResolver;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ProjectContextArgumentResolver;
+import uk.co.ogauthority.pathfinder.mvc.argumentresolver.TeamManagementContextArgumentResolver;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
   private final ProjectContextArgumentResolver projectContextArgumentResolver;
+  private final TeamManagementContextArgumentResolver teamManagementContextArgumentResolver;
 
   @Autowired
-  public WebMvcConfig(ProjectContextArgumentResolver projectContextArgumentResolver) {
+  public WebMvcConfig(ProjectContextArgumentResolver projectContextArgumentResolver,
+                      TeamManagementContextArgumentResolver teamManagementContextArgumentResolver) {
     this.projectContextArgumentResolver = projectContextArgumentResolver;
+    this.teamManagementContextArgumentResolver = teamManagementContextArgumentResolver;
   }
 
   @Override
@@ -26,6 +30,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     resolvers.add(new AuthenticatedUserAccountArgumentResolver());
     resolvers.add(new ValidationTypeArgumentResolver());
     resolvers.add(projectContextArgumentResolver);
+    resolvers.add(teamManagementContextArgumentResolver);
   }
 
   @Override

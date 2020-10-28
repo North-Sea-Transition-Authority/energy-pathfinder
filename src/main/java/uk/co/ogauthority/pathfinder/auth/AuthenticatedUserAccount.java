@@ -12,7 +12,7 @@ public class AuthenticatedUserAccount extends WebUserAccount implements Serializ
 
   private static final long serialVersionUID = 1;
 
-  private Collection<UserPrivilege> userPrivileges;
+  private final Collection<UserPrivilege> userPrivileges;
 
   public AuthenticatedUserAccount(WebUserAccount webUserAccount, Collection<UserPrivilege> userPrivileges) {
     this.wuaId = webUserAccount.getWuaId();

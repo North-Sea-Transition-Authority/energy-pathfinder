@@ -21,9 +21,7 @@
     </@fdsDetails.summaryDetails>
   </#if>
 
-  <#if userCanManageAccess>
-    <@fdsAction.link linkText="Add user" linkUrl=springUrl(addUserUrl) linkClass="govuk-button govuk-button--blue" role=true/>
-  </#if>
+  <@userAction.userAction userAction=addUserAction />
 
   <#list teamMemberViews>
     <table class="govuk-table">
@@ -32,7 +30,7 @@
         <th class="govuk-table__header" scope="col">Name</th>
         <th class="govuk-table__header" scope="col">Contact details</th>
         <th class="govuk-table__header" scope="col">Roles</th>
-        <#if userCanManageAccess>
+        <#if showTeamMemberActions>
           <th class="govuk-table__header" scope="col">Actions</th>
         </#if>
       </tr>
@@ -54,24 +52,14 @@
                 <br>
               </#list>
             </td>
-            <#if userCanManageAccess>
+            <#if showTeamMemberActions>
               <td class="govuk-table__cell">
                 <ul class="govuk-list">
                   <li>
-                    <@fdsAction.link
-                      linkUrl=springUrl(teamMemberView.editRoute)
-                      linkText="Edit"
-                      linkScreenReaderText="${teamMemberView.fullName} user"
-                      linkClass="govuk-link govuk-link--no-visited-state"
-                    />
+                    <@userAction.userAction userAction=teamMemberView.editAction/>
                   </li>
                   <li>
-                    <@fdsAction.link
-                      linkUrl=springUrl(teamMemberView.removeRoute)
-                      linkText="Remove"
-                      linkScreenReaderText="${teamMemberView.fullName} user"
-                      linkClass="govuk-link govuk-link--no-visited-state"
-                    />
+                    <@userAction.userAction userAction=teamMemberView.removeAction/>
                   </li>
                 </ul>
               </td>

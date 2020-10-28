@@ -70,10 +70,7 @@ public class SelectOperatorService {
    * @return the PortalOrganisationGroup with the specified id
    */
   public PortalOrganisationGroup getOrganisationGroupOrError(Integer orgGrpId) {
-    return portalOrganisationAccessor.getOrganisationGroupById(orgGrpId)
-        .orElseThrow(() -> new PathfinderEntityNotFoundException(
-            String.format("unable to find organisation group with id %d", orgGrpId))
-        );
+    return portalOrganisationAccessor.getOrganisationGroupOrError(orgGrpId);
   }
 
   public ProjectOperator updateProjectOperator(ProjectDetail detail, PortalOrganisationGroup organisationGroup) {
@@ -141,7 +138,7 @@ public class SelectOperatorService {
         .addObject("backLink", topNavigationType.equals(TopNavigationType.BACKLINK))
         .addObject("breadCrumbs", topNavigationType.equals(TopNavigationType.BREADCRUMBS))
         .addObject("operatorsRestUrl", SearchSelectorService.route(on(OrganisationGroupRestController.class)
-            .searchFields(null, null))
+            .searchUserOrganisations(null, null))
         );
   }
 

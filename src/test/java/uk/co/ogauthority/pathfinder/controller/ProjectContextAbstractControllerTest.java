@@ -26,6 +26,7 @@ import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
+import uk.co.ogauthority.pathfinder.service.team.teammanagementcontext.TeamManagementContextService;
 
 @Import({AbstractControllerTest.TestConfig.class, ProjectContextAbstractControllerTest.TestConfig.class})
 public abstract class ProjectContextAbstractControllerTest {
@@ -58,6 +59,9 @@ public abstract class ProjectContextAbstractControllerTest {
 
   @MockBean
   protected ProjectOperatorService projectOperatorService;
+
+  @MockBean
+  protected TeamManagementContextService teamManagementContextService;
 
   @Before
   public void  projectContextAbstractControllerTestSetUp() {

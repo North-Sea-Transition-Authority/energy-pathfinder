@@ -10,6 +10,7 @@ import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamMember
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationUnit;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationUnitDetail;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
 import uk.co.ogauthority.pathfinder.model.team.RegulatorRole;
 import uk.co.ogauthority.pathfinder.model.team.RegulatorTeam;
@@ -103,8 +104,9 @@ public class TeamTestingUtil {
     return generateOrganisationUnit(1000, "ORGANISATION_UNIT", portalOrganisationGroup);
   }
 
-  private static PortalOrganisationUnit generateOrganisationUnit(int ouId, String name,
-                                                                 PortalOrganisationGroup portalOrganisationGroup) {
+  public static PortalOrganisationUnit generateOrganisationUnit(int ouId,
+                                                                String name,
+                                                                PortalOrganisationGroup portalOrganisationGroup) {
     PortalOrganisationUnit organisationUnit = new PortalOrganisationUnit();
     try {
       FieldUtils.writeField(organisationUnit, "ouId", ouId, true);
@@ -130,6 +132,24 @@ public class TeamTestingUtil {
     }
 
     return portalOrganisationGroup;
+  }
+
+  public static PortalOrganisationUnitDetail generateOrganisationUnitDetail(int ouId,
+                                                                       PortalOrganisationUnit organisationUnit,
+                                                                       String legalAddress,
+                                                                       String registeredNumber) {
+
+    var portalOrganisationUnitDetail = new PortalOrganisationUnitDetail();
+    try {
+      FieldUtils.writeField(portalOrganisationUnitDetail, "ouId", ouId, true);
+      FieldUtils.writeField(portalOrganisationUnitDetail, "organisationUnit", organisationUnit, true);
+      FieldUtils.writeField(portalOrganisationUnitDetail, "legalAddress", legalAddress, true);
+      FieldUtils.writeField(portalOrganisationUnitDetail, "registeredNumber", registeredNumber, true);
+    } catch (IllegalAccessException e) {
+      e.printStackTrace();
+    }
+
+    return portalOrganisationUnitDetail;
   }
 
   public static TeamMember createRegulatorTeamMember(Team regulatorTeam, Person person, Set<RegulatorRole> regulatorRoles) {

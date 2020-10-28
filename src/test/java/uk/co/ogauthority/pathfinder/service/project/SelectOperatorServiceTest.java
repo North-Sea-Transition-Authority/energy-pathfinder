@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
@@ -53,8 +53,6 @@ public class SelectOperatorServiceTest {
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       SystemAccessService.CREATE_PROJECT_PRIVILEGES);
 
-  private static final Person person = UserTestingUtil.getPerson(authenticatedUser);
-
   private static final PortalOrganisationGroup organisationGroup = TeamTestingUtil.generateOrganisationGroup(
       1,
       "Org Grp",
@@ -64,7 +62,7 @@ public class SelectOperatorServiceTest {
   private static final ProjectOperator projectOperator = ProjectOperatorUtil.getOperator(detail, organisationGroup);
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     selectOperatorService = new SelectOperatorService(
         portalOrganisationAccessor,
         validationService,
@@ -75,21 +73,21 @@ public class SelectOperatorServiceTest {
 
   @Test
   public void getOrganisationGroupOrError_userCanAccessGroup() {
-    when(portalOrganisationAccessor.getOrganisationGroupById(organisationGroup.getOrgGrpId())).thenReturn(Optional.of(organisationGroup));
+    when(portalOrganisationAccessor.getOrganisationGroupOrError(organisationGroup.getOrgGrpId())).thenReturn(organisationGroup);
     when(projectOperatorService.canUserAccessOrgGroup(authenticatedUser, organisationGroup)).thenReturn(true);
     assertThat(selectOperatorService.getOrganisationGroupOrError(authenticatedUser, organisationGroup.getOrgGrpId())).isEqualTo(organisationGroup);
   }
 
   @Test(expected = AccessDeniedException.class)
   public void getOrganisationGroupOrError_userCannotAccessGroup() {
-    when(portalOrganisationAccessor.getOrganisationGroupById(organisationGroup.getOrgGrpId())).thenReturn(Optional.of(organisationGroup));
+    when(portalOrganisationAccessor.getOrganisationGroupOrError(organisationGroup.getOrgGrpId())).thenReturn(organisationGroup);
     when(projectOperatorService.canUserAccessOrgGroup(authenticatedUser, organisationGroup)).thenReturn(false);
     selectOperatorService.getOrganisationGroupOrError(authenticatedUser, organisationGroup.getOrgGrpId());
   }
 
   @Test(expected = PathfinderEntityNotFoundException.class)
   public void getOrganisationGroupOrError_noMatchingGroup() {
-    when(portalOrganisationAccessor.getOrganisationGroupById(organisationGroup.getOrgGrpId())).thenReturn(Optional.empty());
+    doThrow(new PathfinderEntityNotFoundException("test")).when(portalOrganisationAccessor).getOrganisationGroupOrError(organisationGroup.getOrgGrpId());
     selectOperatorService.getOrganisationGroupOrError(authenticatedUser, organisationGroup.getOrgGrpId());
   }
 

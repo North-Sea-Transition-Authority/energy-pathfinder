@@ -25,6 +25,10 @@ import uk.co.ogauthority.pathfinder.energyportal.repository.PersonRepository;
 import uk.co.ogauthority.pathfinder.energyportal.repository.WebUserAccountRepository;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.form.teammanagement.UserRolesForm;
+import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
+import uk.co.ogauthority.pathfinder.model.form.useraction.Link;
+import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
+import uk.co.ogauthority.pathfinder.model.form.useraction.UserAction;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationRole;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
 import uk.co.ogauthority.pathfinder.model.team.RegulatorRole;
@@ -40,6 +44,7 @@ import uk.co.ogauthority.pathfinder.service.team.TeamService;
 @Service
 public class TeamManagementService {
 
+  public static final String ADD_USER_ACTION_PROMPT = "Add user";
   private static final Logger LOGGER = LoggerFactory.getLogger(TeamManagementService.class);
 
   private final TeamService teamService;
@@ -66,13 +71,13 @@ public class TeamManagementService {
   /**
    * Convert TeamMember of a Team into TeamUserViews for team management screens.
    */
-  public List<TeamMemberView> getTeamMemberViewsForTeam(Team team) {
+  public List<TeamMemberView> getTeamMemberViewsForTeam(Team team, AuthenticatedUserAccount userAccount) {
     List<TeamMember> teamMembers = teamService.getTeamMembers(team);
 
     List<TeamMemberView> users = new ArrayList<>();
 
     for (TeamMember teamMember : teamMembers) {
-      users.add(convertTeamMemberToTeamUserView(teamMember));
+      users.add(convertTeamMemberToTeamUserView(teamMember, team, userAccount));
     }
 
     return users;
@@ -81,19 +86,23 @@ public class TeamManagementService {
   /**
    * Return an optional wrapping a TeamMemberView of a person if they are a member of the provided team.
    */
-  public Optional<TeamMemberView> getTeamMemberViewForTeamAndPerson(Team team, Person person) {
+  public Optional<TeamMemberView> getTeamMemberViewForTeamAndPerson(Team team,
+                                                                    Person person,
+                                                                    AuthenticatedUserAccount userAccount) {
     return teamService.getMembershipOfPersonInTeam(team, person)
-        .map(this::convertTeamMemberToTeamUserView);
+        .map(teamMember -> convertTeamMemberToTeamUserView(teamMember, team, userAccount));
 
   }
 
-  TeamMemberView convertTeamMemberToTeamUserView(TeamMember teamMember) {
+  TeamMemberView convertTeamMemberToTeamUserView(TeamMember teamMember, Team team, AuthenticatedUserAccount userAccount) {
     Person teamMemberPerson = teamMember.getPerson();
-    Team team = teamMember.getTeam();
+    final var canManageTeam = canManageTeam(team, userAccount);
 
     Set<TeamRoleView> roleViews = teamMember.getRoleSet().stream()
         .map(TeamRoleView::createTeamRoleViewFrom)
         .collect(Collectors.toSet());
+
+    final var teamMemberActionScreenReaderText = String.format("%s user", teamMemberPerson.getFullName());
 
     String editRoute = ReverseRouter.route(on(PortalTeamManagementController.class).renderMemberRoles(
         team.getId(),
@@ -102,16 +111,30 @@ public class TeamManagementService {
         null
     ));
 
+    var editAction = new Link(
+        "Edit",
+        editRoute,
+        canManageTeam,
+        teamMemberActionScreenReaderText
+    );
+
     String removeRoute = ReverseRouter.route(on(PortalTeamManagementController.class).renderRemoveTeamMember(
         team.getId(),
         teamMemberPerson.getId().asInt(),
         null
     ));
 
+    var removeAction = new Link(
+        "Remove",
+        removeRoute,
+        canManageTeam,
+        teamMemberActionScreenReaderText
+    );
+
     return new TeamMemberView(
         teamMemberPerson,
-        editRoute,
-        removeRoute,
+        editAction,
+        removeAction,
         roleViews
     );
   }
@@ -199,8 +222,11 @@ public class TeamManagementService {
   /**
    * Populate the existing roles a person has for a given team.
    */
-  public void populateExistingRoles(Person person, Team team, UserRolesForm form) {
-    Optional<TeamMemberView> teamMember = getTeamMemberViewForTeamAndPerson(team, person);
+  public void populateExistingRoles(Person person,
+                                    Team team,
+                                    UserRolesForm form,
+                                    AuthenticatedUserAccount userAccount) {
+    Optional<TeamMemberView> teamMember = getTeamMemberViewForTeamAndPerson(team, person, userAccount);
     if (teamMember.isPresent()) {
       List<TeamRoleView> personRoles = new ArrayList<>(teamMember.get().getRoleViews());
       List<String> personRoleNames = personRoles.stream()
@@ -394,15 +420,29 @@ public class TeamManagementService {
         .anyMatch(p -> p.equals(UserPrivilege.PATHFINDER_REGULATOR_ADMIN));
   }
 
-  @VisibleForTesting
-  boolean canManageAnyOrgTeam(List<UserPrivilege> userPrivileges) {
+  public boolean canManageAnyOrgTeam(List<UserPrivilege> userPrivileges) {
     return userPrivileges.stream()
         .anyMatch(p -> p.equals(UserPrivilege.PATHFINDER_REG_ORG_MANAGER));
+  }
+
+  public boolean canManageAnyOrgTeam(AuthenticatedUserAccount userAccount) {
+    List<UserPrivilege> userPrivileges = teamService.getAllUserPrivilegesForPerson(userAccount.getLinkedPerson());
+    return canManageAnyOrgTeam(userPrivileges);
   }
 
   public boolean isPersonMemberOfTeam(Person person, Team team) {
     return teamService.isPersonMemberOfTeam(person, team);
   }
 
+  public UserAction constructAddMemberAction(Team team, AuthenticatedUserAccount userAccount) {
+    return new LinkButton(
+        ADD_USER_ACTION_PROMPT,
+        ReverseRouter.route(on(PortalTeamManagementController.class)
+            .renderAddUserToTeam(team.getId(), null, null)
+        ),
+        canManageTeam(team, userAccount),
+        ButtonType.BLUE
+    );
+  }
 }
 
