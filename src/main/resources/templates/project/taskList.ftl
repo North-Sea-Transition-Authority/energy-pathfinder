@@ -41,5 +41,11 @@
         useNotCompletedLabels=true
       />
     </@fdsTaskList.taskListSection>
+    <@fdsTaskList.taskListSection sectionNumber="3" sectionHeadingText="Submit project" >
+      <@fdsTaskList.taskListItem
+        itemUrl=springUrl(reviewAndSubmitLink)
+        itemText="Review and submit"
+      />
+    </@fdsTaskList.taskListSection>
   </@fdsTaskList.taskList>
 </@defaultPage>

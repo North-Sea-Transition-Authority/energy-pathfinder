@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationC
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
 import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProjectOperatorController;
+import uk.co.ogauthority.pathfinder.controller.project.submission.SubmitProjectController;
 import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.SubseaInfrastructureController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -148,6 +149,10 @@ public class TaskListController {
     modelAndView.addObject("integratedRigCompleted", integratedRigService.isComplete(
         projectDetails
     ));
+
+    modelAndView.addObject("reviewAndSubmitLink",
+        ReverseRouter.route(on(SubmitProjectController.class).getProjectSummary(projectId, null))
+    );
 
     return modelAndView;
   }
