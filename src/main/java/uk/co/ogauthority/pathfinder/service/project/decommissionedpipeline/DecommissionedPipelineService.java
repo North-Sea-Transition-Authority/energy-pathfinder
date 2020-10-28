@@ -1,13 +1,17 @@
 package uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline;
 
+import java.util.List;
 import java.util.Map;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.decommissionedpipeline.DecommissionedPipeline;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineForm;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineValidationHint;
@@ -34,6 +38,32 @@ public class DecommissionedPipelineService {
     this.validationService = validationService;
   }
 
+  public DecommissionedPipelineForm getForm(Integer decommissionedPipelineId, ProjectDetail projectDetail) {
+    var decommissionedPipeline = getDecommissionedPipelineOrError(decommissionedPipelineId, projectDetail);
+    return getForm(decommissionedPipeline);
+  }
+
+  private DecommissionedPipelineForm getForm(DecommissionedPipeline decommissionedPipeline) {
+    var form = new DecommissionedPipelineForm();
+
+    String pipeline = null;
+
+    if (decommissionedPipeline.getPipeline() != null) {
+      pipeline = decommissionedPipeline.getPipeline().getSelectionId();
+    }
+
+    form.setPipeline(pipeline);
+    form.setMaterialType(decommissionedPipeline.getMaterialType());
+    form.setStatus(decommissionedPipeline.getStatus());
+    form.setDecommissioningDate(new MinMaxDateInput(
+        decommissionedPipeline.getEarliestRemovalYear(),
+        decommissionedPipeline.getLatestRemovalYear())
+    );
+    form.setRemovalPremise(decommissionedPipeline.getRemovalPremise());
+
+    return form;
+  }
+
   public String getPipelineRestUrl() {
     return pipelineService.getPipelineRestUrl();
   }
@@ -56,12 +86,41 @@ public class DecommissionedPipelineService {
     return createOrUpdateDecommissionedPipeline(decommissionedPipeline, projectDetail, form);
   }
 
+  public DecommissionedPipeline updateDecommissionedPipeline(Integer decommissionedPipelineId,
+                                                             ProjectDetail projectDetail,
+                                                             DecommissionedPipelineForm form) {
+    var decommissionedPipeline = getDecommissionedPipelineOrError(decommissionedPipelineId, projectDetail);
+    return createOrUpdateDecommissionedPipeline(decommissionedPipeline, projectDetail, form);
+  }
+
   @Transactional
   DecommissionedPipeline createOrUpdateDecommissionedPipeline(DecommissionedPipeline decommissionedPipeline,
-                                                     ProjectDetail projectDetail,
-                                                     DecommissionedPipelineForm form) {
+                                                              ProjectDetail projectDetail,
+                                                              DecommissionedPipelineForm form) {
     setCommonEntityFields(decommissionedPipeline, projectDetail, form);
     return decommissionedPipelineRepository.save(decommissionedPipeline);
+  }
+
+  public List<DecommissionedPipeline> getDecommissionedPipelines(ProjectDetail projectDetail) {
+    return decommissionedPipelineRepository.findByProjectDetailOrderByIdAsc(projectDetail);
+  }
+
+  public boolean isValid(DecommissionedPipeline decommissionedPipeline, ValidationType validationType) {
+    var form = getForm(decommissionedPipeline);
+    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult = validate(form, bindingResult, validationType);
+    return !bindingResult.hasErrors();
+  }
+
+  @Transactional
+  public void deleteDecommissionedPipeline(DecommissionedPipeline decommissionedPipeline) {
+    decommissionedPipelineRepository.delete(decommissionedPipeline);
+  }
+
+  public boolean isComplete(ProjectDetail projectDetail) {
+    var decommissionedPipelines = getDecommissionedPipelines(projectDetail);
+    return !decommissionedPipelines.isEmpty() && decommissionedPipelines.stream()
+        .allMatch(decommissionedPipeline -> isValid(decommissionedPipeline, ValidationType.FULL));
   }
 
   private void setCommonEntityFields(DecommissionedPipeline decommissionedPipeline,
@@ -80,5 +139,14 @@ public class DecommissionedPipelineService {
     decommissionedPipeline.setEarliestRemovalYear(form.getDecommissioningDate().getMinYear());
     decommissionedPipeline.setLatestRemovalYear(form.getDecommissioningDate().getMaxYear());
     decommissionedPipeline.setRemovalPremise(form.getRemovalPremise());
+  }
+
+  public DecommissionedPipeline getDecommissionedPipelineOrError(Integer decommissionedPipelineId, ProjectDetail projectDetail) {
+    return decommissionedPipelineRepository.findByIdAndProjectDetail(decommissionedPipelineId, projectDetail)
+        .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format(
+            "Could not find DecommissionedPipeline with ID %d for ProjectDetail with ID %s",
+            decommissionedPipelineId,
+            projectDetail.getId()
+        )));
   }
 }

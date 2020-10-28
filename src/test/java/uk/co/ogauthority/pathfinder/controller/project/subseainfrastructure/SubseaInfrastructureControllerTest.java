@@ -221,8 +221,8 @@ public class SubseaInfrastructureControllerTest extends ProjectContextAbstractCo
 
   @Test
   public void updateSubseaInfrastructure_whenUnauthenticatedFullSave_thenNoAccess() throws Exception {
-    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
-      add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
 
     var form = new SubseaInfrastructureForm();
@@ -236,7 +236,7 @@ public class SubseaInfrastructureControllerTest extends ProjectContextAbstractCo
         ))
             .with(authenticatedUserAndSession(unauthenticatedUser))
             .with(csrf())
-            .params(completeLaterParams))
+            .params(completeParams))
         .andExpect(status().isForbidden());
 
     verify(subseaInfrastructureService, times(0)).validate(any(), any(), eq(ValidationType.FULL));
