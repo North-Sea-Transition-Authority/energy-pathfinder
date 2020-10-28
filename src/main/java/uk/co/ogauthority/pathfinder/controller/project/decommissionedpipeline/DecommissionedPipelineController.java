@@ -45,23 +45,23 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
   }
 
   @GetMapping
-  public ModelAndView getPipelinesToBeDecommissioned(@PathVariable Integer projectId,
-                                                     ProjectContext projectContext) {
+  public ModelAndView getPipelines(@PathVariable Integer projectId,
+                                   ProjectContext projectContext) {
     return getDecommissionedPipelinesSummaryModelAndView(projectId);
   }
 
-  @GetMapping("/pipeline-to-be-decommissioned")
-  public ModelAndView addPipelineToBeDecommissioned(@PathVariable("projectId") Integer projectId,
-                                                    ProjectContext projectContext) {
+  @GetMapping("/pipeline")
+  public ModelAndView addPipeline(@PathVariable("projectId") Integer projectId,
+                                  ProjectContext projectContext) {
     return getDecommissionedPipelineModelAndView(projectId, new DecommissionedPipelineForm());
   }
 
-  @PostMapping("/pipeline-to-be-decommissioned")
-  public ModelAndView createPipelineToBeDecommissioned(@PathVariable("projectId") Integer projectId,
-                                                       @Valid @ModelAttribute("form") DecommissionedPipelineForm form,
-                                                       BindingResult bindingResult,
-                                                       ValidationType validationType,
-                                                       ProjectContext projectContext) {
+  @PostMapping("/pipeline")
+  public ModelAndView createPipeline(@PathVariable("projectId") Integer projectId,
+                                     @Valid @ModelAttribute("form") DecommissionedPipelineForm form,
+                                     BindingResult bindingResult,
+                                     ValidationType validationType,
+                                     ProjectContext projectContext) {
     bindingResult = decommissionedPipelineService.validate(form, bindingResult, validationType);
 
     return controllerHelperService.checkErrorsAndRedirect(
@@ -79,7 +79,7 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
     var modelAndView = new ModelAndView("project/decommissionedpipeline/decommissionedPipelinesSummary")
         .addObject("pageTitle", SUMMARY_PAGE_NAME)
         .addObject("addDecommissionedPipelineUrl",
-            ReverseRouter.route(on(DecommissionedPipelineController.class).addPipelineToBeDecommissioned(projectId, null))
+            ReverseRouter.route(on(DecommissionedPipelineController.class).addPipeline(projectId, null))
         )
         .addObject("backToTaskListUrl",
             ControllerUtils.getBackToTaskListUrl(projectId)
@@ -105,6 +105,6 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
   }
 
   private ModelAndView getDecommissionedPipelineSummaryRedirect(Integer projectId) {
-    return ReverseRouter.redirect(on(DecommissionedPipelineController.class).getPipelinesToBeDecommissioned(projectId, null));
+    return ReverseRouter.redirect(on(DecommissionedPipelineController.class).getPipelines(projectId, null));
   }
 }

@@ -110,7 +110,7 @@ public class BreadcrumbService {
 
   private Map<String, String> decommissionedPipeline(Integer projectId) {
     var map = taskList(projectId);
-    String route = ReverseRouter.route(on(DecommissionedPipelineController.class).getPipelinesToBeDecommissioned(projectId, null));
+    String route = ReverseRouter.route(on(DecommissionedPipelineController.class).getPipelines(projectId, null));
     map.put(route, DecommissionedPipelineController.SUMMARY_PAGE_NAME);
     return map;
   }

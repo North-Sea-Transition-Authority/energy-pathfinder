@@ -70,39 +70,39 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
   }
 
   @Test
-  public void getPipelinesToBeDecommissioned_whenAuthenticated_thenAccess() throws Exception {
+  public void getPipelines_whenAuthenticated_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(DecommissionedPipelineController.class).getPipelinesToBeDecommissioned(PROJECT_ID, null)))
+        on(DecommissionedPipelineController.class).getPipelines(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
 
   @Test
-  public void getPipelinesToBeDecommissioned_whenUnauthenticated_thenNoAccess() throws Exception {
+  public void getPipelines_whenUnauthenticated_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(DecommissionedPipelineController.class).getPipelinesToBeDecommissioned(PROJECT_ID, null)))
+        on(DecommissionedPipelineController.class).getPipelines(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }
 
   @Test
-  public void addPipelineToBeDecommissioned_whenAuthenticated_thenAccess() throws Exception {
+  public void addPipeline_whenAuthenticated_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(DecommissionedPipelineController.class).addPipelineToBeDecommissioned(PROJECT_ID, null)))
+        on(DecommissionedPipelineController.class).addPipeline(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
 
   @Test
-  public void addPipelineToBeDecommissioned_whenUnauthenticated_thenNoAccess() throws Exception {
+  public void addPipeline_whenUnauthenticated_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(DecommissionedPipelineController.class).addPipelineToBeDecommissioned(PROJECT_ID, null)))
+        on(DecommissionedPipelineController.class).addPipeline(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }
 
   @Test
-  public void createPipelineToBeDecommissioned_whenUnauthenticatedPartialSave_thenNoAccess() throws Exception {
+  public void createPipeline_whenUnauthenticatedPartialSave_thenNoAccess() throws Exception {
     MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
     }};
@@ -114,7 +114,7 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
 
     mockMvc.perform(
         post(ReverseRouter.route(on(DecommissionedPipelineController.class)
-            .createPipelineToBeDecommissioned(PROJECT_ID, form, bindingResult, ValidationType.PARTIAL, null)
+            .createPipeline(PROJECT_ID, form, bindingResult, ValidationType.PARTIAL, null)
         ))
             .with(authenticatedUserAndSession(unauthenticatedUser))
             .with(csrf())
@@ -126,7 +126,7 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
   }
 
   @Test
-  public void createPipelineToBeDecommissioned_whenUnauthenticatedFullSave_thenNoAccess() throws Exception {
+  public void createPipeline_whenUnauthenticatedFullSave_thenNoAccess() throws Exception {
     MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
@@ -138,7 +138,7 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
 
     mockMvc.perform(
         post(ReverseRouter.route(on(DecommissionedPipelineController.class)
-            .createPipelineToBeDecommissioned(PROJECT_ID, form, bindingResult, ValidationType.FULL, null)
+            .createPipeline(PROJECT_ID, form, bindingResult, ValidationType.FULL, null)
         ))
             .with(authenticatedUserAndSession(unauthenticatedUser))
             .with(csrf())
@@ -150,7 +150,7 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
   }
 
   @Test
-  public void createPipelineToBeDecommissioned_whenValidFormAndPartialSave_thenCreate() throws Exception {
+  public void createPipeline_whenValidFormAndPartialSave_thenCreate() throws Exception {
     MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
     }};
@@ -162,7 +162,7 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
 
     mockMvc.perform(
         post(ReverseRouter.route(on(DecommissionedPipelineController.class)
-            .createPipelineToBeDecommissioned(PROJECT_ID, form, bindingResult, ValidationType.PARTIAL, null)
+            .createPipeline(PROJECT_ID, form, bindingResult, ValidationType.PARTIAL, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())
@@ -174,7 +174,7 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
   }
 
   @Test
-  public void createPipelineToBeDecommissioned_whenValidFormAndFullSave_thenCreate() throws Exception {
+  public void createPipeline_whenValidFormAndFullSave_thenCreate() throws Exception {
     MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
@@ -186,7 +186,7 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
 
     mockMvc.perform(
         post(ReverseRouter.route(on(DecommissionedPipelineController.class)
-            .createPipelineToBeDecommissioned(PROJECT_ID, form, bindingResult, ValidationType.FULL, null)
+            .createPipeline(PROJECT_ID, form, bindingResult, ValidationType.FULL, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())
@@ -198,7 +198,7 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
   }
 
   @Test
-  public void createPipelineToBeDecommissioned_whenInvalidFormAndFullSave_thenNoCreate() throws Exception {
+  public void createPipeline_whenInvalidFormAndFullSave_thenNoCreate() throws Exception {
     MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
@@ -212,7 +212,7 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
 
     mockMvc.perform(
         post(ReverseRouter.route(on(DecommissionedPipelineController.class)
-            .createPipelineToBeDecommissioned(PROJECT_ID, form, bindingResult, ValidationType.FULL, null)
+            .createPipeline(PROJECT_ID, form, bindingResult, ValidationType.FULL, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())
@@ -224,7 +224,7 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
   }
 
   @Test
-  public void createPipelineToBeDecommissioned_whenInvalidFormAndPartialSave_thenNoCreate() throws Exception {
+  public void createPipeline_whenInvalidFormAndPartialSave_thenNoCreate() throws Exception {
     MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
     }};
@@ -238,7 +238,7 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
 
     mockMvc.perform(
         post(ReverseRouter.route(on(DecommissionedPipelineController.class)
-            .createPipelineToBeDecommissioned(PROJECT_ID, form, bindingResult, ValidationType.PARTIAL, null)
+            .createPipeline(PROJECT_ID, form, bindingResult, ValidationType.PARTIAL, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())
