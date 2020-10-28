@@ -154,7 +154,7 @@ public class TaskListController {
     modelAndView.addObject("decommissionedPipelinesUrl",
         ReverseRouter.route(on(DecommissionedPipelineController.class).getPipelines(projectId, null))
     );
-    modelAndView.addObject("decommissionedPipelinesText", DecommissionedPipelineController.SUMMARY_PAGE_NAME);
+    modelAndView.addObject("decommissionedPipelinesText", DecommissionedPipelineController.TASK_LIST_NAME);
     modelAndView.addObject("decommissionedPipelinesCompleted", false); // TODO: PAT-269
 
     modelAndView.addObject("reviewAndSubmitLink",

@@ -83,7 +83,7 @@ public class DecommissionedPipelineServiceTest {
 
   @Test
   public void getPipelinesRestUrl() {
-    pipelinesService.getPipelinesRestUrl();
+    decommissionedPipelineService.getPipelinesRestUrl();
     verify(pipelinesService, times(1)).getPipelinesRestUrl();
   }
 

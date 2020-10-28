@@ -7,9 +7,9 @@ import uk.co.ogauthority.pathfinder.util.StreamUtil;
 public enum PipelineRemovalPremise {
 
   LEAVE_IN_PLACE("Leave in place"),
-  FULL_REMOVAL("Full removal"),
+  LEAVE_IN_SITU_BURIED_TO_1M("Leave in situ buried to 1m"),
   PARTIAL_REMOVAL_AND_BURY("Partial removal and bury"),
-  LEAVE_IN_SITU_BURIED_TO_1M("Leave in situ buried to 1m");
+  FULL_REMOVAL("Full removal");
 
   private final String displayName;
 

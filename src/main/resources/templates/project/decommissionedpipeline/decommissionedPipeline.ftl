@@ -20,8 +20,8 @@
       minFormPath="form.decommissioningDate.minYear"
       maxFormPath="form.decommissioningDate.maxYear"
       labelText="Provide the period over which the pipeline will be decommissioned"
-      altMinLabel="Earliest year"
-      altMaxLabel="Latest year"
+      altMinLabel="Earliest start year"
+      altMaxLabel="Latest completion year"
       formId="decommissioning-period"
     />
     <@fdsRadio.radio path="form.removalPremise" labelText="Pipeline removal premise" radioItems=pipelineRemovalPremises/>

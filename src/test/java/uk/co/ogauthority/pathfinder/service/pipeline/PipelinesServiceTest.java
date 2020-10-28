@@ -15,7 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.controller.rest.PipelinesRestController;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.pipeline.Pipeline;
-import uk.co.ogauthority.pathfinder.repository.pipeline.PipelinesRepository;
+import uk.co.ogauthority.pathfinder.repository.pipeline.PipelineRepository;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.testutil.PipelineTestUtil;
 
@@ -23,7 +23,7 @@ import uk.co.ogauthority.pathfinder.testutil.PipelineTestUtil;
 public class PipelinesServiceTest {
 
   @Mock
-  private PipelinesRepository pipelinesRepository;
+  private PipelineRepository pipelineRepository;
 
   private PipelinesService pipelinesService;
 
@@ -31,7 +31,7 @@ public class PipelinesServiceTest {
   public void setup() {
     var searchSelectorService = new SearchSelectorService();
     pipelinesService = new PipelinesService(
-        pipelinesRepository,
+        pipelineRepository,
         searchSelectorService
     );
   }
@@ -40,7 +40,7 @@ public class PipelinesServiceTest {
   public void searchPipelinesWithNameContaining() {
     var searchTerm = "pipe";
     var pipeline = PipelineTestUtil.getPipeline();
-    when(pipelinesRepository.findAllByNameContainingIgnoreCase(searchTerm)).thenReturn(
+    when(pipelineRepository.findAllByNameContainingIgnoreCase(searchTerm)).thenReturn(
         Collections.singletonList(pipeline)
     );
     var results = pipelinesService.searchPipelinesWithNameContaining(searchTerm);
@@ -51,7 +51,7 @@ public class PipelinesServiceTest {
   @Test
   public void searchPipelinesWithNameContaining_whenNoResults() {
     var searchTerm = "pipe";
-    when(pipelinesRepository.findAllByNameContainingIgnoreCase(searchTerm)).thenReturn(
+    when(pipelineRepository.findAllByNameContainingIgnoreCase(searchTerm)).thenReturn(
         Collections.emptyList()
     );
     var results = pipelinesService.searchPipelinesWithNameContaining(searchTerm);
@@ -78,7 +78,7 @@ public class PipelinesServiceTest {
     final Integer fromListSelectionId = 1234;
     final Pipeline pipeline = PipelineTestUtil.getPipeline(fromListSelectionId, "A pipeline");
 
-    when(pipelinesRepository.findById(fromListSelectionId))
+    when(pipelineRepository.findById(fromListSelectionId))
         .thenReturn(Optional.of(pipeline));
 
     var result = pipelinesService.getPreSelectedPipeline(String.valueOf(fromListSelectionId));
@@ -88,18 +88,18 @@ public class PipelinesServiceTest {
   }
 
   @Test
-  public void getPipelineAsList_whenFacilityIsNull_thenEmptyList() {
+  public void getPipelineAsList_whenPipelineIsNull_thenEmptyList() {
     var result = pipelinesService.getPipelineAsList(null);
     assertThat(result).isEmpty();
   }
 
   @Test
-  public void getPipelineAsList_whenFacilityIsFromListEntry_thenPopulatedListReturned() {
+  public void getPipelineAsList_whenPipelineIsFromListEntry_thenPopulatedListReturned() {
 
     final Integer fromListSelectionId = 1234;
     final Pipeline pipeline = PipelineTestUtil.getPipeline(fromListSelectionId, "A pipeline");
 
-    when(pipelinesRepository.findById(fromListSelectionId))
+    when(pipelineRepository.findById(fromListSelectionId))
         .thenReturn(Optional.of(pipeline));
 
     var result = pipelinesService.getPipelineAsList(String.valueOf(fromListSelectionId));
@@ -107,11 +107,11 @@ public class PipelinesServiceTest {
   }
 
   @Test
-  public void getPipelineAsList_whenFacilityIsFromListButNotFound_thenEmptyList() {
+  public void getPipelineAsList_whenPipelineIsFromListButNotFound_thenEmptyList() {
 
     final Integer fromListSelectionId = 1234;
 
-    when(pipelinesRepository.findById(fromListSelectionId))
+    when(pipelineRepository.findById(fromListSelectionId))
         .thenReturn(Optional.empty());
 
     var result = pipelinesService.getPipelineAsList(String.valueOf(fromListSelectionId));
@@ -123,7 +123,7 @@ public class PipelinesServiceTest {
 
     final Integer pipelineId = 1234;
 
-    when(pipelinesRepository.findById(pipelineId))
+    when(pipelineRepository.findById(pipelineId))
         .thenReturn(Optional.empty());
 
     pipelinesService.getPipelineByIdOrError(pipelineId);
@@ -135,7 +135,7 @@ public class PipelinesServiceTest {
     final Integer pipelineId = 1234;
     final Pipeline pipeline = PipelineTestUtil.getPipeline();
 
-    when(pipelinesRepository.findById(pipelineId))
+    when(pipelineRepository.findById(pipelineId))
         .thenReturn(Optional.of(pipeline));
 
     var result = pipelinesService.getPipelineByIdOrError(pipelineId);
@@ -148,7 +148,7 @@ public class PipelinesServiceTest {
     final Integer pipelineId = 1234;
     final Pipeline pipeline = PipelineTestUtil.getPipeline();
 
-    when(pipelinesRepository.findById(pipelineId)).thenReturn(Optional.of(pipeline));
+    when(pipelineRepository.findById(pipelineId)).thenReturn(Optional.of(pipeline));
 
     var result = pipelinesService.findById(pipelineId);
     assertThat(result).contains(pipeline);
@@ -159,7 +159,7 @@ public class PipelinesServiceTest {
 
     final Integer pipelineId = 1234;
 
-    when(pipelinesRepository.findById(pipelineId)).thenReturn(Optional.empty());
+    when(pipelineRepository.findById(pipelineId)).thenReturn(Optional.empty());
 
     var result = pipelinesService.findById(pipelineId);
     assertThat(result).isNotPresent();

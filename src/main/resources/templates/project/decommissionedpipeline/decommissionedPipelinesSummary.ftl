@@ -5,7 +5,7 @@
     <@fdsError.errorSummary errorItems=errorList />
   </#if>
   <@fdsAction.link
-    linkText="Add pipeline to be decommissioned"
+    linkText="Add pipeline"
     linkUrl=springUrl(addDecommissionedPipelineUrl)
     linkClass="govuk-button govuk-button--blue"
   />

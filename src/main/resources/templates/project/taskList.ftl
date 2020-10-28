@@ -41,10 +41,10 @@
         useNotCompletedLabels=true
       />
       <@fdsTaskList.taskListItem
-      itemUrl=springUrl(decommissionedPipelinesUrl)
-      itemText=decommissionedPipelinesText
-      completed=decommissionedPipelinesCompleted
-      useNotCompletedLabels=true
+        itemUrl=springUrl(decommissionedPipelinesUrl)
+        itemText=decommissionedPipelinesText
+        completed=decommissionedPipelinesCompleted
+        useNotCompletedLabels=true
       />
     </@fdsTaskList.taskListSection>
     <@fdsTaskList.taskListSection sectionNumber="3" sectionHeadingText="Submit project" >

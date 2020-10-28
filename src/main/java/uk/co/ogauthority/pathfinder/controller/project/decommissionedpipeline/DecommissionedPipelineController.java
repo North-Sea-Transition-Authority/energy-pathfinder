@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.controller.project.decommissionedpipeline;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import javax.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,11 +33,13 @@ import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 @RequestMapping("/project/{projectId}/pipelines")
 public class DecommissionedPipelineController extends ProjectFormPageController {
 
-  public static final String SUMMARY_PAGE_NAME = "Pipelines";
-  private static final String FORM_PAGE_NAME = "Pipeline to be decommissioned";
+  private static final String SUMMARY_PAGE_NAME = "Pipelines to be decommissioned";
+  public static final String TASK_LIST_NAME = "Pipelines";
+  private static final String FORM_PAGE_NAME = "Pipeline";
 
   private final DecommissionedPipelineService decommissionedPipelineService;
 
+  @Autowired
   public DecommissionedPipelineController(BreadcrumbService breadcrumbService,
                                           ControllerHelperService controllerHelperService,
                                           DecommissionedPipelineService decommissionedPipelineService) {
@@ -85,7 +88,7 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
             ControllerUtils.getBackToTaskListUrl(projectId)
         );
 
-    breadcrumbService.fromTaskList(projectId, modelAndView, SUMMARY_PAGE_NAME);
+    breadcrumbService.fromTaskList(projectId, modelAndView, TASK_LIST_NAME);
 
     return modelAndView;
   }

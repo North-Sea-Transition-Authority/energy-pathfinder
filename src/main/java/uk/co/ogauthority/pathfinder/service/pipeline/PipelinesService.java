@@ -12,19 +12,19 @@ import uk.co.ogauthority.pathfinder.controller.rest.PipelinesRestController;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.pipeline.Pipeline;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
-import uk.co.ogauthority.pathfinder.repository.pipeline.PipelinesRepository;
+import uk.co.ogauthority.pathfinder.repository.pipeline.PipelineRepository;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 
 @Service
 public class PipelinesService {
 
-  private final PipelinesRepository pipelinesRepository;
+  private final PipelineRepository pipelineRepository;
   private final SearchSelectorService searchSelectorService;
 
   @Autowired
-  public PipelinesService(PipelinesRepository pipelinesRepository,
+  public PipelinesService(PipelineRepository pipelineRepository,
                           SearchSelectorService searchSelectorService) {
-    this.pipelinesRepository = pipelinesRepository;
+    this.pipelineRepository = pipelineRepository;
     this.searchSelectorService = searchSelectorService;
   }
 
@@ -42,16 +42,16 @@ public class PipelinesService {
   public Map<String, String> getPreSelectedPipeline(String pipelineFromForm) {
     return (pipelineFromForm != null)
         ? searchSelectorService.getPreSelectedSearchSelectorValue(
-        pipelineFromForm,
-        getPipelineAsList(pipelineFromForm)
-    )
+            pipelineFromForm,
+            getPipelineAsList(pipelineFromForm)
+        )
         : Map.of();
   }
 
   public List<Pipeline> getPipelineAsList(String pipelineFromForm) {
     var pipelines = new ArrayList<Pipeline>();
 
-    if (pipelineFromForm != null && !SearchSelectorService.isManualEntry(pipelineFromForm)) {
+    if (pipelineFromForm != null) {
       var pipelineId = Integer.parseInt(pipelineFromForm);
       findById(pipelineId).ifPresent(pipelines::add);
     }
@@ -66,10 +66,10 @@ public class PipelinesService {
   }
 
   public Optional<Pipeline> findById(Integer pipelineId) {
-    return pipelinesRepository.findById(pipelineId);
+    return pipelineRepository.findById(pipelineId);
   }
 
   private List<Pipeline> findByNameContaining(String searchTerm) {
-    return pipelinesRepository.findAllByNameContainingIgnoreCase(searchTerm);
+    return pipelineRepository.findAllByNameContainingIgnoreCase(searchTerm);
   }
 }
