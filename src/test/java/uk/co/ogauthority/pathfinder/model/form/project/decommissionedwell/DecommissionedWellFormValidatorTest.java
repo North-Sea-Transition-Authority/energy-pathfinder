@@ -137,8 +137,8 @@ public class DecommissionedWellFormValidatorTest {
 
     assertThat(fieldErrorMessages).containsExactly(
         entry("plugAbandonmentDate.quarter", Set.of(String.format(
-            DecommissionedWellValidationHint.PLUG_ABANDONMENT_DATE_LABEL.getInitCappedLabel(),
-            QuarterYearInputValidator.VALID_QUARTER_YEAR_ERROR
+            QuarterYearInputValidator.VALID_QUARTER_YEAR_ERROR,
+            DecommissionedWellValidationHint.PLUG_ABANDONMENT_DATE_LABEL.getInitCappedLabel()
         ))),
         entry("plugAbandonmentDate.year", Set.of(""))
     );
