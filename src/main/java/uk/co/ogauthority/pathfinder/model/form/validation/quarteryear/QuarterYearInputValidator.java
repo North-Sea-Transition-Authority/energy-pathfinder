@@ -65,7 +65,7 @@ public class QuarterYearInputValidator implements SmartValidator {
             errors,
             QUARTER_INVALID_CODE,
             YEAR_INVALID_CODE,
-            String.format(formInputLabel.getInitCappedLabel(), VALID_QUARTER_YEAR_ERROR)
+            String.format(VALID_QUARTER_YEAR_ERROR, formInputLabel.getInitCappedLabel())
         );
       } else {
 

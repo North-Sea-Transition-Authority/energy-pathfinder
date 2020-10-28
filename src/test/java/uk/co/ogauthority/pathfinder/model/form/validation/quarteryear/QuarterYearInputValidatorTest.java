@@ -90,7 +90,7 @@ public class QuarterYearInputValidatorTest {
     );
 
     assertThat(fieldErrorMessages).containsExactly(
-        entry("quarter", Set.of(String.format(formInputLabel.getLabel(), QuarterYearInputValidator.VALID_QUARTER_YEAR_ERROR))),
+        entry("quarter", Set.of(String.format(QuarterYearInputValidator.VALID_QUARTER_YEAR_ERROR, formInputLabel.getLabel()))),
         entry("year",  Set.of(""))
     );
   }
@@ -112,7 +112,7 @@ public class QuarterYearInputValidatorTest {
     );
 
     assertThat(fieldErrorMessages).containsExactly(
-        entry("quarter", Set.of(String.format(formInputLabel.getLabel(), QuarterYearInputValidator.VALID_QUARTER_YEAR_ERROR))),
+        entry("quarter", Set.of(String.format(QuarterYearInputValidator.VALID_QUARTER_YEAR_ERROR, formInputLabel.getLabel()))),
         entry("year",  Set.of(""))
     );
   }
