@@ -12,34 +12,34 @@ import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.De
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedpipeline.DecommissionedPipelineRepository;
-import uk.co.ogauthority.pathfinder.service.pipeline.PipelinesService;
+import uk.co.ogauthority.pathfinder.service.pipeline.PipelineService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
 public class DecommissionedPipelineService {
 
-  private final PipelinesService pipelinesService;
+  private final PipelineService pipelineService;
   private final DecommissionedPipelineRepository decommissionedPipelineRepository;
   private final DecommissionedPipelineFormValidator decommissionedPipelineFormValidator;
   private final ValidationService validationService;
 
   @Autowired
-  public DecommissionedPipelineService(PipelinesService pipelinesService,
+  public DecommissionedPipelineService(PipelineService pipelineService,
                                        DecommissionedPipelineRepository decommissionedPipelineRepository,
                                        DecommissionedPipelineFormValidator decommissionedPipelineFormValidator,
                                        ValidationService validationService) {
-    this.pipelinesService = pipelinesService;
+    this.pipelineService = pipelineService;
     this.decommissionedPipelineRepository = decommissionedPipelineRepository;
     this.decommissionedPipelineFormValidator = decommissionedPipelineFormValidator;
     this.validationService = validationService;
   }
 
-  public String getPipelinesRestUrl() {
-    return pipelinesService.getPipelinesRestUrl();
+  public String getPipelineRestUrl() {
+    return pipelineService.getPipelineRestUrl();
   }
 
   public Map<String, String> getPreSelectedPipeline(DecommissionedPipelineForm form) {
-    return pipelinesService.getPreSelectedPipeline(form.getPipeline());
+    return pipelineService.getPreSelectedPipeline(form.getPipeline());
   }
 
   public BindingResult validate(DecommissionedPipelineForm form,
@@ -70,7 +70,7 @@ public class DecommissionedPipelineService {
     decommissionedPipeline.setProjectDetail(projectDetail);
 
     if (form.getPipeline() != null) {
-      decommissionedPipeline.setPipeline(pipelinesService.getPipelineByIdOrError(Integer.parseInt(form.getPipeline())));
+      decommissionedPipeline.setPipeline(pipelineService.getPipelineByIdOrError(Integer.parseInt(form.getPipeline())));
     } else {
       decommissionedPipeline.setPipeline(null);
     }

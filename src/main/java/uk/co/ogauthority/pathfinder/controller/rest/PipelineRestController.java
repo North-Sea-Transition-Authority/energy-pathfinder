@@ -7,22 +7,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchResult;
-import uk.co.ogauthority.pathfinder.service.pipeline.PipelinesService;
+import uk.co.ogauthority.pathfinder.service.pipeline.PipelineService;
 
 @RestController
 @RequestMapping("/api/pipelines")
-public class PipelinesRestController {
+public class PipelineRestController {
 
-  private final PipelinesService pipelinesService;
+  private final PipelineService pipelineService;
 
   @Autowired
-  public PipelinesRestController(PipelinesService pipelinesService) {
-    this.pipelinesService = pipelinesService;
+  public PipelineRestController(PipelineService pipelineService) {
+    this.pipelineService = pipelineService;
   }
 
   @GetMapping
   @ResponseBody
   public RestSearchResult searchPipelines(@RequestParam("term") String searchTerm) {
-    return new RestSearchResult(pipelinesService.searchPipelinesWithNameContaining(searchTerm));
+    return new RestSearchResult(pipelineService.searchPipelinesWithNameContaining(searchTerm));
   }
 }

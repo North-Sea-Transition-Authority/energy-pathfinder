@@ -66,7 +66,7 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
 
-    when(decommissionedPipelineService.getPipelinesRestUrl()).thenReturn("testUrl");
+    when(decommissionedPipelineService.getPipelineRestUrl()).thenReturn("testUrl");
   }
 
   @Test

@@ -18,7 +18,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineForm;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedpipeline.DecommissionedPipelineRepository;
-import uk.co.ogauthority.pathfinder.service.pipeline.PipelinesService;
+import uk.co.ogauthority.pathfinder.service.pipeline.PipelineService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.DecommissionedPipelineTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.PipelineTestUtil;
@@ -30,7 +30,7 @@ public class DecommissionedPipelineServiceTest {
   private DecommissionedPipelineService decommissionedPipelineService;
 
   @Mock
-  private PipelinesService pipelinesService;
+  private PipelineService pipelineService;
 
   @Mock
   private DecommissionedPipelineRepository decommissionedPipelineRepository;
@@ -46,7 +46,7 @@ public class DecommissionedPipelineServiceTest {
   @Before
   public void setup() {
     decommissionedPipelineService = new DecommissionedPipelineService(
-        pipelinesService,
+        pipelineService,
         decommissionedPipelineRepository,
         decommissionedPipelineFormValidator,
         validationService
@@ -82,9 +82,9 @@ public class DecommissionedPipelineServiceTest {
   }
 
   @Test
-  public void getPipelinesRestUrl() {
-    decommissionedPipelineService.getPipelinesRestUrl();
-    verify(pipelinesService, times(1)).getPipelinesRestUrl();
+  public void getPipelineRestUrl() {
+    decommissionedPipelineService.getPipelineRestUrl();
+    verify(pipelineService, times(1)).getPipelineRestUrl();
   }
 
   @Test
@@ -93,7 +93,7 @@ public class DecommissionedPipelineServiceTest {
     form.setPipeline("test");
 
     decommissionedPipelineService.getPreSelectedPipeline(form);
-    verify(pipelinesService, times(1)).getPreSelectedPipeline(form.getPipeline());
+    verify(pipelineService, times(1)).getPreSelectedPipeline(form.getPipeline());
   }
 
 
@@ -117,7 +117,7 @@ public class DecommissionedPipelineServiceTest {
     var form = DecommissionedPipelineTestUtil.createDecommissionedPipelineForm();
     form.setPipeline(String.valueOf(pipelineId));
 
-    when(pipelinesService.getPipelineByIdOrError(pipelineId)).thenReturn(pipeline);
+    when(pipelineService.getPipelineByIdOrError(pipelineId)).thenReturn(pipeline);
 
     var persistedDecommissionedPipeline = decommissionedPipelineService.createDecommissionedPipeline(projectDetail, form);
 

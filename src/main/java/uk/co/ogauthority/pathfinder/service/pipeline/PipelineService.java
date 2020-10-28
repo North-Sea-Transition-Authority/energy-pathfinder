@@ -3,12 +3,13 @@ package uk.co.ogauthority.pathfinder.service.pipeline;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.co.ogauthority.pathfinder.controller.rest.PipelinesRestController;
+import uk.co.ogauthority.pathfinder.controller.rest.PipelineRestController;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.pipeline.Pipeline;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
@@ -16,14 +17,14 @@ import uk.co.ogauthority.pathfinder.repository.pipeline.PipelineRepository;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 
 @Service
-public class PipelinesService {
+public class PipelineService {
 
   private final PipelineRepository pipelineRepository;
   private final SearchSelectorService searchSelectorService;
 
   @Autowired
-  public PipelinesService(PipelineRepository pipelineRepository,
-                          SearchSelectorService searchSelectorService) {
+  public PipelineService(PipelineRepository pipelineRepository,
+                         SearchSelectorService searchSelectorService) {
     this.pipelineRepository = pipelineRepository;
     this.searchSelectorService = searchSelectorService;
   }
@@ -33,9 +34,9 @@ public class PipelinesService {
     return searchSelectorService.search(searchTerm, searchableList);
   }
 
-  public String getPipelinesRestUrl() {
+  public String getPipelineRestUrl() {
     return SearchSelectorService.route(
-        on(PipelinesRestController.class).searchPipelines(null)
+        on(PipelineRestController.class).searchPipelines(null)
     );
   }
 
@@ -49,14 +50,9 @@ public class PipelinesService {
   }
 
   public List<Pipeline> getPipelineAsList(String pipelineFromForm) {
-    var pipelines = new ArrayList<Pipeline>();
-
-    if (pipelineFromForm != null) {
-      var pipelineId = Integer.parseInt(pipelineFromForm);
-      findById(pipelineId).ifPresent(pipelines::add);
-    }
-
-    return pipelines;
+    return findById(Integer.parseInt(pipelineFromForm))
+        .map(List::of)
+        .orElse(Collections.emptyList());
   }
 
   public Pipeline getPipelineByIdOrError(Integer pipelineId) {

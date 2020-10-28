@@ -97,7 +97,7 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
     var modelAndView = new ModelAndView("project/decommissionedpipeline/decommissionedPipeline")
         .addObject("form", form)
         .addObject("pageTitle", FORM_PAGE_NAME)
-        .addObject("pipelinesRestUrl", decommissionedPipelineService.getPipelinesRestUrl())
+        .addObject("pipelineRestUrl", decommissionedPipelineService.getPipelineRestUrl())
         .addObject("preSelectedPipelineMap", decommissionedPipelineService.getPreSelectedPipeline(form))
         .addObject("pipelineStatuses", InfrastructureStatus.getAllAsMap())
         .addObject("pipelineRemovalPremises", PipelineRemovalPremise.getAllAsMap());

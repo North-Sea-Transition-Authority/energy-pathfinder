@@ -11,7 +11,7 @@
       path="form.pipeline"
       selectorMinInputLength=1
       labelText="What is the pipeline number?"
-      restUrl=springUrl(pipelinesRestUrl)
+      restUrl=springUrl(pipelineRestUrl)
       preselectedItems=preSelectedPipelineMap!{}
     />
     <@fdsTextInput.textInput path="form.materialType" labelText="What is the material type of the pipeline?"/>

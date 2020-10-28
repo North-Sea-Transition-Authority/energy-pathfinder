@@ -19,21 +19,21 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.pipeline.PipelinesService;
+import uk.co.ogauthority.pathfinder.service.pipeline.PipelineService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(
-    value = PipelinesRestController.class,
+    value = PipelineRestController.class,
     includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ProjectContextService.class)
 )
-public class PipelinesRestControllerTest extends AbstractControllerTest {
+public class PipelineRestControllerTest extends AbstractControllerTest {
 
   private static final String SEARCH_TERM = "searchTerm";
 
   @MockBean
-  private PipelinesService pipelinesService;
+  private PipelineService pipelineService;
 
   private AuthenticatedUserAccount authenticatedUser;
   private AuthenticatedUserAccount unauthenticatedUser;
@@ -47,20 +47,20 @@ public class PipelinesRestControllerTest extends AbstractControllerTest {
   @Test
   public void searchPipelines_whenAuthenticated_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(PipelinesRestController.class).searchPipelines(SEARCH_TERM)))
+        on(PipelineRestController.class).searchPipelines(SEARCH_TERM)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
 
-    verify(pipelinesService, times(1)).searchPipelinesWithNameContaining(SEARCH_TERM);
+    verify(pipelineService, times(1)).searchPipelinesWithNameContaining(SEARCH_TERM);
   }
 
   @Test
   public void searchPipelines_whenUnauthenticated_thenForbidden() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(PipelinesRestController.class).searchPipelines(SEARCH_TERM)))
+        on(PipelineRestController.class).searchPipelines(SEARCH_TERM)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
 
-    verify(pipelinesService, times(0)).searchPipelinesWithNameContaining(SEARCH_TERM);
+    verify(pipelineService, times(0)).searchPipelinesWithNameContaining(SEARCH_TERM);
   }
 }
