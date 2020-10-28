@@ -10,7 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkFacility;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
-import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.InfrastructureStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureType;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaStructureMass;
 
@@ -29,7 +29,7 @@ public class SubseaInfrastructure extends ProjectDetailEntity {
   private String description;
 
   @Enumerated(EnumType.STRING)
-  private SubseaInfrastructureStatus status;
+  private InfrastructureStatus status;
 
   @Enumerated(EnumType.STRING)
   private SubseaInfrastructureType infrastructureType;
@@ -75,12 +75,12 @@ public class SubseaInfrastructure extends ProjectDetailEntity {
     this.description = description;
   }
 
-  public SubseaInfrastructureStatus getStatus() {
+  public InfrastructureStatus getStatus() {
     return status;
   }
 
   public void setStatus(
-      SubseaInfrastructureStatus status) {
+      InfrastructureStatus status) {
     this.status = status;
   }
 

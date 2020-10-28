@@ -2,7 +2,7 @@ package uk.co.ogauthority.pathfinder.testutil;
 
 import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkFacility;
 import uk.co.ogauthority.pathfinder.model.entity.project.subseainfrastructure.SubseaInfrastructure;
-import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.InfrastructureStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureType;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaStructureMass;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
@@ -16,7 +16,7 @@ import uk.co.ogauthority.pathfinder.model.view.subseainfrastructure.SubseaInfras
 public class SubseaInfrastructureTestUtil {
 
   private static final String DESCRIPTION = "description";
-  private static final SubseaInfrastructureStatus INFRASTRUCTURE_STATUS = SubseaInfrastructureStatus.IN_USE;
+  private static final InfrastructureStatus INFRASTRUCTURE_STATUS = InfrastructureStatus.IN_USE;
   private static final Integer EARLIEST_DECOM_START = 2020;
   private static final Integer LATEST_DECOM_COMPLETION = 2021;
   private static final Integer NUMBER_OF_MATTRESSES = 1;

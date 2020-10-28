@@ -19,8 +19,8 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.InfrastructureStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
-import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureType;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaStructureMass;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.SubseaInfrastructureForm;
@@ -195,7 +195,7 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
         .addObject("pageTitle", FORM_PAGE_NAME)
         .addObject("facilitiesRestUrl", subseaInfrastructureService.getFacilityRestUrl())
         .addObject("preSelectedFacilityMap", subseaInfrastructureService.getPreSelectedFacility(form))
-        .addObject("infrastructureStatuses", SubseaInfrastructureStatus.getAllAsMap())
+        .addObject("infrastructureStatuses", InfrastructureStatus.getAllAsMap())
         .addObject("concreteMattressInfrastructureType",
             SubseaInfrastructureType.getEntryAsMap(SubseaInfrastructureType.CONCRETE_MATTRESSES)
         )
