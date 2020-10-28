@@ -11,6 +11,10 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
 public class DecommissionedPipelineViewUtil {
 
+  public static final String DEFAULT_DECOM_YEAR_TEXT = "Not set";
+  public static final String EARLIEST_DECOM_YEAR_TEXT = "Earliest start year: %s";
+  public static final String LATEST_DECOM_YEAR_TEXT = "Latest completion year: %s";
+
   private DecommissionedPipelineViewUtil() {
     throw new IllegalStateException("DecommissionedPipelineViewUtil is a util class and should not be instantiated");
   }
@@ -49,6 +53,8 @@ public class DecommissionedPipelineViewUtil {
         : null;
     decommissionedPipelineView.setRemovalPremise(removalPremise);
 
+    setDecommissioningPeriod(decommissionedPipeline, decommissionedPipelineView);
+
     var summaryLinks = new ArrayList<SummaryLink>();
     summaryLinks.add(getEditSummaryLink(projectId, decommissionedPipeline.getId()));
     summaryLinks.add(getDeleteSummaryLink(projectId, decommissionedPipeline.getId(), displayOrder));
@@ -57,6 +63,21 @@ public class DecommissionedPipelineViewUtil {
     decommissionedPipelineView.setIsValid(isValid);
 
     return decommissionedPipelineView;
+  }
+
+  private static void setDecommissioningPeriod(DecommissionedPipeline decommissionedPipeline,
+                                               DecommissionedPipelineView decommissionedPipelineView) {
+
+    var decomStart = (decommissionedPipeline.getEarliestRemovalYear() != null)
+        ? String.valueOf(decommissionedPipeline.getEarliestRemovalYear())
+        : DEFAULT_DECOM_YEAR_TEXT;
+
+    var decomFinish = (decommissionedPipeline.getLatestRemovalYear() != null)
+        ? String.valueOf(decommissionedPipeline.getLatestRemovalYear())
+        : DEFAULT_DECOM_YEAR_TEXT;
+
+    decommissionedPipelineView.setDecommissioningEarliestYear(String.format(EARLIEST_DECOM_YEAR_TEXT, decomStart));
+    decommissionedPipelineView.setDecommissioningLatestYear(String.format(LATEST_DECOM_YEAR_TEXT, decomFinish));
   }
 
   private static SummaryLink getEditSummaryLink(Integer projectId, Integer decommissionedPipelineId) {
