@@ -35,7 +35,7 @@ public class DecommissionedPipelineSummaryService {
   public DecommissionedPipelineView getDecommissionedPipelineSummaryView(Integer decommissionedPipelineId,
                                                                          ProjectDetail projectDetail,
                                                                          Integer displayOrder) {
-    var decommissionedPipeline = decommissionedPipelineService.getDecommissionedPipeline(
+    var decommissionedPipeline = decommissionedPipelineService.getDecommissionedPipelineOrError(
         decommissionedPipelineId,
         projectDetail
     );

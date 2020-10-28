@@ -66,7 +66,7 @@ public class DecommissionedPipelineSummaryServiceTest {
     final var decommissionedPipelineId = 1;
     var decommissionedPipeline = DecommissionedPipelineTestUtil.createDecommissionedPipeline();
 
-    when(decommissionedPipelineService.getDecommissionedPipeline(decommissionedPipelineId, projectDetail)).thenReturn(decommissionedPipeline);
+    when(decommissionedPipelineService.getDecommissionedPipelineOrError(decommissionedPipelineId, projectDetail)).thenReturn(decommissionedPipeline);
 
     var view = decommissionedPipelineSummaryService.getDecommissionedPipelineSummaryView(
         decommissionedPipelineId,

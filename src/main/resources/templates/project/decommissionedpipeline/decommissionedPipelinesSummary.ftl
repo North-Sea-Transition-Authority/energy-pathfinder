@@ -1,5 +1,5 @@
 <#include '../../layout.ftl'>
-<#import 'decommissionedPipelineSummary.ftl' as decommissionedPipelineSummary>
+<#import '_decommissionedPipelineSummary.ftl' as decommissionedPipelineSummary>
 
 <@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true>
   <#if errorList?has_content>

@@ -206,7 +206,7 @@ public class DecommissionedPipelineServiceTest {
   }
 
   @Test
-  public void getDecommissionedPipeline_whenExists_thenReturn() {
+  public void getDecommissionedPipelineOrError_whenExists_thenReturn() {
 
     var decommissionedPipeline = DecommissionedPipelineTestUtil.createDecommissionedPipeline();
 
@@ -214,19 +214,19 @@ public class DecommissionedPipelineServiceTest {
         Optional.of(decommissionedPipeline)
     );
 
-    var result = decommissionedPipelineService.getDecommissionedPipeline(DECOMMISSIONED_PIPELINE_ID, projectDetail);
+    var result = decommissionedPipelineService.getDecommissionedPipelineOrError(DECOMMISSIONED_PIPELINE_ID, projectDetail);
 
     assertThat(result.getId()).isEqualTo(decommissionedPipeline.getId());
     assertThat(result.getProjectDetail().getId()).isEqualTo(decommissionedPipeline.getProjectDetail().getId());
   }
 
   @Test(expected = PathfinderEntityNotFoundException.class)
-  public void getDecommissionedPipeline_whenNotFound_thenException() {
+  public void getDecommissionedPipelineOrError_whenNotFound_thenException() {
 
     when(decommissionedPipelineRepository.findByIdAndProjectDetail(DECOMMISSIONED_PIPELINE_ID, projectDetail)).thenReturn(
         Optional.empty()
     );
 
-    decommissionedPipelineService.getDecommissionedPipeline(DECOMMISSIONED_PIPELINE_ID, projectDetail);
+    decommissionedPipelineService.getDecommissionedPipelineOrError(DECOMMISSIONED_PIPELINE_ID, projectDetail);
   }
 }

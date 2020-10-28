@@ -39,7 +39,7 @@ public class DecommissionedPipelineService {
   }
 
   public DecommissionedPipelineForm getForm(Integer decommissionedPipelineId, ProjectDetail projectDetail) {
-    var decommissionedPipeline = getDecommissionedPipeline(decommissionedPipelineId, projectDetail);
+    var decommissionedPipeline = getDecommissionedPipelineOrError(decommissionedPipelineId, projectDetail);
     return getForm(decommissionedPipeline);
   }
 
@@ -89,7 +89,7 @@ public class DecommissionedPipelineService {
   public DecommissionedPipeline updateDecommissionedPipeline(Integer decommissionedPipelineId,
                                                              ProjectDetail projectDetail,
                                                              DecommissionedPipelineForm form) {
-    var decommissionedPipeline = getDecommissionedPipeline(decommissionedPipelineId, projectDetail);
+    var decommissionedPipeline = getDecommissionedPipelineOrError(decommissionedPipelineId, projectDetail);
     return createOrUpdateDecommissionedPipeline(decommissionedPipeline, projectDetail, form);
   }
 
@@ -141,7 +141,7 @@ public class DecommissionedPipelineService {
     decommissionedPipeline.setRemovalPremise(form.getRemovalPremise());
   }
 
-  public DecommissionedPipeline getDecommissionedPipeline(Integer decommissionedPipelineId, ProjectDetail projectDetail) {
+  public DecommissionedPipeline getDecommissionedPipelineOrError(Integer decommissionedPipelineId, ProjectDetail projectDetail) {
     return decommissionedPipelineRepository.findByIdAndProjectDetail(decommissionedPipelineId, projectDetail)
         .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format(
             "Could not find DecommissionedPipeline with ID %d for ProjectDetail with ID %s",

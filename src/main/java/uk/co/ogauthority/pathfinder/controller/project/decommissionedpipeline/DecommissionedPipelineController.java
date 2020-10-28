@@ -68,8 +68,8 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
   @PostMapping
   public ModelAndView savePipelines(@PathVariable("projectId") Integer projectId,
                                     ProjectContext projectContext) {
-    var decommissionedPipelineViews =
-        decommissionedPipelineSummaryService.getValidatedDecommissionedPipelineSummaryViews(
+    var decommissionedPipelineViews = decommissionedPipelineSummaryService
+        .getValidatedDecommissionedPipelineSummaryViews(
             projectContext.getProjectDetails()
         );
 
@@ -155,7 +155,7 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
                                      @PathVariable("decommissionedPipelineId") Integer decommissionedPipelineId,
                                      @PathVariable("displayOrder") Integer displayOrder,
                                      ProjectContext projectContext) {
-    var decommissionedPipeline = decommissionedPipelineService.getDecommissionedPipeline(
+    var decommissionedPipeline = decommissionedPipelineService.getDecommissionedPipelineOrError(
         decommissionedPipelineId,
         projectContext.getProjectDetails()
     );

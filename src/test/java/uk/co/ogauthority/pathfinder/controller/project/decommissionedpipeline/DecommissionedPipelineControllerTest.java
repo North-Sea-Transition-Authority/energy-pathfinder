@@ -535,7 +535,7 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
 
     var decommissionedPipeline = DecommissionedPipelineTestUtil.createDecommissionedPipeline();
 
-    when(decommissionedPipelineService.getDecommissionedPipeline(any(), any())).thenReturn(
+    when(decommissionedPipelineService.getDecommissionedPipelineOrError(any(), any())).thenReturn(
         decommissionedPipeline
     );
 
@@ -561,7 +561,7 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
 
     var decommissionedPipeline = DecommissionedPipelineTestUtil.createDecommissionedPipeline();
 
-    when(decommissionedPipelineService.getDecommissionedPipeline(any(), any())).thenReturn(
+    when(decommissionedPipelineService.getDecommissionedPipelineOrError(any(), any())).thenReturn(
         decommissionedPipeline
     );
 
