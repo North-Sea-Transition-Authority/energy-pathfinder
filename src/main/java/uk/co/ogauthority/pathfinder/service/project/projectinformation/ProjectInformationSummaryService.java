@@ -48,8 +48,9 @@ public class ProjectInformationSummaryService implements ProjectSectionSummarySe
           summaryModel.put("developmentRelated", FieldStage.DEVELOPMENT.equals(projectInformation.getFieldStage()));
           summaryModel.put("discoveryRelated", FieldStage.DISCOVERY.equals(projectInformation.getFieldStage()));
           summaryModel.put("decomRelated", FieldStage.DECOMMISSIONING.equals(projectInformation.getFieldStage()));
-          summaryModel.put("developmentFirstProductionDate", getFirstProductionDate(projectInformation));
-          summaryModel.put("discoveryFirstProductionDate", getFirstProductionDate(projectInformation));
+          var firstProductionDate = getFirstProductionDate(projectInformation);
+          summaryModel.put("developmentFirstProductionDate", firstProductionDate);
+          summaryModel.put("discoveryFirstProductionDate", firstProductionDate);
           summaryModel.put("decomWorkStartDate",
               DateUtil.getDateFromQuarterYear(
                   projectInformation.getDecomWorkStartDateQuarter(),

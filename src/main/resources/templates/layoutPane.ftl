@@ -17,7 +17,6 @@
 
   <@genericLayout htmlTitle=htmlTitle htmlAppTitle=service.serviceName errorCheck=errorCheck noIndex=noIndex>
     <div class="fds-pane fds-pane--enabled" id="top">
-        <#--Header goes below me-->
         <#--Header-->
         <@applicationHeader.header
         topNavigation=topNavigation
@@ -28,7 +27,7 @@
         headerNav=true
         />
 
-        <#--Phase banner goes below me-->
+        <#--Phase banner -->
         <#if phaseBanner>
           <div class="govuk-phase-banner__wrapper">
             <div class="govuk-phase-banner govuk-phase-banner--no-border<#if wrapperWidth> govuk-width-container-wide<#else> govuk-width-container</#if>">
@@ -40,7 +39,7 @@
           </div>
         </#if>
 
-        <#--Top navigation goes below me-->
+        <#--Top navigation -->
         <#if topNavigation>
           <@fdsNavigation.navigation navigationItems=navigationItems currentEndPoint=currentEndPoint wrapperWidth=wrapperWidth/>
         </#if>
@@ -48,11 +47,11 @@
       <div class="fds-pane__body ${wrapperClasses}<#if wrapperWidth> govuk-width-container-wide<#else> govuk-width-container</#if>">
         <#nested>
 
-        <#--Back to top goes below me-->
+        <#--Back to top -->
         <@fdsBackToTop.backToTop/>
       </div>
 
-        <#--Footer goes below me-->
+        <#--Footer -->
         <@fdsFooter.footer wrapperWidth=wrapperWidth/>
     </div>
   </@genericLayout>
