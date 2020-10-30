@@ -1,6 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.entity.project;
 
+import java.time.Instant;
 import java.util.Objects;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -32,6 +34,11 @@ public class ProjectDetail {
   private boolean isCurrentVersion;
 
   private Integer createdByWua;
+
+  @Column(name = "submitted_datetime")
+  private Instant submittedInstant;
+
+  private Integer submittedByWua;
 
   public ProjectDetail() {
   }
@@ -92,6 +99,22 @@ public class ProjectDetail {
     this.createdByWua = createdByWua;
   }
 
+  public Instant getSubmittedInstant() {
+    return submittedInstant;
+  }
+
+  public void setSubmittedInstant(Instant submittedInstant) {
+    this.submittedInstant = submittedInstant;
+  }
+
+  public Integer getSubmittedByWua() {
+    return submittedByWua;
+  }
+
+  public void setSubmittedByWua(Integer submittedByWua) {
+    this.submittedByWua = submittedByWua;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -101,16 +124,18 @@ public class ProjectDetail {
       return false;
     }
     ProjectDetail projectDetail = (ProjectDetail) o;
-    return id.equals(projectDetail.id)
+    return Objects.equals(id, projectDetail.id)
         && Objects.equals(project, projectDetail.project)
         && status == projectDetail.status
         && Objects.equals(version, projectDetail.version)
         && Objects.equals(isCurrentVersion, projectDetail.isCurrentVersion)
-        && Objects.equals(createdByWua, projectDetail.createdByWua);
+        && Objects.equals(createdByWua, projectDetail.createdByWua)
+        && Objects.equals(submittedInstant, projectDetail.submittedInstant)
+        && Objects.equals(submittedByWua, projectDetail.submittedByWua);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, project, status, version, isCurrentVersion, createdByWua);
+    return Objects.hash(id, project, status, version, isCurrentVersion, createdByWua, submittedInstant, submittedByWua);
   }
 }

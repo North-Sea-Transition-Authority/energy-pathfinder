@@ -11,9 +11,13 @@ public class ProjectUtil {
   public static final Integer WUA = 1;
 
   public static ProjectDetail getProjectDetails() {
+    return getProjectDetails(STATUS);
+  }
+
+  public static ProjectDetail getProjectDetails(ProjectStatus status) {
     return new ProjectDetail(
         getProject(),
-        STATUS,
+        status,
         WUA,
         StartProjectService.FIRST_VERSION,
         StartProjectService.CURRENT_VERSION

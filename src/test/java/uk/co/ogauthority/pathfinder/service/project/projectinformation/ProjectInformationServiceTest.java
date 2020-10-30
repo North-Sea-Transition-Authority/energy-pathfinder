@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -203,6 +204,58 @@ public class ProjectInformationServiceTest {
     assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
     assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
     assertThat(projectInformation.getProductionCessationDate()).isNull();
+  }
+
+  @Test
+  public void getProjectInformation_whenExists_thenReturn() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    when(projectInformationRepository.findByProjectDetail(projectDetail)).thenReturn(
+        Optional.of(projectInformation)
+    );
+
+    var result = projectInformationService.getProjectInformation(projectDetail);
+
+    assertThat(result).isEqualTo(result);
+  }
+
+  @Test
+  public void getProjectInformation_whenNotFound_thenReturnEmpty() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+
+    when(projectInformationRepository.findByProjectDetail(projectDetail)).thenReturn(
+        Optional.empty()
+    );
+
+    var result = projectInformationService.getProjectInformation(projectDetail);
+
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void getProjectInformationOrError_whenExists_thenReturn() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    when(projectInformationRepository.findByProjectDetail(projectDetail)).thenReturn(
+        Optional.of(projectInformation)
+    );
+
+    var result = projectInformationService.getProjectInformationOrError(projectDetail);
+
+    assertThat(result).isEqualTo(projectInformation);
+  }
+
+  @Test(expected = PathfinderEntityNotFoundException.class)
+  public void getProjectInformationOrError_whenNotFound_thenException() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+
+    when(projectInformationRepository.findByProjectDetail(projectDetail)).thenReturn(
+        Optional.empty()
+    );
+
+    projectInformationService.getProjectInformationOrError(projectDetail);
   }
 
   @Test
