@@ -217,7 +217,7 @@ public class ProjectInformationServiceTest {
 
     var result = projectInformationService.getProjectInformation(projectDetail);
 
-    assertThat(result).isEqualTo(result);
+    assertThat(result).contains(projectInformation);
   }
 
   @Test
