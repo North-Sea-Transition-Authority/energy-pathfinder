@@ -1,5 +1,5 @@
 <#include '../../layout.ftl'>
-<#import 'awardedContractSummary.ftl' as awardedContractSummary>
+<#import '_awardedContractSummary.ftl' as awardedContractSummary>
 
 <@defaultPage
   htmlTitle="Remove awarded contract"

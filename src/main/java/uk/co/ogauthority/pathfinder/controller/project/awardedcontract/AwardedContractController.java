@@ -160,7 +160,7 @@ public class AwardedContractController extends ProjectFormPageController {
   private ModelAndView getAwardedContractsSummaryModelAndView(Integer projectId,
                                                               List<AwardedContractView> awardedContractViews,
                                                               ValidationResult validationResult) {
-    var modelAndView = new ModelAndView("project/awardedcontract/awardedContractsSummary")
+    var modelAndView = new ModelAndView("project/awardedcontract/awardedContractFormSummary")
         .addObject("pageTitle", PAGE_NAME)
         .addObject("awardedContractViews", awardedContractViews)
         .addObject("addAwardedContractUrl",

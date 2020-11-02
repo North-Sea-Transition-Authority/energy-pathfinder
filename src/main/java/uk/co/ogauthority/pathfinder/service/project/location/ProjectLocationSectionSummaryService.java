@@ -14,9 +14,9 @@ import uk.co.ogauthority.pathfinder.model.view.summary.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
-public class ProjectLocationSummaryService implements ProjectSectionSummaryService {
+public class ProjectLocationSectionSummaryService implements ProjectSectionSummaryService {
 
-  public static final String TEMPLATE_PATH = "project/location/locationSummary.ftl";
+  public static final String TEMPLATE_PATH = "project/location/locationSectionSummary.ftl";
   public static final String PAGE_NAME = ProjectLocationController.PAGE_NAME;
   public static final String SECTION_ID = "projectLocation";
   public static final SidebarSectionLink SECTION_LINK = SidebarSectionLink.createAnchorLink(
@@ -29,8 +29,8 @@ public class ProjectLocationSummaryService implements ProjectSectionSummaryServi
   private final ProjectLocationBlocksService projectLocationBlocksService;
 
   @Autowired
-  public ProjectLocationSummaryService(ProjectLocationService projectLocationService,
-                                       ProjectLocationBlocksService projectLocationBlocksService) {
+  public ProjectLocationSectionSummaryService(ProjectLocationService projectLocationService,
+                                              ProjectLocationBlocksService projectLocationBlocksService) {
     this.projectLocationService = projectLocationService;
     this.projectLocationBlocksService = projectLocationBlocksService;
   }

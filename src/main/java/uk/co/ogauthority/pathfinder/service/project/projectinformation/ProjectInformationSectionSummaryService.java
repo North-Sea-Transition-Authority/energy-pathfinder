@@ -15,8 +15,8 @@ import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummar
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @Service
-public class ProjectInformationSummaryService implements ProjectSectionSummaryService {
-  public static final String TEMPLATE_PATH = "project/projectinformation/projectInformationSummary.ftl";
+public class ProjectInformationSectionSummaryService implements ProjectSectionSummaryService {
+  public static final String TEMPLATE_PATH = "project/projectinformation/projectInformationSectionSummary.ftl";
   public static final String PAGE_NAME = ProjectInformationController.PAGE_NAME;
   public static final String SECTION_ID = "projectInformation";
   public static final SidebarSectionLink SECTION_LINK = SidebarSectionLink.createAnchorLink(
@@ -28,7 +28,7 @@ public class ProjectInformationSummaryService implements ProjectSectionSummarySe
   private final ProjectInformationService projectInformationService;
 
   @Autowired
-  public ProjectInformationSummaryService(ProjectInformationService projectInformationService) {
+  public ProjectInformationSectionSummaryService(ProjectInformationService projectInformationService) {
     this.projectInformationService = projectInformationService;
   }
 

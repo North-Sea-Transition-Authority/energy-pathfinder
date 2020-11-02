@@ -8,6 +8,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContract;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
@@ -25,7 +26,9 @@ public class AwardedContractViewUtilTest {
     var awardedContractView = AwardedContractViewUtil.from(awardedContract, DISPLAY_ORDER);
 
     checkCommonFields(awardedContract, awardedContractView, DISPLAY_ORDER);
-    assertThat(awardedContractView.getContractFunction()).isEqualTo(awardedContract.getContractFunction().getDisplayName());
+    var contractFunction = awardedContractView.getContractFunction();
+    assertThat(contractFunction.getValue()).isEqualTo(awardedContract.getContractFunction().getDisplayName());
+    assertThat(contractFunction.getTag()).isEqualTo(Tag.NONE);
     assertThat(awardedContractView.isValid()).isTrue();
   }
 
@@ -38,7 +41,9 @@ public class AwardedContractViewUtilTest {
     var awardedContractView = AwardedContractViewUtil.from(awardedContract, DISPLAY_ORDER);
 
     checkCommonFields(awardedContract, awardedContractView, DISPLAY_ORDER);
-    assertThat(awardedContractView.getContractFunction()).isEqualTo(awardedContract.getManualContractFunction());
+    var contractFunction = awardedContractView.getContractFunction();
+    assertThat(contractFunction.getValue()).isEqualTo(awardedContract.getManualContractFunction());
+    assertThat(contractFunction.getTag()).isEqualTo(Tag.NOT_FROM_LIST);
   }
 
   @Test

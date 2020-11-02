@@ -10,4 +10,5 @@
 <#import 'project/macros/summaryViewWrapper.ftl' as summaryViewWrapper>
 <#import 'project/macros/sidebarSectionLink.ftl' as sideBarSectionLink>
 <#import 'project/macros/stringWithTag.ftl' as stringWithTag>
+<#import 'project/macros/sectionSummaryWrapper.ftl' as sectionSummaryWrapper>
 <#import 'macros/useraction/userAction.ftl' as userAction>

@@ -20,7 +20,7 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProjectLocationSummaryServiceTest {
+public class ProjectLocationSectionSummaryServiceTest {
 
   @Mock
   private ProjectLocationService projectLocationService;
@@ -28,14 +28,14 @@ public class ProjectLocationSummaryServiceTest {
   @Mock
   private ProjectLocationBlocksService projectLocationBlocksService;
 
-  private ProjectLocationSummaryService projectLocationSummaryService;
+  private ProjectLocationSectionSummaryService projectLocationSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
   private final ProjectLocation projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(detail);
 
   @Before
   public void setup() {
-    projectLocationSummaryService = new ProjectLocationSummaryService(
+    projectLocationSectionSummaryService = new ProjectLocationSectionSummaryService(
         projectLocationService,
         projectLocationBlocksService
     );
@@ -44,17 +44,17 @@ public class ProjectLocationSummaryServiceTest {
   @Test
   public void getSummary() {
     when(projectLocationService.findByProjectDetail(detail)).thenReturn(Optional.of(projectLocation));
-    var sectionSummary = projectLocationSummaryService.getSummary(detail);
+    var sectionSummary = projectLocationSectionSummaryService.getSummary(detail);
     var model = sectionSummary.getTemplateModel();
-    assertThat(sectionSummary.getDisplayOrder()).isEqualTo(ProjectLocationSummaryService.DISPLAY_ORDER);
-    assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectLocationSummaryService.SECTION_LINK));
-    assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectLocationSummaryService.TEMPLATE_PATH);
+    assertThat(sectionSummary.getDisplayOrder()).isEqualTo(ProjectLocationSectionSummaryService.DISPLAY_ORDER);
+    assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectLocationSectionSummaryService.SECTION_LINK));
+    assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectLocationSectionSummaryService.TEMPLATE_PATH);
 
     var projectLocationView = ProjectLocationViewUtil.from(projectLocation, Collections.emptyList());
 
     assertThat(model).containsOnly(
-        entry("sectionTitle", ProjectLocationSummaryService.PAGE_NAME),
-        entry("sectionId", ProjectLocationSummaryService.SECTION_ID),
+        entry("sectionTitle", ProjectLocationSectionSummaryService.PAGE_NAME),
+        entry("sectionId", ProjectLocationSectionSummaryService.SECTION_ID),
         entry("projectLocationView", projectLocationView)
     );
   }
@@ -62,17 +62,17 @@ public class ProjectLocationSummaryServiceTest {
   @Test
   public void getSummary_noProjectLocation() {
     when(projectLocationService.findByProjectDetail(detail)).thenReturn(Optional.empty());
-    var sectionSummary = projectLocationSummaryService.getSummary(detail);
+    var sectionSummary = projectLocationSectionSummaryService.getSummary(detail);
     var model = sectionSummary.getTemplateModel();
-    assertThat(sectionSummary.getDisplayOrder()).isEqualTo(ProjectLocationSummaryService.DISPLAY_ORDER);
-    assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectLocationSummaryService.SECTION_LINK));
-    assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectLocationSummaryService.TEMPLATE_PATH);
+    assertThat(sectionSummary.getDisplayOrder()).isEqualTo(ProjectLocationSectionSummaryService.DISPLAY_ORDER);
+    assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectLocationSectionSummaryService.SECTION_LINK));
+    assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectLocationSectionSummaryService.TEMPLATE_PATH);
 
     var projectLocationView = new ProjectLocationView();
 
     assertThat(model).containsOnly(
-        entry("sectionTitle", ProjectLocationSummaryService.PAGE_NAME),
-        entry("sectionId", ProjectLocationSummaryService.SECTION_ID),
+        entry("sectionTitle", ProjectLocationSectionSummaryService.PAGE_NAME),
+        entry("sectionId", ProjectLocationSectionSummaryService.SECTION_ID),
         entry("projectLocationView", projectLocationView)
     );
   }

@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.model.view.awardedcontract;
 
 import java.util.List;
 import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 
@@ -9,7 +10,7 @@ public class AwardedContractView extends ProjectSummaryItem {
 
   private String contractorName;
 
-  private String contractFunction;
+  private StringWithTag contractFunction;
 
   private String descriptionOfWork;
 
@@ -29,11 +30,11 @@ public class AwardedContractView extends ProjectSummaryItem {
     this.contractorName = contractorName;
   }
 
-  public String getContractFunction() {
+  public StringWithTag getContractFunction() {
     return contractFunction;
   }
 
-  public void setContractFunction(String contractFunction) {
+  public void setContractFunction(StringWithTag contractFunction) {
     this.contractFunction = contractFunction;
   }
 
