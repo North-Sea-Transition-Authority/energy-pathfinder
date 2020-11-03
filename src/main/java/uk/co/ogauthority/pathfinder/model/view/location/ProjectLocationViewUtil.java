@@ -19,7 +19,7 @@ public class ProjectLocationViewUtil {
 
     var field = projectLocation.getField() != null
         ? new StringWithTag(projectLocation.getField().getFieldName(), Tag.NONE)
-        : new StringWithTag(projectLocation.getManualFieldName(), Tag.NOT_FROM_PORTAL);
+        : new StringWithTag(projectLocation.getManualFieldName(), Tag.NOT_FROM_LIST);
     projectLocationView.setField(field);
 
     var fieldType = projectLocation.getFieldType() != null

@@ -2,7 +2,7 @@ package uk.co.ogauthority.pathfinder.model.view;
 
 public enum Tag {
 
-  NOT_FROM_PORTAL("NOT FROM PORTAL"),
+  NOT_FROM_LIST("NOT FROM LIST"),
   NONE("");
 
   private final String displayName;

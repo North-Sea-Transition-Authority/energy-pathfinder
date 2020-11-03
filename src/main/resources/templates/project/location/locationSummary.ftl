@@ -3,7 +3,9 @@
 <h2 class="govuk-heading-l summary-list__heading" id=${sectionId} >${sectionTitle}</h2>
 <@fdsCheckAnswers.checkAnswers >
   <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Field">
-    <@stringWithTag.stringWithTag stringWithTag=projectLocationView.field />
+    <#if projectLocationView.field?has_content>
+      <@stringWithTag.stringWithTag stringWithTag=projectLocationView.field />
+    </#if>
   </@checkAnswers.checkAnswersRowNoActionsWithNested>
   <@checkAnswers.checkAnswersRowNoActions prompt="Field type" value=projectLocationView.fieldType!"" />
   <@checkAnswers.checkAnswersRowNoActions prompt="Water depth" value=projectLocationView.waterDepth!"" />
@@ -17,9 +19,10 @@
   </#if>
   <@checkAnswers.checkAnswersRowNoActions prompt="UKCS area" value=projectLocationView.ukcsArea!"" />
   <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Licence blocks">
-    <#list projectLocationView.licenceBlocks as licenceBlock>
-      ${licenceBlock}
-      <br>
-    </#list>
+    <#if projectLocationView.licenceBlocks?has_content>
+      <#list projectLocationView.licenceBlocks as licenceBlock>
+        <div>${licenceBlock}</div>
+      </#list>
+    </#if>
   </@checkAnswers.checkAnswersRowNoActionsWithNested>
 </@fdsCheckAnswers.checkAnswers>

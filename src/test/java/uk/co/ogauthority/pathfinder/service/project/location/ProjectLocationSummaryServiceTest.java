@@ -58,7 +58,7 @@ public class ProjectLocationSummaryServiceTest {
   }
 
   @Test
-  public void getSummary_noProjectInformation() {
+  public void getSummary_noProjectLocation() {
     when(projectLocationService.findByProjectDetail(detail)).thenReturn(Optional.empty());
     var sectionSummary = projectLocationSummaryService.getSummary(detail);
     var model = sectionSummary.getTemplateModel();
@@ -66,9 +66,13 @@ public class ProjectLocationSummaryServiceTest {
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectLocationSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectLocationSummaryService.TEMPLATE_PATH);
 
+    var projectLocationView = model.get("projectLocationView");
+    assertThat(projectLocationView).isNotNull();
+
     assertThat(model).containsOnly(
         entry("sectionTitle", ProjectLocationSummaryService.PAGE_NAME),
-        entry("sectionId", ProjectLocationSummaryService.SECTION_ID)
+        entry("sectionId", ProjectLocationSummaryService.SECTION_ID),
+        entry("projectLocationView", projectLocationView)
     );
   }
 }

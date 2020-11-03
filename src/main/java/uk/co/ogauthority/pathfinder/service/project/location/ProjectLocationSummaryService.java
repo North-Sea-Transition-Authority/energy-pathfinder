@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationView;
 import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.model.view.summary.SidebarSectionLink;
@@ -39,12 +40,16 @@ public class ProjectLocationSummaryService implements ProjectSectionSummaryServi
     Map<String, Object> summaryModel = new HashMap<>();
     summaryModel.put("sectionTitle", PAGE_NAME);
     summaryModel.put("sectionId", SECTION_ID);
-    projectLocationService.findByProjectDetail(detail).ifPresent((projectLocation) -> {
-      summaryModel.put("projectLocationView", ProjectLocationViewUtil.from(
-          projectLocation,
-          projectLocationBlocksService.getBlocks(projectLocation)
-      ));
-    });
+    ProjectLocationView projectLocationView;
+    var projectLocationViewOptional = projectLocationService.findByProjectDetail(detail);
+    if (projectLocationViewOptional.isPresent()) {
+      var projectLocation = projectLocationViewOptional.get();
+      var projectLocationBlocks = projectLocationBlocksService.getBlocks(projectLocation);
+      projectLocationView = ProjectLocationViewUtil.from(projectLocation, projectLocationBlocks);
+    } else {
+      projectLocationView = new ProjectLocationView();
+    }
+    summaryModel.put("projectLocationView", projectLocationView);
     return new ProjectSectionSummary(
         List.of(SECTION_LINK),
         TEMPLATE_PATH,

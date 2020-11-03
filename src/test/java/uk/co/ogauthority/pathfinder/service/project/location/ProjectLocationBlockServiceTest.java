@@ -288,7 +288,7 @@ public class ProjectLocationBlockServiceTest {
 
   @Test
   public void getBlocks() {
-    when(projectLocationBlockRepository.findAllByProjectLocation(PROJECT_LOCATION)).thenReturn(
+    when(projectLocationBlockRepository.findAllByProjectLocationOrderByBlockReference(PROJECT_LOCATION)).thenReturn(
         PROJECT_LOCATION_BLOCKS
     );
     var blocks = projectLocationBlocksService.getBlocks(

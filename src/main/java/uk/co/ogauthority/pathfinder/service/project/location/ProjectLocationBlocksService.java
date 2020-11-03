@@ -120,7 +120,7 @@ public class ProjectLocationBlocksService {
   }
 
   public List<ProjectLocationBlock> getBlocks(ProjectLocation projectLocation) {
-    return projectLocationBlockRepository.findAllByProjectLocation(projectLocation);
+    return projectLocationBlockRepository.findAllByProjectLocationOrderByBlockReference(projectLocation);
   }
 
   /**
