@@ -1,11 +1,13 @@
 package uk.co.ogauthority.pathfinder.model.view.platformfpso;
 
+import java.util.List;
 import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 
 public class PlatformFpsoView extends ProjectSummaryItem {
 
-  private String platformFpso;
+  private StringWithTag platformFpso;
 
   private String topsideFpsoMass;
 
@@ -29,9 +31,7 @@ public class PlatformFpsoView extends ProjectSummaryItem {
 
   private String futurePlans;
 
-  private SummaryLink editLink;
-
-  private SummaryLink deleteLink;
+  private List<SummaryLink> summaryLinks;
 
 
   public PlatformFpsoView(Integer id,
@@ -44,11 +44,11 @@ public class PlatformFpsoView extends ProjectSummaryItem {
     this.projectId = projectId;
   }
 
-  public String getPlatformFpso() {
+  public StringWithTag getPlatformFpso() {
     return platformFpso;
   }
 
-  public void setPlatformFpso(String platformFpso) {
+  public void setPlatformFpso(StringWithTag platformFpso) {
     this.platformFpso = platformFpso;
   }
 
@@ -140,19 +140,11 @@ public class PlatformFpsoView extends ProjectSummaryItem {
     this.futurePlans = futurePlans;
   }
 
-  public SummaryLink getEditLink() {
-    return editLink;
+  public List<SummaryLink> getSummaryLinks() {
+    return summaryLinks;
   }
 
-  public void setEditLink(SummaryLink editLink) {
-    this.editLink = editLink;
-  }
-
-  public SummaryLink getDeleteLink() {
-    return deleteLink;
-  }
-
-  public void setDeleteLink(SummaryLink deleteLink) {
-    this.deleteLink = deleteLink;
+  public void setSummaryLinks(List<SummaryLink> summaryLinks) {
+    this.summaryLinks = summaryLinks;
   }
 }

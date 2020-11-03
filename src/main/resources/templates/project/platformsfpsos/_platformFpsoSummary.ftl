@@ -1,20 +1,21 @@
 <#include '../../layout.ftl'/>
 
-<#macro platformFpsoSummary view platformFpsoName="platform or FPSO" showValidationAndActions=false>
-  <@fdsCheckAnswers.checkAnswers >
-    <#if showValidationAndActions>
-      <div class="summary-list__actions">
-        <@fdsAction.link linkText=view.getEditLink().getLinkText() linkUrl=springUrl(view.getEditLink().url) linkScreenReaderText=platformFpsoName />
-        <@fdsAction.link linkText=view.getDeleteLink().getLinkText() linkUrl=springUrl(view.getDeleteLink().url) linkScreenReaderText=platformFpsoName />
-      </div>
-      <#if view.valid?has_content && !view.valid>
-        <span class="govuk-error-message">
-          <span class="govuk-visually-hidden">Error:</span>${platformFpsoName} is incomplete
-        </span>
+<#macro platformFpsoSummary view platformFpsoName="platform or FPSO" showActions=false headingSize="h2" headingClass="govuk-heading-l" showTag=false>
+  <@summaryViewWrapper.summaryViewItemWrapper
+    idPrefix="platform-fpso"
+    headingPrefix="Platform or FPSO"
+    summaryView=view
+    showActions=showActions
+    headingSize=headingSize
+    headingClass=headingClass
+  >
+    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Platform or FPSO">
+      <#if showTag>
+        <@stringWithTag.stringWithTag stringWithTag=view.platformFpso />
+      <#else>
+        ${view.platformFpso.value!""}
       </#if>
-    </#if>
-
-    <@checkAnswers.checkAnswersRowNoActions prompt="Platform or FPSO" value=view.platformFpso!"" />
+    </@checkAnswers.checkAnswersRowNoActionsWithNested>
     <@checkAnswers.checkAnswersRowNoActions prompt="Topside / FPSO removal mass" value=view.topsideFpsoMass!"" />
     <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Topside removal years">
       ${view.topsideRemovalEarliestYear!""}
@@ -37,5 +38,5 @@
     <@checkAnswers.checkAnswersRowNoActions prompt="FPSO type" value=view.fpsoType!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="FPSO dimensions" value=view.fpsoDimensions!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="Future plans" value=view.futurePlans!"" />
-  </@fdsCheckAnswers.checkAnswers>
+  </@summaryViewWrapper.summaryViewItemWrapper>
 </#macro>
