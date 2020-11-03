@@ -95,7 +95,7 @@ public class ProjectInformationService {
   }
 
   public ProjectInformation getProjectInformationOrError(ProjectDetail projectDetail) {
-    return projectInformationRepository.findByProjectDetail(projectDetail)
+    return getProjectInformation(projectDetail)
         .orElseThrow(() -> new PathfinderEntityNotFoundException(
             String.format("Unable to find ProjectInformation for projectDetail with ID %s", projectDetail.getId())));
   }

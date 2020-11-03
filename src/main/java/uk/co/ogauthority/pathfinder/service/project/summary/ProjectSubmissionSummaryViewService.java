@@ -6,7 +6,7 @@ import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountS
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSubmissionSummaryView;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
-import uk.co.ogauthority.pathfinder.util.InstantUtil;
+import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @Service
 public class ProjectSubmissionSummaryViewService {
@@ -26,8 +26,9 @@ public class ProjectSubmissionSummaryViewService {
 
     var webUserAccount = webUserAccountService.getWebUserAccountOrError(projectDetail.getSubmittedByWua());
 
-    return new ProjectSubmissionSummaryView(projectInformation.getProjectTitle(),
-        InstantUtil.formatInstant(projectDetail.getSubmittedInstant()),
+    return new ProjectSubmissionSummaryView(
+        projectInformation.getProjectTitle(),
+        DateUtil.formatInstant(projectDetail.getSubmittedInstant()),
         webUserAccount.getFullName());
   }
 }

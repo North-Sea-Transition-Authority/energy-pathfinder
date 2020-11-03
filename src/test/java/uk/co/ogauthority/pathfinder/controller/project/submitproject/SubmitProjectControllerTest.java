@@ -129,6 +129,8 @@ public class SubmitProjectControllerTest extends ProjectContextAbstractControlle
 
   @Test
   public void submitProjectConfirmation_whenAuthenticatedAndNonQA_thenNoAccess() throws Exception {
+    detail.setStatus(ProjectStatus.DRAFT);
+
     mockMvc.perform(get(ReverseRouter.route(
         on(SubmitProjectController.class).submitProjectConfirmation(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))

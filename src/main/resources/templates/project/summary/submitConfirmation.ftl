@@ -8,7 +8,7 @@
 
   <ul class="govuk-list">
     <li>Submitted date and time: ${projectSubmissionSummaryView.formattedSubmittedTimestamp}</li>
-    <li>Submitted by ${projectSubmissionSummaryView.submittedBy}</li>
+    <li>Submitted by: ${projectSubmissionSummaryView.submittedBy}</li>
   </ul>
 
   <h2 class="govuk-heading-m">What happens next</h2>

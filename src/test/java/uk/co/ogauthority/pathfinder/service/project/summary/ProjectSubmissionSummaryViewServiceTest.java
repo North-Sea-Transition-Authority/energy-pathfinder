@@ -14,7 +14,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectIn
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
-import uk.co.ogauthority.pathfinder.util.InstantUtil;
+import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectSubmissionSummaryViewServiceTest {
@@ -49,7 +49,7 @@ public class ProjectSubmissionSummaryViewServiceTest {
     var projectSubmissionSummaryView = projectSubmissionSummaryViewService.getProjectSubmissionSummaryView(projectDetail);
 
     assertThat(projectSubmissionSummaryView.getProjectTitle()).isEqualTo(projectInformation.getProjectTitle());
-    assertThat(projectSubmissionSummaryView.getFormattedSubmittedTimestamp()).isEqualTo(InstantUtil.formatInstant(projectDetail.getSubmittedInstant()));
+    assertThat(projectSubmissionSummaryView.getFormattedSubmittedTimestamp()).isEqualTo(DateUtil.formatInstant(projectDetail.getSubmittedInstant()));
     assertThat(projectSubmissionSummaryView.getSubmittedBy()).isEqualTo(webUserAccount.getFullName());
   }
 }
