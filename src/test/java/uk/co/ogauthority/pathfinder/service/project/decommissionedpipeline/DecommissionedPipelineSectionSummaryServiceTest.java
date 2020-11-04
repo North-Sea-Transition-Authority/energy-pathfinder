@@ -44,8 +44,7 @@ public class DecommissionedPipelineSectionSummaryServiceTest {
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(DecommissionedPipelineSectionSummaryService.TEMPLATE_PATH);
 
     var decommissionedPipelineViews = (List<DecommissionedPipelineView>) model.get("decommissionedPipelineViews");
-    assertThat(decommissionedPipelineViews).isNotNull();
-    assertThat(decommissionedPipelineViews.size()).isEqualTo(2);
+    assertThat(decommissionedPipelineViews).hasSize(2);
 
     assertThat(model).containsOnly(
         entry("sectionTitle", DecommissionedPipelineSectionSummaryService.PAGE_NAME),
@@ -64,7 +63,6 @@ public class DecommissionedPipelineSectionSummaryServiceTest {
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(DecommissionedPipelineSectionSummaryService.TEMPLATE_PATH);
 
     var decommissionedPipelineViews = (List<DecommissionedPipelineView>) model.get("decommissionedPipelineViews");
-    assertThat(decommissionedPipelineViews).isNotNull();
     assertThat(decommissionedPipelineViews).isEmpty();
 
     assertThat(model).containsOnly(

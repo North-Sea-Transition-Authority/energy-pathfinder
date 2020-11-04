@@ -13,6 +13,6 @@
       />
     </#list>
   <#else>
-    <@emptySectionSummaryInset.emptySectionSummaryInset itemText="decommissioned pipelines"/>
+    <@emptySectionSummaryInset.emptySectionSummaryInset itemText="pipelines"/>
   </#if>
 </@sectionSummaryWrapper.sectionSummaryWrapper>
