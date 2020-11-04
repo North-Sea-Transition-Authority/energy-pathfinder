@@ -149,7 +149,7 @@ public class UpcomingTenderSummaryServiceTest {
 
   private void checkCommonFields(UpcomingTenderView view, UpcomingTender tender) {
     assertThat(view.getDescriptionOfWork()).isEqualTo(tender.getDescriptionOfWork());
-    assertThat(view.getEstimatedTenderDate()).isEqualTo(DateUtil.formatDate(tender.getEstimatedTenderDate()));
+    assertThat(view.getEstimatedTenderDate()).isEqualTo(DateUtil.format(tender.getEstimatedTenderDate()));
     assertThat(view.getContractBand()).isEqualTo(tender.getContractBand().getDisplayName());
 
     var contactDetailView = view.getContactDetailView();

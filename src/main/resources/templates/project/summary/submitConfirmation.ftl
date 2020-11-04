@@ -14,7 +14,7 @@
   <h2 class="govuk-heading-m">What happens next</h2>
 
   <p class="govuk-body">
-    Your project has been sent to the ${service.customerName!"the regulator"} to review.
+    Your project has been sent to the ${service.customerName!"regulator"} to review.
   </p>
 
   <p class="govuk-body">

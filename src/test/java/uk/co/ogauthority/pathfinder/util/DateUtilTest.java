@@ -13,29 +13,29 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarte
 public class DateUtilTest {
 
   @Test
-  public void formatDate() {
+  public void format() {
     var testDate = LocalDate.now();
     var expected = testDate.format(DateUtil.DATE_FORMATTER);
-    assertThat(DateUtil.formatDate(testDate)).isEqualTo(expected);
+    assertThat(DateUtil.format(testDate)).isEqualTo(expected);
   }
 
   @Test
-  public void formatDate_whenNull() {
+  public void format_whenNull() {
     var expected = "";
-    assertThat(DateUtil.formatDate(null)).isEqualTo(expected);
+    assertThat(DateUtil.format(null)).isEqualTo(expected);
   }
 
   @Test
-  public void formatInstant() {
+  public void format_withDateTimeFormatter() {
     var testInstant = Instant.now();
     var expected = DateUtil.DATE_TIME_FORMATTER.format(testInstant);
-    assertThat(DateUtil.formatInstant(testInstant)).isEqualTo(expected);
+    assertThat(DateUtil.format(testInstant, DateUtil.DATE_TIME_FORMATTER)).isEqualTo(expected);
   }
 
   @Test
-  public void formatInstant_whenNull() {
+  public void format_withDateTimeFormatter_whenNull() {
     var expected = "";
-    assertThat(DateUtil.formatInstant(null)).isEqualTo(expected);
+    assertThat(DateUtil.format(null, DateUtil.DATE_TIME_FORMATTER)).isEqualTo(expected);
   }
 
   @Test

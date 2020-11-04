@@ -28,7 +28,7 @@ public class ProjectSubmissionSummaryViewService {
 
     return new ProjectSubmissionSummaryView(
         projectInformation.getProjectTitle(),
-        DateUtil.formatInstant(projectDetail.getSubmittedInstant()),
+        DateUtil.format(projectDetail.getSubmittedInstant(), DateUtil.DATE_TIME_FORMATTER),
         webUserAccount.getFullName());
   }
 }
