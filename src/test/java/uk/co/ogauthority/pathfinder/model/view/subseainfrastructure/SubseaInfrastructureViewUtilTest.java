@@ -107,6 +107,23 @@ public class SubseaInfrastructureViewUtilTest {
   }
 
   @Test
+  public void from_withConcreteMattressInfrastructureType_whenNullTotalEstimatesMattressMass() {
+    var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withConcreteMattresses();
+    subseaInfrastructure.setTotalEstimatedMattressMass(null);
+
+    var subseaInfrastructureView = SubseaInfrastructureViewUtil.from(subseaInfrastructure, DISPLAY_ORDER, IS_VALID);
+
+    assertThat(subseaInfrastructureView.getInfrastructureType()).isEqualTo(subseaInfrastructure.getInfrastructureType().getDisplayName());
+    assertThat(subseaInfrastructureView.getNumberOfMattresses()).isEqualTo(subseaInfrastructure.getNumberOfMattresses());
+    assertThat(subseaInfrastructureView.getTotalEstimatedMattressMass()).isEqualTo("");
+    assertThat(subseaInfrastructureView.getTotalEstimatedSubseaMass()).isNull();
+    assertThat(subseaInfrastructureView.getOtherInfrastructureType()).isNull();
+    assertThat(subseaInfrastructureView.getTotalEstimatedOtherMass()).isNull();
+
+    checkCommonFields(subseaInfrastructureView, DISPLAY_ORDER, IS_VALID, subseaInfrastructure);
+  }
+
+  @Test
   public void from_withSubseaStructureInfrastructureType() {
     var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withSubseaStructure();
 
@@ -133,6 +150,23 @@ public class SubseaInfrastructureViewUtilTest {
     assertThat(subseaInfrastructureView.getTotalEstimatedOtherMass()).isEqualTo(
         SubseaInfrastructureViewUtil.getMassString(subseaInfrastructure.getTotalEstimatedOtherMass())
     );
+    assertThat(subseaInfrastructureView.getTotalEstimatedSubseaMass()).isNull();
+    assertThat(subseaInfrastructureView.getNumberOfMattresses()).isNull();
+    assertThat(subseaInfrastructureView.getTotalEstimatedMattressMass()).isNull();
+
+    checkCommonFields(subseaInfrastructureView, DISPLAY_ORDER, IS_VALID, subseaInfrastructure);
+  }
+
+  @Test
+  public void from_withOtherInfrastructureInfrastructureType_whenNullTotalEstimatesOtherMass() {
+    var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withOtherInfrastructure();
+    subseaInfrastructure.setTotalEstimatedOtherMass(null);
+
+    var subseaInfrastructureView = SubseaInfrastructureViewUtil.from(subseaInfrastructure, DISPLAY_ORDER, IS_VALID);
+
+    assertThat(subseaInfrastructureView.getInfrastructureType()).isEqualTo(subseaInfrastructure.getInfrastructureType().getDisplayName());
+    assertThat(subseaInfrastructureView.getOtherInfrastructureType()).isEqualTo(subseaInfrastructure.getOtherInfrastructureType());
+    assertThat(subseaInfrastructureView.getTotalEstimatedOtherMass()).isEqualTo("");
     assertThat(subseaInfrastructureView.getTotalEstimatedSubseaMass()).isNull();
     assertThat(subseaInfrastructureView.getNumberOfMattresses()).isNull();
     assertThat(subseaInfrastructureView.getTotalEstimatedMattressMass()).isNull();

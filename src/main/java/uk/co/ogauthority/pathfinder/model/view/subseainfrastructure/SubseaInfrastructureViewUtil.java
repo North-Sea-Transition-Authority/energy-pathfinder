@@ -101,8 +101,9 @@ public class SubseaInfrastructureViewUtil {
                                                     SubseaInfrastructureView subseaInfrastructureView) {
     subseaInfrastructureView.setConcreteMattress(true);
     subseaInfrastructureView.setNumberOfMattresses(subseaInfrastructure.getNumberOfMattresses());
-    subseaInfrastructureView.setTotalEstimatedMattressMass(
-        getMassString(subseaInfrastructure.getTotalEstimatedMattressMass())
+    subseaInfrastructureView.setTotalEstimatedMattressMass(subseaInfrastructure.getTotalEstimatedMattressMass() != null
+        ? getMassString(subseaInfrastructure.getTotalEstimatedMattressMass())
+        : ""
     );
   }
 
@@ -119,8 +120,10 @@ public class SubseaInfrastructureViewUtil {
                                                        SubseaInfrastructureView subseaInfrastructureView) {
     subseaInfrastructureView.setOtherInfrastructure(true);
     subseaInfrastructureView.setOtherInfrastructureType(subseaInfrastructure.getOtherInfrastructureType());
-    subseaInfrastructureView.setTotalEstimatedOtherMass(
-        getMassString(subseaInfrastructure.getTotalEstimatedOtherMass()));
+    subseaInfrastructureView.setTotalEstimatedOtherMass(subseaInfrastructure.getTotalEstimatedOtherMass() != null
+        ? getMassString(subseaInfrastructure.getTotalEstimatedOtherMass())
+        : ""
+    );
   }
 
   private static SummaryLink getEditSummaryLink(Integer projectId, Integer subseaInfrastructureId) {
