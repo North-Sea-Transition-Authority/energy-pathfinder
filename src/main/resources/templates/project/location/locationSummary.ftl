@@ -19,10 +19,8 @@
   </#if>
   <@checkAnswers.checkAnswersRowNoActions prompt="UKCS area" value=projectLocationView.ukcsArea!"" />
   <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Licence blocks">
-    <#if projectLocationView.licenceBlocks?has_content>
-      <#list projectLocationView.licenceBlocks as licenceBlock>
-        <div>${licenceBlock}</div>
-      </#list>
-    </#if>
+    <#list projectLocationView.licenceBlocks as licenceBlock>
+      <div>${licenceBlock}</div>
+    </#list>
   </@checkAnswers.checkAnswersRowNoActionsWithNested>
 </@fdsCheckAnswers.checkAnswers>

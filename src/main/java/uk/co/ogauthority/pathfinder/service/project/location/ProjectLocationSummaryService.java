@@ -40,15 +40,12 @@ public class ProjectLocationSummaryService implements ProjectSectionSummaryServi
     Map<String, Object> summaryModel = new HashMap<>();
     summaryModel.put("sectionTitle", PAGE_NAME);
     summaryModel.put("sectionId", SECTION_ID);
-    ProjectLocationView projectLocationView;
-    var projectLocationViewOptional = projectLocationService.findByProjectDetail(detail);
-    if (projectLocationViewOptional.isPresent()) {
-      var projectLocation = projectLocationViewOptional.get();
-      var projectLocationBlocks = projectLocationBlocksService.getBlocks(projectLocation);
-      projectLocationView = ProjectLocationViewUtil.from(projectLocation, projectLocationBlocks);
-    } else {
-      projectLocationView = new ProjectLocationView();
-    }
+    var projectLocationView = projectLocationService.findByProjectDetail(detail)
+        .map(projectLocation -> {
+          var projectLocationBlocks = projectLocationBlocksService.getBlocks(projectLocation);
+          return ProjectLocationViewUtil.from(projectLocation, projectLocationBlocks);
+        })
+        .orElse(new ProjectLocationView());
     summaryModel.put("projectLocationView", projectLocationView);
     return new ProjectSectionSummary(
         List.of(SECTION_LINK),
