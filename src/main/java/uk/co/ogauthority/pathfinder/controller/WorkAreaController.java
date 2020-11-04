@@ -1,22 +1,32 @@
 package uk.co.ogauthority.pathfinder.controller;
 
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
-import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
-import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.WorkAreaService;
 
 @Controller
 public class WorkAreaController {
 
+  private final WorkAreaService workAreaService;
+
+  @Autowired
+  public WorkAreaController(WorkAreaService workAreaService) {
+    this.workAreaService = workAreaService;
+  }
+
   @GetMapping("/work-area")
   public ModelAndView getWorkArea(AuthenticatedUserAccount user) {
-    return new ModelAndView("workArea")
-        .addObject("showStartProject", user.getUserPrivileges().contains(UserPrivilege.PATHFINDER_PROJECT_CREATE))
-        .addObject("startProjectUrl", ReverseRouter.route(on(StartProjectController.class).startProject(null)));
+    return workAreaService.getWorkAreaModelAndViewForUser(user);
   }
+
+  @PostMapping("/work-area")
+  public ModelAndView getWorkAreaFiltered(AuthenticatedUserAccount user) {
+    //TODO PAT-116 filter projects
+    return workAreaService.getWorkAreaModelAndViewForUser(user);
+  }
+
 }

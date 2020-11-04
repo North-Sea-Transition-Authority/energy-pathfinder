@@ -10,6 +10,20 @@
   </#if>
 </#macro>
 
+<#macro dashboardLink userAction applyNotVisitedClass=true>
+    <#assign classes = "govuk-link govuk-!-font-size-24"/>
+    <#if applyNotVisitedClass>
+      <#assign classes = classes + " govuk-link--no-visited-state"/>
+    </#if>
+    <@fdsAction.link
+      linkText=userAction.prompt
+      linkUrl=springUrl(userAction.url)
+      linkClass=classes
+      role=false
+      linkScreenReaderText=userAction.screenReaderText!""
+    />
+</#macro>
+
 <#macro _linkButton userAction>
   <#assign linkClasses = "govuk-button"/>
 

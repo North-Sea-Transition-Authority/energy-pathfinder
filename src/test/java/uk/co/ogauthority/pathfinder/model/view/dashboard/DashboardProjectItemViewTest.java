@@ -1,0 +1,86 @@
+package uk.co.ogauthority.pathfinder.model.view.dashboard;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
+import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
+import uk.co.ogauthority.pathfinder.model.form.useraction.Link;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
+import uk.co.ogauthority.pathfinder.util.DateUtil;
+
+@RunWith(MockitoJUnitRunner.class)
+public class DashboardProjectItemViewTest {
+
+  private final DashboardProjectItem dashboardProjectItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+
+  @Test
+  public void from_allFieldsSetCorrectly() {
+    var view = DashboardProjectItemView.from(dashboardProjectItem);
+    var title = dashboardProjectItem.getProjectTitle();
+    var screenReaderText = String.format(DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
+
+    assertThat(view.getProjectTitle()).isEqualTo(title);
+    assertCommonFieldsMatch(dashboardProjectItem, view);
+    assertLinkMatches(
+        dashboardProjectItem,
+        DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText),
+        title
+      );
+  }
+
+  @Test
+  public void from_allFieldsSetCorrectly_noTitle() {
+    dashboardProjectItem.setProjectTitle(null);
+    var view = DashboardProjectItemView.from(dashboardProjectItem);
+    var title = String.format(DashboardProjectItemView.TITLE_PLACEHOLDER, dashboardProjectItem.getStatus().getDisplayName(), DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
+    var screenReaderText = String.format(DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
+
+    assertThat(view.getProjectTitle()).isEqualTo(title);
+    assertCommonFieldsMatch(dashboardProjectItem, view);
+    assertLinkMatches(
+        dashboardProjectItem,
+        DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText),
+        title
+    );
+  }
+
+
+
+  @Test
+  public void getLink() {
+    var title = dashboardProjectItem.getProjectTitle();
+    var screenReaderText = String.format(DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
+    assertLinkMatches(dashboardProjectItem, DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText), title);
+  }
+
+  @Test
+  public void getLink_placeholderTitle() {
+    var title = String.format(DashboardProjectItemView.TITLE_PLACEHOLDER, dashboardProjectItem.getStatus().getDisplayName(), DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
+    var screenReaderText = String.format(DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
+    assertLinkMatches(dashboardProjectItem, DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText), title);
+  }
+
+  private void assertCommonFieldsMatch(DashboardProjectItem dashboardProjectItem, DashboardProjectItemView view) {
+    assertThat(view.getFieldStage()).isEqualTo(
+        dashboardProjectItem.getFieldStage() != null ? dashboardProjectItem.getFieldStage().getDisplayName() : ""
+    );
+    assertThat(view.getFieldName()).isEqualTo(dashboardProjectItem.getFieldName());
+    assertThat(view.getOperatorName()).isEqualTo(dashboardProjectItem.getOperatorName());
+    assertThat(view.getStatus()).isEqualTo(dashboardProjectItem.getStatus().getDisplayName());
+  }
+
+  private void assertLinkMatches(DashboardProjectItem dashboardProjectItem, Link link, String prompt) {
+    assertThat(link.getScreenReaderText()).isEqualTo(String.format(
+        DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime())
+    ));
+    assertThat(link.getPrompt()).isEqualTo(prompt);
+    assertThat(link.getUrl()).isEqualTo(
+      ReverseRouter.route(on(TaskListController.class).viewTaskList(dashboardProjectItem.getProjectId(), null))
+    );
+  }
+}

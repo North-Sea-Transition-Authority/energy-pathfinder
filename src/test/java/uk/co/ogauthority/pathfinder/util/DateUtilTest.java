@@ -2,7 +2,10 @@ package uk.co.ogauthority.pathfinder.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -22,6 +25,20 @@ public class DateUtilTest {
   public void formatDate_whenNull() {
     var expected = "";
     assertThat(DateUtil.formatDate(null)).isEqualTo(expected);
+  }
+
+  @Test
+  public void formatInstant() {
+    var testInstant = Instant.now();
+    var expected = LocalDateTime.ofInstant(testInstant, ZoneId.systemDefault())
+        .format(DateUtil.DATE_TIME_FORMATTER);
+    assertThat(DateUtil.formatInstant(testInstant)).isEqualTo(expected);
+  }
+
+  @Test
+  public void formatInstant_whenNull() {
+    var expected = "";
+    assertThat(DateUtil.formatInstant(null)).isEqualTo(expected);
   }
 
   @Test
