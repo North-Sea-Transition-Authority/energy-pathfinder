@@ -10,7 +10,7 @@
     headingSize=headingSize
     headingClass=headingClass
   >
-    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Description">
+    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Host structure">
       <#if showTag>
         <@stringWithTag.stringWithTag stringWithTag=subseaInfrastructureView.structure />
       <#else>

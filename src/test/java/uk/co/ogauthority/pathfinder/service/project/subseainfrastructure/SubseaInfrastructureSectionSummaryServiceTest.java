@@ -44,8 +44,7 @@ public class SubseaInfrastructureSectionSummaryServiceTest {
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(SubseaInfrastructureSectionSummaryService.TEMPLATE_PATH);
 
     var subseaInfrastructureViews = (List<SubseaInfrastructureView>) model.get("subseaInfrastructureViews");
-    assertThat(subseaInfrastructureViews).isNotNull();
-    assertThat(subseaInfrastructureViews.size()).isEqualTo(2);
+    assertThat(subseaInfrastructureViews).hasSize(2);
 
     assertThat(model).containsOnly(
         entry("sectionTitle", SubseaInfrastructureSectionSummaryService.PAGE_NAME),
@@ -64,7 +63,6 @@ public class SubseaInfrastructureSectionSummaryServiceTest {
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(SubseaInfrastructureSectionSummaryService.TEMPLATE_PATH);
 
     var subseaInfrastructureViews = (List<SubseaInfrastructureView>) model.get("subseaInfrastructureViews");
-    assertThat(subseaInfrastructureViews).isNotNull();
     assertThat(subseaInfrastructureViews).isEmpty();
 
     assertThat(model).containsOnly(
