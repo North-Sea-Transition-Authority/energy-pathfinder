@@ -4,6 +4,7 @@ import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +46,26 @@ public class PlatformsFpsosSectionSummaryServiceTest {
     var platformFpsoViews = (List<PlatformFpsoView>) model.get("platformFpsoViews");
     assertThat(platformFpsoViews).isNotNull();
     assertThat(platformFpsoViews.size()).isEqualTo(2);
+
+    assertThat(model).containsOnly(
+        entry("sectionTitle", PlatformsFpsosSectionSummaryService.PAGE_NAME),
+        entry("sectionId", PlatformsFpsosSectionSummaryService.SECTION_ID),
+        entry("platformFpsoViews", platformFpsoViews)
+    );
+  }
+
+  @Test
+  public void getSummary_noPlatformsFpsos() {
+    when(platformsFpsosService.getPlatformsFpsosForDetail(detail)).thenReturn(Collections.emptyList());
+    var sectionSummary = platformsFpsosSectionSummaryService.getSummary(detail);
+    var model = sectionSummary.getTemplateModel();
+    assertThat(sectionSummary.getDisplayOrder()).isEqualTo(PlatformsFpsosSectionSummaryService.DISPLAY_ORDER);
+    assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(PlatformsFpsosSectionSummaryService.SECTION_LINK));
+    assertThat(sectionSummary.getTemplatePath()).isEqualTo(PlatformsFpsosSectionSummaryService.TEMPLATE_PATH);
+
+    var platformFpsoViews = (List<PlatformFpsoView>) model.get("platformFpsoViews");
+    assertThat(platformFpsoViews).isNotNull();
+    assertThat(platformFpsoViews).isEmpty();
 
     assertThat(model).containsOnly(
         entry("sectionTitle", PlatformsFpsosSectionSummaryService.PAGE_NAME),
