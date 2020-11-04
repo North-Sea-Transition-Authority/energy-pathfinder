@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractView;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -42,8 +43,29 @@ public class AwardedContractSectionSummaryServiceTest {
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(AwardedContractSectionSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(AwardedContractSectionSummaryService.TEMPLATE_PATH);
 
-    var awardedContractViews = model.get("awardedContractViews");
+    var awardedContractViews = (List<AwardedContractView>) model.get("awardedContractViews");
     assertThat(awardedContractViews).isNotNull();
+    assertThat(awardedContractViews.size()).isEqualTo(2);
+
+    assertThat(model).containsOnly(
+        entry("sectionTitle", AwardedContractSectionSummaryService.PAGE_NAME),
+        entry("sectionId", AwardedContractSectionSummaryService.SECTION_ID),
+        entry("awardedContractViews", awardedContractViews)
+    );
+  }
+
+  @Test
+  public void getSummary_noAwardedContracts() {
+    when(awardedContractService.getAwardedContracts(detail)).thenReturn(Collections.emptyList());
+    var sectionSummary = awardedContractSectionSummaryService.getSummary(detail);
+    var model = sectionSummary.getTemplateModel();
+    assertThat(sectionSummary.getDisplayOrder()).isEqualTo(AwardedContractSectionSummaryService.DISPLAY_ORDER);
+    assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(AwardedContractSectionSummaryService.SECTION_LINK));
+    assertThat(sectionSummary.getTemplatePath()).isEqualTo(AwardedContractSectionSummaryService.TEMPLATE_PATH);
+
+    var awardedContractViews = (List<AwardedContractView>) model.get("awardedContractViews");
+    assertThat(awardedContractViews).isNotNull();
+    assertThat(awardedContractViews).isEmpty();
 
     assertThat(model).containsOnly(
         entry("sectionTitle", AwardedContractSectionSummaryService.PAGE_NAME),
