@@ -44,8 +44,7 @@ public class PlatformsFpsosSectionSummaryServiceTest {
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(PlatformsFpsosSectionSummaryService.TEMPLATE_PATH);
 
     var platformFpsoViews = (List<PlatformFpsoView>) model.get("platformFpsoViews");
-    assertThat(platformFpsoViews).isNotNull();
-    assertThat(platformFpsoViews.size()).isEqualTo(2);
+    assertThat(platformFpsoViews).hasSize(2);
 
     assertThat(model).containsOnly(
         entry("sectionTitle", PlatformsFpsosSectionSummaryService.PAGE_NAME),
@@ -64,7 +63,6 @@ public class PlatformsFpsosSectionSummaryServiceTest {
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(PlatformsFpsosSectionSummaryService.TEMPLATE_PATH);
 
     var platformFpsoViews = (List<PlatformFpsoView>) model.get("platformFpsoViews");
-    assertThat(platformFpsoViews).isNotNull();
     assertThat(platformFpsoViews).isEmpty();
 
     assertThat(model).containsOnly(
