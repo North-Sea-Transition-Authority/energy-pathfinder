@@ -24,17 +24,13 @@ public class ProjectLocationViewUtilTest {
   private void checkCommonFields(ProjectLocationView projectLocationView,
                                  ProjectLocation projectLocation,
                                  List<ProjectLocationBlock> projectLocationBlocks) {
-    assertThat(projectLocationView.getFieldType()).isEqualTo(projectLocation.getFieldType() != null
-        ? projectLocation.getFieldType().getDisplayName()
-        : null);
+    assertThat(projectLocationView.getFieldType()).isEqualTo(projectLocation.getFieldType().getDisplayName());
     assertThat(projectLocationView.getWaterDepth()).isEqualTo(projectLocation.getWaterDepth());
     assertThat(projectLocationView.getApprovedFieldDevelopmentPlan()).isEqualTo(projectLocation.getApprovedFieldDevelopmentPlan());
     assertThat(projectLocationView.getApprovedFdpDate()).isEqualTo(DateUtil.formatDate(projectLocation.getApprovedFdpDate()));
     assertThat(projectLocationView.getApprovedDecomProgram()).isEqualTo(projectLocation.getApprovedDecomProgram());
     assertThat(projectLocationView.getApprovedDecomProgramDate()).isEqualTo(DateUtil.formatDate(projectLocation.getApprovedDecomProgramDate()));
-    assertThat(projectLocationView.getUkcsArea()).isEqualTo(projectLocation.getUkcsArea() != null
-        ? projectLocation.getUkcsArea().getDisplayName()
-        : null);
+    assertThat(projectLocationView.getUkcsArea()).isEqualTo(projectLocation.getUkcsArea().getDisplayName());
     assertThat(projectLocationView.getLicenceBlocks()).containsExactlyElementsOf(projectLocationBlocks.stream()
       .map(ProjectLocationBlock::getBlockReference)
       .collect(Collectors.toList()));
@@ -45,7 +41,14 @@ public class ProjectLocationViewUtilTest {
     var projectLocation = new ProjectLocation();
     var projectLocationView = ProjectLocationViewUtil.from(projectLocation, Collections.emptyList());
 
-    checkCommonFields(projectLocationView, projectLocation, Collections.emptyList());
+    assertThat(projectLocationView.getFieldType()).isNull();
+    assertThat(projectLocationView.getWaterDepth()).isNull();
+    assertThat(projectLocationView.getApprovedFieldDevelopmentPlan()).isNull();
+    assertThat(projectLocationView.getApprovedFdpDate()).isEqualTo("");
+    assertThat(projectLocationView.getApprovedDecomProgram()).isNull();
+    assertThat(projectLocationView.getApprovedDecomProgramDate()).isEqualTo("");
+    assertThat(projectLocationView.getUkcsArea()).isNull();
+    assertThat(projectLocationView.getLicenceBlocks()).isEmpty();
   }
 
   @Test
