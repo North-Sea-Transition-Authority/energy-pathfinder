@@ -168,7 +168,7 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
   private ModelAndView getDecommissionedPipelinesSummaryModelAndView(Integer projectId,
                                                                      List<DecommissionedPipelineView> decommissionedPipelineViews,
                                                                      ValidationResult validationResult) {
-    var modelAndView = new ModelAndView("project/decommissionedpipeline/decommissionedPipelinesSummary")
+    var modelAndView = new ModelAndView("project/decommissionedpipeline/decommissionedPipelineFormSummary")
         .addObject("pageTitle", SUMMARY_PAGE_NAME)
         .addObject("addDecommissionedPipelineUrl",
             ReverseRouter.route(on(DecommissionedPipelineController.class).addPipeline(projectId, null))
