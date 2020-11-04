@@ -1,5 +1,5 @@
 <#include '../../layout.ftl'>
-<#import 'subseaInfrastructureSummary.ftl' as subseaInfrastructureSummary>
+<#import '_subseaInfrastructureSummary.ftl' as subseaInfrastructureSummary>
 
 <@defaultPage
   htmlTitle=pageName

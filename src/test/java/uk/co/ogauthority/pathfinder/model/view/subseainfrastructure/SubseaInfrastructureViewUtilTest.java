@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.subseainfrastructure.SubseaInfrastructure;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.testutil.SubseaInfrastructureTestUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -31,7 +32,9 @@ public class SubseaInfrastructureViewUtilTest {
     var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withDevUkFacility();
     var subseaInfrastructureView = SubseaInfrastructureViewUtil.from(subseaInfrastructure, DISPLAY_ORDER, IS_VALID);
 
-    assertThat(subseaInfrastructureView.getStructure()).isEqualTo(subseaInfrastructure.getFacility().getSelectionText());
+    var structure = subseaInfrastructureView.getStructure();
+    assertThat(structure.getValue()).isEqualTo(subseaInfrastructure.getFacility().getSelectionText());
+    assertThat(structure.getTag()).isEqualTo(Tag.NONE);
     checkCommonFields(subseaInfrastructureView, DISPLAY_ORDER, IS_VALID, subseaInfrastructure);
   }
 
@@ -41,7 +44,9 @@ public class SubseaInfrastructureViewUtilTest {
     var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withManualFacility();
     var subseaInfrastructureView = SubseaInfrastructureViewUtil.from(subseaInfrastructure, DISPLAY_ORDER, IS_VALID);
 
-    assertThat(subseaInfrastructureView.getStructure()).isEqualTo(subseaInfrastructure.getManualFacility());
+    var structure = subseaInfrastructureView.getStructure();
+    assertThat(structure.getValue()).isEqualTo(subseaInfrastructure.getManualFacility());
+    assertThat(structure.getTag()).isEqualTo(Tag.NOT_FROM_LIST);
     checkCommonFields(subseaInfrastructureView, DISPLAY_ORDER, IS_VALID, subseaInfrastructure);
   }
 

@@ -7,8 +7,10 @@ import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.Subs
 import uk.co.ogauthority.pathfinder.model.entity.project.subseainfrastructure.SubseaInfrastructure;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureType;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
 public class SubseaInfrastructureViewUtil {
@@ -36,8 +38,8 @@ public class SubseaInfrastructureViewUtil {
     subseaInfrastructureView.setProjectId(projectId);
 
     var structure = (subseaInfrastructure.getFacility() != null)
-        ? subseaInfrastructure.getFacility().getSelectionText()
-        : subseaInfrastructure.getManualFacility();
+        ? new StringWithTag(subseaInfrastructure.getFacility().getSelectionText(), Tag.NONE)
+        : new StringWithTag(subseaInfrastructure.getManualFacility(), Tag.NOT_FROM_LIST);
     subseaInfrastructureView.setStructure(structure);
 
     subseaInfrastructureView.setDescription(subseaInfrastructure.getDescription());

@@ -2,11 +2,12 @@ package uk.co.ogauthority.pathfinder.model.view.subseainfrastructure;
 
 import java.util.List;
 import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 
 public class SubseaInfrastructureView extends ProjectSummaryItem {
 
-  private String structure;
+  private StringWithTag structure;
 
   private String description;
 
@@ -36,11 +37,11 @@ public class SubseaInfrastructureView extends ProjectSummaryItem {
 
   private boolean isOtherInfrastructure;
 
-  public String getStructure() {
+  public StringWithTag getStructure() {
     return structure;
   }
 
-  public void setStructure(String structure) {
+  public void setStructure(StringWithTag structure) {
     this.structure = structure;
   }
 

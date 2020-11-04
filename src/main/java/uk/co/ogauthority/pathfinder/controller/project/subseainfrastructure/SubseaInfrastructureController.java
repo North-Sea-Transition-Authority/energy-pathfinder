@@ -168,7 +168,7 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
   private ModelAndView getSubseaStructuresSummaryModelAndView(Integer projectId,
                                                               List<SubseaInfrastructureView> subseaInfrastructureViews,
                                                               ValidationResult validationResult) {
-    var modelAndView = new ModelAndView("project/subseainfrastructure/subseaInfrastructuresSummary")
+    var modelAndView = new ModelAndView("project/subseainfrastructure/subseaInfrastructureFormSummary")
         .addObject("pageTitle", SUMMARY_PAGE_NAME)
         .addObject("addSubseaInfrastructureUrl",
             ReverseRouter.route(on(SubseaInfrastructureController.class).addSubseaInfrastructure(projectId, null))
