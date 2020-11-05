@@ -44,8 +44,7 @@ public class AwardedContractSectionSummaryServiceTest {
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(AwardedContractSectionSummaryService.TEMPLATE_PATH);
 
     var awardedContractViews = (List<AwardedContractView>) model.get("awardedContractViews");
-    assertThat(awardedContractViews).isNotNull();
-    assertThat(awardedContractViews.size()).isEqualTo(2);
+    assertThat(awardedContractViews).hasSize(2);
 
     assertThat(model).containsOnly(
         entry("sectionTitle", AwardedContractSectionSummaryService.PAGE_NAME),
@@ -64,7 +63,6 @@ public class AwardedContractSectionSummaryServiceTest {
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(AwardedContractSectionSummaryService.TEMPLATE_PATH);
 
     var awardedContractViews = (List<AwardedContractView>) model.get("awardedContractViews");
-    assertThat(awardedContractViews).isNotNull();
     assertThat(awardedContractViews).isEmpty();
 
     assertThat(model).containsOnly(
