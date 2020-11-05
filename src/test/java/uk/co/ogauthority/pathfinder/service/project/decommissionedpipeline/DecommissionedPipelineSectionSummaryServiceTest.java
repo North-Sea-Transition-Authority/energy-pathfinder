@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.decommissionedpipeline.DecommissionedPipelineView;
+import uk.co.ogauthority.pathfinder.model.view.decommissionedpipeline.DecommissionedPipelineViewUtil;
 import uk.co.ogauthority.pathfinder.testutil.DecommissionedPipelineTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -33,9 +34,11 @@ public class DecommissionedPipelineSectionSummaryServiceTest {
 
   @Test
   public void getSummary() {
+    var decommissionedPipeline1 = DecommissionedPipelineTestUtil.createDecommissionedPipeline();
+    var decommissionedPipeline2 = DecommissionedPipelineTestUtil.createDecommissionedPipeline();
     when(decommissionedPipelineService.getDecommissionedPipelines(detail)).thenReturn(List.of(
-        DecommissionedPipelineTestUtil.createDecommissionedPipeline(),
-        DecommissionedPipelineTestUtil.createDecommissionedPipeline()
+        decommissionedPipeline1,
+        decommissionedPipeline2
     ));
     var sectionSummary = decommissionedPipelineSectionSummaryService.getSummary(detail);
     var model = sectionSummary.getTemplateModel();
@@ -43,13 +46,13 @@ public class DecommissionedPipelineSectionSummaryServiceTest {
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(DecommissionedPipelineSectionSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(DecommissionedPipelineSectionSummaryService.TEMPLATE_PATH);
 
-    var decommissionedPipelineViews = (List<DecommissionedPipelineView>) model.get("decommissionedPipelineViews");
-    assertThat(decommissionedPipelineViews).hasSize(2);
+    var decommissionedPipelineView1 = DecommissionedPipelineViewUtil.from(decommissionedPipeline1, 1);
+    var decommissionedPipelineView2 = DecommissionedPipelineViewUtil.from(decommissionedPipeline2, 2);
 
     assertThat(model).containsOnly(
         entry("sectionTitle", DecommissionedPipelineSectionSummaryService.PAGE_NAME),
         entry("sectionId", DecommissionedPipelineSectionSummaryService.SECTION_ID),
-        entry("decommissionedPipelineViews", decommissionedPipelineViews)
+        entry("decommissionedPipelineViews", List.of(decommissionedPipelineView1, decommissionedPipelineView2))
     );
   }
 
@@ -62,13 +65,10 @@ public class DecommissionedPipelineSectionSummaryServiceTest {
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(DecommissionedPipelineSectionSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(DecommissionedPipelineSectionSummaryService.TEMPLATE_PATH);
 
-    var decommissionedPipelineViews = (List<DecommissionedPipelineView>) model.get("decommissionedPipelineViews");
-    assertThat(decommissionedPipelineViews).isEmpty();
-
     assertThat(model).containsOnly(
         entry("sectionTitle", DecommissionedPipelineSectionSummaryService.PAGE_NAME),
         entry("sectionId", DecommissionedPipelineSectionSummaryService.SECTION_ID),
-        entry("decommissionedPipelineViews", decommissionedPipelineViews)
+        entry("decommissionedPipelineViews", Collections.emptyList())
     );
   }
 }
