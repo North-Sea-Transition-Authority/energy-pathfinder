@@ -1,6 +1,6 @@
 <#include '../../layout.ftl'>
 
-<#macro awardedContractSummary awardedContractView showHeader=true showActions=true headingSize="h2" headingClass="govuk-heading-l" showTag=false>
+<#macro awardedContractSummary awardedContractView showHeader=false showActions=false headingSize="h2" headingClass="govuk-heading-l" showTag=false>
   <@summaryViewWrapper.summaryViewItemWrapper
     idPrefix="awarded-contract"
     headingPrefix="Awarded contract"

@@ -1,10 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.view.awardedcontract;
 
-import java.util.List;
 import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
-import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 
 public class AwardedContractView extends ProjectSummaryItem {
@@ -20,8 +18,6 @@ public class AwardedContractView extends ProjectSummaryItem {
   private String contractBand;
 
   private ContactDetailView contactDetailView;
-
-  List<SummaryLink> summaryLinks;
 
   public String getContractorName() {
     return contractorName;
@@ -71,14 +67,6 @@ public class AwardedContractView extends ProjectSummaryItem {
     this.contactDetailView = contactDetailView;
   }
 
-  public List<SummaryLink> getSummaryLinks() {
-    return summaryLinks;
-  }
-
-  public void setSummaryLinks(List<SummaryLink> summaryLinks) {
-    this.summaryLinks = summaryLinks;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -96,8 +84,7 @@ public class AwardedContractView extends ProjectSummaryItem {
         && Objects.equals(descriptionOfWork, that.descriptionOfWork)
         && Objects.equals(dateAwarded, that.dateAwarded)
         && Objects.equals(contractBand, that.contractBand)
-        && Objects.equals(contactDetailView, that.contactDetailView)
-        && Objects.equals(summaryLinks, that.summaryLinks);
+        && Objects.equals(contactDetailView, that.contactDetailView);
   }
 
   @Override
@@ -109,8 +96,7 @@ public class AwardedContractView extends ProjectSummaryItem {
         descriptionOfWork,
         dateAwarded,
         contractBand,
-        contactDetailView,
-        summaryLinks
+        contactDetailView
     );
   }
 }

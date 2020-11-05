@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.view;
 
+import java.util.List;
 import java.util.Objects;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryItem;
 
@@ -12,6 +13,8 @@ public abstract class ProjectSummaryItem implements SummaryItem {
   protected Integer projectId;
 
   protected Boolean isValid;
+
+  protected List<SummaryLink> summaryLinks;
 
   @Override
   public Integer getDisplayOrder() {
@@ -51,6 +54,14 @@ public abstract class ProjectSummaryItem implements SummaryItem {
     return isValid;
   }
 
+  public List<SummaryLink> getSummaryLinks() {
+    return summaryLinks;
+  }
+
+  public void setSummaryLinks(List<SummaryLink> summaryLinks) {
+    this.summaryLinks = summaryLinks;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -63,11 +74,12 @@ public abstract class ProjectSummaryItem implements SummaryItem {
     return Objects.equals(displayOrder, that.displayOrder)
         && Objects.equals(id, that.id)
         && Objects.equals(projectId, that.projectId)
-        && Objects.equals(isValid, that.isValid);
+        && Objects.equals(isValid, that.isValid)
+        && Objects.equals(summaryLinks, that.summaryLinks);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(displayOrder, id, projectId, isValid);
+    return Objects.hash(displayOrder, id, projectId, isValid, summaryLinks);
   }
 }

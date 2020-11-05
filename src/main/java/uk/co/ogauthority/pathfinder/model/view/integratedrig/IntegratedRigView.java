@@ -1,8 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.view.integratedrig;
 
-import java.util.List;
 import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
-import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 
 public class IntegratedRigView extends ProjectSummaryItem {
 
@@ -13,8 +11,6 @@ public class IntegratedRigView extends ProjectSummaryItem {
   private String status;
 
   private String intentionToReactivate;
-
-  private List<SummaryLink> summaryLinks;
 
   public String getStructure() {
     return structure;
@@ -46,13 +42,5 @@ public class IntegratedRigView extends ProjectSummaryItem {
 
   public void setIntentionToReactivate(String intentionToReactivate) {
     this.intentionToReactivate = intentionToReactivate;
-  }
-
-  public List<SummaryLink> getSummaryLinks() {
-    return summaryLinks;
-  }
-
-  public void setSummaryLinks(List<SummaryLink> summaryLinks) {
-    this.summaryLinks = summaryLinks;
   }
 }

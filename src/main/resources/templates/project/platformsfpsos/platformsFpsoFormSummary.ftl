@@ -8,7 +8,12 @@
     <#if views?has_content>
       <#list views as view>
         <div class="summary-list">
-          <@platformFpsoSummary.platformFpsoSummary view=view platformFpsoName=platformFpsoName showActions=true />
+          <@platformFpsoSummary.platformFpsoSummary
+            view=view
+            platformFpsoName=platformFpsoName
+            showHeader=true
+            showActions=true
+          />
         </div>
       </#list>
     <#else>

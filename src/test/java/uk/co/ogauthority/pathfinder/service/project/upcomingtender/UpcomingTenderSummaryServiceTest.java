@@ -14,6 +14,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -158,7 +159,9 @@ public class UpcomingTenderSummaryServiceTest {
     assertThat(contactDetailView.getJobTitle()).isEqualTo(tender.getJobTitle());
     assertThat(contactDetailView.getEmailAddress()).isEqualTo(tender.getEmailAddress());
 
-    assertThat(view.getEditLink().getLinkText()).isEqualTo(SummaryLinkText.EDIT.getDisplayName());
-    assertThat(view.getDeleteLink().getLinkText()).isEqualTo(SummaryLinkText.DELETE.getDisplayName());
+    assertThat(view.getSummaryLinks()).extracting(SummaryLink::getLinkText).containsExactly(
+        SummaryLinkText.EDIT.getDisplayName(),
+        SummaryLinkText.DELETE.getDisplayName()
+    );
   }
 }

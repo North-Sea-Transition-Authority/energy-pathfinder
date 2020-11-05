@@ -14,6 +14,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.platformfpso.PlatformFpsoView;
@@ -36,7 +37,7 @@ public class PlatformsFpsosSummaryServiceTest {
   private final PlatformFpso platformFpsoWithoutSubstructuresRemoved = PlatformFpsoTestUtil.getPlatformFpso_NoSubstructuresRemoved(detail);
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     platformsFpsosSummaryService = new PlatformsFpsosSummaryService(platformsFpsosService);
     when(platformsFpsosService.getPlatformsFpsosForDetail(detail)).thenReturn(
         List.of(platformFpso, platformFpsoWithoutSubstructuresRemoved)
@@ -123,6 +124,11 @@ public class PlatformsFpsosSummaryServiceTest {
     }
     assertThat(view.getFpsoType()).isEqualTo(platformFpso.getFpsoType());
     assertThat(view.getFpsoDimensions()).isEqualTo(platformFpso.getFpsoDimensions());
+
+    assertThat(view.getSummaryLinks()).extracting(SummaryLink::getLinkText).containsExactly(
+        SummaryLinkText.EDIT.getDisplayName(),
+        SummaryLinkText.DELETE.getDisplayName()
+    );
   }
 
 }

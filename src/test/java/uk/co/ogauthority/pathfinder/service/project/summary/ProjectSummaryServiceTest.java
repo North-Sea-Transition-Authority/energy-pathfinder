@@ -25,7 +25,7 @@ public class ProjectSummaryServiceTest {
   private ProjectSummaryService projectSummaryService;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     projectSummaryService = new ProjectSummaryService(List.of(projectInformationSectionSummaryService));
     when(projectInformationSectionSummaryService.getSummary(detail)).thenReturn(
         ProjectSectionSummaryTestUtil.getSummary()
@@ -47,6 +47,6 @@ public class ProjectSummaryServiceTest {
   public void summarise_sectionDoesNotAppearForDetail() {
     when(projectInformationSectionSummaryService.canShowSection(detail)).thenReturn(false);
     var summaryList = projectSummaryService.summarise(detail);
-    assertThat(summaryList.size()).isEqualTo(0);
+    assertThat(summaryList).isEmpty();
   }
 }

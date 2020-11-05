@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.service.pipeline;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

@@ -5,7 +5,7 @@
 
 <@defaultPage htmlTitle=title pageHeading=title breadcrumbs=true>
 
-  <@tenderSummary.upcomingTenderSummary view=view/>
+  <@tenderSummary.upcomingTenderSummary view=view showHeader=false showActions=false/>
 
   <@fdsForm.htmlForm>
     <@fdsAction.submitButtons

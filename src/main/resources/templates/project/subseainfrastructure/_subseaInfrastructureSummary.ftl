@@ -1,6 +1,6 @@
 <#include '../../layout.ftl'>
 
-<#macro subseaInfrastructureSummary subseaInfrastructureView showHeader=true showActions=true headingSize="h2" headingClass="govuk-heading-l" showTag=false>
+<#macro subseaInfrastructureSummary subseaInfrastructureView showHeader=false showActions=false headingSize="h2" headingClass="govuk-heading-l" showTag=false>
   <@summaryViewWrapper.summaryViewItemWrapper
     idPrefix="subsea-infrastructure"
     headingPrefix="Subsea infrastructure"

@@ -1,10 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.view.platformfpso;
 
-import java.util.List;
 import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
-import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 
 public class PlatformFpsoView extends ProjectSummaryItem {
 
@@ -31,9 +29,6 @@ public class PlatformFpsoView extends ProjectSummaryItem {
   private String fpsoDimensions;
 
   private String futurePlans;
-
-  private List<SummaryLink> summaryLinks;
-
 
   public PlatformFpsoView(Integer id,
                           Integer displayOrder,
@@ -141,14 +136,6 @@ public class PlatformFpsoView extends ProjectSummaryItem {
     this.futurePlans = futurePlans;
   }
 
-  public List<SummaryLink> getSummaryLinks() {
-    return summaryLinks;
-  }
-
-  public void setSummaryLinks(List<SummaryLink> summaryLinks) {
-    this.summaryLinks = summaryLinks;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -172,8 +159,7 @@ public class PlatformFpsoView extends ProjectSummaryItem {
         && Objects.equals(substructureRemovalLatestYear, that.substructureRemovalLatestYear)
         && Objects.equals(fpsoType, that.fpsoType)
         && Objects.equals(fpsoDimensions, that.fpsoDimensions)
-        && Objects.equals(futurePlans, that.futurePlans)
-        && Objects.equals(summaryLinks, that.summaryLinks);
+        && Objects.equals(futurePlans, that.futurePlans);
   }
 
   @Override
@@ -191,8 +177,7 @@ public class PlatformFpsoView extends ProjectSummaryItem {
         substructureRemovalLatestYear,
         fpsoType,
         fpsoDimensions,
-        futurePlans,
-        summaryLinks
+        futurePlans
     );
   }
 }

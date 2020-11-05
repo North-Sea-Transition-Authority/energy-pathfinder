@@ -8,7 +8,11 @@
   <div class="summary-list">
     <#if integratedRigViews?has_content>
       <#list integratedRigViews as integratedRigView>
-        <@integratedRigSummary.integratedRigSummary integratedRigView=integratedRigView />
+        <@integratedRigSummary.integratedRigSummary
+          integratedRigView=integratedRigView
+          showHeader=true
+          showActions=true
+        />
       </#list>
       <#else>
         <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="integrated rig" linkUrl=""/>

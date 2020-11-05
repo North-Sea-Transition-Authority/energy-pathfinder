@@ -186,7 +186,7 @@ public class CollaborationOpportunitiesController extends PathfinderFileUploadCo
         .addObject("cancelUrl", ReverseRouter.route(
               on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null))
         );
-    breadcrumbService.fromUpcomingTenders(projectId, modelAndView, REMOVE_PAGE_NAME);
+    breadcrumbService.fromCollaborationOpportunities(projectId, modelAndView, REMOVE_PAGE_NAME);
     return modelAndView;
   }
 

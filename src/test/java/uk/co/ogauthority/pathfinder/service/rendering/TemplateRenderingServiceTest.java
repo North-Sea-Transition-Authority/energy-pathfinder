@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.rendering;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -27,8 +28,7 @@ public class TemplateRenderingServiceTest {
 
   private TemplateRenderingService templateRenderingService;
 
-  private String templateName = "TEMPLATE.ftl";
-  private Map<String, Object> templateModel = new HashMap<>();
+  private final Map<String, Object> templateModel = new HashMap<>();
 
   @Before
   public void setup(){
@@ -42,8 +42,10 @@ public class TemplateRenderingServiceTest {
    */
   @Test
   public void render() throws IOException {
+    final var templateName = "TEMPLATE.ftl";
     when(mockFreemarkerConfig.getTemplate(ArgumentMatchers.eq(templateName), any(Locale.class))).thenReturn(template);
     String renderedTemplate = templateRenderingService.render(templateName, templateModel, false);
+    assertThat(renderedTemplate).isNotNull();
   }
 
 }

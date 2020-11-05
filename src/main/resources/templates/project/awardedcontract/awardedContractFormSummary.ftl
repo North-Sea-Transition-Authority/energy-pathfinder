@@ -8,7 +8,12 @@
   <div class="summary-list">
     <#if awardedContractViews?has_content>
       <#list awardedContractViews as awardedContractView>
-        <@awardedContractSummary.awardedContractSummary awardedContractView=awardedContractView showTag=false />
+        <@awardedContractSummary.awardedContractSummary
+          awardedContractView=awardedContractView
+          showActions=true
+          showHeader=true
+          showTag=false
+        />
       </#list>
       <#else>
         <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="awarded contract" linkUrl=""/>

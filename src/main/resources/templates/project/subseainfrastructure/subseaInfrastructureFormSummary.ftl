@@ -8,7 +8,11 @@
   <div class="summary-list">
     <#if subseaInfrastructureViews?has_content>
       <#list subseaInfrastructureViews as subseaInfrastructureView>
-        <@subseaInfrastructureSummary.subseaInfrastructureSummary subseaInfrastructureView=subseaInfrastructureView />
+        <@subseaInfrastructureSummary.subseaInfrastructureSummary
+          subseaInfrastructureView=subseaInfrastructureView
+          showHeader=true
+          showActions=true
+        />
       </#list>
       <#else>
         <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="subsea infrastructure" linkUrl=""/>

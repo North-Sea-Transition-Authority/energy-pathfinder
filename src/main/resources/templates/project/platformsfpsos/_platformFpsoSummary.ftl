@@ -1,10 +1,11 @@
 <#include '../../layout.ftl'/>
 
-<#macro platformFpsoSummary view platformFpsoName="platform or FPSO" showActions=false headingSize="h2" headingClass="govuk-heading-l" showTag=false>
+<#macro platformFpsoSummary view platformFpsoName="Platform or FPSO" showHeader=false showActions=false headingSize="h2" headingClass="govuk-heading-l" showTag=false>
   <@summaryViewWrapper.summaryViewItemWrapper
     idPrefix="platform-fpso"
     headingPrefix="Platform or FPSO"
     summaryView=view
+    showHeader=showHeader
     showActions=showActions
     headingSize=headingSize
     headingClass=headingClass

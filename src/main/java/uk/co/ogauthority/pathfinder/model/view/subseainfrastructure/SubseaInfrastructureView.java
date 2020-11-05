@@ -1,10 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.view.subseainfrastructure;
 
-import java.util.List;
 import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
-import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 
 public class SubseaInfrastructureView extends ProjectSummaryItem {
 
@@ -29,8 +27,6 @@ public class SubseaInfrastructureView extends ProjectSummaryItem {
   private String earliestDecommissioningStartYear;
 
   private String latestDecommissioningCompletionYear;
-
-  private List<SummaryLink> summaryLinks;
 
   private boolean isConcreteMattress;
 
@@ -124,14 +120,6 @@ public class SubseaInfrastructureView extends ProjectSummaryItem {
 
   public void setLatestDecommissioningCompletionYear(String latestDecommissioningCompletionYear) {
     this.latestDecommissioningCompletionYear = latestDecommissioningCompletionYear;
-  }
-
-  public List<SummaryLink> getSummaryLinks() {
-    return summaryLinks;
-  }
-
-  public void setSummaryLinks(List<SummaryLink> summaryLinks) {
-    this.summaryLinks = summaryLinks;
   }
 
   public boolean getConcreteMattress() {
