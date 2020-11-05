@@ -13,7 +13,7 @@
           <@_dashboardItem dashboardItem=dashboardItem showOperator=showOperator/>
         </li>
       </#list>
-    <ol>
+    </ol>
   </#if>
 </#macro>
 
