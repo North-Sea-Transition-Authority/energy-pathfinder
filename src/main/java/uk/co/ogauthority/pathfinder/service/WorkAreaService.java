@@ -8,6 +8,8 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
+import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
+import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.dashboard.DashboardService;
 
@@ -15,6 +17,7 @@ import uk.co.ogauthority.pathfinder.service.dashboard.DashboardService;
 public class WorkAreaService {
 
   public static final String WORK_AREA_TEMPLATE_PATH = "workarea/workArea";
+  public static final String LINK_BUTTON_TEXT = "Create project";
 
   private final DashboardService dashboardService;
 
@@ -26,10 +29,18 @@ public class WorkAreaService {
   public ModelAndView getWorkAreaModelAndViewForUser(AuthenticatedUserAccount user) {
     var dashboardProjectItemViews =  dashboardService.getDashboardProjectItemViewsForUser(user);
     return new ModelAndView(WORK_AREA_TEMPLATE_PATH)
-        .addObject("showStartProject", user.getUserPrivileges().contains(UserPrivilege.PATHFINDER_PROJECT_CREATE))
+        .addObject("startProjectButton", getStartProjectLinkButton(user))
         .addObject("dashboardProjectItemViews", dashboardProjectItemViews)
-        .addObject("resultSize", dashboardProjectItemViews.size())
-        .addObject("startProjectUrl", ReverseRouter.route(on(StartProjectController.class).startProject(null)));
+        .addObject("resultSize", dashboardProjectItemViews.size());
+  }
+
+  public LinkButton getStartProjectLinkButton(AuthenticatedUserAccount user) {
+    return new LinkButton(
+        LINK_BUTTON_TEXT,
+        ReverseRouter.route(on(StartProjectController.class).startProject(null)),
+        user.getUserPrivileges().contains(UserPrivilege.PATHFINDER_PROJECT_CREATE),
+        ButtonType.PRIMARY
+    );
   }
 
 }

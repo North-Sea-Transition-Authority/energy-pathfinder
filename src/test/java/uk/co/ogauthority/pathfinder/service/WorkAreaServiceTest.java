@@ -17,6 +17,8 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
+import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.model.view.dashboard.DashboardProjectItemView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.dashboard.DashboardService;
@@ -50,13 +52,15 @@ public class WorkAreaServiceTest {
   @Test
   public void getWorkAreaModelAndViewForUser_createProjectButton_notShownWithoutPrivilege() {
     var modelAndView = workAreaService.getWorkAreaModelAndViewForUser(workAreaOnlyUser);
-    assertThat(modelAndView.getModel()).containsEntry("showStartProject", false);
+    LinkButton link = (LinkButton) modelAndView.getModel().get("startProjectButton");
+    assertThat(link.getEnabled()).isFalse();
   }
 
   @Test
   public void getWorkAreaModelAndViewForUser_createProjectButton_shownWithPrivilege() {
     var modelAndView = workAreaService.getWorkAreaModelAndViewForUser(createProjectUser);
-    assertThat(modelAndView.getModel()).containsEntry("showStartProject", true);
+    LinkButton link = (LinkButton) modelAndView.getModel().get("startProjectButton");
+    assertThat(link.getEnabled()).isTrue();
   }
 
   @Test
@@ -68,11 +72,34 @@ public class WorkAreaServiceTest {
   @Test
   public void getWorkAreaModelAndViewForUser_allFieldsSet() {
     var modelAndView = workAreaService.getWorkAreaModelAndViewForUser(createProjectUser);
-    assertThat(modelAndView.getModel()).containsOnly(
-        entry("showStartProject", true),
+    LinkButton link = (LinkButton) modelAndView.getModel().get("startProjectButton");
+
+    assertThat(link.getEnabled()).isTrue();
+    assertLinkFieldsCorrect(link);
+
+    assertThat(modelAndView.getModel()).contains(
         entry("dashboardProjectItemViews", dashboardProjectItemViews),
-        entry("resultSize", dashboardProjectItemViews.size()),
-        entry("startProjectUrl", ReverseRouter.route(on(StartProjectController.class).startProject(null)))
+        entry("resultSize", dashboardProjectItemViews.size())
     );
+  }
+
+  @Test
+  public void getLink_enabledWithCorrectPrivilege() {
+    var link = workAreaService.getStartProjectLinkButton(createProjectUser);
+    assertThat(link.getEnabled()).isTrue();
+    assertLinkFieldsCorrect(link);
+  }
+
+  @Test
+  public void getLink_disabledWithCorrectPrivilege() {
+    var link = workAreaService.getStartProjectLinkButton(workAreaOnlyUser);
+    assertThat(link.getEnabled()).isFalse();
+    assertLinkFieldsCorrect(link);
+  }
+
+  private void assertLinkFieldsCorrect(LinkButton link) {
+    assertThat(link.getButtonType()).isEqualTo(ButtonType.PRIMARY);
+    assertThat(link.getPrompt()).isEqualTo(WorkAreaService.LINK_BUTTON_TEXT);
+    assertThat(link.getUrl()).isEqualTo(ReverseRouter.route(on(StartProjectController.class).startProject(null)));
   }
 }

@@ -10,10 +10,11 @@ import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.Sub
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
 public class SubseaInfrastructureViewUtil {
 
-  public static final String DEFAULT_DECOM_YEAR_TEXT = "Not set";
+  public static final String DEFAULT_DECOM_YEAR_TEXT = StringDisplayUtil.NOT_SET_TEXT;
   public static final String EARLIEST_DECOM_YEAR_TEXT = "Earliest start year: %s";
   public static final String LATEST_DECOM_YEAR_TEXT = "Latest completion year: %s";
 

@@ -35,8 +35,6 @@ public class DashboardProjectItem {
 
   private String fieldName;
 
-  private String operatorName;
-
   @ManyToOne
   @JoinColumn(name = "operator_org_grp_id")
   private PortalOrganisationGroup organisationGroup;
@@ -70,7 +68,7 @@ public class DashboardProjectItem {
   }
 
   public String getOperatorName() {
-    return operatorName;
+    return organisationGroup.getName();
   }
 
   public PortalOrganisationGroup getOrganisationGroup() {
@@ -103,10 +101,6 @@ public class DashboardProjectItem {
 
   public void setFieldName(String fieldName) {
     this.fieldName = fieldName;
-  }
-
-  public void setOperatorName(String operatorName) {
-    this.operatorName = operatorName;
   }
 
   public void setOrganisationGroup(

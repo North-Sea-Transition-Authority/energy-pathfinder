@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
-import uk.co.ogauthority.pathfinder.model.form.useraction.Link;
+import uk.co.ogauthority.pathfinder.model.form.useraction.DashboardLink;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -74,7 +74,7 @@ public class DashboardProjectItemViewTest {
     assertThat(view.getStatus()).isEqualTo(dashboardProjectItem.getStatus().getDisplayName());
   }
 
-  private void assertLinkMatches(DashboardProjectItem dashboardProjectItem, Link link, String prompt) {
+  private void assertLinkMatches(DashboardProjectItem dashboardProjectItem, DashboardLink link, String prompt) {
     assertThat(link.getScreenReaderText()).isEqualTo(String.format(
         DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime())
     ));

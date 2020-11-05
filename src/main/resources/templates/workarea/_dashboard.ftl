@@ -9,7 +9,9 @@
     <@_resultCounter resultSize=resultSize/>
     <ol class="govuk-list dashboard-list">
       <#list dashboardProjectItemViews as dashboardItem>
-        <@_dashboardItem dashboardItem=dashboardItem showOperator=showOperator/>
+        <li class="govuk-list__item dashboard-list__item">
+          <@_dashboardItem dashboardItem=dashboardItem showOperator=showOperator/>
+        </li>
       </#list>
     <ol>
   </#if>
@@ -22,17 +24,15 @@
 </#macro>
 
 <#macro _dashboardItem dashboardItem showOperator=true>
-  <li class="govuk-list__item dashboard-list__item">
-    <h3 class="govuk-heading-s govuk-!-margin-bottom-0">
-      <@userAction.dashboardLink userAction=dashboardItem.projectLink/>
-      <#if showOperator>
-        <span class="govuk-caption-m">${dashboardItem.operatorName}</span>
-      </#if>
-    </h3>
-    <@fdsDataItems.dataItem dataItemListClasses="govuk-!-margin-bottom-0 govuk-!-margin-top-1" >
-      <@fdsDataItems.dataValues key="Field stage" value=dashboardItem.fieldStage!""/>
-      <@fdsDataItems.dataValues key="Field" value=dashboardItem.fieldName!""/>
-      <@fdsDataItems.dataValues key="Status" value=dashboardItem.status!""/>
-    </@fdsDataItems.dataItem>
-  </li>
+  <h3 class="govuk-heading-s dashboard-item-heading">
+    <@userAction.userAction userAction=dashboardItem.dashboardLink/>
+    <#if showOperator>
+      <span class="govuk-caption-m">${dashboardItem.operatorName}</span>
+    </#if>
+  </h3>
+  <@fdsDataItems.dataItem dataItemListClasses="dashboard-item-data-list" >
+    <@fdsDataItems.dataValues key="Field stage" value=dashboardItem.fieldStage!""/>
+    <@fdsDataItems.dataValues key="Field" value=dashboardItem.fieldName!""/>
+    <@fdsDataItems.dataValues key="Status" value=dashboardItem.status!""/>
+  </@fdsDataItems.dataItem>
 </#macro>

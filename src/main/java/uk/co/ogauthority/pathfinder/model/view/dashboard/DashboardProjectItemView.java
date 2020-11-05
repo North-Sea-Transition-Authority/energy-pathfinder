@@ -4,16 +4,17 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
-import uk.co.ogauthority.pathfinder.model.form.useraction.Link;
+import uk.co.ogauthority.pathfinder.model.form.useraction.DashboardLink;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
+import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
 public class DashboardProjectItemView {
 
   public static final String TITLE_PLACEHOLDER = "%s project created on %s";
   public static final String SCREEN_READER_TEXT = " created on %s";
 
-  private Link projectLink;
+  private DashboardLink dashboardLink;
 
   private String projectTitle;
 
@@ -34,20 +35,25 @@ public class DashboardProjectItemView {
         ? dashboardProjectItem.getProjectTitle()
         : String.format(TITLE_PLACEHOLDER, status, formattedCreatedDateTime);
 
-    var screenReaderText = String.format(SCREEN_READER_TEXT, formattedCreatedDateTime);
+    var screenReaderText = dashboardProjectItem.getProjectTitle() != null
+        ? String.format(SCREEN_READER_TEXT, formattedCreatedDateTime)
+        : "";
 
     return new DashboardProjectItemView(
         getLink(dashboardProjectItem, title, screenReaderText),
         title,
-        dashboardProjectItem.getFieldStage() != null ? dashboardProjectItem.getFieldStage().getDisplayName() : "",
-        dashboardProjectItem.getFieldName(),
+        StringDisplayUtil.getValueOrDefault(
+            dashboardProjectItem.getFieldStage(),
+            dashboardProjectItem.getFieldStage() != null ? dashboardProjectItem.getFieldStage()::getDisplayName : null
+        ),
+        StringDisplayUtil.getValueOrDefault(dashboardProjectItem, dashboardProjectItem::getFieldName),
         dashboardProjectItem.getOperatorName(),
         status
       );
   }
 
-  public static Link getLink(DashboardProjectItem dashboardProjectItem, String title, String screenReaderText) {
-    return new Link(
+  public static DashboardLink getLink(DashboardProjectItem dashboardProjectItem, String title, String screenReaderText) {
+    return new DashboardLink(
           title,
           ReverseRouter.route(on(TaskListController.class).viewTaskList(dashboardProjectItem.getProjectId(), null)),
           true,
@@ -55,9 +61,13 @@ public class DashboardProjectItemView {
       );
   }
 
-  private DashboardProjectItemView(Link projectLink, String projectTitle, String fieldStage, String fieldName,
-                                  String operatorName, String status) {
-    this.projectLink = projectLink;
+  private DashboardProjectItemView(DashboardLink dashboardLink,
+                                   String projectTitle,
+                                   String fieldStage,
+                                   String fieldName,
+                                   String operatorName,
+                                   String status) {
+    this.dashboardLink = dashboardLink;
     this.projectTitle = projectTitle;
     this.fieldStage = fieldStage;
     this.fieldName = fieldName;
@@ -65,12 +75,12 @@ public class DashboardProjectItemView {
     this.status = status;
   }
 
-  public Link getProjectLink() {
-    return projectLink;
+  public DashboardLink getLink() {
+    return dashboardLink;
   }
 
-  public void setProjectLink(Link projectLink) {
-    this.projectLink = projectLink;
+  public void setDashboardAction(DashboardLink dashboardLink) {
+    this.dashboardLink = dashboardLink;
   }
 
   public String getProjectTitle() {

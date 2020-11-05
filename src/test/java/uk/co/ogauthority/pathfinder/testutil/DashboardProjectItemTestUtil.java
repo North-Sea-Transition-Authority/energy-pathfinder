@@ -28,7 +28,6 @@ public class DashboardProjectItemTestUtil {
     dashboardProjectItem.setProjectTitle(PROJECT_TITLE);
     dashboardProjectItem.setFieldStage(FIELD_STAGE);
     dashboardProjectItem.setFieldName(FIELD_NAME);
-    dashboardProjectItem.setOperatorName(OPERATOR_NAME);
     dashboardProjectItem.setOrganisationGroup(ORGANISATION_GROUP);
 
     return dashboardProjectItem;

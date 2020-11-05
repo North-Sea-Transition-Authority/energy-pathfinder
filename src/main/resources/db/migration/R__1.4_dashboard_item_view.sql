@@ -7,14 +7,13 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
   , pi.project_title
   , pi.field_stage
   , COALESCE(
-      (SELECT f.field_name FROM ${datasource.user}.devuk_fields f WHERE f.field_id = pl.field_id)
-    ,  pl.manual_field_name
+      (
+       SELECT f.field_name
+       FROM ${datasource.user}.devuk_fields f
+       WHERE f.field_id = pl.field_id
+      )
+    , pl.manual_field_name
     ) field_name
-  , (
-     SELECT pog.name
-     FROM ${datasource.user}.portal_organisation_groups pog
-     WHERE pog.org_grp_id = po.operator_org_grp_id
-  ) operator_name
   , po.operator_org_grp_id
   FROM ${datasource.user}.projects p
   JOIN ${datasource.user}.project_details pd ON pd.project_id = p.id
