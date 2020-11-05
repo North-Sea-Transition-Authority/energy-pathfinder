@@ -1,0 +1,5 @@
+.string-with-tag {
+  &__tag {
+    @include govuk-responsive-margin(2, "left");
+  }
+}

@@ -287,6 +287,17 @@ public class ProjectLocationBlockServiceTest {
   }
 
   @Test
+  public void getBlocks() {
+    when(projectLocationBlockRepository.findAllByProjectLocationOrderByBlockReference(PROJECT_LOCATION)).thenReturn(
+        PROJECT_LOCATION_BLOCKS
+    );
+    var blocks = projectLocationBlocksService.getBlocks(
+        PROJECT_LOCATION
+    );
+    assertThat(blocks).isEqualTo(PROJECT_LOCATION_BLOCKS);
+  }
+
+  @Test
   public void isBlockReferenceValid_fullValidation_existsInPortalData() {
     when(licenceBlockValidatorService.existsInPortalData(anyString())).thenReturn(true);
     assertThat(projectLocationBlocksService.isBlockReferenceValid(BLOCK_REF_1, ValidationType.FULL)).isTrue();

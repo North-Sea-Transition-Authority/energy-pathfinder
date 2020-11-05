@@ -119,6 +119,10 @@ public class ProjectLocationBlocksService {
         )).collect(Collectors.toList());
   }
 
+  public List<ProjectLocationBlock> getBlocks(ProjectLocation projectLocation) {
+    return projectLocationBlockRepository.findAllByProjectLocationOrderByBlockReference(projectLocation);
+  }
+
   /**
    * Validate the licence block exists in the portal if the validation type is FULL.
    * @param compositeKey key to search for

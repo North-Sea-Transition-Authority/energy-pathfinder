@@ -9,4 +9,5 @@
 <#import 'project/macros/minMaxDateInput.ftl' as minMaxDate>
 <#import 'project/macros/summaryViewWrapper.ftl' as summaryViewWrapper>
 <#import 'project/macros/sidebarSectionLink.ftl' as sideBarSectionLink>
+<#import 'project/macros/stringWithTag.ftl' as stringWithTag>
 <#import 'macros/useraction/userAction.ftl' as userAction>
