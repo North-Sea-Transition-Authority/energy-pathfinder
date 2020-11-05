@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.view.platformfpso.PlatformFpsoView;
+import uk.co.ogauthority.pathfinder.model.view.platformfpso.PlatformFpsoViewUtil;
 import uk.co.ogauthority.pathfinder.testutil.PlatformFpsoTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -33,9 +33,11 @@ public class PlatformsFpsosSectionSummaryServiceTest {
 
   @Test
   public void getSummary() {
+    var platformFpso1 = PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(detail);
+    var platformFpso2 = PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(detail);
     when(platformsFpsosService.getPlatformsFpsosForDetail(detail)).thenReturn(List.of(
-        PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(detail),
-        PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(detail)
+        platformFpso1,
+        platformFpso2
     ));
     var sectionSummary = platformsFpsosSectionSummaryService.getSummary(detail);
     var model = sectionSummary.getTemplateModel();
@@ -43,13 +45,13 @@ public class PlatformsFpsosSectionSummaryServiceTest {
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(PlatformsFpsosSectionSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(PlatformsFpsosSectionSummaryService.TEMPLATE_PATH);
 
-    var platformFpsoViews = (List<PlatformFpsoView>) model.get("platformFpsoViews");
-    assertThat(platformFpsoViews).hasSize(2);
+    var platformFpsoView1 = PlatformFpsoViewUtil.createView(platformFpso1, 1, detail.getProject().getId());
+    var platformFpsoView2 = PlatformFpsoViewUtil.createView(platformFpso2, 2, detail.getProject().getId());
 
     assertThat(model).containsOnly(
         entry("sectionTitle", PlatformsFpsosSectionSummaryService.PAGE_NAME),
         entry("sectionId", PlatformsFpsosSectionSummaryService.SECTION_ID),
-        entry("platformFpsoViews", platformFpsoViews)
+        entry("platformFpsoViews", List.of(platformFpsoView1, platformFpsoView2))
     );
   }
 
@@ -62,13 +64,10 @@ public class PlatformsFpsosSectionSummaryServiceTest {
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(PlatformsFpsosSectionSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(PlatformsFpsosSectionSummaryService.TEMPLATE_PATH);
 
-    var platformFpsoViews = (List<PlatformFpsoView>) model.get("platformFpsoViews");
-    assertThat(platformFpsoViews).isEmpty();
-
     assertThat(model).containsOnly(
         entry("sectionTitle", PlatformsFpsosSectionSummaryService.PAGE_NAME),
         entry("sectionId", PlatformsFpsosSectionSummaryService.SECTION_ID),
-        entry("platformFpsoViews", platformFpsoViews)
+        entry("platformFpsoViews", Collections.emptyList())
     );
   }
 }

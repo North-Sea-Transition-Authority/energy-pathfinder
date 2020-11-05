@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.view.platformfpso;
 
 import java.util.List;
+import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
@@ -146,5 +147,52 @@ public class PlatformFpsoView extends ProjectSummaryItem {
 
   public void setSummaryLinks(List<SummaryLink> summaryLinks) {
     this.summaryLinks = summaryLinks;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    PlatformFpsoView that = (PlatformFpsoView) o;
+    return Objects.equals(platformFpso, that.platformFpso)
+        && Objects.equals(topsideFpsoMass, that.topsideFpsoMass)
+        && Objects.equals(topsideRemovalEarliestYear, that.topsideRemovalEarliestYear)
+        && Objects.equals(topsideRemovalLatestYear, that.topsideRemovalLatestYear)
+        && Objects.equals(substructuresExpectedToBeRemoved, that.substructuresExpectedToBeRemoved)
+        && Objects.equals(substructureRemovalPremise, that.substructureRemovalPremise)
+        && Objects.equals(substructureRemovalMass, that.substructureRemovalMass)
+        && Objects.equals(substructureRemovalEarliestYear, that.substructureRemovalEarliestYear)
+        && Objects.equals(substructureRemovalLatestYear, that.substructureRemovalLatestYear)
+        && Objects.equals(fpsoType, that.fpsoType)
+        && Objects.equals(fpsoDimensions, that.fpsoDimensions)
+        && Objects.equals(futurePlans, that.futurePlans)
+        && Objects.equals(summaryLinks, that.summaryLinks);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        super.hashCode(),
+        platformFpso,
+        topsideFpsoMass,
+        topsideRemovalEarliestYear,
+        topsideRemovalLatestYear,
+        substructuresExpectedToBeRemoved,
+        substructureRemovalPremise,
+        substructureRemovalMass,
+        substructureRemovalEarliestYear,
+        substructureRemovalLatestYear,
+        fpsoType,
+        fpsoDimensions,
+        futurePlans,
+        summaryLinks
+    );
   }
 }
