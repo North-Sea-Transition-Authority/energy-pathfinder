@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.view.subseainfrastructure.SubseaInfrastructureView;
+import uk.co.ogauthority.pathfinder.model.view.subseainfrastructure.SubseaInfrastructureViewUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.SubseaInfrastructureTestUtil;
 
@@ -33,9 +33,11 @@ public class SubseaInfrastructureSectionSummaryServiceTest {
 
   @Test
   public void getSummary() {
+    var subseaInfrastructure1 = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withDevUkFacility();
+    var subseaInfrastructure2 = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withManualFacility();
     when(subseaInfrastructureService.getSubseaInfrastructures(detail)).thenReturn(List.of(
-        SubseaInfrastructureTestUtil.createSubseaInfrastructure_withDevUkFacility(),
-        SubseaInfrastructureTestUtil.createSubseaInfrastructure_withManualFacility()
+        subseaInfrastructure1,
+        subseaInfrastructure2
     ));
     var sectionSummary = subseaInfrastructureSectionSummaryService.getSummary(detail);
     var model = sectionSummary.getTemplateModel();
@@ -43,13 +45,13 @@ public class SubseaInfrastructureSectionSummaryServiceTest {
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(SubseaInfrastructureSectionSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(SubseaInfrastructureSectionSummaryService.TEMPLATE_PATH);
 
-    var subseaInfrastructureViews = (List<SubseaInfrastructureView>) model.get("subseaInfrastructureViews");
-    assertThat(subseaInfrastructureViews).hasSize(2);
+    var subseaInfrastructureView1 = SubseaInfrastructureViewUtil.from(subseaInfrastructure1, 1);
+    var subseaInfrastructureView2 = SubseaInfrastructureViewUtil.from(subseaInfrastructure2, 2);
 
     assertThat(model).containsOnly(
         entry("sectionTitle", SubseaInfrastructureSectionSummaryService.PAGE_NAME),
         entry("sectionId", SubseaInfrastructureSectionSummaryService.SECTION_ID),
-        entry("subseaInfrastructureViews", subseaInfrastructureViews)
+        entry("subseaInfrastructureViews", List.of(subseaInfrastructureView1, subseaInfrastructureView2))
     );
   }
 
@@ -62,13 +64,10 @@ public class SubseaInfrastructureSectionSummaryServiceTest {
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(SubseaInfrastructureSectionSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(SubseaInfrastructureSectionSummaryService.TEMPLATE_PATH);
 
-    var subseaInfrastructureViews = (List<SubseaInfrastructureView>) model.get("subseaInfrastructureViews");
-    assertThat(subseaInfrastructureViews).isEmpty();
-
     assertThat(model).containsOnly(
         entry("sectionTitle", SubseaInfrastructureSectionSummaryService.PAGE_NAME),
         entry("sectionId", SubseaInfrastructureSectionSummaryService.SECTION_ID),
-        entry("subseaInfrastructureViews", subseaInfrastructureViews)
+        entry("subseaInfrastructureViews", Collections.emptyList())
     );
   }
 }
