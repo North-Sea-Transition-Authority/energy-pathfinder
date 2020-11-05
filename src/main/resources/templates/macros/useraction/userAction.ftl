@@ -13,14 +13,14 @@
 </#macro>
 
 <#macro _dashboardLink userAction applyNotVisitedClass=true>
-    <#assign classes = "govuk-link govuk-!-font-size-24"/>
-    <#if applyNotVisitedClass>
-      <#assign classes = classes + " govuk-link--no-visited-state"/>
-    </#if>
-    <@_link
-      userAction=userAction
-      linkClass=classes
-    />
+  <#assign classes = "govuk-link govuk-!-font-size-24"/>
+  <#if applyNotVisitedClass>
+    <#assign classes = classes + " govuk-link--no-visited-state"/>
+  </#if>
+  <@_link
+    userAction=userAction
+    linkClass=classes
+  />
 </#macro>
 
 <#macro _linkButton userAction>

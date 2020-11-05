@@ -75,7 +75,7 @@ public class DashboardProjectItemView {
     this.status = status;
   }
 
-  public DashboardLink getLink() {
+  public DashboardLink getDashboardLink() {
     return dashboardLink;
   }
 

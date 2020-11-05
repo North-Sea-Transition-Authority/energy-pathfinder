@@ -25,10 +25,10 @@
 
 <#macro _dashboardItem dashboardItem showOperator=true>
   <h3 class="govuk-heading-s dashboard-item-heading">
-    <@userAction.userAction userAction=dashboardItem.dashboardLink/>
-    <#if showOperator>
-      <span class="govuk-caption-m">${dashboardItem.operatorName}</span>
-    </#if>
+   <@userAction.userAction userAction=dashboardItem.dashboardLink/>
+   <#if showOperator>
+     <span class="govuk-caption-m">${dashboardItem.operatorName}</span>
+   </#if>
   </h3>
   <@fdsDataItems.dataItem dataItemListClasses="dashboard-item-data-list" >
     <@fdsDataItems.dataValues key="Field stage" value=dashboardItem.fieldStage!""/>
