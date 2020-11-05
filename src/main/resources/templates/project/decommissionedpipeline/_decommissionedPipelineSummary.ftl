@@ -1,12 +1,14 @@
 <#include '../../layout.ftl'>
 
-<#macro decommissionedPipelineSummary decommissionedPipelineView showHeader=true showActions=true>
+<#macro decommissionedPipelineSummary decommissionedPipelineView showHeader=true showActions=true headingSize="h2" headingClass="govuk-heading-l">
   <@summaryViewWrapper.summaryViewItemWrapper
     idPrefix="pipeline"
     headingPrefix="Pipeline"
     summaryView=decommissionedPipelineView
     showHeader=showHeader
     showActions=showActions
+    headingSize=headingSize
+    headingClass=headingClass
   >
     <@checkAnswers.checkAnswersRowNoActions prompt="Pipeline" value=decommissionedPipelineView.pipeline!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="Material type" value=decommissionedPipelineView.materialType!"" />
