@@ -1,6 +1,7 @@
 <#--Import statements-->
 <#import 'header.ftl' as applicationHeader>
 <#import 'project/macros/contactDetails.ftl' as contactDetails>
+<#import 'project/macros/emptySectionSummaryInset.ftl' as emptySectionSummaryInset>
 <#import 'project/macros/quarterYearInput.ftl' as quarterYear>
 <#import 'project/macros/checkAnswers.ftl' as checkAnswers>
 <#import 'project/macros/fileUpload.ftl' as fileUpload>
@@ -10,4 +11,5 @@
 <#import 'project/macros/summaryViewWrapper.ftl' as summaryViewWrapper>
 <#import 'project/macros/sidebarSectionLink.ftl' as sideBarSectionLink>
 <#import 'project/macros/stringWithTag.ftl' as stringWithTag>
+<#import 'project/macros/sectionSummaryWrapper.ftl' as sectionSummaryWrapper>
 <#import 'macros/useraction/userAction.ftl' as userAction>

@@ -18,7 +18,7 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProjectInformationSummaryServiceTest {
+public class ProjectInformationSectionSummaryServiceTest {
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
   private final ProjectInformation projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(detail);
@@ -26,26 +26,26 @@ public class ProjectInformationSummaryServiceTest {
   @Mock
   private ProjectInformationService projectInformationService;
 
-  private ProjectInformationSummaryService projectInformationSummaryService;
+  private ProjectInformationSectionSummaryService projectInformationSectionSummaryService;
 
   @Before
   public void setUp() throws Exception {
-    projectInformationSummaryService = new ProjectInformationSummaryService(projectInformationService);
+    projectInformationSectionSummaryService = new ProjectInformationSectionSummaryService(projectInformationService);
     when(projectInformationService.getProjectInformation(detail)).thenReturn(Optional.of(projectInformation));
   }
 
   @Test
   public void getSummary() {
     when(projectInformationService.getProjectInformation(detail)).thenReturn(Optional.of(projectInformation));
-    var sectionSummary = projectInformationSummaryService.getSummary(detail);
+    var sectionSummary = projectInformationSectionSummaryService.getSummary(detail);
     var model = sectionSummary.getTemplateModel();
-    assertThat(sectionSummary.getDisplayOrder()).isEqualTo(ProjectInformationSummaryService.DISPLAY_ORDER);
-    assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectInformationSummaryService.SECTION_LINK));
-    assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectInformationSummaryService.TEMPLATE_PATH);
+    assertThat(sectionSummary.getDisplayOrder()).isEqualTo(ProjectInformationSectionSummaryService.DISPLAY_ORDER);
+    assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectInformationSectionSummaryService.SECTION_LINK));
+    assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectInformationSectionSummaryService.TEMPLATE_PATH);
 
     assertThat(model).containsOnly(
-        entry("sectionTitle", ProjectInformationSummaryService.PAGE_NAME),
-        entry("sectionId", ProjectInformationSummaryService.SECTION_ID),
+        entry("sectionTitle", ProjectInformationSectionSummaryService.PAGE_NAME),
+        entry("sectionId", ProjectInformationSectionSummaryService.SECTION_ID),
         entry("projectTitle", projectInformation.getProjectTitle()),
         entry("projectSummary", projectInformation.getProjectSummary()),
         entry("fieldStage", projectInformation.getFieldStage().getDisplayName()),
@@ -69,14 +69,14 @@ public class ProjectInformationSummaryServiceTest {
   @Test
   public void getSummary_noProjectInformation() {
     when(projectInformationService.getProjectInformation(detail)).thenReturn(Optional.empty());
-    var sectionSummary = projectInformationSummaryService.getSummary(detail);
+    var sectionSummary = projectInformationSectionSummaryService.getSummary(detail);
     var model = sectionSummary.getTemplateModel();
-    assertThat(sectionSummary.getDisplayOrder()).isEqualTo(ProjectInformationSummaryService.DISPLAY_ORDER);
-    assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectInformationSummaryService.SECTION_LINK));
-    assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectInformationSummaryService.TEMPLATE_PATH);
+    assertThat(sectionSummary.getDisplayOrder()).isEqualTo(ProjectInformationSectionSummaryService.DISPLAY_ORDER);
+    assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectInformationSectionSummaryService.SECTION_LINK));
+    assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectInformationSectionSummaryService.TEMPLATE_PATH);
     assertThat(model).containsOnly(
-        entry("sectionTitle", ProjectInformationSummaryService.PAGE_NAME),
-        entry("sectionId", ProjectInformationSummaryService.SECTION_ID)
+        entry("sectionTitle", ProjectInformationSectionSummaryService.PAGE_NAME),
+        entry("sectionId", ProjectInformationSectionSummaryService.SECTION_ID)
     );
   }
 }

@@ -1,5 +1,5 @@
 <#include '../../layout.ftl'>
-<#import 'awardedContractSummary.ftl' as awardedContractSummary>
+<#import '_awardedContractSummary.ftl' as awardedContractSummary>
 
 <@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true>
   <#if errorList?has_content>
@@ -8,7 +8,7 @@
   <div class="summary-list">
     <#if awardedContractViews?has_content>
       <#list awardedContractViews as awardedContractView>
-        <@awardedContractSummary.awardedContractSummary awardedContractView=awardedContractView />
+        <@awardedContractSummary.awardedContractSummary awardedContractView=awardedContractView showTag=false />
       </#list>
       <#else>
         <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="awarded contract" linkUrl=""/>

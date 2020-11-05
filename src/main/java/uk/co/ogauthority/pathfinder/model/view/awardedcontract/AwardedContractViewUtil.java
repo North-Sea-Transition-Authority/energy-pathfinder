@@ -5,8 +5,10 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.ArrayList;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContract;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -31,8 +33,8 @@ public class AwardedContractViewUtil {
     awardedContractView.setContractorName(awardedContract.getContractorName());
 
     var contractFunction = (awardedContract.getContractFunction() != null)
-        ? awardedContract.getContractFunction().getDisplayName()
-        : awardedContract.getManualContractFunction();
+        ? new StringWithTag(awardedContract.getContractFunction().getDisplayName(), Tag.NONE)
+        : new StringWithTag(awardedContract.getManualContractFunction(), Tag.NOT_FROM_LIST);
     awardedContractView.setContractFunction(contractFunction);
 
     awardedContractView.setDescriptionOfWork(awardedContract.getDescriptionOfWork());
