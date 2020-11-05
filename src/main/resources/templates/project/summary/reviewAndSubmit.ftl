@@ -9,8 +9,10 @@
     projectSummaryView=projectSummaryView
     sidebarHeading="Check your answers for all sections on the project"
   >
-    <@fdsAction.button buttonText="Submit" buttonValue="submit" />
-    <@fdsAction.link linkText="Back to task list" linkClass="govuk-link govuk-link--button" linkUrl=springUrl(taskListUrl)/>
+    <@fdsForm.htmlForm actionUrl=springUrl(submitProjectUrl)>
+      <@fdsAction.button buttonText="Submit" buttonValue="submit" />
+      <@fdsAction.link linkText="Back to task list" linkClass="govuk-link govuk-link--button" linkUrl=springUrl(taskListUrl)/>
+    </@fdsForm.htmlForm>
   </@projectSummary.summary>
 
 </@defaultPagePane>

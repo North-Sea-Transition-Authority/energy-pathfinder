@@ -5,7 +5,11 @@
 
 <@defaultPage htmlTitle=title pageHeading=title breadcrumbs=true>
 
-    <@platformFpsoSummary.platformFpsoSummary view=view/>
+    <@platformFpsoSummary.platformFpsoSummary
+      view=view
+      showHeader=false
+      showActions=false
+    />
 
     <@fdsForm.htmlForm>
         <@fdsAction.submitButtons

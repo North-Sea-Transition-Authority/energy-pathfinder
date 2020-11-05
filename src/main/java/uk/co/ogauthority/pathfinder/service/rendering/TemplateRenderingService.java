@@ -27,7 +27,7 @@ public class TemplateRenderingService {
 
   public String render(String template,
                        Map<String, Object> viewModel,
-                       boolean addSpringRequestSupport) throws TemplateRenderingException {
+                       boolean addSpringRequestSupport) {
 
     // This is a bit of a hack to get access to spring.ftl macros to work if they are included in the template.
     // This prevents rendering from working async as there will be no active request.

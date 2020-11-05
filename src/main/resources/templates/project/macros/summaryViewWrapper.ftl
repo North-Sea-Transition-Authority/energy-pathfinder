@@ -1,12 +1,12 @@
 <#include '../../layout.ftl'>
 
-<#macro summaryViewItemWrapper summaryView idPrefix headingPrefix showHeader=true showActions=true>
+<#macro summaryViewItemWrapper summaryView idPrefix headingPrefix showHeader=true showActions=true headingSize="h2" headingClass="govuk-heading-l">
   <#assign heading = headingPrefix + " " + summaryView.displayOrder />
   <div class="summary-list__item">
     <#if showHeader>
-      <h2 id="${idPrefix}-${summaryView.displayOrder}" class="govuk-heading-l summary-list__heading">
+      <${headingSize} id="${idPrefix}-${summaryView.displayOrder}" class="${headingClass} summary-list__heading">
         ${heading}
-      </h2>
+      </${headingSize}>
     </#if>
     <@fdsCheckAnswers.checkAnswers>
       <#if showActions>

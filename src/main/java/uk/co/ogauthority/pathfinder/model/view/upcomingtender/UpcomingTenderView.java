@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.model.view.upcomingtender;
 
 import java.util.List;
 import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
-import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 
@@ -19,10 +18,6 @@ public class UpcomingTenderView extends ProjectSummaryItem {
   private ContactDetailView contactDetailView;
 
   private List<UploadedFileView> uploadedFileViews;
-
-  private SummaryLink editLink;
-
-  private SummaryLink deleteLink;
 
   public UpcomingTenderView(
       Integer displayOrder,
@@ -72,22 +67,6 @@ public class UpcomingTenderView extends ProjectSummaryItem {
 
   public void setContactDetailView(ContactDetailView contactDetailView) {
     this.contactDetailView = contactDetailView;
-  }
-
-  public SummaryLink getEditLink() {
-    return editLink;
-  }
-
-  public void setEditLink(SummaryLink editLink) {
-    this.editLink = editLink;
-  }
-
-  public SummaryLink getDeleteLink() {
-    return deleteLink;
-  }
-
-  public void setDeleteLink(SummaryLink deleteLink) {
-    this.deleteLink = deleteLink;
   }
 
   public List<UploadedFileView> getUploadedFileViews() {

@@ -1,15 +1,15 @@
 package uk.co.ogauthority.pathfinder.model.view.awardedcontract;
 
-import java.util.List;
+import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
-import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 
 public class AwardedContractView extends ProjectSummaryItem {
 
   private String contractorName;
 
-  private String contractFunction;
+  private StringWithTag contractFunction;
 
   private String descriptionOfWork;
 
@@ -19,8 +19,6 @@ public class AwardedContractView extends ProjectSummaryItem {
 
   private ContactDetailView contactDetailView;
 
-  List<SummaryLink> summaryLinks;
-
   public String getContractorName() {
     return contractorName;
   }
@@ -29,11 +27,11 @@ public class AwardedContractView extends ProjectSummaryItem {
     this.contractorName = contractorName;
   }
 
-  public String getContractFunction() {
+  public StringWithTag getContractFunction() {
     return contractFunction;
   }
 
-  public void setContractFunction(String contractFunction) {
+  public void setContractFunction(StringWithTag contractFunction) {
     this.contractFunction = contractFunction;
   }
 
@@ -69,12 +67,36 @@ public class AwardedContractView extends ProjectSummaryItem {
     this.contactDetailView = contactDetailView;
   }
 
-  public List<SummaryLink> getSummaryLinks() {
-    return summaryLinks;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    AwardedContractView that = (AwardedContractView) o;
+    return Objects.equals(contractorName, that.contractorName)
+        && Objects.equals(contractFunction, that.contractFunction)
+        && Objects.equals(descriptionOfWork, that.descriptionOfWork)
+        && Objects.equals(dateAwarded, that.dateAwarded)
+        && Objects.equals(contractBand, that.contractBand)
+        && Objects.equals(contactDetailView, that.contactDetailView);
   }
 
-  public void setSummaryLinks(List<SummaryLink> summaryLinks) {
-    this.summaryLinks = summaryLinks;
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        super.hashCode(),
+        contractorName,
+        contractFunction,
+        descriptionOfWork,
+        dateAwarded,
+        contractBand,
+        contactDetailView
+    );
   }
-
 }

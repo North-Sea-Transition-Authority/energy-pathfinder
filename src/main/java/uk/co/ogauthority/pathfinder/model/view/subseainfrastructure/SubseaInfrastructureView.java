@@ -1,12 +1,12 @@
 package uk.co.ogauthority.pathfinder.model.view.subseainfrastructure;
 
-import java.util.List;
+import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
-import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 
 public class SubseaInfrastructureView extends ProjectSummaryItem {
 
-  private String structure;
+  private StringWithTag structure;
 
   private String description;
 
@@ -28,19 +28,17 @@ public class SubseaInfrastructureView extends ProjectSummaryItem {
 
   private String latestDecommissioningCompletionYear;
 
-  private List<SummaryLink> summaryLinks;
-
   private boolean isConcreteMattress;
 
   private boolean isSubseaStructure;
 
   private boolean isOtherInfrastructure;
 
-  public String getStructure() {
+  public StringWithTag getStructure() {
     return structure;
   }
 
-  public void setStructure(String structure) {
+  public void setStructure(StringWithTag structure) {
     this.structure = structure;
   }
 
@@ -124,14 +122,6 @@ public class SubseaInfrastructureView extends ProjectSummaryItem {
     this.latestDecommissioningCompletionYear = latestDecommissioningCompletionYear;
   }
 
-  public List<SummaryLink> getSummaryLinks() {
-    return summaryLinks;
-  }
-
-  public void setSummaryLinks(List<SummaryLink> summaryLinks) {
-    this.summaryLinks = summaryLinks;
-  }
-
   public boolean getConcreteMattress() {
     return isConcreteMattress;
   }
@@ -154,5 +144,56 @@ public class SubseaInfrastructureView extends ProjectSummaryItem {
 
   public void setOtherInfrastructure(boolean otherInfrastructure) {
     isOtherInfrastructure = otherInfrastructure;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    SubseaInfrastructureView that = (SubseaInfrastructureView) o;
+    return isConcreteMattress == that.isConcreteMattress
+        && isSubseaStructure == that.isSubseaStructure
+        && isOtherInfrastructure == that.isOtherInfrastructure
+        && Objects.equals(structure, that.structure)
+        && Objects.equals(description, that.description)
+        && Objects.equals(status, that.status)
+        && Objects.equals(infrastructureType, that.infrastructureType)
+        && Objects.equals(numberOfMattresses, that.numberOfMattresses)
+        && Objects.equals(totalEstimatedMattressMass, that.totalEstimatedMattressMass)
+        && Objects.equals(totalEstimatedSubseaMass, that.totalEstimatedSubseaMass)
+        && Objects.equals(otherInfrastructureType, that.otherInfrastructureType)
+        && Objects.equals(totalEstimatedOtherMass, that.totalEstimatedOtherMass)
+        && Objects.equals(earliestDecommissioningStartYear, that.earliestDecommissioningStartYear)
+        && Objects.equals(latestDecommissioningCompletionYear, that.latestDecommissioningCompletionYear)
+        && Objects.equals(summaryLinks, that.summaryLinks);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        super.hashCode(),
+        structure,
+        description,
+        status,
+        infrastructureType,
+        numberOfMattresses,
+        totalEstimatedMattressMass,
+        totalEstimatedSubseaMass,
+        otherInfrastructureType,
+        totalEstimatedOtherMass,
+        earliestDecommissioningStartYear,
+        latestDecommissioningCompletionYear,
+        summaryLinks,
+        isConcreteMattress,
+        isSubseaStructure,
+        isOtherInfrastructure
+    );
   }
 }

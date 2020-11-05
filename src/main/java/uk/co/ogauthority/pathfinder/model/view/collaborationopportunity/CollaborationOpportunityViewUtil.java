@@ -47,28 +47,26 @@ public class CollaborationOpportunityViewUtil {
 
     view.setUploadedFileViews(uploadedFileViews);
 
-    view.setEditLink(
-        new SummaryLink(
-            SummaryLinkText.EDIT.getDisplayName(),
-            ReverseRouter.route(on(CollaborationOpportunitiesController.class).editCollaborationOpportunity(
-                projectId,
-                opportunity.getId(),
-                null
-            ))
-        )
+    var editLink = new SummaryLink(
+        SummaryLinkText.EDIT.getDisplayName(),
+        ReverseRouter.route(on(CollaborationOpportunitiesController.class).editCollaborationOpportunity(
+            projectId,
+            opportunity.getId(),
+            null
+        ))
     );
 
-    view.setDeleteLink(
-        new SummaryLink(
-            SummaryLinkText.DELETE.getDisplayName(),
-            ReverseRouter.route(on(CollaborationOpportunitiesController.class).deleteCollaborationOpportunityConfirm(
-                projectId,
-                opportunity.getId(),
-                displayOrder,
-                null
-            ))
-        )
+    var removeLink = new SummaryLink(
+        SummaryLinkText.DELETE.getDisplayName(),
+        ReverseRouter.route(on(CollaborationOpportunitiesController.class).deleteCollaborationOpportunityConfirm(
+            projectId,
+            opportunity.getId(),
+            displayOrder,
+            null
+        ))
     );
+
+    view.setSummaryLinks(List.of(editLink, removeLink));
 
     return view;
   }

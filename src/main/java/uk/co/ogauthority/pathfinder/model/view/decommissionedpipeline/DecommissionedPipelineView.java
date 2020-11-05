@@ -1,8 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.view.decommissionedpipeline;
 
-import java.util.List;
+import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
-import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 
 public class DecommissionedPipelineView extends ProjectSummaryItem {
 
@@ -17,8 +16,6 @@ public class DecommissionedPipelineView extends ProjectSummaryItem {
   private String decommissioningLatestYear;
 
   private String removalPremise;
-
-  private List<SummaryLink> summaryLinks;
 
   public String getPipeline() {
     return pipeline;
@@ -68,11 +65,37 @@ public class DecommissionedPipelineView extends ProjectSummaryItem {
     this.removalPremise = removalPremise;
   }
 
-  public List<SummaryLink> getSummaryLinks() {
-    return summaryLinks;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    DecommissionedPipelineView that = (DecommissionedPipelineView) o;
+    return Objects.equals(pipeline, that.pipeline)
+        && Objects.equals(materialType, that.materialType)
+        && Objects.equals(status, that.status)
+        && Objects.equals(decommissioningEarliestYear, that.decommissioningEarliestYear)
+        && Objects.equals(decommissioningLatestYear, that.decommissioningLatestYear)
+        && Objects.equals(removalPremise, that.removalPremise);
   }
 
-  public void setSummaryLinks(List<SummaryLink> summaryLinks) {
-    this.summaryLinks = summaryLinks;
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        super.hashCode(),
+        pipeline,
+        materialType,
+        status,
+        decommissioningEarliestYear,
+        decommissioningLatestYear,
+        removalPremise,
+        summaryLinks
+    );
   }
 }

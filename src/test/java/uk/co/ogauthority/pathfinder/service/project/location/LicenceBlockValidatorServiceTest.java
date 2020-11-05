@@ -30,7 +30,7 @@ public class LicenceBlockValidatorServiceTest {
   private ProjectLocationForm form;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     licenceBlockValidatorService = new LicenceBlockValidatorService(
         licenceBlocksService
     );
@@ -58,7 +58,7 @@ public class LicenceBlockValidatorServiceTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors.size()).isEqualTo(1);
+    assertThat(fieldErrors).hasSize(1);
     assertThat(fieldErrors).containsExactly(
         entry(FIELD_ID, Set.of(FIELD_ID + ".notPresent"))
     );

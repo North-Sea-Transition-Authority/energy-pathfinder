@@ -1,22 +1,26 @@
 <#include '../../layout.ftl'>
-<#import 'subseaInfrastructureSummary.ftl' as subseaInfrastructureSummary>
+<#import '_decommissionedPipelineSummary.ftl' as decommissionedPipelineSummary>
 
 <@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true>
   <#if errorList?has_content>
     <@fdsError.errorSummary errorItems=errorList />
   </#if>
   <div class="summary-list">
-    <#if subseaInfrastructureViews?has_content>
-      <#list subseaInfrastructureViews as subseaInfrastructureView>
-        <@subseaInfrastructureSummary.subseaInfrastructureSummary subseaInfrastructureView=subseaInfrastructureView />
+    <#if decommissionedPipelineViews?has_content>
+      <#list decommissionedPipelineViews as decommissionedPipelineView>
+        <@decommissionedPipelineSummary.decommissionedPipelineSummary
+          decommissionedPipelineView=decommissionedPipelineView
+          showHeader=true
+          showActions=true
+        />
       </#list>
       <#else>
-        <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="subsea infrastructure" linkUrl=""/>
+        <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="pipeline" linkUrl=""/>
     </#if>
   </div>
   <@fdsAction.link
-    linkText="Add subsea infrastructure"
-    linkUrl=springUrl(addSubseaInfrastructureUrl)
+    linkText="Add pipeline"
+    linkUrl=springUrl(addDecommissionedPipelineUrl)
     linkClass="govuk-button govuk-button--blue"
   />
   <@fdsForm.htmlForm>

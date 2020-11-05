@@ -1,5 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.view.contactdetail;
 
+import java.util.Objects;
+
 public class ContactDetailView {
 
   private String name;
@@ -40,5 +42,25 @@ public class ContactDetailView {
 
   public void setEmailAddress(String emailAddress) {
     this.emailAddress = emailAddress;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    ContactDetailView that = (ContactDetailView) o;
+    return Objects.equals(name, that.name)
+        && Objects.equals(phoneNumber, that.phoneNumber)
+        && Objects.equals(jobTitle, that.jobTitle)
+        && Objects.equals(emailAddress, that.emailAddress);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, phoneNumber, jobTitle, emailAddress);
   }
 }

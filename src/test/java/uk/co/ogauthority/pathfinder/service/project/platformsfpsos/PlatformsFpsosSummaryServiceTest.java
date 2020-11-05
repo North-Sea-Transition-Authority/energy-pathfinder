@@ -14,7 +14,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.platformfpso.PlatformFpsoView;
 import uk.co.ogauthority.pathfinder.model.view.platformfpso.PlatformFpsoViewUtil;
 import uk.co.ogauthority.pathfinder.testutil.PlatformFpsoTestUtil;
@@ -35,7 +37,7 @@ public class PlatformsFpsosSummaryServiceTest {
   private final PlatformFpso platformFpsoWithoutSubstructuresRemoved = PlatformFpsoTestUtil.getPlatformFpso_NoSubstructuresRemoved(detail);
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     platformsFpsosSummaryService = new PlatformsFpsosSummaryService(platformsFpsosService);
     when(platformsFpsosService.getPlatformsFpsosForDetail(detail)).thenReturn(
         List.of(platformFpso, platformFpsoWithoutSubstructuresRemoved)
@@ -49,9 +51,13 @@ public class PlatformsFpsosSummaryServiceTest {
     var view1 = views.get(0);
     var view2 = views.get(1);
 
-    assertThat(view1.getPlatformFpso()).isEqualTo(platformFpso.getManualStructureName());
+    var view1PlatformFpso = view1.getPlatformFpso();
+    assertThat(view1PlatformFpso.getValue()).isEqualTo(platformFpso.getManualStructureName());
+    assertThat(view1PlatformFpso.getTag()).isEqualTo(Tag.NOT_FROM_LIST);
     assertThat(view1.getDisplayOrder()).isEqualTo(1);
-    assertThat(view2.getPlatformFpso()).isEqualTo(platformFpsoWithoutSubstructuresRemoved.getStructure().getFacilityName());
+    var view2PlatformFpso = view2.getPlatformFpso();
+    assertThat(view2PlatformFpso.getValue()).isEqualTo(platformFpsoWithoutSubstructuresRemoved.getStructure().getFacilityName());
+    assertThat(view2PlatformFpso.getTag()).isEqualTo(Tag.NONE);
     assertThat(view2.getDisplayOrder()).isEqualTo(2);
     checkCommonFields(view1, platformFpso);
     checkCommonFields(view2, platformFpsoWithoutSubstructuresRemoved);
@@ -118,8 +124,11 @@ public class PlatformsFpsosSummaryServiceTest {
     }
     assertThat(view.getFpsoType()).isEqualTo(platformFpso.getFpsoType());
     assertThat(view.getFpsoDimensions()).isEqualTo(platformFpso.getFpsoDimensions());
-    assertThat(view.getEditLink().getLinkText()).isEqualTo(SummaryLinkText.EDIT.getDisplayName());
-    assertThat(view.getDeleteLink().getLinkText()).isEqualTo(SummaryLinkText.DELETE.getDisplayName());
+
+    assertThat(view.getSummaryLinks()).extracting(SummaryLink::getLinkText).containsExactly(
+        SummaryLinkText.EDIT.getDisplayName(),
+        SummaryLinkText.DELETE.getDisplayName()
+    );
   }
 
 }

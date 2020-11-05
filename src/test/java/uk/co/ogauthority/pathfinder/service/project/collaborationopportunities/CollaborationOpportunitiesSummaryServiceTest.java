@@ -15,6 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityView;
 import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtil;
@@ -105,7 +106,9 @@ public class CollaborationOpportunitiesSummaryServiceTest {
     assertThat(view.getContactDetailView().getPhoneNumber()).isEqualTo(opportunity.getPhoneNumber());
     assertThat(view.getContactDetailView().getJobTitle()).isEqualTo(opportunity.getJobTitle());
     assertThat(view.getContactDetailView().getEmailAddress()).isEqualTo(opportunity.getEmailAddress());
-    assertThat(view.getEditLink().getLinkText()).isEqualTo(SummaryLinkText.EDIT.getDisplayName());
-    assertThat(view.getDeleteLink().getLinkText()).isEqualTo(SummaryLinkText.DELETE.getDisplayName());
+    assertThat(view.getSummaryLinks()).extracting(SummaryLink::getLinkText).containsExactly(
+        SummaryLinkText.EDIT.getDisplayName(),
+        SummaryLinkText.DELETE.getDisplayName()
+    );
   }
 }

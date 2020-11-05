@@ -1,6 +1,6 @@
 <#include '../../layout.ftl'>
 
-<#macro integratedRigSummary integratedRigView showHeader=true showActions=true>
+<#macro integratedRigSummary integratedRigView showHeader=false showActions=false>
   <@summaryViewWrapper.summaryViewItemWrapper
     idPrefix="integrated-rig"
     headingPrefix="Integrated rig"

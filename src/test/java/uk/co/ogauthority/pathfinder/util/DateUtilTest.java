@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -30,8 +28,7 @@ public class DateUtilTest {
   @Test
   public void formatInstant() {
     var testInstant = Instant.now();
-    var expected = LocalDateTime.ofInstant(testInstant, ZoneId.systemDefault())
-        .format(DateUtil.DATE_TIME_FORMATTER);
+    var expected = DateUtil.DATE_TIME_FORMATTER.format(testInstant);
     assertThat(DateUtil.formatInstant(testInstant)).isEqualTo(expected);
   }
 

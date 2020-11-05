@@ -8,10 +8,12 @@
     <#if views?has_content>
       <#list views as view>
         <div class="summary-list">
-          <#assign errorId = "platform-fpso-" + view.getDisplayOrder()/>
-          <#assign platformFpsoName = "Platform or FPSO " + view.getDisplayOrder()/>
-          <h2 class="govuk-heading-l summary-list__heading" id=${errorId} >${platformFpsoName}</h2>
-          <@platformFpsoSummary.platformFpsoSummary view=view platformFpsoName=platformFpsoName showValidationAndActions=true />
+          <@platformFpsoSummary.platformFpsoSummary
+            view=view
+            platformFpsoName=platformFpsoName
+            showHeader=true
+            showActions=true
+          />
         </div>
       </#list>
     <#else>

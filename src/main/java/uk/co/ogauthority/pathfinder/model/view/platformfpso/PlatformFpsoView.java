@@ -1,11 +1,12 @@
 package uk.co.ogauthority.pathfinder.model.view.platformfpso;
 
+import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
-import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 
 public class PlatformFpsoView extends ProjectSummaryItem {
 
-  private String platformFpso;
+  private StringWithTag platformFpso;
 
   private String topsideFpsoMass;
 
@@ -29,11 +30,6 @@ public class PlatformFpsoView extends ProjectSummaryItem {
 
   private String futurePlans;
 
-  private SummaryLink editLink;
-
-  private SummaryLink deleteLink;
-
-
   public PlatformFpsoView(Integer id,
                           Integer displayOrder,
                           Integer projectId
@@ -44,11 +40,11 @@ public class PlatformFpsoView extends ProjectSummaryItem {
     this.projectId = projectId;
   }
 
-  public String getPlatformFpso() {
+  public StringWithTag getPlatformFpso() {
     return platformFpso;
   }
 
-  public void setPlatformFpso(String platformFpso) {
+  public void setPlatformFpso(StringWithTag platformFpso) {
     this.platformFpso = platformFpso;
   }
 
@@ -140,19 +136,48 @@ public class PlatformFpsoView extends ProjectSummaryItem {
     this.futurePlans = futurePlans;
   }
 
-  public SummaryLink getEditLink() {
-    return editLink;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    PlatformFpsoView that = (PlatformFpsoView) o;
+    return Objects.equals(platformFpso, that.platformFpso)
+        && Objects.equals(topsideFpsoMass, that.topsideFpsoMass)
+        && Objects.equals(topsideRemovalEarliestYear, that.topsideRemovalEarliestYear)
+        && Objects.equals(topsideRemovalLatestYear, that.topsideRemovalLatestYear)
+        && Objects.equals(substructuresExpectedToBeRemoved, that.substructuresExpectedToBeRemoved)
+        && Objects.equals(substructureRemovalPremise, that.substructureRemovalPremise)
+        && Objects.equals(substructureRemovalMass, that.substructureRemovalMass)
+        && Objects.equals(substructureRemovalEarliestYear, that.substructureRemovalEarliestYear)
+        && Objects.equals(substructureRemovalLatestYear, that.substructureRemovalLatestYear)
+        && Objects.equals(fpsoType, that.fpsoType)
+        && Objects.equals(fpsoDimensions, that.fpsoDimensions)
+        && Objects.equals(futurePlans, that.futurePlans);
   }
 
-  public void setEditLink(SummaryLink editLink) {
-    this.editLink = editLink;
-  }
-
-  public SummaryLink getDeleteLink() {
-    return deleteLink;
-  }
-
-  public void setDeleteLink(SummaryLink deleteLink) {
-    this.deleteLink = deleteLink;
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        super.hashCode(),
+        platformFpso,
+        topsideFpsoMass,
+        topsideRemovalEarliestYear,
+        topsideRemovalLatestYear,
+        substructuresExpectedToBeRemoved,
+        substructureRemovalPremise,
+        substructureRemovalMass,
+        substructureRemovalEarliestYear,
+        substructureRemovalLatestYear,
+        fpsoType,
+        fpsoDimensions,
+        futurePlans
+    );
   }
 }

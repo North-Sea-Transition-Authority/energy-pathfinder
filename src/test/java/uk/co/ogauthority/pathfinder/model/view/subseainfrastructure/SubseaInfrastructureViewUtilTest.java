@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.subseainfrastructure.SubseaInfrastructure;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.testutil.SubseaInfrastructureTestUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -31,7 +32,9 @@ public class SubseaInfrastructureViewUtilTest {
     var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withDevUkFacility();
     var subseaInfrastructureView = SubseaInfrastructureViewUtil.from(subseaInfrastructure, DISPLAY_ORDER, IS_VALID);
 
-    assertThat(subseaInfrastructureView.getStructure()).isEqualTo(subseaInfrastructure.getFacility().getSelectionText());
+    var structure = subseaInfrastructureView.getStructure();
+    assertThat(structure.getValue()).isEqualTo(subseaInfrastructure.getFacility().getSelectionText());
+    assertThat(structure.getTag()).isEqualTo(Tag.NONE);
     checkCommonFields(subseaInfrastructureView, DISPLAY_ORDER, IS_VALID, subseaInfrastructure);
   }
 
@@ -41,7 +44,9 @@ public class SubseaInfrastructureViewUtilTest {
     var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withManualFacility();
     var subseaInfrastructureView = SubseaInfrastructureViewUtil.from(subseaInfrastructure, DISPLAY_ORDER, IS_VALID);
 
-    assertThat(subseaInfrastructureView.getStructure()).isEqualTo(subseaInfrastructure.getManualFacility());
+    var structure = subseaInfrastructureView.getStructure();
+    assertThat(structure.getValue()).isEqualTo(subseaInfrastructure.getManualFacility());
+    assertThat(structure.getTag()).isEqualTo(Tag.NOT_FROM_LIST);
     checkCommonFields(subseaInfrastructureView, DISPLAY_ORDER, IS_VALID, subseaInfrastructure);
   }
 
@@ -102,6 +107,23 @@ public class SubseaInfrastructureViewUtilTest {
   }
 
   @Test
+  public void from_withConcreteMattressInfrastructureType_whenNullTotalEstimatesMattressMass() {
+    var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withConcreteMattresses();
+    subseaInfrastructure.setTotalEstimatedMattressMass(null);
+
+    var subseaInfrastructureView = SubseaInfrastructureViewUtil.from(subseaInfrastructure, DISPLAY_ORDER, IS_VALID);
+
+    assertThat(subseaInfrastructureView.getInfrastructureType()).isEqualTo(subseaInfrastructure.getInfrastructureType().getDisplayName());
+    assertThat(subseaInfrastructureView.getNumberOfMattresses()).isEqualTo(subseaInfrastructure.getNumberOfMattresses());
+    assertThat(subseaInfrastructureView.getTotalEstimatedMattressMass()).isEqualTo("");
+    assertThat(subseaInfrastructureView.getTotalEstimatedSubseaMass()).isNull();
+    assertThat(subseaInfrastructureView.getOtherInfrastructureType()).isNull();
+    assertThat(subseaInfrastructureView.getTotalEstimatedOtherMass()).isNull();
+
+    checkCommonFields(subseaInfrastructureView, DISPLAY_ORDER, IS_VALID, subseaInfrastructure);
+  }
+
+  @Test
   public void from_withSubseaStructureInfrastructureType() {
     var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withSubseaStructure();
 
@@ -128,6 +150,23 @@ public class SubseaInfrastructureViewUtilTest {
     assertThat(subseaInfrastructureView.getTotalEstimatedOtherMass()).isEqualTo(
         SubseaInfrastructureViewUtil.getMassString(subseaInfrastructure.getTotalEstimatedOtherMass())
     );
+    assertThat(subseaInfrastructureView.getTotalEstimatedSubseaMass()).isNull();
+    assertThat(subseaInfrastructureView.getNumberOfMattresses()).isNull();
+    assertThat(subseaInfrastructureView.getTotalEstimatedMattressMass()).isNull();
+
+    checkCommonFields(subseaInfrastructureView, DISPLAY_ORDER, IS_VALID, subseaInfrastructure);
+  }
+
+  @Test
+  public void from_withOtherInfrastructureInfrastructureType_whenNullTotalEstimatesOtherMass() {
+    var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withOtherInfrastructure();
+    subseaInfrastructure.setTotalEstimatedOtherMass(null);
+
+    var subseaInfrastructureView = SubseaInfrastructureViewUtil.from(subseaInfrastructure, DISPLAY_ORDER, IS_VALID);
+
+    assertThat(subseaInfrastructureView.getInfrastructureType()).isEqualTo(subseaInfrastructure.getInfrastructureType().getDisplayName());
+    assertThat(subseaInfrastructureView.getOtherInfrastructureType()).isEqualTo(subseaInfrastructure.getOtherInfrastructureType());
+    assertThat(subseaInfrastructureView.getTotalEstimatedOtherMass()).isEqualTo("");
     assertThat(subseaInfrastructureView.getTotalEstimatedSubseaMass()).isNull();
     assertThat(subseaInfrastructureView.getNumberOfMattresses()).isNull();
     assertThat(subseaInfrastructureView.getTotalEstimatedMattressMass()).isNull();

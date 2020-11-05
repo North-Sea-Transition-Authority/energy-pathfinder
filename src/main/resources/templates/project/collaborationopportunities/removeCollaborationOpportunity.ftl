@@ -5,7 +5,11 @@
 
 <@defaultPage htmlTitle=title pageHeading=title breadcrumbs=true>
 
-    <@collaborationOpportunitySummary.collaborationOpportunitySummary view=view/>
+    <@collaborationOpportunitySummary.collaborationOpportunitySummary
+      view=view
+      showHeader=false
+      showActions=false
+    />
 
     <@fdsForm.htmlForm>
         <@fdsAction.submitButtons

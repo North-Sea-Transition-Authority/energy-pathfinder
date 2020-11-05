@@ -10,7 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationSummaryService;
+import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationSectionSummaryService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectSectionSummaryTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -18,23 +18,23 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 public class ProjectSummaryServiceTest {
 
   @Mock
-  private ProjectInformationSummaryService projectInformationSummaryService;
+  private ProjectInformationSectionSummaryService projectInformationSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
   private ProjectSummaryService projectSummaryService;
 
   @Before
-  public void setUp() throws Exception {
-    projectSummaryService = new ProjectSummaryService(List.of(projectInformationSummaryService));
-    when(projectInformationSummaryService.getSummary(detail)).thenReturn(
+  public void setUp() {
+    projectSummaryService = new ProjectSummaryService(List.of(projectInformationSectionSummaryService));
+    when(projectInformationSectionSummaryService.getSummary(detail)).thenReturn(
         ProjectSectionSummaryTestUtil.getSummary()
     );
   }
 
   @Test
   public void summarise_sectionAppearsForDetail() {
-    when(projectInformationSummaryService.canShowSection(detail)).thenReturn(true);
+    when(projectInformationSectionSummaryService.canShowSection(detail)).thenReturn(true);
     var summaryList = projectSummaryService.summarise(detail);
     assertThat(summaryList.size()).isEqualTo(1);
     assertThat(summaryList.get(0).getDisplayOrder()).isEqualTo(1);
@@ -45,8 +45,8 @@ public class ProjectSummaryServiceTest {
 
   @Test
   public void summarise_sectionDoesNotAppearForDetail() {
-    when(projectInformationSummaryService.canShowSection(detail)).thenReturn(false);
+    when(projectInformationSectionSummaryService.canShowSection(detail)).thenReturn(false);
     var summaryList = projectSummaryService.summarise(detail);
-    assertThat(summaryList.size()).isEqualTo(0);
+    assertThat(summaryList).isEmpty();
   }
 }

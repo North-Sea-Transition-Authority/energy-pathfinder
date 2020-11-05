@@ -55,7 +55,7 @@ public class PipelineServiceTest {
         Collections.emptyList()
     );
     var results = pipelineService.searchPipelinesWithNameContaining(searchTerm);
-    assertThat(results.size()).isEqualTo(0);
+    assertThat(results).isEmpty();
   }
 
   @Test

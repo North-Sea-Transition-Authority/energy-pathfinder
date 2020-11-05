@@ -48,28 +48,26 @@ public class UpcomingTenderViewUtil {
     contactDetailView.setJobTitle(upcomingTender.getJobTitle());
     tender.setContactDetailView(contactDetailView);
 
-    tender.setEditLink(
-        new SummaryLink(
-            SummaryLinkText.EDIT.getDisplayName(),
-            ReverseRouter.route(on(UpcomingTendersController.class).editUpcomingTender(
-                projectId,
-                upcomingTender.getId(),
-                null
-            ))
-        )
+    var editLink = new SummaryLink(
+        SummaryLinkText.EDIT.getDisplayName(),
+        ReverseRouter.route(on(UpcomingTendersController.class).editUpcomingTender(
+            projectId,
+            upcomingTender.getId(),
+            null
+        ))
     );
 
-    tender.setDeleteLink(
-        new SummaryLink(
-            SummaryLinkText.DELETE.getDisplayName(),
-            ReverseRouter.route(on(UpcomingTendersController.class).deleteUpcomingTenderConfirm(
-                projectId,
-                upcomingTender.getId(),
-                displayOrder,
-                null
-            ))
-        )
+    var removeLink = new SummaryLink(
+        SummaryLinkText.DELETE.getDisplayName(),
+        ReverseRouter.route(on(UpcomingTendersController.class).deleteUpcomingTenderConfirm(
+            projectId,
+            upcomingTender.getId(),
+            displayOrder,
+            null
+        ))
     );
+
+    tender.setSummaryLinks(List.of(editLink, removeLink));
 
     tender.setUploadedFileViews(uploadedFileViews);
 

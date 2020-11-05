@@ -41,7 +41,7 @@ public class TeamManagementContextService {
   }
 
   private Set<TeamManagementPermission> checkTeamManagementPermissions(Set<TeamManagementPermission> teamManagementPermissions,
-                                                                       AuthenticatedUserAccount userAccount) throws AccessDeniedException {
+                                                                       AuthenticatedUserAccount userAccount) {
 
     var userTeamManagementPermissions = getUserTeamManagementPermissions(userAccount);
 
