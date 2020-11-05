@@ -1,14 +1,22 @@
 <#include '../../layout.ftl'>
 
-<#macro subseaInfrastructureSummary subseaInfrastructureView showHeader=true showActions=true>
+<#macro subseaInfrastructureSummary subseaInfrastructureView showHeader=true showActions=true headingSize="h2" headingClass="govuk-heading-l" showTag=false>
   <@summaryViewWrapper.summaryViewItemWrapper
     idPrefix="subsea-infrastructure"
     headingPrefix="Subsea infrastructure"
     summaryView=subseaInfrastructureView
     showHeader=showHeader
     showActions=showActions
+    headingSize=headingSize
+    headingClass=headingClass
   >
-    <@checkAnswers.checkAnswersRowNoActions prompt="Structure" value=subseaInfrastructureView.structure!"" />
+    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Host structure">
+      <#if showTag>
+        <@stringWithTag.stringWithTag stringWithTag=subseaInfrastructureView.structure />
+      <#else>
+        ${subseaInfrastructureView.structure.value!""}
+      </#if>
+    </@checkAnswers.checkAnswersRowNoActionsWithNested>
     <@checkAnswers.checkAnswersRowNoActions prompt="Description" value=subseaInfrastructureView.description!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="Structure status" value=subseaInfrastructureView.status!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="Type of infrastructure" value=subseaInfrastructureView.infrastructureType!"" />

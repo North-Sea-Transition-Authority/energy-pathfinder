@@ -1,5 +1,5 @@
 <#include '../../layout.ftl'>
-<#import 'subseaInfrastructureSummary.ftl' as subseaInfrastructureSummary>
+<#import '_subseaInfrastructureSummary.ftl' as subseaInfrastructureSummary>
 
 <@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true>
   <#if errorList?has_content>
