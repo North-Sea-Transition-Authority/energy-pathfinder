@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.view.location;
 
 import java.util.List;
+import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 
 public class ProjectLocationView {
@@ -93,5 +94,38 @@ public class ProjectLocationView {
 
   public void setLicenceBlocks(List<String> licenceBlocks) {
     this.licenceBlocks = licenceBlocks;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    ProjectLocationView that = (ProjectLocationView) o;
+    return Objects.equals(field, that.field)
+        && Objects.equals(fieldType, that.fieldType)
+        && Objects.equals(waterDepth, that.waterDepth)
+        && Objects.equals(approvedFieldDevelopmentPlan, that.approvedFieldDevelopmentPlan)
+        && Objects.equals(approvedFdpDate, that.approvedFdpDate)
+        && Objects.equals(approvedDecomProgram, that.approvedDecomProgram)
+        && Objects.equals(approvedDecomProgramDate, that.approvedDecomProgramDate)
+        && Objects.equals(ukcsArea, that.ukcsArea)
+        && Objects.equals(licenceBlocks, that.licenceBlocks);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        field,
+        fieldType,
+        waterDepth,
+        approvedFieldDevelopmentPlan,
+        approvedFdpDate,
+        approvedDecomProgram,
+        approvedDecomProgramDate, ukcsArea, licenceBlocks
+    );
   }
 }

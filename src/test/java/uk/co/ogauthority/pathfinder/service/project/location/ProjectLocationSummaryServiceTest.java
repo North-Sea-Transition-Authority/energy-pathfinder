@@ -4,6 +4,7 @@ import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
@@ -13,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
+import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationView;
+import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationViewUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -47,8 +50,7 @@ public class ProjectLocationSummaryServiceTest {
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectLocationSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectLocationSummaryService.TEMPLATE_PATH);
 
-    var projectLocationView = model.get("projectLocationView");
-    assertThat(projectLocationView).isNotNull();
+    var projectLocationView = ProjectLocationViewUtil.from(projectLocation, Collections.emptyList());
 
     assertThat(model).containsOnly(
         entry("sectionTitle", ProjectLocationSummaryService.PAGE_NAME),
@@ -66,8 +68,7 @@ public class ProjectLocationSummaryServiceTest {
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectLocationSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectLocationSummaryService.TEMPLATE_PATH);
 
-    var projectLocationView = model.get("projectLocationView");
-    assertThat(projectLocationView).isNotNull();
+    var projectLocationView = new ProjectLocationView();
 
     assertThat(model).containsOnly(
         entry("sectionTitle", ProjectLocationSummaryService.PAGE_NAME),
