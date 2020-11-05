@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.view;
 
+import java.util.Objects;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryItem;
 
 public abstract class ProjectSummaryItem implements SummaryItem {
@@ -48,5 +49,25 @@ public abstract class ProjectSummaryItem implements SummaryItem {
   @Override
   public Boolean isValid() {
     return isValid;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    ProjectSummaryItem that = (ProjectSummaryItem) o;
+    return Objects.equals(displayOrder, that.displayOrder)
+        && Objects.equals(id, that.id)
+        && Objects.equals(projectId, that.projectId)
+        && Objects.equals(isValid, that.isValid);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(displayOrder, id, projectId, isValid);
   }
 }

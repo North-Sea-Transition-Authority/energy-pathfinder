@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractView;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractViewUtil;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -33,9 +33,11 @@ public class AwardedContractSectionSummaryServiceTest {
 
   @Test
   public void getSummary() {
+    var awardedContract1 = AwardedContractTestUtil.createAwardedContract();
+    var awardedContract2 = AwardedContractTestUtil.createAwardedContract();
     when(awardedContractService.getAwardedContracts(detail)).thenReturn(List.of(
-        AwardedContractTestUtil.createAwardedContract(),
-        AwardedContractTestUtil.createAwardedContract()
+        awardedContract1,
+        awardedContract2
     ));
     var sectionSummary = awardedContractSectionSummaryService.getSummary(detail);
     var model = sectionSummary.getTemplateModel();
@@ -43,13 +45,13 @@ public class AwardedContractSectionSummaryServiceTest {
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(AwardedContractSectionSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(AwardedContractSectionSummaryService.TEMPLATE_PATH);
 
-    var awardedContractViews = (List<AwardedContractView>) model.get("awardedContractViews");
-    assertThat(awardedContractViews).hasSize(2);
+    var awardedContractView1 = AwardedContractViewUtil.from(awardedContract1, 1);
+    var awardedContractView2 = AwardedContractViewUtil.from(awardedContract2, 2);
 
     assertThat(model).containsOnly(
         entry("sectionTitle", AwardedContractSectionSummaryService.PAGE_NAME),
         entry("sectionId", AwardedContractSectionSummaryService.SECTION_ID),
-        entry("awardedContractViews", awardedContractViews)
+        entry("awardedContractViews", List.of(awardedContractView1, awardedContractView2))
     );
   }
 
@@ -62,13 +64,10 @@ public class AwardedContractSectionSummaryServiceTest {
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(AwardedContractSectionSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(AwardedContractSectionSummaryService.TEMPLATE_PATH);
 
-    var awardedContractViews = (List<AwardedContractView>) model.get("awardedContractViews");
-    assertThat(awardedContractViews).isEmpty();
-
     assertThat(model).containsOnly(
         entry("sectionTitle", AwardedContractSectionSummaryService.PAGE_NAME),
         entry("sectionId", AwardedContractSectionSummaryService.SECTION_ID),
-        entry("awardedContractViews", awardedContractViews)
+        entry("awardedContractViews", Collections.emptyList())
     );
   }
 }
