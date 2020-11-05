@@ -58,7 +58,7 @@ public class ProjectInformationSummaryServiceTest {
             projectInformation.getDecomWorkStartDateQuarter(),
             projectInformation.getDecomWorkStartDateYear()
         )),
-        entry("decomProductionCessationDate", DateUtil.format(projectInformation.getProductionCessationDate())),
+        entry("decomProductionCessationDate", DateUtil.formatDate(projectInformation.getProductionCessationDate())),
         entry("name", projectInformation.getName()),
         entry("phoneNumber", projectInformation.getPhoneNumber()),
         entry("jobTitle", projectInformation.getJobTitle()),

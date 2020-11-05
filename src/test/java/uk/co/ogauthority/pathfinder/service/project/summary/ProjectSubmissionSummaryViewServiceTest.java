@@ -49,7 +49,7 @@ public class ProjectSubmissionSummaryViewServiceTest {
     var projectSubmissionSummaryView = projectSubmissionSummaryViewService.getProjectSubmissionSummaryView(projectDetail);
 
     assertThat(projectSubmissionSummaryView.getProjectTitle()).isEqualTo(projectInformation.getProjectTitle());
-    assertThat(projectSubmissionSummaryView.getFormattedSubmittedTimestamp()).isEqualTo(DateUtil.format(projectDetail.getSubmittedInstant(), DateUtil.DATE_TIME_FORMATTER));
+    assertThat(projectSubmissionSummaryView.getFormattedSubmittedTimestamp()).isEqualTo(DateUtil.formatInstant(projectDetail.getSubmittedInstant()));
     assertThat(projectSubmissionSummaryView.getSubmittedBy()).isEqualTo(webUserAccount.getFullName());
   }
 }

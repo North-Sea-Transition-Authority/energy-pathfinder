@@ -1,5 +1,7 @@
 package uk.co.ogauthority.pathfinder.util;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
@@ -15,16 +17,18 @@ public class DateUtil {
   public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm:ss")
       .withZone(ZoneId.systemDefault());
 
-  public static String format(Temporal temporal) {
-    return temporal != null
-        ? DATE_FORMATTER.format(temporal)
-        : "";
-  }
-
-  public static String format(Temporal temporal, DateTimeFormatter dateTimeFormatter) {
+  private static String format(Temporal temporal, DateTimeFormatter dateTimeFormatter) {
     return temporal != null
         ? dateTimeFormatter.format(temporal)
         : "";
+  }
+
+  public static String formatDate(LocalDate localDate) {
+    return format(localDate, DATE_FORMATTER);
+  }
+
+  public static String formatInstant(Instant instant) {
+    return format(instant, DATE_TIME_FORMATTER);
   }
 
   public static String getDateFromQuarterYear(Quarter quarter, Integer year) {

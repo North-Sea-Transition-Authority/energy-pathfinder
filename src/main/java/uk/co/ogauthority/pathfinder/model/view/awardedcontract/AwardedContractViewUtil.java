@@ -36,7 +36,7 @@ public class AwardedContractViewUtil {
     awardedContractView.setContractFunction(contractFunction);
 
     awardedContractView.setDescriptionOfWork(awardedContract.getDescriptionOfWork());
-    awardedContractView.setDateAwarded(DateUtil.format(awardedContract.getDateAwarded()));
+    awardedContractView.setDateAwarded(DateUtil.formatDate(awardedContract.getDateAwarded()));
 
     var contractBand = (awardedContract.getContractBand() != null)
         ? awardedContract.getContractBand().getDisplayName()

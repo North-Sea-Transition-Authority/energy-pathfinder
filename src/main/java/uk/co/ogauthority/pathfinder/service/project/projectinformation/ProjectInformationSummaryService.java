@@ -58,7 +58,7 @@ public class ProjectInformationSummaryService implements ProjectSectionSummarySe
               )
           );
           summaryModel.put("decomProductionCessationDate",
-              DateUtil.format(projectInformation.getProductionCessationDate())
+              DateUtil.formatDate(projectInformation.getProductionCessationDate())
           );
           summaryModel.put("name", projectInformation.getName());
           summaryModel.put("phoneNumber", projectInformation.getPhoneNumber());

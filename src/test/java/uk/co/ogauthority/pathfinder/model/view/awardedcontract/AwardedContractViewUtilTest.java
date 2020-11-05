@@ -102,7 +102,7 @@ public class AwardedContractViewUtilTest {
     assertThat(destination.getDisplayOrder()).isEqualTo(displayOrder);
     assertThat(destination.getContractorName()).isEqualTo(source.getContractorName());
     assertThat(destination.getDescriptionOfWork()).isEqualTo(source.getDescriptionOfWork());
-    assertThat(destination.getDateAwarded()).isEqualTo(DateUtil.format(source.getDateAwarded()));
+    assertThat(destination.getDateAwarded()).isEqualTo(DateUtil.formatDate(source.getDateAwarded()));
 
     var contactDetailView = destination.getContactDetailView();
     assertThat(contactDetailView.getName()).isEqualTo(source.getContactName());

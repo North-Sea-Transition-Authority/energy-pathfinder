@@ -34,7 +34,7 @@ public class UpcomingTenderViewUtil {
             : upcomingTender.getManualTenderFunction()
     );
     tender.setDescriptionOfWork(upcomingTender.getDescriptionOfWork());
-    tender.setEstimatedTenderDate(DateUtil.format(upcomingTender.getEstimatedTenderDate()));
+    tender.setEstimatedTenderDate(DateUtil.formatDate(upcomingTender.getEstimatedTenderDate()));
     tender.setContractBand(
         upcomingTender.getContractBand() != null
             ? upcomingTender.getContractBand().getDisplayName()

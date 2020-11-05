@@ -65,7 +65,7 @@ public class UpcomingTenderUtil {
     );
     view.setIsValid(isValid);
     view.setTenderFunction(TENDER_FUNCTION.getDisplayName());
-    view.setEstimatedTenderDate(DateUtil.format(ESTIMATED_TENDER_DATE));
+    view.setEstimatedTenderDate(DateUtil.formatDate(ESTIMATED_TENDER_DATE));
     view.setContractBand(CONTRACT_BAND.getDisplayName());
 
     ContactDetailView contactDetailView = new ContactDetailView();
