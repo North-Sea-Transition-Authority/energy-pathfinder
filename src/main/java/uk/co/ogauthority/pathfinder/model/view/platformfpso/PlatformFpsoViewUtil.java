@@ -2,11 +2,14 @@ package uk.co.ogauthority.pathfinder.model.view.platformfpso;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.ArrayList;
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
 public class PlatformFpsoViewUtil {
@@ -30,8 +33,8 @@ public class PlatformFpsoViewUtil {
     );
 
     view.setPlatformFpso(platformFpso.getStructure() != null
-        ? platformFpso.getStructure().getFacilityName()
-        : platformFpso.getManualStructureName()
+        ? new StringWithTag(platformFpso.getStructure().getFacilityName(), Tag.NONE)
+        : new StringWithTag(platformFpso.getManualStructureName(), Tag.NOT_FROM_LIST)
     );
 
     view.setTopsideFpsoMass(platformFpso.getTopsideFpsoMass() != null
@@ -54,7 +57,9 @@ public class PlatformFpsoViewUtil {
     view.setFpsoType(platformFpso.getFpsoType());
     view.setFpsoDimensions(platformFpso.getFpsoDimensions());
     view.setFuturePlans(platformFpso.getFuturePlans() != null ? platformFpso.getFuturePlans().getDisplayName() : "");
-    view.setEditLink(
+
+    var summaryLinks = new ArrayList<SummaryLink>();
+    summaryLinks.add(
         new SummaryLink(
             SummaryLinkText.EDIT.getDisplayName(),
             ReverseRouter.route(on(PlatformsFpsosController.class).editPlatformFpso(
@@ -65,7 +70,7 @@ public class PlatformFpsoViewUtil {
         )
     );
 
-    view.setDeleteLink(
+    summaryLinks.add(
         new SummaryLink(
             SummaryLinkText.DELETE.getDisplayName(),
             ReverseRouter.route(on(PlatformsFpsosController.class).deletePlatformFpsoConfirm(
@@ -76,6 +81,7 @@ public class PlatformFpsoViewUtil {
             ))
         )
     );
+    view.setSummaryLinks(summaryLinks);
     return view;
   }
 

@@ -103,6 +103,7 @@ public class AwardedContractView extends ProjectSummaryItem {
   @Override
   public int hashCode() {
     return Objects.hash(
+        super.hashCode(),
         contractorName,
         contractFunction,
         descriptionOfWork,

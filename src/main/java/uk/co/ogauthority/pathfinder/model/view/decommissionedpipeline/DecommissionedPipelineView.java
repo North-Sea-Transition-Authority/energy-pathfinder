@@ -101,6 +101,7 @@ public class DecommissionedPipelineView extends ProjectSummaryItem {
   @Override
   public int hashCode() {
     return Objects.hash(
+        super.hashCode(),
         pipeline,
         materialType,
         status,

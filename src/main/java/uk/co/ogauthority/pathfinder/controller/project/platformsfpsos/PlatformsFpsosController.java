@@ -179,7 +179,7 @@ public class PlatformsFpsosController extends ProjectFormPageController {
                                                          ValidationResult validationResult
 
   ) {
-    var modelAndView = new ModelAndView("project/platformsfpsos/platformsFpsosSummary")
+    var modelAndView = new ModelAndView("project/platformsfpsos/platformsFpsoFormSummary")
         .addObject("views", views)
         .addObject("isValid", validationResult.equals(ValidationResult.VALID))
         .addObject("errorSummary",
