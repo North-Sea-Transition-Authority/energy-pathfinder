@@ -18,7 +18,7 @@
       </#if>
     </@checkAnswers.checkAnswersRowNoActionsWithNested>
     <@checkAnswers.checkAnswersRowNoActions prompt="Topside / FPSO removal mass" value=view.topsideFpsoMass!"" />
-    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Topside removal years">
+    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Expected topside removal period">
       ${view.topsideRemovalEarliestYear!""}
       <br/>
         ${view.topsideRemovalLatestYear!""}
