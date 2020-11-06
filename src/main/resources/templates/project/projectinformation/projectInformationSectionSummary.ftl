@@ -13,7 +13,7 @@
     </#if>
     <#if decomRelated?has_content && decomRelated>
       <@checkAnswers.checkAnswersRowNoActions prompt="Decommissioning work start date" value=decomWorkStartDate!"" />
-      <@checkAnswers.checkAnswersRowNoActions prompt="Decommissionoing production cessation date" value=decomProductionCessationDate!"" />
+      <@checkAnswers.checkAnswersRowNoActions prompt="Decommissioning production cessation date" value=decomProductionCessationDate!"" />
     </#if>
     <@checkAnswers.checkAnswersRowNoActions prompt="Name" value=name!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="Phone number" value=phoneNumber!"" />

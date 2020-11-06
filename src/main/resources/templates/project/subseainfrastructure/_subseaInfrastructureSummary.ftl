@@ -46,7 +46,7 @@
         value=subseaInfrastructureView.totalEstimatedOtherMass!""
       />
     </#if>
-    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Decommissioning period">
+    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Expected decommissioning period">
       ${subseaInfrastructureView.earliestDecommissioningStartYear!""}
       <br/>
       ${subseaInfrastructureView.latestDecommissioningCompletionYear!""}

@@ -9,7 +9,7 @@
     <@fdsSearchSelector.searchSelectorRest
       path="form.structure"
       selectorMinInputLength=1
-      labelText="What structure does this subsea infrastructure belong to?"
+      labelText="What host structure does this subsea infrastructure relate to?"
       restUrl=springUrl(facilitiesRestUrl)
       preselectedItems=preSelectedFacilityMap!{}
     />
@@ -33,7 +33,7 @@
     <@minMaxDate.minMaxDateInput
       minFormPath="form.decommissioningDate.minYear"
       maxFormPath="form.decommissioningDate.maxYear"
-      labelText="Provide the period in which the decommissioning takes place"
+      labelText="Provide the period in which the decommissioning is expected to take place"
       altMinLabel="Earliest start year"
       altMaxLabel="Latest completion year"
       formId="decommissioning-date-min-max"
