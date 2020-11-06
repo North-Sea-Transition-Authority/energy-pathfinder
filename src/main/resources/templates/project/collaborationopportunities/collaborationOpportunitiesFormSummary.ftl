@@ -1,5 +1,5 @@
 <#include '../../layout.ftl'>
-<#import './collaborationOpportunitySummary.ftl' as collaborationOpportunitySummary />
+<#import '_collaborationOpportunitySummary.ftl' as collaborationOpportunitySummary />
 
 <@defaultPage htmlTitle="Collaboration opportunities" pageHeading="Collaboration opportunities" breadcrumbs=true>
     <#if errorSummary?has_content>
@@ -12,6 +12,7 @@
             view=view
             showHeader=true
             showActions=true
+            showTag=false
           />
         </#list>
       <#else>

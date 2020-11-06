@@ -245,7 +245,7 @@ public class CollaborationOpportunitiesController extends PathfinderFileUploadCo
       ValidationResult validationResult,
       ProjectContext projectContext
   ) {
-    var modelAndView = new ModelAndView("project/collaborationopportunities/collaborationOpportunitiesSummary")
+    var modelAndView = new ModelAndView("project/collaborationopportunities/collaborationOpportunitiesFormSummary")
         .addObject(
             "addCollaborationOpportunityUrl",
             ReverseRouter.route(on(CollaborationOpportunitiesController.class).addCollaborationOpportunity(projectId, null))
@@ -264,7 +264,7 @@ public class CollaborationOpportunitiesController extends PathfinderFileUploadCo
 
   private ModelAndView getCollaborationOpportunityModelAndView(ProjectDetail projectDetail, CollaborationOpportunityForm form) {
     var modelAndView = createModelAndView(
-        "project/collaborationopportunities/collaborationOpportunity",
+        "project/collaborationopportunities/collaborationOpportunityForm",
         projectDetail,
         CollaborationOpportunityFileLinkService.FILE_PURPOSE,
         form

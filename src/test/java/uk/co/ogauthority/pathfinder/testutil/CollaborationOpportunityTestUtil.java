@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
-import java.time.LocalDate;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
@@ -8,6 +7,8 @@ import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunit
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityView;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -20,7 +21,6 @@ public class CollaborationOpportunityTestUtil {
   public static final String MANUAL_FUNCTION = SearchSelectablePrefix.FREE_TEXT_PREFIX + "function";
   public static final String DESCRIPTION_OF_WORK = "work description";
   public static final Boolean URGENT_RESPONSE_NEEDED = true;
-  public static final LocalDate ESTIMATED_SERVICE_DATE = LocalDate.now().plusMonths(1L);
   public static final String CONTACT_NAME = ContactDetailsTestUtil.CONTACT_NAME;
   public static final String PHONE_NUMBER = ContactDetailsTestUtil.PHONE_NUMBER;
   public static final String JOB_TITLE = ContactDetailsTestUtil.JOB_TITLE;
@@ -62,7 +62,7 @@ public class CollaborationOpportunityTestUtil {
         PROJECT_ID
     );
     view.setIsValid(isValid);
-    view.setFunction(FUNCTION.getDisplayName());
+    view.setFunction(new StringWithTag(FUNCTION.getDisplayName(), Tag.NONE));
     view.setUrgentResponseNeeded(StringDisplayUtil.yesNoFromBoolean(URGENT_RESPONSE_NEEDED));
     var contactDetailsView = new ContactDetailView();
     contactDetailsView.setName(CONTACT_NAME);

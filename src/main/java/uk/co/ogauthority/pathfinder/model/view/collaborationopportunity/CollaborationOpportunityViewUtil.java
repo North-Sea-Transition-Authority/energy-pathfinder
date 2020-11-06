@@ -5,8 +5,10 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.List;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -33,8 +35,8 @@ public class CollaborationOpportunityViewUtil {
 
     view.setFunction(
         opportunity.getFunction() != null
-            ? opportunity.getFunction().getDisplayName()
-            : opportunity.getManualFunction()
+            ? new StringWithTag(opportunity.getFunction().getDisplayName(), Tag.NONE)
+            : new StringWithTag(opportunity.getManualFunction(), Tag.NOT_FROM_LIST)
     );
     view.setDescriptionOfWork(opportunity.getDescriptionOfWork());
     view.setUrgentResponseNeeded(StringDisplayUtil.yesNoFromBoolean(opportunity.getUrgentResponseNeeded()));
