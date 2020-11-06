@@ -130,7 +130,7 @@ public class SelectOperatorService {
                                                     String cancelUrl,
                                                     String primaryButtonText,
                                                     TopNavigationType topNavigationType) {
-    return new ModelAndView("project/selectoperator/selectOperator")
+    return new ModelAndView("project/projectoperator/selectOperator")
         .addObject("form", form)
         .addObject("preselectedOperator", getPreSelectedOrgGroup(form))
         .addObject("primaryButtonText", primaryButtonText)

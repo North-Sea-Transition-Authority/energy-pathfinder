@@ -26,7 +26,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
-import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -59,7 +59,7 @@ public class SelectOperatorServiceTest {
       "Org Grp"
   );
 
-  private static final ProjectOperator projectOperator = ProjectOperatorUtil.getOperator(detail, organisationGroup);
+  private static final ProjectOperator projectOperator = ProjectOperatorTestUtil.getOperator(detail, organisationGroup);
 
   @Before
   public void setUp() {

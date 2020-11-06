@@ -5,7 +5,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 
-public class ProjectOperatorUtil {
+public class ProjectOperatorTestUtil {
 
   public static final Integer ORG_GROUP_ID = 1;
   public static final String ORG_GROUP_NAME = "Org Grp";
@@ -15,6 +15,13 @@ public class ProjectOperatorUtil {
       ORG_GROUP_NAME,
       ORG_GROUP_SHORT_NAME
   );
+
+  public static ProjectOperator getOperator() {
+    return getOperator(
+        ProjectUtil.getProjectDetails(),
+        ORG_GROUP
+    );
+  }
 
 
   public static ProjectOperator getOperator(ProjectDetail detail, PortalOrganisationGroup organisationGroup) {

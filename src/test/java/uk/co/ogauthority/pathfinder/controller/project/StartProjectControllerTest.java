@@ -23,7 +23,7 @@ import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
-import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -59,8 +59,8 @@ public class StartProjectControllerTest extends AbstractControllerTest {
   @Test
   public void redirect_whenMultipleTeams() throws Exception {
     when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUser.getLinkedPerson())).thenReturn(
-        List.of(TeamTestingUtil.getOrganisationTeam(ProjectOperatorUtil.ORG_GROUP), TeamTestingUtil.getOrganisationTeam(
-            ProjectOperatorUtil.ORG_GROUP))
+        List.of(TeamTestingUtil.getOrganisationTeam(ProjectOperatorTestUtil.ORG_GROUP), TeamTestingUtil.getOrganisationTeam(
+            ProjectOperatorTestUtil.ORG_GROUP))
     );
     mockMvc.perform(
           MockMvcRequestBuilders.post(
@@ -76,9 +76,9 @@ public class StartProjectControllerTest extends AbstractControllerTest {
   @Test
   public void redirect_whenSingleTeam() throws Exception {
     when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUser.getLinkedPerson())).thenReturn(
-        List.of(TeamTestingUtil.getOrganisationTeam(ProjectOperatorUtil.ORG_GROUP))
+        List.of(TeamTestingUtil.getOrganisationTeam(ProjectOperatorTestUtil.ORG_GROUP))
     );
-    when(startProjectService.startProject(authenticatedUser, ProjectOperatorUtil.ORG_GROUP)).thenReturn(detail);
+    when(startProjectService.startProject(authenticatedUser, ProjectOperatorTestUtil.ORG_GROUP)).thenReturn(detail);
 
     mockMvc.perform(
         MockMvcRequestBuilders.post(

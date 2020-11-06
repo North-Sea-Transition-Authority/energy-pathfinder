@@ -28,7 +28,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOpe
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
-import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -66,9 +66,9 @@ public class SelectProjectOperatorControllerTest extends AbstractControllerTest 
   @Test
   public void startProject_validForm() throws Exception {
     when(selectOperatorService.getOrganisationGroupOrError(any(), any())).thenReturn(
-        ProjectOperatorUtil.ORG_GROUP
+        ProjectOperatorTestUtil.ORG_GROUP
     );
-    when(startProjectService.startProject(authenticatedUser, ProjectOperatorUtil.ORG_GROUP)).thenReturn(
+    when(startProjectService.startProject(authenticatedUser, ProjectOperatorTestUtil.ORG_GROUP)).thenReturn(
         ProjectUtil.getProjectDetails()
     );
 

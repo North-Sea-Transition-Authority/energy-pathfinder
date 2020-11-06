@@ -21,7 +21,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
-import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -52,10 +52,10 @@ public class ProjectOperatorServiceTest {
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
-  private final ProjectOperator projectOperator = ProjectOperatorUtil.getOperator(detail, organisationGroup);
+  private final ProjectOperator projectOperator = ProjectOperatorTestUtil.getOperator(detail, organisationGroup);
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     projectOperatorService = new ProjectOperatorService(
         teamService,
         projectOperatorRepository
