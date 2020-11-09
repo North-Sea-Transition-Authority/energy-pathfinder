@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.view.location;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
@@ -22,7 +23,7 @@ public class ProjectLocationView {
 
   private String ukcsArea;
 
-  private List<String> licenceBlocks;
+  private List<String> licenceBlocks = new ArrayList<>();
 
   public StringWithTag getField() {
     return field;
