@@ -1,5 +1,5 @@
 <#include '../../layout.ftl'>
-<#import 'integratedRigSummary.ftl' as integratedRigSummary>
+<#import '_integratedRigSummary.ftl' as integratedRigSummary>
 
 <@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true>
   <#if errorList?has_content>
@@ -12,6 +12,7 @@
           integratedRigView=integratedRigView
           showHeader=true
           showActions=true
+          showTag=false
         />
       </#list>
       <#else>
