@@ -42,11 +42,12 @@ public class DashboardProjectItemView {
     return new DashboardProjectItemView(
         getLink(dashboardProjectItem, title, screenReaderText),
         title,
-        StringDisplayUtil.getValueOrDefault(
-            dashboardProjectItem.getFieldStage(),
-            dashboardProjectItem.getFieldStage() != null ? dashboardProjectItem.getFieldStage()::getDisplayName : null
-        ),
-        StringDisplayUtil.getValueOrDefault(dashboardProjectItem, dashboardProjectItem::getFieldName),
+        dashboardProjectItem.getFieldStage() != null
+            ? dashboardProjectItem.getFieldStage().getDisplayName()
+            : StringDisplayUtil.NOT_SET_TEXT,
+        dashboardProjectItem.getFieldName() != null
+            ? dashboardProjectItem.getFieldName()
+            : StringDisplayUtil.NOT_SET_TEXT,
         dashboardProjectItem.getOperatorName(),
         status
       );

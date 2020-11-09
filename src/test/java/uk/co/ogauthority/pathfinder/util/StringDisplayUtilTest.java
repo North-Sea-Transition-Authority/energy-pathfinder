@@ -44,30 +44,4 @@ public class StringDisplayUtilTest {
   public void getPrefixForVowelOrConsonant_startsWithConsonant() {
     assertThat(StringDisplayUtil.getPrefixForVowelOrConsonant("Book")).isEqualTo(StringDisplayUtil.A);
   }
-
-  @Test
-  public void getValueOrDefault_valueReturned() {
-    var testHelper = new StringDisplayTestHelper();
-    assertThat(StringDisplayUtil.getValueOrDefault(testHelper, testHelper::getName)).isEqualTo(testHelper.getName());
-  }
-
-  @Test
-  public void getValueOrDefault_nullReturnsDefault() {
-    assertThat(StringDisplayUtil.getValueOrDefault(null, null)).isEqualTo(StringDisplayUtil.NOT_SET_TEXT);
-  }
-
-  private static class StringDisplayTestHelper {
-    private String name = "Test";
-
-    public StringDisplayTestHelper(String name) {
-      this.name = name;
-    }
-
-    public StringDisplayTestHelper() {
-    }
-
-    public String getName() {
-      return name;
-    }
-  }
 }
