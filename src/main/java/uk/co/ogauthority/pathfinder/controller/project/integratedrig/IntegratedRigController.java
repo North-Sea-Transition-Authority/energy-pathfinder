@@ -166,7 +166,7 @@ public class IntegratedRigController extends ProjectFormPageController {
   private ModelAndView getIntegratedRigsSummaryModelAndView(Integer projectId,
                                                             List<IntegratedRigView> integratedRigViews,
                                                             ValidationResult validationResult) {
-    var modelAndView = new ModelAndView("project/integratedrig/integratedRigsSummary")
+    var modelAndView = new ModelAndView("project/integratedrig/integratedRigFormSummary")
         .addObject("pageTitle", SUMMARY_PAGE_NAME)
         .addObject("addIntegratedRigUrl",
             ReverseRouter.route(on(IntegratedRigController.class).addIntegratedRig(projectId, null))
@@ -187,7 +187,7 @@ public class IntegratedRigController extends ProjectFormPageController {
   }
 
   private ModelAndView getIntegratedRigModelAndView(Integer projectId, IntegratedRigForm form) {
-    var modelAndView = new ModelAndView("project/integratedrig/integratedRig")
+    var modelAndView = new ModelAndView("project/integratedrig/integratedRigForm")
         .addObject("form", form)
         .addObject("pageTitle", FORM_PAGE_NAME)
         .addObject("facilitiesRestUrl", integratedRigService.getFacilityRestUrl())

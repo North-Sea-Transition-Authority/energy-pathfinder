@@ -1,5 +1,5 @@
 <#include '../../layout.ftl'>
-<#import 'integratedRigSummary.ftl' as integratedRigSummary>
+<#import '_integratedRigSummary.ftl' as integratedRigSummary>
 
 <@defaultPage
   htmlTitle=pageName
