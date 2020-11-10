@@ -24,15 +24,17 @@
 </#macro>
 
 <#macro _dashboardItem dashboardItem showOperator=true>
-  <h3 class="govuk-heading-s dashboard-item__heading">
-   <@userAction.userAction userAction=dashboardItem.dashboardLink/>
-   <#if showOperator>
-     <span class="govuk-caption-m">${dashboardItem.operatorName}</span>
-   </#if>
-  </h3>
-  <@fdsDataItems.dataItem dataItemListClasses="dashboard-item__data-list" >
-    <@fdsDataItems.dataValues key="Field stage" value=dashboardItem.fieldStage!""/>
-    <@fdsDataItems.dataValues key="Field" value=dashboardItem.fieldName!""/>
-    <@fdsDataItems.dataValues key="Status" value=dashboardItem.status!""/>
-  </@fdsDataItems.dataItem>
+  <div class="dashboard-item">
+    <h3 class="dashboard-item__heading">
+      <@userAction.userAction userAction=dashboardItem.dashboardLink/>
+      <#if showOperator>
+        <span class="govuk-caption-m">${dashboardItem.operatorName}</span>
+      </#if>
+    </h3>
+    <@fdsDataItems.dataItem dataItemListClasses="dashboard-item__data-list" >
+      <@fdsDataItems.dataValues key="Field stage" value=dashboardItem.fieldStage!""/>
+      <@fdsDataItems.dataValues key="Field" value=dashboardItem.fieldName!""/>
+      <@fdsDataItems.dataValues key="Status" value=dashboardItem.status!""/>
+    </@fdsDataItems.dataItem>
+  </div>
 </#macro>
