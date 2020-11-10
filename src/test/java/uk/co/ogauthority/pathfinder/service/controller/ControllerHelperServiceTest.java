@@ -149,6 +149,38 @@ public class ControllerHelperServiceTest {
   }
 
   @Test
+  public void checkErrorsAndRedirect_errorListOrderSameAsForm_nestedForm() {
+    var form = new NestedTestForm();
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult.rejectValue("firstField", "firstField.invalid", "NotNull");
+    bindingResult.rejectValue("thirdField", "thirdField.invalid", "NotNull");
+    bindingResult.rejectValue("nestedForm.firstField", "firstField.invalid", "NotNull");
+    bindingResult.rejectValue("nestedForm.secondField", "secondField.invalid", "NotNull");
+    bindingResult.rejectValue("nestedForm.thirdField", "thirdField.invalid", "NotNull");
+
+    var result = controllerHelperService.checkErrorsAndRedirect(
+        bindingResult,
+        failedModelAndView,
+        form,
+        () -> passedModelAndView
+    );
+
+    @SuppressWarnings("unchecked")
+    var errorItemList = (List<ErrorItem>) result.getModel().get("errorList");
+
+    assertThat(errorItemList)
+        .extracting(ErrorItem::getDisplayOrder, ErrorItem::getFieldName, ErrorItem::getErrorMessage)
+        .containsExactly(
+            tuple(0, "firstField", "NotNull"),
+            tuple(1, "nestedForm.firstField", "NotNull"),
+            tuple(2, "nestedForm.secondField", "NotNull"),
+            tuple(3, "nestedForm.thirdField", "NotNull"),
+            tuple(4, "thirdField", "NotNull")
+        );
+  }
+
+  @Test
   public void checkErrorsAndRedirect_errorListOrder_whenNoErrors_thenNullErrorList() {
     var form = new FieldOrderTestForm();
 

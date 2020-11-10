@@ -3,13 +3,17 @@ package uk.co.ogauthority.pathfinder.service.controller;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -110,14 +114,31 @@ public class ControllerHelperService {
     List<FieldError> errorList = new ArrayList<>();
 
     if (form != null && bindingResult != null && bindingResult.hasErrors()) {
-      var formFields = Arrays.stream(form.getClass().getDeclaredFields())
-          .map(Field::getName)
-          .collect(Collectors.toList());
+      var classesToScan = new HashSet<Class<?>>();
+      classesToScan.add(form.getClass());
+      for (FieldError error : bindingResult.getFieldErrors()) {
+        String fieldPath = error.getField();
+        Class<?> fieldClass = form.getClass();
+        while (fieldPath.contains(".")) {
+          String[] split = fieldPath.split("\\.", 2);
+          String fieldName = split[0].split("\\[")[0];
+          fieldPath = split[1];
+          Field subField = findFieldInClassHierarchy(fieldClass, fieldName);
+          if (subField == null) {
+            throw new RuntimeException(new NoSuchFieldException(fieldName));
+          }
+          fieldClass = subField.getType();
+          classesToScan.addAll(getClassHierarchy(fieldClass));
+        }
+      }
+
+      var formFieldPositions = new HashMap<String, Integer>();
+      calculateFormFieldPositionsRecursive(form.getClass(), 0, "", classesToScan, formFieldPositions);
 
       errorList.addAll(bindingResult.getFieldErrors());
-      errorList.sort(Comparator.comparing(// match on field names but ditch any sub fields as we won't match those
-          fieldError -> formFields.indexOf(fieldError.getField().split("\\.")[0]))
-      );
+      errorList.sort(Comparator.comparing(
+          fieldError -> formFieldPositions.getOrDefault(fieldError.getField().split("\\[")[0], -1)
+      ));
     } else if (form == null && bindingResult != null) {
       errorList = bindingResult.getFieldErrors();
     }
@@ -125,4 +146,54 @@ public class ControllerHelperService {
     return errorList;
   }
 
+  private int calculateFormFieldPositionsRecursive(Class<?> formClass,
+                                                   int startIndex,
+                                                   String prefix,
+                                                   Set<Class<?>> classesToScan,
+                                                   Map<String, Integer> formFieldPositions) {
+    var i = 0;
+    List<Class<?>> formClasses = getClassHierarchy(formClass);
+    Collections.reverse(formClasses);
+    for (Class<?> classToScan : formClasses) {
+      for (Field field : classToScan.getDeclaredFields()) {
+        Class<?> type = field.getType();
+        if (classesToScan.contains(type)) {
+          i += calculateFormFieldPositionsRecursive(
+              type,
+              startIndex + i,
+              prefix + field.getName() + ".",
+              classesToScan,
+              formFieldPositions
+          );
+          continue;
+        }
+        formFieldPositions.put(prefix + field.getName(), startIndex + i++);
+      }
+    }
+    return i;
+  }
+
+  private List<Class<?>> getClassHierarchy(Class<?> clazz) {
+    List<Class<?>> classes = new ArrayList<>();
+    classes.add(clazz);
+    Class<?> superclass = clazz.getSuperclass();
+    while (superclass != null && !superclass.equals(Object.class)) {
+      classes.add(superclass);
+      superclass = superclass.getSuperclass();
+    }
+    return classes;
+  }
+
+  private Field findFieldInClassHierarchy(Class<?> clazz, String fieldName) {
+    Class<?> currentClass = clazz;
+    while (currentClass != null && !currentClass.equals(Object.class)) {
+      try {
+        return currentClass.getDeclaredField(fieldName);
+      } catch (NoSuchFieldException exception) {
+        // Ignore
+      }
+      currentClass = currentClass.getSuperclass();
+    }
+    return null;
+  }
 }
