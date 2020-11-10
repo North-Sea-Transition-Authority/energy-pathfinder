@@ -15,8 +15,7 @@ public class DashboardProjectItemTestUtil {
   public static final FieldStage FIELD_STAGE = FieldStage.DECOMMISSIONING;
   public static final String PROJECT_TITLE = "Dummy title";
   public static final String FIELD_NAME = "A field";
-  public static final String OPERATOR_NAME = "An Operator";
-  public static final PortalOrganisationGroup ORGANISATION_GROUP = ProjectOperatorUtil.ORG_GROUP;
+  public static final PortalOrganisationGroup ORGANISATION_GROUP = ProjectOperatorTestUtil.ORG_GROUP;
 
 
   public static DashboardProjectItem getDashboardProjectItem(){
