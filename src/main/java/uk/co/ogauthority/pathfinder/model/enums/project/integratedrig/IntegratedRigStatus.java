@@ -6,7 +6,7 @@ import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
 public enum IntegratedRigStatus {
 
-  IN_USE("In Use"),
+  IN_USE("In use"),
   WARM("Warm"),
   COLD("Cold");
 

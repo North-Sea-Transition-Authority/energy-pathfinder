@@ -6,8 +6,21 @@
       <@_linkButton userAction=userAction/>
     <#elseif userAction.type = "LINK">
       <@_link userAction=userAction/>
+    <#elseif userAction.type = "DASHBOARD_LINK">
+      <@_dashboardLink userAction=userAction applyNotVisitedClass=userAction.applyNotVisitedClass/>
     </#if>
   </#if>
+</#macro>
+
+<#macro _dashboardLink userAction applyNotVisitedClass=true>
+  <#assign classes = "govuk-link govuk-!-font-size-24"/>
+  <#if applyNotVisitedClass>
+    <#assign classes = classes + " govuk-link--no-visited-state"/>
+  </#if>
+  <@_link
+    userAction=userAction
+    linkClass=classes
+  />
 </#macro>
 
 <#macro _linkButton userAction>
@@ -24,11 +37,11 @@
   />
 </#macro>
 
-<#macro _link userAction>
+<#macro _link userAction linkClass="govuk-link">
   <@fdsAction.link
     linkText=userAction.prompt
     linkUrl=springUrl(userAction.url)
-    linkClass="govuk-link"
+    linkClass=linkClass
     role=false
     linkScreenReaderText=userAction.screenReaderText!""
   />
