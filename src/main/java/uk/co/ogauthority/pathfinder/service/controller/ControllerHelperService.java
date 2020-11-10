@@ -1,9 +1,10 @@
 package uk.co.ogauthority.pathfinder.service.controller;
 
+import com.google.common.collect.Iterables;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,6 +19,7 @@ import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
@@ -114,30 +116,37 @@ public class ControllerHelperService {
     List<FieldError> errorList = new ArrayList<>();
 
     if (form != null && bindingResult != null && bindingResult.hasErrors()) {
-      var classesToScan = new HashSet<Class<?>>();
-      classesToScan.add(form.getClass());
+      var fieldPaths = new HashSet<String>();
+      var nestedFormPaths = new HashSet<String>();
       for (FieldError error : bindingResult.getFieldErrors()) {
-        String fieldPath = error.getField();
-        Class<?> fieldClass = form.getClass();
-        while (fieldPath.contains(".")) {
-          String[] split = fieldPath.split("\\.", 2);
-          String fieldName = split[0].split("\\[")[0];
-          fieldPath = split[1];
-          Field subField = findFieldInClassHierarchy(fieldClass, fieldName);
-          if (subField == null) {
-            throw new RuntimeException(new NoSuchFieldException(fieldName));
+        String fieldPath = error.getField().replaceAll("\\[.*?\\]", "");
+        fieldPaths.add(fieldPath);
+
+        String currentPath = "";
+        String[] split = fieldPath.split("\\.");
+        for (int i = 0; i < split.length - 1; i++) {
+          if (!currentPath.equals("")) {
+            currentPath += ".";
           }
-          fieldClass = subField.getType();
-          classesToScan.addAll(getClassHierarchy(fieldClass));
+          currentPath += split[i];
+          nestedFormPaths.add(currentPath);
         }
       }
 
       var formFieldPositions = new HashMap<String, Integer>();
-      calculateFormFieldPositionsRecursive(form.getClass(), 0, "", classesToScan, formFieldPositions);
+      calculateFormFieldPositionsRecursive(
+          form.getClass(),
+          form,
+          0,
+          "",
+          fieldPaths,
+          nestedFormPaths,
+          formFieldPositions
+      );
 
       errorList.addAll(bindingResult.getFieldErrors());
       errorList.sort(Comparator.comparing(
-          fieldError -> formFieldPositions.getOrDefault(fieldError.getField().split("\\[")[0], -1)
+          fieldError -> formFieldPositions.getOrDefault(fieldError.getField().replaceAll("\\[.*?\\]", ""), -1)
       ));
     } else if (form == null && bindingResult != null) {
       errorList = bindingResult.getFieldErrors();
@@ -147,53 +156,55 @@ public class ControllerHelperService {
   }
 
   private int calculateFormFieldPositionsRecursive(Class<?> formClass,
+                                                   Object form,
                                                    int startIndex,
                                                    String prefix,
-                                                   Set<Class<?>> classesToScan,
+                                                   Set<String> fieldPaths,
+                                                   Set<String> nestedFormPaths,
                                                    Map<String, Integer> formFieldPositions) {
     var i = 0;
-    List<Class<?>> formClasses = getClassHierarchy(formClass);
-    Collections.reverse(formClasses);
-    for (Class<?> classToScan : formClasses) {
+
+    Class<?> classToScan = formClass;
+    do {
       for (Field field : classToScan.getDeclaredFields()) {
-        Class<?> type = field.getType();
-        if (classesToScan.contains(type)) {
+        String fieldPath = prefix + field.getName();
+
+        if (nestedFormPaths.contains(fieldPath)) {
+          formFieldPositions.put(fieldPath, startIndex + i++);
+
+          field.setAccessible(true);
+          Object nestedForm;
+          try {
+            nestedForm = field.get(form);
+          } catch (IllegalAccessException exception) {
+            throw new RuntimeException(exception);
+          }
+
+          // Special-case collection handling to use the type of the first item.
+          // We only use the actual form object for this purpose, so we don't need to
+          // handle each element individually
+          Class<?> nestedFieldType = field.getType();
+          if (nestedForm instanceof Collection) {
+            nestedForm = Iterables.getFirst(((Collection) nestedForm), null);
+            nestedFieldType = nestedForm.getClass();
+          }
+
           i += calculateFormFieldPositionsRecursive(
-              type,
+              nestedFieldType,
+              nestedForm,
               startIndex + i,
-              prefix + field.getName() + ".",
-              classesToScan,
+              fieldPath + ".",
+              fieldPaths,
+              nestedFormPaths,
               formFieldPositions
           );
-          continue;
+        } else if (fieldPaths.contains(fieldPath)) {
+          formFieldPositions.put(fieldPath, startIndex + i++);
         }
-        formFieldPositions.put(prefix + field.getName(), startIndex + i++);
       }
-    }
+      classToScan = classToScan.getSuperclass();
+    } while (classToScan != null && classToScan != Object.class);
+
     return i;
-  }
-
-  private List<Class<?>> getClassHierarchy(Class<?> clazz) {
-    List<Class<?>> classes = new ArrayList<>();
-    classes.add(clazz);
-    Class<?> superclass = clazz.getSuperclass();
-    while (superclass != null && !superclass.equals(Object.class)) {
-      classes.add(superclass);
-      superclass = superclass.getSuperclass();
-    }
-    return classes;
-  }
-
-  private Field findFieldInClassHierarchy(Class<?> clazz, String fieldName) {
-    Class<?> currentClass = clazz;
-    while (currentClass != null && !currentClass.equals(Object.class)) {
-      try {
-        return currentClass.getDeclaredField(fieldName);
-      } catch (NoSuchFieldException exception) {
-        // Ignore
-      }
-      currentClass = currentClass.getSuperclass();
-    }
-    return null;
   }
 }
