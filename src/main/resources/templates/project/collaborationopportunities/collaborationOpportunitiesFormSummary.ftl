@@ -5,20 +5,18 @@
     <#if errorSummary?has_content>
       <@fdsError.errorSummary errorItems=errorSummary />
     </#if>
-    <div class="summary-list">
-      <#if opportunityViews?has_content>
-        <#list opportunityViews as view>
-          <@collaborationOpportunitySummary.collaborationOpportunitySummary
-            view=view
-            showHeader=true
-            showActions=true
-            showTag=false
-          />
-        </#list>
-      <#else>
-        <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="collaboration opportunity" linkUrl=""/>
-      </#if>
-    </div>
+    <#if opportunityViews?has_content>
+      <#list opportunityViews as view>
+        <@collaborationOpportunitySummary.collaborationOpportunitySummary
+          view=view
+          showHeader=true
+          showActions=true
+          showTag=false
+        />
+      </#list>
+    <#else>
+      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="collaboration opportunity" linkUrl=""/>
+    </#if>
     <@fdsAction.link linkText="Add collaboration opportunity" linkUrl=springUrl(addCollaborationOpportunityUrl) linkClass="govuk-button govuk-button--blue"/>
     <@fdsForm.htmlForm>
         <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryLinkText="Back to task list" linkSecondaryAction=true linkSecondaryActionUrl=springUrl(backToTaskListUrl) />

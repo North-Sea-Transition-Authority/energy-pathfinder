@@ -7,13 +7,11 @@
   breadcrumbs=true
   twoThirdsColumn=true
 >
-  <div class="summary-list">
-    <@decommissionedPipelineSummary.decommissionedPipelineSummary
-      decommissionedPipelineView=decommissionedPipelineView
-      showHeader=false
-      showActions=false
-    />
-  </div>
+  <@decommissionedPipelineSummary.decommissionedPipelineSummary
+    decommissionedPipelineView=decommissionedPipelineView
+    showHeader=false
+    showActions=false
+  />
   <@fdsForm.htmlForm>
     <@fdsAction.submitButtons
       primaryButtonText="Remove"

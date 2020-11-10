@@ -1,7 +1,11 @@
 <#include '../../layout.ftl'>
 
 <#macro summaryViewItemWrapper summaryView idPrefix headingPrefix showHeader=true showActions=true headingSize="h2" headingClass="govuk-heading-l">
-  <#assign heading = headingPrefix + " " + summaryView.displayOrder />
+  <#if showHeader>
+    <#assign heading = headingPrefix + " " + summaryView.displayOrder />
+  <#else>
+    <#assign heading = "" />
+  </#if>
   <#if summaryView.valid?has_content && !summaryView.valid>
     <#assign errorMessage = "${heading} is incomplete" />
   <#else>
@@ -20,6 +24,7 @@
           linkText=summaryLink.linkText
           linkUrl=springUrl(summaryLink.url)
           linkScreenReaderText=heading
+          linkClass="govuk-link govuk-!-font-size-19"
         />
       </#list>
     </#if>

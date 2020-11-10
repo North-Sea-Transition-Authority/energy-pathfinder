@@ -5,19 +5,17 @@
   <#if errorList?has_content>
     <@fdsError.errorSummary errorItems=errorList />
   </#if>
-  <div class="summary-list">
-    <#if decommissionedPipelineViews?has_content>
-      <#list decommissionedPipelineViews as decommissionedPipelineView>
-        <@decommissionedPipelineSummary.decommissionedPipelineSummary
-          decommissionedPipelineView=decommissionedPipelineView
-          showHeader=true
-          showActions=true
-        />
-      </#list>
-      <#else>
-        <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="pipeline" linkUrl=""/>
-    </#if>
-  </div>
+  <#if decommissionedPipelineViews?has_content>
+    <#list decommissionedPipelineViews as decommissionedPipelineView>
+      <@decommissionedPipelineSummary.decommissionedPipelineSummary
+        decommissionedPipelineView=decommissionedPipelineView
+        showHeader=true
+        showActions=true
+      />
+    </#list>
+    <#else>
+      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="pipeline" linkUrl=""/>
+  </#if>
   <@fdsAction.link
     linkText="Add pipeline"
     linkUrl=springUrl(addDecommissionedPipelineUrl)
