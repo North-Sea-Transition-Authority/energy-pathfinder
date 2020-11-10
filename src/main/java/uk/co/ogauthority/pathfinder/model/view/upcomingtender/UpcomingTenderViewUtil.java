@@ -5,8 +5,10 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.List;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -30,8 +32,8 @@ public class UpcomingTenderViewUtil {
 
     tender.setTenderFunction(
         upcomingTender.getTenderFunction() != null
-            ? upcomingTender.getTenderFunction().getDisplayName()
-            : upcomingTender.getManualTenderFunction()
+            ? new StringWithTag(upcomingTender.getTenderFunction().getDisplayName(), Tag.NONE)
+            : new StringWithTag(upcomingTender.getManualTenderFunction(), Tag.NOT_FROM_LIST)
     );
     tender.setDescriptionOfWork(upcomingTender.getDescriptionOfWork());
     tender.setEstimatedTenderDate(DateUtil.formatDate(upcomingTender.getEstimatedTenderDate()));

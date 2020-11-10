@@ -1,5 +1,5 @@
 <#include '../../layout.ftl'>
-<#import './upcomingTenderSummary.ftl' as tenderSummary>
+<#import './_upcomingTenderSummary.ftl' as tenderSummary>
 
 <#assign title = "Are you sure you want to remove upcoming tender " + displayOrder/>
 

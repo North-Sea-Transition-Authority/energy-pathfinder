@@ -1,13 +1,15 @@
 package uk.co.ogauthority.pathfinder.model.view.upcomingtender;
 
 import java.util.List;
+import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 
 public class UpcomingTenderView extends ProjectSummaryItem {
 
-  private String tenderFunction;
+  private StringWithTag tenderFunction;
 
   private String descriptionOfWork;
 
@@ -29,11 +31,11 @@ public class UpcomingTenderView extends ProjectSummaryItem {
     this.projectId = projectId;
   }
 
-  public String getTenderFunction() {
+  public StringWithTag getTenderFunction() {
     return tenderFunction;
   }
 
-  public void setTenderFunction(String tenderFunction) {
+  public void setTenderFunction(StringWithTag tenderFunction) {
     this.tenderFunction = tenderFunction;
   }
 
@@ -76,5 +78,38 @@ public class UpcomingTenderView extends ProjectSummaryItem {
   public void setUploadedFileViews(
       List<UploadedFileView> uploadedFileViews) {
     this.uploadedFileViews = uploadedFileViews;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    UpcomingTenderView that = (UpcomingTenderView) o;
+    return Objects.equals(tenderFunction, that.tenderFunction)
+        && Objects.equals(descriptionOfWork, that.descriptionOfWork)
+        && Objects.equals(estimatedTenderDate, that.estimatedTenderDate)
+        && Objects.equals(contractBand, that.contractBand)
+        && Objects.equals(contactDetailView, that.contactDetailView)
+        && Objects.equals(uploadedFileViews, that.uploadedFileViews);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        super.hashCode(),
+        tenderFunction,
+        descriptionOfWork,
+        estimatedTenderDate,
+        contractBand,
+        contactDetailView,
+        uploadedFileViews
+    );
   }
 }
