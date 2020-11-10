@@ -7,13 +7,11 @@
   breadcrumbs=true
   twoThirdsColumn=true
 >
-  <div class="summary-list">
-    <@integratedRigSummary.integratedRigSummary
-      integratedRigView=integratedRigView
-      showHeader=false
-      showActions=false
-    />
-  </div>
+  <@integratedRigSummary.integratedRigSummary
+    integratedRigView=integratedRigView
+    showHeader=false
+    showActions=false
+  />
   <@fdsForm.htmlForm>
     <@fdsAction.submitButtons
       primaryButtonText="Remove"

@@ -5,20 +5,18 @@
   <#if errorList?has_content>
     <@fdsError.errorSummary errorItems=errorList />
   </#if>
-  <div class="summary-list">
-    <#if integratedRigViews?has_content>
-      <#list integratedRigViews as integratedRigView>
-        <@integratedRigSummary.integratedRigSummary
-          integratedRigView=integratedRigView
-          showHeader=true
-          showActions=true
-          showTag=false
-        />
-      </#list>
-      <#else>
-        <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="integrated rig" linkUrl=""/>
-    </#if>
-  </div>
+  <#if integratedRigViews?has_content>
+    <#list integratedRigViews as integratedRigView>
+      <@integratedRigSummary.integratedRigSummary
+        integratedRigView=integratedRigView
+        showHeader=true
+        showActions=true
+        showTag=false
+      />
+    </#list>
+    <#else>
+      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="integrated rig" linkUrl=""/>
+  </#if>
   <@fdsAction.link
     linkText="Add integrated rig"
     linkUrl=springUrl(addIntegratedRigUrl)

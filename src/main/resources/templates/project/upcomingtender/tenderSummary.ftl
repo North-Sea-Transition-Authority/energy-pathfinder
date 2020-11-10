@@ -6,15 +6,13 @@
   <#if errorSummary?has_content>
     <@fdsError.errorSummary errorItems=errorSummary />
   </#if>
-  <div class="summary-list">
-    <#if tenderViews?has_content>
-      <#list tenderViews as view>
-        <@tenderSummary.upcomingTenderSummary view=view showHeader=true showActions=true />
-      </#list>
-    <#else>
-      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="upcoming tender" linkUrl=""/>
-    </#if>
-  </div>
+  <#if tenderViews?has_content>
+    <#list tenderViews as view>
+      <@tenderSummary.upcomingTenderSummary view=view showHeader=true showActions=true />
+    </#list>
+  <#else>
+    <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="upcoming tender" linkUrl=""/>
+  </#if>
 
   <@fdsAction.link linkText="Add upcoming tender" linkUrl=springUrl(addTenderUrl) linkClass="govuk-button govuk-button--blue"/>
 

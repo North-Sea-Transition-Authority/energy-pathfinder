@@ -5,19 +5,17 @@
   <#if errorList?has_content>
     <@fdsError.errorSummary errorItems=errorList />
   </#if>
-  <div class="summary-list">
-    <#if subseaInfrastructureViews?has_content>
-      <#list subseaInfrastructureViews as subseaInfrastructureView>
-        <@subseaInfrastructureSummary.subseaInfrastructureSummary
-          subseaInfrastructureView=subseaInfrastructureView
-          showHeader=true
-          showActions=true
-        />
-      </#list>
-      <#else>
-        <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="subsea infrastructure" linkUrl=""/>
-    </#if>
-  </div>
+  <#if subseaInfrastructureViews?has_content>
+    <#list subseaInfrastructureViews as subseaInfrastructureView>
+      <@subseaInfrastructureSummary.subseaInfrastructureSummary
+        subseaInfrastructureView=subseaInfrastructureView
+        showHeader=true
+        showActions=true
+      />
+    </#list>
+    <#else>
+      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="subsea infrastructure" linkUrl=""/>
+  </#if>
   <@fdsAction.link
     linkText="Add subsea infrastructure"
     linkUrl=springUrl(addSubseaInfrastructureUrl)
