@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.project;
+package uk.co.ogauthority.pathfinder.service.project.selectoperator;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -20,11 +20,13 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.enums.TopNavigationType;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
+import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
-public class SelectOperatorService {
+public class SelectOperatorService implements ProjectFormSectionService {
 
   private final PortalOrganisationAccessor portalOrganisationAccessor;
   private final ValidationService validationService;
@@ -92,13 +94,6 @@ public class SelectOperatorService {
     return new ProjectOperatorForm(projectOperator.getOrganisationGroup().getOrgGrpId().toString());
   }
 
-  public boolean isComplete(ProjectDetail detail) {
-    var form = getForm(detail);
-    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
-    bindingResult = validate(form, bindingResult);
-    return !bindingResult.hasErrors();
-  }
-
   /**
    * If there's data in the form turn it back into a format the searchSelector can parse.
    * @param form valid or invalid ProjectOperatorForm
@@ -149,5 +144,13 @@ public class SelectOperatorService {
                 "No ProjectOperator found for detail id: %d", detail.getId()
             )
         ));
+  }
+
+  @Override
+  public boolean isComplete(ProjectDetail detail) {
+    var form = getForm(detail);
+    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult = validate(form, bindingResult);
+    return !bindingResult.hasErrors();
   }
 }

@@ -17,10 +17,11 @@ import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.De
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedpipeline.DecommissionedPipelineRepository;
 import uk.co.ogauthority.pathfinder.service.pipeline.PipelineService;
+import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
-public class DecommissionedPipelineService {
+public class DecommissionedPipelineService implements ProjectFormSectionService {
 
   private final PipelineService pipelineService;
   private final DecommissionedPipelineRepository decommissionedPipelineRepository;
@@ -117,12 +118,6 @@ public class DecommissionedPipelineService {
     decommissionedPipelineRepository.delete(decommissionedPipeline);
   }
 
-  public boolean isComplete(ProjectDetail projectDetail) {
-    var decommissionedPipelines = getDecommissionedPipelines(projectDetail);
-    return !decommissionedPipelines.isEmpty() && decommissionedPipelines.stream()
-        .allMatch(decommissionedPipeline -> isValid(decommissionedPipeline, ValidationType.FULL));
-  }
-
   private void setCommonEntityFields(DecommissionedPipeline decommissionedPipeline,
                                      ProjectDetail projectDetail,
                                      DecommissionedPipelineForm form) {
@@ -148,5 +143,12 @@ public class DecommissionedPipelineService {
             decommissionedPipelineId,
             projectDetail.getId()
         )));
+  }
+
+  @Override
+  public boolean isComplete(ProjectDetail projectDetail) {
+    var decommissionedPipelines = getDecommissionedPipelines(projectDetail);
+    return !decommissionedPipelines.isEmpty() && decommissionedPipelines.stream()
+        .allMatch(decommissionedPipeline -> isValid(decommissionedPipeline, ValidationType.FULL));
   }
 }

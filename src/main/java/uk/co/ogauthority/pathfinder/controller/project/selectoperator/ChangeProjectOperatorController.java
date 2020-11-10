@@ -22,8 +22,8 @@ import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOpe
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
-import uk.co.ogauthority.pathfinder.service.project.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
+import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)

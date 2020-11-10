@@ -19,12 +19,13 @@ import uk.co.ogauthority.pathfinder.model.form.project.decommissionedwell.Decomm
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedwell.DecommissionedWellFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedwell.DecommissionedWellValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedwell.DecommissionedWellRepository;
+import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
 @Service
-public class DecommissionedWellService {
+public class DecommissionedWellService implements ProjectFormSectionService {
 
   private final SearchSelectorService searchSelectorService;
   private final ValidationService validationService;
@@ -185,5 +186,10 @@ public class DecommissionedWellService {
                 projectDetail != null ? projectDetail.getId() : "null"
             )
         ));
+  }
+
+  @Override
+  public boolean isComplete(ProjectDetail detail) {
+    return false;
   }
 }

@@ -17,8 +17,8 @@ import uk.co.ogauthority.pathfinder.model.enums.TopNavigationType;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
-import uk.co.ogauthority.pathfinder.service.project.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
+import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
 
 /**
  * A controller for users who are in multiple teams to use to select which team a project is for prior to creation.

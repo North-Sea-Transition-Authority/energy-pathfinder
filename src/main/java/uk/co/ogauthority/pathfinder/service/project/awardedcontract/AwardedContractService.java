@@ -21,11 +21,12 @@ import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedCo
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.AwardedContractRepository;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
-public class AwardedContractService {
+public class AwardedContractService implements ProjectFormSectionService {
 
   private final FunctionService functionService;
   private final ValidationService validationService;
@@ -161,6 +162,7 @@ public class AwardedContractService {
     return !bindingResult.hasErrors();
   }
 
+  @Override
   public boolean isComplete(ProjectDetail projectDetail) {
     var awardedContracts = getAwardedContracts(projectDetail);
     return !awardedContracts.isEmpty()

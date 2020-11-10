@@ -19,10 +19,11 @@ import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.Projec
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
+import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
-public class ProjectInformationService {
+public class ProjectInformationService implements ProjectFormSectionService {
 
   private static final Set<FieldStage> FIELD_STAGES_WITH_HIDDEN_INPUTS = Set.of(
       FieldStage.DECOMMISSIONING,
@@ -136,14 +137,6 @@ public class ProjectInformationService {
     return validationService.validate(form, bindingResult, validationType);
   }
 
-
-  public boolean isComplete(ProjectDetail details) {
-    var form = getForm(details);
-    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
-    bindingResult = validate(form, bindingResult, ValidationType.FULL);
-    return !bindingResult.hasErrors();
-  }
-
   private void setEntityHiddenFieldStageData(ProjectInformationForm form, ProjectInformation projectInformation) {
 
     var fieldStage = form.getFieldStage();
@@ -222,6 +215,19 @@ public class ProjectInformationService {
 
       clearFirstProductionDate(form);
     }
+  }
+
+  public boolean isDecomRelated(ProjectDetail detail) {
+    return getProjectInformation(detail).map(p -> FieldStage.DECOMMISSIONING.equals(p.getFieldStage()))
+        .orElse(false);
+  }
+
+  @Override
+  public boolean isComplete(ProjectDetail details) {
+    var form = getForm(details);
+    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult = validate(form, bindingResult, ValidationType.FULL);
+    return !bindingResult.hasErrors();
   }
 
 }

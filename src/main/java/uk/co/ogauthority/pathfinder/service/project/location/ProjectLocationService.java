@@ -23,11 +23,12 @@ import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationV
 import uk.co.ogauthority.pathfinder.model.view.projectlocation.ProjectLocationBlockView;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
+import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
-public class ProjectLocationService {
+public class ProjectLocationService implements ProjectFormSectionService {
 
   private final ProjectLocationRepository projectLocationRepository;
   private final DevUkFieldService fieldService;
@@ -154,13 +155,6 @@ public class ProjectLocationService {
     return new ProjectLocationValidationHint(validationType);
   }
 
-  public boolean isComplete(ProjectDetail details) {
-    var form = getForm(details);
-    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
-    bindingResult = validate(form, bindingResult, ValidationType.FULL);
-    return !bindingResult.hasErrors();
-  }
-
   /**
    * If there's data in the form turn it back into a format the searchselector can parse.
    * @param form valid or invalid ProjectLocationForm
@@ -242,6 +236,14 @@ public class ProjectLocationService {
       views.sort(Comparator.comparing(ProjectLocationBlockView::getBlockReference));
     });
 
+  }
+
+  @Override
+  public boolean isComplete(ProjectDetail details) {
+    var form = getForm(details);
+    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult = validate(form, bindingResult, ValidationType.FULL);
+    return !bindingResult.hasErrors();
   }
 
 }
