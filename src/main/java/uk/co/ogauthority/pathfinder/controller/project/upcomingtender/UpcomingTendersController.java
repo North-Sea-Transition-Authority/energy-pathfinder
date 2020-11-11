@@ -233,7 +233,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
       List<UpcomingTenderView> tenderViews,
       ValidationResult validationResult
   ) {
-    var modelAndView = new ModelAndView("project/upcomingtender/tenderSummary")
+    var modelAndView = new ModelAndView("project/upcomingtender/upcomingTenderFormSummary")
         .addObject("addTenderUrl", ReverseRouter.route(on(UpcomingTendersController.class).addUpcomingTender(projectId, null)))
         .addObject("tenderViews", tenderViews)
         .addObject("isValid", validationResult.equals(ValidationResult.VALID))

@@ -1,14 +1,30 @@
 <#include '../../layout.ftl'/>
 
-<#macro upcomingTenderSummary view tenderName="Upcoming tender" showHeader=false showActions=false>
+<#macro upcomingTenderSummary
+  view
+  tenderName="Upcoming tender"
+  showHeader=false
+  showActions=false
+  showTag=false
+  headingSize="h2"
+  headingClass="govuk-heading-l"
+>
   <@summaryViewWrapper.summaryViewItemWrapper
     idPrefix="upcoming-tender"
     headingPrefix=tenderName
     summaryView=view
     showHeader=showHeader
     showActions=showActions
+    headingSize=headingSize
+    headingClass=headingClass
   >
-    <@checkAnswers.checkAnswersRowNoActions prompt="Tender function" value=view.tenderFunction!"" />
+    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Tender function">
+      <#if showTag>
+        <@stringWithTag.stringWithTag stringWithTag=view.tenderFunction />
+      <#else>
+        ${view.tenderFunction.value!""}
+      </#if>
+    </@checkAnswers.checkAnswersRowNoActionsWithNested>
     <@checkAnswers.checkAnswersRowNoActions prompt="Description of work" value=view.descriptionOfWork!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="Estimated tender date" value=view.estimatedTenderDate!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="Contract band" value=view.contractBand!"" />

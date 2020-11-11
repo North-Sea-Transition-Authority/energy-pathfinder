@@ -1,5 +1,5 @@
 <#include '../../layout.ftl'>
-<#import './upcomingTenderSummary.ftl' as tenderSummary>
+<#import './_upcomingTenderSummary.ftl' as tenderSummary>
 
 <@defaultPage htmlTitle="Upcoming tenders" pageHeading="Upcoming tenders" breadcrumbs=true>
 
@@ -8,7 +8,7 @@
   </#if>
   <#if tenderViews?has_content>
     <#list tenderViews as view>
-      <@tenderSummary.upcomingTenderSummary view=view showHeader=true showActions=true />
+      <@tenderSummary.upcomingTenderSummary view=view showHeader=true showActions=true showTag=false />
     </#list>
   <#else>
     <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="upcoming tender" linkUrl=""/>
