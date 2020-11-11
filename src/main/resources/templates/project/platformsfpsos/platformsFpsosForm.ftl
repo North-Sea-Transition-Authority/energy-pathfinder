@@ -8,11 +8,11 @@
 
   <@fdsForm.htmlForm>
     <@fdsSearchSelector.searchSelectorRest path="form.structure" selectorMinInputLength=3  labelText="Platform or FPSO" restUrl=springUrl(facilitiesUrl)  preselectedItems=preselectedStructure!{} />
-    <@fdsTextInput.textInput path="form.topsideFpsoMass" labelText="Topside / FPSO mass " suffix=mtUnit.plural suffixScreenReaderPrompt=mtUnit.screenReaderSuffix inputClass="govuk-input--width-4" />
+    <@fdsTextInput.textInput path="form.topsideFpsoMass" labelText="Topside/FPSO mass " suffix=mtUnit.plural suffixScreenReaderPrompt=mtUnit.screenReaderSuffix inputClass="govuk-input--width-4" />
     <@minMaxDateInput
       minFormPath="form.topsideRemovalYears.minYear"
       maxFormPath="form.topsideRemovalYears.maxYear"
-      labelText="Provide the period in which the topsides / FPSO removal is expected to take place"
+      labelText="Provide the period in which the topsides/FPSO removal is expected to take place"
       altMinLabel="Earliest start year"
       altMaxLabel="Latest completion year"
       formId="topsides-fpso-removal"

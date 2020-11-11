@@ -17,7 +17,7 @@
         ${view.platformFpso.value!""}
       </#if>
     </@checkAnswers.checkAnswersRowNoActionsWithNested>
-    <@checkAnswers.checkAnswersRowNoActions prompt="Topside / FPSO removal mass" value=view.topsideFpsoMass!"" />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Topside/FPSO removal mass" value=view.topsideFpsoMass!"" />
     <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Expected topside removal period">
       ${view.topsideRemovalEarliestYear!""}
       <br/>

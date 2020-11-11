@@ -7,7 +7,7 @@ public enum FieldStage {
   DISCOVERY("Discovery", "Early phase before FDP approval"),
   DEVELOPMENT("Development", "FDP has been approved"),
   OPERATIONS("Operations", "Field now operational"),
-  DECOMMISSIONING("Decommissioning", "Decommissioning planning commenced either pre / post COP"),
+  DECOMMISSIONING("Decommissioning", "Decommissioning planning commenced either pre/post COP"),
   ENERGY_TRANSITION("Energy transition", "");
 
   private final String displayName;

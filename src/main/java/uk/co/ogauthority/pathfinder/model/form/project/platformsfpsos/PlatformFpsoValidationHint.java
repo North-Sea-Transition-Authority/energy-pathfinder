@@ -10,7 +10,7 @@ import uk.co.ogauthority.pathfinder.model.form.validation.minmaxdate.MinMaxDateI
 
 public class PlatformFpsoValidationHint {
 
-  public static final FormInputLabel TOPSIDES_REMOVAL_LABEL = new FormInputLabel("Topsides / FPSO removal");
+  public static final FormInputLabel TOPSIDES_REMOVAL_LABEL = new FormInputLabel("Topside/FPSO removal");
   public static final FormInputLabel SUBSTRUCTURE_REMOVAL_LABEL = new FormInputLabel("substructure removal");
 
   public static final MinMaxYearLabelsHint TOPSIDES_YEAR_LABELS = new MinMaxYearLabelsHint("earliest", "latest");

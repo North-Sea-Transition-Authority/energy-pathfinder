@@ -25,13 +25,13 @@ import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MinMaxDateInputValidatorTest {
-  private static final String LABEL_TEXT = "FPSO / Topsides removal";
+  private static final String LABEL_TEXT = "Label text";
   private MinMaxDateInputValidator validator;
   private MinMaxDateInput input;
   private final FormInputLabel inputLabel = new FormInputLabel(LABEL_TEXT);
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     validator = new MinMaxDateInputValidator();
   }
 

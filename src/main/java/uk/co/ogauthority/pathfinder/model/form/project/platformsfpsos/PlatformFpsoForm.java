@@ -14,8 +14,8 @@ public class PlatformFpsoForm {
   @NotEmpty(message = "Select a platform or FPSO", groups = FullValidation.class)
   private String structure;
 
-  @NotNull(message = "Enter a topside / FPSO mass", groups = FullValidation.class)
-  @PositiveWholeNumber(messagePrefix = "Topside / FPSO mass", groups = {FullValidation.class, PartialValidation.class})
+  @NotNull(message = "Enter a topside/FPSO mass", groups = FullValidation.class)
+  @PositiveWholeNumber(messagePrefix = "Topside/FPSO mass", groups = {FullValidation.class, PartialValidation.class})
   private Integer topsideFpsoMass;
 
   private MinMaxDateInput topsideRemovalYears;
