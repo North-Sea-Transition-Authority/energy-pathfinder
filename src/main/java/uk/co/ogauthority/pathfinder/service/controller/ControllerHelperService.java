@@ -182,6 +182,9 @@ public class ControllerHelperService {
           // handle each element individually
           if (nestedForm instanceof Collection) {
             nestedForm = Iterables.getFirst(((Collection) nestedForm), null);
+            if (nestedForm == null) {
+              continue;
+            }
           }
 
           i += calculateFormFieldPositionsRecursive(
@@ -196,8 +199,7 @@ public class ControllerHelperService {
           formFieldPositions.put(fieldPath, startIndex + i++);
         }
       }
-      classToScan = classToScan.getSuperclass();
-    } while (classToScan != null && classToScan != Object.class);
+    } while ((classToScan = classToScan.getSuperclass()) != null && classToScan != Object.class);
 
     return i;
   }
