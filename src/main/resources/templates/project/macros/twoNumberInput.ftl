@@ -42,10 +42,10 @@
       noFieldsetHeadingSize=noFieldsetHeadingSize>
 
     <#if hasError>
-      <@fdsError.inputError inputId="${formId}"/>
+      <@fdsError.inputError inputId="${formId}-1"/>
       <#-- Re-bind to our first path to set out any relevant errors -->
       <@spring.bind pathOne/>
-      <@fdsError.inputError inputId="${formId}"/>
+      <@fdsError.inputError inputId="${formId}-2"/>
     </#if>
     <div class="govuk-date-input" id="${formId}-number-input">
         <@numberInputItem path=pathOne labelText=pathOneLabelText formId=formId inputClass=numberInputLabelClass/>
