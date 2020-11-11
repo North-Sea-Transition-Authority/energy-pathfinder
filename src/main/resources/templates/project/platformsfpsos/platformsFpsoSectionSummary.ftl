@@ -6,6 +6,7 @@
     <#list platformFpsoViews as platformFpsoView>
       <@platformFpsoSummary.platformFpsoSummary
         view=platformFpsoView
+        showHeader=true
         showActions=false
         headingSize="h3"
         headingClass="govuk-heading-m"
