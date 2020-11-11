@@ -1,15 +1,16 @@
 package uk.co.ogauthority.pathfinder.model.enums.project.tasks;
 
 import java.util.Arrays;
-import java.util.Map;
-import uk.co.ogauthority.pathfinder.model.enums.DisplayableEnum;
-import uk.co.ogauthority.pathfinder.util.StreamUtil;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * An enum to manage which {@see ProjectTask}s are conditionally shown
  * each question links to a task which will appear if it has been answered.
+ * Each question has a yes or no answer in the form of a {@link TaskListSectionAnswer} this
+ * is used to set out the form answer values for each individual question
  */
-public enum TaskListSectionQuestion implements DisplayableEnum {
+public enum TaskListSectionQuestion {
 
   //TODO when working out in the ProjectSetUpService if a page should appear we can fetch the
   // ProjectTaskListSetUp entity and stream it's list of TaskListSectionQuestions to see if they contain the
@@ -17,51 +18,86 @@ public enum TaskListSectionQuestion implements DisplayableEnum {
   // if the user has answered the corresponding question
   UPCOMING_TENDERS(
       ProjectTask.UPCOMING_TENDERS,
-      ProjectTask.UPCOMING_TENDERS.getDisplayName(),
+      "Do you have any upcoming tenders on this project?",
+      "form.upcomingTendersIncluded",
+      TaskListSectionAnswer.UPCOMING_TENDERS_YES,
+      TaskListSectionAnswer.UPCOMING_TENDERS_NO,
       false),
   AWARDED_CONTRACTS(
       ProjectTask.AWARDED_CONTRACTS,
-      ProjectTask.AWARDED_CONTRACTS.getDisplayName(),
-      false
+      "Do you have any awarded contracts on this project?",
+      "form.awardedContractsIncluded",
+      TaskListSectionAnswer.AWARDED_CONTRACTS_YES,
+      TaskListSectionAnswer.AWARDED_CONTRACTS_NO,
+       false
   ),
   COLLABORATION_OPPORTUNITIES(
       ProjectTask.COLLABORATION_OPPORTUNITIES,
-      ProjectTask.COLLABORATION_OPPORTUNITIES.getDisplayName(),
+      "Do you have any collaboration opportunities on this project?",
+      "form.collaborationOpportunitiesIncluded",
+      TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_YES,
+      TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_NO,
       false
   ),
   WELLS(
       ProjectTask.WELLS,
-      ProjectTask.WELLS.getDisplayName(),
+      "Are wells being decommissioned on this project?",
+      "form.wellsIncluded",
+      TaskListSectionAnswer.WELLS_YES,
+      TaskListSectionAnswer.WELLS_NO,
       true
   ),
   PLATFORM_FPSO(
       ProjectTask.PLATFORM_FPSO,
-      ProjectTask.PLATFORM_FPSO.getDisplayName(),
+      "Are platforms or FPSOs being decommissioned on this project?",
+      "form.platformsFpsosIncluded",
+      TaskListSectionAnswer.PLATFORM_FPSO_YES,
+      TaskListSectionAnswer.PLATFORM_FPSO_NO,
       true
   ),
   SUBSEA_INFRASTRUCTURE(
       ProjectTask.SUBSEA_INFRASTRUCTURE,
-      ProjectTask.SUBSEA_INFRASTRUCTURE.getDisplayName(),
+      "Is subsea infrastructure being decommissioned on this project?",
+      "form.subseaInfrastructureIncluded",
+      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
+      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_NO,
       true
   ),
   INTEGRATED_RIGS(
       ProjectTask.INTEGRATED_RIGS,
-      ProjectTask.INTEGRATED_RIGS.getDisplayName(),
+      "Do you have any integrated rigs on this project?",
+      "form.integratedRigsIncluded",
+      TaskListSectionAnswer.INTEGRATED_RIGS_YES,
+      TaskListSectionAnswer.INTEGRATED_RIGS_NO,
       true
   ),
   PIPELINES(
       ProjectTask.PIPELINES,
-      ProjectTask.PIPELINES.getDisplayName(),
+      "Are pipelines being decommissioned on this project?",
+      "form.pipelinesIncluded",
+      TaskListSectionAnswer.PIPELINES_YES,
+      TaskListSectionAnswer.PIPELINES_NO,
       true
   );
 
   private final ProjectTask projectTask;
   private final String displayName;
+  private final String formField;
+  private final TaskListSectionAnswer yesAnswer;
+  private final TaskListSectionAnswer noAnswer;
   private final boolean decommissioningRelated;
 
-  TaskListSectionQuestion(ProjectTask projectTask, String displayName, boolean decommissioningRelated) {
+  TaskListSectionQuestion(ProjectTask projectTask,
+                          String displayName,
+                          String formField,
+                          TaskListSectionAnswer yesAnswer,
+                          TaskListSectionAnswer noAnswer,
+                          boolean decommissioningRelated) {
     this.projectTask = projectTask;
     this.displayName = displayName;
+    this.formField = formField;
+    this.yesAnswer = yesAnswer;
+    this.noAnswer = noAnswer;
     this.decommissioningRelated = decommissioningRelated;
   }
 
@@ -73,18 +109,29 @@ public enum TaskListSectionQuestion implements DisplayableEnum {
     return displayName;
   }
 
+  public String getFormField() {
+    return formField;
+  }
+
+  public TaskListSectionAnswer getYesAnswer() {
+    return yesAnswer;
+  }
+
+  public TaskListSectionAnswer getNoAnswer() {
+    return noAnswer;
+  }
+
   public boolean isDecommissioningRelated() {
     return decommissioningRelated;
   }
 
-  public static Map<String, String> getAllAsMap() {
-    return Arrays.stream(values())
-        .collect(StreamUtil.toLinkedHashMap(Enum::name, TaskListSectionQuestion::getDisplayName));
+  public static List<TaskListSectionQuestion> getAllValues() {
+    return Arrays.asList(values());
   }
 
-  public static Map<String, String> getNonDecommissioningRelatedAsMap() {
+  public static List<TaskListSectionQuestion> getNonDecommissioningRelatedValues() {
     return Arrays.stream(values())
         .filter(tlq -> !tlq.isDecommissioningRelated())
-        .collect(StreamUtil.toLinkedHashMap(Enum::name, TaskListSectionQuestion::getDisplayName));
+        .collect(Collectors.toList());
   }
 }

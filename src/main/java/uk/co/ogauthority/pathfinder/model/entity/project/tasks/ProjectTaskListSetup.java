@@ -8,6 +8,8 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionAnswer;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionAnswerConverter;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionQuestion;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionQuestionsConverter;
 
@@ -20,6 +22,11 @@ public class ProjectTaskListSetup extends ProjectDetailEntity {
   @Column(name = "task_list_sections", columnDefinition = "CLOB")
   List<TaskListSectionQuestion> taskListSectionQuestions;
 
+  @Convert(converter = TaskListSectionAnswerConverter.class)
+  @Lob
+  @Column(name = "task_list_answers", columnDefinition = "CLOB")
+  List<TaskListSectionAnswer> taskListAnswers;
+
   public ProjectTaskListSetup() {
   }
 
@@ -27,9 +34,12 @@ public class ProjectTaskListSetup extends ProjectDetailEntity {
     this.projectDetail = detail;
   }
 
-  public ProjectTaskListSetup(ProjectDetail detail, List<TaskListSectionQuestion> taskListSectionQuestions) {
+  public ProjectTaskListSetup(ProjectDetail detail,
+                              List<TaskListSectionQuestion> taskListSectionQuestions,
+                              List<TaskListSectionAnswer> taskListAnswers) {
     this.projectDetail = detail;
     this.taskListSectionQuestions = taskListSectionQuestions;
+    this.taskListAnswers = taskListAnswers;
   }
 
   public List<TaskListSectionQuestion> getTaskListSectionQuestions() {
@@ -41,5 +51,12 @@ public class ProjectTaskListSetup extends ProjectDetailEntity {
     this.taskListSectionQuestions = taskListSectionQuestions;
   }
 
+  public List<TaskListSectionAnswer> getTaskListAnswers() {
+    return taskListAnswers;
+  }
 
+  public void setTaskListAnswers(
+      List<TaskListSectionAnswer> taskListAnswers) {
+    this.taskListAnswers = taskListAnswers;
+  }
 }

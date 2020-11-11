@@ -146,7 +146,7 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
         return ReverseRouter.route(on(ProjectInformationController.class).getProjectInformation(projectId, null));
       case PROJECT_LOCATION:
         return ReverseRouter.route(on(ProjectLocationController.class).getLocationDetails(projectId, null));
-      default: //TODO fill out
+      default: //TODO PAT-298 fill out
         return "";
     }
   }
