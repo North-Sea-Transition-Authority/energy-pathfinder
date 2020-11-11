@@ -19,7 +19,6 @@ import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
@@ -135,7 +134,6 @@ public class ControllerHelperService {
 
       var formFieldPositions = new HashMap<String, Integer>();
       calculateFormFieldPositionsRecursive(
-          form.getClass(),
           form,
           0,
           "",
@@ -155,8 +153,7 @@ public class ControllerHelperService {
     return errorList;
   }
 
-  private int calculateFormFieldPositionsRecursive(Class<?> formClass,
-                                                   Object form,
+  private int calculateFormFieldPositionsRecursive(Object form,
                                                    int startIndex,
                                                    String prefix,
                                                    Set<String> fieldPaths,
@@ -164,7 +161,7 @@ public class ControllerHelperService {
                                                    Map<String, Integer> formFieldPositions) {
     var i = 0;
 
-    Class<?> classToScan = formClass;
+    Class<?> classToScan = form.getClass();
     do {
       for (Field field : classToScan.getDeclaredFields()) {
         String fieldPath = prefix + field.getName();
@@ -183,14 +180,11 @@ public class ControllerHelperService {
           // Special-case collection handling to use the type of the first item.
           // We only use the actual form object for this purpose, so we don't need to
           // handle each element individually
-          Class<?> nestedFieldType = field.getType();
           if (nestedForm instanceof Collection) {
             nestedForm = Iterables.getFirst(((Collection) nestedForm), null);
-            nestedFieldType = nestedForm.getClass();
           }
 
           i += calculateFormFieldPositionsRecursive(
-              nestedFieldType,
               nestedForm,
               startIndex + i,
               fieldPath + ".",
