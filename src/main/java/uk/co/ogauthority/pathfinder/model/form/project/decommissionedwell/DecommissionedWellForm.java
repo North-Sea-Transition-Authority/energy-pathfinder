@@ -25,7 +25,7 @@ public class DecommissionedWellForm {
   @NotNull(message = "Select if the P&A date is estimated or actual", groups = FullValidation.class)
   private InputEntryType plugAbandonmentDateType;
 
-  @NotEmpty(message = "Enter the operational status", groups = FullValidation.class)
+  @NotEmpty(message = "Select the operational status", groups = FullValidation.class)
   private String operationalStatus;
 
   @NotEmpty(message = "Select the mechanical status", groups = FullValidation.class)
