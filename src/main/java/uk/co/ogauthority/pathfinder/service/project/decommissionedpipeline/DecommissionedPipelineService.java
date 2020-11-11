@@ -2,9 +2,9 @@ package uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline;
 
 import java.util.List;
 import java.util.Map;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
