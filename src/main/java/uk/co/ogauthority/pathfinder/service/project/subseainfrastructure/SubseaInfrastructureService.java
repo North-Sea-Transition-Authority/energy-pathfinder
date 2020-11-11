@@ -137,13 +137,11 @@ public class SubseaInfrastructureService implements ProjectFormSectionService {
     }
   }
 
-  @Transactional
   public SubseaInfrastructure createSubseaInfrastructure(ProjectDetail projectDetail, SubseaInfrastructureForm form) {
     var subseaInfrastructure = new SubseaInfrastructure();
     return createOrUpdateSubseaInfrastructure(subseaInfrastructure, projectDetail, form);
   }
 
-  @Transactional
   public SubseaInfrastructure updateSubseaInfrastructure(Integer subseaInfrastructureId,
                                                          ProjectDetail projectDetail,
                                                          SubseaInfrastructureForm form) {

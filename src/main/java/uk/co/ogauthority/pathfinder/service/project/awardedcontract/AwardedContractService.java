@@ -92,13 +92,11 @@ public class AwardedContractService implements ProjectFormSectionService {
     return validationService.validate(form, bindingResult, validationType);
   }
 
-  @Transactional
   public AwardedContract createAwardedContract(ProjectDetail projectDetail, AwardedContractForm form) {
     var awardedContract = new AwardedContract(projectDetail);
     return createOrUpdateAwardedContract(awardedContract, form);
   }
 
-  @Transactional
   public AwardedContract updateAwardedContract(Integer awardedContractId,
                                                ProjectDetail projectDetail,
                                                AwardedContractForm form) {
