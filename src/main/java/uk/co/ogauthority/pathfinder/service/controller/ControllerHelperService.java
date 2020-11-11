@@ -115,7 +115,21 @@ public class ControllerHelperService {
     List<FieldError> errorList = new ArrayList<>();
 
     if (form != null && bindingResult != null && bindingResult.hasErrors()) {
+      // We want to sort the errors based on the order in which the fields occur in the form class.
+      // This needs to support nested forms such as ThreeFieldDateInput. Determining which fields are
+      // nested forms is slightly complicated and the approach we have decided on is to rely on the
+      // fields with errors having a "." in the paths. For example, if we have an error on a field
+      // "estimatedTenderDate.day", then the field "estimatedTenderDate" will be treated as a nested form.
+
+      // A set of all field paths which contain errors. This is exactly the same as the FieldError error fields,
+      // with any brackets replaced.
+      // Example input: ["estimatedTenderDate.day", "uploadedFileWithDescriptionForms[0].uploadedFileDescription"]
+      // fieldPaths: ["estimatedTenderDate.day", "uploadedFileWithDescriptionForms.uploadedFileDescription"]
       var fieldPaths = new HashSet<String>();
+
+      // A set of all paths for nested form objects.
+      // Example input: ["estimatedTenderDate.day", "uploadedFileWithDescriptionForms[0].uploadedFileDescription"]
+      // nestedFormPaths: ["estimatedTenderDate", "uploadedFileWithDescriptionForms"]
       var nestedFormPaths = new HashSet<String>();
       for (FieldError error : bindingResult.getFieldErrors()) {
         String fieldPath = error.getField().replaceAll("\\[.*?\\]", "");
@@ -132,6 +146,7 @@ public class ControllerHelperService {
         }
       }
 
+      // Map of field path with any brackets replaced -> position index
       var formFieldPositions = new HashMap<String, Integer>();
       calculateFormFieldPositionsRecursive(
           form,
@@ -161,12 +176,17 @@ public class ControllerHelperService {
                                                    Map<String, Integer> formFieldPositions) {
     var i = 0;
 
+    // We need a loop to scan the extended class hierarchy up to Object.class as class.getDeclaredFields does
+    // not return fields for extended classes.
     Class<?> classToScan = form.getClass();
     do {
       for (Field field : classToScan.getDeclaredFields()) {
         String fieldPath = prefix + field.getName();
 
+        // Check if the field is a nested form
         if (nestedFormPaths.contains(fieldPath)) {
+          // Important: We still want to populate the field position for the nested form,
+          // some custom validators also put errors on the nested object such as uploadedFileWithDescriptionForms.
           formFieldPositions.put(fieldPath, startIndex + i++);
 
           field.setAccessible(true);
@@ -187,6 +207,8 @@ public class ControllerHelperService {
             }
           }
 
+          // Recurse over the nested form, however this time offset the start index
+          // and append "<fieldPath>." to the prefix
           i += calculateFormFieldPositionsRecursive(
               nestedForm,
               startIndex + i,
@@ -196,6 +218,8 @@ public class ControllerHelperService {
               formFieldPositions
           );
         } else if (fieldPaths.contains(fieldPath)) {
+          // We don't need to map fields which are not included in the fieldPaths set
+          // as they don't have any errors associated with them and won't be used for sorting.
           formFieldPositions.put(fieldPath, startIndex + i++);
         }
       }
