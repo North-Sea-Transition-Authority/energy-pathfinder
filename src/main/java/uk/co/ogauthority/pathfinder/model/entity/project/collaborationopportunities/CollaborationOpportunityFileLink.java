@@ -9,10 +9,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
+import uk.co.ogauthority.pathfinder.service.file.FileLinkEntity;
 
 @Entity
 @Table(name = "collaboration_op_file_links")
-public class CollaborationOpportunityFileLink {
+public class CollaborationOpportunityFileLink implements FileLinkEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +36,7 @@ public class CollaborationOpportunityFileLink {
     this.collaborationOpportunity = collaborationOpportunity;
   }
 
+  @Override
   public ProjectDetailFile getProjectDetailFile() {
     return projectDetailFile;
   }

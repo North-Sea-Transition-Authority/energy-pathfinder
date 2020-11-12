@@ -9,10 +9,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
+import uk.co.ogauthority.pathfinder.service.file.FileLinkEntity;
 
 @Entity
 @Table(name = "upcoming_tender_file_links")
-public class UpcomingTenderFileLink {
+public class UpcomingTenderFileLink implements FileLinkEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +35,7 @@ public class UpcomingTenderFileLink {
     this.upcomingTender = upcomingTender;
   }
 
+  @Override
   public ProjectDetailFile getProjectDetailFile() {
     return projectDetailFile;
   }
