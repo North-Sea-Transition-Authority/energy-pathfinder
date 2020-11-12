@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.portal;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +25,8 @@ public class LicenceBlocksService {
 
   public List<RestSearchItem> searchLicenceBlocksWithReferenceContaining(String searchTerm) {
     var searchableList = findCurrentByReference(searchTerm);
-    return searchSelectorService.search(searchTerm, searchableList)
+    return searchSelectorService.search(searchTerm, searchableList, false)
         .stream()
-        .sorted(Comparator.comparing(RestSearchItem::getText))
         .collect(Collectors.toList());
   }
 

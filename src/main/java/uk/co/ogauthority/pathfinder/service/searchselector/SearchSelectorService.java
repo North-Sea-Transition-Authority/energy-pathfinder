@@ -25,25 +25,45 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 public class SearchSelectorService {
 
   public List<RestSearchItem> search(String searchQuery, Collection<? extends SearchSelectable> selectableList) {
-    return selectableList.stream()
+    return search(searchQuery, selectableList, true);
+  }
+
+  public List<RestSearchItem> search(String searchQuery,
+                                     Collection<? extends SearchSelectable> selectableList,
+                                     boolean sortResults) {
+    var restSearchResults = selectableList.stream()
         .filter(searchSelectable ->
             searchSelectable.getSelectionText()
                 .toLowerCase()
                 .contains(StringUtils.defaultIfBlank(searchQuery, "").toLowerCase()))
         .map(item -> new RestSearchItem(item.getSelectionId(), item.getSelectionText()))
-        .sorted(Comparator.comparing(RestSearchItem::getText))
         .collect(Collectors.toList());
+
+    if (sortResults) {
+      restSearchResults.sort(Comparator.comparing(RestSearchItem::getText));
+    }
+
+    return restSearchResults;
   }
 
   public List<RestSearchItem> searchWithManualEntry(String searchQuery,
                                                     Collection<? extends SearchSelectable> selectableList) {
-    var restSearchResults = search(searchQuery, selectableList);
+    return searchWithManualEntry(searchQuery, selectableList, true);
+  }
+
+  public List<RestSearchItem> searchWithManualEntry(String searchQuery,
+                                                    Collection<? extends SearchSelectable> selectableList,
+                                                    boolean sortResults) {
+    var restSearchResults = search(searchQuery, selectableList, sortResults);
     addManualEntry(searchQuery, restSearchResults);
 
     restSearchResults = restSearchResults
         .stream()
-        .sorted(Comparator.comparing(RestSearchItem::getText))
         .collect(Collectors.toList());
+
+    if (sortResults) {
+      restSearchResults.sort(Comparator.comparing(RestSearchItem::getText));
+    }
 
     return restSearchResults;
   }

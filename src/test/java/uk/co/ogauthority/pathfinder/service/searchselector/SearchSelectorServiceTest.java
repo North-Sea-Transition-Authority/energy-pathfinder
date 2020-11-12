@@ -51,6 +51,35 @@ public class SearchSelectorServiceTest {
         .containsExactly(String.valueOf(searchItem.getId()));
   }
 
+  @Test
+  public void search_resultsAreOrdered() {
+
+    var searchItem1 = new SearchSelectableTestItem(1, "value2");
+    var searchItem2 = new SearchSelectableTestItem(2, "value1");
+    var searchableResults = List.of(searchItem1, searchItem2);
+
+    final String searchTerm = "value";
+    var result = searchSelectorService.search(searchTerm, searchableResults);
+    assertThat(result).extracting(RestSearchItem::getId)
+        .containsExactly(
+            String.valueOf(searchItem2.getId()),
+            String.valueOf(searchItem1.getId()));
+  }
+
+  @Test
+  public void search_whenSortIsFalse_resultsAreNotOrdered() {
+
+    var searchItem1 = new SearchSelectableTestItem(1, "value2");
+    var searchItem2 = new SearchSelectableTestItem(2, "value1");
+    var searchableResults = List.of(searchItem1, searchItem2);
+
+    final String searchTerm = "value";
+    var result = searchSelectorService.search(searchTerm, searchableResults, false);
+    assertThat(result).extracting(RestSearchItem::getId)
+        .containsExactly(
+            String.valueOf(searchItem1.getId()),
+            String.valueOf(searchItem2.getId()));
+  }
 
   @Test
   public void addManualEntry() {
@@ -147,6 +176,22 @@ public class SearchSelectorServiceTest {
             SearchSelectablePrefix.FREE_TEXT_PREFIX + searchTerm,
             String.valueOf(searchItem2.getId()),
             String.valueOf(searchItem1.getId()));
+  }
+
+  @Test
+  public void searchWithManualEntry_whenSortIsFalse_resultsAreNotOrdered() {
+
+    var searchItem1 = new SearchSelectableTestItem(1, "value2");
+    var searchItem2 = new SearchSelectableTestItem(2, "value1");
+    var searchableResults = List.of(searchItem1, searchItem2);
+
+    final String searchTerm = "value";
+    var result = searchSelectorService.searchWithManualEntry(searchTerm, searchableResults, false);
+    assertThat(result).extracting(RestSearchItem::getId)
+        .containsExactly(
+            SearchSelectablePrefix.FREE_TEXT_PREFIX + searchTerm,
+            String.valueOf(searchItem1.getId()),
+            String.valueOf(searchItem2.getId()));
   }
 
   @Test
