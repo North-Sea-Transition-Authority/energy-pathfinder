@@ -17,7 +17,7 @@ public class IntegratedRigForm {
   @NotNull(message = "Select the status of the integrated rig", groups = FullValidation.class)
   private IntegratedRigStatus status;
 
-  @NotNull(message = "Select the intention to reactivate", groups = FullValidation.class)
+  @NotNull(message = "Select yes if you intend to reactivate the integrated rig", groups = FullValidation.class)
   private IntegratedRigIntentionToReactivate intentionToReactivate;
 
   public String getStructure() {
