@@ -35,6 +35,7 @@ import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpso
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.subseainfrastructure.SubseaInfrastructureService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 
@@ -55,6 +56,7 @@ public class TaskListController {
   private final SubseaInfrastructureService subseaInfrastructureService;
   private final IntegratedRigService integratedRigService;
   private final DecommissionedPipelineService decommissionedPipelineService;
+  private final ProjectSetupService projectSetupService;
 
   @Autowired
   public TaskListController(ProjectInformationService projectInformationService,
@@ -67,7 +69,8 @@ public class TaskListController {
                             PlatformsFpsosService platformsFpsosService,
                             SubseaInfrastructureService subseaInfrastructureService,
                             IntegratedRigService integratedRigService,
-                            DecommissionedPipelineService decommissionedPipelineService) {
+                            DecommissionedPipelineService decommissionedPipelineService,
+                            ProjectSetupService projectSetupService) {
     this.projectInformationService = projectInformationService;
     this.breadcrumbService = breadcrumbService;
     this.projectLocationService = projectLocationService;
@@ -79,6 +82,7 @@ public class TaskListController {
     this.subseaInfrastructureService = subseaInfrastructureService;
     this.integratedRigService = integratedRigService;
     this.decommissionedPipelineService = decommissionedPipelineService;
+    this.projectSetupService = projectSetupService;
   }
 
   @GetMapping
@@ -112,7 +116,7 @@ public class TaskListController {
         ReverseRouter.route(on(ProjectSetupController.class).getProjectSetup(projectId, null))
     );
     modelAndView.addObject("projectSetupText", ProjectSetupController.PAGE_NAME);
-    modelAndView.addObject("projectSetupCompleted", false);
+    modelAndView.addObject("projectSetupCompleted", projectSetupService.isComplete(projectDetails));
 
     modelAndView.addObject("upcomingTendersUrl",
         ReverseRouter.route(on(UpcomingTendersController.class).viewTenders(projectId, null))

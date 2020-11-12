@@ -59,7 +59,12 @@ public class ProjectSetupController extends ProjectFormPageController {
                                        BindingResult bindingResult,
                                        ValidationType validationType,
                                        ProjectContext projectContext) {
-    //bindingResult = projectSetupService.validate(form, bindingResult, validationType);
+    bindingResult = projectSetupService.validate(
+        form,
+        bindingResult,
+        validationType,
+        projectContext.getProjectDetails()
+    );
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,

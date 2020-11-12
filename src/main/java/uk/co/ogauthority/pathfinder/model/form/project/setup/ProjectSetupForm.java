@@ -15,20 +15,14 @@ public class ProjectSetupForm {
   @NotNull(message = "Select yes if you plan to add any collaboration opportunities to your project", groups = FullValidation.class)
   private TaskListSectionAnswer collaborationOpportunitiesIncluded;
 
-  //TODO from here validation is custom
-  //@NotNull(message = "Select yes if you plan to add any wells to be decommissioned to your project", groups = FullValidation.class)
   private TaskListSectionAnswer wellsIncluded;
 
-//  @NotNull(message = "Select yes if you plan to add any platforms or FPSOs to be decommissioned to your project", groups = FullValidation.class)
   private TaskListSectionAnswer platformsFpsosIncluded;
 
-//  @NotNull(message = "Select yes if you plan to add any subsea infrastructure to be decommissioned to your project", groups = FullValidation.class)
   private TaskListSectionAnswer subseaInfrastructureIncluded;
 
-//  @NotNull(message = "Select yes if you plan to add any integrated rigs to be decommissioned to your project", groups = FullValidation.class)
   private TaskListSectionAnswer integratedRigsIncluded;
 
-//  @NotNull(message = "Select yes if you plan to add any wells to be decommissioned to your project", groups = FullValidation.class)
   private TaskListSectionAnswer pipelinesIncluded;
 
   public ProjectSetupForm() {

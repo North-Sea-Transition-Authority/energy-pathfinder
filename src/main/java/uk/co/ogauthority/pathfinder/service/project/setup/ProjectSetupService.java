@@ -8,32 +8,44 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.tasks.ProjectTaskListSetup;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionAnswer;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionQuestion;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupForm;
+import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupFormValidationHint;
+import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.tasks.ProjectTaskListSetupRepository;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
+import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
+import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 /**
  * The service used in the 'Set up your project' page to decide what optional features of a project should be included.
  */
 @Service
-public class ProjectSetupService {
-  //TODO refactor into ProjectTaskListSetupService (?) which handles the entity and form specific stuff
+public class ProjectSetupService implements ProjectFormSectionService {
 
   public static final String MODEL_AND_VIEW_PATH = "project/setup/projectSetup";
 
   private final ProjectTaskListSetupRepository projectTaskListSetupRepository;
   private final ProjectInformationService projectInformationService;
+  private final ProjectSetupFormValidator projectSetupFormValidator;
+  private final ValidationService validationService;
 
   @Autowired
   public ProjectSetupService(ProjectTaskListSetupRepository projectTaskListSetupRepository,
-                             ProjectInformationService projectInformationService) {
+                             ProjectInformationService projectInformationService,
+                             ProjectSetupFormValidator projectSetupFormValidator,
+                             ValidationService validationService) {
     this.projectTaskListSetupRepository = projectTaskListSetupRepository;
     this.projectInformationService = projectInformationService;
+    this.projectSetupFormValidator = projectSetupFormValidator;
+    this.validationService = validationService;
   }
 
   public List<TaskListSectionQuestion> getSectionQuestionsForProjectDetail(ProjectDetail detail) {
@@ -106,6 +118,7 @@ public class ProjectSetupService {
   }
 
   private TaskListSectionAnswer getAnswerForQuestion(List<TaskListSectionAnswer> answers, TaskListSectionQuestion question) {
+    //stream list of TaskListSectionQuestionAnswers and match the first which corresponds to the form field
     return answers.stream()
         .filter(a -> containsYesOrNoAnswerForQuestion(question, a))
         .findFirst().orElse(null);
@@ -132,7 +145,7 @@ public class ProjectSetupService {
     return Arrays.stream(form.getClass().getDeclaredFields())
         .map(f -> {
           try {
-            f.setAccessible(true); //TODO raise Jira about this or set fields to be public
+            f.setAccessible(true);
             return (TaskListSectionAnswer) f.get(form);
           } catch (IllegalAccessException | NullPointerException e) {
             return null;
@@ -146,13 +159,14 @@ public class ProjectSetupService {
    * Validate the projectLocationForm, calls custom validator first.
    * Validates dates if FDP or Decom program questions are true.
    */
-//  public BindingResult validate(ProjectSetupForm form,
-//                                BindingResult bindingResult,
-//                                ValidationType validationType) {
-//    var projectLocationValidationHint = createProjectLocationValidationHint(validationType);
-//    projectLocationFormValidator.validate(form, bindingResult, projectLocationValidationHint);
-//    return validationService.validate(form, bindingResult, validationType);
-//  }
+  public BindingResult validate(ProjectSetupForm form,
+                                BindingResult bindingResult,
+                                ValidationType validationType,
+                                ProjectDetail detail) {
+    var hint = new ProjectSetupFormValidationHint(projectInformationService.isDecomRelated(detail), validationType);
+    projectSetupFormValidator.validate(form, bindingResult, hint);
+    return validationService.validate(form, bindingResult, validationType);
+  }
 
   @Transactional
   public void removeDecomSelectionsIfPresent(ProjectDetail detail) {
@@ -161,6 +175,14 @@ public class ProjectSetupService {
     //Filter the results of the setup to remove the decom ones
     //save result
     //TODO this would have to change the question answers if it was going from decom to not??
+  }
+
+  @Override
+  public boolean isComplete(ProjectDetail details) {
+    var form = getForm(details);
+    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult = validate(form, bindingResult, ValidationType.FULL, details);
+    return !bindingResult.hasErrors();
   }
 
 }

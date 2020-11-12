@@ -12,6 +12,7 @@ import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationC
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
 import uk.co.ogauthority.pathfinder.controller.project.selectoperator.SelectProjectOperatorController;
+import uk.co.ogauthority.pathfinder.controller.project.setup.ProjectSetupController;
 import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.SubseaInfrastructureController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
@@ -25,6 +26,7 @@ import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationServ
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.subseainfrastructure.SubseaInfrastructureService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
@@ -49,7 +51,12 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       ProjectLocationService.class,
       30
   ),
-  //TODO SET UP YOUR PROJECT SECTION
+  PROJECT_SETUP(
+      ProjectSetupController.PAGE_NAME,
+      ProjectSetupController.class,
+      ProjectSetupService.class,
+      40
+  ),
   UPCOMING_TENDERS(
       UpcomingTendersController.PAGE_NAME,
       UpcomingTendersController.class,
