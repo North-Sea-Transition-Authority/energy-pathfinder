@@ -12,10 +12,6 @@ import java.util.stream.Collectors;
  */
 public enum TaskListSectionQuestion {
 
-  //TODO when working out in the ProjectSetUpService if a page should appear we can fetch the
-  // ProjectTaskListSetUp entity and stream it's list of TaskListSectionQuestions to see if they contain the
-  // matching ProjectTask then we'll know
-  // if the user has answered the corresponding question
   UPCOMING_TENDERS(
       ProjectTask.UPCOMING_TENDERS,
       "Do you have any upcoming tenders on this project?",

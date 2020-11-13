@@ -11,8 +11,6 @@ import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
 public class ProjectSetupFormValidator implements SmartValidator {
   @Override
   public void validate(Object target, Errors errors, Object... validationHints) {
-    var form = (ProjectSetupForm) target;
-
     ProjectSetupFormValidationHint validationHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(ProjectSetupFormValidationHint.class))
         .map(hint -> ((ProjectSetupFormValidationHint) hint))

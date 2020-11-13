@@ -63,9 +63,8 @@ public class ProjectSetupService implements ProjectFormSectionService {
   @Transactional
   public ProjectTaskListSetup createOrUpdateProjectTaskListSetup(ProjectDetail detail, ProjectSetupForm form) {
     var taskListSetup = projectTaskListSetupRepository.findByProjectDetail(detail).orElse(
-        new ProjectTaskListSetup()
+        new ProjectTaskListSetup(detail)
     );
-    taskListSetup.setProjectDetail(detail);
     taskListSetup.setTaskListAnswers(getTaskListSectionAnswersFromForm(form));
     taskListSetup.setTaskListSectionQuestions(getTaskListSectionQuestionsFromForm(form));
     return projectTaskListSetupRepository.save(taskListSetup);
@@ -170,11 +169,12 @@ public class ProjectSetupService implements ProjectFormSectionService {
 
   @Transactional
   public void removeDecomSelectionsIfPresent(ProjectDetail detail) {
+    //TODO PAT-314
     //get the ProjectTaskListSetup
     //If not decom related
     //Filter the results of the setup to remove the decom ones
+    //BOTH Question and answer
     //save result
-    //TODO this would have to change the question answers if it was going from decom to not??
   }
 
   @Override

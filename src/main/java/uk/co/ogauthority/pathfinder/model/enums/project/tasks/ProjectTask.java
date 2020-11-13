@@ -31,6 +31,9 @@ import uk.co.ogauthority.pathfinder.service.project.subseainfrastructure.SubseaI
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 
+/**
+ * An enum to encapsulate a task list section, to be used when generating the task list for a given project.
+ */
 public enum ProjectTask implements GeneralPurposeProjectTask {
 
   PROJECT_OPERATOR(
