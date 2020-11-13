@@ -21,11 +21,21 @@ public class ProjectSetupFormValidator implements SmartValidator {
 
     if (validationHint.validateDecomSections()) {
       //reject missing values for decom sections
-      ValidationUtils.rejectIfEmpty(errors, "wellsIncluded", "wellsIncluded.invalid", ProjectSetupFormValidationHint.WELLS_REQUIRED_TEXT);
-      ValidationUtils.rejectIfEmpty(errors, "platformsFpsosIncluded", "platformsFpsosIncluded.invalid", ProjectSetupFormValidationHint.PLATFORMS_FPSOS_REQUIRED_TEXT);
-      ValidationUtils.rejectIfEmpty(errors, "subseaInfrastructureIncluded", "subseaInfrastructureIncluded.invalid", ProjectSetupFormValidationHint.SUBSEA_INFRASTRUCTURE_REQUIRED_TEXT);
-      ValidationUtils.rejectIfEmpty(errors, "integratedRigsIncluded", "integratedRigsIncluded.invalid", ProjectSetupFormValidationHint.INTEGRATED_RIGS_REQUIRED_TEXT);
-      ValidationUtils.rejectIfEmpty(errors, "pipelinesIncluded", "pipelinesIncluded.invalid", ProjectSetupFormValidationHint.PIPELINES_REQUIRED_TEXT);
+      ValidationUtils.rejectIfEmpty(errors, "wellsIncluded", "wellsIncluded.invalid",
+          ProjectSetupFormValidationHint.WELLS_REQUIRED_TEXT
+      );
+      ValidationUtils.rejectIfEmpty(errors, "platformsFpsosIncluded", "platformsFpsosIncluded.invalid",
+          ProjectSetupFormValidationHint.PLATFORMS_FPSOS_REQUIRED_TEXT
+      );
+      ValidationUtils.rejectIfEmpty(errors, "subseaInfrastructureIncluded", "subseaInfrastructureIncluded.invalid",
+          ProjectSetupFormValidationHint.SUBSEA_INFRASTRUCTURE_REQUIRED_TEXT
+      );
+      ValidationUtils.rejectIfEmpty(errors, "integratedRigsIncluded", "integratedRigsIncluded.invalid",
+          ProjectSetupFormValidationHint.INTEGRATED_RIGS_REQUIRED_TEXT
+      );
+      ValidationUtils.rejectIfEmpty(errors, "pipelinesIncluded", "pipelinesIncluded.invalid",
+          ProjectSetupFormValidationHint.PIPELINES_REQUIRED_TEXT
+      );
     }
   }
 
