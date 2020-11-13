@@ -30,6 +30,7 @@ import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpso
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.subseainfrastructure.SubseaInfrastructureService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -68,6 +69,9 @@ public class TaskListControllerTest extends ProjectContextAbstractControllerTest
 
   @MockBean
   private PlatformsFpsosService platformsFpsosService;
+
+  @MockBean
+  private ProjectSetupService projectSetupService;
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.CREATE_PROJECT_PRIVILEGES);
 
