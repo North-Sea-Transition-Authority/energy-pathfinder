@@ -33,7 +33,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOpe
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
-import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -51,7 +51,7 @@ public class ChangeProjectOperatorControllerTest extends ProjectContextAbstractC
       SystemAccessService.CREATE_PROJECT_PRIVILEGES);
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(detail));
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
     when(selectOperatorService.getSelectOperatorModelAndView(
@@ -65,7 +65,7 @@ public class ChangeProjectOperatorControllerTest extends ProjectContextAbstractC
   @Test
   public void startProject_validForm() throws Exception {
     when(selectOperatorService.getOrganisationGroupOrError(any(), any())).thenReturn(
-        ProjectOperatorUtil.ORG_GROUP
+        ProjectOperatorTestUtil.ORG_GROUP
     );
 
 

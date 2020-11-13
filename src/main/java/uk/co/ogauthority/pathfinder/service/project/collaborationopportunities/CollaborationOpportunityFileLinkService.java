@@ -1,14 +1,12 @@
 package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
-import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
@@ -16,68 +14,32 @@ import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunit
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.CollaborationOpportunityFileLinkRepository;
-import uk.co.ogauthority.pathfinder.service.file.FileUpdateMode;
+import uk.co.ogauthority.pathfinder.service.file.EntityWithLinkedFile;
+import uk.co.ogauthority.pathfinder.service.file.FileLinkEntity;
+import uk.co.ogauthority.pathfinder.service.file.FileLinkService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 
 @Service
-public class CollaborationOpportunityFileLinkService {
+public class CollaborationOpportunityFileLinkService extends FileLinkService {
 
   public static final ProjectDetailFilePurpose FILE_PURPOSE = ProjectDetailFilePurpose.COLLABORATION_OPPORTUNITY;
 
   private final CollaborationOpportunityFileLinkRepository collaborationOpportunityFileLinkRepository;
-  private final ProjectDetailFileService projectDetailFileService;
 
   @Autowired
   public CollaborationOpportunityFileLinkService(
       CollaborationOpportunityFileLinkRepository collaborationOpportunityFileLinkRepository,
       ProjectDetailFileService projectDetailFileService
   ) {
+    super(projectDetailFileService);
     this.collaborationOpportunityFileLinkRepository = collaborationOpportunityFileLinkRepository;
-    this.projectDetailFileService = projectDetailFileService;
   }
 
   @Transactional
   public void updateCollaborationOpportunityFileLinks(CollaborationOpportunity collaborationOpportunity,
                                                       CollaborationOpportunityForm form,
                                                       AuthenticatedUserAccount authenticatedUserAccount) {
-    // clear any existing collaboration opportunity file links
-    var existingLinks = collaborationOpportunityFileLinkRepository.findAllByCollaborationOpportunity(
-        collaborationOpportunity
-    );
-    collaborationOpportunityFileLinkRepository.deleteAll(existingLinks);
-
-    // update the project detail files with files from from
-    var persistedProjectDetailFileMap = projectDetailFileService.updateFiles(
-        form,
-        collaborationOpportunity.getProjectDetail(),
-        FILE_PURPOSE,
-        FileUpdateMode.KEEP_UNLINKED_FILES,
-        authenticatedUserAccount
-    )
-        .stream()
-        .collect(Collectors.toMap(ProjectDetailFile::getFileId, file -> file));
-
-    var collaborationOpportunityFileLinks = new ArrayList<CollaborationOpportunityFileLink>();
-
-    // for each file in the form create a link to this collaboration opportunity
-    form.getUploadedFileWithDescriptionForms()
-        .forEach(uploadFileWithDescriptionForm -> {
-
-          var projectDetailFile = persistedProjectDetailFileMap.get(
-              uploadFileWithDescriptionForm.getUploadedFileId()
-          );
-
-          var collaborationOpportunityFileLink = new CollaborationOpportunityFileLink();
-          collaborationOpportunityFileLink.setCollaborationOpportunity(collaborationOpportunity);
-          collaborationOpportunityFileLink.setProjectDetailFile(projectDetailFile);
-
-          collaborationOpportunityFileLinks.add(collaborationOpportunityFileLink);
-
-        });
-
-    // bulk save all the collaboration opportunity links
-    collaborationOpportunityFileLinkRepository.saveAll(collaborationOpportunityFileLinks);
-
+    updateFileLinks(collaborationOpportunity, form, authenticatedUserAccount);
   }
 
   /**
@@ -85,14 +47,8 @@ public class CollaborationOpportunityFileLinkService {
    * @param projectDetailFile the project detail file to identify the CollaborationOpportunityFileLink
    */
   @Transactional
-  protected void removeCollaborationOpportunityFileLink(ProjectDetailFile projectDetailFile) {
-    var opportunityFileLink =
-        collaborationOpportunityFileLinkRepository.findByProjectDetailFile(projectDetailFile)
-        .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format(
-            "CollaborationOpportunityFileLink for project detail file with file id %s could not be found",
-            projectDetailFile.getFileId()
-        )));
-    collaborationOpportunityFileLinkRepository.delete(opportunityFileLink);
+  public void removeCollaborationOpportunityFileLink(ProjectDetailFile projectDetailFile) {
+    deleteFileLinkByProjectDetailFile(projectDetailFile);
   }
 
   /**
@@ -100,30 +56,8 @@ public class CollaborationOpportunityFileLinkService {
    * @param collaborationOpportunity the collaboration opportunity to to remove all the file links from
    */
   @Transactional
-  protected void removeCollaborationOpportunityFileLinks(CollaborationOpportunity collaborationOpportunity) {
-
-    // remove the collaboration opportunity file links
-    var collaborationOpportunityFileLinks =
-        getAllByCollaborationOpportunity(collaborationOpportunity);
-    collaborationOpportunityFileLinkRepository.deleteAll(collaborationOpportunityFileLinks);
-
-    // remove the project detail files no longer required
-    var projectDetailFiles = collaborationOpportunityFileLinks
-        .stream()
-        .map(CollaborationOpportunityFileLink::getProjectDetailFile)
-        .collect(Collectors.toList());
-
-    projectDetailFileService.removeProjectDetailFiles(projectDetailFiles);
-  }
-
-  /**
-   * Retrieve all the CollaborationOpportunityFileLink entities linked to the provided collaboration opportunity.
-   * @param collaborationOpportunity the collaboration opportunity to retrieve the file links for
-   * @return all the CollaborationOpportunityFileLink entities linked to the provided collaboration opportunity
-   */
-  protected List<CollaborationOpportunityFileLink> getAllByCollaborationOpportunity(
-      CollaborationOpportunity collaborationOpportunity) {
-    return collaborationOpportunityFileLinkRepository.findAllByCollaborationOpportunity(collaborationOpportunity);
+  public void removeCollaborationOpportunityFileLinks(CollaborationOpportunity collaborationOpportunity) {
+    deleteAllFileLinksAndProjectDetailFilesLinkedToEntity(collaborationOpportunity);
   }
 
   /**
@@ -132,16 +66,77 @@ public class CollaborationOpportunityFileLinkService {
    * @return a list of UploadedFileView linked to an collaboration opportunity
    */
   public List<UploadedFileView> getFileUploadViewsLinkedToOpportunity(CollaborationOpportunity collaborationOpportunity) {
-    return getAllByCollaborationOpportunity(collaborationOpportunity)
+    return getFileUploadViewsLinkedEntity(collaborationOpportunity);
+  }
+
+  /**
+   * Retrieve all the CollaborationOpportunityFileLink entities linked to the provided collaboration opportunity.
+   * @param collaborationOpportunity the collaboration opportunity to retrieve the file links for
+   * @return all the CollaborationOpportunityFileLink entities linked to the provided collaboration opportunity
+   */
+  public List<CollaborationOpportunityFileLink> getAllByCollaborationOpportunity(
+      CollaborationOpportunity collaborationOpportunity
+  ) {
+    return findAllByFileLinkableEntity(collaborationOpportunity);
+  }
+
+  @Override
+  public ProjectDetailFilePurpose getFilePurpose() {
+    return FILE_PURPOSE;
+  }
+
+  @Override
+  public List<CollaborationOpportunityFileLink> findAllByFileLinkableEntity(
+      EntityWithLinkedFile entityWithLinkedFile) {
+    return collaborationOpportunityFileLinkRepository.findAllByCollaborationOpportunity((CollaborationOpportunity) entityWithLinkedFile);
+  }
+
+  @Override
+  @Transactional
+  public void deleteAllFileLinksLinkedToEntity(EntityWithLinkedFile entityWithLinkedFile) {
+    var existingFileLinks = findAllByFileLinkableEntity(entityWithLinkedFile);
+    collaborationOpportunityFileLinkRepository.deleteAll(existingFileLinks);
+  }
+
+  @Override
+  public FileLinkEntity createFileLinkEntity(EntityWithLinkedFile entityWithLinkedFile,
+                                             ProjectDetailFile projectDetailFile) {
+    var collaborationOpportunityFileLink = new CollaborationOpportunityFileLink();
+    collaborationOpportunityFileLink.setCollaborationOpportunity((CollaborationOpportunity) entityWithLinkedFile);
+    collaborationOpportunityFileLink.setProjectDetailFile(projectDetailFile);
+    return collaborationOpportunityFileLink;
+  }
+
+  @Override
+  @Transactional
+  public void saveFileLinks(List<? extends FileLinkEntity> fileLinkEntities) {
+    var collaborationOpportunityFileLinks = mapFileLinkEntityList(fileLinkEntities);
+    collaborationOpportunityFileLinkRepository.saveAll(collaborationOpportunityFileLinks);
+  }
+
+  @Override
+  @Transactional
+  public void deleteFileLinks(List<? extends FileLinkEntity> fileLinkEntities) {
+    var collaborationOpportunityFileLinks = mapFileLinkEntityList(fileLinkEntities);
+    collaborationOpportunityFileLinkRepository.deleteAll(collaborationOpportunityFileLinks);
+  }
+
+  @Override
+  @Transactional
+  public void deleteFileLinkByProjectDetailFile(ProjectDetailFile projectDetailFile) {
+    var collaborationOpportunityFileLink =
+        collaborationOpportunityFileLinkRepository.findByProjectDetailFile(projectDetailFile)
+            .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format(
+                "CollaborationOpportunityFileLink for project detail file with file id %s could not be found",
+                projectDetailFile.getFileId()
+            )));
+    collaborationOpportunityFileLinkRepository.delete(collaborationOpportunityFileLink);
+  }
+
+  private List<CollaborationOpportunityFileLink> mapFileLinkEntityList(List<? extends FileLinkEntity> fileLinkEntities) {
+    return fileLinkEntities
         .stream()
-        .map(collaborationOpportunityFileLink ->
-            projectDetailFileService.getUploadedFileView(
-                collaborationOpportunity.getProjectDetail(),
-                collaborationOpportunityFileLink.getProjectDetailFile().getFileId(),
-                CollaborationOpportunityFileLinkService.FILE_PURPOSE,
-                FileLinkStatus.FULL
-            )
-        )
+        .map(fileLinkEntity -> (CollaborationOpportunityFileLink) fileLinkEntity)
         .collect(Collectors.toList());
   }
 

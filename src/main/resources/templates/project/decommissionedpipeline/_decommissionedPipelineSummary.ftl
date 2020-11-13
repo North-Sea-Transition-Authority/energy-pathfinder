@@ -13,7 +13,7 @@
     <@checkAnswers.checkAnswersRowNoActions prompt="Pipeline" value=decommissionedPipelineView.pipeline!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="Material type" value=decommissionedPipelineView.materialType!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="Pipeline status" value=decommissionedPipelineView.status!"" />
-    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Decommissioning period">
+    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Expected decommissioning period">
       ${decommissionedPipelineView.decommissioningEarliestYear!""}
       <br/>
       ${decommissionedPipelineView.decommissioningLatestYear!""}

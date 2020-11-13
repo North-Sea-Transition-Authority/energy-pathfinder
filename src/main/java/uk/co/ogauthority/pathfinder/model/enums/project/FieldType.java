@@ -8,7 +8,7 @@ public enum FieldType {
 
   OIL("Oil"),
   GAS("Gas"),
-  OIL_GAS("Oil / gas"),
+  OIL_GAS("Oil/gas"),
   CONDENSATE("Condensate"),
   OIL_CONDENSATE("Oil condensate"),
   GAS_CONDENSATE("Gas condensate"),

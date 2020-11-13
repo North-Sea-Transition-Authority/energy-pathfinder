@@ -1,13 +1,15 @@
 package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity;
 
 import java.util.List;
+import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 
 public class CollaborationOpportunityView extends ProjectSummaryItem {
 
-  private String function;
+  private StringWithTag function;
 
   private String descriptionOfWork;
 
@@ -26,11 +28,11 @@ public class CollaborationOpportunityView extends ProjectSummaryItem {
     this.projectId = projectId;
   }
 
-  public String getFunction() {
+  public StringWithTag getFunction() {
     return function;
   }
 
-  public void setFunction(String function) {
+  public void setFunction(StringWithTag function) {
     this.function = function;
   }
 
@@ -65,5 +67,36 @@ public class CollaborationOpportunityView extends ProjectSummaryItem {
   public void setUploadedFileViews(
       List<UploadedFileView> uploadedFileViews) {
     this.uploadedFileViews = uploadedFileViews;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    CollaborationOpportunityView that = (CollaborationOpportunityView) o;
+    return Objects.equals(function, that.function)
+        && Objects.equals(descriptionOfWork, that.descriptionOfWork)
+        && Objects.equals(urgentResponseNeeded, that.urgentResponseNeeded)
+        && Objects.equals(contactDetailView, that.contactDetailView)
+        && Objects.equals(uploadedFileViews, that.uploadedFileViews);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        super.hashCode(),
+        function,
+        descriptionOfWork,
+        urgentResponseNeeded,
+        contactDetailView,
+        uploadedFileViews
+    );
   }
 }

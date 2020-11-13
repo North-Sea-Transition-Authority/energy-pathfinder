@@ -1,16 +1,33 @@
 <#include '../../layout.ftl'/>
 
-<#macro collaborationOpportunitySummary view opportunityName="Collaboration opportunity" showHeader=false showActions=false>
+<#macro upcomingTenderSummary
+  view
+  tenderName="Upcoming tender"
+  showHeader=false
+  showActions=false
+  showTag=false
+  headingSize="h2"
+  headingClass="govuk-heading-l"
+>
   <@summaryViewWrapper.summaryViewItemWrapper
-    idPrefix="collaboration-opportunity"
-    headingPrefix=opportunityName
+    idPrefix="upcoming-tender"
+    headingPrefix=tenderName
     summaryView=view
     showHeader=showHeader
     showActions=showActions
+    headingSize=headingSize
+    headingClass=headingClass
   >
-    <@checkAnswers.checkAnswersRowNoActions prompt="Opportunity function" value=view.function!"" />
+    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Tender function">
+      <#if showTag>
+        <@stringWithTag.stringWithTag stringWithTag=view.tenderFunction />
+      <#else>
+        ${view.tenderFunction.value!""}
+      </#if>
+    </@checkAnswers.checkAnswersRowNoActionsWithNested>
     <@checkAnswers.checkAnswersRowNoActions prompt="Description of work" value=view.descriptionOfWork!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Urgent response required" value=view.urgentResponseNeeded!"" />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Estimated tender date" value=view.estimatedTenderDate!"" />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Contract band" value=view.contractBand!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="Name" value=view.contactDetailView.name!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="Phone number" value=view.contactDetailView.phoneNumber!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="Job title" value=view.contactDetailView.jobTitle!"" />

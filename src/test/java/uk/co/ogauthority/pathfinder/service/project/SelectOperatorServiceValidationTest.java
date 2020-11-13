@@ -19,7 +19,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
-import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 
@@ -44,11 +44,11 @@ public class SelectOperatorServiceValidationTest {
       "Org Grp"
   );
 
-  private static final ProjectOperator projectOperator = ProjectOperatorUtil.getOperator(detail, organisationGroup);
+  private static final ProjectOperator projectOperator = ProjectOperatorTestUtil.getOperator(detail, organisationGroup);
 
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     var validator = new SpringValidatorAdapter(Validation.buildDefaultValidatorFactory().getValidator());
     var validationService = new ValidationService(validator);
     selectOperatorService = new SelectOperatorService(

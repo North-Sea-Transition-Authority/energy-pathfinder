@@ -11,9 +11,10 @@ import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
 public class PlatformFpsoViewUtil {
-  public static final String YEAR_NOT_SET_TEXT = "Not set";
+  public static final String YEAR_NOT_SET_TEXT = StringDisplayUtil.NOT_SET_TEXT;
   public static final String EARLIEST_YEAR_TEXT = "Earliest start year: %s";
   public static final String LATEST_YEAR_TEXT = "Latest completion year: %s";
 

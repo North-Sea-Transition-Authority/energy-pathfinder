@@ -1,14 +1,12 @@
 package uk.co.ogauthority.pathfinder.service.project.upcomingtender;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
-import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
@@ -16,22 +14,23 @@ import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.Upcoming
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderFileLinkRepository;
-import uk.co.ogauthority.pathfinder.service.file.FileUpdateMode;
+import uk.co.ogauthority.pathfinder.service.file.EntityWithLinkedFile;
+import uk.co.ogauthority.pathfinder.service.file.FileLinkEntity;
+import uk.co.ogauthority.pathfinder.service.file.FileLinkService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 
 @Service
-public class UpcomingTenderFileLinkService {
+public class UpcomingTenderFileLinkService extends FileLinkService {
 
   public static final ProjectDetailFilePurpose FILE_PURPOSE = ProjectDetailFilePurpose.UPCOMING_TENDER;
 
   private final UpcomingTenderFileLinkRepository upcomingTenderFileLinkRepository;
-  private final ProjectDetailFileService projectDetailFileService;
 
   @Autowired
   public UpcomingTenderFileLinkService(UpcomingTenderFileLinkRepository upcomingTenderFileLinkRepository,
                                        ProjectDetailFileService projectDetailFileService) {
+    super(projectDetailFileService);
     this.upcomingTenderFileLinkRepository = upcomingTenderFileLinkRepository;
-    this.projectDetailFileService = projectDetailFileService;
   }
 
   /**
@@ -50,43 +49,10 @@ public class UpcomingTenderFileLinkService {
    * @param authenticatedUserAccount The logged in user
    */
   @Transactional
-  protected void updateUpcomingTenderFileLinks(UpcomingTender upcomingTender,
-                                               UpcomingTenderForm form,
-                                               AuthenticatedUserAccount authenticatedUserAccount) {
-
-    // clear any existing upcoming tender file links
-    var existingLinks = upcomingTenderFileLinkRepository.findAllByUpcomingTender(upcomingTender);
-    upcomingTenderFileLinkRepository.deleteAll(existingLinks);
-
-    // update the project detail files with files from from
-    var persistedProjectDetailFileMap = projectDetailFileService.updateFiles(
-        form,
-        upcomingTender.getProjectDetail(),
-        FILE_PURPOSE,
-        FileUpdateMode.KEEP_UNLINKED_FILES,
-        authenticatedUserAccount
-    )
-        .stream()
-        .collect(Collectors.toMap(ProjectDetailFile::getFileId, file -> file));
-
-    var upcomingTenderFileLinks = new ArrayList<UpcomingTenderFileLink>();
-
-    // for each file in the form create a link to this upcoming tender
-    form.getUploadedFileWithDescriptionForms()
-        .forEach(uploadFileWithDescriptionForm -> {
-
-          var projectDetailFile = persistedProjectDetailFileMap.get(uploadFileWithDescriptionForm.getUploadedFileId());
-
-          var upcomingTenderFileLink = new UpcomingTenderFileLink();
-          upcomingTenderFileLink.setUpcomingTender(upcomingTender);
-          upcomingTenderFileLink.setProjectDetailFile(projectDetailFile);
-
-          upcomingTenderFileLinks.add(upcomingTenderFileLink);
-
-        });
-
-    // bulk save all the upcoming tender links
-    upcomingTenderFileLinkRepository.saveAll(upcomingTenderFileLinks);
+  public void updateUpcomingTenderFileLinks(UpcomingTender upcomingTender,
+                                            UpcomingTenderForm form,
+                                            AuthenticatedUserAccount authenticatedUserAccount) {
+    updateFileLinks(upcomingTender, form, authenticatedUserAccount);
   }
 
   /**
@@ -94,13 +60,8 @@ public class UpcomingTenderFileLinkService {
    * @param projectDetailFile the project detail file to identify the UpcomingTenderFileLink
    */
   @Transactional
-  protected void removeUpcomingTenderFileLink(ProjectDetailFile projectDetailFile) {
-    var upcomingTenderFileLink = upcomingTenderFileLinkRepository.findByProjectDetailFile(projectDetailFile)
-        .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format(
-            "UpcomingTenderFileLink for project detail file with file id %s could not be found",
-            projectDetailFile.getFileId()
-        )));
-    upcomingTenderFileLinkRepository.delete(upcomingTenderFileLink);
+  public void removeUpcomingTenderFileLink(ProjectDetailFile projectDetailFile) {
+    deleteFileLinkByProjectDetailFile(projectDetailFile);
   }
 
   /**
@@ -108,19 +69,8 @@ public class UpcomingTenderFileLinkService {
    * @param upcomingTender the upcoming tender to to remove all the file links from
    */
   @Transactional
-  protected void removeUpcomingTenderFileLinks(UpcomingTender upcomingTender) {
-
-    // remove the upcoming tender file links
-    var upcomingTenderFileLinks = upcomingTenderFileLinkRepository.findAllByUpcomingTender(upcomingTender);
-    upcomingTenderFileLinkRepository.deleteAll(upcomingTenderFileLinks);
-
-    // remove the project detail files no longer required
-    var projectDetailFiles = upcomingTenderFileLinks
-        .stream()
-        .map(UpcomingTenderFileLink::getProjectDetailFile)
-        .collect(Collectors.toList());
-
-    projectDetailFileService.removeProjectDetailFiles(projectDetailFiles);
+  public void removeUpcomingTenderFileLinks(UpcomingTender upcomingTender) {
+    deleteAllFileLinksAndProjectDetailFilesLinkedToEntity(upcomingTender);
   }
 
   /**
@@ -129,16 +79,65 @@ public class UpcomingTenderFileLinkService {
    * @return a list of UploadedFileView linked to an upcoming tender
    */
   public List<UploadedFileView> getFileUploadViewsLinkedToUpcomingTender(UpcomingTender upcomingTender) {
-    return getAllByUpcomingTender(upcomingTender)
+    return getFileUploadViewsLinkedEntity(upcomingTender);
+  }
+
+  @Override
+  public ProjectDetailFilePurpose getFilePurpose() {
+    return FILE_PURPOSE;
+  }
+
+  @Override
+  public List<UpcomingTenderFileLink> findAllByFileLinkableEntity(EntityWithLinkedFile entityWithLinkedFile) {
+    return upcomingTenderFileLinkRepository.findAllByUpcomingTender((UpcomingTender) entityWithLinkedFile);
+  }
+
+  @Override
+  @Transactional
+  public void deleteAllFileLinksLinkedToEntity(EntityWithLinkedFile entityWithLinkedFile) {
+    var existingFileLinks = findAllByFileLinkableEntity(entityWithLinkedFile);
+    upcomingTenderFileLinkRepository.deleteAll(existingFileLinks);
+  }
+
+  @Override
+  public FileLinkEntity createFileLinkEntity(EntityWithLinkedFile entityWithLinkedFile,
+                                             ProjectDetailFile projectDetailFile) {
+    var upcomingTenderFileLink = new UpcomingTenderFileLink();
+    upcomingTenderFileLink.setUpcomingTender((UpcomingTender) entityWithLinkedFile);
+    upcomingTenderFileLink.setProjectDetailFile(projectDetailFile);
+    return upcomingTenderFileLink;
+  }
+
+  @Override
+  @Transactional
+  public void saveFileLinks(List<? extends FileLinkEntity> fileLinkEntities) {
+    var upcomingTenderFileLinks = mapFileLinkEntityList(fileLinkEntities);
+    upcomingTenderFileLinkRepository.saveAll(upcomingTenderFileLinks);
+  }
+
+  @Override
+  @Transactional
+  public void deleteFileLinks(List<? extends FileLinkEntity> fileLinkEntities) {
+    var upcomingTenderFileLinks = mapFileLinkEntityList(fileLinkEntities);
+    upcomingTenderFileLinkRepository.deleteAll(upcomingTenderFileLinks);
+  }
+
+  @Override
+  @Transactional
+  public void deleteFileLinkByProjectDetailFile(ProjectDetailFile projectDetailFile) {
+    var upcomingTenderFileLink = upcomingTenderFileLinkRepository.findByProjectDetailFile(projectDetailFile)
+        .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format(
+            "UpcomingTenderFileLink for project detail file with file id %s could not be found",
+            projectDetailFile.getFileId()
+        )));
+    upcomingTenderFileLinkRepository.delete(upcomingTenderFileLink);
+  }
+
+  private List<UpcomingTenderFileLink> mapFileLinkEntityList(List<? extends FileLinkEntity> fileLinkEntities) {
+    return fileLinkEntities
         .stream()
-        .map(upcomingTenderFileLink ->
-          projectDetailFileService.getUploadedFileView(
-              upcomingTender.getProjectDetail(),
-              upcomingTenderFileLink.getProjectDetailFile().getFileId(),
-              UpcomingTenderFileLinkService.FILE_PURPOSE,
-              FileLinkStatus.FULL
-          )
-        )
+        .map(fileLinkEntity -> (UpcomingTenderFileLink) fileLinkEntity)
         .collect(Collectors.toList());
   }
+
 }

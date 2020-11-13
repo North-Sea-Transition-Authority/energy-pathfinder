@@ -6,6 +6,7 @@ public class StringDisplayUtil {
   public static final String NO = "No";
   public static final String A = "a ";
   public static final String AN = "an ";
+  public static final String NOT_SET_TEXT = "Not set";
 
   private StringDisplayUtil() {
     throw new IllegalStateException("StringDisplayUtil is a utility class and should not be instantiated");

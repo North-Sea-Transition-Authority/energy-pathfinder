@@ -19,7 +19,7 @@
     <@minMaxDateInput
       minFormPath="form.decommissioningDate.minYear"
       maxFormPath="form.decommissioningDate.maxYear"
-      labelText="Provide the period over which the pipeline will be decommissioned"
+      labelText="Provide the period in which the decommissioning is expected to take place"
       altMinLabel="Earliest start year"
       altMaxLabel="Latest completion year"
       formId="decommissioning-period"

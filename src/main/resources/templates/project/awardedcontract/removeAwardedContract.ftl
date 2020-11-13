@@ -7,13 +7,11 @@
   breadcrumbs=true
   twoThirdsColumn=true
 >
-  <div class="summary-list">
-    <@awardedContractSummary.awardedContractSummary
-      awardedContractView=awardedContractView
-      showHeader=false
-      showActions=false
-    />
-  </div>
+  <@awardedContractSummary.awardedContractSummary
+    awardedContractView=awardedContractView
+    showHeader=false
+    showActions=false
+  />
   <@fdsForm.htmlForm>
     <@fdsAction.submitButtons
       primaryButtonText="Remove"

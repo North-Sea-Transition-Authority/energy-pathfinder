@@ -5,20 +5,18 @@
   <#if errorList?has_content>
     <@fdsError.errorSummary errorItems=errorList />
   </#if>
-  <div class="summary-list">
-    <#if awardedContractViews?has_content>
-      <#list awardedContractViews as awardedContractView>
-        <@awardedContractSummary.awardedContractSummary
-          awardedContractView=awardedContractView
-          showActions=true
-          showHeader=true
-          showTag=false
-        />
-      </#list>
-      <#else>
-        <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="awarded contract" linkUrl=""/>
-    </#if>
-  </div>
+  <#if awardedContractViews?has_content>
+    <#list awardedContractViews as awardedContractView>
+      <@awardedContractSummary.awardedContractSummary
+        awardedContractView=awardedContractView
+        showActions=true
+        showHeader=true
+        showTag=false
+      />
+    </#list>
+    <#else>
+      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="awarded contract" linkUrl=""/>
+  </#if>
   <@fdsAction.link
     linkText="Add awarded contract"
     linkUrl=springUrl(addAwardedContractUrl)

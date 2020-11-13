@@ -16,6 +16,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.Upcoming
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
@@ -53,9 +54,13 @@ public class UpcomingTenderSummaryServiceTest {
     assertThat(views.size()).isEqualTo(2);
     var view1 = views.get(0);
     var view2 = views.get(1);
-    assertThat(view1.getTenderFunction()).isEqualTo(upcomingTender.getTenderFunction().getDisplayName());
+    var view1TenderFunction = view1.getTenderFunction();
+    var view2TenderFunction = view2.getTenderFunction();
+    assertThat(view1TenderFunction.getValue()).isEqualTo(upcomingTender.getTenderFunction().getDisplayName());
+    assertThat(view1TenderFunction.getTag()).isEqualTo(Tag.NONE);
     assertThat(view1.getDisplayOrder()).isEqualTo(1);
-    assertThat(view2.getTenderFunction()).isEqualTo(manualEntryUpcomingTender.getManualTenderFunction());
+    assertThat(view2TenderFunction.getValue()).isEqualTo(manualEntryUpcomingTender.getManualTenderFunction());
+    assertThat(view2TenderFunction.getTag()).isEqualTo(Tag.NOT_FROM_LIST);
     assertThat(view2.getDisplayOrder()).isEqualTo(2);
     checkCommonFields(view1, upcomingTender);
     checkCommonFields(view2, manualEntryUpcomingTender);

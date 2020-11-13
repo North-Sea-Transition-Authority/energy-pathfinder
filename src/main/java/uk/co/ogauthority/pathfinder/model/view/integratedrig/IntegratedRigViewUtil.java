@@ -5,8 +5,10 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.ArrayList;
 import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedRigController;
 import uk.co.ogauthority.pathfinder.model.entity.project.integratedrig.IntegratedRig;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
 public class IntegratedRigViewUtil {
@@ -30,8 +32,8 @@ public class IntegratedRigViewUtil {
     integratedRigView.setProjectId(projectId);
 
     var structure = (integratedRig.getFacility() != null)
-        ? integratedRig.getFacility().getSelectionText()
-        : integratedRig.getManualFacility();
+        ? new StringWithTag(integratedRig.getFacility().getSelectionText(), Tag.NONE)
+        : new StringWithTag(integratedRig.getManualFacility(), Tag.NOT_FROM_LIST);
     integratedRigView.setStructure(structure);
 
     integratedRigView.setName(integratedRig.getName());

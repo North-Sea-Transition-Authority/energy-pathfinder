@@ -12,10 +12,11 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
+import uk.co.ogauthority.pathfinder.service.file.EntityWithLinkedFile;
 
 @Entity
 @Table(name = "upcoming_tenders")
-public class UpcomingTender extends ProjectDetailEntity implements ContactDetailCapture {
+public class UpcomingTender extends ProjectDetailEntity implements ContactDetailCapture, EntityWithLinkedFile {
 
   @Enumerated(EnumType.STRING)
   private Function tenderFunction;

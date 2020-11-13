@@ -8,6 +8,8 @@ import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -64,7 +66,7 @@ public class UpcomingTenderUtil {
         PROJECT_ID
     );
     view.setIsValid(isValid);
-    view.setTenderFunction(TENDER_FUNCTION.getDisplayName());
+    view.setTenderFunction(new StringWithTag(TENDER_FUNCTION.getDisplayName(), Tag.NONE));
     view.setEstimatedTenderDate(DateUtil.formatDate(ESTIMATED_TENDER_DATE));
     view.setContractBand(CONTRACT_BAND.getDisplayName());
 

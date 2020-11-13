@@ -14,7 +14,7 @@ public class DateUtil {
   }
 
   public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy");
-  public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm:ss")
+  public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm")
       .withZone(ZoneId.systemDefault());
 
   private static String format(Temporal temporal, DateTimeFormatter dateTimeFormatter) {

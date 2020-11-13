@@ -1,0 +1,12 @@
+.dashboard-item {
+
+  &__heading {
+    @include govuk-responsive-margin(0, 'bottom');
+    @extend %govuk-heading-s;
+  }
+
+  &__data-list {
+    @include govuk-responsive-margin(1, 'top');
+    @include govuk-responsive-margin(0, 'bottom');
+  }
+}
