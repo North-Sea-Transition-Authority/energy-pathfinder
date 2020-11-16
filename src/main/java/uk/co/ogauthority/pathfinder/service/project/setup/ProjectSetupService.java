@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,12 +63,16 @@ public class ProjectSetupService implements ProjectFormSectionService {
 
   @Transactional
   public ProjectTaskListSetup createOrUpdateProjectTaskListSetup(ProjectDetail detail, ProjectSetupForm form) {
-    var taskListSetup = projectTaskListSetupRepository.findByProjectDetail(detail).orElse(
+    var taskListSetup = getProjectTaskListSetup(detail).orElse(
         new ProjectTaskListSetup(detail)
     );
     taskListSetup.setTaskListAnswers(getTaskListSectionAnswersFromForm(form));
-    taskListSetup.setTaskListSectionQuestions(getTaskListSectionQuestionsFromForm(form));
+    taskListSetup.setTaskListSections(getTaskListSectionQuestionsFromForm(form));
     return projectTaskListSetupRepository.save(taskListSetup);
+  }
+
+  private Optional<ProjectTaskListSetup> getProjectTaskListSetup(ProjectDetail detail) {
+    return projectTaskListSetupRepository.findByProjectDetail(detail);
   }
 
   public ProjectSetupForm getForm(ProjectDetail detail) {
@@ -80,7 +85,7 @@ public class ProjectSetupService implements ProjectFormSectionService {
         .orElse(new ProjectSetupForm());
   }
 
-  public void setFormFieldsFromProjectTaskListSetup(ProjectTaskListSetup taskListSetup, ProjectSetupForm form) {
+  private void setFormFieldsFromProjectTaskListSetup(ProjectTaskListSetup taskListSetup, ProjectSetupForm form) {
     //stream list of TaskListSectionQuestionAnswers and match the first which corresponds to the form field
     //Set that as the form field value
     form.setUpcomingTendersIncluded(
@@ -155,8 +160,7 @@ public class ProjectSetupService implements ProjectFormSectionService {
   }
 
   /**
-   * Validate the projectLocationForm, calls custom validator first.
-   * Validates dates if FDP or Decom program questions are true.
+   * Validate the ProjectSetupForm, calls custom validator first.
    */
   public BindingResult validate(ProjectSetupForm form,
                                 BindingResult bindingResult,
@@ -167,14 +171,30 @@ public class ProjectSetupService implements ProjectFormSectionService {
     return validationService.validate(form, bindingResult, validationType);
   }
 
+  /**
+   * Removes any decommissioning related sections and their answers if the project is no longer decommissioning related.
+   * @param detail project detail to remove the answers for.
+   */
   @Transactional
   public void removeDecomSelectionsIfPresent(ProjectDetail detail) {
-    //TODO PAT-314
-    //get the ProjectTaskListSetup
-    //If not decom related
-    //Filter the results of the setup to remove the decom ones
-    //BOTH Question and answer
-    //save result
+    if (!projectInformationService.isDecomRelated(detail)) {
+      getProjectTaskListSetup(detail).ifPresent(tls -> {
+        var sections = tls.getTaskListSections();
+        var answers = tls.getTaskListAnswers();
+
+        TaskListSectionQuestion.getAllValues().forEach(s -> {
+          if (s.isDecommissioningRelated()) {
+            answers.remove(s.getYesAnswer());
+            answers.remove(s.getNoAnswer());
+          }
+        });
+        sections.removeIf(TaskListSectionQuestion::isDecommissioningRelated);
+
+        tls.setTaskListAnswers(answers);
+        tls.setTaskListSections(sections);
+        projectTaskListSetupRepository.save(tls);
+      });
+    }
   }
 
   @Override

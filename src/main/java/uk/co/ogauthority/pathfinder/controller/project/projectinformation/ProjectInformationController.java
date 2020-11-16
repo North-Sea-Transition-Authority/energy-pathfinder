@@ -26,6 +26,7 @@ import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
@@ -36,13 +37,16 @@ public class ProjectInformationController extends ProjectFormPageController {
   public static final String PAGE_NAME = "Project information & contact details";
 
   private final ProjectInformationService projectInformationService;
+  private final ProjectSetupService projectSetupService;
 
   @Autowired
   public ProjectInformationController(BreadcrumbService breadcrumbService,
                                       ProjectInformationService projectInformationService,
-                                      ControllerHelperService controllerHelperService) {
+                                      ControllerHelperService controllerHelperService,
+                                      ProjectSetupService projectSetupService) {
     super(breadcrumbService, controllerHelperService);
     this.projectInformationService = projectInformationService;
+    this.projectSetupService = projectSetupService;
   }
 
   @GetMapping
@@ -65,8 +69,7 @@ public class ProjectInformationController extends ProjectFormPageController {
         form,
         () -> {
           projectInformationService.createOrUpdate(projectContext.getProjectDetails(), form);
-          //TODO PAT-314 in here have a parent service that includes projectInformation and the ProjectSetup services
-          //Call that to filter any decom stuff if necessary? Or just call projectSetupService directly?
+          projectSetupService.removeDecomSelectionsIfPresent(projectContext.getProjectDetails());
 
           return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
         });
