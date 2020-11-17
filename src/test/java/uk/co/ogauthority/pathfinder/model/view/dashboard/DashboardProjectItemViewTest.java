@@ -6,8 +6,10 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.controller.project.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.useraction.DashboardLink;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
@@ -49,6 +51,40 @@ public class DashboardProjectItemViewTest {
     );
   }
 
+  @Test
+  public void from_allFieldsSetCorrectly_whenQA() {
+    var dashboardProjectItem = DashboardProjectItemTestUtil.getDashboardProjectItem(ProjectStatus.QA);
+
+    var view = DashboardProjectItemView.from(dashboardProjectItem);
+    var title = dashboardProjectItem.getProjectTitle();
+    var screenReaderText = String.format(DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
+
+    assertThat(view.getProjectTitle()).isEqualTo(title);
+    assertCommonFieldsMatch(dashboardProjectItem, view);
+    assertLinkMatches(
+        dashboardProjectItem,
+        DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText),
+        title
+    );
+  }
+
+  @Test
+  public void from_allFieldsSetCorrectly_whenPublished() {
+    var dashboardProjectItem = DashboardProjectItemTestUtil.getDashboardProjectItem(ProjectStatus.PUBLISHED);
+
+    var view = DashboardProjectItemView.from(dashboardProjectItem);
+    var title = dashboardProjectItem.getProjectTitle();
+    var screenReaderText = String.format(DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
+
+    assertThat(view.getProjectTitle()).isEqualTo(title);
+    assertCommonFieldsMatch(dashboardProjectItem, view);
+    assertLinkMatches(
+        dashboardProjectItem,
+        DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText),
+        title
+    );
+  }
+
 
 
   @Test
@@ -79,8 +115,19 @@ public class DashboardProjectItemViewTest {
         DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime())
     ));
     assertThat(link.getPrompt()).isEqualTo(prompt);
-    assertThat(link.getUrl()).isEqualTo(
-      ReverseRouter.route(on(TaskListController.class).viewTaskList(dashboardProjectItem.getProjectId(), null))
-    );
+    var status = dashboardProjectItem.getStatus();
+    String expectedUrl;
+    switch (status) {
+      case DRAFT:
+        expectedUrl = ReverseRouter.route(on(TaskListController.class).viewTaskList(dashboardProjectItem.getProjectId(), null));
+        break;
+      case QA:
+      case PUBLISHED:
+        expectedUrl = ReverseRouter.route(on(ManageProjectController.class).getProject(dashboardProjectItem.getProjectId(), null, null));
+        break;
+      default:
+        throw new IllegalStateException(String.format("Project status %s not supported", status));
+    }
+    assertThat(link.getUrl()).isEqualTo(expectedUrl);
   }
 }

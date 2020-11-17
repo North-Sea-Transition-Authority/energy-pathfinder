@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.model.view.dashboard;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import uk.co.ogauthority.pathfinder.controller.project.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
 import uk.co.ogauthority.pathfinder.model.form.useraction.DashboardLink;
@@ -54,9 +55,22 @@ public class DashboardProjectItemView {
   }
 
   public static DashboardLink getLink(DashboardProjectItem dashboardProjectItem, String title, String screenReaderText) {
+    var status = dashboardProjectItem.getStatus();
+    String url;
+    switch (status) {
+      case DRAFT:
+        url = ReverseRouter.route(on(TaskListController.class).viewTaskList(dashboardProjectItem.getProjectId(), null));
+        break;
+      case QA:
+      case PUBLISHED:
+        url = ReverseRouter.route(on(ManageProjectController.class).getProject(dashboardProjectItem.getProjectId(), null, null));
+        break;
+      default:
+        throw new IllegalStateException(String.format("Project status %s not supported", status));
+    }
     return new DashboardLink(
           title,
-          ReverseRouter.route(on(TaskListController.class).viewTaskList(dashboardProjectItem.getProjectId(), null)),
+          url,
           true,
           screenReaderText
       );

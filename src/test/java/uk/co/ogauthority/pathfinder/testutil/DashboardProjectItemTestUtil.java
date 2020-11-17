@@ -17,13 +17,16 @@ public class DashboardProjectItemTestUtil {
   public static final String FIELD_NAME = "A field";
   public static final PortalOrganisationGroup ORGANISATION_GROUP = ProjectOperatorTestUtil.ORG_GROUP;
 
+  public static DashboardProjectItem getDashboardProjectItem() {
+    return getDashboardProjectItem(PROJECT_STATUS);
+  }
 
-  public static DashboardProjectItem getDashboardProjectItem(){
+  public static DashboardProjectItem getDashboardProjectItem(ProjectStatus status){
     var dashboardProjectItem = new DashboardProjectItem();
     dashboardProjectItem.setProjectId(PROJECT_ID);
     dashboardProjectItem.setProjectDetailId(PROJECT_DETAIL_ID);
     dashboardProjectItem.setCreatedDatetime(CREATED_INSTANT);
-    dashboardProjectItem.setStatus(PROJECT_STATUS);
+    dashboardProjectItem.setStatus(status);
     dashboardProjectItem.setProjectTitle(PROJECT_TITLE);
     dashboardProjectItem.setFieldStage(FIELD_STAGE);
     dashboardProjectItem.setFieldName(FIELD_NAME);
