@@ -176,6 +176,7 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
         .addObject("backToTaskListUrl",
             ControllerUtils.getBackToTaskListUrl(projectId)
         )
+        .addObject("projectSetupUrl", ControllerUtils.getProjectSetupUrl(projectId))
         .addObject("subseaInfrastructureViews", subseaInfrastructureViews)
         .addObject("errorList",
             validationResult.equals(ValidationResult.INVALID)

@@ -15,7 +15,7 @@
         />
       </#list>
     <#else>
-      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="platform or FPSO" linkUrl=""/>
+      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="platform or FPSO" linkUrl=springUrl(projectSetupUrl)/>
     </#if>
   <@fdsAction.link linkText="Add platform or FPSO" linkUrl=springUrl(addPlatformFpsoUrl) linkClass="govuk-button govuk-button--blue"/>
   <@fdsForm.htmlForm>

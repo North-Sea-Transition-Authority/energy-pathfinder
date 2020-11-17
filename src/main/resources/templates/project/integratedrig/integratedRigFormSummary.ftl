@@ -15,7 +15,7 @@
       />
     </#list>
     <#else>
-      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="integrated rig" linkUrl=""/>
+      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="integrated rig" linkUrl=springUrl(projectSetupUrl)/>
   </#if>
   <@fdsAction.link
     linkText="Add integrated rig"

@@ -15,7 +15,7 @@
       />
     </#list>
     <#else>
-      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="awarded contract" linkUrl=""/>
+      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="awarded contract" linkUrl=springUrl(projectSetupUrl)/>
   </#if>
   <@fdsAction.link
     linkText="Add awarded contract"

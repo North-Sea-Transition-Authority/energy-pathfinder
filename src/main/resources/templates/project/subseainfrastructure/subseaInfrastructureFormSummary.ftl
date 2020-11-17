@@ -14,7 +14,7 @@
       />
     </#list>
     <#else>
-      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="subsea infrastructure" linkUrl=""/>
+      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="subsea infrastructure" linkUrl=springUrl(projectSetupUrl)/>
   </#if>
   <@fdsAction.link
     linkText="Add subsea infrastructure"

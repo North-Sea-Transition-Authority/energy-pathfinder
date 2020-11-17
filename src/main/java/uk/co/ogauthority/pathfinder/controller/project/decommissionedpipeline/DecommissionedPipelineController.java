@@ -176,6 +176,7 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
         .addObject("backToTaskListUrl",
             ControllerUtils.getBackToTaskListUrl(projectId)
         )
+        .addObject("projectSetupUrl", ControllerUtils.getProjectSetupUrl(projectId))
         .addObject("decommissionedPipelineViews", decommissionedPipelineViews)
         .addObject("errorList",
             validationResult.equals(ValidationResult.INVALID)
