@@ -37,7 +37,7 @@ import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTende
 public enum ProjectTask implements GeneralPurposeProjectTask {
 
   PROJECT_OPERATOR(
-      "Project operator",
+      SelectProjectOperatorController.PAGE_NAME,
       SelectProjectOperatorController.class,
       SelectOperatorService.class,
       1
@@ -67,10 +67,10 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       50
   ),
   AWARDED_CONTRACTS(
-    AwardedContractController.PAGE_NAME,
-    AwardedContractController.class,
-    AwardedContractService.class,
-    60
+      AwardedContractController.PAGE_NAME,
+      AwardedContractController.class,
+      AwardedContractService.class,
+      60
   ),
   COLLABORATION_OPPORTUNITIES(
       CollaborationOpportunitiesController.PAGE_NAME,
@@ -90,16 +90,16 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       PlatformsFpsosService.class,
       90
   ),
-  SUBSEA_INFRASTRUCTURE(
-      SubseaInfrastructureController.SUMMARY_PAGE_NAME,
-      SubseaInfrastructureController.class,
-      SubseaInfrastructureService.class,
-      100
-  ),
   INTEGRATED_RIGS(
       IntegratedRigController.SUMMARY_PAGE_NAME,
       IntegratedRigController.class,
       IntegratedRigService.class,
+      100
+  ),
+  SUBSEA_INFRASTRUCTURE(
+      SubseaInfrastructureController.SUMMARY_PAGE_NAME,
+      SubseaInfrastructureController.class,
+      SubseaInfrastructureService.class,
       110
   ),
   PIPELINES(
@@ -114,8 +114,10 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
   private final Class<? extends ProjectFormSectionService> serviceClass;
   private final int displayOrder;
 
-  ProjectTask(String displayName, Class<?> controllerClass,
-              Class<? extends ProjectFormSectionService> serviceClass, int displayOrder) {
+  ProjectTask(String displayName,
+              Class<?> controllerClass,
+              Class<? extends ProjectFormSectionService> serviceClass,
+              int displayOrder) {
     this.displayName = displayName;
     this.controllerClass = controllerClass;
     this.serviceClass = serviceClass;

@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.enums.project.tasks;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,7 +19,8 @@ public enum TaskListSectionQuestion {
       "form.upcomingTendersIncluded",
       TaskListSectionAnswer.UPCOMING_TENDERS_YES,
       TaskListSectionAnswer.UPCOMING_TENDERS_NO,
-      false),
+      false
+  ),
   AWARDED_CONTRACTS(
       ProjectTask.AWARDED_CONTRACTS,
       "Do you have any awarded contracts on this project?",
@@ -51,20 +53,20 @@ public enum TaskListSectionQuestion {
       TaskListSectionAnswer.PLATFORM_FPSO_NO,
       true
   ),
-  SUBSEA_INFRASTRUCTURE(
-      ProjectTask.SUBSEA_INFRASTRUCTURE,
-      "Is subsea infrastructure being decommissioned on this project?",
-      "form.subseaInfrastructureIncluded",
-      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
-      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_NO,
-      true
-  ),
   INTEGRATED_RIGS(
       ProjectTask.INTEGRATED_RIGS,
       "Do you have any integrated rigs on this project?",
       "form.integratedRigsIncluded",
       TaskListSectionAnswer.INTEGRATED_RIGS_YES,
       TaskListSectionAnswer.INTEGRATED_RIGS_NO,
+      true
+  ),
+  SUBSEA_INFRASTRUCTURE(
+      ProjectTask.SUBSEA_INFRASTRUCTURE,
+      "Is subsea infrastructure being decommissioned on this project?",
+      "form.subseaInfrastructureIncluded",
+      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
+      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_NO,
       true
   ),
   PIPELINES(
@@ -122,12 +124,20 @@ public enum TaskListSectionQuestion {
   }
 
   public static List<TaskListSectionQuestion> getAllValues() {
-    return Arrays.asList(values());
+    var questions = Arrays.asList(values());
+    sort(questions);
+    return questions;
   }
 
   public static List<TaskListSectionQuestion> getNonDecommissioningRelatedValues() {
-    return Arrays.stream(values())
+    var questions = Arrays.stream(values())
         .filter(tlq -> !tlq.isDecommissioningRelated())
         .collect(Collectors.toList());
+    sort(questions);
+    return questions;
+  }
+
+  private static void sort(List<TaskListSectionQuestion> questions) {
+    questions.sort(Comparator.comparing(q -> q.getProjectTask().getDisplayOrder()));
   }
 }

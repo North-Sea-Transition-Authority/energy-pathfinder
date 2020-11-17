@@ -19,7 +19,7 @@ public class ProjectSetupFormValidator implements SmartValidator {
             () -> new ActionNotAllowedException("Expected ProjectSetupFormValidationHint to be provided")
         );
 
-    if (validationHint.validateDecomSections()) {
+    if (validationHint.decomValidationRequired()) {
       //reject missing values for decom sections
       ValidationUtils.rejectIfEmpty(errors, "wellsIncluded", "wellsIncluded.invalid",
           ProjectSetupFormValidationHint.WELLS_REQUIRED_TEXT

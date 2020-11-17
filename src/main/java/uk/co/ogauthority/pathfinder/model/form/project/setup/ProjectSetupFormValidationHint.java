@@ -9,7 +9,7 @@ public final class ProjectSetupFormValidationHint {
   public static final String SUBSEA_INFRASTRUCTURE_REQUIRED_TEXT = "Select yes if you plan to add any subsea " +
       "infrastructure to be decommissioned to your project";
   public static final String INTEGRATED_RIGS_REQUIRED_TEXT = "Select yes if you plan to add any integrated rigs to your project";
-  public static final String PIPELINES_REQUIRED_TEXT = "Select yes if you plan to add any wells to be decommissioned to your project";
+  public static final String PIPELINES_REQUIRED_TEXT = "Select yes if you plan to add any pipelines to be decommissioned to your project";
 
   public final boolean isDecomRelated;
   public final ValidationType validationType;
@@ -24,7 +24,7 @@ public final class ProjectSetupFormValidationHint {
     return isDecomRelated;
   }
 
-  public boolean validateDecomSections() {
+  public boolean decomValidationRequired() {
     return ValidationType.FULL.equals(this.validationType) && this.isDecomRelated;
   }
 }

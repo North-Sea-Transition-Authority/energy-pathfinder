@@ -30,15 +30,15 @@
         useNotCompletedLabels=true
       />
       <@fdsTaskList.taskListItem
-        itemUrl=springUrl(subseaInfrastructureUrl)
-        itemText=subseaInfrastructureText
-        completed=subseaInfrastructureCompleted
-        useNotCompletedLabels=true
-      />
-      <@fdsTaskList.taskListItem
         itemUrl=springUrl(integratedRigUrl)
         itemText=integratedRigText
         completed=integratedRigCompleted
+        useNotCompletedLabels=true
+      />
+      <@fdsTaskList.taskListItem
+        itemUrl=springUrl(subseaInfrastructureUrl)
+        itemText=subseaInfrastructureText
+        completed=subseaInfrastructureCompleted
         useNotCompletedLabels=true
       />
       <@fdsTaskList.taskListItem
