@@ -11,13 +11,13 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionAnswer;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionAnswerConverter;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionQuestion;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionQuestionsConverter;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionQuestionConverter;
 
 @Table(name = "project_task_list_setup")
 @Entity
 public class ProjectTaskListSetup extends ProjectDetailEntity {
 
-  @Convert(converter = TaskListSectionQuestionsConverter.class)
+  @Convert(converter = TaskListSectionQuestionConverter.class)
   @Lob
   @Column(name = "task_list_sections", columnDefinition = "CLOB")
   List<TaskListSectionQuestion> taskListSections;

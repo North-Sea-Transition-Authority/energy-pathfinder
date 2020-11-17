@@ -9,15 +9,15 @@ import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 
 @Converter
-public class TaskListSectionQuestionsConverter implements AttributeConverter<List<TaskListSectionQuestion>, String> {
+public class TaskListSectionQuestionConverter implements AttributeConverter<List<TaskListSectionQuestion>, String> {
   @Override
   public String convertToDatabaseColumn(List<TaskListSectionQuestion> taskListSectionQuestions) {
     if (taskListSectionQuestions != null) {
-      List<String> mnemonicList = taskListSectionQuestions.stream()
+      List<String> questionList = taskListSectionQuestions.stream()
           .map(TaskListSectionQuestion::name)
           .collect(Collectors.toList());
 
-      return String.join(",", mnemonicList);
+      return String.join(",", questionList);
     }
 
     return null;

@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.enums.project.tasks;
 
 
+import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 
@@ -13,7 +14,7 @@ public interface GeneralPurposeProjectTask {
   /**
    * Returns the class of a controller that defines general purpose task restrictions.
    */
-  Class getControllerClass();
+  Class<?extends ProjectFormPageController> getControllerClass();
 
   int getDisplayOrder();
 

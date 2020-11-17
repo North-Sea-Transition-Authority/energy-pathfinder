@@ -27,6 +27,7 @@ import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperato
 @RequestMapping("/project-operator-select")
 public class SelectProjectOperatorController {
 
+  public static final String PAGE_NAME = "Project operator";
   public static final String PRIMARY_BUTTON_TEXT = "Save and continue";
 
   private final StartProjectService startProjectService;
