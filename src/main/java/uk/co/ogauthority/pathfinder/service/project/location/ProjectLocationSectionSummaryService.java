@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationView;
 import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
@@ -23,7 +24,7 @@ public class ProjectLocationSectionSummaryService implements ProjectSectionSumma
       PAGE_NAME,
       SECTION_ID
   );
-  public static final int DISPLAY_ORDER = 2;
+  public static final int DISPLAY_ORDER = ProjectTask.PROJECT_LOCATION.getDisplayOrder();
 
   private final ProjectLocationService projectLocationService;
   private final ProjectLocationBlocksService projectLocationBlocksService;
