@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +19,6 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.tasks.ProjectTaskListSetup;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionAnswer;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionQuestion;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupForm;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupFormValidator;
@@ -49,7 +47,7 @@ public class ProjectSetupServiceTest {
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
 
-  private final ProjectTaskListSetup setup = ProjectTaskListSetupTestUtil.getProjectTaskListSetup(details);
+  private final ProjectTaskListSetup setup = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_nonDecom(details);
 
   private final ProjectTaskListSetup decomSetup = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_decomSections(details);
 
@@ -83,7 +81,7 @@ public class ProjectSetupServiceTest {
   @Test
   public void getProjectSetupModelAndView() {
     when(projectInformationService.isDecomRelated(details)).thenReturn(false);
-    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm();
+    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm_nonDecom();
     var modelAndView = projectSetupService.getProjectSetupModelAndView(details, form);
 
     assertThat(modelAndView.getViewName()).isEqualTo(ProjectSetupService.MODEL_AND_VIEW_PATH);
@@ -96,7 +94,7 @@ public class ProjectSetupServiceTest {
   @Test
   public void getProjectSetupModelAndView_decomRelated() {
     when(projectInformationService.isDecomRelated(details)).thenReturn(true);
-    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm();
+    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm_nonDecom();
     var modelAndView = projectSetupService.getProjectSetupModelAndView(details, form);
 
     assertThat(modelAndView.getViewName()).isEqualTo(ProjectSetupService.MODEL_AND_VIEW_PATH);
@@ -109,7 +107,7 @@ public class ProjectSetupServiceTest {
   @Test
   public void createOrUpdateProjectTaskListSetup() {
     when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
-    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm();
+    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm_nonDecom();
     var projectTaskListSetup = projectSetupService.createOrUpdateProjectTaskListSetup(details, form);
     assertThat(projectTaskListSetup.getTaskListSections()).containsExactlyInAnyOrderElementsOf(ProjectTaskListSetupTestUtil.NON_DECOM_SECTIONS);
     assertThat(projectTaskListSetup.getTaskListAnswers()).containsExactlyInAnyOrderElementsOf(ProjectTaskListSetupTestUtil.NON_DECOM_ANSWERS);
@@ -131,7 +129,7 @@ public class ProjectSetupServiceTest {
     when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(
         Optional.of(decomSetup)
     );
-    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm();
+    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm_nonDecom();
     var projectTaskListSetup = projectSetupService.createOrUpdateProjectTaskListSetup(details, form);
     assertThat(projectTaskListSetup.getTaskListSections()).containsExactlyInAnyOrderElementsOf(ProjectTaskListSetupTestUtil.NON_DECOM_SECTIONS);
     assertThat(projectTaskListSetup.getTaskListAnswers()).containsExactlyInAnyOrderElementsOf(ProjectTaskListSetupTestUtil.NON_DECOM_ANSWERS);
@@ -151,7 +149,7 @@ public class ProjectSetupServiceTest {
         Optional.of(setup)
       );
     var form = projectSetupService.getForm(details);
-    checkCommonFieldsMatch(ProjectTaskListSetupTestUtil.getProjectSetupForm(), form);
+    checkCommonFieldsMatch(ProjectTaskListSetupTestUtil.getProjectSetupForm_nonDecom(), form);
   }
 
   @Test
@@ -165,7 +163,7 @@ public class ProjectSetupServiceTest {
 
   @Test
   public void getTaskListSectionQuestionsForForm() {
-    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm();
+    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm_nonDecom();
     assertThat(projectSetupService.getTaskListSectionQuestionsFromForm(form)).containsExactlyInAnyOrderElementsOf(
         ProjectTaskListSetupTestUtil.NON_DECOM_SECTIONS
     );
@@ -214,7 +212,7 @@ public class ProjectSetupServiceTest {
 
   @Test
   public void removeDecomSelectionsIfPresent() {
-    var setupToTest = ProjectTaskListSetupTestUtil.getProjectTaskListSetup(details);
+    var setupToTest = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_nonDecom(details);
     var answerList = new ArrayList<>(ProjectTaskListSetupTestUtil.NON_DECOM_ANSWERS);
     var sectionList = new ArrayList<>(ProjectTaskListSetupTestUtil.NON_DECOM_SECTIONS);
     setupToTest.setTaskListAnswers(answerList);
@@ -238,7 +236,28 @@ public class ProjectSetupServiceTest {
     setupToTest.setTaskListAnswers(answerList);
     setupToTest.setTaskListSections(sectionList);
 
-    var setupToCompare = ProjectTaskListSetupTestUtil.getProjectTaskListSetup(details);
+    var setupToCompare = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_nonDecom(details);
+    when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(
+        Optional.of(setupToTest)
+    );
+
+    projectSetupService.removeDecomSelectionsIfPresent(details);
+
+    assertThat(setupToTest.getTaskListSections()).containsExactlyInAnyOrderElementsOf(setupToCompare.getTaskListSections());
+    assertThat(setupToTest.getTaskListAnswers()).containsExactlyInAnyOrderElementsOf(setupToCompare.getTaskListAnswers());
+  }
+
+  @Test
+  public void removeDecomSelectionsIfPresent_onlyDecomRelated() {
+    var setupToTest = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_decomSections(details);
+    var answerList = new ArrayList<>(ProjectTaskListSetupTestUtil.ONLY_DECOM_ANSWERS);
+    var sectionList = new ArrayList<>(ProjectTaskListSetupTestUtil.ONLY_DECOM_SECTIONS);
+    setupToTest.setTaskListAnswers(answerList);
+    setupToTest.setTaskListSections(sectionList);
+
+    var setupToCompare = new ProjectTaskListSetup(details);
+    setupToCompare.setTaskListAnswers(Collections.emptyList());
+    setupToCompare.setTaskListSections(Collections.emptyList());
     when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(
         Optional.of(setupToTest)
     );
