@@ -44,9 +44,9 @@ public class ProjectLocationViewUtilTest {
     assertThat(projectLocationView.getFieldType()).isNull();
     assertThat(projectLocationView.getWaterDepth()).isNull();
     assertThat(projectLocationView.getApprovedFieldDevelopmentPlan()).isNull();
-    assertThat(projectLocationView.getApprovedFdpDate()).isEqualTo("");
+    assertThat(projectLocationView.getApprovedFdpDate()).isEmpty();
     assertThat(projectLocationView.getApprovedDecomProgram()).isNull();
-    assertThat(projectLocationView.getApprovedDecomProgramDate()).isEqualTo("");
+    assertThat(projectLocationView.getApprovedDecomProgramDate()).isEmpty();
     assertThat(projectLocationView.getUkcsArea()).isNull();
     assertThat(projectLocationView.getLicenceBlocks()).isEmpty();
   }

@@ -57,10 +57,6 @@ public class SearchSelectorService {
     var restSearchResults = search(searchQuery, selectableList, sortResults);
     addManualEntry(searchQuery, restSearchResults);
 
-    restSearchResults = restSearchResults
-        .stream()
-        .collect(Collectors.toList());
-
     if (sortResults) {
       restSearchResults.sort(Comparator.comparing(RestSearchItem::getText));
     }
@@ -72,7 +68,8 @@ public class SearchSelectorService {
     return addManualEntry(searchQuery, resultList, ManualEntryAttribute.WITH_FREE_TEXT_PREFIX);
   }
 
-  public List<RestSearchItem> addManualEntry(String searchQuery, List<RestSearchItem> resultList,
+  public List<RestSearchItem> addManualEntry(String searchQuery,
+                                             List<RestSearchItem> resultList,
                                              ManualEntryAttribute manualEntryAttribute) {
     if (!StringUtils.isBlank(searchQuery)) {
       var entryExists = resultList.stream()

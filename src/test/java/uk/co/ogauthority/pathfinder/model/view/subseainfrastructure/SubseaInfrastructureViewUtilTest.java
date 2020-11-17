@@ -115,7 +115,7 @@ public class SubseaInfrastructureViewUtilTest {
 
     assertThat(subseaInfrastructureView.getInfrastructureType()).isEqualTo(subseaInfrastructure.getInfrastructureType().getDisplayName());
     assertThat(subseaInfrastructureView.getNumberOfMattresses()).isEqualTo(subseaInfrastructure.getNumberOfMattresses());
-    assertThat(subseaInfrastructureView.getTotalEstimatedMattressMass()).isEqualTo("");
+    assertThat(subseaInfrastructureView.getTotalEstimatedMattressMass()).isEmpty();
     assertThat(subseaInfrastructureView.getTotalEstimatedSubseaMass()).isNull();
     assertThat(subseaInfrastructureView.getOtherInfrastructureType()).isNull();
     assertThat(subseaInfrastructureView.getTotalEstimatedOtherMass()).isNull();
@@ -166,7 +166,7 @@ public class SubseaInfrastructureViewUtilTest {
 
     assertThat(subseaInfrastructureView.getInfrastructureType()).isEqualTo(subseaInfrastructure.getInfrastructureType().getDisplayName());
     assertThat(subseaInfrastructureView.getOtherInfrastructureType()).isEqualTo(subseaInfrastructure.getOtherInfrastructureType());
-    assertThat(subseaInfrastructureView.getTotalEstimatedOtherMass()).isEqualTo("");
+    assertThat(subseaInfrastructureView.getTotalEstimatedOtherMass()).isEmpty();
     assertThat(subseaInfrastructureView.getTotalEstimatedSubseaMass()).isNull();
     assertThat(subseaInfrastructureView.getNumberOfMattresses()).isNull();
     assertThat(subseaInfrastructureView.getTotalEstimatedMattressMass()).isNull();

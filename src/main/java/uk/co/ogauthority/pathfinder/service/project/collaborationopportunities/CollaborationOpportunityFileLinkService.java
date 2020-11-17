@@ -87,8 +87,11 @@ public class CollaborationOpportunityFileLinkService extends FileLinkService {
 
   @Override
   public List<CollaborationOpportunityFileLink> findAllByFileLinkableEntity(
-      EntityWithLinkedFile entityWithLinkedFile) {
-    return collaborationOpportunityFileLinkRepository.findAllByCollaborationOpportunity((CollaborationOpportunity) entityWithLinkedFile);
+      EntityWithLinkedFile entityWithLinkedFile
+  ) {
+    return collaborationOpportunityFileLinkRepository.findAllByCollaborationOpportunity(
+        (CollaborationOpportunity) entityWithLinkedFile
+    );
   }
 
   @Override
