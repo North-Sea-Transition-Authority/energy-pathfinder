@@ -6,5 +6,5 @@ import uk.co.ogauthority.pathfinder.model.view.management.ProjectManagementSecti
 
 public interface ProjectManagementSectionService {
 
-  ProjectManagementSection getSection(ProjectDetail projectDetail, AuthenticatedUserAccount authenticatedUserAccount);
+  ProjectManagementSection getSection(ProjectDetail projectDetail, AuthenticatedUserAccount user);
 }

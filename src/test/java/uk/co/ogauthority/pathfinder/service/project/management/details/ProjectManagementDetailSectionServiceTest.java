@@ -12,7 +12,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.view.management.details.ProjectManagementDetailsViewUtil;
+import uk.co.ogauthority.pathfinder.model.view.management.details.ProjectManagementDetailViewUtil;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
@@ -21,7 +21,7 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProjectManagementDetailsSectionServiceTest {
+public class ProjectManagementDetailSectionServiceTest {
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
@@ -35,11 +35,11 @@ public class ProjectManagementDetailsSectionServiceTest {
   @Mock
   private WebUserAccountService webUserAccountService;
 
-  private ProjectManagementDetailsSectionService projectManagementDetailsSectionService;
+  private ProjectManagementDetailSectionService projectManagementDetailSectionService;
 
   @Before
   public void setup() {
-    projectManagementDetailsSectionService = new ProjectManagementDetailsSectionService(
+    projectManagementDetailSectionService = new ProjectManagementDetailSectionService(
         projectInformationService,
         projectLocationService,
         webUserAccountService
@@ -56,18 +56,18 @@ public class ProjectManagementDetailsSectionServiceTest {
     when(projectLocationService.getOrError(projectDetail)).thenReturn(projectLocation);
     when(webUserAccountService.getWebUserAccountOrError(projectDetail.getSubmittedByWua())).thenReturn(submitterAccount);
 
-    var section = projectManagementDetailsSectionService.getSection(projectDetail, authenticatedUser);
-    assertThat(section.getTemplatePath()).isEqualTo(ProjectManagementDetailsSectionService.TEMPLATE_PATH);
-    assertThat(section.getDisplayOrder()).isEqualTo(ProjectManagementDetailsSectionService.DISPLAY_ORDER);
+    var section = projectManagementDetailSectionService.getSection(projectDetail, authenticatedUser);
+    assertThat(section.getTemplatePath()).isEqualTo(ProjectManagementDetailSectionService.TEMPLATE_PATH);
+    assertThat(section.getDisplayOrder()).isEqualTo(ProjectManagementDetailSectionService.DISPLAY_ORDER);
 
-    var projectManagementDetailsView = ProjectManagementDetailsViewUtil.from(
+    var projectManagementDetailView = ProjectManagementDetailViewUtil.from(
         projectDetail,
         projectInformation,
         projectLocation,
         submitterAccount
     );
     assertThat(section.getTemplateModel()).containsExactly(
-        entry("projectManagementDetailsView", projectManagementDetailsView)
+        entry("projectManagementDetailView", projectManagementDetailView)
     );
   }
 }

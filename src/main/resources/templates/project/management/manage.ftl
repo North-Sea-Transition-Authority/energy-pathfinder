@@ -8,7 +8,7 @@
     pageHeading="Project: ${projectManagementView.title}"
     pageHeadingClass="govuk-heading-xl"
   >
-    <span class="govuk-caption-m">${projectManagementView.operator}</span>
+    <span class="govuk-caption-l">${projectManagementView.operator}</span>
   </@headingWithContent>
   ${projectManagementView.sectionsHtml?no_esc}
 </@defaultPage>

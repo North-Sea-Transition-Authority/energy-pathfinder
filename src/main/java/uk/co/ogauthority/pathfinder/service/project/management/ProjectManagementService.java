@@ -20,10 +20,11 @@ public class ProjectManagementService {
   }
 
   public List<ProjectManagementSection> getSections(ProjectDetail projectDetail,
-                                                    AuthenticatedUserAccount authenticatedUserAccount) {
+                                                    AuthenticatedUserAccount user) {
     var sections = new ArrayList<ProjectManagementSection>();
-    sectionServices.forEach(sectionService ->
-        sections.add(sectionService.getSection(projectDetail, authenticatedUserAccount)));
+    sectionServices.forEach(
+        sectionService -> sections.add(sectionService.getSection(projectDetail, user))
+    );
 
     sections.sort(Comparator.comparing(ProjectManagementSection::getDisplayOrder));
 

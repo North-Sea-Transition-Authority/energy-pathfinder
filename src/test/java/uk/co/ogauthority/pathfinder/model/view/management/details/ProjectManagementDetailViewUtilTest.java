@@ -15,20 +15,20 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProjectManagementDetailsViewUtilTest {
+public class ProjectManagementDetailViewUtilTest {
 
   private static final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
 
-  private static void checkCommonFields(ProjectManagementDetailsView projectManagementDetailsView,
+  private static void checkCommonFields(ProjectManagementDetailView projectManagementDetailView,
                                         ProjectInformation projectInformation,
                                         AuthenticatedUserAccount submitterAccount) {
-    assertThat(projectManagementDetailsView.getFieldStage()).isEqualTo(
+    assertThat(projectManagementDetailView.getFieldStage()).isEqualTo(
         projectInformation.getFieldStage().getDisplayName());
-    assertThat(projectManagementDetailsView.getVersion()).isEqualTo(projectDetail.getVersion());
-    assertThat(projectManagementDetailsView.getSubmissionDate()).isEqualTo(
+    assertThat(projectManagementDetailView.getStatus()).isEqualTo(projectDetail.getStatus().getDisplayName());
+    assertThat(projectManagementDetailView.getSubmissionDate()).isEqualTo(
         DateUtil.formatInstant(projectDetail.getSubmittedInstant()));
-    assertThat(projectManagementDetailsView.getSubmittedByUser()).isEqualTo(submitterAccount.getFullName());
-    assertThat(projectManagementDetailsView.getSubmittedByUserEmail()).isEqualTo(submitterAccount.getEmailAddress());
+    assertThat(projectManagementDetailView.getSubmittedByUser()).isEqualTo(submitterAccount.getFullName());
+    assertThat(projectManagementDetailView.getSubmittedByUserEmail()).isEqualTo(submitterAccount.getEmailAddress());
   }
 
   @Test
@@ -37,15 +37,15 @@ public class ProjectManagementDetailsViewUtilTest {
     var projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(projectDetail);
     var submitterAccount = UserTestingUtil.getAuthenticatedUserAccount();
 
-    var projectManagementDetailsView = ProjectManagementDetailsViewUtil.from(
+    var projectManagementDetailView = ProjectManagementDetailViewUtil.from(
         projectDetail,
         projectInformation,
         projectLocation,
         submitterAccount
     );
 
-    checkCommonFields(projectManagementDetailsView, projectInformation, submitterAccount);
-    assertThat(projectManagementDetailsView.getField()).isEqualTo(projectLocation.getField().getFieldName());
+    checkCommonFields(projectManagementDetailView, projectInformation, submitterAccount);
+    assertThat(projectManagementDetailView.getField()).isEqualTo(projectLocation.getField().getFieldName());
   }
 
   @Test
@@ -54,14 +54,14 @@ public class ProjectManagementDetailsViewUtilTest {
     var projectLocation = ProjectLocationTestUtil.getProjectLocation_withManualField(projectDetail);
     var submitterAccount = UserTestingUtil.getAuthenticatedUserAccount();
 
-    var projectManagementDetailsView = ProjectManagementDetailsViewUtil.from(
+    var projectManagementDetailView = ProjectManagementDetailViewUtil.from(
         projectDetail,
         projectInformation,
         projectLocation,
         submitterAccount
     );
 
-    checkCommonFields(projectManagementDetailsView, projectInformation, submitterAccount);
-    assertThat(projectManagementDetailsView.getField()).isEqualTo(projectLocation.getManualFieldName());
+    checkCommonFields(projectManagementDetailView, projectInformation, submitterAccount);
+    assertThat(projectManagementDetailView.getField()).isEqualTo(projectLocation.getManualFieldName());
   }
 }

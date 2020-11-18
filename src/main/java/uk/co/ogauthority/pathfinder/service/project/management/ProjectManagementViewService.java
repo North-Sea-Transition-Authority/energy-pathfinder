@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project.management;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -30,23 +31,24 @@ public class ProjectManagementViewService {
     this.templateRenderingService = templateRenderingService;
   }
 
-  public ProjectManagementView getProjectManagementView(ProjectDetail projectDetail,
-                                                        AuthenticatedUserAccount authenticatedUserAccount) {
+  public ModelAndView getProjectManagementModelAndView(ProjectDetail projectDetail,
+                                                       AuthenticatedUserAccount user) {
     var projectInformation = projectInformationService.getProjectInformationOrError(projectDetail);
 
-    var projectOperator = projectOperatorService.getProjectOperatorByProjectDetail(projectDetail)
-        .orElseThrow(() -> new PathfinderEntityNotFoundException(
-            String.format("Unable to find ProjectOperator for projectDetail with ID %s", projectDetail.getId())));
+    var projectOperator = projectOperatorService.getProjectOperatorByProjectDetailOrError(projectDetail);
 
-    var sections = projectManagementService.getSections(projectDetail, authenticatedUserAccount);
+    var sections = projectManagementService.getSections(projectDetail, user);
 
     String combinedRenderedHtml = sections.stream()
         .map(summary -> templateRenderingService.render(summary.getTemplatePath(), summary.getTemplateModel(), true))
         .collect(Collectors.joining());
 
-    return new ProjectManagementView(
+    var projectManagementView = new ProjectManagementView(
         projectInformation.getProjectTitle(),
         projectOperator.getOrganisationGroup().getName(),
         combinedRenderedHtml);
+
+    return new ModelAndView("project/management/manage")
+        .addObject("projectManagementView", projectManagementView);
   }
 }

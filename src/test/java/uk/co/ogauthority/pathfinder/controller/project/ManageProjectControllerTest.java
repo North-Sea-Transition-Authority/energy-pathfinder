@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.controller.project;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
@@ -24,7 +23,6 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.management.ProjectManagementViewService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
-import uk.co.ogauthority.pathfinder.testutil.ProjectManagementTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -37,36 +35,24 @@ public class ManageProjectControllerTest extends ProjectContextAbstractControlle
   @MockBean
   private ProjectManagementViewService projectManagementViewService;
 
-  private ProjectDetail projectDetail;
+  private final ProjectDetail projectDetail  = ProjectUtil.getProjectDetails(ProjectStatus.PUBLISHED);
 
-  private AuthenticatedUserAccount authenticatedUser;
-
-  private AuthenticatedUserAccount unauthenticatedUser;
+  private final AuthenticatedUserAccount authenticatedOperatorUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.VIEW_PROJECT_PRIVILEGES);
+  private final AuthenticatedUserAccount unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   @Before
-  public void setup() throws Exception {
-    projectDetail = ProjectUtil.getProjectDetails(ProjectStatus.PUBLISHED);
-    authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.CREATE_PROJECT_PRIVILEGES);
-    unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
-
+  public void setup() {
     when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(projectDetail));
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedOperatorUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
   }
 
   @Test
   public void getProject_whenAuthenticated_thenAccess() throws Exception {
-    var projectManagementView = ProjectManagementTestUtil.createProjectManagementView();
-
-    when(projectManagementViewService.getProjectManagementView(projectDetail, authenticatedUser)).thenReturn(
-        projectManagementView
-    );
-
     mockMvc.perform(get(ReverseRouter.route(
         on(ManageProjectController.class).getProject(PROJECT_ID, null, null)))
-        .with(authenticatedUserAndSession(authenticatedUser)))
-        .andExpect(status().isOk())
-        .andExpect(model().attribute("projectManagementView", projectManagementView));
+        .with(authenticatedUserAndSession(authenticatedOperatorUser)))
+        .andExpect(status().isOk());
   }
 
   @Test
@@ -83,7 +69,7 @@ public class ManageProjectControllerTest extends ProjectContextAbstractControlle
     var projectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
 
     when(projectService.getLatestDetail(projectId)).thenReturn(Optional.of(projectDetail));
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedOperatorUser)).thenReturn(true);
 
     mockMvc.perform(get(ReverseRouter.route(
         on(ManageProjectController.class).getProject(projectId, null, null)))

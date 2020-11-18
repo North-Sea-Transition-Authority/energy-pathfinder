@@ -16,6 +16,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.management.ProjectManagementSection;
+import uk.co.ogauthority.pathfinder.model.view.management.ProjectManagementView;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.rendering.TemplateRenderingService;
@@ -55,7 +56,7 @@ public class ProjectManagementViewServiceTest {
   }
 
   @Test
-  public void getProjectManagementView() {
+  public void getProjectManagementModelAndView() {
     var stubRender = "FAKE";
     var sectionName1 = "text";
     var sectionName2 = "text2";
@@ -66,8 +67,8 @@ public class ProjectManagementViewServiceTest {
     when(projectInformationService.getProjectInformationOrError(projectDetail)).thenReturn(
         projectInformation
     );
-    when(projectOperatorService.getProjectOperatorByProjectDetail(projectDetail)).thenReturn(
-        Optional.of(projectOperator)
+    when(projectOperatorService.getProjectOperatorByProjectDetailOrError(projectDetail)).thenReturn(
+        projectOperator
     );
     when(projectManagementService.getSections(projectDetail, authenticatedUser)).thenReturn(List.of(
         new ProjectManagementSection(sectionName1, Map.of("test", "1"), 1),
@@ -76,11 +77,9 @@ public class ProjectManagementViewServiceTest {
 
     when(templateRenderingService.render(any(), any(), anyBoolean())).thenReturn(stubRender);
 
-    var projectManagementView = projectManagementViewService.getProjectManagementView(
-        projectDetail,
-        authenticatedUser
-    );
+    var modelAndView = projectManagementViewService.getProjectManagementModelAndView(projectDetail, authenticatedUser);
 
+    var projectManagementView = (ProjectManagementView) modelAndView.getModel().get("projectManagementView");
     assertThat(projectManagementView.getTitle()).isEqualTo(projectInformation.getProjectTitle());
     assertThat(projectManagementView.getOperator()).isEqualTo(projectOperator.getOrganisationGroup().getName());
     assertThat(projectManagementView.getSectionsHtml()).isEqualTo(stubRender + stubRender);

@@ -9,7 +9,7 @@ import uk.co.ogauthority.pathfinder.model.form.useraction.UserAction;
 @Service
 public class ProjectManagementActionService {
 
-  public List<UserAction> getUserActions(AuthenticatedUserAccount authenticatedUserAccount) {
+  public List<UserAction> getUserActions(AuthenticatedUserAccount user) {
     return Collections.emptyList();
   }
 }

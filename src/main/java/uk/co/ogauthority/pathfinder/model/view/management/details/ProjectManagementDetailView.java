@@ -2,13 +2,13 @@ package uk.co.ogauthority.pathfinder.model.view.management.details;
 
 import java.util.Objects;
 
-public class ProjectManagementDetailsView {
+public class ProjectManagementDetailView {
 
   private String fieldStage;
 
   private String field;
 
-  private Integer version;
+  private String status;
 
   private String submissionDate;
 
@@ -32,12 +32,12 @@ public class ProjectManagementDetailsView {
     this.field = field;
   }
 
-  public Integer getVersion() {
-    return version;
+  public String getStatus() {
+    return status;
   }
 
-  public void setVersion(Integer version) {
-    this.version = version;
+  public void setStatus(String status) {
+    this.status = status;
   }
 
   public String getSubmissionDate() {
@@ -72,10 +72,10 @@ public class ProjectManagementDetailsView {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ProjectManagementDetailsView that = (ProjectManagementDetailsView) o;
+    ProjectManagementDetailView that = (ProjectManagementDetailView) o;
     return Objects.equals(fieldStage, that.fieldStage)
         && Objects.equals(field, that.field)
-        && Objects.equals(version, that.version)
+        && Objects.equals(status, that.status)
         && Objects.equals(submissionDate, that.submissionDate)
         && Objects.equals(submittedByUser, that.submittedByUser)
         && Objects.equals(submittedByUserEmail, that.submittedByUserEmail);
@@ -86,7 +86,7 @@ public class ProjectManagementDetailsView {
     return Objects.hash(
         fieldStage,
         field,
-        version,
+        status,
         submissionDate,
         submittedByUser,
         submittedByUserEmail

@@ -12,10 +12,11 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusC
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.service.project.management.ProjectManagementViewService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 
 @Controller
 @ProjectStatusCheck(status = {ProjectStatus.QA, ProjectStatus.PUBLISHED})
-@ProjectFormPagePermissionCheck
+@ProjectFormPagePermissionCheck(permissions = {ProjectPermission.VIEW})
 @RequestMapping("/project/{projectId}/manage")
 public class ManageProjectController {
 
@@ -29,13 +30,10 @@ public class ManageProjectController {
   @GetMapping
   public ModelAndView getProject(@PathVariable Integer projectId,
                                  ProjectContext projectContext,
-                                 AuthenticatedUserAccount authenticatedUserAccount) {
-    var projectManagementView = projectManagementViewService.getProjectManagementView(
+                                 AuthenticatedUserAccount user) {
+    return projectManagementViewService.getProjectManagementModelAndView(
         projectContext.getProjectDetails(),
-        authenticatedUserAccount
+        user
     );
-
-    return new ModelAndView("project/management/manage")
-        .addObject("projectManagementView", projectManagementView);
   }
 }

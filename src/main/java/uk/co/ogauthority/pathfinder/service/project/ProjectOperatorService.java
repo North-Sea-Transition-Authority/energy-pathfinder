@@ -80,6 +80,12 @@ public class ProjectOperatorService {
     return projectOperatorRepository.findByProjectDetail(detail);
   }
 
+  public ProjectOperator getProjectOperatorByProjectDetailOrError(ProjectDetail projectDetail) {
+    return getProjectOperatorByProjectDetail(projectDetail)
+        .orElseThrow(() -> new PathfinderEntityNotFoundException(
+            String.format("Unable to find ProjectOperator for projectDetail with ID %s", projectDetail.getId())));
+  }
+
   public boolean isUserInMultipleTeams(AuthenticatedUserAccount user) {
     return teamService.getOrganisationTeamsPersonIsMemberOf(user.getLinkedPerson()).size() > 1;
   }

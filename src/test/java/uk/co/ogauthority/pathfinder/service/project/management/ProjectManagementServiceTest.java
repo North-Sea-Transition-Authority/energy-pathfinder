@@ -12,7 +12,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.service.project.management.action.ProjectManagementActionSectionService;
-import uk.co.ogauthority.pathfinder.service.project.management.details.ProjectManagementDetailsSectionService;
+import uk.co.ogauthority.pathfinder.service.project.management.details.ProjectManagementDetailSectionService;
 import uk.co.ogauthority.pathfinder.service.project.management.summary.ProjectManagementSummarySectionService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectManagementSectionTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -25,7 +25,7 @@ public class ProjectManagementServiceTest {
   private ProjectManagementActionSectionService projectManagementActionSectionService;
 
   @Mock
-  private ProjectManagementDetailsSectionService projectManagementDetailsSectionService;
+  private ProjectManagementDetailSectionService projectManagementDetailSectionService;
 
   @Mock
   private ProjectManagementSummarySectionService projectManagementSummarySectionService;
@@ -39,14 +39,14 @@ public class ProjectManagementServiceTest {
   public void setup() {
     projectManagementService = new ProjectManagementService(List.of(
         projectManagementActionSectionService,
-        projectManagementDetailsSectionService,
+        projectManagementDetailSectionService,
         projectManagementSummarySectionService
     ));
 
     when(projectManagementActionSectionService.getSection(projectDetail, authenticatedUser)).thenReturn(
         ProjectManagementSectionTestUtil.getProjectManagementSection()
     );
-    when(projectManagementDetailsSectionService.getSection(projectDetail, authenticatedUser)).thenReturn(
+    when(projectManagementDetailSectionService.getSection(projectDetail, authenticatedUser)).thenReturn(
         ProjectManagementSectionTestUtil.getProjectManagementSection()
     );
     when(projectManagementSummarySectionService.getSection(projectDetail, authenticatedUser)).thenReturn(

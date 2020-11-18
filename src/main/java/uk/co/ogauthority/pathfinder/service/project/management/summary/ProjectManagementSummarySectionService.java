@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.management.ProjectManagementSectionType;
 import uk.co.ogauthority.pathfinder.model.view.management.ProjectManagementSection;
 import uk.co.ogauthority.pathfinder.service.project.management.ProjectManagementSectionService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryViewService;
@@ -14,7 +15,7 @@ import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryViewSe
 public class ProjectManagementSummarySectionService implements ProjectManagementSectionService {
 
   public static final String TEMPLATE_PATH = "project/management/summary/projectSummary.ftl";
-  public static final int DISPLAY_ORDER = 3;
+  public static final int DISPLAY_ORDER = ProjectManagementSectionType.PROJECT_SUMMARY.getDisplayOrder();
 
   private final ProjectSummaryViewService projectSummaryViewService;
 
@@ -24,7 +25,7 @@ public class ProjectManagementSummarySectionService implements ProjectManagement
   }
 
   @Override
-  public ProjectManagementSection getSection(ProjectDetail projectDetail, AuthenticatedUserAccount authenticatedUserAccount) {
+  public ProjectManagementSection getSection(ProjectDetail projectDetail, AuthenticatedUserAccount user) {
     Map<String, Object> summaryModel = new HashMap<>();
     summaryModel.put("projectSummaryView", projectSummaryViewService.getProjectSummaryView(projectDetail));
     return new ProjectManagementSection(
