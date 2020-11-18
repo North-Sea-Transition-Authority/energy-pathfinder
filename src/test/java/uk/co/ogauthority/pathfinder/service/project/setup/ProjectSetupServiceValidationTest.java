@@ -35,7 +35,7 @@ public class ProjectSetupServiceValidationTest {
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
 
-  private final ProjectTaskListSetup setup = ProjectTaskListSetupTestUtil.getProjectTaskListSetup(details);
+  private final ProjectTaskListSetup setup = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_nonDecom(details);
 
   @Before
   public void setUp() throws Exception {
@@ -58,6 +58,14 @@ public class ProjectSetupServiceValidationTest {
 
   @Test
   public void isCompleted_incompleteForm() {
+    when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
+    assertThat(projectSetupService.isComplete(details)).isFalse();
+  }
+
+  @Test
+  public void isCompleted_partiallyCompleteForm() {
+    var incompleteSetup = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_nonDecom(details);
+    incompleteSetup.setTaskListSections(null);
     when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
     assertThat(projectSetupService.isComplete(details)).isFalse();
   }

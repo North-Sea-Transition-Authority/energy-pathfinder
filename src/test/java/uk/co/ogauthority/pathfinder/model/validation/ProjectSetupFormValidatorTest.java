@@ -30,7 +30,7 @@ public class ProjectSetupFormValidatorTest {
 
   @Test
   public void validate_completeForm_isValid() {
-    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm();
+    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm_nonDecom();
     var errors =  new BeanPropertyBindingResult(form, "form");
 
     var hint = new ProjectSetupFormValidationHint(false, ValidationType.FULL);
@@ -42,7 +42,7 @@ public class ProjectSetupFormValidatorTest {
   }
 
   @Test
-  public void validate_inCompleteForm_imValid() {
+  public void validate_inCompleteForm_inValid() {
     var form = ProjectTaskListSetupTestUtil.getProjectSetupForm_withDecomSections();
     form.setWellsIncluded(null);
     var errors =  new BeanPropertyBindingResult(form, "form");
@@ -80,7 +80,7 @@ public class ProjectSetupFormValidatorTest {
 
   @Test
   public void validate_partialForm_partialValidation_isValid() {
-    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm();
+    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm_nonDecom();
     form.setAwardedContractsIncluded(null);
     var errors =  new BeanPropertyBindingResult(form, "form");
 

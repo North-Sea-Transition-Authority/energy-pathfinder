@@ -96,7 +96,7 @@ public class ProjectSetupControllerTest extends ProjectContextAbstractController
       add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
     }};
 
-    var bindingResult = new BeanPropertyBindingResult(UpcomingTenderForm.class, "form");
+    var bindingResult = new BeanPropertyBindingResult(ProjectSetupForm.class, "form");
     when(projectSetupService.validate(any(), any(), any(),any())).thenReturn(bindingResult);
 
     mockMvc.perform(
@@ -118,7 +118,7 @@ public class ProjectSetupControllerTest extends ProjectContextAbstractController
       add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
     }};
 
-    var bindingResult = new BeanPropertyBindingResult(UpcomingTenderForm.class, "form");
+    var bindingResult = new BeanPropertyBindingResult(ProjectSetupForm.class, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
     when(projectSetupService.validate(any(), any(), any(),any())).thenReturn(bindingResult);
 
@@ -141,7 +141,7 @@ public class ProjectSetupControllerTest extends ProjectContextAbstractController
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
 
-    var bindingResult = new BeanPropertyBindingResult(UpcomingTenderForm.class, "form");
+    var bindingResult = new BeanPropertyBindingResult(ProjectSetupForm.class, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
     when(projectSetupService.validate(any(), any(), any(),any())).thenReturn(bindingResult);
 
@@ -164,7 +164,7 @@ public class ProjectSetupControllerTest extends ProjectContextAbstractController
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
 
-    var bindingResult = new BeanPropertyBindingResult(UpcomingTenderForm.class, "form");
+    var bindingResult = new BeanPropertyBindingResult(ProjectSetupForm.class, "form");
     when(projectSetupService.validate(any(), any(), any(),any())).thenReturn(bindingResult);
 
     mockMvc.perform(

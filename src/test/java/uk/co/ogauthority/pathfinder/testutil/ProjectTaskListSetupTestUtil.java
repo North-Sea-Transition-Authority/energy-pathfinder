@@ -36,8 +36,21 @@ public class ProjectTaskListSetupTestUtil {
       TaskListSectionAnswer.PIPELINES_NO
   );
 
+  public static final List<TaskListSectionAnswer> ONLY_DECOM_ANSWERS = List.of(
+      TaskListSectionAnswer.WELLS_YES,
+      TaskListSectionAnswer.PLATFORM_FPSO_NO,
+      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
+      TaskListSectionAnswer.INTEGRATED_RIGS_NO,
+      TaskListSectionAnswer.PIPELINES_NO
+  );
 
-  public static ProjectTaskListSetup getProjectTaskListSetup(ProjectDetail detail) {
+  public static final List<TaskListSectionQuestion> ONLY_DECOM_SECTIONS = List.of(
+      TaskListSectionQuestion.WELLS,
+      TaskListSectionQuestion.SUBSEA_INFRASTRUCTURE
+  );
+
+
+  public static ProjectTaskListSetup getProjectTaskListSetup_nonDecom(ProjectDetail detail) {
     var setup = new ProjectTaskListSetup(detail);
     setup.setTaskListAnswers(NON_DECOM_ANSWERS);
     setup.setTaskListSections(NON_DECOM_SECTIONS);
@@ -51,14 +64,14 @@ public class ProjectTaskListSetupTestUtil {
     return setup;
   }
 
-  public static ProjectSetupForm getProjectSetupForm() {
+  public static ProjectSetupForm getProjectSetupForm_nonDecom() {
     var form = new ProjectSetupForm();
     setCommonFields(form);
     return form;
   }
 
   public static ProjectSetupForm getProjectSetupForm_withDecomSections(){
-    var form = getProjectSetupForm();
+    var form = getProjectSetupForm_nonDecom();
     form.setWellsIncluded(TaskListSectionAnswer.WELLS_YES);
     form.setPlatformsFpsosIncluded(TaskListSectionAnswer.PLATFORM_FPSO_NO);
     form.setSubseaInfrastructureIncluded(TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES);

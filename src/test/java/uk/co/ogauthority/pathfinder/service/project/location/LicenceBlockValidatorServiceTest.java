@@ -58,7 +58,6 @@ public class LicenceBlockValidatorServiceTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors).hasSize(1);
     assertThat(fieldErrors).containsExactly(
         entry(FIELD_ID, Set.of(FIELD_ID + ".notPresent"))
     );

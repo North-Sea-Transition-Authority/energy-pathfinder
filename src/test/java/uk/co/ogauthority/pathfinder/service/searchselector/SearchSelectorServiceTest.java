@@ -96,6 +96,18 @@ public class SearchSelectorServiceTest {
   }
 
   @Test
+  public void addManualEntry_whenSearchQueryIsNull_thenListNotChanged() {
+    var searchableResults = searchSelectorService.addManualEntry(null, new ArrayList<>());
+    assertThat(searchableResults).isEmpty();
+  }
+
+  @Test
+  public void addManualEntry_whenSearchQueryIsEmptyString_thenListNotChanged() {
+    var searchableResults = searchSelectorService.addManualEntry("", new ArrayList<>());
+    assertThat(searchableResults).isEmpty();
+  }
+
+  @Test
   public void buildPrepopulatedSelections() {
     var prefix = SearchSelectablePrefix.FREE_TEXT_PREFIX;
     var selections = List.of(prefix + "Test", "1", "2");
