@@ -169,6 +169,7 @@ public class AwardedContractController extends ProjectFormPageController {
         .addObject("backToTaskListUrl",
             ControllerUtils.getBackToTaskListUrl(projectId)
         )
+        .addObject("projectSetupUrl", ControllerUtils.getProjectSetupUrl(projectId))
         .addObject("errorList",
             validationResult.equals(ValidationResult.INVALID)
                 ? awardedContractSummaryService.getAwardedContractViewErrors(awardedContractViews)

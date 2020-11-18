@@ -188,6 +188,7 @@ public class PlatformsFpsosController extends ProjectFormPageController {
             : null
         )
         .addObject("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectId))
+        .addObject("projectSetupUrl", ControllerUtils.getProjectSetupUrl(projectId))
         .addObject("addPlatformFpsoUrl", ReverseRouter.route(on(PlatformsFpsosController.class).addPlatformFpso(projectId, null)));
     breadcrumbService.fromTaskList(projectId, modelAndView, SUMMARY_PAGE_NAME);
     return modelAndView;

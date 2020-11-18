@@ -257,7 +257,8 @@ public class CollaborationOpportunitiesController extends PathfinderFileUploadCo
             ? collaborationOpportunitiesSummaryService.getErrors(views)
             : null
         )
-        .addObject("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectId));
+        .addObject("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectId))
+        .addObject("projectSetupUrl", ControllerUtils.getProjectSetupUrl(projectId));
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;
   }

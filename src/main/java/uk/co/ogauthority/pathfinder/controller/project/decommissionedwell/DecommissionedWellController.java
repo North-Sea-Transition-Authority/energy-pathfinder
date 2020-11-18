@@ -27,6 +27,7 @@ import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.decommissionedwell.DecommissionedWellService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
@@ -116,7 +117,8 @@ public class DecommissionedWellController extends ProjectFormPageController {
         .addObject("pageName", SUMMARY_PAGE_NAME)
         .addObject("addDecommissionedWellUrl",
             ReverseRouter.route(on(DecommissionedWellController.class).addWellsToBeDecommissioned(projectId, null))
-        );
+        )
+        .addObject("projectSetupUrl", ControllerUtils.getProjectSetupUrl(projectId));
 
     breadcrumbService.fromTaskList(projectId, modelAndView, SUMMARY_PAGE_NAME);
 

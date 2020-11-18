@@ -174,6 +174,7 @@ public class IntegratedRigController extends ProjectFormPageController {
         .addObject("backToTaskListUrl",
             ControllerUtils.getBackToTaskListUrl(projectId)
         )
+        .addObject("projectSetupUrl", ControllerUtils.getProjectSetupUrl(projectId))
         .addObject("integratedRigViews", integratedRigViews)
         .addObject("errorList",
             validationResult.equals(ValidationResult.INVALID)

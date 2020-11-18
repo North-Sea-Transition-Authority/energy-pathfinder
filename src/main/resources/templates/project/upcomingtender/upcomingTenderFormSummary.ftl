@@ -11,7 +11,7 @@
       <@tenderSummary.upcomingTenderSummary view=view showHeader=true showActions=true showTag=false />
     </#list>
   <#else>
-    <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="upcoming tender" linkUrl=""/>
+    <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="upcoming tender" linkUrl=springUrl(projectSetupUrl)/>
   </#if>
 
   <@fdsAction.link linkText="Add upcoming tender" linkUrl=springUrl(addTenderUrl) linkClass="govuk-button govuk-button--blue"/>

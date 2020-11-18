@@ -20,7 +20,7 @@ public class ProjectTaskListSetup extends ProjectDetailEntity {
   @Convert(converter = TaskListSectionQuestionConverter.class)
   @Lob
   @Column(name = "task_list_sections", columnDefinition = "CLOB")
-  List<TaskListSectionQuestion> taskListSectionQuestions;
+  List<TaskListSectionQuestion> taskListSections;
 
   @Convert(converter = TaskListSectionAnswerConverter.class)
   @Lob
@@ -35,20 +35,20 @@ public class ProjectTaskListSetup extends ProjectDetailEntity {
   }
 
   public ProjectTaskListSetup(ProjectDetail detail,
-                              List<TaskListSectionQuestion> taskListSectionQuestions,
+                              List<TaskListSectionQuestion> taskListSections,
                               List<TaskListSectionAnswer> taskListAnswers) {
     this.projectDetail = detail;
-    this.taskListSectionQuestions = taskListSectionQuestions;
+    this.taskListSections = taskListSections;
     this.taskListAnswers = taskListAnswers;
   }
 
-  public List<TaskListSectionQuestion> getTaskListSectionQuestions() {
-    return taskListSectionQuestions;
+  public List<TaskListSectionQuestion> getTaskListSections() {
+    return taskListSections;
   }
 
-  public void setTaskListSectionQuestions(
+  public void setTaskListSections(
       List<TaskListSectionQuestion> taskListSectionQuestions) {
-    this.taskListSectionQuestions = taskListSectionQuestions;
+    this.taskListSections = taskListSectionQuestions;
   }
 
   public List<TaskListSectionAnswer> getTaskListAnswers() {

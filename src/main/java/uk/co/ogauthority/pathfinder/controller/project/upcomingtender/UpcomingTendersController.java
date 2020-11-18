@@ -242,7 +242,8 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
               ? upcomingTenderSummaryService.getErrors(tenderViews)
               : null
         )
-        .addObject("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectId));
+        .addObject("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectId))
+        .addObject("projectSetupUrl", ControllerUtils.getProjectSetupUrl(projectId));
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;
   }

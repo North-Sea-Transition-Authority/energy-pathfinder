@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
+import uk.co.ogauthority.pathfinder.controller.project.setup.ProjectSetupController;
 import uk.co.ogauthority.pathfinder.model.Checkable;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
@@ -28,5 +29,9 @@ public class ControllerUtils {
 
   public static String getBackToTaskListUrl(Integer projectId) {
     return ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId, null));
+  }
+
+  public static String getProjectSetupUrl(Integer projectId) {
+    return ReverseRouter.route(on(ProjectSetupController.class).getProjectSetup(projectId, null));
   }
 }
