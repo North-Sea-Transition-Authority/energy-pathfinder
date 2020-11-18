@@ -8,8 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,8 +18,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.tasks.ProjectTaskListSetup;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionAnswer;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionQuestion;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionQuestion;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupForm;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.tasks.ProjectTaskListSetupRepository;

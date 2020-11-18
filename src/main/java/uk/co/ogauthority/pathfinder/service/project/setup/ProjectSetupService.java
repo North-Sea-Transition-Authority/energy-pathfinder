@@ -15,8 +15,9 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.tasks.ProjectTaskListSetup;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionAnswer;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionQuestion;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionAnswer;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionQuestion;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupForm;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupFormValidationHint;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupFormValidator;
@@ -195,6 +196,12 @@ public class ProjectSetupService implements ProjectFormSectionService {
         projectTaskListSetupRepository.save(tls);
       });
     }
+  }
+
+  public boolean taskSelectedForProjectDetail(ProjectDetail detail, ProjectTask task) {
+    return projectTaskListSetupRepository.findByProjectDetail(detail)
+        .map(setup -> setup.getTaskListSections().stream().anyMatch(q -> q.getProjectTask().equals(task)))
+        .orElse(false);
   }
 
   @Override

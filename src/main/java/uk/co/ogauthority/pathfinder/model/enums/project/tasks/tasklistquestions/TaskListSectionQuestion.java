@@ -1,9 +1,10 @@
-package uk.co.ogauthority.pathfinder.model.enums.project.tasks;
+package uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 
 /**
  * An enum to manage which {@see ProjectTask}s are conditionally shown
@@ -47,7 +48,7 @@ public enum TaskListSectionQuestion {
   ),
   PLATFORM_FPSO(
       ProjectTask.PLATFORM_FPSO,
-      "Are platforms or FPSOs being decommissioned on this project?",
+      "Are platforms or floating production storage and offloading units being decommissioned on this project?",
       "form.platformsFpsosIncluded",
       TaskListSectionAnswer.PLATFORM_FPSO_YES,
       TaskListSectionAnswer.PLATFORM_FPSO_NO,

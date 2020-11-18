@@ -88,7 +88,7 @@ public class BreadcrumbService {
 
   private Map<String, String> subseaInfrastructure(Integer projectId) {
     var map = taskList(projectId);
-    String route = ReverseRouter.route(on(SubseaInfrastructureController.class).getSubseaStructures(projectId, null));
+    String route = ReverseRouter.route(on(SubseaInfrastructureController.class).viewSubseaStructures(projectId, null));
     map.put(route, SubseaInfrastructureController.SUMMARY_PAGE_NAME);
     return map;
   }
@@ -99,7 +99,7 @@ public class BreadcrumbService {
 
   private Map<String, String> integratedRig(Integer projectId) {
     var map = taskList(projectId);
-    String route = ReverseRouter.route(on(IntegratedRigController.class).getIntegratedRigs(projectId, null));
+    String route = ReverseRouter.route(on(IntegratedRigController.class).viewIntegratedRigs(projectId, null));
     map.put(route, IntegratedRigController.SUMMARY_PAGE_NAME);
     return map;
   }
@@ -110,7 +110,7 @@ public class BreadcrumbService {
 
   private Map<String, String> decommissionedPipeline(Integer projectId) {
     var map = taskList(projectId);
-    String route = ReverseRouter.route(on(DecommissionedPipelineController.class).getPipelines(projectId, null));
+    String route = ReverseRouter.route(on(DecommissionedPipelineController.class).viewPipelines(projectId, null));
     map.put(route, DecommissionedPipelineController.TASK_LIST_NAME);
     return map;
   }

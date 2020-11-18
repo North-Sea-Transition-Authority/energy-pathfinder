@@ -82,7 +82,7 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
   @Test
   public void getPipelines_whenAuthenticated_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(DecommissionedPipelineController.class).getPipelines(PROJECT_ID, null)))
+        on(DecommissionedPipelineController.class).viewPipelines(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -90,7 +90,7 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
   @Test
   public void getPipelines_whenUnauthenticated_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(DecommissionedPipelineController.class).getPipelines(PROJECT_ID, null)))
+        on(DecommissionedPipelineController.class).viewPipelines(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }

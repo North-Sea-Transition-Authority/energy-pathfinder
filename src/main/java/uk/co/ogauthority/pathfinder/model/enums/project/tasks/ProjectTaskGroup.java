@@ -1,0 +1,77 @@
+package uk.co.ogauthority.pathfinder.model.enums.project.tasks;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public enum ProjectTaskGroup {
+
+  PROJECT_OPERATOR(
+      ProjectTask.PROJECT_OPERATOR.getDisplayName(),
+      List.of(ProjectTask.PROJECT_OPERATOR),
+      1
+  ),
+  PREPARE_PROJECT(
+      "Prepare project",
+      List.of(
+          ProjectTask.PROJECT_INFORMATION,
+          ProjectTask.PROJECT_LOCATION,
+          ProjectTask.PROJECT_SETUP
+      ),
+      2
+  ),
+  COMMERCIAL_INFORMATION(
+    "Commercial information",
+      List.of(
+          ProjectTask.UPCOMING_TENDERS,
+          ProjectTask.AWARDED_CONTRACTS,
+          ProjectTask.COLLABORATION_OPPORTUNITIES
+      ),
+      3
+  ),
+  DECOMMISSIONING_SCHEDULES(
+      "Decommissioning schedules",
+      List.of(
+          ProjectTask.WELLS,
+          ProjectTask.PLATFORM_FPSO,
+          ProjectTask.INTEGRATED_RIGS,
+          ProjectTask.SUBSEA_INFRASTRUCTURE,
+          ProjectTask.PIPELINES
+      ),
+      4
+  );
+
+
+  private final String displayName;
+  private final List<ProjectTask> tasks;
+  private final int displayOrder;
+
+  ProjectTaskGroup(String displayName, List<ProjectTask> tasks, int displayOrder) {
+    this.displayName = displayName;
+    this.tasks = tasks;
+    this.displayOrder = displayOrder;
+  }
+
+  public String getDisplayName() {
+    return displayName;
+  }
+
+  public List<ProjectTask> getTasks() {
+    return tasks;
+  }
+
+  public int getDisplayOrder() {
+    return displayOrder;
+  }
+
+  public static List<ProjectTaskGroup> asList() {
+    return Arrays.stream(ProjectTaskGroup.values())
+        .collect(Collectors.toList());
+  }
+
+  public Set<ProjectTask> getProjectTaskSet() {
+    return new HashSet<>(tasks);
+  }
+}
