@@ -75,11 +75,13 @@ public class IntegratedRigService implements ProjectFormSectionService {
     return validationService.validate(form, bindingResult, validationType);
   }
 
+  @Transactional
   public IntegratedRig createIntegratedRig(ProjectDetail projectDetail, IntegratedRigForm form) {
     var integratedRig = new IntegratedRig();
     return createOrUpdateIntegratedRig(integratedRig, projectDetail, form);
   }
 
+  @Transactional
   public IntegratedRig updateIntegratedRig(Integer integratedRigId,
                                            ProjectDetail projectDetail,
                                            IntegratedRigForm form) {
@@ -87,7 +89,6 @@ public class IntegratedRigService implements ProjectFormSectionService {
     return createOrUpdateIntegratedRig(integratedRig, projectDetail, form);
   }
 
-  @Transactional
   IntegratedRig createOrUpdateIntegratedRig(IntegratedRig integratedRig,
                                             ProjectDetail projectDetail,
                                             IntegratedRigForm form) {

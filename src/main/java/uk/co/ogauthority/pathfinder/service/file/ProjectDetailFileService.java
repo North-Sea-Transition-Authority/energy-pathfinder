@@ -180,7 +180,6 @@ public class ProjectDetailFileService {
     projectDetailFile.setFileLinkStatus(FileLinkStatus.FULL);
   }
 
-  @Transactional
   void deleteProjectDetailFileLinksAndUploadedFiles(Iterable<ProjectDetailFile> filesToBeRemoved,
                                                     WebUserAccount user) {
 

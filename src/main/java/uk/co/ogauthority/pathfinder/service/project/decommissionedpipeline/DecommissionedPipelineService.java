@@ -81,12 +81,14 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
     return validationService.validate(form, bindingResult, validationType);
   }
 
+  @Transactional
   public DecommissionedPipeline createDecommissionedPipeline(ProjectDetail projectDetail,
                                                              DecommissionedPipelineForm form) {
     var decommissionedPipeline = new DecommissionedPipeline();
     return createOrUpdateDecommissionedPipeline(decommissionedPipeline, projectDetail, form);
   }
 
+  @Transactional
   public DecommissionedPipeline updateDecommissionedPipeline(Integer decommissionedPipelineId,
                                                              ProjectDetail projectDetail,
                                                              DecommissionedPipelineForm form) {
@@ -94,7 +96,6 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
     return createOrUpdateDecommissionedPipeline(decommissionedPipeline, projectDetail, form);
   }
 
-  @Transactional
   DecommissionedPipeline createOrUpdateDecommissionedPipeline(DecommissionedPipeline decommissionedPipeline,
                                                               ProjectDetail projectDetail,
                                                               DecommissionedPipelineForm form) {

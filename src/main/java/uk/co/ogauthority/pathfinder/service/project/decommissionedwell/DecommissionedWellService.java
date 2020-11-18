@@ -72,12 +72,14 @@ public class DecommissionedWellService implements ProjectFormSectionService {
     return bindingResult;
   }
 
+  @Transactional
   public DecommissionedWell createDecommissionedWell(DecommissionedWellForm form, ProjectDetail projectDetail) {
     var decommissionedWell = new DecommissionedWell();
     decommissionedWell.setProjectDetail(projectDetail);
     return updateDecommissionedWell(form, decommissionedWell);
   }
 
+  @Transactional
   public DecommissionedWell updateDecommissionedWell(Integer decommissionedWellId,
                                                      ProjectDetail projectDetail,
                                                      DecommissionedWellForm decommissionedWellForm) {
@@ -85,7 +87,6 @@ public class DecommissionedWellService implements ProjectFormSectionService {
     return updateDecommissionedWell(decommissionedWellForm, decommissionedWell);
   }
 
-  @Transactional
   protected DecommissionedWell updateDecommissionedWell(DecommissionedWellForm form,
                                                         DecommissionedWell decommissionedWell) {
 
