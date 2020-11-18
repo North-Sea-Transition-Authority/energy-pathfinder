@@ -19,11 +19,12 @@ import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFp
 import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFpsoValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.platformsfpsos.PlatformFpsoRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
-public class PlatformsFpsosService {
+public class PlatformsFpsosService implements ProjectFormSectionService {
 
 
   private final PlatformFpsoRepository platformFpsoRepository;
@@ -116,11 +117,6 @@ public class PlatformsFpsosService {
     return validationService.validate(form, bindingResult, validationType);
   }
 
-  public boolean isComplete(ProjectDetail detail) {
-    var platformsFpsos = getPlatformsFpsosForDetail(detail);
-    return !platformsFpsos.isEmpty() && platformsFpsos.stream().allMatch(p -> isValid(p, ValidationType.FULL));
-  }
-
   public PlatformFpsoForm getForm(PlatformFpso platformFpso) {
     var form = new PlatformFpsoForm();
 
@@ -169,5 +165,11 @@ public class PlatformsFpsosService {
 
     }
     return Map.of();
+  }
+
+  @Override
+  public boolean isComplete(ProjectDetail detail) {
+    var platformsFpsos = getPlatformsFpsosForDetail(detail);
+    return !platformsFpsos.isEmpty() && platformsFpsos.stream().allMatch(p -> isValid(p, ValidationType.FULL));
   }
 }

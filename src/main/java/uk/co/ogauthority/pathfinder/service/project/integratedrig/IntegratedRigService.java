@@ -14,11 +14,12 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.integratedrig.IntegratedRigForm;
 import uk.co.ogauthority.pathfinder.repository.project.integratedrig.IntegratedRigRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
-public class IntegratedRigService {
+public class IntegratedRigService implements ProjectFormSectionService {
 
   private final DevUkFacilitiesService devUkFacilitiesService;
   private final IntegratedRigRepository integratedRigRepository;
@@ -110,12 +111,6 @@ public class IntegratedRigService {
     integratedRigRepository.delete(integratedRig);
   }
 
-  public boolean isComplete(ProjectDetail projectDetail) {
-    var integratedRigs = getIntegratedRigs(projectDetail);
-    return !integratedRigs.isEmpty() && integratedRigs.stream()
-        .allMatch(integratedRig -> isValid(integratedRig, ValidationType.FULL));
-  }
-
   private void setCommonEntityFields(IntegratedRig integratedRig,
                                      ProjectDetail projectDetail,
                                      IntegratedRigForm form) {
@@ -140,5 +135,12 @@ public class IntegratedRigService {
             integratedRigId,
             projectDetail.getId()
         )));
+  }
+
+  @Override
+  public boolean isComplete(ProjectDetail projectDetail) {
+    var integratedRigs = getIntegratedRigs(projectDetail);
+    return !integratedRigs.isEmpty() && integratedRigs.stream()
+        .allMatch(integratedRig -> isValid(integratedRig, ValidationType.FULL));
   }
 }

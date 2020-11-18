@@ -8,6 +8,7 @@
     <@fdsTaskList.taskListSection sectionNumber="2" sectionHeadingText="Prepare project" >
       <@fdsTaskList.taskListItem itemUrl=springUrl(projectInformationUrl) itemText=projectInformationText completed=projectInformationCompleted useNotCompletedLabels=true />
       <@fdsTaskList.taskListItem itemUrl=springUrl(locationUrl) itemText=projectLocationText completed=projectLocationCompleted useNotCompletedLabels=true />
+      <@fdsTaskList.taskListItem itemUrl=springUrl(projectSetupUrl) itemText=projectSetupText completed=projectSetupCompleted useNotCompletedLabels=true />
       <@fdsTaskList.taskListItem itemUrl=springUrl(upcomingTendersUrl) itemText=upcomingTendersText completed=upcomingTendersCompleted useNotCompletedLabels=true />
       <@fdsTaskList.taskListItem
         itemUrl=springUrl(awardedContractsUrl)
@@ -29,15 +30,15 @@
         useNotCompletedLabels=true
       />
       <@fdsTaskList.taskListItem
-        itemUrl=springUrl(subseaInfrastructureUrl)
-        itemText=subseaInfrastructureText
-        completed=subseaInfrastructureCompleted
-        useNotCompletedLabels=true
-      />
-      <@fdsTaskList.taskListItem
         itemUrl=springUrl(integratedRigUrl)
         itemText=integratedRigText
         completed=integratedRigCompleted
+        useNotCompletedLabels=true
+      />
+      <@fdsTaskList.taskListItem
+        itemUrl=springUrl(subseaInfrastructureUrl)
+        itemText=subseaInfrastructureText
+        completed=subseaInfrastructureCompleted
         useNotCompletedLabels=true
       />
       <@fdsTaskList.taskListItem

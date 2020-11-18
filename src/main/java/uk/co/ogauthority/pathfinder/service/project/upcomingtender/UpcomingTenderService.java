@@ -28,11 +28,12 @@ import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTe
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
-public class UpcomingTenderService {
+public class UpcomingTenderService implements ProjectFormSectionService {
 
   private final UpcomingTenderRepository upcomingTenderRepository;
   private final ValidationService validationService;
@@ -130,12 +131,6 @@ public class UpcomingTenderService {
     return !bindingResult.hasErrors();
   }
 
-  public boolean isComplete(ProjectDetail detail) {
-    var upcomingTenders =  getUpcomingTendersForDetail(detail);
-    return !upcomingTenders.isEmpty() && upcomingTenders.stream()
-        .allMatch(ut -> isValid(ut, ValidationType.FULL));
-  }
-
   public UpcomingTenderForm getForm(UpcomingTender upcomingTender) {
     var form = new UpcomingTenderForm();
 
@@ -217,5 +212,12 @@ public class UpcomingTenderService {
    */
   public List<RestSearchItem> findTenderFunctionsLikeWithManualEntry(String searchTerm) {
     return functionService.findFunctionsLikeWithManualEntry(searchTerm, FunctionType.UPCOMING_TENDER);
+  }
+
+  @Override
+  public boolean isComplete(ProjectDetail detail) {
+    var upcomingTenders =  getUpcomingTendersForDetail(detail);
+    return !upcomingTenders.isEmpty() && upcomingTenders.stream()
+        .allMatch(ut -> isValid(ut, ValidationType.FULL));
   }
 }

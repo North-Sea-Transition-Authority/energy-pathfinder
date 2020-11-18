@@ -65,6 +65,8 @@ public class ProjectInformationController extends ProjectFormPageController {
         form,
         () -> {
           projectInformationService.createOrUpdate(projectContext.getProjectDetails(), form);
+          //TODO PAT-314 in here have a parent service that includes projectInformation and the ProjectSetup services
+          //Call that to filter any decom stuff if necessary? Or just call projectSetupService directly?
 
           return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
         });

@@ -28,12 +28,13 @@ import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.vali
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.validation.subseastructure.SubseaStructurePartialValidation;
 import uk.co.ogauthority.pathfinder.repository.project.subseainfrastructure.SubseaInfrastructureRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
 @Service
-public class SubseaInfrastructureService {
+public class SubseaInfrastructureService implements ProjectFormSectionService {
 
   private final DevUkFacilitiesService devUkFacilitiesService;
   private final SubseaInfrastructureRepository subseaInfrastructureRepository;
@@ -172,12 +173,6 @@ public class SubseaInfrastructureService {
   @Transactional
   public void deleteSubseaInfrastructure(SubseaInfrastructure subseaInfrastructure) {
     subseaInfrastructureRepository.delete(subseaInfrastructure);
-  }
-
-  public boolean isComplete(ProjectDetail projectDetail) {
-    var subseaInfrastructures = getSubseaInfrastructures(projectDetail);
-    return !subseaInfrastructures.isEmpty() && subseaInfrastructures.stream()
-        .allMatch(subseaInfrastructure -> isValid(subseaInfrastructure, ValidationType.FULL));
   }
 
   private void setCommonEntityFields(SubseaInfrastructure subseaInfrastructure,
@@ -325,5 +320,12 @@ public class SubseaInfrastructureService {
                                                  OtherSubseaStructureForm form) {
     form.setTypeOfStructure(subseaInfrastructure.getOtherInfrastructureType());
     form.setTotalEstimatedMass(subseaInfrastructure.getTotalEstimatedOtherMass());
+  }
+
+  @Override
+  public boolean isComplete(ProjectDetail projectDetail) {
+    var subseaInfrastructures = getSubseaInfrastructures(projectDetail);
+    return !subseaInfrastructures.isEmpty() && subseaInfrastructures.stream()
+        .allMatch(subseaInfrastructure -> isValid(subseaInfrastructure, ValidationType.FULL));
   }
 }

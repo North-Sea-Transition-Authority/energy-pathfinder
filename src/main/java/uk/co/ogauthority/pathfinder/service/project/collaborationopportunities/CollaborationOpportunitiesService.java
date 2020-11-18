@@ -27,11 +27,12 @@ import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.CollaborationOpportunitiesRepository;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
-public class CollaborationOpportunitiesService {
+public class CollaborationOpportunitiesService implements ProjectFormSectionService {
 
 
   private final SearchSelectorService searchSelectorService;
@@ -73,12 +74,6 @@ public class CollaborationOpportunitiesService {
     BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult = validate(form, bindingResult, validationType);
     return !bindingResult.hasErrors();
-  }
-
-  public boolean isComplete(ProjectDetail detail) {
-    var opportunities =  getOpportunitiesForDetail(detail);
-    return !opportunities.isEmpty() && opportunities.stream()
-        .allMatch(ut -> isValid(ut, ValidationType.FULL));
   }
 
   @Transactional
@@ -215,5 +210,12 @@ public class CollaborationOpportunitiesService {
           );
         })
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public boolean isComplete(ProjectDetail detail) {
+    var opportunities =  getOpportunitiesForDetail(detail);
+    return !opportunities.isEmpty() && opportunities.stream()
+        .allMatch(ut -> isValid(ut, ValidationType.FULL));
   }
 }

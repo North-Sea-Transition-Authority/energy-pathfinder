@@ -19,13 +19,13 @@ import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationC
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
 import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProjectOperatorController;
+import uk.co.ogauthority.pathfinder.controller.project.setup.ProjectSetupController;
 import uk.co.ogauthority.pathfinder.controller.project.submission.SubmitProjectController;
 import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.SubseaInfrastructureController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
-import uk.co.ogauthority.pathfinder.service.project.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
 import uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline.DecommissionedPipelineService;
@@ -34,6 +34,8 @@ import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationServ
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
+import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.subseainfrastructure.SubseaInfrastructureService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 
@@ -54,6 +56,7 @@ public class TaskListController {
   private final SubseaInfrastructureService subseaInfrastructureService;
   private final IntegratedRigService integratedRigService;
   private final DecommissionedPipelineService decommissionedPipelineService;
+  private final ProjectSetupService projectSetupService;
 
   @Autowired
   public TaskListController(ProjectInformationService projectInformationService,
@@ -66,7 +69,8 @@ public class TaskListController {
                             PlatformsFpsosService platformsFpsosService,
                             SubseaInfrastructureService subseaInfrastructureService,
                             IntegratedRigService integratedRigService,
-                            DecommissionedPipelineService decommissionedPipelineService) {
+                            DecommissionedPipelineService decommissionedPipelineService,
+                            ProjectSetupService projectSetupService) {
     this.projectInformationService = projectInformationService;
     this.breadcrumbService = breadcrumbService;
     this.projectLocationService = projectLocationService;
@@ -78,6 +82,7 @@ public class TaskListController {
     this.subseaInfrastructureService = subseaInfrastructureService;
     this.integratedRigService = integratedRigService;
     this.decommissionedPipelineService = decommissionedPipelineService;
+    this.projectSetupService = projectSetupService;
   }
 
   @GetMapping
@@ -106,6 +111,12 @@ public class TaskListController {
     );
     modelAndView.addObject("projectLocationText", ProjectLocationController.PAGE_NAME);
     modelAndView.addObject("projectLocationCompleted", projectLocationService.isComplete(projectDetails));
+
+    modelAndView.addObject("projectSetupUrl",
+        ReverseRouter.route(on(ProjectSetupController.class).getProjectSetup(projectId, null))
+    );
+    modelAndView.addObject("projectSetupText", ProjectSetupController.PAGE_NAME);
+    modelAndView.addObject("projectSetupCompleted", projectSetupService.isComplete(projectDetails));
 
     modelAndView.addObject("upcomingTendersUrl",
         ReverseRouter.route(on(UpcomingTendersController.class).viewTenders(projectId, null))
