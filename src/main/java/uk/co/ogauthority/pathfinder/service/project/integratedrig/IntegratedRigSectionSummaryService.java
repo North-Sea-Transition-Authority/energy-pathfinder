@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedRigController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.model.view.summary.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
@@ -21,7 +22,7 @@ public class IntegratedRigSectionSummaryService implements ProjectSectionSummary
       PAGE_NAME,
       SECTION_ID
   );
-  public static final int DISPLAY_ORDER = 9;
+  public static final int DISPLAY_ORDER = ProjectTask.INTEGRATED_RIGS.getDisplayOrder();
 
   private final IntegratedRigSummaryService integratedRigSummaryService;
 

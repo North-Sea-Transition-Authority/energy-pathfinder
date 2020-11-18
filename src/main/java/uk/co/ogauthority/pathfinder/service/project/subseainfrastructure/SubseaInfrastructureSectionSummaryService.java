@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.SubseaInfrastructureController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.subseainfrastructure.SubseaInfrastructureViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.model.view.summary.SidebarSectionLink;
@@ -24,7 +25,7 @@ public class SubseaInfrastructureSectionSummaryService implements ProjectSection
       PAGE_NAME,
       SECTION_ID
   );
-  public static final int DISPLAY_ORDER = 8;
+  public static final int DISPLAY_ORDER = ProjectTask.SUBSEA_INFRASTRUCTURE.getDisplayOrder();
 
   private final SubseaInfrastructureService subseaInfrastructureService;
 

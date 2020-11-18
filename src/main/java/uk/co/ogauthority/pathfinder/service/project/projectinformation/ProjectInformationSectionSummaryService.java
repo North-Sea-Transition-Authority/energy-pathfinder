@@ -9,6 +9,7 @@ import uk.co.ogauthority.pathfinder.controller.project.projectinformation.Projec
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.model.view.summary.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
@@ -23,7 +24,7 @@ public class ProjectInformationSectionSummaryService implements ProjectSectionSu
       PAGE_NAME,
       SECTION_ID
   );
-  public static final int DISPLAY_ORDER = 1;
+  public static final int DISPLAY_ORDER = ProjectTask.PROJECT_INFORMATION.getDisplayOrder();
 
   private final ProjectInformationService projectInformationService;
 
