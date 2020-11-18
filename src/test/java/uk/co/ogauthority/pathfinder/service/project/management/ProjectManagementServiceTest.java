@@ -21,6 +21,10 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectManagementServiceTest {
 
+  private static final int FIRST_SERVICE_DISPLAY_ORDER = 10;
+  private static final int SECOND_SERVICE_DISPLAY_ORDER = 20;
+  private static final int THIRD_SERVICE_DISPLAY_ORDER = 30;
+
   @Mock
   private ProjectManagementActionSectionService projectManagementActionSectionService;
 
@@ -44,13 +48,13 @@ public class ProjectManagementServiceTest {
     ));
 
     when(projectManagementActionSectionService.getSection(projectDetail, authenticatedUser)).thenReturn(
-        ProjectManagementSectionTestUtil.getProjectManagementSection()
+        ProjectManagementSectionTestUtil.getProjectManagementSection(FIRST_SERVICE_DISPLAY_ORDER)
     );
     when(projectManagementDetailSectionService.getSection(projectDetail, authenticatedUser)).thenReturn(
-        ProjectManagementSectionTestUtil.getProjectManagementSection()
+        ProjectManagementSectionTestUtil.getProjectManagementSection(SECOND_SERVICE_DISPLAY_ORDER)
     );
     when(projectManagementSummarySectionService.getSection(projectDetail, authenticatedUser)).thenReturn(
-        ProjectManagementSectionTestUtil.getProjectManagementSection()
+        ProjectManagementSectionTestUtil.getProjectManagementSection(THIRD_SERVICE_DISPLAY_ORDER)
     );
   }
 
@@ -60,15 +64,15 @@ public class ProjectManagementServiceTest {
 
     assertThat(sections.size()).isEqualTo(3);
 
-    assertThat(sections.get(0).getDisplayOrder()).isEqualTo(ProjectManagementSectionTestUtil.DISPLAY_ORDER);
+    assertThat(sections.get(0).getDisplayOrder()).isEqualTo(FIRST_SERVICE_DISPLAY_ORDER);
     assertThat(sections.get(0).getTemplatePath()).isEqualTo(ProjectManagementSectionTestUtil.TEMPLATE_PATH);
     assertThat(sections.get(0).getTemplateModel()).isEqualTo(ProjectManagementSectionTestUtil.TEMPLATE_MODEL);
 
-    assertThat(sections.get(1).getDisplayOrder()).isEqualTo(ProjectManagementSectionTestUtil.DISPLAY_ORDER);
+    assertThat(sections.get(1).getDisplayOrder()).isEqualTo(SECOND_SERVICE_DISPLAY_ORDER);
     assertThat(sections.get(1).getTemplatePath()).isEqualTo(ProjectManagementSectionTestUtil.TEMPLATE_PATH);
     assertThat(sections.get(1).getTemplateModel()).isEqualTo(ProjectManagementSectionTestUtil.TEMPLATE_MODEL);
 
-    assertThat(sections.get(2).getDisplayOrder()).isEqualTo(ProjectManagementSectionTestUtil.DISPLAY_ORDER);
+    assertThat(sections.get(2).getDisplayOrder()).isEqualTo(THIRD_SERVICE_DISPLAY_ORDER);
     assertThat(sections.get(2).getTemplatePath()).isEqualTo(ProjectManagementSectionTestUtil.TEMPLATE_PATH);
     assertThat(sections.get(2).getTemplateModel()).isEqualTo(ProjectManagementSectionTestUtil.TEMPLATE_MODEL);
   }

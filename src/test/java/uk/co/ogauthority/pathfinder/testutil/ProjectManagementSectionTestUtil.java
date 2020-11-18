@@ -1,9 +1,7 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
-import java.util.List;
 import java.util.Map;
 import uk.co.ogauthority.pathfinder.model.view.management.ProjectManagementSection;
-import uk.co.ogauthority.pathfinder.model.view.summary.SidebarSectionLink;
 
 public class ProjectManagementSectionTestUtil {
 
@@ -12,10 +10,14 @@ public class ProjectManagementSectionTestUtil {
   public static final Map<String, Object> TEMPLATE_MODEL = Map.of("key", "value");
 
   public static ProjectManagementSection getProjectManagementSection() {
+    return getProjectManagementSection(DISPLAY_ORDER);
+  }
+
+  public static ProjectManagementSection getProjectManagementSection(int displayOrder) {
     return new ProjectManagementSection(
         TEMPLATE_PATH,
         TEMPLATE_MODEL,
-        DISPLAY_ORDER
+        displayOrder
     );
   }
 }
