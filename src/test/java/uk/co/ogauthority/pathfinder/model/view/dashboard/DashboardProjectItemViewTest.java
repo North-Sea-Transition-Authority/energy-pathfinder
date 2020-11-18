@@ -31,8 +31,9 @@ public class DashboardProjectItemViewTest {
     assertLinkMatches(
         dashboardProjectItem,
         DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText),
-        title
-      );
+        title,
+        getTaskListUrl(dashboardProjectItem.getProjectId())
+    );
   }
 
   @Test
@@ -47,7 +48,8 @@ public class DashboardProjectItemViewTest {
     assertLinkMatches(
         dashboardProjectItem,
         DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText),
-        title
+        title,
+        getTaskListUrl(dashboardProjectItem.getProjectId())
     );
   }
 
@@ -64,7 +66,8 @@ public class DashboardProjectItemViewTest {
     assertLinkMatches(
         dashboardProjectItem,
         DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText),
-        title
+        title,
+        getProjectManagementPageUrl(dashboardProjectItem.getProjectId())
     );
   }
 
@@ -81,7 +84,8 @@ public class DashboardProjectItemViewTest {
     assertLinkMatches(
         dashboardProjectItem,
         DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText),
-        title
+        title,
+        getProjectManagementPageUrl(dashboardProjectItem.getProjectId())
     );
   }
 
@@ -91,14 +95,24 @@ public class DashboardProjectItemViewTest {
   public void getLink() {
     var title = dashboardProjectItem.getProjectTitle();
     var screenReaderText = String.format(DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
-    assertLinkMatches(dashboardProjectItem, DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText), title);
+    assertLinkMatches(
+        dashboardProjectItem,
+        DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText),
+        title,
+        getTaskListUrl(dashboardProjectItem.getProjectId())
+    );
   }
 
   @Test
   public void getLink_placeholderTitle() {
     var title = String.format(DashboardProjectItemView.TITLE_PLACEHOLDER, dashboardProjectItem.getStatus().getDisplayName(), DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
     var screenReaderText = String.format(DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
-    assertLinkMatches(dashboardProjectItem, DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText), title);
+    assertLinkMatches(
+        dashboardProjectItem,
+        DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText),
+        title,
+        getTaskListUrl(dashboardProjectItem.getProjectId())
+    );
   }
 
   private void assertCommonFieldsMatch(DashboardProjectItem dashboardProjectItem, DashboardProjectItemView view) {
@@ -110,24 +124,19 @@ public class DashboardProjectItemViewTest {
     assertThat(view.getStatus()).isEqualTo(dashboardProjectItem.getStatus().getDisplayName());
   }
 
-  private void assertLinkMatches(DashboardProjectItem dashboardProjectItem, DashboardLink link, String prompt) {
+  private void assertLinkMatches(DashboardProjectItem dashboardProjectItem, DashboardLink link, String prompt, String url) {
     assertThat(link.getScreenReaderText()).isEqualTo(String.format(
         DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime())
     ));
     assertThat(link.getPrompt()).isEqualTo(prompt);
-    var status = dashboardProjectItem.getStatus();
-    String expectedUrl;
-    switch (status) {
-      case DRAFT:
-        expectedUrl = ReverseRouter.route(on(TaskListController.class).viewTaskList(dashboardProjectItem.getProjectId(), null));
-        break;
-      case QA:
-      case PUBLISHED:
-        expectedUrl = ReverseRouter.route(on(ManageProjectController.class).getProject(dashboardProjectItem.getProjectId(), null, null));
-        break;
-      default:
-        throw new IllegalStateException(String.format("Project status %s not supported", status));
-    }
-    assertThat(link.getUrl()).isEqualTo(expectedUrl);
+    assertThat(link.getUrl()).isEqualTo(url);
+  }
+
+  private String getTaskListUrl(Integer projectId) {
+    return ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId, null));
+  }
+
+  private String getProjectManagementPageUrl(Integer projectId) {
+    return ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null));
   }
 }
