@@ -8,18 +8,18 @@ public class TaskListEntry {
   private final String taskName;
   private final String route;
   private final boolean completed;
-  private final boolean useCompletedLabels;
+  private final boolean usingCompletedLabels;
   private final int displayOrder;
 
   public TaskListEntry(String taskName,
                        String route,
                        boolean completed,
-                       boolean useCompletedLabels,
+                       boolean usingCompletedLabels,
                        int displayOrder) {
     this.taskName = taskName;
     this.route = route;
     this.completed = completed;
-    this.useCompletedLabels = useCompletedLabels;
+    this.usingCompletedLabels = usingCompletedLabels;
     this.displayOrder = displayOrder;
   }
 
@@ -43,8 +43,8 @@ public class TaskListEntry {
     return completed;
   }
 
-  public boolean useCompletedLabels() {
-    return useCompletedLabels;
+  public boolean isUsingCompletedLabels() {
+    return usingCompletedLabels;
   }
 
   public int getDisplayOrder() {
