@@ -89,9 +89,9 @@ public class IntegratedRigService implements ProjectFormSectionService {
     return createOrUpdateIntegratedRig(integratedRig, projectDetail, form);
   }
 
-  IntegratedRig createOrUpdateIntegratedRig(IntegratedRig integratedRig,
-                                            ProjectDetail projectDetail,
-                                            IntegratedRigForm form) {
+  private IntegratedRig createOrUpdateIntegratedRig(IntegratedRig integratedRig,
+                                                    ProjectDetail projectDetail,
+                                                    IntegratedRigForm form) {
     setCommonEntityFields(integratedRig, projectDetail, form);
     return integratedRigRepository.save(integratedRig);
   }

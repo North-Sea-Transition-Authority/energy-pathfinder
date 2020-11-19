@@ -96,9 +96,9 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
     return createOrUpdateDecommissionedPipeline(decommissionedPipeline, projectDetail, form);
   }
 
-  DecommissionedPipeline createOrUpdateDecommissionedPipeline(DecommissionedPipeline decommissionedPipeline,
-                                                              ProjectDetail projectDetail,
-                                                              DecommissionedPipelineForm form) {
+  private DecommissionedPipeline createOrUpdateDecommissionedPipeline(DecommissionedPipeline decommissionedPipeline,
+                                                                      ProjectDetail projectDetail,
+                                                                      DecommissionedPipelineForm form) {
     setCommonEntityFields(decommissionedPipeline, projectDetail, form);
     return decommissionedPipelineRepository.save(decommissionedPipeline);
   }

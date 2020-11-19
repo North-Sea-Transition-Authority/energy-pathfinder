@@ -151,9 +151,9 @@ public class SubseaInfrastructureService implements ProjectFormSectionService {
     return createOrUpdateSubseaInfrastructure(subseaInfrastructure, projectDetail, form);
   }
 
-  SubseaInfrastructure createOrUpdateSubseaInfrastructure(SubseaInfrastructure subseaInfrastructure,
-                                                          ProjectDetail projectDetail,
-                                                          SubseaInfrastructureForm form) {
+  private SubseaInfrastructure createOrUpdateSubseaInfrastructure(SubseaInfrastructure subseaInfrastructure,
+                                                                  ProjectDetail projectDetail,
+                                                                  SubseaInfrastructureForm form) {
     setCommonEntityFields(subseaInfrastructure, projectDetail, form);
     return subseaInfrastructureRepository.save(subseaInfrastructure);
   }

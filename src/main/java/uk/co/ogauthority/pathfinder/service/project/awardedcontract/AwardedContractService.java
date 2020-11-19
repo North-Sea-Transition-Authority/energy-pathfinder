@@ -106,7 +106,7 @@ public class AwardedContractService implements ProjectFormSectionService {
     return createOrUpdateAwardedContract(awardedContract, form);
   }
 
-  AwardedContract createOrUpdateAwardedContract(AwardedContract awardedContract, AwardedContractForm form) {
+  private AwardedContract createOrUpdateAwardedContract(AwardedContract awardedContract, AwardedContractForm form) {
 
     awardedContract.setContractorName(form.getContractorName());
 
