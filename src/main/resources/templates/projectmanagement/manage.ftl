@@ -1,7 +1,13 @@
 <#include '../layout.ftl'>
 <#import '../project/summary/projectSummary.ftl' as projectSummary/>
 
-<@defaultPage htmlTitle="Manage project" fullWidthColumn=true twoThirdsColumn=false>
+<@defaultPage
+  htmlTitle="Manage project"
+  fullWidthColumn=true
+  twoThirdsColumn=false
+  backLink=true
+  backLinkUrl=springUrl(backLinkUrl)
+>
   <@headingWithContent
     caption=""
     captionClass=""

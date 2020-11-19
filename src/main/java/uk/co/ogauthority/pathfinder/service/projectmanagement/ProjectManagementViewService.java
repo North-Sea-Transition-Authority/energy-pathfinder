@@ -1,12 +1,16 @@
 package uk.co.ogauthority.pathfinder.service.projectmanagement;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementView;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.rendering.TemplateRenderingService;
@@ -48,6 +52,7 @@ public class ProjectManagementViewService {
         combinedRenderedHtml);
 
     return new ModelAndView("projectmanagement/manage")
-        .addObject("projectManagementView", projectManagementView);
+        .addObject("projectManagementView", projectManagementView)
+        .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)));
   }
 }
