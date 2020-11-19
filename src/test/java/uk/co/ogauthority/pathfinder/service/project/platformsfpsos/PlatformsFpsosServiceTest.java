@@ -14,10 +14,12 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFpsoForm;
 import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFpsoFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.platformsfpsos.PlatformFpsoRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.PlatformFpsoTestUtil;
@@ -36,6 +38,9 @@ public class PlatformsFpsosServiceTest {
 
   @Mock
   private ValidationService validationService;
+
+  @Mock
+  private ProjectSetupService projectSetupService;
 
   private PlatformsFpsosService platformsFpsosService;
 
@@ -198,6 +203,18 @@ public class PlatformsFpsosServiceTest {
     assertThat(form.getFpsoType()).isEqualTo(platformFpso.getFpsoType());
     assertThat(form.getFpsoDimensions()).isEqualTo(platformFpso.getFpsoDimensions());
     assertThat(form.getFuturePlans()).isEqualTo(platformFpso.getFuturePlans());
+  }
+
+  @Test
+  public void canShowInTaskList_true() {
+    when(projectSetupService.taskSelectedForProjectDetail(details, ProjectTask.PLATFORM_FPSO)).thenReturn(true);
+    assertThat(platformsFpsosService.canShowInTaskList(details)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_false() {
+    when(projectSetupService.taskSelectedForProjectDetail(details, ProjectTask.PLATFORM_FPSO)).thenReturn(false);
+    assertThat(platformsFpsosService.canShowInTaskList(details)).isFalse();
   }
 
 }

@@ -19,12 +19,14 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContract;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractForm;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.AwardedContractRepository;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
@@ -42,7 +44,12 @@ public class AwardedContractServiceTest {
   @Mock
   private AwardedContractFormValidator awardedContractFormValidator;
 
+  @Mock
+  private ProjectSetupService projectSetupService;
+
   private AwardedContractService awardedContractService;
+
+  private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
   @Before
   public void setup() {
@@ -56,7 +63,8 @@ public class AwardedContractServiceTest {
         awardedContractRepository,
         awardedContractFormValidator,
         searchSelectorService,
-        projectSetupService);
+        projectSetupService
+    );
 
     when(awardedContractRepository.save(any(AwardedContract.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
 
@@ -261,5 +269,17 @@ public class AwardedContractServiceTest {
     var awardedContract = AwardedContractTestUtil.createAwardedContract();
     awardedContractService.deleteAwardedContract(awardedContract);
     verify(awardedContractRepository, times(1)).delete(awardedContract);
+  }
+
+  @Test
+  public void canShowInTaskList_true() {
+    when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS)).thenReturn(true);
+    assertThat(awardedContractService.canShowInTaskList(detail)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_false() {
+    when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS)).thenReturn(false);
+    assertThat(awardedContractService.canShowInTaskList(detail)).isFalse();
   }
 }

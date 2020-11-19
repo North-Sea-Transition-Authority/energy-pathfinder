@@ -61,7 +61,7 @@ public class TaskListService {
         .sorted(Comparator.comparing(TaskListGroup::getDisplayOrder))
         .collect(Collectors.toList());
 
-    groups.add(taskListEntryFactory.createReviewAndSubmitGroup(detail));
+    groups.add(TaskListEntryFactory.createReviewAndSubmitGroup(detail));
 
     setDisplayOrderForGroups(groups);
 

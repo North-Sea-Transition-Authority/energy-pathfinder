@@ -35,9 +35,9 @@ public class TaskListEntryFactory {
     );
   }
 
-  public TaskListEntry createReviewAndSubmitTask(ProjectDetail detail) {
+  public static TaskListEntry createReviewAndSubmitTask(ProjectDetail detail) {
     return new TaskListEntry(
-        SubmitProjectController.PAGE_NAME,
+        REVIEW_AND_SUBMIT_GROUP_TITLE,
         ReverseRouter.route(on(SubmitProjectController.class)
             .getProjectSummary(detail.getProject().getId(), null)),
         false,
@@ -46,7 +46,7 @@ public class TaskListEntryFactory {
     );
   }
 
-  public TaskListGroup createReviewAndSubmitGroup(ProjectDetail detail) {
+  public static TaskListGroup createReviewAndSubmitGroup(ProjectDetail detail) {
     return new TaskListGroup(
         REVIEW_AND_SUBMIT_GROUP_TITLE,
         REVIEW_AND_SUBMIT_DISPLAY_ORDER,

@@ -21,11 +21,13 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedwell.DecommissionedWellType;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedwell.WellMechanicalStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedwell.WellOperationalStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedwell.DecommissionedWellForm;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedwell.DecommissionedWellFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedwell.DecommissionedWellRepository;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.DecommissionedWellTestUtil;
@@ -47,7 +49,12 @@ public class DecommissionedWellServiceTest {
   @Mock
   private DecommissionedWellRepository decommissionedWellRepository;
 
+  @Mock
+  private ProjectSetupService projectSetupService;
+
   private DecommissionedWellService decommissionedWellService;
+
+  private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
   @Before
   public void setup() {
@@ -481,6 +488,18 @@ public class DecommissionedWellServiceTest {
         String.valueOf(decommissionedWell.getPlugAbandonmentDateYear())
     ));
     assertThat(form.getPlugAbandonmentDateType()).isEqualTo(decommissionedWell.getPlugAbandonmentDateType());
+  }
+
+  @Test
+  public void canShowInTaskList_true() {
+    when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.WELLS)).thenReturn(true);
+    assertThat(decommissionedWellService.canShowInTaskList(detail)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_false() {
+    when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.WELLS)).thenReturn(false);
+    assertThat(decommissionedWellService.canShowInTaskList(detail)).isFalse();
   }
 
 }

@@ -17,6 +17,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
@@ -199,6 +200,18 @@ public class CollaborationOpportunitiesServiceTest {
     var results = collaborationOpportunitiesService.findFunctionsLikeWithManualEntry(manualEntry);
     assertThat(results.size()).isEqualTo(1);
     assertThat(results.get(0).getId()).isEqualTo(SearchSelectablePrefix.FREE_TEXT_PREFIX+manualEntry);
+  }
+
+  @Test
+  public void canShowInTaskList_true() {
+    when(projectSetupService.taskSelectedForProjectDetail(details, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(true);
+    assertThat(collaborationOpportunitiesService.canShowInTaskList(details)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_false() {
+    when(projectSetupService.taskSelectedForProjectDetail(details, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(false);
+    assertThat(collaborationOpportunitiesService.canShowInTaskList(details)).isFalse();
   }
 
 }

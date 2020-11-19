@@ -21,12 +21,14 @@ import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.Upcoming
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTenderFileLink;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -51,6 +53,9 @@ public class UpcomingTenderServiceTest {
 
   @Mock
   private ProjectDetailFileService projectDetailFileService;
+
+  @Mock
+  private ProjectSetupService projectSetupService;
 
   private UpcomingTenderService upcomingTenderService;
 
@@ -277,5 +282,17 @@ public class UpcomingTenderServiceTest {
     verify(upcomingTenderFileLinkService, times(1)).removeUpcomingTenderFileLink(projectDetailFile);
     verify(projectDetailFileService, times(1)).processFileDeletion(projectDetailFile, authenticatedUserAccount);
 
+  }
+
+  @Test
+  public void canShowInTaskList_true() {
+    when(projectSetupService.taskSelectedForProjectDetail(details, ProjectTask.UPCOMING_TENDERS)).thenReturn(true);
+    assertThat(upcomingTenderService.canShowInTaskList(details)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_false() {
+    when(projectSetupService.taskSelectedForProjectDetail(details, ProjectTask.UPCOMING_TENDERS)).thenReturn(false);
+    assertThat(upcomingTenderService.canShowInTaskList(details)).isFalse();
   }
 }

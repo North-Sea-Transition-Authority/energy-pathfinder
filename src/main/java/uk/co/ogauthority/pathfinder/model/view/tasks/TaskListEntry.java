@@ -43,7 +43,7 @@ public class TaskListEntry {
     return completed;
   }
 
-  public boolean isUseCompletedLabels() {
+  public boolean useCompletedLabels() {
     return useCompletedLabels;
   }
 

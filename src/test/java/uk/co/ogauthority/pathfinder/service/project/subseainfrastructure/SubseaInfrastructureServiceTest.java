@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.subseainfrastructure.SubseaInfrastructure;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.ConcreteMattressForm;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.OtherSubseaStructureForm;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.SubseaInfrastructureForm;
@@ -33,6 +34,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.vali
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.subseainfrastructure.SubseaInfrastructureRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.DevUkTestUtil;
@@ -55,6 +57,9 @@ public class SubseaInfrastructureServiceTest {
 
   @Mock
   private SubseaInfrastructureFormValidator subseaInfrastructureFormValidator;
+
+  @Mock
+  private ProjectSetupService projectSetupService;
 
   private SubseaInfrastructureService subseaInfrastructureService;
 
@@ -626,6 +631,18 @@ public class SubseaInfrastructureServiceTest {
     );
 
     subseaInfrastructureService.getSubseaInfrastructure(SUBSEA_INFRASTRUCTURE_ID, projectDetail);
+  }
+
+  @Test
+  public void canShowInTaskList_true() {
+    when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.SUBSEA_INFRASTRUCTURE)).thenReturn(true);
+    assertThat(subseaInfrastructureService.canShowInTaskList(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_false() {
+    when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.SUBSEA_INFRASTRUCTURE)).thenReturn(false);
+    assertThat(subseaInfrastructureService.canShowInTaskList(projectDetail)).isFalse();
   }
 
 }

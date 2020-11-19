@@ -16,6 +16,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedCo
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.AwardedContractRepository;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
@@ -32,6 +33,9 @@ public class AwardedContractServiceValidationTest {
 
   @Mock
   private SearchSelectorService searchSelectorService;
+
+  @Mock
+  private ProjectSetupService projectSetupService;
 
   private AwardedContractService awardedContractService;
 

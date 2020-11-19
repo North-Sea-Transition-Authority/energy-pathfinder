@@ -18,10 +18,12 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.decommissionedpipeline.DecommissionedPipeline;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineForm;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedpipeline.DecommissionedPipelineRepository;
 import uk.co.ogauthority.pathfinder.service.pipeline.PipelineService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.DecommissionedPipelineTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.PipelineTestUtil;
@@ -45,6 +47,9 @@ public class DecommissionedPipelineServiceTest {
 
   @Mock
   private ValidationService validationService;
+
+  @Mock
+  private ProjectSetupService projectSetupService;
 
   private ProjectDetail projectDetail;
 
@@ -228,5 +233,17 @@ public class DecommissionedPipelineServiceTest {
     );
 
     decommissionedPipelineService.getDecommissionedPipelineOrError(DECOMMISSIONED_PIPELINE_ID, projectDetail);
+  }
+
+  @Test
+  public void canShowInTaskList_true() {
+    when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.PIPELINES)).thenReturn(true);
+    assertThat(decommissionedPipelineService.canShowInTaskList(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_false() {
+    when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.PIPELINES)).thenReturn(false);
+    assertThat(decommissionedPipelineService.canShowInTaskList(projectDetail)).isFalse();
   }
 }
