@@ -2,9 +2,9 @@ package uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline;
 
 import java.util.List;
 import java.util.Map;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
@@ -81,12 +81,14 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
     return validationService.validate(form, bindingResult, validationType);
   }
 
+  @Transactional
   public DecommissionedPipeline createDecommissionedPipeline(ProjectDetail projectDetail,
                                                              DecommissionedPipelineForm form) {
     var decommissionedPipeline = new DecommissionedPipeline();
     return createOrUpdateDecommissionedPipeline(decommissionedPipeline, projectDetail, form);
   }
 
+  @Transactional
   public DecommissionedPipeline updateDecommissionedPipeline(Integer decommissionedPipelineId,
                                                              ProjectDetail projectDetail,
                                                              DecommissionedPipelineForm form) {
@@ -94,10 +96,9 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
     return createOrUpdateDecommissionedPipeline(decommissionedPipeline, projectDetail, form);
   }
 
-  @Transactional
-  DecommissionedPipeline createOrUpdateDecommissionedPipeline(DecommissionedPipeline decommissionedPipeline,
-                                                              ProjectDetail projectDetail,
-                                                              DecommissionedPipelineForm form) {
+  private DecommissionedPipeline createOrUpdateDecommissionedPipeline(DecommissionedPipeline decommissionedPipeline,
+                                                                      ProjectDetail projectDetail,
+                                                                      DecommissionedPipelineForm form) {
     setCommonEntityFields(decommissionedPipeline, projectDetail, form);
     return decommissionedPipelineRepository.save(decommissionedPipeline);
   }

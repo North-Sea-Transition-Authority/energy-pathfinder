@@ -3,9 +3,9 @@ package uk.co.ogauthority.pathfinder.service.project.subseainfrastructure;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
@@ -151,10 +151,9 @@ public class SubseaInfrastructureService implements ProjectFormSectionService {
     return createOrUpdateSubseaInfrastructure(subseaInfrastructure, projectDetail, form);
   }
 
-  @Transactional
-  SubseaInfrastructure createOrUpdateSubseaInfrastructure(SubseaInfrastructure subseaInfrastructure,
-                                                          ProjectDetail projectDetail,
-                                                          SubseaInfrastructureForm form) {
+  private SubseaInfrastructure createOrUpdateSubseaInfrastructure(SubseaInfrastructure subseaInfrastructure,
+                                                                  ProjectDetail projectDetail,
+                                                                  SubseaInfrastructureForm form) {
     setCommonEntityFields(subseaInfrastructure, projectDetail, form);
     return subseaInfrastructureRepository.save(subseaInfrastructure);
   }

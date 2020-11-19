@@ -3,8 +3,8 @@ package uk.co.ogauthority.pathfinder.service.project.decommissionedwell;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -72,12 +72,14 @@ public class DecommissionedWellService implements ProjectFormSectionService {
     return bindingResult;
   }
 
+  @Transactional
   public DecommissionedWell createDecommissionedWell(DecommissionedWellForm form, ProjectDetail projectDetail) {
     var decommissionedWell = new DecommissionedWell();
     decommissionedWell.setProjectDetail(projectDetail);
     return updateDecommissionedWell(form, decommissionedWell);
   }
 
+  @Transactional
   public DecommissionedWell updateDecommissionedWell(Integer decommissionedWellId,
                                                      ProjectDetail projectDetail,
                                                      DecommissionedWellForm decommissionedWellForm) {
@@ -85,7 +87,6 @@ public class DecommissionedWellService implements ProjectFormSectionService {
     return updateDecommissionedWell(decommissionedWellForm, decommissionedWell);
   }
 
-  @Transactional
   protected DecommissionedWell updateDecommissionedWell(DecommissionedWellForm form,
                                                         DecommissionedWell decommissionedWell) {
 

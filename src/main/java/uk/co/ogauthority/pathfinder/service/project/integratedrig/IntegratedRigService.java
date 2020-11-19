@@ -2,9 +2,9 @@ package uk.co.ogauthority.pathfinder.service.project.integratedrig;
 
 import java.util.List;
 import java.util.Map;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
@@ -75,11 +75,13 @@ public class IntegratedRigService implements ProjectFormSectionService {
     return validationService.validate(form, bindingResult, validationType);
   }
 
+  @Transactional
   public IntegratedRig createIntegratedRig(ProjectDetail projectDetail, IntegratedRigForm form) {
     var integratedRig = new IntegratedRig();
     return createOrUpdateIntegratedRig(integratedRig, projectDetail, form);
   }
 
+  @Transactional
   public IntegratedRig updateIntegratedRig(Integer integratedRigId,
                                            ProjectDetail projectDetail,
                                            IntegratedRigForm form) {
@@ -87,10 +89,9 @@ public class IntegratedRigService implements ProjectFormSectionService {
     return createOrUpdateIntegratedRig(integratedRig, projectDetail, form);
   }
 
-  @Transactional
-  IntegratedRig createOrUpdateIntegratedRig(IntegratedRig integratedRig,
-                                            ProjectDetail projectDetail,
-                                            IntegratedRigForm form) {
+  private IntegratedRig createOrUpdateIntegratedRig(IntegratedRig integratedRig,
+                                                    ProjectDetail projectDetail,
+                                                    IntegratedRigForm form) {
     setCommonEntityFields(integratedRig, projectDetail, form);
     return integratedRigRepository.save(integratedRig);
   }
