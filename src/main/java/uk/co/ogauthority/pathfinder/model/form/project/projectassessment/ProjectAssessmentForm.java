@@ -9,7 +9,7 @@ public class ProjectAssessmentForm {
   @NotNull(message = "Select the project quality", groups = FullValidation.class)
   private ProjectQuality projectQuality;
 
-  @NotNull(message = "Select if the project is ready to be published", groups = FullValidation.class)
+  @NotNull(message = "Select yes if the project is ready to be published", groups = FullValidation.class)
   private Boolean readyToBePublished;
 
   private Boolean updateRequired;

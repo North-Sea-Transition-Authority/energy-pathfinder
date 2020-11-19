@@ -4,38 +4,33 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.context.support.SimpleThreadScope;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
-import uk.co.ogauthority.pathfinder.config.file.FileUploadProperties;
-import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.UserSession;
-import uk.co.ogauthority.pathfinder.mvc.error.ErrorService;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
 import uk.co.ogauthority.pathfinder.service.UserSessionService;
-import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
-import uk.co.ogauthority.pathfinder.service.file.FileUploadServiceTest;
-import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.navigation.TopNavigationService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectassessment.ProjectAssessmentContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.team.teammanagementcontext.TeamManagementContextService;
 
-@Import(AbstractControllerTest.TestConfig.class)
-public abstract class AbstractControllerTest {
+@Import({AbstractControllerTest.TestConfig.class, ProjectAssessmentContextAbstractControllerTest.TestConfig.class})
+public abstract class ProjectAssessmentContextAbstractControllerTest {
 
   protected MockMvc mockMvc;
 
@@ -57,20 +52,23 @@ public abstract class AbstractControllerTest {
   @MockBean
   protected TopNavigationService topNavigationService;
 
-  @MockBean
+  @Autowired
   protected ProjectContextService projectContextService;
 
   @MockBean
+  protected ProjectService projectService;
+
+  @MockBean
+  protected ProjectOperatorService projectOperatorService;
+
+  @Autowired
   protected ProjectAssessmentContextService projectAssessmentContextService;
 
   @MockBean
   protected TeamManagementContextService teamManagementContextService;
 
-  @MockBean
-  protected ErrorService errorService;
-
   @Before
-  public void abstractControllerTestSetup() {
+  public void projectContextAbstractControllerTestSetUp() {
     mockMvc = MockMvcBuilders
         .webAppContextSetup(context)
         .apply(SecurityMockMvcConfigurers.springSecurity())
@@ -87,32 +85,12 @@ public abstract class AbstractControllerTest {
   @TestConfiguration
   public static class TestConfig {
 
+    // for controllers using session scoped attributes
     @Bean
-    public SystemAccessService systemAreaAccessService() {
-      return new SystemAccessService();
-    }
-
-    @Bean
-    public BreadcrumbService breadcrumbService() { return new BreadcrumbService(); }
-
-    @Bean("messageSource")
-    public MessageSource messageSource() {
-      ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
-      messageSource.setBasename("messages");
-      messageSource.setDefaultEncoding("UTF-8");
-      return messageSource;
-    }
-
-    @Bean
-    public ControllerHelperService controllerHelperService() { return new ControllerHelperService(messageSource()); }
-
-    @Bean
-    public FileUploadProperties fileUploadProperties() {
-      FileUploadProperties fileUploadProperties = new FileUploadProperties();
-      fileUploadProperties.setMaxFileSize(FileUploadServiceTest.MAX_TEST_FILE_SIZE);
-      fileUploadProperties.setAllowedExtensions(FileUploadServiceTest.ALLOWED_TEST_EXTENSIONS);
-      return fileUploadProperties;
+    public CustomScopeConfigurer customScopeConfigurer() {
+      CustomScopeConfigurer configurer = new CustomScopeConfigurer();
+      configurer.addScope("session", new SimpleThreadScope());
+      return configurer;
     }
   }
-
 }

@@ -5,7 +5,7 @@ CREATE TABLE ${datasource.user}.project_assessments (
 , ready_to_be_published NUMBER
 , update_required NUMBER
 , assessed_datetime TIMESTAMP
-, assessor_wua NUMBER
+, assessor_wua_id NUMBER
 , CONSTRAINT proj_assess_proj_detail_fk FOREIGN KEY (project_detail_id) REFERENCES ${datasource.user}.project_details (id)
 ) TABLESPACE tbsdata;
 

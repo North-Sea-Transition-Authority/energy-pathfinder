@@ -23,7 +23,7 @@ public class ProjectAssessment extends ProjectDetailEntity {
   @Column(name = "assessed_datetime")
   private Instant assessedInstant;
 
-  private Integer assessorWua;
+  private Integer assessorWuaId;
 
   public ProjectQuality getProjectQuality() {
     return projectQuality;
@@ -58,11 +58,11 @@ public class ProjectAssessment extends ProjectDetailEntity {
     this.assessedInstant = assessedInstant;
   }
 
-  public Integer getAssessorWua() {
-    return assessorWua;
+  public Integer getAssessorWuaId() {
+    return assessorWuaId;
   }
 
-  public void setAssessorWua(Integer assessorWua) {
-    this.assessorWua = assessorWua;
+  public void setAssessorWuaId(Integer assessorWua) {
+    this.assessorWuaId = assessorWua;
   }
 }

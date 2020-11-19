@@ -11,7 +11,9 @@ import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 public enum ProjectPermission {
   EDIT(Collections.singletonList(UserPrivilege.PATHFINDER_PROJECT_CREATE)),
   SUBMIT(Collections.singletonList(UserPrivilege.PATHFINDER_PROJECT_CREATE)),
-  VIEW(Collections.singletonList(UserPrivilege.PATHFINDER_PROJECT_VIEWER));
+  VIEW(Collections.singletonList(UserPrivilege.PATHFINDER_PROJECT_VIEWER)),
+  // TODO PAT-325 switch to the correct privilege
+  PROVIDE_ASSESSMENT(Collections.singletonList(UserPrivilege.PATHFINDER_REGULATOR_ADMIN));
 
   private final List<UserPrivilege> userPrivileges;
 

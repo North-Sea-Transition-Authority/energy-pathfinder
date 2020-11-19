@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.controller.project.projectassessment;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -22,42 +23,45 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
-import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.controller.ProjectAssessmentContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.projectassessment.ProjectAssessmentForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.project.projectassessment.ProjectAssessmentContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectassessment.ProjectAssessmentService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(
     value = ProjectAssessmentController.class,
-    includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ProjectContextService.class)
+    includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {ProjectContextService.class, ProjectAssessmentContextService.class})
 )
-public class ProjectAssessmentControllerTest extends ProjectContextAbstractControllerTest {
+public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbstractControllerTest {
 
-  private static final Integer PROJECT_ID = 1;
+  private static final Integer QA_PROJECT_ID = 1;
   private static final Integer DRAFT_PROJECT_ID = 2;
 
   @MockBean
   private ProjectAssessmentService projectAssessmentService;
 
-  private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+  private final ProjectDetail aqProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
   private final ProjectDetail draftProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
 
-  private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.CREATE_PROJECT_PRIVILEGES);
+  private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
+      ProjectPermission.PROVIDE_ASSESSMENT.getUserPrivileges());
   private final AuthenticatedUserAccount unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   @Before
   public void setup() {
-    when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(projectDetail));
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectService.getLatestDetail(QA_PROJECT_ID)).thenReturn(Optional.of(aqProjectDetail));
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(aqProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(aqProjectDetail, unauthenticatedUser)).thenReturn(false);
 
     when(projectService.getLatestDetail(DRAFT_PROJECT_ID)).thenReturn(Optional.of(draftProjectDetail));
     when(projectOperatorService.isUserInProjectTeamOrRegulator(draftProjectDetail, authenticatedUser)).thenReturn(true);
@@ -67,7 +71,7 @@ public class ProjectAssessmentControllerTest extends ProjectContextAbstractContr
   @Test
   public void getProjectAssessment_whenAuthenticated_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(ProjectAssessmentController.class).getProjectAssessment(PROJECT_ID, null)))
+        on(ProjectAssessmentController.class).getProjectAssessment(QA_PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -75,7 +79,7 @@ public class ProjectAssessmentControllerTest extends ProjectContextAbstractContr
   @Test
   public void getProjectAssessment_whenUnauthenticated_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(ProjectAssessmentController.class).getProjectAssessment(PROJECT_ID, null)))
+        on(ProjectAssessmentController.class).getProjectAssessment(QA_PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -97,7 +101,7 @@ public class ProjectAssessmentControllerTest extends ProjectContextAbstractContr
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectAssessmentController.class)
-            .createProjectAssessment(PROJECT_ID, null, null, null, null)
+            .createProjectAssessment(QA_PROJECT_ID, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf()))
@@ -114,11 +118,12 @@ public class ProjectAssessmentControllerTest extends ProjectContextAbstractContr
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
 
+    when(projectAssessmentService.getProjectAssessmentModelAndView(eq(QA_PROJECT_ID), any())).thenReturn(new ModelAndView());
     when(projectAssessmentService.validate(any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectAssessmentController.class)
-            .createProjectAssessment(PROJECT_ID, null, null, null, null)
+            .createProjectAssessment(QA_PROJECT_ID, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf()))
@@ -137,7 +142,7 @@ public class ProjectAssessmentControllerTest extends ProjectContextAbstractContr
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectAssessmentController.class)
-            .createProjectAssessment(PROJECT_ID, null, null, null, null)
+            .createProjectAssessment(QA_PROJECT_ID, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(unauthenticatedUser))
             .with(csrf()))

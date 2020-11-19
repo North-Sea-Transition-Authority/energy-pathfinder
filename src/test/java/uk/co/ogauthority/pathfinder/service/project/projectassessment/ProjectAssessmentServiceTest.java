@@ -5,7 +5,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,10 +15,15 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.project.ManageProjectController;
+import uk.co.ogauthority.pathfinder.controller.project.projectassessment.ProjectAssessmentController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectassessment.ProjectAssessment;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.projectassessment.ProjectQuality;
+import uk.co.ogauthority.pathfinder.model.form.project.projectassessment.ProjectAssessmentForm;
 import uk.co.ogauthority.pathfinder.model.form.project.projectassessment.ProjectAssessmentFormValidator;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.projectassessment.ProjectAssessmentRepository;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectAssessmentTestUtil;
@@ -65,7 +72,31 @@ public class ProjectAssessmentServiceTest {
     assertThat(projectAssessment.getReadyToBePublished()).isEqualTo(form.getReadyToBePublished());
     assertThat(projectAssessment.getUpdateRequired()).isEqualTo(form.getUpdateRequired());
     assertThat(projectAssessment.getAssessedInstant()).isNotNull();
-    assertThat(projectAssessment.getAssessorWua()).isEqualTo(authenticatedUser.getWuaId());
+    assertThat(projectAssessment.getAssessorWuaId()).isEqualTo(authenticatedUser.getWuaId());
+  }
+
+  @Test
+  public void getProjectAssessment_whenExists_thenReturn() {
+    var projectAssessment = ProjectAssessmentTestUtil.createProjectAssessment();
+
+    when(projectAssessmentRepository.findByProjectDetail(projectDetail)).thenReturn(
+        Optional.of(projectAssessment)
+    );
+
+    var result = projectAssessmentService.getProjectAssessment(projectDetail);
+
+    assertThat(result).contains(projectAssessment);
+  }
+
+  @Test
+  public void getProjectAssessment_whenNotFound_thenReturnEmpty() {
+    when(projectAssessmentRepository.findByProjectDetail(projectDetail)).thenReturn(
+        Optional.empty()
+    );
+
+    var result = projectAssessmentService.getProjectAssessment(projectDetail);
+
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -78,5 +109,20 @@ public class ProjectAssessmentServiceTest {
 
     verify(projectAssessmentFormValidator, times(1)).validate(form, bindingResult);
     verify(validationService, times(1)).validate(form, bindingResult, ValidationType.FULL);
+  }
+
+  @Test
+  public void getProjectAssessmentModelAndView() {
+    var projectId = 1;
+    var form = new ProjectAssessmentForm();
+
+    var modelAndView = projectAssessmentService.getProjectAssessmentModelAndView(projectId, form);
+
+    var model = modelAndView.getModel();
+    assertThat(model.get("pageName")).isEqualTo(ProjectAssessmentController.PAGE_NAME);
+    assertThat(model.get("form")).isEqualTo(form);
+    assertThat(model.get("projectQualities")).isEqualTo(ProjectQuality.getAllAsMap());
+    assertThat(model.get("cancelUrl")).isEqualTo(ReverseRouter.route(on(ManageProjectController.class)
+        .getProject(projectId, null, null)));
   }
 }

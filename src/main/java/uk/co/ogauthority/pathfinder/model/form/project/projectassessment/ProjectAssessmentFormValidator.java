@@ -9,7 +9,7 @@ import org.springframework.validation.ValidationUtils;
 @Component
 public class ProjectAssessmentFormValidator implements SmartValidator {
 
-  public static final String MISSING_UPDATE_REQUIRED_ERROR = "Select if an update to the project is required";
+  public static final String MISSING_UPDATE_REQUIRED_ERROR = "Select yes if the project requires an update";
 
   @Override
   public void validate(Object target, Errors errors, Object... validationHints) {
