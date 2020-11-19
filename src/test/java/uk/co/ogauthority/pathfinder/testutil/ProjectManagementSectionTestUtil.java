@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
 import java.util.Map;
-import uk.co.ogauthority.pathfinder.model.view.management.ProjectManagementSection;
+import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementSection;
 
 public class ProjectManagementSectionTestUtil {
 

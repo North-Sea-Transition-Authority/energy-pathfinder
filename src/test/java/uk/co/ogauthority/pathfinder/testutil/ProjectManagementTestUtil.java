@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
-import uk.co.ogauthority.pathfinder.model.view.management.ProjectManagementView;
+import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementView;
 
 public class ProjectManagementTestUtil {
 

@@ -20,10 +20,6 @@ public class SystemAccessService {
       UserPrivilege.PATHFINDER_TEAM_VIEWER
   );
 
-  public static final Set<UserPrivilege> VIEW_PROJECT_PRIVILEGES = Set.of(
-      UserPrivilege.PATHFINDER_PROJECT_VIEWER
-  );
-
   /**
    * For use in WebSecurityConfig. In other instances call canAccessWorkArea
    */
