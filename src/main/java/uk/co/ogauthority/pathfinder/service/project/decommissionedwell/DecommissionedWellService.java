@@ -13,12 +13,14 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedwell.DecommissionedWellType;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedwell.WellMechanicalStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedwell.WellOperationalStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedwell.DecommissionedWellForm;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedwell.DecommissionedWellFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedwell.DecommissionedWellValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedwell.DecommissionedWellRepository;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -31,15 +33,18 @@ public class DecommissionedWellService implements ProjectFormSectionService {
   private final ValidationService validationService;
   private final DecommissionedWellFormValidator decommissionedWellFormValidator;
   private final DecommissionedWellRepository decommissionedWellRepository;
+  private final ProjectSetupService projectSetupService;
 
   public DecommissionedWellService(SearchSelectorService searchSelectorService,
                                    ValidationService validationService,
                                    DecommissionedWellFormValidator decommissionedWellFormValidator,
-                                   DecommissionedWellRepository decommissionedWellRepository) {
+                                   DecommissionedWellRepository decommissionedWellRepository,
+                                   ProjectSetupService projectSetupService) {
     this.searchSelectorService = searchSelectorService;
     this.validationService = validationService;
     this.decommissionedWellFormValidator = decommissionedWellFormValidator;
     this.decommissionedWellRepository = decommissionedWellRepository;
+    this.projectSetupService = projectSetupService;
   }
 
   public List<RestSearchItem> findTypesLikeWithManualEntry(String searchTerm) {
@@ -191,5 +196,10 @@ public class DecommissionedWellService implements ProjectFormSectionService {
   @Override
   public boolean isComplete(ProjectDetail detail) {
     return false;
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail) {
+    return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.WELLS);
   }
 }

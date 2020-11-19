@@ -54,8 +54,8 @@ public class DecommissionedPipelineServiceTest {
         pipelineService,
         decommissionedPipelineRepository,
         decommissionedPipelineFormValidator,
-        validationService
-    );
+        validationService,
+        projectSetupService);
 
     projectDetail = ProjectUtil.getProjectDetails();
 

@@ -56,8 +56,8 @@ public class DecommissionedWellServiceTest {
         searchSelectorService,
         validationService,
         decommissionedWellFormValidator,
-        decommissionedWellRepository
-    );
+        decommissionedWellRepository,
+        projectSetupService);
 
     when(decommissionedWellRepository.save(any(DecommissionedWell.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
   }

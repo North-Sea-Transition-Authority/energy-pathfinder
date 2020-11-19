@@ -55,8 +55,8 @@ public class AwardedContractServiceTest {
         validationService,
         awardedContractRepository,
         awardedContractFormValidator,
-        searchSelectorService
-    );
+        searchSelectorService,
+        projectSetupService);
 
     when(awardedContractRepository.save(any(AwardedContract.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
 

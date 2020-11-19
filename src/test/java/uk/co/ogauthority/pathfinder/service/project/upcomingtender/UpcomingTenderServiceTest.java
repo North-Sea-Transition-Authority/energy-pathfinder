@@ -73,8 +73,8 @@ public class UpcomingTenderServiceTest {
         functionService,
         searchSelectorService,
         projectDetailFileService,
-        upcomingTenderFileLinkService
-    );
+        upcomingTenderFileLinkService,
+        projectSetupService);
 
     when(upcomingTenderRepository.save(any(UpcomingTender.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);

@@ -50,8 +50,8 @@ public class PlatformsFpsosServiceTest {
         devUkFacilitiesService,
         new SearchSelectorService(),
         platformFpsoFormValidator,
-        validationService
-    );
+        validationService,
+        projectSetupService);
     when(platformFpsoRepository.save(any(PlatformFpso.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
   }

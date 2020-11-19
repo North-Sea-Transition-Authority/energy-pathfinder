@@ -11,12 +11,12 @@ import uk.co.ogauthority.pathfinder.model.enums.project.tasks.GeneralPurposeProj
 import uk.co.ogauthority.pathfinder.model.view.tasks.TaskListEntry;
 import uk.co.ogauthority.pathfinder.model.view.tasks.TaskListGroup;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 
 @Service
 public class TaskListEntryFactory {
 
   public static final String REVIEW_AND_SUBMIT_GROUP_TITLE = "Review and submit";
+  public static final int REVIEW_AND_SUBMIT_DISPLAY_ORDER = 999;
   private final ProjectTaskService projectTaskService;
 
 
@@ -25,24 +25,13 @@ public class TaskListEntryFactory {
     this.projectTaskService = projectTaskService;
   }
 
-  public TaskListEntry createApplicationTaskListEntry(ProjectDetail detail,
-                                               GeneralPurposeProjectTask projectTask) {
+  public TaskListEntry createTaskListEntry(ProjectDetail detail,
+                                           GeneralPurposeProjectTask projectTask) {
     return new TaskListEntry(
         projectTask.getDisplayName(),
         projectTask.getTaskLandingPageRoute(detail.getProject()),
         projectTaskService.isTaskComplete(projectTask, detail),
         projectTask.getDisplayOrder()
-    );
-  }
-
-  //TODO do we need this??
-  public TaskListEntry createNoTasksEntry(ProjectDetail detail) {
-    return new TaskListEntry(
-        "No tasks",
-        ControllerUtils.getBackToTaskListUrl(detail.getProject().getId()),
-        false,
-        false,
-        0
     );
   }
 
@@ -53,14 +42,14 @@ public class TaskListEntryFactory {
             .getProjectSummary(detail.getProject().getId(), null)),
         false,
         false,
-        999
+        REVIEW_AND_SUBMIT_DISPLAY_ORDER
     );
   }
 
-  public TaskListGroup createReviewAndSubmitGroup(ProjectDetail detail, int displayOrder) {
+  public TaskListGroup createReviewAndSubmitGroup(ProjectDetail detail) {
     return new TaskListGroup(
         REVIEW_AND_SUBMIT_GROUP_TITLE,
-        displayOrder,
+        REVIEW_AND_SUBMIT_DISPLAY_ORDER,
         List.of(createReviewAndSubmitTask(detail))
     );
   }

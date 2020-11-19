@@ -65,8 +65,8 @@ public class UpcomingTenderServiceValidationTest {
         functionService,
         searchSelectorService,
         projectDetailFileService,
-        upcomingTenderFileLinkService
-    );
+        upcomingTenderFileLinkService,
+        projectSetupService);
   }
 
   @Test

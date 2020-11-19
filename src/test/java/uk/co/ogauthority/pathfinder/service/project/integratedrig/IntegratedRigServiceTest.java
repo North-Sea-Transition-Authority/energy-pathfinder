@@ -53,8 +53,8 @@ public class IntegratedRigServiceTest {
         devUkFacilitiesService,
         integratedRigRepository,
         searchSelectorService,
-        validationService
-    );
+        validationService,
+        projectSetupService);
 
     projectDetail = ProjectUtil.getProjectDetails();
 

@@ -1,11 +1,11 @@
 package uk.co.ogauthority.pathfinder.service.project.tasks;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.apache.commons.collections4.SetUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,11 @@ public class TaskListService {
   }
 
 
-  //Method to return a list of TaskListGroup view objects
+  /**
+   * Get a list of TaskListGroup view objects for the given project.
+   * @param detail the project detail to get the task list groups for.
+   * @return a list of TaskListGroup objects for each group present on the project with the appropriate tasks.
+   */
   public List<TaskListGroup> getTaskListGroups(ProjectDetail detail) {
     Set<ProjectTask> tasks = new HashSet<>(getProjectTasksForDetail(detail));
 
@@ -46,10 +50,9 @@ public class TaskListService {
 
           return new TaskListGroup(
               group.getDisplayName(),
-              group.getDisplayOrder(), //TODO this should probably change depending on the position in the list? Maybe do in template?
+              group.getDisplayOrder(),
               visibleTasksInGroup.stream()
-                  .map(orderedTaskGroupTask -> taskListEntryFactory.createApplicationTaskListEntry(detail,
-                      orderedTaskGroupTask))
+                  .map(orderedTask -> taskListEntryFactory.createTaskListEntry(detail, orderedTask))
                   // sort the tasks by their display order
                   .sorted(Comparator.comparing(TaskListEntry::getDisplayOrder))
                   .collect(Collectors.toList())
@@ -58,12 +61,22 @@ public class TaskListService {
         .sorted(Comparator.comparing(TaskListGroup::getDisplayOrder))
         .collect(Collectors.toList());
 
-    groups.add(taskListEntryFactory.createReviewAndSubmitGroup(detail, groups.size()+1));
+    groups.add(taskListEntryFactory.createReviewAndSubmitGroup(detail));
+
+    setDisplayOrderForGroups(groups);
 
     return groups;
   }
 
-  //Return a list of the tasks that appear on the task list for a given detail
+  private void setDisplayOrderForGroups(List<TaskListGroup> groups) {
+    //Set the displayOrder for each item based on it's position in the sorted list.
+    IntStream.range(0, groups.size())
+        .forEach(index -> {
+          var group = groups.get(index);
+          group.setDisplayOrder(index + 1);
+        });
+  }
+
   public List<ProjectTask> getProjectTasksForDetail(ProjectDetail detail) {
     return ProjectTask.stream()
         .filter(task -> projectTaskService.canShowTask(task, detail))
@@ -72,18 +85,8 @@ public class TaskListService {
 
 
   public ModelAndView getTaskListModelAndView(ProjectDetail detail) {
-    var modelAndView = new ModelAndView(TASK_LIST_TEMPLATE_PATH);
-
-    modelAndView.addObject(
-        "groups",
-        getTaskListGroups(detail)
-    );
-
-    //build up groups
-
-    //add review and submit task/group
-
-    return modelAndView;
+    return new ModelAndView(TASK_LIST_TEMPLATE_PATH)
+        .addObject("groups", getTaskListGroups(detail));
   }
 
 }

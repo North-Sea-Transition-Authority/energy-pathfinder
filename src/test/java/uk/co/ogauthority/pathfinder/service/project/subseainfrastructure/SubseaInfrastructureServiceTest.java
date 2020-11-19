@@ -68,8 +68,8 @@ public class SubseaInfrastructureServiceTest {
         subseaInfrastructureRepository,
         searchSelectorService,
         validationService,
-        subseaInfrastructureFormValidator
-    );
+        subseaInfrastructureFormValidator,
+        projectSetupService);
 
     projectDetail = ProjectUtil.getProjectDetails();
 

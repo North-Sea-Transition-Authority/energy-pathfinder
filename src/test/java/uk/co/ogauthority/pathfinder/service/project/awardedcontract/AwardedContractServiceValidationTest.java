@@ -48,8 +48,8 @@ public class AwardedContractServiceValidationTest {
         validationService,
         awardedContractRepository,
         awardedContractFormValidator,
-        searchSelectorService
-    );
+        searchSelectorService,
+        projectSetupService);
   }
 
   @Test

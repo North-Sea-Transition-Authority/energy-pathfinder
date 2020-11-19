@@ -7,9 +7,9 @@ import java.util.List;
  */
 public class TaskListGroup {
 
-  private final String groupName;
-  private final int displayOrder;
-  private final List<TaskListEntry> taskListEntries;
+  private String groupName;
+  private int displayOrder;
+  private List<TaskListEntry> taskListEntries;
 
   public TaskListGroup(String groupName,
                        int displayOrder,
@@ -29,5 +29,17 @@ public class TaskListGroup {
 
   public List<TaskListEntry> getTaskListEntries() {
     return taskListEntries;
+  }
+
+  public void setDisplayOrder(int displayOrder) {
+    this.displayOrder = displayOrder;
+  }
+
+  public void setGroupName(String groupName) {
+    this.groupName = groupName;
+  }
+
+  public void setTaskListEntries(List<TaskListEntry> taskListEntries) {
+    this.taskListEntries = taskListEntries;
   }
 }

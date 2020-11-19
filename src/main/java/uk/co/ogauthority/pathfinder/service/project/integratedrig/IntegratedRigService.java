@@ -11,9 +11,11 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.integratedrig.IntegratedRig;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.integratedrig.IntegratedRigForm;
 import uk.co.ogauthority.pathfinder.repository.project.integratedrig.IntegratedRigRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -25,16 +27,19 @@ public class IntegratedRigService implements ProjectFormSectionService {
   private final IntegratedRigRepository integratedRigRepository;
   private final SearchSelectorService searchSelectorService;
   private final ValidationService validationService;
+  private final ProjectSetupService projectSetupService;
 
   @Autowired
   public IntegratedRigService(DevUkFacilitiesService devUkFacilitiesService,
                               IntegratedRigRepository integratedRigRepository,
                               SearchSelectorService searchSelectorService,
-                              ValidationService validationService) {
+                              ValidationService validationService,
+                              ProjectSetupService projectSetupService) {
     this.devUkFacilitiesService = devUkFacilitiesService;
     this.integratedRigRepository = integratedRigRepository;
     this.searchSelectorService = searchSelectorService;
     this.validationService = validationService;
+    this.projectSetupService = projectSetupService;
   }
 
   public IntegratedRigForm getForm(Integer integratedRigId, ProjectDetail projectDetail) {
@@ -142,5 +147,10 @@ public class IntegratedRigService implements ProjectFormSectionService {
     var integratedRigs = getIntegratedRigs(projectDetail);
     return !integratedRigs.isEmpty() && integratedRigs.stream()
         .allMatch(integratedRig -> isValid(integratedRig, ValidationType.FULL));
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail) {
+    return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.INTEGRATED_RIGS);
   }
 }

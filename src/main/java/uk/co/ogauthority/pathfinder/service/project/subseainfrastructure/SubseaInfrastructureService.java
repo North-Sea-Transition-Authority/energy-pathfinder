@@ -13,6 +13,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.subseainfrastructure.SubseaInfrastructure;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.ConcreteMattressForm;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.OtherSubseaStructureForm;
@@ -28,6 +29,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.vali
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.validation.subseastructure.SubseaStructurePartialValidation;
 import uk.co.ogauthority.pathfinder.repository.project.subseainfrastructure.SubseaInfrastructureRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -41,18 +43,21 @@ public class SubseaInfrastructureService implements ProjectFormSectionService {
   private final SearchSelectorService searchSelectorService;
   private final ValidationService validationService;
   private final SubseaInfrastructureFormValidator subseaInfrastructureFormValidator;
+  private final ProjectSetupService projectSetupService;
 
   @Autowired
   public SubseaInfrastructureService(DevUkFacilitiesService devUkFacilitiesService,
                                      SubseaInfrastructureRepository subseaInfrastructureRepository,
                                      SearchSelectorService searchSelectorService,
                                      ValidationService validationService,
-                                     SubseaInfrastructureFormValidator subseaInfrastructureFormValidator) {
+                                     SubseaInfrastructureFormValidator subseaInfrastructureFormValidator,
+                                     ProjectSetupService projectSetupService) {
     this.devUkFacilitiesService = devUkFacilitiesService;
     this.subseaInfrastructureRepository = subseaInfrastructureRepository;
     this.searchSelectorService = searchSelectorService;
     this.validationService = validationService;
     this.subseaInfrastructureFormValidator = subseaInfrastructureFormValidator;
+    this.projectSetupService = projectSetupService;
   }
 
   public SubseaInfrastructureForm getForm(Integer subseaInfrastructureId, ProjectDetail projectDetail) {
@@ -327,5 +332,10 @@ public class SubseaInfrastructureService implements ProjectFormSectionService {
     var subseaInfrastructures = getSubseaInfrastructures(projectDetail);
     return !subseaInfrastructures.isEmpty() && subseaInfrastructures.stream()
         .allMatch(subseaInfrastructure -> isValid(subseaInfrastructure, ValidationType.FULL));
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail) {
+    return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.SUBSEA_INFRASTRUCTURE);
   }
 }

@@ -51,8 +51,8 @@ public class PlatformsFpsosServiceValidationTest {
         devUkFacilitiesService,
         new SearchSelectorService(),
         platformFpsoFormValidator,
-        validationService
-    );
+        validationService,
+        projectSetupService);
   }
 
   @Test
