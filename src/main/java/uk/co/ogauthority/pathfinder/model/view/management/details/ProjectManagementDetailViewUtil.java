@@ -8,6 +8,10 @@ import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class ProjectManagementDetailViewUtil {
 
+  private ProjectManagementDetailViewUtil() {
+    throw new IllegalStateException("ProjectManagementDetailViewUtil is a util class and should not be instantiated");
+  }
+
   public static ProjectManagementDetailView from(ProjectDetail projectDetail,
                                                  ProjectInformation projectInformation,
                                                  ProjectLocation projectLocation,

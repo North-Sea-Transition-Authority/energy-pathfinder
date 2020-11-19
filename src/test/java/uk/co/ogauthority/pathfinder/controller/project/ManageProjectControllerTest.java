@@ -37,13 +37,13 @@ public class ManageProjectControllerTest extends ProjectContextAbstractControlle
 
   private final ProjectDetail projectDetail  = ProjectUtil.getProjectDetails(ProjectStatus.PUBLISHED);
 
-  private final AuthenticatedUserAccount authenticatedOperatorUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.VIEW_PROJECT_PRIVILEGES);
+  private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.VIEW_PROJECT_PRIVILEGES);
   private final AuthenticatedUserAccount unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   @Before
   public void setup() {
     when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(projectDetail));
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedOperatorUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
   }
 
@@ -51,7 +51,7 @@ public class ManageProjectControllerTest extends ProjectContextAbstractControlle
   public void getProject_whenAuthenticated_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
         on(ManageProjectController.class).getProject(PROJECT_ID, null, null)))
-        .with(authenticatedUserAndSession(authenticatedOperatorUser)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
 
@@ -69,7 +69,7 @@ public class ManageProjectControllerTest extends ProjectContextAbstractControlle
     var projectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
 
     when(projectService.getLatestDetail(projectId)).thenReturn(Optional.of(projectDetail));
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedOperatorUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
 
     mockMvc.perform(get(ReverseRouter.route(
         on(ManageProjectController.class).getProject(projectId, null, null)))
