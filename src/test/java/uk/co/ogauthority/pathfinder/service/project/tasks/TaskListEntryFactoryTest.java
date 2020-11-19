@@ -38,7 +38,7 @@ public class TaskListEntryFactoryTest {
     assertThat(task.getTaskName()).isEqualTo(TaskListEntryFactory.REVIEW_AND_SUBMIT_GROUP_TITLE);
     assertThat(task.getDisplayOrder()).isEqualTo(TaskListEntryFactory.REVIEW_AND_SUBMIT_DISPLAY_ORDER);
     assertThat(task.isCompleted()).isFalse();
-    assertThat(task.useCompletedLabels()).isFalse();
+    assertThat(task.isUsingCompletedLabels()).isFalse();
   }
 
 
@@ -60,7 +60,7 @@ public class TaskListEntryFactoryTest {
 
   //Check common fields against the TestGeneralPurposeProjectTask
   private void checkCommonFields(TaskListEntry taskListEntry) {
-    assertThat(taskListEntry.useCompletedLabels()).isTrue(); // our default
+    assertThat(taskListEntry.isUsingCompletedLabels()).isTrue(); // our default
     assertThat(taskListEntry.getDisplayOrder()).isEqualTo(testGeneralPurposeProjectTask.getDisplayOrder());
     assertThat(taskListEntry.getRoute()).isEqualTo(testGeneralPurposeProjectTask.getTaskLandingPageRoute(detail.getProject()));
   }
