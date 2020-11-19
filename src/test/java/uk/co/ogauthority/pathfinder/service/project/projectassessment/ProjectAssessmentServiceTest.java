@@ -119,10 +119,10 @@ public class ProjectAssessmentServiceTest {
     var modelAndView = projectAssessmentService.getProjectAssessmentModelAndView(projectId, form);
 
     var model = modelAndView.getModel();
-    assertThat(model.get("pageName")).isEqualTo(ProjectAssessmentController.PAGE_NAME);
-    assertThat(model.get("form")).isEqualTo(form);
-    assertThat(model.get("projectQualities")).isEqualTo(ProjectQuality.getAllAsMap());
-    assertThat(model.get("cancelUrl")).isEqualTo(ReverseRouter.route(on(ManageProjectController.class)
+    assertThat(model).containsEntry("pageName", ProjectAssessmentController.PAGE_NAME);
+    assertThat(model).containsEntry("form", form);
+    assertThat(model).containsEntry("projectQualities", ProjectQuality.getAllAsMap());
+    assertThat(model).containsEntry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class)
         .getProject(projectId, null, null)));
   }
 }
