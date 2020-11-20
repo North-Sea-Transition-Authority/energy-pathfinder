@@ -2,6 +2,8 @@ package uk.co.ogauthority.pathfinder.controller.project;
 
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -9,6 +11,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
 import java.util.Optional;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -16,23 +19,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
-import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
-import uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline.DecommissionedPipelineService;
-import uk.co.ogauthority.pathfinder.service.project.integratedrig.IntegratedRigService;
-import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
-import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
-import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
-import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
-import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
-import uk.co.ogauthority.pathfinder.service.project.subseainfrastructure.SubseaInfrastructureService;
-import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
+import uk.co.ogauthority.pathfinder.service.project.tasks.TaskListService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -41,37 +35,7 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 public class TaskListControllerTest extends ProjectContextAbstractControllerTest {
 
   @MockBean
-  ProjectInformationService projectInformationService;
-
-  @MockBean
-  ProjectLocationService projectLocationService;
-
-  @MockBean
-  SelectOperatorService selectOperatorService;
-
-  @MockBean
-  UpcomingTenderService upcomingTenderService;
-
-  @MockBean
-  AwardedContractService awardedContractService;
-
-  @MockBean
-  CollaborationOpportunitiesService collaborationOpportunitiesService;
-
-  @MockBean
-  SubseaInfrastructureService subseaInfrastructureService;
-
-  @MockBean
-  IntegratedRigService integratedRigService;
-
-  @MockBean
-  DecommissionedPipelineService decommissionedPipelineService;
-
-  @MockBean
-  private PlatformsFpsosService platformsFpsosService;
-
-  @MockBean
-  private ProjectSetupService projectSetupService;
+  private TaskListService taskListService;
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.CREATE_PROJECT_PRIVILEGES);
 
@@ -79,6 +43,10 @@ public class TaskListControllerTest extends ProjectContextAbstractControllerTest
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
 
+  @Before
+  public void setUp() throws Exception {
+    when(taskListService.getTaskListModelAndView(details)).thenReturn(new ModelAndView("test/blankTemplate.ftl"));
+  }
 
   @Test
   public void authenticatedUser_hasAccessToTaskList() throws Exception {
@@ -88,6 +56,8 @@ public class TaskListControllerTest extends ProjectContextAbstractControllerTest
     mockMvc.perform(get(ReverseRouter.route(on(TaskListController.class).viewTaskList(1, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
+
+    verify(taskListService, times(1)).getTaskListModelAndView(details);
   }
 
   @Test
@@ -96,5 +66,7 @@ public class TaskListControllerTest extends ProjectContextAbstractControllerTest
     mockMvc.perform(get(ReverseRouter.route(on(TaskListController.class).viewTaskList(1, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
+
+    verify(taskListService, times(0)).getTaskListModelAndView(details);
   }
 }

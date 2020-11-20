@@ -57,8 +57,8 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
   }
 
   @GetMapping
-  public ModelAndView getPipelines(@PathVariable Integer projectId,
-                                   ProjectContext projectContext) {
+  public ModelAndView viewPipelines(@PathVariable Integer projectId,
+                                    ProjectContext projectContext) {
     var decommissionedPipelineViews = decommissionedPipelineSummaryService.getDecommissionedPipelineSummaryViews(
         projectContext.getProjectDetails()
     );
@@ -204,11 +204,11 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
   }
 
   private ModelAndView getDecommissionedPipelineSummaryRedirect(Integer projectId) {
-    return ReverseRouter.redirect(on(DecommissionedPipelineController.class).getPipelines(projectId, null));
+    return ReverseRouter.redirect(on(DecommissionedPipelineController.class).viewPipelines(projectId, null));
   }
 
   private String getDecommissionedPipelineSummaryUrl(Integer projectId) {
-    return ReverseRouter.route(on(DecommissionedPipelineController.class).getPipelines(projectId, null));
+    return ReverseRouter.route(on(DecommissionedPipelineController.class).viewPipelines(projectId, null));
   }
 
   private ModelAndView removeDecommissionedPipelineModelAndView(Integer projectId, DecommissionedPipelineView decommissionedPipelineView) {

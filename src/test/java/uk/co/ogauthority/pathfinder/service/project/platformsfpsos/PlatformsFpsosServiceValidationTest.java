@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFpsoFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.platformsfpsos.PlatformFpsoRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.PlatformFpsoTestUtil;
@@ -38,6 +39,9 @@ public class PlatformsFpsosServiceValidationTest {
   @Mock
   private PlatformsFpsosService platformsFpsosService;
 
+  @Mock
+  private ProjectSetupService projectSetupService;
+
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
 
   private final PlatformFpso platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(details);
@@ -51,8 +55,8 @@ public class PlatformsFpsosServiceValidationTest {
         devUkFacilitiesService,
         new SearchSelectorService(),
         platformFpsoFormValidator,
-        validationService
-    );
+        validationService,
+        projectSetupService);
   }
 
   @Test

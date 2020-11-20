@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunit
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDescriptionForm;
@@ -27,6 +28,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.CollaborationOpportunitiesRepository;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -42,6 +44,7 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
   private final CollaborationOpportunitiesRepository collaborationOpportunitiesRepository;
   private final CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService;
   private final ProjectDetailFileService projectDetailFileService;
+  private final ProjectSetupService projectSetupService;
 
   @Autowired
   public CollaborationOpportunitiesService(SearchSelectorService searchSelectorService,
@@ -50,7 +53,8 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
                                            CollaborationOpportunityFormValidator collaborationOpportunityFormValidator,
                                            CollaborationOpportunitiesRepository collaborationOpportunitiesRepository,
                                            CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService,
-                                           ProjectDetailFileService projectDetailFileService) {
+                                           ProjectDetailFileService projectDetailFileService,
+                                           ProjectSetupService projectSetupService) {
     this.searchSelectorService = searchSelectorService;
     this.functionService = functionService;
     this.validationService = validationService;
@@ -58,6 +62,7 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
     this.collaborationOpportunitiesRepository = collaborationOpportunitiesRepository;
     this.collaborationOpportunityFileLinkService = collaborationOpportunityFileLinkService;
     this.projectDetailFileService = projectDetailFileService;
+    this.projectSetupService = projectSetupService;
   }
 
 
@@ -217,5 +222,10 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
     var opportunities =  getOpportunitiesForDetail(detail);
     return !opportunities.isEmpty() && opportunities.stream()
         .allMatch(ut -> isValid(ut, ValidationType.FULL));
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail) {
+    return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES);
   }
 }

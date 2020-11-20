@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.enums.project.tasks;
+package uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions;
 
 import com.google.common.base.Splitter;
 import java.util.List;

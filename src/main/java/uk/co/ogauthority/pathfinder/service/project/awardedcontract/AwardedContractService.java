@@ -13,6 +13,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.Awarded
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
@@ -21,6 +22,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedCo
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.AwardedContractRepository;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -33,18 +35,21 @@ public class AwardedContractService implements ProjectFormSectionService {
   private final AwardedContractRepository awardedContractRepository;
   private final AwardedContractFormValidator awardedContractFormValidator;
   private final SearchSelectorService searchSelectorService;
+  private final ProjectSetupService projectSetupService;
 
   @Autowired
   public AwardedContractService(FunctionService functionService,
                                 ValidationService validationService,
                                 AwardedContractRepository awardedContractRepository,
                                 AwardedContractFormValidator awardedContractFormValidator,
-                                SearchSelectorService searchSelectorService) {
+                                SearchSelectorService searchSelectorService,
+                                ProjectSetupService projectSetupService) {
     this.functionService = functionService;
     this.validationService = validationService;
     this.awardedContractRepository = awardedContractRepository;
     this.awardedContractFormValidator = awardedContractFormValidator;
     this.searchSelectorService = searchSelectorService;
+    this.projectSetupService = projectSetupService;
   }
 
   public AwardedContractForm getForm(Integer awardedContractId, ProjectDetail projectDetail) {
@@ -168,6 +173,11 @@ public class AwardedContractService implements ProjectFormSectionService {
         && awardedContracts
         .stream()
         .allMatch(awardedContract -> isValid(awardedContract, ValidationType.FULL));
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail) {
+    return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS);
   }
 
 }

@@ -13,11 +13,11 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.subseainfrastructure.SubseaInfrastructure;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.SubseaInfrastructureFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.subseainfrastructure.SubseaInfrastructureRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -35,6 +35,9 @@ public class SubseaInfrastructureValidationServiceTest {
   @Mock
   private SubseaInfrastructureFormValidator subseaInfrastructureFormValidator;
 
+  @Mock
+  private ProjectSetupService projectSetupService;
+
   private SubseaInfrastructureService subseaInfrastructureService;
 
   private ProjectDetail projectDetail;
@@ -50,8 +53,8 @@ public class SubseaInfrastructureValidationServiceTest {
         subseaInfrastructureRepository,
         searchSelectorService,
         validationService,
-        subseaInfrastructureFormValidator
-    );
+        subseaInfrastructureFormValidator,
+        projectSetupService);
 
     projectDetail = ProjectUtil.getProjectDetails();
   }

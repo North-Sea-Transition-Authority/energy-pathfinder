@@ -17,12 +17,14 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.CollaborationOpportunitiesRepository;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtil;
@@ -47,6 +49,9 @@ public class CollaborationOpportunitiesServiceTest {
   @Mock
   private ProjectDetailFileService projectDetailFileService;
 
+  @Mock
+  private ProjectSetupService projectSetupService;
+
   private CollaborationOpportunitiesService collaborationOpportunitiesService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -68,8 +73,8 @@ public class CollaborationOpportunitiesServiceTest {
         collaborationOpportunityFormValidator,
         collaborationOpportunitiesRepository,
         collaborationOpportunityFileLinkService,
-        projectDetailFileService
-    );
+        projectDetailFileService,
+        projectSetupService);
 
     when(collaborationOpportunitiesRepository.save(any(CollaborationOpportunity.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
@@ -195,6 +200,18 @@ public class CollaborationOpportunitiesServiceTest {
     var results = collaborationOpportunitiesService.findFunctionsLikeWithManualEntry(manualEntry);
     assertThat(results.size()).isEqualTo(1);
     assertThat(results.get(0).getId()).isEqualTo(SearchSelectablePrefix.FREE_TEXT_PREFIX+manualEntry);
+  }
+
+  @Test
+  public void canShowInTaskList_true() {
+    when(projectSetupService.taskSelectedForProjectDetail(details, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(true);
+    assertThat(collaborationOpportunitiesService.canShowInTaskList(details)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_false() {
+    when(projectSetupService.taskSelectedForProjectDetail(details, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(false);
+    assertThat(collaborationOpportunitiesService.canShowInTaskList(details)).isFalse();
   }
 
 }

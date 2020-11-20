@@ -58,8 +58,8 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
   }
 
   @GetMapping
-  public ModelAndView getSubseaStructures(@PathVariable Integer projectId,
-                                          ProjectContext projectContext) {
+  public ModelAndView viewSubseaStructures(@PathVariable Integer projectId,
+                                           ProjectContext projectContext) {
     var subseaInfrastructureViews = subseaInfrastructureSummaryService.getSubseaInfrastructureSummaryViews(
         projectContext.getProjectDetails()
     );
@@ -215,11 +215,11 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
   }
 
   private ModelAndView getSubseaInfrastructureSummaryRedirect(Integer projectId) {
-    return ReverseRouter.redirect(on(SubseaInfrastructureController.class).getSubseaStructures(projectId, null));
+    return ReverseRouter.redirect(on(SubseaInfrastructureController.class).viewSubseaStructures(projectId, null));
   }
 
   private String getSubseaInfrastructureSummaryUrl(Integer projectId) {
-    return ReverseRouter.route(on(SubseaInfrastructureController.class).getSubseaStructures(projectId, null));
+    return ReverseRouter.route(on(SubseaInfrastructureController.class).viewSubseaStructures(projectId, null));
   }
 
   private ModelAndView removeSubseaInfrastructureModelAndView(Integer projectId, SubseaInfrastructureView subseaInfrastructureView) {

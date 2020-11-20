@@ -82,7 +82,7 @@ public class SubseaInfrastructureControllerTest extends ProjectContextAbstractCo
   @Test
   public void getSubseaStructures_whenAuthenticated_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(SubseaInfrastructureController.class).getSubseaStructures(PROJECT_ID, null)))
+        on(SubseaInfrastructureController.class).viewSubseaStructures(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -90,7 +90,7 @@ public class SubseaInfrastructureControllerTest extends ProjectContextAbstractCo
   @Test
   public void getSubseaStructures_whenUnauthenticated_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(SubseaInfrastructureController.class).getSubseaStructures(PROJECT_ID, null)))
+        on(SubseaInfrastructureController.class).viewSubseaStructures(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }

@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionQuestion;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionQuestion;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TaskListSectionQuestionTest {

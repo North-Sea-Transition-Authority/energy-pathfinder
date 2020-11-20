@@ -56,8 +56,8 @@ public class IntegratedRigController extends ProjectFormPageController {
   }
 
   @GetMapping
-  public ModelAndView getIntegratedRigs(@PathVariable Integer projectId,
-                                        ProjectContext projectContext) {
+  public ModelAndView viewIntegratedRigs(@PathVariable Integer projectId,
+                                         ProjectContext projectContext) {
     var integratedRigViews = integratedRigSummaryService.getIntegratedRigSummaryViews(
         projectContext.getProjectDetails()
     );
@@ -202,11 +202,11 @@ public class IntegratedRigController extends ProjectFormPageController {
   }
 
   private ModelAndView getIntegratedRigSummaryRedirect(Integer projectId) {
-    return ReverseRouter.redirect(on(IntegratedRigController.class).getIntegratedRigs(projectId, null));
+    return ReverseRouter.redirect(on(IntegratedRigController.class).viewIntegratedRigs(projectId, null));
   }
 
   private String getIntegratedRigSummaryUrl(Integer projectId) {
-    return ReverseRouter.route(on(IntegratedRigController.class).getIntegratedRigs(projectId, null));
+    return ReverseRouter.route(on(IntegratedRigController.class).viewIntegratedRigs(projectId, null));
   }
 
   private ModelAndView removeIntegratedRigModelAndView(Integer projectId, IntegratedRigView integratedRigView) {

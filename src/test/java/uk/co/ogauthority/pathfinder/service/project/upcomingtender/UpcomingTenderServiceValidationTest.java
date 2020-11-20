@@ -22,6 +22,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTe
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -50,6 +51,9 @@ public class UpcomingTenderServiceValidationTest {
   @Mock
   private UpcomingTenderFileLinkService upcomingTenderFileLinkService;
 
+  @Mock
+  private ProjectSetupService projectSetupService;
+
   private UpcomingTenderService upcomingTenderService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -65,8 +69,8 @@ public class UpcomingTenderServiceValidationTest {
         functionService,
         searchSelectorService,
         projectDetailFileService,
-        upcomingTenderFileLinkService
-    );
+        upcomingTenderFileLinkService,
+        projectSetupService);
   }
 
   @Test

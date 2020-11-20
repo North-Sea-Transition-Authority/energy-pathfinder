@@ -13,12 +13,14 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFpsoForm;
 import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFpsoFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFpsoValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.platformsfpsos.PlatformFpsoRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -32,6 +34,7 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
   private final SearchSelectorService searchSelectorService;
   private final PlatformFpsoFormValidator platformFpsoFormValidator;
   private final ValidationService validationService;
+  private final ProjectSetupService projectSetupService;
 
   @Autowired
   public PlatformsFpsosService(
@@ -39,12 +42,13 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
       DevUkFacilitiesService devUkFacilitiesService,
       SearchSelectorService searchSelectorService,
       PlatformFpsoFormValidator platformFpsoFormValidator,
-      ValidationService validationService) {
+      ValidationService validationService, ProjectSetupService projectSetupService) {
     this.platformFpsoRepository = platformFpsoRepository;
     this.devUkFacilitiesService = devUkFacilitiesService;
     this.searchSelectorService = searchSelectorService;
     this.platformFpsoFormValidator = platformFpsoFormValidator;
     this.validationService = validationService;
+    this.projectSetupService = projectSetupService;
   }
 
   @Transactional
@@ -171,5 +175,10 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
   public boolean isComplete(ProjectDetail detail) {
     var platformsFpsos = getPlatformsFpsosForDetail(detail);
     return !platformsFpsos.isEmpty() && platformsFpsos.stream().allMatch(p -> isValid(p, ValidationType.FULL));
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail) {
+    return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.PLATFORM_FPSO);
   }
 }

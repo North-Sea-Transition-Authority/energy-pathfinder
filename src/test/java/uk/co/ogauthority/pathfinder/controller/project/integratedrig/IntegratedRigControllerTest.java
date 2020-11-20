@@ -82,7 +82,7 @@ public class IntegratedRigControllerTest extends ProjectContextAbstractControlle
   @Test
   public void getIntegratedRigs_whenAuthenticated_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(IntegratedRigController.class).getIntegratedRigs(PROJECT_ID, null)))
+        on(IntegratedRigController.class).viewIntegratedRigs(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -90,7 +90,7 @@ public class IntegratedRigControllerTest extends ProjectContextAbstractControlle
   @Test
   public void getIntegratedRigs_whenUnauthenticated_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(IntegratedRigController.class).getIntegratedRigs(PROJECT_ID, null)))
+        on(IntegratedRigController.class).viewIntegratedRigs(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }

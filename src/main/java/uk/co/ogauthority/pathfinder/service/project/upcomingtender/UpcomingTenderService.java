@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.Upcoming
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
@@ -28,6 +29,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTe
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -42,6 +44,7 @@ public class UpcomingTenderService implements ProjectFormSectionService {
   private final SearchSelectorService searchSelectorService;
   private final ProjectDetailFileService projectDetailFileService;
   private final UpcomingTenderFileLinkService upcomingTenderFileLinkService;
+  private final ProjectSetupService projectSetupService;
 
   @Autowired
   public UpcomingTenderService(UpcomingTenderRepository upcomingTenderRepository,
@@ -50,7 +53,8 @@ public class UpcomingTenderService implements ProjectFormSectionService {
                                FunctionService functionService,
                                SearchSelectorService searchSelectorService,
                                ProjectDetailFileService projectDetailFileService,
-                               UpcomingTenderFileLinkService upcomingTenderFileLinkService) {
+                               UpcomingTenderFileLinkService upcomingTenderFileLinkService,
+                               ProjectSetupService projectSetupService) {
     this.upcomingTenderRepository = upcomingTenderRepository;
     this.validationService = validationService;
     this.upcomingTenderFormValidator = upcomingTenderFormValidator;
@@ -58,6 +62,7 @@ public class UpcomingTenderService implements ProjectFormSectionService {
     this.searchSelectorService = searchSelectorService;
     this.projectDetailFileService = projectDetailFileService;
     this.upcomingTenderFileLinkService = upcomingTenderFileLinkService;
+    this.projectSetupService = projectSetupService;
   }
 
   @Transactional
@@ -219,5 +224,10 @@ public class UpcomingTenderService implements ProjectFormSectionService {
     var upcomingTenders =  getUpcomingTendersForDetail(detail);
     return !upcomingTenders.isEmpty() && upcomingTenders.stream()
         .allMatch(ut -> isValid(ut, ValidationType.FULL));
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail) {
+    return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS);
   }
 }

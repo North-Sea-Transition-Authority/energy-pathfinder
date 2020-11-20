@@ -8,10 +8,10 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionAnswer;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionAnswerConverter;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionQuestion;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.TaskListSectionQuestionConverter;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionAnswer;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionAnswerConverter;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionQuestion;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionQuestionConverter;
 
 @Table(name = "project_task_list_setup")
 @Entity

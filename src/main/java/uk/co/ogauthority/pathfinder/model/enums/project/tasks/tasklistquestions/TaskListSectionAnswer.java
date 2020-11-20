@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.enums.project.tasks;
+package uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions;
 
 /**
  * Enum to store the two possible answers for any {@link TaskListSectionQuestion}. A list of these

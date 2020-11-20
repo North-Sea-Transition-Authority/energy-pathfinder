@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.model.enums.project.tasks;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.stream.Stream;
+import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedpipeline.DecommissionedPipelineController;
@@ -110,12 +111,12 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
   );
 
   private final String displayName;
-  private final Class<?> controllerClass;
+  private final Class controllerClass;
   private final Class<? extends ProjectFormSectionService> serviceClass;
   private final int displayOrder;
 
   ProjectTask(String displayName,
-              Class<?> controllerClass,
+              Class controllerClass,
               Class<? extends ProjectFormSectionService> serviceClass,
               int displayOrder) {
     this.displayName = displayName;
@@ -158,7 +159,25 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
         return ReverseRouter.route(on(ProjectInformationController.class).getProjectInformation(projectId, null));
       case PROJECT_LOCATION:
         return ReverseRouter.route(on(ProjectLocationController.class).getLocationDetails(projectId, null));
-      default: //TODO PAT-298 fill out
+      case PROJECT_SETUP:
+        return ReverseRouter.route(on(ProjectSetupController.class).getProjectSetup(projectId, null));
+      case UPCOMING_TENDERS:
+        return ReverseRouter.route(on(UpcomingTendersController.class).viewTenders(projectId, null));
+      case AWARDED_CONTRACTS:
+        return ReverseRouter.route(on(AwardedContractController.class).viewAwardedContracts(projectId, null));
+      case COLLABORATION_OPPORTUNITIES:
+        return ReverseRouter.route(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null));
+      case WELLS:
+        return ReverseRouter.route(on(DecommissionedWellController.class).viewWellsToBeDecommissioned(projectId, null));
+      case PLATFORM_FPSO:
+        return ReverseRouter.route(on(PlatformsFpsosController.class).viewPlatformFpso(projectId, null));
+      case INTEGRATED_RIGS:
+        return ReverseRouter.route(on(IntegratedRigController.class).viewIntegratedRigs(projectId, null));
+      case SUBSEA_INFRASTRUCTURE:
+        return ReverseRouter.route(on(SubseaInfrastructureController.class).viewSubseaStructures(projectId, null));
+      case PIPELINES:
+        return ReverseRouter.route(on(DecommissionedPipelineController.class).viewPipelines(projectId, null));
+      default:
         return "";
     }
   }

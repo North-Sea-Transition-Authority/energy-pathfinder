@@ -11,12 +11,14 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.decommissionedpipeline.DecommissionedPipeline;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineForm;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedpipeline.DecommissionedPipelineRepository;
 import uk.co.ogauthority.pathfinder.service.pipeline.PipelineService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
@@ -27,16 +29,19 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
   private final DecommissionedPipelineRepository decommissionedPipelineRepository;
   private final DecommissionedPipelineFormValidator decommissionedPipelineFormValidator;
   private final ValidationService validationService;
+  private final ProjectSetupService projectSetupService;
 
   @Autowired
   public DecommissionedPipelineService(PipelineService pipelineService,
                                        DecommissionedPipelineRepository decommissionedPipelineRepository,
                                        DecommissionedPipelineFormValidator decommissionedPipelineFormValidator,
-                                       ValidationService validationService) {
+                                       ValidationService validationService,
+                                       ProjectSetupService projectSetupService) {
     this.pipelineService = pipelineService;
     this.decommissionedPipelineRepository = decommissionedPipelineRepository;
     this.decommissionedPipelineFormValidator = decommissionedPipelineFormValidator;
     this.validationService = validationService;
+    this.projectSetupService = projectSetupService;
   }
 
   public DecommissionedPipelineForm getForm(Integer decommissionedPipelineId, ProjectDetail projectDetail) {
@@ -151,5 +156,10 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
     var decommissionedPipelines = getDecommissionedPipelines(projectDetail);
     return !decommissionedPipelines.isEmpty() && decommissionedPipelines.stream()
         .allMatch(decommissionedPipeline -> isValid(decommissionedPipeline, ValidationType.FULL));
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail) {
+    return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.PIPELINES);
   }
 }

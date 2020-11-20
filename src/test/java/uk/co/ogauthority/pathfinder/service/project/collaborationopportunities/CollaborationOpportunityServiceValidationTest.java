@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.CollaborationOpportunitiesRepository;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtil;
@@ -44,6 +45,9 @@ public class CollaborationOpportunityServiceValidationTest {
   @Mock
   private ProjectDetailFileService projectDetailFileService;
 
+  @Mock
+  private ProjectSetupService projectSetupService;
+
   private CollaborationOpportunitiesService collaborationOpportunitiesService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -60,8 +64,8 @@ public class CollaborationOpportunityServiceValidationTest {
         collaborationOpportunityFormValidator,
         collaborationOpportunitiesRepository,
         collaborationOpportunityFileLinkService,
-        projectDetailFileService
-    );
+        projectDetailFileService,
+        projectSetupService);
   }
 
   @Test
