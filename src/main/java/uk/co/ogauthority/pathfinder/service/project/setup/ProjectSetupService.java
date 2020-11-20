@@ -72,7 +72,7 @@ public class ProjectSetupService implements ProjectFormSectionService {
     return projectTaskListSetupRepository.save(taskListSetup);
   }
 
-  private Optional<ProjectTaskListSetup> getProjectTaskListSetup(ProjectDetail detail) {
+  public Optional<ProjectTaskListSetup> getProjectTaskListSetup(ProjectDetail detail) {
     return projectTaskListSetupRepository.findByProjectDetail(detail);
   }
 
@@ -202,6 +202,10 @@ public class ProjectSetupService implements ProjectFormSectionService {
     return projectTaskListSetupRepository.findByProjectDetail(detail)
         .map(setup -> setup.getTaskListSections().stream().anyMatch(q -> q.getProjectTask().equals(task)))
         .orElse(false);
+  }
+
+  boolean isDecomRelated(ProjectDetail detail) {
+    return projectInformationService.isDecomRelated(detail);
   }
 
   @Override
