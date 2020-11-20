@@ -2,8 +2,8 @@ package uk.co.ogauthority.pathfinder.model.view.dashboard;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-import uk.co.ogauthority.pathfinder.controller.project.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
+import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
 import uk.co.ogauthority.pathfinder.model.form.useraction.DashboardLink;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
