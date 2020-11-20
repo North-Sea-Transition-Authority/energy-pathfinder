@@ -14,7 +14,7 @@ import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectManagementS
 @Service
 public class ProjectManagementSummarySectionService implements ProjectManagementSectionService {
 
-  public static final String TEMPLATE_PATH = "projectmanagement/summary/projectSummary.ftl";
+  public static final String TEMPLATE_PATH = "projectmanagement/summary/projectManagementSummary.ftl";
   public static final int DISPLAY_ORDER = ProjectManagementSectionType.PROJECT_SUMMARY.getDisplayOrder();
 
   private final ProjectSummaryViewService projectSummaryViewService;
