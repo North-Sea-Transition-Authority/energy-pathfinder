@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.project.projectassessment;
 
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -100,6 +101,24 @@ public class ProjectAssessmentServiceTest {
   }
 
   @Test
+  public void hasProjectBeenAssessed_whenNotAssessed() {
+    when(projectAssessmentRepository.findByProjectDetail(projectDetail)).thenReturn(
+        Optional.empty()
+    );
+
+    assertThat(projectAssessmentService.hasProjectBeenAssessed(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void hasProjectBeenAssessed_whenAssessed() {
+    when(projectAssessmentRepository.findByProjectDetail(projectDetail)).thenReturn(
+        Optional.of(ProjectAssessmentTestUtil.createProjectAssessment())
+    );
+
+    assertThat(projectAssessmentService.hasProjectBeenAssessed(projectDetail)).isTrue();
+  }
+
+  @Test
   public void validate() {
     var form = ProjectAssessmentTestUtil.createProjectAssessmentForm();
 
@@ -118,11 +137,12 @@ public class ProjectAssessmentServiceTest {
 
     var modelAndView = projectAssessmentService.getProjectAssessmentModelAndView(projectId, form);
 
-    var model = modelAndView.getModel();
-    assertThat(model).containsEntry("pageName", ProjectAssessmentController.PAGE_NAME);
-    assertThat(model).containsEntry("form", form);
-    assertThat(model).containsEntry("projectQualities", ProjectQuality.getAllAsMap());
-    assertThat(model).containsEntry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class)
-        .getProject(projectId, null, null)));
+    assertThat(modelAndView.getModel()).containsExactly(
+        entry("pageName", ProjectAssessmentController.PAGE_NAME),
+        entry("form", form),
+        entry("projectQualities", ProjectQuality.getAllAsMap()),
+        entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class)
+            .getProject(projectId, null, null)))
+    );
   }
 }

@@ -50,7 +50,7 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
   @MockBean
   private ProjectAssessmentService projectAssessmentService;
 
-  private final ProjectDetail aqProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+  private final ProjectDetail qaProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
   private final ProjectDetail draftProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
 
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
@@ -59,9 +59,9 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
 
   @Before
   public void setup() {
-    when(projectService.getLatestDetail(QA_PROJECT_ID)).thenReturn(Optional.of(aqProjectDetail));
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(aqProjectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(aqProjectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectService.getLatestDetail(QA_PROJECT_ID)).thenReturn(Optional.of(qaProjectDetail));
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(qaProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(qaProjectDetail, unauthenticatedUser)).thenReturn(false);
 
     when(projectService.getLatestDetail(DRAFT_PROJECT_ID)).thenReturn(Optional.of(draftProjectDetail));
     when(projectOperatorService.isUserInProjectTeamOrRegulator(draftProjectDetail, authenticatedUser)).thenReturn(true);

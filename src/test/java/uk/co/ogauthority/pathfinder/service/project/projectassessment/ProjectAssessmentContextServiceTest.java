@@ -51,8 +51,6 @@ public class ProjectAssessmentContextServiceTest {
 
   @Test
   public void buildProjectAssessmentContext_whenNotAssessed() {
-    when(projectAssessmentService.getProjectAssessment(projectDetail)).thenReturn(Optional.empty());
-
     var projectAssessmentContext = projectAssessmentContextService.buildProjectAssessmentContext(
         projectDetail,
         authenticatedUser,
@@ -67,9 +65,7 @@ public class ProjectAssessmentContextServiceTest {
 
   @Test(expected = AccessDeniedException.class)
   public void buildProjectAssessmentContext_whenAssessed() {
-    when(projectAssessmentService.getProjectAssessment(projectDetail)).thenReturn(
-        Optional.of(ProjectAssessmentTestUtil.createProjectAssessment()
-    ));
+    when(projectAssessmentService.hasProjectBeenAssessed(projectDetail)).thenReturn(true);
 
     projectAssessmentContextService.buildProjectAssessmentContext(
         projectDetail,

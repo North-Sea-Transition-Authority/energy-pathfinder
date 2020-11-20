@@ -57,6 +57,10 @@ public class ProjectAssessmentService {
     return projectAssessmentRepository.findByProjectDetail(projectDetail);
   }
 
+  public boolean hasProjectBeenAssessed(ProjectDetail projectDetail) {
+    return getProjectAssessment(projectDetail).isPresent();
+  }
+
   public BindingResult validate(ProjectAssessmentForm form, BindingResult bindingResult) {
     projectAssessmentFormValidator.validate(form, bindingResult);
     return validationService.validate(form, bindingResult, ValidationType.FULL);

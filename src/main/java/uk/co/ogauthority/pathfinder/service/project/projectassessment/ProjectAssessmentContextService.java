@@ -27,20 +27,20 @@ public class ProjectAssessmentContextService {
                                                                 AuthenticatedUserAccount user,
                                                                 Set<ProjectStatus> statusCheck,
                                                                 Set<ProjectPermission> permissionCheck) {
-    var projectContext = projectContextService.buildProjectContext(
-        detail,
-        user,
-        statusCheck,
-        permissionCheck
-    );
-
-    if (projectAssessmentService.getProjectAssessment(detail).isPresent()) {
+    if (projectAssessmentService.hasProjectBeenAssessed(detail)) {
       throw new AccessDeniedException(
           String.format(
               "Project detail with id %s has already been assessed",
               detail.getId())
       );
     }
+
+    var projectContext = projectContextService.buildProjectContext(
+        detail,
+        user,
+        statusCheck,
+        permissionCheck
+    );
 
     return new ProjectAssessmentContext(
         projectContext.getProjectDetails(),
