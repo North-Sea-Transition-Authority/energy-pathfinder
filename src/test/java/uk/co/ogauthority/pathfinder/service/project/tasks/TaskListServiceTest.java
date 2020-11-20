@@ -26,7 +26,7 @@ public class TaskListServiceTest {
   private ProjectTaskService projectTaskService;
 
   @Mock
-  private TaskListEntryFactory taskListEntryFactory;
+  private TaskListEntryCreatorService taskListEntryCreatorService;
 
   private TaskListService taskListService;
 
@@ -36,10 +36,10 @@ public class TaskListServiceTest {
   public void setUp() throws Exception {
     taskListService = new TaskListService(
         projectTaskService,
-        taskListEntryFactory
+        taskListEntryCreatorService
     );
     when(projectTaskService.canShowTask(any(), any())).thenReturn(true);
-    when(taskListEntryFactory.createTaskListEntry(any(), any())).thenReturn(TaskListTestUtil.getTaskListEntry());
+    when(taskListEntryCreatorService.createTaskListEntry(any(), any())).thenReturn(TaskListTestUtil.getTaskListEntry());
   }
 
   @Test

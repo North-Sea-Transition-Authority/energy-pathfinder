@@ -21,7 +21,7 @@ public class TaskListEntryFactoryTest {
   @Mock
   private ProjectTaskService projectTaskService;
 
-  private TaskListEntryFactory taskListEntryFactory;
+  private TaskListEntryCreatorService taskListEntryCreatorService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
@@ -29,14 +29,14 @@ public class TaskListEntryFactoryTest {
 
   @Before
   public void setUp() throws Exception {
-    taskListEntryFactory = new TaskListEntryFactory(projectTaskService);
+    taskListEntryCreatorService = new TaskListEntryCreatorService(projectTaskService);
   }
 
   @Test
   public void createReviewAndSubmitTask() {
-    var task = TaskListEntryFactory.createReviewAndSubmitTask(detail);
-    assertThat(task.getTaskName()).isEqualTo(TaskListEntryFactory.REVIEW_AND_SUBMIT_GROUP_TITLE);
-    assertThat(task.getDisplayOrder()).isEqualTo(TaskListEntryFactory.REVIEW_AND_SUBMIT_DISPLAY_ORDER);
+    var task = TaskListEntryCreatorService.createReviewAndSubmitTask(detail);
+    assertThat(task.getTaskName()).isEqualTo(TaskListEntryCreatorService.REVIEW_AND_SUBMIT_GROUP_TITLE);
+    assertThat(task.getDisplayOrder()).isEqualTo(TaskListEntryCreatorService.REVIEW_AND_SUBMIT_DISPLAY_ORDER);
     assertThat(task.isCompleted()).isFalse();
     assertThat(task.isUsingCompletedLabels()).isFalse();
   }
@@ -45,7 +45,7 @@ public class TaskListEntryFactoryTest {
   @Test
   public void createTaskListEntry_isComplete() {
     when(projectTaskService.isTaskComplete(testGeneralPurposeProjectTask, detail)).thenReturn(true);
-    var taskListEntry = taskListEntryFactory.createTaskListEntry(detail, testGeneralPurposeProjectTask);
+    var taskListEntry = taskListEntryCreatorService.createTaskListEntry(detail, testGeneralPurposeProjectTask);
     assertThat(taskListEntry.isCompleted()).isTrue();
     checkCommonFields(taskListEntry);
   }
@@ -53,7 +53,7 @@ public class TaskListEntryFactoryTest {
   @Test
   public void createTaskListEntry_isNotComplete() {
     when(projectTaskService.isTaskComplete(testGeneralPurposeProjectTask, detail)).thenReturn(false);
-    var taskListEntry = taskListEntryFactory.createTaskListEntry(detail, testGeneralPurposeProjectTask);
+    var taskListEntry = taskListEntryCreatorService.createTaskListEntry(detail, testGeneralPurposeProjectTask);
     assertThat(taskListEntry.isCompleted()).isFalse();
     checkCommonFields(taskListEntry);
   }

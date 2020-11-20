@@ -22,13 +22,13 @@ public class TaskListService {
   public static final String TASK_LIST_TEMPLATE_PATH = "project/taskList";
 
   private final ProjectTaskService projectTaskService;
-  private final TaskListEntryFactory taskListEntryFactory;
+  private final TaskListEntryCreatorService taskListEntryCreatorService;
 
   @Autowired
   public TaskListService(ProjectTaskService projectTaskService,
-                         TaskListEntryFactory taskListEntryFactory) {
+                         TaskListEntryCreatorService taskListEntryCreatorService) {
     this.projectTaskService = projectTaskService;
-    this.taskListEntryFactory = taskListEntryFactory;
+    this.taskListEntryCreatorService = taskListEntryCreatorService;
   }
 
 
@@ -52,7 +52,7 @@ public class TaskListService {
               group.getDisplayName(),
               group.getDisplayOrder(),
               visibleTasksInGroup.stream()
-                  .map(orderedTask -> taskListEntryFactory.createTaskListEntry(detail, orderedTask))
+                  .map(orderedTask -> taskListEntryCreatorService.createTaskListEntry(detail, orderedTask))
                   // sort the tasks by their display order
                   .sorted(Comparator.comparing(TaskListEntry::getDisplayOrder))
                   .collect(Collectors.toList())
@@ -61,7 +61,7 @@ public class TaskListService {
         .sorted(Comparator.comparing(TaskListGroup::getDisplayOrder))
         .collect(Collectors.toList());
 
-    groups.add(TaskListEntryFactory.createReviewAndSubmitGroup(detail));
+    groups.add(TaskListEntryCreatorService.createReviewAndSubmitGroup(detail));
 
     setDisplayOrderForGroups(groups);
 

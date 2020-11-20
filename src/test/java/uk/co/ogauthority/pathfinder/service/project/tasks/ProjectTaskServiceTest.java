@@ -50,9 +50,9 @@ public class ProjectTaskServiceTest {
   public void canShowTask_allConditionalTasksShown() {
     when(projectFormSectionService.canShowInTaskList(eq(detail))).thenReturn(true);
 
-      ProjectTask.stream().forEach(projectTask -> {
-        assertThat(projectTaskService.canShowTask(projectTask, detail)).isTrue();
-      });
+    ProjectTask.stream().forEach(projectTask -> {
+      assertThat(projectTaskService.canShowTask(projectTask, detail)).isTrue();
+    });
   }
 
   @Test

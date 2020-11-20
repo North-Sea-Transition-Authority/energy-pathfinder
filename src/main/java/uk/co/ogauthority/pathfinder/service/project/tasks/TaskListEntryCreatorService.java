@@ -13,7 +13,7 @@ import uk.co.ogauthority.pathfinder.model.view.tasks.TaskListGroup;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
 @Service
-public class TaskListEntryFactory {
+public class TaskListEntryCreatorService {
 
   public static final String REVIEW_AND_SUBMIT_GROUP_TITLE = "Review and submit";
   public static final int REVIEW_AND_SUBMIT_DISPLAY_ORDER = 999;
@@ -21,7 +21,7 @@ public class TaskListEntryFactory {
 
 
   @Autowired
-  public TaskListEntryFactory(ProjectTaskService projectTaskService) {
+  public TaskListEntryCreatorService(ProjectTaskService projectTaskService) {
     this.projectTaskService = projectTaskService;
   }
 
