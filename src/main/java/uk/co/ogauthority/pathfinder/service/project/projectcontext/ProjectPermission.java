@@ -11,7 +11,7 @@ import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 public enum ProjectPermission {
   EDIT(Collections.singletonList(UserPrivilege.PATHFINDER_PROJECT_CREATE)),
   SUBMIT(Collections.singletonList(UserPrivilege.PATHFINDER_PROJECT_CREATE)),
-  VIEW(Collections.emptyList());
+  VIEW(Collections.singletonList(UserPrivilege.PATHFINDER_PROJECT_VIEWER));
 
   private final List<UserPrivilege> userPrivileges;
 
