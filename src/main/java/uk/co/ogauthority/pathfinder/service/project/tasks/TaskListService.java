@@ -68,8 +68,11 @@ public class TaskListService {
     return groups;
   }
 
+  /**
+   * Set the displayOrder for each item based on it's position in the sorted list.
+   * @param groups the list of TaskListGroups to set the displayOrder for
+   */
   private void setDisplayOrderForGroups(List<TaskListGroup> groups) {
-    //Set the displayOrder for each item based on it's position in the sorted list.
     IntStream.range(0, groups.size())
         .forEach(index -> {
           var group = groups.get(index);
