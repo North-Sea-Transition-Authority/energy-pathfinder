@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.form.project.projectassessment;
+package uk.co.ogauthority.pathfinder.model.form.projectassessment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;

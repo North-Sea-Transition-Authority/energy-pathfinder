@@ -1,7 +1,7 @@
-package uk.co.ogauthority.pathfinder.model.form.project.projectassessment;
+package uk.co.ogauthority.pathfinder.model.form.projectassessment;
 
 import javax.validation.constraints.NotNull;
-import uk.co.ogauthority.pathfinder.model.enums.project.projectassessment.ProjectQuality;
+import uk.co.ogauthority.pathfinder.model.enums.projectassessment.ProjectQuality;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
 public class ProjectAssessmentForm {

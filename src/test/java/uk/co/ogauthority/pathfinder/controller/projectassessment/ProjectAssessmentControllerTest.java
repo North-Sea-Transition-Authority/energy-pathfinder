@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.controller.project.projectassessment;
+package uk.co.ogauthority.pathfinder.controller.projectassessment;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -28,10 +28,10 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectAssessmentContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
-import uk.co.ogauthority.pathfinder.model.form.project.projectassessment.ProjectAssessmentForm;
+import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.project.projectassessment.ProjectAssessmentContextService;
-import uk.co.ogauthority.pathfinder.service.project.projectassessment.ProjectAssessmentService;
+import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContextService;
+import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;

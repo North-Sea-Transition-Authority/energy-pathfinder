@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.project.projectassessment;
+package uk.co.ogauthority.pathfinder.service.projectassessment;
 
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;

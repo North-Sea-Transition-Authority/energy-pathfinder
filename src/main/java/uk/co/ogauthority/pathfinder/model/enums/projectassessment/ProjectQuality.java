@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.enums.project.projectassessment;
+package uk.co.ogauthority.pathfinder.model.enums.projectassessment;
 
 import java.util.Arrays;
 import java.util.Map;

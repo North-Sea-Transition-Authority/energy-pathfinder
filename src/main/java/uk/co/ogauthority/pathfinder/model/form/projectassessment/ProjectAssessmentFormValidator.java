@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.form.project.projectassessment;
+package uk.co.ogauthority.pathfinder.model.form.projectassessment;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Component;

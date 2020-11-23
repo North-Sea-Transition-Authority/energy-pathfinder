@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.entity.project.projectassessment;
+package uk.co.ogauthority.pathfinder.model.entity.projectassessment;
 
 import java.time.Instant;
 import javax.persistence.Column;
@@ -7,7 +7,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
-import uk.co.ogauthority.pathfinder.model.enums.project.projectassessment.ProjectQuality;
+import uk.co.ogauthority.pathfinder.model.enums.projectassessment.ProjectQuality;
 
 @Entity
 @Table(name = "project_assessments")

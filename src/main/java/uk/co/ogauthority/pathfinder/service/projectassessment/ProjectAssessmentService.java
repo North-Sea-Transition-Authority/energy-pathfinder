@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.project.projectassessment;
+package uk.co.ogauthority.pathfinder.service.projectassessment;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -10,16 +10,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.controller.project.projectassessment.ProjectAssessmentController;
+import uk.co.ogauthority.pathfinder.controller.projectassessment.ProjectAssessmentController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.projectassessment.ProjectAssessment;
+import uk.co.ogauthority.pathfinder.model.entity.projectassessment.ProjectAssessment;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.enums.project.projectassessment.ProjectQuality;
-import uk.co.ogauthority.pathfinder.model.form.project.projectassessment.ProjectAssessmentForm;
-import uk.co.ogauthority.pathfinder.model.form.project.projectassessment.ProjectAssessmentFormValidator;
+import uk.co.ogauthority.pathfinder.model.enums.projectassessment.ProjectQuality;
+import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentForm;
+import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentFormValidator;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.repository.project.projectassessment.ProjectAssessmentRepository;
+import uk.co.ogauthority.pathfinder.repository.projectassessment.ProjectAssessmentRepository;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
@@ -67,7 +67,7 @@ public class ProjectAssessmentService {
   }
 
   public ModelAndView getProjectAssessmentModelAndView(Integer projectId, ProjectAssessmentForm form) {
-    return new ModelAndView("project/projectassessment/projectAssessment")
+    return new ModelAndView("projectassessment/projectAssessment")
         .addObject("pageName", ProjectAssessmentController.PAGE_NAME)
         .addObject("form", form)
         .addObject("projectQualities", ProjectQuality.getAllAsMap())

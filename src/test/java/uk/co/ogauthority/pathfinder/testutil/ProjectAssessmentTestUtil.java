@@ -1,8 +1,8 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
-import uk.co.ogauthority.pathfinder.model.entity.project.projectassessment.ProjectAssessment;
-import uk.co.ogauthority.pathfinder.model.enums.project.projectassessment.ProjectQuality;
-import uk.co.ogauthority.pathfinder.model.form.project.projectassessment.ProjectAssessmentForm;
+import uk.co.ogauthority.pathfinder.model.entity.projectassessment.ProjectAssessment;
+import uk.co.ogauthority.pathfinder.model.enums.projectassessment.ProjectQuality;
+import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentForm;
 
 public class ProjectAssessmentTestUtil {
 

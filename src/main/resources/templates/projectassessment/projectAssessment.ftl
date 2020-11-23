@@ -1,4 +1,4 @@
-<#include '../../layout.ftl'>
+<#include '../layout.ftl'>
 
 <@defaultPage htmlTitle=pageName pageHeading=pageName breadcrumbs=false>
   <#if errorList?has_content>

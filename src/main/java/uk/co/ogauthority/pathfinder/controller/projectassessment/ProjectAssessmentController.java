@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.controller.project.projectassessment;
+package uk.co.ogauthority.pathfinder.controller.projectassessment;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -17,13 +17,13 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
-import uk.co.ogauthority.pathfinder.model.form.project.projectassessment.ProjectAssessmentForm;
+import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
-import uk.co.ogauthority.pathfinder.service.project.projectassessment.ProjectAssessmentContext;
-import uk.co.ogauthority.pathfinder.service.project.projectassessment.ProjectAssessmentService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContext;
+import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentService;
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.QA)

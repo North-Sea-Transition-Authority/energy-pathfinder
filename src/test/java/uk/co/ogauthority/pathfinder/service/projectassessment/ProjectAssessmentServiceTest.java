@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.project.projectassessment;
+package uk.co.ogauthority.pathfinder.service.projectassessment;
 
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,16 +16,16 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.controller.project.projectassessment.ProjectAssessmentController;
+import uk.co.ogauthority.pathfinder.controller.projectassessment.ProjectAssessmentController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.projectassessment.ProjectAssessment;
+import uk.co.ogauthority.pathfinder.model.entity.projectassessment.ProjectAssessment;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.enums.project.projectassessment.ProjectQuality;
-import uk.co.ogauthority.pathfinder.model.form.project.projectassessment.ProjectAssessmentForm;
-import uk.co.ogauthority.pathfinder.model.form.project.projectassessment.ProjectAssessmentFormValidator;
+import uk.co.ogauthority.pathfinder.model.enums.projectassessment.ProjectQuality;
+import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentForm;
+import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentFormValidator;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.repository.project.projectassessment.ProjectAssessmentRepository;
+import uk.co.ogauthority.pathfinder.repository.projectassessment.ProjectAssessmentRepository;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectAssessmentTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
