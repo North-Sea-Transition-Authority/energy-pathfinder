@@ -59,6 +59,7 @@ public class ProjectManagementDetailSectionServiceTest {
     var section = projectManagementDetailSectionService.getSection(projectDetail, authenticatedUser);
     assertThat(section.getTemplatePath()).isEqualTo(ProjectManagementDetailSectionService.TEMPLATE_PATH);
     assertThat(section.getDisplayOrder()).isEqualTo(ProjectManagementDetailSectionService.DISPLAY_ORDER);
+    assertThat(section.getPosition()).isEqualTo(ProjectManagementDetailSectionService.POSITION);
 
     var projectManagementDetailView = ProjectManagementDetailViewUtil.from(
         projectDetail,

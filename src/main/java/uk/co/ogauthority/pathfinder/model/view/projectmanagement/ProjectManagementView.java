@@ -6,12 +6,15 @@ public class ProjectManagementView {
 
   private String operator;
 
-  private String sectionsHtml;
+  private String staticContentHtml;
 
-  public ProjectManagementView(String title, String operator, String sectionsHtml) {
+  private String versionContentHtml;
+
+  public ProjectManagementView(String title, String operator, String staticContentHtml, String versionContentHtml) {
     this.title = title;
     this.operator = operator;
-    this.sectionsHtml = sectionsHtml;
+    this.staticContentHtml = staticContentHtml;
+    this.versionContentHtml = versionContentHtml;
   }
 
   public String getTitle() {
@@ -30,11 +33,19 @@ public class ProjectManagementView {
     this.operator = operator;
   }
 
-  public String getSectionsHtml() {
-    return sectionsHtml;
+  public String getStaticContentHtml() {
+    return staticContentHtml;
   }
 
-  public void setSectionsHtml(String sectionsHtml) {
-    this.sectionsHtml = sectionsHtml;
+  public void setStaticContentHtml(String staticContentHtml) {
+    this.staticContentHtml = staticContentHtml;
+  }
+
+  public String getVersionContentHtml() {
+    return versionContentHtml;
+  }
+
+  public void setVersionContentHtml(String versionContentHtml) {
+    this.versionContentHtml = versionContentHtml;
   }
 }

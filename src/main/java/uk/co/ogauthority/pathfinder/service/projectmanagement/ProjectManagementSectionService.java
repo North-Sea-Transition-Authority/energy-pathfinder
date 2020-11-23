@@ -6,5 +6,9 @@ import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManageme
 
 public interface ProjectManagementSectionService {
 
+  default boolean useSelectedVersionProjectDetail() {
+    return false;
+  }
+
   ProjectManagementSection getSection(ProjectDetail projectDetail, AuthenticatedUserAccount user);
 }

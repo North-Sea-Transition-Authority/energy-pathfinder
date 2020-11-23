@@ -8,6 +8,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.management.ProjectManagementSectionType;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementSection;
+import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagementPageSectionPosition;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectManagementSectionService;
 
 @Service
@@ -15,6 +16,7 @@ public class ProjectManagementActionSectionService implements ProjectManagementS
 
   public static final String TEMPLATE_PATH = "projectmanagement/actions/actions.ftl";
   public static final int DISPLAY_ORDER = ProjectManagementSectionType.ACTIONS.getDisplayOrder();
+  public static final ProjectManagementPageSectionPosition POSITION = ProjectManagementPageSectionPosition.STATIC_CONTENT;
 
   private final ProjectManagementActionService projectManagementActionService;
 
@@ -30,7 +32,8 @@ public class ProjectManagementActionSectionService implements ProjectManagementS
     return new ProjectManagementSection(
         TEMPLATE_PATH,
         summaryModel,
-        DISPLAY_ORDER
+        DISPLAY_ORDER,
+        POSITION
     );
   }
 }
