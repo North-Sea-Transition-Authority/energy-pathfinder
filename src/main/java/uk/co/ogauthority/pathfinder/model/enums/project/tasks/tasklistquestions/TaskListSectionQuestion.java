@@ -97,7 +97,8 @@ public enum TaskListSectionQuestion {
 
   TaskListSectionQuestion(ProjectTask projectTask,
                           String displayName,
-                          String prompt, String formField,
+                          String prompt,
+                          String formField,
                           TaskListSectionAnswer yesAnswer,
                           TaskListSectionAnswer noAnswer,
                           boolean decommissioningRelated) {
