@@ -31,16 +31,16 @@ public class ProjectTaskListSetupTestUtil {
       TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_NO,
       TaskListSectionAnswer.WELLS_YES,
       TaskListSectionAnswer.PLATFORM_FPSO_NO,
-      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
       TaskListSectionAnswer.INTEGRATED_RIGS_NO,
+      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
       TaskListSectionAnswer.PIPELINES_NO
   );
 
   public static final List<TaskListSectionAnswer> ONLY_DECOM_ANSWERS = List.of(
       TaskListSectionAnswer.WELLS_YES,
       TaskListSectionAnswer.PLATFORM_FPSO_NO,
-      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
       TaskListSectionAnswer.INTEGRATED_RIGS_NO,
+      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
       TaskListSectionAnswer.PIPELINES_NO
   );
 
