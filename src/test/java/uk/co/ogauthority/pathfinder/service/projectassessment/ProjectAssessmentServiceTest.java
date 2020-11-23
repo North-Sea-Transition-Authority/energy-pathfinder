@@ -26,6 +26,7 @@ import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessme
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentFormValidator;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectassessment.ProjectAssessmentRepository;
+import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectAssessmentTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -43,6 +44,9 @@ public class ProjectAssessmentServiceTest {
   @Mock
   private ProjectAssessmentFormValidator projectAssessmentFormValidator;
 
+  @Mock
+  private BreadcrumbService breadcrumbService;
+
   private ProjectAssessmentService projectAssessmentService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
@@ -53,7 +57,8 @@ public class ProjectAssessmentServiceTest {
     projectAssessmentService = new ProjectAssessmentService(
         projectAssessmentRepository,
         validationService,
-        projectAssessmentFormValidator
+        projectAssessmentFormValidator,
+        breadcrumbService
     );
 
     when(projectAssessmentRepository.save(any(ProjectAssessment.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
@@ -144,5 +149,6 @@ public class ProjectAssessmentServiceTest {
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class)
             .getProject(projectId, null, null)))
     );
+    verify(breadcrumbService, times(1)).fromManageProject(projectId, modelAndView, ProjectAssessmentController.PAGE_NAME);
   }
 }

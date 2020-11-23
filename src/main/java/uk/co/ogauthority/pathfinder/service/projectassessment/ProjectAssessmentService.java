@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessme
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentFormValidator;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectassessment.ProjectAssessmentRepository;
+import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
@@ -28,14 +29,17 @@ public class ProjectAssessmentService {
   private final ProjectAssessmentRepository projectAssessmentRepository;
   private final ValidationService validationService;
   private final ProjectAssessmentFormValidator projectAssessmentFormValidator;
+  private final BreadcrumbService breadcrumbService;
 
   @Autowired
   public ProjectAssessmentService(ProjectAssessmentRepository projectAssessmentRepository,
                                   ValidationService validationService,
-                                  ProjectAssessmentFormValidator projectAssessmentFormValidator) {
+                                  ProjectAssessmentFormValidator projectAssessmentFormValidator,
+                                  BreadcrumbService breadcrumbService) {
     this.projectAssessmentRepository = projectAssessmentRepository;
     this.validationService = validationService;
     this.projectAssessmentFormValidator = projectAssessmentFormValidator;
+    this.breadcrumbService = breadcrumbService;
   }
 
   @Transactional
@@ -67,10 +71,12 @@ public class ProjectAssessmentService {
   }
 
   public ModelAndView getProjectAssessmentModelAndView(Integer projectId, ProjectAssessmentForm form) {
-    return new ModelAndView("projectassessment/projectAssessment")
+    var modelAndView = new ModelAndView("projectassessment/projectAssessment")
         .addObject("pageName", ProjectAssessmentController.PAGE_NAME)
         .addObject("form", form)
         .addObject("projectQualities", ProjectQuality.getAllAsMap())
         .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null)));
+    breadcrumbService.fromManageProject(projectId, modelAndView, ProjectAssessmentController.PAGE_NAME);
+    return modelAndView;
   }
 }

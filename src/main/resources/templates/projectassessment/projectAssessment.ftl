@@ -1,6 +1,6 @@
 <#include '../layout.ftl'>
 
-<@defaultPage htmlTitle=pageName pageHeading=pageName breadcrumbs=false>
+<@defaultPage htmlTitle=pageName pageHeading=pageName breadcrumbs=true>
   <#if errorList?has_content>
     <@fdsError.errorSummary errorItems=errorList />
   </#if>

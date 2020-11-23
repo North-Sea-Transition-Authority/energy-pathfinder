@@ -16,6 +16,7 @@ import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedR
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.SubseaInfrastructureController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
+import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
 @Service
@@ -133,6 +134,17 @@ public class BreadcrumbService {
     var map = workArea();
     String route = ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId, null));
     map.put(route, "Task list");
+    return map;
+  }
+
+  public void fromManageProject(Integer projectId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, manageProject(projectId), thisPage);
+  }
+
+  private Map<String, String> manageProject(Integer projectId) {
+    var map = workArea();
+    String route = ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null));
+    map.put(route, "Project");
     return map;
   }
 
