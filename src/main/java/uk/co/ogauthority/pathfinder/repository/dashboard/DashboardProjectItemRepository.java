@@ -12,9 +12,7 @@ public interface DashboardProjectItemRepository extends CrudRepository<Dashboard
 
   List<DashboardProjectItem> findAllByOrganisationGroupInOrderByCreatedDatetimeDesc(List<PortalOrganisationGroup> organisationGroups);
 
-  //TODO PAT-62 This will form the base query for the admin dashboard
-  List<DashboardProjectItem> findAllByOrganisationGroupInAndStatusNotIn(
-      List<PortalOrganisationGroup> organisationGroups,
+  List<DashboardProjectItem> findAllByStatusInOrderByCreatedDatetimeDesc(
       List<ProjectStatus> statuses
   );
 
