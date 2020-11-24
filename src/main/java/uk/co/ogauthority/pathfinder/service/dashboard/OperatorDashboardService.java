@@ -25,7 +25,8 @@ public class OperatorDashboardService {
 
   public List<DashboardProjectItem> getDashboardProjectItems(Person person) {
     var orgGroups = teamService.getOrganisationTeamsPersonIsMemberOf(person)
-        .stream().map(OrganisationTeam::getPortalOrganisationGroup)
+        .stream()
+        .map(OrganisationTeam::getPortalOrganisationGroup)
         .collect(Collectors.toList());
     return dashboardProjectItemRepository.findAllByOrganisationGroupInOrderByCreatedDatetimeDesc(orgGroups);
   }
