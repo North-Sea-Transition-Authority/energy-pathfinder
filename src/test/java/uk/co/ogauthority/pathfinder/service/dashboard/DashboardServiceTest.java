@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +17,6 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
-import uk.co.ogauthority.pathfinder.repository.dashboard.DashboardProjectItemRepository;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -52,10 +52,10 @@ public class DashboardServiceTest {
   }
 
   @Test
-  public void getDashboardProjectItemsForUser_resultsForRegulatorUser() {
+  public void getDashboardProjectItemsForUser_noResultsForRegulatorUser() {
     when(teamService.isPersonMemberOfRegulatorTeam(authenticatedUser.getLinkedPerson())).thenReturn(true);
-    when(regulatorDashboardService.getDashboardProjectItems()).thenReturn(List.of(qaItem));
-    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser).size()).isEqualTo(1);
+    when(regulatorDashboardService.getDashboardProjectItems()).thenReturn(Collections.emptyList());
+    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser).size()).isEqualTo(0);
 
     verify(regulatorDashboardService, times(1)).getDashboardProjectItems();
     verify(operatorDashboardService, times(0)).getDashboardProjectItems(any());
@@ -72,12 +72,12 @@ public class DashboardServiceTest {
   }
 
   @Test
-  public void getDashboardProjectItemsForUser_resultsForOperatorUser() {
+  public void getDashboardProjectItemsForUser_noResultsForOperatorUser() {
     when(teamService.isPersonMemberOfRegulatorTeam(authenticatedUser.getLinkedPerson())).thenReturn(false);
-    when(operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson())).thenReturn
-        (List.of(dashboardProjectItem)
+    when(operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson())).thenReturn(
+        Collections.emptyList()
     );
-    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser).size()).isEqualTo(1);
+    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser).size()).isEqualTo(0);
 
     verify(regulatorDashboardService, times(0)).getDashboardProjectItems();
     verify(operatorDashboardService, times(1)).getDashboardProjectItems(any());
