@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
@@ -73,7 +72,6 @@ public abstract class FileLinkService {
    * @param form The form which contains the files
    * @param userAccount The user undertaking the action
    */
-  @Transactional
   public void updateFileLinks(EntityWithLinkedFile entityWithLinkedFile,
                               UploadMultipleFilesWithDescriptionForm form,
                               AuthenticatedUserAccount userAccount) {
