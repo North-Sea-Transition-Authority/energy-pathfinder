@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.projectmanagement;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -77,24 +78,27 @@ public class ProjectManagementViewService {
         versionContentHtml
     );
 
-    var viewableVersions = projectVersionService.getProjectVersions(project)
-        .entrySet().stream()
+    var viewableVersions = projectVersionService.getProjectVersionDtos(project)
+        .stream()
         .collect(Collectors.toMap(
-            entry -> Integer.toString(entry.getKey()),
-            entry -> formatVersion(entry.getKey(), entry.getValue())));
-    var viewingVersion = formatVersion(selectedVersionProjectDetail.getVersion(), selectedVersionProjectDetail.getSubmittedInstant());
+            projectVersionDto -> Integer.toString(projectVersionDto.getVersion()),
+            projectVersionDto -> String.format(
+                "(%s) Submitted: %s",
+                projectVersionDto.getVersion(),
+                DateUtil.formatInstant(projectVersionDto.getSubmittedInstant())
+            ),
+            (x, y) -> y,
+            LinkedHashMap::new));
+
+    var form = new ProjectManagementForm();
+    form.setVersion(selectedVersionProjectDetail.getVersion());
 
     return new ModelAndView("projectmanagement/manage")
         .addObject("projectManagementView", projectManagementView)
         .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
         .addObject("viewableVersions", viewableVersions)
-        .addObject("viewingVersion", viewingVersion)
-        .addObject("form", new ProjectManagementForm())
+        .addObject("form", form)
         .addObject("viewVersionUrl", ReverseRouter.route(on(ManageProjectController.class)
-            .getProject(project.getId(), null, null, null)));
-  }
-
-  private String formatVersion(Integer version, Instant submittedInstant) {
-    return String.format("(%s) Submitted: %s", version, DateUtil.formatInstant(submittedInstant));
+            .updateProjectVersion(project.getId(), null, null, null)));
   }
 }

@@ -20,7 +20,7 @@
   <#if (viewableVersions?size > 1)>
     <@fdsForm.htmlForm actionUrl=springUrl(viewVersionUrl)>
       <@inlineInputAction.inlineInputAction>
-        <@fdsSelect.select path="form.version" options=viewableVersions labelText="Project version" optionalInputDefault=viewingVersion />
+        <@fdsSelect.select path="form.version" options=viewableVersions labelText="Project version" />
         <@fdsAction.button buttonText="View" buttonClass="govuk-button govuk-button--blue"/>
       </@inlineInputAction.inlineInputAction>
     </@fdsForm.htmlForm>

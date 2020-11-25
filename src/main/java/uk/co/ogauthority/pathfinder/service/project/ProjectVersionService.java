@@ -1,8 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.project;
 
-import java.time.Instant;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.dto.project.ProjectVersionDto;
@@ -19,9 +17,7 @@ public class ProjectVersionService {
     this.projectDetailsRepository = projectDetailsRepository;
   }
 
-  public Map<Integer, Instant> getProjectVersions(Project project) {
-    return projectDetailsRepository.getProjectVersionDtos(project.getId())
-        .stream()
-        .collect(Collectors.toMap(ProjectVersionDto::getVersion, ProjectVersionDto::getSubmittedInstant));
+  public List<ProjectVersionDto> getProjectVersionDtos(Project project) {
+    return projectDetailsRepository.getProjectVersionDtos(project.getId());
   }
 }

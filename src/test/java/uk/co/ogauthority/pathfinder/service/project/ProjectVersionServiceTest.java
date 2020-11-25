@@ -36,19 +36,15 @@ public class ProjectVersionServiceTest {
   }
 
   @Test
-  public void getProjectVersions() {
-    var submittedInstant1 = Instant.now();
-    var submittedInstant2 = Instant.now();
-
-    when(projectDetailsRepository.getProjectVersionDtos(PROJECT_ID)).thenReturn(List.of(
-        new ProjectVersionDto(1, submittedInstant1),
-        new ProjectVersionDto(2, submittedInstant2)
-    ));
-
-    var result = projectVersionService.getProjectVersions(project);
-    assertThat(result).containsExactly(
-        entry(1, submittedInstant1),
-        entry(2, submittedInstant2)
+  public void getProjectVersionDtos() {
+    var projectVersionDtos = List.of(
+        new ProjectVersionDto(1, Instant.now()),
+        new ProjectVersionDto(2, Instant.now())
     );
+
+    when(projectDetailsRepository.getProjectVersionDtos(PROJECT_ID)).thenReturn(projectVersionDtos);
+
+    var result = projectVersionService.getProjectVersionDtos(project);
+    assertThat(result).isEqualTo(projectVersionDtos);
   }
 }
