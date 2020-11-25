@@ -82,12 +82,13 @@ public class ProjectManagementViewService {
         .collect(Collectors.toMap(
             entry -> Integer.toString(entry.getKey()),
             entry -> formatVersion(entry.getKey(), entry.getValue())));
+    var viewingVersion = formatVersion(selectedVersionProjectDetail.getVersion(), selectedVersionProjectDetail.getSubmittedInstant());
 
     return new ModelAndView("projectmanagement/manage")
         .addObject("projectManagementView", projectManagementView)
         .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
         .addObject("viewableVersions", viewableVersions)
-        .addObject("viewingVersion", formatVersion(selectedVersionProjectDetail.getVersion(), selectedVersionProjectDetail.getSubmittedInstant()))
+        .addObject("viewingVersion", viewingVersion)
         .addObject("form", new ProjectManagementForm())
         .addObject("viewVersionUrl", ReverseRouter.route(on(ManageProjectController.class)
             .getProject(project.getId(), null, null, null)));
