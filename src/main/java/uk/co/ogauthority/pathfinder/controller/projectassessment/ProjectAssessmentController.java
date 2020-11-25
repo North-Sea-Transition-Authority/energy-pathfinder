@@ -62,7 +62,7 @@ public class ProjectAssessmentController extends ProjectFormPageController {
         () -> {
           projectAssessmentService.createProjectAssessment(projectAssessmentContext.getProjectDetails(), user, form);
 
-          return ReverseRouter.redirect(on(ManageProjectController.class).getProject(projectId, null, null));
+          return ReverseRouter.redirect(on(ManageProjectController.class).getProject(projectId, null, null, null));
         });
   }
 }

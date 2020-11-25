@@ -143,7 +143,7 @@ public class BreadcrumbService {
 
   private Map<String, String> manageProject(Integer projectId) {
     var map = workArea();
-    String route = ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null));
+    String route = ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null));
     map.put(route, "Manage project");
     return map;
   }
