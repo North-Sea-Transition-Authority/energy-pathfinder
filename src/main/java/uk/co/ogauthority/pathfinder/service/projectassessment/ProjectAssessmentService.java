@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessme
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectassessment.ProjectAssessmentRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.projectpublishing.ProjectPublishingService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
@@ -30,16 +31,19 @@ public class ProjectAssessmentService {
   private final ValidationService validationService;
   private final ProjectAssessmentFormValidator projectAssessmentFormValidator;
   private final BreadcrumbService breadcrumbService;
+  private final ProjectPublishingService projectPublishingService;
 
   @Autowired
   public ProjectAssessmentService(ProjectAssessmentRepository projectAssessmentRepository,
                                   ValidationService validationService,
                                   ProjectAssessmentFormValidator projectAssessmentFormValidator,
-                                  BreadcrumbService breadcrumbService) {
+                                  BreadcrumbService breadcrumbService,
+                                  ProjectPublishingService projectPublishingService) {
     this.projectAssessmentRepository = projectAssessmentRepository;
     this.validationService = validationService;
     this.projectAssessmentFormValidator = projectAssessmentFormValidator;
     this.breadcrumbService = breadcrumbService;
+    this.projectPublishingService = projectPublishingService;
   }
 
   @Transactional
@@ -54,6 +58,9 @@ public class ProjectAssessmentService {
     projectAssessment.setAssessedInstant(Instant.now());
     projectAssessment.setAssessorWuaId(assessor.getWuaId());
     projectAssessmentRepository.save(projectAssessment);
+    if (projectAssessment.getReadyToBePublished()) {
+      projectPublishingService.publishProject(projectDetail, assessor);
+    }
     return projectAssessment;
   }
 
