@@ -48,6 +48,34 @@ public class ProjectAssessmentContextServiceTest {
   }
 
   @Test
+  public void canBuildContext_whenNotAssessed() {
+    when(projectAssessmentService.hasProjectBeenAssessed(projectDetail)).thenReturn(false);
+
+    var result = projectAssessmentContextService.canBuildContext(
+        projectDetail,
+        authenticatedUser,
+        projectStatuses,
+        projectPermissions
+    );
+
+    assertThat(result).isTrue();
+  }
+
+  @Test
+  public void canBuildContext_whenAssessed() {
+    when(projectAssessmentService.hasProjectBeenAssessed(projectDetail)).thenReturn(true);
+
+    var result = projectAssessmentContextService.canBuildContext(
+        projectDetail,
+        authenticatedUser,
+        projectStatuses,
+        projectPermissions
+    );
+
+    assertThat(result).isFalse();
+  }
+
+  @Test
   public void buildProjectAssessmentContext_whenNotAssessed() {
     var projectAssessmentContext = projectAssessmentContextService.buildProjectAssessmentContext(
         projectDetail,

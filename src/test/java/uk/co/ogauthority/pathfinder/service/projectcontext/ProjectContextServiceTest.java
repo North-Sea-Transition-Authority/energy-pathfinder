@@ -148,4 +148,32 @@ public class ProjectContextServiceTest {
   public void getUserProjectPermissions_withNoMatch() {
     assertThat(projectContextService.getUserProjectPermissions(unAuthenticatedUser)).isEmpty();
   }
+
+  @Test
+  public void getProjectStatusesForClass_whenNoStatuses() {
+    assertThat(projectContextService.getProjectStatusesForClass(Object.class)).isEmpty();
+  }
+
+  @Test
+  public void getProjectStatusesForClass_whenStatuses() {
+    var statuses = projectContextService.getProjectStatusesForClass(TestClassWithContextAnnotations.class);
+
+    assertThat(statuses).containsExactly(
+        ProjectStatus.QA
+    );
+  }
+
+  @Test
+  public void getProjectPermissionsForClass_whenNoPermissions() {
+    assertThat(projectContextService.getProjectPermissionsForClass(Object.class)).isEmpty();
+  }
+
+  @Test
+  public void getProjectPermissionsForClass_whenPermissions() {
+    var statuses = projectContextService.getProjectPermissionsForClass(TestClassWithContextAnnotations.class);
+
+    assertThat(statuses).containsExactly(
+        ProjectPermission.PROVIDE_ASSESSMENT
+    );
+  }
 }

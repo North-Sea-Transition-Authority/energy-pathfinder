@@ -23,6 +23,18 @@ public class ProjectAssessmentContextService {
     this.projectAssessmentService = projectAssessmentService;
   }
 
+  public boolean canBuildContext(ProjectDetail detail,
+                                 AuthenticatedUserAccount user,
+                                 Set<ProjectStatus> statusCheck,
+                                 Set<ProjectPermission> permissionCheck) {
+    try {
+      buildProjectAssessmentContext(detail, user, statusCheck, permissionCheck);
+      return true;
+    } catch (AccessDeniedException exception) {
+      return false;
+    }
+  }
+
   public ProjectAssessmentContext buildProjectAssessmentContext(ProjectDetail detail,
                                                                 AuthenticatedUserAccount user,
                                                                 Set<ProjectStatus> statusCheck,

@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -99,5 +101,21 @@ public class ProjectContextService {
     return user.getUserPrivileges().stream()
         .flatMap(userPrivilege -> Arrays.stream(ProjectPermission.values()).filter(p -> p.hasPrivilege(userPrivilege)))
         .collect(Collectors.toSet());
+  }
+
+  public Set<ProjectStatus> getProjectStatusesForClass(Class<?> clazz) {
+    return Arrays.stream(clazz.getAnnotations())
+        .filter(annotation -> annotation.annotationType().equals(ProjectStatusCheck.class))
+        .map(annotation -> Arrays.stream(((ProjectStatusCheck) annotation).status()).collect(Collectors.toSet()))
+        .findFirst()
+        .orElse(Set.of());
+  }
+
+  public Set<ProjectPermission> getProjectPermissionsForClass(Class<?> clazz) {
+    return Arrays.stream(clazz.getAnnotations())
+        .filter(annotation -> annotation.annotationType().equals(ProjectFormPagePermissionCheck.class))
+        .map(annotation -> Arrays.stream(((ProjectFormPagePermissionCheck) annotation).permissions()).collect(Collectors.toSet()))
+        .findFirst()
+        .orElse(Set.of());
   }
 }

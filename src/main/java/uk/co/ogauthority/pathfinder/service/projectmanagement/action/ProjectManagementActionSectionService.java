@@ -26,7 +26,7 @@ public class ProjectManagementActionSectionService implements ProjectManagementS
   @Override
   public ProjectManagementSection getSection(ProjectDetail projectDetail, AuthenticatedUserAccount user) {
     Map<String, Object> summaryModel = new HashMap<>();
-    summaryModel.put("actions", projectManagementActionService.getUserActions(user));
+    summaryModel.put("actions", projectManagementActionService.getActions(projectDetail, user));
     return new ProjectManagementSection(
         TEMPLATE_PATH,
         summaryModel,
