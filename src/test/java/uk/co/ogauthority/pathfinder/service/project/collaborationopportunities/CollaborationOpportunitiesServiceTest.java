@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,9 +55,11 @@ public class CollaborationOpportunitiesServiceTest {
 
   private CollaborationOpportunitiesService collaborationOpportunitiesService;
 
-  private final ProjectDetail details = ProjectUtil.getProjectDetails();
+  private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
-  private final CollaborationOpportunity opportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity(details);
+  private final CollaborationOpportunity opportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity(
+      detail
+  );
 
   private final AuthenticatedUserAccount userAccount = UserTestingUtil.getAuthenticatedUserAccount();
 
@@ -84,11 +87,11 @@ public class CollaborationOpportunitiesServiceTest {
   public void createCollaborationOpportunity() {
     var form = CollaborationOpportunityTestUtil.getCompleteForm();
     var newCollaborationOpportunity = collaborationOpportunitiesService.createCollaborationOpportunity(
-        details,
+        detail,
         form,
         userAccount
     );
-    assertThat(newCollaborationOpportunity.getProjectDetail()).isEqualTo(details);
+    assertThat(newCollaborationOpportunity.getProjectDetail()).isEqualTo(detail);
     assertThat(newCollaborationOpportunity.getFunction()).isEqualTo(CollaborationOpportunityTestUtil.FUNCTION);
     checkCommonFields(form, newCollaborationOpportunity);
   }
@@ -97,11 +100,11 @@ public class CollaborationOpportunitiesServiceTest {
   public void createCollaborationOpportunity_manualFunction() {
     var form = CollaborationOpportunityTestUtil.getCompletedForm_manualEntry();
     var opportunity = collaborationOpportunitiesService.createCollaborationOpportunity(
-        details,
+        detail,
         form,
         userAccount
     );
-    assertThat(opportunity.getProjectDetail()).isEqualTo(details);
+    assertThat(opportunity.getProjectDetail()).isEqualTo(detail);
     checkCommonFields(form, opportunity);
   }
 
@@ -111,7 +114,7 @@ public class CollaborationOpportunitiesServiceTest {
     form.setFunction(Function.DRILLING.name());
     var existingOpportunity = opportunity;
     collaborationOpportunitiesService.updateCollaborationOpportunity(existingOpportunity, form, userAccount);
-    assertThat(existingOpportunity.getProjectDetail()).isEqualTo(details);
+    assertThat(existingOpportunity.getProjectDetail()).isEqualTo(detail);
     assertThat(existingOpportunity.getFunction()).isEqualTo(Function.DRILLING);
     checkCommonFields(form, existingOpportunity);
   }
@@ -122,7 +125,7 @@ public class CollaborationOpportunitiesServiceTest {
     form.setFunction(CollaborationOpportunityTestUtil.MANUAL_FUNCTION);
     var existingOpportunity = opportunity;
     collaborationOpportunitiesService.updateCollaborationOpportunity(existingOpportunity, form, userAccount);
-    assertThat(existingOpportunity.getProjectDetail()).isEqualTo(details);
+    assertThat(existingOpportunity.getProjectDetail()).isEqualTo(detail);
     assertThat(existingOpportunity.getManualFunction()).isEqualTo(SearchSelectorService.removePrefix(CollaborationOpportunityTestUtil.MANUAL_FUNCTION));
     checkCommonFields(form, existingOpportunity);
   }
@@ -136,7 +139,7 @@ public class CollaborationOpportunitiesServiceTest {
 
   @Test
   public void getFormManualEntry() {
-    var manualEntryOpportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity_manualEntry(details);
+    var manualEntryOpportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity_manualEntry(detail);
     var form = collaborationOpportunitiesService.getForm(manualEntryOpportunity);
     assertThat(form.getFunction()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(manualEntryOpportunity.getManualFunction()));
     checkCommonFormFields(form, manualEntryOpportunity);
@@ -204,14 +207,30 @@ public class CollaborationOpportunitiesServiceTest {
 
   @Test
   public void canShowInTaskList_true() {
-    when(projectSetupService.taskSelectedForProjectDetail(details, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(true);
-    assertThat(collaborationOpportunitiesService.canShowInTaskList(details)).isTrue();
+    when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(true);
+    assertThat(collaborationOpportunitiesService.canShowInTaskList(detail)).isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
-    when(projectSetupService.taskSelectedForProjectDetail(details, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(false);
-    assertThat(collaborationOpportunitiesService.canShowInTaskList(details)).isFalse();
+    when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(false);
+    assertThat(collaborationOpportunitiesService.canShowInTaskList(detail)).isFalse();
+  }
+
+  @Test
+  public void removeSectionData_verifyInteractions() {
+    final var collaborationOpportunity1 = CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
+    final var collaborationOpportunity2 = CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
+    final var collaborationOpportunities = List.of(collaborationOpportunity1, collaborationOpportunity2);
+
+    when(collaborationOpportunitiesRepository.findAllByProjectDetailOrderByIdAsc(detail)).thenReturn(collaborationOpportunities);
+
+    collaborationOpportunitiesService.removeSectionData(detail);
+
+    verify(collaborationOpportunityFileLinkService, times(1)).removeCollaborationOpportunityFileLinks(
+        collaborationOpportunities
+    );
+    verify(collaborationOpportunitiesRepository, times(1)).deleteAll(collaborationOpportunities);
   }
 
 }

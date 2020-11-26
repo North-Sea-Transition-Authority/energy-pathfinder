@@ -645,4 +645,18 @@ public class SubseaInfrastructureServiceTest {
     assertThat(subseaInfrastructureService.canShowInTaskList(projectDetail)).isFalse();
   }
 
+  @Test
+  public void removeSectionData_verifyInteractions() {
+
+    final var subseaInfrastructure1 = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withSubseaStructure();
+    final var subseaInfrastructure2 = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withConcreteMattresses();
+    final var subseaInfrastructures = List.of(subseaInfrastructure1, subseaInfrastructure2);
+
+    when(subseaInfrastructureRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(subseaInfrastructures);
+
+    subseaInfrastructureService.removeSectionData(projectDetail);
+
+    verify(subseaInfrastructureRepository, times(1)).deleteAll(subseaInfrastructures);
+  }
+
 }

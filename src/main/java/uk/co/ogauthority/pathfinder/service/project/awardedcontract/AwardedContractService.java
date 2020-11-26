@@ -180,4 +180,10 @@ public class AwardedContractService implements ProjectFormSectionService {
     return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS);
   }
 
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    final var awardedContracts = getAwardedContracts(projectDetail);
+    awardedContractRepository.deleteAll(awardedContracts);
+  }
+
 }

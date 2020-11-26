@@ -162,6 +162,49 @@ public class CollaborationOpportunityFileLinkServiceTest {
   }
 
   @Test
+  public void removeCollaborationOpportunityFileLinks_whenListOfOpportunitiesWithLinks_thenAllRemoved() {
+
+    var projectDetailFile1 = new ProjectDetailFile();
+    projectDetailFile1.setId(1);
+    final var collaborationOpportunity1 = CollaborationOpportunityTestUtil.getCollaborationOpportunity(
+        ProjectUtil.getProjectDetails()
+    );
+
+    final var collaborationOpportunityFileLink1 = CollaborationOpportunityTestUtil.createCollaborationOpportunityFileLink(
+        collaborationOpportunity1,
+        projectDetailFile1
+    );
+
+    when(collaborationOpportunityFileLinkRepository.findAllByCollaborationOpportunity(collaborationOpportunity1)).thenReturn(
+        List.of(collaborationOpportunityFileLink1)
+    );
+
+    var projectDetailFile2 = new ProjectDetailFile();
+    projectDetailFile1.setId(2);
+    final var collaborationOpportunity2 = CollaborationOpportunityTestUtil.getCollaborationOpportunity(
+        ProjectUtil.getProjectDetails()
+    );
+
+    final var collaborationOpportunityFileLink2 = CollaborationOpportunityTestUtil.createCollaborationOpportunityFileLink(
+        collaborationOpportunity2,
+        projectDetailFile2
+    );
+
+    when(collaborationOpportunityFileLinkRepository.findAllByCollaborationOpportunity(collaborationOpportunity2)).thenReturn(
+        List.of(collaborationOpportunityFileLink2)
+    );
+
+    collaborationOpportunityFileLinkService.removeCollaborationOpportunityFileLinks(
+        List.of(collaborationOpportunity1, collaborationOpportunity2)
+    );
+
+    verify(collaborationOpportunityFileLinkRepository, times(1)).deleteAll(List.of(collaborationOpportunityFileLink1));
+    verify(projectDetailFileService, times(1)).removeProjectDetailFiles(List.of(collaborationOpportunityFileLink1.getProjectDetailFile()));
+    verify(collaborationOpportunityFileLinkRepository, times(1)).deleteAll(List.of(collaborationOpportunityFileLink2));
+    verify(projectDetailFileService, times(1)).removeProjectDetailFiles(List.of(collaborationOpportunityFileLink2.getProjectDetailFile()));
+  }
+
+  @Test
   public void getFileUploadViewsLinkedToOpportunity_whenLinksForOpportunity_thenReturnPopulatedList() {
     var collaborationOpportunityFileLink = CollaborationOpportunityTestUtil.createCollaborationOpportunityFileLink();
     var collaborationOpportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity(ProjectUtil.getProjectDetails());

@@ -162,4 +162,10 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
   public boolean canShowInTaskList(ProjectDetail detail) {
     return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.PIPELINES);
   }
+
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    final var decommissionedPipelines = getDecommissionedPipelines(projectDetail);
+    decommissionedPipelineRepository.deleteAll(decommissionedPipelines);
+  }
 }

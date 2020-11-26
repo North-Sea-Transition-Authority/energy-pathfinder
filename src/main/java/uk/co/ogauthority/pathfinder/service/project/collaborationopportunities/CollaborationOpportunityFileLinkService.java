@@ -61,6 +61,14 @@ public class CollaborationOpportunityFileLinkService extends FileLinkService {
   }
 
   /**
+   * Remove all collaboration opportunity file links associated to the collection of collaboration opportunity.
+   * @param collaborationOpportunities the collaboration opportunities to to remove all the file links from
+   */
+  public void removeCollaborationOpportunityFileLinks(List<CollaborationOpportunity> collaborationOpportunities) {
+    collaborationOpportunities.forEach(this::deleteAllFileLinksAndProjectDetailFilesLinkedToEntity);
+  }
+
+  /**
    * Retrieve a list of UploadedFileView objects for documents linked to a collaboration opportunity.
    * @param collaborationOpportunity the collaboration opportunity to get the file views for
    * @return a list of UploadedFileView linked to an collaboration opportunity

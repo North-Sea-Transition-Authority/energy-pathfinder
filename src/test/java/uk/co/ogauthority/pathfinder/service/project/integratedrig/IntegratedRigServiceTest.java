@@ -297,4 +297,18 @@ public class IntegratedRigServiceTest {
     when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.INTEGRATED_RIGS)).thenReturn(false);
     assertThat(integratedRigService.canShowInTaskList(projectDetail)).isFalse();
   }
+
+  @Test
+  public void removeSectionData_verifyInteractions() {
+
+    final var integratedRig1 = IntegratedRigTestUtil.createIntegratedRig_withDevUkFacility();
+    final var integratedRig2 = IntegratedRigTestUtil.createIntegratedRig_withManualFacility();
+    final var integratedRigs = List.of(integratedRig1, integratedRig2);
+
+    when(integratedRigRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(integratedRigs);
+
+    integratedRigService.removeSectionData(projectDetail);
+
+    verify(integratedRigRepository, times(1)).deleteAll(integratedRigs);
+  }
 }

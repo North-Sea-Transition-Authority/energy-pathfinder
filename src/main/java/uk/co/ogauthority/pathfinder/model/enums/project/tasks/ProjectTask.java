@@ -80,7 +80,7 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       70
   ),
   WELLS(
-      DecommissionedWellController.FORM_PAGE_NAME,
+      DecommissionedWellController.SUMMARY_PAGE_NAME,
       DecommissionedWellController.class,
       DecommissionedWellService.class,
       80

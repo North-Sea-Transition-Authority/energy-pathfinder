@@ -337,4 +337,10 @@ public class SubseaInfrastructureService implements ProjectFormSectionService {
   public boolean canShowInTaskList(ProjectDetail detail) {
     return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.SUBSEA_INFRASTRUCTURE);
   }
+
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    final var subseaInfrastructures = getSubseaInfrastructures(projectDetail);
+    subseaInfrastructureRepository.deleteAll(subseaInfrastructures);
+  }
 }

@@ -154,4 +154,10 @@ public class IntegratedRigService implements ProjectFormSectionService {
   public boolean canShowInTaskList(ProjectDetail detail) {
     return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.INTEGRATED_RIGS);
   }
+
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    final var integratedRigs = getIntegratedRigs(projectDetail);
+    integratedRigRepository.deleteAll(integratedRigs);
+  }
 }

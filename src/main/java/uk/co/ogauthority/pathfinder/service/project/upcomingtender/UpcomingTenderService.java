@@ -230,4 +230,11 @@ public class UpcomingTenderService implements ProjectFormSectionService {
   public boolean canShowInTaskList(ProjectDetail detail) {
     return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS);
   }
+
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    final var upcomingTenders = getUpcomingTendersForDetail(projectDetail);
+    upcomingTenderFileLinkService.removeUpcomingTenderFileLinks(upcomingTenders);
+    upcomingTenderRepository.deleteAll(upcomingTenders);
+  }
 }

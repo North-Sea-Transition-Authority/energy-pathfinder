@@ -194,6 +194,10 @@ public class DecommissionedWellService implements ProjectFormSectionService {
         ));
   }
 
+  public List<DecommissionedWell> getDecommissionedWellsForProjectDetail(ProjectDetail projectDetail) {
+    return decommissionedWellRepository.findByProjectDetailOrderByIdAsc(projectDetail);
+  }
+
   @Override
   public boolean isComplete(ProjectDetail detail) {
     return false;
@@ -202,5 +206,11 @@ public class DecommissionedWellService implements ProjectFormSectionService {
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
     return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.WELLS);
+  }
+
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    final var decommissionedWells = getDecommissionedWellsForProjectDetail(projectDetail);
+    decommissionedWellRepository.deleteAll(decommissionedWells);
   }
 }

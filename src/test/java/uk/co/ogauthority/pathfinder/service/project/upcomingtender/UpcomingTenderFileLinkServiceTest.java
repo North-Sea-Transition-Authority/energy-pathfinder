@@ -185,4 +185,43 @@ public class UpcomingTenderFileLinkServiceTest {
 
     assertThat(fileViews).isEmpty();
   }
+
+  @Test
+  public void removeUpcomingTenderFileLinks_whenListOfTendersWithLinks_thenAllRemoved() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+
+    var projectDetailFile1 = new ProjectDetailFile();
+    projectDetailFile1.setId(1);
+
+    final var upcomingTender1 = UpcomingTenderUtil.getUpcomingTender(projectDetail);
+    final var upcomingTenderFileLink1 = UpcomingTenderFileLinkUtil.createUpcomingTenderFileLink(
+        upcomingTender1,
+        projectDetailFile1
+    );
+
+    when(upcomingTenderFileLinkRepository.findAllByUpcomingTender(upcomingTender1)).thenReturn(
+        List.of(upcomingTenderFileLink1)
+    );
+
+    var projectDetailFile2 = new ProjectDetailFile();
+    projectDetailFile1.setId(2);
+
+    final var upcomingTender2 = UpcomingTenderUtil.getUpcomingTender(projectDetail);
+    final var upcomingTenderFileLink2 = UpcomingTenderFileLinkUtil.createUpcomingTenderFileLink(
+        upcomingTender2,
+        projectDetailFile2
+    );
+
+    when(upcomingTenderFileLinkRepository.findAllByUpcomingTender(upcomingTender2)).thenReturn(
+        List.of(upcomingTenderFileLink2)
+    );
+
+    upcomingTenderFileLinkService.removeUpcomingTenderFileLinks(List.of(upcomingTender1, upcomingTender2));
+
+    verify(upcomingTenderFileLinkRepository, times(1)).deleteAll(List.of(upcomingTenderFileLink1));
+    verify(projectDetailFileService, times(1)).removeProjectDetailFiles(List.of(upcomingTenderFileLink1.getProjectDetailFile()));
+    verify(upcomingTenderFileLinkRepository, times(1)).deleteAll(List.of(upcomingTenderFileLink2));
+    verify(projectDetailFileService, times(1)).removeProjectDetailFiles(List.of(upcomingTenderFileLink2.getProjectDetailFile()));
+  }
 }

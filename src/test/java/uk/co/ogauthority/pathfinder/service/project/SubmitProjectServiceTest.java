@@ -20,11 +20,14 @@ public class SubmitProjectServiceTest {
   @Mock
   private ProjectDetailsRepository projectDetailsRepository;
 
+  @Mock
+  private ProjectCleanUpService projectCleanUpService;
+
   private SubmitProjectService submitProjectService;
 
   @Before
   public void setup() {
-    submitProjectService = new SubmitProjectService(projectDetailsRepository);
+    submitProjectService = new SubmitProjectService(projectDetailsRepository, projectCleanUpService);
   }
 
   @Test
@@ -39,5 +42,6 @@ public class SubmitProjectServiceTest {
     assertThat(projectDetail.getSubmittedInstant()).isNotNull();
 
     verify(projectDetailsRepository, times(1)).save(projectDetail);
+    verify(projectCleanUpService, times(1)).removeProjectSectionDataIfNotRelevant(projectDetail);
   }
 }

@@ -14,13 +14,20 @@ public class SubmitProjectService {
 
   private final ProjectDetailsRepository projectDetailsRepository;
 
+  private final ProjectCleanUpService projectCleanUpService;
+
   @Autowired
-  public SubmitProjectService(ProjectDetailsRepository projectDetailsRepository) {
+  public SubmitProjectService(ProjectDetailsRepository projectDetailsRepository,
+                              ProjectCleanUpService projectCleanUpService) {
     this.projectDetailsRepository = projectDetailsRepository;
+    this.projectCleanUpService = projectCleanUpService;
   }
 
   @Transactional
   public void submitProject(ProjectDetail projectDetail, AuthenticatedUserAccount user) {
+
+    projectCleanUpService.removeProjectSectionDataIfNotRelevant(projectDetail);
+
     projectDetail.setStatus(ProjectStatus.QA);
     projectDetail.setSubmittedByWua(user.getWuaId());
     projectDetail.setSubmittedInstant(Instant.now());

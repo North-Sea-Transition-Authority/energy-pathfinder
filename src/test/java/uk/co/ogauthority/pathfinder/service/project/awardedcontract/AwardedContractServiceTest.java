@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -281,5 +282,18 @@ public class AwardedContractServiceTest {
   public void canShowInTaskList_false() {
     when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS)).thenReturn(false);
     assertThat(awardedContractService.canShowInTaskList(detail)).isFalse();
+  }
+
+  @Test
+  public void removeSectionData_verifyInteractions() {
+    final var awardedContract1 = AwardedContractTestUtil.createAwardedContract();
+    final var awardedContract2 = AwardedContractTestUtil.createAwardedContract();
+    final var awardedContracts = List.of(awardedContract1, awardedContract2);
+
+    when(awardedContractRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(awardedContracts);
+
+    awardedContractService.removeSectionData(detail);
+
+    verify(awardedContractRepository, times(1)).deleteAll(awardedContracts);
   }
 }

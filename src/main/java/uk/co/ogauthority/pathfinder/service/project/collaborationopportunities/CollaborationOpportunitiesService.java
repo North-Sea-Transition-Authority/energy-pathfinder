@@ -228,4 +228,11 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
   public boolean canShowInTaskList(ProjectDetail detail) {
     return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES);
   }
+
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    final var collaborationOpportunities = getOpportunitiesForDetail(projectDetail);
+    collaborationOpportunityFileLinkService.removeCollaborationOpportunityFileLinks(collaborationOpportunities);
+    collaborationOpportunitiesRepository.deleteAll(collaborationOpportunities);
+  }
 }

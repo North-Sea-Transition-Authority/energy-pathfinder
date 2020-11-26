@@ -74,6 +74,14 @@ public class UpcomingTenderFileLinkService extends FileLinkService {
   }
 
   /**
+   * Remove all upcoming tender file links associated to the collection of upcoming tenders.
+   * @param upcomingTenderFileLinks the upcoming tenders to to remove all the file links from
+   */
+  public void removeUpcomingTenderFileLinks(List<UpcomingTender> upcomingTenderFileLinks) {
+    upcomingTenderFileLinks.forEach(this::deleteAllFileLinksAndProjectDetailFilesLinkedToEntity);
+  }
+
+  /**
    * Retrieve a list of UploadedFileView objects for documents linked to an upcoming tender.
    * @param upcomingTender the upcoming tender to get the file views for
    * @return a list of UploadedFileView linked to an upcoming tender

@@ -181,4 +181,10 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
   public boolean canShowInTaskList(ProjectDetail detail) {
     return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.PLATFORM_FPSO);
   }
+
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    final var platformFpsos = getPlatformsFpsosForDetail(projectDetail);
+    platformFpsoRepository.deleteAll(platformFpsos);
+  }
 }
