@@ -1,6 +1,6 @@
 <#include '../../layoutPane.ftl'/>
 
-<#macro summaryWithSubNavigation pageHeading projectSummaryView sidebarHeading>
+<#macro summaryWithSubNavigation pageHeading projectSummaryView sidebarHeading errorMessage="">
   <@defaultPagePane htmlTitle=pageHeading phaseBanner=false>
     <@defaultPagePaneSubNav>
       <@fdsSubNavigation.subNavigation>
@@ -13,14 +13,17 @@
     </@defaultPagePaneSubNav>
 
     <@defaultPagePaneContent pageHeading=pageHeading>
-      <@summaryWithoutSubNavigation projectSummaryView=projectSummaryView>
+      <@summaryWithoutSubNavigation projectSummaryView=projectSummaryView errorMessage=errorMessage>
         <#nested>
       </@summaryWithoutSubNavigation>
     </@defaultPagePaneContent>
   </@defaultPagePane>
 </#macro>
 
-<#macro summaryWithoutSubNavigation projectSummaryView>
+<#macro summaryWithoutSubNavigation projectSummaryView errorMessage="">
+  <#if errorMessage?has_content>
+    <@fdsError.singleErrorSummary errorMessage=errorMessage />
+  </#if>
   ${projectSummaryView.summaryHtml?no_esc}
   <#nested>
 </#macro>
