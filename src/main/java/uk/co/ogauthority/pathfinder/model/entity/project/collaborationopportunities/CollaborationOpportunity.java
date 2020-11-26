@@ -10,11 +10,13 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
+import uk.co.ogauthority.pathfinder.service.entityduplication.ParentEntity;
 import uk.co.ogauthority.pathfinder.service.file.EntityWithLinkedFile;
 
 @Entity
 @Table(name = "collaboration_opportunities")
-public class CollaborationOpportunity extends ProjectDetailEntity implements ContactDetailCapture, EntityWithLinkedFile {
+public class CollaborationOpportunity
+    extends ProjectDetailEntity implements ContactDetailCapture, EntityWithLinkedFile, ParentEntity {
 
   @Enumerated(EnumType.STRING)
   private Function function;

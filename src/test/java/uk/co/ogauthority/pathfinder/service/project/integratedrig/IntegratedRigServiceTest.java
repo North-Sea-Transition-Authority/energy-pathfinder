@@ -23,6 +23,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.integratedrig.IntegratedR
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.integratedrig.IntegratedRigRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -49,6 +50,9 @@ public class IntegratedRigServiceTest {
   @Mock
   private ProjectSetupService projectSetupService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private ProjectDetail projectDetail;
 
   @Before
@@ -59,7 +63,9 @@ public class IntegratedRigServiceTest {
         integratedRigRepository,
         searchSelectorService,
         validationService,
-        projectSetupService);
+        projectSetupService,
+        entityDuplicationService
+    );
 
     projectDetail = ProjectUtil.getProjectDetails();
 

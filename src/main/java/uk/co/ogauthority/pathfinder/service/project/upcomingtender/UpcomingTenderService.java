@@ -27,6 +27,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTe
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
@@ -45,6 +46,7 @@ public class UpcomingTenderService implements ProjectFormSectionService {
   private final ProjectDetailFileService projectDetailFileService;
   private final UpcomingTenderFileLinkService upcomingTenderFileLinkService;
   private final ProjectSetupService projectSetupService;
+  private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
   public UpcomingTenderService(UpcomingTenderRepository upcomingTenderRepository,
@@ -54,7 +56,8 @@ public class UpcomingTenderService implements ProjectFormSectionService {
                                SearchSelectorService searchSelectorService,
                                ProjectDetailFileService projectDetailFileService,
                                UpcomingTenderFileLinkService upcomingTenderFileLinkService,
-                               ProjectSetupService projectSetupService) {
+                               ProjectSetupService projectSetupService,
+                               EntityDuplicationService entityDuplicationService) {
     this.upcomingTenderRepository = upcomingTenderRepository;
     this.validationService = validationService;
     this.upcomingTenderFormValidator = upcomingTenderFormValidator;
@@ -63,6 +66,7 @@ public class UpcomingTenderService implements ProjectFormSectionService {
     this.projectDetailFileService = projectDetailFileService;
     this.upcomingTenderFileLinkService = upcomingTenderFileLinkService;
     this.projectSetupService = projectSetupService;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
   @Transactional
@@ -236,5 +240,26 @@ public class UpcomingTenderService implements ProjectFormSectionService {
     final var upcomingTenders = getUpcomingTendersForDetail(projectDetail);
     upcomingTenderFileLinkService.removeUpcomingTenderFileLinks(upcomingTenders);
     upcomingTenderRepository.deleteAll(upcomingTenders);
+  }
+
+  @Override
+  public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
+
+    // duplicate and link the upcoming tender entities to the new ProjectDetail
+    final var duplicatedUpcomingTenderEntities = entityDuplicationService.duplicateEntitiesAndSetNewParent(
+        getUpcomingTendersForDetail(fromDetail),
+        toDetail,
+        UpcomingTender.class
+    );
+
+    final var duplicatedUpcomingTenderEntityMap = entityDuplicationService.createDuplicatedEntityPairingMap(
+        duplicatedUpcomingTenderEntities
+    );
+
+    upcomingTenderFileLinkService.copyUpcomingTenderFileLinkData(
+        fromDetail,
+        toDetail,
+        duplicatedUpcomingTenderEntityMap
+    );
   }
 }

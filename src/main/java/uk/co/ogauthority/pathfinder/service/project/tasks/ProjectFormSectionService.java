@@ -27,4 +27,6 @@ public interface ProjectFormSectionService {
     // default is to not do anything. If appropriate consumers can
     // implement and remove relevant data
   }
+
+  void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail);
 }

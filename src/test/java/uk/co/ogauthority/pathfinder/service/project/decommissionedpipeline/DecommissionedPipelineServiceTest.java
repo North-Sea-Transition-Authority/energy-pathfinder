@@ -22,6 +22,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineForm;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedpipeline.DecommissionedPipelineRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.pipeline.PipelineService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -51,6 +52,9 @@ public class DecommissionedPipelineServiceTest {
   @Mock
   private ProjectSetupService projectSetupService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private ProjectDetail projectDetail;
 
   @Before
@@ -60,7 +64,9 @@ public class DecommissionedPipelineServiceTest {
         decommissionedPipelineRepository,
         decommissionedPipelineFormValidator,
         validationService,
-        projectSetupService);
+        projectSetupService,
+        entityDuplicationService
+    );
 
     projectDetail = ProjectUtil.getProjectDetails();
 

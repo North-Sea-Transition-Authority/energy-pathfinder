@@ -28,6 +28,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.decommissionedwell.Decomm
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedwell.DecommissionedWellFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedwell.DecommissionedWellRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -53,6 +54,9 @@ public class DecommissionedWellServiceTest {
   @Mock
   private ProjectSetupService projectSetupService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private DecommissionedWellService decommissionedWellService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -65,7 +69,9 @@ public class DecommissionedWellServiceTest {
         validationService,
         decommissionedWellFormValidator,
         decommissionedWellRepository,
-        projectSetupService);
+        projectSetupService,
+        entityDuplicationService
+    );
 
     when(decommissionedWellRepository.save(any(DecommissionedWell.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
   }

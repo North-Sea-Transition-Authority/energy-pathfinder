@@ -34,6 +34,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.vali
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.subseainfrastructure.SubseaInfrastructureRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -61,6 +62,9 @@ public class SubseaInfrastructureServiceTest {
   @Mock
   private ProjectSetupService projectSetupService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private SubseaInfrastructureService subseaInfrastructureService;
 
   private ProjectDetail projectDetail;
@@ -74,7 +78,9 @@ public class SubseaInfrastructureServiceTest {
         searchSelectorService,
         validationService,
         subseaInfrastructureFormValidator,
-        projectSetupService);
+        projectSetupService,
+        entityDuplicationService
+    );
 
     projectDetail = ProjectUtil.getProjectDetails();
 

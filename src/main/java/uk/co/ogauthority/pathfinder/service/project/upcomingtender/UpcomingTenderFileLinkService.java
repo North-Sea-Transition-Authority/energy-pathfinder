@@ -1,6 +1,8 @@
 package uk.co.ogauthority.pathfinder.service.project.upcomingtender;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,11 +11,13 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTenderFileLink;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderFileLinkRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.EntityWithLinkedFile;
 import uk.co.ogauthority.pathfinder.service.file.FileLinkEntity;
 import uk.co.ogauthority.pathfinder.service.file.FileLinkService;
@@ -26,11 +30,15 @@ public class UpcomingTenderFileLinkService extends FileLinkService {
 
   private final UpcomingTenderFileLinkRepository upcomingTenderFileLinkRepository;
 
+  private final EntityDuplicationService entityDuplicationService;
+
   @Autowired
   public UpcomingTenderFileLinkService(UpcomingTenderFileLinkRepository upcomingTenderFileLinkRepository,
-                                       ProjectDetailFileService projectDetailFileService) {
+                                       ProjectDetailFileService projectDetailFileService,
+                                       EntityDuplicationService entityDuplicationService) {
     super(projectDetailFileService);
     this.upcomingTenderFileLinkRepository = upcomingTenderFileLinkRepository;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
   /**
@@ -40,6 +48,10 @@ public class UpcomingTenderFileLinkService extends FileLinkService {
    */
   protected List<UpcomingTenderFileLink> getAllByUpcomingTender(UpcomingTender upcomingTender) {
     return upcomingTenderFileLinkRepository.findAllByUpcomingTender(upcomingTender);
+  }
+
+  protected List<UpcomingTenderFileLink> findAllByProjectDetail(ProjectDetail projectDetail)  {
+    return upcomingTenderFileLinkRepository.findAllByProjectDetailFile_ProjectDetail(projectDetail);
   }
 
   /**
@@ -139,6 +151,51 @@ public class UpcomingTenderFileLinkService extends FileLinkService {
             projectDetailFile.getFileId()
         )));
     upcomingTenderFileLinkRepository.delete(upcomingTenderFileLink);
+  }
+
+  public void copyUpcomingTenderFileLinkData(ProjectDetail fromDetail,
+                                             ProjectDetail toDetail,
+                                             Map<UpcomingTender, UpcomingTender> duplicatedUpcomingTenderLookup) {
+
+    // get a map of all the UpcomingTenderFileLink associated to the fromDetail
+    var originalUpcomingTenderToFileLinkLookup = findAllByProjectDetail(fromDetail)
+        .stream()
+        .collect(Collectors.groupingBy(UpcomingTenderFileLink::getUpcomingTender));
+
+    // duplicate any project detail file data associated to the fromDetail
+    final var duplicatedProjectDetailLookup = copyProjectDetailFileData(
+        fromDetail,
+        toDetail,
+        getFilePurpose()
+    );
+
+    originalUpcomingTenderToFileLinkLookup.forEach((originalUpcomingTender, originalUpcomingTenderFileLinks) -> {
+
+      // for each UpcomingTender associated to the fromDetail, duplicate any UpcomingTenderFileLinks and reparent
+      // to the duplicated UpcomingTender
+      final var duplicatedUpcomingTenderFileLinks = entityDuplicationService.duplicateEntitiesAndSetNewParent(
+          originalUpcomingTenderFileLinks,
+          duplicatedUpcomingTenderLookup.get(originalUpcomingTender),
+          UpcomingTenderFileLink.class
+      );
+
+      var upcomingTenderFileLinksToUpdate = new ArrayList<UpcomingTenderFileLink>();
+
+      // for each UpcomingTenderFileLink, lookup the new duplicated ProjectDetailFile and reparent
+      duplicatedUpcomingTenderFileLinks.forEach(duplicatedUpcomingTenderFileLink -> {
+        final var duplicatedProjectDetailFile = duplicatedProjectDetailLookup.get(
+            duplicatedUpcomingTenderFileLink.getOriginalEntity().getProjectDetailFile()
+        );
+
+        var upcomingTenderFileLink = duplicatedUpcomingTenderFileLink.getDuplicateEntity();
+        upcomingTenderFileLink.setProjectDetailFile(duplicatedProjectDetailFile);
+        upcomingTenderFileLinksToUpdate.add(upcomingTenderFileLink);
+
+      });
+
+      upcomingTenderFileLinkRepository.saveAll(upcomingTenderFileLinksToUpdate);
+
+    });
   }
 
   private List<UpcomingTenderFileLink> mapFileLinkEntityList(List<? extends FileLinkEntity> fileLinkEntities) {

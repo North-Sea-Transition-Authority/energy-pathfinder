@@ -15,6 +15,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.integratedrig.IntegratedRigForm;
 import uk.co.ogauthority.pathfinder.repository.project.integratedrig.IntegratedRigRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -28,18 +29,21 @@ public class IntegratedRigService implements ProjectFormSectionService {
   private final SearchSelectorService searchSelectorService;
   private final ValidationService validationService;
   private final ProjectSetupService projectSetupService;
+  private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
   public IntegratedRigService(DevUkFacilitiesService devUkFacilitiesService,
                               IntegratedRigRepository integratedRigRepository,
                               SearchSelectorService searchSelectorService,
                               ValidationService validationService,
-                              ProjectSetupService projectSetupService) {
+                              ProjectSetupService projectSetupService,
+                              EntityDuplicationService entityDuplicationService) {
     this.devUkFacilitiesService = devUkFacilitiesService;
     this.integratedRigRepository = integratedRigRepository;
     this.searchSelectorService = searchSelectorService;
     this.validationService = validationService;
     this.projectSetupService = projectSetupService;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
   public IntegratedRigForm getForm(Integer integratedRigId, ProjectDetail projectDetail) {
@@ -159,5 +163,14 @@ public class IntegratedRigService implements ProjectFormSectionService {
   public void removeSectionData(ProjectDetail projectDetail) {
     final var integratedRigs = getIntegratedRigs(projectDetail);
     integratedRigRepository.deleteAll(integratedRigs);
+  }
+
+  @Override
+  public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
+    entityDuplicationService.duplicateEntitiesAndSetNewParent(
+        getIntegratedRigs(fromDetail),
+        toDetail,
+        IntegratedRig.class
+    );
   }
 }

@@ -26,6 +26,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedCo
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.AwardedContractRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -48,6 +49,9 @@ public class AwardedContractServiceTest {
   @Mock
   private ProjectSetupService projectSetupService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private AwardedContractService awardedContractService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -64,7 +68,8 @@ public class AwardedContractServiceTest {
         awardedContractRepository,
         awardedContractFormValidator,
         searchSelectorService,
-        projectSetupService
+        projectSetupService,
+        entityDuplicationService
     );
 
     when(awardedContractRepository.save(any(AwardedContract.class))).thenAnswer(invocation -> invocation.getArguments()[0]);

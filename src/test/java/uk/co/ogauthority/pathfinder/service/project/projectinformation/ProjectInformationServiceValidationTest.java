@@ -14,6 +14,7 @@ import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -25,11 +26,15 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectInformationServiceValidationTest {
+
   @Mock
   private ProjectInformationRepository projectInformationRepository;
 
   @Mock
   private ProjectInformationFormValidator projectInformationFormValidator;
+
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
 
   private ProjectInformationService projectInformationService;
 
@@ -42,7 +47,8 @@ public class ProjectInformationServiceValidationTest {
     projectInformationService = new ProjectInformationService(
         projectInformationRepository,
         validationService,
-        projectInformationFormValidator
+        projectInformationFormValidator,
+        entityDuplicationService
     );
   }
 

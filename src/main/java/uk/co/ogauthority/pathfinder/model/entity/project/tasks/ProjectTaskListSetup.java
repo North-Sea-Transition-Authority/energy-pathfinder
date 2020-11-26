@@ -55,8 +55,7 @@ public class ProjectTaskListSetup extends ProjectDetailEntity {
     return taskListAnswers;
   }
 
-  public void setTaskListAnswers(
-      List<TaskListSectionAnswer> taskListAnswers) {
+  public void setTaskListAnswers(List<TaskListSectionAnswer> taskListAnswers) {
     this.taskListAnswers = taskListAnswers;
   }
 }

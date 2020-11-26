@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.file;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadMultipleFilesWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 
@@ -137,5 +139,13 @@ public abstract class FileLinkService {
             )
         )
         .collect(Collectors.toList());
+  }
+
+  protected Map<ProjectDetailFile, ProjectDetailFile> copyProjectDetailFileData(
+      ProjectDetail fromDetail,
+      ProjectDetail toDetail,
+      ProjectDetailFilePurpose projectDetailFilePurpose
+  ) {
+    return projectDetailFileService.copyProjectDetailFileData(fromDetail, toDetail, projectDetailFilePurpose);
   }
 }

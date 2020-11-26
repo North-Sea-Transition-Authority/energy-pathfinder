@@ -16,6 +16,7 @@ import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrga
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -25,6 +26,7 @@ import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SelectOperatorServiceValidationTest {
+
   @Mock
   private PortalOrganisationAccessor portalOrganisationAccessor;
 
@@ -33,6 +35,9 @@ public class SelectOperatorServiceValidationTest {
 
   @Mock
   private ProjectOperatorService projectOperatorService;
+
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
 
   private SelectOperatorService selectOperatorService;
 
@@ -55,7 +60,8 @@ public class SelectOperatorServiceValidationTest {
         portalOrganisationAccessor,
         validationService,
         searchSelectorService,
-        projectOperatorService
+        projectOperatorService,
+        entityDuplicationService
     );
   }
 

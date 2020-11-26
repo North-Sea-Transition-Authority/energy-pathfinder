@@ -25,6 +25,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarte
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -41,6 +42,9 @@ public class ProjectInformationServiceTest {
   @Mock
   private ProjectInformationFormValidator projectInformationFormValidator;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private ProjectInformationService projectInformationService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -52,7 +56,8 @@ public class ProjectInformationServiceTest {
     projectInformationService = new ProjectInformationService(
         projectInformationRepository,
         validationService,
-        projectInformationFormValidator
+        projectInformationFormValidator,
+        entityDuplicationService
     );
 
     when(projectInformationRepository.save(any(ProjectInformation.class)))

@@ -26,18 +26,22 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadMultipleFile
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.file.ProjectDetailFileRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 
 @Service
 public class ProjectDetailFileService {
 
   private final FileUploadService fileUploadService;
   private final ProjectDetailFileRepository projectDetailFileRepository;
+  private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
   public ProjectDetailFileService(FileUploadService fileUploadService,
-                                  ProjectDetailFileRepository projectDetailFileRepository) {
+                                  ProjectDetailFileRepository projectDetailFileRepository,
+                                  EntityDuplicationService entityDuplicationService) {
     this.fileUploadService = fileUploadService;
     this.projectDetailFileRepository = projectDetailFileRepository;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
   /**
@@ -288,11 +292,6 @@ public class ProjectDetailFileService {
             fileId)));
   }
 
-  public List<ProjectDetailFile> getAllByProjectDetailAndPurpose(ProjectDetail projectDetail,
-                                                                 ProjectDetailFilePurpose purpose) {
-    return projectDetailFileRepository.findAllByProjectDetailAndPurpose(projectDetail, purpose);
-  }
-
   /**
    * Remove ProjectDetailFile that are linked to a detail and purpose and are not in a specified list.
    * @param projectDetail detail for app to cleanup files for
@@ -323,5 +322,19 @@ public class ProjectDetailFileService {
   @Transactional
   public void removeProjectDetailFiles(List<ProjectDetailFile> projectDetailFilesToRemove) {
     projectDetailFileRepository.deleteAll(projectDetailFilesToRemove);
+  }
+
+  public Map<ProjectDetailFile, ProjectDetailFile> copyProjectDetailFileData(
+      ProjectDetail fromDetail,
+      ProjectDetail toDetail,
+      ProjectDetailFilePurpose projectDetailFilePurpose
+  ) {
+    final var duplicateProjectDetailFiles = entityDuplicationService.duplicateEntitiesAndSetNewParent(
+        projectDetailFileRepository.findAllByProjectDetailAndPurpose(fromDetail, projectDetailFilePurpose),
+        toDetail,
+        ProjectDetailFile.class
+    );
+
+    return entityDuplicationService.createDuplicatedEntityPairingMap(duplicateProjectDetailFiles);
   }
 }

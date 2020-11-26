@@ -16,6 +16,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.CollaborationOpportunitiesRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
@@ -48,6 +49,9 @@ public class CollaborationOpportunityServiceValidationTest {
   @Mock
   private ProjectSetupService projectSetupService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private CollaborationOpportunitiesService collaborationOpportunitiesService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -65,7 +69,9 @@ public class CollaborationOpportunityServiceValidationTest {
         collaborationOpportunitiesRepository,
         collaborationOpportunityFileLinkService,
         projectDetailFileService,
-        projectSetupService);
+        projectSetupService,
+        entityDuplicationService
+    );
   }
 
   @Test

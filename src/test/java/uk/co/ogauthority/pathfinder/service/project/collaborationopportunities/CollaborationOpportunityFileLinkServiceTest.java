@@ -17,6 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.CollaborationOpportunityFileLinkRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.FileUpdateMode;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtil;
@@ -33,13 +34,17 @@ public class CollaborationOpportunityFileLinkServiceTest {
   @Mock
   private ProjectDetailFileService projectDetailFileService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService;
 
   @Before
   public void setup() {
     collaborationOpportunityFileLinkService = new CollaborationOpportunityFileLinkService(
         collaborationOpportunityFileLinkRepository,
-        projectDetailFileService
+        projectDetailFileService,
+        entityDuplicationService
     );
   }
 

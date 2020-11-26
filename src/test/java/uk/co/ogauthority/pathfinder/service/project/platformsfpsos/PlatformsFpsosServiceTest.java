@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFp
 import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFpsoFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.platformsfpsos.PlatformFpsoRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -44,6 +45,9 @@ public class PlatformsFpsosServiceTest {
   @Mock
   private ProjectSetupService projectSetupService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private PlatformsFpsosService platformsFpsosService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -51,14 +55,17 @@ public class PlatformsFpsosServiceTest {
   private final PlatformFpso platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(detail);
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     platformsFpsosService = new PlatformsFpsosService(
         platformFpsoRepository,
         devUkFacilitiesService,
         new SearchSelectorService(),
         platformFpsoFormValidator,
         validationService,
-        projectSetupService);
+        projectSetupService,
+        entityDuplicationService
+    );
+
     when(platformFpsoRepository.save(any(PlatformFpso.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
   }

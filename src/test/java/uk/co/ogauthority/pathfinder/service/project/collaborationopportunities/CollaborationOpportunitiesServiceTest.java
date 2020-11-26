@@ -23,6 +23,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.CollaborationOpportunitiesRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
@@ -53,6 +54,9 @@ public class CollaborationOpportunitiesServiceTest {
   @Mock
   private ProjectSetupService projectSetupService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private CollaborationOpportunitiesService collaborationOpportunitiesService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -77,7 +81,9 @@ public class CollaborationOpportunitiesServiceTest {
         collaborationOpportunitiesRepository,
         collaborationOpportunityFileLinkService,
         projectDetailFileService,
-        projectSetupService);
+        projectSetupService,
+        entityDuplicationService
+    );
 
     when(collaborationOpportunitiesRepository.save(any(CollaborationOpportunity.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);

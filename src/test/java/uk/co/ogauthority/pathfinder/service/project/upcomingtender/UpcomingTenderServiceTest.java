@@ -26,6 +26,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTe
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
@@ -57,6 +58,9 @@ public class UpcomingTenderServiceTest {
   @Mock
   private ProjectSetupService projectSetupService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private UpcomingTenderService upcomingTenderService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -79,7 +83,9 @@ public class UpcomingTenderServiceTest {
         searchSelectorService,
         projectDetailFileService,
         upcomingTenderFileLinkService,
-        projectSetupService);
+        projectSetupService,
+        entityDuplicationService
+    );
 
     when(upcomingTenderRepository.save(any(UpcomingTender.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);

@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderFileLinkRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.FileUpdateMode;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -35,13 +36,17 @@ public class UpcomingTenderFileLinkServiceTest {
   @Mock
   private ProjectDetailFileService projectDetailFileService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private UpcomingTenderFileLinkService upcomingTenderFileLinkService;
 
   @Before
   public void setup() {
     upcomingTenderFileLinkService = new UpcomingTenderFileLinkService(
         upcomingTenderFileLinkRepository,
-        projectDetailFileService
+        projectDetailFileService,
+        entityDuplicationService
     );
   }
 

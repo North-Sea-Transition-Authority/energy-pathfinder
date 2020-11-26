@@ -13,10 +13,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.service.entityduplication.ParentEntity;
 
 @Entity
 @Table(name = "project_details")
-public class ProjectDetail {
+public class ProjectDetail implements ParentEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

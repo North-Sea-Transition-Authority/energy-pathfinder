@@ -24,6 +24,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationF
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
@@ -52,6 +53,9 @@ public class ProjectLocationServiceTest {
   @Mock
   ProjectLocationBlocksService projectLocationBlocksService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private ProjectLocationService projectLocationService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -66,7 +70,8 @@ public class ProjectLocationServiceTest {
         searchSelectorService,
         validationService,
         projectLocationFormValidator,
-        projectLocationBlocksService
+        projectLocationBlocksService,
+        entityDuplicationService
     );
     when(projectLocationRepository.save(any(ProjectLocation.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
