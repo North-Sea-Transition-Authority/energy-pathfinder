@@ -4,7 +4,7 @@ public class NestedTestForm {
 
   private String firstField;
 
-  private FieldOrderTestForm nestedForm;
+  private FieldOrderTestForm secondField;
 
   private String thirdField;
 
@@ -16,12 +16,12 @@ public class NestedTestForm {
     this.firstField = firstField;
   }
 
-  public FieldOrderTestForm getNestedForm() {
-    return nestedForm;
+  public FieldOrderTestForm getSecondField() {
+    return secondField;
   }
 
-  public void setNestedForm(FieldOrderTestForm nestedForm) {
-    this.nestedForm = nestedForm;
+  public void setSecondField(FieldOrderTestForm secondField) {
+    this.secondField = secondField;
   }
 
   public String getThirdField() {
