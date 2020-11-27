@@ -1,7 +1,9 @@
 package uk.co.ogauthority.pathfinder.model.enums.project;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
+import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
 public enum FieldStage {
   DISCOVERY("Discovery", "Early phase before FDP approval"),
@@ -29,5 +31,10 @@ public enum FieldStage {
 
   public static Map<String, String> getEntryAsMap(FieldStage fieldStage) {
     return Collections.singletonMap(fieldStage.name(), fieldStage.getDisplayName());
+  }
+
+  public static Map<String, String> getAllAsMap() {
+    return Arrays.stream(values())
+        .collect(StreamUtil.toLinkedHashMap(Enum::name, FieldStage::getDisplayName));
   }
 }
