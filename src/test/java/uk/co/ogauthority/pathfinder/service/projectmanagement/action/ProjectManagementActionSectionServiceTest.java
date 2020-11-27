@@ -43,7 +43,7 @@ public class ProjectManagementActionSectionServiceTest {
     var section = projectManagementActionSectionService.getSection(projectDetail, authenticatedUser);
     assertThat(section.getTemplatePath()).isEqualTo(ProjectManagementActionSectionService.TEMPLATE_PATH);
     assertThat(section.getDisplayOrder()).isEqualTo(ProjectManagementActionSectionService.DISPLAY_ORDER);
-    assertThat(section.getPosition()).isEqualTo(ProjectManagementActionSectionService.POSITION);
+    assertThat(section.getSectionType()).isEqualTo(ProjectManagementActionSectionService.SECTION_TYPE);
     assertThat(section.getTemplateModel()).containsExactly(
         entry("actions", actions)
     );

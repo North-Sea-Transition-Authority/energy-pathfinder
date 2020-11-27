@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.view.projectmanagement;
 
 import java.util.Map;
-import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagementPageSectionPosition;
+import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagementPageSectionType;
 
 public class ProjectManagementSection {
 
@@ -11,16 +11,16 @@ public class ProjectManagementSection {
 
   private final int displayOrder;
 
-  private final ProjectManagementPageSectionPosition position;
+  private final ProjectManagementPageSectionType sectionType;
 
   public ProjectManagementSection(String templatePath,
                                   Map<String, Object> templateModel,
                                   int displayOrder,
-                                  ProjectManagementPageSectionPosition position) {
+                                  ProjectManagementPageSectionType sectionType) {
     this.templatePath = templatePath;
     this.templateModel = templateModel;
     this.displayOrder = displayOrder;
-    this.position = position;
+    this.sectionType = sectionType;
   }
 
   public String getTemplatePath() {
@@ -35,7 +35,7 @@ public class ProjectManagementSection {
     return displayOrder;
   }
 
-  public ProjectManagementPageSectionPosition getPosition() {
-    return position;
+  public ProjectManagementPageSectionType getSectionType() {
+    return sectionType;
   }
 }

@@ -8,7 +8,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.management.ProjectManagementSectionType;
-import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagementPageSectionPosition;
+import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagementPageSectionType;
 import uk.co.ogauthority.pathfinder.model.view.projectassessment.ProjectAssessmentViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementSection;
 import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentService;
@@ -20,7 +20,7 @@ public class ProjectManagementAssessmentSectionService implements ProjectManagem
 
   public static final String TEMPLATE_PATH = "projectmanagement/assessment/projectAssessment.ftl";
   public static final int DISPLAY_ORDER = ProjectManagementSectionType.PROJECT_ASSESSMENT.getDisplayOrder();
-  public static final ProjectManagementPageSectionPosition POSITION = ProjectManagementPageSectionPosition.VERSION_CONTENT;
+  public static final ProjectManagementPageSectionType SECTION_TYPE = ProjectManagementPageSectionType.VERSION_CONTENT;
 
   private final ProjectAssessmentService projectAssessmentService;
   private final ManageTeamService manageTeamService;
@@ -55,7 +55,7 @@ public class ProjectManagementAssessmentSectionService implements ProjectManagem
         TEMPLATE_PATH,
         summaryModel,
         DISPLAY_ORDER,
-        POSITION
+        SECTION_TYPE
     );
   }
 }

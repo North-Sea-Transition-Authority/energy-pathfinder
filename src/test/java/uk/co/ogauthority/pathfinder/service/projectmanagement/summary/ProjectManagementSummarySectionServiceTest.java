@@ -44,7 +44,7 @@ public class ProjectManagementSummarySectionServiceTest {
     var section = projectManagementSummarySectionService.getSection(projectDetail, authenticatedUser);
     assertThat(section.getTemplatePath()).isEqualTo(ProjectManagementSummarySectionService.TEMPLATE_PATH);
     assertThat(section.getDisplayOrder()).isEqualTo(ProjectManagementSummarySectionService.DISPLAY_ORDER);
-    assertThat(section.getPosition()).isEqualTo(ProjectManagementSummarySectionService.POSITION);
+    assertThat(section.getSectionType()).isEqualTo(ProjectManagementSummarySectionService.SECTION_TYPE);
     assertThat(section.getTemplateModel()).containsExactly(
         entry("projectSummaryView", projectSummaryView)
     );

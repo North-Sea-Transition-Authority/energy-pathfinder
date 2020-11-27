@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.management.ProjectManagementSectionType;
-import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagementPageSectionPosition;
+import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagementPageSectionType;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementSection;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectManagementSectionService;
@@ -17,7 +17,7 @@ public class ProjectManagementSummarySectionService implements ProjectManagement
 
   public static final String TEMPLATE_PATH = "projectmanagement/summary/projectManagementSummary.ftl";
   public static final int DISPLAY_ORDER = ProjectManagementSectionType.PROJECT_SUMMARY.getDisplayOrder();
-  public static final ProjectManagementPageSectionPosition POSITION = ProjectManagementPageSectionPosition.VERSION_CONTENT;
+  public static final ProjectManagementPageSectionType SECTION_TYPE = ProjectManagementPageSectionType.VERSION_CONTENT;
 
   private final ProjectSummaryViewService projectSummaryViewService;
 
@@ -39,7 +39,7 @@ public class ProjectManagementSummarySectionService implements ProjectManagement
         TEMPLATE_PATH,
         summaryModel,
         DISPLAY_ORDER,
-        POSITION
+        SECTION_TYPE
     );
   }
 }

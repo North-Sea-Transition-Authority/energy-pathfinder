@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagementPageSectionPosition;
+import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagementPageSectionType;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementSection;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementView;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
@@ -82,9 +82,9 @@ public class ProjectManagementViewServiceTest {
         projectOperator
     );
     when(projectManagementService.getSections(projectDetail, projectDetail, authenticatedUser)).thenReturn(List.of(
-        new ProjectManagementSection(sectionName1, Map.of("test", "1"), 1, ProjectManagementPageSectionPosition.STATIC_CONTENT),
-        new ProjectManagementSection(sectionName2, Map.of("test", "2"), 2, ProjectManagementPageSectionPosition.VERSION_CONTENT),
-        new ProjectManagementSection(sectionName3, Map.of("test", "3"), 3, ProjectManagementPageSectionPosition.VERSION_CONTENT)
+        new ProjectManagementSection(sectionName1, Map.of("test", "1"), 1, ProjectManagementPageSectionType.STATIC_CONTENT),
+        new ProjectManagementSection(sectionName2, Map.of("test", "2"), 2, ProjectManagementPageSectionType.VERSION_CONTENT),
+        new ProjectManagementSection(sectionName3, Map.of("test", "3"), 3, ProjectManagementPageSectionType.VERSION_CONTENT)
     ));
 
     when(templateRenderingService.render(any(), any(), anyBoolean())).thenReturn(stubRender);
