@@ -23,6 +23,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.integratedrig.IntegratedR
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.integratedrig.IntegratedRigRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -49,6 +50,9 @@ public class IntegratedRigServiceTest {
   @Mock
   private ProjectSetupService projectSetupService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private ProjectDetail projectDetail;
 
   @Before
@@ -59,7 +63,9 @@ public class IntegratedRigServiceTest {
         integratedRigRepository,
         searchSelectorService,
         validationService,
-        projectSetupService);
+        projectSetupService,
+        entityDuplicationService
+    );
 
     projectDetail = ProjectUtil.getProjectDetails();
 
@@ -296,5 +302,19 @@ public class IntegratedRigServiceTest {
   public void canShowInTaskList_false() {
     when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.INTEGRATED_RIGS)).thenReturn(false);
     assertThat(integratedRigService.canShowInTaskList(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void removeSectionData_verifyInteractions() {
+
+    final var integratedRig1 = IntegratedRigTestUtil.createIntegratedRig_withDevUkFacility();
+    final var integratedRig2 = IntegratedRigTestUtil.createIntegratedRig_withManualFacility();
+    final var integratedRigs = List.of(integratedRig1, integratedRig2);
+
+    when(integratedRigRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(integratedRigs);
+
+    integratedRigService.removeSectionData(projectDetail);
+
+    verify(integratedRigRepository, times(1)).deleteAll(integratedRigs);
   }
 }

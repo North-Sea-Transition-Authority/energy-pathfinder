@@ -17,6 +17,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.CollaborationOpportunityFileLinkRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.FileUpdateMode;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtil;
@@ -33,13 +34,17 @@ public class CollaborationOpportunityFileLinkServiceTest {
   @Mock
   private ProjectDetailFileService projectDetailFileService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService;
 
   @Before
   public void setup() {
     collaborationOpportunityFileLinkService = new CollaborationOpportunityFileLinkService(
         collaborationOpportunityFileLinkRepository,
-        projectDetailFileService
+        projectDetailFileService,
+        entityDuplicationService
     );
   }
 
@@ -159,6 +164,49 @@ public class CollaborationOpportunityFileLinkServiceTest {
         collaborationOpportunityFileLink1.getProjectDetailFile(),
         collaborationOpportunityFileLink2.getProjectDetailFile()
     ));
+  }
+
+  @Test
+  public void removeCollaborationOpportunityFileLinks_whenListOfOpportunitiesWithLinks_thenAllRemoved() {
+
+    var projectDetailFile1 = new ProjectDetailFile();
+    projectDetailFile1.setId(1);
+    final var collaborationOpportunity1 = CollaborationOpportunityTestUtil.getCollaborationOpportunity(
+        ProjectUtil.getProjectDetails()
+    );
+
+    final var collaborationOpportunityFileLink1 = CollaborationOpportunityTestUtil.createCollaborationOpportunityFileLink(
+        collaborationOpportunity1,
+        projectDetailFile1
+    );
+
+    when(collaborationOpportunityFileLinkRepository.findAllByCollaborationOpportunity(collaborationOpportunity1)).thenReturn(
+        List.of(collaborationOpportunityFileLink1)
+    );
+
+    var projectDetailFile2 = new ProjectDetailFile();
+    projectDetailFile1.setId(2);
+    final var collaborationOpportunity2 = CollaborationOpportunityTestUtil.getCollaborationOpportunity(
+        ProjectUtil.getProjectDetails()
+    );
+
+    final var collaborationOpportunityFileLink2 = CollaborationOpportunityTestUtil.createCollaborationOpportunityFileLink(
+        collaborationOpportunity2,
+        projectDetailFile2
+    );
+
+    when(collaborationOpportunityFileLinkRepository.findAllByCollaborationOpportunity(collaborationOpportunity2)).thenReturn(
+        List.of(collaborationOpportunityFileLink2)
+    );
+
+    collaborationOpportunityFileLinkService.removeCollaborationOpportunityFileLinks(
+        List.of(collaborationOpportunity1, collaborationOpportunity2)
+    );
+
+    verify(collaborationOpportunityFileLinkRepository, times(1)).deleteAll(List.of(collaborationOpportunityFileLink1));
+    verify(projectDetailFileService, times(1)).removeProjectDetailFiles(List.of(collaborationOpportunityFileLink1.getProjectDetailFile()));
+    verify(collaborationOpportunityFileLinkRepository, times(1)).deleteAll(List.of(collaborationOpportunityFileLink2));
+    verify(projectDetailFileService, times(1)).removeProjectDetailFiles(List.of(collaborationOpportunityFileLink2.getProjectDetailFile()));
   }
 
   @Test

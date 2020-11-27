@@ -15,6 +15,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.AwardedContractRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -37,6 +38,9 @@ public class AwardedContractServiceValidationTest {
   @Mock
   private ProjectSetupService projectSetupService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private AwardedContractService awardedContractService;
 
   @Before
@@ -53,7 +57,9 @@ public class AwardedContractServiceValidationTest {
         awardedContractRepository,
         awardedContractFormValidator,
         searchSelectorService,
-        projectSetupService);
+        projectSetupService,
+        entityDuplicationService
+    );
   }
 
   @Test

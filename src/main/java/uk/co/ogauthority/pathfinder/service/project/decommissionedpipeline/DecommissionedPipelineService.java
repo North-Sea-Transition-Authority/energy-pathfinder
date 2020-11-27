@@ -17,6 +17,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.De
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedpipeline.DecommissionedPipelineRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.pipeline.PipelineService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
@@ -30,18 +31,21 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
   private final DecommissionedPipelineFormValidator decommissionedPipelineFormValidator;
   private final ValidationService validationService;
   private final ProjectSetupService projectSetupService;
+  private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
   public DecommissionedPipelineService(PipelineService pipelineService,
                                        DecommissionedPipelineRepository decommissionedPipelineRepository,
                                        DecommissionedPipelineFormValidator decommissionedPipelineFormValidator,
                                        ValidationService validationService,
-                                       ProjectSetupService projectSetupService) {
+                                       ProjectSetupService projectSetupService,
+                                       EntityDuplicationService entityDuplicationService) {
     this.pipelineService = pipelineService;
     this.decommissionedPipelineRepository = decommissionedPipelineRepository;
     this.decommissionedPipelineFormValidator = decommissionedPipelineFormValidator;
     this.validationService = validationService;
     this.projectSetupService = projectSetupService;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
   public DecommissionedPipelineForm getForm(Integer decommissionedPipelineId, ProjectDetail projectDetail) {
@@ -161,5 +165,20 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
     return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.PIPELINES);
+  }
+
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    final var decommissionedPipelines = getDecommissionedPipelines(projectDetail);
+    decommissionedPipelineRepository.deleteAll(decommissionedPipelines);
+  }
+
+  @Override
+  public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
+    entityDuplicationService.duplicateEntitiesAndSetNewParent(
+        getDecommissionedPipelines(fromDetail),
+        toDetail,
+        DecommissionedPipeline.class
+    );
   }
 }

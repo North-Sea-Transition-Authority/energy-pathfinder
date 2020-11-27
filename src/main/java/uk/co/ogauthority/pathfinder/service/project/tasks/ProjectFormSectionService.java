@@ -16,4 +16,17 @@ public interface ProjectFormSectionService {
   default boolean canShowInTaskList(ProjectDetail detail) {
     return true;
   }
+
+  /**
+   * Method to remove all section data. This method will be called when
+   * submitting a project if the section associated is no longer an section
+   * on the task list.
+   * @param projectDetail the project detail to remove data from
+   */
+  default void removeSectionData(ProjectDetail projectDetail) {
+    // default is to not do anything. If appropriate consumers can
+    // implement and remove relevant data
+  }
+
+  void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail);
 }

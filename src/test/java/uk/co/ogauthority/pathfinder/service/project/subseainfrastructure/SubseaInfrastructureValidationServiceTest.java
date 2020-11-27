@@ -17,6 +17,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.SubseaInfrastructureFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.subseainfrastructure.SubseaInfrastructureRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -38,6 +39,9 @@ public class SubseaInfrastructureValidationServiceTest {
   @Mock
   private ProjectSetupService projectSetupService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private SubseaInfrastructureService subseaInfrastructureService;
 
   private ProjectDetail projectDetail;
@@ -54,7 +58,9 @@ public class SubseaInfrastructureValidationServiceTest {
         searchSelectorService,
         validationService,
         subseaInfrastructureFormValidator,
-        projectSetupService);
+        projectSetupService,
+        entityDuplicationService
+    );
 
     projectDetail = ProjectUtil.getProjectDetails();
   }

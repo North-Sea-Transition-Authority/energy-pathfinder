@@ -15,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
+import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
@@ -23,6 +24,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationV
 import uk.co.ogauthority.pathfinder.model.view.projectlocation.ProjectLocationBlockView;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -36,6 +38,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
   private final ValidationService validationService;
   private final ProjectLocationFormValidator projectLocationFormValidator;
   private final ProjectLocationBlocksService projectLocationBlocksService;
+  private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
   public ProjectLocationService(ProjectLocationRepository projectLocationRepository,
@@ -43,13 +46,15 @@ public class ProjectLocationService implements ProjectFormSectionService {
                                 SearchSelectorService searchSelectorService,
                                 ValidationService validationService,
                                 ProjectLocationFormValidator projectLocationFormValidator,
-                                ProjectLocationBlocksService projectLocationBlocksService) {
+                                ProjectLocationBlocksService projectLocationBlocksService,
+                                EntityDuplicationService entityDuplicationService) {
     this.projectLocationRepository = projectLocationRepository;
     this.fieldService = fieldService;
     this.searchSelectorService = searchSelectorService;
     this.validationService = validationService;
     this.projectLocationFormValidator = projectLocationFormValidator;
     this.projectLocationBlocksService = projectLocationBlocksService;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
   @Transactional
@@ -244,6 +249,29 @@ public class ProjectLocationService implements ProjectFormSectionService {
     BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult = validate(form, bindingResult, ValidationType.FULL);
     return !bindingResult.hasErrors();
+  }
+
+  @Override
+  public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
+
+    final var fromLocation = getOrError(fromDetail);
+
+    // duplicate ProjectLocation entity and reparent to toDetail
+    final var toLocation = entityDuplicationService.duplicateEntityAndSetNewParent(
+        fromLocation,
+        toDetail,
+        ProjectLocation.class
+    );
+
+    final var blocksLinkedToFromLocation =  projectLocationBlocksService.getBlocks(fromLocation);
+
+    // duplicate the ProjectLocationBlock entities linked to the fromLocation and reparent to toLocation
+    entityDuplicationService.duplicateEntitiesAndSetNewParent(
+        blocksLinkedToFromLocation,
+        toLocation,
+        ProjectLocationBlock.class
+    );
+
   }
 
 }

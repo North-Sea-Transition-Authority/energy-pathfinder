@@ -9,33 +9,31 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.SubmitProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSubmissionSummaryViewService;
-import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryViewService;
-import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
 @RequestMapping("/project/{projectId}/submit")
 public class SubmitProjectController {
+
   public static final String PAGE_NAME = "Review and submit";
 
-  private final ProjectSummaryViewService projectSummaryViewService;
   private final SubmitProjectService submitProjectService;
   private final ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService;
 
   @Autowired
-  public SubmitProjectController(ProjectSummaryViewService projectSummaryViewService,
-                                 SubmitProjectService submitProjectService,
+  public SubmitProjectController(SubmitProjectService submitProjectService,
                                  ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService) {
-    this.projectSummaryViewService = projectSummaryViewService;
     this.submitProjectService = submitProjectService;
     this.projectSubmissionSummaryViewService = projectSubmissionSummaryViewService;
   }
@@ -43,22 +41,19 @@ public class SubmitProjectController {
   @GetMapping
   public ModelAndView getProjectSummary(@PathVariable("projectId") Integer projectId,
                                         ProjectContext projectContext) {
-    var modelAndView = new ModelAndView("project/summary/reviewAndSubmit");
-    var projectSummaryView = projectSummaryViewService.getProjectSummaryView(projectContext.getProjectDetails());
-
-    modelAndView
-        .addObject("projectSummaryView", projectSummaryView)
-        .addObject("submitProjectUrl", ReverseRouter.route(on(SubmitProjectController.class).submitProject(projectId, null)))
-        .addObject("taskListUrl", ControllerUtils.getBackToTaskListUrl(projectId));
-
-    return modelAndView;
+    return submitProjectService.getProjectSubmitSummaryModelAndView(projectContext.getProjectDetails());
   }
 
   @PostMapping
   public ModelAndView submitProject(@PathVariable("projectId") Integer projectId,
                                     ProjectContext projectContext) {
-    submitProjectService.submitProject(projectContext.getProjectDetails(), projectContext.getUserAccount());
-    return ReverseRouter.redirect(on(SubmitProjectController.class).submitProjectConfirmation(projectId, null));
+
+    final var projectDetail = projectContext.getProjectDetails();
+    final var isProjectValid = submitProjectService.isProjectValid(projectDetail);
+
+    return isProjectValid
+        ? submitProjectAndRedirectToConfirmation(projectDetail, projectContext.getUserAccount())
+        : submitProjectService.getProjectSubmitSummaryModelAndViewWithSubmissionError(projectDetail);
   }
 
   @GetMapping("/confirmation")
@@ -75,5 +70,12 @@ public class SubmitProjectController {
         .addObject("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)));
 
     return modelAndView;
+  }
+
+  private ModelAndView submitProjectAndRedirectToConfirmation(ProjectDetail projectDetail,
+                                                              AuthenticatedUserAccount userAccount) {
+    submitProjectService.submitProject(projectDetail, userAccount);
+    final var projectId = projectDetail.getProject().getId();
+    return ReverseRouter.redirect(on(SubmitProjectController.class).submitProjectConfirmation(projectId, null));
   }
 }

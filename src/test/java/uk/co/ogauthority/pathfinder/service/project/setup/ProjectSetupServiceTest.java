@@ -23,6 +23,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupForm;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.tasks.ProjectTaskListSetupRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectTaskListSetupTestUtil;
@@ -43,6 +44,9 @@ public class ProjectSetupServiceTest {
   @Mock
   private ValidationService validationService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private ProjectSetupService projectSetupService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -52,12 +56,13 @@ public class ProjectSetupServiceTest {
   private final ProjectTaskListSetup decomSetup = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_decomSections(details);
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     projectSetupService = new ProjectSetupService(
         projectTaskListSetupRepository,
         projectInformationService,
         projectSetupFormValidator,
-        validationService
+        validationService,
+        entityDuplicationService
     );
 
     when(projectTaskListSetupRepository.save(any(ProjectTaskListSetup.class)))

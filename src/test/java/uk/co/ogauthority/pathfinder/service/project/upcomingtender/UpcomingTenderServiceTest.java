@@ -26,6 +26,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTe
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
@@ -57,11 +58,14 @@ public class UpcomingTenderServiceTest {
   @Mock
   private ProjectSetupService projectSetupService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private UpcomingTenderService upcomingTenderService;
 
-  private final ProjectDetail details = ProjectUtil.getProjectDetails();
+  private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
-  private final UpcomingTender upcomingTender = UpcomingTenderUtil.getUpcomingTender(details);
+  private final UpcomingTender upcomingTender = UpcomingTenderUtil.getUpcomingTender(detail);
 
   private final AuthenticatedUserAccount authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount();
 
@@ -79,7 +83,9 @@ public class UpcomingTenderServiceTest {
         searchSelectorService,
         projectDetailFileService,
         upcomingTenderFileLinkService,
-        projectSetupService);
+        projectSetupService,
+        entityDuplicationService
+    );
 
     when(upcomingTenderRepository.save(any(UpcomingTender.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
@@ -90,11 +96,11 @@ public class UpcomingTenderServiceTest {
   public void createUpcomingTender() {
     var form = UpcomingTenderUtil.getCompleteForm();
     var newUpcomingTender = upcomingTenderService.createUpcomingTender(
-        details,
+        detail,
         form,
         authenticatedUserAccount
     );
-    assertThat(newUpcomingTender.getProjectDetail()).isEqualTo(details);
+    assertThat(newUpcomingTender.getProjectDetail()).isEqualTo(detail);
     assertThat(newUpcomingTender.getTenderFunction()).isEqualTo(UpcomingTenderUtil.TENDER_FUNCTION);
     checkCommonFields(form, newUpcomingTender);
   }
@@ -103,11 +109,11 @@ public class UpcomingTenderServiceTest {
   public void createUpcomingTender_manualFunction() {
     var form = UpcomingTenderUtil.getCompletedForm_manualEntry();
     var newUpcomingTender = upcomingTenderService.createUpcomingTender(
-        details,
+        detail,
         form,
         authenticatedUserAccount
     );
-    assertThat(newUpcomingTender.getProjectDetail()).isEqualTo(details);
+    assertThat(newUpcomingTender.getProjectDetail()).isEqualTo(detail);
     checkCommonFields(form, newUpcomingTender);
   }
 
@@ -121,7 +127,7 @@ public class UpcomingTenderServiceTest {
         form,
         authenticatedUserAccount
     );
-    assertThat(existingUpcomingTender.getProjectDetail()).isEqualTo(details);
+    assertThat(existingUpcomingTender.getProjectDetail()).isEqualTo(detail);
     assertThat(existingUpcomingTender.getTenderFunction()).isEqualTo(Function.DRILLING);
     checkCommonFields(form, existingUpcomingTender);
   }
@@ -133,7 +139,7 @@ public class UpcomingTenderServiceTest {
     form.setTenderFunction(UpcomingTenderUtil.MANUAL_TENDER_FUNCTION);
     var existingUpcomingTender = upcomingTender;
     upcomingTenderService.updateUpcomingTender(existingUpcomingTender, form, authenticatedUserAccount);
-    assertThat(existingUpcomingTender.getProjectDetail()).isEqualTo(details);
+    assertThat(existingUpcomingTender.getProjectDetail()).isEqualTo(detail);
     assertThat(existingUpcomingTender.getManualTenderFunction()).isEqualTo(SearchSelectorService.removePrefix(UpcomingTenderUtil.MANUAL_TENDER_FUNCTION));
     checkCommonFields(form, existingUpcomingTender);
   }
@@ -147,7 +153,7 @@ public class UpcomingTenderServiceTest {
 
   @Test
   public void getForm_manualEntry() {
-    var manualEntryTender = UpcomingTenderUtil.getUpcomingTender_manualEntry(details);
+    var manualEntryTender = UpcomingTenderUtil.getUpcomingTender_manualEntry(detail);
     var form = upcomingTenderService.getForm(manualEntryTender);
     assertThat(form.getTenderFunction()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(manualEntryTender.getManualTenderFunction()));
     checkCommonFormFields(form, upcomingTender);
@@ -286,13 +292,28 @@ public class UpcomingTenderServiceTest {
 
   @Test
   public void canShowInTaskList_true() {
-    when(projectSetupService.taskSelectedForProjectDetail(details, ProjectTask.UPCOMING_TENDERS)).thenReturn(true);
-    assertThat(upcomingTenderService.canShowInTaskList(details)).isTrue();
+    when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(true);
+    assertThat(upcomingTenderService.canShowInTaskList(detail)).isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
-    when(projectSetupService.taskSelectedForProjectDetail(details, ProjectTask.UPCOMING_TENDERS)).thenReturn(false);
-    assertThat(upcomingTenderService.canShowInTaskList(details)).isFalse();
+    when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(false);
+    assertThat(upcomingTenderService.canShowInTaskList(detail)).isFalse();
+  }
+
+  @Test
+  public void removeSectionData_verifyInteractions() {
+
+    final var upcomingTender1 = UpcomingTenderUtil.getUpcomingTender(detail);
+    final var upcomingTender2 = UpcomingTenderUtil.getUpcomingTender(detail);
+    final var upcomingTenders = List.of(upcomingTender1, upcomingTender2);
+
+    when(upcomingTenderRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(upcomingTenders);
+
+    upcomingTenderService.removeSectionData(detail);
+
+    verify(upcomingTenderFileLinkService, times(1)).removeUpcomingTenderFileLinks(upcomingTenders);
+    verify(upcomingTenderRepository, times(1)).deleteAll(upcomingTenders);
   }
 }

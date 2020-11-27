@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedCo
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.AwardedContractRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
@@ -36,6 +37,7 @@ public class AwardedContractService implements ProjectFormSectionService {
   private final AwardedContractFormValidator awardedContractFormValidator;
   private final SearchSelectorService searchSelectorService;
   private final ProjectSetupService projectSetupService;
+  private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
   public AwardedContractService(FunctionService functionService,
@@ -43,13 +45,15 @@ public class AwardedContractService implements ProjectFormSectionService {
                                 AwardedContractRepository awardedContractRepository,
                                 AwardedContractFormValidator awardedContractFormValidator,
                                 SearchSelectorService searchSelectorService,
-                                ProjectSetupService projectSetupService) {
+                                ProjectSetupService projectSetupService,
+                                EntityDuplicationService entityDuplicationService) {
     this.functionService = functionService;
     this.validationService = validationService;
     this.awardedContractRepository = awardedContractRepository;
     this.awardedContractFormValidator = awardedContractFormValidator;
     this.searchSelectorService = searchSelectorService;
     this.projectSetupService = projectSetupService;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
   public AwardedContractForm getForm(Integer awardedContractId, ProjectDetail projectDetail) {
@@ -178,6 +182,21 @@ public class AwardedContractService implements ProjectFormSectionService {
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
     return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS);
+  }
+
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    final var awardedContracts = getAwardedContracts(projectDetail);
+    awardedContractRepository.deleteAll(awardedContracts);
+  }
+
+  @Override
+  public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
+    entityDuplicationService.duplicateEntitiesAndSetNewParent(
+        getAwardedContracts(fromDetail),
+        toDetail,
+        AwardedContract.class
+    );
   }
 
 }

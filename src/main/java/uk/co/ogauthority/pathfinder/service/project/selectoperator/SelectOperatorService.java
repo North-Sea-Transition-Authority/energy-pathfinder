@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.enums.TopNavigationType;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -32,17 +33,20 @@ public class SelectOperatorService implements ProjectFormSectionService {
   private final ValidationService validationService;
   private final SearchSelectorService searchSelectorService;
   private final ProjectOperatorService projectOperatorService;
+  private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
   public SelectOperatorService(
       PortalOrganisationAccessor portalOrganisationAccessor,
       ValidationService validationService,
       SearchSelectorService searchSelectorService,
-      ProjectOperatorService projectOperatorService) {
+      ProjectOperatorService projectOperatorService,
+      EntityDuplicationService entityDuplicationService) {
     this.portalOrganisationAccessor = portalOrganisationAccessor;
     this.validationService = validationService;
     this.searchSelectorService = searchSelectorService;
     this.projectOperatorService = projectOperatorService;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
   /**
@@ -152,5 +156,14 @@ public class SelectOperatorService implements ProjectFormSectionService {
     BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult = validate(form, bindingResult);
     return !bindingResult.hasErrors();
+  }
+
+  @Override
+  public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
+    entityDuplicationService.duplicateEntityAndSetNewParent(
+        getProjectOperatorOrError(fromDetail),
+        toDetail,
+        ProjectOperator.class
+    );
   }
 }

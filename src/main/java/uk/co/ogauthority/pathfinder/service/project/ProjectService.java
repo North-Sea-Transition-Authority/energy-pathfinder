@@ -3,7 +3,9 @@ package uk.co.ogauthority.pathfinder.service.project;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 
 /**
@@ -22,10 +24,26 @@ public class ProjectService {
   /**
    * Get the current projectDetail for a given projectId.
    * @param projectId the id of the Project associated with the detail
-   * @return
+   * @return an optional of the latest ProjectDetail for the provided projectId
    */
   public Optional<ProjectDetail> getLatestDetail(Integer projectId) {
     return projectDetailsRepository.findByProjectIdAndIsCurrentVersionIsTrue(projectId);
+  }
+
+  public ProjectDetail createNewProjectDetailVersion(ProjectDetail fromDetail, AuthenticatedUserAccount userAccount) {
+
+    fromDetail.setIsCurrentVersion(false);
+
+    final var newProjectDetail = new ProjectDetail(
+        fromDetail.getProject(),
+        ProjectStatus.DRAFT,
+        userAccount.getWuaId(),
+        fromDetail.getVersion() + 1,
+        true
+    );
+
+    projectDetailsRepository.save(fromDetail);
+    return projectDetailsRepository.save(newProjectDetail);
   }
 
 }

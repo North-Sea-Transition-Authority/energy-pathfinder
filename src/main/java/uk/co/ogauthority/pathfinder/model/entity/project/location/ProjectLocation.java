@@ -13,10 +13,11 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
 import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
+import uk.co.ogauthority.pathfinder.service.entityduplication.ParentEntity;
 
 @Entity
 @Table(name = "project_locations")
-public class ProjectLocation extends ProjectDetailEntity {
+public class ProjectLocation extends ProjectDetailEntity implements ParentEntity {
 
   @ManyToOne
   @JoinColumn(name = "field_id")

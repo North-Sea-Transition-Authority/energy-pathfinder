@@ -29,6 +29,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.vali
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.validation.subseastructure.SubseaStructurePartialValidation;
 import uk.co.ogauthority.pathfinder.repository.project.subseainfrastructure.SubseaInfrastructureRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -44,6 +45,7 @@ public class SubseaInfrastructureService implements ProjectFormSectionService {
   private final ValidationService validationService;
   private final SubseaInfrastructureFormValidator subseaInfrastructureFormValidator;
   private final ProjectSetupService projectSetupService;
+  private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
   public SubseaInfrastructureService(DevUkFacilitiesService devUkFacilitiesService,
@@ -51,13 +53,15 @@ public class SubseaInfrastructureService implements ProjectFormSectionService {
                                      SearchSelectorService searchSelectorService,
                                      ValidationService validationService,
                                      SubseaInfrastructureFormValidator subseaInfrastructureFormValidator,
-                                     ProjectSetupService projectSetupService) {
+                                     ProjectSetupService projectSetupService,
+                                     EntityDuplicationService entityDuplicationService) {
     this.devUkFacilitiesService = devUkFacilitiesService;
     this.subseaInfrastructureRepository = subseaInfrastructureRepository;
     this.searchSelectorService = searchSelectorService;
     this.validationService = validationService;
     this.subseaInfrastructureFormValidator = subseaInfrastructureFormValidator;
     this.projectSetupService = projectSetupService;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
   public SubseaInfrastructureForm getForm(Integer subseaInfrastructureId, ProjectDetail projectDetail) {
@@ -336,5 +340,20 @@ public class SubseaInfrastructureService implements ProjectFormSectionService {
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
     return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.SUBSEA_INFRASTRUCTURE);
+  }
+
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    final var subseaInfrastructures = getSubseaInfrastructures(projectDetail);
+    subseaInfrastructureRepository.deleteAll(subseaInfrastructures);
+  }
+
+  @Override
+  public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
+    entityDuplicationService.duplicateEntitiesAndSetNewParent(
+        getSubseaInfrastructures(fromDetail),
+        toDetail,
+        SubseaInfrastructure.class
+    );
   }
 }

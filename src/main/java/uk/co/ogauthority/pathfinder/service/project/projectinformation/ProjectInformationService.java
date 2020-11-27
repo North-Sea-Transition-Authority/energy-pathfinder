@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.Projec
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
@@ -34,14 +35,17 @@ public class ProjectInformationService implements ProjectFormSectionService {
   private final ProjectInformationRepository projectInformationRepository;
   private final ValidationService validationService;
   private final ProjectInformationFormValidator projectInformationFormValidator;
+  private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
   public ProjectInformationService(ProjectInformationRepository projectInformationRepository,
                                    ValidationService validationService,
-                                   ProjectInformationFormValidator projectInformationFormValidator) {
+                                   ProjectInformationFormValidator projectInformationFormValidator,
+                                   EntityDuplicationService entityDuplicationService) {
     this.projectInformationRepository = projectInformationRepository;
     this.validationService = validationService;
     this.projectInformationFormValidator = projectInformationFormValidator;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
   @Transactional
@@ -230,4 +234,12 @@ public class ProjectInformationService implements ProjectFormSectionService {
     return !bindingResult.hasErrors();
   }
 
+  @Override
+  public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
+    entityDuplicationService.duplicateEntityAndSetNewParent(
+        getProjectInformationOrError(fromDetail),
+        toDetail,
+        ProjectInformation.class
+    );
+  }
 }

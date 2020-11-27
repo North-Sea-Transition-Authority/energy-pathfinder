@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +28,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.decommissionedwell.Decomm
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedwell.DecommissionedWellFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedwell.DecommissionedWellRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -52,6 +54,9 @@ public class DecommissionedWellServiceTest {
   @Mock
   private ProjectSetupService projectSetupService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private DecommissionedWellService decommissionedWellService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -64,7 +69,9 @@ public class DecommissionedWellServiceTest {
         validationService,
         decommissionedWellFormValidator,
         decommissionedWellRepository,
-        projectSetupService);
+        projectSetupService,
+        entityDuplicationService
+    );
 
     when(decommissionedWellRepository.save(any(DecommissionedWell.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
   }
@@ -500,6 +507,47 @@ public class DecommissionedWellServiceTest {
   public void canShowInTaskList_false() {
     when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.WELLS)).thenReturn(false);
     assertThat(decommissionedWellService.canShowInTaskList(detail)).isFalse();
+  }
+
+  @Test
+  public void getDecommissionedWellsForProjectDetail_whenResults_thenReturnPopulatedList() {
+
+    final var decommissionedWell1 = DecommissionedWellTestUtil.createDecommissionedWell();
+    final var decommissionedWell2 = DecommissionedWellTestUtil.createDecommissionedWell();
+    final var decommissionedWells = List.of(decommissionedWell1, decommissionedWell2);
+
+    when(decommissionedWellRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(decommissionedWells);
+
+    final var result = decommissionedWellService.getDecommissionedWellsForProjectDetail(detail);
+
+    assertThat(result).containsExactly(
+        decommissionedWell1,
+        decommissionedWell2
+    );
+  }
+
+  @Test
+  public void getDecommissionedWellsForProjectDetail_whenNoResults_thenReturnEmptyList() {
+
+    when(decommissionedWellRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(List.of());
+
+    final var result = decommissionedWellService.getDecommissionedWellsForProjectDetail(detail);
+
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void removeSectionData_verifyInteractions() {
+
+    final var decommissionedWell1 = DecommissionedWellTestUtil.createDecommissionedWell();
+    final var decommissionedWell2 = DecommissionedWellTestUtil.createDecommissionedWell();
+    final var decommissionedWells = List.of(decommissionedWell1, decommissionedWell2);
+
+    when(decommissionedWellRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(decommissionedWells);
+
+    decommissionedWellService.removeSectionData(detail);
+
+    verify(decommissionedWellRepository, times(1)).deleteAll(decommissionedWells);
   }
 
 }

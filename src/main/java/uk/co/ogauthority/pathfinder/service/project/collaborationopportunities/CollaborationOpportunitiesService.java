@@ -26,6 +26,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.CollaborationOpportunitiesRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
@@ -45,6 +46,7 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
   private final CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService;
   private final ProjectDetailFileService projectDetailFileService;
   private final ProjectSetupService projectSetupService;
+  private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
   public CollaborationOpportunitiesService(SearchSelectorService searchSelectorService,
@@ -54,7 +56,8 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
                                            CollaborationOpportunitiesRepository collaborationOpportunitiesRepository,
                                            CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService,
                                            ProjectDetailFileService projectDetailFileService,
-                                           ProjectSetupService projectSetupService) {
+                                           ProjectSetupService projectSetupService,
+                                           EntityDuplicationService entityDuplicationService) {
     this.searchSelectorService = searchSelectorService;
     this.functionService = functionService;
     this.validationService = validationService;
@@ -63,6 +66,7 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
     this.collaborationOpportunityFileLinkService = collaborationOpportunityFileLinkService;
     this.projectDetailFileService = projectDetailFileService;
     this.projectSetupService = projectSetupService;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
 
@@ -227,5 +231,32 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
     return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES);
+  }
+
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    final var collaborationOpportunities = getOpportunitiesForDetail(projectDetail);
+    collaborationOpportunityFileLinkService.removeCollaborationOpportunityFileLinks(collaborationOpportunities);
+    collaborationOpportunitiesRepository.deleteAll(collaborationOpportunities);
+  }
+
+  @Override
+  public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
+
+    final var duplicatedOpportunityEntities = entityDuplicationService.duplicateEntitiesAndSetNewParent(
+        getOpportunitiesForDetail(fromDetail),
+        toDetail,
+        CollaborationOpportunity.class
+    );
+
+    final var duplicatedOpportunityEntityMap = entityDuplicationService.createDuplicatedEntityPairingMap(
+        duplicatedOpportunityEntities
+    );
+
+    collaborationOpportunityFileLinkService.copyCollaborationOpportunityFileLinkData(
+        fromDetail,
+        toDetail,
+        duplicatedOpportunityEntityMap
+    );
   }
 }

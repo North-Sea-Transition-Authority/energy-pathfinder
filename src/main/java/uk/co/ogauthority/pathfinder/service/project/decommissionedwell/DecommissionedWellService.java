@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.decommissionedwell.Decomm
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedwell.DecommissionedWellFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedwell.DecommissionedWellValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedwell.DecommissionedWellRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -34,17 +35,20 @@ public class DecommissionedWellService implements ProjectFormSectionService {
   private final DecommissionedWellFormValidator decommissionedWellFormValidator;
   private final DecommissionedWellRepository decommissionedWellRepository;
   private final ProjectSetupService projectSetupService;
+  private final EntityDuplicationService entityDuplicationService;
 
   public DecommissionedWellService(SearchSelectorService searchSelectorService,
                                    ValidationService validationService,
                                    DecommissionedWellFormValidator decommissionedWellFormValidator,
                                    DecommissionedWellRepository decommissionedWellRepository,
-                                   ProjectSetupService projectSetupService) {
+                                   ProjectSetupService projectSetupService,
+                                   EntityDuplicationService entityDuplicationService) {
     this.searchSelectorService = searchSelectorService;
     this.validationService = validationService;
     this.decommissionedWellFormValidator = decommissionedWellFormValidator;
     this.decommissionedWellRepository = decommissionedWellRepository;
     this.projectSetupService = projectSetupService;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
   public List<RestSearchItem> findTypesLikeWithManualEntry(String searchTerm) {
@@ -194,6 +198,10 @@ public class DecommissionedWellService implements ProjectFormSectionService {
         ));
   }
 
+  public List<DecommissionedWell> getDecommissionedWellsForProjectDetail(ProjectDetail projectDetail) {
+    return decommissionedWellRepository.findByProjectDetailOrderByIdAsc(projectDetail);
+  }
+
   @Override
   public boolean isComplete(ProjectDetail detail) {
     return false;
@@ -202,5 +210,20 @@ public class DecommissionedWellService implements ProjectFormSectionService {
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
     return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.WELLS);
+  }
+
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    final var decommissionedWells = getDecommissionedWellsForProjectDetail(projectDetail);
+    decommissionedWellRepository.deleteAll(decommissionedWells);
+  }
+
+  @Override
+  public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
+    entityDuplicationService.duplicateEntitiesAndSetNewParent(
+        getDecommissionedWellsForProjectDetail(fromDetail),
+        toDetail,
+        DecommissionedWell.class
+    );
   }
 }

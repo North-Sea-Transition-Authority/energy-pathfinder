@@ -57,7 +57,7 @@ public class AwardedContractTestUtil {
 
   public static AwardedContract createAwardedContract() {
     return createAwardedContract(
-      ProjectUtil.getProjectDetails(),
+        ProjectUtil.getProjectDetails(),
         CONTRACTOR_NAME,
         CONTRACT_FUNCTION,
         null,

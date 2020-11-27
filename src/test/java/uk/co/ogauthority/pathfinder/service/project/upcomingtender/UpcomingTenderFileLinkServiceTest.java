@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderFileLinkRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.FileUpdateMode;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -35,13 +36,17 @@ public class UpcomingTenderFileLinkServiceTest {
   @Mock
   private ProjectDetailFileService projectDetailFileService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private UpcomingTenderFileLinkService upcomingTenderFileLinkService;
 
   @Before
   public void setup() {
     upcomingTenderFileLinkService = new UpcomingTenderFileLinkService(
         upcomingTenderFileLinkRepository,
-        projectDetailFileService
+        projectDetailFileService,
+        entityDuplicationService
     );
   }
 
@@ -184,5 +189,44 @@ public class UpcomingTenderFileLinkServiceTest {
     var fileViews = upcomingTenderFileLinkService.getFileUploadViewsLinkedToUpcomingTender(upcomingTender);
 
     assertThat(fileViews).isEmpty();
+  }
+
+  @Test
+  public void removeUpcomingTenderFileLinks_whenListOfTendersWithLinks_thenAllRemoved() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+
+    var projectDetailFile1 = new ProjectDetailFile();
+    projectDetailFile1.setId(1);
+
+    final var upcomingTender1 = UpcomingTenderUtil.getUpcomingTender(projectDetail);
+    final var upcomingTenderFileLink1 = UpcomingTenderFileLinkUtil.createUpcomingTenderFileLink(
+        upcomingTender1,
+        projectDetailFile1
+    );
+
+    when(upcomingTenderFileLinkRepository.findAllByUpcomingTender(upcomingTender1)).thenReturn(
+        List.of(upcomingTenderFileLink1)
+    );
+
+    var projectDetailFile2 = new ProjectDetailFile();
+    projectDetailFile1.setId(2);
+
+    final var upcomingTender2 = UpcomingTenderUtil.getUpcomingTender(projectDetail);
+    final var upcomingTenderFileLink2 = UpcomingTenderFileLinkUtil.createUpcomingTenderFileLink(
+        upcomingTender2,
+        projectDetailFile2
+    );
+
+    when(upcomingTenderFileLinkRepository.findAllByUpcomingTender(upcomingTender2)).thenReturn(
+        List.of(upcomingTenderFileLink2)
+    );
+
+    upcomingTenderFileLinkService.removeUpcomingTenderFileLinks(List.of(upcomingTender1, upcomingTender2));
+
+    verify(upcomingTenderFileLinkRepository, times(1)).deleteAll(List.of(upcomingTenderFileLink1));
+    verify(projectDetailFileService, times(1)).removeProjectDetailFiles(List.of(upcomingTenderFileLink1.getProjectDetailFile()));
+    verify(upcomingTenderFileLinkRepository, times(1)).deleteAll(List.of(upcomingTenderFileLink2));
+    verify(projectDetailFileService, times(1)).removeProjectDetailFiles(List.of(upcomingTenderFileLink2.getProjectDetailFile()));
   }
 }

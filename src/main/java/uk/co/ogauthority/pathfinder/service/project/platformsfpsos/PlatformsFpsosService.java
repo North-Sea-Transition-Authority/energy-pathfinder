@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFp
 import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFpsoValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.platformsfpsos.PlatformFpsoRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -35,6 +36,7 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
   private final PlatformFpsoFormValidator platformFpsoFormValidator;
   private final ValidationService validationService;
   private final ProjectSetupService projectSetupService;
+  private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
   public PlatformsFpsosService(
@@ -42,13 +44,16 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
       DevUkFacilitiesService devUkFacilitiesService,
       SearchSelectorService searchSelectorService,
       PlatformFpsoFormValidator platformFpsoFormValidator,
-      ValidationService validationService, ProjectSetupService projectSetupService) {
+      ValidationService validationService,
+      ProjectSetupService projectSetupService,
+      EntityDuplicationService entityDuplicationService) {
     this.platformFpsoRepository = platformFpsoRepository;
     this.devUkFacilitiesService = devUkFacilitiesService;
     this.searchSelectorService = searchSelectorService;
     this.platformFpsoFormValidator = platformFpsoFormValidator;
     this.validationService = validationService;
     this.projectSetupService = projectSetupService;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
   @Transactional
@@ -180,5 +185,20 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
     return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.PLATFORM_FPSO);
+  }
+
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    final var platformFpsos = getPlatformsFpsosForDetail(projectDetail);
+    platformFpsoRepository.deleteAll(platformFpsos);
+  }
+
+  @Override
+  public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
+    entityDuplicationService.duplicateEntitiesAndSetNewParent(
+        getPlatformsFpsosForDetail(fromDetail),
+        toDetail,
+        PlatformFpso.class
+    );
   }
 }

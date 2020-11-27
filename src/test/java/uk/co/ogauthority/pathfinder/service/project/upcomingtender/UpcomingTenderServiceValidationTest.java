@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
@@ -54,6 +55,9 @@ public class UpcomingTenderServiceValidationTest {
   @Mock
   private ProjectSetupService projectSetupService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private UpcomingTenderService upcomingTenderService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -70,7 +74,9 @@ public class UpcomingTenderServiceValidationTest {
         searchSelectorService,
         projectDetailFileService,
         upcomingTenderFileLinkService,
-        projectSetupService);
+        projectSetupService,
+        entityDuplicationService
+    );
   }
 
   @Test

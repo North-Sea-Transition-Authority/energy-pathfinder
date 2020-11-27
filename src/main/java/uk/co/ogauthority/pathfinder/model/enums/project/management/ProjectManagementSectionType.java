@@ -4,7 +4,8 @@ public enum ProjectManagementSectionType {
 
   PROJECT_DETAILS(10),
   ACTIONS(20),
-  PROJECT_SUMMARY(30);
+  PROJECT_ASSESSMENT(30),
+  PROJECT_SUMMARY(40);
 
   private final int displayOrder;
 

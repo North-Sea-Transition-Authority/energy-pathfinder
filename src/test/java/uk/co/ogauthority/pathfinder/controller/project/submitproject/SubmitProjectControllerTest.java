@@ -88,7 +88,10 @@ public class SubmitProjectControllerTest extends ProjectContextAbstractControlle
   }
 
   @Test
-  public void submitProject_whenAuthenticated_thenAccess() throws Exception {
+  public void submitProject_whenAuthenticatedAndProjectValid_thenAccess() throws Exception {
+
+    when(submitProjectService.isProjectValid(any())).thenReturn(true);
+
     mockMvc.perform(post(ReverseRouter.route(
         on(SubmitProjectController.class).submitProject(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser))
@@ -96,6 +99,20 @@ public class SubmitProjectControllerTest extends ProjectContextAbstractControlle
         .andExpect(status().is3xxRedirection());
 
     verify(submitProjectService, times(1)).submitProject(any(), any());
+  }
+
+  @Test
+  public void submitProject_whenAuthenticatedAndProjectInvalid_thenSubmitNotCalled() throws Exception {
+
+    when(submitProjectService.isProjectValid(any())).thenReturn(false);
+
+    mockMvc.perform(post(ReverseRouter.route(
+        on(SubmitProjectController.class).submitProject(PROJECT_ID, null)))
+        .with(authenticatedUserAndSession(authenticatedUser))
+        .with(csrf()))
+        .andExpect(status().isOk());
+
+    verify(submitProjectService, times(0)).submitProject(any(), any());
   }
 
   @Test

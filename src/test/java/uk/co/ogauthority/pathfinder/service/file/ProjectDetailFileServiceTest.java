@@ -32,6 +32,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.repository.file.ProjectDetailFileRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -44,6 +45,9 @@ public class ProjectDetailFileServiceTest {
 
   @Mock
   private FileUploadService fileUploadService;
+
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
 
   @Captor
   private ArgumentCaptor<ProjectDetailFile> projectDetailFileArgumentCaptor;
@@ -70,7 +74,11 @@ public class ProjectDetailFileServiceTest {
   @Before
   public void setUp() {
 
-    projectDetailFileService = new ProjectDetailFileService(fileUploadService, projectDetailFileRepository);
+    projectDetailFileService = new ProjectDetailFileService(
+        fileUploadService,
+        projectDetailFileRepository,
+        entityDuplicationService
+    );
 
     projectDetail = ProjectUtil.getProjectDetails();
     file = new ProjectDetailFile();

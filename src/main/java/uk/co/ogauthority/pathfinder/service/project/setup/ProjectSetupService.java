@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.tasks.ProjectTaskListSetup;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -22,6 +23,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupForm;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupFormValidationHint;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.tasks.ProjectTaskListSetupRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -38,16 +40,19 @@ public class ProjectSetupService implements ProjectFormSectionService {
   private final ProjectInformationService projectInformationService;
   private final ProjectSetupFormValidator projectSetupFormValidator;
   private final ValidationService validationService;
+  private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
   public ProjectSetupService(ProjectTaskListSetupRepository projectTaskListSetupRepository,
                              ProjectInformationService projectInformationService,
                              ProjectSetupFormValidator projectSetupFormValidator,
-                             ValidationService validationService) {
+                             ValidationService validationService,
+                             EntityDuplicationService entityDuplicationService) {
     this.projectTaskListSetupRepository = projectTaskListSetupRepository;
     this.projectInformationService = projectInformationService;
     this.projectSetupFormValidator = projectSetupFormValidator;
     this.validationService = validationService;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
   public List<TaskListSectionQuestion> getSectionQuestionsForProjectDetail(ProjectDetail detail) {
@@ -70,6 +75,14 @@ public class ProjectSetupService implements ProjectFormSectionService {
     taskListSetup.setTaskListAnswers(getTaskListSectionAnswersFromForm(form));
     taskListSetup.setTaskListSections(getTaskListSectionQuestionsFromForm(form));
     return projectTaskListSetupRepository.save(taskListSetup);
+  }
+
+  private ProjectTaskListSetup getProjectTaskListSetupOrError(ProjectDetail projectDetail) {
+    return getProjectTaskListSetup(projectDetail).orElseThrow(
+        () -> new PathfinderEntityNotFoundException(
+            String.format("Could not find ProjectTaskListSetup for ProjectDetail with ID %d", projectDetail.getId())
+        )
+    );
   }
 
   public Optional<ProjectTaskListSetup> getProjectTaskListSetup(ProjectDetail detail) {
@@ -214,6 +227,15 @@ public class ProjectSetupService implements ProjectFormSectionService {
     BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult = validate(form, bindingResult, ValidationType.FULL, details);
     return !bindingResult.hasErrors();
+  }
+
+  @Override
+  public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
+    entityDuplicationService.duplicateEntityAndSetNewParent(
+        getProjectTaskListSetupOrError(fromDetail),
+        toDetail,
+        ProjectTaskListSetup.class
+    );
   }
 
 }

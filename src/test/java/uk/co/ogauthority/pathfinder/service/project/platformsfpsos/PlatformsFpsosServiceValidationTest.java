@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFpsoFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.platformsfpsos.PlatformFpsoRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -42,12 +43,15 @@ public class PlatformsFpsosServiceValidationTest {
   @Mock
   private ProjectSetupService projectSetupService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
 
   private final PlatformFpso platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(details);
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     var validator = new SpringValidatorAdapter(Validation.buildDefaultValidatorFactory().getValidator());
     var validationService = new ValidationService(validator);
     platformsFpsosService = new PlatformsFpsosService(
@@ -56,7 +60,9 @@ public class PlatformsFpsosServiceValidationTest {
         new SearchSelectorService(),
         platformFpsoFormValidator,
         validationService,
-        projectSetupService);
+        projectSetupService,
+        entityDuplicationService
+    );
   }
 
   @Test

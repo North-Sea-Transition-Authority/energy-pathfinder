@@ -15,6 +15,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.tasks.ProjectTaskListSetup;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.tasks.ProjectTaskListSetupRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectTaskListSetupTestUtil;
@@ -22,6 +23,7 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectSetupServiceValidationTest {
+
   @Mock
   private ProjectTaskListSetupRepository projectTaskListSetupRepository;
 
@@ -31,6 +33,9 @@ public class ProjectSetupServiceValidationTest {
   @Mock
   private ProjectSetupFormValidator projectSetupFormValidator;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private ProjectSetupService projectSetupService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -38,14 +43,15 @@ public class ProjectSetupServiceValidationTest {
   private final ProjectTaskListSetup setup = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_nonDecom(details);
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     var validator = new SpringValidatorAdapter(Validation.buildDefaultValidatorFactory().getValidator());
     var validationService = new ValidationService(validator);
     projectSetupService = new ProjectSetupService(
         projectTaskListSetupRepository,
         projectInformationService,
         projectSetupFormValidator,
-        validationService
+        validationService,
+        entityDuplicationService
     );
   }
 

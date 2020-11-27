@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityFileLink;
 
@@ -17,4 +18,7 @@ public interface CollaborationOpportunityFileLinkRepository
   );
 
   Optional<CollaborationOpportunityFileLink> findByProjectDetailFile(ProjectDetailFile projectDetailFile);
+
+  List<CollaborationOpportunityFileLink> findAllByProjectDetailFile_ProjectDetail(ProjectDetail projectDetail);
+
 }

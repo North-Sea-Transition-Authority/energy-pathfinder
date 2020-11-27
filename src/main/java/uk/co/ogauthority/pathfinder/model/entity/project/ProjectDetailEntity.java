@@ -6,9 +6,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import uk.co.ogauthority.pathfinder.service.entityduplication.ChildEntity;
 
 @MappedSuperclass
-public abstract class ProjectDetailEntity {
+public abstract class ProjectDetailEntity implements ChildEntity<Integer, ProjectDetail> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +29,21 @@ public abstract class ProjectDetailEntity {
 
   public void setProjectDetail(ProjectDetail projectDetail) {
     this.projectDetail = projectDetail;
+  }
+
+  @Override
+  public void clearId() {
+    this.id = null;
+  }
+
+  @Override
+  public void setParent(ProjectDetail parentEntity) {
+    setProjectDetail(parentEntity);
+  }
+
+  @Override
+  public ProjectDetail getParent() {
+    return getProjectDetail();
   }
 
 }

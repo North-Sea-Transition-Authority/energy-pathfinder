@@ -7,6 +7,7 @@
   pageHeading=pageHeading
   projectSummaryView=projectSummaryView
   sidebarHeading="Check your answers for all sections on the project"
+  errorMessage=errorMessage
 >
   <@fdsForm.htmlForm actionUrl=springUrl(submitProjectUrl)>
     <@fdsAction.button buttonText="Submit" buttonValue="submit" />

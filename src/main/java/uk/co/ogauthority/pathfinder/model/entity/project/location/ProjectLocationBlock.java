@@ -11,10 +11,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.enums.portal.BlockLocation;
+import uk.co.ogauthority.pathfinder.service.entityduplication.ChildEntity;
 
 @Entity
 @Table(name = "project_location_blocks")
-public class ProjectLocationBlock {
+public class ProjectLocationBlock implements ChildEntity<Integer, ProjectLocation> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -136,5 +137,20 @@ public class ProjectLocationBlock {
         getBlockSuffix() != null ? getBlockSuffix() : "",
         getPedLicenceId().toString()
     );
+  }
+
+  @Override
+  public void clearId() {
+    this.id = null;
+  }
+
+  @Override
+  public void setParent(ProjectLocation parentEntity) {
+    setProjectLocation(parentEntity);
+  }
+
+  @Override
+  public ProjectLocation getParent() {
+    return getProjectLocation();
   }
 }

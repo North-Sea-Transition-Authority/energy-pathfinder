@@ -30,6 +30,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.enums.TopNavigationType;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -53,6 +54,9 @@ public class SelectOperatorServiceTest {
   @Mock
   private ProjectOperatorService projectOperatorService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private SelectOperatorService selectOperatorService;
 
   private static final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -74,7 +78,8 @@ public class SelectOperatorServiceTest {
         portalOrganisationAccessor,
         validationService,
         searchSelectorService,
-        projectOperatorService
+        projectOperatorService,
+        entityDuplicationService
     );
   }
 
