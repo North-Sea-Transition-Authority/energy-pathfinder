@@ -187,7 +187,7 @@ public class ControllerHelperServiceTest {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.rejectValue("firstField", "firstField.invalid", "NotNull");
     bindingResult.rejectValue("thirdField", "thirdField.invalid", "NotNull");
-    bindingResult.rejectValue("fourthField", "fourthField.invalid", "NotNull");
+    bindingResult.rejectValue("nonParentField", "nonParentField.invalid", "NotNull");
 
     var result = controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
@@ -202,7 +202,7 @@ public class ControllerHelperServiceTest {
     assertThat(errorItemList)
         .extracting(ErrorItem::getDisplayOrder, ErrorItem::getFieldName, ErrorItem::getErrorMessage)
         .containsExactly(
-            tuple(0, "fourthField", "NotNull"),
+            tuple(0, "nonParentField", "NotNull"),
             tuple(1, "firstField", "NotNull"),
             tuple(2, "thirdField", "NotNull")
         );

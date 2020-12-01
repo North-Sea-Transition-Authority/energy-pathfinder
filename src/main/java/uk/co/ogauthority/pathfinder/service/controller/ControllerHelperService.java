@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,8 @@ import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 
 @Service
 public class ControllerHelperService {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ControllerHelperService.class);
 
   // Replaces all square brackets and anything inside them.
   // Example input: uploadedFileWithDescriptionForms[0].uploadedFileDescription
@@ -130,11 +134,11 @@ public class ControllerHelperService {
       var fieldPathsWithErrors = new HashSet<String>();
       var nestedFormPathsWithErrors = new HashSet<String>();
       for (FieldError error : bindingResult.getFieldErrors()) {
-        String fieldPath = error.getField().replaceAll(REPLACE_BRACKETS_AND_CONTENTS_REGEX, "");
+        var fieldPath = error.getField().replaceAll(REPLACE_BRACKETS_AND_CONTENTS_REGEX, "");
         fieldPathsWithErrors.add(fieldPath);
 
-        String currentPath = "";
-        String[] split = fieldPath.split("\\.");
+        var currentPath = "";
+        var split = fieldPath.split("\\.");
         for (int i = 0; i < split.length - 1; i++) {
           if (!currentPath.equals("")) {
             currentPath += ".";
@@ -170,7 +174,7 @@ public class ControllerHelperService {
                                             List<String> fieldsWithErrors,
                                             String prefix) {
     FieldUtils.getAllFieldsList(form.getClass()).forEach(field -> {
-      String fieldPath = prefix + field.getName();
+      var fieldPath = prefix + field.getName();
 
       if (nestedFormPathsWithErrors.contains(fieldPath)) {
         // We still want to populate the field position for the nested form, some custom validators also put errors
@@ -182,7 +186,15 @@ public class ControllerHelperService {
         try {
           nestedForm = field.get(form);
         } catch (IllegalAccessException exception) {
-          throw new RuntimeException(exception);
+          LOGGER.warn(
+              String.format(
+                  "Exception while trying to get nested form field %s in form %s",
+                  field.getName(),
+                  form.getClass().getName()
+              ),
+              exception
+          );
+          return;
         }
 
         // Special-case collection handling to use the type of the first item. We only use the actual form object for

@@ -2,13 +2,13 @@ package uk.co.ogauthority.pathfinder.service.controller;
 
 public class TestFormWithParentForm extends FieldOrderTestForm {
 
-  private String fourthField;
+  private String nonParentField;
 
-  public String getFourthField() {
-    return fourthField;
+  public String getNonParentField() {
+    return nonParentField;
   }
 
-  public void setFourthField(String fourthField) {
-    this.fourthField = fourthField;
+  public void setNonParentField(String nonParentField) {
+    this.nonParentField = nonParentField;
   }
 }
