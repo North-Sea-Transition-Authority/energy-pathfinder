@@ -75,7 +75,7 @@ public class ProjectAssessmentService {
         .addObject("pageName", ProjectAssessmentController.PAGE_NAME)
         .addObject("form", form)
         .addObject("projectQualities", ProjectQuality.getAllAsMap())
-        .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null)));
+        .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)));
     breadcrumbService.fromManageProject(projectId, modelAndView, ProjectAssessmentController.PAGE_NAME);
     return modelAndView;
   }

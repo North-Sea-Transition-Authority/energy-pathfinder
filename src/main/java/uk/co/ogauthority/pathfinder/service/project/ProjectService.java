@@ -4,6 +4,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
@@ -30,6 +31,12 @@ public class ProjectService {
     return projectDetailsRepository.findByProjectIdAndIsCurrentVersionIsTrue(projectId);
   }
 
+  public ProjectDetail getDetailOrError(Integer projectId, Integer version) {
+    return projectDetailsRepository.findByProjectIdAndVersion(projectId, version)
+        .orElseThrow(() -> new PathfinderEntityNotFoundException(
+            String.format("Unable to find project detail with version %s for project with id %s", version, projectId)));
+  }
+
   public ProjectDetail createNewProjectDetailVersion(ProjectDetail fromDetail, AuthenticatedUserAccount userAccount) {
 
     fromDetail.setIsCurrentVersion(false);
@@ -45,5 +52,4 @@ public class ProjectService {
     projectDetailsRepository.save(fromDetail);
     return projectDetailsRepository.save(newProjectDetail);
   }
-
 }

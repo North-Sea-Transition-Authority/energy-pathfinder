@@ -6,13 +6,15 @@ public class ProjectManagementTestUtil {
 
   private static final String TITLE = "title";
   private static final String OPERATOR = "operator";
-  private static final String HTML = "html";
+  private static final String STATIC_CONTENT_HTML = "html";
+  private static final String VERSION_CONTENT_HTML = "html";
 
   public static ProjectManagementView createProjectManagementView() {
     return new ProjectManagementView(
         TITLE,
         OPERATOR,
-        HTML
+        STATIC_CONTENT_HTML,
+        VERSION_CONTENT_HTML
     );
   }
 }

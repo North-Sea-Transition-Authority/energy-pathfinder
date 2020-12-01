@@ -60,7 +60,7 @@ public class ProjectManagementServiceTest {
 
   @Test
   public void getSections() {
-    var sections = projectManagementService.getSections(projectDetail, authenticatedUser);
+    var sections = projectManagementService.getSections(projectDetail, projectDetail, authenticatedUser);
 
     assertThat(sections.size()).isEqualTo(3);
 

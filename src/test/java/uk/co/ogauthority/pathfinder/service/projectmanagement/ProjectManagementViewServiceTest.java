@@ -14,9 +14,12 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagementPageSectionType;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementSection;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementView;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.rendering.TemplateRenderingService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
@@ -28,6 +31,9 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 public class ProjectManagementViewServiceTest {
 
   @Mock
+  private ProjectService projectService;
+
+  @Mock
   private ProjectManagementService projectManagementService;
 
   @Mock
@@ -35,6 +41,9 @@ public class ProjectManagementViewServiceTest {
 
   @Mock
   private ProjectOperatorService projectOperatorService;
+
+  @Mock
+  private ProjectVersionService projectVersionService;
 
   @Mock
   private TemplateRenderingService templateRenderingService;
@@ -47,9 +56,11 @@ public class ProjectManagementViewServiceTest {
   @Before
   public void setup() {
     projectManagementViewService = new ProjectManagementViewService(
+        projectService,
         projectManagementService,
         projectInformationService,
         projectOperatorService,
+        projectVersionService,
         templateRenderingService
     );
   }
@@ -59,6 +70,7 @@ public class ProjectManagementViewServiceTest {
     var stubRender = "FAKE";
     var sectionName1 = "text";
     var sectionName2 = "text2";
+    var sectionName3 = "text3";
 
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
     var projectOperator = ProjectOperatorTestUtil.getOperator();
@@ -69,18 +81,20 @@ public class ProjectManagementViewServiceTest {
     when(projectOperatorService.getProjectOperatorByProjectDetailOrError(projectDetail)).thenReturn(
         projectOperator
     );
-    when(projectManagementService.getSections(projectDetail, authenticatedUser)).thenReturn(List.of(
-        new ProjectManagementSection(sectionName1, Map.of("test", "1"), 1),
-        new ProjectManagementSection(sectionName2, Map.of("test", "2"), 2)
+    when(projectManagementService.getSections(projectDetail, projectDetail, authenticatedUser)).thenReturn(List.of(
+        new ProjectManagementSection(sectionName1, Map.of("test", "1"), 1, ProjectManagementPageSectionType.STATIC_CONTENT),
+        new ProjectManagementSection(sectionName2, Map.of("test", "2"), 2, ProjectManagementPageSectionType.VERSION_CONTENT),
+        new ProjectManagementSection(sectionName3, Map.of("test", "3"), 3, ProjectManagementPageSectionType.VERSION_CONTENT)
     ));
 
     when(templateRenderingService.render(any(), any(), anyBoolean())).thenReturn(stubRender);
 
-    var modelAndView = projectManagementViewService.getProjectManagementModelAndView(projectDetail, authenticatedUser);
+    var modelAndView = projectManagementViewService.getProjectManagementModelAndView(projectDetail, null, authenticatedUser);
 
     var projectManagementView = (ProjectManagementView) modelAndView.getModel().get("projectManagementView");
     assertThat(projectManagementView.getTitle()).isEqualTo(projectInformation.getProjectTitle());
     assertThat(projectManagementView.getOperator()).isEqualTo(projectOperator.getOrganisationGroup().getName());
-    assertThat(projectManagementView.getSectionsHtml()).isEqualTo(stubRender + stubRender);
+    assertThat(projectManagementView.getStaticContentHtml()).isEqualTo(stubRender);
+    assertThat(projectManagementView.getVersionContentHtml()).isEqualTo(stubRender + stubRender);
   }
 }
