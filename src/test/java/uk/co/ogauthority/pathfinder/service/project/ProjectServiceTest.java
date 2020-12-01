@@ -67,9 +67,9 @@ public class ProjectServiceTest {
   }
 
   @Test
-  public void setProjectDetailStatus() {
+  public void updateProjectDetailStatus() {
     projectDetail.setStatus(ProjectStatus.DRAFT);
-    projectService.setProjectDetailStatus(projectDetail, ProjectStatus.PUBLISHED);
+    projectService.updateProjectDetailStatus(projectDetail, ProjectStatus.PUBLISHED);
     assertThat(projectDetail.getStatus()).isEqualTo(ProjectStatus.PUBLISHED);
     verify(projectDetailsRepository, times(1)).save(projectDetail);
   }

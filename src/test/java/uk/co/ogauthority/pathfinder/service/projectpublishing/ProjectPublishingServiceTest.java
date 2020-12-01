@@ -49,6 +49,6 @@ public class ProjectPublishingServiceTest {
     assertThat(projectPublishingDetail.getPublishedInstant()).isNotNull();
     assertThat(projectPublishingDetail.getPublisherWuaId()).isEqualTo(authenticatedUser.getWuaId());
 
-    verify(projectService, times(1)).setProjectDetailStatus(projectDetail, ProjectStatus.PUBLISHED);
+    verify(projectService, times(1)).updateProjectDetailStatus(projectDetail, ProjectStatus.PUBLISHED);
   }
 }

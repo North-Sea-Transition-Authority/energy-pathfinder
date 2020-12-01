@@ -31,7 +31,7 @@ public class ProjectPublishingService {
     projectPublishingDetail.setPublishedInstant(Instant.now());
     projectPublishingDetail.setPublisherWuaId(publisher.getWuaId());
     projectPublishingDetailRepository.save(projectPublishingDetail);
-    projectService.setProjectDetailStatus(projectDetail, ProjectStatus.PUBLISHED);
+    projectService.updateProjectDetailStatus(projectDetail, ProjectStatus.PUBLISHED);
     return projectPublishingDetail;
   }
 }

@@ -53,7 +53,7 @@ public class ProjectService {
     return projectDetailsRepository.save(newProjectDetail);
   }
 
-  public void setProjectDetailStatus(ProjectDetail projectDetail, ProjectStatus status) {
+  public void updateProjectDetailStatus(ProjectDetail projectDetail, ProjectStatus status) {
     projectDetail.setStatus(status);
     projectDetailsRepository.save(projectDetail);
   }
