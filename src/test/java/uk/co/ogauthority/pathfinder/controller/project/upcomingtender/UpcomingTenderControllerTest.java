@@ -107,7 +107,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
   @Test
   public void authenticatedUser_hasAccessToUpcomingTenderSummary() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(UpcomingTendersController.class).viewTenders(PROJECT_ID, null)))
+        on(UpcomingTendersController.class).viewUpcomingTenders(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -115,23 +115,23 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
   @Test
   public void unAuthenticatedUser_cannotAccessUpcomingTenderSummary() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(UpcomingTendersController.class).viewTenders(PROJECT_ID, null)))
+        on(UpcomingTendersController.class).viewUpcomingTenders(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }
 
   @Test
-  public void authenticatedUser_hasAccessToUpcomingTenderDelete() throws Exception {
+  public void authenticatedUser_hasAccessToUpcomingTenderRemove() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(UpcomingTendersController.class).deleteUpcomingTenderConfirm(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)))
+        on(UpcomingTendersController.class).removeUpcomingTenderConfirm(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
 
   @Test
-  public void unAuthenticatedUser_cannotAccessUpcomingTenderDelete() throws Exception {
+  public void unAuthenticatedUser_cannotAccessUpcomingTenderRemove() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(UpcomingTendersController.class).deleteUpcomingTenderConfirm(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)))
+        on(UpcomingTendersController.class).removeUpcomingTenderConfirm(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }

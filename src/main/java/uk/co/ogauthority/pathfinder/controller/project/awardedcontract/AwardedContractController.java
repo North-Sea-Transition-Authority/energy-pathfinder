@@ -71,7 +71,7 @@ public class AwardedContractController extends ProjectFormPageController {
     return getAwardedContractModelAndView(projectId, new AwardedContractForm());
   }
 
-  @GetMapping("/awarded-contract/{awardedContractId}")
+  @GetMapping("/awarded-contract/{awardedContractId}/edit")
   public ModelAndView getAwardedContract(@PathVariable("projectId") Integer projectId,
                                          @PathVariable("awardedContractId") Integer awardedProjectId,
                                          ProjectContext projectContext) {
@@ -110,7 +110,7 @@ public class AwardedContractController extends ProjectFormPageController {
     );
   }
 
-  @PostMapping("/awarded-contract/{awardedContractId}")
+  @PostMapping("/awarded-contract/{awardedContractId}/edit")
   public ModelAndView saveAwardedContract(@PathVariable("projectId") Integer projectId,
                                           @PathVariable("awardedContractId") Integer awardedContractId,
                                           @Valid @ModelAttribute("form") AwardedContractForm form,

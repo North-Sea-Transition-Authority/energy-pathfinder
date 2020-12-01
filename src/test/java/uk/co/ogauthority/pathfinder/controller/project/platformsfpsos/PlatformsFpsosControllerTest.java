@@ -101,7 +101,7 @@ public class PlatformsFpsosControllerTest extends ProjectContextAbstractControll
   @Test
   public void authenticatedUser_hasAccessToPlatformsFpsosSummary() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(PlatformsFpsosController.class).viewPlatformFpso(PROJECT_ID, null)))
+        on(PlatformsFpsosController.class).viewPlatformsFpsos(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -109,23 +109,23 @@ public class PlatformsFpsosControllerTest extends ProjectContextAbstractControll
   @Test
   public void unAuthenticatedUser_cannotAccessPlatformsFpsosSummary() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(PlatformsFpsosController.class).viewPlatformFpso(PROJECT_ID, null)))
+        on(PlatformsFpsosController.class).viewPlatformsFpsos(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }
 
   @Test
-  public void authenticatedUser_hasAccessToPlatformsFpsosDelete() throws Exception {
+  public void authenticatedUser_hasAccessToPlatformsFpsosRemove() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(PlatformsFpsosController.class).deletePlatformFpsoConfirm(PROJECT_ID, PLATFORM_FPSO_ID, DISPLAY_ORDER, null)))
+        on(PlatformsFpsosController.class).removePlatformFpsoConfirm(PROJECT_ID, PLATFORM_FPSO_ID, DISPLAY_ORDER, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
 
   @Test
-  public void unAuthenticatedUser_cannotAccessPlatformsFpsosDelete() throws Exception {
+  public void unAuthenticatedUser_cannotAccessPlatformsFpsosRemove() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(PlatformsFpsosController.class).deletePlatformFpsoConfirm(PROJECT_ID, PLATFORM_FPSO_ID, DISPLAY_ORDER, null)))
+        on(PlatformsFpsosController.class).removePlatformFpsoConfirm(PROJECT_ID, PLATFORM_FPSO_ID, DISPLAY_ORDER, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }

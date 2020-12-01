@@ -74,7 +74,7 @@ public class PlatformFpsoViewUtil {
     summaryLinks.add(
         new SummaryLink(
             SummaryLinkText.DELETE.getDisplayName(),
-            ReverseRouter.route(on(PlatformsFpsosController.class).deletePlatformFpsoConfirm(
+            ReverseRouter.route(on(PlatformsFpsosController.class).removePlatformFpsoConfirm(
                 projectId,
                 platformFpso.getId(),
                 displayOrder,

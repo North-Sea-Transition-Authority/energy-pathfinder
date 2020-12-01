@@ -21,7 +21,6 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.config.file.FileDeleteResult;
 import uk.co.ogauthority.pathfinder.config.file.FileUploadResult;
 import uk.co.ogauthority.pathfinder.controller.file.PathfinderFileUploadController;
-import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
@@ -47,7 +46,7 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
-@RequestMapping("/project/{projectId}/tenders")
+@RequestMapping("/project/{projectId}/upcoming-tenders")
 public class UpcomingTendersController extends PathfinderFileUploadController {
 
   public static final String PAGE_NAME = "Upcoming tenders";
@@ -74,9 +73,9 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
   }
 
   @GetMapping
-  public ModelAndView viewTenders(@PathVariable("projectId") Integer projectId,
-                                  ProjectContext projectContext) {
-    return getViewTendersModelAndView(
+  public ModelAndView viewUpcomingTenders(@PathVariable("projectId") Integer projectId,
+                                          ProjectContext projectContext) {
+    return getViewUpcomingTendersModelAndView(
         projectId,
         projectContext,
         upcomingTenderSummaryService.getSummaryViews(projectContext.getProjectDetails()),
@@ -85,8 +84,8 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
   }
 
   @PostMapping
-  public ModelAndView saveTenders(@PathVariable("projectId") Integer projectId,
-                                  ProjectContext projectContext) {
+  public ModelAndView saveUpcomingTenders(@PathVariable("projectId") Integer projectId,
+                                          ProjectContext projectContext) {
     var tenderViews = upcomingTenderSummaryService.getValidatedSummaryViews(
         projectContext.getProjectDetails()
     );
@@ -94,7 +93,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
     var validationResult = upcomingTenderSummaryService.validateViews(tenderViews);
 
     if (validationResult.equals(ValidationResult.INVALID)) {
-      return getViewTendersModelAndView(
+      return getViewUpcomingTendersModelAndView(
           projectId,
           projectContext,
           tenderViews,
@@ -129,7 +128,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
               form,
               projectContext.getUserAccount()
           );
-          return ReverseRouter.redirect(on(UpcomingTendersController.class).viewTenders(projectId, null));
+          return ReverseRouter.redirect(on(UpcomingTendersController.class).viewUpcomingTenders(projectId, null));
         }
     );
   }
@@ -160,13 +159,13 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
         form,
         () -> {
           upcomingTenderService.updateUpcomingTender(upcomingTender, form, projectContext.getUserAccount());
-          return ReverseRouter.redirect(on(UpcomingTendersController.class).viewTenders(projectId, null));
+          return ReverseRouter.redirect(on(UpcomingTendersController.class).viewUpcomingTenders(projectId, null));
         }
     );
   }
 
-  @GetMapping("/upcoming-tender/{upcomingTenderId}/delete/{displayOrder}")
-  public ModelAndView deleteUpcomingTenderConfirm(@PathVariable("projectId") Integer projectId,
+  @GetMapping("/upcoming-tender/{upcomingTenderId}/remove/{displayOrder}")
+  public ModelAndView removeUpcomingTenderConfirm(@PathVariable("projectId") Integer projectId,
                                                   @PathVariable("upcomingTenderId") Integer upcomingTenderId,
                                                   @PathVariable("displayOrder") Integer displayOrder,
                                                   ProjectContext projectContext) {
@@ -174,19 +173,19 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
 
     var modelAndView = new ModelAndView("project/upcomingtender/removeUpcomingTender")
           .addObject("view", upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, displayOrder))
-          .addObject("cancelUrl", ReverseRouter.route(on(UpcomingTendersController.class).viewTenders(projectId, null)));
+          .addObject("cancelUrl", ReverseRouter.route(on(UpcomingTendersController.class).viewUpcomingTenders(projectId, null)));
     breadcrumbService.fromUpcomingTenders(projectId, modelAndView, REMOVE_PAGE_NAME);
     return modelAndView;
   }
 
-  @PostMapping("/upcoming-tender/{upcomingTenderId}/delete/{displayOrder}")
-  public ModelAndView deleteUpcomingTender(@PathVariable("projectId") Integer projectId,
+  @PostMapping("/upcoming-tender/{upcomingTenderId}/remove/{displayOrder}")
+  public ModelAndView removeUpcomingTender(@PathVariable("projectId") Integer projectId,
                                            @PathVariable("upcomingTenderId") Integer upcomingTenderId,
                                            @PathVariable("displayOrder") Integer displayOrder,
                                            ProjectContext projectContext) {
     var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
     upcomingTenderService.delete(upcomingTender);
-    return ReverseRouter.redirect(on(UpcomingTendersController.class).viewTenders(projectId, null));
+    return ReverseRouter.redirect(on(UpcomingTendersController.class).viewUpcomingTenders(projectId, null));
   }
 
   @PostMapping("/upcoming-tender/files/upload")
@@ -228,7 +227,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
     );
   }
 
-  private ModelAndView getViewTendersModelAndView(
+  private ModelAndView getViewUpcomingTendersModelAndView(
       Integer projectId,
       ProjectContext projectContext,
       List<UpcomingTenderView> tenderViews,

@@ -119,17 +119,17 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
   }
 
   @Test
-  public void authenticatedUser_hasAccessToCollaborationOpportunityDelete() throws Exception {
+  public void authenticatedUser_hasAccessToCollaborationOpportunityRemove() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(CollaborationOpportunitiesController.class).deleteCollaborationOpportunityConfirm(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, DISPLAY_ORDER, null)))
+        on(CollaborationOpportunitiesController.class).removeCollaborationOpportunityConfirm(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, DISPLAY_ORDER, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
 
   @Test
-  public void unAuthenticatedUser_cannotAccessCollaborationOpportunityDelete() throws Exception {
+  public void unAuthenticatedUser_cannotAccessCollaborationOpportunityRemove() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(CollaborationOpportunitiesController.class).deleteCollaborationOpportunityConfirm(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, DISPLAY_ORDER, null)))
+        on(CollaborationOpportunitiesController.class).removeCollaborationOpportunityConfirm(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, DISPLAY_ORDER, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }
