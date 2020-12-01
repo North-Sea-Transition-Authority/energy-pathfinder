@@ -1,10 +1,10 @@
 package uk.co.ogauthority.pathfinder.service.project;
 
-import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,5 +46,13 @@ public class ProjectVersionServiceTest {
 
     var result = projectVersionService.getProjectVersionDtos(project);
     assertThat(result).isEqualTo(projectVersionDtos);
+  }
+
+  @Test
+  public void getProjectVersionDtos_whenNoProjectVersionDtos_thenEmpty() {
+    when(projectDetailsRepository.getProjectVersionDtos(PROJECT_ID)).thenReturn(Collections.emptyList());
+
+    var result = projectVersionService.getProjectVersionDtos(project);
+    assertThat(result).isEmpty();
   }
 }
