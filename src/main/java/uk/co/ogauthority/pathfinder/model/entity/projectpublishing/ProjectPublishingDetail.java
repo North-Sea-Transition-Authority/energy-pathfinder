@@ -3,25 +3,13 @@ package uk.co.ogauthority.pathfinder.model.entity.projectpublishing;
 import java.time.Instant;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 
 @Entity
 @Table(name = "project_publishing_details")
-public class ProjectPublishingDetail {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
-
-  @ManyToOne
-  @JoinColumn(name = "project_detail_id")
-  private ProjectDetail projectDetail;
+public class ProjectPublishingDetail extends ProjectDetailEntity {
 
   @Column(name = "published_datetime")
   private Instant publishedInstant;

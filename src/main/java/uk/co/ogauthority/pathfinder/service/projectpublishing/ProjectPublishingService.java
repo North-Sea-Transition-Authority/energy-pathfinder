@@ -9,15 +9,19 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.projectpublishing.ProjectPublishingDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.repository.projectpublishing.ProjectPublishingDetailRepository;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 
 @Service
 public class ProjectPublishingService {
 
   private final ProjectPublishingDetailRepository projectPublishingDetailRepository;
+  private final ProjectService projectService;
 
   @Autowired
-  public ProjectPublishingService(ProjectPublishingDetailRepository projectPublishingDetailRepository) {
+  public ProjectPublishingService(ProjectPublishingDetailRepository projectPublishingDetailRepository,
+                                  ProjectService projectService) {
     this.projectPublishingDetailRepository = projectPublishingDetailRepository;
+    this.projectService = projectService;
   }
 
   @Transactional
@@ -27,7 +31,7 @@ public class ProjectPublishingService {
     projectPublishingDetail.setPublishedInstant(Instant.now());
     projectPublishingDetail.setPublisherWuaId(publisher.getWuaId());
     projectPublishingDetailRepository.save(projectPublishingDetail);
-    projectDetail.setStatus(ProjectStatus.PUBLISHED);
+    projectService.setProjectDetailStatus(projectDetail, ProjectStatus.PUBLISHED);
     return projectPublishingDetail;
   }
 }

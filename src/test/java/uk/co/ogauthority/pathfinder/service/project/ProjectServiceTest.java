@@ -1,6 +1,8 @@
 package uk.co.ogauthority.pathfinder.service.project;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -11,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -61,5 +64,13 @@ public class ProjectServiceTest {
     );
 
     projectService.getDetailOrError(PROJECT_ID, PROJECT_VERSION);
+  }
+
+  @Test
+  public void setProjectDetailStatus() {
+    projectDetail.setStatus(ProjectStatus.DRAFT);
+    projectService.setProjectDetailStatus(projectDetail, ProjectStatus.PUBLISHED);
+    assertThat(projectDetail.getStatus()).isEqualTo(ProjectStatus.PUBLISHED);
+    verify(projectDetailsRepository, times(1)).save(projectDetail);
   }
 }

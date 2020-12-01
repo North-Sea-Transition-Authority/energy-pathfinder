@@ -7,5 +7,5 @@ CREATE TABLE ${datasource.user}.project_publishing_details (
 ) TABLESPACE tbsdata;
 
 CREATE INDEX ${datasource.user}.proj_pub_details_project_idx
-ON ${datasource.user}.project_publishing_details (project_id)
+ON ${datasource.user}.project_publishing_details (project_detail_id)
 TABLESPACE tbsidx;
