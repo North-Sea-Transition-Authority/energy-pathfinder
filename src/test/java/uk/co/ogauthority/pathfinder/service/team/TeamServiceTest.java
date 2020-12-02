@@ -311,4 +311,18 @@ public class TeamServiceTest {
 
     assertThat(stringListCaptor.getValue()).containsExactlyInAnyOrderElementsOf(expectedRoles);
   }
+
+  @Test
+  public void isPersonMemberOfTeamType_whenNoTeamsWherePersonMemberOfTeamType() {
+    when(portalTeamAccessor.getNumberOfTeamsWherePersonMemberOfTeamType(organisationPerson, TeamType.ORGANISATION.getPortalTeamType())).thenReturn(0L);
+
+    assertThat(teamService.isPersonMemberOfTeamType(organisationPerson, TeamType.ORGANISATION)).isFalse();
+  }
+
+  @Test
+  public void isPersonMemberOfTeamType_whenTeamsWherePersonMemberOfTeamType() {
+    when(portalTeamAccessor.getNumberOfTeamsWherePersonMemberOfTeamType(organisationPerson, TeamType.ORGANISATION.getPortalTeamType())).thenReturn(1L);
+
+    assertThat(teamService.isPersonMemberOfTeamType(organisationPerson, TeamType.ORGANISATION)).isTrue();
+  }
 }

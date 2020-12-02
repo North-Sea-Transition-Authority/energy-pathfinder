@@ -26,6 +26,7 @@ import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.team.teammanagementcontext.TeamManagementContextService;
 
@@ -63,6 +64,9 @@ public abstract class ProjectAssessmentContextAbstractControllerTest {
 
   @Autowired
   protected ProjectAssessmentContextService projectAssessmentContextService;
+
+  @MockBean
+  protected ProjectUpdateContextService projectUpdateContextService;
 
   @MockBean
   protected TeamManagementContextService teamManagementContextService;
