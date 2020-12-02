@@ -61,7 +61,7 @@ public class UpcomingTenderViewUtil {
 
     var removeLink = new SummaryLink(
         SummaryLinkText.DELETE.getDisplayName(),
-        ReverseRouter.route(on(UpcomingTendersController.class).deleteUpcomingTenderConfirm(
+        ReverseRouter.route(on(UpcomingTendersController.class).removeUpcomingTenderConfirm(
             projectId,
             upcomingTender.getId(),
             displayOrder,

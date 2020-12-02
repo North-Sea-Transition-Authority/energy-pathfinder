@@ -86,7 +86,7 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
     return getDecommissionedPipelineModelAndView(projectId, new DecommissionedPipelineForm());
   }
 
-  @GetMapping("/pipeline/{decommissionedPipelineId}")
+  @GetMapping("/pipeline/{decommissionedPipelineId}/edit")
   public ModelAndView getPipeline(@PathVariable("projectId") Integer projectId,
                                   @PathVariable("decommissionedPipelineId") Integer decommissionedPipelineId,
                                   ProjectContext projectContext) {
@@ -113,7 +113,7 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
     );
   }
 
-  @PostMapping("/pipeline/{decommissionedPipelineId}")
+  @PostMapping("/pipeline/{decommissionedPipelineId}/edit")
   public ModelAndView updatePipeline(@PathVariable("projectId") Integer projectId,
                                      @PathVariable("decommissionedPipelineId") Integer decommissionedPipelineId,
                                      @Valid @ModelAttribute("form") DecommissionedPipelineForm form,
