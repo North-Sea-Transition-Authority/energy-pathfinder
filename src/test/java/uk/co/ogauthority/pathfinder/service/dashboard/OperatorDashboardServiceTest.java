@@ -29,8 +29,7 @@ public class OperatorDashboardServiceTest {
   @Mock
   private TeamService teamService;
 
-  @Mock
-  private DashboardFilterService filterService;
+  private final DashboardFilterService filterService = new DashboardFilterService();
 
   private OperatorDashboardService operatorDashboardService;
 
@@ -47,9 +46,8 @@ public class OperatorDashboardServiceTest {
     operatorDashboardService = new OperatorDashboardService(
         dashboardProjectItemRepository,
         teamService,
-        filterService);
-
-    when(filterService.filter(any(), any())).thenCallRealMethod();
+        filterService
+    );
   }
 
   @Test
@@ -57,7 +55,6 @@ public class OperatorDashboardServiceTest {
     when(dashboardProjectItemRepository.findAllByOrganisationGroupInOrderByCreatedDatetimeDesc(any())).thenReturn(
         List.of(item1, item2)
     );
-    operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson(), filter);
     assertThat(operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson(), filter).size()).isEqualTo(2);
   }
 }

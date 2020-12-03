@@ -1,7 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.dashboard;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -21,8 +20,7 @@ public class RegulatorDashboardServiceTest {
   @Mock
   private DashboardProjectItemRepository dashboardProjectItemRepository;
 
-  @Mock
-  private DashboardFilterService filterService;
+  private final DashboardFilterService filterService = new DashboardFilterService();
 
   private RegulatorDashboardService regulatorDashboardService;
 
@@ -35,7 +33,6 @@ public class RegulatorDashboardServiceTest {
         dashboardProjectItemRepository,
         filterService
     );
-    when(filterService.filter(any(), any())).thenCallRealMethod();
   }
 
   @Test
