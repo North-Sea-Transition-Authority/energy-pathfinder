@@ -52,4 +52,9 @@ public class ProjectService {
     projectDetailsRepository.save(fromDetail);
     return projectDetailsRepository.save(newProjectDetail);
   }
+
+  public void updateProjectDetailStatus(ProjectDetail projectDetail, ProjectStatus status) {
+    projectDetail.setStatus(status);
+    projectDetailsRepository.save(projectDetail);
+  }
 }

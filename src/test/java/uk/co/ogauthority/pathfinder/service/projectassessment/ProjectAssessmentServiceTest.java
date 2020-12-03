@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.projectassessment;
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,6 +28,7 @@ import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessme
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectassessment.ProjectAssessmentRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.projectpublishing.ProjectPublishingService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectAssessmentTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -47,6 +49,9 @@ public class ProjectAssessmentServiceTest {
   @Mock
   private BreadcrumbService breadcrumbService;
 
+  @Mock
+  private ProjectPublishingService projectPublishingService;
+
   private ProjectAssessmentService projectAssessmentService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
@@ -58,15 +63,18 @@ public class ProjectAssessmentServiceTest {
         projectAssessmentRepository,
         validationService,
         projectAssessmentFormValidator,
-        breadcrumbService
+        breadcrumbService,
+        projectPublishingService
     );
 
     when(projectAssessmentRepository.save(any(ProjectAssessment.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
   @Test
-  public void createProjectAssessment() {
+  public void createProjectAssessment_whenReadyToBePublished() {
     var form = ProjectAssessmentTestUtil.createProjectAssessmentForm();
+
+    form.setReadyToBePublished(true);
 
     var projectAssessment = projectAssessmentService.createProjectAssessment(
         projectDetail,
@@ -79,6 +87,29 @@ public class ProjectAssessmentServiceTest {
     assertThat(projectAssessment.getUpdateRequired()).isEqualTo(form.getUpdateRequired());
     assertThat(projectAssessment.getAssessedInstant()).isNotNull();
     assertThat(projectAssessment.getAssessorWuaId()).isEqualTo(authenticatedUser.getWuaId());
+
+    verify(projectPublishingService, times(1)).publishProject(projectDetail, authenticatedUser);
+  }
+
+  @Test
+  public void createProjectAssessment_whenNotReadyToBePublished() {
+    var form = ProjectAssessmentTestUtil.createProjectAssessmentForm();
+
+    form.setReadyToBePublished(false);
+
+    var projectAssessment = projectAssessmentService.createProjectAssessment(
+        projectDetail,
+        authenticatedUser,
+        form
+    );
+
+    assertThat(projectAssessment.getProjectQuality()).isEqualTo(form.getProjectQuality());
+    assertThat(projectAssessment.getReadyToBePublished()).isEqualTo(form.getReadyToBePublished());
+    assertThat(projectAssessment.getUpdateRequired()).isEqualTo(form.getUpdateRequired());
+    assertThat(projectAssessment.getAssessedInstant()).isNotNull();
+    assertThat(projectAssessment.getAssessorWuaId()).isEqualTo(authenticatedUser.getWuaId());
+
+    verify(projectPublishingService, never()).publishProject(projectDetail, authenticatedUser);
   }
 
   @Test
