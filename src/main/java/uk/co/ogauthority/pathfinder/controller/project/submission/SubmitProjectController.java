@@ -67,7 +67,7 @@ public class SubmitProjectController {
 
     modelAndView
         .addObject("projectSubmissionSummaryView", projectSubmissionSummaryView)
-        .addObject("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)));
+        .addObject("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)));
 
     return modelAndView;
   }

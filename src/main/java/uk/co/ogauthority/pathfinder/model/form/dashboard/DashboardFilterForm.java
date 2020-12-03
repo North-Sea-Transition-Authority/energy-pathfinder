@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.form.dashboard;
 
 import java.util.List;
+import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
@@ -9,14 +10,24 @@ public class DashboardFilterForm {
 
   private String projectTitle;
 
-  private String field;
-
   private List<FieldStage> fieldStages;
+
+  private String field;
 
   private List<UkcsArea> ukcsAreas;
 
   private List<ProjectStatus> projectStatusList;
 
+  public DashboardFilterForm() {
+  }
+
+  public DashboardFilterForm(DashboardFilter filter) {
+    this.projectTitle = filter.getProjectTitle();
+    this.fieldStages = filter.getFieldStages();
+    this.field = filter.getField();
+    this.ukcsAreas = filter.getUkcsAreas();
+    this.projectStatusList = filter.getProjectStatusList();
+  }
 
   public String getProjectTitle() {
     return projectTitle;
@@ -26,20 +37,20 @@ public class DashboardFilterForm {
     this.projectTitle = projectTitle;
   }
 
-  public String getField() {
-    return field;
-  }
-
-  public void setField(String field) {
-    this.field = field;
-  }
-
   public List<FieldStage> getFieldStages() {
     return fieldStages;
   }
 
   public void setFieldStages(List<FieldStage> fieldStages) {
     this.fieldStages = fieldStages;
+  }
+
+  public String getField() {
+    return field;
+  }
+
+  public void setField(String field) {
+    this.field = field;
   }
 
   public List<UkcsArea> getUkcsAreas() {

@@ -53,6 +53,6 @@ public class ProjectManagementViewService {
 
     return new ModelAndView("projectmanagement/manage")
         .addObject("projectManagementView", projectManagementView)
-        .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)));
+        .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)));
   }
 }

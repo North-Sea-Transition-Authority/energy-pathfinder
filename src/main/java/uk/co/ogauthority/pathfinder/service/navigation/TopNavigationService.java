@@ -36,7 +36,7 @@ public class TopNavigationService {
 
     if (systemAccessService.canAccessWorkArea(user)) {
       navigationItems.add(
-          new TopNavigationItem(WORK_AREA_TITLE, ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
+          new TopNavigationItem(WORK_AREA_TITLE, ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
       );
     }
 
