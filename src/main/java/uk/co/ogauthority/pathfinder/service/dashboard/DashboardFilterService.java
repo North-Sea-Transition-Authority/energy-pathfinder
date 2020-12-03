@@ -37,29 +37,34 @@ public class DashboardFilterService {
     return dashboardItems.stream().filter(compositePredicate).collect(Collectors.toList());
   }
 
-  private boolean titleMatches(DashboardProjectItem di, DashboardFilter filter) {
+
+  public boolean titleMatches(DashboardProjectItem di, DashboardFilter filter) {
     if (filter.getProjectTitle() != null) {
       return di.getProjectTitle() != null && di.getProjectTitle().toLowerCase().contains(filter.getProjectTitle().toLowerCase());
     }
     return true;
   }
 
-  private boolean fieldStageMatches(DashboardProjectItem di, DashboardFilter filter) {
+
+  public boolean fieldStageMatches(DashboardProjectItem di, DashboardFilter filter) {
     return filter.getFieldStages() == null || filter.getFieldStages().contains(di.getFieldStage());
   }
 
-  private boolean fieldMatches(DashboardProjectItem di, DashboardFilter filter) {
+
+  public boolean fieldMatches(DashboardProjectItem di, DashboardFilter filter) {
     if (filter.getField() != null) {
       return di.getFieldName() != null && di.getFieldName().toLowerCase().contains(filter.getField().toLowerCase());
     }
     return true;
   }
 
-  private boolean ukcsAreaMatches(DashboardProjectItem di, DashboardFilter filter) {
+
+  public boolean ukcsAreaMatches(DashboardProjectItem di, DashboardFilter filter) {
     return filter.getUkcsAreas() == null || filter.getUkcsAreas().contains(di.getUkcsArea());
   }
 
-  private boolean statusMatches(DashboardProjectItem di, DashboardFilter filter) {
+
+  public boolean statusMatches(DashboardProjectItem di, DashboardFilter filter) {
     return filter.getProjectStatusList() == null || filter.getProjectStatusList().contains(di.getStatus());
   }
 }

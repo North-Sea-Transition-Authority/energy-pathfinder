@@ -18,6 +18,9 @@ import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 import uk.co.ogauthority.pathfinder.model.form.dashboard.DashboardFilterForm;
 import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
@@ -82,9 +85,14 @@ public class WorkAreaServiceTest {
     assertThat(link.getEnabled()).isTrue();
     assertLinkFieldsCorrect(link);
 
-    assertThat(modelAndView.getModel()).contains(
+    assertThat(modelAndView.getModel()).containsOnly(
         entry("dashboardProjectItemViews", dashboardProjectItemViews),
-        entry("resultSize", dashboardProjectItemViews.size())
+        entry("startProjectButton", link),
+        entry("resultSize", dashboardProjectItemViews.size()),
+        entry("form", form),
+        entry("statuses", ProjectStatus.getAllAsMap()),
+        entry("fieldStages", FieldStage.getAllAsMap()),
+        entry("ukcsAreas", UkcsArea.getAllAsMap())
     );
   }
 
