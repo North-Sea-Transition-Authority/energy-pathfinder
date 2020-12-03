@@ -38,12 +38,13 @@ public class ProjectDetailFileDtoRepositoryImpl implements ProjectDetailFileDtoR
             "WHERE uf.status = :fileStatus " +
             "AND pf.projectDetail = :projectDetail " +
             "AND pf.purpose = :purpose " +
-            "AND (pf.fileLinkStatus = :fileLinkStatus OR :fileLinkStatus = '" + FileLinkStatus.ALL + "')",
+            "AND (pf.fileLinkStatus = :fileLinkStatus OR :fileLinkStatus = :allFileLinkStatus)",
         UploadedFileView.class)
         .setParameter("projectDetail", detail)
         .setParameter("purpose", purpose)
         .setParameter("fileStatus", FileUploadStatus.CURRENT)
         .setParameter("fileLinkStatus", linkStatus)
+        .setParameter("allFileLinkStatus", FileLinkStatus.ALL)
         .getResultList();
 
   }
@@ -68,13 +69,14 @@ public class ProjectDetailFileDtoRepositoryImpl implements ProjectDetailFileDtoR
             "AND uf.status = :fileStatus " +
             "AND pf.projectDetail = :projectDetail " +
             "AND pf.purpose = :purpose " +
-            "AND (pf.fileLinkStatus = :fileLinkStatus OR :fileLinkStatus = '" + FileLinkStatus.ALL + "')",
+            "AND (pf.fileLinkStatus = :fileLinkStatus OR :fileLinkStatus = :allFileLinkStatus)",
         UploadedFileView.class)
         .setParameter("projectDetail", detail)
         .setParameter("purpose", purpose)
         .setParameter("fileId", fileId)
         .setParameter("fileStatus", FileUploadStatus.CURRENT)
         .setParameter("fileLinkStatus", linkStatus)
+        .setParameter("allFileLinkStatus", FileLinkStatus.ALL)
         .getSingleResult();
   }
 

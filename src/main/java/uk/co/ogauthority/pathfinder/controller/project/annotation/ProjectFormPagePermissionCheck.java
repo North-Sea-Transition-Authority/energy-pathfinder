@@ -15,6 +15,6 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermis
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface ProjectFormPagePermissionCheck {
-  //TODO PAT-82 Operator view privilege / separate annotations for RegulatorPagePermissionCheck
+  //TODO PAT-328 separate annotations for RegulatorPagePermissionCheck
   ProjectPermission[] permissions() default {ProjectPermission.SUBMIT, ProjectPermission.EDIT};
 }

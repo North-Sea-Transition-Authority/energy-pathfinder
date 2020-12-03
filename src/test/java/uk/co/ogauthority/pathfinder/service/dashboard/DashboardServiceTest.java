@@ -43,7 +43,7 @@ public class DashboardServiceTest {
   private final DashboardProjectItem qaItem = DashboardProjectItemTestUtil.getDashboardProjectItem(ProjectStatus.QA);
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     dashboardService = new DashboardService(
         teamService,
         regulatorDashboardService,
@@ -55,7 +55,7 @@ public class DashboardServiceTest {
   public void getDashboardProjectItemsForUser_noResultsForRegulatorUser() {
     when(teamService.isPersonMemberOfRegulatorTeam(authenticatedUser.getLinkedPerson())).thenReturn(true);
     when(regulatorDashboardService.getDashboardProjectItems()).thenReturn(Collections.emptyList());
-    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser).size()).isEqualTo(0);
+    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser).size()).isZero();
 
     verify(regulatorDashboardService, times(1)).getDashboardProjectItems();
     verify(operatorDashboardService, times(0)).getDashboardProjectItems(any());
@@ -77,7 +77,7 @@ public class DashboardServiceTest {
     when(operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson())).thenReturn(
         Collections.emptyList()
     );
-    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser).size()).isEqualTo(0);
+    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser).size()).isZero();
 
     verify(regulatorDashboardService, times(0)).getDashboardProjectItems();
     verify(operatorDashboardService, times(1)).getDashboardProjectItems(any());
