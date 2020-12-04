@@ -1,15 +1,19 @@
 package uk.co.ogauthority.pathfinder.controller;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
 import uk.co.ogauthority.pathfinder.model.form.dashboard.DashboardFilterForm;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.WorkAreaService;
 
 @Controller
@@ -37,7 +41,17 @@ public class WorkAreaController {
       @ModelAttribute("form") DashboardFilterForm form,
       @ModelAttribute("dashboardFilter") DashboardFilter filter
   ) {
+    filter = new DashboardFilter(form);
     return workAreaService.getWorkAreaModelAndViewForUser(user, filter, form);
+  }
+
+  @GetMapping("/work-area/clear-filter")
+  public ModelAndView getWorkAreaClearFilter(
+      AuthenticatedUserAccount user,
+      SessionStatus status
+  ) {
+    status.setComplete();
+    return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(user, getDefaultFilter()));
   }
 
   @ModelAttribute("dashboardFilter")
