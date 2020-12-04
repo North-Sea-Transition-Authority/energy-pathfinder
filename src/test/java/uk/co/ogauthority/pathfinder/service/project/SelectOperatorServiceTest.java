@@ -29,6 +29,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.enums.TopNavigationType;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
@@ -180,4 +181,25 @@ public class SelectOperatorServiceTest {
         )
     );
   }
+
+  @Test
+  public void copySectionData_verifyDuplicationServiceInteraction() {
+
+    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+    final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+
+    final var fromOperator = ProjectOperatorTestUtil.getOperator();
+
+    when(projectOperatorService.getProjectOperatorByProjectDetail(fromProjectDetail))
+        .thenReturn(Optional.of(fromOperator));
+
+    selectOperatorService.copySectionData(fromProjectDetail, toProjectDetail);
+
+    verify(entityDuplicationService, times(1)).duplicateEntityAndSetNewParent(
+        fromOperator,
+        toProjectDetail,
+        ProjectOperator.class
+    );
+  }
+
 }

@@ -3,12 +3,15 @@ package uk.co.ogauthority.pathfinder.service.project.upcomingtender;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,8 +19,12 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
+import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTenderFileLink;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderFileLinkRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.DuplicatedEntityPairing;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.FileUpdateMode;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
@@ -228,5 +235,84 @@ public class UpcomingTenderFileLinkServiceTest {
     verify(projectDetailFileService, times(1)).removeProjectDetailFiles(List.of(upcomingTenderFileLink1.getProjectDetailFile()));
     verify(upcomingTenderFileLinkRepository, times(1)).deleteAll(List.of(upcomingTenderFileLink2));
     verify(projectDetailFileService, times(1)).removeProjectDetailFiles(List.of(upcomingTenderFileLink2.getProjectDetailFile()));
+  }
+
+  @Test
+  public void findAllByProjectDetail_whenResults_thenReturnPopulatedList() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+    final var upcomingTenderFileLink = UpcomingTenderFileLinkUtil.createUpcomingTenderFileLink();
+
+    when(upcomingTenderFileLinkRepository.findAllByProjectDetailFile_ProjectDetail(projectDetail))
+        .thenReturn(List.of(upcomingTenderFileLink));
+
+    var results = upcomingTenderFileLinkService.findAllByProjectDetail(projectDetail);
+
+    assertThat(results).containsExactly(upcomingTenderFileLink);
+  }
+
+  @Test
+  public void findAllByProjectDetail_whenNoResults_thenReturnEmptyList() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+
+    when(upcomingTenderFileLinkRepository.findAllByProjectDetailFile_ProjectDetail(projectDetail))
+        .thenReturn(List.of());
+
+    var results = upcomingTenderFileLinkService.findAllByProjectDetail(projectDetail);
+
+    assertThat(results).isEmpty();
+  }
+
+  @Test
+  public void copyUpcomingTenderFileLinkData_ensureDuplicationServiceInteraction() {
+
+    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+    final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+
+    final var fromUpcomingTender = UpcomingTenderUtil.getUpcomingTender(fromProjectDetail);
+    final var toUpcomingTender = UpcomingTenderUtil.getUpcomingTender(fromProjectDetail);
+
+    final var fileLink = UpcomingTenderFileLinkUtil.createUpcomingTenderFileLink(
+        fromUpcomingTender,
+        new ProjectDetailFile()
+    );
+
+    final var fileLinks = List.of(fileLink);
+
+    when(upcomingTenderFileLinkRepository.findAllByProjectDetailFile_ProjectDetail(fromProjectDetail))
+        .thenReturn(fileLinks);
+
+    when(entityDuplicationService.duplicateEntitiesAndSetNewParent(
+        any(),
+        any(),
+        eq(UpcomingTenderFileLink.class)
+    )).thenReturn(Set.of(new DuplicatedEntityPairing<>(fileLink, fileLink)));
+
+    final var upcomingTenderMap = Map.of(
+        fromUpcomingTender,
+        toUpcomingTender
+    );
+
+    upcomingTenderFileLinkService.copyUpcomingTenderFileLinkData(
+        fromProjectDetail,
+        toProjectDetail,
+        upcomingTenderMap
+    );
+
+    verify(projectDetailFileService, times(1)).copyProjectDetailFileData(
+        fromProjectDetail,
+        toProjectDetail,
+        ProjectDetailFilePurpose.UPCOMING_TENDER
+    );
+
+    verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
+        fileLinks,
+        toUpcomingTender,
+        UpcomingTenderFileLink.class
+    );
+
+    verify(upcomingTenderFileLinkRepository, times(1)).saveAll(any());
+
   }
 }

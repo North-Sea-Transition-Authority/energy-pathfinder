@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.integratedrig.IntegratedRig;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.integratedrig.IntegratedRigForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
@@ -316,5 +317,24 @@ public class IntegratedRigServiceTest {
     integratedRigService.removeSectionData(projectDetail);
 
     verify(integratedRigRepository, times(1)).deleteAll(integratedRigs);
+  }
+
+  @Test
+  public void copySectionData_verifyDuplicationServiceInteraction() {
+
+    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+    final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+
+    final var integratedRigs = List.of(IntegratedRigTestUtil.createIntegratedRig_withDevUkFacility());
+
+    when(integratedRigRepository.findByProjectDetailOrderByIdAsc(fromProjectDetail)).thenReturn(integratedRigs);
+
+    integratedRigService.copySectionData(fromProjectDetail, toProjectDetail);
+
+    verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
+        integratedRigs,
+        toProjectDetail,
+        IntegratedRig.class
+    );
   }
 }

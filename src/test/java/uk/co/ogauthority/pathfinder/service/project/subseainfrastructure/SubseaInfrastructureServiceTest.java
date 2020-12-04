@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.subseainfrastructure.SubseaInfrastructure;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.ConcreteMattressForm;
@@ -663,6 +664,27 @@ public class SubseaInfrastructureServiceTest {
     subseaInfrastructureService.removeSectionData(projectDetail);
 
     verify(subseaInfrastructureRepository, times(1)).deleteAll(subseaInfrastructures);
+  }
+
+  @Test
+  public void copySectionData_verifyDuplicationServiceInteraction() {
+
+    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+    final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+
+    final var subseaInfrastructures = List.of(
+        SubseaInfrastructureTestUtil.createSubseaInfrastructure_withConcreteMattresses()
+    );
+    when(subseaInfrastructureRepository.findByProjectDetailOrderByIdAsc(fromProjectDetail)).thenReturn(subseaInfrastructures);
+
+    subseaInfrastructureService.copySectionData(fromProjectDetail, toProjectDetail);
+
+    verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
+        subseaInfrastructures,
+        toProjectDetail,
+        SubseaInfrastructure.class
+    );
+
   }
 
 }

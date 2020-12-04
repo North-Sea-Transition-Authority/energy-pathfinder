@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,6 +17,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectServiceTest {
@@ -33,6 +35,7 @@ public class ProjectServiceTest {
   @Before
   public void setup() {
     projectService = new ProjectService(projectDetailsRepository);
+    when(projectDetailsRepository.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
   @Test
@@ -72,5 +75,24 @@ public class ProjectServiceTest {
     projectService.updateProjectDetailStatus(projectDetail, ProjectStatus.PUBLISHED);
     assertThat(projectDetail.getStatus()).isEqualTo(ProjectStatus.PUBLISHED);
     verify(projectDetailsRepository, times(1)).save(projectDetail);
+  }
+
+  @Test
+  public void createNewProjectDetailVersion_assertRepositoryInteractions() {
+
+    final var fromProjectDetail = ProjectUtil.getProjectDetails();
+    fromProjectDetail.setIsCurrentVersion(true);
+    fromProjectDetail.setVersion(1);
+
+    final var user = UserTestingUtil.getAuthenticatedUserAccount();
+
+    final var newProjectDetail = projectService.createNewProjectDetailVersion(fromProjectDetail, user);
+
+    assertThat(fromProjectDetail.getIsCurrentVersion()).isFalse();
+    assertThat(newProjectDetail.getIsCurrentVersion()).isTrue();
+    assertThat(newProjectDetail.getVersion()).isEqualTo(fromProjectDetail.getVersion() + 1);
+
+    verify(projectDetailsRepository, times(1)).save(fromProjectDetail);
+    verify(projectDetailsRepository, times(1)).save(newProjectDetail);
   }
 }
