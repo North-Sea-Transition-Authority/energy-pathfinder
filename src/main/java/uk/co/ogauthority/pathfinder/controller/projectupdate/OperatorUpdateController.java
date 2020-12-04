@@ -33,6 +33,8 @@ import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
 @RequestMapping("/project/{projectId}")
 public class OperatorUpdateController {
 
+  public static final String NO_UPDATE_REQUIRED_PAGE_NAME = "No changes required";
+
   private final OperatorProjectUpdateService operatorProjectUpdateService;
   private final ProjectUpdateService projectUpdateService;
   private final ControllerHelperService controllerHelperService;

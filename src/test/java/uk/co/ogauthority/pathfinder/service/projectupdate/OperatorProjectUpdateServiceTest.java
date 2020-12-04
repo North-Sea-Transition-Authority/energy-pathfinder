@@ -12,10 +12,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.OperatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.ProvideNoUpdateForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -26,11 +28,14 @@ public class OperatorProjectUpdateServiceTest {
   @Mock
   private ValidationService validationService;
 
+  @Mock
+  private BreadcrumbService breadcrumbService;
+
   private OperatorProjectUpdateService operatorProjectUpdateService;
 
   @Before
   public void setup() {
-    operatorProjectUpdateService = new OperatorProjectUpdateService(validationService);
+    operatorProjectUpdateService = new OperatorProjectUpdateService(validationService, breadcrumbService);
   }
 
   @Test
@@ -64,7 +69,10 @@ public class OperatorProjectUpdateServiceTest {
     assertThat(modelAndView.getModel()).containsExactly(
         entry("form", form),
         entry("confirmActionUrl", ReverseRouter.route(on(OperatorUpdateController.class)
-            .provideNoUpdate(PROJECT_ID, null, null, null, null)))
+            .provideNoUpdate(PROJECT_ID, null, null, null, null))),
+        entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(PROJECT_ID, null, null, null)))
     );
+
+    verify(breadcrumbService, times(1)).fromManageProject(PROJECT_ID, modelAndView, OperatorUpdateController.NO_UPDATE_REQUIRED_PAGE_NAME);
   }
 }

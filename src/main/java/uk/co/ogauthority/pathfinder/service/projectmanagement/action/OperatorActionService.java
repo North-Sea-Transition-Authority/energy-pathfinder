@@ -21,7 +21,7 @@ public class OperatorActionService {
   public static final String PROVIDE_UPDATE_ACTION_PROMPT = "Provide update";
   public static final int PROVIDE_UPDATE_ACTION_DISPLAY_ORDER = 10;
 
-  public static final String PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_PROMPT = "Provide no update notification";
+  public static final String PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_PROMPT = "Confirm no changes";
   public static final int PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_DISPLAY_ORDER = 20;
 
   private final ProjectUpdateContextService projectUpdateContextService;

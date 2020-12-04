@@ -5,8 +5,8 @@ import uk.co.ogauthority.pathfinder.model.form.validation.lengthrestrictedstring
 
 public class ProvideNoUpdateForm {
 
-  @NotEmpty(message = "Enter the reason no update was required")
-  @LengthRestrictedString(messagePrefix = "The reason no update was required")
+  @NotEmpty(message = "Enter the reason no changes are required")
+  @LengthRestrictedString(messagePrefix = "The reason no changes are required")
   private String reasonNoUpdateRequired;
 
   public String getReasonNoUpdateRequired() {
