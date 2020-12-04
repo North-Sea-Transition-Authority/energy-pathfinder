@@ -1,16 +1,20 @@
 package uk.co.ogauthority.pathfinder.service.controller;
 
-import java.lang.reflect.Field;
+import com.google.common.collect.Iterables;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,13 @@ import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 
 @Service
 public class ControllerHelperService {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ControllerHelperService.class);
+
+  // Replaces all square brackets and anything inside them.
+  // Example input: uploadedFileWithDescriptionForms[0].uploadedFileDescription
+  // Output: uploadedFileWithDescriptionForms.uploadedFileDescription
+  private static final String REPLACE_BRACKETS_AND_CONTENTS_REGEX = "\\[.*?\\]";
 
   private final MessageSource messageSource;
 
@@ -110,14 +121,46 @@ public class ControllerHelperService {
     List<FieldError> errorList = new ArrayList<>();
 
     if (form != null && bindingResult != null && bindingResult.hasErrors()) {
-      var formFields = Arrays.stream(form.getClass().getDeclaredFields())
-          .map(Field::getName)
-          .collect(Collectors.toList());
+      // We want to sort the errors based on the order in which the fields occur in the form class.
+      // This needs to support nested forms such as ThreeFieldDateInput. Determining which fields are
+      // nested forms is slightly complicated and the approach we have decided on is to rely on the
+      // fields with errors having a "." in the paths. For example, if we have an error on a field
+      // "estimatedTenderDate.day", then the field "estimatedTenderDate" will be treated as a nested form.
+
+      // Example errors: ["estimatedTenderDate.day", "uploadedFileWithDescriptionForms[0].uploadedFileDescription"]
+      // fieldPathsWithErrors: ["estimatedTenderDate.day", "uploadedFileWithDescriptionForms.uploadedFileDescription"]
+      // nestedFormPathsWithErrors: ["estimatedTenderDate", "uploadedFileWithDescriptionForms"]
+
+      var fieldPathsWithErrors = new HashSet<String>();
+      var nestedFormPathsWithErrors = new HashSet<String>();
+      for (FieldError error : bindingResult.getFieldErrors()) {
+        var fieldPath = error.getField().replaceAll(REPLACE_BRACKETS_AND_CONTENTS_REGEX, "");
+        fieldPathsWithErrors.add(fieldPath);
+
+        var currentPath = "";
+        var split = fieldPath.split("\\.");
+        for (int i = 0; i < split.length - 1; i++) {
+          if (!currentPath.equals("")) {
+            currentPath += ".";
+          }
+          currentPath += split[i];
+          nestedFormPathsWithErrors.add(currentPath);
+        }
+      }
+
+      var formFieldsWithErrors = new ArrayList<String>();
+      getFieldsWithErrorsRecursive(
+          form,
+          fieldPathsWithErrors,
+          nestedFormPathsWithErrors,
+          formFieldsWithErrors,
+          ""
+      );
 
       errorList.addAll(bindingResult.getFieldErrors());
-      errorList.sort(Comparator.comparing(// match on field names but ditch any sub fields as we won't match those
-          fieldError -> formFields.indexOf(fieldError.getField().split("\\.")[0]))
-      );
+      errorList.sort(Comparator.comparing(
+          fieldError -> formFieldsWithErrors.indexOf(fieldError.getField().replaceAll(REPLACE_BRACKETS_AND_CONTENTS_REGEX, ""))
+      ));
     } else if (form == null && bindingResult != null) {
       errorList = bindingResult.getFieldErrors();
     }
@@ -125,4 +168,54 @@ public class ControllerHelperService {
     return errorList;
   }
 
+  private void getFieldsWithErrorsRecursive(Object form,
+                                            Set<String> fieldPathsWithErrors,
+                                            Set<String> nestedFormPathsWithErrors,
+                                            List<String> fieldsWithErrors,
+                                            String prefix) {
+    FieldUtils.getAllFieldsList(form.getClass()).forEach(field -> {
+      var fieldPath = prefix + field.getName();
+
+      if (nestedFormPathsWithErrors.contains(fieldPath)) {
+        // We still want to populate the field position for the nested form, some custom validators also put errors
+        // on the nested object such as uploadedFileWithDescriptionForms.
+        fieldsWithErrors.add(fieldPath);
+
+        field.setAccessible(true);
+        Object nestedForm;
+        try {
+          nestedForm = field.get(form);
+        } catch (IllegalAccessException exception) {
+          LOGGER.warn(
+              String.format(
+                  "Exception while trying to get nested form field %s in form %s",
+                  field.getName(),
+                  form.getClass().getName()
+              ),
+              exception
+          );
+          return;
+        }
+
+        // Special-case collection handling to use the type of the first item. We only use the actual form object for
+        // this purpose, so we don't need to handle each element individually.
+        if (nestedForm instanceof Iterable) {
+          nestedForm = Iterables.getFirst(((Iterable) nestedForm), null);
+          if (nestedForm == null) {
+            return;
+          }
+        }
+
+        getFieldsWithErrorsRecursive(
+            nestedForm,
+            fieldPathsWithErrors,
+            nestedFormPathsWithErrors,
+            fieldsWithErrors,
+            fieldPath + "."
+        );
+      } else if (fieldPathsWithErrors.contains(fieldPath)) {
+        fieldsWithErrors.add(fieldPath);
+      }
+    });
+  }
 }
