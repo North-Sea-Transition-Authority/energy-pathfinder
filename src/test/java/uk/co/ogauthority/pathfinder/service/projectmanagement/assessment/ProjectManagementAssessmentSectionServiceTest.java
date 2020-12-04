@@ -57,6 +57,7 @@ public class ProjectManagementAssessmentSectionServiceTest {
     var section = projectManagementAssessmentSectionService.getSection(projectDetail, authenticatedUser);
     assertThat(section.getTemplatePath()).isEqualTo(ProjectManagementAssessmentSectionService.TEMPLATE_PATH);
     assertThat(section.getDisplayOrder()).isEqualTo(ProjectManagementAssessmentSectionService.DISPLAY_ORDER);
+    assertThat(section.getSectionType()).isEqualTo(ProjectManagementAssessmentSectionService.SECTION_TYPE);
 
     var projectAssessmentView = ProjectAssessmentViewUtil.from(projectAssessment, authenticatedUser);
     assertThat(section.getTemplateModel()).containsExactly(
@@ -69,6 +70,7 @@ public class ProjectManagementAssessmentSectionServiceTest {
     var section = projectManagementAssessmentSectionService.getSection(projectDetail, authenticatedUser);
     assertThat(section.getTemplatePath()).isEqualTo(ProjectManagementAssessmentSectionService.TEMPLATE_PATH);
     assertThat(section.getDisplayOrder()).isEqualTo(ProjectManagementAssessmentSectionService.DISPLAY_ORDER);
+    assertThat(section.getSectionType()).isEqualTo(ProjectManagementAssessmentSectionService.SECTION_TYPE);
 
     assertThat(section.getTemplateModel()).isEmpty();
   }
@@ -81,6 +83,7 @@ public class ProjectManagementAssessmentSectionServiceTest {
     var section = projectManagementAssessmentSectionService.getSection(projectDetail, authenticatedUser);
     assertThat(section.getTemplatePath()).isEqualTo(ProjectManagementAssessmentSectionService.TEMPLATE_PATH);
     assertThat(section.getDisplayOrder()).isEqualTo(ProjectManagementAssessmentSectionService.DISPLAY_ORDER);
+    assertThat(section.getSectionType()).isEqualTo(ProjectManagementAssessmentSectionService.SECTION_TYPE);
 
     assertThat(section.getTemplateModel()).isEmpty();
   }

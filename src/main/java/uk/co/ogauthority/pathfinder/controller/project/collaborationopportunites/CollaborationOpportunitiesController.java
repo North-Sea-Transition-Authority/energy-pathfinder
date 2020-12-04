@@ -174,8 +174,8 @@ public class CollaborationOpportunitiesController extends PathfinderFileUploadCo
     );
   }
 
-  @GetMapping("/collaboration-opportunity/{opportunityId}/delete/{displayOrder}")
-  public ModelAndView deleteCollaborationOpportunityConfirm(@PathVariable("projectId") Integer projectId,
+  @GetMapping("/collaboration-opportunity/{opportunityId}/remove/{displayOrder}")
+  public ModelAndView removeCollaborationOpportunityConfirm(@PathVariable("projectId") Integer projectId,
                                                             @PathVariable("opportunityId") Integer opportunityId,
                                                             @PathVariable("displayOrder") Integer displayOrder,
                                                             ProjectContext projectContext) {
@@ -190,11 +190,11 @@ public class CollaborationOpportunitiesController extends PathfinderFileUploadCo
     return modelAndView;
   }
 
-  @PostMapping("/collaboration-opportunity/{opportunityId}/delete/{displayOrder}")
-  public ModelAndView deleteUpcomingTender(@PathVariable("projectId") Integer projectId,
-                                           @PathVariable("opportunityId") Integer opportunityId,
-                                           @PathVariable("displayOrder") Integer displayOrder,
-                                           ProjectContext projectContext) {
+  @PostMapping("/collaboration-opportunity/{opportunityId}/remove/{displayOrder}")
+  public ModelAndView removeCollaborationOpportunity(@PathVariable("projectId") Integer projectId,
+                                                     @PathVariable("opportunityId") Integer opportunityId,
+                                                     @PathVariable("displayOrder") Integer displayOrder,
+                                                     ProjectContext projectContext) {
     var opportunity = collaborationOpportunitiesService.getOrError(opportunityId);
     collaborationOpportunitiesService.delete(opportunity);
     return ReverseRouter.redirect(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null));

@@ -1,7 +1,9 @@
 package uk.co.ogauthority.pathfinder.controller.projectmanagement;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
@@ -17,7 +19,6 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
-import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -31,12 +32,14 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 @WebMvcTest(controllers = ManageProjectController.class, includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ProjectContextService.class))
 public class ManageProjectControllerTest extends ProjectContextAbstractControllerTest {
 
-  private static final Integer PROJECT_ID = 1;
+  private static final Integer PUBLISHED_PROJECT_ID = 1;
+  private static final Integer DRAFT_PROJECT_ID = 2;
 
   @MockBean
   private ProjectManagementViewService projectManagementViewService;
 
-  private final ProjectDetail projectDetail  = ProjectUtil.getProjectDetails(ProjectStatus.PUBLISHED);
+  private final ProjectDetail publishedProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.PUBLISHED);
+  private final ProjectDetail draftProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
 
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       ProjectPermission.VIEW.getUserPrivileges());
@@ -44,15 +47,19 @@ public class ManageProjectControllerTest extends ProjectContextAbstractControlle
 
   @Before
   public void setup() {
-    when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(projectDetail));
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectService.getLatestDetail(PUBLISHED_PROJECT_ID)).thenReturn(Optional.of(publishedProjectDetail));
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(publishedProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(publishedProjectDetail, unauthenticatedUser)).thenReturn(false);
+
+    when(projectService.getLatestDetail(DRAFT_PROJECT_ID)).thenReturn(Optional.of(draftProjectDetail));
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(draftProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(draftProjectDetail, unauthenticatedUser)).thenReturn(false);
   }
 
   @Test
   public void getProject_whenAuthenticated_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(ManageProjectController.class).getProject(PROJECT_ID, null, null)))
+        on(ManageProjectController.class).getProject(PUBLISHED_PROJECT_ID, null, null, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -60,22 +67,43 @@ public class ManageProjectControllerTest extends ProjectContextAbstractControlle
   @Test
   public void getProject_whenUnauthenticated_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(ManageProjectController.class).getProject(PROJECT_ID, null, null)))
+        on(ManageProjectController.class).getProject(PUBLISHED_PROJECT_ID, null, null, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }
 
   @Test
   public void getProject_whenAuthenticatedAndDraft_thenNoAccess() throws Exception {
-    var projectId = 2;
-    var projectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
-
-    when(projectService.getLatestDetail(projectId)).thenReturn(Optional.of(projectDetail));
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
-
     mockMvc.perform(get(ReverseRouter.route(
-        on(ManageProjectController.class).getProject(projectId, null, null)))
-        .with(authenticatedUserAndSession(unauthenticatedUser)))
+        on(ManageProjectController.class).getProject(DRAFT_PROJECT_ID, null, null, null)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void updateProjectVersion_whenAuthenticated_thenRedirect() throws Exception {
+    mockMvc.perform(post(ReverseRouter.route(
+        on(ManageProjectController.class).updateProjectVersion(PUBLISHED_PROJECT_ID, null, null, null)))
+        .with(authenticatedUserAndSession(authenticatedUser))
+        .with(csrf()))
+        .andExpect(status().is3xxRedirection());
+  }
+
+  @Test
+  public void updateProjectVersion_whenUnauthenticated_thenNoAccess() throws Exception {
+    mockMvc.perform(post(ReverseRouter.route(
+        on(ManageProjectController.class).updateProjectVersion(PUBLISHED_PROJECT_ID, null, null, null)))
+        .with(authenticatedUserAndSession(unauthenticatedUser))
+        .with(csrf()))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void updateProjectVersion_whenAuthenticatedAndDraft_thenNoAccess() throws Exception {
+    mockMvc.perform(post(ReverseRouter.route(
+        on(ManageProjectController.class).updateProjectVersion(DRAFT_PROJECT_ID, null, null, null)))
+        .with(authenticatedUserAndSession(authenticatedUser))
+        .with(csrf()))
         .andExpect(status().isForbidden());
   }
 }

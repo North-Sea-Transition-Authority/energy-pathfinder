@@ -3,7 +3,6 @@ package uk.co.ogauthority.pathfinder.model.enums.project.tasks;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.stream.Stream;
-import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedpipeline.DecommissionedPipelineController;
@@ -162,7 +161,7 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       case PROJECT_SETUP:
         return ReverseRouter.route(on(ProjectSetupController.class).getProjectSetup(projectId, null));
       case UPCOMING_TENDERS:
-        return ReverseRouter.route(on(UpcomingTendersController.class).viewTenders(projectId, null));
+        return ReverseRouter.route(on(UpcomingTendersController.class).viewUpcomingTenders(projectId, null));
       case AWARDED_CONTRACTS:
         return ReverseRouter.route(on(AwardedContractController.class).viewAwardedContracts(projectId, null));
       case COLLABORATION_OPPORTUNITIES:
@@ -170,7 +169,7 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       case WELLS:
         return ReverseRouter.route(on(DecommissionedWellController.class).viewWellsToBeDecommissioned(projectId, null));
       case PLATFORM_FPSO:
-        return ReverseRouter.route(on(PlatformsFpsosController.class).viewPlatformFpso(projectId, null));
+        return ReverseRouter.route(on(PlatformsFpsosController.class).viewPlatformsFpsos(projectId, null));
       case INTEGRATED_RIGS:
         return ReverseRouter.route(on(IntegratedRigController.class).viewIntegratedRigs(projectId, null));
       case SUBSEA_INFRASTRUCTURE:

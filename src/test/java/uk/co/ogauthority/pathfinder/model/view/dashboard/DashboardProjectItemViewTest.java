@@ -137,6 +137,6 @@ public class DashboardProjectItemViewTest {
   }
 
   private String getProjectManagementPageUrl(Integer projectId) {
-    return ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null));
+    return ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null));
   }
 }

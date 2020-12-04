@@ -78,7 +78,7 @@ public class DecommissionedWellController extends ProjectFormPageController {
     );
   }
 
-  @GetMapping("/wells-to-be-decommissioned/{decommissionedWellId}")
+  @GetMapping("/wells-to-be-decommissioned/{decommissionedWellId}/edit")
   public ModelAndView getWellsToBeDecommissioned(@PathVariable("projectId") Integer projectId,
                                                  @PathVariable("decommissionedWellId") Integer decommissionedWellId,
                                                  ProjectContext projectContext) {
@@ -89,7 +89,7 @@ public class DecommissionedWellController extends ProjectFormPageController {
     return getWellsToBeDecommissionedModelAndView(projectId, form);
   }
 
-  @PostMapping("/wells-to-be-decommissioned/{decommissionedWellId}")
+  @PostMapping("/wells-to-be-decommissioned/{decommissionedWellId}/edit")
   public ModelAndView updateWellsToBeDecommissioned(@PathVariable("projectId") Integer projectId,
                                                     @PathVariable("decommissionedWellId") Integer decommissionedWellId,
                                                     @Valid @ModelAttribute("form") DecommissionedWellForm form,

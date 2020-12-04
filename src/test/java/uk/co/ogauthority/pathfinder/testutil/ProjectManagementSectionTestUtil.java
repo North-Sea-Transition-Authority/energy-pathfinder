@@ -2,12 +2,14 @@ package uk.co.ogauthority.pathfinder.testutil;
 
 import java.util.Map;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementSection;
+import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagementPageSectionType;
 
 public class ProjectManagementSectionTestUtil {
 
   public static final int DISPLAY_ORDER = 1;
   public static final String TEMPLATE_PATH = "TEMPLATE";
   public static final Map<String, Object> TEMPLATE_MODEL = Map.of("key", "value");
+  public static final ProjectManagementPageSectionType SECTION_TYPE = ProjectManagementPageSectionType.STATIC_CONTENT;
 
   public static ProjectManagementSection getProjectManagementSection() {
     return getProjectManagementSection(DISPLAY_ORDER);
@@ -17,7 +19,8 @@ public class ProjectManagementSectionTestUtil {
     return new ProjectManagementSection(
         TEMPLATE_PATH,
         TEMPLATE_MODEL,
-        displayOrder
+        displayOrder,
+        SECTION_TYPE
     );
   }
 }

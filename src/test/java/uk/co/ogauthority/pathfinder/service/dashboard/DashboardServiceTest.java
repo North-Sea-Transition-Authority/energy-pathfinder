@@ -46,7 +46,7 @@ public class DashboardServiceTest {
   private final DashboardFilter filter = DashboardFilterTestUtil.getEmptyFilter();
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     dashboardService = new DashboardService(
         teamService,
         regulatorDashboardService,
@@ -58,7 +58,7 @@ public class DashboardServiceTest {
   public void getDashboardProjectItemsForUser_noResultsForRegulatorUser() {
     when(teamService.isPersonMemberOfRegulatorTeam(authenticatedUser.getLinkedPerson())).thenReturn(true);
     when(regulatorDashboardService.getDashboardProjectItems(filter)).thenReturn(Collections.emptyList());
-    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser, filter).size()).isEqualTo(0);
+    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser, filter).size()).isZero();
 
     verify(regulatorDashboardService, times(1)).getDashboardProjectItems(filter);
     verify(operatorDashboardService, times(0)).getDashboardProjectItems(any(), any());
@@ -80,7 +80,7 @@ public class DashboardServiceTest {
     when(operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson(), filter)).thenReturn(
         Collections.emptyList()
     );
-    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser, filter).size()).isEqualTo(0);
+    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser, filter).size()).isZero();
 
     verify(regulatorDashboardService, times(0)).getDashboardProjectItems(any());
     verify(operatorDashboardService, times(1)).getDashboardProjectItems(any(), any());

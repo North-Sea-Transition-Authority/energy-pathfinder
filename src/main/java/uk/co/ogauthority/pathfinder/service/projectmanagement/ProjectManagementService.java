@@ -19,11 +19,17 @@ public class ProjectManagementService {
     this.sectionServices = sectionServices;
   }
 
-  public List<ProjectManagementSection> getSections(ProjectDetail projectDetail,
+  public List<ProjectManagementSection> getSections(ProjectDetail latestProjectDetail,
+                                                    ProjectDetail selectedVersionProjectDetail,
                                                     AuthenticatedUserAccount user) {
     var sections = new ArrayList<ProjectManagementSection>();
     sectionServices.forEach(
-        sectionService -> sections.add(sectionService.getSection(projectDetail, user))
+        sectionService -> sections.add(
+            sectionService.getSection(
+                sectionService.useSelectedVersionProjectDetail() ? selectedVersionProjectDetail : latestProjectDetail,
+                user
+            )
+        )
     );
 
     sections.sort(Comparator.comparing(ProjectManagementSection::getDisplayOrder));

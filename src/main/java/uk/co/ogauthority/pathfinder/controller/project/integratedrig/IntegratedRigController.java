@@ -85,7 +85,7 @@ public class IntegratedRigController extends ProjectFormPageController {
     return getIntegratedRigModelAndView(projectId, new IntegratedRigForm());
   }
 
-  @GetMapping("/integrated-rig/{integratedRigId}")
+  @GetMapping("/integrated-rig/{integratedRigId}/edit")
   public ModelAndView getIntegratedRig(@PathVariable("projectId") Integer projectId,
                                        @PathVariable("integratedRigId") Integer integratedRigId,
                                        ProjectContext projectContext) {
@@ -111,7 +111,7 @@ public class IntegratedRigController extends ProjectFormPageController {
     );
   }
 
-  @PostMapping("/integrated-rig/{integratedRigId}")
+  @PostMapping("/integrated-rig/{integratedRigId}/edit")
   public ModelAndView updateIntegratedRig(@PathVariable("projectId") Integer projectId,
                                           @PathVariable("integratedRigId") Integer integratedRigId,
                                           @Valid @ModelAttribute("form") IntegratedRigForm form,
