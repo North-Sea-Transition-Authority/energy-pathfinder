@@ -17,11 +17,17 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
+import uk.co.ogauthority.pathfinder.model.form.dashboard.DashboardFilterForm;
 import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.model.view.dashboard.DashboardProjectItemView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.dashboard.DashboardService;
+import uk.co.ogauthority.pathfinder.testutil.DashboardFilterTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -42,44 +48,51 @@ public class WorkAreaServiceTest {
   );
 
   private final List<DashboardProjectItemView> dashboardProjectItemViews = List.of(DashboardProjectItemTestUtil.getDashboardProjectItemView());
+  private final DashboardFilter filter = DashboardFilterTestUtil.getEmptyFilter();
+  private final DashboardFilterForm form = DashboardFilterTestUtil.getEmptyForm();
 
   @Before
   public void setUp() throws Exception {
     workAreaService = new WorkAreaService(dashboardService);
-    when(dashboardService.getDashboardProjectItemViewsForUser(any())).thenReturn(dashboardProjectItemViews);
+    when(dashboardService.getDashboardProjectItemViewsForUser(any(), any())).thenReturn(dashboardProjectItemViews);
   }
 
   @Test
   public void getWorkAreaModelAndViewForUser_createProjectButton_notShownWithoutPrivilege() {
-    var modelAndView = workAreaService.getWorkAreaModelAndViewForUser(workAreaOnlyUser);
+    var modelAndView = workAreaService.getWorkAreaModelAndViewForUser(workAreaOnlyUser, filter, form);
     LinkButton link = (LinkButton) modelAndView.getModel().get("startProjectButton");
     assertThat(link.getEnabled()).isFalse();
   }
 
   @Test
   public void getWorkAreaModelAndViewForUser_createProjectButton_shownWithPrivilege() {
-    var modelAndView = workAreaService.getWorkAreaModelAndViewForUser(createProjectUser);
+    var modelAndView = workAreaService.getWorkAreaModelAndViewForUser(createProjectUser, filter, form);
     LinkButton link = (LinkButton) modelAndView.getModel().get("startProjectButton");
     assertThat(link.getEnabled()).isTrue();
   }
 
   @Test
   public void getWorkAreaModelAndViewForUser_resultSizeMatches() {
-    var modelAndView = workAreaService.getWorkAreaModelAndViewForUser(createProjectUser);
+    var modelAndView = workAreaService.getWorkAreaModelAndViewForUser(createProjectUser, filter, form);
     assertThat(modelAndView.getModel()).containsEntry("resultSize", dashboardProjectItemViews.size());
   }
 
   @Test
   public void getWorkAreaModelAndViewForUser_allFieldsSet() {
-    var modelAndView = workAreaService.getWorkAreaModelAndViewForUser(createProjectUser);
+    var modelAndView = workAreaService.getWorkAreaModelAndViewForUser(createProjectUser, filter, form);
     LinkButton link = (LinkButton) modelAndView.getModel().get("startProjectButton");
 
     assertThat(link.getEnabled()).isTrue();
     assertLinkFieldsCorrect(link);
 
-    assertThat(modelAndView.getModel()).contains(
+    assertThat(modelAndView.getModel()).containsOnly(
         entry("dashboardProjectItemViews", dashboardProjectItemViews),
-        entry("resultSize", dashboardProjectItemViews.size())
+        entry("startProjectButton", link),
+        entry("resultSize", dashboardProjectItemViews.size()),
+        entry("form", form),
+        entry("statuses", ProjectStatus.getAllAsMap()),
+        entry("fieldStages", FieldStage.getAllAsMap()),
+        entry("ukcsAreas", UkcsArea.getAllAsMap())
     );
   }
 

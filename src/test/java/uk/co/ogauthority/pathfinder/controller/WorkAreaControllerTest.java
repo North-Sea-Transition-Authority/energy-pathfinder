@@ -48,7 +48,7 @@ public class WorkAreaControllerTest extends AbstractControllerTest {
 
   @Test
   public void authenticatedUser_hasAccessToFilteredWorkArea() throws Exception {
-    mockMvc.perform(post(ReverseRouter.route(on(WorkAreaController.class).getWorkAreaFiltered(authenticatedUser)))
+    mockMvc.perform(post(ReverseRouter.route(on(WorkAreaController.class).getWorkAreaFiltered(authenticatedUser, null)))
         .with(authenticatedUserAndSession(authenticatedUser))
         .with(csrf()))
         .andExpect(status().isOk());
@@ -56,7 +56,7 @@ public class WorkAreaControllerTest extends AbstractControllerTest {
 
   @Test
   public void unAuthenticatedUser_cannotAccessFilteredWorkArea() throws Exception {
-    mockMvc.perform(post(ReverseRouter.route(on(WorkAreaController.class).getWorkAreaFiltered(unAuthenticatedUser)))
+    mockMvc.perform(post(ReverseRouter.route(on(WorkAreaController.class).getWorkAreaFiltered(unAuthenticatedUser, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser))
         .with(csrf()))
         .andExpect(status().isForbidden());

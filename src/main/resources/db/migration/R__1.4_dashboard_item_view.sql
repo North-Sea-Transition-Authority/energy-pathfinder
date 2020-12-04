@@ -14,6 +14,7 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
       )
     , pl.manual_field_name
     ) field_name
+  , pl.ukcs_area
   , po.operator_org_grp_id
   FROM ${datasource.user}.projects p
   JOIN ${datasource.user}.project_details pd ON pd.project_id = p.id

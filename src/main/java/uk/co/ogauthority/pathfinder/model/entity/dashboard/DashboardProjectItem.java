@@ -12,6 +12,7 @@ import org.hibernate.annotations.Immutable;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 
 @Entity
 @Table(name = "dashboard_project_items")
@@ -34,6 +35,9 @@ public class DashboardProjectItem {
   private FieldStage fieldStage;
 
   private String fieldName;
+
+  @Enumerated(EnumType.STRING)
+  private UkcsArea ukcsArea;
 
   @ManyToOne
   @JoinColumn(name = "operator_org_grp_id")
@@ -71,6 +75,10 @@ public class DashboardProjectItem {
     return organisationGroup.getName();
   }
 
+  public UkcsArea getUkcsArea() {
+    return ukcsArea;
+  }
+
   public PortalOrganisationGroup getOrganisationGroup() {
     return organisationGroup;
   }
@@ -101,6 +109,10 @@ public class DashboardProjectItem {
 
   public void setFieldName(String fieldName) {
     this.fieldName = fieldName;
+  }
+
+  public void setUkcsArea(UkcsArea ukcsArea) {
+    this.ukcsArea = ukcsArea;
   }
 
   public void setOrganisationGroup(

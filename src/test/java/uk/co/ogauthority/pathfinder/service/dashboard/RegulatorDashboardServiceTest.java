@@ -9,18 +9,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
 import uk.co.ogauthority.pathfinder.repository.dashboard.DashboardProjectItemRepository;
+import uk.co.ogauthority.pathfinder.testutil.DashboardFilterTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
-import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RegulatorDashboardServiceTest {
 
   @Mock
   private DashboardProjectItemRepository dashboardProjectItemRepository;
+
+  private final DashboardFilterService filterService = new DashboardFilterService();
 
   private RegulatorDashboardService regulatorDashboardService;
 
@@ -30,7 +30,8 @@ public class RegulatorDashboardServiceTest {
   @Before
   public void setUp() throws Exception {
     regulatorDashboardService = new RegulatorDashboardService(
-        dashboardProjectItemRepository
+        dashboardProjectItemRepository,
+        filterService
     );
   }
 
@@ -38,6 +39,6 @@ public class RegulatorDashboardServiceTest {
   public void getDashboardProjectItems_correctNumberOfResultsReturned() {
     when(dashboardProjectItemRepository.findAllByStatusInOrderByCreatedDatetimeDesc(RegulatorDashboardService.REGULATOR_PROJECT_ACCESS_STATUSES))
         .thenReturn(List.of(item1, item2));
-    assertThat(regulatorDashboardService.getDashboardProjectItems().size()).isEqualTo(2);
+    assertThat(regulatorDashboardService.getDashboardProjectItems(DashboardFilterTestUtil.getEmptyFilter()).size()).isEqualTo(2);
   }
 }

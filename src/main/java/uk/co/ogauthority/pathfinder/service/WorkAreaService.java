@@ -8,6 +8,11 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
+import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
+import uk.co.ogauthority.pathfinder.model.form.dashboard.DashboardFilterForm;
 import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -26,10 +31,14 @@ public class WorkAreaService {
     this.dashboardService = dashboardService;
   }
 
-  public ModelAndView getWorkAreaModelAndViewForUser(AuthenticatedUserAccount user) {
-    var dashboardProjectItemViews =  dashboardService.getDashboardProjectItemViewsForUser(user);
+  public ModelAndView getWorkAreaModelAndViewForUser(AuthenticatedUserAccount user, DashboardFilter filter, DashboardFilterForm form) {
+    var dashboardProjectItemViews =  dashboardService.getDashboardProjectItemViewsForUser(user, filter);
     return new ModelAndView(WORK_AREA_TEMPLATE_PATH)
         .addObject("startProjectButton", getStartProjectLinkButton(user))
+        .addObject("form", form)
+        .addObject("statuses", ProjectStatus.getAllAsMap())
+        .addObject("fieldStages", FieldStage.getAllAsMap())
+        .addObject("ukcsAreas", UkcsArea.getAllAsMap())
         .addObject("dashboardProjectItemViews", dashboardProjectItemViews)
         .addObject("resultSize", dashboardProjectItemViews.size());
   }

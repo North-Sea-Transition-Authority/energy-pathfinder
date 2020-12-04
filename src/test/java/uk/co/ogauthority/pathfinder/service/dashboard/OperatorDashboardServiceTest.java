@@ -12,9 +12,11 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
 import uk.co.ogauthority.pathfinder.repository.dashboard.DashboardProjectItemRepository;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
+import uk.co.ogauthority.pathfinder.testutil.DashboardFilterTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -27,6 +29,8 @@ public class OperatorDashboardServiceTest {
   @Mock
   private TeamService teamService;
 
+  private final DashboardFilterService filterService = new DashboardFilterService();
+
   private OperatorDashboardService operatorDashboardService;
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
@@ -35,12 +39,14 @@ public class OperatorDashboardServiceTest {
 
   private final DashboardProjectItem item1 = DashboardProjectItemTestUtil.getDashboardProjectItem();
   private final DashboardProjectItem item2 = DashboardProjectItemTestUtil.getDashboardProjectItem();
+  private final DashboardFilter filter = DashboardFilterTestUtil.getEmptyFilter();
 
   @Before
   public void setUp() throws Exception {
     operatorDashboardService = new OperatorDashboardService(
         dashboardProjectItemRepository,
-        teamService
+        teamService,
+        filterService
     );
   }
 
@@ -49,7 +55,6 @@ public class OperatorDashboardServiceTest {
     when(dashboardProjectItemRepository.findAllByOrganisationGroupInOrderByCreatedDatetimeDesc(any())).thenReturn(
         List.of(item1, item2)
     );
-    operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson());
-    assertThat(operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson()).size()).isEqualTo(2);
+    assertThat(operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson(), filter).size()).isEqualTo(2);
   }
 }
