@@ -86,7 +86,7 @@ public class ProjectServiceTest {
 
     final var user = UserTestingUtil.getAuthenticatedUserAccount();
 
-    final var newProjectDetail = projectService.createNewProjectDetailVersion(fromProjectDetail, user);
+    final var newProjectDetail = projectService.createNewProjectDetailVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
 
     assertThat(fromProjectDetail.getIsCurrentVersion()).isFalse();
     assertThat(newProjectDetail.getIsCurrentVersion()).isTrue();

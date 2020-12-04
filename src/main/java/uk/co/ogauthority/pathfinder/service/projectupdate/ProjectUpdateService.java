@@ -8,6 +8,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.ProjectUpdateRepository;
@@ -38,12 +39,39 @@ public class ProjectUpdateService {
   public ProjectUpdate startUpdate(ProjectDetail projectDetail,
                                    AuthenticatedUserAccount user,
                                    ProjectUpdateType updateType) {
-    var newDetail = createNewProjectVersion(projectDetail, user);
+    var projectUpdate = createProjectUpdate(
+        projectDetail,
+        ProjectStatus.DRAFT,
+        user,
+        updateType
+    );
+    return projectUpdateRepository.save(projectUpdate);
+  }
+
+  @Transactional
+  public ProjectUpdate createNoUpdateNotification(ProjectDetail projectDetail,
+                                                  AuthenticatedUserAccount user,
+                                                  String reasonNoUpdateRequired) {
+    var projectUpdate = createProjectUpdate(
+        projectDetail,
+        projectDetail.getStatus(),
+        user,
+        ProjectUpdateType.OPERATOR_INITIATED
+    );
+    projectUpdate.setNoUpdate(true);
+    projectUpdate.setReasonNoUpdateRequired(reasonNoUpdateRequired);
+    return projectUpdateRepository.save(projectUpdate);
+  }
+
+  private ProjectUpdate createProjectUpdate(ProjectDetail projectDetail,
+                                            ProjectStatus newStatus,
+                                            AuthenticatedUserAccount user,
+                                            ProjectUpdateType updateType) {
+    var newDetail = createNewProjectVersion(projectDetail, newStatus, user);
     var projectUpdate = new ProjectUpdate();
     projectUpdate.setFromDetail(projectDetail);
     projectUpdate.setNewDetail(newDetail);
     projectUpdate.setUpdateType(updateType);
-    projectUpdateRepository.save(projectUpdate);
     return projectUpdate;
   }
 
@@ -53,8 +81,10 @@ public class ProjectUpdateService {
    * @param userAccount the user creating the new version
    */
   @Transactional
-  public ProjectDetail createNewProjectVersion(ProjectDetail fromDetail, AuthenticatedUserAccount userAccount) {
-    final var newDetail = projectService.createNewProjectDetailVersion(fromDetail, userAccount);
+  public ProjectDetail createNewProjectVersion(ProjectDetail fromDetail,
+                                               ProjectStatus status,
+                                               AuthenticatedUserAccount userAccount) {
+    final var newDetail = projectService.createNewProjectDetailVersion(fromDetail, status, userAccount);
     projectFormSectionServices.forEach(
         projectFormSectionService -> projectFormSectionService.copySectionData(fromDetail, newDetail)
     );

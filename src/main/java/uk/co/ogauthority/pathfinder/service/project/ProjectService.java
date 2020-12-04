@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.project;
 
+import java.time.Instant;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,17 +38,24 @@ public class ProjectService {
             String.format("Unable to find project detail with version %s for project with id %s", version, projectId)));
   }
 
-  public ProjectDetail createNewProjectDetailVersion(ProjectDetail fromDetail, AuthenticatedUserAccount userAccount) {
+  public ProjectDetail createNewProjectDetailVersion(ProjectDetail fromDetail,
+                                                     ProjectStatus newStatus,
+                                                     AuthenticatedUserAccount userAccount) {
 
     fromDetail.setIsCurrentVersion(false);
 
     final var newProjectDetail = new ProjectDetail(
         fromDetail.getProject(),
-        ProjectStatus.DRAFT,
+        newStatus,
         userAccount.getWuaId(),
         fromDetail.getVersion() + 1,
         true
     );
+
+    if (newStatus.equals(ProjectStatus.QA) || newStatus.equals(ProjectStatus.PUBLISHED)) {
+      newProjectDetail.setSubmittedByWua(userAccount.getWuaId());
+      newProjectDetail.setSubmittedInstant(Instant.now());
+    }
 
     projectDetailsRepository.save(fromDetail);
     return projectDetailsRepository.save(newProjectDetail);

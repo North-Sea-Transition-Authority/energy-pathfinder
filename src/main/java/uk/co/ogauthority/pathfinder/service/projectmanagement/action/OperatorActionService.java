@@ -21,6 +21,9 @@ public class OperatorActionService {
   public static final String PROVIDE_UPDATE_ACTION_PROMPT = "Provide update";
   public static final int PROVIDE_UPDATE_ACTION_DISPLAY_ORDER = 10;
 
+  public static final String PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_PROMPT = "Provide no update notification";
+  public static final int PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_DISPLAY_ORDER = 20;
+
   private final ProjectUpdateContextService projectUpdateContextService;
 
   @Autowired
@@ -33,13 +36,20 @@ public class OperatorActionService {
 
     var projectId = projectDetail.getProject().getId();
 
+    var updateActionsEnabled = projectUpdateContextService.canBuildContext(
+        projectDetail,
+        user,
+        OperatorUpdateController.class
+    );
+
     actions.add(getProvideUpdateAction(
         projectId,
-        projectUpdateContextService.canBuildContext(
-            projectDetail,
-            user,
-            OperatorUpdateController.class
-        )
+        updateActionsEnabled
+    ));
+
+    actions.add(getProvideNoUpdateNotificationAction(
+        projectId,
+        updateActionsEnabled
     ));
 
     return actions;
@@ -56,5 +66,18 @@ public class OperatorActionService {
             isEnabled,
             ButtonType.PRIMARY
         ), PROVIDE_UPDATE_ACTION_DISPLAY_ORDER);
+  }
+
+  protected UserActionWithDisplayOrder getProvideNoUpdateNotificationAction(Integer projectId, boolean isEnabled) {
+    return new UserActionWithDisplayOrder(
+        new LinkButton(
+            PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_PROMPT,
+            ReverseRouter.route(on(OperatorUpdateController.class).provideNoUpdateConfirmation(
+                projectId,
+                null
+            )),
+            isEnabled,
+            ButtonType.SECONDARY
+        ), PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_DISPLAY_ORDER);
   }
 }

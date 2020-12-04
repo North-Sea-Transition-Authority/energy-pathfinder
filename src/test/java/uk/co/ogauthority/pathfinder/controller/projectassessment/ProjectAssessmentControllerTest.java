@@ -77,7 +77,7 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
   }
 
   @Test
-  public void getProjectAssessment_whenUnauthenticated_thenAccess() throws Exception {
+  public void getProjectAssessment_whenUnauthenticated_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
         on(ProjectAssessmentController.class).getProjectAssessment(QA_PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))

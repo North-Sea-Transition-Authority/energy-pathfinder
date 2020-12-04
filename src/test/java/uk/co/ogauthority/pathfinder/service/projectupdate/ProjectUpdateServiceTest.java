@@ -69,16 +69,16 @@ public class ProjectUpdateServiceTest {
     final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
     final var user = UserTestingUtil.getAuthenticatedUserAccount();
 
-    projectUpdateService.createNewProjectVersion(fromProjectDetail, user);
+    projectUpdateService.createNewProjectVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
 
-    verify(projectService, times(1)).createNewProjectDetailVersion(fromProjectDetail, user);
+    verify(projectService, times(1)).createNewProjectDetailVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
     verify(projectInformationService, times(1)).copySectionData(eq(fromProjectDetail), any());
     verify(awardedContractService, times(1)).copySectionData(eq(fromProjectDetail), any());
   }
 
   @Test
   public void startUpdate() {
-    when(projectService.createNewProjectDetailVersion(projectDetail, authenticatedUser)).thenReturn(
+    when(projectService.createNewProjectDetailVersion(projectDetail, ProjectStatus.DRAFT, authenticatedUser)).thenReturn(
         ProjectUtil.getProjectDetails()
     );
 
@@ -86,6 +86,25 @@ public class ProjectUpdateServiceTest {
     assertThat(projectUpdate.getFromDetail()).isEqualTo(projectDetail);
     assertThat(projectUpdate.getNewDetail()).isNotNull();
     assertThat(projectUpdate.getUpdateType()).isEqualTo(ProjectUpdateType.OPERATOR_INITIATED);
+    assertThat(projectUpdate.isNoUpdate()).isFalse();
+    assertThat(projectUpdate.getReasonNoUpdateRequired()).isNull();
+    verify(projectUpdateRepository, times(1)).save(projectUpdate);
+  }
+
+  @Test
+  public void createNoUpdateNotification() {
+    when(projectService.createNewProjectDetailVersion(projectDetail, ProjectStatus.DRAFT, authenticatedUser)).thenReturn(
+        ProjectUtil.getProjectDetails()
+    );
+
+    var reasonNoUpdateRequired = "Test reason";
+
+    var projectUpdate = projectUpdateService.createNoUpdateNotification(projectDetail, authenticatedUser, reasonNoUpdateRequired);
+    assertThat(projectUpdate.getFromDetail()).isEqualTo(projectDetail);
+    assertThat(projectUpdate.getNewDetail()).isNotNull();
+    assertThat(projectUpdate.getUpdateType()).isEqualTo(ProjectUpdateType.OPERATOR_INITIATED);
+    assertThat(projectUpdate.isNoUpdate()).isTrue();
+    assertThat(projectUpdate.getReasonNoUpdateRequired()).isEqualTo(reasonNoUpdateRequired);
     verify(projectUpdateRepository, times(1)).save(projectUpdate);
   }
 
