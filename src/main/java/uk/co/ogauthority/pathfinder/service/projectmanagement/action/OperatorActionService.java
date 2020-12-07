@@ -13,7 +13,6 @@ import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.model.form.useraction.UserActionWithDisplayOrder;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
 
 @Service
@@ -22,39 +21,36 @@ public class OperatorActionService {
   public static final String PROVIDE_UPDATE_ACTION_PROMPT = "Provide update";
   public static final int PROVIDE_UPDATE_ACTION_DISPLAY_ORDER = 10;
 
-  private final ProjectContextService projectContextService;
   private final ProjectUpdateContextService projectUpdateContextService;
 
   @Autowired
-  public OperatorActionService(
-      ProjectContextService projectContextService,
-      ProjectUpdateContextService projectUpdateContextService) {
-    this.projectContextService = projectContextService;
+  public OperatorActionService(ProjectUpdateContextService projectUpdateContextService) {
     this.projectUpdateContextService = projectUpdateContextService;
   }
 
   public List<UserActionWithDisplayOrder> getActions(ProjectDetail projectDetail, AuthenticatedUserAccount user) {
     var actions = new ArrayList<UserActionWithDisplayOrder>();
 
+    var projectId = projectDetail.getProject().getId();
+
     actions.add(getProvideUpdateAction(
-        projectDetail,
+        projectId,
         projectUpdateContextService.canBuildContext(
             projectDetail,
             user,
-            projectContextService.getProjectStatusesForClass(OperatorUpdateController.class),
-            projectContextService.getProjectPermissionsForClass(OperatorUpdateController.class)
+            OperatorUpdateController.class
         )
     ));
 
     return actions;
   }
 
-  protected UserActionWithDisplayOrder getProvideUpdateAction(ProjectDetail projectDetail, boolean isEnabled) {
+  protected UserActionWithDisplayOrder getProvideUpdateAction(Integer projectId, boolean isEnabled) {
     return new UserActionWithDisplayOrder(
         new LinkButton(
             PROVIDE_UPDATE_ACTION_PROMPT,
             ReverseRouter.route(on(OperatorUpdateController.class).startPage(
-                projectDetail.getProject().getId(),
+                projectId,
                 null
             )),
             isEnabled,

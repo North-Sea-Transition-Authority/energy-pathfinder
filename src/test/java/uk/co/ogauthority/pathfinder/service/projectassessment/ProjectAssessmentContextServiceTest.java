@@ -1,6 +1,9 @@
 package uk.co.ogauthority.pathfinder.service.projectassessment;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Set;
@@ -42,9 +45,11 @@ public class ProjectAssessmentContextServiceTest {
         projectAssessmentService
     );
 
-    when(projectContextService.buildProjectContext(projectDetail, authenticatedUser, projectStatuses, projectPermissions)).thenReturn(
-        new ProjectContext(projectDetail, projectPermissions, authenticatedUser)
-    );
+    when(projectContextService.buildProjectContext(any(), any(), any(), any()))
+        .thenAnswer(invocation -> new ProjectContext(invocation.getArgument(0), invocation.getArgument(3), invocation.getArgument(1)));
+
+    when(projectContextService.getProjectStatusesForClass(TestController.class)).thenReturn(projectStatuses);
+    when(projectContextService.getProjectPermissionsForClass(TestController.class)).thenReturn(projectPermissions);
   }
 
   @Test
@@ -54,11 +59,12 @@ public class ProjectAssessmentContextServiceTest {
     var result = projectAssessmentContextService.canBuildContext(
         projectDetail,
         authenticatedUser,
-        projectStatuses,
-        projectPermissions
+        TestController.class
     );
 
     assertThat(result).isTrue();
+
+    verify(projectContextService, times(1)).buildProjectContext(projectDetail, authenticatedUser, projectStatuses, projectPermissions);
   }
 
   @Test
@@ -68,11 +74,12 @@ public class ProjectAssessmentContextServiceTest {
     var result = projectAssessmentContextService.canBuildContext(
         projectDetail,
         authenticatedUser,
-        projectStatuses,
-        projectPermissions
+        TestController.class
     );
 
     assertThat(result).isFalse();
+
+    verify(projectContextService, times(0)).buildProjectContext(projectDetail, authenticatedUser, projectStatuses, projectPermissions);
   }
 
   @Test
@@ -102,4 +109,6 @@ public class ProjectAssessmentContextServiceTest {
         projectPermissions
     );
   }
+
+  private static class TestController {}
 }

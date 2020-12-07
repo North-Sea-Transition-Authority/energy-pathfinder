@@ -1,20 +1,14 @@
 package uk.co.ogauthority.pathfinder.service.projectupdate;
 
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.controller.projectupdate.OperatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
-import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
-import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.ProjectUpdateRepository;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
@@ -22,8 +16,6 @@ import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionServ
 
 @Service
 public class ProjectUpdateService {
-
-  public static final String START_PAGE_TEMPLATE_PATH = "projectupdate/startPage";
 
   private final ProjectUpdateRepository projectUpdateRepository;
   private final ProjectDetailsRepository projectDetailsRepository;
@@ -43,12 +35,14 @@ public class ProjectUpdateService {
   }
 
   @Transactional
-  public ProjectUpdate startUpdate(ProjectDetail projectDetail, AuthenticatedUserAccount user) {
+  public ProjectUpdate startUpdate(ProjectDetail projectDetail,
+                                   AuthenticatedUserAccount user,
+                                   ProjectUpdateType updateType) {
     var newDetail = createNewProjectVersion(projectDetail, user);
     var projectUpdate = new ProjectUpdate();
     projectUpdate.setFromDetail(projectDetail);
     projectUpdate.setNewDetail(newDetail);
-    projectUpdate.setUpdateType(ProjectUpdateType.OPERATOR_INITIATED);
+    projectUpdate.setUpdateType(updateType);
     projectUpdateRepository.save(projectUpdate);
     return projectUpdate;
   }
@@ -68,11 +62,6 @@ public class ProjectUpdateService {
   }
 
   public boolean isUpdateInProgress(Project project) {
-    return projectDetailsRepository.projectUpdateInProgress(project.getId());
-  }
-
-  public ModelAndView getProjectUpdateModelAndView(Integer projectId) {
-    return new ModelAndView(START_PAGE_TEMPLATE_PATH)
-        .addObject("startActionUrl", ReverseRouter.route(on(OperatorUpdateController.class).startUpdate(projectId, null, null)));
+    return projectDetailsRepository.isProjectUpdateInProgress(project.getId());
   }
 }

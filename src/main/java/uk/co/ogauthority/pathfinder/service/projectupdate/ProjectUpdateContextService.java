@@ -25,8 +25,10 @@ public class ProjectUpdateContextService {
 
   public boolean canBuildContext(ProjectDetail detail,
                                  AuthenticatedUserAccount user,
-                                 Set<ProjectStatus> statusCheck,
-                                 Set<ProjectPermission> permissionCheck) {
+                                 Class<?> controllerClass) {
+    var statusCheck = projectContextService.getProjectStatusesForClass(controllerClass);
+    var permissionCheck = projectContextService.getProjectPermissionsForClass(controllerClass);
+
     try {
       buildProjectUpdateContext(detail, user, statusCheck, permissionCheck);
       return true;
@@ -36,16 +38,17 @@ public class ProjectUpdateContextService {
   }
 
   public ProjectUpdateContext buildProjectUpdateContext(ProjectDetail detail,
-                                                         AuthenticatedUserAccount user,
-                                                         Set<ProjectStatus> statusCheck,
-                                                         Set<ProjectPermission> permissionCheck) {
+                                                        AuthenticatedUserAccount user,
+                                                        Set<ProjectStatus> statusCheck,
+                                                        Set<ProjectPermission> permissionCheck) {
     var project = detail.getProject();
 
     if (projectUpdateService.isUpdateInProgress(project)) {
       throw new AccessDeniedException(
           String.format(
               "Project id %s already has an update in progress",
-              project)
+              project.getId()
+          )
       );
     }
 

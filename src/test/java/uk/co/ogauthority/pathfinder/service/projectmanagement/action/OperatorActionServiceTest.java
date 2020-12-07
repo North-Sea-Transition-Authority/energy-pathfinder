@@ -13,12 +13,12 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.OperatorUpdateController;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.model.form.useraction.UserActionWithDisplayOrder;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -27,53 +27,52 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 public class OperatorActionServiceTest {
 
   @Mock
-  private ProjectContextService projectContextService;
-
-  @Mock
   private ProjectUpdateContextService projectUpdateContextService;
 
   private OperatorActionService operatorActionService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
+  private final Project project = projectDetail.getProject();
+
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   @Before
   public void setup() {
-    operatorActionService = new OperatorActionService(projectContextService, projectUpdateContextService);
+    operatorActionService = new OperatorActionService(projectUpdateContextService);
   }
 
   @Test
   public void getActions_whenCannotBuildUpdateContext() {
-    when(projectUpdateContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any(), any())).thenReturn(false);
+    when(projectUpdateContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any())).thenReturn(false);
 
     var actions = operatorActionService.getActions(projectDetail, authenticatedUser);
 
     assertThat(actions).containsExactly(
-        operatorActionService.getProvideUpdateAction(projectDetail, false)
+        operatorActionService.getProvideUpdateAction(project.getId(), false)
     );
   }
 
   @Test
   public void getActions_whenCanBuildAssessmentContext() {
-    when(projectUpdateContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any(), any())).thenReturn(true);
+    when(projectUpdateContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any())).thenReturn(true);
 
     var actions = operatorActionService.getActions(projectDetail, authenticatedUser);
 
     assertThat(actions).containsExactly(
-        operatorActionService.getProvideUpdateAction(projectDetail, true)
+        operatorActionService.getProvideUpdateAction(project.getId(), true)
     );
   }
 
   @Test
   public void getProvideUpdateAction_enabled() {
-    var action = operatorActionService.getProvideUpdateAction(projectDetail, true);
+    var action = operatorActionService.getProvideUpdateAction(project.getId(), true);
 
     assertProvideUpdateActionFields(action, true);
   }
 
   @Test
   public void getProvideUpdateAction_disabled() {
-    var action = operatorActionService.getProvideUpdateAction(projectDetail, false);
+    var action = operatorActionService.getProvideUpdateAction(project.getId(), false);
 
     assertProvideUpdateActionFields(action, false);
   }
@@ -82,10 +81,7 @@ public class OperatorActionServiceTest {
     var linkButton = (LinkButton) action.getUserAction();
     assertThat(linkButton.getPrompt()).isEqualTo(OperatorActionService.PROVIDE_UPDATE_ACTION_PROMPT);
     assertThat(linkButton.getUrl()).isEqualTo(
-        ReverseRouter.route(on(OperatorUpdateController.class).startPage(
-            projectDetail.getProject().getId(),
-            null
-        ))
+        ReverseRouter.route(on(OperatorUpdateController.class).startPage(projectDetail.getProject().getId(), null))
     );
     assertThat(linkButton.getEnabled()).isEqualTo(isEnabled);
     assertThat(linkButton.getButtonType()).isEqualTo(ButtonType.PRIMARY);

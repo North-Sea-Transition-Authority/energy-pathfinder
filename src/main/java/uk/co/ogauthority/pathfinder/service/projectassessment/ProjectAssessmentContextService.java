@@ -25,8 +25,10 @@ public class ProjectAssessmentContextService {
 
   public boolean canBuildContext(ProjectDetail detail,
                                  AuthenticatedUserAccount user,
-                                 Set<ProjectStatus> statusCheck,
-                                 Set<ProjectPermission> permissionCheck) {
+                                 Class<?> controllerClass) {
+    var statusCheck = projectContextService.getProjectStatusesForClass(controllerClass);
+    var permissionCheck = projectContextService.getProjectPermissionsForClass(controllerClass);
+
     try {
       buildProjectAssessmentContext(detail, user, statusCheck, permissionCheck);
       return true;

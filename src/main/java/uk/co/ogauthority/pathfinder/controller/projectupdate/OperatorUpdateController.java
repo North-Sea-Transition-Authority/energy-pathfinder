@@ -14,8 +14,10 @@ import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContext;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
 
@@ -25,24 +27,28 @@ import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
 @RequestMapping("/project/{projectId}/project-update")
 public class OperatorUpdateController {
 
+  private final OperatorProjectUpdateService operatorProjectUpdateService;
   private final ProjectUpdateService projectUpdateService;
 
   @Autowired
-  public OperatorUpdateController(ProjectUpdateService projectUpdateService) {
+  public OperatorUpdateController(
+      OperatorProjectUpdateService operatorProjectUpdateService,
+      ProjectUpdateService projectUpdateService) {
+    this.operatorProjectUpdateService = operatorProjectUpdateService;
     this.projectUpdateService = projectUpdateService;
   }
 
   @GetMapping
   public ModelAndView startPage(@PathVariable("projectId") Integer projectId,
                                 ProjectUpdateContext projectUpdateContext) {
-    return projectUpdateService.getProjectUpdateModelAndView(projectId);
+    return operatorProjectUpdateService.getProjectUpdateModelAndView(projectId);
   }
 
   @PostMapping
   public ModelAndView startUpdate(@PathVariable("projectId") Integer projectId,
                                   ProjectUpdateContext projectUpdateContext,
                                   AuthenticatedUserAccount user) {
-    projectUpdateService.startUpdate(projectUpdateContext.getProjectDetails(), user);
+    projectUpdateService.startUpdate(projectUpdateContext.getProjectDetails(), user, ProjectUpdateType.OPERATOR_INITIATED);
     return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
   }
 }

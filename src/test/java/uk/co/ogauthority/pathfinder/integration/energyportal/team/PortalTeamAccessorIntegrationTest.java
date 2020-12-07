@@ -349,25 +349,13 @@ public class PortalTeamAccessorIntegrationTest {
 
   @Test
   @Transactional
-  public void getNumberOfTeamsWherePersonMemberOfTeamType_whenPersonIsTeamMember_AndHasSearchForRole_andTeamScoped() {
+  public void getNumberOfTeamsWherePersonMemberOfTeamType_whenPersonIsTeamMember() {
     long foundTeams = portalTeamAccessor.getNumberOfTeamsWherePersonMemberOfTeamType(
         scopedTeamMemberPerson_1Role,
         SCOPED_TEAM_PORTAL_TYPE
     );
 
-    assertThat(foundTeams).isEqualTo(2);
-
-  }
-
-  @Test
-  @Transactional
-  public void getNumberOfTeamsWherePersonMemberOfTeamType_whenPersonIsTeamMember_AndHasSearchForRole_andTeamUnscoped() {
-    long foundTeams = portalTeamAccessor.getNumberOfTeamsWherePersonMemberOfTeamType(
-        unscopedTeamMemberPerson_2Roles,
-        UNSCOPED_TEAM_PORTAL_TYPE
-    );
-
-    assertThat(foundTeams).isEqualTo(2);
+    assertThat(foundTeams).isEqualTo(1);
 
   }
 

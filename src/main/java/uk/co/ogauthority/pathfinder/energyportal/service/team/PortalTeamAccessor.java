@@ -197,8 +197,7 @@ public class PortalTeamAccessor {
                                                           String portalTeamType) {
     return (Long) entityManager.createQuery("" +
             "SELECT COUNT(pt) " +
-            "FROM PortalTeamTypeRole pttr " +
-            "JOIN PortalTeamType ptt ON ptt = pttr.portalTeamType " +
+            "FROM PortalTeamType ptt " +
             "JOIN PortalTeam pt ON pt.portalTeamType = ptt " +
             "JOIN PortalTeamMember ptm ON ptm.portalTeam = pt " +
             "LEFT JOIN PortalTeamUsage ptu ON ptu.portalTeam = pt " +

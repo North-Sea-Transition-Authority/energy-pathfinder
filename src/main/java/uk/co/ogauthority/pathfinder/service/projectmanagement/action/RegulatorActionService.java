@@ -13,7 +13,6 @@ import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.model.form.useraction.UserActionWithDisplayOrder;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContextService;
 
 @Service
@@ -22,42 +21,36 @@ public class RegulatorActionService {
   public static final String PROVIDE_ASSESSMENT_ACTION_PROMPT = "Provide assessment";
   public static final int PROVIDE_ASSESSMENT_ACTION_DISPLAY_ORDER = 10;
 
-  private final ProjectContextService projectContextService;
   private final ProjectAssessmentContextService projectAssessmentContextService;
 
   @Autowired
-  public RegulatorActionService(
-      ProjectContextService projectContextService,
-      ProjectAssessmentContextService projectAssessmentContextService) {
-    this.projectContextService = projectContextService;
+  public RegulatorActionService(ProjectAssessmentContextService projectAssessmentContextService) {
     this.projectAssessmentContextService = projectAssessmentContextService;
   }
 
   public List<UserActionWithDisplayOrder> getActions(ProjectDetail projectDetail, AuthenticatedUserAccount user) {
     var actions = new ArrayList<UserActionWithDisplayOrder>();
 
+    var projectId = projectDetail.getProject().getId();
+
     actions.add(getProvideAssessmentAction(
-        projectDetail,
+        projectId,
         projectAssessmentContextService.canBuildContext(
             projectDetail,
             user,
-            projectContextService.getProjectStatusesForClass(ProjectAssessmentController.class),
-            projectContextService.getProjectPermissionsForClass(ProjectAssessmentController.class)
+            ProjectAssessmentController.class
         )
     ));
 
     return actions;
   }
 
-  protected UserActionWithDisplayOrder getProvideAssessmentAction(ProjectDetail projectDetail,
+  protected UserActionWithDisplayOrder getProvideAssessmentAction(Integer projectId,
                                                                   boolean isEnabled) {
     return new UserActionWithDisplayOrder(
         new LinkButton(
             PROVIDE_ASSESSMENT_ACTION_PROMPT,
-            ReverseRouter.route(on(ProjectAssessmentController.class).getProjectAssessment(
-                projectDetail.getProject().getId(),
-                null
-            )),
+            ReverseRouter.route(on(ProjectAssessmentController.class).getProjectAssessment(projectId, null)),
             isEnabled,
             ButtonType.PRIMARY
         ), PROVIDE_ASSESSMENT_ACTION_DISPLAY_ORDER);

@@ -7,7 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
@@ -20,12 +20,11 @@ public class ProjectUpdate {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   protected Integer id;
 
-  @ManyToOne
+  @OneToOne
   @JoinColumn(name = "from_project_detail_id")
   private ProjectDetail fromDetail;
 
-
-  @ManyToOne
+  @OneToOne
   @JoinColumn(name = "new_project_detail_id")
   private ProjectDetail newDetail;
 
