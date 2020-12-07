@@ -81,7 +81,7 @@ public class OperatorActionServiceTest {
     var linkButton = (LinkButton) action.getUserAction();
     assertThat(linkButton.getPrompt()).isEqualTo(OperatorActionService.PROVIDE_UPDATE_ACTION_PROMPT);
     assertThat(linkButton.getUrl()).isEqualTo(
-        ReverseRouter.route(on(OperatorUpdateController.class).startPage(projectDetail.getProject().getId(), null))
+        ReverseRouter.route(on(OperatorUpdateController.class).startPage(project.getId(), null))
     );
     assertThat(linkButton.getEnabled()).isEqualTo(isEnabled);
     assertThat(linkButton.getButtonType()).isEqualTo(ButtonType.PRIMARY);
