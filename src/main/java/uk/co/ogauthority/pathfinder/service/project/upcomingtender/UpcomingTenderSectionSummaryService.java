@@ -25,10 +25,18 @@ public class UpcomingTenderSectionSummaryService implements ProjectSectionSummar
   public static final int DISPLAY_ORDER = ProjectTask.UPCOMING_TENDERS.getDisplayOrder();
 
   private final UpcomingTenderSummaryService upcomingTenderSummaryService;
+  private final UpcomingTenderService upcomingTenderService;
 
   @Autowired
-  public UpcomingTenderSectionSummaryService(UpcomingTenderSummaryService upcomingTenderSummaryService) {
+  public UpcomingTenderSectionSummaryService(UpcomingTenderSummaryService upcomingTenderSummaryService,
+                                             UpcomingTenderService upcomingTenderService) {
     this.upcomingTenderSummaryService = upcomingTenderSummaryService;
+    this.upcomingTenderService = upcomingTenderService;
+  }
+
+  @Override
+  public boolean canShowSection(ProjectDetail detail) {
+    return upcomingTenderService.canShowInTaskList(detail);
   }
 
   @Override

@@ -32,6 +32,20 @@ public class PlatformsFpsosSectionSummaryServiceTest {
   }
 
   @Test
+  public void canShowSection_whenCanShowInTaskList_thenTrue() {
+    when(platformsFpsosService.canShowInTaskList(detail)).thenReturn(true);
+
+    assertThat(platformsFpsosSectionSummaryService.canShowSection(detail)).isTrue();
+  }
+
+  @Test
+  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
+    when(platformsFpsosService.canShowInTaskList(detail)).thenReturn(false);
+
+    assertThat(platformsFpsosSectionSummaryService.canShowSection(detail)).isFalse();
+  }
+
+  @Test
   public void getSummary() {
     var platformFpso1 = PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(detail);
     var platformFpso2 = PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(detail);
