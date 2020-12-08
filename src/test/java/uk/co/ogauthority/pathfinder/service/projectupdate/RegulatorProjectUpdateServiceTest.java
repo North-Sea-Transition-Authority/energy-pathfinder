@@ -1,0 +1,128 @@
+package uk.co.ogauthority.pathfinder.service.projectupdate;
+
+import static java.util.Map.entry;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
+import java.time.LocalDate;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
+import uk.co.ogauthority.pathfinder.controller.projectupdate.RegulatorUpdateController;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
+import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorRequestedUpdate;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.projectupdate.RequestUpdateForm;
+import uk.co.ogauthority.pathfinder.model.form.projectupdate.RequestUpdateFormValidator;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.repository.projectupdate.RegulatorRequestedUpdateRepository;
+import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
+
+@RunWith(MockitoJUnitRunner.class)
+public class RegulatorProjectUpdateServiceTest {
+
+  @Mock
+  private RegulatorRequestedUpdateRepository regulatorRequestedUpdateRepository;
+
+  @Mock
+  private ProjectUpdateService projectUpdateService;
+
+  @Mock
+  private RequestUpdateFormValidator requestUpdateFormValidator;
+
+  @Mock
+  private ValidationService validationService;
+
+  @Mock
+  private BreadcrumbService breadcrumbService;
+
+  private RegulatorProjectUpdateService regulatorProjectUpdateService;
+
+  private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
+  private final Project project = projectDetail.getProject();
+
+  private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
+
+  @Before
+  public void setup() {
+    regulatorProjectUpdateService = new RegulatorProjectUpdateService(
+        regulatorRequestedUpdateRepository,
+        projectUpdateService,
+        requestUpdateFormValidator,
+        validationService,
+        breadcrumbService
+    );
+
+    when(regulatorRequestedUpdateRepository.save(any(RegulatorRequestedUpdate.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
+  }
+
+  @Test
+  public void validate() {
+    var form = new RequestUpdateForm();
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+
+    regulatorProjectUpdateService.validate(form, bindingResult);
+
+    verify(requestUpdateFormValidator, times(1)).validate(eq(form), eq(bindingResult), any());
+    verify(validationService, times(1)).validate(form, bindingResult, ValidationType.FULL);
+  }
+
+  @Test
+  public void startRegulatorRequestedUpdate() {
+    var form = new RequestUpdateForm();
+    form.setUpdateReason("Test update reason");
+    form.setDeadlineDate(new ThreeFieldDateInput(LocalDate.now().plusMonths(1)));
+
+    var projectUpdate = new ProjectUpdate();
+
+    when(projectUpdateService.startUpdate(projectDetail, authenticatedUser, ProjectUpdateType.REGULATOR_REQUESTED)).thenReturn(
+        projectUpdate
+    );
+
+    var regulatorRequestedUpdate = regulatorProjectUpdateService.startRegulatorRequestedUpdate(projectDetail, form, authenticatedUser);
+
+    verify(projectUpdateService, times(1)).startUpdate(projectDetail, authenticatedUser, ProjectUpdateType.REGULATOR_REQUESTED);
+
+    assertThat(regulatorRequestedUpdate.getProjectUpdate()).isEqualTo(projectUpdate);
+    assertThat(regulatorRequestedUpdate.getUpdateReason()).isEqualTo(form.getUpdateReason());
+    assertThat(regulatorRequestedUpdate.getDeadlineDate()).isEqualTo(form.getDeadlineDate().createDateOrNull());
+    assertThat(regulatorRequestedUpdate.getRequestedByWuaId()).isEqualTo(authenticatedUser.getWuaId());
+    assertThat(regulatorRequestedUpdate.getRequestedInstant()).isNotNull();
+
+    verify(regulatorRequestedUpdateRepository).save(regulatorRequestedUpdate);
+  }
+
+  @Test
+  public void getRequestUpdateModelAndView() {
+    var form = new RequestUpdateForm();
+
+    var modelAndView = regulatorProjectUpdateService.getRequestUpdateModelAndView(project.getId(), form);
+
+    assertThat(modelAndView.getViewName()).isEqualTo(RegulatorProjectUpdateService.REQUEST_UPDATE_TEMPLATE_PATH);
+    assertThat(modelAndView.getModel()).containsExactly(
+        entry("form", form),
+        entry("startActionUrl", ReverseRouter.route(on(RegulatorUpdateController.class)
+            .requestUpdate(project.getId(), null, null, null, null))),
+        entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(project.getId(), null, null, null)))
+    );
+
+    verify(breadcrumbService, times(1)).fromManageProject(project.getId(), modelAndView, RegulatorUpdateController.REQUEST_UPDATE_PAGE_NAME);
+  }
+}

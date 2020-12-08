@@ -36,7 +36,6 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
-import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -52,9 +51,6 @@ public class OperatorUpdateControllerTest extends ProjectUpdateContextAbstractCo
 
   @MockBean
   private OperatorProjectUpdateService operatorProjectUpdateService;
-
-  @MockBean
-  private ProjectUpdateService projectUpdateService;
 
   private final ProjectDetail qaProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
   private final ProjectDetail draftProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
