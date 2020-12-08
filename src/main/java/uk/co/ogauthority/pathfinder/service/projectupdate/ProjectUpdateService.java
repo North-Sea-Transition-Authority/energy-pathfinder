@@ -39,40 +39,20 @@ public class ProjectUpdateService {
   public ProjectUpdate startUpdate(ProjectDetail projectDetail,
                                    AuthenticatedUserAccount user,
                                    ProjectUpdateType updateType) {
-    var projectUpdate = createProjectUpdate(
-        projectDetail,
-        ProjectStatus.DRAFT,
-        user,
-        updateType
-    );
-    return projectUpdateRepository.save(projectUpdate);
+    return startUpdate(projectDetail, ProjectStatus.DRAFT, user, updateType);
   }
 
   @Transactional
-  public ProjectUpdate createNoUpdateNotification(ProjectDetail projectDetail,
-                                                  AuthenticatedUserAccount user,
-                                                  String reasonNoUpdateRequired) {
-    var projectUpdate = createProjectUpdate(
-        projectDetail,
-        projectDetail.getStatus(),
-        user,
-        ProjectUpdateType.OPERATOR_INITIATED
-    );
-    projectUpdate.setNoUpdate(true);
-    projectUpdate.setReasonNoUpdateRequired(reasonNoUpdateRequired);
-    return projectUpdateRepository.save(projectUpdate);
-  }
-
-  private ProjectUpdate createProjectUpdate(ProjectDetail projectDetail,
-                                            ProjectStatus newStatus,
-                                            AuthenticatedUserAccount user,
-                                            ProjectUpdateType updateType) {
+  public ProjectUpdate startUpdate(ProjectDetail projectDetail,
+                                   ProjectStatus newStatus,
+                                   AuthenticatedUserAccount user,
+                                   ProjectUpdateType updateType) {
     var newDetail = createNewProjectVersion(projectDetail, newStatus, user);
     var projectUpdate = new ProjectUpdate();
     projectUpdate.setFromDetail(projectDetail);
     projectUpdate.setNewDetail(newDetail);
     projectUpdate.setUpdateType(updateType);
-    return projectUpdate;
+    return projectUpdateRepository.save(projectUpdate);
   }
 
   /**

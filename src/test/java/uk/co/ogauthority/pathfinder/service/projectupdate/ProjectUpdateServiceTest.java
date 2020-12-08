@@ -49,6 +49,7 @@ public class ProjectUpdateServiceTest {
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
   private final Project project = projectDetail.getProject();
+
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   @Before
@@ -86,25 +87,6 @@ public class ProjectUpdateServiceTest {
     assertThat(projectUpdate.getFromDetail()).isEqualTo(projectDetail);
     assertThat(projectUpdate.getNewDetail()).isNotNull();
     assertThat(projectUpdate.getUpdateType()).isEqualTo(ProjectUpdateType.OPERATOR_INITIATED);
-    assertThat(projectUpdate.isNoUpdate()).isFalse();
-    assertThat(projectUpdate.getReasonNoUpdateRequired()).isNull();
-    verify(projectUpdateRepository, times(1)).save(projectUpdate);
-  }
-
-  @Test
-  public void createNoUpdateNotification() {
-    when(projectService.createNewProjectDetailVersion(projectDetail, ProjectStatus.DRAFT, authenticatedUser)).thenReturn(
-        ProjectUtil.getProjectDetails()
-    );
-
-    var reasonNoUpdateRequired = "Test reason";
-
-    var projectUpdate = projectUpdateService.createNoUpdateNotification(projectDetail, authenticatedUser, reasonNoUpdateRequired);
-    assertThat(projectUpdate.getFromDetail()).isEqualTo(projectDetail);
-    assertThat(projectUpdate.getNewDetail()).isNotNull();
-    assertThat(projectUpdate.getUpdateType()).isEqualTo(ProjectUpdateType.OPERATOR_INITIATED);
-    assertThat(projectUpdate.isNoUpdate()).isTrue();
-    assertThat(projectUpdate.getReasonNoUpdateRequired()).isEqualTo(reasonNoUpdateRequired);
     verify(projectUpdateRepository, times(1)).save(projectUpdate);
   }
 

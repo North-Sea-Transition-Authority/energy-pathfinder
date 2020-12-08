@@ -175,7 +175,7 @@ public class OperatorUpdateControllerTest extends ProjectUpdateContextAbstractCo
         .andExpect(status().is3xxRedirection());
 
     verify(operatorProjectUpdateService, times(1)).validate(any(), any());
-    verify(projectUpdateService, times(1)).createNoUpdateNotification(any(), any(), any());
+    verify(operatorProjectUpdateService, times(1)).createNoUpdateNotification(any(), any(), any());
   }
 
   @Test
@@ -195,7 +195,7 @@ public class OperatorUpdateControllerTest extends ProjectUpdateContextAbstractCo
         .andExpect(status().isOk());
 
     verify(operatorProjectUpdateService, times(1)).validate(any(), any());
-    verify(projectUpdateService, times(0)).createNoUpdateNotification(any(), any(), any());
+    verify(operatorProjectUpdateService, times(0)).createNoUpdateNotification(any(), any(), any());
   }
 
   @Test
@@ -208,7 +208,7 @@ public class OperatorUpdateControllerTest extends ProjectUpdateContextAbstractCo
             .with(csrf()))
         .andExpect(status().isForbidden());
 
-    verify(projectUpdateService, never()).createNoUpdateNotification(any(), any(), any());
+    verify(operatorProjectUpdateService, never()).createNoUpdateNotification(any(), any(), any());
   }
 
   @Test
@@ -221,6 +221,6 @@ public class OperatorUpdateControllerTest extends ProjectUpdateContextAbstractCo
             .with(csrf()))
         .andExpect(status().isForbidden());
 
-    verify(projectUpdateService, never()).createNoUpdateNotification(any(), any(), any());
+    verify(operatorProjectUpdateService, never()).createNoUpdateNotification(any(), any(), any());
   }
 }

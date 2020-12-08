@@ -80,7 +80,11 @@ public class OperatorUpdateController {
         operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(projectId, form),
         form,
         () -> {
-          projectUpdateService.createNoUpdateNotification(projectUpdateContext.getProjectDetails(), user, form.getReasonNoUpdateRequired());
+          operatorProjectUpdateService.createNoUpdateNotification(
+              projectUpdateContext.getProjectDetails(),
+              user,
+              form.getReasonNoUpdateRequired()
+          );
           return ReverseRouter.redirect(on(ManageProjectController.class).getProject(projectId, null, null, null));
         }
     );

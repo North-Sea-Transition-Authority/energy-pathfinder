@@ -31,10 +31,6 @@ public class ProjectUpdate {
   @Enumerated(EnumType.STRING)
   private ProjectUpdateType updateType;
 
-  private boolean noUpdate;
-
-  private String reasonNoUpdateRequired;
-
   public Integer getId() {
     return id;
   }
@@ -61,21 +57,5 @@ public class ProjectUpdate {
 
   public void setUpdateType(ProjectUpdateType updateType) {
     this.updateType = updateType;
-  }
-
-  public boolean isNoUpdate() {
-    return noUpdate;
-  }
-
-  public void setNoUpdate(boolean noUpdate) {
-    this.noUpdate = noUpdate;
-  }
-
-  public String getReasonNoUpdateRequired() {
-    return reasonNoUpdateRequired;
-  }
-
-  public void setReasonNoUpdateRequired(String reasonNoUpdateRequired) {
-    this.reasonNoUpdateRequired = reasonNoUpdateRequired;
   }
 }
