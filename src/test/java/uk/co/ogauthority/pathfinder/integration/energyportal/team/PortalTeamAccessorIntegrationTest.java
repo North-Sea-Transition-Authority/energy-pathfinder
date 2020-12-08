@@ -337,6 +337,30 @@ public class PortalTeamAccessorIntegrationTest {
 
   @Test
   @Transactional
+  public void getNumberOfTeamsWherePersonMemberOfTeamType_whenPersonNotATeamMember() {
+    long foundTeams = portalTeamAccessor.getNumberOfTeamsWherePersonMemberOfTeamType(
+        scopedTeamMemberPerson_1Role,
+        UNSCOPED_TEAM_PORTAL_TYPE
+    );
+
+    assertThat(foundTeams).isZero();
+
+  }
+
+  @Test
+  @Transactional
+  public void getNumberOfTeamsWherePersonMemberOfTeamType_whenPersonIsTeamMember() {
+    long foundTeams = portalTeamAccessor.getNumberOfTeamsWherePersonMemberOfTeamType(
+        scopedTeamMemberPerson_1Role,
+        SCOPED_TEAM_PORTAL_TYPE
+    );
+
+    assertThat(foundTeams).isEqualTo(1);
+
+  }
+
+  @Test
+  @Transactional
   public void getAllPortalSystemPrivilegesForPerson_returnsExpectedSystemPrivs_whenPersonIsRoleWithPriv(){
     List<PortalSystemPrivilegeDto> privilegeDtoList = portalTeamAccessor.getAllPortalSystemPrivilegesForPerson(unscopedTeamMemberPerson_2Roles);
     assertThat(privilegeDtoList)

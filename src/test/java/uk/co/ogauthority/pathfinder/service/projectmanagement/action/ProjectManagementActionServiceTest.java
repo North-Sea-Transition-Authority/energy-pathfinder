@@ -15,6 +15,7 @@ import uk.co.ogauthority.pathfinder.model.form.useraction.UserActionWithDisplayO
 import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.service.team.ManageTeamService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -25,7 +26,13 @@ public class ProjectManagementActionServiceTest {
   private ManageTeamService manageTeamService;
 
   @Mock
+  private TeamService teamService;
+
+  @Mock
   private RegulatorActionService regulatorActionService;
+
+  @Mock
+  private OperatorActionService operatorActionService;
 
   private ProjectManagementActionService projectManagementActionService;
 
@@ -37,7 +44,9 @@ public class ProjectManagementActionServiceTest {
   public void setup() {
     projectManagementActionService = new ProjectManagementActionService(
         manageTeamService,
-        regulatorActionService
+        teamService,
+        regulatorActionService,
+        operatorActionService
     );
   }
 
@@ -66,7 +75,32 @@ public class ProjectManagementActionServiceTest {
   }
 
   @Test
-  public void getActions_whenNotRegulator() {
+  public void getActions_whenOperator() {
+    var userAction1 = new UserActionWithDisplayOrder(
+        new LinkButton("test", "test", true, ButtonType.PRIMARY),
+        20
+    );
+    var userAction2 = new UserActionWithDisplayOrder(
+        new LinkButton("test2", "test2", true, ButtonType.SECONDARY),
+        10
+    );
+
+    var actions = new ArrayList<UserActionWithDisplayOrder>();
+    actions.add(userAction1);
+    actions.add(userAction2);
+
+    when(manageTeamService.isPersonMemberOfRegulatorTeam(authenticatedUser)).thenReturn(false);
+    when(teamService.isPersonMemberOfAnyOrganisationTeam(authenticatedUser)).thenReturn(true);
+    when(operatorActionService.getActions(projectDetail, authenticatedUser)).thenReturn(actions);
+
+    assertThat(projectManagementActionService.getActions(projectDetail, authenticatedUser)).containsExactly(
+        userAction2,
+        userAction1
+    );
+  }
+
+  @Test
+  public void getActions_whenNotRegulatorOrOperator() {
     when(manageTeamService.isPersonMemberOfRegulatorTeam(authenticatedUser)).thenReturn(false);
 
     assertThat(projectManagementActionService.getActions(projectDetail, authenticatedUser)).isEmpty();

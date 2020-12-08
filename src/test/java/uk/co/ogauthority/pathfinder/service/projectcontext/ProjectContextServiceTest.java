@@ -99,7 +99,8 @@ public class ProjectContextServiceTest {
     assertThat(context.getUserAccount()).isEqualTo(authenticatedUser);
     assertThat(context.getProjectPermissions()).containsExactlyInAnyOrder(
         ProjectPermission.EDIT,
-        ProjectPermission.SUBMIT
+        ProjectPermission.SUBMIT,
+        ProjectPermission.PROVIDE_UPDATE
     );
   }
 
@@ -140,7 +141,8 @@ public class ProjectContextServiceTest {
   public void getUserProjectPermissions_withMatch() {
     assertThat(projectContextService.getUserProjectPermissions(authenticatedUser)).containsExactlyInAnyOrder(
         ProjectPermission.EDIT,
-        ProjectPermission.SUBMIT
+        ProjectPermission.SUBMIT,
+        ProjectPermission.PROVIDE_UPDATE
     );
   }
 

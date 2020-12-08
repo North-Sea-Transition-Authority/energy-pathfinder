@@ -13,7 +13,8 @@ public enum ProjectPermission {
   SUBMIT(Collections.singletonList(UserPrivilege.PATHFINDER_PROJECT_CREATE)),
   VIEW(Collections.singletonList(UserPrivilege.PATHFINDER_PROJECT_VIEWER)),
   // TODO PAT-325 switch to the correct privilege
-  PROVIDE_ASSESSMENT(Collections.singletonList(UserPrivilege.PATHFINDER_REGULATOR_ADMIN));
+  PROVIDE_ASSESSMENT(Collections.singletonList(UserPrivilege.PATHFINDER_REGULATOR_ADMIN)),
+  PROVIDE_UPDATE(Collections.singletonList(UserPrivilege.PATHFINDER_PROJECT_CREATE));
 
   private final List<UserPrivilege> userPrivileges;
 

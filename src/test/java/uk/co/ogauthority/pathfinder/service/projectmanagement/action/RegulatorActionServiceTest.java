@@ -13,13 +13,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.projectassessment.ProjectAssessmentController;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;;
 import uk.co.ogauthority.pathfinder.model.form.useraction.UserActionWithDisplayOrder;
 import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContextService;
-import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -27,54 +27,52 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 public class RegulatorActionServiceTest {
 
   @Mock
-  private ProjectContextService projectContextService;
-
-  @Mock
   private ProjectAssessmentContextService projectAssessmentContextService;
 
   private RegulatorActionService regulatorActionService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
+  private final Project project = projectDetail.getProject();
 
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   @Before
   public void setup() {
-    regulatorActionService = new RegulatorActionService(projectContextService, projectAssessmentContextService);
+    regulatorActionService = new RegulatorActionService(projectAssessmentContextService);
   }
 
   @Test
   public void getActions_whenCannotBuildAssessmentContext() {
-    when(projectAssessmentContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any(), any())).thenReturn(false);
+    when(projectAssessmentContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any())).thenReturn(false);
 
     var actions = regulatorActionService.getActions(projectDetail, authenticatedUser);
 
     assertThat(actions).containsExactly(
-        regulatorActionService.getProvideAssessmentAction(projectDetail, false)
+        regulatorActionService.getProvideAssessmentAction(project.getId(), false)
     );
   }
 
   @Test
   public void getActions_whenCanBuildAssessmentContext() {
-    when(projectAssessmentContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any(), any())).thenReturn(true);
+    when(projectAssessmentContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any())).thenReturn(true);
 
     var actions = regulatorActionService.getActions(projectDetail, authenticatedUser);
 
     assertThat(actions).containsExactly(
-        regulatorActionService.getProvideAssessmentAction(projectDetail, true)
+        regulatorActionService.getProvideAssessmentAction(project.getId(), true)
     );
   }
 
   @Test
   public void getProvideAssessmentAction_enabled() {
-    var action = regulatorActionService.getProvideAssessmentAction(projectDetail, true);
+    var action = regulatorActionService.getProvideAssessmentAction(project.getId(), true);
 
     assertProvideAssessmentActionFields(action, true);
   }
 
   @Test
   public void getProvideAssessmentAction_disabled() {
-    var action = regulatorActionService.getProvideAssessmentAction(projectDetail, false);
+    var action = regulatorActionService.getProvideAssessmentAction(project.getId(), false);
 
     assertProvideAssessmentActionFields(action, false);
   }
@@ -84,7 +82,7 @@ public class RegulatorActionServiceTest {
     assertThat(linkButton.getPrompt()).isEqualTo(RegulatorActionService.PROVIDE_ASSESSMENT_ACTION_PROMPT);
     assertThat(linkButton.getUrl()).isEqualTo(
         ReverseRouter.route(on(ProjectAssessmentController.class).getProjectAssessment(
-            projectDetail.getProject().getId(),
+            project.getId(),
             null
         ))
     );

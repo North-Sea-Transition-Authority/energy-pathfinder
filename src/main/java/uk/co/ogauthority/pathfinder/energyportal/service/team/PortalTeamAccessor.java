@@ -193,6 +193,24 @@ public class PortalTeamAccessor {
         .getResultList();
   }
 
+  public long getNumberOfTeamsWherePersonMemberOfTeamType(Person person,
+                                                          String portalTeamType) {
+    return (Long) entityManager.createQuery("" +
+            "SELECT COUNT(pt) " +
+            "FROM PortalTeamType ptt " +
+            "JOIN PortalTeam pt ON pt.portalTeamType = ptt " +
+            "JOIN PortalTeamMember ptm ON ptm.portalTeam = pt " +
+            "LEFT JOIN PortalTeamUsage ptu ON ptu.portalTeam = pt " +
+            "WHERE ptt.type = :portalTeamType " +
+            "AND ptm.personId = :personId " +
+            "AND (ptu.purpose = :usagePurpose OR ptu IS NULL)"
+        )
+        .setParameter("portalTeamType", portalTeamType)
+        .setParameter("usagePurpose", PortalTeamUsagePurpose.PRIMARY_DATA)
+        .setParameter("personId", person.getId().asInt())
+        .getSingleResult();
+  }
+
   /**
    * Get teams of a given type where the specified Person is a member, they have a role with matching name in that team
    * and the team name matches the search term.

@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.projectassessment;
+package uk.co.ogauthority.pathfinder.service.projectupdate;
 
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,16 +11,16 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 
 @Service
-public class ProjectAssessmentContextService {
+public class ProjectUpdateContextService {
 
   private final ProjectContextService projectContextService;
-  private final ProjectAssessmentService projectAssessmentService;
+  private final ProjectUpdateService projectUpdateService;
 
   @Autowired
-  public ProjectAssessmentContextService(ProjectContextService projectContextService,
-                                         ProjectAssessmentService projectAssessmentService) {
+  public ProjectUpdateContextService(ProjectContextService projectContextService,
+                                     ProjectUpdateService projectUpdateService) {
     this.projectContextService = projectContextService;
-    this.projectAssessmentService = projectAssessmentService;
+    this.projectUpdateService = projectUpdateService;
   }
 
   public boolean canBuildContext(ProjectDetail detail,
@@ -30,22 +30,25 @@ public class ProjectAssessmentContextService {
     var permissionCheck = projectContextService.getProjectPermissionsForClass(controllerClass);
 
     try {
-      buildProjectAssessmentContext(detail, user, statusCheck, permissionCheck);
+      buildProjectUpdateContext(detail, user, statusCheck, permissionCheck);
       return true;
     } catch (AccessDeniedException exception) {
       return false;
     }
   }
 
-  public ProjectAssessmentContext buildProjectAssessmentContext(ProjectDetail detail,
-                                                                AuthenticatedUserAccount user,
-                                                                Set<ProjectStatus> statusCheck,
-                                                                Set<ProjectPermission> permissionCheck) {
-    if (projectAssessmentService.hasProjectBeenAssessed(detail)) {
+  public ProjectUpdateContext buildProjectUpdateContext(ProjectDetail detail,
+                                                        AuthenticatedUserAccount user,
+                                                        Set<ProjectStatus> statusCheck,
+                                                        Set<ProjectPermission> permissionCheck) {
+    var project = detail.getProject();
+
+    if (projectUpdateService.isUpdateInProgress(project)) {
       throw new AccessDeniedException(
           String.format(
-              "Project detail with id %s has already been assessed",
-              detail.getId())
+              "Project id %s already has an update in progress",
+              project.getId()
+          )
       );
     }
 
@@ -56,7 +59,7 @@ public class ProjectAssessmentContextService {
         permissionCheck
     );
 
-    return new ProjectAssessmentContext(
+    return new ProjectUpdateContext(
         projectContext.getProjectDetails(),
         projectContext.getProjectPermissions(),
         projectContext.getUserAccount()

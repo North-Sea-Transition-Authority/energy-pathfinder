@@ -16,6 +16,14 @@ public interface ProjectDetailsRepository extends CrudRepository<ProjectDetail, 
 
   Optional<ProjectDetail> findByProjectIdAndVersion(Integer projectId, Integer version);
 
+  @Query("SELECT CASE WHEN COUNT(pd) > 0 THEN true ELSE false END " +
+         "FROM ProjectDetail pd " +
+         "WHERE pd.project.id = :projectId " +
+         "AND pd.isCurrentVersion = true " +
+         "AND pd.version > 1 " +
+         "AND pd.status = uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus.DRAFT")
+  boolean isProjectUpdateInProgress(@Param("projectId") Integer projectId);
+
   @Query("SELECT new uk.co.ogauthority.pathfinder.model.dto.project.ProjectVersionDto(" +
          "  pd.version" +
          ", pd.submittedInstant" +

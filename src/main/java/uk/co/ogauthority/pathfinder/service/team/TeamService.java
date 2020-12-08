@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
@@ -212,4 +213,15 @@ public class TeamService {
     return isPersonMemberOfTeam(person, getRegulatorTeam());
   }
 
+  public boolean isPersonMemberOfAnyOrganisationTeam(AuthenticatedUserAccount user) {
+    return isPersonMemberOfAnyOrganisationTeam(user.getLinkedPerson());
+  }
+
+  public boolean isPersonMemberOfAnyOrganisationTeam(Person person) {
+    return isPersonMemberOfTeamType(person, TeamType.ORGANISATION);
+  }
+
+  public boolean isPersonMemberOfTeamType(Person person, TeamType teamType) {
+    return portalTeamAccessor.getNumberOfTeamsWherePersonMemberOfTeamType(person, teamType.getPortalTeamType()) > 0;
+  }
 }

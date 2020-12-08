@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.projectassessment;
+package uk.co.ogauthority.pathfinder.service.projectupdate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -24,15 +24,15 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProjectAssessmentContextServiceTest {
+public class ProjectUpdateContextServiceTest {
 
   @Mock
   private ProjectContextService projectContextService;
 
   @Mock
-  private ProjectAssessmentService projectAssessmentService;
+  private ProjectUpdateService projectUpdateService;
 
-  private ProjectAssessmentContextService projectAssessmentContextService;
+  private ProjectUpdateContextService projectUpdateContextService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
@@ -41,9 +41,9 @@ public class ProjectAssessmentContextServiceTest {
 
   @Before
   public void setup() {
-    projectAssessmentContextService = new ProjectAssessmentContextService(
+    projectUpdateContextService = new ProjectUpdateContextService(
         projectContextService,
-        projectAssessmentService
+        projectUpdateService
     );
 
     when(projectContextService.buildProjectContext(any(), any(), any(), any()))
@@ -54,10 +54,10 @@ public class ProjectAssessmentContextServiceTest {
   }
 
   @Test
-  public void canBuildContext_whenNotAssessed() {
-    when(projectAssessmentService.hasProjectBeenAssessed(projectDetail)).thenReturn(false);
+  public void canBuildContext_whenUpdateNotInProgress() {
+    when(projectUpdateService.isUpdateInProgress(projectDetail.getProject())).thenReturn(false);
 
-    var result = projectAssessmentContextService.canBuildContext(
+    var result = projectUpdateContextService.canBuildContext(
         projectDetail,
         authenticatedUser,
         TestController.class
@@ -69,10 +69,10 @@ public class ProjectAssessmentContextServiceTest {
   }
 
   @Test
-  public void canBuildContext_whenAssessed() {
-    when(projectAssessmentService.hasProjectBeenAssessed(projectDetail)).thenReturn(true);
+  public void canBuildContext_whenUpdateInProgress() {
+    when(projectUpdateService.isUpdateInProgress(projectDetail.getProject())).thenReturn(true);
 
-    var result = projectAssessmentContextService.canBuildContext(
+    var result = projectUpdateContextService.canBuildContext(
         projectDetail,
         authenticatedUser,
         TestController.class
@@ -84,10 +84,10 @@ public class ProjectAssessmentContextServiceTest {
   }
 
   @Test
-  public void buildProjectAssessmentContext_whenNotAssessed() {
-    when(projectAssessmentService.hasProjectBeenAssessed(projectDetail)).thenReturn(false);
+  public void buildProjectUpdateContext_whenUpdateNotInProgress() {
+    when(projectUpdateService.isUpdateInProgress(projectDetail.getProject())).thenReturn(false);
 
-    var projectAssessmentContext = projectAssessmentContextService.buildProjectAssessmentContext(
+    var projectAssessmentContext = projectUpdateContextService.buildProjectUpdateContext(
         projectDetail,
         authenticatedUser,
         projectStatuses,
@@ -100,10 +100,10 @@ public class ProjectAssessmentContextServiceTest {
   }
 
   @Test(expected = AccessDeniedException.class)
-  public void buildProjectAssessmentContext_whenAssessed() {
-    when(projectAssessmentService.hasProjectBeenAssessed(projectDetail)).thenReturn(true);
+  public void buildProjectUpdateContext_whenUpdateInProgress() {
+    when(projectUpdateService.isUpdateInProgress(projectDetail.getProject())).thenReturn(true);
 
-    projectAssessmentContextService.buildProjectAssessmentContext(
+    projectUpdateContextService.buildProjectUpdateContext(
         projectDetail,
         authenticatedUser,
         projectStatuses,
