@@ -41,8 +41,8 @@ public class WorkAreaController {
       @ModelAttribute("form") DashboardFilterForm form,
       @ModelAttribute("dashboardFilter") DashboardFilter filter
   ) {
-    filter = new DashboardFilter(form);
-    return workAreaService.getWorkAreaModelAndViewForUser(user, filter, form);
+    filter.setFromForm(form);
+    return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(null, null));
   }
 
   @GetMapping("/work-area/clear-filter")
@@ -50,7 +50,7 @@ public class WorkAreaController {
       AuthenticatedUserAccount user,
       SessionStatus status
   ) {
-    status.setComplete();
+    status.setComplete();//Allow cleanup of session attributes
     return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(user, getDefaultFilter()));
   }
 

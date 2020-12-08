@@ -77,7 +77,7 @@ public class WorkAreaControllerTest extends AbstractControllerTest {
     mockMvc.perform(post(ReverseRouter.route(on(WorkAreaController.class).getWorkAreaFiltered(authenticatedUser, null, DEFAULT_FILTER)))
         .with(authenticatedUserAndSession(authenticatedUser))
         .with(csrf()))
-        .andExpect(status().isOk());
+        .andExpect(status().is3xxRedirection());
   }
 
   @Test
@@ -115,16 +115,25 @@ public class WorkAreaControllerTest extends AbstractControllerTest {
   @Test
   public void filterPreferences_setInModel_fromForm() throws Exception {
     var form = new DashboardFilterForm();
+    var filter = new DashboardFilter();
     form.setProjectTitle(TITLE);
     form.setField(FIELD);
     form.setFieldStages(FIELD_STAGES);
     form.setUkcsAreas(UKCS_AREAS);
     form.setProjectStatusList(STATUSES);
+    filter.setFromForm(form);
 
-    var result = mockMvc.perform(post(ReverseRouter.route(on(WorkAreaController.class).getWorkAreaFiltered(authenticatedUser, form, DEFAULT_FILTER)))
+    mockMvc.perform(post(ReverseRouter.route(on(WorkAreaController.class).getWorkAreaFiltered(authenticatedUser, form, DEFAULT_FILTER)))
         .with(authenticatedUserAndSession(authenticatedUser))
         .sessionAttr("dashboardFilter", DEFAULT_FILTER)
         .flashAttr("form", form)
+        .with(csrf()))
+        .andExpect(status().is3xxRedirection())
+        .andReturn();
+
+    var result = mockMvc.perform(get(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(authenticatedUser, null)))
+        .with(authenticatedUserAndSession(authenticatedUser))
+        .sessionAttr("dashboardFilter", filter)
         .with(csrf()))
         .andExpect(status().isOk())
         .andReturn();

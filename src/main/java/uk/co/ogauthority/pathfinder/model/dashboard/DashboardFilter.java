@@ -24,7 +24,7 @@ public class DashboardFilter implements Serializable {
   public DashboardFilter() {
   }
 
-  public DashboardFilter(DashboardFilterForm form) {
+  public void setFromForm(DashboardFilterForm form) {
     this.projectTitle = form.getProjectTitle();
     this.field = form.getField();
     this.fieldStages = form.getFieldStages();
