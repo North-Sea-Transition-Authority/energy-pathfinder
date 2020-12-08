@@ -35,11 +35,6 @@ public class PlatformsFpsosSectionSummaryService implements ProjectSectionSummar
   }
 
   @Override
-  public boolean canShowSection(ProjectDetail detail) {
-    return platformsFpsosService.canShowInTaskList(detail);
-  }
-
-  @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
     Map<String, Object> summaryModel = new HashMap<>();
     summaryModel.put("sectionTitle", PAGE_NAME);

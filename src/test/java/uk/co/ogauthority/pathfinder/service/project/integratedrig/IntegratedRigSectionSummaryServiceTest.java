@@ -23,33 +23,13 @@ public class IntegratedRigSectionSummaryServiceTest {
   @Mock
   private IntegratedRigSummaryService integratedRigSummaryService;
 
-  @Mock
-  private IntegratedRigService integratedRigService;
-
   private IntegratedRigSectionSummaryService integratedRigSectionSummaryService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
 
   @Before
   public void setup() {
-    integratedRigSectionSummaryService = new IntegratedRigSectionSummaryService(
-        integratedRigSummaryService,
-        integratedRigService
-    );
-  }
-
-  @Test
-  public void canShowSection_whenCanShowInTaskList_thenTrue() {
-    when(integratedRigService.canShowInTaskList(projectDetail)).thenReturn(true);
-
-    assertThat(integratedRigSectionSummaryService.canShowSection(projectDetail)).isTrue();
-  }
-
-  @Test
-  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
-    when(integratedRigService.canShowInTaskList(projectDetail)).thenReturn(false);
-
-    assertThat(integratedRigSectionSummaryService.canShowSection(projectDetail)).isFalse();
+    integratedRigSectionSummaryService = new IntegratedRigSectionSummaryService(integratedRigSummaryService);
   }
 
   @Test

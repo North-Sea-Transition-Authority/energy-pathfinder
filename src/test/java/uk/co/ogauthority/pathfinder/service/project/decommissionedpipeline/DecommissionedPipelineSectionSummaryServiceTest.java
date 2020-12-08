@@ -33,20 +33,6 @@ public class DecommissionedPipelineSectionSummaryServiceTest {
   }
 
   @Test
-  public void canShowSection_whenCanShowInTaskList_thenTrue() {
-    when(decommissionedPipelineService.canShowInTaskList(detail)).thenReturn(true);
-
-    assertThat(decommissionedPipelineSectionSummaryService.canShowSection(detail)).isTrue();
-  }
-
-  @Test
-  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
-    when(decommissionedPipelineService.canShowInTaskList(detail)).thenReturn(false);
-
-    assertThat(decommissionedPipelineSectionSummaryService.canShowSection(detail)).isFalse();
-  }
-
-  @Test
   public void getSummary() {
     var decommissionedPipeline1 = DecommissionedPipelineTestUtil.createDecommissionedPipeline();
     var decommissionedPipeline2 = DecommissionedPipelineTestUtil.createDecommissionedPipeline();

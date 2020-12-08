@@ -35,11 +35,6 @@ public class DecommissionedPipelineSectionSummaryService implements ProjectSecti
   }
 
   @Override
-  public boolean canShowSection(ProjectDetail detail) {
-    return decommissionedPipelineService.canShowInTaskList(detail);
-  }
-
-  @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
     Map<String, Object> summaryModel = new HashMap<>();
     summaryModel.put("sectionTitle", PAGE_NAME);

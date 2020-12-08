@@ -23,9 +23,6 @@ public class CollaborationOpportunitiesSectionSummaryServiceTest {
   @Mock
   private CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService;
 
-  @Mock
-  private CollaborationOpportunitiesService collaborationOpportunitiesService;
-
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
 
   private CollaborationOpportunitiesSectionSummaryService collaborationOpportunitiesSectionSummaryService;
@@ -33,23 +30,8 @@ public class CollaborationOpportunitiesSectionSummaryServiceTest {
   @Before
   public void setup() {
     collaborationOpportunitiesSectionSummaryService = new CollaborationOpportunitiesSectionSummaryService(
-        collaborationOpportunitiesSummaryService,
-        collaborationOpportunitiesService
+        collaborationOpportunitiesSummaryService
     );
-  }
-
-  @Test
-  public void canShowSection_whenCanShowInTaskList_thenTrue() {
-    when(collaborationOpportunitiesService.canShowInTaskList(projectDetail)).thenReturn(true);
-
-    assertThat(collaborationOpportunitiesSectionSummaryService.canShowSection(projectDetail)).isTrue();
-  }
-
-  @Test
-  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
-    when(collaborationOpportunitiesService.canShowInTaskList(projectDetail)).thenReturn(false);
-
-    assertThat(collaborationOpportunitiesSectionSummaryService.canShowSection(projectDetail)).isFalse();
   }
 
   @Test
