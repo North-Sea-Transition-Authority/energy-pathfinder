@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
@@ -108,6 +109,22 @@ public class ProjectUpdateContextServiceTest {
         projectStatuses,
         projectPermissions
     );
+  }
+
+  @Test
+  public void getProjectDetailsOrError_whenPresent_thenReturn() {
+    when(projectContextService.getProjectDetailsOrError(projectDetail.getId())).thenReturn(projectDetail);
+
+    assertThat(projectContextService.getProjectDetailsOrError(projectDetail.getId())).isEqualTo(projectDetail);
+  }
+
+  @Test(expected = PathfinderEntityNotFoundException.class)
+  public void getProjectDetailsOrError_whenNotPresent_thenError() {
+    when(projectContextService.getProjectDetailsOrError(projectDetail.getId())).thenThrow(
+        new PathfinderEntityNotFoundException("")
+    );
+
+    projectContextService.getProjectDetailsOrError(projectDetail.getId());
   }
 
   private static class TestController {}

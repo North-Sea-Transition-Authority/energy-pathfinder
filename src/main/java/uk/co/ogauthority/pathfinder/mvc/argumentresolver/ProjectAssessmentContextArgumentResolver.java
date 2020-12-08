@@ -7,7 +7,6 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContext;
 import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContextService;
 import uk.co.ogauthority.pathfinder.util.ArgumentResolverUtil;
@@ -15,13 +14,11 @@ import uk.co.ogauthority.pathfinder.util.ArgumentResolverUtil;
 @Component
 public class ProjectAssessmentContextArgumentResolver implements HandlerMethodArgumentResolver {
 
-  private final ProjectContextService projectContextService;
   private final ProjectAssessmentContextService projectAssessmentContextService;
 
   @Autowired
-  public ProjectAssessmentContextArgumentResolver(ProjectContextService projectContextService,
-                                                  ProjectAssessmentContextService projectAssessmentContextService) {
-    this.projectContextService = projectContextService;
+  public ProjectAssessmentContextArgumentResolver(
+      ProjectAssessmentContextService projectAssessmentContextService) {
     this.projectAssessmentContextService = projectAssessmentContextService;
   }
 
@@ -37,7 +34,7 @@ public class ProjectAssessmentContextArgumentResolver implements HandlerMethodAr
                                 WebDataBinderFactory binderFactory) throws Exception {
     var user = ArgumentResolverUtil.getAuthenticatedUser();
     var projectId = ArgumentResolverUtil.resolveIdFromRequest(webRequest, ArgumentResolverUtil.PROJECT_ID_PARAM);
-    var detail = projectContextService.getProjectDetailsOrError(projectId);
+    var detail = projectAssessmentContextService.getProjectDetailsOrError(projectId);
     var statusCheck = ArgumentResolverUtil.getProjectStatusCheck(parameter);
     var permissionCheck = ArgumentResolverUtil.getProjectFormPagePermissionCheck(parameter);
 

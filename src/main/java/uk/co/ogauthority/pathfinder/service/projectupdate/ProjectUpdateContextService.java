@@ -65,4 +65,8 @@ public class ProjectUpdateContextService {
         projectContext.getUserAccount()
     );
   }
+
+  public ProjectDetail getProjectDetailsOrError(Integer projectId) {
+    return projectContextService.getProjectDetailsOrError(projectId);
+  }
 }
