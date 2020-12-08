@@ -2,6 +2,8 @@ package uk.co.ogauthority.pathfinder.service.project.upcomingtender;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,6 +23,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.Upcoming
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTenderFileLink;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderFormValidator;
@@ -315,5 +318,33 @@ public class UpcomingTenderServiceTest {
 
     verify(upcomingTenderFileLinkService, times(1)).removeUpcomingTenderFileLinks(upcomingTenders);
     verify(upcomingTenderRepository, times(1)).deleteAll(upcomingTenders);
+  }
+
+  @Test
+  public void copySectionData_verifyDuplicationServiceInteraction() {
+
+    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+    final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+    final var upcomingTenders = List.of(
+        UpcomingTenderUtil.getUpcomingTender(fromProjectDetail)
+    );
+
+    when(upcomingTenderRepository.findByProjectDetailOrderByIdAsc(fromProjectDetail)).thenReturn(upcomingTenders);
+
+    upcomingTenderService.copySectionData(fromProjectDetail, toProjectDetail);
+
+    verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
+        upcomingTenders,
+        toProjectDetail,
+        UpcomingTender.class
+    );
+
+    verify(entityDuplicationService, times(1)).createDuplicatedEntityPairingMap(any());
+
+    verify(upcomingTenderFileLinkService, times(1)).copyUpcomingTenderFileLinkData(
+        eq(fromProjectDetail),
+        eq(toProjectDetail),
+        anyMap()
+    );
   }
 }

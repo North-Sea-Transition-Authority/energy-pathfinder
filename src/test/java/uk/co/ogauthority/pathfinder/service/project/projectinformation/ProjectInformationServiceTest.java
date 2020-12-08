@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarter;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
@@ -436,5 +437,24 @@ public class ProjectInformationServiceTest {
     );
 
     verify(validationService, times(1)).validate(form, bindingResult, ValidationType.FULL);
+  }
+
+  @Test
+  public void copySectionData_verifyDuplicationServiceInteraction() {
+
+    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+    final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+
+    final var fromProjectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(fromProjectDetail);
+    when(projectInformationRepository.findByProjectDetail(fromProjectDetail))
+        .thenReturn(Optional.of(fromProjectInformation));
+
+    projectInformationService.copySectionData(fromProjectDetail, toProjectDetail);
+
+    verify(entityDuplicationService, times(1)).duplicateEntityAndSetNewParent(
+        fromProjectInformation,
+        toProjectDetail,
+        ProjectInformation.class
+    );
   }
 }

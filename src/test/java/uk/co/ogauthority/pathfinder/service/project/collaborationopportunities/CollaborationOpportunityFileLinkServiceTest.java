@@ -3,12 +3,15 @@ package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +19,11 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
+import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityFileLink;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.CollaborationOpportunityFileLinkRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.DuplicatedEntityPairing;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.FileUpdateMode;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
@@ -235,5 +242,84 @@ public class CollaborationOpportunityFileLinkServiceTest {
     var fileViews = collaborationOpportunityFileLinkService.getFileUploadViewsLinkedToOpportunity(collaborationOpportunity);
 
     assertThat(fileViews).isEmpty();
+  }
+
+  @Test
+  public void findAllByProjectDetail_whenResults_thenReturnPopulatedLists() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+    final var fileLink = CollaborationOpportunityTestUtil.createCollaborationOpportunityFileLink();
+
+    when(collaborationOpportunityFileLinkRepository.findAllByProjectDetailFile_ProjectDetail(projectDetail))
+        .thenReturn(List.of(fileLink));
+
+    final var results = collaborationOpportunityFileLinkService.findAllByProjectDetail(projectDetail);
+
+    assertThat(results).containsExactly(fileLink);
+  }
+
+  @Test
+  public void findAllByProjectDetail_whenNoResults_thenReturnEmptyLists() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+
+    when(collaborationOpportunityFileLinkRepository.findAllByProjectDetailFile_ProjectDetail(projectDetail))
+        .thenReturn(List.of());
+
+    final var results = collaborationOpportunityFileLinkService.findAllByProjectDetail(projectDetail);
+
+    assertThat(results).isEmpty();
+
+  }
+
+  @Test
+  public void copyCollaborationOpportunityFileLinkData_ensureDuplicationServiceInteraction() {
+
+    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+    final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+
+    final var fromCollaborationOpportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity(fromProjectDetail);
+    final var toCollaborationOpportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity(fromProjectDetail);
+
+    final var fileLink = CollaborationOpportunityTestUtil.createCollaborationOpportunityFileLink(
+        fromCollaborationOpportunity,
+        new ProjectDetailFile()
+    );
+
+    final var fileLinks = List.of(fileLink);
+
+    when(collaborationOpportunityFileLinkRepository.findAllByProjectDetailFile_ProjectDetail(fromProjectDetail))
+        .thenReturn(fileLinks);
+
+    when(entityDuplicationService.duplicateEntitiesAndSetNewParent(
+        any(),
+        any(),
+        eq(CollaborationOpportunityFileLink.class)
+    )).thenReturn(Set.of(new DuplicatedEntityPairing<>(fileLink, fileLink)));
+
+    final var opportunityMap = Map.of(
+        fromCollaborationOpportunity,
+        toCollaborationOpportunity
+    );
+
+    collaborationOpportunityFileLinkService.copyCollaborationOpportunityFileLinkData(
+        fromProjectDetail,
+        toProjectDetail,
+        opportunityMap
+    );
+
+    verify(projectDetailFileService, times(1)).copyProjectDetailFileData(
+        fromProjectDetail,
+        toProjectDetail,
+        ProjectDetailFilePurpose.COLLABORATION_OPPORTUNITY
+    );
+
+    verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
+        fileLinks,
+        toCollaborationOpportunity,
+        CollaborationOpportunityFileLink.class
+    );
+
+    verify(collaborationOpportunityFileLinkRepository, times(1)).saveAll(any());
   }
 }

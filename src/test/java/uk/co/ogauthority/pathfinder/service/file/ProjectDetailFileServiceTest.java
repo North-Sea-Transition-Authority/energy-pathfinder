@@ -29,6 +29,7 @@ import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.repository.file.ProjectDetailFileRepository;
@@ -361,6 +362,32 @@ public class ProjectDetailFileServiceTest {
     projectDetailFileService.removeProjectDetailFiles(List.of(file1, file2));
     
     verify(projectDetailFileRepository).deleteAll(List.of(file1, file2));
+  }
+
+  @Test
+  public void copyProjectDetailFileData() {
+    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+    final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+    final var projectDetailFilePurpose = ProjectDetailFilePurpose.PLACEHOLDER;
+
+    final var projectDetailFiles = List.of(new ProjectDetailFile());
+
+    when(projectDetailFileRepository.findAllByProjectDetailAndPurpose(fromProjectDetail, projectDetailFilePurpose))
+        .thenReturn(projectDetailFiles);
+
+    projectDetailFileService.copyProjectDetailFileData(
+        fromProjectDetail,
+        toProjectDetail,
+        projectDetailFilePurpose
+    );
+
+    verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
+        projectDetailFiles,
+        toProjectDetail,
+        ProjectDetailFile.class
+    );
+
+    verify(entityDuplicationService, times(1)).createDuplicatedEntityPairingMap(any());
   }
 
 }

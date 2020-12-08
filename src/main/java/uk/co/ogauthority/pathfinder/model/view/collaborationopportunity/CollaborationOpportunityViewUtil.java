@@ -60,7 +60,7 @@ public class CollaborationOpportunityViewUtil {
 
     var removeLink = new SummaryLink(
         SummaryLinkText.DELETE.getDisplayName(),
-        ReverseRouter.route(on(CollaborationOpportunitiesController.class).deleteCollaborationOpportunityConfirm(
+        ReverseRouter.route(on(CollaborationOpportunitiesController.class).removeCollaborationOpportunityConfirm(
             projectId,
             opportunity.getId(),
             displayOrder,

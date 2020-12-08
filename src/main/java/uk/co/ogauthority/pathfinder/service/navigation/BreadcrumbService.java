@@ -28,7 +28,7 @@ public class BreadcrumbService {
 
   private Map<String, String> upcomingTenders(Integer projectId) {
     var map = taskList(projectId);
-    String route = ReverseRouter.route(on(UpcomingTendersController.class).viewTenders(projectId, null));
+    String route = ReverseRouter.route(on(UpcomingTendersController.class).viewUpcomingTenders(projectId, null));
     map.put(route, UpcomingTendersController.PAGE_NAME);
     return map;
   }
@@ -75,7 +75,7 @@ public class BreadcrumbService {
 
   private Map<String, String> platformsFpsos(Integer projectId) {
     var map = taskList(projectId);
-    String route = ReverseRouter.route(on(PlatformsFpsosController.class).viewPlatformFpso(
+    String route = ReverseRouter.route(on(PlatformsFpsosController.class).viewPlatformsFpsos(
         projectId,
         null
     ));
@@ -143,7 +143,7 @@ public class BreadcrumbService {
 
   private Map<String, String> manageProject(Integer projectId) {
     var map = workArea();
-    String route = ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null));
+    String route = ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null));
     map.put(route, "Manage project");
     return map;
   }

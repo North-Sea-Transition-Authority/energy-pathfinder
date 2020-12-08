@@ -2,6 +2,8 @@ package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormValidator;
@@ -237,6 +240,36 @@ public class CollaborationOpportunitiesServiceTest {
         collaborationOpportunities
     );
     verify(collaborationOpportunitiesRepository, times(1)).deleteAll(collaborationOpportunities);
+  }
+
+  @Test
+  public void copySectionData_verifyDuplicationServiceInteraction() {
+
+    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+    final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+    final var collaborationOpportunities = List.of(
+        CollaborationOpportunityTestUtil.getCollaborationOpportunity(fromProjectDetail)
+    );
+
+    when(collaborationOpportunitiesRepository.findAllByProjectDetailOrderByIdAsc(fromProjectDetail))
+        .thenReturn(collaborationOpportunities);
+
+    collaborationOpportunitiesService.copySectionData(fromProjectDetail, toProjectDetail);
+
+    verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
+        collaborationOpportunities,
+        toProjectDetail,
+        CollaborationOpportunity.class
+    );
+
+    verify(entityDuplicationService, times(1)).createDuplicatedEntityPairingMap(any());
+
+    verify(collaborationOpportunityFileLinkService, times(1)).copyCollaborationOpportunityFileLinkData(
+        eq(fromProjectDetail),
+        eq(toProjectDetail),
+        anyMap()
+    );
+
   }
 
 }

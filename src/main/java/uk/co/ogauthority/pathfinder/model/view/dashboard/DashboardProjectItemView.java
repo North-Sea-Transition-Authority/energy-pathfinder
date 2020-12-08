@@ -63,7 +63,7 @@ public class DashboardProjectItemView {
         break;
       case QA:
       case PUBLISHED:
-        url = ReverseRouter.route(on(ManageProjectController.class).getProject(dashboardProjectItem.getProjectId(), null, null));
+        url = ReverseRouter.route(on(ManageProjectController.class).getProject(dashboardProjectItem.getProjectId(), null, null, null));
         break;
       default:
         throw new IllegalStateException(String.format("Project with id %s has unsupported status %s",

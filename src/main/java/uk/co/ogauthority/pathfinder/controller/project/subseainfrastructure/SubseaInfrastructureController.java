@@ -87,7 +87,7 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
     return getSubseaInfrastructureModelAndView(projectId, new SubseaInfrastructureForm());
   }
 
-  @GetMapping("/subsea-infrastructure/{subseaInfrastructureId}")
+  @GetMapping("/subsea-infrastructure/{subseaInfrastructureId}/edit")
   public ModelAndView getSubseaInfrastructure(@PathVariable("projectId") Integer projectId,
                                               @PathVariable("subseaInfrastructureId") Integer subseaInfrastructureId,
                                               ProjectContext projectContext) {
@@ -113,7 +113,7 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
     );
   }
 
-  @PostMapping("/subsea-infrastructure/{subseaInfrastructureId}")
+  @PostMapping("/subsea-infrastructure/{subseaInfrastructureId}/edit")
   public ModelAndView updateSubseaInfrastructure(@PathVariable("projectId") Integer projectId,
                                                  @PathVariable("subseaInfrastructureId") Integer subseaInfrastructureId,
                                                  @Valid @ModelAttribute("form") SubseaInfrastructureForm form,

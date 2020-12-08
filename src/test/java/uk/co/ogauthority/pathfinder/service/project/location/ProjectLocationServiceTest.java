@@ -18,7 +18,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
+import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
@@ -348,6 +350,55 @@ public class ProjectLocationServiceTest {
     assertThat(blocks.get(0).getBlockReference()).isEqualTo(returnedBlockView.getBlockReference());
   }
 
+  @Test
+  public void createOrUpdateBlocks_verifyServiceInteraction() {
+
+    final var licenceBlocks = List.of("1/1", "1/2", "1/3");
+
+    projectLocationService.createOrUpdateBlocks(licenceBlocks, projectLocation);
+
+    verify(projectLocationBlocksService, times(1)).createOrUpdateBlocks(licenceBlocks, projectLocation);
+  }
+
+  @Test
+  public void copySectionData_verifyDuplicationServiceInteraction() {
+
+    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+    final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+
+    final var fromLocation = ProjectLocationTestUtil.getProjectLocation_withField(fromProjectDetail);
+    final var toLocation = ProjectLocationTestUtil.getProjectLocation_withField(toProjectDetail);
+
+    when(projectLocationRepository.findByProjectDetail(fromProjectDetail)).thenReturn(Optional.of(fromLocation));
+
+    final var licenceBlocks = List.of(
+        LicenceBlockTestUtil.getProjectLocationBlock(fromLocation, "1/1"),
+        LicenceBlockTestUtil.getProjectLocationBlock(fromLocation, "1/2")
+    );
+
+    when(projectLocationBlocksService.getBlocks(fromLocation)).thenReturn(licenceBlocks);
+
+    when(entityDuplicationService.duplicateEntityAndSetNewParent(
+        fromLocation,
+        toProjectDetail,
+        ProjectLocation.class
+    )).thenReturn(toLocation);
+
+    projectLocationService.copySectionData(fromProjectDetail, toProjectDetail);
+
+    verify(entityDuplicationService, times(1)).duplicateEntityAndSetNewParent(
+        fromLocation,
+        toProjectDetail,
+        ProjectLocation.class
+    );
+
+    verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
+        licenceBlocks,
+        toLocation,
+        ProjectLocationBlock.class
+    );
+  }
+
   private void checkCommonFieldsMatch(ProjectLocation projectLocation) {
     assertThat(projectLocation.getFieldType()).isEqualTo(ProjectLocationTestUtil.FIELD_TYPE);
     assertThat(projectLocation.getWaterDepth()).isEqualTo(ProjectLocationTestUtil.WATER_DEPTH);
@@ -355,10 +406,6 @@ public class ProjectLocationServiceTest {
     assertThat(projectLocation.getApprovedFdpDate()).isEqualTo(ProjectLocationTestUtil.APPROVED_FDP_DATE);
     assertThat(projectLocation.getApprovedDecomProgram()).isEqualTo(ProjectLocationTestUtil.APPROVED_DECOM_PROGRAM);
     assertThat(projectLocation.getUkcsArea()).isEqualTo(ProjectLocationTestUtil.UKCS_AREA);
-  }
-
-  private void assertAddOrUpdateBlocksCalled(ProjectLocation projectLocation, List<String> licenceBlocks) {
-    verify(projectLocationBlocksService, times(1)).createOrUpdateBlocks(licenceBlocks, projectLocation);
   }
 
   private void checkCommonFormFieldsMatch(ProjectLocation projectLocation, ProjectLocationForm form) {

@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.decommissionedwell.DecommissionedWell;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedwell.DecommissionedWellType;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedwell.WellMechanicalStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedwell.WellOperationalStatus;
@@ -548,6 +549,24 @@ public class DecommissionedWellServiceTest {
     decommissionedWellService.removeSectionData(detail);
 
     verify(decommissionedWellRepository, times(1)).deleteAll(decommissionedWells);
+  }
+
+  @Test
+  public void copySectionData_verifyDuplicationServiceInteraction() {
+
+    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+    final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+
+    final var wells = List.of(DecommissionedWellTestUtil.createDecommissionedWell());
+    when(decommissionedWellRepository.findByProjectDetailOrderByIdAsc(fromProjectDetail)).thenReturn(wells);
+
+    decommissionedWellService.copySectionData(fromProjectDetail, toProjectDetail);
+
+    verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
+        wells,
+        toProjectDetail,
+        DecommissionedWell.class
+    );
   }
 
 }

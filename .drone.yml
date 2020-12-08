@@ -4,7 +4,7 @@ name: default
 
 steps:
   - name: fetch-fds-submodule
-    image: alpine/git
+    image: alpine/git:v2.26.2
     commands:
       # Drone cannot auth to a ssh based repo, so override to https to make use of .netrc
       - git config submodule.fivium-design-system-core.url https://bitbucket.org/fiviumuk/fivium-design-system-core.git
@@ -34,7 +34,7 @@ steps:
       - ./gradlew test jacocoTestReport checkstyleMain bootWar bootJar sonarqube
 
   - name: publish-build-s3
-    image: plugins/s3
+    image: plugins/s3:linux-amd64
     settings:
       bucket: fivium-pathfinder-resources
       region: eu-west-2
@@ -50,7 +50,7 @@ steps:
       branch: [ develop, release/*, master ]
 
   - name: publish-docker-develop
-    image: plugins/docker
+    image: plugins/docker:19.03.8
     settings:
       registry: quay.io
       repo: quay.io/fivium/pathfinder
@@ -68,7 +68,7 @@ steps:
         - success
 
   - name: publish-docker
-    image: plugins/docker
+    image: plugins/docker:19.03.8
     settings:
       registry: quay.io
       repo: quay.io/fivium/pathfinder
@@ -106,7 +106,7 @@ steps:
       branch: develop
 
   - name: sync-reports
-    image: alpine
+    image: alpine:3.12.1
     commands:
       - mkdir -p /var/webfiles/${DRONE_BUILD_NUMBER}
       - cp -r build/reports /var/webfiles/${DRONE_BUILD_NUMBER}
@@ -117,7 +117,7 @@ steps:
       status: [ success, failure ]
 
   - name: deploy-dev
-    image: appleboy/drone-ssh
+    image: appleboy/drone-ssh:linux-amd64
     settings:
       host: lemms1.fivium.local
       username: root
@@ -133,7 +133,7 @@ steps:
       branch: develop
 
   - name: deploy-st
-    image: appleboy/drone-ssh
+    image: appleboy/drone-ssh:linux-amd64
     settings:
       host: lemms1.fivium.local
       username: root
@@ -149,7 +149,7 @@ steps:
       branch: develop
 
   - name: slack
-    image: plugins/slack
+    image: plugins/slack:linux-amd64
     settings:
       webhook: https://hooks.slack.com/services/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
       channel: oga-pathfinder

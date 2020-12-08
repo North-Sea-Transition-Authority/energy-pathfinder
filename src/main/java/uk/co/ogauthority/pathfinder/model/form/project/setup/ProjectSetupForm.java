@@ -25,9 +25,6 @@ public class ProjectSetupForm {
 
   private TaskListSectionAnswer pipelinesIncluded;
 
-  public ProjectSetupForm() {
-  }
-
   public TaskListSectionAnswer getUpcomingTendersIncluded() {
     return upcomingTendersIncluded;
   }

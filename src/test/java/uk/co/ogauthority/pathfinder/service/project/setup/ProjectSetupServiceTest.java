@@ -19,6 +19,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.tasks.ProjectTaskListSetup;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionQuestion;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupForm;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupFormValidator;
@@ -271,6 +272,24 @@ public class ProjectSetupServiceTest {
 
     assertThat(setupToTest.getTaskListSections()).containsExactlyInAnyOrderElementsOf(setupToCompare.getTaskListSections());
     assertThat(setupToTest.getTaskListAnswers()).containsExactlyInAnyOrderElementsOf(setupToCompare.getTaskListAnswers());
+  }
+
+  @Test
+  public void copySectionData_verifyDuplicationServiceInteraction() {
+
+    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+    final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+
+    final var fromTaskListSetup = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_nonDecom(fromProjectDetail);
+    when(projectTaskListSetupRepository.findByProjectDetail(fromProjectDetail)).thenReturn(Optional.of(fromTaskListSetup));
+
+    projectSetupService.copySectionData(fromProjectDetail, toProjectDetail);
+
+    verify(entityDuplicationService, times(1)).duplicateEntityAndSetNewParent(
+        fromTaskListSetup,
+        toProjectDetail,
+        ProjectTaskListSetup.class
+    );
   }
 
   private void checkCommonFieldsMatch(ProjectSetupForm formToCheckAgainst, ProjectSetupForm resultingForm) {

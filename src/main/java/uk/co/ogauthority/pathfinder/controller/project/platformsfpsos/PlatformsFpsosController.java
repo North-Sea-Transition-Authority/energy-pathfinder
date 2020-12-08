@@ -57,8 +57,8 @@ public class PlatformsFpsosController extends ProjectFormPageController {
   }
 
   @GetMapping
-  public ModelAndView viewPlatformFpso(@PathVariable("projectId") Integer projectId,
-                                       ProjectContext projectContext) {
+  public ModelAndView viewPlatformsFpsos(@PathVariable("projectId") Integer projectId,
+                                         ProjectContext projectContext) {
     return getViewPlatformsFpsosModelAndView(
         projectId,
         platformsFpsosSummaryService.getSummaryViews(projectContext.getProjectDetails()),
@@ -67,8 +67,8 @@ public class PlatformsFpsosController extends ProjectFormPageController {
   }
 
   @PostMapping
-  public ModelAndView savePlatformFpso(@PathVariable("projectId") Integer projectId,
-                                       ProjectContext projectContext) {
+  public ModelAndView savePlatformsFpsos(@PathVariable("projectId") Integer projectId,
+                                         ProjectContext projectContext) {
     var views = platformsFpsosSummaryService.getValidatedSummaryViews(projectContext.getProjectDetails());
     var validationResult = platformsFpsosSummaryService.validateViews(views);
 
@@ -83,13 +83,13 @@ public class PlatformsFpsosController extends ProjectFormPageController {
     return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
   }
 
-  @GetMapping("/add")
+  @GetMapping("/platform-fpso")
   public ModelAndView addPlatformFpso(@PathVariable("projectId") Integer projectId,
                                       ProjectContext projectContext) {
     return getPlatformFpsoFormModelAndView(projectId, new PlatformFpsoForm());
   }
 
-  @PostMapping("/add")
+  @PostMapping("/platform-fpso")
   public ModelAndView saveNewPlatformFpso(@PathVariable("projectId") Integer projectId,
                                           @Valid @ModelAttribute("form") PlatformFpsoForm form,
                                           BindingResult bindingResult,
@@ -103,12 +103,12 @@ public class PlatformsFpsosController extends ProjectFormPageController {
         form,
         () -> {
           platformsFpsosService.createPlatformFpso(projectContext.getProjectDetails(), form);
-          return ReverseRouter.redirect(on(PlatformsFpsosController.class).viewPlatformFpso(projectId, null));
+          return ReverseRouter.redirect(on(PlatformsFpsosController.class).viewPlatformsFpsos(projectId, null));
         }
     );
   }
 
-  @GetMapping("/{platformFpsoId}/edit/")
+  @GetMapping("/platform-fpso/{platformFpsoId}/edit")
   public ModelAndView editPlatformFpso(@PathVariable("projectId") Integer projectId,
                                        @PathVariable("platformFpsoId") Integer platformFpsoId,
                                        ProjectContext projectContext) {
@@ -119,7 +119,7 @@ public class PlatformsFpsosController extends ProjectFormPageController {
     );
   }
 
-  @PostMapping("/{platformFpsoId}/edit/")
+  @PostMapping("/platform-fpso/{platformFpsoId}/edit")
   public ModelAndView updatePlatformFpso(@PathVariable("projectId") Integer projectId,
                                          @PathVariable("platformFpsoId") Integer platformFpsoId,
                                          @Valid @ModelAttribute("form") PlatformFpsoForm form,
@@ -134,32 +134,32 @@ public class PlatformsFpsosController extends ProjectFormPageController {
         form,
         () -> {
           platformsFpsosService.updatePlatformFpso(projectContext.getProjectDetails(), platformFpso, form);
-          return ReverseRouter.redirect(on(PlatformsFpsosController.class).viewPlatformFpso(projectId, null));
+          return ReverseRouter.redirect(on(PlatformsFpsosController.class).viewPlatformsFpsos(projectId, null));
         }
     );
   }
 
-  @GetMapping("/{platformFpsoId}/delete/{displayOrder}")
-  public ModelAndView deletePlatformFpsoConfirm(@PathVariable("projectId") Integer projectId,
+  @GetMapping("/platform-fpso/{platformFpsoId}/remove/{displayOrder}")
+  public ModelAndView removePlatformFpsoConfirm(@PathVariable("projectId") Integer projectId,
                                                 @PathVariable("platformFpsoId") Integer platformFpsoId,
                                                 @PathVariable("displayOrder") Integer displayOrder,
                                                 ProjectContext projectContext) {
     var platformFpso = platformsFpsosService.getOrError(platformFpsoId);
     var modelAndView = new ModelAndView("project/platformsfpsos/removePlatformFpso")
         .addObject("view", platformsFpsosSummaryService.getView(platformFpso, displayOrder, projectId))
-        .addObject("cancelUrl", ReverseRouter.route(on(PlatformsFpsosController.class).viewPlatformFpso(projectId, null)));
+        .addObject("cancelUrl", ReverseRouter.route(on(PlatformsFpsosController.class).viewPlatformsFpsos(projectId, null)));
     breadcrumbService.fromPlatformsFpsos(projectId, modelAndView, REMOVE_PAGE_NAME);
     return modelAndView;
   }
 
-  @PostMapping("/{platformFpsoId}/delete/{displayOrder}")
-  public ModelAndView deletePlatformFpso(@PathVariable("projectId") Integer projectId,
+  @PostMapping("/platform-fpso/{platformFpsoId}/remove/{displayOrder}")
+  public ModelAndView removePlatformFpso(@PathVariable("projectId") Integer projectId,
                                          @PathVariable("platformFpsoId") Integer platformFpsoId,
                                          @PathVariable("displayOrder") Integer displayOrder,
                                          ProjectContext projectContext) {
     var platformFpso = platformsFpsosService.getOrError(platformFpsoId);
     platformsFpsosService.delete(platformFpso);
-    return ReverseRouter.redirect(on(PlatformsFpsosController.class).viewPlatformFpso(projectId, null));
+    return ReverseRouter.redirect(on(PlatformsFpsosController.class).viewPlatformsFpsos(projectId, null));
   }
 
   private ModelAndView getPlatformFpsoFormModelAndView(Integer projectId, PlatformFpsoForm form) {

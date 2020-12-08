@@ -33,7 +33,7 @@ public class TemplateRenderingService {
     // This prevents rendering from working async as there will be no active request.
     if (addSpringRequestSupport) {
       HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-      viewModel.put("springMacroRequestContext", new RequestContext(request, null, null, null));
+      viewModel.put("springMacroRequestContext", new RequestContext(request, null, null, viewModel));
     }
     String renderedTemplate;
     try {

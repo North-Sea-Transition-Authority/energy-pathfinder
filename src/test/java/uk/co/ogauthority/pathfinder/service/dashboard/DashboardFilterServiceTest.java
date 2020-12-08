@@ -204,4 +204,31 @@ public class DashboardFilterServiceTest {
     assertThat(results.size()).isEqualTo(1);
     assertThat(results.get(0)).isEqualTo(STATUS_ITEM);
   }
+
+  @Test
+  public void filter_allFieldsSet_matchesResult() {
+    var dashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    filter.setProjectTitle(DashboardProjectItemTestUtil.PROJECT_TITLE);
+    filter.setFieldStages(List.of(DashboardProjectItemTestUtil.FIELD_STAGE));
+    filter.setField(DashboardProjectItemTestUtil.FIELD_NAME);
+    filter.setUkcsAreas(List.of(DashboardProjectItemTestUtil.UKCS_AREA));
+    filter.setProjectStatusList(List.of(DashboardProjectItemTestUtil.PROJECT_STATUS));
+
+    var results = dashboardFilterService.filter(List.of(dashboardItem), filter);
+    assertThat(results.size()).isEqualTo(1);
+    assertThat(results.get(0)).isEqualTo(dashboardItem);
+  }
+
+  @Test
+  public void filter_allFieldsSet_oneMismatchedField_doesNotMatchResult() {
+    var dashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    filter.setProjectTitle(TITLE);
+    filter.setFieldStages(List.of(DashboardProjectItemTestUtil.FIELD_STAGE));
+    filter.setField(DashboardProjectItemTestUtil.FIELD_NAME);
+    filter.setUkcsAreas(List.of(DashboardProjectItemTestUtil.UKCS_AREA));
+    filter.setProjectStatusList(List.of(DashboardProjectItemTestUtil.PROJECT_STATUS));
+
+    var results = dashboardFilterService.filter(List.of(dashboardItem), filter);
+    assertThat(results).isEmpty();
+  }
 }
