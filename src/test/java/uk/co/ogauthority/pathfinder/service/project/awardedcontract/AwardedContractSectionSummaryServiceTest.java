@@ -32,6 +32,20 @@ public class AwardedContractSectionSummaryServiceTest {
   }
 
   @Test
+  public void canShowSection_whenCanShowInTaskList_thenTrue() {
+    when(awardedContractService.canShowInTaskList(detail)).thenReturn(true);
+
+    assertThat(awardedContractSectionSummaryService.canShowSection(detail)).isTrue();
+  }
+
+  @Test
+  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
+    when(awardedContractService.canShowInTaskList(detail)).thenReturn(false);
+
+    assertThat(awardedContractSectionSummaryService.canShowSection(detail)).isFalse();
+  }
+
+  @Test
   public void getSummary() {
     var awardedContract1 = AwardedContractTestUtil.createAwardedContract();
     var awardedContract2 = AwardedContractTestUtil.createAwardedContract();

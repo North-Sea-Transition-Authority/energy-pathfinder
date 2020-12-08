@@ -23,13 +23,33 @@ public class UpcomingTenderSectionSummaryServiceTest {
   @Mock
   private UpcomingTenderSummaryService upcomingTenderSummaryService;
 
+  @Mock
+  private UpcomingTenderService upcomingTenderService;
+
   private UpcomingTenderSectionSummaryService upcomingTenderSectionSummaryService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
 
   @Before
   public void setup() {
-    upcomingTenderSectionSummaryService = new UpcomingTenderSectionSummaryService(upcomingTenderSummaryService);
+    upcomingTenderSectionSummaryService = new UpcomingTenderSectionSummaryService(
+        upcomingTenderSummaryService,
+        upcomingTenderService
+    );
+  }
+
+  @Test
+  public void canShowSection_whenCanShowInTaskList_thenTrue() {
+    when(upcomingTenderService.canShowInTaskList(projectDetail)).thenReturn(true);
+
+    assertThat(upcomingTenderSectionSummaryService.canShowSection(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
+    when(upcomingTenderService.canShowInTaskList(projectDetail)).thenReturn(false);
+
+    assertThat(upcomingTenderSectionSummaryService.canShowSection(projectDetail)).isFalse();
   }
 
   @Test

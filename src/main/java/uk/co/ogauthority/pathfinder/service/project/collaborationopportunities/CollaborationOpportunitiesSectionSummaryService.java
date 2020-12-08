@@ -25,12 +25,19 @@ public class CollaborationOpportunitiesSectionSummaryService implements ProjectS
   public static final int DISPLAY_ORDER = ProjectTask.COLLABORATION_OPPORTUNITIES.getDisplayOrder();
 
   private final CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService;
+  private final CollaborationOpportunitiesService collaborationOpportunitiesService;
 
   @Autowired
   public CollaborationOpportunitiesSectionSummaryService(
-      CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService
-  ) {
+      CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService,
+      CollaborationOpportunitiesService collaborationOpportunitiesService) {
     this.collaborationOpportunitiesSummaryService = collaborationOpportunitiesSummaryService;
+    this.collaborationOpportunitiesService = collaborationOpportunitiesService;
+  }
+
+  @Override
+  public boolean canShowSection(ProjectDetail detail) {
+    return collaborationOpportunitiesService.canShowInTaskList(detail);
   }
 
   @Override
