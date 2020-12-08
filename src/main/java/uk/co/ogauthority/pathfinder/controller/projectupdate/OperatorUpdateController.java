@@ -38,13 +38,13 @@ public class OperatorUpdateController {
     this.projectUpdateService = projectUpdateService;
   }
 
-  @GetMapping
+  @GetMapping("/start-update")
   public ModelAndView startPage(@PathVariable("projectId") Integer projectId,
                                 ProjectUpdateContext projectUpdateContext) {
     return operatorProjectUpdateService.getProjectUpdateModelAndView(projectId);
   }
 
-  @PostMapping
+  @PostMapping("/start-update")
   public ModelAndView startUpdate(@PathVariable("projectId") Integer projectId,
                                   ProjectUpdateContext projectUpdateContext,
                                   AuthenticatedUserAccount user) {
