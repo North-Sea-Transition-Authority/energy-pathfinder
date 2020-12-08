@@ -19,9 +19,9 @@ public class ProjectSetupForm {
 
   private TaskListSectionAnswer platformsFpsosIncluded;
 
-  private TaskListSectionAnswer subseaInfrastructureIncluded;
-
   private TaskListSectionAnswer integratedRigsIncluded;
+
+  private TaskListSectionAnswer subseaInfrastructureIncluded;
 
   private TaskListSectionAnswer pipelinesIncluded;
 
@@ -69,15 +69,6 @@ public class ProjectSetupForm {
     this.platformsFpsosIncluded = platformsFpsosIncluded;
   }
 
-  public TaskListSectionAnswer getSubseaInfrastructureIncluded() {
-    return subseaInfrastructureIncluded;
-  }
-
-  public void setSubseaInfrastructureIncluded(
-      TaskListSectionAnswer subseaInfrastructureIncluded) {
-    this.subseaInfrastructureIncluded = subseaInfrastructureIncluded;
-  }
-
   public TaskListSectionAnswer getIntegratedRigsIncluded() {
     return integratedRigsIncluded;
   }
@@ -85,6 +76,15 @@ public class ProjectSetupForm {
   public void setIntegratedRigsIncluded(
       TaskListSectionAnswer integratedRigsIncluded) {
     this.integratedRigsIncluded = integratedRigsIncluded;
+  }
+
+  public TaskListSectionAnswer getSubseaInfrastructureIncluded() {
+    return subseaInfrastructureIncluded;
+  }
+
+  public void setSubseaInfrastructureIncluded(
+      TaskListSectionAnswer subseaInfrastructureIncluded) {
+    this.subseaInfrastructureIncluded = subseaInfrastructureIncluded;
   }
 
   public TaskListSectionAnswer getPipelinesIncluded() {
