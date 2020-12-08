@@ -24,7 +24,7 @@ import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
 @Controller
 @ProjectStatusCheck(status = {ProjectStatus.QA, ProjectStatus.PUBLISHED})
 @ProjectFormPagePermissionCheck(permissions = {ProjectPermission.PROVIDE_UPDATE})
-@RequestMapping("/project/{projectId}/project-update")
+@RequestMapping("/project/{projectId}")
 public class OperatorUpdateController {
 
   private final OperatorProjectUpdateService operatorProjectUpdateService;
