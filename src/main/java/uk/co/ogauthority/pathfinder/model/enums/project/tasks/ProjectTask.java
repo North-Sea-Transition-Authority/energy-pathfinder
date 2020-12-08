@@ -11,7 +11,7 @@ import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedR
 import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationController;
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
-import uk.co.ogauthority.pathfinder.controller.project.selectoperator.SelectProjectOperatorController;
+import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProjectOperatorController;
 import uk.co.ogauthority.pathfinder.controller.project.setup.ProjectSetupController;
 import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.SubseaInfrastructureController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
@@ -37,8 +37,8 @@ import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTende
 public enum ProjectTask implements GeneralPurposeProjectTask {
 
   PROJECT_OPERATOR(
-      SelectProjectOperatorController.PAGE_NAME,
-      SelectProjectOperatorController.class,
+      ChangeProjectOperatorController.PAGE_NAME,
+      ChangeProjectOperatorController.class,
       SelectOperatorService.class,
       1
   ),
@@ -153,7 +153,7 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
     var projectId = project.getId();
     switch (this) {
       case PROJECT_OPERATOR:
-        return ReverseRouter.route(on(SelectProjectOperatorController.class).selectOperator(null));
+        return ReverseRouter.route(on(ChangeProjectOperatorController.class).changeOperator(null, projectId, null));
       case PROJECT_INFORMATION:
         return ReverseRouter.route(on(ProjectInformationController.class).getProjectInformation(projectId, null));
       case PROJECT_LOCATION:
