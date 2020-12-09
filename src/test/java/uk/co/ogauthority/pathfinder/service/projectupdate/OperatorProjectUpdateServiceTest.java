@@ -2,22 +2,104 @@ package uk.co.ogauthority.pathfinder.service.projectupdate;
 
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.OperatorUpdateController;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.projectupdate.NoUpdateNotification;
+import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
+import uk.co.ogauthority.pathfinder.model.form.projectupdate.ProvideNoUpdateForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.repository.projectupdate.NoUpdateNotificationRepository;
+import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
+@RunWith(MockitoJUnitRunner.class)
 public class OperatorProjectUpdateServiceTest {
 
   private static final int PROJECT_ID = 1;
 
+  @Mock
+  private ProjectUpdateService projectUpdateService;
+
+  @Mock
+  private NoUpdateNotificationRepository noUpdateNotificationRepository;
+
+  @Mock
+  private ValidationService validationService;
+
+  @Mock
+  private BreadcrumbService breadcrumbService;
+
   private OperatorProjectUpdateService operatorProjectUpdateService;
+
+  private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
+
+  private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   @Before
   public void setup() {
-    operatorProjectUpdateService = new OperatorProjectUpdateService();
+    operatorProjectUpdateService = new OperatorProjectUpdateService(
+        projectUpdateService,
+        noUpdateNotificationRepository,
+        validationService,
+        breadcrumbService
+    );
+
+    when(noUpdateNotificationRepository.save(any(NoUpdateNotification.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
+  }
+
+  @Test
+  public void validate() {
+    var form = new ProvideNoUpdateForm();
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+
+    operatorProjectUpdateService.validate(form, bindingResult);
+
+    verify(validationService, times(1)).validate(form, bindingResult, ValidationType.FULL);
+  }
+
+  @Test
+  public void startUpdate() {
+    operatorProjectUpdateService.startUpdate(projectDetail, authenticatedUser);
+
+    verify(projectUpdateService, times(1)).startUpdate(projectDetail, authenticatedUser, ProjectUpdateType.OPERATOR_INITIATED);
+  }
+
+  @Test
+  public void createNoUpdateNotification() {
+    var projectUpdate = new ProjectUpdate();
+
+    when(projectUpdateService.startUpdate(projectDetail, projectDetail.getStatus(), authenticatedUser, ProjectUpdateType.OPERATOR_INITIATED)).thenReturn(
+        projectUpdate
+    );
+
+    var reasonNoUpdateRequired = "Test reason";
+
+    var noUpdateNotification = operatorProjectUpdateService.createNoUpdateNotification(projectDetail, authenticatedUser, reasonNoUpdateRequired);
+
+    verify(projectUpdateService, times(1)).startUpdate(projectDetail, projectDetail.getStatus(), authenticatedUser, ProjectUpdateType.OPERATOR_INITIATED);
+
+    assertThat(noUpdateNotification.getProjectUpdate()).isEqualTo(projectUpdate);
+    assertThat(noUpdateNotification.getReasonNoUpdateRequired()).isEqualTo(reasonNoUpdateRequired);
+
+    verify(noUpdateNotificationRepository, times(1)).save(noUpdateNotification);
   }
 
   @Test
@@ -29,5 +111,22 @@ public class OperatorProjectUpdateServiceTest {
         entry("startActionUrl", ReverseRouter.route(on(OperatorUpdateController.class)
             .startUpdate(PROJECT_ID, null, null)))
     );
+  }
+
+  @Test
+  public void getProjectProvideNoUpdateModelAndView() {
+    var form = new ProvideNoUpdateForm();
+
+    var modelAndView = operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(PROJECT_ID, form);
+
+    assertThat(modelAndView.getViewName()).isEqualTo(OperatorProjectUpdateService.PROVIDE_NO_UPDATE_TEMPLATE_PATH);
+    assertThat(modelAndView.getModel()).containsExactly(
+        entry("form", form),
+        entry("confirmActionUrl", ReverseRouter.route(on(OperatorUpdateController.class)
+            .provideNoUpdate(PROJECT_ID, null, null, null, null))),
+        entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(PROJECT_ID, null, null, null)))
+    );
+
+    verify(breadcrumbService, times(1)).fromManageProject(PROJECT_ID, modelAndView, OperatorUpdateController.NO_UPDATE_REQUIRED_PAGE_NAME);
   }
 }

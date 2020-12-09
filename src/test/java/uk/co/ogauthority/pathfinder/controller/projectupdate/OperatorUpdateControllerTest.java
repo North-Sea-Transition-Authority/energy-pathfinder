@@ -22,17 +22,19 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectUpdateContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
-import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
+import uk.co.ogauthority.pathfinder.model.form.projectupdate.ProvideNoUpdateForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
-import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -48,9 +50,6 @@ public class OperatorUpdateControllerTest extends ProjectUpdateContextAbstractCo
 
   @MockBean
   private OperatorProjectUpdateService operatorProjectUpdateService;
-
-  @MockBean
-  private ProjectUpdateService projectUpdateService;
 
   private final ProjectDetail qaProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
   private final ProjectDetail draftProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
@@ -104,7 +103,7 @@ public class OperatorUpdateControllerTest extends ProjectUpdateContextAbstractCo
         .with(csrf()))
         .andExpect(status().is3xxRedirection());
 
-    verify(projectUpdateService, times(1)).startUpdate(any(), any(), eq(ProjectUpdateType.OPERATOR_INITIATED));
+    verify(operatorProjectUpdateService, times(1)).startUpdate(any(), any());
   }
 
   @Test
@@ -117,7 +116,7 @@ public class OperatorUpdateControllerTest extends ProjectUpdateContextAbstractCo
             .with(csrf()))
         .andExpect(status().isForbidden());
 
-    verify(projectUpdateService, never()).startUpdate(any(), any(), eq(ProjectUpdateType.OPERATOR_INITIATED));
+    verify(operatorProjectUpdateService, never()).startUpdate(any(), any());
   }
 
   @Test
@@ -130,6 +129,93 @@ public class OperatorUpdateControllerTest extends ProjectUpdateContextAbstractCo
             .with(csrf()))
         .andExpect(status().isForbidden());
 
-    verify(projectUpdateService, never()).startUpdate(any(), any(), eq(ProjectUpdateType.OPERATOR_INITIATED));
+    verify(operatorProjectUpdateService, never()).startUpdate(any(), any());
+  }
+
+  @Test
+  public void provideNoUpdateConfirmation_whenAuthenticatedAndQA_thenAccess() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(OperatorUpdateController.class).provideNoUpdateConfirmation(QA_PROJECT_ID, null)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  public void provideNoUpdateConfirmation_whenUnauthenticatedAndQA_thenNoAccess() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(OperatorUpdateController.class).provideNoUpdateConfirmation(QA_PROJECT_ID, null)))
+        .with(authenticatedUserAndSession(unauthenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void provideNoUpdateConfirmation_whenAuthenticatedAndDraft_thenNoAccess() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(OperatorUpdateController.class).provideNoUpdateConfirmation(DRAFT_PROJECT_ID, null)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void provideNoUpdate_whenAuthenticatedAndQAAndValidForm_thenCreate() throws Exception {
+    var bindingResult = new BeanPropertyBindingResult(ProvideNoUpdateForm.class, "form");
+    when(operatorProjectUpdateService.validate(any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(OperatorUpdateController.class)
+            .provideNoUpdate(QA_PROJECT_ID, null, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf()))
+        .andExpect(status().is3xxRedirection());
+
+    verify(operatorProjectUpdateService, times(1)).validate(any(), any());
+    verify(operatorProjectUpdateService, times(1)).createNoUpdateNotification(any(), any(), any());
+  }
+
+  @Test
+  public void provideNoUpdate_whenAuthenticatedAndQAAndInvalidForm_thenNoCreate() throws Exception {
+    var bindingResult = new BeanPropertyBindingResult(ProvideNoUpdateForm.class, "form");
+    bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
+    when(operatorProjectUpdateService.validate(any(), any())).thenReturn(bindingResult);
+
+    when(operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(any(), any())).thenReturn(new ModelAndView());
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(OperatorUpdateController.class)
+            .provideNoUpdate(QA_PROJECT_ID, null, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf()))
+        .andExpect(status().isOk());
+
+    verify(operatorProjectUpdateService, times(1)).validate(any(), any());
+    verify(operatorProjectUpdateService, times(0)).createNoUpdateNotification(any(), any(), any());
+  }
+
+  @Test
+  public void provideNoUpdate_whenUnauthenticatedAndQA_thenNoAccess() throws Exception {
+    mockMvc.perform(
+        post(ReverseRouter.route(on(OperatorUpdateController.class)
+            .provideNoUpdate(QA_PROJECT_ID, null, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(unauthenticatedUser))
+            .with(csrf()))
+        .andExpect(status().isForbidden());
+
+    verify(operatorProjectUpdateService, never()).createNoUpdateNotification(any(), any(), any());
+  }
+
+  @Test
+  public void provideNoUpdate_whenAuthenticatedAndDraft_thenNoAccess() throws Exception {
+    mockMvc.perform(
+        post(ReverseRouter.route(on(OperatorUpdateController.class)
+            .provideNoUpdate(DRAFT_PROJECT_ID, null, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf()))
+        .andExpect(status().isForbidden());
+
+    verify(operatorProjectUpdateService, never()).createNoUpdateNotification(any(), any(), any());
   }
 }

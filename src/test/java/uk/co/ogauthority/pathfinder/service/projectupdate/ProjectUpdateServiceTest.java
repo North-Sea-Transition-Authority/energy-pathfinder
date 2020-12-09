@@ -49,6 +49,7 @@ public class ProjectUpdateServiceTest {
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
   private final Project project = projectDetail.getProject();
+
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   @Before
@@ -69,16 +70,16 @@ public class ProjectUpdateServiceTest {
     final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
     final var user = UserTestingUtil.getAuthenticatedUserAccount();
 
-    projectUpdateService.createNewProjectVersion(fromProjectDetail, user);
+    projectUpdateService.createNewProjectVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
 
-    verify(projectService, times(1)).createNewProjectDetailVersion(fromProjectDetail, user);
+    verify(projectService, times(1)).createNewProjectDetailVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
     verify(projectInformationService, times(1)).copySectionData(eq(fromProjectDetail), any());
     verify(awardedContractService, times(1)).copySectionData(eq(fromProjectDetail), any());
   }
 
   @Test
   public void startUpdate() {
-    when(projectService.createNewProjectDetailVersion(projectDetail, authenticatedUser)).thenReturn(
+    when(projectService.createNewProjectDetailVersion(projectDetail, ProjectStatus.DRAFT, authenticatedUser)).thenReturn(
         ProjectUtil.getProjectDetails()
     );
 

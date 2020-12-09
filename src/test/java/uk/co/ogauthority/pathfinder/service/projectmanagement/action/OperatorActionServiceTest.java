@@ -48,7 +48,8 @@ public class OperatorActionServiceTest {
     var actions = operatorActionService.getActions(projectDetail, authenticatedUser);
 
     assertThat(actions).containsExactly(
-        operatorActionService.getProvideUpdateAction(project.getId(), false)
+        operatorActionService.getProvideUpdateAction(project.getId(), false),
+        operatorActionService.getProvideNoUpdateNotificationAction(project.getId(), false)
     );
   }
 
@@ -59,7 +60,8 @@ public class OperatorActionServiceTest {
     var actions = operatorActionService.getActions(projectDetail, authenticatedUser);
 
     assertThat(actions).containsExactly(
-        operatorActionService.getProvideUpdateAction(project.getId(), true)
+        operatorActionService.getProvideUpdateAction(project.getId(), true),
+        operatorActionService.getProvideNoUpdateNotificationAction(project.getId(), true)
     );
   }
 
@@ -87,5 +89,34 @@ public class OperatorActionServiceTest {
     assertThat(linkButton.getButtonType()).isEqualTo(ButtonType.PRIMARY);
 
     assertThat(action.getDisplayOrder()).isEqualTo(OperatorActionService.PROVIDE_UPDATE_ACTION_DISPLAY_ORDER);
+  }
+
+  @Test
+  public void getProvideNoUpdateNotificationAction_enabled() {
+    var action = operatorActionService.getProvideNoUpdateNotificationAction(project.getId(), true);
+
+    assertProvideNoUpdateNotificationActionFields(action, true);
+  }
+
+  @Test
+  public void getProvideNoUpdateNotificationAction_disabled() {
+    var action = operatorActionService.getProvideNoUpdateNotificationAction(project.getId(), false);
+
+    assertProvideNoUpdateNotificationActionFields(action, false);
+  }
+
+  private void assertProvideNoUpdateNotificationActionFields(UserActionWithDisplayOrder action, boolean isEnabled) {
+    var linkButton = (LinkButton) action.getUserAction();
+    assertThat(linkButton.getPrompt()).isEqualTo(OperatorActionService.PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_PROMPT);
+    assertThat(linkButton.getUrl()).isEqualTo(
+        ReverseRouter.route(on(OperatorUpdateController.class).provideNoUpdateConfirmation(
+            project.getId(),
+            null
+        ))
+    );
+    assertThat(linkButton.getEnabled()).isEqualTo(isEnabled);
+    assertThat(linkButton.getButtonType()).isEqualTo(ButtonType.SECONDARY);
+
+    assertThat(action.getDisplayOrder()).isEqualTo(OperatorActionService.PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_DISPLAY_ORDER);
   }
 }
