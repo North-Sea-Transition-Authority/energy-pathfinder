@@ -96,7 +96,7 @@ public class ProjectManagementViewService {
 
     return new ModelAndView(TEMPLATE_PATH)
         .addObject("projectManagementView", projectManagementView)
-        .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null)))
+        .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
         .addObject("viewableVersions", viewableVersions)
         .addObject("form", form)
         .addObject("viewVersionUrl", ReverseRouter.route(on(ManageProjectController.class)

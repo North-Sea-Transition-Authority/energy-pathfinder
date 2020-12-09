@@ -1,13 +1,15 @@
 package uk.co.ogauthority.pathfinder.model.dashboard;
 
+import java.io.Serializable;
 import java.util.List;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 import uk.co.ogauthority.pathfinder.model.form.dashboard.DashboardFilterForm;
 
-//TODO PAT-343 Will need sessionAttributes annotation
-public class DashboardFilter {
+@SessionAttributes("dashboardFilter")
+public class DashboardFilter implements Serializable {
 
   private String projectTitle;
 
@@ -22,7 +24,7 @@ public class DashboardFilter {
   public DashboardFilter() {
   }
 
-  public DashboardFilter(DashboardFilterForm form) {
+  public void setFromForm(DashboardFilterForm form) {
     this.projectTitle = form.getProjectTitle();
     this.field = form.getField();
     this.fieldStages = form.getFieldStages();
