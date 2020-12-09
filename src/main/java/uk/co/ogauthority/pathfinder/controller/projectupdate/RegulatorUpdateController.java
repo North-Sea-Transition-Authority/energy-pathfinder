@@ -61,7 +61,7 @@ public class RegulatorUpdateController {
         form,
         () -> {
           regulatorProjectUpdateService.startRegulatorRequestedUpdate(projectUpdateContext.getProjectDetails(), form, user);
-          return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(null));
+          return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(null, null));
         }
     );
   }
