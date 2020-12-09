@@ -561,7 +561,8 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     l_field_type ${datasource.migration-user}.legacy_project_data.field_type%TYPE;
     l_fdp_approved ${datasource.migration-user}.legacy_project_data.fdp_approved%TYPE;
 
-    l_water_depth ${datasource.user}.project_locations.water_depth%TYPE;
+    l_legacy_water_depth ${datasource.migration-user}.legacy_project_data.water_depth%TYPE;
+    l_sanitised_water_depth ${datasource.user}.project_locations.water_depth%TYPE;
 
     /**
       Utility function to lookup try to find a matching devuk field based on the free text value
@@ -618,7 +619,8 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
         p_legacy_project_detail_id => p_legacy_project_detail_id
       , p_system_message =>
           'Starting sanitise_legacy_field_inputs for legacy project detail with ID ' || p_legacy_project_detail_id
-          || 'with inputs po_legacy_devuk_field_id => ' || po_legacy_devuk_field_id || ', po_legacy_manual_field_name => ' || po_legacy_manual_field_name
+          || 'with inputs po_legacy_devuk_field_id => ' || COALESCE(TO_CHAR(po_legacy_devuk_field_id), 'NULL')
+          || ', po_legacy_manual_field_name => ' || COALESCE(po_legacy_manual_field_name, 'NULL')
       );
 
       IF po_legacy_devuk_field_id IS NOT NULL THEN
@@ -646,10 +648,146 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
         p_legacy_project_detail_id => p_legacy_project_detail_id
       , p_system_message =>
           'Finished sanitise_legacy_field_inputs for legacy project detail with ID ' || p_legacy_project_detail_id
-          || ' with outputs po_legacy_devuk_field_id => ' || po_legacy_devuk_field_id || ', po_legacy_manual_field_name => ' || po_legacy_manual_field_name
+          || ' with outputs po_legacy_devuk_field_id => ' || COALESCE(TO_CHAR(po_legacy_devuk_field_id), 'NULL')
+          || ', po_legacy_manual_field_name => ' || COALESCE(po_legacy_manual_field_name, 'NULL')
       );
 
     END sanitise_legacy_field_inputs;
+
+    /**
+      Utility function to take in a legacy water depth value and try to sanitise it for inclusion in the new model.
+      We need to remove characters, spaces and any units associated to the legacy input.
+
+      If the input contains a range of values e.g. 150-170 then we need to take the maximum value of the range.
+
+      @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+      @param p_legacy_water_depth_value The legacy water depth value we want to sanitise
+     */
+    FUNCTION sanitise_legacy_water_depth(
+      p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+    , p_legacy_water_depth_value IN ${datasource.migration-user}.legacy_project_data.water_depth%TYPE
+    ) RETURN ${datasource.user}.project_locations.water_depth%TYPE
+    IS
+
+      l_sanitised_water_depth_value ${datasource.migration-user}.legacy_project_data.water_depth%TYPE;
+
+    BEGIN
+
+      log_project_detail_migration(
+        p_legacy_project_detail_id => p_legacy_project_detail_id
+      , p_system_message =>
+          'Starting sanitise_legacy_water_depth_input for legacy project detail with ID ' || p_legacy_project_detail_id
+          || ' with input p_legacy_water_depth_value => ' || COALESCE(p_legacy_water_depth_value, 'NULL')
+      );
+
+      -- remove any text characters, spaces or commas from the legacy value
+      SELECT REGEXP_REPLACE(LOWER(p_legacy_water_depth_value), '[a-z]| |,', '')
+      INTO l_sanitised_water_depth_value
+      FROM dual;
+
+      -- if the string contains a hyphen then we have a range of values
+      IF INSTR(l_sanitised_water_depth_value, '-') > 0 THEN
+
+        -- split on the hyphen character and get the MAX value from the list
+        SELECT MAX(t.column_value)
+        INTO l_sanitised_water_depth_value
+        FROM TABLE(envmgr.st.split(l_sanitised_water_depth_value, '-')) t;
+
+      END IF;
+
+      log_project_detail_migration(
+        p_legacy_project_detail_id => p_legacy_project_detail_id
+      , p_system_message =>
+          'Finished sanitise_legacy_water_depth_input for legacy project detail with ID ' || p_legacy_project_detail_id
+          || ' with sanitised value ' || COALESCE(l_sanitised_water_depth_value, 'NULL')
+      );
+
+      -- return either a number or NULL
+      RETURN envmgr.st.to_number_safe(l_sanitised_water_depth_value);
+
+    END sanitise_legacy_water_depth;
+
+    /**
+      Utility function to get the water depth value for the new model. This will also populate the
+      water_depth_migration_mapping table with the before and after value so we can see how it was sanitised.
+      @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+      @param p_legacy_water_depth_value The legacy water depth value we want to sanitise
+     */
+    FUNCTION get_water_depth_value(
+      p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+    , p_legacy_water_depth_value IN ${datasource.migration-user}.legacy_project_data.water_depth%TYPE
+    ) RETURN NUMBER
+    IS
+
+      PRAGMA AUTONOMOUS_TRANSACTION;
+
+      K_IS_MIGRATABLE_FALSE CONSTANT ${datasource.migration-user}.water_depth_migration_mapping.is_migratable%TYPE := 0;
+      K_IS_MIGRATABLE_TRUE CONSTANT ${datasource.migration-user}.water_depth_migration_mapping.is_migratable%TYPE := 1;
+
+      l_sanitised_water_depth_value ${datasource.user}.project_locations.water_depth%TYPE;
+      l_is_water_depth_migratable ${datasource.migration-user}.water_depth_migration_mapping.is_migratable%TYPE;
+
+    BEGIN
+
+      -- merge statement so we can do rerun of project migrations and not get duplicate rows
+      MERGE INTO ${datasource.migration-user}.water_depth_migration_mapping wdmm
+      USING(
+        SELECT p_legacy_project_detail_id legacy_project_detail_id
+        FROM dual
+      ) t
+      ON (t.legacy_project_detail_id = wdmm.legacy_project_detail_id)
+      WHEN MATCHED THEN
+        UPDATE SET
+          original_water_depth_value = p_legacy_water_depth_value
+        , is_migratable = K_IS_MIGRATABLE_FALSE
+      WHEN NOT MATCHED THEN
+        INSERT (
+          legacy_project_detail_id
+        , original_water_depth_value
+        , is_migratable
+        )
+        VALUES(
+          p_legacy_project_detail_id
+        , p_legacy_water_depth_value
+        , K_IS_MIGRATABLE_FALSE
+        );
+
+      IF p_legacy_water_depth_value IS NOT NULL THEN
+
+        l_sanitised_water_depth_value := sanitise_legacy_water_depth(
+          p_legacy_project_detail_id => p_legacy_project_detail_id
+        , p_legacy_water_depth_value => p_legacy_water_depth_value
+        );
+
+        -- if after sanitisation we have not managed to get a number
+        -- then mark the mapping table as K_IS_MIGRATABLE_FALSE and NULL
+        -- will be returned for migration
+        SELECT DECODE(
+          l_sanitised_water_depth_value
+        , NULL, K_IS_MIGRATABLE_FALSE
+        , K_IS_MIGRATABLE_TRUE
+        )
+        INTO l_is_water_depth_migratable
+        FROM dual;
+
+      ELSE
+        -- if p_legacy_water_depth_value IS NULL then we will migrate NULL to new model
+        l_sanitised_water_depth_value := NULL;
+        l_is_water_depth_migratable := K_IS_MIGRATABLE_TRUE;
+
+      END IF;
+
+      UPDATE ${datasource.migration-user}.water_depth_migration_mapping wdmm
+      SET
+        wdmm.sanitised_water_depth_value = l_sanitised_water_depth_value
+      , wdmm.is_migratable = l_is_water_depth_migratable
+      WHERE wdmm.legacy_project_detail_id = p_legacy_project_detail_id;
+
+      COMMIT;
+
+      RETURN l_sanitised_water_depth_value;
+
+    END get_water_depth_value;
 
   BEGIN
 
@@ -663,11 +801,13 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     , lpd.manual_field_name
     , lpd.field_type
     , lpd.fdp_approved
+    , lpd.water_depth
     INTO
       l_devuk_field_id
     , l_manual_field_name
     , l_field_type
     , l_fdp_approved
+    , l_legacy_water_depth
     FROM ${datasource.migration-user}.legacy_project_data lpd
     WHERE lpd.legacy_project_detail_id = p_legacy_project_detail_id;
 
@@ -675,6 +815,11 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       p_legacy_project_detail_id => p_legacy_project_detail_id
     , po_legacy_devuk_field_id => l_devuk_field_id
     , po_legacy_manual_field_name => l_manual_field_name
+    );
+
+    l_sanitised_water_depth := get_water_depth_value(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_legacy_water_depth_value => l_legacy_water_depth
     );
 
     INSERT INTO ${datasource.user}.project_locations(
@@ -689,7 +834,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       p_new_project_detail_id
     , l_devuk_field_id
     , l_manual_field_name
-    , l_water_depth
+    , l_sanitised_water_depth
     , l_field_type
     , l_fdp_approved
     )
