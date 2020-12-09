@@ -18,14 +18,12 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
-import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.ProvideNoUpdateForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContext;
-import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
 
 @Controller
 @ProjectStatusCheck(status = {ProjectStatus.QA, ProjectStatus.PUBLISHED})
@@ -36,15 +34,12 @@ public class OperatorUpdateController {
   public static final String NO_UPDATE_REQUIRED_PAGE_NAME = "No changes required";
 
   private final OperatorProjectUpdateService operatorProjectUpdateService;
-  private final ProjectUpdateService projectUpdateService;
   private final ControllerHelperService controllerHelperService;
 
   @Autowired
   public OperatorUpdateController(OperatorProjectUpdateService operatorProjectUpdateService,
-                                  ProjectUpdateService projectUpdateService,
                                   ControllerHelperService controllerHelperService) {
     this.operatorProjectUpdateService = operatorProjectUpdateService;
-    this.projectUpdateService = projectUpdateService;
     this.controllerHelperService = controllerHelperService;
   }
 
@@ -58,7 +53,7 @@ public class OperatorUpdateController {
   public ModelAndView startUpdate(@PathVariable("projectId") Integer projectId,
                                   ProjectUpdateContext projectUpdateContext,
                                   AuthenticatedUserAccount user) {
-    projectUpdateService.startUpdate(projectUpdateContext.getProjectDetails(), user, ProjectUpdateType.OPERATOR_INITIATED);
+    operatorProjectUpdateService.startUpdate(projectUpdateContext.getProjectDetails(), user);
     return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
   }
 

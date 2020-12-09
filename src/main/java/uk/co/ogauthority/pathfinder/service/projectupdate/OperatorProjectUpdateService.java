@@ -12,6 +12,7 @@ import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectCo
 import uk.co.ogauthority.pathfinder.controller.projectupdate.OperatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.NoUpdateNotification;
+import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.ProvideNoUpdateForm;
@@ -45,6 +46,10 @@ public class OperatorProjectUpdateService {
 
   public BindingResult validate(ProvideNoUpdateForm form, BindingResult bindingResult) {
     return validationService.validate(form, bindingResult, ValidationType.FULL);
+  }
+
+  public ProjectUpdate startUpdate(ProjectDetail projectDetail, AuthenticatedUserAccount user) {
+    return projectUpdateService.startUpdate(projectDetail, user, ProjectUpdateType.OPERATOR_INITIATED);
   }
 
   @Transactional

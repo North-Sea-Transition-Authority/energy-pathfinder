@@ -76,6 +76,13 @@ public class OperatorProjectUpdateServiceTest {
   }
 
   @Test
+  public void startUpdate() {
+    operatorProjectUpdateService.startUpdate(projectDetail, authenticatedUser);
+
+    verify(projectUpdateService, times(1)).startUpdate(projectDetail, authenticatedUser, ProjectUpdateType.OPERATOR_INITIATED);
+  }
+
+  @Test
   public void createNoUpdateNotification() {
     var projectUpdate = new ProjectUpdate();
 
