@@ -77,4 +77,8 @@ public class IntegratedRigSummaryService {
         })
         .collect(Collectors.toList());
   }
+
+  public boolean canShowInTaskList(ProjectDetail detail) {
+    return integratedRigService.canShowInTaskList(detail);
+  }
 }

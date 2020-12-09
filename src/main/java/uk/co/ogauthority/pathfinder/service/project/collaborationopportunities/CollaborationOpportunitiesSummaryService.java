@@ -88,5 +88,7 @@ public class CollaborationOpportunitiesSummaryService {
         .collect(Collectors.toList());
   }
 
-
+  public boolean canShowInTaskList(ProjectDetail detail) {
+    return collaborationOpportunitiesService.canShowInTaskList(detail);
+  }
 }

@@ -25,18 +25,15 @@ public class IntegratedRigSectionSummaryService implements ProjectSectionSummary
   public static final int DISPLAY_ORDER = ProjectTask.INTEGRATED_RIGS.getDisplayOrder();
 
   private final IntegratedRigSummaryService integratedRigSummaryService;
-  private final IntegratedRigService integratedRigService;
 
   @Autowired
-  public IntegratedRigSectionSummaryService(IntegratedRigSummaryService integratedRigSummaryService,
-                                            IntegratedRigService integratedRigService) {
+  public IntegratedRigSectionSummaryService(IntegratedRigSummaryService integratedRigSummaryService) {
     this.integratedRigSummaryService = integratedRigSummaryService;
-    this.integratedRigService = integratedRigService;
   }
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return integratedRigService.canShowInTaskList(detail);
+    return integratedRigSummaryService.canShowInTaskList(detail);
   }
 
   @Override
