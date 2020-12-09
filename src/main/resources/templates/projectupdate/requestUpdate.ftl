@@ -16,8 +16,9 @@
       dayPath="form.deadlineDate.day"
       monthPath="form.deadlineDate.month"
       yearPath="form.deadlineDate.year"
-      labelText="Deadline"
+      labelText="Deadline for update submission"
       formId="deadlineDate-day-month-year"
+      optionalLabel=true
     />
     <@fdsAction.submitButtons
       primaryButtonText="Save and complete"

@@ -1,7 +1,7 @@
 CREATE TABLE ${datasource.user}.regulator_requested_updates (
   id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY
 , project_update_id NUMBER NOT NULL
-, update_reason VARCHAR2(4000) NOT NULL
+, update_reason CLOB NOT NULL
 , deadline_date TIMESTAMP
 , requested_by_wua_id NUMBER NOT NULL
 , requested_datetime TIMESTAMP NOT NULL

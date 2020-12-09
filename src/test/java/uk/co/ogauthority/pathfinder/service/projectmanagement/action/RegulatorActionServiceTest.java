@@ -47,7 +47,7 @@ public class RegulatorActionServiceTest {
   }
 
   @Test
-  public void getActions_whenCannotBuildContexts() {
+  public void getActions_whenNoActionsAvailable_thenAllReturnedDisabled() {
     when(projectAssessmentContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any())).thenReturn(false);
     when(projectUpdateContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any())).thenReturn(false);
 
@@ -60,7 +60,7 @@ public class RegulatorActionServiceTest {
   }
 
   @Test
-  public void getActions_whenCanBuildContexts() {
+  public void getActions_whenAllActionsAvailable_thenAllReturnedEnabled() {
     when(projectAssessmentContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any())).thenReturn(true);
     when(projectUpdateContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any())).thenReturn(true);
 
