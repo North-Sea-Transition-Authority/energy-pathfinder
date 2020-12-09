@@ -7,7 +7,8 @@ import uk.co.ogauthority.pathfinder.util.StreamUtil;
 public enum ProjectStatus {
   DRAFT("Draft"),
   QA("QA"),
-  PUBLISHED("Published");
+  PUBLISHED("Published"),
+  ARCHIVED("Archived");
 
   private final String displayName;
 
