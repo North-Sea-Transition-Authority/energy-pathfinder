@@ -212,9 +212,16 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   ) RETURN NUMBER
   IS
 
+    K_DESTINATION_TABLE_NAME CONSTANT VARCHAR2(30) := 'PROJECTS';
+
     l_new_project_id NUMBER;
 
   BEGIN
+
+    log_project_migration(
+      p_legacy_project_id => p_legacy_project_id
+    , p_system_message => 'Creating ' || K_DESTINATION_TABLE_NAME || ' record for legacy project with ID ' || p_legacy_project_id
+    );
 
     INSERT INTO ${datasource.user}.projects(
       created_datetime
@@ -227,7 +234,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     log_project_migration(
       p_legacy_project_id => p_legacy_project_id
     , p_new_project_id => l_new_project_id
-    , p_system_message => 'Created new PROJECTS record with ID ' || l_new_project_id
+    , p_system_message => 'Created new ' || K_DESTINATION_TABLE_NAME || ' record with ID ' || l_new_project_id
     );
 
     RETURN l_new_project_id;
@@ -265,19 +272,26 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   )
   IS
 
+    K_DESTINATION_TABLE_NAME CONSTANT VARCHAR2(30) := 'PROJECT_DETAILS';
+
     l_project_detail_status_map project_detail_status_type := get_project_detail_status_map();
 
   BEGIN
 
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message => 'Creating ' || K_DESTINATION_TABLE_NAME || ' record for legacy project detail with ID ' || p_legacy_project_detail_id
+    );
+
     INSERT INTO ${datasource.user}.project_details(
-       project_id
-     , status
-     , version
-     , is_current_version
-     , created_by_wua
-     , submitted_datetime
-     , submitted_by_wua
-     , is_migrated
+      project_id
+    , status
+    , version
+    , is_current_version
+    , created_by_wua
+    , submitted_datetime
+    , submitted_by_wua
+    , is_migrated
     )
     VALUES(
       p_new_project_id
@@ -299,7 +313,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     log_project_detail_migration(
       p_legacy_project_detail_id => p_legacy_project_detail_id
     , p_new_project_detail_id => po_new_project_detail_id
-    , p_system_message => 'Created new PROJECT_DETAILS record with ID ' || po_new_project_detail_id
+    , p_system_message => 'Created new ' || K_DESTINATION_TABLE_NAME || ' record with ID ' || po_new_project_detail_id
     );
 
   EXCEPTION WHEN OTHERS THEN
@@ -333,9 +347,16 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   )
   IS
 
+    K_DESTINATION_TABLE_NAME CONSTANT VARCHAR2(30) := 'PROJECT_PUBLISHING_DETAILS';
+
     l_new_publish_detail_id ${datasource.user}.project_publishing_details.id%TYPE;
 
   BEGIN
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message => 'Creating ' || K_DESTINATION_TABLE_NAME || ' record for legacy project detail with ID ' || p_legacy_project_detail_id
+    );
 
     INSERT INTO ${datasource.user}.project_publishing_details(
       project_detail_id
@@ -351,9 +372,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     log_project_detail_migration(
       p_legacy_project_detail_id => p_legacy_project_detail_id
-    , p_system_message =>
-        'Created PROJECT_PUBLISHING_DETAILS record with ID '
-        || l_new_publish_detail_id || ' for project detail ID ' || p_new_project_detail_id
+    , p_system_message => 'Created new ' || K_DESTINATION_TABLE_NAME || ' record with ID ' || l_new_publish_detail_id
     );
 
   EXCEPTION WHEN OTHERS THEN
@@ -368,6 +387,642 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     );
 
   END create_project_publish_record;
+
+  /**
+    Procedure to create a record in the project_operators table in the new service model.
+    @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+    @param p_new_project_detail_id The detail id the publish record should be associated to
+   */
+  PROCEDURE create_project_operator_record(
+    p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , p_new_project_detail_id IN ${datasource.user}.project_details.id%TYPE
+  )
+  IS
+
+    K_DESTINATION_TABLE_NAME CONSTANT VARCHAR2(30) := 'PROJECT_OPERATORS';
+
+    l_operator_org_grp_id ${datasource.user}.project_operators.operator_org_grp_id%TYPE;
+    l_new_project_operator_id ${datasource.user}.project_operators.id%TYPE;
+
+  BEGIN
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message => 'Creating ' || K_DESTINATION_TABLE_NAME || ' record for legacy project detail with ID ' || p_legacy_project_detail_id
+    );
+
+    SELECT lpd.operator_org_group_id
+    INTO l_operator_org_grp_id
+    FROM ${datasource.migration-user}.legacy_project_data lpd
+    WHERE lpd.legacy_project_detail_id = p_legacy_project_detail_id;
+
+    INSERT INTO ${datasource.user}.project_operators(
+      project_detail_id
+    , operator_org_grp_id
+    )
+    VALUES(
+      p_new_project_detail_id
+    , l_operator_org_grp_id
+    )
+    RETURNING id INTO l_new_project_operator_id;
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message => 'Created new ' || K_DESTINATION_TABLE_NAME || ' record with id ' || l_new_project_operator_id
+    );
+
+  EXCEPTION WHEN OTHERS THEN
+    raise_exception_with_trace(
+      p_message_prefix => 'ERROR in create_project_operator_record(' || CHR(10)
+        || '  p_legacy_project_detail_id => ' || p_legacy_project_detail_id || CHR(10)
+        || ', p_new_project_detail_id => ' || p_new_project_detail_id || CHR(10)
+        || ')'
+    );
+  END create_project_operator_record;
+
+  /**
+    Procedure to create a record in the project_information table in the new service model.
+    @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+    @param p_new_project_detail_id The detail id the publish record should be associated to
+   */
+  PROCEDURE create_project_info_record(
+    p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , p_new_project_detail_id IN ${datasource.user}.project_details.id%TYPE
+  )
+  IS
+
+    K_DESTINATION_TABLE_NAME CONSTANT VARCHAR2(30) := 'PROJECT_INFORMATION';
+
+    l_new_project_information_id ${datasource.user}.project_information.id%TYPE;
+
+    l_field_stage ${datasource.migration-user}.legacy_project_data.field_stage%TYPE;
+    l_project_title ${datasource.migration-user}.legacy_project_data.project_title%TYPE;
+    l_project_summary ${datasource.migration-user}.legacy_project_data.project_summary%TYPE;
+    l_contact_name ${datasource.migration-user}.legacy_project_data.project_contact_name%TYPE;
+    l_contact_phone_number ${datasource.migration-user}.legacy_project_data.project_contact_tel_number%TYPE;
+    l_contact_job_title ${datasource.migration-user}.legacy_project_data.project_contact_job_title%TYPE;
+    l_contact_email_address ${datasource.migration-user}.legacy_project_data.project_contact_email_address%TYPE;
+    l_first_prod_date_quarter ${datasource.migration-user}.legacy_project_data.first_production_quarter%TYPE;
+    l_first_prod_date_year ${datasource.migration-user}.legacy_project_data.first_production_year%TYPE;
+
+  BEGIN
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message => 'Creating ' || K_DESTINATION_TABLE_NAME || ' record for legacy project detail with ID ' || p_legacy_project_detail_id
+    );
+
+    SELECT
+       -- map CURRENT_PROJECT to DEVELOPMENT but leave every other option
+      DECODE(lpd.field_stage, 'CURRENT_PROJECT', 'DEVELOPMENT', lpd.field_stage)
+    , lpd.project_title
+    , lpd.project_summary
+    , lpd.project_contact_name
+    , lpd.project_contact_tel_number
+    , lpd.project_contact_job_title
+    , lpd.project_contact_email_address
+    , DECODE(
+        lpd.first_production_quarter
+      , 0, NULL -- map 0 to NULL to cater for project having NS selected
+      , NULL, NULL -- map NULL to NULL
+      , 'Q' || lpd.first_production_quarter -- map the quarter value to Q1, Q2, Q3, Q4
+      )
+    , lpd.first_production_year
+    INTO
+      l_field_stage
+    , l_project_title
+    , l_project_summary
+    , l_contact_name
+    , l_contact_phone_number
+    , l_contact_job_title
+    , l_contact_email_address
+    , l_first_prod_date_quarter
+    , l_first_prod_date_year
+    FROM ${datasource.migration-user}.legacy_project_data lpd
+    WHERE lpd.legacy_project_detail_id = p_legacy_project_detail_id;
+
+    INSERT INTO ${datasource.user}.project_information(
+      project_detail_id
+    , field_stage
+    , project_title
+    , project_summary
+    , contact_name
+    , phone_number
+    , job_title
+    , email_address
+    , first_production_date_quarter
+    , first_production_date_year
+    )
+    VALUES(
+      p_new_project_detail_id
+    , l_field_stage
+    , l_project_title
+    , l_project_summary
+    , l_contact_name
+    , l_contact_phone_number
+    , l_contact_job_title
+    , l_contact_email_address
+    , l_first_prod_date_quarter
+    , l_first_prod_date_year
+    )
+    RETURNING id INTO l_new_project_information_id;
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message => 'Created new ' || K_DESTINATION_TABLE_NAME || ' record with id ' || l_new_project_information_id
+    );
+
+  EXCEPTION WHEN OTHERS THEN
+    raise_exception_with_trace(
+      p_message_prefix => 'ERROR in create_project_info_record(' || CHR(10)
+        || '  p_legacy_project_detail_id => ' || p_legacy_project_detail_id || CHR(10)
+        || ', p_new_project_detail_id => ' || p_new_project_detail_id || CHR(10)
+        || ')'
+    );
+  END create_project_info_record;
+
+  /**
+    Procedure to create a record in the project_locations table in the new service model.
+    @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+    @param p_new_project_detail_id The detail id the publish record should be associated to
+   */
+  PROCEDURE create_project_location_record(
+    p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , p_new_project_detail_id IN ${datasource.user}.project_details.id%TYPE
+  )
+  IS
+
+    K_DESTINATION_TABLE_NAME CONSTANT VARCHAR2(30) := 'PROJECT_LOCATIONS';
+
+    l_new_project_location_id ${datasource.user}.project_locations.id%TYPE;
+
+    l_devuk_field_id ${datasource.migration-user}.legacy_project_data.devuk_field_id%TYPE;
+    l_manual_field_name ${datasource.migration-user}.legacy_project_data.manual_field_name%TYPE;
+    l_field_type ${datasource.migration-user}.legacy_project_data.field_type%TYPE;
+    l_fdp_approved ${datasource.migration-user}.legacy_project_data.fdp_approved%TYPE;
+
+    l_water_depth ${datasource.user}.project_locations.water_depth%TYPE;
+
+    /**
+      Utility function to lookup try to find a matching devuk field based on the free text value
+      entered on the legacy project.
+      @param p_legacy_manual_entry_field The free text field value entered on the legacy project
+      @return The ID of a devuk field whose name matches exactly p_legacy_manual_entry_field
+     */
+    FUNCTION lookup_field_id_from_freetext(
+      p_legacy_manual_entry_field IN ${datasource.migration-user}.legacy_project_data.manual_field_name%TYPE
+    ) RETURN ${datasource.user}.project_locations.field_id%TYPE
+    IS
+
+      l_matched_devuk_field_id ${datasource.user}.project_locations.field_id%TYPE;
+
+    BEGIN
+
+      BEGIN
+
+        SELECT f.field_identifier
+        INTO l_matched_devuk_field_id
+        FROM devukmgr.fields f
+        WHERE LOWER(f.name) = LOWER(p_legacy_manual_entry_field);
+
+      EXCEPTION WHEN NO_DATA_FOUND THEN
+        l_matched_devuk_field_id := NULL;
+      END;
+
+      RETURN l_matched_devuk_field_id;
+
+    END lookup_field_id_from_freetext;
+
+    /**
+      Utility procedure to sanitise the legacy devuk field data into a format for the new service model.
+      The rules are:
+      - If both po_legacy_devuk_field_id and po_legacy_manual_field_name are populated, then NULL po_legacy_manual_field_name
+        so we only persist po_legacy_devuk_field_id in the new model
+      - If po_legacy_manual_field_name is populated then try to lookup a devuk field id which exactly matches po_legacy_manual_field_name
+      @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+      @param po_legacy_devuk_field_id The devuk field id from the legacy model
+      @param po_legacy_manual_field_name The manual field name from the legacy model
+     */
+    PROCEDURE sanitise_legacy_field_inputs(
+      p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+    , po_legacy_devuk_field_id IN OUT ${datasource.migration-user}.legacy_project_data.devuk_field_id%TYPE
+    , po_legacy_manual_field_name IN OUT ${datasource.migration-user}.legacy_project_data.manual_field_name%TYPE
+    )
+    IS
+
+      l_devuk_field_id_lookup ${datasource.user}.project_locations.field_id%TYPE;
+
+    BEGIN
+
+      log_project_detail_migration(
+        p_legacy_project_detail_id => p_legacy_project_detail_id
+      , p_system_message =>
+          'Starting sanitise_legacy_field_inputs for legacy project detail with ID ' || p_legacy_project_detail_id
+          || 'with inputs po_legacy_devuk_field_id => ' || po_legacy_devuk_field_id || ', po_legacy_manual_field_name => ' || po_legacy_manual_field_name
+      );
+
+      IF po_legacy_devuk_field_id IS NOT NULL THEN
+
+        -- If operator has selected the devuk field, don't set the manual field name.
+        -- There are hundreds of cases on live where both are set and we want to take the devuk id over the free text name.
+        po_legacy_manual_field_name := NULL;
+
+      ELSIF po_legacy_manual_field_name IS NOT NULL THEN
+
+        -- If a manual field name is entered and we don't have a devuk field id, try an exact match lookup from devuk
+        -- to see if we can find a field with the same name. Preference would be to store the devuk id if possible.
+        l_devuk_field_id_lookup := lookup_field_id_from_freetext(
+          p_legacy_manual_entry_field => po_legacy_manual_field_name
+        );
+
+        IF l_devuk_field_id_lookup IS NOT NULL THEN
+          po_legacy_devuk_field_id := l_devuk_field_id_lookup;
+          po_legacy_manual_field_name := NULL;
+        END IF;
+
+      END IF;
+
+      log_project_detail_migration(
+        p_legacy_project_detail_id => p_legacy_project_detail_id
+      , p_system_message =>
+          'Finished sanitise_legacy_field_inputs for legacy project detail with ID ' || p_legacy_project_detail_id
+          || ' with outputs po_legacy_devuk_field_id => ' || po_legacy_devuk_field_id || ', po_legacy_manual_field_name => ' || po_legacy_manual_field_name
+      );
+
+    END sanitise_legacy_field_inputs;
+
+  BEGIN
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message => 'Creating ' || K_DESTINATION_TABLE_NAME || ' record for legacy project detail with ID ' || p_legacy_project_detail_id
+    );
+
+    SELECT
+      lpd.devuk_field_id
+    , lpd.manual_field_name
+    , lpd.field_type
+    , lpd.fdp_approved
+    INTO
+      l_devuk_field_id
+    , l_manual_field_name
+    , l_field_type
+    , l_fdp_approved
+    FROM ${datasource.migration-user}.legacy_project_data lpd
+    WHERE lpd.legacy_project_detail_id = p_legacy_project_detail_id;
+
+    sanitise_legacy_field_inputs(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , po_legacy_devuk_field_id => l_devuk_field_id
+    , po_legacy_manual_field_name => l_manual_field_name
+    );
+
+    INSERT INTO ${datasource.user}.project_locations(
+      project_detail_id
+    , field_id
+    , manual_field_name
+    , water_depth
+    , field_type
+    , approved_fdp
+    )
+    VALUES(
+      p_new_project_detail_id
+    , l_devuk_field_id
+    , l_manual_field_name
+    , l_water_depth
+    , l_field_type
+    , l_fdp_approved
+    )
+    RETURNING id INTO l_new_project_location_id;
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message => 'Created new ' || K_DESTINATION_TABLE_NAME || ' record with id ' || l_new_project_location_id
+    );
+
+  EXCEPTION WHEN OTHERS THEN
+    raise_exception_with_trace(
+      p_message_prefix => 'ERROR in create_project_location_record(' || CHR(10)
+        || '  p_legacy_project_detail_id => ' || p_legacy_project_detail_id || CHR(10)
+        || ', p_new_project_detail_id => ' || p_new_project_detail_id || CHR(10)
+        || ')'
+    );
+  END create_project_location_record;
+
+  /**
+    Procedure to create a record in the awarded_contracts table in the new service model.
+    @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+    @param p_new_project_detail_id The detail id the publish record should be associated to
+   */
+  PROCEDURE create_awarded_contracts(
+    p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , p_new_project_detail_id IN ${datasource.user}.project_details.id%TYPE
+  )
+  IS
+
+    K_DESTINATION_TABLE_NAME CONSTANT VARCHAR2(30) := 'AWARDED_CONTRACTS';
+
+  BEGIN
+
+    FOR legacy_contract IN (
+      SELECT
+        lpc.contractor_name
+      , lpc.description_of_work
+      , lpc.date_awarded
+      , DECODE(
+          lpc.contract_band
+        , 'SMALL', 'LESS_THAN_25M'
+        , 'MEDIUM', 'LESS_THAN_25M'
+        , 'LARGE', 'GREATER_THAN_OR_EQUAL_TO_25M'
+        , NULL
+        ) contract_band
+      , DECODE(
+          lpc.contact_name
+          -- a legacy data patch put "Not Specified" as a default value which
+          -- we don't want to copy over to the new model
+        , 'Not Specified', NULL
+        , lpc.contact_name
+        ) contact_name
+      , lpc.contact_telephone_no
+      , lpc.contact_email_address
+      , ROWNUM idx
+      , COUNT(*) OVER (PARTITION BY lpc.legacy_project_detail_id) total_contracts_for_detail
+      FROM ${datasource.migration-user}.legacy_project_contracts lpc
+      WHERE lpc.legacy_project_detail_id = p_legacy_project_detail_id
+    )
+    LOOP
+
+      DECLARE
+
+        K_AWARDED_CONTRACT_PROGRESS CONSTANT VARCHAR2(4000) := legacy_contract.idx || '/' || legacy_contract.total_contracts_for_detail;
+
+        l_new_awarded_contract_id ${datasource.user}.awarded_contracts.id%TYPE;
+
+      BEGIN
+
+        log_project_detail_migration(
+          p_legacy_project_detail_id => p_legacy_project_detail_id
+        , p_system_message => 'Creating ' || K_DESTINATION_TABLE_NAME || ' record (' || K_AWARDED_CONTRACT_PROGRESS ||
+                              ') for legacy project detail with ID ' || p_legacy_project_detail_id
+        );
+
+        INSERT INTO ${datasource.user}.awarded_contracts(
+          project_detail_id
+        , contractor_name
+        , description_of_work
+        , date_awarded
+        , contract_band
+        , contact_name
+        , phone_number
+        , email_address
+        )
+        VALUES(
+          p_new_project_detail_id
+        , legacy_contract.contractor_name
+        , legacy_contract.description_of_work
+        , legacy_contract.date_awarded
+        , legacy_contract.contract_band
+        , legacy_contract.contact_name
+        , legacy_contract.contact_telephone_no
+        , legacy_contract.contact_email_address
+        )
+        RETURNING id INTO l_new_awarded_contract_id;
+
+        log_project_detail_migration(
+          p_legacy_project_detail_id => p_legacy_project_detail_id
+        , p_system_message => 'Created new ' || K_DESTINATION_TABLE_NAME || ' record (' || K_AWARDED_CONTRACT_PROGRESS ||
+                              ') with id ' || l_new_awarded_contract_id
+        );
+
+      END;
+
+    END LOOP;
+
+  EXCEPTION WHEN OTHERS THEN
+    raise_exception_with_trace(
+      p_message_prefix => 'ERROR in create_awarded_contracts(' || CHR(10)
+        || '  p_legacy_project_detail_id => ' || p_legacy_project_detail_id || CHR(10)
+        || ', p_new_project_detail_id => ' || p_new_project_detail_id || CHR(10)
+        || ')'
+    );
+  END create_awarded_contracts;
+
+  /**
+    Procedure to create a record in the collaboration_opportunities table in the new service model.
+    @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+    @param p_new_project_detail_id The detail id the publish record should be associated to
+   */
+  PROCEDURE create_collab_opportunities(
+    p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , p_new_project_detail_id IN ${datasource.user}.project_details.id%TYPE
+  )
+  IS
+
+    K_DESTINATION_TABLE_NAME CONSTANT VARCHAR2(30) := 'COLLABORATION_OPPORTUNITIES';
+
+  BEGIN
+
+    FOR legacy_opportunity IN(
+      SELECT
+        lpc.description_of_work
+      , lpc.contact_name
+      , lpc.contact_telephone_no
+      , lpc.contact_email_address
+      , ROWNUM idx
+      , COUNT(*) OVER (PARTITION BY lpc.legacy_project_detail_id) total_contracts_for_detail
+      FROM ${datasource.migration-user}.legacy_project_challenges lpc
+      WHERE lpc.legacy_project_detail_id = p_legacy_project_detail_id
+    )
+    LOOP
+
+      DECLARE
+
+        K_COLLAB_OPPORTUNITY_PROGRESS CONSTANT VARCHAR2(4000) := legacy_opportunity.idx || '/' || legacy_opportunity.total_contracts_for_detail;
+
+        l_new_collab_opportunity_id ${datasource.user}.collaboration_opportunities.id%TYPE;
+
+      BEGIN
+
+        log_project_detail_migration(
+          p_legacy_project_detail_id => p_legacy_project_detail_id
+        , p_system_message => 'Creating ' || K_DESTINATION_TABLE_NAME || ' record (' || K_COLLAB_OPPORTUNITY_PROGRESS ||
+                              ') for legacy project detail with ID ' || p_legacy_project_detail_id
+        );
+
+        INSERT INTO ${datasource.user}.collaboration_opportunities(
+          project_detail_id
+        , description_of_work
+        , contact_name
+        , phone_number
+        , email_address
+        )
+        VALUES(
+          p_new_project_detail_id
+        , legacy_opportunity.description_of_work
+        , legacy_opportunity.contact_name
+        , legacy_opportunity.contact_telephone_no
+        , legacy_opportunity.contact_email_address
+        )
+        RETURNING id INTO l_new_collab_opportunity_id;
+
+        log_project_detail_migration(
+          p_legacy_project_detail_id => p_legacy_project_detail_id
+        , p_system_message => 'Created new ' || K_DESTINATION_TABLE_NAME || ' record (' || K_COLLAB_OPPORTUNITY_PROGRESS ||
+                              ') with id ' || l_new_collab_opportunity_id
+        );
+
+      END;
+
+    END LOOP;
+
+  EXCEPTION WHEN OTHERS THEN
+    raise_exception_with_trace(
+      p_message_prefix => 'ERROR in create_collab_opportunities(' || CHR(10)
+        || '  p_legacy_project_detail_id => ' || p_legacy_project_detail_id || CHR(10)
+        || ', p_new_project_detail_id => ' || p_new_project_detail_id || CHR(10)
+        || ')'
+    );
+  END create_collab_opportunities;
+
+  /**
+    Procedure to create a record in the project_task_list_setup table in the new service model.
+    Only the awarded contracts and collaboration opportunities section will be added to the task list
+    setup as these are the only sections that carry over into the new service model.
+    @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+    @param p_new_project_detail_id The detail id the publish record should be associated to
+   */
+  PROCEDURE create_project_setup_record(
+    p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , p_new_project_detail_id IN ${datasource.user}.project_details.id%TYPE
+  )
+  IS
+
+    K_DESTINATION_TABLE_NAME CONSTANT VARCHAR2(30) := 'PROJECT_TASK_LIST_SETUP';
+
+    K_AWARDED_CONTRACTS_YES CONSTANT VARCHAR2(4000) := 'AWARDED_CONTRACTS_YES';
+    K_AWARDED_CONTRACTS_NO CONSTANT VARCHAR2(4000) := 'AWARDED_CONTRACTS_NO';
+    K_AWARDED_CONTRACTS_SECTION CONSTANT VARCHAR2(4000) := 'AWARDED_CONTRACTS';
+
+    K_COLLABORATION_OPS_YES CONSTANT VARCHAR2(4000) := 'COLLABORATION_OPPORTUNITIES_YES';
+    K_COLLABORATION_OPS_NO CONSTANT VARCHAR2(4000) := 'COLLABORATION_OPPORTUNITIES_NO';
+    K_COLLABORATION_OPS_SECTION CONSTANT VARCHAR2(4000) := 'COLLABORATION_OPPORTUNITIES';
+
+    l_awarded_contracts_answer ${datasource.user}.project_task_list_setup.task_list_answers%TYPE;
+    l_collaboration_ops_answer ${datasource.user}.project_task_list_setup.task_list_answers%TYPE;
+
+    l_section_list bpmmgr.varchar2_list_type := bpmmgr.varchar2_list_type();
+
+    l_new_project_setup_id ${datasource.user}.project_task_list_setup.id%TYPE;
+
+  BEGIN
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message => 'Creating ' || K_DESTINATION_TABLE_NAME || ' record for legacy project detail with ID ' || p_legacy_project_detail_id
+    );
+
+    -- establish if we have any awarded contracts or collaboration opportunities
+    -- for the given project detail. This will allow us to back fit the task list
+    -- sections and answers the K_DESTINATION_TABLE_NAME record
+    SELECT
+      DECODE(
+        (
+          SELECT DECODE(COUNT(*), 0, 0, 1)
+          FROM ${datasource.user}.awarded_contracts ac
+          WHERE ac.project_detail_id = pd.id
+        )
+      , 0, K_AWARDED_CONTRACTS_NO
+      , 1, K_AWARDED_CONTRACTS_YES
+      ) awarded_contracts_answer
+    , DECODE(
+        (
+          SELECT DECODE(COUNT(*), 0, 0, 1)
+          FROM ${datasource.user}.collaboration_opportunities co
+          WHERE co.project_detail_id = pd.id
+        )
+      , 0, K_COLLABORATION_OPS_NO
+      , 1, K_COLLABORATION_OPS_YES
+      ) collaboration_ops_answer
+    INTO
+      l_awarded_contracts_answer
+    , l_collaboration_ops_answer
+    FROM ${datasource.user}.project_details pd
+    WHERE pd.id = p_new_project_detail_id;
+
+    IF l_awarded_contracts_answer = K_AWARDED_CONTRACTS_YES THEN
+      l_section_list.EXTEND;
+      l_section_list(l_section_list.COUNT) := K_AWARDED_CONTRACTS_SECTION;
+    END IF;
+
+    IF l_collaboration_ops_answer = K_COLLABORATION_OPS_YES THEN
+      l_section_list.EXTEND;
+      l_section_list(l_section_list.COUNT) := K_COLLABORATION_OPS_SECTION;
+    END IF;
+
+    INSERT INTO ${datasource.user}.project_task_list_setup(
+      project_detail_id
+    , task_list_sections
+    , task_list_answers
+    )
+    VALUES(
+      p_new_project_detail_id
+    , envmgr.st.join(l_section_list, ',')
+    , l_awarded_contracts_answer || ',' || l_collaboration_ops_answer
+    )
+    RETURNING id INTO l_new_project_setup_id;
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message => 'Created new ' || K_DESTINATION_TABLE_NAME || ' record with id ' || l_new_project_setup_id
+    );
+
+  EXCEPTION WHEN OTHERS THEN
+    raise_exception_with_trace(
+      p_message_prefix => 'ERROR in create_project_setup_record(' || CHR(10)
+        || '  p_legacy_project_detail_id => ' || p_legacy_project_detail_id || CHR(10)
+        || ', p_new_project_detail_id => ' || p_new_project_detail_id || CHR(10)
+        || ')'
+    );
+  END create_project_setup_record;
+
+  PROCEDURE migrate_project_form_data(
+    p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , p_new_project_detail_id IN ${datasource.user}.project_details.id%TYPE
+  )
+  IS
+  BEGIN
+
+    create_project_operator_record(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_new_project_detail_id => p_new_project_detail_id
+    );
+
+    create_project_info_record(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_new_project_detail_id => p_new_project_detail_id
+    );
+
+    create_project_location_record(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_new_project_detail_id => p_new_project_detail_id
+    );
+
+    create_awarded_contracts(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_new_project_detail_id => p_new_project_detail_id
+    );
+
+    create_collab_opportunities(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_new_project_detail_id => p_new_project_detail_id
+    );
+
+    create_project_setup_record(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_new_project_detail_id => p_new_project_detail_id
+    );
+
+  END migrate_project_form_data;
 
   /**
     Procedure to create all of the detail records and associated form data for a given legacy project.
@@ -439,6 +1094,11 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
         );
 
       END IF;
+
+      migrate_project_form_data(
+        p_legacy_project_detail_id => l_legacy_project_detail_id
+      , p_new_project_detail_id => l_new_project_detail_id
+      );
 
       log_project_detail_migration(
         p_legacy_project_detail_id => l_legacy_project_detail_id
