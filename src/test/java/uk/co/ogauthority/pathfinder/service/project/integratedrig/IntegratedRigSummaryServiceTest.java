@@ -176,4 +176,18 @@ public class IntegratedRigSummaryServiceTest {
     var validationResult = integratedRigSummaryService.validateViews(List.of(integratedRigView));
     assertThat(validationResult).isEqualTo(ValidationResult.VALID);
   }
+
+  @Test
+  public void canShowInTaskList_whenCanShowInTaskList_thenTrue() {
+    when(integratedRigService.canShowInTaskList(projectDetail)).thenReturn(true);
+
+    assertThat(integratedRigSummaryService.canShowInTaskList(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_whenCannotShowInTaskList_thenFalse() {
+    when(integratedRigService.canShowInTaskList(projectDetail)).thenReturn(false);
+
+    assertThat(integratedRigSummaryService.canShowInTaskList(projectDetail)).isFalse();
+  }
 }

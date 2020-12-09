@@ -33,6 +33,20 @@ public class IntegratedRigSectionSummaryServiceTest {
   }
 
   @Test
+  public void canShowSection_whenCanShowInTaskList_thenTrue() {
+    when(integratedRigSummaryService.canShowInTaskList(projectDetail)).thenReturn(true);
+
+    assertThat(integratedRigSectionSummaryService.canShowSection(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
+    when(integratedRigSummaryService.canShowInTaskList(projectDetail)).thenReturn(false);
+
+    assertThat(integratedRigSectionSummaryService.canShowSection(projectDetail)).isFalse();
+  }
+
+  @Test
   public void getSummary_whenIntegratedRigs_thenViewsPopulated() {
 
     final var integratedRigView1 = IntegratedRigTestUtil.createIntegratedRigView(1, true);

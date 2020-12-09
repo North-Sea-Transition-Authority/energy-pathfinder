@@ -35,6 +35,20 @@ public class CollaborationOpportunitiesSectionSummaryServiceTest {
   }
 
   @Test
+  public void canShowSection_whenCanShowInTaskList_thenTrue() {
+    when(collaborationOpportunitiesSummaryService.canShowInTaskList(projectDetail)).thenReturn(true);
+
+    assertThat(collaborationOpportunitiesSectionSummaryService.canShowSection(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
+    when(collaborationOpportunitiesSummaryService.canShowInTaskList(projectDetail)).thenReturn(false);
+
+    assertThat(collaborationOpportunitiesSectionSummaryService.canShowSection(projectDetail)).isFalse();
+  }
+
+  @Test
   public void getSummary_whenOpportunities_thenViewsPopulated() {
 
     final var collaborationOpportunityView1 = CollaborationOpportunityTestUtil.getView(1, true);

@@ -111,4 +111,18 @@ public class CollaborationOpportunitiesSummaryServiceTest {
         SummaryLinkText.DELETE.getDisplayName()
     );
   }
+
+  @Test
+  public void canShowInTaskList_whenCanShowInTaskList_thenTrue() {
+    when(collaborationOpportunitiesService.canShowInTaskList(detail)).thenReturn(true);
+
+    assertThat(collaborationOpportunitiesSummaryService.canShowInTaskList(detail)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_whenCannotShowInTaskList_thenFalse() {
+    when(collaborationOpportunitiesService.canShowInTaskList(detail)).thenReturn(false);
+
+    assertThat(collaborationOpportunitiesSummaryService.canShowInTaskList(detail)).isFalse();
+  }
 }

@@ -33,6 +33,20 @@ public class UpcomingTenderSectionSummaryServiceTest {
   }
 
   @Test
+  public void canShowSection_whenCanShowInTaskList_thenTrue() {
+    when(upcomingTenderSummaryService.canShowInTaskList(projectDetail)).thenReturn(true);
+
+    assertThat(upcomingTenderSectionSummaryService.canShowSection(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
+    when(upcomingTenderSummaryService.canShowInTaskList(projectDetail)).thenReturn(false);
+
+    assertThat(upcomingTenderSectionSummaryService.canShowSection(projectDetail)).isFalse();
+  }
+
+  @Test
   public void getSummary_whenUpcomingTenders_thenViewsPopulated() {
     final var upcomingTenderView1 = UpcomingTenderUtil.getView(1, true);
     final var upcomingTenderView2 = UpcomingTenderUtil.getView(2, true);

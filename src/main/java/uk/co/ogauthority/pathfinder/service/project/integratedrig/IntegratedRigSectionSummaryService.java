@@ -32,6 +32,11 @@ public class IntegratedRigSectionSummaryService implements ProjectSectionSummary
   }
 
   @Override
+  public boolean canShowSection(ProjectDetail detail) {
+    return integratedRigSummaryService.canShowInTaskList(detail);
+  }
+
+  @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
 
     Map<String, Object> summaryModel = new HashMap<>();

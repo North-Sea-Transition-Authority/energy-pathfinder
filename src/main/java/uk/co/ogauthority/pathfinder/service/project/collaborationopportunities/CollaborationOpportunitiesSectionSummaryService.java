@@ -28,9 +28,13 @@ public class CollaborationOpportunitiesSectionSummaryService implements ProjectS
 
   @Autowired
   public CollaborationOpportunitiesSectionSummaryService(
-      CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService
-  ) {
+      CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService) {
     this.collaborationOpportunitiesSummaryService = collaborationOpportunitiesSummaryService;
+  }
+
+  @Override
+  public boolean canShowSection(ProjectDetail detail) {
+    return collaborationOpportunitiesSummaryService.canShowInTaskList(detail);
   }
 
   @Override

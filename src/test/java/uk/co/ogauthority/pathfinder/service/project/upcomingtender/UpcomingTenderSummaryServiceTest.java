@@ -169,4 +169,18 @@ public class UpcomingTenderSummaryServiceTest {
         SummaryLinkText.DELETE.getDisplayName()
     );
   }
+
+  @Test
+  public void canShowInTaskList_whenCanShowInTaskList_thenTrue() {
+    when(upcomingTenderService.canShowInTaskList(details)).thenReturn(true);
+
+    assertThat(upcomingTenderSummaryService.canShowInTaskList(details)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_whenCannotShowInTaskList_thenFalse() {
+    when(upcomingTenderService.canShowInTaskList(details)).thenReturn(false);
+
+    assertThat(upcomingTenderSummaryService.canShowInTaskList(details)).isFalse();
+  }
 }

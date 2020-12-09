@@ -92,4 +92,7 @@ public class UpcomingTenderSummaryService {
     return views;
   }
 
+  public boolean canShowInTaskList(ProjectDetail detail) {
+    return upcomingTenderService.canShowInTaskList(detail);
+  }
 }
