@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.OperatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -23,6 +24,7 @@ import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.ProvideNoUpdateForm;
+import uk.co.ogauthority.pathfinder.model.view.projectupdate.ProjectNoUpdateSummaryView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.NoUpdateNotificationRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
@@ -42,6 +44,9 @@ public class OperatorProjectUpdateServiceTest {
   private NoUpdateNotificationRepository noUpdateNotificationRepository;
 
   @Mock
+  private ProjectNoUpdateSummaryViewService projectNoUpdateSummaryService;
+
+  @Mock
   private ValidationService validationService;
 
   @Mock
@@ -58,6 +63,7 @@ public class OperatorProjectUpdateServiceTest {
     operatorProjectUpdateService = new OperatorProjectUpdateService(
         projectUpdateService,
         noUpdateNotificationRepository,
+        projectNoUpdateSummaryService,
         validationService,
         breadcrumbService
     );
@@ -122,11 +128,24 @@ public class OperatorProjectUpdateServiceTest {
     assertThat(modelAndView.getViewName()).isEqualTo(OperatorProjectUpdateService.PROVIDE_NO_UPDATE_TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
         entry("form", form),
-        entry("confirmActionUrl", ReverseRouter.route(on(OperatorUpdateController.class)
-            .provideNoUpdate(PROJECT_ID, null, null, null, null))),
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(PROJECT_ID, null, null, null)))
     );
 
     verify(breadcrumbService, times(1)).fromManageProject(PROJECT_ID, modelAndView, OperatorUpdateController.NO_UPDATE_REQUIRED_PAGE_NAME);
+  }
+
+  @Test
+  public void getProjectProvideNoUpdateConfirmationModelAndView() {
+    var projectNoUpdateSummaryView = new ProjectNoUpdateSummaryView();
+
+    when(projectNoUpdateSummaryService.getProjectNoUpdateSummaryView(projectDetail)).thenReturn(projectNoUpdateSummaryView);
+
+    var modelAndView = operatorProjectUpdateService.getProjectProvideNoUpdateConfirmationModelAndView(projectDetail);
+
+    assertThat(modelAndView.getViewName()).isEqualTo(OperatorProjectUpdateService.PROVIDE_NO_UPDATE_CONFIRMATION_TEMPLATE_PATH);
+    assertThat(modelAndView.getModel()).containsExactly(
+        entry("projectNoUpdateSummaryView", projectNoUpdateSummaryView),
+        entry("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
+    );
   }
 }

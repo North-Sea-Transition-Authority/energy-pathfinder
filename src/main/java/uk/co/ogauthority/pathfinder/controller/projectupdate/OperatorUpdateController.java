@@ -16,7 +16,6 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
-import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.ProvideNoUpdateForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -58,17 +57,17 @@ public class OperatorUpdateController {
   }
 
   @GetMapping("/no-update-required")
-  public ModelAndView provideNoUpdateConfirmation(@PathVariable("projectId") Integer projectId,
-                                                  ProjectUpdateContext projectUpdateContext) {
+  public ModelAndView provideNoUpdate(@PathVariable("projectId") Integer projectId,
+                                      ProjectUpdateContext projectUpdateContext) {
     return operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(projectId, new ProvideNoUpdateForm());
   }
 
   @PostMapping("/no-update-required")
-  public ModelAndView provideNoUpdate(@PathVariable("projectId") Integer projectId,
-                                      @Valid @ModelAttribute("form") ProvideNoUpdateForm form,
-                                      BindingResult bindingResult,
-                                      ProjectUpdateContext projectUpdateContext,
-                                      AuthenticatedUserAccount user) {
+  public ModelAndView saveNoUpdate(@PathVariable("projectId") Integer projectId,
+                                   @Valid @ModelAttribute("form") ProvideNoUpdateForm form,
+                                   BindingResult bindingResult,
+                                   ProjectUpdateContext projectUpdateContext,
+                                   AuthenticatedUserAccount user) {
     bindingResult = operatorProjectUpdateService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
@@ -80,8 +79,14 @@ public class OperatorUpdateController {
               user,
               form.getReasonNoUpdateRequired()
           );
-          return ReverseRouter.redirect(on(ManageProjectController.class).getProject(projectId, null, null, null));
+          return ReverseRouter.redirect(on(OperatorUpdateController.class).provideNoUpdateConfirmation(projectId, null));
         }
     );
+  }
+
+  @GetMapping("/no-update-required/confirmation")
+  public ModelAndView provideNoUpdateConfirmation(@PathVariable("projectId") Integer projectId,
+                                                  ProjectUpdateContext projectUpdateContext) {
+    return operatorProjectUpdateService.getProjectProvideNoUpdateConfirmationModelAndView(projectUpdateContext.getProjectDetails());
   }
 }

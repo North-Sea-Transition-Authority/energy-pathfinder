@@ -109,7 +109,7 @@ public class OperatorActionServiceTest {
     var linkButton = (LinkButton) action.getUserAction();
     assertThat(linkButton.getPrompt()).isEqualTo(OperatorActionService.PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_PROMPT);
     assertThat(linkButton.getUrl()).isEqualTo(
-        ReverseRouter.route(on(OperatorUpdateController.class).provideNoUpdateConfirmation(
+        ReverseRouter.route(on(OperatorUpdateController.class).provideNoUpdate(
             project.getId(),
             null
         ))

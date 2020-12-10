@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.OperatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -25,10 +26,12 @@ import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 public class OperatorProjectUpdateService {
 
   public static final String START_PAGE_TEMPLATE_PATH = "projectupdate/startPage";
-  public static final String PROVIDE_NO_UPDATE_TEMPLATE_PATH = "projectupdate/confirmNoUpdate";
+  public static final String PROVIDE_NO_UPDATE_TEMPLATE_PATH = "projectupdate/noUpdate";
+  public static final String PROVIDE_NO_UPDATE_CONFIRMATION_TEMPLATE_PATH = "projectupdate/noUpdateConfirmation";
 
   private final ProjectUpdateService projectUpdateService;
   private final NoUpdateNotificationRepository noUpdateNotificationRepository;
+  private final ProjectNoUpdateSummaryViewService projectNoUpdateSummaryViewService;
   private final ValidationService validationService;
   private final BreadcrumbService breadcrumbService;
 
@@ -36,10 +39,12 @@ public class OperatorProjectUpdateService {
   public OperatorProjectUpdateService(
       ProjectUpdateService projectUpdateService,
       NoUpdateNotificationRepository noUpdateNotificationRepository,
+      ProjectNoUpdateSummaryViewService projectNoUpdateSummaryViewService,
       ValidationService validationService,
       BreadcrumbService breadcrumbService) {
     this.projectUpdateService = projectUpdateService;
     this.noUpdateNotificationRepository = noUpdateNotificationRepository;
+    this.projectNoUpdateSummaryViewService = projectNoUpdateSummaryViewService;
     this.validationService = validationService;
     this.breadcrumbService = breadcrumbService;
   }
@@ -76,10 +81,15 @@ public class OperatorProjectUpdateService {
   public ModelAndView getProjectProvideNoUpdateModelAndView(Integer projectId, ProvideNoUpdateForm form) {
     var modelAndView = new ModelAndView(PROVIDE_NO_UPDATE_TEMPLATE_PATH)
         .addObject("form", form)
-        .addObject("confirmActionUrl", ReverseRouter.route(on(OperatorUpdateController.class)
-            .provideNoUpdate(projectId, null, null, null, null)))
         .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)));
     breadcrumbService.fromManageProject(projectId, modelAndView, OperatorUpdateController.NO_UPDATE_REQUIRED_PAGE_NAME);
     return modelAndView;
+  }
+
+  public ModelAndView getProjectProvideNoUpdateConfirmationModelAndView(ProjectDetail projectDetail) {
+    return new ModelAndView(PROVIDE_NO_UPDATE_CONFIRMATION_TEMPLATE_PATH)
+        .addObject("projectNoUpdateSummaryView", projectNoUpdateSummaryViewService.getProjectNoUpdateSummaryView(projectDetail))
+        .addObject("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class)
+            .getWorkArea(null, null)));
   }
 }

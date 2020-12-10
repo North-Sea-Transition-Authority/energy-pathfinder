@@ -6,10 +6,10 @@
     panelText="${projectSubmissionSummaryView.projectTitle}"
   />
 
-  <ul class="govuk-list">
-    <li>Submitted date and time: ${projectSubmissionSummaryView.formattedSubmittedTimestamp}</li>
-    <li>Submitted by: ${projectSubmissionSummaryView.submittedBy}</li>
-  </ul>
+  <@fdsCheckAnswers.checkAnswers>
+    <@checkAnswers.checkAnswersRowNoActions prompt="Submitted date and time" value=projectSubmissionSummaryView.formattedSubmittedTimestamp!"" />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Submitted by" value=projectSubmissionSummaryView.submittedBy!"" />
+  </@fdsCheckAnswers.checkAnswers>
 
   <h2 class="govuk-heading-m">What happens next</h2>
 

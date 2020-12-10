@@ -72,7 +72,7 @@ public class OperatorActionService {
     return new UserActionWithDisplayOrder(
         new LinkButton(
             PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_PROMPT,
-            ReverseRouter.route(on(OperatorUpdateController.class).provideNoUpdateConfirmation(
+            ReverseRouter.route(on(OperatorUpdateController.class).provideNoUpdate(
                 projectId,
                 null
             )),
