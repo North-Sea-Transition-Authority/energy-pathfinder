@@ -20,7 +20,7 @@ DECLARE
 
   BEGIN
 
-    l_regulator_role_map('RESOURCE_COORDINATOR') := bpmmgr.varchar2_list_type('RESOURCE_COORDINATOR', 'ORGANISATION_MANAGER');
+    l_regulator_role_map('RESOURCE_COORDINATOR') := bpmmgr.varchar2_list_type('RESOURCE_COORDINATOR', 'ORGANISATION_MANAGER', 'PROJECT_ADMINISTRATOR');
     l_regulator_role_map('PATH_COMMENTER') := bpmmgr.varchar2_list_type('COMMENT_PROVIDER');
     l_regulator_role_map('PATH_VIEWER') := bpmmgr.varchar2_list_type('PROJECT_VIEWER');
 
