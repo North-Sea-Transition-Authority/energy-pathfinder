@@ -31,9 +31,7 @@ import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSummaryView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.SubmitProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
-import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSubmissionSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryViewService;
-import uk.co.ogauthority.pathfinder.testutil.ProjectSubmissionSummaryTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -49,9 +47,6 @@ public class SubmitProjectControllerTest extends ProjectContextAbstractControlle
 
   @MockBean
   private SubmitProjectService submitProjectService;
-
-  @MockBean
-  private ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
 
@@ -133,10 +128,6 @@ public class SubmitProjectControllerTest extends ProjectContextAbstractControlle
 
     when(projectService.getLatestDetail(projectId)).thenReturn(Optional.of(projectDetail));
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
-
-    when(projectSubmissionSummaryViewService.getProjectSubmissionSummaryView(projectDetail)).thenReturn(
-        ProjectSubmissionSummaryTestUtil.getProjectSubmissionSummaryView()
-    );
 
     mockMvc.perform(get(ReverseRouter.route(
         on(SubmitProjectController.class).submitProjectConfirmation(projectId, null)))

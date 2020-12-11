@@ -9,11 +9,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.submission.SubmitProjectController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSubmissionSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
@@ -24,11 +26,15 @@ public class SubmitProjectService {
   public static final String INVALID_PROJECT_ERROR_MESSAGE =
       "You cannot submit your project until all sections shown on the task list are completed";
 
+  public static final String PROJECT_SUBMIT_CONFIRMATION_TEMPLATE_PATH = "project/summary/submitConfirmation";
+
   private final ProjectDetailsRepository projectDetailsRepository;
 
   private final ProjectCleanUpService projectCleanUpService;
 
   private final ProjectSummaryViewService projectSummaryViewService;
+
+  private final ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService;
 
   private final List<ProjectFormSectionService> projectFormSectionServices;
 
@@ -36,10 +42,12 @@ public class SubmitProjectService {
   public SubmitProjectService(ProjectDetailsRepository projectDetailsRepository,
                               ProjectCleanUpService projectCleanUpService,
                               ProjectSummaryViewService projectSummaryViewService,
+                              ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService,
                               List<ProjectFormSectionService> projectFormSectionServices) {
     this.projectDetailsRepository = projectDetailsRepository;
     this.projectCleanUpService = projectCleanUpService;
     this.projectSummaryViewService = projectSummaryViewService;
+    this.projectSubmissionSummaryViewService = projectSubmissionSummaryViewService;
     this.projectFormSectionServices = projectFormSectionServices;
   }
 
@@ -81,5 +89,19 @@ public class SubmitProjectService {
   public ModelAndView getProjectSubmitSummaryModelAndViewWithSubmissionError(ProjectDetail projectDetail) {
     return getProjectSubmitSummaryModelAndView(projectDetail)
         .addObject("errorMessage", INVALID_PROJECT_ERROR_MESSAGE);
+  }
+
+  public ModelAndView getProjectSubmitConfirmationModelAndView(ProjectDetail projectDetail) {
+    var modelAndView = new ModelAndView(PROJECT_SUBMIT_CONFIRMATION_TEMPLATE_PATH);
+
+    var projectSubmissionSummaryView = projectSubmissionSummaryViewService
+        .getProjectSubmissionSummaryView(projectDetail);
+
+    modelAndView
+        .addObject("isUpdate", projectDetail.getVersion() > 1)
+        .addObject("projectSubmissionSummaryView", projectSubmissionSummaryView)
+        .addObject("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)));
+
+    return modelAndView;
   }
 }
