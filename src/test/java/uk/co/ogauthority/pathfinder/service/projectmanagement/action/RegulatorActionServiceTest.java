@@ -92,6 +92,7 @@ public class RegulatorActionServiceTest {
     assertThat(linkButton.getUrl()).isEqualTo(
         ReverseRouter.route(on(ProjectAssessmentController.class).getProjectAssessment(
             project.getId(),
+            null,
             null
         ))
     );

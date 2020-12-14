@@ -15,10 +15,8 @@ import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagem
 import uk.co.ogauthority.pathfinder.model.form.projectmanagement.ProjectManagementForm;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectVersionService;
-import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.rendering.TemplateRenderingService;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
@@ -29,22 +27,16 @@ public class ProjectManagementViewService {
 
   private final ProjectService projectService;
   private final ProjectManagementService projectManagementService;
-  private final ProjectInformationService projectInformationService;
-  private final ProjectOperatorService projectOperatorService;
   private final ProjectVersionService projectVersionService;
   private final TemplateRenderingService templateRenderingService;
 
   @Autowired
   public ProjectManagementViewService(ProjectService projectService,
                                       ProjectManagementService projectManagementService,
-                                      ProjectInformationService projectInformationService,
-                                      ProjectOperatorService projectOperatorService,
                                       ProjectVersionService projectVersionService,
                                       TemplateRenderingService templateRenderingService) {
     this.projectService = projectService;
     this.projectManagementService = projectManagementService;
-    this.projectInformationService = projectInformationService;
-    this.projectOperatorService = projectOperatorService;
     this.projectVersionService = projectVersionService;
     this.templateRenderingService = templateRenderingService;
   }
@@ -53,8 +45,6 @@ public class ProjectManagementViewService {
                                                        Integer version,
                                                        AuthenticatedUserAccount user) {
     var project = projectDetail.getProject();
-    var projectInformation = projectInformationService.getProjectInformationOrError(projectDetail);
-    var projectOperator = projectOperatorService.getProjectOperatorByProjectDetailOrError(projectDetail);
 
     var selectedVersionProjectDetail = version == null || projectDetail.getVersion().equals(version)
         ? projectDetail
@@ -72,12 +62,7 @@ public class ProjectManagementViewService {
         .map(summary -> templateRenderingService.render(summary.getTemplatePath(), summary.getTemplateModel(), true))
         .collect(Collectors.joining());
 
-    var projectManagementView = new ProjectManagementView(
-        projectInformation.getProjectTitle(),
-        projectOperator.getOrganisationGroup().getName(),
-        staticContentHtml,
-        versionContentHtml
-    );
+    var projectManagementView = new ProjectManagementView(staticContentHtml, versionContentHtml);
 
     var viewableVersions = projectVersionService.getProjectVersionDtos(project)
         .stream()

@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessme
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectassessment.ProjectAssessmentRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.projectpublishing.ProjectPublishingService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
@@ -32,18 +33,21 @@ public class ProjectAssessmentService {
   private final ProjectAssessmentFormValidator projectAssessmentFormValidator;
   private final BreadcrumbService breadcrumbService;
   private final ProjectPublishingService projectPublishingService;
+  private final ProjectHeaderSummaryService projectHeaderSummaryService;
 
   @Autowired
   public ProjectAssessmentService(ProjectAssessmentRepository projectAssessmentRepository,
                                   ValidationService validationService,
                                   ProjectAssessmentFormValidator projectAssessmentFormValidator,
                                   BreadcrumbService breadcrumbService,
-                                  ProjectPublishingService projectPublishingService) {
+                                  ProjectPublishingService projectPublishingService,
+                                  ProjectHeaderSummaryService projectHeaderSummaryService) {
     this.projectAssessmentRepository = projectAssessmentRepository;
     this.validationService = validationService;
     this.projectAssessmentFormValidator = projectAssessmentFormValidator;
     this.breadcrumbService = breadcrumbService;
     this.projectPublishingService = projectPublishingService;
+    this.projectHeaderSummaryService = projectHeaderSummaryService;
   }
 
   @Transactional
@@ -77,9 +81,13 @@ public class ProjectAssessmentService {
     return validationService.validate(form, bindingResult, ValidationType.FULL);
   }
 
-  public ModelAndView getProjectAssessmentModelAndView(Integer projectId, ProjectAssessmentForm form) {
+  public ModelAndView getProjectAssessmentModelAndView(ProjectDetail projectDetail,
+                                                       AuthenticatedUserAccount user,
+                                                       ProjectAssessmentForm form) {
+    var projectId = projectDetail.getProject().getId();
     var modelAndView = new ModelAndView("projectassessment/projectAssessment")
         .addObject("pageName", ProjectAssessmentController.PAGE_NAME)
+        .addObject("projectHeaderHtml", projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, user))
         .addObject("form", form)
         .addObject("projectQualities", ProjectQuality.getAllAsMap())
         .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)));

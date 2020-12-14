@@ -1,6 +1,10 @@
 <#include '../layout.ftl'>
 
-<@defaultPage htmlTitle=pageName pageHeading=pageName breadcrumbs=true>
+<@defaultPage htmlTitle=pageName pageHeading="" breadcrumbs=true twoThirdsColumn=false>
+  <@noEscapeHtml.noEscapeHtml html=projectHeaderHtml />
+
+  <h2 class="govuk-heading-l">${pageName}</h2>
+
   <#if errorList?has_content>
     <@fdsError.errorSummary errorItems=errorList />
   </#if>

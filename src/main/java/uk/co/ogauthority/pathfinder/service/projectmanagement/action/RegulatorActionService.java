@@ -66,7 +66,7 @@ public class RegulatorActionService {
     return new UserActionWithDisplayOrder(
         new LinkButton(
             PROVIDE_ASSESSMENT_ACTION_PROMPT,
-            ReverseRouter.route(on(ProjectAssessmentController.class).getProjectAssessment(projectId, null)),
+            ReverseRouter.route(on(ProjectAssessmentController.class).getProjectAssessment(projectId, null, null)),
             isEnabled,
             ButtonType.PRIMARY
         ), PROVIDE_ASSESSMENT_ACTION_DISPLAY_ORDER);
