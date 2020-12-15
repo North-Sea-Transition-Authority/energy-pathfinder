@@ -45,7 +45,7 @@ public class DecommissionedPipelineSummaryServiceTest {
     assertThat(results).hasSize(1);
     var decommissionedPipelineView = results.get(0);
     assertThat(decommissionedPipelineView.getId()).isEqualTo(decommissionedPipeline.getId());
-    assertThat(decommissionedPipelineView.getProjectId()).isEqualTo(decommissionedPipeline.getProjectDetail().getId());
+    assertThat(decommissionedPipelineView.getProjectId()).isEqualTo(decommissionedPipeline.getProjectDetail().getProject().getId());
     assertThat(decommissionedPipelineView.isValid()).isTrue();
   }
 

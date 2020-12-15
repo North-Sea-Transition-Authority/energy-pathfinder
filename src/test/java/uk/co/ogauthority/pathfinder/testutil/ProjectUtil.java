@@ -7,6 +7,7 @@ import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
 
 public class ProjectUtil {
 
+  public static final int PROJECT_ID = 1;
   public static final ProjectStatus STATUS = ProjectStatus.DRAFT;
   public static final Integer WUA = 1;
 
@@ -25,6 +26,8 @@ public class ProjectUtil {
   }
 
   public static Project getProject() {
-    return new Project();
+    var project = new Project();
+    project.setId(PROJECT_ID);
+    return project;
   }
 }
