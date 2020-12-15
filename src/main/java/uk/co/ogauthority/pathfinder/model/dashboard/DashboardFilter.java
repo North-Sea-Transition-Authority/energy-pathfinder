@@ -23,9 +23,6 @@ public class DashboardFilter implements Serializable {
 
   private List<ProjectStatus> projectStatusList;
 
-  public DashboardFilter() {
-  }
-
   public DashboardFilter(List<ProjectStatus> projectStatusList) {
     this.projectStatusList = projectStatusList;
   }

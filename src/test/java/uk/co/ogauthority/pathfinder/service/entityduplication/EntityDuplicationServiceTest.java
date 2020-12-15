@@ -130,11 +130,10 @@ public class EntityDuplicationServiceTest {
         duplicatedEntityPairings
     );
 
-    assertThat(duplicatedEntitiesMap).hasSize(duplicatedEntityPairings.size());
-
-    assertThat(duplicatedEntitiesMap).containsEntry(originalChildEntity1, duplicatedChildEntity1);
-    assertThat(duplicatedEntitiesMap).containsEntry(originalChildEntity2, duplicatedChildEntity2);
-
+    assertThat(duplicatedEntitiesMap)
+        .hasSize(duplicatedEntityPairings.size())
+        .containsEntry(originalChildEntity1, duplicatedChildEntity1)
+        .containsEntry(originalChildEntity2, duplicatedChildEntity2);
   }
 
 }

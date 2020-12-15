@@ -137,14 +137,14 @@ public class ControllerHelperService {
         var fieldPath = error.getField().replaceAll(REPLACE_BRACKETS_AND_CONTENTS_REGEX, "");
         fieldPathsWithErrors.add(fieldPath);
 
-        var currentPath = "";
+        var currentPath = new StringBuilder();
         var split = fieldPath.split("\\.");
         for (int i = 0; i < split.length - 1; i++) {
-          if (!currentPath.equals("")) {
-            currentPath += ".";
+          if (!currentPath.toString().equals("")) {
+            currentPath.append(".");
           }
-          currentPath += split[i];
-          nestedFormPathsWithErrors.add(currentPath);
+          currentPath.append(split[i]);
+          nestedFormPathsWithErrors.add(currentPath.toString());
         }
       }
 
