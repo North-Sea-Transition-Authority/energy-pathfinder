@@ -539,16 +539,9 @@ public class DecommissionedWellServiceTest {
 
   @Test
   public void removeSectionData_verifyInteractions() {
-
-    final var decommissionedWell1 = DecommissionedWellTestUtil.createDecommissionedWell();
-    final var decommissionedWell2 = DecommissionedWellTestUtil.createDecommissionedWell();
-    final var decommissionedWells = List.of(decommissionedWell1, decommissionedWell2);
-
-    when(decommissionedWellRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(decommissionedWells);
-
     decommissionedWellService.removeSectionData(detail);
 
-    verify(decommissionedWellRepository, times(1)).deleteAll(decommissionedWells);
+    verify(decommissionedWellRepository, times(1)).deleteAllByProjectDetail(detail);
   }
 
   @Test

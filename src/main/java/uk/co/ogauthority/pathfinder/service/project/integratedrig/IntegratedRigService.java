@@ -161,8 +161,7 @@ public class IntegratedRigService implements ProjectFormSectionService {
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
-    final var integratedRigs = getIntegratedRigs(projectDetail);
-    integratedRigRepository.deleteAll(integratedRigs);
+    integratedRigRepository.deleteAllByProjectDetail(projectDetail);
   }
 
   @Override

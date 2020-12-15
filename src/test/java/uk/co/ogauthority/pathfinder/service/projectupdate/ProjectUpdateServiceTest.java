@@ -92,6 +92,15 @@ public class ProjectUpdateServiceTest {
   }
 
   @Test
+  public void deleteProjectUpdate() {
+    var projectUpdate = new ProjectUpdate();
+
+    projectUpdateService.deleteProjectUpdate(projectUpdate);
+
+    verify(projectUpdateRepository, times(1)).delete(projectUpdate);
+  }
+
+  @Test
   public void isUpdateInProgress_whenUpdateNotInProgress() {
     when(projectDetailsRepository.isProjectUpdateInProgress(project.getId())).thenReturn(false);
 

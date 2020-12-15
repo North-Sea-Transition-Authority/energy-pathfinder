@@ -16,6 +16,7 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
+import uk.co.ogauthority.pathfinder.repository.project.ProjectRepository;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -26,6 +27,9 @@ public class ProjectServiceTest {
   private static final int PROJECT_VERSION = 2;
 
   @Mock
+  private ProjectRepository projectRepository;
+
+  @Mock
   private ProjectDetailsRepository projectDetailsRepository;
 
   private ProjectService projectService;
@@ -34,7 +38,7 @@ public class ProjectServiceTest {
 
   @Before
   public void setup() {
-    projectService = new ProjectService(projectDetailsRepository);
+    projectService = new ProjectService(projectRepository, projectDetailsRepository);
     when(projectDetailsRepository.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
@@ -78,6 +82,14 @@ public class ProjectServiceTest {
   }
 
   @Test
+  public void updateProjectDetailIsCurrentVersion() {
+    projectDetail.setIsCurrentVersion(false);
+    projectService.updateProjectDetailIsCurrentVersion(projectDetail, true);
+    assertThat(projectDetail.getIsCurrentVersion()).isTrue();
+    verify(projectDetailsRepository, times(1)).save(projectDetail);
+  }
+
+  @Test
   public void createNewProjectDetailVersion_assertRepositoryInteractions() {
 
     final var fromProjectDetail = ProjectUtil.getProjectDetails();
@@ -94,5 +106,21 @@ public class ProjectServiceTest {
 
     verify(projectDetailsRepository, times(1)).save(fromProjectDetail);
     verify(projectDetailsRepository, times(1)).save(newProjectDetail);
+  }
+
+  @Test
+  public void deleteProjectDetail() {
+    projectService.deleteProjectDetail(projectDetail);
+
+    verify(projectDetailsRepository, times(1)).delete(projectDetail);
+  }
+
+  @Test
+  public void deleteProject() {
+    var project = projectDetail.getProject();
+
+    projectService.deleteProject(project);
+
+    verify(projectRepository, times(1)).delete(project);
   }
 }

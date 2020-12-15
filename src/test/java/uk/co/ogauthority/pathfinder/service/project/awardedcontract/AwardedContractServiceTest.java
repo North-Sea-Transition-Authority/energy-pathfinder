@@ -292,15 +292,9 @@ public class AwardedContractServiceTest {
 
   @Test
   public void removeSectionData_verifyInteractions() {
-    final var awardedContract1 = AwardedContractTestUtil.createAwardedContract();
-    final var awardedContract2 = AwardedContractTestUtil.createAwardedContract();
-    final var awardedContracts = List.of(awardedContract1, awardedContract2);
-
-    when(awardedContractRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(awardedContracts);
-
     awardedContractService.removeSectionData(detail);
 
-    verify(awardedContractRepository, times(1)).deleteAll(awardedContracts);
+    verify(awardedContractRepository, times(1)).deleteAllByProjectDetail(detail);
   }
 
   @Test

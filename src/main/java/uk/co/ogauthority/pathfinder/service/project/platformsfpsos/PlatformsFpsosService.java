@@ -189,8 +189,7 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
-    final var platformFpsos = getPlatformsFpsosForDetail(projectDetail);
-    platformFpsoRepository.deleteAll(platformFpsos);
+    platformFpsoRepository.deleteAllByProjectDetail(projectDetail);
   }
 
   @Override

@@ -183,6 +183,13 @@ public class SelectOperatorServiceTest {
   }
 
   @Test
+  public void removeSectionData() {
+    selectOperatorService.removeSectionData(detail);
+
+    verify(projectOperatorService, times(1)).deleteProjectOperatorByProjectDetail(detail);
+  }
+
+  @Test
   public void copySectionData_verifyDuplicationServiceInteraction() {
 
     final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);

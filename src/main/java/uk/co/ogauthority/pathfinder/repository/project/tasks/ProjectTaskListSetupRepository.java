@@ -11,4 +11,5 @@ public interface ProjectTaskListSetupRepository extends CrudRepository<ProjectTa
 
   Optional<ProjectTaskListSetup> findByProjectDetail(ProjectDetail detail);
 
+  void deleteByProjectDetail(ProjectDetail projectDetail);
 }

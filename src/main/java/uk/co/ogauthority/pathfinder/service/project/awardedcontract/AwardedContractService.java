@@ -186,8 +186,7 @@ public class AwardedContractService implements ProjectFormSectionService {
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
-    final var awardedContracts = getAwardedContracts(projectDetail);
-    awardedContractRepository.deleteAll(awardedContracts);
+    awardedContractRepository.deleteAllByProjectDetail(projectDetail);
   }
 
   @Override

@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
+import uk.co.ogauthority.pathfinder.repository.project.ProjectRepository;
 
 /**
  * Service to get project and project details.
@@ -16,10 +18,13 @@ import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 @Service
 public class ProjectService {
 
+  private final ProjectRepository projectRepository;
   private final ProjectDetailsRepository projectDetailsRepository;
 
   @Autowired
-  public ProjectService(ProjectDetailsRepository projectDetailsRepository) {
+  public ProjectService(ProjectRepository projectRepository,
+                        ProjectDetailsRepository projectDetailsRepository) {
+    this.projectRepository = projectRepository;
     this.projectDetailsRepository = projectDetailsRepository;
   }
 
@@ -64,5 +69,18 @@ public class ProjectService {
   public void updateProjectDetailStatus(ProjectDetail projectDetail, ProjectStatus status) {
     projectDetail.setStatus(status);
     projectDetailsRepository.save(projectDetail);
+  }
+
+  public void updateProjectDetailIsCurrentVersion(ProjectDetail projectDetail, boolean isCurrentVersion) {
+    projectDetail.setIsCurrentVersion(isCurrentVersion);
+    projectDetailsRepository.save(projectDetail);
+  }
+
+  public void deleteProjectDetail(ProjectDetail projectDetail) {
+    projectDetailsRepository.delete(projectDetail);
+  }
+
+  public void deleteProject(Project project) {
+    projectRepository.delete(project);
   }
 }

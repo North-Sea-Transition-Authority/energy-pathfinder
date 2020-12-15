@@ -214,8 +214,7 @@ public class DecommissionedWellService implements ProjectFormSectionService {
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
-    final var decommissionedWells = getDecommissionedWellsForProjectDetail(projectDetail);
-    decommissionedWellRepository.deleteAll(decommissionedWells);
+    decommissionedWellRepository.deleteAllByProjectDetail(projectDetail);
   }
 
   @Override

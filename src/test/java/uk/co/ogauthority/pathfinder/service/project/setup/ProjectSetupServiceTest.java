@@ -275,6 +275,13 @@ public class ProjectSetupServiceTest {
   }
 
   @Test
+  public void removeSectionData() {
+    projectSetupService.removeSectionData(details);
+
+    verify(projectTaskListSetupRepository, times(1)).deleteByProjectDetail(details);
+  }
+
+  @Test
   public void copySectionData_verifyDuplicationServiceInteraction() {
 
     final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);

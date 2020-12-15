@@ -11,4 +11,6 @@ public interface ProjectLocationBlockRepository extends CrudRepository<ProjectLo
   List<ProjectLocationBlock> findAllByProjectLocation(ProjectLocation projectLocation);
 
   List<ProjectLocationBlock> findAllByProjectLocationOrderByBlockReference(ProjectLocation projectLocation);
+
+  void deleteAllByProjectLocation(ProjectLocation projectLocation);
 }

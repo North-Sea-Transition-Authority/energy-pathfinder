@@ -13,4 +13,6 @@ public interface IntegratedRigRepository extends CrudRepository<IntegratedRig, I
   Optional<IntegratedRig> findByIdAndProjectDetail(Integer integratedRigId, ProjectDetail projectDetail);
 
   List<IntegratedRig> findByProjectDetailOrderByIdAsc(ProjectDetail projectDetail);
+
+  void deleteAllByProjectDetail(ProjectDetail projectDetail);
 }

@@ -256,17 +256,9 @@ public class DecommissionedPipelineServiceTest {
 
   @Test
   public void removeSectionData_verifyInteractions() {
-
-    final var decommissionedPipeline1 = DecommissionedPipelineTestUtil.createDecommissionedPipeline();
-    final var decommissionedPipeline2 = DecommissionedPipelineTestUtil.createDecommissionedPipeline();
-
-    final var decommissionedPipelines = List.of(decommissionedPipeline1, decommissionedPipeline2);
-
-    when(decommissionedPipelineRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(decommissionedPipelines);
-
     decommissionedPipelineService.removeSectionData(projectDetail);
 
-    verify(decommissionedPipelineRepository, times(1)).deleteAll(decommissionedPipelines);
+    verify(decommissionedPipelineRepository, times(1)).deleteAllByProjectDetail(projectDetail);
   }
 
   @Test

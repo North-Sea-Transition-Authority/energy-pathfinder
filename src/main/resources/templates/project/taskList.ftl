@@ -1,6 +1,17 @@
 <#include '../layout.ftl'>
 
+<#if isUpdate>
+  <#assign cancelDraftLinkText = "Cancel draft update">
+<#else>
+  <#assign cancelDraftLinkText = "Cancel draft project">
+</#if>
+
 <@defaultPage htmlTitle="Pathfinder project task list" pageHeading="Pathfinder project" breadcrumbs=true>
+  <@fdsAction.link
+    linkText=cancelDraftLinkText
+    linkUrl=springUrl(cancelDraftUrl)
+    linkClass="govuk-button govuk-button--blue"
+  />
   <@fdsTaskList.taskList>
     <#-- List over groups -->
     <#list groups as group>

@@ -8,5 +8,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.Platform
 
 @Repository
 public interface PlatformFpsoRepository extends CrudRepository<PlatformFpso, Integer> {
-  public List<PlatformFpso> findAllByProjectDetailOrderByIdAsc(ProjectDetail detail);
+  List<PlatformFpso> findAllByProjectDetailOrderByIdAsc(ProjectDetail detail);
+
+  void deleteAllByProjectDetail(ProjectDetail projectDetail);
 }

@@ -230,6 +230,11 @@ public class ProjectSetupService implements ProjectFormSectionService {
   }
 
   @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    projectTaskListSetupRepository.deleteByProjectDetail(projectDetail);
+  }
+
+  @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
     entityDuplicationService.duplicateEntityAndSetNewParent(
         getProjectTaskListSetupOrError(fromDetail),

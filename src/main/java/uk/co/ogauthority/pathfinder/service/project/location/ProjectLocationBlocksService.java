@@ -123,6 +123,10 @@ public class ProjectLocationBlocksService {
     return projectLocationBlockRepository.findAllByProjectLocationOrderByBlockReference(projectLocation);
   }
 
+  public void deleteBlocks(ProjectLocation projectLocation) {
+    projectLocationBlockRepository.deleteAllByProjectLocation(projectLocation);
+  }
+
   /**
    * Validate the licence block exists in the portal if the validation type is FULL.
    * @param compositeKey key to search for

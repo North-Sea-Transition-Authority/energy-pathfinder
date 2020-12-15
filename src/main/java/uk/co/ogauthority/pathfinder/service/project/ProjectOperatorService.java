@@ -86,6 +86,10 @@ public class ProjectOperatorService {
             String.format("Unable to find ProjectOperator for projectDetail with ID %s", projectDetail.getId())));
   }
 
+  public void deleteProjectOperatorByProjectDetail(ProjectDetail projectDetail) {
+    projectOperatorRepository.deleteByProjectDetail(projectDetail);
+  }
+
   public boolean isUserInMultipleTeams(AuthenticatedUserAccount user) {
     return teamService.getOrganisationTeamsPersonIsMemberOf(user.getLinkedPerson()).size() > 1;
   }
