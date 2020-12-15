@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -9,6 +10,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
 import java.util.List;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +59,12 @@ public class WorkAreaControllerTest extends AbstractControllerTest {
   private static final AuthenticatedUserAccount unAuthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   private static final DashboardFilter DEFAULT_FILTER = DashboardFilterTestUtil.getEmptyFilter();
+
+  @Before
+  public void setUp() throws Exception {
+    when(dashboardService.getDefaultFilterForUser(authenticatedUser))
+        .thenReturn(new DashboardFilter(DashboardService.OPERATOR_STATUS_DEFAULTS));
+  }
 
   @Test
   public void authenticatedUser_hasAccessToWorkArea() throws Exception {

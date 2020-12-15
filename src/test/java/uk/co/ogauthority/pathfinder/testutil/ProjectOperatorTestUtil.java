@@ -16,6 +16,14 @@ public class ProjectOperatorTestUtil {
       ORG_GROUP_SHORT_NAME
   );
 
+  public static PortalOrganisationGroup getOrgGroup(String name) {
+    return TeamTestingUtil.generateOrganisationGroup(
+          ORG_GROUP_ID,
+          name,
+          ORG_GROUP_SHORT_NAME
+      );
+  }
+
   public static ProjectOperator getOperator() {
     return getOperator(
         ProjectUtil.getProjectDetails(),

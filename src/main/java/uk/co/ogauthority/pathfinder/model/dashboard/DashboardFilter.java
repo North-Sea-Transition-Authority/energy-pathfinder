@@ -11,6 +11,8 @@ import uk.co.ogauthority.pathfinder.model.form.dashboard.DashboardFilterForm;
 @SessionAttributes("dashboardFilter")
 public class DashboardFilter implements Serializable {
 
+  private String operatorName;
+
   private String projectTitle;
 
   private String field;
@@ -24,12 +26,25 @@ public class DashboardFilter implements Serializable {
   public DashboardFilter() {
   }
 
+  public DashboardFilter(List<ProjectStatus> projectStatusList) {
+    this.projectStatusList = projectStatusList;
+  }
+
   public void setFromForm(DashboardFilterForm form) {
+    this.operatorName = form.getOperatorName();
     this.projectTitle = form.getProjectTitle();
     this.field = form.getField();
     this.fieldStages = form.getFieldStages();
     this.ukcsAreas = form.getUkcsAreas();
     this.projectStatusList = form.getProjectStatusList();
+  }
+
+  public String getOperatorName() {
+    return operatorName;
+  }
+
+  public void setOperatorName(String operatorName) {
+    this.operatorName = operatorName;
   }
 
   public String getProjectTitle() {

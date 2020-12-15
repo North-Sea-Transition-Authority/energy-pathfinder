@@ -24,6 +24,7 @@ public class DashboardFilterService {
    */
   public List<DashboardProjectItem> filter(List<DashboardProjectItem> dashboardItems, DashboardFilter filter) {
     List<Predicate<DashboardProjectItem>> allPredicates = Arrays.asList(
+        di -> operatorMatches(di, filter),
         di -> titleMatches(di, filter),
         di -> fieldMatches(di, filter),
         di -> fieldStageMatches(di, filter),
@@ -37,6 +38,13 @@ public class DashboardFilterService {
     return dashboardItems.stream().filter(compositePredicate).collect(Collectors.toList());
   }
 
+
+  public boolean operatorMatches(DashboardProjectItem di, DashboardFilter filter) {
+    if (filter.getOperatorName() != null) {
+      return di.getOperatorName() != null && di.getOperatorName().toLowerCase().contains(filter.getOperatorName().toLowerCase());
+    }
+    return true;
+  }
 
   public boolean titleMatches(DashboardProjectItem di, DashboardFilter filter) {
     if (filter.getProjectTitle() != null) {

@@ -20,27 +20,31 @@ public class DashboardProjectItemTestUtil {
   public static final PortalOrganisationGroup ORGANISATION_GROUP = ProjectOperatorTestUtil.ORG_GROUP;
 
   public static DashboardProjectItem getDashboardProjectItem() {
-    return getDashboardProjectItem(PROJECT_TITLE, FIELD_STAGE, FIELD_NAME, UKCS_AREA, PROJECT_STATUS);
+    return getDashboardProjectItem(PROJECT_TITLE, FIELD_STAGE, FIELD_NAME, UKCS_AREA, PROJECT_STATUS, ORGANISATION_GROUP);
+  }
+
+  public static DashboardProjectItem getDashboardProjectItem(PortalOrganisationGroup organisationGroup) {
+    return getDashboardProjectItem(PROJECT_TITLE, FIELD_STAGE, FIELD_NAME, UKCS_AREA, PROJECT_STATUS, organisationGroup);
   }
 
   public static DashboardProjectItem getDashboardProjectItem(String projectTitle){
-    return getDashboardProjectItem(projectTitle, FIELD_STAGE, FIELD_NAME, UKCS_AREA, PROJECT_STATUS);
+    return getDashboardProjectItem(projectTitle, FIELD_STAGE, FIELD_NAME, UKCS_AREA, PROJECT_STATUS, ORGANISATION_GROUP);
   }
 
   public static DashboardProjectItem getDashboardProjectItem(FieldStage fieldStage){
-    return getDashboardProjectItem(PROJECT_TITLE, fieldStage, FIELD_NAME, UKCS_AREA, PROJECT_STATUS);
+    return getDashboardProjectItem(PROJECT_TITLE, fieldStage, FIELD_NAME, UKCS_AREA, PROJECT_STATUS, ORGANISATION_GROUP);
   }
 
   public static DashboardProjectItem getDashboardProjectItem_withField(String fieldName){
-    return getDashboardProjectItem(PROJECT_TITLE, FIELD_STAGE, fieldName, UKCS_AREA, PROJECT_STATUS);
+    return getDashboardProjectItem(PROJECT_TITLE, FIELD_STAGE, fieldName, UKCS_AREA, PROJECT_STATUS, ORGANISATION_GROUP);
   }
 
   public static DashboardProjectItem getDashboardProjectItem(UkcsArea ukcsArea){
-    return getDashboardProjectItem(PROJECT_TITLE, FIELD_STAGE, FIELD_NAME, ukcsArea, PROJECT_STATUS);
+    return getDashboardProjectItem(PROJECT_TITLE, FIELD_STAGE, FIELD_NAME, ukcsArea, PROJECT_STATUS, ORGANISATION_GROUP);
   }
 
   public static DashboardProjectItem getDashboardProjectItem(ProjectStatus status){
-    return getDashboardProjectItem(PROJECT_TITLE, FIELD_STAGE, FIELD_NAME, UKCS_AREA, status);
+    return getDashboardProjectItem(PROJECT_TITLE, FIELD_STAGE, FIELD_NAME, UKCS_AREA, status, ORGANISATION_GROUP);
   }
 
   public static DashboardProjectItem getDashboardProjectItem(
@@ -48,7 +52,8 @@ public class DashboardProjectItemTestUtil {
       FieldStage fieldStage,
       String fieldName,
       UkcsArea ukcsArea,
-      ProjectStatus status
+      ProjectStatus status,
+      PortalOrganisationGroup organisationGroup
       ){
     var dashboardProjectItem = new DashboardProjectItem();
     dashboardProjectItem.setProjectId(PROJECT_ID);
@@ -59,7 +64,7 @@ public class DashboardProjectItemTestUtil {
     dashboardProjectItem.setFieldStage(fieldStage);
     dashboardProjectItem.setFieldName(fieldName);
     dashboardProjectItem.setUkcsArea(ukcsArea);
-    dashboardProjectItem.setOrganisationGroup(ORGANISATION_GROUP);
+    dashboardProjectItem.setOrganisationGroup(organisationGroup);
 
     return dashboardProjectItem;
   }

@@ -6,7 +6,7 @@
   <@userAction.userAction userAction=startProjectButton/>
 
   <@fdsSearch.searchPage>
-    <@dashboardFilters.dashboardFilters/>
+    <@dashboardFilters.dashboardFilters includeOperatorFilter=includeOperatorFilter/>
 
     <@fdsSearch.searchPageContent>
       <@dashboard.dashboard dashboardProjectItemViews=dashboardProjectItemViews resultSize=resultSize />

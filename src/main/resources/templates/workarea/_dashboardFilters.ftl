@@ -1,8 +1,13 @@
 <#include '../layout.ftl'/>
 
-<#macro dashboardFilters>
+<#macro dashboardFilters includeOperatorFilter=false>
   <@fdsSearch.searchFilter>
     <@fdsSearch.searchFilterList filterButtonItemText="projects">
+      <#if includeOperatorFilter>
+        <@fdsSearch.searchFilterItem itemName="Project operator">
+          <@fdsSearch.searchTextInput path="form.operatorName" labelText="Project operator"/>
+        </@fdsSearch.searchFilterItem>
+      </#if>
       <@fdsSearch.searchFilterItem itemName="Project title">
         <@fdsSearch.searchTextInput path="form.projectTitle" labelText="Project title"/>
       </@fdsSearch.searchFilterItem>
