@@ -1,11 +1,11 @@
 <#include '../layout.ftl'>
 
 <@defaultPage htmlTitle="Confirm no changes required" breadcrumbs=true twoThirdsColumn=false>
-  <@noEscapeHtml.noEscapeHtml html=projectHeaderHtml />
-
   <#if errorList?has_content>
     <@fdsError.errorSummary errorItems=errorList />
   </#if>
+
+  <@noEscapeHtml.noEscapeHtml html=projectHeaderHtml />
 
   <@fdsForm.htmlForm>
     <@fdsTextarea.textarea
