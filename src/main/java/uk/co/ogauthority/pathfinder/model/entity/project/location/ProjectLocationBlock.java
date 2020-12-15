@@ -135,7 +135,7 @@ public class ProjectLocationBlock implements ChildEntity<Integer, ProjectLocatio
         getQuadrantNumber(),
         getBlockNumber(),
         getBlockSuffix() != null ? getBlockSuffix() : "",
-        getPedLicenceId().toString()
+        getPedLicenceId() != null ? getPedLicenceId().toString() : ""
     );
   }
 

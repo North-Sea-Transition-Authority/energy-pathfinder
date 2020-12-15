@@ -542,14 +542,240 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   END create_project_info_record;
 
   /**
+    Utility function to lookup try to find a matching devuk field based on the free text value
+    entered on the legacy project.
+    @param p_legacy_manual_entry_field The free text field value entered on the legacy project
+    @return The ID of a devuk field whose name matches exactly p_legacy_manual_entry_field
+   */
+  FUNCTION lookup_field_id_from_freetext(
+    p_legacy_manual_entry_field IN ${datasource.migration-user}.legacy_project_data.manual_field_name%TYPE
+  ) RETURN ${datasource.user}.project_locations.field_id%TYPE
+  IS
+
+    l_matched_devuk_field_id ${datasource.user}.project_locations.field_id%TYPE;
+
+  BEGIN
+
+    BEGIN
+
+      SELECT f.field_identifier
+      INTO l_matched_devuk_field_id
+      FROM devukmgr.fields f
+      WHERE LOWER(f.name) = LOWER(p_legacy_manual_entry_field);
+
+    EXCEPTION WHEN NO_DATA_FOUND THEN
+      l_matched_devuk_field_id := NULL;
+    END;
+
+    RETURN l_matched_devuk_field_id;
+
+  END lookup_field_id_from_freetext;
+
+  /**
+    Utility procedure to sanitise the legacy devuk field data into a format for the new service model.
+    The rules are:
+    - If both po_legacy_devuk_field_id and po_legacy_manual_field_name are populated, then NULL po_legacy_manual_field_name
+      so we only persist po_legacy_devuk_field_id in the new model
+    - If po_legacy_manual_field_name is populated then try to lookup a devuk field id which exactly matches po_legacy_manual_field_name
+    @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+    @param po_legacy_devuk_field_id The devuk field id from the legacy model
+    @param po_legacy_manual_field_name The manual field name from the legacy model
+   */
+  PROCEDURE sanitise_legacy_field_inputs(
+    p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , po_legacy_devuk_field_id IN OUT ${datasource.migration-user}.legacy_project_data.devuk_field_id%TYPE
+  , po_legacy_manual_field_name IN OUT ${datasource.migration-user}.legacy_project_data.manual_field_name%TYPE
+  )
+  IS
+
+    l_devuk_field_id_lookup ${datasource.user}.project_locations.field_id%TYPE;
+
+  BEGIN
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message =>
+        'Starting sanitise_legacy_field_inputs for legacy project detail with ID ' || p_legacy_project_detail_id
+        || 'with inputs po_legacy_devuk_field_id => ' || COALESCE(TO_CHAR(po_legacy_devuk_field_id), 'NULL')
+        || ', po_legacy_manual_field_name => ' || COALESCE(po_legacy_manual_field_name, 'NULL')
+    );
+
+    IF po_legacy_devuk_field_id IS NOT NULL THEN
+
+      -- If operator has selected the devuk field, don't set the manual field name.
+      -- There are hundreds of cases on live where both are set and we want to take the devuk id over the free text name.
+      po_legacy_manual_field_name := NULL;
+
+    ELSIF po_legacy_manual_field_name IS NOT NULL THEN
+
+      -- If a manual field name is entered and we don't have a devuk field id, try an exact match lookup from devuk
+      -- to see if we can find a field with the same name. Preference would be to store the devuk id if possible.
+      l_devuk_field_id_lookup := lookup_field_id_from_freetext(
+        p_legacy_manual_entry_field => po_legacy_manual_field_name
+      );
+
+      IF l_devuk_field_id_lookup IS NOT NULL THEN
+        po_legacy_devuk_field_id := l_devuk_field_id_lookup;
+        po_legacy_manual_field_name := NULL;
+      END IF;
+
+    END IF;
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message =>
+          'Finished sanitise_legacy_field_inputs for legacy project detail with ID ' || p_legacy_project_detail_id
+          || ' with outputs po_legacy_devuk_field_id => ' || COALESCE(TO_CHAR(po_legacy_devuk_field_id), 'NULL')
+          || ', po_legacy_manual_field_name => ' || COALESCE(po_legacy_manual_field_name, 'NULL')
+    );
+
+  END sanitise_legacy_field_inputs;
+
+  /**
+    Utility function to take in a legacy water depth value and try to sanitise it for inclusion in the new model.
+    We need to remove characters, spaces and any units associated to the legacy input.
+
+    If the input contains a range of values e.g. 150-170 then we need to take the maximum value of the range.
+
+    @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+    @param p_legacy_water_depth_value The legacy water depth value we want to sanitise
+   */
+  FUNCTION sanitise_legacy_water_depth(
+    p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , p_legacy_water_depth_value IN ${datasource.migration-user}.legacy_project_data.water_depth%TYPE
+  ) RETURN ${datasource.user}.project_locations.water_depth%TYPE
+  IS
+
+    l_sanitised_water_depth_value ${datasource.migration-user}.legacy_project_data.water_depth%TYPE;
+
+  BEGIN
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message =>
+          'Starting sanitise_legacy_water_depth_input for legacy project detail with ID ' || p_legacy_project_detail_id
+          || ' with input p_legacy_water_depth_value => ' || COALESCE(p_legacy_water_depth_value, 'NULL')
+    );
+
+    -- remove any text characters, spaces or commas from the legacy value
+    SELECT REGEXP_REPLACE(LOWER(p_legacy_water_depth_value), '[a-z]| |,', '')
+    INTO l_sanitised_water_depth_value
+    FROM dual;
+
+    -- if the string contains a hyphen then we have a range of values
+    IF INSTR(l_sanitised_water_depth_value, '-') > 0 THEN
+
+      -- split on the hyphen character and get the MAX value from the list
+      SELECT MAX(t.column_value)
+      INTO l_sanitised_water_depth_value
+      FROM TABLE(envmgr.st.split(l_sanitised_water_depth_value, '-')) t;
+
+    END IF;
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message =>
+          'Finished sanitise_legacy_water_depth_input for legacy project detail with ID ' || p_legacy_project_detail_id
+          || ' with sanitised value ' || COALESCE(l_sanitised_water_depth_value, 'NULL')
+    );
+
+    -- return either a number or NULL
+    RETURN envmgr.st.to_number_safe(l_sanitised_water_depth_value);
+
+  END sanitise_legacy_water_depth;
+
+  /**
+    Utility function to get the water depth value for the new model. This will also populate the
+    water_depth_migration_mapping table with the before and after value so we can see how it was sanitised.
+    @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+    @param p_legacy_water_depth_value The legacy water depth value we want to sanitise
+   */
+  FUNCTION get_water_depth_value(
+    p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , p_legacy_water_depth_value IN ${datasource.migration-user}.legacy_project_data.water_depth%TYPE
+  ) RETURN NUMBER
+  IS
+
+    PRAGMA AUTONOMOUS_TRANSACTION;
+
+    K_IS_MIGRATABLE_FALSE CONSTANT ${datasource.migration-user}.water_depth_migration_mapping.is_migratable%TYPE := 0;
+    K_IS_MIGRATABLE_TRUE CONSTANT ${datasource.migration-user}.water_depth_migration_mapping.is_migratable%TYPE := 1;
+
+    l_sanitised_water_depth_value ${datasource.user}.project_locations.water_depth%TYPE;
+    l_is_water_depth_migratable ${datasource.migration-user}.water_depth_migration_mapping.is_migratable%TYPE;
+
+  BEGIN
+
+    -- merge statement so we can do rerun of project migrations and not get duplicate rows
+    MERGE INTO ${datasource.migration-user}.water_depth_migration_mapping wdmm
+    USING(
+      SELECT p_legacy_project_detail_id legacy_project_detail_id
+      FROM dual
+    ) t
+    ON (t.legacy_project_detail_id = wdmm.legacy_project_detail_id)
+    WHEN MATCHED THEN
+      UPDATE SET
+        original_water_depth_value = p_legacy_water_depth_value
+      , is_migratable = K_IS_MIGRATABLE_FALSE
+    WHEN NOT MATCHED THEN
+      INSERT (
+        legacy_project_detail_id
+      , original_water_depth_value
+      , is_migratable
+      )
+      VALUES(
+        p_legacy_project_detail_id
+      , p_legacy_water_depth_value
+      , K_IS_MIGRATABLE_FALSE
+      );
+
+    IF p_legacy_water_depth_value IS NOT NULL THEN
+
+      l_sanitised_water_depth_value := sanitise_legacy_water_depth(
+        p_legacy_project_detail_id => p_legacy_project_detail_id
+      , p_legacy_water_depth_value => p_legacy_water_depth_value
+      );
+
+      -- if after sanitisation we have not managed to get a number
+      -- then mark the mapping table as K_IS_MIGRATABLE_FALSE and NULL
+      -- will be returned for migration
+      SELECT DECODE(
+        l_sanitised_water_depth_value
+      , NULL, K_IS_MIGRATABLE_FALSE
+      , K_IS_MIGRATABLE_TRUE
+      )
+      INTO l_is_water_depth_migratable
+      FROM dual;
+
+    ELSE
+      -- if p_legacy_water_depth_value IS NULL then we will migrate NULL to new model
+      l_sanitised_water_depth_value := NULL;
+      l_is_water_depth_migratable := K_IS_MIGRATABLE_TRUE;
+
+    END IF;
+
+    UPDATE ${datasource.migration-user}.water_depth_migration_mapping wdmm
+    SET
+      wdmm.sanitised_water_depth_value = l_sanitised_water_depth_value
+    , wdmm.is_migratable = l_is_water_depth_migratable
+    WHERE wdmm.legacy_project_detail_id = p_legacy_project_detail_id;
+
+    COMMIT;
+
+    RETURN l_sanitised_water_depth_value;
+
+  END get_water_depth_value;
+
+  /**
     Procedure to create a record in the project_locations table in the new service model.
     @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
     @param p_new_project_detail_id The detail id the publish record should be associated to
+    @return The id of the newly created PROJECT_LOCATIONS record
    */
-  PROCEDURE create_project_location_record(
+  FUNCTION create_project_location_record(
     p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
   , p_new_project_detail_id IN ${datasource.user}.project_details.id%TYPE
-  )
+  ) RETURN ${datasource.user}.project_locations.id%TYPE
   IS
 
     K_DESTINATION_TABLE_NAME CONSTANT VARCHAR2(30) := 'PROJECT_LOCATIONS';
@@ -563,231 +789,6 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     l_legacy_water_depth ${datasource.migration-user}.legacy_project_data.water_depth%TYPE;
     l_sanitised_water_depth ${datasource.user}.project_locations.water_depth%TYPE;
-
-    /**
-      Utility function to lookup try to find a matching devuk field based on the free text value
-      entered on the legacy project.
-      @param p_legacy_manual_entry_field The free text field value entered on the legacy project
-      @return The ID of a devuk field whose name matches exactly p_legacy_manual_entry_field
-     */
-    FUNCTION lookup_field_id_from_freetext(
-      p_legacy_manual_entry_field IN ${datasource.migration-user}.legacy_project_data.manual_field_name%TYPE
-    ) RETURN ${datasource.user}.project_locations.field_id%TYPE
-    IS
-
-      l_matched_devuk_field_id ${datasource.user}.project_locations.field_id%TYPE;
-
-    BEGIN
-
-      BEGIN
-
-        SELECT f.field_identifier
-        INTO l_matched_devuk_field_id
-        FROM devukmgr.fields f
-        WHERE LOWER(f.name) = LOWER(p_legacy_manual_entry_field);
-
-      EXCEPTION WHEN NO_DATA_FOUND THEN
-        l_matched_devuk_field_id := NULL;
-      END;
-
-      RETURN l_matched_devuk_field_id;
-
-    END lookup_field_id_from_freetext;
-
-    /**
-      Utility procedure to sanitise the legacy devuk field data into a format for the new service model.
-      The rules are:
-      - If both po_legacy_devuk_field_id and po_legacy_manual_field_name are populated, then NULL po_legacy_manual_field_name
-        so we only persist po_legacy_devuk_field_id in the new model
-      - If po_legacy_manual_field_name is populated then try to lookup a devuk field id which exactly matches po_legacy_manual_field_name
-      @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
-      @param po_legacy_devuk_field_id The devuk field id from the legacy model
-      @param po_legacy_manual_field_name The manual field name from the legacy model
-     */
-    PROCEDURE sanitise_legacy_field_inputs(
-      p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
-    , po_legacy_devuk_field_id IN OUT ${datasource.migration-user}.legacy_project_data.devuk_field_id%TYPE
-    , po_legacy_manual_field_name IN OUT ${datasource.migration-user}.legacy_project_data.manual_field_name%TYPE
-    )
-    IS
-
-      l_devuk_field_id_lookup ${datasource.user}.project_locations.field_id%TYPE;
-
-    BEGIN
-
-      log_project_detail_migration(
-        p_legacy_project_detail_id => p_legacy_project_detail_id
-      , p_system_message =>
-          'Starting sanitise_legacy_field_inputs for legacy project detail with ID ' || p_legacy_project_detail_id
-          || 'with inputs po_legacy_devuk_field_id => ' || COALESCE(TO_CHAR(po_legacy_devuk_field_id), 'NULL')
-          || ', po_legacy_manual_field_name => ' || COALESCE(po_legacy_manual_field_name, 'NULL')
-      );
-
-      IF po_legacy_devuk_field_id IS NOT NULL THEN
-
-        -- If operator has selected the devuk field, don't set the manual field name.
-        -- There are hundreds of cases on live where both are set and we want to take the devuk id over the free text name.
-        po_legacy_manual_field_name := NULL;
-
-      ELSIF po_legacy_manual_field_name IS NOT NULL THEN
-
-        -- If a manual field name is entered and we don't have a devuk field id, try an exact match lookup from devuk
-        -- to see if we can find a field with the same name. Preference would be to store the devuk id if possible.
-        l_devuk_field_id_lookup := lookup_field_id_from_freetext(
-          p_legacy_manual_entry_field => po_legacy_manual_field_name
-        );
-
-        IF l_devuk_field_id_lookup IS NOT NULL THEN
-          po_legacy_devuk_field_id := l_devuk_field_id_lookup;
-          po_legacy_manual_field_name := NULL;
-        END IF;
-
-      END IF;
-
-      log_project_detail_migration(
-        p_legacy_project_detail_id => p_legacy_project_detail_id
-      , p_system_message =>
-          'Finished sanitise_legacy_field_inputs for legacy project detail with ID ' || p_legacy_project_detail_id
-          || ' with outputs po_legacy_devuk_field_id => ' || COALESCE(TO_CHAR(po_legacy_devuk_field_id), 'NULL')
-          || ', po_legacy_manual_field_name => ' || COALESCE(po_legacy_manual_field_name, 'NULL')
-      );
-
-    END sanitise_legacy_field_inputs;
-
-    /**
-      Utility function to take in a legacy water depth value and try to sanitise it for inclusion in the new model.
-      We need to remove characters, spaces and any units associated to the legacy input.
-
-      If the input contains a range of values e.g. 150-170 then we need to take the maximum value of the range.
-
-      @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
-      @param p_legacy_water_depth_value The legacy water depth value we want to sanitise
-     */
-    FUNCTION sanitise_legacy_water_depth(
-      p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
-    , p_legacy_water_depth_value IN ${datasource.migration-user}.legacy_project_data.water_depth%TYPE
-    ) RETURN ${datasource.user}.project_locations.water_depth%TYPE
-    IS
-
-      l_sanitised_water_depth_value ${datasource.migration-user}.legacy_project_data.water_depth%TYPE;
-
-    BEGIN
-
-      log_project_detail_migration(
-        p_legacy_project_detail_id => p_legacy_project_detail_id
-      , p_system_message =>
-          'Starting sanitise_legacy_water_depth_input for legacy project detail with ID ' || p_legacy_project_detail_id
-          || ' with input p_legacy_water_depth_value => ' || COALESCE(p_legacy_water_depth_value, 'NULL')
-      );
-
-      -- remove any text characters, spaces or commas from the legacy value
-      SELECT REGEXP_REPLACE(LOWER(p_legacy_water_depth_value), '[a-z]| |,', '')
-      INTO l_sanitised_water_depth_value
-      FROM dual;
-
-      -- if the string contains a hyphen then we have a range of values
-      IF INSTR(l_sanitised_water_depth_value, '-') > 0 THEN
-
-        -- split on the hyphen character and get the MAX value from the list
-        SELECT MAX(t.column_value)
-        INTO l_sanitised_water_depth_value
-        FROM TABLE(envmgr.st.split(l_sanitised_water_depth_value, '-')) t;
-
-      END IF;
-
-      log_project_detail_migration(
-        p_legacy_project_detail_id => p_legacy_project_detail_id
-      , p_system_message =>
-          'Finished sanitise_legacy_water_depth_input for legacy project detail with ID ' || p_legacy_project_detail_id
-          || ' with sanitised value ' || COALESCE(l_sanitised_water_depth_value, 'NULL')
-      );
-
-      -- return either a number or NULL
-      RETURN envmgr.st.to_number_safe(l_sanitised_water_depth_value);
-
-    END sanitise_legacy_water_depth;
-
-    /**
-      Utility function to get the water depth value for the new model. This will also populate the
-      water_depth_migration_mapping table with the before and after value so we can see how it was sanitised.
-      @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
-      @param p_legacy_water_depth_value The legacy water depth value we want to sanitise
-     */
-    FUNCTION get_water_depth_value(
-      p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
-    , p_legacy_water_depth_value IN ${datasource.migration-user}.legacy_project_data.water_depth%TYPE
-    ) RETURN NUMBER
-    IS
-
-      PRAGMA AUTONOMOUS_TRANSACTION;
-
-      K_IS_MIGRATABLE_FALSE CONSTANT ${datasource.migration-user}.water_depth_migration_mapping.is_migratable%TYPE := 0;
-      K_IS_MIGRATABLE_TRUE CONSTANT ${datasource.migration-user}.water_depth_migration_mapping.is_migratable%TYPE := 1;
-
-      l_sanitised_water_depth_value ${datasource.user}.project_locations.water_depth%TYPE;
-      l_is_water_depth_migratable ${datasource.migration-user}.water_depth_migration_mapping.is_migratable%TYPE;
-
-    BEGIN
-
-      -- merge statement so we can do rerun of project migrations and not get duplicate rows
-      MERGE INTO ${datasource.migration-user}.water_depth_migration_mapping wdmm
-      USING(
-        SELECT p_legacy_project_detail_id legacy_project_detail_id
-        FROM dual
-      ) t
-      ON (t.legacy_project_detail_id = wdmm.legacy_project_detail_id)
-      WHEN MATCHED THEN
-        UPDATE SET
-          original_water_depth_value = p_legacy_water_depth_value
-        , is_migratable = K_IS_MIGRATABLE_FALSE
-      WHEN NOT MATCHED THEN
-        INSERT (
-          legacy_project_detail_id
-        , original_water_depth_value
-        , is_migratable
-        )
-        VALUES(
-          p_legacy_project_detail_id
-        , p_legacy_water_depth_value
-        , K_IS_MIGRATABLE_FALSE
-        );
-
-      IF p_legacy_water_depth_value IS NOT NULL THEN
-
-        l_sanitised_water_depth_value := sanitise_legacy_water_depth(
-          p_legacy_project_detail_id => p_legacy_project_detail_id
-        , p_legacy_water_depth_value => p_legacy_water_depth_value
-        );
-
-        -- if after sanitisation we have not managed to get a number
-        -- then mark the mapping table as K_IS_MIGRATABLE_FALSE and NULL
-        -- will be returned for migration
-        SELECT DECODE(
-          l_sanitised_water_depth_value
-        , NULL, K_IS_MIGRATABLE_FALSE
-        , K_IS_MIGRATABLE_TRUE
-        )
-        INTO l_is_water_depth_migratable
-        FROM dual;
-
-      ELSE
-        -- if p_legacy_water_depth_value IS NULL then we will migrate NULL to new model
-        l_sanitised_water_depth_value := NULL;
-        l_is_water_depth_migratable := K_IS_MIGRATABLE_TRUE;
-
-      END IF;
-
-      UPDATE ${datasource.migration-user}.water_depth_migration_mapping wdmm
-      SET
-        wdmm.sanitised_water_depth_value = l_sanitised_water_depth_value
-      , wdmm.is_migratable = l_is_water_depth_migratable
-      WHERE wdmm.legacy_project_detail_id = p_legacy_project_detail_id;
-
-      COMMIT;
-
-      RETURN l_sanitised_water_depth_value;
-
-    END get_water_depth_value;
 
   BEGIN
 
@@ -845,6 +846,8 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     , p_system_message => 'Created new ' || K_DESTINATION_TABLE_NAME || ' record with id ' || l_new_project_location_id
     );
 
+    RETURN l_new_project_location_id;
+
   EXCEPTION WHEN OTHERS THEN
     raise_exception_with_trace(
       p_message_prefix => 'ERROR in create_project_location_record(' || CHR(10)
@@ -853,6 +856,244 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
         || ')'
     );
   END create_project_location_record;
+
+  /**
+    Utility function to sanitise the legacy location input and extract a list of block references
+    @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+    @param p_legacy_location_input The legacy location input from the p_legacy_project_detail_id that we want to process
+    @return a list of block references extracted from the legacy location input
+   */
+  FUNCTION sanitise_legacy_location_input(
+    p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , p_legacy_location_input IN ${datasource.migration-user}.legacy_project_data.location%TYPE
+  ) RETURN bpmmgr.varchar2_list_type
+  IS
+
+    l_quadrant_no ${datasource.user}.project_location_blocks.quadrant_no%TYPE;
+    l_block_no ${datasource.user}.project_location_blocks.block_no%TYPE;
+    l_block_suffix ${datasource.user}.project_location_blocks.block_suffix%TYPE;
+
+    l_block_list bpmmgr.varchar2_list_type := bpmmgr.varchar2_list_type();
+
+  BEGIN
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message =>
+          'Starting sanitise_legacy_location_input for legacy project detail with ID ' || p_legacy_project_detail_id
+          || ' with input p_legacy_location_input => ' || COALESCE(p_legacy_location_input, 'NULL')
+    );
+
+    FOR potential_block_ref IN (
+      -- convert all spaces to commas so we can process each item in the string individually
+      SELECT t.column_value reference
+      FROM TABLE(envmgr.st.split(REPLACE(p_legacy_location_input, ' ', ','), ',')) t
+    )
+    LOOP
+
+      -- attempt to extract the quadrant no, block number and suffix from the
+      -- potential block ref string
+      BEGIN
+
+        pedmgr.ped_utils.block_ref_split (
+          p_block_ref => potential_block_ref.reference
+        , p_quadrant_no => l_quadrant_no
+        , p_block_no => l_block_no
+        , p_suffix => l_block_suffix
+        );
+
+      EXCEPTION WHEN OTHERS THEN
+
+        l_quadrant_no := NULL;
+        l_block_no := NULL;
+        l_block_suffix := NULL;
+
+      END;
+
+      -- the quadrant no and block no are the two mandatory parts of a block reference
+      -- so if both are present then we have a valid block reference and should add it to the list
+      IF l_quadrant_no IS NOT NULL AND l_block_no IS NOT NULL THEN
+        l_block_list.EXTEND;
+        l_block_list(l_block_list.COUNT) := potential_block_ref.reference;
+      END IF;
+
+    END LOOP;
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message =>
+        'Finished sanitise_legacy_location_input for legacy project detail with ID ' || p_legacy_project_detail_id
+        || ' with sanitised value ' || COALESCE(envmgr.st.join(l_block_list, ','), 'NULL')
+    );
+
+    RETURN l_block_list;
+
+  END sanitise_legacy_location_input;
+
+  /**
+    @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+    @param p_legacy_location_input The legacy location input from the p_legacy_project_detail_id that we want to process
+    @return a list of block references extracted from the legacy location input
+   */
+  FUNCTION get_location_block_list(
+    p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , p_legacy_location_input ${datasource.migration-user}.legacy_project_data.location%TYPE
+  ) RETURN bpmmgr.varchar2_list_type
+  IS
+
+    PRAGMA AUTONOMOUS_TRANSACTION;
+
+    K_IS_MIGRATABLE_FALSE CONSTANT ${datasource.migration-user}.location_migration_mapping.is_migratable%TYPE := 0;
+    K_IS_MIGRATABLE_TRUE CONSTANT ${datasource.migration-user}.location_migration_mapping.is_migratable%TYPE := 1;
+
+    l_sanitised_location_list bpmmgr.varchar2_list_type;
+    l_is_location_migratable ${datasource.migration-user}.location_migration_mapping.is_migratable%TYPE;
+
+  BEGIN
+
+    -- merge statement so we can do rerun of project migrations and not get duplicate rows
+    MERGE INTO ${datasource.migration-user}.location_migration_mapping lmm
+    USING(
+      SELECT p_legacy_project_detail_id legacy_project_detail_id
+      FROM dual
+    ) t
+    ON (t.legacy_project_detail_id = lmm.legacy_project_detail_id)
+    WHEN MATCHED THEN
+      UPDATE SET
+        original_location_value = p_legacy_location_input
+      , is_migratable = K_IS_MIGRATABLE_FALSE
+    WHEN NOT MATCHED THEN
+      INSERT (
+        legacy_project_detail_id
+      , original_location_value
+      , is_migratable
+      )
+      VALUES(
+        p_legacy_project_detail_id
+      , p_legacy_location_input
+      , K_IS_MIGRATABLE_FALSE
+      );
+
+    IF p_legacy_location_input IS NOT NULL THEN
+
+      l_sanitised_location_list := sanitise_legacy_location_input(
+        p_legacy_project_detail_id => p_legacy_project_detail_id
+      , p_legacy_location_input => p_legacy_location_input
+      );
+
+      -- if we have managed to find blocks to migrate
+      IF l_sanitised_location_list.COUNT != 0 THEN
+        l_is_location_migratable := K_IS_MIGRATABLE_TRUE;
+      ELSE
+        l_is_location_migratable := K_IS_MIGRATABLE_FALSE;
+      END IF;
+
+    ELSE
+
+      -- set to empty list
+      l_sanitised_location_list := bpmmgr.varchar2_list_type();
+      l_is_location_migratable := K_IS_MIGRATABLE_TRUE;
+
+    END IF;
+
+    UPDATE ${datasource.migration-user}.location_migration_mapping lmm
+    SET
+      -- persist a csv of sanitised blocks for easy viewing in the logs
+      lmm.sanitised_location_value = envmgr.st.join(l_sanitised_location_list, ',')
+    , lmm.is_migratable = l_is_location_migratable
+    WHERE lmm.legacy_project_detail_id = p_legacy_project_detail_id;
+
+    COMMIT;
+
+    RETURN l_sanitised_location_list;
+
+  END get_location_block_list;
+
+  /**
+    Procedure to insert zero or more location block records associated to p_new_location_id into the new model.
+    @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+    @param p_new_location_id The id of the PROJECT_LOCATION_BLOCKS record that we want the blocks associated to
+   */
+  PROCEDURE create_location_block_records(
+    p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , p_new_location_id IN ${datasource.user}.project_details.id%TYPE
+  )
+  IS
+
+    K_DESTINATION_TABLE_NAME CONSTANT VARCHAR2(30) := 'PROJECT_LOCATION_BLOCKS';
+
+    l_legacy_location_value ${datasource.migration-user}.legacy_project_data.location%TYPE;
+    l_sanitised_block_list bpmmgr.varchar2_list_type;
+
+    l_new_location_block_id ${datasource.user}.project_location_blocks.id%TYPE;
+    l_block_ref ${datasource.user}.project_location_blocks.block_ref%TYPE;
+    l_quadrant_no ${datasource.user}.project_location_blocks.quadrant_no%TYPE;
+    l_block_no ${datasource.user}.project_location_blocks.block_no%TYPE;
+    l_block_suffix ${datasource.user}.project_location_blocks.block_suffix%TYPE;
+
+  BEGIN
+
+    SELECT lpd.location
+    INTO l_legacy_location_value
+    FROM ${datasource.migration-user}.legacy_project_data lpd
+    WHERE lpd.legacy_project_detail_id = p_legacy_project_detail_id;
+
+    l_sanitised_block_list := get_location_block_list(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_legacy_location_input => l_legacy_location_value
+    );
+
+    IF l_sanitised_block_list.COUNT > 0 THEN
+
+      FOR block_idx IN l_sanitised_block_list.FIRST..l_sanitised_block_list.COUNT LOOP
+
+        log_project_detail_migration(
+          p_legacy_project_detail_id => p_legacy_project_detail_id
+        , p_system_message => 'Creating ' || K_DESTINATION_TABLE_NAME || ' record for legacy project detail with ID ' || p_legacy_project_detail_id
+        );
+
+        l_block_ref := l_sanitised_block_list(block_idx);
+
+        pedmgr.ped_utils.block_ref_split (
+          p_block_ref => l_block_ref
+        , p_quadrant_no => l_quadrant_no
+        , p_block_no => l_block_no
+        , p_suffix => l_block_suffix
+        );
+
+        INSERT INTO ${datasource.user}.project_location_blocks(
+          project_location_id
+        , block_ref
+        , block_no
+        , quadrant_no
+        , block_suffix
+        )
+        VALUES(
+          p_new_location_id
+        , l_block_ref
+        , l_block_no
+        , l_quadrant_no
+        , l_block_suffix
+        )
+        RETURNING id INTO l_new_location_block_id;
+
+        log_project_detail_migration(
+          p_legacy_project_detail_id => p_legacy_project_detail_id
+        , p_system_message => 'Created new ' || K_DESTINATION_TABLE_NAME || ' record with id ' || l_new_location_block_id
+        );
+
+      END LOOP;
+
+    END IF;
+
+  EXCEPTION WHEN OTHERS THEN
+    raise_exception_with_trace(
+      p_message_prefix => 'ERROR in create_location_block_records(' || CHR(10)
+        || '  p_legacy_project_detail_id => ' || p_legacy_project_detail_id || CHR(10)
+        || ', p_new_location_id => ' || p_new_location_id || CHR(10)
+        || ')'
+    );
+  END create_location_block_records;
 
   /**
     Procedure to create a record in the awarded_contracts table in the new service model.
@@ -1135,6 +1376,9 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   , p_new_project_detail_id IN ${datasource.user}.project_details.id%TYPE
   )
   IS
+
+    l_new_location_id ${datasource.user}.project_locations.id%TYPE;
+
   BEGIN
 
     create_project_operator_record(
@@ -1147,9 +1391,14 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     , p_new_project_detail_id => p_new_project_detail_id
     );
 
-    create_project_location_record(
+    l_new_location_id := create_project_location_record(
       p_legacy_project_detail_id => p_legacy_project_detail_id
     , p_new_project_detail_id => p_new_project_detail_id
+    );
+
+    create_location_block_records(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_new_location_id => l_new_location_id
     );
 
     create_awarded_contracts(

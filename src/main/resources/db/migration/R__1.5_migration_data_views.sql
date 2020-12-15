@@ -17,6 +17,7 @@ CREATE OR REPLACE VIEW ${datasource.migration-user}.legacy_project_data AS (
   , xt.project_contact_email_address
   , xt.project_contact_tel_number
   , xt.water_depth
+  , xt.location
   FROM decmgr.path_project_details ppd
   , XMLTABLE('PROJECT_DETAIL'
     PASSING ppd.xml_data
@@ -36,6 +37,7 @@ CREATE OR REPLACE VIEW ${datasource.migration-user}.legacy_project_data AS (
     , project_contact_email_address VARCHAR2(4000) PATH 'CONTACT_EMAIL_ADDRESS/text()'
     , project_contact_tel_number VARCHAR2(4000) PATH 'CONTACT_TELEPHONE_NUMBER/text()'
     , water_depth VARCHAR2(4000) PATH 'WATER_DEPTH/text()'
+    , location VARCHAR2(4000) PATH 'LOCATION/text()'
   ) xt
 );
 
