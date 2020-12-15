@@ -58,7 +58,7 @@ public class ProjectAssessmentService {
     projectAssessment.setAssessedInstant(Instant.now());
     projectAssessment.setAssessorWuaId(assessor.getWuaId());
     projectAssessmentRepository.save(projectAssessment);
-    if (projectAssessment.getReadyToBePublished()) {
+    if (Boolean.TRUE.equals(projectAssessment.getReadyToBePublished())) {
       projectPublishingService.publishProject(projectDetail, assessor);
     }
     return projectAssessment;

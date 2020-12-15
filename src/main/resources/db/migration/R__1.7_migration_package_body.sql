@@ -15,7 +15,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     raise_application_error(
       -20999
-    , p_message_prefix || CHR (10) || SQLERRM || CHR(10) || dbms_utility.format_error_backtrace()
+    , p_message_prefix || CHR (10) || dbms_utility.format_error_stack() || CHR(10) || dbms_utility.format_error_backtrace()
     );
 
   END raise_exception_with_trace;
@@ -1557,7 +1557,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       , p_system_message =>
           'Error migrating legacy project with ID ' || p_legacy_project_id || '. '
           || 'Migration for project has been rolled back.' || CHR(10)
-          || 'Failed with error:' || CHR(10) || SQLERRM || CHR(10) || dbms_utility.format_error_backtrace()
+          || 'Failed with error:' || CHR(10) || dbms_utility.format_error_stack() || CHR(10) || dbms_utility.format_error_backtrace()
       );
 
       reset_project_detail_log(

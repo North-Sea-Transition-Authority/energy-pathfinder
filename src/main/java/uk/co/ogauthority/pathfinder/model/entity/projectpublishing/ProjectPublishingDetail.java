@@ -16,20 +16,8 @@ public class ProjectPublishingDetail extends ProjectDetailEntity {
 
   private Integer publisherWuaId;
 
-  public Integer getId() {
-    return id;
-  }
-
   public void setId(Integer id) {
     this.id = id;
-  }
-
-  public ProjectDetail getProjectDetail() {
-    return projectDetail;
-  }
-
-  public void setProjectDetail(ProjectDetail projectDetail) {
-    this.projectDetail = projectDetail;
   }
 
   public Instant getPublishedInstant() {
@@ -46,5 +34,20 @@ public class ProjectPublishingDetail extends ProjectDetailEntity {
 
   public void setPublisherWuaId(Integer publishedByWuaId) {
     this.publisherWuaId = publishedByWuaId;
+  }
+
+  @Override
+  public Integer getId() {
+    return id;
+  }
+
+  @Override
+  public ProjectDetail getProjectDetail() {
+    return projectDetail;
+  }
+
+  @Override
+  public void setProjectDetail(ProjectDetail projectDetail) {
+    this.projectDetail = projectDetail;
   }
 }
