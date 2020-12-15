@@ -2,7 +2,11 @@
 
 <#assign title = "Request update" />
 
-<@defaultPage htmlTitle=title pageHeading=title breadcrumbs=true>
+<@defaultPage htmlTitle=title pageHeading="" breadcrumbs=true twoThirdsColumn=false>
+  <@noEscapeHtml.noEscapeHtml html=projectHeaderHtml />
+
+  <h2 class="govuk-heading-l">${title}</h2>
+
   <#if errorList?has_content>
     <@fdsError.errorSummary errorItems=errorList />
   </#if>

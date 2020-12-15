@@ -134,7 +134,7 @@ public class OperatorUpdateControllerTest extends ProjectUpdateContextAbstractCo
   @Test
   public void provideNoUpdate_whenAuthenticatedAndQA_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(OperatorUpdateController.class).provideNoUpdate(QA_PROJECT_ID, null)))
+        on(OperatorUpdateController.class).provideNoUpdate(QA_PROJECT_ID, null, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -142,7 +142,7 @@ public class OperatorUpdateControllerTest extends ProjectUpdateContextAbstractCo
   @Test
   public void provideNoUpdate_whenUnauthenticatedAndQA_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(OperatorUpdateController.class).provideNoUpdate(QA_PROJECT_ID, null)))
+        on(OperatorUpdateController.class).provideNoUpdate(QA_PROJECT_ID, null, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -150,7 +150,7 @@ public class OperatorUpdateControllerTest extends ProjectUpdateContextAbstractCo
   @Test
   public void provideNoUpdate_whenAuthenticatedAndDraft_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(OperatorUpdateController.class).provideNoUpdate(DRAFT_PROJECT_ID, null)))
+        on(OperatorUpdateController.class).provideNoUpdate(DRAFT_PROJECT_ID, null, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -178,7 +178,7 @@ public class OperatorUpdateControllerTest extends ProjectUpdateContextAbstractCo
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
     when(operatorProjectUpdateService.validate(any(), any())).thenReturn(bindingResult);
 
-    when(operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(any(), any())).thenReturn(new ModelAndView());
+    when(operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(any(), any(), any())).thenReturn(new ModelAndView());
 
     mockMvc.perform(
         post(ReverseRouter.route(on(OperatorUpdateController.class)

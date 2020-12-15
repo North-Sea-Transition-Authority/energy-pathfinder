@@ -31,6 +31,7 @@ import uk.co.ogauthority.pathfinder.model.form.projectupdate.RequestUpdateFormVa
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.RegulatorRequestedUpdateRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -43,6 +44,9 @@ public class RegulatorProjectUpdateServiceTest {
 
   @Mock
   private ProjectUpdateService projectUpdateService;
+
+  @Mock
+  private ProjectHeaderSummaryService projectHeaderSummaryService;
 
   @Mock
   private RequestUpdateFormValidator requestUpdateFormValidator;
@@ -65,6 +69,7 @@ public class RegulatorProjectUpdateServiceTest {
     regulatorProjectUpdateService = new RegulatorProjectUpdateService(
         regulatorRequestedUpdateRepository,
         projectUpdateService,
+        projectHeaderSummaryService,
         requestUpdateFormValidator,
         validationService,
         breadcrumbService
@@ -112,11 +117,19 @@ public class RegulatorProjectUpdateServiceTest {
   @Test
   public void getRequestUpdateModelAndView() {
     var form = new RequestUpdateForm();
+    var projectHeaderHtml = "html";
 
-    var modelAndView = regulatorProjectUpdateService.getRequestUpdateModelAndView(project.getId(), form);
+    when(projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, authenticatedUser)).thenReturn(projectHeaderHtml);
+
+    var modelAndView = regulatorProjectUpdateService.getRequestUpdateModelAndView(
+        projectDetail,
+        authenticatedUser,
+        form
+    );
 
     assertThat(modelAndView.getViewName()).isEqualTo(RegulatorProjectUpdateService.REQUEST_UPDATE_TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
+        entry("projectHeaderHtml", projectHeaderHtml),
         entry("form", form),
         entry("startActionUrl", ReverseRouter.route(on(RegulatorUpdateController.class)
             .requestUpdate(project.getId(), null, null, null, null))),

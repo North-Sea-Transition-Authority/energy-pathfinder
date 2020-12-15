@@ -1,6 +1,8 @@
 <#include '../layout.ftl'>
 
-<@defaultPage htmlTitle="Confirm no changes required" breadcrumbs=true>
+<@defaultPage htmlTitle="Confirm no changes required" breadcrumbs=true twoThirdsColumn=false>
+  <@noEscapeHtml.noEscapeHtml html=projectHeaderHtml />
+
   <#if errorList?has_content>
     <@fdsError.errorSummary errorItems=errorList />
   </#if>
@@ -9,7 +11,7 @@
     <@fdsTextarea.textarea
       path="form.reasonNoUpdateRequired"
       labelText="What is the reason no changes are required?"
-      labelHeadingClass="govuk-label--l"
+      labelHeadingClass="govuk-label--m"
       pageHeading=true
     />
       <@fdsAction.submitButtons

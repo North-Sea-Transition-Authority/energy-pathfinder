@@ -76,7 +76,7 @@ public class RegulatorActionService {
     return new UserActionWithDisplayOrder(
         new LinkButton(
             REQUEST_UPDATE_ACTION_PROMPT,
-            ReverseRouter.route(on(RegulatorUpdateController.class).getRequestUpdate(projectId, null)),
+            ReverseRouter.route(on(RegulatorUpdateController.class).getRequestUpdate(projectId, null, null)),
             isEnabled,
             ButtonType.SECONDARY
         ), REQUEST_UPDATE_ACTION_DISPLAY_ORDER);

@@ -74,6 +74,7 @@ public class OperatorActionService {
             PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_PROMPT,
             ReverseRouter.route(on(OperatorUpdateController.class).provideNoUpdate(
                 projectId,
+                null,
                 null
             )),
             isEnabled,
