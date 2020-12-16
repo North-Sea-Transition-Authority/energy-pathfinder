@@ -90,7 +90,7 @@ public class WorkAreaServiceTest {
     assertModelAndViewFieldsSet(
         modelAndView,
         link,
-        true
+        DashboardFilterType.REGULATOR
     );
   }
 
@@ -105,7 +105,7 @@ public class WorkAreaServiceTest {
     assertModelAndViewFieldsSet(
         modelAndView,
         link,
-        false
+        DashboardFilterType.OPERATOR
     );
   }
 
@@ -137,11 +137,11 @@ public class WorkAreaServiceTest {
     assertThat(link.getUrl()).isEqualTo(ReverseRouter.route(on(StartProjectController.class).startProject(null)));
   }
 
-  private void assertModelAndViewFieldsSet(ModelAndView modelAndView, LinkButton link, Boolean includeOperatorFilter) {
+  private void assertModelAndViewFieldsSet(ModelAndView modelAndView, LinkButton link, DashboardFilterType filterType) {
     assertThat(modelAndView.getModel()).containsOnly(
         entry("dashboardProjectItemViews", dashboardProjectItemViews),
         entry("startProjectButton", link),
-        entry("includeOperatorFilter", includeOperatorFilter),
+        entry("filterType", filterType),
         entry("resultSize", dashboardProjectItemViews.size()),
         entry("form", form),
         entry("statuses", ProjectStatus.getAllAsMap()),

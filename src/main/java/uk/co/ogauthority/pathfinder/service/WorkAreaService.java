@@ -9,7 +9,6 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
-import uk.co.ogauthority.pathfinder.model.enums.DashboardFilterType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
@@ -38,7 +37,7 @@ public class WorkAreaService {
 
     return new ModelAndView(WORK_AREA_TEMPLATE_PATH)
         .addObject("startProjectButton", getStartProjectLinkButton(user))
-        .addObject("includeOperatorFilter", DashboardFilterType.REGULATOR.equals(filterType))
+        .addObject("filterType", filterType)
         .addObject("form", form)
         .addObject("statuses", ProjectStatus.getAllAsMap())
         .addObject("fieldStages", FieldStage.getAllAsMap())
