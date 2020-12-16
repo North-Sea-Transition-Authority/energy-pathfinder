@@ -1,6 +1,6 @@
 <#include '../layout.ftl'>
 
-<@defaultPage htmlTitle="Confirm no changes required" breadcrumbs=true twoThirdsColumn=false>
+<@defaultPage htmlTitle="Confirm no changes required" breadcrumbs=true fullWidthColumn=true>
   <#if errorList?has_content>
     <@fdsError.errorSummary errorItems=errorList />
   </#if>
