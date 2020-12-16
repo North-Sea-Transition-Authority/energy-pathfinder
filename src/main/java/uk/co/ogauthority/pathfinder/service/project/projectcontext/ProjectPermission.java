@@ -14,7 +14,7 @@ public enum ProjectPermission {
   VIEW(Collections.singletonList(UserPrivilege.PATHFINDER_PROJECT_VIEWER)),
   PROVIDE_ASSESSMENT(Collections.singletonList(UserPrivilege.PATHFINDER_PROJECT_ADMINISTRATOR)),
   PROVIDE_UPDATE(Collections.singletonList(UserPrivilege.PATHFINDER_PROJECT_CREATE)),
-  REQUEST_UPDATE(Collections.singletonList(UserPrivilege.PATHFINDER_REGULATOR_ADMIN));
+  REQUEST_UPDATE(Collections.singletonList(UserPrivilege.PATHFINDER_PROJECT_ADMINISTRATOR));
 
   private final List<UserPrivilege> userPrivileges;
 
