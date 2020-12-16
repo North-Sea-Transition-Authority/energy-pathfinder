@@ -1,8 +1,10 @@
+GRANT SELECT ON decmgr.path_operators TO ${datasource.migration-user};
+
 CREATE OR REPLACE VIEW ${datasource.migration-user}.legacy_project_data AS (
   SELECT
     ppd.path_project_id legacy_project_id
   , ppd.id legacy_project_detail_id
-  , envmgr.st.to_number_safe(xt.operator_org_group_id) operator_org_group_id
+  , po.org_grp_id operator_org_group_id
   , xt.field_stage
   , xt.project_title
   , xt.manual_field_name
@@ -19,10 +21,10 @@ CREATE OR REPLACE VIEW ${datasource.migration-user}.legacy_project_data AS (
   , xt.water_depth
   , xt.location
   FROM decmgr.path_project_details ppd
-  , XMLTABLE('PROJECT_DETAIL'
+  CROSS JOIN XMLTABLE('PROJECT_DETAIL'
     PASSING ppd.xml_data
     COLUMNS
-      operator_org_group_id VARCHAR2(4000) PATH 'PATH_OPERATOR_ID/text()'
+      path_operator_id VARCHAR2(4000) PATH 'PATH_OPERATOR_ID/text()'
     , field_stage VARCHAR2(4000) PATH 'PROJECT_TYPE/text()'
     , project_title VARCHAR2(4000) PATH 'PROJECT_TITLE/text()'
     , manual_field_name VARCHAR2(4000) PATH 'FIELD_NAME/text()'
@@ -39,6 +41,7 @@ CREATE OR REPLACE VIEW ${datasource.migration-user}.legacy_project_data AS (
     , water_depth VARCHAR2(4000) PATH 'WATER_DEPTH/text()'
     , location VARCHAR2(4000) PATH 'LOCATION/text()'
   ) xt
+  LEFT JOIN decmgr.path_operators po ON po.id = envmgr.st.to_number_safe(xt.path_operator_id)
 );
 
 CREATE OR REPLACE VIEW ${datasource.migration-user}.legacy_project_challenges AS (
