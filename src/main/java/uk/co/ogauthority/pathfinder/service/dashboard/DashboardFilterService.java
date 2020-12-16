@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.dashboard;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -35,7 +36,9 @@ public class DashboardFilterService {
     Predicate<DashboardProjectItem> compositePredicate = allPredicates.stream()
         .reduce(di -> true, Predicate::and);
 
-    return dashboardItems.stream().filter(compositePredicate).collect(Collectors.toList());
+    return dashboardItems.stream().filter(compositePredicate)
+        .sorted(Comparator.comparing(DashboardProjectItem::getSortKey).reversed())
+        .collect(Collectors.toList());
   }
 
 

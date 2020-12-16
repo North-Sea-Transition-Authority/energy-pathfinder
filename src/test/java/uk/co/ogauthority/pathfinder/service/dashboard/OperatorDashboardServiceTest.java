@@ -52,7 +52,7 @@ public class OperatorDashboardServiceTest {
 
   @Test
   public void getDashboardProjectItems_correctNumberOfItemsReturned() {
-    when(dashboardProjectItemRepository.findAllByOrganisationGroupInOrderBySortKeyDesc(any())).thenReturn(
+    when(dashboardProjectItemRepository.findAllByOrganisationGroupIn(any())).thenReturn(
         List.of(item1, item2)
     );
     assertThat(operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson(), filter).size()).isEqualTo(2);

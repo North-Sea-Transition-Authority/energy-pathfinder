@@ -18,6 +18,7 @@ public class DashboardProjectItemTestUtil {
   public static final String FIELD_NAME = "A field";
   public static final UkcsArea UKCS_AREA = UkcsArea.WOS;
   public static final PortalOrganisationGroup ORGANISATION_GROUP = ProjectOperatorTestUtil.ORG_GROUP;
+  public static final Instant SORT_KEY = Instant.now();
 
   public static DashboardProjectItem getDashboardProjectItem() {
     return getDashboardProjectItem(PROJECT_TITLE, FIELD_STAGE, FIELD_NAME, UKCS_AREA, PROJECT_STATUS, ORGANISATION_GROUP);
@@ -65,6 +66,7 @@ public class DashboardProjectItemTestUtil {
     dashboardProjectItem.setFieldName(fieldName);
     dashboardProjectItem.setUkcsArea(ukcsArea);
     dashboardProjectItem.setOrganisationGroup(organisationGroup);
+    dashboardProjectItem.setSortKey(SORT_KEY);
 
     return dashboardProjectItem;
   }

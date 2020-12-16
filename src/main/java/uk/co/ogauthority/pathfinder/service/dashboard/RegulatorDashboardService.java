@@ -26,7 +26,7 @@ public class RegulatorDashboardService {
 
   public List<DashboardProjectItem> getDashboardProjectItems(DashboardFilter filter) {
     return filterService.filter(
-      dashboardProjectItemRepository.findAllByStatusInOrderBySortKeyDesc(REGULATOR_PROJECT_ACCESS_STATUSES),
+      dashboardProjectItemRepository.findAllByStatusIn(REGULATOR_PROJECT_ACCESS_STATUSES),
       filter
     );
   }
