@@ -279,10 +279,8 @@ public class DashboardFilterServiceTest {
     var thirdDashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
     firstDashboardItem.setSortKey(Instant.now().plus(2, ChronoUnit.DAYS));
     secondDashboardItem.setSortKey(Instant.now().plus(1, ChronoUnit.DAYS));
-    var blankFilter = new DashboardFilter();
 
     var results = dashboardFilterService.filter(List.of(thirdDashboardItem, secondDashboardItem, firstDashboardItem), filter);
-    assertThat(results.size()).isEqualTo(3);
     assertThat(results).containsExactly(firstDashboardItem, secondDashboardItem, thirdDashboardItem);
   }
 }
