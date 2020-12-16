@@ -124,9 +124,11 @@ public class SubmitProjectServiceTest {
   }
 
   @Test
-  public void getProjectSubmitSummaryModelAndView_assertCorrectProperties() {
+  public void getProjectSubmitSummaryModelAndView_assertCorrectProperties_whenFirstVersion() {
 
     final var projectDetail = PROJECT_DETAIL;
+    projectDetail.setVersion(1);
+
     final var projectId = projectDetail.getProject().getId();
 
     final var projectSummaryView = new ProjectSummaryView("test", List.of());
@@ -134,7 +136,30 @@ public class SubmitProjectServiceTest {
 
     final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail);
 
+    assertProjectSubmitSummaryModelAndView(projectId, modelAndView, false, projectSummaryView);
+  }
+
+  @Test
+  public void getProjectSubmitSummaryModelAndView_assertCorrectProperties_whenUpdate() {
+
+    final var projectDetail = PROJECT_DETAIL;
+    projectDetail.setVersion(2);
+
+    final var projectId = projectDetail.getProject().getId();
+
+    final var projectSummaryView = new ProjectSummaryView("test", List.of());
+    when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
+
+    final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail);
+    assertProjectSubmitSummaryModelAndView(projectId, modelAndView, true, projectSummaryView);
+  }
+
+  private void assertProjectSubmitSummaryModelAndView(Integer projectId,
+                                                      ModelAndView modelAndView,
+                                                      boolean isUpdate,
+                                                      ProjectSummaryView projectSummaryView) {
     assertThat(modelAndView.getModelMap()).containsExactly(
+        entry("isUpdate", isUpdate),
         entry("projectSummaryView", projectSummaryView),
         entry("submitProjectUrl",
             ReverseRouter.route(on(SubmitProjectController.class).submitProject(projectId, null))
@@ -144,17 +169,41 @@ public class SubmitProjectServiceTest {
   }
 
   @Test
-  public void getProjectSubmitSummaryModelAndViewWithSubmissionError_assertCorrectProperties() {
+  public void getProjectSubmitSummaryModelAndViewWithSubmissionError_assertCorrectProperties_whenFirstVersion() {
 
     final var projectDetail = PROJECT_DETAIL;
+    projectDetail.setVersion(1);
+
     final var projectId = projectDetail.getProject().getId();
 
     final var projectSummaryView = new ProjectSummaryView("test", List.of());
     when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
 
     final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndViewWithSubmissionError(projectDetail);
+    assertProjectSubmitSummaryModelAndViewWithSubmissionError(projectId, modelAndView, false, projectSummaryView);
+  }
 
+  @Test
+  public void getProjectSubmitSummaryModelAndViewWithSubmissionError_assertCorrectProperties_whenUpdate() {
+
+    final var projectDetail = PROJECT_DETAIL;
+    projectDetail.setVersion(2);
+
+    final var projectId = projectDetail.getProject().getId();
+
+    final var projectSummaryView = new ProjectSummaryView("test", List.of());
+    when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
+
+    final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndViewWithSubmissionError(projectDetail);
+    assertProjectSubmitSummaryModelAndViewWithSubmissionError(projectId, modelAndView, true, projectSummaryView);
+  }
+
+  private void assertProjectSubmitSummaryModelAndViewWithSubmissionError(Integer projectId,
+                                                                         ModelAndView modelAndView,
+                                                                         boolean isUpdate,
+                                                                         ProjectSummaryView projectSummaryView) {
     assertThat(modelAndView.getModelMap()).containsExactly(
+        entry("isUpdate", isUpdate),
         entry("projectSummaryView", projectSummaryView),
         entry("submitProjectUrl",
             ReverseRouter.route(on(SubmitProjectController.class).submitProject(projectId, null))

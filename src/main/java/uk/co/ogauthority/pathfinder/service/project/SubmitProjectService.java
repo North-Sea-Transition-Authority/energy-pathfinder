@@ -77,6 +77,7 @@ public class SubmitProjectService {
     var projectSummaryView = projectSummaryViewService.getProjectSummaryView(projectDetail);
 
     modelAndView
+        .addObject("isUpdate", !projectDetail.isFirstVersion())
         .addObject("projectSummaryView", projectSummaryView)
         .addObject("submitProjectUrl",
             ReverseRouter.route(on(SubmitProjectController.class).submitProject(projectId, null))
@@ -98,7 +99,7 @@ public class SubmitProjectService {
         .getProjectSubmissionSummaryView(projectDetail);
 
     modelAndView
-        .addObject("isUpdate", projectDetail.getVersion() > 1)
+        .addObject("isUpdate", !projectDetail.isFirstVersion())
         .addObject("projectSubmissionSummaryView", projectSubmissionSummaryView)
         .addObject("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)));
 

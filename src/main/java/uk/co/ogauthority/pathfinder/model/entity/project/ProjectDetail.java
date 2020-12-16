@@ -19,6 +19,8 @@ import uk.co.ogauthority.pathfinder.service.entityduplication.ParentEntity;
 @Table(name = "project_details")
 public class ProjectDetail implements ParentEntity {
 
+  private static final Integer FIRST_VERSION = 1;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
@@ -114,6 +116,10 @@ public class ProjectDetail implements ParentEntity {
 
   public void setSubmittedByWua(Integer submittedByWua) {
     this.submittedByWua = submittedByWua;
+  }
+
+  public boolean isFirstVersion() {
+    return FIRST_VERSION.equals(version);
   }
 
   @Override
