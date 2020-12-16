@@ -33,7 +33,7 @@ public class OperatorDashboardService {
         .map(OrganisationTeam::getPortalOrganisationGroup)
         .collect(Collectors.toList());
 
-    var dashboardItems = dashboardProjectItemRepository.findAllByOrganisationGroupInOrderByCreatedDatetimeDesc(orgGroups);
+    var dashboardItems = dashboardProjectItemRepository.findAllByOrganisationGroupInOrderBySortKeyDesc(orgGroups);
 
     return filterService.filter(dashboardItems, filter);
   }

@@ -41,6 +41,8 @@ public class ProjectDetail implements ParentEntity {
 
   private Integer submittedByWua;
 
+  private Instant createdDatetime;
+
   public ProjectDetail() {
   }
 
@@ -54,6 +56,7 @@ public class ProjectDetail implements ParentEntity {
     this.createdByWua = createdByWua;
     this.version = version;
     this.isCurrentVersion = isCurrentVersion;
+    this.createdDatetime = Instant.now();
   }
 
   public Integer getId() {
@@ -116,6 +119,14 @@ public class ProjectDetail implements ParentEntity {
     this.submittedByWua = submittedByWua;
   }
 
+  public Instant getCreatedDatetime() {
+    return createdDatetime;
+  }
+
+  public void setCreatedDatetime(Instant createdDatetime) {
+    this.createdDatetime = createdDatetime;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -132,11 +143,12 @@ public class ProjectDetail implements ParentEntity {
         && Objects.equals(isCurrentVersion, projectDetail.isCurrentVersion)
         && Objects.equals(createdByWua, projectDetail.createdByWua)
         && Objects.equals(submittedInstant, projectDetail.submittedInstant)
-        && Objects.equals(submittedByWua, projectDetail.submittedByWua);
+        && Objects.equals(submittedByWua, projectDetail.submittedByWua)
+        && Objects.equals(createdDatetime, projectDetail.createdDatetime);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, project, status, version, isCurrentVersion, createdByWua, submittedInstant, submittedByWua);
+    return Objects.hash(id, project, status, version, isCurrentVersion, createdByWua, submittedInstant, submittedByWua, createdDatetime);
   }
 }

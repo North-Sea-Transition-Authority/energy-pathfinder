@@ -10,9 +10,9 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 @Repository
 public interface DashboardProjectItemRepository extends CrudRepository<DashboardProjectItem, Integer> {
 
-  List<DashboardProjectItem> findAllByOrganisationGroupInOrderByCreatedDatetimeDesc(List<PortalOrganisationGroup> organisationGroups);
+  List<DashboardProjectItem> findAllByOrganisationGroupInOrderBySortKeyDesc(List<PortalOrganisationGroup> organisationGroups);
 
-  List<DashboardProjectItem> findAllByStatusInOrderByCreatedDatetimeDesc(
+  List<DashboardProjectItem> findAllByStatusInOrderBySortKeyDesc(
       List<ProjectStatus> statuses
   );
 

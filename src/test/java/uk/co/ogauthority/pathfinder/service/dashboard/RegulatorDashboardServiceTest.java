@@ -37,7 +37,7 @@ public class RegulatorDashboardServiceTest {
 
   @Test
   public void getDashboardProjectItems_correctNumberOfResultsReturned() {
-    when(dashboardProjectItemRepository.findAllByStatusInOrderByCreatedDatetimeDesc(RegulatorDashboardService.REGULATOR_PROJECT_ACCESS_STATUSES))
+    when(dashboardProjectItemRepository.findAllByStatusInOrderBySortKeyDesc(RegulatorDashboardService.REGULATOR_PROJECT_ACCESS_STATUSES))
         .thenReturn(List.of(item1, item2));
     assertThat(regulatorDashboardService.getDashboardProjectItems(DashboardFilterTestUtil.getEmptyFilter()).size()).isEqualTo(2);
   }
