@@ -6,9 +6,9 @@ public class ProjectAssessmentView {
 
   private String projectQuality;
 
-  private boolean readyToBePublished;
+  private Boolean readyToBePublished;
 
-  private boolean updateRequired;
+  private Boolean updateRequired;
 
   private String assessmentDate;
 
@@ -22,19 +22,19 @@ public class ProjectAssessmentView {
     this.projectQuality = projectQuality;
   }
 
-  public boolean isReadyToBePublished() {
+  public Boolean getReadyToBePublished() {
     return readyToBePublished;
   }
 
-  public void setReadyToBePublished(boolean readyToBePublished) {
+  public void setReadyToBePublished(Boolean readyToBePublished) {
     this.readyToBePublished = readyToBePublished;
   }
 
-  public boolean isUpdateRequired() {
+  public Boolean getUpdateRequired() {
     return updateRequired;
   }
 
-  public void setUpdateRequired(boolean updateRequired) {
+  public void setUpdateRequired(Boolean updateRequired) {
     this.updateRequired = updateRequired;
   }
 
@@ -63,15 +63,21 @@ public class ProjectAssessmentView {
       return false;
     }
     ProjectAssessmentView that = (ProjectAssessmentView) o;
-    return readyToBePublished == that.readyToBePublished
-        && updateRequired == that.updateRequired
-        && Objects.equals(projectQuality, that.projectQuality)
+    return Objects.equals(projectQuality, that.projectQuality)
+        && Objects.equals(readyToBePublished, that.readyToBePublished)
+        && Objects.equals(updateRequired, that.updateRequired)
         && Objects.equals(assessmentDate, that.assessmentDate)
         && Objects.equals(assessedByUser, that.assessedByUser);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(projectQuality, readyToBePublished, updateRequired, assessmentDate, assessedByUser);
+    return Objects.hash(
+        projectQuality,
+        readyToBePublished,
+        updateRequired,
+        assessmentDate,
+        assessedByUser
+    );
   }
 }
