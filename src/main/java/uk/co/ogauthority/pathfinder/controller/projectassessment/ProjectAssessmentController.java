@@ -44,8 +44,13 @@ public class ProjectAssessmentController extends ProjectFormPageController {
 
   @GetMapping
   public ModelAndView getProjectAssessment(@PathVariable("projectId") Integer projectId,
-                                           ProjectAssessmentContext projectAssessmentContext) {
-    return projectAssessmentService.getProjectAssessmentModelAndView(projectId, new ProjectAssessmentForm());
+                                           ProjectAssessmentContext projectAssessmentContext,
+                                           AuthenticatedUserAccount user) {
+    return projectAssessmentService.getProjectAssessmentModelAndView(
+        projectAssessmentContext.getProjectDetails(),
+        user,
+        new ProjectAssessmentForm()
+    );
   }
 
   @PostMapping
@@ -57,7 +62,7 @@ public class ProjectAssessmentController extends ProjectFormPageController {
     bindingResult = projectAssessmentService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        projectAssessmentService.getProjectAssessmentModelAndView(projectId, form),
+        projectAssessmentService.getProjectAssessmentModelAndView(projectAssessmentContext.getProjectDetails(), user, form),
         form,
         () -> {
           projectAssessmentService.createProjectAssessment(projectAssessmentContext.getProjectDetails(), user, form);

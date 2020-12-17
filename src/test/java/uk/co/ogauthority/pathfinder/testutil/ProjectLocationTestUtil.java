@@ -67,7 +67,7 @@ public class ProjectLocationTestUtil {
 
   private static void setCommonFields(ProjectLocation projectLocation) {
     projectLocation.setFieldType(FIELD_TYPE);
-    projectLocation.setWaterDepth(WATER_DEPTH);
+    projectLocation.setMaximumWaterDepth(WATER_DEPTH);
     projectLocation.setApprovedFieldDevelopmentPlan(APPROVED_FDP_PLAN);
     projectLocation.setApprovedFdpDate(APPROVED_FDP_DATE);
     projectLocation.setApprovedDecomProgram(APPROVED_DECOM_PROGRAM);
@@ -77,7 +77,7 @@ public class ProjectLocationTestUtil {
 
   private static void setCommonFields(ProjectLocationForm form) {
     form.setFieldType(FIELD_TYPE);
-    form.setWaterDepth(WATER_DEPTH);
+    form.setMaximumWaterDepth(WATER_DEPTH);
     form.setApprovedFieldDevelopmentPlan(APPROVED_FDP_PLAN);
     form.setApprovedFdpDate(new ThreeFieldDateInput(APPROVED_FDP_DATE));
     form.setApprovedDecomProgram(APPROVED_DECOM_PROGRAM);

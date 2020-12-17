@@ -11,7 +11,7 @@ public class ProjectLocationView {
 
   private String fieldType;
 
-  private Integer waterDepth;
+  private Integer maximumWaterDepth;
 
   private Boolean approvedFieldDevelopmentPlan;
 
@@ -41,12 +41,12 @@ public class ProjectLocationView {
     this.fieldType = fieldType;
   }
 
-  public Integer getWaterDepth() {
-    return waterDepth;
+  public Integer getMaximumWaterDepth() {
+    return maximumWaterDepth;
   }
 
-  public void setWaterDepth(Integer waterDepth) {
-    this.waterDepth = waterDepth;
+  public void setMaximumWaterDepth(Integer maximumWaterDepth) {
+    this.maximumWaterDepth = maximumWaterDepth;
   }
 
   public Boolean getApprovedFieldDevelopmentPlan() {
@@ -108,7 +108,7 @@ public class ProjectLocationView {
     ProjectLocationView that = (ProjectLocationView) o;
     return Objects.equals(field, that.field)
         && Objects.equals(fieldType, that.fieldType)
-        && Objects.equals(waterDepth, that.waterDepth)
+        && Objects.equals(maximumWaterDepth, that.maximumWaterDepth)
         && Objects.equals(approvedFieldDevelopmentPlan, that.approvedFieldDevelopmentPlan)
         && Objects.equals(approvedFdpDate, that.approvedFdpDate)
         && Objects.equals(approvedDecomProgram, that.approvedDecomProgram)
@@ -122,7 +122,7 @@ public class ProjectLocationView {
     return Objects.hash(
         field,
         fieldType,
-        waterDepth,
+        maximumWaterDepth,
         approvedFieldDevelopmentPlan,
         approvedFdpDate,
         approvedDecomProgram,

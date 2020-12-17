@@ -58,8 +58,13 @@ public class OperatorUpdateController {
 
   @GetMapping("/no-update-required")
   public ModelAndView provideNoUpdate(@PathVariable("projectId") Integer projectId,
-                                      ProjectUpdateContext projectUpdateContext) {
-    return operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(projectId, new ProvideNoUpdateForm());
+                                      ProjectUpdateContext projectUpdateContext,
+                                      AuthenticatedUserAccount user) {
+    return operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(
+        projectUpdateContext.getProjectDetails(),
+        user,
+        new ProvideNoUpdateForm()
+    );
   }
 
   @PostMapping("/no-update-required")
@@ -71,7 +76,7 @@ public class OperatorUpdateController {
     bindingResult = operatorProjectUpdateService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(projectId, form),
+        operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(projectUpdateContext.getProjectDetails(), user, form),
         form,
         () -> {
           operatorProjectUpdateService.createNoUpdateNotification(
@@ -87,6 +92,7 @@ public class OperatorUpdateController {
   @GetMapping("/no-update-required/confirmation")
   public ModelAndView provideNoUpdateConfirmation(@PathVariable("projectId") Integer projectId,
                                                   ProjectUpdateContext projectUpdateContext) {
+    operatorProjectUpdateService.confirmNoUpdateExistsForProjectDetail(projectUpdateContext.getProjectDetails());
     return operatorProjectUpdateService.getProjectProvideNoUpdateConfirmationModelAndView(projectUpdateContext.getProjectDetails());
   }
 }

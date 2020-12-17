@@ -19,6 +19,8 @@ import uk.co.ogauthority.pathfinder.service.entityduplication.ParentEntity;
 @Table(name = "project_details")
 public class ProjectDetail implements ParentEntity {
 
+  private static final Integer FIRST_VERSION = 1;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
@@ -61,6 +63,10 @@ public class ProjectDetail implements ParentEntity {
 
   public Integer getId() {
     return id;
+  }
+
+  public void setId(Integer id) {
+    this.id = id;
   }
 
   public Project getProject() {
@@ -125,6 +131,10 @@ public class ProjectDetail implements ParentEntity {
 
   public void setCreatedDatetime(Instant createdDatetime) {
     this.createdDatetime = createdDatetime;
+  }
+
+  public boolean isFirstVersion() {
+    return FIRST_VERSION.equals(version);
   }
 
   @Override

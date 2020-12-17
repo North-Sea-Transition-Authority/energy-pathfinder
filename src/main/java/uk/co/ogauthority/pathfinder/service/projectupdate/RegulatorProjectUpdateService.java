@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.form.projectupdate.RequestUpdateValida
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.RegulatorRequestedUpdateRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
@@ -30,6 +31,7 @@ public class RegulatorProjectUpdateService {
 
   private final RegulatorRequestedUpdateRepository regulatorRequestedUpdateRepository;
   private final ProjectUpdateService projectUpdateService;
+  private final ProjectHeaderSummaryService projectHeaderSummaryService;
   private final RequestUpdateFormValidator requestUpdateFormValidator;
   private final ValidationService validationService;
   private final BreadcrumbService breadcrumbService;
@@ -38,11 +40,13 @@ public class RegulatorProjectUpdateService {
   public RegulatorProjectUpdateService(
       RegulatorRequestedUpdateRepository regulatorRequestedUpdateRepository,
       ProjectUpdateService projectUpdateService,
+      ProjectHeaderSummaryService projectHeaderSummaryService,
       RequestUpdateFormValidator requestUpdateFormValidator,
       ValidationService validationService,
       BreadcrumbService breadcrumbService) {
     this.regulatorRequestedUpdateRepository = regulatorRequestedUpdateRepository;
     this.projectUpdateService = projectUpdateService;
+    this.projectHeaderSummaryService = projectHeaderSummaryService;
     this.requestUpdateFormValidator = requestUpdateFormValidator;
     this.validationService = validationService;
     this.breadcrumbService = breadcrumbService;
@@ -67,8 +71,10 @@ public class RegulatorProjectUpdateService {
     return regulatorRequestedUpdateRepository.save(regulatorRequestedUpdate);
   }
 
-  public ModelAndView getRequestUpdateModelAndView(Integer projectId, RequestUpdateForm form) {
+  public ModelAndView getRequestUpdateModelAndView(ProjectDetail projectDetail, AuthenticatedUserAccount user, RequestUpdateForm form) {
+    var projectId = projectDetail.getProject().getId();
     var modelAndView = new ModelAndView(REQUEST_UPDATE_TEMPLATE_PATH)
+        .addObject("projectHeaderHtml", projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, user))
         .addObject("form", form)
         .addObject("startActionUrl", ReverseRouter.route(on(RegulatorUpdateController.class)
             .requestUpdate(projectId, null, null, null, null)))

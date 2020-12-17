@@ -645,7 +645,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   FUNCTION sanitise_legacy_water_depth(
     p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
   , p_legacy_water_depth_value IN ${datasource.migration-user}.legacy_project_data.water_depth%TYPE
-  ) RETURN ${datasource.user}.project_locations.water_depth%TYPE
+  ) RETURN ${datasource.user}.project_locations.maximum_water_depth%TYPE
   IS
 
     l_sanitised_water_depth_value ${datasource.migration-user}.legacy_project_data.water_depth%TYPE;
@@ -703,7 +703,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     K_IS_MIGRATABLE_FALSE CONSTANT ${datasource.migration-user}.water_depth_migration_mapping.is_migratable%TYPE := 0;
     K_IS_MIGRATABLE_TRUE CONSTANT ${datasource.migration-user}.water_depth_migration_mapping.is_migratable%TYPE := 1;
 
-    l_sanitised_water_depth_value ${datasource.user}.project_locations.water_depth%TYPE;
+    l_sanitised_water_depth_value ${datasource.user}.project_locations.maximum_water_depth%TYPE;
     l_is_water_depth_migratable ${datasource.migration-user}.water_depth_migration_mapping.is_migratable%TYPE;
 
   BEGIN
@@ -790,7 +790,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     l_fdp_approved ${datasource.migration-user}.legacy_project_data.fdp_approved%TYPE;
 
     l_legacy_water_depth ${datasource.migration-user}.legacy_project_data.water_depth%TYPE;
-    l_sanitised_water_depth ${datasource.user}.project_locations.water_depth%TYPE;
+    l_sanitised_water_depth ${datasource.user}.project_locations.maximum_water_depth%TYPE;
 
   BEGIN
 
@@ -829,7 +829,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       project_detail_id
     , field_id
     , manual_field_name
-    , water_depth
+    , maximum_water_depth
     , field_type
     , approved_fdp
     )

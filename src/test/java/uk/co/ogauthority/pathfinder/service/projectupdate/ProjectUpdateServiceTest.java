@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -85,7 +86,7 @@ public class ProjectUpdateServiceTest {
 
     var projectUpdate = projectUpdateService.startUpdate(projectDetail, authenticatedUser, ProjectUpdateType.OPERATOR_INITIATED);
     assertThat(projectUpdate.getFromDetail()).isEqualTo(projectDetail);
-    assertThat(projectUpdate.getNewDetail()).isNotNull();
+    assertThat(projectUpdate.getToDetail()).isNotNull();
     assertThat(projectUpdate.getUpdateType()).isEqualTo(ProjectUpdateType.OPERATOR_INITIATED);
     verify(projectUpdateRepository, times(1)).save(projectUpdate);
   }
@@ -102,5 +103,19 @@ public class ProjectUpdateServiceTest {
     when(projectDetailsRepository.isProjectUpdateInProgress(project.getId())).thenReturn(true);
 
     assertThat(projectUpdateService.isUpdateInProgress(project)).isTrue();
+  }
+
+  @Test
+  public void getByToDetail_whenExists() {
+    var update = new ProjectUpdate();
+    when(projectUpdateRepository.findByToDetail(projectDetail)).thenReturn(Optional.of(update));
+    var returnedUpdate = projectUpdateService.getByToDetail(projectDetail);
+    assertThat(returnedUpdate.get()).isEqualTo(update);
+  }
+
+  @Test
+  public void getByToDetail_notFound() {
+    when(projectUpdateRepository.findByToDetail(projectDetail)).thenReturn(Optional.empty());
+    assertThat(projectUpdateService.getByToDetail(projectDetail)).isEqualTo(Optional.empty());
   }
 }

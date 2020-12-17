@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -18,7 +17,6 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.SubmitProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
-import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSubmissionSummaryViewService;
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
@@ -29,13 +27,10 @@ public class SubmitProjectController {
   public static final String PAGE_NAME = "Review and submit";
 
   private final SubmitProjectService submitProjectService;
-  private final ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService;
 
   @Autowired
-  public SubmitProjectController(SubmitProjectService submitProjectService,
-                                 ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService) {
+  public SubmitProjectController(SubmitProjectService submitProjectService) {
     this.submitProjectService = submitProjectService;
-    this.projectSubmissionSummaryViewService = projectSubmissionSummaryViewService;
   }
 
   @GetMapping
@@ -60,16 +55,7 @@ public class SubmitProjectController {
   @ProjectStatusCheck(status = ProjectStatus.QA)
   public ModelAndView submitProjectConfirmation(@PathVariable("projectId") Integer projectId,
                                                 ProjectContext projectContext) {
-    var modelAndView = new ModelAndView("project/summary/submitConfirmation");
-
-    var projectSubmissionSummaryView = projectSubmissionSummaryViewService
-        .getProjectSubmissionSummaryView(projectContext.getProjectDetails());
-
-    modelAndView
-        .addObject("projectSubmissionSummaryView", projectSubmissionSummaryView)
-        .addObject("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)));
-
-    return modelAndView;
+    return submitProjectService.getProjectSubmitConfirmationModelAndView(projectContext.getProjectDetails());
   }
 
   private ModelAndView submitProjectAndRedirectToConfirmation(ProjectDetail projectDetail,

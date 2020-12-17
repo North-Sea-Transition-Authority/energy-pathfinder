@@ -157,7 +157,7 @@ public class ProjectLocationServiceTest {
     assertThat(projectLocation.getField()).isNull();
     assertThat(projectLocation.getManualFieldName()).isNull();
     assertThat(projectLocation.getFieldType()).isNull();
-    assertThat(projectLocation.getWaterDepth()).isNull();
+    assertThat(projectLocation.getMaximumWaterDepth()).isNull();
     assertThat(projectLocation.getApprovedFieldDevelopmentPlan()).isNull();
     assertThat(projectLocation.getApprovedFdpDate()).isNull();
     assertThat(projectLocation.getApprovedDecomProgram()).isNull();
@@ -191,7 +191,7 @@ public class ProjectLocationServiceTest {
     var form = projectLocationService.getForm(details);
     assertThat(form.getField()).isNull();
     assertThat(form.getFieldType()).isNull();
-    assertThat(form.getWaterDepth()).isNull();
+    assertThat(form.getMaximumWaterDepth()).isNull();
     assertThat(form.getApprovedFieldDevelopmentPlan()).isNull();
     assertThat(form.getApprovedFdpDate()).isNull();
     assertThat(form.getApprovedDecomProgram()).isNull();
@@ -401,7 +401,7 @@ public class ProjectLocationServiceTest {
 
   private void checkCommonFieldsMatch(ProjectLocation projectLocation) {
     assertThat(projectLocation.getFieldType()).isEqualTo(ProjectLocationTestUtil.FIELD_TYPE);
-    assertThat(projectLocation.getWaterDepth()).isEqualTo(ProjectLocationTestUtil.WATER_DEPTH);
+    assertThat(projectLocation.getMaximumWaterDepth()).isEqualTo(ProjectLocationTestUtil.WATER_DEPTH);
     assertThat(projectLocation.getApprovedFieldDevelopmentPlan()).isEqualTo(ProjectLocationTestUtil.APPROVED_FDP_PLAN);
     assertThat(projectLocation.getApprovedFdpDate()).isEqualTo(ProjectLocationTestUtil.APPROVED_FDP_DATE);
     assertThat(projectLocation.getApprovedDecomProgram()).isEqualTo(ProjectLocationTestUtil.APPROVED_DECOM_PROGRAM);
@@ -410,7 +410,7 @@ public class ProjectLocationServiceTest {
 
   private void checkCommonFormFieldsMatch(ProjectLocation projectLocation, ProjectLocationForm form) {
     assertThat(form.getFieldType()).isEqualTo(projectLocation.getFieldType());
-    assertThat(form.getWaterDepth()).isEqualTo(projectLocation.getWaterDepth());
+    assertThat(form.getMaximumWaterDepth()).isEqualTo(projectLocation.getMaximumWaterDepth());
     assertThat(form.getApprovedFieldDevelopmentPlan()).isEqualTo(projectLocation.getApprovedFieldDevelopmentPlan());
     assertThat(form.getApprovedFdpDate()).isEqualTo(new ThreeFieldDateInput(projectLocation.getApprovedFdpDate()));
     assertThat(form.getApprovedDecomProgram()).isEqualTo(projectLocation.getApprovedDecomProgram());

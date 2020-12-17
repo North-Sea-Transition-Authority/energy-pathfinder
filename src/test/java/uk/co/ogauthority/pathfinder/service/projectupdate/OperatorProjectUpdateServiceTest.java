@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +19,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.OperatorUpdateController;
+import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.NoUpdateNotification;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
@@ -28,6 +30,7 @@ import uk.co.ogauthority.pathfinder.model.view.projectupdate.ProjectNoUpdateSumm
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.NoUpdateNotificationRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -47,6 +50,9 @@ public class OperatorProjectUpdateServiceTest {
   private ProjectNoUpdateSummaryViewService projectNoUpdateSummaryService;
 
   @Mock
+  private ProjectHeaderSummaryService projectHeaderSummaryService;
+
+  @Mock
   private ValidationService validationService;
 
   @Mock
@@ -64,6 +70,7 @@ public class OperatorProjectUpdateServiceTest {
         projectUpdateService,
         noUpdateNotificationRepository,
         projectNoUpdateSummaryService,
+        projectHeaderSummaryService,
         validationService,
         breadcrumbService
     );
@@ -122,11 +129,19 @@ public class OperatorProjectUpdateServiceTest {
   @Test
   public void getProjectProvideNoUpdateModelAndView() {
     var form = new ProvideNoUpdateForm();
+    var projectHeaderHtml = "html";
 
-    var modelAndView = operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(PROJECT_ID, form);
+    when(projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, authenticatedUser)).thenReturn(projectHeaderHtml);
+
+    var modelAndView = operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(
+        projectDetail,
+        authenticatedUser,
+        form
+    );
 
     assertThat(modelAndView.getViewName()).isEqualTo(OperatorProjectUpdateService.PROVIDE_NO_UPDATE_TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
+        entry("projectHeaderHtml", projectHeaderHtml),
         entry("form", form),
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(PROJECT_ID, null, null, null)))
     );
@@ -147,5 +162,27 @@ public class OperatorProjectUpdateServiceTest {
         entry("projectNoUpdateSummaryView", projectNoUpdateSummaryView),
         entry("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
     );
+  }
+
+  @Test
+  public void confirmNoUpdateExistsForProjectDetail_whenExists() {
+    var update = new ProjectUpdate();
+    when(projectUpdateService.getByToDetail(projectDetail)).thenReturn(Optional.of(update));
+    when(noUpdateNotificationRepository.existsByProjectUpdate(update)).thenReturn(true);
+    operatorProjectUpdateService.confirmNoUpdateExistsForProjectDetail(projectDetail);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  public void confirmNoUpdateExistsForProjectDetail_noUpdateExists() {
+    when(projectUpdateService.getByToDetail(projectDetail)).thenReturn(Optional.empty());
+    operatorProjectUpdateService.confirmNoUpdateExistsForProjectDetail(projectDetail);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  public void confirmNoUpdateExistsForProjectDetail_noNoUpdateNotificationExists() {
+    var update = new ProjectUpdate();
+    when(projectUpdateService.getByToDetail(projectDetail)).thenReturn(Optional.of(update));
+    when(noUpdateNotificationRepository.existsByProjectUpdate(update)).thenReturn(false);
+    operatorProjectUpdateService.confirmNoUpdateExistsForProjectDetail(projectDetail);
   }
 }

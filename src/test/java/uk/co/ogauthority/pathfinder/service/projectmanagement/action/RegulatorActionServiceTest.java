@@ -92,6 +92,7 @@ public class RegulatorActionServiceTest {
     assertThat(linkButton.getUrl()).isEqualTo(
         ReverseRouter.route(on(ProjectAssessmentController.class).getProjectAssessment(
             project.getId(),
+            null,
             null
         ))
     );
@@ -119,7 +120,7 @@ public class RegulatorActionServiceTest {
     var linkButton = (LinkButton) action.getUserAction();
     assertThat(linkButton.getPrompt()).isEqualTo(RegulatorActionService.REQUEST_UPDATE_ACTION_PROMPT);
     assertThat(linkButton.getUrl()).isEqualTo(
-        ReverseRouter.route(on(RegulatorUpdateController.class).getRequestUpdate(project.getId(), null))
+        ReverseRouter.route(on(RegulatorUpdateController.class).getRequestUpdate(project.getId(), null, null))
     );
     assertThat(linkButton.getEnabled()).isEqualTo(isEnabled);
     assertThat(linkButton.getButtonType()).isEqualTo(ButtonType.SECONDARY);

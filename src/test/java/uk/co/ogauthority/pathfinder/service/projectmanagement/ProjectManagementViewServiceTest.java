@@ -17,13 +17,9 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagementPageSectionType;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementSection;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementView;
-import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectVersionService;
-import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.rendering.TemplateRenderingService;
-import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
-import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -35,12 +31,6 @@ public class ProjectManagementViewServiceTest {
 
   @Mock
   private ProjectManagementService projectManagementService;
-
-  @Mock
-  private ProjectInformationService projectInformationService;
-
-  @Mock
-  private ProjectOperatorService projectOperatorService;
 
   @Mock
   private ProjectVersionService projectVersionService;
@@ -58,8 +48,6 @@ public class ProjectManagementViewServiceTest {
     projectManagementViewService = new ProjectManagementViewService(
         projectService,
         projectManagementService,
-        projectInformationService,
-        projectOperatorService,
         projectVersionService,
         templateRenderingService
     );
@@ -72,15 +60,6 @@ public class ProjectManagementViewServiceTest {
     var sectionName2 = "text2";
     var sectionName3 = "text3";
 
-    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
-    var projectOperator = ProjectOperatorTestUtil.getOperator();
-
-    when(projectInformationService.getProjectInformationOrError(projectDetail)).thenReturn(
-        projectInformation
-    );
-    when(projectOperatorService.getProjectOperatorByProjectDetailOrError(projectDetail)).thenReturn(
-        projectOperator
-    );
     when(projectManagementService.getSections(projectDetail, projectDetail, authenticatedUser)).thenReturn(List.of(
         new ProjectManagementSection(sectionName1, Map.of("test", "1"), 1, ProjectManagementPageSectionType.STATIC_CONTENT),
         new ProjectManagementSection(sectionName2, Map.of("test", "2"), 2, ProjectManagementPageSectionType.VERSION_CONTENT),
@@ -92,8 +71,6 @@ public class ProjectManagementViewServiceTest {
     var modelAndView = projectManagementViewService.getProjectManagementModelAndView(projectDetail, null, authenticatedUser);
 
     var projectManagementView = (ProjectManagementView) modelAndView.getModel().get("projectManagementView");
-    assertThat(projectManagementView.getTitle()).isEqualTo(projectInformation.getProjectTitle());
-    assertThat(projectManagementView.getOperator()).isEqualTo(projectOperator.getOrganisationGroup().getName());
     assertThat(projectManagementView.getStaticContentHtml()).isEqualTo(stubRender);
     assertThat(projectManagementView.getVersionContentHtml()).isEqualTo(stubRender + stubRender);
   }

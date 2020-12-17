@@ -25,7 +25,7 @@ public class ProjectLocationViewUtilTest {
                                  ProjectLocation projectLocation,
                                  List<ProjectLocationBlock> projectLocationBlocks) {
     assertThat(projectLocationView.getFieldType()).isEqualTo(projectLocation.getFieldType().getDisplayName());
-    assertThat(projectLocationView.getWaterDepth()).isEqualTo(projectLocation.getWaterDepth());
+    assertThat(projectLocationView.getMaximumWaterDepth()).isEqualTo(projectLocation.getMaximumWaterDepth());
     assertThat(projectLocationView.getApprovedFieldDevelopmentPlan()).isEqualTo(projectLocation.getApprovedFieldDevelopmentPlan());
     assertThat(projectLocationView.getApprovedFdpDate()).isEqualTo(DateUtil.formatDate(projectLocation.getApprovedFdpDate()));
     assertThat(projectLocationView.getApprovedDecomProgram()).isEqualTo(projectLocation.getApprovedDecomProgram());
@@ -42,7 +42,7 @@ public class ProjectLocationViewUtilTest {
     var projectLocationView = ProjectLocationViewUtil.from(projectLocation, Collections.emptyList());
 
     assertThat(projectLocationView.getFieldType()).isNull();
-    assertThat(projectLocationView.getWaterDepth()).isNull();
+    assertThat(projectLocationView.getMaximumWaterDepth()).isNull();
     assertThat(projectLocationView.getApprovedFieldDevelopmentPlan()).isNull();
     assertThat(projectLocationView.getApprovedFdpDate()).isEmpty();
     assertThat(projectLocationView.getApprovedDecomProgram()).isNull();

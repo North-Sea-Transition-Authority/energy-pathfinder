@@ -45,7 +45,7 @@ public class SubseaInfrastructureSummaryServiceTest {
     assertThat(results).hasSize(1);
     var subseaInfrastructureView = results.get(0);
     assertThat(subseaInfrastructureView.getId()).isEqualTo(subseaInfrastructure.getId());
-    assertThat(subseaInfrastructureView.getProjectId()).isEqualTo(subseaInfrastructure.getProjectDetail().getId());
+    assertThat(subseaInfrastructureView.getProjectId()).isEqualTo(subseaInfrastructure.getProjectDetail().getProject().getId());
     assertThat(subseaInfrastructureView.isValid()).isTrue();
   }
 

@@ -19,9 +19,9 @@ public class ProjectLocationForm {
   @NotNull(message = "Select a field type", groups = FullValidation.class)
   private FieldType fieldType;
 
-  @NotNull(message = "Enter a water depth", groups = FullValidation.class)
-  @PositiveWholeNumber(messagePrefix = "Water depth", groups = {FullValidation.class, PartialValidation.class})
-  private Integer waterDepth;
+  @NotNull(message = "Enter the maximum water depth", groups = FullValidation.class)
+  @PositiveWholeNumber(messagePrefix = "Maximum water depth", groups = {FullValidation.class, PartialValidation.class})
+  private Integer maximumWaterDepth;
 
   @NotNull(message = "Select yes if you have an approved Field Development Plan", groups = FullValidation.class)
   private Boolean approvedFieldDevelopmentPlan;
@@ -66,12 +66,12 @@ public class ProjectLocationForm {
     this.fieldType = fieldType;
   }
 
-  public Integer getWaterDepth() {
-    return waterDepth;
+  public Integer getMaximumWaterDepth() {
+    return maximumWaterDepth;
   }
 
-  public void setWaterDepth(Integer waterDepth) {
-    this.waterDepth = waterDepth;
+  public void setMaximumWaterDepth(Integer maximumWaterDepth) {
+    this.maximumWaterDepth = maximumWaterDepth;
   }
 
   public Boolean getApprovedFieldDevelopmentPlan() {
