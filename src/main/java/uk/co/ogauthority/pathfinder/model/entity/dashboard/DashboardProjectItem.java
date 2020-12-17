@@ -126,7 +126,7 @@ public class DashboardProjectItem {
     return sortKey;
   }
 
-  public void setSortKey(Instant sortkey) {
-    this.sortKey = sortkey;
+  public void setSortKey(Instant sortKey) {
+    this.sortKey = sortKey;
   }
 }
