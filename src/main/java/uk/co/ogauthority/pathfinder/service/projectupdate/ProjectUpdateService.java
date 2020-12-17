@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.projectupdate;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +51,7 @@ public class ProjectUpdateService {
     var newDetail = createNewProjectVersion(projectDetail, newStatus, user);
     var projectUpdate = new ProjectUpdate();
     projectUpdate.setFromDetail(projectDetail);
-    projectUpdate.setNewDetail(newDetail);
+    projectUpdate.setToDetail(newDetail);
     projectUpdate.setUpdateType(updateType);
     return projectUpdateRepository.save(projectUpdate);
   }
@@ -73,5 +74,9 @@ public class ProjectUpdateService {
 
   public boolean isUpdateInProgress(Project project) {
     return projectDetailsRepository.isProjectUpdateInProgress(project.getId());
+  }
+
+  public Optional<ProjectUpdate> getByToDetail(ProjectDetail toDetail) {
+    return projectUpdateRepository.findByToDetail(toDetail);
   }
 }

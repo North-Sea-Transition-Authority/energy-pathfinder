@@ -11,6 +11,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.OperatorUpdateController;
+import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.NoUpdateNotification;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
@@ -84,6 +85,28 @@ public class OperatorProjectUpdateService {
         .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)));
     breadcrumbService.fromManageProject(projectId, modelAndView, OperatorUpdateController.NO_UPDATE_REQUIRED_PAGE_NAME);
     return modelAndView;
+  }
+
+  /**
+   * Check a NoUpdateNotification exists for the given projectDetail if not throw an AccessDeniedException.
+   * @param toDetail the toDetail for the NoUpdateNotification
+   * @throws AccessDeniedException if a NoUpdateNotification does not exist for the given detail.
+   */
+  public void confirmNoUpdateExistsForProjectDetail(ProjectDetail toDetail) {
+    var updateOpt = projectUpdateService.getByToDetail(toDetail);
+
+    updateOpt.ifPresentOrElse(update -> {
+      var noUpdateExists = noUpdateNotificationRepository.existsByProjectUpdate(update);
+      if (!noUpdateExists) {
+        throwAccessDeniedExceptionForDetail(toDetail);
+      }
+    }, (() -> throwAccessDeniedExceptionForDetail(toDetail)));
+  }
+
+  private void throwAccessDeniedExceptionForDetail(ProjectDetail toDetail) {
+    throw new AccessDeniedException(String.format(
+        "Tried to access no update confirmation for ProjectDetail with id %d without a NoUpdateNotification", toDetail.getId())
+    );
   }
 
   public ModelAndView getProjectProvideNoUpdateConfirmationModelAndView(ProjectDetail projectDetail) {

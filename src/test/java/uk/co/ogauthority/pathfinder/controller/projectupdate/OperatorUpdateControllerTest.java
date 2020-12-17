@@ -26,6 +26,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectUpdateContextAbstractControllerTest;
+import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.ProvideNoUpdateForm;
@@ -240,5 +241,27 @@ public class OperatorUpdateControllerTest extends ProjectUpdateContextAbstractCo
         on(OperatorUpdateController.class).provideNoUpdateConfirmation(DRAFT_PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void provideNoUpdateConfirmation_whenNoNoUpdateNotificationExists_thenAccessDeniedException() throws Exception {
+    when(operatorProjectUpdateService.getProjectProvideNoUpdateConfirmationModelAndView(qaProjectDetail)).thenThrow(
+        new AccessDeniedException("")
+    );
+
+    mockMvc.perform(get(ReverseRouter.route(
+        on(OperatorUpdateController.class).provideNoUpdateConfirmation(QA_PROJECT_ID, null)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().is4xxClientError());
+  }
+
+  @Test
+  public void provideNoUpdateConfirmation_whenNoUpdateNotificationExists_thenAccess() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(OperatorUpdateController.class).provideNoUpdateConfirmation(QA_PROJECT_ID, null)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isOk());
+
+    verify(operatorProjectUpdateService, times(1)).confirmNoUpdateExistsForProjectDetail(qaProjectDetail);
   }
 }
