@@ -298,6 +298,13 @@ public class ProjectLocationBlockServiceTest {
   }
 
   @Test
+  public void deleteBlocks() {
+    projectLocationBlocksService.deleteBlocks(PROJECT_LOCATION);
+
+    verify(projectLocationBlockRepository).deleteAllByProjectLocation(PROJECT_LOCATION);
+  }
+
+  @Test
   public void isBlockReferenceValid_fullValidation_existsInPortalData() {
     when(licenceBlockValidatorService.existsInPortalData(anyString())).thenReturn(true);
     assertThat(projectLocationBlocksService.isBlockReferenceValid(BLOCK_REF_1, ValidationType.FULL)).isTrue();

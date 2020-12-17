@@ -13,4 +13,6 @@ public interface SubseaInfrastructureRepository extends CrudRepository<SubseaInf
   Optional<SubseaInfrastructure> findByIdAndProjectDetail(Integer subseaInfrastructureId, ProjectDetail projectDetail);
 
   List<SubseaInfrastructure> findByProjectDetailOrderByIdAsc(ProjectDetail projectDetail);
+
+  void deleteAllByProjectDetail(ProjectDetail projectDetail);
 }

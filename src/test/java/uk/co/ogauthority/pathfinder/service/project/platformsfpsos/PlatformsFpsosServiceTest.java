@@ -229,16 +229,9 @@ public class PlatformsFpsosServiceTest {
 
   @Test
   public void removeSectionData_verifyInteractions() {
-
-    final var platformFpso1 = PlatformFpsoTestUtil.getPlatformFpso_NoSubstructuresRemoved(detail);
-    final var platformFpso2 = PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(detail);
-    final var platformFpsos = List.of(platformFpso1, platformFpso2);
-
-    when(platformFpsoRepository.findAllByProjectDetailOrderByIdAsc(detail)).thenReturn(platformFpsos);
-
     platformsFpsosService.removeSectionData(detail);
 
-    verify(platformFpsoRepository, times(1)).deleteAll(platformFpsos);
+    verify(platformFpsoRepository, times(1)).deleteAllByProjectDetail(detail);
   }
 
   @Test

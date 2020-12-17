@@ -12,6 +12,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.RegulatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorRequestedUpdate;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
@@ -71,7 +72,11 @@ public class RegulatorProjectUpdateService {
     return regulatorRequestedUpdateRepository.save(regulatorRequestedUpdate);
   }
 
-  public ModelAndView getRequestUpdateModelAndView(ProjectDetail projectDetail, AuthenticatedUserAccount user, RequestUpdateForm form) {
+  public void deleteRegulatorRequestedUpdate(ProjectUpdate projectUpdate) {
+    regulatorRequestedUpdateRepository.deleteByProjectUpdate(projectUpdate);
+  }
+
+  public ModelAndView getRequestUpdateModelAndView(ProjectDetail projectDetail,AuthenticatedUserAccount user, RequestUpdateForm form) {
     var projectId = projectDetail.getProject().getId();
     var modelAndView = new ModelAndView(REQUEST_UPDATE_TEMPLATE_PATH)
         .addObject("projectHeaderHtml", projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, user))

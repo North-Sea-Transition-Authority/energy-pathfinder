@@ -11,4 +11,5 @@ public interface ProjectOperatorRepository extends CrudRepository<ProjectOperato
 
   Optional<ProjectOperator> findByProjectDetail(ProjectDetail detail);
 
+  void deleteByProjectDetail(ProjectDetail projectDetail);
 }

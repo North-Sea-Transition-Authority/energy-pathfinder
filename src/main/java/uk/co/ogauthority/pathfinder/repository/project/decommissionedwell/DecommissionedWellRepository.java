@@ -14,4 +14,5 @@ public interface DecommissionedWellRepository extends CrudRepository<Decommissio
 
   List<DecommissionedWell> findByProjectDetailOrderByIdAsc(ProjectDetail projectDetail);
 
+  void deleteAllByProjectDetail(ProjectDetail projectDetail);
 }

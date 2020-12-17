@@ -24,6 +24,6 @@
   <#if errorMessage?has_content>
     <@fdsError.singleErrorSummary errorMessage=errorMessage />
   </#if>
-  ${projectSummaryView.summaryHtml?no_esc}
+  <@noEscapeHtml.noEscapeHtml html=projectSummaryView.summaryHtml />
   <#nested>
 </#macro>

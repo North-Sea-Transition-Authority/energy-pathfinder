@@ -56,6 +56,10 @@ public class ProjectUpdateService {
     return projectUpdateRepository.save(projectUpdate);
   }
 
+  public void deleteProjectUpdate(ProjectUpdate projectUpdate) {
+    projectUpdateRepository.delete(projectUpdate);
+  }
+
   /**
    * Create a new project detail version as a duplicate of fromDetail.
    * @param fromDetail the project detail to base the new version off of

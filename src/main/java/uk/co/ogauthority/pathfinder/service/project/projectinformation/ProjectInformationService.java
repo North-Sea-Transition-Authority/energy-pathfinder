@@ -235,6 +235,11 @@ public class ProjectInformationService implements ProjectFormSectionService {
   }
 
   @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    projectInformationRepository.deleteByProjectDetail(projectDetail);
+  }
+
+  @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
     entityDuplicationService.duplicateEntityAndSetNewParent(
         getProjectInformationOrError(fromDetail),

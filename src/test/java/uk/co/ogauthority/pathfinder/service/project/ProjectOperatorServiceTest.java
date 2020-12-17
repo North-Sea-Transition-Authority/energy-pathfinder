@@ -2,6 +2,8 @@ package uk.co.ogauthority.pathfinder.service.project;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -137,6 +139,13 @@ public class ProjectOperatorServiceTest {
     when(teamService.getOrganisationTeamsPersonIsMemberOf(person)).thenReturn(
         Collections.singletonList(organisationTeam));
     assertThat(projectOperatorService.isUserInMultipleTeams(authenticatedUser)).isFalse();
+  }
+
+  @Test
+  public void deleteProjectOperatorByProjectDetail() {
+    projectOperatorService.deleteProjectOperatorByProjectDetail(detail);
+
+    verify(projectOperatorRepository, times(1)).deleteByProjectDetail(detail);
   }
 
   @Test

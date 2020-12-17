@@ -344,8 +344,7 @@ public class SubseaInfrastructureService implements ProjectFormSectionService {
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
-    final var subseaInfrastructures = getSubseaInfrastructures(projectDetail);
-    subseaInfrastructureRepository.deleteAll(subseaInfrastructures);
+    subseaInfrastructureRepository.deleteAllByProjectDetail(projectDetail);
   }
 
   @Override

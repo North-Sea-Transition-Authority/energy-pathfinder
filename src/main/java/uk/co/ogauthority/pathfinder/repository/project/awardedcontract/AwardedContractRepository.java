@@ -13,4 +13,6 @@ public interface AwardedContractRepository extends CrudRepository<AwardedContrac
   Optional<AwardedContract> findByIdAndProjectDetail(Integer awardedContractId, ProjectDetail projectDetail);
 
   List<AwardedContract> findByProjectDetailOrderByIdAsc(ProjectDetail projectDetail);
+
+  void deleteAllByProjectDetail(ProjectDetail projectDetail);
 }

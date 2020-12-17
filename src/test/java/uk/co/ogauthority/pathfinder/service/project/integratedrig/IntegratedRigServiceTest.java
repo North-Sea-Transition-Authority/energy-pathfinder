@@ -307,16 +307,9 @@ public class IntegratedRigServiceTest {
 
   @Test
   public void removeSectionData_verifyInteractions() {
-
-    final var integratedRig1 = IntegratedRigTestUtil.createIntegratedRig_withDevUkFacility();
-    final var integratedRig2 = IntegratedRigTestUtil.createIntegratedRig_withManualFacility();
-    final var integratedRigs = List.of(integratedRig1, integratedRig2);
-
-    when(integratedRigRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(integratedRigs);
-
     integratedRigService.removeSectionData(projectDetail);
 
-    verify(integratedRigRepository, times(1)).deleteAll(integratedRigs);
+    verify(integratedRigRepository, times(1)).deleteAllByProjectDetail(projectDetail);
   }
 
   @Test

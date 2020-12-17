@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project.location;
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -358,6 +359,28 @@ public class ProjectLocationServiceTest {
     projectLocationService.createOrUpdateBlocks(licenceBlocks, projectLocation);
 
     verify(projectLocationBlocksService, times(1)).createOrUpdateBlocks(licenceBlocks, projectLocation);
+  }
+
+  @Test
+  public void removeSectionData_whenLocationNotFound_thenNoDelete() {
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
+
+    projectLocationService.removeSectionData(details);
+
+    verify(projectLocationBlocksService, never()).deleteBlocks(any());
+    verify(projectLocationRepository, never()).delete(any());
+  }
+
+  @Test
+  public void removeSectionData_whenLocationFound_thenDelete() {
+    projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(details);
+
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectLocation));
+
+    projectLocationService.removeSectionData(details);
+
+    verify(projectLocationBlocksService, times(1)).deleteBlocks(projectLocation);
+    verify(projectLocationRepository, times(1)).delete(projectLocation);
   }
 
   @Test

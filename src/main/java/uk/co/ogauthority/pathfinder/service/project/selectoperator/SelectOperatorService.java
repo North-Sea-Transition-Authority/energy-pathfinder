@@ -159,6 +159,11 @@ public class SelectOperatorService implements ProjectFormSectionService {
   }
 
   @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    projectOperatorService.deleteProjectOperatorByProjectDetail(projectDetail);
+  }
+
+  @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
     entityDuplicationService.duplicateEntityAndSetNewParent(
         getProjectOperatorOrError(fromDetail),

@@ -169,8 +169,7 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
-    final var decommissionedPipelines = getDecommissionedPipelines(projectDetail);
-    decommissionedPipelineRepository.deleteAll(decommissionedPipelines);
+    decommissionedPipelineRepository.deleteAllByProjectDetail(projectDetail);
   }
 
   @Override

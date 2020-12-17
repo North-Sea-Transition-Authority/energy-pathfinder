@@ -440,6 +440,13 @@ public class ProjectInformationServiceTest {
   }
 
   @Test
+  public void removeSectionData() {
+    projectInformationService.removeSectionData(details);
+
+    verify(projectInformationRepository, times(1)).deleteByProjectDetail(details);
+  }
+
+  @Test
   public void copySectionData_verifyDuplicationServiceInteraction() {
 
     final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);

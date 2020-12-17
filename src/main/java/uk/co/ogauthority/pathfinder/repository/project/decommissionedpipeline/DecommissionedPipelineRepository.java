@@ -13,4 +13,6 @@ public interface DecommissionedPipelineRepository extends CrudRepository<Decommi
   Optional<DecommissionedPipeline> findByIdAndProjectDetail(Integer decommissionedPipelineId, ProjectDetail projectDetail);
 
   List<DecommissionedPipeline> findByProjectDetailOrderByIdAsc(ProjectDetail projectDetail);
+
+  void deleteAllByProjectDetail(ProjectDetail projectDetail);
 }

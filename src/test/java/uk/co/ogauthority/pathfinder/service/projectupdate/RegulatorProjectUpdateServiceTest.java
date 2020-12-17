@@ -115,6 +115,15 @@ public class RegulatorProjectUpdateServiceTest {
   }
 
   @Test
+  public void deleteRegulatorRequestedUpdate() {
+    var projectUpdate = new ProjectUpdate();
+
+    regulatorProjectUpdateService.deleteRegulatorRequestedUpdate(projectUpdate);
+
+    verify(regulatorRequestedUpdateRepository, times(1)).deleteByProjectUpdate(projectUpdate);
+  }
+
+  @Test
   public void getRequestUpdateModelAndView() {
     var form = new RequestUpdateForm();
     var projectHeaderHtml = "html";

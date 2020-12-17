@@ -252,6 +252,14 @@ public class ProjectLocationService implements ProjectFormSectionService {
   }
 
   @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    findByProjectDetail(projectDetail).ifPresent(projectLocation -> {
+      projectLocationBlocksService.deleteBlocks(projectLocation);
+      projectLocationRepository.delete(projectLocation);
+    });
+  }
+
+  @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
 
     final var fromLocation = getOrError(fromDetail);
