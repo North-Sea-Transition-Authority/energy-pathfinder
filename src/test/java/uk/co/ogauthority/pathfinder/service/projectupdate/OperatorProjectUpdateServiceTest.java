@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +19,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.OperatorUpdateController;
+import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.NoUpdateNotification;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
@@ -160,5 +162,27 @@ public class OperatorProjectUpdateServiceTest {
         entry("projectNoUpdateSummaryView", projectNoUpdateSummaryView),
         entry("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
     );
+  }
+
+  @Test
+  public void confirmNoUpdateExistsForProjectDetail_whenExists() {
+    var update = new ProjectUpdate();
+    when(projectUpdateService.getByToDetail(projectDetail)).thenReturn(Optional.of(update));
+    when(noUpdateNotificationRepository.existsByProjectUpdate(update)).thenReturn(true);
+    operatorProjectUpdateService.confirmNoUpdateExistsForProjectDetail(projectDetail);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  public void confirmNoUpdateExistsForProjectDetail_noUpdateExists() {
+    when(projectUpdateService.getByToDetail(projectDetail)).thenReturn(Optional.empty());
+    operatorProjectUpdateService.confirmNoUpdateExistsForProjectDetail(projectDetail);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  public void confirmNoUpdateExistsForProjectDetail_noNoUpdateNotificationExists() {
+    var update = new ProjectUpdate();
+    when(projectUpdateService.getByToDetail(projectDetail)).thenReturn(Optional.of(update));
+    when(noUpdateNotificationRepository.existsByProjectUpdate(update)).thenReturn(false);
+    operatorProjectUpdateService.confirmNoUpdateExistsForProjectDetail(projectDetail);
   }
 }

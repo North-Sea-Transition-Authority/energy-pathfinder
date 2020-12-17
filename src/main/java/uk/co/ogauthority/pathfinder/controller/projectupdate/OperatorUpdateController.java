@@ -92,6 +92,7 @@ public class OperatorUpdateController {
   @GetMapping("/no-update-required/confirmation")
   public ModelAndView provideNoUpdateConfirmation(@PathVariable("projectId") Integer projectId,
                                                   ProjectUpdateContext projectUpdateContext) {
+    operatorProjectUpdateService.confirmNoUpdateExistsForProjectDetail(projectUpdateContext.getProjectDetails());
     return operatorProjectUpdateService.getProjectProvideNoUpdateConfirmationModelAndView(projectUpdateContext.getProjectDetails());
   }
 }

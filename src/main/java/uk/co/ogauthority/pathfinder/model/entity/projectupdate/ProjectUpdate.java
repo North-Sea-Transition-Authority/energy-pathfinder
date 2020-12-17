@@ -26,7 +26,7 @@ public class ProjectUpdate {
 
   @OneToOne
   @JoinColumn(name = "new_project_detail_id")
-  private ProjectDetail newDetail;
+  private ProjectDetail toDetail;
 
   @Enumerated(EnumType.STRING)
   private ProjectUpdateType updateType;
@@ -43,12 +43,12 @@ public class ProjectUpdate {
     this.fromDetail = fromDetail;
   }
 
-  public ProjectDetail getNewDetail() {
-    return newDetail;
+  public ProjectDetail getToDetail() {
+    return toDetail;
   }
 
-  public void setNewDetail(ProjectDetail newDetail) {
-    this.newDetail = newDetail;
+  public void setToDetail(ProjectDetail toDetail) {
+    this.toDetail = toDetail;
   }
 
   public ProjectUpdateType getUpdateType() {
