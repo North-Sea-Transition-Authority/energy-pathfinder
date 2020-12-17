@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.projectupdate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,6 +42,9 @@ public class ProjectUpdateServiceTest {
   private ProjectService projectService;
 
   @Mock
+  private RegulatorProjectUpdateService regulatorProjectUpdateService;
+
+  @Mock
   private ProjectInformationService projectInformationService;
 
   @Mock
@@ -59,6 +63,7 @@ public class ProjectUpdateServiceTest {
         projectUpdateRepository,
         projectDetailsRepository,
         projectService,
+        regulatorProjectUpdateService,
         List.of(projectInformationService, awardedContractService)
     );
 
@@ -92,12 +97,37 @@ public class ProjectUpdateServiceTest {
   }
 
   @Test
-  public void deleteProjectUpdate() {
+  public void cancelUpdate_whenOperatorInitiatedUpdate() {
     var projectUpdate = new ProjectUpdate();
+    projectUpdate.setUpdateType(ProjectUpdateType.OPERATOR_INITIATED);
 
-    projectUpdateService.deleteProjectUpdate(projectUpdate);
+    var fromDetail = ProjectUtil.getProjectDetails();
+    projectUpdate.setFromDetail(fromDetail);
 
+    when(projectUpdateRepository.findByToDetail(projectDetail)).thenReturn(Optional.of(projectUpdate));
+
+    projectUpdateService.cancelUpdate(projectDetail);
+
+    verify(regulatorProjectUpdateService, never()).deleteRegulatorRequestedUpdate(projectUpdate);
     verify(projectUpdateRepository, times(1)).delete(projectUpdate);
+    verify(projectService, times(1)).updateProjectDetailIsCurrentVersion(fromDetail, true);
+  }
+
+  @Test
+  public void cancelUpdate_whenRegulatorRequestedUpdate() {
+    var projectUpdate = new ProjectUpdate();
+    projectUpdate.setUpdateType(ProjectUpdateType.REGULATOR_REQUESTED);
+
+    var fromDetail = ProjectUtil.getProjectDetails();
+    projectUpdate.setFromDetail(fromDetail);
+
+    when(projectUpdateRepository.findByToDetail(projectDetail)).thenReturn(Optional.of(projectUpdate));
+
+    projectUpdateService.cancelUpdate(projectDetail);
+
+    verify(regulatorProjectUpdateService, times(1)).deleteRegulatorRequestedUpdate(projectUpdate);
+    verify(projectUpdateRepository, times(1)).delete(projectUpdate);
+    verify(projectService, times(1)).updateProjectDetailIsCurrentVersion(fromDetail, true);
   }
 
   @Test

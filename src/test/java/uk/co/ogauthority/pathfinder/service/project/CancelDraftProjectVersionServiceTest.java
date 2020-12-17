@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,14 +19,11 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
-import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryRenderingService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
-import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -39,9 +35,6 @@ public class CancelDraftProjectVersionServiceTest {
 
   @Mock
   private ProjectUpdateService projectUpdateService;
-
-  @Mock
-  private RegulatorProjectUpdateService regulatorProjectUpdateService;
 
   @Mock
   private ProjectSummaryRenderingService projectSummaryRenderingService;
@@ -64,7 +57,6 @@ public class CancelDraftProjectVersionServiceTest {
     cancelDraftProjectVersionService = new CancelDraftProjectVersionService(
         projectService,
         projectUpdateService,
-        regulatorProjectUpdateService,
         projectSummaryRenderingService,
         List.of(upcomingTenderService, platformsFpsosService)
     );
@@ -74,62 +66,27 @@ public class CancelDraftProjectVersionServiceTest {
   public void cancelDraft_whenFirstVersion() {
     projectDetail.setVersion(1);
 
-    when(projectUpdateService.getByToDetail(projectDetail)).thenReturn(Optional.empty());
-
     cancelDraftProjectVersionService.cancelDraft(projectDetail);
 
     verify(upcomingTenderService, times(1)).removeSectionData(projectDetail);
     verify(platformsFpsosService, times(1)).removeSectionData(projectDetail);
+
+    verify(projectUpdateService, never()).cancelUpdate(projectDetail);
 
     verify(projectService, times(1)).deleteProjectDetail(projectDetail);
     verify(projectService, times(1)).deleteProject(project);
   }
 
   @Test
-  public void cancelDraft_whenOperatorRequestedUpdate() {
+  public void cancelDraft_whenUpdate() {
     projectDetail.setVersion(2);
-
-    var projectUpdate = new ProjectUpdate();
-    projectUpdate.setUpdateType(ProjectUpdateType.OPERATOR_INITIATED);
-
-    var fromDetail = ProjectUtil.getProjectDetails();
-    projectUpdate.setFromDetail(fromDetail);
-
-    when(projectUpdateService.getByToDetail(projectDetail)).thenReturn(Optional.of(projectUpdate));
 
     cancelDraftProjectVersionService.cancelDraft(projectDetail);
 
     verify(upcomingTenderService, times(1)).removeSectionData(projectDetail);
     verify(platformsFpsosService, times(1)).removeSectionData(projectDetail);
 
-    verify(regulatorProjectUpdateService, never()).deleteRegulatorRequestedUpdate(projectUpdate);
-    verify(projectUpdateService, times(1)).deleteProjectUpdate(projectUpdate);
-    verify(projectService, times(1)).updateProjectDetailIsCurrentVersion(fromDetail, true);
-
-    verify(projectService, times(1)).deleteProjectDetail(projectDetail);
-    verify(projectService, never()).deleteProject(project);
-  }
-
-  @Test
-  public void cancelDraft_whenRegulatorRequestedUpdate() {
-    projectDetail.setVersion(2);
-
-    var projectUpdate = new ProjectUpdate();
-    projectUpdate.setUpdateType(ProjectUpdateType.REGULATOR_REQUESTED);
-
-    var fromDetail = ProjectUtil.getProjectDetails();
-    projectUpdate.setFromDetail(fromDetail);
-
-    when(projectUpdateService.getByToDetail(projectDetail)).thenReturn(Optional.of(projectUpdate));
-
-    cancelDraftProjectVersionService.cancelDraft(projectDetail);
-
-    verify(upcomingTenderService, times(1)).removeSectionData(projectDetail);
-    verify(platformsFpsosService, times(1)).removeSectionData(projectDetail);
-
-    verify(regulatorProjectUpdateService, times(1)).deleteRegulatorRequestedUpdate(projectUpdate);
-    verify(projectUpdateService, times(1)).deleteProjectUpdate(projectUpdate);
-    verify(projectService, times(1)).updateProjectDetailIsCurrentVersion(fromDetail, true);
+    verify(projectUpdateService, times(1)).cancelUpdate(projectDetail);
 
     verify(projectService, times(1)).deleteProjectDetail(projectDetail);
     verify(projectService, never()).deleteProject(project);

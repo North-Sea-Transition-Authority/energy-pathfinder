@@ -24,6 +24,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.CancelDraftProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
@@ -37,12 +38,14 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 )
 public class CancelDraftProjectVersionControllerTest extends ProjectContextAbstractControllerTest {
 
-  private static final int PROJECT_ID = 1;
+  private static final Integer DRAFT_PROJECT_ID = 1;
+  private static final Integer PUBLISHED_PROJECT_ID = 2;
 
   @MockBean
   private CancelDraftProjectVersionService cancelDraftProjectVersionService;
 
-  private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
+  private final ProjectDetail draftProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+  private final ProjectDetail publishedProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.PUBLISHED);
 
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       SystemAccessService.CREATE_PROJECT_PRIVILEGES);
@@ -50,50 +53,75 @@ public class CancelDraftProjectVersionControllerTest extends ProjectContextAbstr
 
   @Before
   public void setup() {
-    when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(projectDetail));
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectService.getLatestDetail(DRAFT_PROJECT_ID)).thenReturn(Optional.of(draftProjectDetail));
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(draftProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(draftProjectDetail, unauthenticatedUser)).thenReturn(false);
+
+    when(projectService.getLatestDetail(PUBLISHED_PROJECT_ID)).thenReturn(Optional.of(publishedProjectDetail));
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(publishedProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(publishedProjectDetail, unauthenticatedUser)).thenReturn(false);
   }
 
   @Test
-  public void getCancelDraft_whenAuthenticated_thenAccess() throws Exception {
+  public void getCancelDraft_whenAuthenticatedAndDraft_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(CancelDraftProjectVersionController.class).getCancelDraft(PROJECT_ID, null, null)))
+        on(CancelDraftProjectVersionController.class).getCancelDraft(DRAFT_PROJECT_ID, null, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
 
   @Test
-  public void getCancelDraft_whenUnauthenticated_thenNoAccess() throws Exception {
+  public void getCancelDraft_whenUnauthenticatedAndDraft_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(CancelDraftProjectVersionController.class).getCancelDraft(PROJECT_ID, null, null)))
+        on(CancelDraftProjectVersionController.class).getCancelDraft(DRAFT_PROJECT_ID, null, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }
 
   @Test
-  public void cancelDraft_whenAuthenticated_thenCancel() throws Exception {
+  public void getCancelDraft_whenAuthenticatedAndPublished_thenNoAccess() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(CancelDraftProjectVersionController.class).getCancelDraft(PUBLISHED_PROJECT_ID, null, null)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void cancelDraft_whenAuthenticatedAndDraft_thenCancel() throws Exception {
     mockMvc.perform(
         post(ReverseRouter.route(on(CancelDraftProjectVersionController.class)
-            .cancelDraft(PROJECT_ID, null, null)
+            .cancelDraft(DRAFT_PROJECT_ID, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf()))
         .andExpect(status().is3xxRedirection());
 
-    verify(cancelDraftProjectVersionService, times(1)).cancelDraft(projectDetail);
+    verify(cancelDraftProjectVersionService, times(1)).cancelDraft(draftProjectDetail);
   }
 
   @Test
-  public void cancelDraft_whenUnauthenticated_thenNoAccess() throws Exception {
+  public void cancelDraft_whenUnauthenticatedAndDraft_thenNoAccess() throws Exception {
     mockMvc.perform(
         post(ReverseRouter.route(on(CancelDraftProjectVersionController.class)
-            .cancelDraft(PROJECT_ID, null, null)
+            .cancelDraft(DRAFT_PROJECT_ID, null, null)
         ))
             .with(authenticatedUserAndSession(unauthenticatedUser))
             .with(csrf()))
         .andExpect(status().isForbidden());
 
-    verify(cancelDraftProjectVersionService, never()).cancelDraft(projectDetail);
+    verify(cancelDraftProjectVersionService, never()).cancelDraft(draftProjectDetail);
+  }
+
+  @Test
+  public void cancelDraft_whenAuthenticatedAndPublished_thenNoAccess() throws Exception {
+    mockMvc.perform(
+        post(ReverseRouter.route(on(CancelDraftProjectVersionController.class)
+            .cancelDraft(PUBLISHED_PROJECT_ID, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf()))
+        .andExpect(status().isForbidden());
+
+    verify(cancelDraftProjectVersionService, never()).cancelDraft(publishedProjectDetail);
   }
 }

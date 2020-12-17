@@ -22,6 +22,7 @@ public class ProjectUpdateService {
   private final ProjectUpdateRepository projectUpdateRepository;
   private final ProjectDetailsRepository projectDetailsRepository;
   private final ProjectService projectService;
+  private final RegulatorProjectUpdateService regulatorProjectUpdateService;
   private final List<ProjectFormSectionService> projectFormSectionServices;
 
   @Autowired
@@ -29,10 +30,12 @@ public class ProjectUpdateService {
       ProjectUpdateRepository projectUpdateRepository,
       ProjectDetailsRepository projectDetailsRepository,
       ProjectService projectService,
+      RegulatorProjectUpdateService regulatorProjectUpdateService,
       List<ProjectFormSectionService> projectFormSectionServices) {
     this.projectUpdateRepository = projectUpdateRepository;
     this.projectDetailsRepository = projectDetailsRepository;
     this.projectService = projectService;
+    this.regulatorProjectUpdateService = regulatorProjectUpdateService;
     this.projectFormSectionServices = projectFormSectionServices;
   }
 
@@ -56,8 +59,14 @@ public class ProjectUpdateService {
     return projectUpdateRepository.save(projectUpdate);
   }
 
-  public void deleteProjectUpdate(ProjectUpdate projectUpdate) {
-    projectUpdateRepository.delete(projectUpdate);
+  public void cancelUpdate(ProjectDetail toDetail) {
+    getByToDetail(toDetail).ifPresent(projectUpdate -> {
+      if (projectUpdate.getUpdateType() == ProjectUpdateType.REGULATOR_REQUESTED) {
+        regulatorProjectUpdateService.deleteRegulatorRequestedUpdate(projectUpdate);
+      }
+      projectUpdateRepository.delete(projectUpdate);
+      projectService.updateProjectDetailIsCurrentVersion(projectUpdate.getFromDetail(), true);
+    });
   }
 
   /**
