@@ -43,6 +43,8 @@ public class DashboardProjectItem {
   @JoinColumn(name = "operator_org_grp_id")
   private PortalOrganisationGroup organisationGroup;
 
+  private Instant sortKey;
+
   public Integer getProjectId() {
     return projectId;
   }
@@ -118,5 +120,13 @@ public class DashboardProjectItem {
   public void setOrganisationGroup(
       PortalOrganisationGroup organisationGroup) {
     this.organisationGroup = organisationGroup;
+  }
+
+  public Instant getSortKey() {
+    return sortKey;
+  }
+
+  public void setSortKey(Instant sortKey) {
+    this.sortKey = sortKey;
   }
 }

@@ -16,6 +16,7 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
     ) field_name
   , pl.ukcs_area
   , po.operator_org_grp_id
+  , COALESCE(pd.submitted_datetime, pd.created_datetime, p.created_datetime) sort_key
   FROM ${datasource.user}.projects p
   JOIN ${datasource.user}.project_details pd ON pd.project_id = p.id
   JOIN ${datasource.user}.project_operators po ON po.project_detail_id = pd.id

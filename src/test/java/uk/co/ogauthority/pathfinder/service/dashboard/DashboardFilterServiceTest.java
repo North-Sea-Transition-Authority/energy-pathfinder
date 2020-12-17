@@ -2,6 +2,8 @@ package uk.co.ogauthority.pathfinder.service.dashboard;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -268,5 +270,17 @@ public class DashboardFilterServiceTest {
 
     var results = dashboardFilterService.filter(List.of(dashboardItem), filter);
     assertThat(results).isEmpty();
+  }
+
+  @Test
+  public void filter_orderedCorrectly() {
+    var firstDashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    var secondDashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    var thirdDashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    firstDashboardItem.setSortKey(Instant.now().plus(2, ChronoUnit.DAYS));
+    secondDashboardItem.setSortKey(Instant.now().plus(1, ChronoUnit.DAYS));
+
+    var results = dashboardFilterService.filter(List.of(thirdDashboardItem, secondDashboardItem, firstDashboardItem), filter);
+    assertThat(results).containsExactly(firstDashboardItem, secondDashboardItem, thirdDashboardItem);
   }
 }

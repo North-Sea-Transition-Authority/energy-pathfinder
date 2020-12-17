@@ -292,6 +292,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     , submitted_datetime
     , submitted_by_wua
     , is_migrated
+    , created_datetime
     )
     VALUES(
       p_new_project_id
@@ -302,6 +303,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     , p_submitted_datetime
     , p_created_by_wua
     , 1
+    , p_submitted_datetime
     )
     RETURNING
       id
