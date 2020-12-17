@@ -79,11 +79,11 @@ public class RegulatorProjectUpdateService {
   public ModelAndView getRequestUpdateModelAndView(ProjectDetail projectDetail,AuthenticatedUserAccount user, RequestUpdateForm form) {
     var projectId = projectDetail.getProject().getId();
     var modelAndView = new ModelAndView(REQUEST_UPDATE_TEMPLATE_PATH)
-      .addObject("projectHeaderHtml", projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, user))
-      .addObject("form", form)
-      .addObject("startActionUrl", ReverseRouter.route(on(RegulatorUpdateController.class)
-          .requestUpdate(projectId, null, null, null, null)))
-      .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)));
+        .addObject("projectHeaderHtml", projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, user))
+        .addObject("form", form)
+        .addObject("startActionUrl", ReverseRouter.route(on(RegulatorUpdateController.class)
+            .requestUpdate(projectId, null, null, null, null)))
+        .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)));
     breadcrumbService.fromManageProject(projectId, modelAndView, RegulatorUpdateController.REQUEST_UPDATE_PAGE_NAME);
     return modelAndView;
   }

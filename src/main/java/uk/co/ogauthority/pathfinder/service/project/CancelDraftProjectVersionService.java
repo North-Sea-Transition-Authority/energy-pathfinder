@@ -54,7 +54,7 @@ public class CancelDraftProjectVersionService {
       projectService.updateProjectDetailIsCurrentVersion(projectUpdate.getFromDetail(), true);
     });
     projectService.deleteProjectDetail(projectDetail);
-    if (projectDetail.getVersion() == 1) {
+    if (projectDetail.isFirstVersion()) {
       projectService.deleteProject(projectDetail.getProject());
     }
   }

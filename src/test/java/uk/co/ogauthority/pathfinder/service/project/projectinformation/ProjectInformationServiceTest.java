@@ -443,7 +443,7 @@ public class ProjectInformationServiceTest {
   public void removeSectionData() {
     projectInformationService.removeSectionData(details);
 
-    verify(projectInformationRepository, times(1)).deleteAllByProjectDetail(details);
+    verify(projectInformationRepository, times(1)).deleteByProjectDetail(details);
   }
 
   @Test

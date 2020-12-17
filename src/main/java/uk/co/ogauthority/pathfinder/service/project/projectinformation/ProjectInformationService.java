@@ -236,7 +236,7 @@ public class ProjectInformationService implements ProjectFormSectionService {
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
-    projectInformationRepository.deleteAllByProjectDetail(projectDetail);
+    projectInformationRepository.deleteByProjectDetail(projectDetail);
   }
 
   @Override

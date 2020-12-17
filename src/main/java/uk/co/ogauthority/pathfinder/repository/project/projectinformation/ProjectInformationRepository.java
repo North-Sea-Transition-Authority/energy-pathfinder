@@ -10,5 +10,5 @@ import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.Proj
 public interface ProjectInformationRepository extends CrudRepository<ProjectInformation, Integer> {
   Optional<ProjectInformation> findByProjectDetail(ProjectDetail projectDetail);
 
-  void deleteAllByProjectDetail(ProjectDetail projectDetail);
+  void deleteByProjectDetail(ProjectDetail projectDetail);
 }
