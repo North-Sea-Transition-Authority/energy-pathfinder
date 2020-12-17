@@ -1373,6 +1373,11 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     );
   END create_project_setup_record;
 
+  /**
+    Procedure to create records in all of the new form page section tables for a given legacy project detail
+    @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+    @param p_new_project_detail_id The detail id the publish record should be associated to
+   */
   PROCEDURE migrate_project_form_data(
     p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
   , p_new_project_detail_id IN ${datasource.user}.project_details.id%TYPE
@@ -1419,6 +1424,68 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     );
 
   END migrate_project_form_data;
+
+  /**
+    Procedure to create a record in the project_updates table in the new model for p_new_project_detail_id
+    @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+    @param p_new_project_detail_id The detail id the publish record should be associated to
+   */
+  PROCEDURE create_project_update_record(
+    p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , p_new_project_detail_id IN ${datasource.user}.project_details.id%TYPE
+  )
+  IS
+
+    K_DESTINATION_TABLE_NAME CONSTANT VARCHAR2(30) := 'PROJECT_UPDATES';
+
+    l_new_project_update_id ${datasource.user}.project_updates.id%TYPE;
+    l_prev_project_detail_id ${datasource.user}.project_details.id%TYPE;
+
+  BEGIN
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message => 'Creating ' || K_DESTINATION_TABLE_NAME || ' record for legacy project detail with ID ' || p_legacy_project_detail_id
+    );
+
+    -- find the project detail id for the previous version of this project
+    SELECT v.prev_project_detail_id
+    INTO l_prev_project_detail_id
+    FROM (
+     SELECT
+       pd.*
+     , LAG(id, 1, 0) OVER (PARTITION BY project_id ORDER BY version) AS prev_project_detail_id
+     FROM ${datasource.user}.project_details pd
+    ) v
+    WHERE v.id = p_new_project_detail_id;
+
+    INSERT INTO ${datasource.user}.project_updates(
+      from_project_detail_id
+    , new_project_detail_id
+    , update_type
+    )
+    VALUES(
+      l_prev_project_detail_id
+    , p_new_project_detail_id
+    , K_OPERATOR_INITIATED_UPDATE
+    )
+    RETURNING id INTO l_new_project_update_id;
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message =>
+        'Created new ' || K_DESTINATION_TABLE_NAME || ' record with id => ' || l_new_project_update_id ||
+        ' and from_project_detail_id => ' || l_prev_project_detail_id
+    );
+
+  EXCEPTION WHEN OTHERS THEN
+    raise_exception_with_trace(
+      p_message_prefix => 'ERROR in create_project_update_record(' || CHR(10)
+        || '  p_legacy_project_detail_id => ' || p_legacy_project_detail_id || CHR(10)
+        || ', p_new_project_detail_id => ' || p_new_project_detail_id || CHR(10)
+        || ')'
+    );
+  END create_project_update_record;
 
   /**
     Procedure to create all of the detail records and associated form data for a given legacy project.
@@ -1487,6 +1554,19 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
         , p_new_project_detail_id => l_new_project_detail_id
         , p_published_datetime => l_new_detail_submitted_date
         , p_published_by_wua => l_new_detail_submitted_by_wua
+        );
+
+      END IF;
+
+      /**
+        If we have a version greater than 1 and our detail row is not archived then insert am
+        update record. If the detail is archived that is not being consider an update in the model.
+       */
+      IF project_detail.version > 1 AND l_new_detail_status != K_NEW_ARCHIVED_STATUS THEN
+
+        create_project_update_record(
+          p_legacy_project_detail_id => l_legacy_project_detail_id
+        , p_new_project_detail_id => l_new_project_detail_id
         );
 
       END IF;
