@@ -1,7 +1,11 @@
 <#include '../../layoutPane.ftl'>
 <#import 'projectSummary.ftl' as projectSummary/>
 
-<#assign pageHeading="Review and submit project"/>
+<#if isUpdate>
+  <#assign pageHeading="Review and submit project update" />
+<#else>
+  <#assign pageHeading="Review and submit project" />
+</#if>
 
 <@projectSummary.summaryWithSubNavigation
   pageHeading=pageHeading

@@ -1,8 +1,14 @@
 <#include '../../layout.ftl'>
 
-<@defaultPage htmlTitle="Project submitted" pageHeading="" breadcrumbs=false>
+<#if isUpdate>
+  <#assign title = "Project update submitted">
+<#else>
+  <#assign title = "Project submitted">
+</#if>
+
+<@defaultPage htmlTitle=title pageHeading="" breadcrumbs=false>
   <@fdsPanel.panel
-    panelTitle="Project submitted"
+    panelTitle=title
     panelText="${projectSubmissionSummaryView.projectTitle}"
   />
 
