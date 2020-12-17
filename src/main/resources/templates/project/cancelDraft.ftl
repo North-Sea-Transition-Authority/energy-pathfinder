@@ -17,7 +17,7 @@
   twoThirdsColumn=true
 >
   <@fdsDetails.summaryDetails summaryTitle=summaryTitle>
-    ${projectSummaryHtml?no_esc}
+    <@noEscapeHtml.noEscapeHtml html=projectSummaryHtml />
   </@fdsDetails.summaryDetails>
 
   <@fdsForm.htmlForm>

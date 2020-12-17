@@ -8,7 +8,7 @@
   backLink=true
   backLinkUrl=springUrl(backLinkUrl)
 >
-  ${projectManagementView.staticContentHtml?no_esc}
+  <@noEscapeHtml.noEscapeHtml html=projectManagementView.staticContentHtml />
   <#if (viewableVersions?size > 1)>
     <@fdsForm.htmlForm actionUrl=springUrl(viewVersionUrl)>
       <@inlineInputAction.inlineInputAction>
@@ -17,5 +17,5 @@
       </@inlineInputAction.inlineInputAction>
     </@fdsForm.htmlForm>
   </#if>
-  ${projectManagementView.versionContentHtml?no_esc}
+  <@noEscapeHtml.noEscapeHtml html=projectManagementView.versionContentHtml />
 </@defaultPage>
