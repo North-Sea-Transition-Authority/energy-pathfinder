@@ -27,7 +27,7 @@ public class ProjectLocationViewUtil {
         : null;
     projectLocationView.setFieldType(fieldType);
 
-    projectLocationView.setWaterDepth(projectLocation.getWaterDepth());
+    projectLocationView.setMaximumWaterDepth(projectLocation.getMaximumWaterDepth());
     projectLocationView.setApprovedFieldDevelopmentPlan(projectLocation.getApprovedFieldDevelopmentPlan());
     projectLocationView.setApprovedFdpDate(DateUtil.formatDate(projectLocation.getApprovedFdpDate()));
     projectLocationView.setApprovedDecomProgram(projectLocation.getApprovedDecomProgram());

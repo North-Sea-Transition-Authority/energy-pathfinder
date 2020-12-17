@@ -73,7 +73,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
     }
 
     projectLocation.setFieldType(form.getFieldType());
-    projectLocation.setWaterDepth(form.getWaterDepth());
+    projectLocation.setMaximumWaterDepth(form.getMaximumWaterDepth());
 
     projectLocation.setApprovedFieldDevelopmentPlan(form.getApprovedFieldDevelopmentPlan());
     projectLocation.setApprovedFdpDate(
@@ -131,7 +131,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
     }
 
     form.setFieldType(projectLocation.getFieldType());
-    form.setWaterDepth(projectLocation.getWaterDepth());
+    form.setMaximumWaterDepth(projectLocation.getMaximumWaterDepth());
 
     form.setApprovedDecomProgram(projectLocation.getApprovedDecomProgram());
     form.setApprovedDecomProgramDate(new ThreeFieldDateInput(projectLocation.getApprovedDecomProgramDate()));

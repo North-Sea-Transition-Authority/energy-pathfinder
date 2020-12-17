@@ -28,7 +28,7 @@ public class ProjectLocation extends ProjectDetailEntity implements ParentEntity
   @Enumerated(EnumType.STRING)
   private FieldType fieldType;
 
-  private Integer waterDepth;
+  private Integer maximumWaterDepth;
 
   @Column(name = "approved_fdp")
   private Boolean approvedFieldDevelopmentPlan;
@@ -83,12 +83,12 @@ public class ProjectLocation extends ProjectDetailEntity implements ParentEntity
     this.fieldType = fieldType;
   }
 
-  public Integer getWaterDepth() {
-    return waterDepth;
+  public Integer getMaximumWaterDepth() {
+    return maximumWaterDepth;
   }
 
-  public void setWaterDepth(Integer waterDepth) {
-    this.waterDepth = waterDepth;
+  public void setMaximumWaterDepth(Integer maximumWaterDepth) {
+    this.maximumWaterDepth = maximumWaterDepth;
   }
 
   public Boolean getApprovedFieldDevelopmentPlan() {

@@ -8,7 +8,7 @@
       </#if>
     </@checkAnswers.checkAnswersRowNoActionsWithNested>
     <@checkAnswers.checkAnswersRowNoActions prompt="Field type" value=projectLocationView.fieldType!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Water depth" value=projectLocationView.waterDepth!"" />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Maximum water depth" value=projectLocationView.maximumWaterDepth!"" />
     <@checkAnswers.checkAnswersRowNoActions prompt="Approved Field Development Plan" value=projectLocationView.approvedFieldDevelopmentPlan?has_content?then(projectLocationView.approvedFieldDevelopmentPlan?string("Yes", "No"), "") />
     <#if projectLocationView.approvedFieldDevelopmentPlan?has_content && projectLocationView.approvedFieldDevelopmentPlan>
       <@checkAnswers.checkAnswersRowNoActions prompt="FDP approval date" value=projectLocationView.approvedFdpDate!"" />
