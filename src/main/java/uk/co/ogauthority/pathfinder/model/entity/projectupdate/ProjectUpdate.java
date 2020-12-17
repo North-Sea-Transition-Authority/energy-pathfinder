@@ -47,8 +47,8 @@ public class ProjectUpdate {
     return toDetail;
   }
 
-  public void setToDetail(ProjectDetail newDetail) {
-    this.toDetail = newDetail;
+  public void setToDetail(ProjectDetail toDetail) {
+    this.toDetail = toDetail;
   }
 
   public ProjectUpdateType getUpdateType() {
