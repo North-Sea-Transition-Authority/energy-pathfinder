@@ -25,22 +25,22 @@ import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerT
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.project.CancelDraftService;
+import uk.co.ogauthority.pathfinder.service.project.CancelDraftProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(
-    value = CancelDraftController.class,
+    value = CancelDraftProjectVersionController.class,
     includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {ProjectContextService.class})
 )
-public class CancelDraftControllerTest extends ProjectContextAbstractControllerTest {
+public class CancelDraftProjectVersionControllerTest extends ProjectContextAbstractControllerTest {
 
   private static final int PROJECT_ID = 1;
 
   @MockBean
-  private CancelDraftService cancelDraftService;
+  private CancelDraftProjectVersionService cancelDraftProjectVersionService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
 
@@ -58,7 +58,7 @@ public class CancelDraftControllerTest extends ProjectContextAbstractControllerT
   @Test
   public void getCancelDraft_whenAuthenticated_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(CancelDraftController.class).getCancelDraft(PROJECT_ID, null, null)))
+        on(CancelDraftProjectVersionController.class).getCancelDraft(PROJECT_ID, null, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -66,7 +66,7 @@ public class CancelDraftControllerTest extends ProjectContextAbstractControllerT
   @Test
   public void getCancelDraft_whenUnauthenticated_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(CancelDraftController.class).getCancelDraft(PROJECT_ID, null, null)))
+        on(CancelDraftProjectVersionController.class).getCancelDraft(PROJECT_ID, null, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -74,26 +74,26 @@ public class CancelDraftControllerTest extends ProjectContextAbstractControllerT
   @Test
   public void cancelDraft_whenAuthenticated_thenCancel() throws Exception {
     mockMvc.perform(
-        post(ReverseRouter.route(on(CancelDraftController.class)
+        post(ReverseRouter.route(on(CancelDraftProjectVersionController.class)
             .cancelDraft(PROJECT_ID, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf()))
         .andExpect(status().is3xxRedirection());
 
-    verify(cancelDraftService, times(1)).cancelDraft(projectDetail);
+    verify(cancelDraftProjectVersionService, times(1)).cancelDraft(projectDetail);
   }
 
   @Test
   public void cancelDraft_whenUnauthenticated_thenNoAccess() throws Exception {
     mockMvc.perform(
-        post(ReverseRouter.route(on(CancelDraftController.class)
+        post(ReverseRouter.route(on(CancelDraftProjectVersionController.class)
             .cancelDraft(PROJECT_ID, null, null)
         ))
             .with(authenticatedUserAndSession(unauthenticatedUser))
             .with(csrf()))
         .andExpect(status().isForbidden());
 
-    verify(cancelDraftService, never()).cancelDraft(projectDetail);
+    verify(cancelDraftProjectVersionService, never()).cancelDraft(projectDetail);
   }
 }

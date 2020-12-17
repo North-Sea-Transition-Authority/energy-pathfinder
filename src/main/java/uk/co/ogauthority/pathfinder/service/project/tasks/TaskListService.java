@@ -5,7 +5,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
-import uk.co.ogauthority.pathfinder.controller.project.CancelDraftController;
+import uk.co.ogauthority.pathfinder.controller.project.CancelDraftProjectVersionController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
@@ -25,7 +25,7 @@ public class TaskListService {
     return new ModelAndView(TASK_LIST_TEMPLATE_PATH)
         .addObject("isUpdate", !detail.isFirstVersion())
         .addObject("groups", taskListGroupsService.getTaskListGroups(detail))
-        .addObject("cancelDraftUrl", ReverseRouter.route(on(CancelDraftController.class)
+        .addObject("cancelDraftUrl", ReverseRouter.route(on(CancelDraftProjectVersionController.class)
             .getCancelDraft(detail.getProject().getId(), null, null)));
   }
 }

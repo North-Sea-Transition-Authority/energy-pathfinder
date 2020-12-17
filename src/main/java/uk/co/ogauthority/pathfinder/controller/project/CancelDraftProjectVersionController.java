@@ -15,34 +15,34 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.project.CancelDraftService;
+import uk.co.ogauthority.pathfinder.service.project.CancelDraftProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 
 @Controller
 @ProjectStatusCheck(status = {ProjectStatus.DRAFT})
 @ProjectFormPagePermissionCheck
 @RequestMapping("/project/{projectId}/cancel-draft")
-public class CancelDraftController {
+public class CancelDraftProjectVersionController {
 
-  private final CancelDraftService cancelDraftService;
+  private final CancelDraftProjectVersionService cancelDraftProjectVersionService;
 
   @Autowired
-  public CancelDraftController(CancelDraftService cancelDraftService) {
-    this.cancelDraftService = cancelDraftService;
+  public CancelDraftProjectVersionController(CancelDraftProjectVersionService cancelDraftProjectVersionService) {
+    this.cancelDraftProjectVersionService = cancelDraftProjectVersionService;
   }
 
   @GetMapping
   public ModelAndView getCancelDraft(@PathVariable("projectId") Integer projectId,
                                      ProjectContext projectContext,
                                      AuthenticatedUserAccount user) {
-    return cancelDraftService.getCancelDraftModelAndView(projectContext.getProjectDetails(), user);
+    return cancelDraftProjectVersionService.getCancelDraftModelAndView(projectContext.getProjectDetails(), user);
   }
 
   @PostMapping
   public ModelAndView cancelDraft(@PathVariable("projectId") Integer projectId,
                                   ProjectContext projectContext,
                                   AuthenticatedUserAccount user) {
-    cancelDraftService.cancelDraft(projectContext.getProjectDetails());
+    cancelDraftProjectVersionService.cancelDraft(projectContext.getProjectDetails());
     return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(user, null));
   }
 }

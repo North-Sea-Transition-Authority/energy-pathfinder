@@ -18,7 +18,7 @@ import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateService;
 
 @Service
-public class CancelDraftService {
+public class CancelDraftProjectVersionService {
 
   public static final String CANCEL_DRAFT_TEMPLATE_PATH = "project/cancelDraft";
 
@@ -29,11 +29,11 @@ public class CancelDraftService {
   private final List<ProjectFormSectionService> projectFormSectionServices;
 
   @Autowired
-  public CancelDraftService(ProjectService projectService,
-                            ProjectUpdateService projectUpdateService,
-                            RegulatorProjectUpdateService regulatorProjectUpdateService,
-                            ProjectSummaryRenderingService projectSummaryRenderingService,
-                            List<ProjectFormSectionService> projectFormSectionServices) {
+  public CancelDraftProjectVersionService(ProjectService projectService,
+                                          ProjectUpdateService projectUpdateService,
+                                          RegulatorProjectUpdateService regulatorProjectUpdateService,
+                                          ProjectSummaryRenderingService projectSummaryRenderingService,
+                                          List<ProjectFormSectionService> projectFormSectionServices) {
     this.projectService = projectService;
     this.projectUpdateService = projectUpdateService;
     this.regulatorProjectUpdateService = regulatorProjectUpdateService;

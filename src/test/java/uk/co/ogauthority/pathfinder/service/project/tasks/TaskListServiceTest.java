@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.servlet.ModelAndView;
-import uk.co.ogauthority.pathfinder.controller.project.CancelDraftController;
+import uk.co.ogauthority.pathfinder.controller.project.CancelDraftProjectVersionController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.tasks.TaskListGroup;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -71,7 +71,7 @@ public class TaskListServiceTest {
     assertThat(modelAndView.getModel()).containsExactly(
         entry("isUpdate", isUpdate),
         entry("groups", groups),
-        entry("cancelDraftUrl", ReverseRouter.route(on(CancelDraftController.class)
+        entry("cancelDraftUrl", ReverseRouter.route(on(CancelDraftProjectVersionController.class)
             .getCancelDraft(detail.getProject().getId(), null, null)))
     );
   }

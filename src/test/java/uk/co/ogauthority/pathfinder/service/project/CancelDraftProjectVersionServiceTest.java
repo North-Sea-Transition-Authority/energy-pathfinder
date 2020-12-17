@@ -32,7 +32,7 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CancelDraftServiceTest {
+public class CancelDraftProjectVersionServiceTest {
 
   @Mock
   private ProjectService projectService;
@@ -52,7 +52,7 @@ public class CancelDraftServiceTest {
   @Mock
   private PlatformsFpsosService platformsFpsosService;
 
-  private CancelDraftService cancelDraftService;
+  private CancelDraftProjectVersionService cancelDraftProjectVersionService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
   private final Project project = projectDetail.getProject();
@@ -61,7 +61,7 @@ public class CancelDraftServiceTest {
 
   @Before
   public void setup() {
-    cancelDraftService = new CancelDraftService(
+    cancelDraftProjectVersionService = new CancelDraftProjectVersionService(
         projectService,
         projectUpdateService,
         regulatorProjectUpdateService,
@@ -76,7 +76,7 @@ public class CancelDraftServiceTest {
 
     when(projectUpdateService.getByToDetail(projectDetail)).thenReturn(Optional.empty());
 
-    cancelDraftService.cancelDraft(projectDetail);
+    cancelDraftProjectVersionService.cancelDraft(projectDetail);
 
     verify(upcomingTenderService, times(1)).removeSectionData(projectDetail);
     verify(platformsFpsosService, times(1)).removeSectionData(projectDetail);
@@ -97,7 +97,7 @@ public class CancelDraftServiceTest {
 
     when(projectUpdateService.getByToDetail(projectDetail)).thenReturn(Optional.of(projectUpdate));
 
-    cancelDraftService.cancelDraft(projectDetail);
+    cancelDraftProjectVersionService.cancelDraft(projectDetail);
 
     verify(upcomingTenderService, times(1)).removeSectionData(projectDetail);
     verify(platformsFpsosService, times(1)).removeSectionData(projectDetail);
@@ -122,7 +122,7 @@ public class CancelDraftServiceTest {
 
     when(projectUpdateService.getByToDetail(projectDetail)).thenReturn(Optional.of(projectUpdate));
 
-    cancelDraftService.cancelDraft(projectDetail);
+    cancelDraftProjectVersionService.cancelDraft(projectDetail);
 
     verify(upcomingTenderService, times(1)).removeSectionData(projectDetail);
     verify(platformsFpsosService, times(1)).removeSectionData(projectDetail);
@@ -143,7 +143,7 @@ public class CancelDraftServiceTest {
 
     when(projectSummaryRenderingService.renderSummary(projectDetail, authenticatedUser)).thenReturn(projectSummaryHtml);
 
-    var modelAndView = cancelDraftService.getCancelDraftModelAndView(projectDetail, authenticatedUser);
+    var modelAndView = cancelDraftProjectVersionService.getCancelDraftModelAndView(projectDetail, authenticatedUser);
     assertCancelDraftModelAndView(modelAndView, false, projectSummaryHtml);
   }
 
@@ -155,14 +155,14 @@ public class CancelDraftServiceTest {
 
     when(projectSummaryRenderingService.renderSummary(projectDetail, authenticatedUser)).thenReturn(projectSummaryHtml);
 
-    var modelAndView = cancelDraftService.getCancelDraftModelAndView(projectDetail, authenticatedUser);
+    var modelAndView = cancelDraftProjectVersionService.getCancelDraftModelAndView(projectDetail, authenticatedUser);
     assertCancelDraftModelAndView(modelAndView, true, projectSummaryHtml);
   }
 
   private void assertCancelDraftModelAndView(ModelAndView modelAndView,
                                              boolean isUpdate,
                                              String projectSummaryHtml) {
-    assertThat(modelAndView.getViewName()).isEqualTo(CancelDraftService.CANCEL_DRAFT_TEMPLATE_PATH);
+    assertThat(modelAndView.getViewName()).isEqualTo(CancelDraftProjectVersionService.CANCEL_DRAFT_TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
         entry("isUpdate", isUpdate),
         entry("projectSummaryHtml", projectSummaryHtml),
