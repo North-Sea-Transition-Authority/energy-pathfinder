@@ -43,6 +43,6 @@ public class CancelDraftProjectVersionController {
                                   ProjectContext projectContext,
                                   AuthenticatedUserAccount user) {
     cancelDraftProjectVersionService.cancelDraft(projectContext.getProjectDetails());
-    return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(user, null));
+    return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(null, null));
   }
 }
