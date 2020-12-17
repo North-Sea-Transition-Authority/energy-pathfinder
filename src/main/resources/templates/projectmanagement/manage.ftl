@@ -8,14 +8,6 @@
   backLink=true
   backLinkUrl=springUrl(backLinkUrl)
 >
-  <@headingWithContent
-    caption=""
-    captionClass=""
-    pageHeading="Project: ${projectManagementView.title}"
-    pageHeadingClass="govuk-heading-xl"
-  >
-    <span class="govuk-caption-l">${projectManagementView.operator}</span>
-  </@headingWithContent>
   ${projectManagementView.staticContentHtml?no_esc}
   <#if (viewableVersions?size > 1)>
     <@fdsForm.htmlForm actionUrl=springUrl(viewVersionUrl)>

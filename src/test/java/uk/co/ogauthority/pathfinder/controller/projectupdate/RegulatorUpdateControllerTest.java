@@ -71,7 +71,7 @@ public class RegulatorUpdateControllerTest extends ProjectUpdateContextAbstractC
   @Test
   public void getRequestUpdate_whenAuthenticatedAndQA_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(RegulatorUpdateController.class).getRequestUpdate(QA_PROJECT_ID, null)))
+        on(RegulatorUpdateController.class).getRequestUpdate(QA_PROJECT_ID, null, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -79,7 +79,7 @@ public class RegulatorUpdateControllerTest extends ProjectUpdateContextAbstractC
   @Test
   public void getRequestUpdate_whenUnauthenticatedAndQA_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(RegulatorUpdateController.class).getRequestUpdate(QA_PROJECT_ID, null)))
+        on(RegulatorUpdateController.class).getRequestUpdate(QA_PROJECT_ID, null, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -87,7 +87,7 @@ public class RegulatorUpdateControllerTest extends ProjectUpdateContextAbstractC
   @Test
   public void getRequestUpdate_whenAuthenticatedAndDraft_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(RegulatorUpdateController.class).getRequestUpdate(DRAFT_PROJECT_ID, null)))
+        on(RegulatorUpdateController.class).getRequestUpdate(DRAFT_PROJECT_ID, null, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -115,7 +115,7 @@ public class RegulatorUpdateControllerTest extends ProjectUpdateContextAbstractC
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
     when(regulatorProjectUpdateService.validate(any(), any())).thenReturn(bindingResult);
 
-    when(regulatorProjectUpdateService.getRequestUpdateModelAndView(any(), any())).thenReturn(new ModelAndView());
+    when(regulatorProjectUpdateService.getRequestUpdateModelAndView(any(), any(), any())).thenReturn(new ModelAndView());
 
     mockMvc.perform(
         post(ReverseRouter.route(on(RegulatorUpdateController.class)

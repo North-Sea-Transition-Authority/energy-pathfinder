@@ -28,6 +28,7 @@ import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessme
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectassessment.ProjectAssessmentRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.projectpublishing.ProjectPublishingService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectAssessmentTestUtil;
@@ -52,6 +53,9 @@ public class ProjectAssessmentServiceTest {
   @Mock
   private ProjectPublishingService projectPublishingService;
 
+  @Mock
+  private ProjectHeaderSummaryService projectHeaderSummaryService;
+
   private ProjectAssessmentService projectAssessmentService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
@@ -64,7 +68,8 @@ public class ProjectAssessmentServiceTest {
         validationService,
         projectAssessmentFormValidator,
         breadcrumbService,
-        projectPublishingService
+        projectPublishingService,
+        projectHeaderSummaryService
     );
 
     when(projectAssessmentRepository.save(any(ProjectAssessment.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
@@ -168,17 +173,21 @@ public class ProjectAssessmentServiceTest {
 
   @Test
   public void getProjectAssessmentModelAndView() {
-    var projectId = 1;
+    var projectId = projectDetail.getProject().getId();
+    var projectHeaderHtml = "html";
+
+    when(projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, authenticatedUser)).thenReturn(projectHeaderHtml);
+
     var form = new ProjectAssessmentForm();
 
-    var modelAndView = projectAssessmentService.getProjectAssessmentModelAndView(projectId, form);
+    var modelAndView = projectAssessmentService.getProjectAssessmentModelAndView(projectDetail, authenticatedUser, form);
 
     assertThat(modelAndView.getModel()).containsExactly(
         entry("pageName", ProjectAssessmentController.PAGE_NAME),
+        entry("projectHeaderHtml", projectHeaderHtml),
         entry("form", form),
         entry("projectQualities", ProjectQuality.getAllAsMap()),
-        entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class)
-            .getProject(projectId, null, null, null)))
+        entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)))
     );
     verify(breadcrumbService, times(1)).fromManageProject(projectId, modelAndView, ProjectAssessmentController.PAGE_NAME);
   }

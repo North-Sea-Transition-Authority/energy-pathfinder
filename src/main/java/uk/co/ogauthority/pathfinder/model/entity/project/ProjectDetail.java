@@ -62,6 +62,10 @@ public class ProjectDetail implements ParentEntity {
     return id;
   }
 
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
   public Project getProject() {
     return project;
   }

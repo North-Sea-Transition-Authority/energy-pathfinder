@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.form.projectupdate.ProvideNoUpdateForm
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.NoUpdateNotificationRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
@@ -32,6 +33,7 @@ public class OperatorProjectUpdateService {
   private final ProjectUpdateService projectUpdateService;
   private final NoUpdateNotificationRepository noUpdateNotificationRepository;
   private final ProjectNoUpdateSummaryViewService projectNoUpdateSummaryViewService;
+  private final ProjectHeaderSummaryService projectHeaderSummaryService;
   private final ValidationService validationService;
   private final BreadcrumbService breadcrumbService;
 
@@ -40,11 +42,13 @@ public class OperatorProjectUpdateService {
       ProjectUpdateService projectUpdateService,
       NoUpdateNotificationRepository noUpdateNotificationRepository,
       ProjectNoUpdateSummaryViewService projectNoUpdateSummaryViewService,
+      ProjectHeaderSummaryService projectHeaderSummaryService,
       ValidationService validationService,
       BreadcrumbService breadcrumbService) {
     this.projectUpdateService = projectUpdateService;
     this.noUpdateNotificationRepository = noUpdateNotificationRepository;
     this.projectNoUpdateSummaryViewService = projectNoUpdateSummaryViewService;
+    this.projectHeaderSummaryService = projectHeaderSummaryService;
     this.validationService = validationService;
     this.breadcrumbService = breadcrumbService;
   }
@@ -78,8 +82,12 @@ public class OperatorProjectUpdateService {
         .addObject("startActionUrl", ReverseRouter.route(on(OperatorUpdateController.class).startUpdate(projectId, null, null)));
   }
 
-  public ModelAndView getProjectProvideNoUpdateModelAndView(Integer projectId, ProvideNoUpdateForm form) {
+  public ModelAndView getProjectProvideNoUpdateModelAndView(ProjectDetail projectDetail,
+                                                            AuthenticatedUserAccount user,
+                                                            ProvideNoUpdateForm form) {
+    var projectId = projectDetail.getProject().getId();
     var modelAndView = new ModelAndView(PROVIDE_NO_UPDATE_TEMPLATE_PATH)
+        .addObject("projectHeaderHtml", projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, user))
         .addObject("form", form)
         .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)));
     breadcrumbService.fromManageProject(projectId, modelAndView, OperatorUpdateController.NO_UPDATE_REQUIRED_PAGE_NAME);

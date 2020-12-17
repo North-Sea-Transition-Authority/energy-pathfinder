@@ -28,6 +28,7 @@ import uk.co.ogauthority.pathfinder.model.view.projectupdate.ProjectNoUpdateSumm
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.NoUpdateNotificationRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -47,6 +48,9 @@ public class OperatorProjectUpdateServiceTest {
   private ProjectNoUpdateSummaryViewService projectNoUpdateSummaryService;
 
   @Mock
+  private ProjectHeaderSummaryService projectHeaderSummaryService;
+
+  @Mock
   private ValidationService validationService;
 
   @Mock
@@ -64,6 +68,7 @@ public class OperatorProjectUpdateServiceTest {
         projectUpdateService,
         noUpdateNotificationRepository,
         projectNoUpdateSummaryService,
+        projectHeaderSummaryService,
         validationService,
         breadcrumbService
     );
@@ -122,11 +127,19 @@ public class OperatorProjectUpdateServiceTest {
   @Test
   public void getProjectProvideNoUpdateModelAndView() {
     var form = new ProvideNoUpdateForm();
+    var projectHeaderHtml = "html";
 
-    var modelAndView = operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(PROJECT_ID, form);
+    when(projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, authenticatedUser)).thenReturn(projectHeaderHtml);
+
+    var modelAndView = operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(
+        projectDetail,
+        authenticatedUser,
+        form
+    );
 
     assertThat(modelAndView.getViewName()).isEqualTo(OperatorProjectUpdateService.PROVIDE_NO_UPDATE_TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
+        entry("projectHeaderHtml", projectHeaderHtml),
         entry("form", form),
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(PROJECT_ID, null, null, null)))
     );

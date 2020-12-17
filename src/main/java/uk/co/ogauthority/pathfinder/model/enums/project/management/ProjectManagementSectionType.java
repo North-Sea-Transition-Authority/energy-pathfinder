@@ -2,10 +2,11 @@ package uk.co.ogauthority.pathfinder.model.enums.project.management;
 
 public enum ProjectManagementSectionType {
 
-  PROJECT_DETAILS(10),
-  ACTIONS(20),
-  PROJECT_ASSESSMENT(30),
-  PROJECT_SUMMARY(40);
+  HEADING(10),
+  PROJECT_DETAILS(20),
+  ACTIONS(30),
+  PROJECT_ASSESSMENT(40),
+  PROJECT_SUMMARY(50);
 
   private final int displayOrder;
 

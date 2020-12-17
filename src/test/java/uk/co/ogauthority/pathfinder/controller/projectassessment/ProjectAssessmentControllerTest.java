@@ -71,7 +71,7 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
   @Test
   public void getProjectAssessment_whenAuthenticated_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(ProjectAssessmentController.class).getProjectAssessment(QA_PROJECT_ID, null)))
+        on(ProjectAssessmentController.class).getProjectAssessment(QA_PROJECT_ID, null, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -79,7 +79,7 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
   @Test
   public void getProjectAssessment_whenUnauthenticated_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(ProjectAssessmentController.class).getProjectAssessment(QA_PROJECT_ID, null)))
+        on(ProjectAssessmentController.class).getProjectAssessment(QA_PROJECT_ID, null, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -87,7 +87,7 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
   @Test
   public void getProjectAssessment_whenAuthenticatedAndDraft_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(ProjectAssessmentController.class).getProjectAssessment(DRAFT_PROJECT_ID, null)))
+        on(ProjectAssessmentController.class).getProjectAssessment(DRAFT_PROJECT_ID, null, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -118,7 +118,7 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
 
-    when(projectAssessmentService.getProjectAssessmentModelAndView(eq(QA_PROJECT_ID), any())).thenReturn(new ModelAndView());
+    when(projectAssessmentService.getProjectAssessmentModelAndView(eq(qaProjectDetail), eq(authenticatedUser), any())).thenReturn(new ModelAndView());
     when(projectAssessmentService.validate(any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(

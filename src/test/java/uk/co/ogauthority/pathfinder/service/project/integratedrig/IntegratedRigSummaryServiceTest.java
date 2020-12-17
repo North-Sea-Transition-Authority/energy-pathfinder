@@ -45,7 +45,7 @@ public class IntegratedRigSummaryServiceTest {
     assertThat(results).hasSize(1);
     var integratedRigView = results.get(0);
     assertThat(integratedRigView.getId()).isEqualTo(integratedRig.getId());
-    assertThat(integratedRigView.getProjectId()).isEqualTo(integratedRig.getProjectDetail().getId());
+    assertThat(integratedRigView.getProjectId()).isEqualTo(integratedRig.getProjectDetail().getProject().getId());
     assertThat(integratedRigView.isValid()).isTrue();
   }
 

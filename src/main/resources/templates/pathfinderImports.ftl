@@ -14,3 +14,4 @@
 <#import 'project/macros/sectionSummaryWrapper.ftl' as sectionSummaryWrapper>
 <#import 'macros/useraction/userAction.ftl' as userAction>
 <#import 'macros/inlineInputAction.ftl' as inlineInputAction>
+<#import 'macros/noEscapeHtml.ftl' as noEscapeHtml>

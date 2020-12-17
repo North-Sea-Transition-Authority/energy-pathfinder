@@ -1,9 +1,13 @@
 <#include '../layout.ftl'>
 
-<@defaultPage htmlTitle=pageName pageHeading=pageName breadcrumbs=true>
+<@defaultPage htmlTitle=pageName pageHeading="" breadcrumbs=true fullWidthColumn=true>
   <#if errorList?has_content>
     <@fdsError.errorSummary errorItems=errorList />
   </#if>
+
+  <@noEscapeHtml.noEscapeHtml html=projectHeaderHtml />
+
+  <h2 class="govuk-heading-l">${pageName}</h2>
 
   <@fdsForm.htmlForm>
     <@fdsRadio.radio path="form.projectQuality" labelText="What is the quality of the project?" radioItems=projectQualities />

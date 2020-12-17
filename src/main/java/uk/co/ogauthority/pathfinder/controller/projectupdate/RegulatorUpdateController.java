@@ -44,8 +44,13 @@ public class RegulatorUpdateController {
 
   @GetMapping("/request-update")
   public ModelAndView getRequestUpdate(@PathVariable("projectId") Integer projectId,
-                                       ProjectUpdateContext projectUpdateContext) {
-    return regulatorProjectUpdateService.getRequestUpdateModelAndView(projectId, new RequestUpdateForm());
+                                       ProjectUpdateContext projectUpdateContext,
+                                       AuthenticatedUserAccount user) {
+    return regulatorProjectUpdateService.getRequestUpdateModelAndView(
+        projectUpdateContext.getProjectDetails(),
+        user,
+        new RequestUpdateForm()
+    );
   }
 
   @PostMapping("/request-update")
@@ -57,7 +62,7 @@ public class RegulatorUpdateController {
     bindingResult = regulatorProjectUpdateService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        regulatorProjectUpdateService.getRequestUpdateModelAndView(projectId, form),
+        regulatorProjectUpdateService.getRequestUpdateModelAndView(projectUpdateContext.getProjectDetails(), user, form),
         form,
         () -> {
           regulatorProjectUpdateService.startRegulatorRequestedUpdate(projectUpdateContext.getProjectDetails(), form, user);
