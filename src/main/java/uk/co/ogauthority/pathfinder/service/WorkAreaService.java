@@ -32,9 +32,12 @@ public class WorkAreaService {
   }
 
   public ModelAndView getWorkAreaModelAndViewForUser(AuthenticatedUserAccount user, DashboardFilter filter, DashboardFilterForm form) {
-    var dashboardProjectItemViews =  dashboardService.getDashboardProjectItemViewsForUser(user, filter);
+    var filterType = dashboardService.getDashboardFilterType(user);
+    var dashboardProjectItemViews =  dashboardService.getDashboardProjectItemViewsForUser(user, filterType, filter);
+
     return new ModelAndView(WORK_AREA_TEMPLATE_PATH)
         .addObject("startProjectButton", getStartProjectLinkButton(user))
+        .addObject("filterType", filterType)
         .addObject("form", form)
         .addObject("statuses", ProjectStatus.getAllAsMap())
         .addObject("fieldStages", FieldStage.getAllAsMap())
@@ -50,6 +53,10 @@ public class WorkAreaService {
         user.getUserPrivileges().contains(UserPrivilege.PATHFINDER_PROJECT_CREATE),
         ButtonType.PRIMARY
     );
+  }
+
+  public DashboardFilter getDefaultFilterForUser(AuthenticatedUserAccount user) {
+    return dashboardService.getDefaultFilterForUser(user);
   }
 
 }

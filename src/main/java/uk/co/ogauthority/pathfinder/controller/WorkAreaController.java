@@ -51,12 +51,12 @@ public class WorkAreaController {
       SessionStatus status
   ) {
     status.setComplete();//Allow cleanup of session attributes
-    return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(user, getDefaultFilter()));
+    return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(user, getDefaultFilter(user)));
   }
 
   @ModelAttribute("dashboardFilter")
-  private DashboardFilter getDefaultFilter() {
-    return new DashboardFilter();
+  private DashboardFilter getDefaultFilter(AuthenticatedUserAccount user) {
+    return workAreaService.getDefaultFilterForUser(user);
   }
 
 }

@@ -17,6 +17,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
+import uk.co.ogauthority.pathfinder.model.enums.DashboardFilterType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.testutil.DashboardFilterTestUtil;
@@ -56,9 +57,8 @@ public class DashboardServiceTest {
 
   @Test
   public void getDashboardProjectItemsForUser_noResultsForRegulatorUser() {
-    when(teamService.isPersonMemberOfRegulatorTeam(authenticatedUser.getLinkedPerson())).thenReturn(true);
     when(regulatorDashboardService.getDashboardProjectItems(filter)).thenReturn(Collections.emptyList());
-    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser, filter).size()).isZero();
+    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser, DashboardFilterType.REGULATOR, filter).size()).isZero();
 
     verify(regulatorDashboardService, times(1)).getDashboardProjectItems(filter);
     verify(operatorDashboardService, times(0)).getDashboardProjectItems(any(), any());
@@ -66,9 +66,8 @@ public class DashboardServiceTest {
 
   @Test
   public void getDashboardProjectItemViewsForUser_regulatorUserCorrectNumberOfViewsReturned() {
-    when(teamService.isPersonMemberOfRegulatorTeam(authenticatedUser.getLinkedPerson())).thenReturn(true);
     when(regulatorDashboardService.getDashboardProjectItems(filter)).thenReturn(List.of(qaItem));
-    assertThat(dashboardService.getDashboardProjectItemViewsForUser(authenticatedUser, filter).size()).isEqualTo(1);
+    assertThat(dashboardService.getDashboardProjectItemViewsForUser(authenticatedUser, DashboardFilterType.REGULATOR, filter).size()).isEqualTo(1);
 
     verify(regulatorDashboardService, times(1)).getDashboardProjectItems(filter);
     verify(operatorDashboardService, times(0)).getDashboardProjectItems(any(), any());
@@ -76,11 +75,10 @@ public class DashboardServiceTest {
 
   @Test
   public void getDashboardProjectItemsForUser_noResultsForOperatorUser() {
-    when(teamService.isPersonMemberOfRegulatorTeam(authenticatedUser.getLinkedPerson())).thenReturn(false);
     when(operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson(), filter)).thenReturn(
         Collections.emptyList()
     );
-    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser, filter).size()).isZero();
+    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser, DashboardFilterType.OPERATOR, filter).size()).isZero();
 
     verify(regulatorDashboardService, times(0)).getDashboardProjectItems(any());
     verify(operatorDashboardService, times(1)).getDashboardProjectItems(any(), any());
@@ -88,13 +86,49 @@ public class DashboardServiceTest {
 
   @Test
   public void getDashboardProjectItemViewsForUser_operatorUserCorrectNumberOfViewsReturned() {
-    when(teamService.isPersonMemberOfRegulatorTeam(authenticatedUser.getLinkedPerson())).thenReturn(false);
     when(operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson(), filter)).thenReturn(
         List.of(dashboardProjectItem)
     );
-    assertThat(dashboardService.getDashboardProjectItemViewsForUser(authenticatedUser, filter).size()).isEqualTo(1);
+    assertThat(dashboardService.getDashboardProjectItemViewsForUser(authenticatedUser, DashboardFilterType.OPERATOR, filter).size()).isEqualTo(1);
 
     verify(regulatorDashboardService, times(0)).getDashboardProjectItems(any());
     verify(operatorDashboardService, times(1)).getDashboardProjectItems(any(), any());
+  }
+
+  @Test
+  public void getDashboardFilterType_regulator() {
+    when(teamService.isPersonMemberOfRegulatorTeam(authenticatedUser.getLinkedPerson())).thenReturn(true);
+    assertThat(dashboardService.getDashboardFilterType(authenticatedUser)).isEqualTo(DashboardFilterType.REGULATOR);
+  }
+
+  @Test
+  public void getDashboardFilterType_operator() {
+    when(teamService.isPersonMemberOfRegulatorTeam(authenticatedUser.getLinkedPerson())).thenReturn(false);
+    assertThat(dashboardService.getDashboardFilterType(authenticatedUser)).isEqualTo(DashboardFilterType.OPERATOR);
+  }
+
+  @Test
+  public void getDefaultFilterForUser_regulator() {
+    when(teamService.isPersonMemberOfRegulatorTeam(authenticatedUser.getLinkedPerson())).thenReturn(true);
+    var filter = dashboardService.getDefaultFilterForUser(authenticatedUser);
+    assertThat(filter.getProjectStatusList()).isEqualTo(DashboardService.REGULATOR_STATUS_DEFAULTS);
+    assertCommonFields(filter);
+  }
+
+  @Test
+  public void getDefaultFilterForUser_operator() {
+    when(teamService.isPersonMemberOfRegulatorTeam(authenticatedUser.getLinkedPerson())).thenReturn(false);
+    var filter = dashboardService.getDefaultFilterForUser(authenticatedUser);
+    assertThat(filter.getProjectStatusList()).isEqualTo(DashboardService.OPERATOR_STATUS_DEFAULTS);
+    assertCommonFields(filter);
+  }
+
+
+  private void assertCommonFields(DashboardFilter filter) {
+    assertThat(filter.getOperatorName()).isNull();
+    assertThat(filter.getProjectTitle()).isNull();
+    assertThat(filter.getFieldStages()).isNull();
+    assertThat(filter.getField()).isNull();
+    assertThat(filter.getUkcsAreas()).isNull();
   }
 }

@@ -14,16 +14,19 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 import uk.co.ogauthority.pathfinder.testutil.DashboardFilterTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DashboardFilterServiceTest {
 
+  private static final String OPERATOR = "Test operator";
   private static final String TITLE = "Test project";
   private static final FieldStage FIELD_STAGE = FieldStage.DEVELOPMENT;
   private static final String FIELD_NAME = "Filter Test Field";
   private static final ProjectStatus PROJECT_STATUS = ProjectStatus.PUBLISHED;
   private static final UkcsArea UKCS_AREA = UkcsArea.NNS;
 
+  private static final DashboardProjectItem OPERATOR_ITEM = DashboardProjectItemTestUtil.getDashboardProjectItem(ProjectOperatorTestUtil.getOrgGroup(OPERATOR));
   private static final DashboardProjectItem TITLE_ITEM = DashboardProjectItemTestUtil.getDashboardProjectItem(TITLE);
   private static final DashboardProjectItem FIELD_STAGE_ITEM = DashboardProjectItemTestUtil.getDashboardProjectItem(FIELD_STAGE);
   private static final DashboardProjectItem FIELD_ITEM = DashboardProjectItemTestUtil.getDashboardProjectItem_withField(FIELD_NAME);
@@ -32,6 +35,7 @@ public class DashboardFilterServiceTest {
 
   private DashboardFilter filter;
   private List<DashboardProjectItem> dashboardProjectItems = List.of(
+      OPERATOR_ITEM,
       TITLE_ITEM,
       FIELD_STAGE_ITEM,
       FIELD_ITEM,
@@ -47,6 +51,29 @@ public class DashboardFilterServiceTest {
     filter = DashboardFilterTestUtil.getEmptyFilter();
   }
 
+  //OPERATOR_NAME
+  @Test
+  public void operatorMatches_whenFilterNotSet() {
+    assertThat(dashboardFilterService.operatorMatches(OPERATOR_ITEM, filter)).isTrue();
+  }
+
+  @Test
+  public void operatorMatches_whenFilterSet_filterMatches() {
+    filter.setOperatorName(OPERATOR);
+    assertThat(dashboardFilterService.operatorMatches(OPERATOR_ITEM, filter)).isTrue();
+  }
+
+  @Test
+  public void operatorMatches_whenFilterSet_filterMatchesCaseInsensitive() {
+    filter.setOperatorName(OPERATOR.toLowerCase());
+    assertThat(dashboardFilterService.operatorMatches(OPERATOR_ITEM, filter)).isTrue();
+  }
+
+  @Test
+  public void operatorMatches_whenFilterSet_filterDoesNotMatch() {
+    filter.setOperatorName("Another operator name");
+    assertThat(dashboardFilterService.operatorMatches(OPERATOR_ITEM, filter)).isFalse();
+  }
   //TITLE
   @Test
   public void titleMatches_whenFilterNotSet() {
@@ -161,6 +188,15 @@ public class DashboardFilterServiceTest {
   }
 
   @Test
+  public void filter_operatorMatches() {
+    filter.setOperatorName(OPERATOR);
+    var results = dashboardFilterService.filter(dashboardProjectItems, filter);
+
+    assertThat(results.size()).isEqualTo(1);
+    assertThat(results.get(0)).isEqualTo(OPERATOR_ITEM);
+  }
+
+  @Test
   public void filter_titleMatches() {
     filter.setProjectTitle(TITLE);
     var results = dashboardFilterService.filter(dashboardProjectItems, filter);
@@ -208,6 +244,7 @@ public class DashboardFilterServiceTest {
   @Test
   public void filter_allFieldsSet_matchesResult() {
     var dashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    filter.setOperatorName(DashboardProjectItemTestUtil.ORGANISATION_GROUP.getName());
     filter.setProjectTitle(DashboardProjectItemTestUtil.PROJECT_TITLE);
     filter.setFieldStages(List.of(DashboardProjectItemTestUtil.FIELD_STAGE));
     filter.setField(DashboardProjectItemTestUtil.FIELD_NAME);
@@ -222,6 +259,7 @@ public class DashboardFilterServiceTest {
   @Test
   public void filter_allFieldsSet_oneMismatchedField_doesNotMatchResult() {
     var dashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    filter.setOperatorName(DashboardProjectItemTestUtil.ORGANISATION_GROUP.getName());
     filter.setProjectTitle(TITLE);
     filter.setFieldStages(List.of(DashboardProjectItemTestUtil.FIELD_STAGE));
     filter.setField(DashboardProjectItemTestUtil.FIELD_NAME);

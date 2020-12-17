@@ -13,11 +13,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
+import uk.co.ogauthority.pathfinder.model.enums.DashboardFilterType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
@@ -54,7 +56,7 @@ public class WorkAreaServiceTest {
   @Before
   public void setUp() throws Exception {
     workAreaService = new WorkAreaService(dashboardService);
-    when(dashboardService.getDashboardProjectItemViewsForUser(any(), any())).thenReturn(dashboardProjectItemViews);
+    when(dashboardService.getDashboardProjectItemViewsForUser(any(), any(), any())).thenReturn(dashboardProjectItemViews);
   }
 
   @Test
@@ -78,21 +80,32 @@ public class WorkAreaServiceTest {
   }
 
   @Test
-  public void getWorkAreaModelAndViewForUser_allFieldsSet() {
+  public void getWorkAreaModelAndViewForUser_allFieldsSet_regulator() {
+    when(dashboardService.getDashboardFilterType(createProjectUser)).thenReturn(DashboardFilterType.REGULATOR);
     var modelAndView = workAreaService.getWorkAreaModelAndViewForUser(createProjectUser, filter, form);
     LinkButton link = (LinkButton) modelAndView.getModel().get("startProjectButton");
 
     assertThat(link.getEnabled()).isTrue();
     assertLinkFieldsCorrect(link);
+    assertModelAndViewFieldsSet(
+        modelAndView,
+        link,
+        DashboardFilterType.REGULATOR
+    );
+  }
 
-    assertThat(modelAndView.getModel()).containsOnly(
-        entry("dashboardProjectItemViews", dashboardProjectItemViews),
-        entry("startProjectButton", link),
-        entry("resultSize", dashboardProjectItemViews.size()),
-        entry("form", form),
-        entry("statuses", ProjectStatus.getAllAsMap()),
-        entry("fieldStages", FieldStage.getAllAsMap()),
-        entry("ukcsAreas", UkcsArea.getAllAsMap())
+  @Test
+  public void getWorkAreaModelAndViewForUser_allFieldsSet_operator() {
+    when(dashboardService.getDashboardFilterType(createProjectUser)).thenReturn(DashboardFilterType.OPERATOR);
+    var modelAndView = workAreaService.getWorkAreaModelAndViewForUser(createProjectUser, filter, form);
+    LinkButton link = (LinkButton) modelAndView.getModel().get("startProjectButton");
+
+    assertThat(link.getEnabled()).isTrue();
+    assertLinkFieldsCorrect(link);
+    assertModelAndViewFieldsSet(
+        modelAndView,
+        link,
+        DashboardFilterType.OPERATOR
     );
   }
 
@@ -110,9 +123,30 @@ public class WorkAreaServiceTest {
     assertLinkFieldsCorrect(link);
   }
 
+  @Test
+  public void getDefaultFilterForUser() {
+    var filter = new DashboardFilter(DashboardService.REGULATOR_STATUS_DEFAULTS);
+    when(dashboardService.getDefaultFilterForUser(createProjectUser)).thenReturn(filter);
+    var defaultFilterForUser = workAreaService.getDefaultFilterForUser(createProjectUser);
+    assertThat(defaultFilterForUser).isEqualTo(filter);
+  }
+
   private void assertLinkFieldsCorrect(LinkButton link) {
     assertThat(link.getButtonType()).isEqualTo(ButtonType.PRIMARY);
     assertThat(link.getPrompt()).isEqualTo(WorkAreaService.LINK_BUTTON_TEXT);
     assertThat(link.getUrl()).isEqualTo(ReverseRouter.route(on(StartProjectController.class).startProject(null)));
+  }
+
+  private void assertModelAndViewFieldsSet(ModelAndView modelAndView, LinkButton link, DashboardFilterType filterType) {
+    assertThat(modelAndView.getModel()).containsOnly(
+        entry("dashboardProjectItemViews", dashboardProjectItemViews),
+        entry("startProjectButton", link),
+        entry("filterType", filterType),
+        entry("resultSize", dashboardProjectItemViews.size()),
+        entry("form", form),
+        entry("statuses", ProjectStatus.getAllAsMap()),
+        entry("fieldStages", FieldStage.getAllAsMap()),
+        entry("ukcsAreas", UkcsArea.getAllAsMap())
+    );
   }
 }
