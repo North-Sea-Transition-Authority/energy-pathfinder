@@ -1,5 +1,3 @@
-GRANT SELECT ON decmgr.path_operators TO ${datasource.migration-user};
-
 CREATE OR REPLACE VIEW ${datasource.migration-user}.legacy_project_data AS (
   SELECT
     ppd.path_project_id legacy_project_id

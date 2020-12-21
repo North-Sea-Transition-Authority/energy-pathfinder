@@ -1,10 +1,3 @@
-GRANT SELECT ON pedmgr.ped_licence_details TO ${datasource.user};
-GRANT SELECT ON pedmgr.ped_licences TO ${datasource.user};
-GRANT SELECT ON pedmgr.ped_current_data_points TO ${datasource.user};
-GRANT SELECT ON pedmgr.ped_current_licence_blocks TO ${datasource.user};
-GRANT SELECT ON pedmgr.xview_ped_ld_current TO ${datasource.user};
-GRANT EXECUTE ON pedmgr.ped_utils TO ${datasource.user};
-
 CREATE OR REPLACE VIEW ${datasource.user}.ped_licences AS
 SELECT
   xplc.ped_lm_id plm_id

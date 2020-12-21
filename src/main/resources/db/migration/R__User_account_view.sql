@@ -1,5 +1,3 @@
-GRANT SELECT ON securemgr.web_user_accounts TO ${datasource.user};
-
 CREATE OR REPLACE VIEW ${datasource.user}.user_accounts
 AS
 SELECT
