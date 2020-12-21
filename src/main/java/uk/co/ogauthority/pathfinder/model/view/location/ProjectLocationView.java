@@ -11,7 +11,7 @@ public class ProjectLocationView {
 
   private String fieldType;
 
-  private Integer maximumWaterDepth;
+  private String maximumWaterDepth;
 
   private Boolean approvedFieldDevelopmentPlan;
 
@@ -41,11 +41,11 @@ public class ProjectLocationView {
     this.fieldType = fieldType;
   }
 
-  public Integer getMaximumWaterDepth() {
+  public String getMaximumWaterDepth() {
     return maximumWaterDepth;
   }
 
-  public void setMaximumWaterDepth(Integer maximumWaterDepth) {
+  public void setMaximumWaterDepth(String maximumWaterDepth) {
     this.maximumWaterDepth = maximumWaterDepth;
   }
 
