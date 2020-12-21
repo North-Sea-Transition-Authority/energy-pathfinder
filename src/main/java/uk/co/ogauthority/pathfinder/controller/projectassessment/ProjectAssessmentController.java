@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.controller.projectassessment;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import javax.validation.Valid;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
+import uk.co.ogauthority.pathfinder.controller.projectupdate.RegulatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -67,6 +69,9 @@ public class ProjectAssessmentController extends ProjectFormPageController {
         () -> {
           projectAssessmentService.createProjectAssessment(projectAssessmentContext.getProjectDetails(), user, form);
 
+          if (!BooleanUtils.isTrue(form.getReadyToBePublished()) || BooleanUtils.isTrue(form.getUpdateRequired())) {
+            return ReverseRouter.redirect(on(RegulatorUpdateController.class).getRequestUpdate(projectId, null, null));
+          }
           return ReverseRouter.redirect(on(ManageProjectController.class).getProject(projectId, null, null, null));
         });
   }
