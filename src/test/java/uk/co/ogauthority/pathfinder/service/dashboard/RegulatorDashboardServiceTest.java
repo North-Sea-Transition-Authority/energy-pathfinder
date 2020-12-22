@@ -10,7 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
-import uk.co.ogauthority.pathfinder.repository.dashboard.DashboardProjectItemRepository;
+import uk.co.ogauthority.pathfinder.repository.dashboard.RegulatorDashboardProjectItemRepository;
 import uk.co.ogauthority.pathfinder.testutil.DashboardFilterTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
 
@@ -18,7 +18,7 @@ import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
 public class RegulatorDashboardServiceTest {
 
   @Mock
-  private DashboardProjectItemRepository dashboardProjectItemRepository;
+  private RegulatorDashboardProjectItemRepository regulatorDashboardProjectItemRepository;
 
   private final DashboardFilterService filterService = new DashboardFilterService();
 
@@ -30,14 +30,14 @@ public class RegulatorDashboardServiceTest {
   @Before
   public void setUp() throws Exception {
     regulatorDashboardService = new RegulatorDashboardService(
-        dashboardProjectItemRepository,
+        regulatorDashboardProjectItemRepository,
         filterService
     );
   }
 
   @Test
   public void getDashboardProjectItems_correctNumberOfResultsReturned() {
-    when(dashboardProjectItemRepository.findAllByStatusIn(RegulatorDashboardService.REGULATOR_PROJECT_ACCESS_STATUSES))
+    when(regulatorDashboardProjectItemRepository.findAllByStatusIn(RegulatorDashboardService.REGULATOR_PROJECT_ACCESS_STATUSES))
         .thenReturn(List.of(item1, item2));
     assertThat(regulatorDashboardService.getDashboardProjectItems(DashboardFilterTestUtil.getEmptyFilter()).size()).isEqualTo(2);
   }
