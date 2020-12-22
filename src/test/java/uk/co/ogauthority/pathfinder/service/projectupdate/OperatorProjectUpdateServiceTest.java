@@ -103,14 +103,21 @@ public class OperatorProjectUpdateServiceTest {
         projectUpdate
     );
 
-    var reasonNoUpdateRequired = "Test reason";
+    var form = new ProvideNoUpdateForm();
+    form.setSupplyChainReason("Test supply chain reason");
+    form.setRegulatorReason("Test regulator reason");
 
-    var noUpdateNotification = operatorProjectUpdateService.createNoUpdateNotification(projectDetail, authenticatedUser, reasonNoUpdateRequired);
+    var noUpdateNotification = operatorProjectUpdateService.createNoUpdateNotification(
+        projectDetail,
+        authenticatedUser,
+        form
+    );
 
     verify(projectUpdateService, times(1)).startUpdate(projectDetail, projectDetail.getStatus(), authenticatedUser, ProjectUpdateType.OPERATOR_INITIATED);
 
     assertThat(noUpdateNotification.getProjectUpdate()).isEqualTo(projectUpdate);
-    assertThat(noUpdateNotification.getReasonNoUpdateRequired()).isEqualTo(reasonNoUpdateRequired);
+    assertThat(noUpdateNotification.getSupplyChainReason()).isEqualTo(form.getSupplyChainReason());
+    assertThat(noUpdateNotification.getRegulatorReason()).isEqualTo(form.getRegulatorReason());
 
     verify(noUpdateNotificationRepository, times(1)).save(noUpdateNotification);
   }

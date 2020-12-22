@@ -13,8 +13,15 @@
 
   <@fdsForm.htmlForm>
     <@fdsTextarea.textarea
-      path="form.reasonNoUpdateRequired"
-      labelText="What is the reason no changes are required?"
+      path="form.supplyChainReason"
+      labelText="Provide a reason for the supply chain as to why no changes are required"
+      hintText="This reason will be visible to the supply chain"
+    />
+    <@fdsTextarea.textarea
+      path="form.regulatorReason"
+      labelText="Provide a reason for the ${service.customerMnemonic} as to why no changes are required"
+      hintText="This reason will only be visible to the ${service.customerName}"
+      optionalLabel=true
     />
       <@fdsAction.submitButtons
         primaryButtonText="Save and complete"
