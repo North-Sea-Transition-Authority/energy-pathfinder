@@ -7,14 +7,39 @@
   <#assign pageHeading="Review and submit project" />
 </#if>
 
-<@projectSummary.summaryWithSubNavigation
-  pageHeading=pageHeading
-  projectSummaryView=projectSummaryView
-  sidebarHeading="Check your answers for all sections on the project"
-  errorMessage=errorMessage
->
-  <@fdsForm.htmlForm actionUrl=springUrl(submitProjectUrl)>
-    <@fdsAction.button buttonText="Submit" buttonValue="submit" />
-    <@fdsAction.link linkText="Back to task list" linkClass="govuk-link govuk-link--button" linkUrl=springUrl(taskListUrl)/>
-  </@fdsForm.htmlForm>
-</@projectSummary.summaryWithSubNavigation>
+<@defaultPagePane htmlTitle=pageHeading phaseBanner=false>
+  <@defaultPagePaneSubNav>
+    <@fdsSubNavigation.subNavigation>
+      <@fdsSubNavigation.subNavigationSection themeHeading="Check your answers for all sections on the project">
+        <#list projectSummaryView.sidebarSectionLinks as sidebarLink>
+          <@sideBarSectionLink.renderSidebarLink sidebarLink=sidebarLink/>
+        </#list>
+      </@fdsSubNavigation.subNavigationSection>
+    </@fdsSubNavigation.subNavigation>
+  </@defaultPagePaneSubNav>
+
+  <@defaultPagePaneContent pageHeading=pageHeading>
+    <#if !isProjectValid>
+      <@invalidProjectInset errorMessage=errorMessage />
+    </#if>
+
+    <@projectSummary.summary projectSummaryView=projectSummaryView />
+
+    <#if !isProjectValid>
+      <@invalidProjectInset errorMessage=errorMessage />
+    <#else>
+      <@fdsForm.htmlForm actionUrl=springUrl(submitProjectUrl)>
+        <@fdsAction.button buttonText="Submit" buttonValue="submit" />
+        <@fdsAction.link linkText="Back to task list" linkClass="govuk-link govuk-link--button" linkUrl=springUrl(taskListUrl)/>
+      </@fdsForm.htmlForm>
+    </#if>
+  </@defaultPagePaneContent>
+</@defaultPagePane>
+
+
+<#macro invalidProjectInset errorMessage>
+  <@fdsInsetText.insetText insetTextClass="govuk-inset-text--red">
+    <p>You cannot submit your project until all sections shown on the task list are completed</p>
+    <@fdsAction.link linkText="Back to task list" linkUrl=springUrl(taskListUrl)/>
+  </@fdsInsetText.insetText>
+</#macro>
