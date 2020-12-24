@@ -57,7 +57,9 @@ public class ProjectService {
         true
     );
 
-    if (newStatus.equals(ProjectStatus.QA) || newStatus.equals(ProjectStatus.PUBLISHED)) {
+    if (newStatus.equals(ProjectStatus.QA)
+        || newStatus.equals(ProjectStatus.PUBLISHED)
+        || newStatus.equals(ProjectStatus.ARCHIVED)) {
       newProjectDetail.setSubmittedByWua(userAccount.getWuaId());
       newProjectDetail.setSubmittedInstant(Instant.now());
     }

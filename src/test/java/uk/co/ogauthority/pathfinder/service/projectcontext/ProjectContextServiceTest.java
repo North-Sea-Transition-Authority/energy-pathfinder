@@ -100,7 +100,8 @@ public class ProjectContextServiceTest {
     assertThat(context.getProjectPermissions()).containsExactlyInAnyOrder(
         ProjectPermission.EDIT,
         ProjectPermission.SUBMIT,
-        ProjectPermission.PROVIDE_UPDATE
+        ProjectPermission.PROVIDE_UPDATE,
+        ProjectPermission.ARCHIVE
     );
   }
 
@@ -142,7 +143,8 @@ public class ProjectContextServiceTest {
     assertThat(projectContextService.getUserProjectPermissions(authenticatedUser)).containsExactlyInAnyOrder(
         ProjectPermission.EDIT,
         ProjectPermission.SUBMIT,
-        ProjectPermission.PROVIDE_UPDATE
+        ProjectPermission.PROVIDE_UPDATE,
+        ProjectPermission.ARCHIVE
     );
   }
 

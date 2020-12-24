@@ -21,7 +21,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermis
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectManagementViewService;
 
 @Controller
-@ProjectStatusCheck(status = {ProjectStatus.QA, ProjectStatus.PUBLISHED})
+@ProjectStatusCheck(status = {ProjectStatus.QA, ProjectStatus.PUBLISHED, ProjectStatus.ARCHIVED})
 @ProjectFormPagePermissionCheck(permissions = {ProjectPermission.VIEW})
 @RequestMapping("/project/{projectId}/manage")
 public class ManageProjectController {

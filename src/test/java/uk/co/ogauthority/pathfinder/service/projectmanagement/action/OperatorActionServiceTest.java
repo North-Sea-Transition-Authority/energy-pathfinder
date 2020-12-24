@@ -27,6 +27,9 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 public class OperatorActionServiceTest {
 
   @Mock
+  private ProjectActionService projectActionService;
+
+  @Mock
   private ProjectUpdateContextService projectUpdateContextService;
 
   private OperatorActionService operatorActionService;
@@ -38,7 +41,7 @@ public class OperatorActionServiceTest {
 
   @Before
   public void setup() {
-    operatorActionService = new OperatorActionService(projectUpdateContextService);
+    operatorActionService = new OperatorActionService(projectActionService, projectUpdateContextService);
   }
 
   @Test
@@ -49,19 +52,21 @@ public class OperatorActionServiceTest {
 
     assertThat(actions).containsExactly(
         operatorActionService.getProvideUpdateAction(project.getId(), false),
-        operatorActionService.getProvideNoUpdateNotificationAction(project.getId(), false)
+        operatorActionService.getProvideNoUpdateNotificationAction(project.getId(), false),
+        projectActionService.getArchiveAction(project.getId(), OperatorActionService.ARCHIVE_ACTION_DISPLAY_ORDER, false) // FIXME
     );
   }
 
   @Test
-  public void getActions_whenCanBuildAssessmentContext() {
+  public void getActions_whenCanBuildUpdateContext() {
     when(projectUpdateContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any())).thenReturn(true);
 
     var actions = operatorActionService.getActions(projectDetail, authenticatedUser);
 
     assertThat(actions).containsExactly(
         operatorActionService.getProvideUpdateAction(project.getId(), true),
-        operatorActionService.getProvideNoUpdateNotificationAction(project.getId(), true)
+        operatorActionService.getProvideNoUpdateNotificationAction(project.getId(), true),
+        projectActionService.getArchiveAction(project.getId(), OperatorActionService.ARCHIVE_ACTION_DISPLAY_ORDER, true) // FIXME
     );
   }
 

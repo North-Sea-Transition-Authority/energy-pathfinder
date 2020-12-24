@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.OperatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.model.form.useraction.UserActionWithDisplayOrder;
@@ -24,10 +25,16 @@ public class OperatorActionService {
   public static final String PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_PROMPT = "Confirm no changes";
   public static final int PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_DISPLAY_ORDER = 20;
 
+  public static final int ARCHIVE_ACTION_DISPLAY_ORDER = 30;
+
+  private final ProjectActionService projectActionService;
   private final ProjectUpdateContextService projectUpdateContextService;
 
   @Autowired
-  public OperatorActionService(ProjectUpdateContextService projectUpdateContextService) {
+  public OperatorActionService(
+      ProjectActionService projectActionService,
+      ProjectUpdateContextService projectUpdateContextService) {
+    this.projectActionService = projectActionService;
     this.projectUpdateContextService = projectUpdateContextService;
   }
 
@@ -50,6 +57,12 @@ public class OperatorActionService {
     actions.add(getProvideNoUpdateNotificationAction(
         projectId,
         updateActionsEnabled
+    ));
+
+    actions.add(projectActionService.getArchiveAction(
+        projectId,
+        ARCHIVE_ACTION_DISPLAY_ORDER,
+        !projectDetail.getStatus().equals(ProjectStatus.ARCHIVED)
     ));
 
     return actions;
