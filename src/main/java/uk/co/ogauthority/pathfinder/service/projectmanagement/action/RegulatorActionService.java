@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.projectarchive.ArchiveProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectassessment.ProjectAssessmentController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.RegulatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -14,6 +15,7 @@ import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.model.form.useraction.UserActionWithDisplayOrder;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContextService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
 
@@ -26,12 +28,21 @@ public class RegulatorActionService {
   public static final String REQUEST_UPDATE_ACTION_PROMPT = "Request update";
   public static final int REQUEST_UPDATE_ACTION_DISPLAY_ORDER = 20;
 
+  public static final int ARCHIVE_ACTION_DISPLAY_ORDER = 30;
+
+  private final ProjectActionService projectActionService;
+  private final ProjectContextService projectContextService;
   private final ProjectAssessmentContextService projectAssessmentContextService;
   private final ProjectUpdateContextService projectUpdateContextService;
 
   @Autowired
-  public RegulatorActionService(ProjectAssessmentContextService projectAssessmentContextService,
-                                ProjectUpdateContextService projectUpdateContextService) {
+  public RegulatorActionService(
+      ProjectActionService projectActionService,
+      ProjectContextService projectContextService,
+      ProjectAssessmentContextService projectAssessmentContextService,
+      ProjectUpdateContextService projectUpdateContextService) {
+    this.projectActionService = projectActionService;
+    this.projectContextService = projectContextService;
     this.projectAssessmentContextService = projectAssessmentContextService;
     this.projectUpdateContextService = projectUpdateContextService;
   }
@@ -57,6 +68,15 @@ public class RegulatorActionService {
     );
     if (canRequestUpdate) {
       actions.add(getRequestUpdateAction(projectId));
+    }
+
+    var canArchive = projectContextService.canBuildContext(
+        projectDetail,
+        user,
+        ArchiveProjectController.class
+    );
+    if (canArchive) {
+      actions.add(projectActionService.getArchiveAction(projectId, ARCHIVE_ACTION_DISPLAY_ORDER));
     }
 
     return actions;
