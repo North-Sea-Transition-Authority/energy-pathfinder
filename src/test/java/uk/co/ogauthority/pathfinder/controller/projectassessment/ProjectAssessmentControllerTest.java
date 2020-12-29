@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
@@ -26,6 +27,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectAssessmentContextAbstractControllerTest;
+import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
+import uk.co.ogauthority.pathfinder.controller.projectupdate.RegulatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentForm;
@@ -93,7 +96,7 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
   }
 
   @Test
-  public void createProjectAssessment_whenValidForm_thenCreate() throws Exception {
+  public void createProjectAssessment_whenValidFormAndReadyToBePublishedAndNoUpdateRequired_thenCreateAndRedirect() throws Exception {
     var form = new ProjectAssessmentForm();
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
@@ -103,9 +106,55 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
         post(ReverseRouter.route(on(ProjectAssessmentController.class)
             .createProjectAssessment(QA_PROJECT_ID, null, null, null, null)
         ))
+            .param("readyToBePublished", "true")
+            .param("updateRequired", "false")
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf()))
-        .andExpect(status().is3xxRedirection());
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl(ReverseRouter.route(on(ManageProjectController.class).getProject(QA_PROJECT_ID, null, null, null))));
+
+    verify(projectAssessmentService, times(1)).validate(any(), any());
+    verify(projectAssessmentService, times(1)).createProjectAssessment(any(), any(), any());
+  }
+
+  @Test
+  public void createProjectAssessment_whenValidFormAndReadyToBePublishedAndUpdateRequired_thenCreateAndRedirect() throws Exception {
+    var form = new ProjectAssessmentForm();
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    when(projectAssessmentService.validate(any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(ProjectAssessmentController.class)
+            .createProjectAssessment(QA_PROJECT_ID, null, null, null, null)
+        ))
+            .param("readyToBePublished", "true")
+            .param("updateRequired", "true")
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf()))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl(ReverseRouter.route(on(RegulatorUpdateController.class).getRequestUpdate(QA_PROJECT_ID, null, null))));
+
+    verify(projectAssessmentService, times(1)).validate(any(), any());
+    verify(projectAssessmentService, times(1)).createProjectAssessment(any(), any(), any());
+  }
+
+  @Test
+  public void createProjectAssessment_whenValidFormAndNotReadyToBePublished_thenCreateAndRedirect() throws Exception {
+    var form = new ProjectAssessmentForm();
+
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    when(projectAssessmentService.validate(any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(ProjectAssessmentController.class)
+            .createProjectAssessment(QA_PROJECT_ID, null, null, null, null)
+        ))
+            .param("readyToBePublished", "false")
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf()))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl(ReverseRouter.route(on(RegulatorUpdateController.class).getRequestUpdate(QA_PROJECT_ID, null, null))));
 
     verify(projectAssessmentService, times(1)).validate(any(), any());
     verify(projectAssessmentService, times(1)).createProjectAssessment(any(), any(), any());
