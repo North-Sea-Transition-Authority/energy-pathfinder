@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
+import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -27,7 +28,9 @@ public class ProjectLocationViewUtil {
         : null;
     projectLocationView.setFieldType(fieldType);
 
-    projectLocationView.setMaximumWaterDepth(projectLocation.getMaximumWaterDepth());
+    projectLocationView.setMaximumWaterDepth(projectLocation.getMaximumWaterDepth() != null
+        ? getWaterDepthString(projectLocation.getMaximumWaterDepth())
+        : "");
     projectLocationView.setApprovedFieldDevelopmentPlan(projectLocation.getApprovedFieldDevelopmentPlan());
     projectLocationView.setApprovedFdpDate(DateUtil.formatDate(projectLocation.getApprovedFdpDate()));
     projectLocationView.setApprovedDecomProgram(projectLocation.getApprovedDecomProgram());
@@ -43,5 +46,9 @@ public class ProjectLocationViewUtil {
         .collect(Collectors.toList()));
 
     return projectLocationView;
+  }
+
+  public static String getWaterDepthString(Integer waterDepth) {
+    return String.format("%d %s", waterDepth, MeasurementUnits.METRES.getPlural());
   }
 }
