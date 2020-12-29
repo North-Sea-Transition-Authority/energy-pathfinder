@@ -60,6 +60,10 @@ public class ProjectUpdateService {
     projectUpdateRepository.delete(projectUpdate);
   }
 
+  public ProjectDetail createNewProjectVersion(ProjectDetail fromDetail, AuthenticatedUserAccount userAccount) {
+    return createNewProjectVersion(fromDetail, fromDetail.getStatus(), userAccount);
+  }
+
   /**
    * Create a new project detail version as a duplicate of fromDetail.
    * @param fromDetail the project detail to base the new version off of
