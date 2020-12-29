@@ -1,8 +1,3 @@
-GRANT SELECT ON decmgr.xview_organisation_units TO ${datasource.user};
-GRANT SELECT ON decmgr.current_org_grp_organisations TO ${datasource.user};
-GRANT SELECT ON decmgr.current_organisation_groups TO ${datasource.user};
-GRANT SELECT ON decmgr.organisation_address_details TO ${datasource.user};
-
 CREATE OR REPLACE VIEW ${datasource.user}.portal_organisation_units AS
 SELECT
   xou.organ_id ou_id

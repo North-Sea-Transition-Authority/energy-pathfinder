@@ -1,11 +1,3 @@
-GRANT SELECT ON decmgr.xview_resources TO ${datasource.user};
-GRANT SELECT ON decmgr.xview_resource_types TO ${datasource.user};
-GRANT SELECT ON decmgr.xview_resource_type_roles TO ${datasource.user};
-GRANT SELECT ON decmgr.xview_resource_type_privs TO ${datasource.user};
-GRANT SELECT ON decmgr.resource_usages_current TO ${datasource.user};
-GRANT SELECT ON decmgr.resource_members_current TO ${datasource.user};
-GRANT SELECT ON decmgr.xview_resource_people_history TO ${datasource.user};
-
 CREATE OR REPLACE VIEW ${datasource.user}.portal_resources AS
 SELECT
   xr.res_id

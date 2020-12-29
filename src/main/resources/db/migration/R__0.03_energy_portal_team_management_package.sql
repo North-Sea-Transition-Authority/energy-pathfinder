@@ -1,7 +1,3 @@
-GRANT SELECT ON decmgr.resources TO ${datasource.user};
-GRANT SELECT ON decmgr.resource_people TO ${datasource.user};
-GRANT EXECUTE ON decmgr.contact TO ${datasource.user};
-
 CREATE OR REPLACE PACKAGE ${datasource.user}.team_management AS
   /*
   * Adds a user to a team into a list of roles. This is a wrapper of the
