@@ -33,19 +33,8 @@ public class ProjectActionServiceTest {
 
   @Test
   public void getArchiveAction_enabled() {
-    var action = projectActionService.getArchiveAction(project.getId(), ARCHIVE_ACTION_DISPLAY_ORDER, true);
+    var action = projectActionService.getArchiveAction(project.getId(), ARCHIVE_ACTION_DISPLAY_ORDER);
 
-    assertArchiveActionFields(action, true);
-  }
-
-  @Test
-  public void getArchiveAction_disabled() {
-    var action = projectActionService.getArchiveAction(project.getId(), 10, false);
-
-    assertArchiveActionFields(action, false);
-  }
-
-  private void assertArchiveActionFields(UserActionWithDisplayOrder action, boolean isEnabled) {
     var linkButton = (LinkButton) action.getUserAction();
     assertThat(linkButton.getPrompt()).isEqualTo(ProjectActionService.ARCHIVE_ACTION_PROMPT);
     assertThat(linkButton.getUrl()).isEqualTo(
@@ -55,7 +44,7 @@ public class ProjectActionServiceTest {
             null
         ))
     );
-    assertThat(linkButton.getEnabled()).isEqualTo(isEnabled);
+    assertThat(linkButton.getEnabled()).isTrue();
     assertThat(linkButton.getButtonType()).isEqualTo(ButtonType.SECONDARY);
 
     assertThat(action.getDisplayOrder()).isEqualTo(ARCHIVE_ACTION_DISPLAY_ORDER);

@@ -47,36 +47,32 @@ public class OperatorActionService {
 
     var projectId = projectDetail.getProject().getId();
 
-    var updateActionsEnabled = projectUpdateContextService.canBuildContext(
+    var canUpdate = projectUpdateContextService.canBuildContext(
         projectDetail,
         user,
         OperatorUpdateController.class
     );
+    if (canUpdate) {
+      actions.add(getProvideUpdateAction(projectId));
+      actions.add(getProvideNoUpdateNotificationAction(projectId));
+    }
 
-    actions.add(getProvideUpdateAction(
-        projectId,
-        updateActionsEnabled
-    ));
-
-    actions.add(getProvideNoUpdateNotificationAction(
-        projectId,
-        updateActionsEnabled
-    ));
-
-    actions.add(projectActionService.getArchiveAction(
-        projectId,
-        ARCHIVE_ACTION_DISPLAY_ORDER,
-        projectContextService.canBuildContext(
-            projectDetail,
-            user,
-            ArchiveProjectController.class
-        )
-    ));
+    var canArchive = projectContextService.canBuildContext(
+        projectDetail,
+        user,
+        ArchiveProjectController.class
+    );
+    if (canArchive) {
+      actions.add(projectActionService.getArchiveAction(
+          projectId,
+          ARCHIVE_ACTION_DISPLAY_ORDER
+      ));
+    }
 
     return actions;
   }
 
-  protected UserActionWithDisplayOrder getProvideUpdateAction(Integer projectId, boolean isEnabled) {
+  protected UserActionWithDisplayOrder getProvideUpdateAction(Integer projectId) {
     return new UserActionWithDisplayOrder(
         new LinkButton(
             PROVIDE_UPDATE_ACTION_PROMPT,
@@ -84,12 +80,12 @@ public class OperatorActionService {
                 projectId,
                 null
             )),
-            isEnabled,
+            true,
             ButtonType.PRIMARY
         ), PROVIDE_UPDATE_ACTION_DISPLAY_ORDER);
   }
 
-  protected UserActionWithDisplayOrder getProvideNoUpdateNotificationAction(Integer projectId, boolean isEnabled) {
+  protected UserActionWithDisplayOrder getProvideNoUpdateNotificationAction(Integer projectId) {
     return new UserActionWithDisplayOrder(
         new LinkButton(
             PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_PROMPT,
@@ -98,7 +94,7 @@ public class OperatorActionService {
                 null,
                 null
             )),
-            isEnabled,
+            true,
             ButtonType.SECONDARY
         ), PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_DISPLAY_ORDER);
   }

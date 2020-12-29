@@ -14,7 +14,7 @@ public class ProjectActionService {
 
   public static final String ARCHIVE_ACTION_PROMPT = "Archive project";
 
-  protected UserActionWithDisplayOrder getArchiveAction(Integer projectId, int displayOrder, boolean isEnabled) {
+  protected UserActionWithDisplayOrder getArchiveAction(Integer projectId, int displayOrder) {
     return new UserActionWithDisplayOrder(
         new LinkButton(
             ARCHIVE_ACTION_PROMPT,
@@ -23,7 +23,7 @@ public class ProjectActionService {
                 null,
                 null
             )),
-            isEnabled,
+            true,
             ButtonType.SECONDARY
         ), displayOrder);
   }

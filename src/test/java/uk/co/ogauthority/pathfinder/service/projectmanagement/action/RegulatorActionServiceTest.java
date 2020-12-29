@@ -1,8 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.projectmanagement.action;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -15,8 +13,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.projectassessment.ProjectAssessmentController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.RegulatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;;
-import uk.co.ogauthority.pathfinder.model.form.useraction.UserActionWithDisplayOrder;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -47,46 +44,49 @@ public class RegulatorActionServiceTest {
   }
 
   @Test
-  public void getActions_whenNoActionsAvailable_thenAllReturnedDisabled() {
-    when(projectAssessmentContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any())).thenReturn(false);
-    when(projectUpdateContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any())).thenReturn(false);
+  public void getActions_whenCannotAssess() {
+    when(projectAssessmentContextService.canBuildContext(projectDetail, authenticatedUser, ProjectAssessmentController.class)).thenReturn(false);
+
+    var actions = regulatorActionService.getActions(projectDetail, authenticatedUser);
+
+    assertThat(actions).isEmpty();
+  }
+
+  @Test
+  public void getActions_whenCanAssess() {
+    when(projectAssessmentContextService.canBuildContext(projectDetail, authenticatedUser, ProjectAssessmentController.class)).thenReturn(true);
 
     var actions = regulatorActionService.getActions(projectDetail, authenticatedUser);
 
     assertThat(actions).containsExactly(
-        regulatorActionService.getProvideAssessmentAction(project.getId(), false),
-        regulatorActionService.getRequestUpdateAction(project.getId(), false)
+        regulatorActionService.getProvideAssessmentAction(project.getId())
     );
   }
 
   @Test
-  public void getActions_whenAllActionsAvailable_thenAllReturnedEnabled() {
-    when(projectAssessmentContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any())).thenReturn(true);
-    when(projectUpdateContextService.canBuildContext(eq(projectDetail), eq(authenticatedUser), any())).thenReturn(true);
+  public void getActions_whenCannotRequestUpdate() {
+    when(projectUpdateContextService.canBuildContext(projectDetail, authenticatedUser, RegulatorUpdateController.class)).thenReturn(false);
+
+    var actions = regulatorActionService.getActions(projectDetail, authenticatedUser);
+
+    assertThat(actions).isEmpty();
+  }
+
+  @Test
+  public void getActions_whenCanRequestUpdate() {
+    when(projectUpdateContextService.canBuildContext(projectDetail, authenticatedUser, RegulatorUpdateController.class)).thenReturn(true);
 
     var actions = regulatorActionService.getActions(projectDetail, authenticatedUser);
 
     assertThat(actions).containsExactly(
-        regulatorActionService.getProvideAssessmentAction(project.getId(), true),
-        regulatorActionService.getRequestUpdateAction(project.getId(), true)
+        regulatorActionService.getRequestUpdateAction(project.getId())
     );
   }
 
   @Test
-  public void getProvideAssessmentAction_enabled() {
-    var action = regulatorActionService.getProvideAssessmentAction(project.getId(), true);
+  public void getProvideAssessmentAction() {
+    var action = regulatorActionService.getProvideAssessmentAction(project.getId());
 
-    assertProvideAssessmentActionFields(action, true);
-  }
-
-  @Test
-  public void getProvideAssessmentAction_disabled() {
-    var action = regulatorActionService.getProvideAssessmentAction(project.getId(), false);
-
-    assertProvideAssessmentActionFields(action, false);
-  }
-
-  private void assertProvideAssessmentActionFields(UserActionWithDisplayOrder action, boolean isEnabled) {
     var linkButton = (LinkButton) action.getUserAction();
     assertThat(linkButton.getPrompt()).isEqualTo(RegulatorActionService.PROVIDE_ASSESSMENT_ACTION_PROMPT);
     assertThat(linkButton.getUrl()).isEqualTo(
@@ -96,33 +96,22 @@ public class RegulatorActionServiceTest {
             null
         ))
     );
-    assertThat(linkButton.getEnabled()).isEqualTo(isEnabled);
+    assertThat(linkButton.getEnabled()).isTrue();
     assertThat(linkButton.getButtonType()).isEqualTo(ButtonType.PRIMARY);
 
     assertThat(action.getDisplayOrder()).isEqualTo(RegulatorActionService.PROVIDE_ASSESSMENT_ACTION_DISPLAY_ORDER);
   }
 
   @Test
-  public void getRequestUpdateAction_enabled() {
-    var action = regulatorActionService.getRequestUpdateAction(project.getId(), true);
+  public void getRequestUpdateAction() {
+    var action = regulatorActionService.getRequestUpdateAction(project.getId());
 
-    assertRequestUpdateActionFields(action, true);
-  }
-
-  @Test
-  public void getRequestUpdateAction_disabled() {
-    var action = regulatorActionService.getRequestUpdateAction(project.getId(), false);
-
-    assertRequestUpdateActionFields(action, false);
-  }
-
-  private void assertRequestUpdateActionFields(UserActionWithDisplayOrder action, boolean isEnabled) {
     var linkButton = (LinkButton) action.getUserAction();
     assertThat(linkButton.getPrompt()).isEqualTo(RegulatorActionService.REQUEST_UPDATE_ACTION_PROMPT);
     assertThat(linkButton.getUrl()).isEqualTo(
         ReverseRouter.route(on(RegulatorUpdateController.class).getRequestUpdate(project.getId(), null, null))
     );
-    assertThat(linkButton.getEnabled()).isEqualTo(isEnabled);
+    assertThat(linkButton.getEnabled()).isTrue();
     assertThat(linkButton.getButtonType()).isEqualTo(ButtonType.SECONDARY);
 
     assertThat(action.getDisplayOrder()).isEqualTo(RegulatorActionService.REQUEST_UPDATE_ACTION_DISPLAY_ORDER);

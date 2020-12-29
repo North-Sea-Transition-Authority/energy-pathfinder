@@ -12,6 +12,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
@@ -84,6 +86,18 @@ public class ProjectContextServiceTest {
   public void getProjectDetailsOrError_whenNotPresent() {
     when(projectService.getLatestDetail(any())).thenReturn(Optional.empty());
     projectContextService.getProjectDetailsOrError(detail.getId());
+  }
+
+  @Test
+  public void canBuildContext_whenNoException() {
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+
+    assertThat(projectContextService.canBuildContext(detail, authenticatedUser, TestController.class)).isTrue();
+  }
+
+  @Test
+  public void canBuildContext_whenException() {
+    assertThat(projectContextService.canBuildContext(detail, authenticatedUser, TestController.class)).isFalse();
   }
 
   @Test
@@ -180,4 +194,8 @@ public class ProjectContextServiceTest {
         ProjectPermission.PROVIDE_ASSESSMENT
     );
   }
+
+  @ProjectStatusCheck(status = ProjectStatus.DRAFT)
+  @ProjectFormPagePermissionCheck
+  private static final class TestController {}
 }
