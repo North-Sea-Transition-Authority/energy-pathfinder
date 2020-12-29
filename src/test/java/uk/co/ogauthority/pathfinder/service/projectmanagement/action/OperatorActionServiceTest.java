@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.model.form.useraction.UserActionWithDisplayOrder;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -28,6 +29,9 @@ public class OperatorActionServiceTest {
 
   @Mock
   private ProjectActionService projectActionService;
+
+  @Mock
+  private ProjectContextService projectContextService;
 
   @Mock
   private ProjectUpdateContextService projectUpdateContextService;
@@ -41,7 +45,11 @@ public class OperatorActionServiceTest {
 
   @Before
   public void setup() {
-    operatorActionService = new OperatorActionService(projectActionService, projectUpdateContextService);
+    operatorActionService = new OperatorActionService(
+        projectActionService,
+        projectContextService,
+        projectUpdateContextService
+    );
   }
 
   @Test

@@ -27,7 +27,7 @@ import uk.co.ogauthority.pathfinder.service.projectarchive.ArchiveProjectService
 @Controller
 @ProjectStatusCheck(status = {ProjectStatus.QA, ProjectStatus.PUBLISHED})
 @ProjectFormPagePermissionCheck(permissions = {ProjectPermission.ARCHIVE})
-@RequestMapping("/project/{projectId}")
+@RequestMapping("/project/{projectId}/archive")
 public class ArchiveProjectController {
 
   public static final String ARCHIVE_PROJECT_PAGE_NAME = "Archive project";
@@ -42,7 +42,7 @@ public class ArchiveProjectController {
     this.controllerHelperService = controllerHelperService;
   }
 
-  @GetMapping("/archive")
+  @GetMapping
   public ModelAndView getArchiveProject(@PathVariable("projectId") Integer projectId,
                                         ProjectContext projectContext,
                                         AuthenticatedUserAccount user) {
@@ -53,7 +53,7 @@ public class ArchiveProjectController {
     );
   }
 
-  @PostMapping("/archive")
+  @PostMapping
   public ModelAndView archiveProject(@PathVariable("projectId") Integer projectId,
                                      @Valid @ModelAttribute("form") ArchiveProjectForm form,
                                      BindingResult bindingResult,
