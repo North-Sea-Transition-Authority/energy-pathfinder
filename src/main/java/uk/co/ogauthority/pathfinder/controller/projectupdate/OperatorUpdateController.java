@@ -82,7 +82,7 @@ public class OperatorUpdateController {
           operatorProjectUpdateService.createNoUpdateNotification(
               projectUpdateContext.getProjectDetails(),
               user,
-              form.getReasonNoUpdateRequired()
+              form
           );
           return ReverseRouter.redirect(on(OperatorUpdateController.class).provideNoUpdateConfirmation(projectId, null));
         }

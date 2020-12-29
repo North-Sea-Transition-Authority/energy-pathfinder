@@ -23,8 +23,12 @@ public class NoUpdateNotification {
   private ProjectUpdate projectUpdate;
 
   @Lob
-  @Column(name = "reason_no_update_required", columnDefinition = "CLOB")
-  private String reasonNoUpdateRequired;
+  @Column(name = "supply_chain_reason", columnDefinition = "CLOB")
+  private String supplyChainReason;
+
+  @Lob
+  @Column(name = "regulator_reason", columnDefinition = "CLOB")
+  private String regulatorReason;
 
   public Integer getId() {
     return id;
@@ -38,11 +42,19 @@ public class NoUpdateNotification {
     this.projectUpdate = projectUpdate;
   }
 
-  public String getReasonNoUpdateRequired() {
-    return reasonNoUpdateRequired;
+  public String getSupplyChainReason() {
+    return supplyChainReason;
   }
 
-  public void setReasonNoUpdateRequired(String reasonNoUpdateRequired) {
-    this.reasonNoUpdateRequired = reasonNoUpdateRequired;
+  public void setSupplyChainReason(String supplyChainReason) {
+    this.supplyChainReason = supplyChainReason;
+  }
+
+  public String getRegulatorReason() {
+    return regulatorReason;
+  }
+
+  public void setRegulatorReason(String regulatorReason) {
+    this.regulatorReason = regulatorReason;
   }
 }

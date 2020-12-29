@@ -4,14 +4,24 @@ import javax.validation.constraints.NotEmpty;
 
 public class ProvideNoUpdateForm {
 
-  @NotEmpty(message = "Enter the reason no changes are required")
-  private String reasonNoUpdateRequired;
+  @NotEmpty(message = "Enter a reason for the supply chain as to why no changes are required")
+  private String supplyChainReason;
 
-  public String getReasonNoUpdateRequired() {
-    return reasonNoUpdateRequired;
+  private String regulatorReason;
+
+  public String getSupplyChainReason() {
+    return supplyChainReason;
   }
 
-  public void setReasonNoUpdateRequired(String reasonNoUpdateRequired) {
-    this.reasonNoUpdateRequired = reasonNoUpdateRequired;
+  public void setSupplyChainReason(String supplyChainReason) {
+    this.supplyChainReason = supplyChainReason;
+  }
+
+  public String getRegulatorReason() {
+    return regulatorReason;
+  }
+
+  public void setRegulatorReason(String regulatorReason) {
+    this.regulatorReason = regulatorReason;
   }
 }

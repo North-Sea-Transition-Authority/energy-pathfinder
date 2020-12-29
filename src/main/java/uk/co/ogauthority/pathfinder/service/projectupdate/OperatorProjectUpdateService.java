@@ -65,7 +65,7 @@ public class OperatorProjectUpdateService {
   @Transactional
   public NoUpdateNotification createNoUpdateNotification(ProjectDetail projectDetail,
                                                          AuthenticatedUserAccount user,
-                                                         String reasonNoUpdateRequired) {
+                                                         ProvideNoUpdateForm form) {
     var projectUpdate = projectUpdateService.startUpdate(
         projectDetail,
         projectDetail.getStatus(),
@@ -74,7 +74,8 @@ public class OperatorProjectUpdateService {
     );
     var noUpdateNotification = new NoUpdateNotification();
     noUpdateNotification.setProjectUpdate(projectUpdate);
-    noUpdateNotification.setReasonNoUpdateRequired(reasonNoUpdateRequired);
+    noUpdateNotification.setSupplyChainReason(form.getSupplyChainReason());
+    noUpdateNotification.setRegulatorReason(form.getRegulatorReason());
     return noUpdateNotificationRepository.save(noUpdateNotification);
   }
 
