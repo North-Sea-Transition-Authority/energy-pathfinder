@@ -20,13 +20,13 @@
 
   <@defaultPagePaneContent pageHeading=pageHeading>
     <#if !isProjectValid>
-      <@invalidProjectInset errorMessage=errorMessage />
+      <@invalidProjectInset />
     </#if>
 
     <@projectSummary.summary projectSummaryView=projectSummaryView />
 
     <#if !isProjectValid>
-      <@invalidProjectInset errorMessage=errorMessage />
+      <@invalidProjectInset />
     <#else>
       <@fdsForm.htmlForm actionUrl=springUrl(submitProjectUrl)>
         <@fdsAction.button buttonText="Submit" buttonValue="submit" />
@@ -37,7 +37,7 @@
 </@defaultPagePane>
 
 
-<#macro invalidProjectInset errorMessage>
+<#macro invalidProjectInset>
   <@fdsInsetText.insetText insetTextClass="govuk-inset-text--red">
     <p>You cannot submit your project until all sections shown on the task list are completed</p>
     <@fdsAction.link linkText="Back to task list" linkUrl=springUrl(taskListUrl)/>
