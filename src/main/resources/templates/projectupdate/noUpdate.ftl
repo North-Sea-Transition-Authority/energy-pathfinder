@@ -20,7 +20,7 @@
     <@fdsTextarea.textarea
       path="form.regulatorReason"
       labelText="Provide a reason for the ${service.customerMnemonic} as to why no changes are required"
-      hintText="This reason will only be visible to the ${service.customerName}"
+      hintText="This reason will only be visible to the ${service.customerMnemonic}"
       optionalLabel=true
     />
       <@fdsAction.submitButtons
