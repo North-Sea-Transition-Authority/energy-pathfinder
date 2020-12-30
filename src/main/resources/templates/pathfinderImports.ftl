@@ -13,5 +13,6 @@
 <#import 'project/macros/stringWithTag.ftl' as stringWithTag>
 <#import 'project/macros/sectionSummaryWrapper.ftl' as sectionSummaryWrapper>
 <#import 'macros/useraction/userAction.ftl' as userAction>
+<#import 'macros/defaultPageWithSidebar.ftl' as defaultPageWithSidebar>
 <#import 'macros/inlineInputAction.ftl' as inlineInputAction>
 <#import 'macros/noEscapeHtml.ftl' as noEscapeHtml>

@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.model.view.summary;
 
 import java.util.List;
 import java.util.Map;
+import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 
 public class ProjectSectionSummary {
   private final List<SidebarSectionLink> sidebarSectionLinks;

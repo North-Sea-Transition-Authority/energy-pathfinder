@@ -48,7 +48,7 @@ public class SubmitProjectController {
 
     return isProjectValid
         ? submitProjectAndRedirectToConfirmation(projectDetail, projectContext.getUserAccount())
-        : submitProjectService.getProjectSubmitSummaryModelAndViewWithSubmissionError(projectDetail);
+        : submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail, false);
   }
 
   @GetMapping("/confirmation")

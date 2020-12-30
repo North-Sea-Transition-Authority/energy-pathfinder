@@ -2,8 +2,8 @@ package uk.co.ogauthority.pathfinder.testutil;
 
 import java.util.List;
 import java.util.Map;
+import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
-import uk.co.ogauthority.pathfinder.model.view.summary.SidebarSectionLink;
 
 public class ProjectSectionSummaryTestUtil {
   public static final int DISPLAY_ORDER = 1;

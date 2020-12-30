@@ -124,7 +124,7 @@ public class SubmitProjectServiceTest {
   }
 
   @Test
-  public void getProjectSubmitSummaryModelAndView_assertCorrectProperties_whenFirstVersion() {
+  public void getProjectSubmitSummaryModelAndView_assertCorrectProperties_whenFirstVersionAndValidProject() {
 
     final var projectDetail = PROJECT_DETAIL;
     projectDetail.setVersion(1);
@@ -134,13 +134,29 @@ public class SubmitProjectServiceTest {
     final var projectSummaryView = new ProjectSummaryView("test", List.of());
     when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
 
-    final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail);
+    final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail, true);
 
-    assertProjectSubmitSummaryModelAndView(projectId, modelAndView, false, projectSummaryView);
+    assertProjectSubmitSummaryModelAndView(projectId, modelAndView, false, true, projectSummaryView);
   }
 
   @Test
-  public void getProjectSubmitSummaryModelAndView_assertCorrectProperties_whenUpdate() {
+  public void getProjectSubmitSummaryModelAndView_assertCorrectProperties_whenFirstVersionAndInvalidProject() {
+
+    final var projectDetail = PROJECT_DETAIL;
+    projectDetail.setVersion(1);
+
+    final var projectId = projectDetail.getProject().getId();
+
+    final var projectSummaryView = new ProjectSummaryView("test", List.of());
+    when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
+
+    final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail, false);
+
+    assertProjectSubmitSummaryModelAndView(projectId, modelAndView, false, false, projectSummaryView);
+  }
+
+  @Test
+  public void getProjectSubmitSummaryModelAndView_assertCorrectProperties_whenUpdateAndValidProject() {
 
     final var projectDetail = PROJECT_DETAIL;
     projectDetail.setVersion(2);
@@ -150,66 +166,38 @@ public class SubmitProjectServiceTest {
     final var projectSummaryView = new ProjectSummaryView("test", List.of());
     when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
 
-    final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail);
-    assertProjectSubmitSummaryModelAndView(projectId, modelAndView, true, projectSummaryView);
+    final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail, true);
+    assertProjectSubmitSummaryModelAndView(projectId, modelAndView, true, true, projectSummaryView);
+  }
+
+  @Test
+  public void getProjectSubmitSummaryModelAndView_assertCorrectProperties_whenUpdateAndInvalidProject() {
+
+    final var projectDetail = PROJECT_DETAIL;
+    projectDetail.setVersion(2);
+
+    final var projectId = projectDetail.getProject().getId();
+
+    final var projectSummaryView = new ProjectSummaryView("test", List.of());
+    when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
+
+    final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail, false);
+    assertProjectSubmitSummaryModelAndView(projectId, modelAndView, true, false, projectSummaryView);
   }
 
   private void assertProjectSubmitSummaryModelAndView(Integer projectId,
                                                       ModelAndView modelAndView,
                                                       boolean isUpdate,
+                                                      boolean isProjectValid,
                                                       ProjectSummaryView projectSummaryView) {
     assertThat(modelAndView.getModelMap()).containsExactly(
         entry("isUpdate", isUpdate),
+        entry("isProjectValid", isProjectValid),
         entry("projectSummaryView", projectSummaryView),
         entry("submitProjectUrl",
             ReverseRouter.route(on(SubmitProjectController.class).submitProject(projectId, null))
         ),
         entry("taskListUrl", ControllerUtils.getBackToTaskListUrl(projectId))
-    );
-  }
-
-  @Test
-  public void getProjectSubmitSummaryModelAndViewWithSubmissionError_assertCorrectProperties_whenFirstVersion() {
-
-    final var projectDetail = PROJECT_DETAIL;
-    projectDetail.setVersion(1);
-
-    final var projectId = projectDetail.getProject().getId();
-
-    final var projectSummaryView = new ProjectSummaryView("test", List.of());
-    when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
-
-    final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndViewWithSubmissionError(projectDetail);
-    assertProjectSubmitSummaryModelAndViewWithSubmissionError(projectId, modelAndView, false, projectSummaryView);
-  }
-
-  @Test
-  public void getProjectSubmitSummaryModelAndViewWithSubmissionError_assertCorrectProperties_whenUpdate() {
-
-    final var projectDetail = PROJECT_DETAIL;
-    projectDetail.setVersion(2);
-
-    final var projectId = projectDetail.getProject().getId();
-
-    final var projectSummaryView = new ProjectSummaryView("test", List.of());
-    when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
-
-    final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndViewWithSubmissionError(projectDetail);
-    assertProjectSubmitSummaryModelAndViewWithSubmissionError(projectId, modelAndView, true, projectSummaryView);
-  }
-
-  private void assertProjectSubmitSummaryModelAndViewWithSubmissionError(Integer projectId,
-                                                                         ModelAndView modelAndView,
-                                                                         boolean isUpdate,
-                                                                         ProjectSummaryView projectSummaryView) {
-    assertThat(modelAndView.getModelMap()).containsExactly(
-        entry("isUpdate", isUpdate),
-        entry("projectSummaryView", projectSummaryView),
-        entry("submitProjectUrl",
-            ReverseRouter.route(on(SubmitProjectController.class).submitProject(projectId, null))
-        ),
-        entry("taskListUrl", ControllerUtils.getBackToTaskListUrl(projectId)),
-        entry("errorMessage", SubmitProjectService.INVALID_PROJECT_ERROR_MESSAGE)
     );
   }
 

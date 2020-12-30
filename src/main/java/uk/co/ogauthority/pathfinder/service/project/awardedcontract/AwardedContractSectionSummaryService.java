@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
+import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
-import uk.co.ogauthority.pathfinder.model.view.summary.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service

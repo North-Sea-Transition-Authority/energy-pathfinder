@@ -7,14 +7,30 @@
   <#assign pageHeading="Review and submit project" />
 </#if>
 
-<@projectSummary.summaryWithSubNavigation
+<@defaultPageWithSidebar.defaultPageWithSidebar
   pageHeading=pageHeading
-  projectSummaryView=projectSummaryView
-  sidebarHeading="Check your answers for all sections on the project"
-  errorMessage=errorMessage
->
-  <@fdsForm.htmlForm actionUrl=springUrl(submitProjectUrl)>
-    <@fdsAction.button buttonText="Submit" buttonValue="submit" />
-    <@fdsAction.link linkText="Back to task list" linkClass="govuk-link govuk-link--button" linkUrl=springUrl(taskListUrl)/>
-  </@fdsForm.htmlForm>
-</@projectSummary.summaryWithSubNavigation>
+  themeHeading="Check your answers for all sections on the project"
+  sidebarSectionLinks=projectSummaryView.sidebarSectionLinks>
+
+  <#if !isProjectValid>
+    <@_invalidProjectInset />
+  </#if>
+
+  <@projectSummary.summary projectSummaryView=projectSummaryView />
+
+  <#if !isProjectValid>
+    <@_invalidProjectInset />
+  <#else>
+    <@fdsForm.htmlForm actionUrl=springUrl(submitProjectUrl)>
+      <@fdsAction.button buttonText="Submit" buttonValue="submit" />
+      <@fdsAction.link linkText="Back to task list" linkClass="govuk-link govuk-link--button" linkUrl=springUrl(taskListUrl)/>
+    </@fdsForm.htmlForm>
+  </#if>
+</@defaultPageWithSidebar.defaultPageWithSidebar>
+
+<#macro _invalidProjectInset>
+  <@fdsInsetText.insetText insetTextClass="govuk-inset-text--red">
+    <p>You cannot submit your project until all sections shown on the task list are completed</p>
+    <@fdsAction.link linkText="Back to task list" linkUrl=springUrl(taskListUrl)/>
+  </@fdsInsetText.insetText>
+</#macro>

@@ -5,8 +5,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSummaryView;
-import uk.co.ogauthority.pathfinder.model.view.summary.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.service.rendering.TemplateRenderingService;
 
 /**

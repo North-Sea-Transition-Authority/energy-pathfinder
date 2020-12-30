@@ -23,9 +23,6 @@ import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 @Service
 public class SubmitProjectService {
 
-  public static final String INVALID_PROJECT_ERROR_MESSAGE =
-      "You cannot submit your project until all sections shown on the task list are completed";
-
   public static final String PROJECT_SUBMIT_CONFIRMATION_TEMPLATE_PATH = "project/summary/submitConfirmation";
 
   private final ProjectDetailsRepository projectDetailsRepository;
@@ -70,6 +67,10 @@ public class SubmitProjectService {
   }
 
   public ModelAndView getProjectSubmitSummaryModelAndView(ProjectDetail projectDetail) {
+    return getProjectSubmitSummaryModelAndView(projectDetail, isProjectValid(projectDetail));
+  }
+
+  public ModelAndView getProjectSubmitSummaryModelAndView(ProjectDetail projectDetail, boolean projectValid) {
 
     final var projectId = projectDetail.getProject().getId();
 
@@ -78,6 +79,7 @@ public class SubmitProjectService {
 
     modelAndView
         .addObject("isUpdate", !projectDetail.isFirstVersion())
+        .addObject("isProjectValid", projectValid)
         .addObject("projectSummaryView", projectSummaryView)
         .addObject("submitProjectUrl",
             ReverseRouter.route(on(SubmitProjectController.class).submitProject(projectId, null))
@@ -85,11 +87,6 @@ public class SubmitProjectService {
         .addObject("taskListUrl", ControllerUtils.getBackToTaskListUrl(projectId));
 
     return modelAndView;
-  }
-
-  public ModelAndView getProjectSubmitSummaryModelAndViewWithSubmissionError(ProjectDetail projectDetail) {
-    return getProjectSubmitSummaryModelAndView(projectDetail)
-        .addObject("errorMessage", INVALID_PROJECT_ERROR_MESSAGE);
   }
 
   public ModelAndView getProjectSubmitConfirmationModelAndView(ProjectDetail projectDetail) {

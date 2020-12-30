@@ -1,3 +1,3 @@
 <#import '../../project/summary/projectSummary.ftl' as projectSummary/>
 
-<@projectSummary.summaryWithoutSubNavigation projectSummaryView=projectSummaryView />
+<@projectSummary.summary projectSummaryView=projectSummaryView />
