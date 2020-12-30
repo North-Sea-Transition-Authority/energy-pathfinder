@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProjectOperatorController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
+import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.projectoperator.ProjectOperatorView;
 import uk.co.ogauthority.pathfinder.model.view.projectoperator.ProjectOperatorViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
-import uk.co.ogauthority.pathfinder.model.view.summary.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 

@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.view.summary;
 
 import java.util.List;
+import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 
 /**
  * A collection of rendered {@link ProjectSectionSummary} objects and their associated sideBarSectionLinks.

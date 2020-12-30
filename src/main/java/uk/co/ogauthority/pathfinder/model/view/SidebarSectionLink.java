@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.view.summary;
+package uk.co.ogauthority.pathfinder.model.view;
 
 import java.util.Objects;
 

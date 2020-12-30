@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
-import uk.co.ogauthority.pathfinder.model.view.summary.SidebarSectionLink;
+import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.service.rendering.TemplateRenderingService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
