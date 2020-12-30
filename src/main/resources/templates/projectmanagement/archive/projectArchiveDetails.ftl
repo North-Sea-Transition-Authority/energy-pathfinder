@@ -6,6 +6,9 @@
   <@fdsCheckAnswers.checkAnswers>
     <@checkAnswers.checkAnswersRowNoActions prompt="Archive reason" value=projectArchiveDetailView.archiveReason />
     <@checkAnswers.checkAnswersRowNoActions prompt="Archived date" value=projectArchiveDetailView.archivedDate />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Archived by" value=projectArchiveDetailView.archivedByUser />
+    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Archived by">
+      <div>${projectArchiveDetailView.archivedByUserName}</div>
+      <div>${projectArchiveDetailView.archivedByUserEmailAddress}</div>
+    </@checkAnswers.checkAnswersRowNoActionsWithNested>
   </@fdsCheckAnswers.checkAnswers>
 </#if>

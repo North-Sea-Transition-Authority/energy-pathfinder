@@ -29,6 +29,7 @@ public class ProjectArchiveDetailViewUtilTest {
 
     assertThat(projectArchiveDetailView.getArchiveReason()).isEqualTo(projectArchiveDetail.getArchiveReason());
     assertThat(projectArchiveDetailView.getArchivedDate()).isEqualTo(DateUtil.formatInstant(archivedInstant));
-    assertThat(projectArchiveDetailView.getArchivedByUser()).isEqualTo(archivedByUser.getFullName());
+    assertThat(projectArchiveDetailView.getArchivedByUserName()).isEqualTo(archivedByUser.getFullName());
+    assertThat(projectArchiveDetailView.getArchivedByUserEmailAddress()).isEqualTo(archivedByUser.getEmailAddress());
   }
 }

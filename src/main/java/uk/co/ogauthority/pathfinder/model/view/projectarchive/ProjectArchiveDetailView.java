@@ -8,7 +8,9 @@ public class ProjectArchiveDetailView {
 
   private String archivedDate;
 
-  private String archivedByUser;
+  private String archivedByUserName;
+
+  private String archivedByUserEmailAddress;
 
   public String getArchiveReason() {
     return archiveReason;
@@ -26,12 +28,20 @@ public class ProjectArchiveDetailView {
     this.archivedDate = archivedDate;
   }
 
-  public String getArchivedByUser() {
-    return archivedByUser;
+  public String getArchivedByUserName() {
+    return archivedByUserName;
   }
 
-  public void setArchivedByUser(String archivedByUser) {
-    this.archivedByUser = archivedByUser;
+  public void setArchivedByUserName(String archivedByUserName) {
+    this.archivedByUserName = archivedByUserName;
+  }
+
+  public String getArchivedByUserEmailAddress() {
+    return archivedByUserEmailAddress;
+  }
+
+  public void setArchivedByUserEmailAddress(String archivedByUserEmailAddress) {
+    this.archivedByUserEmailAddress = archivedByUserEmailAddress;
   }
 
   @Override
@@ -45,11 +55,12 @@ public class ProjectArchiveDetailView {
     ProjectArchiveDetailView that = (ProjectArchiveDetailView) o;
     return Objects.equals(getArchiveReason(), that.getArchiveReason())
         && Objects.equals(getArchivedDate(), that.getArchivedDate())
-        && Objects.equals(getArchivedByUser(), that.getArchivedByUser());
+        && Objects.equals(getArchivedByUserName(), that.getArchivedByUserName())
+        && Objects.equals(getArchivedByUserEmailAddress(), that.getArchivedByUserEmailAddress());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getArchiveReason(), getArchivedDate(), getArchivedByUser());
+    return Objects.hash(getArchiveReason(), getArchivedDate(), getArchivedByUserName(), getArchivedByUserEmailAddress());
   }
 }

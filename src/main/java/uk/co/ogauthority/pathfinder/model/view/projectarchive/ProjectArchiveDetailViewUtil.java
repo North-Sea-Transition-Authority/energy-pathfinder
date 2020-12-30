@@ -17,7 +17,8 @@ public class ProjectArchiveDetailViewUtil {
     var projectArchiveDetailView = new ProjectArchiveDetailView();
     projectArchiveDetailView.setArchiveReason(projectArchiveDetail.getArchiveReason());
     projectArchiveDetailView.setArchivedDate(DateUtil.formatInstant(archivedInstant));
-    projectArchiveDetailView.setArchivedByUser(archivedByUser.getFullName());
+    projectArchiveDetailView.setArchivedByUserName(archivedByUser.getFullName());
+    projectArchiveDetailView.setArchivedByUserEmailAddress(archivedByUser.getEmailAddress());
     return projectArchiveDetailView;
   }
 }

@@ -16,11 +16,11 @@
       path="form.archiveReason"
       labelText="What is the reason you are archiving the project?"
     />
-      <@fdsAction.submitButtons
-        primaryButtonText="Save and complete"
-        linkSecondaryAction=true
-        secondaryLinkText="Cancel"
-        linkSecondaryActionUrl=springUrl(cancelUrl)
-      />
+    <@fdsAction.submitButtons
+      primaryButtonText="Save and complete"
+      linkSecondaryAction=true
+      secondaryLinkText="Cancel"
+      linkSecondaryActionUrl=springUrl(cancelUrl)
+    />
   </@fdsForm.htmlForm>
 </@defaultPage>
