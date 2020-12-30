@@ -15,6 +15,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.team.annotation.TeamManagementPermissionCheck;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.team.teammanagementcontext.TeamManagementPermission;
@@ -89,6 +90,24 @@ public class ArgumentResolverUtil {
         .orElse(Set.of());
 
   }
+
+  public static ProjectDetailVersionType getProjectStatusCheckProjectDetailVersionType(MethodParameter methodParameter) {
+    var methodLevelProjectDetailVersionType = Optional.ofNullable(
+        methodParameter.getMethodAnnotation(ProjectStatusCheck.class))
+        .map(ProjectStatusCheck::projectDetailVersionType);
+
+    return methodLevelProjectDetailVersionType.orElseGet(() -> Optional.ofNullable(
+        methodParameter.getContainingClass().getAnnotation(ProjectStatusCheck.class))
+        .map(ProjectStatusCheck::projectDetailVersionType)
+        .orElseThrow(() -> new RuntimeException(
+            String.format(
+                "Unable to find ProjectStatusCheck annotation while calling %s within %s",
+                methodParameter.toString(),
+                methodParameter.getContainingClass().getName()
+            ))
+        ));
+  }
+
 
   public static Set<ProjectPermission> getProjectFormPagePermissionCheck(MethodParameter methodParameter) {
     var methodLevelPermissions = Optional.ofNullable(

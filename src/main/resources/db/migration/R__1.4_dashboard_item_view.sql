@@ -20,10 +20,10 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
   , pd.is_current_version
   , DECODE(
       (
-       SELECT MAX(pd.version)
-       FROM ${datasource.user}.project_details pd
-       WHERE pd.project_id = project_id
-       AND pd.status IN ('QA', 'PUBLISHED', 'ARCHIVED')
+       SELECT MAX(details.version)
+       FROM ${datasource.user}.project_details details
+       WHERE details.project_id = pd.project_id
+       AND details.status IN ('QA', 'PUBLISHED', 'ARCHIVED')
       )
     , pd.version
     , 1
@@ -38,12 +38,12 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
 
 CREATE OR REPLACE VIEW ${datasource.user}.operator_dashboard_items AS (
   SELECT *
-  FROM ${datasource.user}.dashboard_project_items
-  WHERE is_current_version = 1
+  FROM ${datasource.user}.dashboard_project_items dpi
+  WHERE dpi.is_current_version = 1
 );
 
 CREATE OR REPLACE VIEW ${datasource.user}.regulator_dashboard_items AS (
   SELECT *
-  FROM ${datasource.user}.dashboard_project_items
-  WHERE is_latest_submitted_version = 1
+  FROM ${datasource.user}.dashboard_project_items dpi
+  WHERE dpi.is_latest_submitted_version = 1
 );

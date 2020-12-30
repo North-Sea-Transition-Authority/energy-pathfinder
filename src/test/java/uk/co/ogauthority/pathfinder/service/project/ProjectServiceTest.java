@@ -55,6 +55,18 @@ public class ProjectServiceTest {
   }
 
   @Test
+  public void getLatestSubmittedDetail() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+
+    when(projectDetailsRepository.findByProjectIdAndIsLatestSubmittedVersion(PROJECT_ID)).thenReturn(
+        Optional.of(projectDetail)
+    );
+
+    var result = projectService.getLatestSubmittedDetail(PROJECT_ID);
+    assertThat(result).contains(projectDetail);
+  }
+
+  @Test
   public void getDetailOrError_whenExists_thenReturn() {
     when(projectDetailsRepository.findByProjectIdAndVersion(PROJECT_ID, PROJECT_VERSION)).thenReturn(
         Optional.of(projectDetail)

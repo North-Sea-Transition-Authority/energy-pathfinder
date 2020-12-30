@@ -33,13 +33,13 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 public class ManageProjectControllerTest extends ProjectContextAbstractControllerTest {
 
   private static final Integer PUBLISHED_PROJECT_ID = 1;
-  private static final Integer DRAFT_PROJECT_ID = 2;
+  private static final Integer UNSUBMITTED_PROJECT_ID = 2;
 
   @MockBean
   private ProjectManagementViewService projectManagementViewService;
 
   private final ProjectDetail publishedProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.PUBLISHED);
-  private final ProjectDetail draftProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+  private final ProjectDetail unsubmittedProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
 
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       ProjectPermission.VIEW.getUserPrivileges());
@@ -47,13 +47,13 @@ public class ManageProjectControllerTest extends ProjectContextAbstractControlle
 
   @Before
   public void setup() {
-    when(projectService.getLatestDetail(PUBLISHED_PROJECT_ID)).thenReturn(Optional.of(publishedProjectDetail));
+    when(projectService.getLatestSubmittedDetail(PUBLISHED_PROJECT_ID)).thenReturn(Optional.of(publishedProjectDetail));
     when(projectOperatorService.isUserInProjectTeamOrRegulator(publishedProjectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(publishedProjectDetail, unauthenticatedUser)).thenReturn(false);
 
-    when(projectService.getLatestDetail(DRAFT_PROJECT_ID)).thenReturn(Optional.of(draftProjectDetail));
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(draftProjectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(draftProjectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectService.getLatestDetail(UNSUBMITTED_PROJECT_ID)).thenReturn(Optional.of(unsubmittedProjectDetail));
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(unsubmittedProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(unsubmittedProjectDetail, unauthenticatedUser)).thenReturn(false);
   }
 
   @Test
@@ -73,11 +73,11 @@ public class ManageProjectControllerTest extends ProjectContextAbstractControlle
   }
 
   @Test
-  public void getProject_whenAuthenticatedAndDraft_thenNoAccess() throws Exception {
+  public void getProject_whenAuthenticatedAndUnsubmitted_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(ManageProjectController.class).getProject(DRAFT_PROJECT_ID, null, null, null)))
+        on(ManageProjectController.class).getProject(UNSUBMITTED_PROJECT_ID, null, null, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isNotFound());
   }
 
   @Test
@@ -99,11 +99,11 @@ public class ManageProjectControllerTest extends ProjectContextAbstractControlle
   }
 
   @Test
-  public void updateProjectVersion_whenAuthenticatedAndDraft_thenNoAccess() throws Exception {
+  public void updateProjectVersion_whenAuthenticatedAndUnsubmitted_thenNoAccess() throws Exception {
     mockMvc.perform(post(ReverseRouter.route(
-        on(ManageProjectController.class).updateProjectVersion(DRAFT_PROJECT_ID, null, null, null)))
+        on(ManageProjectController.class).updateProjectVersion(UNSUBMITTED_PROJECT_ID, null, null, null)))
         .with(authenticatedUserAndSession(authenticatedUser))
         .with(csrf()))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isNotFound());
   }
 }

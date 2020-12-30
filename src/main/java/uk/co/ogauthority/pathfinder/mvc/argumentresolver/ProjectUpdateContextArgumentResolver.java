@@ -34,7 +34,10 @@ public class ProjectUpdateContextArgumentResolver implements HandlerMethodArgume
                                 WebDataBinderFactory binderFactory) throws Exception {
     var user = ArgumentResolverUtil.getAuthenticatedUser();
     var projectId = ArgumentResolverUtil.resolveIdFromRequest(webRequest, ArgumentResolverUtil.PROJECT_ID_PARAM);
-    var detail = projectUpdateContextService.getProjectDetailsOrError(projectId);
+    var detail = projectUpdateContextService.getProjectDetailsOrError(
+        projectId,
+        ArgumentResolverUtil.getProjectStatusCheckProjectDetailVersionType(parameter)
+    );
     var statusCheck = ArgumentResolverUtil.getProjectStatusCheck(parameter);
     var permissionCheck = ArgumentResolverUtil.getProjectFormPagePermissionCheck(parameter);
 

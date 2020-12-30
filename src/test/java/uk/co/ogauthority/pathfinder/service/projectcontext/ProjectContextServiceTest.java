@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
@@ -77,15 +78,27 @@ public class ProjectContextServiceTest {
   }
 
   @Test
-  public void getProjectDetailsOrError_whenPresent() {
+  public void getProjectDetailsOrError_whenCurrentVersionAndPresent() {
     when(projectService.getLatestDetail(any())).thenReturn(Optional.of(detail));
-    assertThat(projectContextService.getProjectDetailsOrError(detail.getId())).isEqualTo(detail);
+    assertThat(projectContextService.getProjectDetailsOrError(detail.getId(), ProjectDetailVersionType.CURRENT_VERSION)).isEqualTo(detail);
   }
 
   @Test(expected = PathfinderEntityNotFoundException.class)
-  public void getProjectDetailsOrError_whenNotPresent() {
+  public void getProjectDetailsOrError_whenCurrentVersionAndNotPresent() {
     when(projectService.getLatestDetail(any())).thenReturn(Optional.empty());
-    projectContextService.getProjectDetailsOrError(detail.getId());
+    projectContextService.getProjectDetailsOrError(detail.getId(), ProjectDetailVersionType.CURRENT_VERSION);
+  }
+
+  @Test
+  public void getProjectDetailsOrError_whenLatestSubmittedVersionAndPresent() {
+    when(projectService.getLatestSubmittedDetail(any())).thenReturn(Optional.of(detail));
+    assertThat(projectContextService.getProjectDetailsOrError(detail.getId(), ProjectDetailVersionType.LATEST_SUBMITTED_VERSION)).isEqualTo(detail);
+  }
+
+  @Test(expected = PathfinderEntityNotFoundException.class)
+  public void getProjectDetailsOrError_whenLatestSubmittedVersionAndNotPresent() {
+    when(projectService.getLatestSubmittedDetail(any())).thenReturn(Optional.empty());
+    projectContextService.getProjectDetailsOrError(detail.getId(), ProjectDetailVersionType.LATEST_SUBMITTED_VERSION);
   }
 
   @Test

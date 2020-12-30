@@ -37,6 +37,10 @@ public class ProjectService {
     return projectDetailsRepository.findByProjectIdAndIsCurrentVersionIsTrue(projectId);
   }
 
+  public Optional<ProjectDetail> getLatestSubmittedDetail(Integer projectId) {
+    return projectDetailsRepository.findByProjectIdAndIsLatestSubmittedVersion(projectId);
+  }
+
   public ProjectDetail getDetailOrError(Integer projectId, Integer version) {
     return projectDetailsRepository.findByProjectIdAndVersion(projectId, version)
         .orElseThrow(() -> new PathfinderEntityNotFoundException(
