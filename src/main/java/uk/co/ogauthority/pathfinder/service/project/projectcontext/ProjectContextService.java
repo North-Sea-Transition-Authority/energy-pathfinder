@@ -28,6 +28,20 @@ public class ProjectContextService {
     this.projectOperatorService = projectOperatorService;
   }
 
+  public boolean canBuildContext(ProjectDetail detail,
+                                 AuthenticatedUserAccount user,
+                                 Class<?> controllerClass) {
+    var statusCheck = getProjectStatusesForClass(controllerClass);
+    var permissionCheck = getProjectPermissionsForClass(controllerClass);
+
+    try {
+      buildProjectContext(detail, user, statusCheck, permissionCheck);
+      return true;
+    } catch (AccessDeniedException exception) {
+      return false;
+    }
+  }
+
   /**
    * Do some preliminary access checks and return the project context if the checks pass.
    *

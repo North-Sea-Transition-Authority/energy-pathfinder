@@ -41,43 +41,43 @@ public class RegulatorActionService {
 
     var projectId = projectDetail.getProject().getId();
 
-    actions.add(getProvideAssessmentAction(
-        projectId,
-        projectAssessmentContextService.canBuildContext(
-            projectDetail,
-            user,
-            ProjectAssessmentController.class
-        )
-    ));
+    var canAssess = projectAssessmentContextService.canBuildContext(
+        projectDetail,
+        user,
+        ProjectAssessmentController.class
+    );
+    if (canAssess) {
+      actions.add(getProvideAssessmentAction(projectId));
+    }
 
-    actions.add(getRequestUpdateAction(
-        projectId,
-        projectUpdateContextService.canBuildContext(
-            projectDetail,
-            user,
-            RegulatorUpdateController.class
-        )
-    ));
+    var canRequestUpdate = projectUpdateContextService.canBuildContext(
+        projectDetail,
+        user,
+        RegulatorUpdateController.class
+    );
+    if (canRequestUpdate) {
+      actions.add(getRequestUpdateAction(projectId));
+    }
 
     return actions;
   }
 
-  protected UserActionWithDisplayOrder getProvideAssessmentAction(Integer projectId, boolean isEnabled) {
+  protected UserActionWithDisplayOrder getProvideAssessmentAction(Integer projectId) {
     return new UserActionWithDisplayOrder(
         new LinkButton(
             PROVIDE_ASSESSMENT_ACTION_PROMPT,
             ReverseRouter.route(on(ProjectAssessmentController.class).getProjectAssessment(projectId, null, null)),
-            isEnabled,
+            true,
             ButtonType.PRIMARY
         ), PROVIDE_ASSESSMENT_ACTION_DISPLAY_ORDER);
   }
 
-  protected UserActionWithDisplayOrder getRequestUpdateAction(Integer projectId, boolean isEnabled) {
+  protected UserActionWithDisplayOrder getRequestUpdateAction(Integer projectId) {
     return new UserActionWithDisplayOrder(
         new LinkButton(
             REQUEST_UPDATE_ACTION_PROMPT,
             ReverseRouter.route(on(RegulatorUpdateController.class).getRequestUpdate(projectId, null, null)),
-            isEnabled,
+            true,
             ButtonType.SECONDARY
         ), REQUEST_UPDATE_ACTION_DISPLAY_ORDER);
   }

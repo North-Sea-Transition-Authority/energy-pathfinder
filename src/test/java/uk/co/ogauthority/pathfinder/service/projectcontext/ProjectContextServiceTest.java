@@ -12,6 +12,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
@@ -87,6 +89,18 @@ public class ProjectContextServiceTest {
   }
 
   @Test
+  public void canBuildContext_whenNoException() {
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+
+    assertThat(projectContextService.canBuildContext(detail, authenticatedUser, TestController.class)).isTrue();
+  }
+
+  @Test
+  public void canBuildContext_whenException() {
+    assertThat(projectContextService.canBuildContext(detail, authenticatedUser, TestController.class)).isFalse();
+  }
+
+  @Test
   public void buildProjectContext_whenHasAccess() {
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
     var context = projectContextService.buildProjectContext(
@@ -100,7 +114,8 @@ public class ProjectContextServiceTest {
     assertThat(context.getProjectPermissions()).containsExactlyInAnyOrder(
         ProjectPermission.EDIT,
         ProjectPermission.SUBMIT,
-        ProjectPermission.PROVIDE_UPDATE
+        ProjectPermission.PROVIDE_UPDATE,
+        ProjectPermission.ARCHIVE
     );
   }
 
@@ -142,7 +157,8 @@ public class ProjectContextServiceTest {
     assertThat(projectContextService.getUserProjectPermissions(authenticatedUser)).containsExactlyInAnyOrder(
         ProjectPermission.EDIT,
         ProjectPermission.SUBMIT,
-        ProjectPermission.PROVIDE_UPDATE
+        ProjectPermission.PROVIDE_UPDATE,
+        ProjectPermission.ARCHIVE
     );
   }
 
@@ -178,4 +194,8 @@ public class ProjectContextServiceTest {
         ProjectPermission.PROVIDE_ASSESSMENT
     );
   }
+
+  @ProjectStatusCheck(status = ProjectStatus.DRAFT)
+  @ProjectFormPagePermissionCheck
+  private static final class TestController {}
 }
