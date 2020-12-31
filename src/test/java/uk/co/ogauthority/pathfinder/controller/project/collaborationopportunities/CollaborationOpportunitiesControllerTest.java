@@ -13,7 +13,6 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
 import java.util.Collections;
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,7 +72,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
 
   @Before
   public void setUp() {
-    when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(detail));
+    when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(detail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(false);
     when(collaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID)).thenReturn(opportunity);

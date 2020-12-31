@@ -64,7 +64,7 @@ public class ProjectManagementViewService {
 
     var projectManagementView = new ProjectManagementView(staticContentHtml, versionContentHtml);
 
-    var viewableVersions = projectVersionService.getProjectVersionDtos(project)
+    var viewableVersions = projectVersionService.getSubmittedProjectVersionDtos(project)
         .stream()
         .collect(Collectors.toMap(
             projectVersionDto -> Integer.toString(projectVersionDto.getVersion()),

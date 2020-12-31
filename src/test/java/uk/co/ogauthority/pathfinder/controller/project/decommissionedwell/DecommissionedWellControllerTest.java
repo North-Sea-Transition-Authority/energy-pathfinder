@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,7 +62,7 @@ public class DecommissionedWellControllerTest extends ProjectContextAbstractCont
     authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.CREATE_PROJECT_PRIVILEGES);
     unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
-    when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(projectDetail));
+    when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
   }

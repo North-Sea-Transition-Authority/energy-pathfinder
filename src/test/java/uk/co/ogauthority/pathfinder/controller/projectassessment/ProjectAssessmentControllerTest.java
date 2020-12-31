@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.controller.projectassessment;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +29,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectAssessmentContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.RegulatorUpdateController;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentForm;
@@ -62,11 +63,11 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
 
   @Before
   public void setup() {
-    when(projectService.getLatestSubmittedDetail(QA_PROJECT_ID)).thenReturn(Optional.of(qaProjectDetail));
+    when(projectService.getLatestSubmittedDetailOrError(QA_PROJECT_ID)).thenReturn(qaProjectDetail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(qaProjectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(qaProjectDetail, unauthenticatedUser)).thenReturn(false);
 
-    when(projectService.getLatestDetail(UNSUBMITTED_PROJECT_ID)).thenReturn(Optional.of(unsubmittedProjectDetail));
+    doThrow(new PathfinderEntityNotFoundException("test")).when(projectService).getLatestSubmittedDetailOrError(UNSUBMITTED_PROJECT_ID);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(unsubmittedProjectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(unsubmittedProjectDetail, unauthenticatedUser)).thenReturn(false);
   }

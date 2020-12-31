@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,11 +59,11 @@ public class OperatorUpdateControllerTest extends ProjectUpdateContextAbstractCo
 
   @Before
   public void setup() {
-    when(projectService.getLatestDetail(QA_PROJECT_ID)).thenReturn(Optional.of(qaProjectDetail));
+    when(projectService.getLatestDetailOrError(QA_PROJECT_ID)).thenReturn(qaProjectDetail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(qaProjectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(qaProjectDetail, unauthenticatedUser)).thenReturn(false);
 
-    when(projectService.getLatestDetail(DRAFT_PROJECT_ID)).thenReturn(Optional.of(draftProjectDetail));
+    when(projectService.getLatestDetailOrError(DRAFT_PROJECT_ID)).thenReturn(draftProjectDetail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(draftProjectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(draftProjectDetail, unauthenticatedUser)).thenReturn(false);
   }

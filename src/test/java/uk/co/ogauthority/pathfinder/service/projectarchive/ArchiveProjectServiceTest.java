@@ -27,6 +27,7 @@ import uk.co.ogauthority.pathfinder.model.form.projectarchive.ArchiveProjectForm
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectarchive.ProjectArchiveDetailRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.CancelDraftProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -41,6 +42,9 @@ public class ArchiveProjectServiceTest {
 
   @Mock
   private ProjectUpdateService projectUpdateService;
+
+  @Mock
+  private CancelDraftProjectVersionService cancelDraftProjectVersionService;
 
   @Mock
   private ProjectHeaderSummaryService projectHeaderSummaryService;
@@ -62,6 +66,7 @@ public class ArchiveProjectServiceTest {
     archiveProjectService = new ArchiveProjectService(
         projectArchiveDetailRepository,
         projectUpdateService,
+        cancelDraftProjectVersionService,
         projectHeaderSummaryService,
         validationService,
         breadcrumbService
@@ -71,7 +76,7 @@ public class ArchiveProjectServiceTest {
   }
 
   @Test
-  public void archiveProject() {
+  public void archiveProject_whenNotDraft() {
     var newProjectDetail = ProjectUtil.getProjectDetails();
 
     when(projectUpdateService.createNewProjectVersion(projectDetail, ProjectStatus.ARCHIVED, authenticatedUser)).thenReturn(
@@ -83,6 +88,7 @@ public class ArchiveProjectServiceTest {
 
     var projectArchiveDetail = archiveProjectService.archiveProject(projectDetail, authenticatedUser, form);
 
+    verify(cancelDraftProjectVersionService, times(1)).cancelDraftIfExists(projectDetail.getProject().getId());
     verify(projectUpdateService, times(1)).createNewProjectVersion(projectDetail, ProjectStatus.ARCHIVED, authenticatedUser);
 
     assertThat(projectArchiveDetail.getProjectDetail()).isEqualTo(newProjectDetail);

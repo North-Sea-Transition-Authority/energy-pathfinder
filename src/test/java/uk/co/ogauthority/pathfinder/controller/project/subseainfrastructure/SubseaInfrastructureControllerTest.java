@@ -14,7 +14,6 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
 import java.util.List;
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,7 +71,7 @@ public class SubseaInfrastructureControllerTest extends ProjectContextAbstractCo
     authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.CREATE_PROJECT_PRIVILEGES);
     unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
-    when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(projectDetail));
+    when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
 

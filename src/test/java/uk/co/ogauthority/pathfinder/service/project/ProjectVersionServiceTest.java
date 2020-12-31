@@ -36,23 +36,23 @@ public class ProjectVersionServiceTest {
   }
 
   @Test
-  public void getProjectVersionDtos() {
+  public void getSubmittedProjectVersionDtos() {
     var projectVersionDtos = List.of(
         new ProjectVersionDto(1, Instant.now()),
         new ProjectVersionDto(2, Instant.now())
     );
 
-    when(projectDetailsRepository.getProjectVersionDtos(PROJECT_ID)).thenReturn(projectVersionDtos);
+    when(projectDetailsRepository.getSubmittedProjectVersionDtos(PROJECT_ID)).thenReturn(projectVersionDtos);
 
-    var result = projectVersionService.getProjectVersionDtos(project);
+    var result = projectVersionService.getSubmittedProjectVersionDtos(project);
     assertThat(result).isEqualTo(projectVersionDtos);
   }
 
   @Test
-  public void getProjectVersionDtos_whenNoProjectVersionDtos_thenEmpty() {
-    when(projectDetailsRepository.getProjectVersionDtos(PROJECT_ID)).thenReturn(Collections.emptyList());
+  public void getSubmittedProjectVersionDtos_whenNoProjectVersionDtos_thenEmpty() {
+    when(projectDetailsRepository.getSubmittedProjectVersionDtos(PROJECT_ID)).thenReturn(Collections.emptyList());
 
-    var result = projectVersionService.getProjectVersionDtos(project);
+    var result = projectVersionService.getSubmittedProjectVersionDtos(project);
     assertThat(result).isEmpty();
   }
 }

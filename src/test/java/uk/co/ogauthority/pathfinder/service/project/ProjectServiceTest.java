@@ -55,6 +55,27 @@ public class ProjectServiceTest {
   }
 
   @Test
+  public void getLatestDetailOrError_whenExists_thenReturn() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+
+    when(projectDetailsRepository.findByProjectIdAndIsCurrentVersionIsTrue(PROJECT_ID)).thenReturn(
+        Optional.of(projectDetail)
+    );
+
+    var result = projectService.getLatestDetailOrError(PROJECT_ID);
+    assertThat(result).isEqualTo(projectDetail);
+  }
+
+  @Test(expected = PathfinderEntityNotFoundException.class)
+  public void getLatestDetailOrError_whenNotFound_thenException() {
+    when(projectDetailsRepository.findByProjectIdAndIsCurrentVersionIsTrue(PROJECT_ID)).thenReturn(
+        Optional.empty()
+    );
+
+    projectService.getLatestDetailOrError(PROJECT_ID);
+  }
+
+  @Test
   public void getLatestSubmittedDetail() {
     var projectDetail = ProjectUtil.getProjectDetails();
 
@@ -64,6 +85,27 @@ public class ProjectServiceTest {
 
     var result = projectService.getLatestSubmittedDetail(PROJECT_ID);
     assertThat(result).contains(projectDetail);
+  }
+
+  @Test
+  public void getLatestSubmittedDetailOrError_whenExists_thenReturn() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+
+    when(projectDetailsRepository.findByProjectIdAndIsLatestSubmittedVersion(PROJECT_ID)).thenReturn(
+        Optional.of(projectDetail)
+    );
+
+    var result = projectService.getLatestSubmittedDetailOrError(PROJECT_ID);
+    assertThat(result).isEqualTo(projectDetail);
+  }
+
+  @Test(expected = PathfinderEntityNotFoundException.class)
+  public void getLatestSubmittedDetailOrError_whenNotFound_thenException() {
+    when(projectDetailsRepository.findByProjectIdAndIsLatestSubmittedVersion(PROJECT_ID)).thenReturn(
+        Optional.empty()
+    );
+
+    projectService.getLatestSubmittedDetailOrError(PROJECT_ID);
   }
 
   @Test

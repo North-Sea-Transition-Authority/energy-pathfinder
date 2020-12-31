@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,7 +68,7 @@ public class PlatformsFpsosControllerTest extends ProjectContextAbstractControll
 
   @Before
   public void setUp() {
-    when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(detail));
+    when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(detail);
     when(platformsFpsosService.getOrError(PLATFORM_FPSO_ID)).thenReturn(platformFpso);
     var platformFpsoView = PlatformFpsoViewUtil.createView(
         platformFpso,

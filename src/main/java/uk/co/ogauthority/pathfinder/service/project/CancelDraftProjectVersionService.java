@@ -10,6 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryRenderingService;
@@ -58,6 +59,13 @@ public class CancelDraftProjectVersionService {
     projectService.deleteProjectDetail(projectDetail);
     if (projectDetail.isFirstVersion()) {
       projectService.deleteProject(projectDetail.getProject());
+    }
+  }
+
+  public void cancelDraftIfExists(Integer projectId) {
+    var latestProjectDetail = projectService.getLatestDetailOrError(projectId);
+    if (latestProjectDetail.getStatus().equals(ProjectStatus.DRAFT)) {
+      cancelDraft(latestProjectDetail);
     }
   }
 

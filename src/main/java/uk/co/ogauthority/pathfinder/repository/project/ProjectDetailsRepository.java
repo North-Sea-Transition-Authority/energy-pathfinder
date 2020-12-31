@@ -46,6 +46,11 @@ public interface ProjectDetailsRepository extends CrudRepository<ProjectDetail, 
          ") " +
          "FROM ProjectDetail pd " +
          "WHERE pd.project.id = :projectId " +
-         "ORDER BY pd.version DESC ")
-  List<ProjectVersionDto> getProjectVersionDtos(@Param("projectId") Integer projectId);
+         "AND pd.status IN(" +
+         "  uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus.QA" +
+         ", uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus.PUBLISHED" +
+         ", uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus.ARCHIVED" +
+         ") " +
+         "ORDER BY pd.version DESC")
+  List<ProjectVersionDto> getSubmittedProjectVersionDtos(@Param("projectId") Integer projectId);
 }
