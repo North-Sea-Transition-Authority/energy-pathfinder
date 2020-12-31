@@ -62,6 +62,7 @@ public class CancelDraftProjectVersionService {
     }
   }
 
+  @Transactional
   public void cancelDraftIfExists(Integer projectId) {
     var latestProjectDetail = projectService.getLatestDetailOrError(projectId);
     if (latestProjectDetail.getStatus().equals(ProjectStatus.DRAFT)) {
