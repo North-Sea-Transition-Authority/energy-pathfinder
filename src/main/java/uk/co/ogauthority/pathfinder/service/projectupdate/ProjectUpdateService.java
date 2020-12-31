@@ -60,6 +60,7 @@ public class ProjectUpdateService {
     projectUpdateRepository.delete(projectUpdate);
   }
 
+  @Transactional
   public ProjectDetail createNewProjectVersion(ProjectDetail fromDetail, AuthenticatedUserAccount userAccount) {
     return createNewProjectVersion(fromDetail, fromDetail.getStatus(), userAccount);
   }
