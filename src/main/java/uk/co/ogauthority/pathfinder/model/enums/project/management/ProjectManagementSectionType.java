@@ -5,9 +5,10 @@ public enum ProjectManagementSectionType {
   HEADING(10),
   PROJECT_DETAILS(20),
   ACTIONS(30),
-  PROJECT_ASSESSMENT(40),
-  PROJECT_ARCHIVE(50),
-  PROJECT_SUMMARY(60);
+  PROJECT_ARCHIVE(40),
+  PROJECT_TRANSFER(50),
+  PROJECT_ASSESSMENT(60),
+  PROJECT_SUMMARY(70);
 
   private final int displayOrder;
 

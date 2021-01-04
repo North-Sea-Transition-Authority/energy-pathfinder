@@ -12,6 +12,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.projectarchive.ArchiveProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectassessment.ProjectAssessmentController;
+import uk.co.ogauthority.pathfinder.controller.projecttransfer.ProjectTransferController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.RegulatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -97,6 +98,26 @@ public class RegulatorActionServiceTest {
   }
 
   @Test
+  public void getActions_whenCannotTransferProject() {
+    when(projectContextService.canBuildContext(projectDetail, authenticatedUser, ProjectTransferController.class)).thenReturn(false);
+
+    var actions = regulatorActionService.getActions(projectDetail, authenticatedUser);
+
+    assertThat(actions).isEmpty();
+  }
+
+  @Test
+  public void getActions_whenCanTransferProject() {
+    when(projectContextService.canBuildContext(projectDetail, authenticatedUser, ProjectTransferController.class)).thenReturn(true);
+
+    var actions = regulatorActionService.getActions(projectDetail, authenticatedUser);
+
+    assertThat(actions).containsExactly(
+        regulatorActionService.getTransferProjectAction(project.getId())
+    );
+  }
+
+  @Test
   public void getActions_whenCannotArchive() {
     when(projectContextService.canBuildContext(projectDetail, authenticatedUser, ArchiveProjectController.class)).thenReturn(false);
 
@@ -148,5 +169,20 @@ public class RegulatorActionServiceTest {
     assertThat(linkButton.getButtonType()).isEqualTo(ButtonType.SECONDARY);
 
     assertThat(action.getDisplayOrder()).isEqualTo(RegulatorActionService.REQUEST_UPDATE_ACTION_DISPLAY_ORDER);
+  }
+
+  @Test
+  public void getTransferProjectAction() {
+    var action = regulatorActionService.getTransferProjectAction(project.getId());
+
+    var linkButton = (LinkButton) action.getUserAction();
+    assertThat(linkButton.getPrompt()).isEqualTo(RegulatorActionService.TRANSFER_PROJECT_ACTION_PROMPT);
+    assertThat(linkButton.getUrl()).isEqualTo(
+        ReverseRouter.route(on(ProjectTransferController.class).getTransferProject(project.getId(), null, null))
+    );
+    assertThat(linkButton.getEnabled()).isTrue();
+    assertThat(linkButton.getButtonType()).isEqualTo(ButtonType.SECONDARY);
+
+    assertThat(action.getDisplayOrder()).isEqualTo(RegulatorActionService.TRANSFER_PROJECT_ACTION_DISPLAY_ORDER);
   }
 }

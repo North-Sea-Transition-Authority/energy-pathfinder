@@ -31,6 +31,12 @@ public class ProjectOperatorTestUtil {
     );
   }
 
+  public static ProjectOperator getOperator(PortalOrganisationGroup organisationGroup) {
+    return getOperator(
+        ProjectUtil.getProjectDetails(),
+        organisationGroup
+    );
+  }
 
   public static ProjectOperator getOperator(ProjectDetail detail, PortalOrganisationGroup organisationGroup) {
     return new ProjectOperator(
