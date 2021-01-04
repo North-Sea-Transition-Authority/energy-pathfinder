@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.form.projectarchive.ArchiveProjectForm
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectarchive.ProjectArchiveDetailRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.CancelDraftProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -30,6 +31,7 @@ public class ArchiveProjectService {
 
   private final ProjectArchiveDetailRepository projectArchiveDetailRepository;
   private final ProjectUpdateService projectUpdateService;
+  private final CancelDraftProjectVersionService cancelDraftProjectVersionService;
   private final ProjectHeaderSummaryService projectHeaderSummaryService;
   private final ValidationService validationService;
   private final BreadcrumbService breadcrumbService;
@@ -38,19 +40,25 @@ public class ArchiveProjectService {
   public ArchiveProjectService(
       ProjectArchiveDetailRepository projectArchiveDetailRepository,
       ProjectUpdateService projectUpdateService,
+      CancelDraftProjectVersionService cancelDraftProjectVersionService,
       ProjectHeaderSummaryService projectHeaderSummaryService,
       ValidationService validationService,
       BreadcrumbService breadcrumbService) {
     this.projectArchiveDetailRepository = projectArchiveDetailRepository;
     this.projectUpdateService = projectUpdateService;
+    this.cancelDraftProjectVersionService = cancelDraftProjectVersionService;
     this.projectHeaderSummaryService = projectHeaderSummaryService;
     this.validationService = validationService;
     this.breadcrumbService = breadcrumbService;
   }
 
   @Transactional
-  public ProjectArchiveDetail archiveProject(ProjectDetail projectDetail, AuthenticatedUserAccount user, ArchiveProjectForm form) {
-    var newProjectDetail = projectUpdateService.createNewProjectVersion(projectDetail, ProjectStatus.ARCHIVED, user);
+  public ProjectArchiveDetail archiveProject(ProjectDetail latestSubmittedProjectDetail,
+                                             AuthenticatedUserAccount user,
+                                             ArchiveProjectForm form) {
+    cancelDraftProjectVersionService.cancelDraftIfExists(latestSubmittedProjectDetail.getProject().getId());
+
+    var newProjectDetail = projectUpdateService.createNewProjectVersion(latestSubmittedProjectDetail, ProjectStatus.ARCHIVED, user);
     var projectArchiveDetail = new ProjectArchiveDetail();
     projectArchiveDetail.setProjectDetail(newProjectDetail);
     projectArchiveDetail.setArchiveReason(form.getArchiveReason());

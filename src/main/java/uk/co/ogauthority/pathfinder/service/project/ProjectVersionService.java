@@ -17,7 +17,7 @@ public class ProjectVersionService {
     this.projectDetailsRepository = projectDetailsRepository;
   }
 
-  public List<ProjectVersionDto> getProjectVersionDtos(Project project) {
-    return projectDetailsRepository.getProjectVersionDtos(project.getId());
+  public List<ProjectVersionDto> getSubmittedProjectVersionDtos(Project project) {
+    return projectDetailsRepository.getSubmittedProjectVersionDtos(project.getId());
   }
 }

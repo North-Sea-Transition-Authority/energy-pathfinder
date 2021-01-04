@@ -2,9 +2,9 @@ package uk.co.ogauthority.pathfinder.service.projectcontext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,25 +79,25 @@ public class ProjectContextServiceTest {
 
   @Test
   public void getProjectDetailsOrError_whenCurrentVersionAndPresent() {
-    when(projectService.getLatestDetail(any())).thenReturn(Optional.of(detail));
+    when(projectService.getLatestDetailOrError(any())).thenReturn(detail);
     assertThat(projectContextService.getProjectDetailsOrError(detail.getId(), ProjectDetailVersionType.CURRENT_VERSION)).isEqualTo(detail);
   }
 
   @Test(expected = PathfinderEntityNotFoundException.class)
   public void getProjectDetailsOrError_whenCurrentVersionAndNotPresent() {
-    when(projectService.getLatestDetail(any())).thenReturn(Optional.empty());
+    doThrow(new PathfinderEntityNotFoundException("test")).when(projectService).getLatestDetailOrError(any());
     projectContextService.getProjectDetailsOrError(detail.getId(), ProjectDetailVersionType.CURRENT_VERSION);
   }
 
   @Test
   public void getProjectDetailsOrError_whenLatestSubmittedVersionAndPresent() {
-    when(projectService.getLatestSubmittedDetail(any())).thenReturn(Optional.of(detail));
+    when(projectService.getLatestSubmittedDetailOrError(any())).thenReturn(detail);
     assertThat(projectContextService.getProjectDetailsOrError(detail.getId(), ProjectDetailVersionType.LATEST_SUBMITTED_VERSION)).isEqualTo(detail);
   }
 
   @Test(expected = PathfinderEntityNotFoundException.class)
   public void getProjectDetailsOrError_whenLatestSubmittedVersionAndNotPresent() {
-    when(projectService.getLatestSubmittedDetail(any())).thenReturn(Optional.empty());
+    doThrow(new PathfinderEntityNotFoundException("test")).when(projectService).getLatestSubmittedDetailOrError(any());
     projectContextService.getProjectDetailsOrError(detail.getId(), ProjectDetailVersionType.LATEST_SUBMITTED_VERSION);
   }
 

@@ -1,7 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.project.projectcontext;
 
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
-import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -103,19 +101,13 @@ public class ProjectContextService {
   }
 
   public ProjectDetail getProjectDetailsOrError(Integer projectId, ProjectDetailVersionType projectDetailVersionType) {
-    Optional<ProjectDetail> projectDetail;
     if (projectDetailVersionType.equals(ProjectDetailVersionType.CURRENT_VERSION)) {
-      projectDetail = projectService.getLatestDetail(projectId);
+      return projectService.getLatestDetailOrError(projectId);
     } else if (projectDetailVersionType.equals(ProjectDetailVersionType.LATEST_SUBMITTED_VERSION)) {
-      projectDetail = projectService.getLatestSubmittedDetail(projectId);
+      return projectService.getLatestSubmittedDetailOrError(projectId);
     } else {
       throw new IllegalStateException(String.format("Unsupported ProjectDetailVersionType %s", projectDetailVersionType));
     }
-    return projectDetail.orElseThrow(() ->
-        new PathfinderEntityNotFoundException(
-            String.format("Unable to find project detail for project id %d", projectId)
-        )
-    );
   }
 
   public boolean projectStatusMatches(ProjectDetail detail,

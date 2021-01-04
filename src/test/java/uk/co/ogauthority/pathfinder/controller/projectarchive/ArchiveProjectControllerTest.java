@@ -13,7 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,11 +58,11 @@ public class ArchiveProjectControllerTest extends ProjectContextAbstractControll
 
   @Before
   public void setup() {
-    when(projectService.getLatestDetail(PUBLISHED_PROJECT_ID)).thenReturn(Optional.of(publishedProjectDetail));
+    when(projectService.getLatestSubmittedDetailOrError(PUBLISHED_PROJECT_ID)).thenReturn(publishedProjectDetail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(publishedProjectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(publishedProjectDetail, unauthenticatedUser)).thenReturn(false);
 
-    when(projectService.getLatestDetail(ARCHIVED_PROJECT_ID)).thenReturn(Optional.of(archivedProjectDetail));
+    when(projectService.getLatestSubmittedDetailOrError(ARCHIVED_PROJECT_ID)).thenReturn(archivedProjectDetail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(archivedProjectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(archivedProjectDetail, unauthenticatedUser)).thenReturn(false);
   }

@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.controller.project.selectoperator;
 
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -11,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,7 +50,7 @@ public class ChangeProjectOperatorControllerTest extends ProjectContextAbstractC
 
   @Before
   public void setUp() {
-    when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(detail));
+    when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(detail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
     when(selectOperatorService.getSelectOperatorModelAndView(
         any(),

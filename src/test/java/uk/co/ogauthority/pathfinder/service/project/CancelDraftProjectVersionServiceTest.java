@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,6 +22,7 @@ import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
@@ -133,6 +135,30 @@ public class CancelDraftProjectVersionServiceTest {
 
     verify(projectService, times(1)).deleteProjectDetail(projectDetail);
     verify(projectService, never()).deleteProject(project);
+  }
+
+  @Test
+  public void cancelDraftIfExists_whenExists() {
+    var projectId = project.getId();
+    var draftProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+
+    when(projectService.getLatestDetailOrError(projectId)).thenReturn(draftProjectDetail);
+
+    var cancelDraftProjectVersionServiceSpy = spy(cancelDraftProjectVersionService);
+    cancelDraftProjectVersionServiceSpy.cancelDraftIfExists(projectId);
+    verify(cancelDraftProjectVersionServiceSpy, times(1)).cancelDraft(draftProjectDetail);
+  }
+
+  @Test
+  public void cancelDraftIfExists_whenNotExists() {
+    var projectId = project.getId();
+    var publishedProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.PUBLISHED);
+
+    when(projectService.getLatestDetailOrError(projectId)).thenReturn(publishedProjectDetail);
+
+    var cancelDraftProjectVersionServiceSpy = spy(cancelDraftProjectVersionService);
+    cancelDraftProjectVersionServiceSpy.cancelDraftIfExists(projectId);
+    verify(cancelDraftProjectVersionServiceSpy, never()).cancelDraft(publishedProjectDetail);
   }
 
   @Test

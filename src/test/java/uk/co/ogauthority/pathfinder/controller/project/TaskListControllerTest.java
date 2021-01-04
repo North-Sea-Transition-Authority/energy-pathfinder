@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.controller.project;
 
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -10,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,7 +48,7 @@ public class TaskListControllerTest extends ProjectContextAbstractControllerTest
 
   @Test
   public void authenticatedUser_hasAccessToTaskList() throws Exception {
-    when(projectService.getLatestDetail(any())).thenReturn(Optional.of(details));
+    when(projectService.getLatestDetailOrError(any())).thenReturn(details);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(details, authenticatedUser)).thenReturn(true);
 
     mockMvc.perform(get(ReverseRouter.route(on(TaskListController.class).viewTaskList(1, null)))
@@ -62,7 +60,7 @@ public class TaskListControllerTest extends ProjectContextAbstractControllerTest
 
   @Test
   public void unAuthenticatedUser_cannotAccessTaskList() throws Exception {
-    when(projectService.getLatestDetail(any())).thenReturn(Optional.of(details));
+    when(projectService.getLatestDetailOrError(any())).thenReturn(details);
     mockMvc.perform(get(ReverseRouter.route(on(TaskListController.class).viewTaskList(1, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());

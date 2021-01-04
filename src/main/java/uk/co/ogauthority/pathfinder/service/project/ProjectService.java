@@ -37,8 +37,24 @@ public class ProjectService {
     return projectDetailsRepository.findByProjectIdAndIsCurrentVersionIsTrue(projectId);
   }
 
+  public ProjectDetail getLatestDetailOrError(Integer projectId) {
+    return getLatestDetail(projectId).orElseThrow(() ->
+        new PathfinderEntityNotFoundException(
+            String.format("Unable to find project detail for project with id %d", projectId)
+        )
+    );
+  }
+
   public Optional<ProjectDetail> getLatestSubmittedDetail(Integer projectId) {
     return projectDetailsRepository.findByProjectIdAndIsLatestSubmittedVersion(projectId);
+  }
+
+  public ProjectDetail getLatestSubmittedDetailOrError(Integer projectId) {
+    return getLatestSubmittedDetail(projectId).orElseThrow(() ->
+        new PathfinderEntityNotFoundException(
+            String.format("Unable to find latest submitted project detail for project with id %d", projectId)
+        )
+    );
   }
 
   public ProjectDetail getDetailOrError(Integer projectId, Integer version) {

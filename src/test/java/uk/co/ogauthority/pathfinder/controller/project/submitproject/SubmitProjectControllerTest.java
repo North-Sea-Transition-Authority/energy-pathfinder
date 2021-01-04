@@ -12,7 +12,6 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
 import java.util.Collections;
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,7 +58,7 @@ public class SubmitProjectControllerTest extends ProjectContextAbstractControlle
 
   @Before
   public void setUp() throws Exception {
-    when(projectService.getLatestDetail(PROJECT_ID)).thenReturn(Optional.of(detail));
+    when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(detail);
     when(projectSummaryViewService.getProjectSummaryView(detail)).thenReturn(new ProjectSummaryView("",
         Collections.emptyList()));
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
@@ -126,7 +125,7 @@ public class SubmitProjectControllerTest extends ProjectContextAbstractControlle
     var projectId = 2;
     var projectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
 
-    when(projectService.getLatestDetail(projectId)).thenReturn(Optional.of(projectDetail));
+    when(projectService.getLatestDetailOrError(projectId)).thenReturn(projectDetail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
 
     mockMvc.perform(get(ReverseRouter.route(

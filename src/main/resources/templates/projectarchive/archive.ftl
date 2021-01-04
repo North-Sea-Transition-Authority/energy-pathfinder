@@ -11,6 +11,10 @@
 
   <h2 class="govuk-heading-l">${title}</h2>
 
+  <@fdsInsetText.insetText insetTextClass="govuk-inset-text--yellow">
+    By archiving this project, any in progress updates will no longer be able to be submitted.
+  </@fdsInsetText.insetText>
+
   <@fdsForm.htmlForm>
     <@fdsTextarea.textarea
       path="form.archiveReason"

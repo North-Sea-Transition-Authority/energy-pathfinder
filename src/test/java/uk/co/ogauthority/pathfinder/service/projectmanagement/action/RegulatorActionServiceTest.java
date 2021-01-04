@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.projectarchive.ArchiveProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectassessment.ProjectAssessmentController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.RegulatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
@@ -17,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContextService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -24,6 +26,12 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RegulatorActionServiceTest {
+
+  @Mock
+  private ProjectActionService projectActionService;
+
+  @Mock
+  private ProjectContextService projectContextService;
 
   @Mock
   private ProjectAssessmentContextService projectAssessmentContextService;
@@ -40,7 +48,12 @@ public class RegulatorActionServiceTest {
 
   @Before
   public void setup() {
-    regulatorActionService = new RegulatorActionService(projectAssessmentContextService, projectUpdateContextService);
+    regulatorActionService = new RegulatorActionService(
+        projectActionService,
+        projectContextService,
+        projectAssessmentContextService,
+        projectUpdateContextService
+    );
   }
 
   @Test
@@ -80,6 +93,26 @@ public class RegulatorActionServiceTest {
 
     assertThat(actions).containsExactly(
         regulatorActionService.getRequestUpdateAction(project.getId())
+    );
+  }
+
+  @Test
+  public void getActions_whenCannotArchive() {
+    when(projectContextService.canBuildContext(projectDetail, authenticatedUser, ArchiveProjectController.class)).thenReturn(false);
+
+    var actions = regulatorActionService.getActions(projectDetail, authenticatedUser);
+
+    assertThat(actions).isEmpty();
+  }
+
+  @Test
+  public void getActions_whenCanArchive() {
+    when(projectContextService.canBuildContext(projectDetail, authenticatedUser, ArchiveProjectController.class)).thenReturn(true);
+
+    var actions = regulatorActionService.getActions(projectDetail, authenticatedUser);
+
+    assertThat(actions).containsExactly(
+        projectActionService.getArchiveAction(project.getId(), RegulatorActionService.ARCHIVE_ACTION_DISPLAY_ORDER)
     );
   }
 
