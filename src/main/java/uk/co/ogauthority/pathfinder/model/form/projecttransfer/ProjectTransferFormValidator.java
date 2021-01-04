@@ -21,7 +21,7 @@ public class ProjectTransferFormValidator implements SmartValidator {
         .map(hint -> ((ProjectTransferValidationHint) hint))
         .findFirst()
         .orElseThrow(
-            () -> new ActionNotAllowedException("Expected ProjectTransferValidationHint validation hint to be provided")
+            () -> new ActionNotAllowedException("Expected ProjectTransferValidationHint to be provided")
         );
 
     if (form.getNewOrganisationGroup() != null) {

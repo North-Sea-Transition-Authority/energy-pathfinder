@@ -172,7 +172,7 @@ public class RegulatorActionServiceTest {
   }
 
   @Test
-  public void getTransferProjectUpdateAction() {
+  public void getTransferProjectAction() {
     var action = regulatorActionService.getTransferProjectAction(project.getId());
 
     var linkButton = (LinkButton) action.getUserAction();
