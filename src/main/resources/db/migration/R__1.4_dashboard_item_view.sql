@@ -25,8 +25,7 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
        WHERE details.project_id = pd.project_id
        AND details.status IN ('QA', 'PUBLISHED', 'ARCHIVED')
       )
-    , pd.version
-    , 1
+    , pd.version, 1
     , 0
     ) is_latest_submitted_version
   FROM ${datasource.user}.projects p
