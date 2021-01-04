@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 
 /**
@@ -16,5 +17,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 public @interface ProjectStatusCheck {
 
   ProjectStatus[] status() default {};
+
+  ProjectDetailVersionType projectDetailVersionType() default ProjectDetailVersionType.CURRENT_VERSION;
 
 }

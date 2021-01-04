@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project.projectcontext;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusC
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
@@ -100,9 +102,19 @@ public class ProjectContextService {
     );
   }
 
-  public ProjectDetail getProjectDetailsOrError(Integer projectId) {
-    return projectService.getLatestDetail(projectId).orElseThrow(() -> new PathfinderEntityNotFoundException(
-        String.format("Unable to find project detail for project id  %d", projectId))
+  public ProjectDetail getProjectDetailsOrError(Integer projectId, ProjectDetailVersionType projectDetailVersionType) {
+    Optional<ProjectDetail> projectDetail;
+    if (projectDetailVersionType.equals(ProjectDetailVersionType.CURRENT_VERSION)) {
+      projectDetail = projectService.getLatestDetail(projectId);
+    } else if (projectDetailVersionType.equals(ProjectDetailVersionType.LATEST_SUBMITTED_VERSION)) {
+      projectDetail = projectService.getLatestSubmittedDetail(projectId);
+    } else {
+      throw new IllegalStateException(String.format("Unsupported ProjectDetailVersionType %s", projectDetailVersionType));
+    }
+    return projectDetail.orElseThrow(() ->
+        new PathfinderEntityNotFoundException(
+            String.format("Unable to find project detail for project id %d", projectId)
+        )
     );
   }
 

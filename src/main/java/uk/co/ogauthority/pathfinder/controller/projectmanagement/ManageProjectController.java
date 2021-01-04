@@ -13,6 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.projectmanagement.ProjectManagementForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -21,7 +22,10 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermis
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectManagementViewService;
 
 @Controller
-@ProjectStatusCheck(status = {ProjectStatus.QA, ProjectStatus.PUBLISHED, ProjectStatus.ARCHIVED})
+@ProjectStatusCheck(
+    status = { ProjectStatus.QA, ProjectStatus.PUBLISHED, ProjectStatus.ARCHIVED },
+    projectDetailVersionType = ProjectDetailVersionType.LATEST_SUBMITTED_VERSION
+)
 @ProjectFormPagePermissionCheck(permissions = {ProjectPermission.VIEW})
 @RequestMapping("/project/{projectId}/manage")
 public class ManageProjectController {

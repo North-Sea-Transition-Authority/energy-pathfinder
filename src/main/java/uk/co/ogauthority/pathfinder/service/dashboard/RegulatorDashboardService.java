@@ -6,27 +6,27 @@ import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
-import uk.co.ogauthority.pathfinder.repository.dashboard.DashboardProjectItemRepository;
+import uk.co.ogauthority.pathfinder.repository.dashboard.RegulatorDashboardProjectItemRepository;
 
 @Service
 public class RegulatorDashboardService {
 
   public static final List<ProjectStatus> REGULATOR_PROJECT_ACCESS_STATUSES = List.of(ProjectStatus.PUBLISHED, ProjectStatus.QA);
 
-  private final DashboardProjectItemRepository dashboardProjectItemRepository;
+  private final RegulatorDashboardProjectItemRepository regulatorDashboardProjectItemRepository;
   private final DashboardFilterService filterService;
 
 
   @Autowired
-  public RegulatorDashboardService(DashboardProjectItemRepository dashboardProjectItemRepository,
+  public RegulatorDashboardService(RegulatorDashboardProjectItemRepository regulatorDashboardProjectItemRepository,
                                    DashboardFilterService filterService) {
-    this.dashboardProjectItemRepository = dashboardProjectItemRepository;
+    this.regulatorDashboardProjectItemRepository = regulatorDashboardProjectItemRepository;
     this.filterService = filterService;
   }
 
   public List<DashboardProjectItem> getDashboardProjectItems(DashboardFilter filter) {
     return filterService.filter(
-      dashboardProjectItemRepository.findAllByStatusIn(REGULATOR_PROJECT_ACCESS_STATUSES),
+      regulatorDashboardProjectItemRepository.findAllByStatusIn(REGULATOR_PROJECT_ACCESS_STATUSES),
       filter
     );
   }

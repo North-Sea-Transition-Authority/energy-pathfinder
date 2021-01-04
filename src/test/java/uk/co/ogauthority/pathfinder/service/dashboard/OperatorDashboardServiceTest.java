@@ -14,7 +14,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
-import uk.co.ogauthority.pathfinder.repository.dashboard.DashboardProjectItemRepository;
+import uk.co.ogauthority.pathfinder.repository.dashboard.OperatorDashboardProjectItemRepository;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.testutil.DashboardFilterTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
@@ -24,7 +24,7 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 public class OperatorDashboardServiceTest {
 
   @Mock
-  private DashboardProjectItemRepository dashboardProjectItemRepository;
+  private OperatorDashboardProjectItemRepository operatorDashboardProjectItemRepository;
 
   @Mock
   private TeamService teamService;
@@ -44,7 +44,7 @@ public class OperatorDashboardServiceTest {
   @Before
   public void setUp() throws Exception {
     operatorDashboardService = new OperatorDashboardService(
-        dashboardProjectItemRepository,
+        operatorDashboardProjectItemRepository,
         teamService,
         filterService
     );
@@ -52,7 +52,7 @@ public class OperatorDashboardServiceTest {
 
   @Test
   public void getDashboardProjectItems_correctNumberOfItemsReturned() {
-    when(dashboardProjectItemRepository.findAllByOrganisationGroupIn(any())).thenReturn(
+    when(operatorDashboardProjectItemRepository.findAllByOrganisationGroupIn(any())).thenReturn(
         List.of(item1, item2)
     );
     assertThat(operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson(), filter).size()).isEqualTo(2);

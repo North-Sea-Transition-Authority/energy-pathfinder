@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
@@ -63,7 +64,7 @@ public class ProjectAssessmentContextService {
     );
   }
 
-  public ProjectDetail getProjectDetailsOrError(Integer projectId) {
-    return projectContextService.getProjectDetailsOrError(projectId);
+  public ProjectDetail getProjectDetailsOrError(Integer projectId, ProjectDetailVersionType projectDetailVersionType) {
+    return projectContextService.getProjectDetailsOrError(projectId, projectDetailVersionType);
   }
 }

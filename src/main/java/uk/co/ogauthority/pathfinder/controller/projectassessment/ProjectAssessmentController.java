@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.RegulatorUpdateController;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -28,7 +29,10 @@ import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentC
 import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentService;
 
 @Controller
-@ProjectStatusCheck(status = ProjectStatus.QA)
+@ProjectStatusCheck(
+    status = ProjectStatus.QA,
+    projectDetailVersionType = ProjectDetailVersionType.LATEST_SUBMITTED_VERSION
+)
 @ProjectFormPagePermissionCheck(permissions = {ProjectPermission.PROVIDE_ASSESSMENT})
 @RequestMapping("/project/{projectId}/project-assessment")
 public class ProjectAssessmentController extends ProjectFormPageController {

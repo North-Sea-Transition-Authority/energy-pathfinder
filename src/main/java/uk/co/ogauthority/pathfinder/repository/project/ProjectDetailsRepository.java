@@ -16,6 +16,22 @@ public interface ProjectDetailsRepository extends CrudRepository<ProjectDetail, 
 
   Optional<ProjectDetail> findByProjectIdAndVersion(Integer projectId, Integer version);
 
+  @Query("SELECT pd " +
+         "FROM ProjectDetail pd " +
+         "WHERE pd.version = ( " +
+         "  SELECT MAX(detail.version) " +
+         "  FROM ProjectDetail detail " +
+         "  WHERE detail.status IN(" +
+         "    uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus.QA" +
+         "  , uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus.PUBLISHED" +
+         "  , uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus.ARCHIVED" +
+         "  ) " +
+         "  AND detail.project.id = pd.project.id " +
+         ") " +
+         "AND pd.project.id = :projectId"
+  )
+  Optional<ProjectDetail> findByProjectIdAndIsLatestSubmittedVersion(@Param("projectId") Integer projectId);
+
   @Query("SELECT CASE WHEN COUNT(pd) > 0 THEN true ELSE false END " +
          "FROM ProjectDetail pd " +
          "WHERE pd.project.id = :projectId " +

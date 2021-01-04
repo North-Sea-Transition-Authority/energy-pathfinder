@@ -48,13 +48,13 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbstractControllerTest {
 
   private static final Integer QA_PROJECT_ID = 1;
-  private static final Integer DRAFT_PROJECT_ID = 2;
+  private static final Integer UNSUBMITTED_PROJECT_ID = 2;
 
   @MockBean
   private ProjectAssessmentService projectAssessmentService;
 
   private final ProjectDetail qaProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
-  private final ProjectDetail draftProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+  private final ProjectDetail unsubmittedProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
 
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       ProjectPermission.PROVIDE_ASSESSMENT.getUserPrivileges());
@@ -62,13 +62,13 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
 
   @Before
   public void setup() {
-    when(projectService.getLatestDetail(QA_PROJECT_ID)).thenReturn(Optional.of(qaProjectDetail));
+    when(projectService.getLatestSubmittedDetail(QA_PROJECT_ID)).thenReturn(Optional.of(qaProjectDetail));
     when(projectOperatorService.isUserInProjectTeamOrRegulator(qaProjectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(qaProjectDetail, unauthenticatedUser)).thenReturn(false);
 
-    when(projectService.getLatestDetail(DRAFT_PROJECT_ID)).thenReturn(Optional.of(draftProjectDetail));
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(draftProjectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(draftProjectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectService.getLatestDetail(UNSUBMITTED_PROJECT_ID)).thenReturn(Optional.of(unsubmittedProjectDetail));
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(unsubmittedProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(unsubmittedProjectDetail, unauthenticatedUser)).thenReturn(false);
   }
 
   @Test
@@ -88,11 +88,11 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
   }
 
   @Test
-  public void getProjectAssessment_whenAuthenticatedAndDraft_thenNoAccess() throws Exception {
+  public void getProjectAssessment_whenAuthenticatedAndUnsubmitted_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(ProjectAssessmentController.class).getProjectAssessment(DRAFT_PROJECT_ID, null, null)))
+        on(ProjectAssessmentController.class).getProjectAssessment(UNSUBMITTED_PROJECT_ID, null, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isNotFound());
   }
 
   @Test
@@ -202,7 +202,7 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
   }
 
   @Test
-  public void createProjectAssessment_whenAuthenticatedAndDraft_thenNoAccess() throws Exception {
+  public void createProjectAssessment_whenAuthenticatedAndUnsubmitted_thenNoAccess() throws Exception {
     var form = new ProjectAssessmentForm();
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
@@ -210,11 +210,11 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectAssessmentController.class)
-            .createProjectAssessment(DRAFT_PROJECT_ID, null, null, null, null)
+            .createProjectAssessment(UNSUBMITTED_PROJECT_ID, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf()))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isNotFound());
 
     verify(projectAssessmentService, times(0)).validate(any(), any());
     verify(projectAssessmentService, times(0)).createProjectAssessment(any(), any(), any());
