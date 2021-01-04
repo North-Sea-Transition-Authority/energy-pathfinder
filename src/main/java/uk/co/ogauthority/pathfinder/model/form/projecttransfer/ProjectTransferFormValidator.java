@@ -18,7 +18,7 @@ public class ProjectTransferFormValidator implements SmartValidator {
 
     ProjectTransferValidationHint projectTransferValidationHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(ProjectTransferValidationHint.class))
-        .map(hint -> ((ProjectTransferValidationHint) hint))
+        .map(ProjectTransferValidationHint.class::cast)
         .findFirst()
         .orElseThrow(
             () -> new ActionNotAllowedException("Expected ProjectTransferValidationHint to be provided")

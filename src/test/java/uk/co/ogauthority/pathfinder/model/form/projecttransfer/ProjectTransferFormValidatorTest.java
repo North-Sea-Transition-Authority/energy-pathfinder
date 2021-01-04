@@ -22,9 +22,6 @@ public class ProjectTransferFormValidatorTest {
   private ProjectTransferFormValidator projectTransferFormValidator;
 
   private final PortalOrganisationGroup portalOrganisationGroup = ProjectOperatorTestUtil.ORG_GROUP;
-  private final ProjectTransferValidationHint projectTransferValidationHint = new ProjectTransferValidationHint(
-      portalOrganisationGroup
-  );
 
   @Before
   public void setup() {
@@ -36,6 +33,7 @@ public class ProjectTransferFormValidatorTest {
     var form = ProjectTransferTestUtil.createProjectTransferForm();
     form.setNewOrganisationGroup(null);
     var errors = new BeanPropertyBindingResult(form, "form");
+    var projectTransferValidationHint = new ProjectTransferValidationHint(portalOrganisationGroup);
 
     ValidationUtils.invokeValidator(projectTransferFormValidator, form, errors, projectTransferValidationHint);
 
@@ -48,6 +46,7 @@ public class ProjectTransferFormValidatorTest {
     var form = ProjectTransferTestUtil.createProjectTransferForm();
     form.setNewOrganisationGroup("2");
     var errors = new BeanPropertyBindingResult(form, "form");
+    var projectTransferValidationHint = new ProjectTransferValidationHint(portalOrganisationGroup);
 
     ValidationUtils.invokeValidator(projectTransferFormValidator, form, errors, projectTransferValidationHint);
 
@@ -60,6 +59,7 @@ public class ProjectTransferFormValidatorTest {
     var form = ProjectTransferTestUtil.createProjectTransferForm();
     form.setNewOrganisationGroup(Integer.toString(portalOrganisationGroup.getOrgGrpId()));
     var errors = new BeanPropertyBindingResult(form, "form");
+    var projectTransferValidationHint = new ProjectTransferValidationHint(portalOrganisationGroup);
 
     ValidationUtils.invokeValidator(projectTransferFormValidator, form, errors, projectTransferValidationHint);
 
