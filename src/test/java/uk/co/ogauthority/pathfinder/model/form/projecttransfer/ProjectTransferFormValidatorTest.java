@@ -28,6 +28,12 @@ public class ProjectTransferFormValidatorTest {
     projectTransferFormValidator = new ProjectTransferFormValidator();
   }
 
+  /**
+   * Ensure that the validator doesn't break or add any errors when the new organisation group
+   * is null. The purpose of the validator is to add errors when there is a new organisation group
+   * provided and it is the same as the existing one. Validation for the new organisation group not being
+   * null is handled by the @NotNull annotation on the form.
+   */
   @Test
   public void validate_whenNoNewOrganisationGroup_thenNoErrors() {
     var form = ProjectTransferTestUtil.createProjectTransferForm();
