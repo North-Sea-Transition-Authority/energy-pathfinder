@@ -1,6 +1,7 @@
 <#--Import statements-->
 <#import 'header.ftl' as applicationHeader>
 <#import 'project/macros/contactDetails.ftl' as contactDetails>
+<#import 'project/macros/differenceChanges.ftl' as differenceChanges>
 <#import 'project/macros/emptySectionSummaryInset.ftl' as emptySectionSummaryInset>
 <#import 'project/macros/quarterYearInput.ftl' as quarterYear>
 <#import 'project/macros/checkAnswers.ftl' as checkAnswers>
@@ -15,4 +16,5 @@
 <#import 'macros/useraction/userAction.ftl' as userAction>
 <#import 'macros/defaultPageWithSidebar.ftl' as defaultPageWithSidebar>
 <#import 'macros/inlineInputAction.ftl' as inlineInputAction>
+<#import 'macros/multiLineText.ftl' as multiLineText>
 <#import 'macros/noEscapeHtml.ftl' as noEscapeHtml>

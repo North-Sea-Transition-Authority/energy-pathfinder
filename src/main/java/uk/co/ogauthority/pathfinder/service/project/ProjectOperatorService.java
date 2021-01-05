@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
@@ -58,12 +59,7 @@ public class ProjectOperatorService {
 
     var userTeams = teamService.getOrganisationTeamsPersonIsMemberOf(person);
 
-    var projectOperator = projectOperatorRepository.findByProjectDetail(detail)
-        .orElseThrow(
-            () -> new PathfinderEntityNotFoundException(
-                String.format("Project Operator not found for detail with id: %d", detail.getId())
-            )
-        );
+    var projectOperator = getProjectOperatorByProjectDetailOrError(detail);
 
     return userTeams.stream().anyMatch(
         t -> projectOperator.getOrganisationGroup().equals(t.getPortalOrganisationGroup())
@@ -84,6 +80,10 @@ public class ProjectOperatorService {
     return getProjectOperatorByProjectDetail(projectDetail)
         .orElseThrow(() -> new PathfinderEntityNotFoundException(
             String.format("Unable to find ProjectOperator for projectDetail with ID %s", projectDetail.getId())));
+  }
+
+  public Optional<ProjectOperator> getProjectOperatorByProjectAndVersion(Project project, Integer version) {
+    return projectOperatorRepository.findByProjectDetail_ProjectAndProjectDetail_Version(project, version);
   }
 
   public void deleteProjectOperatorByProjectDetail(ProjectDetail projectDetail) {

@@ -2,9 +2,9 @@
 
 <@sectionSummaryWrapper.sectionSummaryWrapper sectionId=sectionId sectionTitle=sectionTitle>
   <@fdsCheckAnswers.checkAnswers>
-    <@checkAnswers.checkAnswersRowNoActions
+    <@checkAnswers.diffedCheckAnswersRowNoActions
       prompt="Project operator"
-      value=projectOperatorView.organisationGroupName!""
+      diffedField=projectOperatorDiffModel.ProjectOperatorView_organisationGroupName
     />
   </@fdsCheckAnswers.checkAnswers>
 </@sectionSummaryWrapper.sectionSummaryWrapper>

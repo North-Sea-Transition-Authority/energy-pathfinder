@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
@@ -160,5 +161,48 @@ public class ProjectOperatorServiceTest {
         )
     );
     assertThat(projectOperatorService.isUserInMultipleTeams(authenticatedUser)).isTrue();
+  }
+
+  @Test
+  public void getProjectOperatorByProjectAndVersion_whenFound_thenReturn() {
+    when(projectOperatorRepository.findByProjectDetail_ProjectAndProjectDetail_Version(
+        detail.getProject(),
+        detail.getVersion()
+    )).thenReturn(Optional.of(projectOperator));
+
+    var resultingProjectOperator = projectOperatorService.getProjectOperatorByProjectAndVersion(
+        detail.getProject(),
+        detail.getVersion()
+    );
+
+    assertThat(resultingProjectOperator).contains(projectOperator);
+  }
+
+  @Test
+  public void getProjectOperatorByProjectAndVersion_whenNotFound_thenReturnEmpty() {
+    when(projectOperatorRepository.findByProjectDetail_ProjectAndProjectDetail_Version(
+        detail.getProject(),
+        detail.getVersion()
+    )).thenReturn(Optional.empty());
+
+    var resultingProjectOperator = projectOperatorService.getProjectOperatorByProjectAndVersion(
+        detail.getProject(),
+        detail.getVersion()
+    );
+
+    assertThat(resultingProjectOperator).isEmpty();
+  }
+
+  @Test
+  public void getProjectOperatorByProjectDetailOrError_whenFound_thenReturn() {
+    when(projectOperatorRepository.findByProjectDetail(detail)).thenReturn(Optional.of(projectOperator));
+    var resultingProjectOperator = projectOperatorService.getProjectOperatorByProjectDetailOrError(detail);
+    assertThat(resultingProjectOperator).isEqualTo(projectOperator);
+  }
+
+  @Test(expected = PathfinderEntityNotFoundException.class)
+  public void getProjectOperatorByProjectDetailOrError_whenNotFound_thenException() {
+    when(projectOperatorRepository.findByProjectDetail(detail)).thenReturn(Optional.empty());
+    projectOperatorService.getProjectOperatorByProjectDetailOrError(detail);
   }
 }

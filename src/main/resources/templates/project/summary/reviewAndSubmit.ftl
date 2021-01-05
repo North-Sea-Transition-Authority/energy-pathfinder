@@ -16,6 +16,9 @@
     <@_invalidProjectInset />
   </#if>
 
+  <#if isUpdate>
+    <@differenceChanges.toggler/>
+  </#if>
   <@projectSummary.summary projectSummaryView=projectSummaryView />
 
   <#if !isProjectValid>

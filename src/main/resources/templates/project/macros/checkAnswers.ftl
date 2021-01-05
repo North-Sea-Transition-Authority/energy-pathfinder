@@ -29,3 +29,9 @@
     </#if>
   </@fdsCheckAnswers.checkAnswersRowNoAction>
 </#macro>
+
+<#macro diffedCheckAnswersRowNoActions prompt diffedField>
+  <@checkAnswersRowNoActionsWithNested prompt=prompt>
+    <@differenceChanges.renderDifference diffedField />
+  </@checkAnswersRowNoActionsWithNested>
+</#macro>

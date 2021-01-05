@@ -12,6 +12,7 @@ import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.projectoperator.ProjectOperatorView;
 import uk.co.ogauthority.pathfinder.model.view.projectoperator.ProjectOperatorViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
+import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
@@ -28,10 +29,13 @@ public class ProjectOperatorSectionSummaryService implements ProjectSectionSumma
   public static final int DISPLAY_ORDER = ProjectTask.PROJECT_OPERATOR.getDisplayOrder();
 
   private final ProjectOperatorService projectOperatorService;
+  private final DifferenceService differenceService;
 
   @Autowired
-  public ProjectOperatorSectionSummaryService(ProjectOperatorService projectOperatorService) {
+  public ProjectOperatorSectionSummaryService(ProjectOperatorService projectOperatorService,
+                                              DifferenceService differenceService) {
     this.projectOperatorService = projectOperatorService;
+    this.differenceService = differenceService;
   }
 
   @Override
@@ -40,11 +44,7 @@ public class ProjectOperatorSectionSummaryService implements ProjectSectionSumma
     summaryModel.put("sectionTitle", PAGE_NAME);
     summaryModel.put("sectionId", SECTION_ID);
 
-    var projectOperatorView = projectOperatorService.getProjectOperatorByProjectDetail(detail)
-        .map(ProjectOperatorViewUtil::from)
-        .orElse(new ProjectOperatorView());
-
-    summaryModel.put("projectOperatorView", projectOperatorView);
+    summaryModel.put("projectOperatorDiffModel", getProjectOperatorDifferenceModel(detail));
 
     return new ProjectSectionSummary(
         List.of(SECTION_LINK),
@@ -52,5 +52,21 @@ public class ProjectOperatorSectionSummaryService implements ProjectSectionSumma
         summaryModel,
         DISPLAY_ORDER
     );
+  }
+
+  private Map<String, Object> getProjectOperatorDifferenceModel(ProjectDetail projectDetail) {
+
+    var currentProjectOperatorView = projectOperatorService.getProjectOperatorByProjectDetail(projectDetail)
+        .map(ProjectOperatorViewUtil::from)
+        .orElse(new ProjectOperatorView());
+
+    var previousProjectOperatorView = projectOperatorService.getProjectOperatorByProjectAndVersion(
+        projectDetail.getProject(),
+        projectDetail.getVersion() - 1
+    )
+        .map(ProjectOperatorViewUtil::from)
+        .orElse(new ProjectOperatorView());
+
+    return differenceService.differentiate(currentProjectOperatorView, previousProjectOperatorView);
   }
 }

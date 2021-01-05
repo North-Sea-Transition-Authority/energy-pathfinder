@@ -1,5 +1,4 @@
 <#include '../layout.ftl'>
-<#import '../project/summary/projectSummary.ftl' as projectSummary/>
 
 <@defaultPage
   htmlTitle="Manage project"
@@ -16,6 +15,9 @@
         <@fdsAction.button buttonText="View" buttonClass="govuk-button govuk-button--blue"/>
       </@inlineInputAction.inlineInputAction>
     </@fdsForm.htmlForm>
+    <#if form.version != 1>
+      <@differenceChanges.toggler/>
+    </#if>
   </#if>
   <@noEscapeHtml.noEscapeHtml html=projectManagementView.versionContentHtml />
 </@defaultPage>
