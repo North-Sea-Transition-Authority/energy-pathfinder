@@ -369,7 +369,8 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     K_DESTINATION_TABLE_NAME CONSTANT VARCHAR2(30) := 'PROJECTS';
 
-    l_new_project_id NUMBER;
+    l_created_datetime decmgr.path_project_details.start_datetime%TYPE;
+    l_new_project_id ${datasource.user}.projects.id%TYPE;
 
   BEGIN
 
@@ -378,11 +379,16 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     , p_system_message => 'Creating ' || K_DESTINATION_TABLE_NAME || ' record for legacy project with ID ' || p_legacy_project_id
     );
 
+    SELECT MIN(ppd.start_datetime)
+    INTO l_created_datetime
+    FROM decmgr.path_project_details ppd
+    WHERE ppd.path_project_id = p_legacy_project_id;
+
     INSERT INTO ${datasource.user}.projects(
       created_datetime
     )
     VALUES(
-      SYSTIMESTAMP
+      l_created_datetime
     )
     RETURNING id INTO l_new_project_id;
 
