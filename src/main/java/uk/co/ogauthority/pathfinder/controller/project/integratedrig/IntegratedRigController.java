@@ -38,7 +38,8 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @RequestMapping("/project/{projectId}/integrated-rigs")
 public class IntegratedRigController extends ProjectFormPageController {
 
-  public static final String SUMMARY_PAGE_NAME = "Integrated rigs";
+  public static final String TASK_LIST_NAME = "Integrated rigs";
+  public static final String SUMMARY_PAGE_NAME = "Integrated rigs to be decommissioned";
   private static final String FORM_PAGE_NAME = "Integrated rig";
   public static final String REMOVE_PAGE_NAME = "Remove integrated rig";
 
@@ -182,7 +183,7 @@ public class IntegratedRigController extends ProjectFormPageController {
                 : null
         );
 
-    breadcrumbService.fromTaskList(projectId, modelAndView, SUMMARY_PAGE_NAME);
+    breadcrumbService.fromTaskList(projectId, modelAndView, TASK_LIST_NAME);
 
     return modelAndView;
   }

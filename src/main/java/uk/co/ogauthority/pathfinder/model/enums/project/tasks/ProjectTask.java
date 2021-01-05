@@ -79,25 +79,25 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       70
   ),
   WELLS(
-      DecommissionedWellController.SUMMARY_PAGE_NAME,
+      DecommissionedWellController.TASK_LIST_NAME,
       DecommissionedWellController.class,
       DecommissionedWellService.class,
       80
   ),
   PLATFORM_FPSO(
-      PlatformsFpsosController.SUMMARY_PAGE_NAME,
+      PlatformsFpsosController.TASK_LIST_NAME,
       PlatformsFpsosController.class,
       PlatformsFpsosService.class,
       90
   ),
   INTEGRATED_RIGS(
-      IntegratedRigController.SUMMARY_PAGE_NAME,
+      IntegratedRigController.TASK_LIST_NAME,
       IntegratedRigController.class,
       IntegratedRigService.class,
       100
   ),
   SUBSEA_INFRASTRUCTURE(
-      SubseaInfrastructureController.SUMMARY_PAGE_NAME,
+      SubseaInfrastructureController.TASK_LIST_NAME,
       SubseaInfrastructureController.class,
       SubseaInfrastructureService.class,
       110

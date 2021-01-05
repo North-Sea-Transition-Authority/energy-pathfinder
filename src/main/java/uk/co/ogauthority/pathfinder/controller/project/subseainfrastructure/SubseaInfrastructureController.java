@@ -40,8 +40,9 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @RequestMapping("/project/{projectId}/subsea-infrastructures")
 public class SubseaInfrastructureController extends ProjectFormPageController {
 
-  public static final String SUMMARY_PAGE_NAME = "Subsea infrastructure";
-  private static final String FORM_PAGE_NAME = "Subsea infrastructure to be decommissioned";
+  public static final String TASK_LIST_NAME = "Subsea infrastructure";
+  public static final String SUMMARY_PAGE_NAME = "Subsea infrastructure to be decommissioned";
+  private static final String FORM_PAGE_NAME = "Subsea infrastructure";
   public static final String REMOVE_PAGE_NAME = "Remove subsea infrastructure";
 
   private final SubseaInfrastructureService subseaInfrastructureService;
@@ -184,7 +185,7 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
                 : null
         );
 
-    breadcrumbService.fromTaskList(projectId, modelAndView, SUMMARY_PAGE_NAME);
+    breadcrumbService.fromTaskList(projectId, modelAndView, TASK_LIST_NAME);
 
     return modelAndView;
   }

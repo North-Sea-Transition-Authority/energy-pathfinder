@@ -1,7 +1,7 @@
 <#include '../../layout.ftl'>
 <#import './_platformFpsoSummary.ftl' as platformFpsoSummary/>
 
-<@defaultPage htmlTitle="Platforms and FPSOs" pageHeading="Platforms and FPSOs" breadcrumbs=true>
+<@defaultPage htmlTitle=pageName pageHeading=pageName breadcrumbs=true>
     <#if errorSummary?has_content>
         <@fdsError.errorSummary errorItems=errorSummary />
     </#if>

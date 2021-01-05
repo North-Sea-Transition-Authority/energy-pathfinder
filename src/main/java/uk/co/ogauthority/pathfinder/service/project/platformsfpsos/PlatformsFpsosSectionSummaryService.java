@@ -19,7 +19,7 @@ import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummar
 public class PlatformsFpsosSectionSummaryService implements ProjectSectionSummaryService {
 
   public static final String TEMPLATE_PATH = "project/platformsfpsos/platformsFpsoSectionSummary.ftl";
-  public static final String PAGE_NAME = PlatformsFpsosController.SUMMARY_PAGE_NAME;
+  public static final String PAGE_NAME = PlatformsFpsosController.TASK_LIST_NAME;
   public static final String SECTION_ID = "platformFpso";
   public static final SidebarSectionLink SECTION_LINK = SidebarSectionLink.createAnchorLink(
       PAGE_NAME,

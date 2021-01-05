@@ -35,8 +35,9 @@ import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 @RequestMapping("/project/{projectId}/wells")
 public class DecommissionedWellController extends ProjectFormPageController {
 
-  public static final String SUMMARY_PAGE_NAME = "Wells";
-  public static final String FORM_PAGE_NAME = "Wells to be decommissioned";
+  public static final String TASK_LIST_NAME = "Wells";
+  public static final String SUMMARY_PAGE_NAME = "Wells to be decommissioned";
+  public static final String FORM_PAGE_NAME = "Wells";
 
   private final DecommissionedWellService decommissionedWellService;
 
@@ -120,7 +121,7 @@ public class DecommissionedWellController extends ProjectFormPageController {
         )
         .addObject("projectSetupUrl", ControllerUtils.getProjectSetupUrl(projectId));
 
-    breadcrumbService.fromTaskList(projectId, modelAndView, SUMMARY_PAGE_NAME);
+    breadcrumbService.fromTaskList(projectId, modelAndView, TASK_LIST_NAME);
 
     return modelAndView;
   }

@@ -53,7 +53,7 @@ public enum TaskListSectionQuestion {
   PLATFORM_FPSO(
       ProjectTask.PLATFORM_FPSO,
       "Are platforms or floating production storage and offloading units being decommissioned on this project?",
-      "Platforms or floating production storage and offloading units",
+      "Platforms or floating production storage and offloading units to be decommissioned",
       "form.platformsFpsosIncluded",
       TaskListSectionAnswer.PLATFORM_FPSO_YES,
       TaskListSectionAnswer.PLATFORM_FPSO_NO,

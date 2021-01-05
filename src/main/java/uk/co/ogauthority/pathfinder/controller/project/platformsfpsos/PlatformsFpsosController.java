@@ -40,7 +40,8 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @RequestMapping("/project/{projectId}/platforms-fpsos")
 public class PlatformsFpsosController extends ProjectFormPageController {
 
-  public static final String SUMMARY_PAGE_NAME = "Platforms and FPSOs";
+  public static final String TASK_LIST_NAME = "Platforms and FPSOs";
+  public static final String SUMMARY_PAGE_NAME = "Platforms and FPSOs to be decommissioned";
   public static final String FORM_PAGE_NAME = "Platform or FPSO";
   public static final String REMOVE_PAGE_NAME = "Remove platform or FPSO";
 
@@ -180,6 +181,7 @@ public class PlatformsFpsosController extends ProjectFormPageController {
 
   ) {
     var modelAndView = new ModelAndView("project/platformsfpsos/platformsFpsoFormSummary")
+        .addObject("pageName", SUMMARY_PAGE_NAME)
         .addObject("views", views)
         .addObject("isValid", validationResult.equals(ValidationResult.VALID))
         .addObject("errorSummary",
@@ -190,7 +192,7 @@ public class PlatformsFpsosController extends ProjectFormPageController {
         .addObject("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectId))
         .addObject("projectSetupUrl", ControllerUtils.getProjectSetupUrl(projectId))
         .addObject("addPlatformFpsoUrl", ReverseRouter.route(on(PlatformsFpsosController.class).addPlatformFpso(projectId, null)));
-    breadcrumbService.fromTaskList(projectId, modelAndView, SUMMARY_PAGE_NAME);
+    breadcrumbService.fromTaskList(projectId, modelAndView, TASK_LIST_NAME);
     return modelAndView;
   }
 }
