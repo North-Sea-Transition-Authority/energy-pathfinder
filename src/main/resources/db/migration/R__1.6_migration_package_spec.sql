@@ -18,12 +18,29 @@ CREATE OR REPLACE PACKAGE ${datasource.migration-user}.migration AS
     @param p_legacy_project_id The id of the legacy project you want to migrate
    */
   PROCEDURE migrate_project(
-    p_legacy_project_id IN NUMBER
+    p_legacy_project_id IN decmgr.path_projects.id%TYPE
   );
 
   /**
     Procedure to migrate all legacy projects into the new service model.
    */
   PROCEDURE migrate_projects;
+
+  /**
+    Procedure to migrate any data that exists in the legacy model that
+    is not mapped to the new model for a single project. This will be
+    used as a backup to avoid loosing any data when the legacy schema is cleaned up.
+    @param p_legacy_project_id The id of the legacy project you want to migrate
+   */
+  PROCEDURE migrate_unmapped_project_data(
+    p_legacy_project_id IN decmgr.path_projects.id%TYPE
+  );
+
+  /**
+    Procedure to migrate any data that exists in the legacy model that
+    is not mapped to the new model. This will be used as a backup to avoid
+    loosing any data when the legacy schema is cleaned up.
+   */
+  PROCEDURE migrate_unmapped_project_data;
 
 END migration;

@@ -98,6 +98,63 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   END populate_detail_migration_log;
 
   /**
+    Procedure to populate the unmapped_project_migration_log table. This is being
+    done in a procedure so we always populate the log table with all the latest
+    projects from the legacy model when the migration is being run.
+   */
+  PROCEDURE populate_unmapped_project_log
+  IS
+  BEGIN
+
+    INSERT INTO ${datasource.migration-user}.unmapped_project_migration_log(
+      legacy_project_id
+    , migration_status
+    , system_message
+    )
+    SELECT
+      pp.id
+    , K_PENDING_MIGRATION_STATUS
+    , EMPTY_CLOB()
+    FROM decmgr.path_projects pp
+    -- Safety check to not populate with duplicate projects
+    WHERE pp.id NOT IN (
+      SELECT pml.legacy_project_id
+      FROM ${datasource.migration-user}.unmapped_project_migration_log pml
+    );
+
+  END populate_unmapped_project_log;
+
+  /**
+    Procedure to populate the unmapped_detail_migration_log table. This is being
+    done in a procedure so we always populate the log table with all the latest
+    projects from the legacy model when the migration is being run.
+   */
+  PROCEDURE populate_unmapped_detail_log
+  IS
+
+  BEGIN
+
+    INSERT INTO ${datasource.migration-user}.unmapped_detail_migration_log(
+      legacy_project_id
+    , legacy_project_detail_id
+    , migration_status
+    , system_message
+    )
+    SELECT
+      ppd.path_project_id
+    , ppd.id
+    , K_PENDING_MIGRATION_STATUS
+    , EMPTY_CLOB()
+    FROM decmgr.path_project_details ppd
+    -- Safety check to not populate with duplicate projects
+    WHERE ppd.id NOT IN (
+      SELECT pml.legacy_project_detail_id
+      FROM ${datasource.migration-user}.unmapped_detail_migration_log pml
+    );
+
+  END populate_unmapped_detail_log;
+
+  /**
     Procedure to populate the migration control tables before the migration runs.
    */
   PROCEDURE populate_migration_logs
@@ -111,6 +168,21 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     COMMIT;
 
   END populate_migration_logs;
+
+  /**
+    Procedure to populate the unmapped migration control tables before the migration runs.
+   */
+  PROCEDURE populate_unmapped_data_logs
+  IS
+
+  BEGIN
+
+    populate_unmapped_project_log();
+    populate_unmapped_detail_log();
+
+    COMMIT;
+
+  END populate_unmapped_data_logs;
 
   /**
     Utility function to write to the project_migration_log table. The write to the log is autonomous so will
@@ -201,6 +273,89 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     COMMIT;
 
   END reset_project_detail_log;
+
+  /**
+    Utility function to write to the unmapped_project_migration_log table. The write to the log is autonomous so will
+    be persisted regardless of errors in the consumer.
+    @param p_legacy_project_id The legacy project id
+    @param p_migration_status The status of the record
+    @param p_system_message The message to append to the log
+   */
+  PROCEDURE log_unmapped_project_migration(
+    p_legacy_project_id IN ${datasource.migration-user}.unmapped_project_migration_log.legacy_project_id%TYPE
+  , p_migration_status IN ${datasource.migration-user}.unmapped_project_migration_log.migration_status%TYPE DEFAULT NULL
+  , p_system_message IN ${datasource.migration-user}.unmapped_project_migration_log.system_message%TYPE
+  )
+  IS
+
+    PRAGMA AUTONOMOUS_TRANSACTION;
+
+  BEGIN
+
+    UPDATE ${datasource.migration-user}.unmapped_project_migration_log upml
+    SET
+      upml.migration_status = COALESCE(p_migration_status, upml.migration_status)
+    , upml.system_message = upml.system_message || CHR(10) || TO_CHAR(SYSTIMESTAMP) || ': ' || p_system_message || CHR(10)
+    WHERE upml.legacy_project_id = p_legacy_project_id;
+
+    COMMIT;
+
+  END log_unmapped_project_migration;
+
+  /**
+  Utility function to write to the unmapped_detail_migration_log table. The write to the log is autonomous so will
+  be persisted regardless of errors in the consumer.
+  @param p_legacy_project_detail_id The legacy project detail id
+  @param p_migration_status The status of the record
+  @param p_system_message The message to append to the log
+ */
+  PROCEDURE log_unmapped_detail_migration(
+    p_legacy_project_detail_id IN ${datasource.migration-user}.unmapped_detail_migration_log.legacy_project_detail_id%TYPE
+  , p_migration_status IN ${datasource.migration-user}.unmapped_detail_migration_log.migration_status%TYPE DEFAULT NULL
+  , p_system_message IN ${datasource.migration-user}.unmapped_detail_migration_log.system_message%TYPE
+  )
+  IS
+
+    PRAGMA AUTONOMOUS_TRANSACTION;
+
+  BEGIN
+
+    UPDATE ${datasource.migration-user}.unmapped_detail_migration_log pudl
+    SET
+      pudl.migration_status = COALESCE(p_migration_status, pudl.migration_status)
+    , pudl.system_message = pudl.system_message || CHR(10) || TO_CHAR(SYSTIMESTAMP) || ': ' || p_system_message || CHR(10)
+    WHERE pudl.legacy_project_detail_id = p_legacy_project_detail_id;
+
+    COMMIT;
+
+  END log_unmapped_detail_migration;
+
+  /**
+    Utility procedure to bulk update the migration_status and system_message for
+    all UNMAPPED_DETAIL_MIGRATION_LOG records associated to p_legacy_project_id. The write to the log is autonomous
+    so will be persisted regardless of errors in the consumer.
+    @param p_legacy_project_id The legacy project id that is being migrated
+    @param p_system_message The message to write to all the project detail migration logs for this project
+   */
+  PROCEDURE reset_unmapped_detail_log(
+    p_legacy_project_id IN ${datasource.migration-user}.unmapped_detail_migration_log.legacy_project_id%TYPE
+  , p_system_message IN ${datasource.migration-user}.unmapped_detail_migration_log.system_message%TYPE
+  )
+  IS
+
+    PRAGMA AUTONOMOUS_TRANSACTION;
+
+  BEGIN
+
+    UPDATE ${datasource.migration-user}.unmapped_detail_migration_log udml
+    SET
+      udml.migration_status = K_PENDING_MIGRATION_STATUS
+    , udml.system_message = udml.system_message || CHR(10) || TO_CHAR(SYSTIMESTAMP) || ': ' || p_system_message || CHR(10)
+    WHERE udml.legacy_project_id = p_legacy_project_id;
+
+    COMMIT;
+
+  END reset_unmapped_detail_log;
 
   /**
     Function to create a new record in the projects table in the new service model
@@ -1588,7 +1743,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   END create_project_detail_records;
 
   PROCEDURE migrate_project(
-    p_legacy_project_id IN NUMBER
+    p_legacy_project_id IN decmgr.path_projects.id%TYPE
   )
   IS
 
@@ -1673,5 +1828,327 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     END LOOP;
 
   END migrate_projects;
+
+  /**
+    Procedure to create a record in UNMAPPED_PROJECT_DATA. This will store the answer to a legacy question
+    which is not mapped in the new model.
+    @param p_legacy_project_id The id of the legacy project you want to migrate
+    @param p_legacy_project_detail_id The id of the legacy project detail you want to migrate
+    @param p_legacy_question_id The id of the legacy question from the UNMAPPED_PROJECT_DATA table
+    @param p_legacy_answer The legacy answer to p_legacy_question_id that we want to store
+   */
+  PROCEDURE create_unmapped_data_record(
+    p_legacy_project_id IN decmgr.path_projects.id%TYPE
+  , p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , p_legacy_question_id IN ${datasource.migration-user}.unmapped_project_data.legacy_question_id%TYPE
+  , p_legacy_answer IN ${datasource.migration-user}.unmapped_project_data.legacy_answer%TYPE
+  )
+  IS
+
+    l_new_project_id ${datasource.migration-user}.project_migration_log.new_project_id%TYPE;
+    l_new_project_detail_id ${datasource.migration-user}.project_detail_migration_log.new_project_detail_id%TYPE;
+
+    l_unmapped_project_data_id ${datasource.migration-user}.unmapped_project_data.id%TYPE;
+
+  BEGIN
+
+    IF p_legacy_answer IS NOT NULL THEN
+
+      log_unmapped_detail_migration(
+        p_legacy_project_detail_id => p_legacy_project_detail_id
+      , p_system_message =>
+          'Starting migrating for legacy question with p_legacy_question_id => ' || p_legacy_question_id ||
+          ' and p_legacy_answer => ' || p_legacy_answer
+      );
+
+      SELECT
+        pml.new_project_id
+      , pdml.new_project_detail_id
+      INTO
+        l_new_project_id
+      , l_new_project_detail_id
+      FROM ${datasource.migration-user}.project_detail_migration_log pdml
+      JOIN ${datasource.migration-user}.project_migration_log pml ON pml.legacy_project_id = pdml.legacy_project_id
+      WHERE pdml.legacy_project_detail_id = p_legacy_project_detail_id;
+
+      INSERT INTO ${datasource.migration-user}.unmapped_project_data(
+        legacy_project_id
+      , new_project_id
+      , legacy_project_detail_id
+      , new_project_detail_id
+      , legacy_question_id
+      , legacy_answer
+      )
+      VALUES(
+        p_legacy_project_id
+      , l_new_project_id
+      , p_legacy_project_detail_id
+      , l_new_project_detail_id
+      , p_legacy_question_id
+      , p_legacy_answer
+      )
+      RETURNING id INTO l_unmapped_project_data_id;
+
+      log_unmapped_detail_migration(
+        p_legacy_project_detail_id => p_legacy_project_detail_id
+      , p_system_message =>
+          'Completed migrating for legacy question with p_legacy_question_id => ' || p_legacy_question_id ||
+          ' and p_legacy_answer => ' || p_legacy_answer || '. UNMAPPED_PROJECT_DATA record created with ID ' || l_unmapped_project_data_id
+      );
+
+    ELSE
+
+      log_unmapped_detail_migration(
+        p_legacy_project_detail_id => p_legacy_project_detail_id
+      , p_system_message =>
+          'Skipping migrating for legacy question with ID ' || p_legacy_question_id ||
+          ' for legacy project detail with ID ' || p_legacy_project_detail_id || ' as p_legacy_answer IS NULL'
+      );
+
+    END IF;
+
+  END create_unmapped_data_record;
+
+  /**
+    Procedure to create records in UNMAPPED_PROJECT_COMMENTS. This will store the details of the comment
+    that was made on the project. This table will be used as a backup for when the legacy schema is torn down.
+    @param p_legacy_project_id The id of the legacy project you want to migrate
+   */
+  PROCEDURE migrate_project_comments(
+    p_legacy_project_id IN decmgr.path_projects.id%TYPE
+  )
+  IS
+
+    l_unmapped_project_comment_id ${datasource.migration-user}.unmapped_project_comments.id%TYPE;
+
+  BEGIN
+
+    log_unmapped_project_migration(
+      p_legacy_project_id => p_legacy_project_id
+    , p_system_message => 'Starting unmapped project comment migration for legacy project with ID ' || p_legacy_project_id
+    );
+
+    FOR comment IN (
+      SELECT
+        ulc.comment_text
+      , ulc.comment_datetime
+      , ulc.commented_by_wua_id
+      , ulc.comment_type
+      FROM ${datasource.migration-user}.unmapped_legacy_comments ulc
+      WHERE ulc.legacy_project_id = p_legacy_project_id
+    )
+    LOOP
+
+      INSERT INTO ${datasource.migration-user}.unmapped_project_comments(
+        legacy_project_id
+      , comment_text
+      , comment_datetime
+      , commented_by_wua_id
+      , comment_type
+      )
+      VALUES(
+        p_legacy_project_id
+      , comment.comment_text
+      , comment.comment_datetime
+      , comment.commented_by_wua_id
+      , comment.comment_type
+      ) RETURNING id INTO l_unmapped_project_comment_id;
+
+      log_unmapped_project_migration(
+        p_legacy_project_id => p_legacy_project_id
+      , p_system_message => 'New UNMAPPED_PROJECT_COMMENTS record created with id ' || l_unmapped_project_comment_id ||
+                            ' for legacy project with ID ' || p_legacy_project_id
+      );
+
+    END LOOP;
+
+    log_unmapped_project_migration(
+      p_legacy_project_id => p_legacy_project_id
+    , p_system_message => 'Completed unmapped project comment migration for legacy project with ID ' || p_legacy_project_id
+    );
+
+  END migrate_project_comments;
+
+  /**
+    Procedure to migrate any unmapped project data for a single project into the new model.
+    @param p_legacy_project_id The id of the legacy project you want to migrate
+   */
+  PROCEDURE migrate_unmapped_project_data(
+    p_legacy_project_id IN decmgr.path_projects.id%TYPE
+  )
+  IS
+  BEGIN
+
+    SAVEPOINT sp_before_unmapped_migration;
+
+    BEGIN
+
+      log_unmapped_project_migration(
+        p_legacy_project_id => p_legacy_project_id
+      , p_migration_status => K_PROCESSING_MIGRATION_STATUS
+      , p_system_message => 'Starting unmapped data migration for legacy project with ID ' || p_legacy_project_id
+      );
+
+      FOR project_detail IN (
+        SELECT
+          ppd.id legacy_detail_id
+        , (
+          SELECT upq.id
+          FROM ${datasource.migration-user}.unmapped_project_questions upq
+          WHERE upq.legacy_question_mnem = 'SUMMARY_OF_UPDATE'
+        ) update_summary_question_id
+        , (
+          SELECT upq.id
+          FROM ${datasource.migration-user}.unmapped_project_questions upq
+          WHERE upq.legacy_question_mnem = 'ORIGINAL_PRODUCTION_QUARTER'
+        ) orig_prod_quarter_question_id
+        , (
+          SELECT upq.id
+          FROM ${datasource.migration-user}.unmapped_project_questions upq
+          WHERE upq.legacy_question_mnem = 'ORIGINAL_PRODUCTION_YEAR'
+        ) orig_prod_year_question_id
+        , (
+          SELECT upq.id
+          FROM ${datasource.migration-user}.unmapped_project_questions upq
+          WHERE upq.legacy_question_mnem = 'UNDER_CONSTRUCTION_FLAG'
+        ) construction_flag_question_id
+        , (
+          SELECT upq.id
+          FROM ${datasource.migration-user}.unmapped_project_questions upq
+          WHERE upq.legacy_question_mnem = 'CONSTRUCTION_DATE'
+        ) construction_date_question_id
+        , ulpd.update_summary update_summary_answer
+        , ulpd.original_production_quarter original_prod_quarter_answer
+        , ulpd.original_production_year original_prod_year_answer
+        , ulpd.under_construction_flag under_construction_flag_answer
+        , ulpd.construction_date construction_date_answer
+        FROM decmgr.path_projects pp
+        JOIN decmgr.path_project_details ppd ON ppd.path_project_id = pp.id
+        JOIN ${datasource.migration-user}.project_migration_log pml ON pml.legacy_project_id = pp.id
+        JOIN ${datasource.migration-user}.unmapped_detail_migration_log udml ON udml.legacy_project_detail_id = ppd.id
+        JOIN ${datasource.migration-user}.unmapped_legacy_project_data ulpd ON ulpd.legacy_project_detail_id = udml.legacy_project_detail_id
+        WHERE pp.id = p_legacy_project_id
+        -- where the unmapped status is pending
+        AND udml.migration_status = K_PENDING_MIGRATION_STATUS
+        -- but the actual project has successfully been migrated
+        AND pml.migration_status = K_COMPLETE_MIGRATION_STATUS
+        ORDER BY ppd.start_datetime
+      )
+      LOOP
+
+        log_unmapped_detail_migration(
+          p_legacy_project_detail_id => project_detail.legacy_detail_id
+        , p_migration_status => K_PROCESSING_MIGRATION_STATUS
+        , p_system_message =>
+            'Starting unmapped data migrating for legacy project detail with ID ' || project_detail.legacy_detail_id
+        );
+
+        create_unmapped_data_record(
+          p_legacy_project_id => p_legacy_project_id
+        , p_legacy_project_detail_id => project_detail.legacy_detail_id
+        , p_legacy_question_id => project_detail.update_summary_question_id
+        , p_legacy_answer => project_detail.update_summary_answer
+        );
+
+        create_unmapped_data_record(
+          p_legacy_project_id => p_legacy_project_id
+        , p_legacy_project_detail_id => project_detail.legacy_detail_id
+        , p_legacy_question_id => project_detail.orig_prod_quarter_question_id
+        , p_legacy_answer => project_detail.original_prod_quarter_answer
+        );
+
+        create_unmapped_data_record(
+          p_legacy_project_id => p_legacy_project_id
+        , p_legacy_project_detail_id => project_detail.legacy_detail_id
+        , p_legacy_question_id => project_detail.orig_prod_year_question_id
+        , p_legacy_answer => project_detail.original_prod_year_answer
+        );
+
+        create_unmapped_data_record(
+          p_legacy_project_id => p_legacy_project_id
+        , p_legacy_project_detail_id => project_detail.legacy_detail_id
+        , p_legacy_question_id => project_detail.construction_flag_question_id
+        , p_legacy_answer => project_detail.under_construction_flag_answer
+        );
+
+        create_unmapped_data_record(
+          p_legacy_project_id => p_legacy_project_id
+        , p_legacy_project_detail_id => project_detail.legacy_detail_id
+        , p_legacy_question_id => project_detail.construction_date_question_id
+        , p_legacy_answer => project_detail.construction_date_answer
+        );
+
+        log_unmapped_detail_migration(
+          p_legacy_project_detail_id => project_detail.legacy_detail_id
+        , p_migration_status => K_COMPLETE_MIGRATION_STATUS
+        , p_system_message =>
+            'Completed unmapped data migrating for legacy project detail with ID ' || project_detail.legacy_detail_id
+        );
+
+      END LOOP;
+
+      migrate_project_comments(
+        p_legacy_project_id => p_legacy_project_id
+      );
+
+      log_unmapped_project_migration(
+        p_legacy_project_id => p_legacy_project_id
+      , p_migration_status => K_COMPLETE_MIGRATION_STATUS
+      , p_system_message => 'Completed unmapped data migration for legacy project with ID ' || p_legacy_project_id
+      );
+
+      COMMIT;
+
+    EXCEPTION WHEN OTHERS THEN
+
+      ROLLBACK TO SAVEPOINT sp_before_unmapped_migration;
+
+      log_unmapped_project_migration(
+        p_legacy_project_id => p_legacy_project_id
+      , p_migration_status => K_ERROR_MIGRATION_STATUS
+      , p_system_message =>
+          'Error migrating legacy unmapped project data for project with ID ' || p_legacy_project_id || '. '
+          || 'Unmapped data migration for project has been rolled back.' || CHR(10)
+          || 'Failed with error:' || CHR(10) || dbms_utility.format_error_stack() || CHR(10) || dbms_utility.format_error_backtrace()
+      );
+
+      reset_unmapped_detail_log(
+        p_legacy_project_id => p_legacy_project_id
+      , p_system_message =>
+          'Error migrating unmapped project data. Unmapped data migration has been rolled back for this project. See project log for trace'
+      );
+
+    END;
+
+  END migrate_unmapped_project_data;
+
+  /**
+    Procedure to migrate any unmapped project data for all projects into the new model.
+   */
+  PROCEDURE migrate_unmapped_project_data
+  IS
+  BEGIN
+
+    populate_unmapped_data_logs();
+
+    FOR project IN (
+      SELECT upml.legacy_project_id id
+      FROM ${datasource.migration-user}.unmapped_project_migration_log upml
+      JOIN ${datasource.migration-user}.project_migration_log pml ON pml.legacy_project_id = upml.legacy_project_id
+      -- where the unmapped status is pending
+      WHERE upml.migration_status = K_PENDING_MIGRATION_STATUS
+      -- but the actual project has successfully been migrated
+      AND pml.migration_status = K_COMPLETE_MIGRATION_STATUS
+      ORDER BY upml.legacy_project_id
+    )
+    LOOP
+
+      migrate_unmapped_project_data(
+        p_legacy_project_id => project.id
+      );
+
+    END LOOP;
+
+  END migrate_unmapped_project_data;
 
 END migration;

@@ -85,3 +85,45 @@ CREATE OR REPLACE VIEW ${datasource.migration-user}.legacy_project_contracts AS 
     , contact_email_address VARCHAR2(4000) PATH 'EMAIL_ADDRESS/text()'
   ) xt
 );
+
+CREATE OR REPLACE VIEW ${datasource.migration-user}.unmapped_legacy_project_data AS (
+  SELECT
+    ppd.path_project_id legacy_project_id
+  , ppd.id legacy_project_detail_id
+  , xt.update_summary
+  , xt.original_production_quarter
+  , xt.original_production_year
+  , xt.under_construction_flag
+  , xt.construction_date
+  FROM decmgr.path_project_details ppd
+  , XMLTABLE('PROJECT_DETAIL'
+    PASSING ppd.xml_data
+    COLUMNS
+      update_summary VARCHAR2(4000) PATH 'UPDATE_SUMMARY/text()'
+    , original_production_quarter VARCHAR2(4000) PATH 'ORIGINAL_PRODUCTION_QUARTER/text()'
+    , original_production_year VARCHAR2(4000) PATH 'ORIGINAL_PRODUCTION_YEAR/text()'
+    , under_construction_flag VARCHAR2(4000) PATH 'UNDER_CONSTRUCTION_FLAG/text()'
+    , construction_date VARCHAR2(4000) PATH 'CONSTRUCTION_DATE/text()'
+  ) xt
+);
+
+CREATE OR REPLACE VIEW ${datasource.migration-user}.unmapped_legacy_comments AS (
+  SELECT
+    pp.id legacy_project_id
+  , xt.comment_text
+  , envmgr.dt.to_datetime_safe(xt.comment_datetime) comment_datetime
+  , envmgr.st.to_number_safe(xt.commented_by_wua_id) commented_by_wua_id
+  , CASE
+      WHEN xt.comment_type = 'DECC_TO_OPERATOR_COMMENTS' THEN 'REGULATOR_TO_OPERATOR'
+      WHEN xt.comment_type = 'DECC_TO_DECC_COMMENTS' THEN 'REGULATOR_TO_REGULATOR'
+    END comment_type
+  FROM decmgr.path_projects pp
+  , XMLTABLE('COMMENTS/(DECC_TO_DECC_COMMENTS, DECC_TO_OPERATOR_COMMENTS)/COMMENT_LIST/COMMENT'
+    PASSING pp.comments_xml
+    COLUMNS
+      comment_text VARCHAR2(4000) PATH 'TEXT/text()'
+    , comment_datetime VARCHAR2(4000) PATH 'DATETIME/text()'
+    , commented_by_wua_id VARCHAR2(4000) PATH 'WUA_ID/text()'
+    , comment_type VARCHAR2(4000) PATH 'ancestor-or-self::COMMENT_LIST/../name()'
+  ) xt
+);
