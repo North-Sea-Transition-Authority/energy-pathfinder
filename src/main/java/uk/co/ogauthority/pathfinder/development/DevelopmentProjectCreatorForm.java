@@ -6,12 +6,23 @@ import uk.co.ogauthority.pathfinder.model.form.validation.positivewholenumber.Po
 
 public class DevelopmentProjectCreatorForm {
 
-  @NotNull(message = "Select a field type")
+  @NotNull(message = "Select an operator")
+  private String organisationGroup;
+
+  @NotNull(message = "Enter a number of projects")
   @PositiveWholeNumber(messagePrefix = "number of projects")
   private Integer numberOfProjects;
 
   @NotNull(message = "Select a project status")
   private ProjectStatus projectStatus;
+
+  public String getOrganisationGroup() {
+    return organisationGroup;
+  }
+
+  public void setOrganisationGroup(String organisationGroup) {
+    this.organisationGroup = organisationGroup;
+  }
 
   public Integer getNumberOfProjects() {
     return numberOfProjects;

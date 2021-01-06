@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
@@ -23,18 +22,6 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = DevelopmentProjectCreatorController.class)
-@TestPropertySource(properties = {
-    "PATHFINDER_DB_URL=jdbc:oracle:thin:@edu-dev-db5.decc.local:1521:edudev1",
-    "PATHFINDER_DB_SCHEMA=dev",
-    "PATHFINDER_DB_PASSWORD=dev1",
-    "PATHFINDER_FOX_LOGIN_URL=http://edu-app3.decc.local/engedudev1/fox/oga/OGA_LOGIN/login?REFERRED_BY=PATHFINDER",
-    "PATHFINDER_FOX_LOGIN_URL=http://edu-app3.decc.local/engedudev1/fox/oga/OGA_LOGIN/logout",
-    "PATHFINDER_FOX_REGISTRATION_URL=http://edu-app3.decc.local/engedudev1/fox?foxopen=oga/LOGIN001L/register",
-    "PATHFINDER_CLAMAV_HOST=dkr1.prod.fivium.local",
-    "PATHFINDER_CLAMAV_PORT=3310",
-    "PATHFINDER_CLAMAV_TIMEOUT=60000",
-    "PATHFINDER_CONTEXT=/engedudev1"
-})
 @ActiveProfiles("production")
 public class DevelopmentProjectCreatorControllerTest extends AbstractControllerTest {
 
