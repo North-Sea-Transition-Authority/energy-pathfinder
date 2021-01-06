@@ -16,7 +16,7 @@ import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummar
 public class IntegratedRigSectionSummaryService implements ProjectSectionSummaryService {
 
   public static final String TEMPLATE_PATH = "project/integratedrig/integratedRigSectionSummary.ftl";
-  public static final String PAGE_NAME = IntegratedRigController.SUMMARY_PAGE_NAME;
+  public static final String PAGE_NAME = IntegratedRigController.TASK_LIST_NAME;
   public static final String SECTION_ID = "integrated-rigs";
   public static final SidebarSectionLink SECTION_LINK = SidebarSectionLink.createAnchorLink(
       PAGE_NAME,

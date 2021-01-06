@@ -19,7 +19,7 @@ import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummar
 public class SubseaInfrastructureSectionSummaryService implements ProjectSectionSummaryService {
 
   public static final String TEMPLATE_PATH = "project/subseainfrastructure/subseaInfrastructureSectionSummary.ftl";
-  public static final String PAGE_NAME = SubseaInfrastructureController.SUMMARY_PAGE_NAME;
+  public static final String PAGE_NAME = SubseaInfrastructureController.TASK_LIST_NAME;
   public static final String SECTION_ID = "subseaInfrastructure";
   public static final SidebarSectionLink SECTION_LINK = SidebarSectionLink.createAnchorLink(
       PAGE_NAME,

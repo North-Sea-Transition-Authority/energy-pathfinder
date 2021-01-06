@@ -65,7 +65,7 @@ public class BreadcrumbService {
         projectId,
         null
     ));
-    map.put(route, DecommissionedWellController.SUMMARY_PAGE_NAME);
+    map.put(route, DecommissionedWellController.TASK_LIST_NAME);
     return map;
   }
 
@@ -79,7 +79,7 @@ public class BreadcrumbService {
         projectId,
         null
     ));
-    map.put(route, PlatformsFpsosController.SUMMARY_PAGE_NAME);
+    map.put(route, PlatformsFpsosController.TASK_LIST_NAME);
     return map;
   }
 
@@ -90,7 +90,7 @@ public class BreadcrumbService {
   private Map<String, String> subseaInfrastructure(Integer projectId) {
     var map = taskList(projectId);
     String route = ReverseRouter.route(on(SubseaInfrastructureController.class).viewSubseaStructures(projectId, null));
-    map.put(route, SubseaInfrastructureController.SUMMARY_PAGE_NAME);
+    map.put(route, SubseaInfrastructureController.TASK_LIST_NAME);
     return map;
   }
 
@@ -101,7 +101,7 @@ public class BreadcrumbService {
   private Map<String, String> integratedRig(Integer projectId) {
     var map = taskList(projectId);
     String route = ReverseRouter.route(on(IntegratedRigController.class).viewIntegratedRigs(projectId, null));
-    map.put(route, IntegratedRigController.SUMMARY_PAGE_NAME);
+    map.put(route, IntegratedRigController.TASK_LIST_NAME);
     return map;
   }
 

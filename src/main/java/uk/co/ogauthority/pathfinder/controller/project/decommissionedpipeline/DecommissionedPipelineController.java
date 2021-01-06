@@ -38,8 +38,8 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @RequestMapping("/project/{projectId}/pipelines")
 public class DecommissionedPipelineController extends ProjectFormPageController {
 
-  private static final String SUMMARY_PAGE_NAME = "Pipelines to be decommissioned";
   public static final String TASK_LIST_NAME = "Pipelines";
+  private static final String SUMMARY_PAGE_NAME = "Pipelines to be decommissioned";
   private static final String FORM_PAGE_NAME = "Pipeline";
   public static final String REMOVE_PAGE_NAME = "Remove pipeline";
 
