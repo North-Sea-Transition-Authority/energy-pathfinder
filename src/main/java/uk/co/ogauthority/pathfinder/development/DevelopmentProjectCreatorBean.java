@@ -5,10 +5,12 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.springframework.stereotype.Component;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.development.service.DevelopmentProjectCreatorService;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 
+@Component
 public class DevelopmentProjectCreatorBean extends QuartzJobBean {
 
   private final DevelopmentProjectCreatorService developmentProjectCreatorService;
