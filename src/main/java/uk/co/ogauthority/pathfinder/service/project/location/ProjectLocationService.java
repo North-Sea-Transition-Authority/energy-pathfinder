@@ -195,7 +195,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
 
   private List<ProjectLocationBlockView> getBlockViewsForLocation(ProjectDetail detail, ValidationType validationType) {
     var location = findByProjectDetail(detail);
-    return  location.isPresent()
+    return location.isPresent()
         ? projectLocationBlocksService.getBlockViewsForLocation(location.get(), validationType)
         : Collections.emptyList();
   }
@@ -208,11 +208,13 @@ public class ProjectLocationService implements ProjectFormSectionService {
                                                                ProjectDetail detail,
                                                                ValidationType validationType
   ) {
-    var views =  projectLocationBlocksService.getBlockViewsFromForm(form, validationType);
+    var views = projectLocationBlocksService.getBlockViewsFromForm(form, validationType);
 
     if (views.size() != form.getLicenceBlocks().size()) {
       getMissingPortalBlockViewsFromForm(form, detail, views, validationType);
     }
+
+    views.sort(Comparator.comparing(ProjectLocationBlockView::getSortKey));
 
     return views;
   }
@@ -238,7 +240,6 @@ public class ProjectLocationService implements ProjectFormSectionService {
       views.addAll(
           projectLocationBlocksService.getBlockViewsByProjectLocationAndCompositeKeyIn(location, missingViews, validationType)
       );
-      views.sort(Comparator.comparing(ProjectLocationBlockView::getBlockReference));
     });
 
   }

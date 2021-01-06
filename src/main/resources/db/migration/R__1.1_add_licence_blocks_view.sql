@@ -19,7 +19,6 @@ SELECT
 , b.suffix
 , b.plm_id
 , b.location
-, sort_key
 FROM (
   SELECT
     pclb.block_ref || pclb.quadrant_no || TO_CHAR(pclb.block_no) || pclb.suffix || pl.plm_id composite_key
@@ -29,7 +28,6 @@ FROM (
   , pclb.suffix
   , pl.plm_id
   , pclb.location
-  , pedmgr.ped_utils.block_ref_sort_key(pclb.block_ref) sort_key
   FROM pedmgr.ped_current_licence_blocks pclb
   JOIN ${datasource.user}.ped_licences pl
   ON pl.licence_type = pclb.licence_type AND pl.licence_number = pclb.licence_no

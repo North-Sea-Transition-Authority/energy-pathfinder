@@ -9,14 +9,12 @@ import uk.co.ogauthority.pathfinder.model.enums.portal.BlockLocation;
 @Repository
 public interface CurrentLicenceBlocksRepository extends CrudRepository<LicenceBlock, String> {
 
-  List<LicenceBlock> findAllByBlockLocationAndBlockReferenceContainingIgnoreCaseOrderBySortKeyAsc(
+  List<LicenceBlock> findAllByBlockLocationAndBlockReferenceContainingIgnoreCase(
       BlockLocation blockLocation,
       String searchTerm
   );
 
   List<LicenceBlock> findAllByCompositeKeyIn(List<String> ids);
-
-  List<LicenceBlock> findAllByCompositeKeyInOrderByBlockReference(List<String> ids);
 
   boolean existsByCompositeKey(String compositeKey);
 }

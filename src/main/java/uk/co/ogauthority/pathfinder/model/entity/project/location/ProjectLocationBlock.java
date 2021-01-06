@@ -11,11 +11,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.enums.portal.BlockLocation;
+import uk.co.ogauthority.pathfinder.model.licenceblock.SortableLicenceBlock;
 import uk.co.ogauthority.pathfinder.service.entityduplication.ChildEntity;
 
 @Entity
 @Table(name = "project_location_blocks")
-public class ProjectLocationBlock implements ChildEntity<Integer, ProjectLocation> {
+public class ProjectLocationBlock implements ChildEntity<Integer, ProjectLocation>, SortableLicenceBlock {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -92,24 +93,12 @@ public class ProjectLocationBlock implements ChildEntity<Integer, ProjectLocatio
     this.blockReference = blockReference;
   }
 
-  public String getBlockNumber() {
-    return blockNumber;
-  }
-
   public void setBlockNumber(String blockNumber) {
     this.blockNumber = blockNumber;
   }
 
-  public String getQuadrantNumber() {
-    return quadrantNumber;
-  }
-
   public void setQuadrantNumber(String quadrantNumber) {
     this.quadrantNumber = quadrantNumber;
-  }
-
-  public String getBlockSuffix() {
-    return blockSuffix;
   }
 
   public void setBlockSuffix(String suffix) {
@@ -152,5 +141,20 @@ public class ProjectLocationBlock implements ChildEntity<Integer, ProjectLocatio
   @Override
   public ProjectLocation getParent() {
     return getProjectLocation();
+  }
+
+  @Override
+  public String getBlockNumber() {
+    return blockNumber;
+  }
+
+  @Override
+  public String getQuadrantNumber() {
+    return quadrantNumber;
+  }
+
+  @Override
+  public String getBlockSuffix() {
+    return blockSuffix;
   }
 }

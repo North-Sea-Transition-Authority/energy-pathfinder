@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.portal;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,25 +26,21 @@ public class LicenceBlocksService {
 
   public List<RestSearchItem> searchLicenceBlocksWithReferenceContaining(String searchTerm) {
     var searchableList = findCurrentByReference(searchTerm);
-    return searchSelectorService.search(searchTerm, searchableList, false)
-        .stream()
-        .collect(Collectors.toList());
+    return searchSelectorService.search(searchTerm, searchableList, false);
   }
 
-
   public List<LicenceBlock> findCurrentByReference(String blockReference) {
-    return licenceBlocksRepository.findAllByBlockLocationAndBlockReferenceContainingIgnoreCaseOrderBySortKeyAsc(
+    return licenceBlocksRepository.findAllByBlockLocationAndBlockReferenceContainingIgnoreCase(
         BlockLocation.OFFSHORE,
         blockReference
-      );
+      )
+        .stream()
+        .sorted(Comparator.comparing(LicenceBlock::getSortKey))
+        .collect(Collectors.toList());
   }
 
   public List<LicenceBlock> findAllByCompositeKeyIn(List<String> ids) {
     return licenceBlocksRepository.findAllByCompositeKeyIn(ids);
-  }
-
-  public List<LicenceBlock> findAllByCompositeKeyInOrdered(List<String> ids) {
-    return licenceBlocksRepository.findAllByCompositeKeyInOrderByBlockReference(ids);
   }
 
   public boolean blockExists(String compositeKey) {
