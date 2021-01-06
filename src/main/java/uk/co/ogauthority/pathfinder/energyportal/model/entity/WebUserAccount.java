@@ -52,6 +52,26 @@ public class WebUserAccount implements Serializable {
     this.person = person;
   }
 
+  @VisibleForTesting
+  public WebUserAccount(int wuaId,
+                        String title,
+                        String forename,
+                        String surname,
+                        String emailAddress,
+                        String loginId,
+                        WebUserAccountStatus accountStatus,
+                        Person person
+  ) {
+    this.wuaId = wuaId;
+    this.title = title;
+    this.forename = forename;
+    this.surname = surname;
+    this.emailAddress = emailAddress;
+    this.loginId = loginId;
+    this.accountStatus = accountStatus;
+    this.person = person;
+  }
+
   public int getWuaId() {
     return wuaId;
   }
