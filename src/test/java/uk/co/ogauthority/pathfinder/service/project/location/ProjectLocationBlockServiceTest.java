@@ -142,21 +142,23 @@ public class ProjectLocationBlockServiceTest {
 
   @Test
   public void createOrUpdateBlocks_verifyDelete() {
-    var projectLocationBlocks = List.of(
-        LicenceBlockTestUtil.getProjectLocationBlock(PROJECT_LOCATION, BLOCKS.get(0))
-    );
     var block = BLOCKS.get(0);
+    var projectLocationBlocks = List.of(
+        LicenceBlockTestUtil.getProjectLocationBlock(PROJECT_LOCATION, block)
+    );
 
     when(projectLocationBlockRepository.findAllByProjectLocation(PROJECT_LOCATION)).thenReturn(
         projectLocationBlocks
     );
 
-    projectLocationBlocksService.createOrUpdateBlocks(BLOCK_REFS, PROJECT_LOCATION);
+    //pass in an empty list to remove any existing blocks
+    projectLocationBlocksService.createOrUpdateBlocks(Collections.emptyList(), PROJECT_LOCATION);
 
     verify(projectLocationBlockRepository, times(1)).deleteAll(projectLocationBlockRepositoryArgumentCaptor.capture());
     verify(projectLocationBlockRepository, times(0)).saveAll(any());
     var deletedBlocks = projectLocationBlockRepositoryArgumentCaptor.getValue();
     assertThat(deletedBlocks.size()).isEqualTo(1);
+    assertThat(deletedBlocks.get(0).getBlockReference()).isEqualTo(block.getBlockReference());
   }
 
   @Test
