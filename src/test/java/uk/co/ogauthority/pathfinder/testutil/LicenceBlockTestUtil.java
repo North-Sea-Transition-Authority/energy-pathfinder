@@ -27,6 +27,21 @@ public class LicenceBlockTestUtil {
     return getBlock(BLOCK_REFERENCE);
   }
 
+  public static LicenceBlock getBlock(String blockReference,
+                                      String quadrantNumber,
+                                      String blockNumber,
+                                      String blockSuffix) {
+    var block = new LicenceBlock();
+    block.setBlockReference(blockReference);
+    block.setCompositeKey(blockReference + quadrantNumber + blockNumber + blockSuffix + PLM_ID);
+    block.setPedLicenceId(PLM_ID);
+    block.setBlockNumber(blockNumber);
+    block.setQuadrantNumber(quadrantNumber);
+    block.setBlockSuffix(blockSuffix);
+    block.setBlockLocation(BLOCK_LOCATION);
+    return block;
+  }
+
   public static LicenceBlock getBlock(String blockReference) {
     var block = new LicenceBlock();
     block.setBlockReference(blockReference);
@@ -39,7 +54,10 @@ public class LicenceBlockTestUtil {
     return new ProjectLocationBlockView(
         COMPOSITE_KEY,
         BLOCK_REFERENCE,
-        isValid
+        isValid,
+        QUADRANT_NUMBER,
+        BLOCK_NUMBER,
+        BLOCK_SUFFIX
     );
   }
 
@@ -55,11 +73,23 @@ public class LicenceBlockTestUtil {
     );
   }
 
+  public static ProjectLocationBlock getProjectLocationBlock(ProjectLocation location, LicenceBlock licenceBlock) {
+    return new ProjectLocationBlock(
+        location,
+        PLM_ID,
+        licenceBlock.getBlockReference(),
+        licenceBlock.getBlockNumber(),
+        licenceBlock.getQuadrantNumber(),
+        licenceBlock.getBlockSuffix(),
+        BLOCK_LOCATION
+    );
+  }
+
   private static void setCommonFields(LicenceBlock block) {
     block.setPedLicenceId(PLM_ID);
     block.setBlockNumber(BLOCK_NUMBER);
     block.setQuadrantNumber(QUADRANT_NUMBER);
-    block.setSuffix(BLOCK_SUFFIX);
+    block.setBlockSuffix(BLOCK_SUFFIX);
     block.setBlockLocation(BLOCK_LOCATION);
   }
 }

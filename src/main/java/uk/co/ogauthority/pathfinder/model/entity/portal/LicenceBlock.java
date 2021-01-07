@@ -8,12 +8,13 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import org.hibernate.annotations.Immutable;
 import uk.co.ogauthority.pathfinder.model.enums.portal.BlockLocation;
+import uk.co.ogauthority.pathfinder.model.licenceblock.SortableLicenceBlock;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
 
 @Entity
 @Table(name = "current_licence_blocks")
 @Immutable
-public class LicenceBlock implements SearchSelectable {
+public class LicenceBlock implements SearchSelectable, SortableLicenceBlock {
 
   @Id
   private String compositeKey;
@@ -30,13 +31,12 @@ public class LicenceBlock implements SearchSelectable {
   @Column(name = "quadrant_no")
   private String quadrantNumber;
 
-  private String suffix;
+  @Column(name = "suffix")
+  private String blockSuffix;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "location")
   private BlockLocation blockLocation;
-
-  private String sortKey;
 
   public String getCompositeKey() {
     return compositeKey;
@@ -48,18 +48,6 @@ public class LicenceBlock implements SearchSelectable {
 
   public String getBlockReference() {
     return blockReference;
-  }
-
-  public String getBlockNumber() {
-    return blockNumber;
-  }
-
-  public String getQuadrantNumber() {
-    return quadrantNumber;
-  }
-
-  public String getSuffix() {
-    return suffix;
   }
 
   public BlockLocation getBlockLocation() {
@@ -86,16 +74,12 @@ public class LicenceBlock implements SearchSelectable {
     this.quadrantNumber = quadrantNumber;
   }
 
-  public void setSuffix(String suffix) {
-    this.suffix = suffix;
+  public void setBlockSuffix(String blockSuffix) {
+    this.blockSuffix = blockSuffix;
   }
 
   public void setBlockLocation(BlockLocation blockLocation) {
     this.blockLocation = blockLocation;
-  }
-
-  public String getSortKey() {
-    return sortKey;
   }
 
   @Override
@@ -106,5 +90,20 @@ public class LicenceBlock implements SearchSelectable {
   @Override
   public String getSelectionText() {
     return getBlockReference();
+  }
+
+  @Override
+  public String getBlockNumber() {
+    return blockNumber;
+  }
+
+  @Override
+  public String getQuadrantNumber() {
+    return quadrantNumber;
+  }
+
+  @Override
+  public String getBlockSuffix() {
+    return blockSuffix;
   }
 }

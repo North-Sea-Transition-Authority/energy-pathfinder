@@ -2,11 +2,11 @@ package uk.co.ogauthority.pathfinder.service.portal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,11 +21,14 @@ import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
 @RunWith(MockitoJUnitRunner.class)
 public class LicenceBlockServiceTest {
   private static final String COMPOSITE_KEY = "12/34a1234a111";
-  private static final List<String> COMPOSITE_KEY_LIST = List.of("12/34a1234a111", "12/45a1245a112", "12/56a1256a113");
+  /**
+   * These blocks are intentionally in the wrong order, so we can verify that the
+   * methods sort correctly. The correct sorted order is 9/25a, 12/5, 20/1
+   */
   private static final List<LicenceBlock> BLOCKS  = List.of(
-      LicenceBlockTestUtil.getBlock(COMPOSITE_KEY_LIST.get(0)),
-      LicenceBlockTestUtil.getBlock(COMPOSITE_KEY_LIST.get(1)),
-      LicenceBlockTestUtil.getBlock(COMPOSITE_KEY_LIST.get(2))
+      LicenceBlockTestUtil.getBlock("20/1", "20", "1", ""),
+      LicenceBlockTestUtil.getBlock("9/25a", "9", "25", "a"),
+      LicenceBlockTestUtil.getBlock("12/5", "12", "5", "")
   );
 
   @Mock
@@ -41,26 +44,41 @@ public class LicenceBlockServiceTest {
   }
 
   @Test
+  public void searchLicenceBlocksWithReferenceContaining() {
+    when(currentLicenceBlocksRepository.findAllByBlockLocationAndBlockReferenceContainingIgnoreCase(any(), any()))
+        .thenReturn(BLOCKS);
+
+    var searchItems = licenceBlockService.searchLicenceBlocksWithReferenceContaining("/");
+    assertThat(searchItems.size()).isEqualTo(3);
+    assertSearchItemMatchesBlock(searchItems.get(0), BLOCKS.get(1));
+    assertSearchItemMatchesBlock(searchItems.get(1), BLOCKS.get(2));
+    assertSearchItemMatchesBlock(searchItems.get(2), BLOCKS.get(0));
+  }
+
+  @Test
   public void findCurrentByReference() {
-    when(currentLicenceBlocksRepository.findAllByBlockLocationAndBlockReferenceContainingIgnoreCaseOrderBySortKeyAsc(any(), anyString())).thenReturn(
-        Collections.singletonList(LicenceBlockTestUtil.getBlock())
-    );
-    var blocks = licenceBlockService.findCurrentByReference(LicenceBlockTestUtil.BLOCK_REFERENCE);
-    assertThat(blocks.size()).isEqualTo(1);
-    assertThat(blocks.get(0).getBlockReference()).isEqualTo(LicenceBlockTestUtil.BLOCK_REFERENCE);
+    when(currentLicenceBlocksRepository.findAllByBlockLocationAndBlockReferenceContainingIgnoreCase(any(), eq("/")))
+        .thenReturn(BLOCKS);
+
+    var blocks = licenceBlockService.findCurrentByReference("/");
+    assertThat(blocks.size()).isEqualTo(3);
+    assertThat(blocks.get(0).getBlockReference()).isEqualTo(BLOCKS.get(1).getBlockReference());
+    assertThat(blocks.get(1).getBlockReference()).isEqualTo(BLOCKS.get(2).getBlockReference());
+    assertThat(blocks.get(2).getBlockReference()).isEqualTo(BLOCKS.get(0).getBlockReference());
   }
 
   @Test
   public void findAllByCompositeKeyIn() {
-    when(currentLicenceBlocksRepository.findAllByCompositeKeyIn(COMPOSITE_KEY_LIST)).thenReturn(
+    var compositeKeys = BLOCKS.stream()
+        .map(LicenceBlock::getCompositeKey)
+        .collect(Collectors.toList());
+
+    when(currentLicenceBlocksRepository.findAllByCompositeKeyIn(compositeKeys)).thenReturn(
         BLOCKS
     );
 
-    var blocks = licenceBlockService.findAllByCompositeKeyIn(COMPOSITE_KEY_LIST);
-    assertThat(blocks.size()).isEqualTo(3);
-    assertThat(blocks.get(0).getBlockReference()).isEqualTo(COMPOSITE_KEY_LIST.get(0));
-    assertThat(blocks.get(1).getBlockReference()).isEqualTo(COMPOSITE_KEY_LIST.get(1));
-    assertThat(blocks.get(2).getBlockReference()).isEqualTo(COMPOSITE_KEY_LIST.get(2));
+    var blocks = licenceBlockService.findAllByCompositeKeyIn(compositeKeys);
+    assertThat(blocks).isEqualTo(BLOCKS);
   }
 
   @Test
@@ -73,18 +91,6 @@ public class LicenceBlockServiceTest {
   public void blockExists_whenExists() {
     when(currentLicenceBlocksRepository.existsByCompositeKey(COMPOSITE_KEY)).thenReturn(true);
     assertThat(licenceBlockService.blockExists(COMPOSITE_KEY)).isTrue();
-  }
-
-  @Test
-  public void searchLicenceBlocksWithReferenceContaining() {
-    when(currentLicenceBlocksRepository.findAllByBlockLocationAndBlockReferenceContainingIgnoreCaseOrderBySortKeyAsc(any(), any())).thenReturn(
-        BLOCKS
-    );
-    var searchItems = licenceBlockService.searchLicenceBlocksWithReferenceContaining("12");
-    assertThat(searchItems.size()).isEqualTo(3);
-    assertSearchItemMatchesBlock(searchItems.get(0), BLOCKS.get(0));
-    assertSearchItemMatchesBlock(searchItems.get(1), BLOCKS.get(1));
-    assertSearchItemMatchesBlock(searchItems.get(2), BLOCKS.get(2));
   }
 
   private void assertSearchItemMatchesBlock(RestSearchItem searchItem, LicenceBlock block) {

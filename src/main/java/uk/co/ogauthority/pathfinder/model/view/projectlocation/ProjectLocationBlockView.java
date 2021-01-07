@@ -3,8 +3,9 @@ package uk.co.ogauthority.pathfinder.model.view.projectlocation;
 import uk.co.ogauthority.pathfinder.model.addtolist.AddToListItem;
 import uk.co.ogauthority.pathfinder.model.entity.portal.LicenceBlock;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
+import uk.co.ogauthority.pathfinder.model.licenceblock.SortableLicenceBlock;
 
-public class ProjectLocationBlockView implements AddToListItem {
+public class ProjectLocationBlockView implements AddToListItem, SortableLicenceBlock {
 
   private String compositeKey;
 
@@ -12,27 +13,43 @@ public class ProjectLocationBlockView implements AddToListItem {
 
   private Boolean isValid;
 
+  private final String quadrantNumber;
+
+  private final String blockNumber;
+
+  private final String blockSuffix;
+
   public ProjectLocationBlockView(ProjectLocationBlock projectLocationBlock, Boolean isValid) {
-    this.compositeKey = projectLocationBlock.getCompositeKey();
-    this.blockReference = projectLocationBlock.getBlockReference();
-    this.isValid = isValid;
+    this(projectLocationBlock.getCompositeKey(),
+        projectLocationBlock.getBlockReference(),
+        isValid,
+        projectLocationBlock.getQuadrantNumber(),
+        projectLocationBlock.getBlockNumber(),
+        projectLocationBlock.getBlockSuffix());
   }
 
-
+  public ProjectLocationBlockView(LicenceBlock licenceBlock, Boolean isValid) {
+    this(licenceBlock.getCompositeKey(),
+        licenceBlock.getBlockReference(),
+        isValid,
+        licenceBlock.getQuadrantNumber(),
+        licenceBlock.getBlockNumber(),
+        licenceBlock.getBlockSuffix());
+  }
 
   public ProjectLocationBlockView(String compositeKey,
                                   String blockReference,
-                                  Boolean isValid
+                                  Boolean isValid,
+                                  String quadrantNumber,
+                                  String blockNumber,
+                                  String blockSuffix
   ) {
     this.compositeKey = compositeKey;
     this.blockReference = blockReference;
     this.isValid = isValid;
-  }
-
-  public ProjectLocationBlockView(LicenceBlock licenceBlock, Boolean isValid) {
-    this.compositeKey = licenceBlock.getCompositeKey();
-    this.blockReference = licenceBlock.getBlockReference();
-    this.isValid = isValid;
+    this.quadrantNumber = quadrantNumber;
+    this.blockNumber = blockNumber;
+    this.blockSuffix = blockSuffix;
   }
 
   public String getCompositeKey() {
@@ -57,6 +74,21 @@ public class ProjectLocationBlockView implements AddToListItem {
 
   public void setValid(Boolean valid) {
     isValid = valid;
+  }
+
+  @Override
+  public String getQuadrantNumber() {
+    return quadrantNumber;
+  }
+
+  @Override
+  public String getBlockNumber() {
+    return blockNumber;
+  }
+
+  @Override
+  public String getBlockSuffix() {
+    return blockSuffix;
   }
 
   @Override

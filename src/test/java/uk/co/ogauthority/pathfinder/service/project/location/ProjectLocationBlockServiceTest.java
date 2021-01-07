@@ -34,15 +34,20 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectLocationBlockServiceTest {
-  private static final String BLOCK_REF_1 = "12/34a";
-  private static final String BLOCK_REF_2 = "12/34b";
-  private static final String BLOCK_REF_3 = "34/56";
-  private static final List<String> BLOCK_REFS = new ArrayList<>(Arrays.asList(BLOCK_REF_1, BLOCK_REF_2, BLOCK_REF_3));
+
+  /**
+   * These blocks are intentionally in the wrong order, so we can verify that the
+   * methods sort correctly. The correct sorted order is 9/2, 12/34a, 12/34b
+   */
   private static final List<LicenceBlock> BLOCKS  = List.of(
-      LicenceBlockTestUtil.getBlock(BLOCK_REF_1),
-      LicenceBlockTestUtil.getBlock(BLOCK_REF_2),
-      LicenceBlockTestUtil.getBlock(BLOCK_REF_3)
+      LicenceBlockTestUtil.getBlock("12/34a", "12", "34", "a"),
+      LicenceBlockTestUtil.getBlock("12/34b", "12", "34", "b"),
+      LicenceBlockTestUtil.getBlock("9/2", "9", "2", "")
   );
+  private static final String BLOCK_REF_1 = BLOCKS.get(0).getBlockReference();
+  private static final String BLOCK_REF_2 = BLOCKS.get(1).getBlockReference();
+  private static final String BLOCK_REF_3 = BLOCKS.get(2).getBlockReference();
+  private static final List<String> BLOCK_REFS = new ArrayList<>(Arrays.asList(BLOCK_REF_1, BLOCK_REF_2, BLOCK_REF_3));
 
   @Mock
   private LicenceBlocksService licenceBlocksService;
@@ -63,9 +68,9 @@ public class ProjectLocationBlockServiceTest {
   private static final ProjectLocation PROJECT_LOCATION = ProjectLocationTestUtil.getProjectLocation_withField(DETAIL);
 
   public static final List<ProjectLocationBlock> PROJECT_LOCATION_BLOCKS = List.of(
-      LicenceBlockTestUtil.getProjectLocationBlock(PROJECT_LOCATION, BLOCK_REF_1),
-      LicenceBlockTestUtil.getProjectLocationBlock(PROJECT_LOCATION, BLOCK_REF_2),
-      LicenceBlockTestUtil.getProjectLocationBlock(PROJECT_LOCATION, BLOCK_REF_3)
+      LicenceBlockTestUtil.getProjectLocationBlock(PROJECT_LOCATION, BLOCKS.get(0)),
+      LicenceBlockTestUtil.getProjectLocationBlock(PROJECT_LOCATION, BLOCKS.get(1)),
+      LicenceBlockTestUtil.getProjectLocationBlock(PROJECT_LOCATION, BLOCKS.get(2))
   );
 
   @Before
@@ -131,36 +136,29 @@ public class ProjectLocationBlockServiceTest {
     assertThat(projectLocationBlock.getProjectLocation()).isEqualTo(PROJECT_LOCATION);
     assertThat(projectLocationBlock.getBlockNumber()).isEqualTo(block.getBlockNumber());
     assertThat(projectLocationBlock.getQuadrantNumber()).isEqualTo(block.getQuadrantNumber());
-    assertThat(projectLocationBlock.getBlockSuffix()).isEqualTo(block.getSuffix());
+    assertThat(projectLocationBlock.getBlockSuffix()).isEqualTo(block.getBlockSuffix());
     assertThat(projectLocationBlock.getBlockLocation()).isEqualTo(block.getBlockLocation());
   }
 
   @Test
   public void createOrUpdateBlocks_verifyDelete() {
+    var block = BLOCKS.get(0);
     var projectLocationBlocks = List.of(
-        LicenceBlockTestUtil.getProjectLocationBlock(PROJECT_LOCATION, BLOCK_REF_1)
+        LicenceBlockTestUtil.getProjectLocationBlock(PROJECT_LOCATION, block)
     );
-    var block = LicenceBlockTestUtil.getBlock(BLOCK_REF_1);
 
     when(projectLocationBlockRepository.findAllByProjectLocation(PROJECT_LOCATION)).thenReturn(
         projectLocationBlocks
     );
 
-    projectLocationBlocksService.createOrUpdateBlocks(BLOCK_REFS, PROJECT_LOCATION);
+    //pass in an empty list to remove any existing blocks
+    projectLocationBlocksService.createOrUpdateBlocks(Collections.emptyList(), PROJECT_LOCATION);
 
     verify(projectLocationBlockRepository, times(1)).deleteAll(projectLocationBlockRepositoryArgumentCaptor.capture());
     verify(projectLocationBlockRepository, times(0)).saveAll(any());
     var deletedBlocks = projectLocationBlockRepositoryArgumentCaptor.getValue();
     assertThat(deletedBlocks.size()).isEqualTo(1);
-
-    var projectLocationBlock = projectLocationBlocks.get(0);
-    assertThat(projectLocationBlock.getBlockReference()).isEqualTo(block.getBlockReference());
-    assertThat(projectLocationBlock.getCompositeKey()).isEqualTo(block.getCompositeKey());
-    assertThat(projectLocationBlock.getProjectLocation()).isEqualTo(PROJECT_LOCATION);
-    assertThat(projectLocationBlock.getBlockNumber()).isEqualTo(block.getBlockNumber());
-    assertThat(projectLocationBlock.getQuadrantNumber()).isEqualTo(block.getQuadrantNumber());
-    assertThat(projectLocationBlock.getBlockSuffix()).isEqualTo(block.getSuffix());
-    assertThat(projectLocationBlock.getBlockLocation()).isEqualTo(block.getBlockLocation());
+    assertThat(deletedBlocks.get(0).getBlockReference()).isEqualTo(block.getBlockReference());
   }
 
   @Test
@@ -172,11 +170,10 @@ public class ProjectLocationBlockServiceTest {
 
     projectLocationBlocksService.addBlocksToForm(form, PROJECT_LOCATION);
 
-    assertThat(form.getLicenceBlocks().size()).isEqualTo(3);
-    assertThat(form.getLicenceBlocks()).containsExactlyInAnyOrder(
+    assertThat(form.getLicenceBlocks()).containsExactly(
+        PROJECT_LOCATION_BLOCKS.get(2).getCompositeKey(),
         PROJECT_LOCATION_BLOCKS.get(0).getCompositeKey(),
-        PROJECT_LOCATION_BLOCKS.get(1).getCompositeKey(),
-        PROJECT_LOCATION_BLOCKS.get(2).getCompositeKey()
+        PROJECT_LOCATION_BLOCKS.get(1).getCompositeKey()
     );
   }
 
@@ -193,7 +190,7 @@ public class ProjectLocationBlockServiceTest {
 
   @Test
   public void getBlockViewsFromForm_noValidation_allValid() {
-    when(licenceBlocksService.findAllByCompositeKeyInOrdered(any())).thenReturn(
+    when(licenceBlocksService.findAllByCompositeKeyIn(any())).thenReturn(
         BLOCKS
     );
     var form = new ProjectLocationForm();
@@ -206,7 +203,7 @@ public class ProjectLocationBlockServiceTest {
 
   @Test
   public void getBlockViewsFromForm_withValidation_CorrectlyValid() {
-    when(licenceBlocksService.findAllByCompositeKeyInOrdered(any())).thenReturn(
+    when(licenceBlocksService.findAllByCompositeKeyIn(any())).thenReturn(
         BLOCKS
     );
     when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(0).getCompositeKey())).thenReturn(false);
@@ -222,20 +219,20 @@ public class ProjectLocationBlockServiceTest {
 
   @Test
   public void getBlockViewsForLocation_noValidation_allValid() {
-    when(projectLocationBlockRepository.findAllByProjectLocationOrderByBlockReference(any())).thenReturn(
+    when(projectLocationBlockRepository.findAllByProjectLocation(any())).thenReturn(
         PROJECT_LOCATION_BLOCKS
     );
     var form = new ProjectLocationForm();
     var blockViews = projectLocationBlocksService.getBlockViewsForLocation(PROJECT_LOCATION, ValidationType.NO_VALIDATION);
     assertThat(blockViews.size()).isEqualTo(3);
-    assertBlockViewMatchesProjectLocationBlock(blockViews.get(0), PROJECT_LOCATION_BLOCKS.get(0), true);
-    assertBlockViewMatchesProjectLocationBlock(blockViews.get(1), PROJECT_LOCATION_BLOCKS.get(1), true);
-    assertBlockViewMatchesProjectLocationBlock(blockViews.get(2), PROJECT_LOCATION_BLOCKS.get(2), true);
+    assertBlockViewMatchesProjectLocationBlock(blockViews.get(0), PROJECT_LOCATION_BLOCKS.get(2), true);
+    assertBlockViewMatchesProjectLocationBlock(blockViews.get(1), PROJECT_LOCATION_BLOCKS.get(0), true);
+    assertBlockViewMatchesProjectLocationBlock(blockViews.get(2), PROJECT_LOCATION_BLOCKS.get(1), true);
   }
 
   @Test
   public void getBlockViewsForLocation_withValidation_CorrectlyValid() {
-    when(projectLocationBlockRepository.findAllByProjectLocationOrderByBlockReference(any())).thenReturn(
+    when(projectLocationBlockRepository.findAllByProjectLocation(any())).thenReturn(
         PROJECT_LOCATION_BLOCKS
     );
     when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(0).getCompositeKey())).thenReturn(false);
@@ -244,9 +241,9 @@ public class ProjectLocationBlockServiceTest {
     var form = new ProjectLocationForm();
     var blockViews = projectLocationBlocksService.getBlockViewsForLocation(PROJECT_LOCATION, ValidationType.FULL);
     assertThat(blockViews.size()).isEqualTo(3);
-    assertBlockViewMatchesProjectLocationBlock(blockViews.get(0), PROJECT_LOCATION_BLOCKS.get(0), false);
-    assertBlockViewMatchesProjectLocationBlock(blockViews.get(1), PROJECT_LOCATION_BLOCKS.get(1), true);
-    assertBlockViewMatchesProjectLocationBlock(blockViews.get(2), PROJECT_LOCATION_BLOCKS.get(2), false);
+    assertBlockViewMatchesProjectLocationBlock(blockViews.get(0), PROJECT_LOCATION_BLOCKS.get(2), false);
+    assertBlockViewMatchesProjectLocationBlock(blockViews.get(1), PROJECT_LOCATION_BLOCKS.get(0), false);
+    assertBlockViewMatchesProjectLocationBlock(blockViews.get(2), PROJECT_LOCATION_BLOCKS.get(1), true);
   }
 
   @Test
@@ -288,13 +285,17 @@ public class ProjectLocationBlockServiceTest {
 
   @Test
   public void getBlocks() {
-    when(projectLocationBlockRepository.findAllByProjectLocationOrderByBlockReference(PROJECT_LOCATION)).thenReturn(
+    when(projectLocationBlockRepository.findAllByProjectLocation(PROJECT_LOCATION)).thenReturn(
         PROJECT_LOCATION_BLOCKS
     );
     var blocks = projectLocationBlocksService.getBlocks(
         PROJECT_LOCATION
     );
-    assertThat(blocks).isEqualTo(PROJECT_LOCATION_BLOCKS);
+    assertThat(blocks).containsExactly(
+        PROJECT_LOCATION_BLOCKS.get(2),
+        PROJECT_LOCATION_BLOCKS.get(0),
+        PROJECT_LOCATION_BLOCKS.get(1)
+    );
   }
 
   @Test

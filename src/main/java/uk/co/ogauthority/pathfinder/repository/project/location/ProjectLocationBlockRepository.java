@@ -8,9 +8,8 @@ import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocatio
 
 @Repository
 public interface ProjectLocationBlockRepository extends CrudRepository<ProjectLocationBlock, Integer> {
-  List<ProjectLocationBlock> findAllByProjectLocation(ProjectLocation projectLocation);
 
-  List<ProjectLocationBlock> findAllByProjectLocationOrderByBlockReference(ProjectLocation projectLocation);
+  List<ProjectLocationBlock> findAllByProjectLocation(ProjectLocation projectLocation);
 
   void deleteAllByProjectLocation(ProjectLocation projectLocation);
 }

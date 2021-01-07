@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.project.location;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,7 @@ public class ProjectLocationBlocksService {
                   b.getBlockReference(),
                   b.getBlockNumber(),
                   b.getQuadrantNumber(),
-                  b.getSuffix(),
+                  b.getBlockSuffix(),
                   b.getBlockLocation()
               ))
               .collect(Collectors.toList())
@@ -85,14 +86,14 @@ public class ProjectLocationBlocksService {
    * @param projectLocation location to get blocks for
    */
   public ProjectLocationForm addBlocksToForm(ProjectLocationForm form, ProjectLocation projectLocation) {
-    var existingBlocks = projectLocationBlockRepository.findAllByProjectLocation(projectLocation);
+    var existingBlocks = getBlocks(projectLocation);
     form.setLicenceBlocks(existingBlocks.stream().map(ProjectLocationBlock::getCompositeKey)
         .collect(Collectors.toList()));
     return form;
   }
 
   public List<ProjectLocationBlockView> getBlockViewsFromForm(ProjectLocationForm form, ValidationType validationType) {
-    return licenceBlocksService.findAllByCompositeKeyInOrdered(form.getLicenceBlocks()).stream()
+    return licenceBlocksService.findAllByCompositeKeyIn(form.getLicenceBlocks()).stream()
         .map(plb -> new ProjectLocationBlockView(
              plb,
              isBlockReferenceValid(plb.getCompositeKey(), validationType)
@@ -112,7 +113,9 @@ public class ProjectLocationBlocksService {
 
 
   public List<ProjectLocationBlockView> getBlockViewsForLocation(ProjectLocation projectLocation, ValidationType validationType) {
-    return projectLocationBlockRepository.findAllByProjectLocationOrderByBlockReference(projectLocation).stream()
+    return projectLocationBlockRepository.findAllByProjectLocation(projectLocation)
+        .stream()
+        .sorted(Comparator.comparing(ProjectLocationBlock::getSortKey))
         .map(plb -> new ProjectLocationBlockView(
              plb,
              isBlockReferenceValid(plb.getCompositeKey(), validationType)
@@ -120,7 +123,10 @@ public class ProjectLocationBlocksService {
   }
 
   public List<ProjectLocationBlock> getBlocks(ProjectLocation projectLocation) {
-    return projectLocationBlockRepository.findAllByProjectLocationOrderByBlockReference(projectLocation);
+    return projectLocationBlockRepository.findAllByProjectLocation(projectLocation)
+        .stream()
+        .sorted(Comparator.comparing(ProjectLocationBlock::getSortKey))
+        .collect(Collectors.toList());
   }
 
   public void deleteBlocks(ProjectLocation projectLocation) {
