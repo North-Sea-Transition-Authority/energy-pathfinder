@@ -25,7 +25,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
-import uk.co.ogauthority.pathfinder.model.view.projectlocation.ProjectLocationBlockView;
+import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationBlockView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;

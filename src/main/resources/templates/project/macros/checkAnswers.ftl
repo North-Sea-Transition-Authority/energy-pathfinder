@@ -1,9 +1,9 @@
 <#include '../../layout.ftl'/>
 
-<#macro checkAnswersRowNoActions prompt value>
+<#macro checkAnswersRowNoActions prompt value multiLineTextBlockClass="govuk-body">
   <@checkAnswersRowNoActionsWithNested prompt=prompt>
     <#if value?has_content>
-      ${value}
+      <@multiLineText.multiLineText blockClass=multiLineTextBlockClass>${value}</@multiLineText.multiLineText>
     </#if>
   </@checkAnswersRowNoActionsWithNested>
 </#macro>
@@ -30,8 +30,11 @@
   </@fdsCheckAnswers.checkAnswersRowNoAction>
 </#macro>
 
-<#macro diffedCheckAnswersRowNoActions prompt diffedField>
+<#macro diffedCheckAnswersRowNoActions prompt diffedField multiLineTextBlockClass="">
   <@checkAnswersRowNoActionsWithNested prompt=prompt>
-    <@differenceChanges.renderDifference diffedField />
+    <@differenceChanges.renderDifference
+      diffedField=diffedField
+      multiLineTextBlockClass=multiLineTextBlockClass
+    />
   </@checkAnswersRowNoActionsWithNested>
 </#macro>

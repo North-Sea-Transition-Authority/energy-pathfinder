@@ -4,7 +4,7 @@ import uk.co.ogauthority.pathfinder.model.entity.portal.LicenceBlock;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
 import uk.co.ogauthority.pathfinder.model.enums.portal.BlockLocation;
-import uk.co.ogauthority.pathfinder.model.view.projectlocation.ProjectLocationBlockView;
+import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationBlockView;
 
 public class LicenceBlockTestUtil {
 

@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.view.projectlocation;
+package uk.co.ogauthority.pathfinder.model.view.location;
 
 import uk.co.ogauthority.pathfinder.model.addtolist.AddToListItem;
 import uk.co.ogauthority.pathfinder.model.entity.portal.LicenceBlock;

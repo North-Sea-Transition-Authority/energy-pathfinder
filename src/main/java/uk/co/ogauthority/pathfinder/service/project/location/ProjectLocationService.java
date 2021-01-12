@@ -21,7 +21,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDat
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationValidationHint;
-import uk.co.ogauthority.pathfinder.model.view.projectlocation.ProjectLocationBlockView;
+import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationBlockView;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;

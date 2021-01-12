@@ -52,9 +52,11 @@
     </span>
   <#else>
     <span class="diff-changes__value">
-      <@multiLineText.multiLineText blockClass=multiLineTextBlockClass>
-        ${value}
-      </@multiLineText.multiLineText>
+      <!--
+        It is important that this macro call is on one line to avoid extra carriage returns being shown
+        on the screen due to new lines being preserved within the macro
+      -->
+      <@multiLineText.multiLineText blockClass=multiLineTextBlockClass>${value}</@multiLineText.multiLineText>
     </span>
     <#if tag.displayName?has_content>
       <strong class="govuk-tag">

@@ -464,4 +464,34 @@ public class ProjectInformationServiceTest {
         ProjectInformation.class
     );
   }
+
+  @Test
+  public void getProjectInformationByProjectAndVersion_whenFoundThenReturn() {
+
+    final var project = details.getProject();
+    final var version = details.getVersion() - 1;
+
+    final var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
+
+    when(projectInformationRepository.findByProjectDetail_ProjectAndProjectDetail_Version(project, version))
+        .thenReturn(Optional.of(projectInformation));
+
+    var result = projectInformationService.getProjectInformationByProjectAndVersion(project, version);
+
+    assertThat(result).contains(projectInformation);
+  }
+
+  @Test
+  public void getProjectInformationByProjectAndVersion_whenNotFoundThenReturnEmpty() {
+
+    final var project = details.getProject();
+    final var version = details.getVersion() - 1;
+
+    when(projectInformationRepository.findByProjectDetail_ProjectAndProjectDetail_Version(project, version))
+        .thenReturn(Optional.empty());
+
+    var result = projectInformationService.getProjectInformationByProjectAndVersion(project, version);
+
+    assertThat(result).isEmpty();
+  }
 }

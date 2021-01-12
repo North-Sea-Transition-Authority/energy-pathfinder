@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -93,6 +94,10 @@ public class ProjectInformationService implements ProjectFormSectionService {
 
   private void clearProductionCessationDate(ProjectInformationForm form) {
     form.setProductionCessationDate(null);
+  }
+
+  public Optional<ProjectInformation> getProjectInformationByProjectAndVersion(Project project, Integer version) {
+    return projectInformationRepository.findByProjectDetail_ProjectAndProjectDetail_Version(project, version);
   }
 
   public Optional<ProjectInformation> getProjectInformation(ProjectDetail projectDetail) {

@@ -7,13 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
+import uk.co.ogauthority.pathfinder.model.view.projectinformation.ProjectInformationView;
+import uk.co.ogauthority.pathfinder.model.view.projectinformation.ProjectInformationViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
+import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
-import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @Service
 public class ProjectInformationSectionSummaryService implements ProjectSectionSummaryService {
@@ -28,9 +29,13 @@ public class ProjectInformationSectionSummaryService implements ProjectSectionSu
 
   private final ProjectInformationService projectInformationService;
 
+  private final DifferenceService differenceService;
+
   @Autowired
-  public ProjectInformationSectionSummaryService(ProjectInformationService projectInformationService) {
+  public ProjectInformationSectionSummaryService(ProjectInformationService projectInformationService,
+                                                 DifferenceService differenceService) {
     this.projectInformationService = projectInformationService;
+    this.differenceService = differenceService;
   }
 
   @Override
@@ -38,36 +43,20 @@ public class ProjectInformationSectionSummaryService implements ProjectSectionSu
     Map<String, Object> summaryModel = new HashMap<>();
     summaryModel.put("sectionTitle", PAGE_NAME);
     summaryModel.put("sectionId", SECTION_ID);
-    projectInformationService.getProjectInformation(detail).ifPresent(
-        projectInformation -> {
-          summaryModel.put("projectTitle", projectInformation.getProjectTitle());
-          summaryModel.put("projectSummary", projectInformation.getProjectSummary());
-          summaryModel.put("fieldStage", projectInformation.getFieldStage() != null
-              ? projectInformation.getFieldStage().getDisplayName()
-              : ""
-          );
-          summaryModel.put("developmentRelated", FieldStage.DEVELOPMENT.equals(projectInformation.getFieldStage()));
-          summaryModel.put("discoveryRelated", FieldStage.DISCOVERY.equals(projectInformation.getFieldStage()));
-          summaryModel.put("decomRelated", FieldStage.DECOMMISSIONING.equals(projectInformation.getFieldStage()));
-          var firstProductionDate = getFirstProductionDate(projectInformation);
-          summaryModel.put("developmentFirstProductionDate", firstProductionDate);
-          summaryModel.put("discoveryFirstProductionDate", firstProductionDate);
-          summaryModel.put("decomWorkStartDate",
-              DateUtil.getDateFromQuarterYear(
-                  projectInformation.getDecomWorkStartDateQuarter(),
-                  projectInformation.getDecomWorkStartDateYear()
-              )
-          );
-          summaryModel.put("decomProductionCessationDate",
-              DateUtil.formatDate(projectInformation.getProductionCessationDate())
-          );
-          summaryModel.put("name", projectInformation.getName());
-          summaryModel.put("phoneNumber", projectInformation.getPhoneNumber());
-          summaryModel.put("jobTitle", projectInformation.getJobTitle());
-          summaryModel.put("emailAddress", projectInformation.getEmailAddress());
-        }
-    );
 
+    var projectInformationView = projectInformationService.getProjectInformation(detail)
+        .map(ProjectInformationViewUtil::from)
+        .orElse(new ProjectInformationView());
+
+    summaryModel.put("projectInformationDiffModel", getProjectInformationDifferenceModel(
+        detail,
+        projectInformationView
+    ));
+
+    final var fieldStage = projectInformationView.getFieldStage();
+    summaryModel.put("isDevelopmentFieldStage", FieldStage.DEVELOPMENT.getDisplayName().equals(fieldStage));
+    summaryModel.put("isDiscoveryFieldStage", FieldStage.DISCOVERY.getDisplayName().equals(fieldStage));
+    summaryModel.put("isDecommissioningFieldStage", FieldStage.DECOMMISSIONING.getDisplayName().equals(fieldStage));
 
     return new ProjectSectionSummary(
         List.of(SECTION_LINK),
@@ -77,12 +66,18 @@ public class ProjectInformationSectionSummaryService implements ProjectSectionSu
     );
   }
 
-  private String getFirstProductionDate(ProjectInformation projectInformation) {
-    return DateUtil.getDateFromQuarterYear(
-        projectInformation.getFirstProductionDateQuarter(),
-        projectInformation.getFirstProductionDateYear()
-    );
+  private Map<String, Object> getProjectInformationDifferenceModel(
+      ProjectDetail projectDetail,
+      ProjectInformationView currentProjectInformationView
+  ) {
+
+    var previousProjectInformationView = projectInformationService.getProjectInformationByProjectAndVersion(
+        projectDetail.getProject(),
+        projectDetail.getVersion() - 1
+    )
+        .map(ProjectInformationViewUtil::from)
+        .orElse(new ProjectInformationView());
+
+    return differenceService.differentiate(currentProjectInformationView, previousProjectInformationView);
   }
-
-
 }

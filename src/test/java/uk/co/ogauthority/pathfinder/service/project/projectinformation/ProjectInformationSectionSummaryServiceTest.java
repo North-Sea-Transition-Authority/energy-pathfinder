@@ -1,7 +1,8 @@
 package uk.co.ogauthority.pathfinder.service.project.projectinformation;
 
-import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -13,9 +14,12 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
+import uk.co.ogauthority.pathfinder.model.view.projectinformation.ProjectInformationView;
+import uk.co.ogauthority.pathfinder.model.view.projectinformation.ProjectInformationViewUtil;
+import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
+import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
-import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectInformationSectionSummaryServiceTest {
@@ -26,57 +30,83 @@ public class ProjectInformationSectionSummaryServiceTest {
   @Mock
   private ProjectInformationService projectInformationService;
 
+  @Mock
+  private DifferenceService differenceService;
+
   private ProjectInformationSectionSummaryService projectInformationSectionSummaryService;
 
   @Before
   public void setUp() throws Exception {
-    projectInformationSectionSummaryService = new ProjectInformationSectionSummaryService(projectInformationService);
+    projectInformationSectionSummaryService = new ProjectInformationSectionSummaryService(
+        projectInformationService,
+        differenceService
+    );
     when(projectInformationService.getProjectInformation(detail)).thenReturn(Optional.of(projectInformation));
   }
 
   @Test
   public void getSummary() {
-    when(projectInformationService.getProjectInformation(detail)).thenReturn(Optional.of(projectInformation));
-    var sectionSummary = projectInformationSectionSummaryService.getSummary(detail);
-    var model = sectionSummary.getTemplateModel();
-    assertThat(sectionSummary.getDisplayOrder()).isEqualTo(ProjectInformationSectionSummaryService.DISPLAY_ORDER);
-    assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectInformationSectionSummaryService.SECTION_LINK));
-    assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectInformationSectionSummaryService.TEMPLATE_PATH);
 
-    assertThat(model).containsOnly(
-        entry("sectionTitle", ProjectInformationSectionSummaryService.PAGE_NAME),
-        entry("sectionId", ProjectInformationSectionSummaryService.SECTION_ID),
-        entry("projectTitle", projectInformation.getProjectTitle()),
-        entry("projectSummary", projectInformation.getProjectSummary()),
-        entry("fieldStage", projectInformation.getFieldStage().getDisplayName()),
-        entry("developmentRelated", false),
-        entry("discoveryRelated", false),
-        entry("decomRelated", true),
-        entry("developmentFirstProductionDate", ""),
-        entry("discoveryFirstProductionDate", ""),
-        entry("decomWorkStartDate", DateUtil.getDateFromQuarterYear(
-            projectInformation.getDecomWorkStartDateQuarter(),
-            projectInformation.getDecomWorkStartDateYear()
-        )),
-        entry("decomProductionCessationDate", DateUtil.formatDate(projectInformation.getProductionCessationDate())),
-        entry("name", projectInformation.getName()),
-        entry("phoneNumber", projectInformation.getPhoneNumber()),
-        entry("jobTitle", projectInformation.getJobTitle()),
-        entry("emailAddress", projectInformation.getEmailAddress())
-    );
+    when(projectInformationService.getProjectInformation(detail)).thenReturn(Optional.of(projectInformation));
+
+    var previousProjectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(detail);
+    previousProjectInformation.setProjectTitle("Previous project information");
+
+    when(projectInformationService.getProjectInformationByProjectAndVersion(
+        detail.getProject(),
+        detail.getVersion() - 1
+    )).thenReturn(Optional.of(previousProjectInformation));
+
+    var sectionSummary = projectInformationSectionSummaryService.getSummary(detail);
+
+    var currentProjectInformationView = ProjectInformationViewUtil.from(projectInformation);
+    var previousProjectInformationView = ProjectInformationViewUtil.from(previousProjectInformation);
+
+    assertModelProperties(sectionSummary);
+    assertInteractions(currentProjectInformationView, previousProjectInformationView);
   }
 
   @Test
   public void getSummary_noProjectInformation() {
     when(projectInformationService.getProjectInformation(detail)).thenReturn(Optional.empty());
+
+    when(projectInformationService.getProjectInformationByProjectAndVersion(
+        detail.getProject(),
+        detail.getVersion() - 1
+    )).thenReturn(Optional.empty());
+
     var sectionSummary = projectInformationSectionSummaryService.getSummary(detail);
-    var model = sectionSummary.getTemplateModel();
-    assertThat(sectionSummary.getDisplayOrder()).isEqualTo(ProjectInformationSectionSummaryService.DISPLAY_ORDER);
-    assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectInformationSectionSummaryService.SECTION_LINK));
-    assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectInformationSectionSummaryService.TEMPLATE_PATH);
-    assertThat(model).containsOnly(
-        entry("sectionTitle", ProjectInformationSectionSummaryService.PAGE_NAME),
-        entry("sectionId", ProjectInformationSectionSummaryService.SECTION_ID)
+    assertModelProperties(sectionSummary);
+    assertInteractions(new ProjectInformationView(), new ProjectInformationView());
+  }
+
+  private void assertModelProperties(ProjectSectionSummary projectSectionSummary) {
+
+    assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(ProjectInformationSectionSummaryService.DISPLAY_ORDER);
+    assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectInformationSectionSummaryService.SECTION_LINK));
+    assertThat(projectSectionSummary.getTemplatePath()).isEqualTo(ProjectInformationSectionSummaryService.TEMPLATE_PATH);
+
+    var model = projectSectionSummary.getTemplateModel();
+
+    assertThat(model).containsOnlyKeys(
+        "sectionTitle",
+        "sectionId",
+        "projectInformationDiffModel",
+        "isDevelopmentFieldStage",
+        "isDiscoveryFieldStage",
+        "isDecommissioningFieldStage"
+    );
+
+    assertThat(model).containsEntry("sectionTitle", ProjectInformationSectionSummaryService.PAGE_NAME);
+    assertThat(model).containsEntry("sectionId", ProjectInformationSectionSummaryService.SECTION_ID);
+  }
+
+  private void assertInteractions(ProjectInformationView currentProjectInformationView,
+                                  ProjectInformationView previousProjectInformationView) {
+    verify(differenceService, times(1)).differentiate(
+        currentProjectInformationView,
+        previousProjectInformationView
     );
   }
+
 }

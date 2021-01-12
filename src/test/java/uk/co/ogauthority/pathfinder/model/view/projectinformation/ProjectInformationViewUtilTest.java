@@ -1,0 +1,145 @@
+package uk.co.ogauthority.pathfinder.model.view.projectinformation;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+import java.time.LocalDate;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarter;
+import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.util.DateUtil;
+
+@RunWith(MockitoJUnitRunner.class)
+public class ProjectInformationViewUtilTest {
+
+  private ProjectInformation projectInformation;
+
+  @Before
+  public void setup() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+    projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+  }
+
+  private void assertCommonProperties(ProjectInformationView projectInformationView,
+                                      ProjectInformation projectInformation) {
+    assertThat(projectInformationView.getProjectTitle()).isEqualTo(projectInformation.getProjectTitle());
+    assertThat(projectInformationView.getProjectSummary()).isEqualTo(projectInformation.getProjectSummary());
+    assertThat(projectInformationView.getContactName()).isEqualTo(projectInformation.getContactName());
+    assertThat(projectInformationView.getContactPhoneNumber()).isEqualTo(projectInformation.getPhoneNumber());
+    assertThat(projectInformationView.getContactJobTitle()).isEqualTo(projectInformation.getJobTitle());
+    assertThat(projectInformationView.getContactEmailAddress()).isEqualTo(projectInformation.getEmailAddress());
+  }
+
+  @Test
+  public void from_whenNoFieldStage() {
+
+    projectInformation.setFieldStage(null);
+
+    var projectInformationView = ProjectInformationViewUtil.from(projectInformation);
+
+    assertCommonProperties(projectInformationView, projectInformation);
+    assertThat(projectInformationView.getFieldStage()).isEmpty();
+  }
+
+  @Test
+  public void from_whenDevelopmentFieldStage() {
+
+    final var fieldStage = FieldStage.DEVELOPMENT;
+    final var firstProductionQuarter = Quarter.Q1;
+    final var firstProductionYear = 2020;
+
+    projectInformation.setFieldStage(fieldStage);
+    projectInformation.setFirstProductionDateQuarter(firstProductionQuarter);
+    projectInformation.setFirstProductionDateYear(firstProductionYear);
+
+    var projectInformationView = ProjectInformationViewUtil.from(projectInformation);
+
+    assertCommonProperties(projectInformationView, projectInformation);
+    assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
+
+    var expectedFirstProductionDate = DateUtil.getDateFromQuarterYear(
+        firstProductionQuarter,
+        firstProductionYear
+    );
+    assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isEqualTo(expectedFirstProductionDate);
+    assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isNull();
+    assertThat(projectInformationView.getDecomWorkStartDate()).isNull();
+    assertThat(projectInformationView.getDecomProductionCessationDate()).isNull();
+  }
+
+  @Test
+  public void from_whenDiscoveryFieldStage() {
+    final var fieldStage = FieldStage.DISCOVERY;
+    final var firstProductionQuarter = Quarter.Q1;
+    final var firstProductionYear = 2020;
+
+    projectInformation.setFieldStage(fieldStage);
+    projectInformation.setFirstProductionDateQuarter(firstProductionQuarter);
+    projectInformation.setFirstProductionDateYear(firstProductionYear);
+
+    var projectInformationView = ProjectInformationViewUtil.from(projectInformation);
+
+    assertCommonProperties(projectInformationView, projectInformation);
+    assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
+
+    var expectedFirstProductionDate = DateUtil.getDateFromQuarterYear(
+        firstProductionQuarter,
+        firstProductionYear
+    );
+    assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isEqualTo(expectedFirstProductionDate);
+    assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
+    assertThat(projectInformationView.getDecomWorkStartDate()).isNull();
+    assertThat(projectInformationView.getDecomProductionCessationDate()).isNull();
+  }
+
+  @Test
+  public void from_whenDecommissioningFieldStage() {
+
+    final var fieldStage = FieldStage.DECOMMISSIONING;
+
+    final var decomWorkStartDateQuarter = Quarter.Q1;
+    final var decomWorkStartDateYear = 2020;
+    final var productionCessationDate = LocalDate.now();
+
+    projectInformation.setFieldStage(fieldStage);
+    projectInformation.setDecomWorkStartDateQuarter(decomWorkStartDateQuarter);
+    projectInformation.setDecomWorkStartDateYear(decomWorkStartDateYear);
+    projectInformation.setProductionCessationDate(productionCessationDate);
+
+    var projectInformationView = ProjectInformationViewUtil.from(projectInformation);
+
+    assertCommonProperties(projectInformationView, projectInformation);
+    assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
+
+    var expectedDecomWorkStartDate = DateUtil.getDateFromQuarterYear(
+        decomWorkStartDateQuarter,
+        decomWorkStartDateYear
+    );
+    assertThat(projectInformationView.getDecomWorkStartDate()).isEqualTo(expectedDecomWorkStartDate);
+    assertThat(projectInformationView.getDecomProductionCessationDate()).isEqualTo(DateUtil.formatDate(productionCessationDate));
+    assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isNull();
+    assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
+  }
+
+  @Test
+  public void from_whenFieldStageWithNoHiddenContent() {
+
+    final var fieldStage = FieldStage.OPERATIONS;
+
+    projectInformation.setFieldStage(fieldStage);
+
+    var projectInformationView = ProjectInformationViewUtil.from(projectInformation);
+
+    assertCommonProperties(projectInformationView, projectInformation);
+    assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
+    assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
+    assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isNull();
+    assertThat(projectInformationView.getDecomWorkStartDate()).isNull();
+    assertThat(projectInformationView.getDecomProductionCessationDate()).isNull();
+  }
+}

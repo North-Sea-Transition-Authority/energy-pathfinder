@@ -2,22 +2,56 @@
 
 <@sectionSummaryWrapper.sectionSummaryWrapper sectionId=sectionId sectionTitle=sectionTitle>
   <@fdsCheckAnswers.checkAnswers >
-    <@checkAnswers.checkAnswersRowNoActions prompt="Project title" value=projectTitle!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Project summary" value=projectSummary!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Field stage" value=fieldStage!"" />
-    <#if developmentRelated?has_content && developmentRelated>
-      <@checkAnswers.checkAnswersRowNoActions prompt="Development first production date" value=developmentFirstProductionDate!"" />
+    <@checkAnswers.diffedCheckAnswersRowNoActions
+      prompt="Project title"
+      diffedField=projectInformationDiffModel.ProjectInformationView_projectTitle
+    />
+    <@checkAnswers.diffedCheckAnswersRowNoActions
+      prompt="Project summary"
+      diffedField=projectInformationDiffModel.ProjectInformationView_projectSummary
+      multiLineTextBlockClass="govuk-body"
+    />
+    <@checkAnswers.diffedCheckAnswersRowNoActions
+      prompt="Field stage"
+      diffedField=projectInformationDiffModel.ProjectInformationView_fieldStage
+    />
+    <#if isDevelopmentFieldStage>
+      <@checkAnswers.diffedCheckAnswersRowNoActions
+        prompt="Development first production date"
+        diffedField=projectInformationDiffModel.ProjectInformationView_developmentFirstProductionDate
+      />
     </#if>
-    <#if discoveryRelated?has_content && discoveryRelated>
-      <@checkAnswers.checkAnswersRowNoActions prompt="Discovery first production date" value=discoveryFirstProductionDate!"" />
+    <#if isDiscoveryFieldStage>
+      <@checkAnswers.diffedCheckAnswersRowNoActions
+        prompt="Discovery first production date"
+        diffedField=projectInformationDiffModel.ProjectInformationView_discoveryFirstProductionDate
+      />
     </#if>
-    <#if decomRelated?has_content && decomRelated>
-      <@checkAnswers.checkAnswersRowNoActions prompt="Decommissioning work start date" value=decomWorkStartDate!"" />
-      <@checkAnswers.checkAnswersRowNoActions prompt="Decommissioning production cessation date" value=decomProductionCessationDate!"" />
+    <#if isDecommissioningFieldStage>
+      <@checkAnswers.diffedCheckAnswersRowNoActions
+        prompt="Decommissioning work start date"
+        diffedField=projectInformationDiffModel.ProjectInformationView_decomWorkStartDate
+      />
+      <@checkAnswers.diffedCheckAnswersRowNoActions
+        prompt="Decommissioning production cessation date"
+        diffedField=projectInformationDiffModel.ProjectInformationView_decomProductionCessationDate
+      />
     </#if>
-    <@checkAnswers.checkAnswersRowNoActions prompt="Name" value=name!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Phone number" value=phoneNumber!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Job title" value=jobTitle!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Email address" value=emailAddress!"" />
+    <@checkAnswers.diffedCheckAnswersRowNoActions
+      prompt="Name"
+      diffedField=projectInformationDiffModel.ProjectInformationView_contactName
+    />
+    <@checkAnswers.diffedCheckAnswersRowNoActions
+      prompt="Phone number"
+      diffedField=projectInformationDiffModel.ProjectInformationView_contactPhoneNumber
+    />
+    <@checkAnswers.diffedCheckAnswersRowNoActions
+      prompt="Job title"
+      diffedField=projectInformationDiffModel.ProjectInformationView_contactJobTitle
+    />
+    <@checkAnswers.diffedCheckAnswersRowNoActions
+      prompt="Email address"
+      diffedField=projectInformationDiffModel.ProjectInformationView_contactEmailAddress
+    />
   </@fdsCheckAnswers.checkAnswers>
 </@sectionSummaryWrapper.sectionSummaryWrapper>
