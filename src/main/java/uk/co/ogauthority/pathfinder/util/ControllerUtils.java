@@ -7,8 +7,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.setup.ProjectSetupController;
+import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.model.Checkable;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
@@ -33,5 +35,13 @@ public class ControllerUtils {
 
   public static String getProjectSetupUrl(Integer projectId) {
     return ReverseRouter.route(on(ProjectSetupController.class).getProjectSetup(projectId, null));
+  }
+
+  public static String getProjectManagementUrl(Integer projectId) {
+    return ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null));
+  }
+
+  public static String getWorkAreaUrl() {
+    return ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null));
   }
 }

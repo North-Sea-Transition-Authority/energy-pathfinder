@@ -54,7 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .mvcMatchers("/start-project", "/project-operator-select")
           .hasAnyAuthority(systemAccessService.getCreateProjectGrantedAuthorities())
 
-        .mvcMatchers("/session-info")
+        .mvcMatchers("/session-info", "/notify/callback")
           .permitAll()
 
         .mvcMatchers("/api/**")
@@ -62,6 +62,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         .anyRequest()
           .authenticated();
+
+    http.csrf().ignoringAntMatchers("/notify/callback");
 
     try {
       // Redirect to FOX for login if the request is unauthenticated.
