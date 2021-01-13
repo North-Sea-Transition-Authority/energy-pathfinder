@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.projectupdate;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.time.Instant;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,6 +70,10 @@ public class RegulatorUpdateRequestService {
 
   public boolean hasUpdateBeenRequested(ProjectDetail projectDetail) {
     return regulatorUpdateRequestRepository.existsByProjectDetail(projectDetail);
+  }
+
+  public Optional<RegulatorUpdateRequest> getUpdateRequest(ProjectDetail projectDetail) {
+    return regulatorUpdateRequestRepository.findByProjectDetail(projectDetail);
   }
 
   public ModelAndView getRequestUpdateModelAndView(ProjectDetail projectDetail,AuthenticatedUserAccount user, RequestUpdateForm form) {

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -112,6 +113,22 @@ public class RegulatorUpdateRequestServiceTest {
     when(regulatorUpdateRequestRepository.existsByProjectDetail(projectDetail)).thenReturn(false);
 
     assertThat(regulatorUpdateRequestService.hasUpdateBeenRequested(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void getUpdateRequest_whenFound_thenReturn() {
+    var regulatorUpdateRequest = new RegulatorUpdateRequest();
+
+    when(regulatorUpdateRequestRepository.findByProjectDetail(projectDetail)).thenReturn(Optional.of(regulatorUpdateRequest));
+
+    assertThat(regulatorUpdateRequestService.getUpdateRequest(projectDetail)).contains(regulatorUpdateRequest);
+  }
+
+  @Test
+  public void getUpdateRequest_whenNotFound_thenEmptyOptionalReturned() {
+    when(regulatorUpdateRequestRepository.findByProjectDetail(projectDetail)).thenReturn(Optional.empty());
+
+    assertThat(regulatorUpdateRequestService.getUpdateRequest(projectDetail)).isEmpty();
   }
 
   @Test
