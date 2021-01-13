@@ -29,7 +29,6 @@ import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpso
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryRenderingService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
-import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -41,9 +40,6 @@ public class CancelDraftProjectVersionServiceTest {
 
   @Mock
   private ProjectUpdateService projectUpdateService;
-
-  @Mock
-  private RegulatorProjectUpdateService regulatorProjectUpdateService;
 
   @Mock
   private ProjectSummaryRenderingService projectSummaryRenderingService;
@@ -66,7 +62,6 @@ public class CancelDraftProjectVersionServiceTest {
     cancelDraftProjectVersionService = new CancelDraftProjectVersionService(
         projectService,
         projectUpdateService,
-        regulatorProjectUpdateService,
         projectSummaryRenderingService,
         List.of(upcomingTenderService, platformsFpsosService)
     );
