@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.email.NotifyCallback;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailDeliveryFailedEmailProps;
+import uk.co.ogauthority.pathfinder.service.email.EmailService;
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientApi;
 import uk.gov.service.notify.NotificationClientException;

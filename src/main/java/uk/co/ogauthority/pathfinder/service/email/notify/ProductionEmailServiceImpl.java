@@ -7,6 +7,7 @@ import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
+import uk.co.ogauthority.pathfinder.service.email.EmailService;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
