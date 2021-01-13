@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.model.email.emailproperties;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Value;
 import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplate;
 
 /**
@@ -11,10 +10,7 @@ import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplate;
 public class EmailProperties {
 
   public static final String DEFAULT_RECIPIENT_IDENTIFIER = "Pathfinder user";
-  public static final String DEFAULT_SIGN_OFF_IDENTIFIER = "%s admin team";
-
-  @Value("${service.customer.mnemonic}")
-  private String customerMnemonic;
+  public static final String DEFAULT_SIGN_OFF_IDENTIFIER = "OGA admin team";
 
   private final NotifyTemplate template;
   private final String recipientIdentifier;
@@ -26,7 +22,7 @@ public class EmailProperties {
   public EmailProperties(NotifyTemplate template) {
     this.template = template;
     this.recipientIdentifier = DEFAULT_RECIPIENT_IDENTIFIER;
-    this.signOffIdentifier = String.format(DEFAULT_SIGN_OFF_IDENTIFIER, customerMnemonic);
+    this.signOffIdentifier = DEFAULT_SIGN_OFF_IDENTIFIER;
   }
 
   public EmailProperties(NotifyTemplate template, String recipientIdentifier, String signOffIdentifier) {
