@@ -44,6 +44,9 @@ public class OperatorProjectUpdateServiceTest {
   private ProjectUpdateService projectUpdateService;
 
   @Mock
+  private RegulatorProjectUpdateService regulatorProjectUpdateService;
+
+  @Mock
   private NoUpdateNotificationRepository noUpdateNotificationRepository;
 
   @Mock
@@ -68,6 +71,7 @@ public class OperatorProjectUpdateServiceTest {
   public void setup() {
     operatorProjectUpdateService = new OperatorProjectUpdateService(
         projectUpdateService,
+        regulatorProjectUpdateService,
         noUpdateNotificationRepository,
         projectNoUpdateSummaryService,
         projectHeaderSummaryService,
@@ -89,7 +93,18 @@ public class OperatorProjectUpdateServiceTest {
   }
 
   @Test
-  public void startUpdate() {
+  public void startUpdate_whenUpdateRequested() {
+    when(regulatorProjectUpdateService.hasUpdateBeenRequested(projectDetail)).thenReturn(true);
+
+    operatorProjectUpdateService.startUpdate(projectDetail, authenticatedUser);
+
+    verify(projectUpdateService, times(1)).startUpdate(projectDetail, authenticatedUser, ProjectUpdateType.REGULATOR_REQUESTED);
+  }
+
+  @Test
+  public void startUpdate_whenNoUpdateRequested() {
+    when(regulatorProjectUpdateService.hasUpdateBeenRequested(projectDetail)).thenReturn(false);
+
     operatorProjectUpdateService.startUpdate(projectDetail, authenticatedUser);
 
     verify(projectUpdateService, times(1)).startUpdate(projectDetail, authenticatedUser, ProjectUpdateType.OPERATOR_INITIATED);

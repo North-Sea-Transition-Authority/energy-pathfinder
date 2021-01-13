@@ -21,8 +21,8 @@ import uk.co.ogauthority.pathfinder.model.form.projectupdate.ProvideNoUpdateForm
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateContext;
 import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateService;
-import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContext;
 
 @Controller
 @ProjectStatusCheck(status = {ProjectStatus.QA, ProjectStatus.PUBLISHED})
@@ -44,24 +44,24 @@ public class OperatorUpdateController {
 
   @GetMapping("/start-update")
   public ModelAndView startPage(@PathVariable("projectId") Integer projectId,
-                                ProjectUpdateContext projectUpdateContext) {
+                                OperatorProjectUpdateContext operatorProjectUpdateContext) {
     return operatorProjectUpdateService.getProjectUpdateModelAndView(projectId);
   }
 
   @PostMapping("/start-update")
   public ModelAndView startUpdate(@PathVariable("projectId") Integer projectId,
-                                  ProjectUpdateContext projectUpdateContext,
+                                  OperatorProjectUpdateContext operatorProjectUpdateContext,
                                   AuthenticatedUserAccount user) {
-    operatorProjectUpdateService.startUpdate(projectUpdateContext.getProjectDetails(), user);
+    operatorProjectUpdateService.startUpdate(operatorProjectUpdateContext.getProjectDetails(), user);
     return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
   }
 
   @GetMapping("/no-update-required")
   public ModelAndView provideNoUpdate(@PathVariable("projectId") Integer projectId,
-                                      ProjectUpdateContext projectUpdateContext,
+                                      OperatorProjectUpdateContext operatorProjectUpdateContext,
                                       AuthenticatedUserAccount user) {
     return operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(
-        projectUpdateContext.getProjectDetails(),
+        operatorProjectUpdateContext.getProjectDetails(),
         user,
         new ProvideNoUpdateForm()
     );
@@ -71,16 +71,16 @@ public class OperatorUpdateController {
   public ModelAndView saveNoUpdate(@PathVariable("projectId") Integer projectId,
                                    @Valid @ModelAttribute("form") ProvideNoUpdateForm form,
                                    BindingResult bindingResult,
-                                   ProjectUpdateContext projectUpdateContext,
+                                   OperatorProjectUpdateContext operatorProjectUpdateContext,
                                    AuthenticatedUserAccount user) {
     bindingResult = operatorProjectUpdateService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(projectUpdateContext.getProjectDetails(), user, form),
+        operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(operatorProjectUpdateContext.getProjectDetails(), user, form),
         form,
         () -> {
           operatorProjectUpdateService.createNoUpdateNotification(
-              projectUpdateContext.getProjectDetails(),
+              operatorProjectUpdateContext.getProjectDetails(),
               user,
               form
           );
@@ -91,8 +91,8 @@ public class OperatorUpdateController {
 
   @GetMapping("/no-update-required/confirmation")
   public ModelAndView provideNoUpdateConfirmation(@PathVariable("projectId") Integer projectId,
-                                                  ProjectUpdateContext projectUpdateContext) {
-    operatorProjectUpdateService.confirmNoUpdateExistsForProjectDetail(projectUpdateContext.getProjectDetails());
-    return operatorProjectUpdateService.getProjectProvideNoUpdateConfirmationModelAndView(projectUpdateContext.getProjectDetails());
+                                                  OperatorProjectUpdateContext operatorProjectUpdateContext) {
+    operatorProjectUpdateService.confirmNoUpdateExistsForProjectDetail(operatorProjectUpdateContext.getProjectDetails());
+    return operatorProjectUpdateService.getProjectProvideNoUpdateConfirmationModelAndView(operatorProjectUpdateContext.getProjectDetails());
   }
 }

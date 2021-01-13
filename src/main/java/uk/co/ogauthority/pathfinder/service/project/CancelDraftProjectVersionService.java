@@ -49,9 +49,6 @@ public class CancelDraftProjectVersionService {
     );
     if (!projectDetail.isFirstVersion()) {
       projectUpdateService.getByToDetail(projectDetail).ifPresent(projectUpdate -> {
-        if (projectUpdate.getUpdateType() == ProjectUpdateType.REGULATOR_REQUESTED) {
-          regulatorProjectUpdateService.deleteRegulatorRequestedUpdate(projectUpdate);
-        }
         projectUpdateService.deleteProjectUpdate(projectUpdate);
         projectService.updateProjectDetailIsCurrentVersion(projectUpdate.getFromDetail(), true);
       });

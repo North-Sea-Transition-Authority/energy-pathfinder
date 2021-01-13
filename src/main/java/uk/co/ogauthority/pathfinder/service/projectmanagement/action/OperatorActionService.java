@@ -15,7 +15,7 @@ import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.model.form.useraction.UserActionWithDisplayOrder;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
-import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateContextService;
 
 @Service
 public class OperatorActionService {
@@ -30,16 +30,16 @@ public class OperatorActionService {
 
   private final ProjectActionService projectActionService;
   private final ProjectContextService projectContextService;
-  private final ProjectUpdateContextService projectUpdateContextService;
+  private final OperatorProjectUpdateContextService operatorProjectUpdateContextService;
 
   @Autowired
   public OperatorActionService(
       ProjectActionService projectActionService,
       ProjectContextService projectContextService,
-      ProjectUpdateContextService projectUpdateContextService) {
+      OperatorProjectUpdateContextService operatorProjectUpdateContextService) {
     this.projectActionService = projectActionService;
     this.projectContextService = projectContextService;
-    this.projectUpdateContextService = projectUpdateContextService;
+    this.operatorProjectUpdateContextService = operatorProjectUpdateContextService;
   }
 
   public List<UserActionWithDisplayOrder> getActions(ProjectDetail projectDetail, AuthenticatedUserAccount user) {
@@ -47,7 +47,7 @@ public class OperatorActionService {
 
     var projectId = projectDetail.getProject().getId();
 
-    var canUpdate = projectUpdateContextService.canBuildContext(
+    var canUpdate = operatorProjectUpdateContextService.canBuildContext(
         projectDetail,
         user,
         OperatorUpdateController.class

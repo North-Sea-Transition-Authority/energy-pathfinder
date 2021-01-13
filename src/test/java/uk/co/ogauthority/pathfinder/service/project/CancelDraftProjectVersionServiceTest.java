@@ -88,7 +88,7 @@ public class CancelDraftProjectVersionServiceTest {
   }
 
   @Test
-  public void cancelDraft_whenOperatorRequestedUpdate() {
+  public void cancelDraft_whenUpdate() {
     projectDetail.setVersion(2);
 
     var projectUpdate = new ProjectUpdate();
@@ -104,32 +104,6 @@ public class CancelDraftProjectVersionServiceTest {
     verify(upcomingTenderService, times(1)).removeSectionData(projectDetail);
     verify(platformsFpsosService, times(1)).removeSectionData(projectDetail);
 
-    verify(regulatorProjectUpdateService, never()).deleteRegulatorRequestedUpdate(projectUpdate);
-    verify(projectUpdateService, times(1)).deleteProjectUpdate(projectUpdate);
-    verify(projectService, times(1)).updateProjectDetailIsCurrentVersion(fromDetail, true);
-
-    verify(projectService, times(1)).deleteProjectDetail(projectDetail);
-    verify(projectService, never()).deleteProject(project);
-  }
-
-  @Test
-  public void cancelDraft_whenRegulatorRequestedUpdate() {
-    projectDetail.setVersion(2);
-
-    var projectUpdate = new ProjectUpdate();
-    projectUpdate.setUpdateType(ProjectUpdateType.REGULATOR_REQUESTED);
-
-    var fromDetail = ProjectUtil.getProjectDetails();
-    projectUpdate.setFromDetail(fromDetail);
-
-    when(projectUpdateService.getByToDetail(projectDetail)).thenReturn(Optional.of(projectUpdate));
-
-    cancelDraftProjectVersionService.cancelDraft(projectDetail);
-
-    verify(upcomingTenderService, times(1)).removeSectionData(projectDetail);
-    verify(platformsFpsosService, times(1)).removeSectionData(projectDetail);
-
-    verify(regulatorProjectUpdateService, times(1)).deleteRegulatorRequestedUpdate(projectUpdate);
     verify(projectUpdateService, times(1)).deleteProjectUpdate(projectUpdate);
     verify(projectService, times(1)).updateProjectDetailIsCurrentVersion(fromDetail, true);
 

@@ -21,7 +21,7 @@ import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContextService;
-import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateContextService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -38,7 +38,7 @@ public class RegulatorActionServiceTest {
   private ProjectAssessmentContextService projectAssessmentContextService;
 
   @Mock
-  private ProjectUpdateContextService projectUpdateContextService;
+  private RegulatorProjectUpdateContextService regulatorProjectUpdateContextService;
 
   private RegulatorActionService regulatorActionService;
 
@@ -53,7 +53,7 @@ public class RegulatorActionServiceTest {
         projectActionService,
         projectContextService,
         projectAssessmentContextService,
-        projectUpdateContextService
+        regulatorProjectUpdateContextService
     );
   }
 
@@ -79,7 +79,7 @@ public class RegulatorActionServiceTest {
 
   @Test
   public void getActions_whenCannotRequestUpdate() {
-    when(projectUpdateContextService.canBuildContext(projectDetail, authenticatedUser, RegulatorUpdateController.class)).thenReturn(false);
+    when(regulatorProjectUpdateContextService.canBuildContext(projectDetail, authenticatedUser, RegulatorUpdateController.class)).thenReturn(false);
 
     var actions = regulatorActionService.getActions(projectDetail, authenticatedUser);
 
@@ -88,7 +88,7 @@ public class RegulatorActionServiceTest {
 
   @Test
   public void getActions_whenCanRequestUpdate() {
-    when(projectUpdateContextService.canBuildContext(projectDetail, authenticatedUser, RegulatorUpdateController.class)).thenReturn(true);
+    when(regulatorProjectUpdateContextService.canBuildContext(projectDetail, authenticatedUser, RegulatorUpdateController.class)).thenReturn(true);
 
     var actions = regulatorActionService.getActions(projectDetail, authenticatedUser);
 

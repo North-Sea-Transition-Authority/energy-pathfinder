@@ -21,15 +21,13 @@ import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectCo
 import uk.co.ogauthority.pathfinder.controller.projectupdate.RegulatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
-import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorRequestedUpdate;
+import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRequest;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.RequestUpdateForm;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.RequestUpdateFormValidator;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.repository.projectupdate.RegulatorRequestedUpdateRepository;
+import uk.co.ogauthority.pathfinder.repository.projectupdate.RegulatorUpdateRequestRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -40,10 +38,7 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 public class RegulatorProjectUpdateServiceTest {
 
   @Mock
-  private RegulatorRequestedUpdateRepository regulatorRequestedUpdateRepository;
-
-  @Mock
-  private ProjectUpdateService projectUpdateService;
+  private RegulatorUpdateRequestRepository regulatorUpdateRequestRepository;
 
   @Mock
   private ProjectHeaderSummaryService projectHeaderSummaryService;
@@ -67,15 +62,14 @@ public class RegulatorProjectUpdateServiceTest {
   @Before
   public void setup() {
     regulatorProjectUpdateService = new RegulatorProjectUpdateService(
-        regulatorRequestedUpdateRepository,
-        projectUpdateService,
+        regulatorUpdateRequestRepository,
         projectHeaderSummaryService,
         requestUpdateFormValidator,
         validationService,
         breadcrumbService
     );
 
-    when(regulatorRequestedUpdateRepository.save(any(RegulatorRequestedUpdate.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
+    when(regulatorUpdateRequestRepository.save(any(RegulatorUpdateRequest.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
   @Test
@@ -90,37 +84,34 @@ public class RegulatorProjectUpdateServiceTest {
   }
 
   @Test
-  public void startRegulatorRequestedUpdate() {
+  public void requestUpdate() {
     var form = new RequestUpdateForm();
     form.setUpdateReason("Test update reason");
     form.setDeadlineDate(new ThreeFieldDateInput(LocalDate.now().plusMonths(1)));
 
-    var projectUpdate = new ProjectUpdate();
+    var regulatorRequestedUpdate = regulatorProjectUpdateService.requestUpdate(projectDetail, form, authenticatedUser);
 
-    when(projectUpdateService.startUpdate(projectDetail, authenticatedUser, ProjectUpdateType.REGULATOR_REQUESTED)).thenReturn(
-        projectUpdate
-    );
-
-    var regulatorRequestedUpdate = regulatorProjectUpdateService.startRegulatorRequestedUpdate(projectDetail, form, authenticatedUser);
-
-    verify(projectUpdateService, times(1)).startUpdate(projectDetail, authenticatedUser, ProjectUpdateType.REGULATOR_REQUESTED);
-
-    assertThat(regulatorRequestedUpdate.getProjectUpdate()).isEqualTo(projectUpdate);
+    assertThat(regulatorRequestedUpdate.getProjectDetail()).isEqualTo(projectDetail);
     assertThat(regulatorRequestedUpdate.getUpdateReason()).isEqualTo(form.getUpdateReason());
     assertThat(regulatorRequestedUpdate.getDeadlineDate()).isEqualTo(form.getDeadlineDate().createDateOrNull());
     assertThat(regulatorRequestedUpdate.getRequestedByWuaId()).isEqualTo(authenticatedUser.getWuaId());
     assertThat(regulatorRequestedUpdate.getRequestedInstant()).isNotNull();
 
-    verify(regulatorRequestedUpdateRepository).save(regulatorRequestedUpdate);
+    verify(regulatorUpdateRequestRepository, times(1)).save(regulatorRequestedUpdate);
   }
 
   @Test
-  public void deleteRegulatorRequestedUpdate() {
-    var projectUpdate = new ProjectUpdate();
+  public void hasUpdateBeenRequested_whenExists_thenTrue() {
+    when(regulatorUpdateRequestRepository.existsByProjectDetail(projectDetail)).thenReturn(true);
 
-    regulatorProjectUpdateService.deleteRegulatorRequestedUpdate(projectUpdate);
+    assertThat(regulatorProjectUpdateService.hasUpdateBeenRequested(projectDetail)).isTrue();
+  }
 
-    verify(regulatorRequestedUpdateRepository, times(1)).deleteByProjectUpdate(projectUpdate);
+  @Test
+  public void hasUpdateBeenRequested_whenNotExists_thenFalse() {
+    when(regulatorUpdateRequestRepository.existsByProjectDetail(projectDetail)).thenReturn(false);
+
+    assertThat(regulatorProjectUpdateService.hasUpdateBeenRequested(projectDetail)).isFalse();
   }
 
   @Test

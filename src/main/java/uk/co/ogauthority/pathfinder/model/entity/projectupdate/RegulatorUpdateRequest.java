@@ -11,18 +11,19 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 
 @Entity
-@Table(name = "regulator_requested_updates")
-public class RegulatorRequestedUpdate {
+@Table(name = "regulator_update_requests")
+public class RegulatorUpdateRequest {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   protected Integer id;
 
   @OneToOne
-  @JoinColumn(name = "project_update_id")
-  private ProjectUpdate projectUpdate;
+  @JoinColumn(name = "project_detail_id")
+  private ProjectDetail projectDetail;
 
   @Lob
   @Column(name = "update_reason", columnDefinition = "CLOB")
@@ -39,12 +40,12 @@ public class RegulatorRequestedUpdate {
     return id;
   }
 
-  public ProjectUpdate getProjectUpdate() {
-    return projectUpdate;
+  public ProjectDetail getProjectDetail() {
+    return projectDetail;
   }
 
-  public void setProjectUpdate(ProjectUpdate projectUpdate) {
-    this.projectUpdate = projectUpdate;
+  public void setProjectDetail(ProjectDetail projectDetail) {
+    this.projectDetail = projectDetail;
   }
 
   public String getUpdateReason() {

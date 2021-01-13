@@ -7,24 +7,24 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContext;
-import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateContext;
+import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateContextService;
 import uk.co.ogauthority.pathfinder.util.ArgumentResolverUtil;
 
 @Component
-public class ProjectUpdateContextArgumentResolver implements HandlerMethodArgumentResolver {
+public class OperatorProjectUpdateContextArgumentResolver implements HandlerMethodArgumentResolver {
 
-  private final ProjectUpdateContextService projectUpdateContextService;
+  private final OperatorProjectUpdateContextService operatorProjectUpdateContextService;
 
   @Autowired
-  public ProjectUpdateContextArgumentResolver(
-      ProjectUpdateContextService projectUpdateContextService) {
-    this.projectUpdateContextService = projectUpdateContextService;
+  public OperatorProjectUpdateContextArgumentResolver(
+      OperatorProjectUpdateContextService operatorProjectUpdateContextService) {
+    this.operatorProjectUpdateContextService = operatorProjectUpdateContextService;
   }
 
   @Override
   public boolean supportsParameter(MethodParameter parameter) {
-    return parameter.getParameterType().equals(ProjectUpdateContext.class);
+    return parameter.getParameterType().equals(OperatorProjectUpdateContext.class);
   }
 
   @Override
@@ -34,14 +34,14 @@ public class ProjectUpdateContextArgumentResolver implements HandlerMethodArgume
                                 WebDataBinderFactory binderFactory) throws Exception {
     var user = ArgumentResolverUtil.getAuthenticatedUser();
     var projectId = ArgumentResolverUtil.resolveIdFromRequest(webRequest, ArgumentResolverUtil.PROJECT_ID_PARAM);
-    var detail = projectUpdateContextService.getProjectDetailsOrError(
+    var detail = operatorProjectUpdateContextService.getProjectDetailsOrError(
         projectId,
         ArgumentResolverUtil.getProjectStatusCheckProjectDetailVersionType(parameter)
     );
     var statusCheck = ArgumentResolverUtil.getProjectStatusCheck(parameter);
     var permissionCheck = ArgumentResolverUtil.getProjectFormPagePermissionCheck(parameter);
 
-    return projectUpdateContextService.buildProjectUpdateContext(
+    return operatorProjectUpdateContextService.buildProjectUpdateContext(
         detail,
         user,
         statusCheck,

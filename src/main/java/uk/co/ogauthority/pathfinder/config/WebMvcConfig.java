@@ -8,9 +8,10 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.co.ogauthority.pathfinder.mvc.ResponseBufferSizeHandlerInterceptor;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.AuthenticatedUserAccountArgumentResolver;
+import uk.co.ogauthority.pathfinder.mvc.argumentresolver.OperatorProjectUpdateContextArgumentResolver;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ProjectAssessmentContextArgumentResolver;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ProjectContextArgumentResolver;
-import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ProjectUpdateContextArgumentResolver;
+import uk.co.ogauthority.pathfinder.mvc.argumentresolver.RegulatorProjectUpdateContextArgumentResolver;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.TeamManagementContextArgumentResolver;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 
@@ -19,17 +20,20 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
   private final ProjectContextArgumentResolver projectContextArgumentResolver;
   private final ProjectAssessmentContextArgumentResolver projectAssessmentContextArgumentResolver;
-  private final ProjectUpdateContextArgumentResolver projectUpdateContextArgumentResolver;
+  private final OperatorProjectUpdateContextArgumentResolver operatorProjectUpdateContextArgumentResolver;
+  private final RegulatorProjectUpdateContextArgumentResolver regulatorProjectUpdateContextArgumentResolver;
   private final TeamManagementContextArgumentResolver teamManagementContextArgumentResolver;
 
   @Autowired
   public WebMvcConfig(ProjectContextArgumentResolver projectContextArgumentResolver,
                       ProjectAssessmentContextArgumentResolver projectAssessmentContextArgumentResolver,
-                      ProjectUpdateContextArgumentResolver projectUpdateContextArgumentResolver,
+                      OperatorProjectUpdateContextArgumentResolver operatorProjectUpdateContextArgumentResolver,
+                      RegulatorProjectUpdateContextArgumentResolver regulatorProjectUpdateContextArgumentResolver,
                       TeamManagementContextArgumentResolver teamManagementContextArgumentResolver) {
     this.projectContextArgumentResolver = projectContextArgumentResolver;
     this.projectAssessmentContextArgumentResolver = projectAssessmentContextArgumentResolver;
-    this.projectUpdateContextArgumentResolver = projectUpdateContextArgumentResolver;
+    this.operatorProjectUpdateContextArgumentResolver = operatorProjectUpdateContextArgumentResolver;
+    this.regulatorProjectUpdateContextArgumentResolver = regulatorProjectUpdateContextArgumentResolver;
     this.teamManagementContextArgumentResolver = teamManagementContextArgumentResolver;
   }
 
@@ -39,7 +43,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     resolvers.add(new ValidationTypeArgumentResolver());
     resolvers.add(projectContextArgumentResolver);
     resolvers.add(projectAssessmentContextArgumentResolver);
-    resolvers.add(projectUpdateContextArgumentResolver);
+    resolvers.add(operatorProjectUpdateContextArgumentResolver);
+    resolvers.add(regulatorProjectUpdateContextArgumentResolver);
     resolvers.add(teamManagementContextArgumentResolver);
   }
 
