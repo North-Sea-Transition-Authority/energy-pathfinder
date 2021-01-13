@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import uk.co.ogauthority.pathfinder.service.email.notify.NotifyTemplateService;
-import uk.co.ogauthority.pathfinder.service.email.notify.ProductionNotifyServiceImpl;
+import uk.co.ogauthority.pathfinder.service.email.notify.ProductionEmailServiceImpl;
 import uk.gov.service.notify.NotificationClient;
 
 /**
@@ -28,10 +28,10 @@ public class ProductionConfiguration {
    */
   @Bean
   @ConditionalOnProperty(name = "email.mode", havingValue = "production")
-  public ProductionNotifyServiceImpl productionNotifyService(NotifyTemplateService notifyTemplateService,
-                                                             NotificationClient notificationClient,
-                                                             EmailValidator emailValidator,
-                                                             @Value("${service.name}") String serviceName) {
-    return new ProductionNotifyServiceImpl(notifyTemplateService, notificationClient, emailValidator, serviceName);
+  public ProductionEmailServiceImpl productionNotifyService(NotifyTemplateService notifyTemplateService,
+                                                            NotificationClient notificationClient,
+                                                            EmailValidator emailValidator,
+                                                            @Value("${service.name}") String serviceName) {
+    return new ProductionEmailServiceImpl(notifyTemplateService, notificationClient, emailValidator, serviceName);
   }
 }

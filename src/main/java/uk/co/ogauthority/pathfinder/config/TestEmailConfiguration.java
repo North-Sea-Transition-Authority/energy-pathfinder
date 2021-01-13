@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import uk.co.ogauthority.pathfinder.service.email.notify.NotifyTemplateService;
-import uk.co.ogauthority.pathfinder.service.email.notify.TestNotifyServiceImpl;
+import uk.co.ogauthority.pathfinder.service.email.notify.TestEmailServiceImpl;
 import uk.gov.service.notify.NotificationClient;
 
 /**
@@ -30,13 +30,13 @@ public class TestEmailConfiguration {
    */
   @Bean
   @ConditionalOnProperty(name = "email.mode", havingValue = "test")
-  public TestNotifyServiceImpl testNotifyService(NotifyTemplateService notifyTemplateService,
-                                                 NotificationClient notificationClient,
-                                                 EmailValidator emailValidator,
-                                                 // NB: the ":" means the default value will be an empty string when not specified
-                                                 @Value("#{'${email.testRecipientList:}'.split(';')}") List<String> testRecipientList,
-                                                 @Value("${service.name}") String serviceName
+  public TestEmailServiceImpl testNotifyService(NotifyTemplateService notifyTemplateService,
+                                                NotificationClient notificationClient,
+                                                EmailValidator emailValidator,
+                                                // NB: the ":" means the default value will be an empty string when not specified
+                                                @Value("#{'${email.testRecipientList:}'.split(';')}") List<String> testRecipientList,
+                                                @Value("${service.name}") String serviceName
   ) {
-    return new TestNotifyServiceImpl(notifyTemplateService, notificationClient, emailValidator, testRecipientList, serviceName);
+    return new TestEmailServiceImpl(notifyTemplateService, notificationClient, emailValidator, testRecipientList, serviceName);
   }
 }

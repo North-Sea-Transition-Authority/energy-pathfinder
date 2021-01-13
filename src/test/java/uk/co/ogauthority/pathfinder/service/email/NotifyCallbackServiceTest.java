@@ -18,8 +18,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.email.NotifyCallback;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailDeliveryFailedEmailProps;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
+import uk.co.ogauthority.pathfinder.service.email.notify.EmailService;
 import uk.co.ogauthority.pathfinder.service.email.notify.NotifyCallbackService;
-import uk.co.ogauthority.pathfinder.service.email.notify.NotifyService;
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientApi;
 
@@ -30,7 +30,7 @@ public class NotifyCallbackServiceTest {
   private static final String BOUNCE_BACK_EMAIL_BOX = "bounceback@pathfinder.co.uk";
 
   @Mock
-  private NotifyService notifyServiceMock;
+  private EmailService emailServiceMock;
 
   @Mock
   private NotificationClientApi notificationClientMock;
@@ -42,7 +42,7 @@ public class NotifyCallbackServiceTest {
   @Before
   public void setup() {
 
-    notifyCallbackService = new NotifyCallbackService(notifyServiceMock, notificationClientMock, BOUNCE_BACK_EMAIL_BOX, CALLBACK_TOKEN);
+    notifyCallbackService = new NotifyCallbackService(emailServiceMock, notificationClientMock, BOUNCE_BACK_EMAIL_BOX, CALLBACK_TOKEN);
 
     notifyCallback = new NotifyCallback(
         "be0a4c7d-1657-4b83-8771-2a40e7408d67",
@@ -81,7 +81,7 @@ public class NotifyCallbackServiceTest {
   @Test
   public void handleCallback_emailDelivered() throws Exception {
     notifyCallbackService.handleCallback(notifyCallback);
-    verifyNoInteractions(notifyServiceMock);
+    verifyNoInteractions(emailServiceMock);
   }
 
   @Test
@@ -90,7 +90,7 @@ public class NotifyCallbackServiceTest {
     notifyCallback.setTo(BOUNCE_BACK_EMAIL_BOX);
 
     notifyCallbackService.handleCallback(notifyCallback);
-    verifyNoInteractions(notifyServiceMock);
+    verifyNoInteractions(emailServiceMock);
   }
 
   @Test
@@ -103,7 +103,7 @@ public class NotifyCallbackServiceTest {
 
     ArgumentCaptor<EmailProperties> emailCaptor = ArgumentCaptor.forClass(EmailProperties.class);
 
-    verify(notifyServiceMock, times(1)).sendEmail(emailCaptor.capture(), eq(BOUNCE_BACK_EMAIL_BOX));
+    verify(emailServiceMock, times(1)).sendEmail(emailCaptor.capture(), eq(BOUNCE_BACK_EMAIL_BOX));
 
     EmailDeliveryFailedEmailProps failedEmail = (EmailDeliveryFailedEmailProps)emailCaptor.getValue();
 

@@ -20,7 +20,7 @@ public class NotifyCallbackService {
   private static final Logger LOGGER = LoggerFactory.getLogger(NotifyCallbackService.class);
   public static final String AUTHORIZATION_SCHEME = "Bearer ";
 
-  private final NotifyService notifyService;
+  private final EmailService emailService;
   private final NotificationClientApi notificationClient;
 
   private final String regulatorSharedEmail;
@@ -30,11 +30,11 @@ public class NotifyCallbackService {
       Set.of(NotifyCallback.NotifyCallbackStatus.PERMANENT_FAILURE, NotifyCallback.NotifyCallbackStatus.TEMPORARY_FAILURE);
 
   @Autowired
-  public NotifyCallbackService(NotifyService notifyService,
+  public NotifyCallbackService(EmailService emailService,
                                NotificationClientApi notificationClient,
                                @Value("${regulator.shared.email}") String regulatorSharedEmail,
                                @Value("${email.notifyCallbackToken}") String callbackToken) {
-    this.notifyService = notifyService;
+    this.emailService = emailService;
     this.notificationClient = notificationClient;
     this.regulatorSharedEmail = regulatorSharedEmail;
     this.callbackToken = callbackToken;
@@ -60,7 +60,7 @@ public class NotifyCallbackService {
               failedEmail.getBody()
           );
 
-          notifyService.sendEmail(failedEmailProperties, regulatorSharedEmail);
+          emailService.sendEmail(failedEmailProperties, regulatorSharedEmail);
 
           throw new NotificationClientException("");
 

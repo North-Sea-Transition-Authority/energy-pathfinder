@@ -14,18 +14,18 @@ import uk.gov.service.notify.NotificationClientException;
  * Implementation for the Production GOV.UK Notify service
  * The production implementation will send to the actual recipient
  */
-public class ProductionNotifyServiceImpl implements NotifyService {
+public class ProductionEmailServiceImpl implements EmailService {
 
   private final NotificationClient notificationClient;
   private final NotifyTemplateService notifyTemplateService;
   private final EmailValidator emailValidator;
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProductionNotifyServiceImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProductionEmailServiceImpl.class);
   private final String serviceName;
 
-  public ProductionNotifyServiceImpl(NotifyTemplateService notifyTemplateService,
-                                     NotificationClient notificationClient,
-                                     EmailValidator emailValidator,
-                                     String serviceName) {
+  public ProductionEmailServiceImpl(NotifyTemplateService notifyTemplateService,
+                                    NotificationClient notificationClient,
+                                    EmailValidator emailValidator,
+                                    String serviceName) {
     this.notificationClient = notificationClient;
     this.notifyTemplateService = notifyTemplateService;
     this.emailValidator = emailValidator;

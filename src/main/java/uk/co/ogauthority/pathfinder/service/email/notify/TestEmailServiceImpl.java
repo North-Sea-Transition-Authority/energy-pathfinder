@@ -16,20 +16,20 @@ import uk.gov.service.notify.NotificationClientException;
  * The test implementation will not send to the actual recipient and instead send to ${email.testRecipientList}
  * if set. All emails will include "TEST EMAIL" as the first part of the subject.
  */
-public class TestNotifyServiceImpl implements NotifyService {
+public class TestEmailServiceImpl implements EmailService {
 
   private final NotificationClient notificationClient;
   private final NotifyTemplateService notifyTemplateService;
   private final List<String> testRecipientList;
   private final EmailValidator emailValidator;
-  private static final Logger LOGGER = LoggerFactory.getLogger(TestNotifyServiceImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TestEmailServiceImpl.class);
   private final String serviceName;
 
-  public TestNotifyServiceImpl(NotifyTemplateService notifyTemplateService,
-                               NotificationClient notificationClient,
-                               EmailValidator emailValidator,
-                               List<String> testRecipientList,
-                               String serviceName
+  public TestEmailServiceImpl(NotifyTemplateService notifyTemplateService,
+                              NotificationClient notificationClient,
+                              EmailValidator emailValidator,
+                              List<String> testRecipientList,
+                              String serviceName
   ) {
     this.notificationClient = notificationClient;
     this.notifyTemplateService = notifyTemplateService;

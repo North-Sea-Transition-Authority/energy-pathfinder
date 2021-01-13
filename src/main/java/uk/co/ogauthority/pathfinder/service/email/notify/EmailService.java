@@ -3,7 +3,7 @@ package uk.co.ogauthority.pathfinder.service.email.notify;
 
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 
-public interface NotifyService {
+public interface EmailService {
 
   /**
    * Method to send an email to a single recipient.
