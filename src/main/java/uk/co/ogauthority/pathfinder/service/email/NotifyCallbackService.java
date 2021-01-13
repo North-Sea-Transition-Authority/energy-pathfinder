@@ -71,7 +71,7 @@ public class NotifyCallbackService {
       } else {
         // otherwise we failed to email the OGA mailbox
         // TODO PAT-28 log metric
-        LOGGER.error("Email send to the OGA consents mailbox failed {}", notifyCallback.toString());
+        LOGGER.error("Email send to the OGA consents mailbox failed {}", notifyCallback);
       }
     }
   }
