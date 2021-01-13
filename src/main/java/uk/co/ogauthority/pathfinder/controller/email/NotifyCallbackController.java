@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.co.ogauthority.pathfinder.exception.NotifyCallbackAccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.email.NotifyCallback;
-import uk.co.ogauthority.pathfinder.service.email.NotifyCallbackService;
+import uk.co.ogauthority.pathfinder.service.email.notify.NotifyCallbackService;
 
 /**
  * Rest controller to handle GOV.UK Notify callback requests. A callback message is formatted in JSON.

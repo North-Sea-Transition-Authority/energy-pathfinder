@@ -20,7 +20,7 @@ public class BeanConfig {
   @Bean
   public NotificationClient notificationClient(@Value("${notify.apiKey}") String apiKey,
                                                @Value("${pathfinder.proxy.host:#{null}}") String proxyHost,
-                                               @Value("${athfinder.proxy.port:#{null}}") String proxyPort) {
+                                               @Value("${pathfinder.proxy.port:#{null}}") String proxyPort) {
     Proxy proxy;
     if (proxyHost == null) {
       proxy = Proxy.NO_PROXY;

@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.email;
+package uk.co.ogauthority.pathfinder.service.email.notify;
 
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +23,7 @@ public class NotifyCallbackService {
   private final NotifyService notifyService;
   private final NotificationClientApi notificationClient;
 
-  private final String ogaConsentsMailboxEmail;
+  private final String regulatorSharedEmail;
   private final String callbackToken;
 
   private final Set<NotifyCallback.NotifyCallbackStatus> failureStatuses =
@@ -32,11 +32,11 @@ public class NotifyCallbackService {
   @Autowired
   public NotifyCallbackService(NotifyService notifyService,
                                NotificationClientApi notificationClient,
-                               @Value("${oga.consents.email}") String ogaConsentsMailboxEmail,
+                               @Value("${regulator.shared.email}") String regulatorSharedEmail,
                                @Value("${email.notifyCallbackToken}") String callbackToken) {
     this.notifyService = notifyService;
     this.notificationClient = notificationClient;
-    this.ogaConsentsMailboxEmail = ogaConsentsMailboxEmail;
+    this.regulatorSharedEmail = regulatorSharedEmail;
     this.callbackToken = callbackToken;
   }
 
@@ -48,7 +48,7 @@ public class NotifyCallbackService {
       LOGGER.info("The Notify provider could not deliver the message to the email address {}.", notifyCallback.getTo());
 
       // if an email failed and the failed email wasn't going to the OGA mailbox, notify OGA
-      if (!notifyCallback.getTo().equals(ogaConsentsMailboxEmail)) {
+      if (!notifyCallback.getTo().equals(regulatorSharedEmail)) {
 
         try {
 
@@ -60,7 +60,7 @@ public class NotifyCallbackService {
               failedEmail.getBody()
           );
 
-          notifyService.sendEmail(failedEmailProperties, ogaConsentsMailboxEmail);
+          notifyService.sendEmail(failedEmailProperties, regulatorSharedEmail);
 
           throw new NotificationClientException("");
 
@@ -71,7 +71,7 @@ public class NotifyCallbackService {
       } else {
         // otherwise we failed to email the OGA mailbox
         // TODO PAT-28 log metric
-        LOGGER.error("Email send to the OGA consents mailbox failed {}", notifyCallback);
+        LOGGER.error("Email send to the Pathfinder shared mailbox failed {}", notifyCallback);
       }
     }
   }

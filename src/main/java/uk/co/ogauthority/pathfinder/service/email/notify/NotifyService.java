@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.email;
+package uk.co.ogauthority.pathfinder.service.email.notify;
 
 
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;

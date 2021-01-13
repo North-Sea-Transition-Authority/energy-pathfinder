@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.email;
+package uk.co.ogauthority.pathfinder.service.email.notify;
 
 import java.util.List;
 import java.util.Map;

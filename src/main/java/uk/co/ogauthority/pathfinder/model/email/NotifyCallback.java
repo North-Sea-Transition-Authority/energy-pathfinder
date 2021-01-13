@@ -27,10 +27,7 @@ public class NotifyCallback {
   public enum NotifyNotificationType {
 
     @JsonProperty("email")
-    EMAIL,
-
-    @JsonProperty("sms")
-    SMS
+    EMAIL;
 
   }
 

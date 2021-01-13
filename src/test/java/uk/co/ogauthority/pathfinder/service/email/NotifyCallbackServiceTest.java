@@ -18,6 +18,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.email.NotifyCallback;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailDeliveryFailedEmailProps;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
+import uk.co.ogauthority.pathfinder.service.email.notify.NotifyCallbackService;
+import uk.co.ogauthority.pathfinder.service.email.notify.NotifyService;
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientApi;
 

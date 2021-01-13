@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import uk.co.ogauthority.pathfinder.service.email.NotifyTemplateService;
-import uk.co.ogauthority.pathfinder.service.email.ProductionNotifyServiceImpl;
+import uk.co.ogauthority.pathfinder.service.email.notify.NotifyTemplateService;
+import uk.co.ogauthority.pathfinder.service.email.notify.ProductionNotifyServiceImpl;
 import uk.gov.service.notify.NotificationClient;
 
 /**
