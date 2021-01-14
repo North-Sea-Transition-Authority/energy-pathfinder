@@ -15,6 +15,12 @@ public class ProjectUpdateEmailProperties extends EmailProperties {
     this.serviceLoginUrl = serviceLoginUrl;
   }
 
+  public ProjectUpdateEmailProperties(NotifyTemplate template, String projectName, String serviceLoginUrl) {
+    super(template);
+    this.projectName = projectName;
+    this.serviceLoginUrl = serviceLoginUrl;
+  }
+
   @Override
   public Map<String, String> getEmailPersonalisation() {
     Map<String, String> emailPersonalisation = super.getEmailPersonalisation();

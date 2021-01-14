@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.repository.project.projectinformation;
 
 import java.util.Optional;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -11,4 +12,7 @@ public interface ProjectInformationRepository extends CrudRepository<ProjectInfo
   Optional<ProjectInformation> findByProjectDetail(ProjectDetail projectDetail);
 
   void deleteByProjectDetail(ProjectDetail projectDetail);
+
+  @Query("SELECT pi.projectTitle FROM ProjectInformation pi WHERE pi.projectDetail = :detail")
+  String findTitleByProjectDetail(ProjectDetail detail);
 }

@@ -105,6 +105,11 @@ public class ProjectInformationService implements ProjectFormSectionService {
             String.format("Unable to find ProjectInformation for projectDetail with ID %s", projectDetail.getId())));
   }
 
+  public String getProjectTitle(ProjectDetail detail) {
+    var title = projectInformationRepository.findTitleByProjectDetail(detail);
+    return title != null ? title : "";
+  }
+
   public ProjectInformationForm getForm(ProjectDetail projectDetail) {
     return projectInformationRepository.findByProjectDetail(projectDetail)
         .map(this::getForm).orElse(new ProjectInformationForm());
