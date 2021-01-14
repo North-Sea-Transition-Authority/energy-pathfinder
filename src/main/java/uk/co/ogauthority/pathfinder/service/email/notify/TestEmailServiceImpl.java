@@ -57,6 +57,7 @@ public class TestEmailServiceImpl implements EmailService {
       // Set the TEST_EMAIL personalisation when in the development service
       Map<String, String> personalisation = emailProperties.getEmailPersonalisation();
       personalisation.put("TEST_EMAIL", "yes");
+      personalisation.put("SUBJECT_PREFIX", "**TEST EMAIL**");
       personalisation.put("SERVICE_NAME", serviceName);
 
       // If we have test recipients send the email to each
