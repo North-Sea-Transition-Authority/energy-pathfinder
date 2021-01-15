@@ -46,7 +46,8 @@ public class OperatorProjectUpdateService {
       NoUpdateNotificationRepository noUpdateNotificationRepository,
       ProjectNoUpdateSummaryViewService projectNoUpdateSummaryViewService,
       ProjectHeaderSummaryService projectHeaderSummaryService,
-      RegulatorEmailService regulatorEmailService, ValidationService validationService,
+      RegulatorEmailService regulatorEmailService,
+      ValidationService validationService,
       BreadcrumbService breadcrumbService) {
     this.projectUpdateService = projectUpdateService;
     this.noUpdateNotificationRepository = noUpdateNotificationRepository;

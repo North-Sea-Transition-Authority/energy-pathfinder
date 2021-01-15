@@ -31,10 +31,13 @@ public class ProjectUpdateEmailProperties extends EmailProperties {
 
   @Override
   public boolean equals(Object o) {
+    if (!super.equals(o)) {
+      return false;
+    }
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (getClass() != o.getClass()) {
       return false;
     }
     ProjectUpdateEmailProperties that = (ProjectUpdateEmailProperties) o;
