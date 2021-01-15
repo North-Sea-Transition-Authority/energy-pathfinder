@@ -8,6 +8,8 @@ public class RegulatorUpdateRequestView {
 
   private String deadlineDate;
 
+  private String requestedDate;
+
   private String requestedByUserName;
 
   private String requestedByUserEmailAddress;
@@ -26,6 +28,14 @@ public class RegulatorUpdateRequestView {
 
   public void setDeadlineDate(String deadlineDate) {
     this.deadlineDate = deadlineDate;
+  }
+
+  public String getRequestedDate() {
+    return requestedDate;
+  }
+
+  public void setRequestedDate(String requestedDate) {
+    this.requestedDate = requestedDate;
   }
 
   public String getRequestedByUserName() {
@@ -55,12 +65,13 @@ public class RegulatorUpdateRequestView {
     RegulatorUpdateRequestView that = (RegulatorUpdateRequestView) o;
     return Objects.equals(updateReason, that.updateReason)
         && Objects.equals(deadlineDate, that.deadlineDate)
+        && Objects.equals(requestedDate, that.requestedDate)
         && Objects.equals(requestedByUserName, that.requestedByUserName)
         && Objects.equals(requestedByUserEmailAddress, that.requestedByUserEmailAddress);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(updateReason, deadlineDate, requestedByUserName, requestedByUserEmailAddress);
+    return Objects.hash(updateReason, requestedDate, deadlineDate, requestedByUserName, requestedByUserEmailAddress);
   }
 }

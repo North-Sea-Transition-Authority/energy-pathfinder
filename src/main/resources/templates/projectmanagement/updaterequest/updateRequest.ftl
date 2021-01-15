@@ -5,6 +5,7 @@
   <@fdsCheckAnswers.checkAnswers>
     <@checkAnswers.checkAnswersRowNoActions prompt="Reason for update" value=regulatorUpdateRequestView.updateReason />
     <@checkAnswers.checkAnswersRowNoActions prompt="Deadline date" value=regulatorUpdateRequestView.deadlineDate />
+    <@checkAnswers.checkAnswersRowNoActions prompt="Update requested date" value=regulatorUpdateRequestView.requestedDate />
     <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Update requested by">
       <div>${regulatorUpdateRequestView.requestedByUserName}</div>
       <div>${regulatorUpdateRequestView.requestedByUserEmailAddress}</div>

@@ -14,7 +14,8 @@ public class RegulatorUpdateRequestViewUtil {
                                                 WebUserAccount requestedByUser) {
     var regulatorUpdateRequestView = new RegulatorUpdateRequestView();
     regulatorUpdateRequestView.setUpdateReason(regulatorUpdateRequest.getUpdateReason());
-    regulatorUpdateRequestView.setDeadlineDate(DateUtil.formatInstant(regulatorUpdateRequest.getRequestedInstant()));
+    regulatorUpdateRequestView.setDeadlineDate(DateUtil.formatDate(regulatorUpdateRequest.getDeadlineDate()));
+    regulatorUpdateRequestView.setRequestedDate(DateUtil.formatInstant(regulatorUpdateRequest.getRequestedInstant()));
     regulatorUpdateRequestView.setRequestedByUserName(requestedByUser.getFullName());
     regulatorUpdateRequestView.setRequestedByUserEmailAddress(requestedByUser.getEmailAddress());
     return regulatorUpdateRequestView;
