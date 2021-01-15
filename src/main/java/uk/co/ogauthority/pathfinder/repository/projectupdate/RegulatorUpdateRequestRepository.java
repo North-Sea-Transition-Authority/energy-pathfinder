@@ -9,6 +9,4 @@ import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRe
 public interface RegulatorUpdateRequestRepository extends CrudRepository<RegulatorUpdateRequest, Integer> {
 
   boolean existsByProjectDetail(ProjectDetail projectDetail);
-
-  void deleteByProjectDetail(ProjectDetail projectDetail);
 }

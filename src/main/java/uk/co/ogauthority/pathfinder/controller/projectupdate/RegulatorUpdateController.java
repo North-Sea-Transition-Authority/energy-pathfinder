@@ -23,7 +23,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateContext;
-import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequestService;
 
 @Controller
 @ProjectStatusCheck(
@@ -36,13 +36,13 @@ public class RegulatorUpdateController {
 
   public static final String REQUEST_UPDATE_PAGE_NAME = "Request update";
 
-  private final RegulatorProjectUpdateService regulatorProjectUpdateService;
+  private final RegulatorUpdateRequestService regulatorUpdateRequestService;
   private final ControllerHelperService controllerHelperService;
 
   @Autowired
-  public RegulatorUpdateController(RegulatorProjectUpdateService regulatorProjectUpdateService,
+  public RegulatorUpdateController(RegulatorUpdateRequestService regulatorUpdateRequestService,
                                    ControllerHelperService controllerHelperService) {
-    this.regulatorProjectUpdateService = regulatorProjectUpdateService;
+    this.regulatorUpdateRequestService = regulatorUpdateRequestService;
     this.controllerHelperService = controllerHelperService;
   }
 
@@ -50,7 +50,7 @@ public class RegulatorUpdateController {
   public ModelAndView getRequestUpdate(@PathVariable("projectId") Integer projectId,
                                        RegulatorProjectUpdateContext regulatorProjectUpdateContext,
                                        AuthenticatedUserAccount user) {
-    return regulatorProjectUpdateService.getRequestUpdateModelAndView(
+    return regulatorUpdateRequestService.getRequestUpdateModelAndView(
         regulatorProjectUpdateContext.getProjectDetails(),
         user,
         new RequestUpdateForm()
@@ -63,13 +63,13 @@ public class RegulatorUpdateController {
                                     BindingResult bindingResult,
                                     RegulatorProjectUpdateContext regulatorProjectUpdateContext,
                                     AuthenticatedUserAccount user) {
-    bindingResult = regulatorProjectUpdateService.validate(form, bindingResult);
+    bindingResult = regulatorUpdateRequestService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        regulatorProjectUpdateService.getRequestUpdateModelAndView(regulatorProjectUpdateContext.getProjectDetails(), user, form),
+        regulatorUpdateRequestService.getRequestUpdateModelAndView(regulatorProjectUpdateContext.getProjectDetails(), user, form),
         form,
         () -> {
-          regulatorProjectUpdateService.requestUpdate(regulatorProjectUpdateContext.getProjectDetails(), form, user);
+          regulatorUpdateRequestService.requestUpdate(regulatorProjectUpdateContext.getProjectDetails(), form, user);
           return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(null, null));
         }
     );

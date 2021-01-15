@@ -24,7 +24,7 @@ import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSumma
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
-public class RegulatorProjectUpdateService {
+public class RegulatorUpdateRequestService {
 
   public static final String REQUEST_UPDATE_TEMPLATE_PATH = "projectupdate/requestUpdate";
 
@@ -35,7 +35,7 @@ public class RegulatorProjectUpdateService {
   private final BreadcrumbService breadcrumbService;
 
   @Autowired
-  public RegulatorProjectUpdateService(
+  public RegulatorUpdateRequestService(
       RegulatorUpdateRequestRepository regulatorUpdateRequestRepository,
       ProjectHeaderSummaryService projectHeaderSummaryService,
       RequestUpdateFormValidator requestUpdateFormValidator,

@@ -15,17 +15,17 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermis
 public class RegulatorProjectUpdateContextService extends ProjectUpdateContextService {
 
   private final ProjectService projectService;
-  private final RegulatorProjectUpdateService regulatorProjectUpdateService;
+  private final RegulatorUpdateRequestService regulatorUpdateRequestService;
 
   @Autowired
   public RegulatorProjectUpdateContextService(
       ProjectContextService projectContextService,
       ProjectUpdateService projectUpdateService,
       ProjectService projectService,
-      RegulatorProjectUpdateService regulatorProjectUpdateService) {
+      RegulatorUpdateRequestService regulatorUpdateRequestService) {
     super(projectContextService, projectUpdateService);
     this.projectService = projectService;
-    this.regulatorProjectUpdateService = regulatorProjectUpdateService;
+    this.regulatorUpdateRequestService = regulatorUpdateRequestService;
   }
 
   @Override
@@ -37,7 +37,7 @@ public class RegulatorProjectUpdateContextService extends ProjectUpdateContextSe
     // detail is not the latest submitted detail.
     var latestSubmittedDetail = projectService.getLatestSubmittedDetailOrError(detail.getProject().getId());
 
-    if (regulatorProjectUpdateService.hasUpdateBeenRequested(latestSubmittedDetail)) {
+    if (regulatorUpdateRequestService.hasUpdateBeenRequested(latestSubmittedDetail)) {
       throw new AccessDeniedException(
           String.format(
               "An update has already been requested on latest submitted project detail id with %s",

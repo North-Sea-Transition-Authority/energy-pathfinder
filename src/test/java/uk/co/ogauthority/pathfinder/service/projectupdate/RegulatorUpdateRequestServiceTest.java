@@ -35,7 +35,7 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class RegulatorProjectUpdateServiceTest {
+public class RegulatorUpdateRequestServiceTest {
 
   @Mock
   private RegulatorUpdateRequestRepository regulatorUpdateRequestRepository;
@@ -52,7 +52,7 @@ public class RegulatorProjectUpdateServiceTest {
   @Mock
   private BreadcrumbService breadcrumbService;
 
-  private RegulatorProjectUpdateService regulatorProjectUpdateService;
+  private RegulatorUpdateRequestService regulatorUpdateRequestService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
   private final Project project = projectDetail.getProject();
@@ -61,7 +61,7 @@ public class RegulatorProjectUpdateServiceTest {
 
   @Before
   public void setup() {
-    regulatorProjectUpdateService = new RegulatorProjectUpdateService(
+    regulatorUpdateRequestService = new RegulatorUpdateRequestService(
         regulatorUpdateRequestRepository,
         projectHeaderSummaryService,
         requestUpdateFormValidator,
@@ -77,7 +77,7 @@ public class RegulatorProjectUpdateServiceTest {
     var form = new RequestUpdateForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
-    regulatorProjectUpdateService.validate(form, bindingResult);
+    regulatorUpdateRequestService.validate(form, bindingResult);
 
     verify(requestUpdateFormValidator, times(1)).validate(eq(form), eq(bindingResult), any());
     verify(validationService, times(1)).validate(form, bindingResult, ValidationType.FULL);
@@ -89,7 +89,7 @@ public class RegulatorProjectUpdateServiceTest {
     form.setUpdateReason("Test update reason");
     form.setDeadlineDate(new ThreeFieldDateInput(LocalDate.now().plusMonths(1)));
 
-    var regulatorRequestedUpdate = regulatorProjectUpdateService.requestUpdate(projectDetail, form, authenticatedUser);
+    var regulatorRequestedUpdate = regulatorUpdateRequestService.requestUpdate(projectDetail, form, authenticatedUser);
 
     assertThat(regulatorRequestedUpdate.getProjectDetail()).isEqualTo(projectDetail);
     assertThat(regulatorRequestedUpdate.getUpdateReason()).isEqualTo(form.getUpdateReason());
@@ -104,14 +104,14 @@ public class RegulatorProjectUpdateServiceTest {
   public void hasUpdateBeenRequested_whenExists_thenTrue() {
     when(regulatorUpdateRequestRepository.existsByProjectDetail(projectDetail)).thenReturn(true);
 
-    assertThat(regulatorProjectUpdateService.hasUpdateBeenRequested(projectDetail)).isTrue();
+    assertThat(regulatorUpdateRequestService.hasUpdateBeenRequested(projectDetail)).isTrue();
   }
 
   @Test
   public void hasUpdateBeenRequested_whenNotExists_thenFalse() {
     when(regulatorUpdateRequestRepository.existsByProjectDetail(projectDetail)).thenReturn(false);
 
-    assertThat(regulatorProjectUpdateService.hasUpdateBeenRequested(projectDetail)).isFalse();
+    assertThat(regulatorUpdateRequestService.hasUpdateBeenRequested(projectDetail)).isFalse();
   }
 
   @Test
@@ -121,13 +121,13 @@ public class RegulatorProjectUpdateServiceTest {
 
     when(projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, authenticatedUser)).thenReturn(projectHeaderHtml);
 
-    var modelAndView = regulatorProjectUpdateService.getRequestUpdateModelAndView(
+    var modelAndView = regulatorUpdateRequestService.getRequestUpdateModelAndView(
         projectDetail,
         authenticatedUser,
         form
     );
 
-    assertThat(modelAndView.getViewName()).isEqualTo(RegulatorProjectUpdateService.REQUEST_UPDATE_TEMPLATE_PATH);
+    assertThat(modelAndView.getViewName()).isEqualTo(RegulatorUpdateRequestService.REQUEST_UPDATE_TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
         entry("projectHeaderHtml", projectHeaderHtml),
         entry("form", form),

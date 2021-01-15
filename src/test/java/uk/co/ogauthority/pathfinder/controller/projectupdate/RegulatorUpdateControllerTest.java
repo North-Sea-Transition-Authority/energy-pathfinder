@@ -34,7 +34,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateContextService;
-import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequestService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -49,7 +49,7 @@ public class RegulatorUpdateControllerTest extends RegulatorProjectUpdateContext
   private static final Integer UNSUBMITTED_PROJECT_ID = 2;
 
   @MockBean
-  private RegulatorProjectUpdateService regulatorProjectUpdateService;
+  private RegulatorUpdateRequestService regulatorUpdateRequestService;
 
   private final ProjectDetail qaProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
   private final ProjectDetail unsubmittedProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
@@ -96,7 +96,7 @@ public class RegulatorUpdateControllerTest extends RegulatorProjectUpdateContext
   @Test
   public void requestUpdate_whenAuthenticatedAndQAAndValidForm_thenCreate() throws Exception {
     var bindingResult = new BeanPropertyBindingResult(RequestUpdateForm.class, "form");
-    when(regulatorProjectUpdateService.validate(any(), any())).thenReturn(bindingResult);
+    when(regulatorUpdateRequestService.validate(any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(RegulatorUpdateController.class)
@@ -106,17 +106,17 @@ public class RegulatorUpdateControllerTest extends RegulatorProjectUpdateContext
             .with(csrf()))
         .andExpect(status().is3xxRedirection());
 
-    verify(regulatorProjectUpdateService, times(1)).validate(any(), any());
-    verify(regulatorProjectUpdateService, times(1)).requestUpdate(any(), any(), any());
+    verify(regulatorUpdateRequestService, times(1)).validate(any(), any());
+    verify(regulatorUpdateRequestService, times(1)).requestUpdate(any(), any(), any());
   }
 
   @Test
   public void requestUpdate_whenAuthenticatedAndQAAndInvalidForm_thenNoCreate() throws Exception {
     var bindingResult = new BeanPropertyBindingResult(RequestUpdateForm.class, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
-    when(regulatorProjectUpdateService.validate(any(), any())).thenReturn(bindingResult);
+    when(regulatorUpdateRequestService.validate(any(), any())).thenReturn(bindingResult);
 
-    when(regulatorProjectUpdateService.getRequestUpdateModelAndView(any(), any(), any())).thenReturn(new ModelAndView());
+    when(regulatorUpdateRequestService.getRequestUpdateModelAndView(any(), any(), any())).thenReturn(new ModelAndView());
 
     mockMvc.perform(
         post(ReverseRouter.route(on(RegulatorUpdateController.class)
@@ -126,8 +126,8 @@ public class RegulatorUpdateControllerTest extends RegulatorProjectUpdateContext
             .with(csrf()))
         .andExpect(status().isOk());
 
-    verify(regulatorProjectUpdateService, times(1)).validate(any(), any());
-    verify(regulatorProjectUpdateService, times(0)).requestUpdate(any(), any(), any());
+    verify(regulatorUpdateRequestService, times(1)).validate(any(), any());
+    verify(regulatorUpdateRequestService, times(0)).requestUpdate(any(), any(), any());
   }
 
   @Test
@@ -140,7 +140,7 @@ public class RegulatorUpdateControllerTest extends RegulatorProjectUpdateContext
             .with(csrf()))
         .andExpect(status().isForbidden());
 
-    verify(regulatorProjectUpdateService, never()).requestUpdate(any(), any(), any());
+    verify(regulatorUpdateRequestService, never()).requestUpdate(any(), any(), any());
   }
 
   @Test
@@ -153,6 +153,6 @@ public class RegulatorUpdateControllerTest extends RegulatorProjectUpdateContext
             .with(csrf()))
         .andExpect(status().isNotFound());
 
-    verify(regulatorProjectUpdateService, never()).requestUpdate(any(), any(), any());
+    verify(regulatorUpdateRequestService, never()).requestUpdate(any(), any(), any());
   }
 }

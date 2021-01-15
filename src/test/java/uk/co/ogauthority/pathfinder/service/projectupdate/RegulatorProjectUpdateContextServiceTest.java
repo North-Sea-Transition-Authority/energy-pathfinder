@@ -34,7 +34,7 @@ public class RegulatorProjectUpdateContextServiceTest {
   private ProjectService projectService;
 
   @Mock
-  private RegulatorProjectUpdateService regulatorProjectUpdateService;
+  private RegulatorUpdateRequestService regulatorUpdateRequestService;
 
   private RegulatorProjectUpdateContextService regulatorProjectUpdateContextService;
 
@@ -49,7 +49,7 @@ public class RegulatorProjectUpdateContextServiceTest {
         projectContextService,
         projectUpdateService,
         projectService,
-        regulatorProjectUpdateService
+        regulatorUpdateRequestService
     );
 
     when(projectService.getLatestSubmittedDetailOrError(projectDetail.getProject().getId())).thenReturn(projectDetail);
@@ -60,7 +60,7 @@ public class RegulatorProjectUpdateContextServiceTest {
 
   @Test
   public void buildProjectUpdateContext_whenUpdateNotRequested() {
-    when(regulatorProjectUpdateService.hasUpdateBeenRequested(projectDetail)).thenReturn(false);
+    when(regulatorUpdateRequestService.hasUpdateBeenRequested(projectDetail)).thenReturn(false);
 
     var regulatorProjectUpdateContext = regulatorProjectUpdateContextService.buildProjectUpdateContext(
         projectDetail,
@@ -76,7 +76,7 @@ public class RegulatorProjectUpdateContextServiceTest {
 
   @Test(expected = AccessDeniedException.class)
   public void buildProjectUpdateContext_whenUpdateRequested() {
-    when(regulatorProjectUpdateService.hasUpdateBeenRequested(projectDetail)).thenReturn(true);
+    when(regulatorUpdateRequestService.hasUpdateBeenRequested(projectDetail)).thenReturn(true);
 
     regulatorProjectUpdateContextService.buildProjectUpdateContext(
         projectDetail,
