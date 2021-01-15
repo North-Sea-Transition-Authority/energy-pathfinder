@@ -4,11 +4,11 @@ RENAME TO regulator_update_requests;
 ALTER TABLE ${datasource.user}.regulator_update_requests
 ADD project_detail_id NUMBER;
 
-UPDATE ${datasource.user}.regulator_update_requests ror
-SET ror.project_detail_id = (
-  SELECT from_project_detail_id
+UPDATE ${datasource.user}.regulator_update_requests rur
+SET rur.project_detail_id = (
+  SELECT pu.from_project_detail_id
   FROM ${datasource.user}.project_updates pu
-  WHERE pu.id = ror.project_update_id
+  WHERE pu.id = rur.project_update_id
 );
 
 ALTER TABLE ${datasource.user}.regulator_update_requests
