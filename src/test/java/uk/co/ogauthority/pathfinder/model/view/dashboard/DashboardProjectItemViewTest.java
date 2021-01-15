@@ -54,6 +54,44 @@ public class DashboardProjectItemViewTest {
   }
 
   @Test
+  public void from_allFieldsSetCorrectly_whenDraftAndFirstVersion() {
+    var dashboardProjectItem = DashboardProjectItemTestUtil.getDashboardProjectItem(ProjectStatus.DRAFT);
+    dashboardProjectItem.setVersion(1);
+
+    var view = DashboardProjectItemView.from(dashboardProjectItem);
+    var title = dashboardProjectItem.getProjectTitle();
+    var screenReaderText = String.format(DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
+
+    assertThat(view.getProjectTitle()).isEqualTo(title);
+    assertCommonFieldsMatch(dashboardProjectItem, view);
+    assertLinkMatches(
+        dashboardProjectItem,
+        DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText),
+        title,
+        getTaskListUrl(dashboardProjectItem.getProjectId())
+    );
+  }
+
+  @Test
+  public void from_allFieldsSetCorrectly_whenDraftAndNotFirstVersion() {
+    var dashboardProjectItem = DashboardProjectItemTestUtil.getDashboardProjectItem(ProjectStatus.DRAFT);
+    dashboardProjectItem.setVersion(2);
+
+    var view = DashboardProjectItemView.from(dashboardProjectItem);
+    var title = dashboardProjectItem.getProjectTitle();
+    var screenReaderText = String.format(DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
+
+    assertThat(view.getProjectTitle()).isEqualTo(title);
+    assertCommonFieldsMatch(dashboardProjectItem, view);
+    assertLinkMatches(
+        dashboardProjectItem,
+        DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText),
+        title,
+        getProjectManagementPageUrl(dashboardProjectItem.getProjectId())
+    );
+  }
+
+  @Test
   public void from_allFieldsSetCorrectly_whenQA() {
     var dashboardProjectItem = DashboardProjectItemTestUtil.getDashboardProjectItem(ProjectStatus.QA);
 

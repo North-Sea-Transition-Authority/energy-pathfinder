@@ -7,6 +7,7 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
     , pd.id project_detail_id
     , p.created_datetime
     , pd.status
+    , pd.version
     , pi.project_title
     , pi.field_stage
     , COALESCE(

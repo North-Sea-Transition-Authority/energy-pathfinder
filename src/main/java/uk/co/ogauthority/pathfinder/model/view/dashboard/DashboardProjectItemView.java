@@ -65,7 +65,11 @@ public class DashboardProjectItemView {
     String url;
     switch (status) {
       case DRAFT:
-        url = ReverseRouter.route(on(TaskListController.class).viewTaskList(dashboardProjectItem.getProjectId(), null));
+        if (dashboardProjectItem.getVersion() == 1) {
+          url = ReverseRouter.route(on(TaskListController.class).viewTaskList(dashboardProjectItem.getProjectId(), null));
+        } else {
+          url = ReverseRouter.route(on(ManageProjectController.class).getProject(dashboardProjectItem.getProjectId(), null, null, null));
+        }
         break;
       case QA:
       case ARCHIVED:

@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.projectarchive.ArchiveProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.OperatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -14,6 +15,7 @@ import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.model.form.useraction.UserActionWithDisplayOrder;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateContextService;
 
@@ -26,17 +28,23 @@ public class OperatorActionService {
   public static final String PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_PROMPT = "Confirm no changes";
   public static final int PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_DISPLAY_ORDER = 20;
 
+  public static final String RESUME_UPDATE_ACTION_PROMPT = "Resume update";
+  public static final int RESUME_UPDATE_ACTION_DISPLAY_ORDER = 10;
+
   public static final int ARCHIVE_ACTION_DISPLAY_ORDER = 30;
 
+  private final ProjectService projectService;
   private final ProjectActionService projectActionService;
   private final ProjectContextService projectContextService;
   private final OperatorProjectUpdateContextService operatorProjectUpdateContextService;
 
   @Autowired
   public OperatorActionService(
+      ProjectService projectService,
       ProjectActionService projectActionService,
       ProjectContextService projectContextService,
       OperatorProjectUpdateContextService operatorProjectUpdateContextService) {
+    this.projectService = projectService;
     this.projectActionService = projectActionService;
     this.projectContextService = projectContextService;
     this.operatorProjectUpdateContextService = operatorProjectUpdateContextService;
@@ -55,6 +63,16 @@ public class OperatorActionService {
     if (canUpdate) {
       actions.add(getProvideUpdateAction(projectId));
       actions.add(getProvideNoUpdateNotificationAction(projectId));
+    } else {
+      var latestDetail = projectService.getLatestDetailOrError(projectId);
+      var canResumeUpdate = projectContextService.canBuildContext(
+          latestDetail,
+          user,
+          TaskListController.class
+      );
+      if (canResumeUpdate) {
+        actions.add(getResumeUpdateAction(projectId));
+      }
     }
 
     var canArchive = projectContextService.canBuildContext(
@@ -97,5 +115,18 @@ public class OperatorActionService {
             true,
             ButtonType.SECONDARY
         ), PROVIDE_NO_UPDATE_NOTIFICATION_ACTION_DISPLAY_ORDER);
+  }
+
+  protected UserActionWithDisplayOrder getResumeUpdateAction(Integer projectId) {
+    return new UserActionWithDisplayOrder(
+        new LinkButton(
+            RESUME_UPDATE_ACTION_PROMPT,
+            ReverseRouter.route(on(TaskListController.class).viewTaskList(
+                projectId,
+                null
+            )),
+            true,
+            ButtonType.PRIMARY
+        ), RESUME_UPDATE_ACTION_DISPLAY_ORDER);
   }
 }
