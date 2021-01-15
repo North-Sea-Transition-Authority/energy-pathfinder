@@ -24,6 +24,8 @@
 | -------------------- |-------------|
 | DB_SCHEMA_NAME | Database schema to connect as. E.g. `PATHFINDER_XX` This schema will be created for you by Flyway|
 | CONTEXT_SUFFIX | A unique per developer suffix string to apply to the application context path. E.g. your initials |
+| PATHFINDER_GOVUK_NOTIFY_API_KEY | API key for the environment. for Local dev see TPM https://tpm.fivium.local/index.php/pwd/view/1569 |
+| PATHFINDER_TEST_EMAIL_RECIPIENT | Email address to send all emails to when email.mode = "test" |
 
 
 #### Create the Flyway user
