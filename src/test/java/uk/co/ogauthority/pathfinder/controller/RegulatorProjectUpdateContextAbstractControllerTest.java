@@ -26,13 +26,14 @@ import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContextService;
-import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateContextService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateContextService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.team.teammanagementcontext.TeamManagementContextService;
 
-@Import({AbstractControllerTest.TestConfig.class, ProjectUpdateContextAbstractControllerTest.TestConfig.class})
-public abstract class ProjectUpdateContextAbstractControllerTest {
+@Import({AbstractControllerTest.TestConfig.class, RegulatorProjectUpdateContextAbstractControllerTest.TestConfig.class})
+public abstract class RegulatorProjectUpdateContextAbstractControllerTest {
 
   protected MockMvc mockMvc;
 
@@ -69,8 +70,11 @@ public abstract class ProjectUpdateContextAbstractControllerTest {
   @MockBean
   protected ProjectUpdateService projectUpdateService;
 
+  @MockBean
+  protected OperatorProjectUpdateContextService operatorProjectUpdateContextService;
+
   @Autowired
-  protected ProjectUpdateContextService projectUpdateContextService;
+  protected RegulatorProjectUpdateContextService regulatorProjectUpdateContextService;
 
   @MockBean
   protected TeamManagementContextService teamManagementContextService;

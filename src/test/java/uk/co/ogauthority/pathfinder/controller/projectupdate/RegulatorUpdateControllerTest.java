@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.controller.projectupdate;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,33 +25,34 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.controller.ProjectUpdateContextAbstractControllerTest;
+import uk.co.ogauthority.pathfinder.controller.RegulatorProjectUpdateContextAbstractControllerTest;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.RequestUpdateForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
-import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
-import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateContextService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequestService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(
     value = RegulatorUpdateController.class,
-    includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {ProjectContextService.class, ProjectUpdateContextService.class})
+    includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {ProjectContextService.class, RegulatorProjectUpdateContextService.class})
 )
-public class RegulatorUpdateControllerTest extends ProjectUpdateContextAbstractControllerTest {
+public class RegulatorUpdateControllerTest extends RegulatorProjectUpdateContextAbstractControllerTest {
 
   private static final Integer QA_PROJECT_ID = 1;
-  private static final Integer DRAFT_PROJECT_ID = 2;
+  private static final Integer UNSUBMITTED_PROJECT_ID = 2;
 
   @MockBean
-  private RegulatorProjectUpdateService regulatorProjectUpdateService;
+  private RegulatorUpdateRequestService regulatorUpdateRequestService;
 
   private final ProjectDetail qaProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
-  private final ProjectDetail draftProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+  private final ProjectDetail unsubmittedProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
 
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       ProjectPermission.REQUEST_UPDATE.getUserPrivileges());
@@ -58,13 +60,13 @@ public class RegulatorUpdateControllerTest extends ProjectUpdateContextAbstractC
 
   @Before
   public void setup() {
-    when(projectService.getLatestDetailOrError(QA_PROJECT_ID)).thenReturn(qaProjectDetail);
+    when(projectService.getLatestSubmittedDetailOrError(QA_PROJECT_ID)).thenReturn(qaProjectDetail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(qaProjectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(qaProjectDetail, unauthenticatedUser)).thenReturn(false);
 
-    when(projectService.getLatestDetailOrError(DRAFT_PROJECT_ID)).thenReturn(draftProjectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(draftProjectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(draftProjectDetail, unauthenticatedUser)).thenReturn(false);
+    doThrow(new PathfinderEntityNotFoundException("test")).when(projectService).getLatestSubmittedDetailOrError(UNSUBMITTED_PROJECT_ID);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(unsubmittedProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(unsubmittedProjectDetail, unauthenticatedUser)).thenReturn(false);
   }
 
   @Test
@@ -84,17 +86,17 @@ public class RegulatorUpdateControllerTest extends ProjectUpdateContextAbstractC
   }
 
   @Test
-  public void getRequestUpdate_whenAuthenticatedAndDraft_thenNoAccess() throws Exception {
+  public void getRequestUpdate_whenAuthenticatedAndUnsubmitted_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(RegulatorUpdateController.class).getRequestUpdate(DRAFT_PROJECT_ID, null, null)))
+        on(RegulatorUpdateController.class).getRequestUpdate(UNSUBMITTED_PROJECT_ID, null, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isNotFound());
   }
 
   @Test
   public void requestUpdate_whenAuthenticatedAndQAAndValidForm_thenCreate() throws Exception {
     var bindingResult = new BeanPropertyBindingResult(RequestUpdateForm.class, "form");
-    when(regulatorProjectUpdateService.validate(any(), any())).thenReturn(bindingResult);
+    when(regulatorUpdateRequestService.validate(any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(RegulatorUpdateController.class)
@@ -104,17 +106,17 @@ public class RegulatorUpdateControllerTest extends ProjectUpdateContextAbstractC
             .with(csrf()))
         .andExpect(status().is3xxRedirection());
 
-    verify(regulatorProjectUpdateService, times(1)).validate(any(), any());
-    verify(regulatorProjectUpdateService, times(1)).startRegulatorRequestedUpdate(any(), any(), any());
+    verify(regulatorUpdateRequestService, times(1)).validate(any(), any());
+    verify(regulatorUpdateRequestService, times(1)).requestUpdate(any(), any(), any());
   }
 
   @Test
   public void requestUpdate_whenAuthenticatedAndQAAndInvalidForm_thenNoCreate() throws Exception {
     var bindingResult = new BeanPropertyBindingResult(RequestUpdateForm.class, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
-    when(regulatorProjectUpdateService.validate(any(), any())).thenReturn(bindingResult);
+    when(regulatorUpdateRequestService.validate(any(), any())).thenReturn(bindingResult);
 
-    when(regulatorProjectUpdateService.getRequestUpdateModelAndView(any(), any(), any())).thenReturn(new ModelAndView());
+    when(regulatorUpdateRequestService.getRequestUpdateModelAndView(any(), any(), any())).thenReturn(new ModelAndView());
 
     mockMvc.perform(
         post(ReverseRouter.route(on(RegulatorUpdateController.class)
@@ -124,8 +126,8 @@ public class RegulatorUpdateControllerTest extends ProjectUpdateContextAbstractC
             .with(csrf()))
         .andExpect(status().isOk());
 
-    verify(regulatorProjectUpdateService, times(1)).validate(any(), any());
-    verify(regulatorProjectUpdateService, times(0)).startRegulatorRequestedUpdate(any(), any(), any());
+    verify(regulatorUpdateRequestService, times(1)).validate(any(), any());
+    verify(regulatorUpdateRequestService, times(0)).requestUpdate(any(), any(), any());
   }
 
   @Test
@@ -138,19 +140,19 @@ public class RegulatorUpdateControllerTest extends ProjectUpdateContextAbstractC
             .with(csrf()))
         .andExpect(status().isForbidden());
 
-    verify(regulatorProjectUpdateService, never()).startRegulatorRequestedUpdate(any(), any(), any());
+    verify(regulatorUpdateRequestService, never()).requestUpdate(any(), any(), any());
   }
 
   @Test
-  public void requestUpdate_whenAuthenticatedAndDraft_thenNoAccess() throws Exception {
+  public void requestUpdate_whenAuthenticatedAndUnsubmitted_thenNoAccess() throws Exception {
     mockMvc.perform(
         post(ReverseRouter.route(on(RegulatorUpdateController.class)
-            .requestUpdate(DRAFT_PROJECT_ID, null, null, null, null)
+            .requestUpdate(UNSUBMITTED_PROJECT_ID, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf()))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isNotFound());
 
-    verify(regulatorProjectUpdateService, never()).startRegulatorRequestedUpdate(any(), any(), any());
+    verify(regulatorUpdateRequestService, never()).requestUpdate(any(), any(), any());
   }
 }

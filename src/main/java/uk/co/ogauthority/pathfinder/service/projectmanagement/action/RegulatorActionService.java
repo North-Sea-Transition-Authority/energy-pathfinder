@@ -18,7 +18,7 @@ import uk.co.ogauthority.pathfinder.model.form.useraction.UserActionWithDisplayO
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContextService;
-import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateContextService;
 
 @Service
 public class RegulatorActionService {
@@ -37,18 +37,18 @@ public class RegulatorActionService {
   private final ProjectActionService projectActionService;
   private final ProjectContextService projectContextService;
   private final ProjectAssessmentContextService projectAssessmentContextService;
-  private final ProjectUpdateContextService projectUpdateContextService;
+  private final RegulatorProjectUpdateContextService regulatorProjectUpdateContextService;
 
   @Autowired
   public RegulatorActionService(
       ProjectActionService projectActionService,
       ProjectContextService projectContextService,
       ProjectAssessmentContextService projectAssessmentContextService,
-      ProjectUpdateContextService projectUpdateContextService) {
+      RegulatorProjectUpdateContextService regulatorProjectUpdateContextService) {
     this.projectActionService = projectActionService;
     this.projectContextService = projectContextService;
     this.projectAssessmentContextService = projectAssessmentContextService;
-    this.projectUpdateContextService = projectUpdateContextService;
+    this.regulatorProjectUpdateContextService = regulatorProjectUpdateContextService;
   }
 
   public List<UserActionWithDisplayOrder> getActions(ProjectDetail projectDetail, AuthenticatedUserAccount user) {
@@ -65,7 +65,7 @@ public class RegulatorActionService {
       actions.add(getProvideAssessmentAction(projectId));
     }
 
-    var canRequestUpdate = projectUpdateContextService.canBuildContext(
+    var canRequestUpdate = regulatorProjectUpdateContextService.canBuildContext(
         projectDetail,
         user,
         RegulatorUpdateController.class

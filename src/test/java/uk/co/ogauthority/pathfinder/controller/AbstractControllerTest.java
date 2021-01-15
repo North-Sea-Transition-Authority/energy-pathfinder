@@ -28,9 +28,10 @@ import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.file.FileUploadServiceTest;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.navigation.TopNavigationService;
-import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
-import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
+import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContextService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateContextService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateContextService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.team.teammanagementcontext.TeamManagementContextService;
 
@@ -64,7 +65,10 @@ public abstract class AbstractControllerTest {
   protected ProjectAssessmentContextService projectAssessmentContextService;
 
   @MockBean
-  protected ProjectUpdateContextService projectUpdateContextService;
+  protected OperatorProjectUpdateContextService operatorProjectUpdateContextService;
+
+  @MockBean
+  protected RegulatorProjectUpdateContextService regulatorProjectUpdateContextService;
 
   @MockBean
   protected TeamManagementContextService teamManagementContextService;

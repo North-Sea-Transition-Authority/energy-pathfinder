@@ -32,6 +32,7 @@ public class OperatorProjectUpdateService {
   public static final String PROVIDE_NO_UPDATE_CONFIRMATION_TEMPLATE_PATH = "projectupdate/noUpdateConfirmation";
 
   private final ProjectUpdateService projectUpdateService;
+  private final RegulatorUpdateRequestService regulatorUpdateRequestService;
   private final NoUpdateNotificationRepository noUpdateNotificationRepository;
   private final ProjectNoUpdateSummaryViewService projectNoUpdateSummaryViewService;
   private final ProjectHeaderSummaryService projectHeaderSummaryService;
@@ -41,12 +42,14 @@ public class OperatorProjectUpdateService {
   @Autowired
   public OperatorProjectUpdateService(
       ProjectUpdateService projectUpdateService,
+      RegulatorUpdateRequestService regulatorUpdateRequestService,
       NoUpdateNotificationRepository noUpdateNotificationRepository,
       ProjectNoUpdateSummaryViewService projectNoUpdateSummaryViewService,
       ProjectHeaderSummaryService projectHeaderSummaryService,
       ValidationService validationService,
       BreadcrumbService breadcrumbService) {
     this.projectUpdateService = projectUpdateService;
+    this.regulatorUpdateRequestService = regulatorUpdateRequestService;
     this.noUpdateNotificationRepository = noUpdateNotificationRepository;
     this.projectNoUpdateSummaryViewService = projectNoUpdateSummaryViewService;
     this.projectHeaderSummaryService = projectHeaderSummaryService;
@@ -59,7 +62,11 @@ public class OperatorProjectUpdateService {
   }
 
   public ProjectUpdate startUpdate(ProjectDetail projectDetail, AuthenticatedUserAccount user) {
-    return projectUpdateService.startUpdate(projectDetail, user, ProjectUpdateType.OPERATOR_INITIATED);
+    var updateType = regulatorUpdateRequestService.hasUpdateBeenRequested(projectDetail)
+        ? ProjectUpdateType.REGULATOR_REQUESTED
+        : ProjectUpdateType.OPERATOR_INITIATED;
+
+    return projectUpdateService.startUpdate(projectDetail, user, updateType);
   }
 
   @Transactional

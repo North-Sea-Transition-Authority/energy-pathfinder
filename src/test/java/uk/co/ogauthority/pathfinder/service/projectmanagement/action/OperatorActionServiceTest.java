@@ -18,7 +18,7 @@ import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
-import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateContextService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -32,7 +32,7 @@ public class OperatorActionServiceTest {
   private ProjectContextService projectContextService;
 
   @Mock
-  private ProjectUpdateContextService projectUpdateContextService;
+  private OperatorProjectUpdateContextService operatorProjectUpdateContextService;
 
   private OperatorActionService operatorActionService;
 
@@ -46,13 +46,13 @@ public class OperatorActionServiceTest {
     operatorActionService = new OperatorActionService(
         projectActionService,
         projectContextService,
-        projectUpdateContextService
+        operatorProjectUpdateContextService
     );
   }
 
   @Test
   public void getActions_whenCannotUpdate() {
-    when(projectUpdateContextService.canBuildContext(projectDetail, authenticatedUser, OperatorUpdateController.class)).thenReturn(false);
+    when(operatorProjectUpdateContextService.canBuildContext(projectDetail, authenticatedUser, OperatorUpdateController.class)).thenReturn(false);
 
     var actions = operatorActionService.getActions(projectDetail, authenticatedUser);
 
@@ -61,7 +61,7 @@ public class OperatorActionServiceTest {
 
   @Test
   public void getActions_whenCanUpdate() {
-    when(projectUpdateContextService.canBuildContext(projectDetail, authenticatedUser, OperatorUpdateController.class)).thenReturn(true);
+    when(operatorProjectUpdateContextService.canBuildContext(projectDetail, authenticatedUser, OperatorUpdateController.class)).thenReturn(true);
 
     var actions = operatorActionService.getActions(projectDetail, authenticatedUser);
 

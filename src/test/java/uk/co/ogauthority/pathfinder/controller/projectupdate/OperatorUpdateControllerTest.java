@@ -24,7 +24,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.controller.ProjectUpdateContextAbstractControllerTest;
+import uk.co.ogauthority.pathfinder.controller.OperatorProjectUpdateContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -33,16 +33,16 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateService;
-import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContextService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateContextService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(
     value = OperatorUpdateController.class,
-    includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {ProjectContextService.class, ProjectUpdateContextService.class})
+    includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {ProjectContextService.class, OperatorProjectUpdateContextService.class})
 )
-public class OperatorUpdateControllerTest extends ProjectUpdateContextAbstractControllerTest {
+public class OperatorUpdateControllerTest extends OperatorProjectUpdateContextAbstractControllerTest {
 
   private static final Integer QA_PROJECT_ID = 1;
   private static final Integer DRAFT_PROJECT_ID = 2;

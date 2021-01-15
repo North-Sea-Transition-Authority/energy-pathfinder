@@ -12,41 +12,36 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.RegulatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
-import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorRequestedUpdate;
+import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRequest;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.RequestUpdateForm;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.RequestUpdateFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.RequestUpdateValidationHint;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.repository.projectupdate.RegulatorRequestedUpdateRepository;
+import uk.co.ogauthority.pathfinder.repository.projectupdate.RegulatorUpdateRequestRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
-public class RegulatorProjectUpdateService {
+public class RegulatorUpdateRequestService {
 
   public static final String REQUEST_UPDATE_TEMPLATE_PATH = "projectupdate/requestUpdate";
 
-  private final RegulatorRequestedUpdateRepository regulatorRequestedUpdateRepository;
-  private final ProjectUpdateService projectUpdateService;
+  private final RegulatorUpdateRequestRepository regulatorUpdateRequestRepository;
   private final ProjectHeaderSummaryService projectHeaderSummaryService;
   private final RequestUpdateFormValidator requestUpdateFormValidator;
   private final ValidationService validationService;
   private final BreadcrumbService breadcrumbService;
 
   @Autowired
-  public RegulatorProjectUpdateService(
-      RegulatorRequestedUpdateRepository regulatorRequestedUpdateRepository,
-      ProjectUpdateService projectUpdateService,
+  public RegulatorUpdateRequestService(
+      RegulatorUpdateRequestRepository regulatorUpdateRequestRepository,
       ProjectHeaderSummaryService projectHeaderSummaryService,
       RequestUpdateFormValidator requestUpdateFormValidator,
       ValidationService validationService,
       BreadcrumbService breadcrumbService) {
-    this.regulatorRequestedUpdateRepository = regulatorRequestedUpdateRepository;
-    this.projectUpdateService = projectUpdateService;
+    this.regulatorUpdateRequestRepository = regulatorUpdateRequestRepository;
     this.projectHeaderSummaryService = projectHeaderSummaryService;
     this.requestUpdateFormValidator = requestUpdateFormValidator;
     this.validationService = validationService;
@@ -59,21 +54,21 @@ public class RegulatorProjectUpdateService {
   }
 
   @Transactional
-  public RegulatorRequestedUpdate startRegulatorRequestedUpdate(ProjectDetail projectDetail,
-                                                                RequestUpdateForm form,
-                                                                AuthenticatedUserAccount requestedByUser) {
-    var projectUpdate = projectUpdateService.startUpdate(projectDetail, requestedByUser, ProjectUpdateType.REGULATOR_REQUESTED);
-    var regulatorRequestedUpdate = new RegulatorRequestedUpdate();
-    regulatorRequestedUpdate.setProjectUpdate(projectUpdate);
-    regulatorRequestedUpdate.setUpdateReason(form.getUpdateReason());
-    regulatorRequestedUpdate.setDeadlineDate(form.getDeadlineDate().createDateOrNull());
-    regulatorRequestedUpdate.setRequestedByWuaId(requestedByUser.getWuaId());
-    regulatorRequestedUpdate.setRequestedInstant(Instant.now());
-    return regulatorRequestedUpdateRepository.save(regulatorRequestedUpdate);
+  public RegulatorUpdateRequest requestUpdate(ProjectDetail projectDetail,
+                                              RequestUpdateForm form,
+                                              AuthenticatedUserAccount requestedByUser) {
+
+    var regulatorUpdateRequest = new RegulatorUpdateRequest();
+    regulatorUpdateRequest.setProjectDetail(projectDetail);
+    regulatorUpdateRequest.setUpdateReason(form.getUpdateReason());
+    regulatorUpdateRequest.setDeadlineDate(form.getDeadlineDate().createDateOrNull());
+    regulatorUpdateRequest.setRequestedByWuaId(requestedByUser.getWuaId());
+    regulatorUpdateRequest.setRequestedInstant(Instant.now());
+    return regulatorUpdateRequestRepository.save(regulatorUpdateRequest);
   }
 
-  public void deleteRegulatorRequestedUpdate(ProjectUpdate projectUpdate) {
-    regulatorRequestedUpdateRepository.deleteByProjectUpdate(projectUpdate);
+  public boolean hasUpdateBeenRequested(ProjectDetail projectDetail) {
+    return regulatorUpdateRequestRepository.existsByProjectDetail(projectDetail);
   }
 
   public ModelAndView getRequestUpdateModelAndView(ProjectDetail projectDetail,AuthenticatedUserAccount user, RequestUpdateForm form) {

@@ -11,12 +11,10 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
-import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryRenderingService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
-import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateService;
 
 @Service
 public class CancelDraftProjectVersionService {
@@ -25,19 +23,16 @@ public class CancelDraftProjectVersionService {
 
   private final ProjectService projectService;
   private final ProjectUpdateService projectUpdateService;
-  private final RegulatorProjectUpdateService regulatorProjectUpdateService;
   private final ProjectSummaryRenderingService projectSummaryRenderingService;
   private final List<ProjectFormSectionService> projectFormSectionServices;
 
   @Autowired
   public CancelDraftProjectVersionService(ProjectService projectService,
                                           ProjectUpdateService projectUpdateService,
-                                          RegulatorProjectUpdateService regulatorProjectUpdateService,
                                           ProjectSummaryRenderingService projectSummaryRenderingService,
                                           List<ProjectFormSectionService> projectFormSectionServices) {
     this.projectService = projectService;
     this.projectUpdateService = projectUpdateService;
-    this.regulatorProjectUpdateService = regulatorProjectUpdateService;
     this.projectSummaryRenderingService = projectSummaryRenderingService;
     this.projectFormSectionServices = projectFormSectionServices;
   }
@@ -49,9 +44,6 @@ public class CancelDraftProjectVersionService {
     );
     if (!projectDetail.isFirstVersion()) {
       projectUpdateService.getByToDetail(projectDetail).ifPresent(projectUpdate -> {
-        if (projectUpdate.getUpdateType() == ProjectUpdateType.REGULATOR_REQUESTED) {
-          regulatorProjectUpdateService.deleteRegulatorRequestedUpdate(projectUpdate);
-        }
         projectUpdateService.deleteProjectUpdate(projectUpdate);
         projectService.updateProjectDetailIsCurrentVersion(projectUpdate.getFromDetail(), true);
       });

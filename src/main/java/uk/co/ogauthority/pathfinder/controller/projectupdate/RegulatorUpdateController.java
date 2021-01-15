@@ -16,38 +16,42 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.RequestUpdateForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
-import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateContext;
-import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateContext;
+import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequestService;
 
 @Controller
-@ProjectStatusCheck(status = {ProjectStatus.QA, ProjectStatus.PUBLISHED})
+@ProjectStatusCheck(
+    status = { ProjectStatus.QA, ProjectStatus.PUBLISHED },
+    projectDetailVersionType = ProjectDetailVersionType.LATEST_SUBMITTED_VERSION
+)
 @ProjectFormPagePermissionCheck(permissions = {ProjectPermission.REQUEST_UPDATE})
 @RequestMapping("/project/{projectId}")
 public class RegulatorUpdateController {
 
   public static final String REQUEST_UPDATE_PAGE_NAME = "Request update";
 
-  private final RegulatorProjectUpdateService regulatorProjectUpdateService;
+  private final RegulatorUpdateRequestService regulatorUpdateRequestService;
   private final ControllerHelperService controllerHelperService;
 
   @Autowired
-  public RegulatorUpdateController(RegulatorProjectUpdateService regulatorProjectUpdateService,
+  public RegulatorUpdateController(RegulatorUpdateRequestService regulatorUpdateRequestService,
                                    ControllerHelperService controllerHelperService) {
-    this.regulatorProjectUpdateService = regulatorProjectUpdateService;
+    this.regulatorUpdateRequestService = regulatorUpdateRequestService;
     this.controllerHelperService = controllerHelperService;
   }
 
   @GetMapping("/request-update")
   public ModelAndView getRequestUpdate(@PathVariable("projectId") Integer projectId,
-                                       ProjectUpdateContext projectUpdateContext,
+                                       RegulatorProjectUpdateContext regulatorProjectUpdateContext,
                                        AuthenticatedUserAccount user) {
-    return regulatorProjectUpdateService.getRequestUpdateModelAndView(
-        projectUpdateContext.getProjectDetails(),
+    return regulatorUpdateRequestService.getRequestUpdateModelAndView(
+        regulatorProjectUpdateContext.getProjectDetails(),
         user,
         new RequestUpdateForm()
     );
@@ -57,15 +61,15 @@ public class RegulatorUpdateController {
   public ModelAndView requestUpdate(@PathVariable("projectId") Integer projectId,
                                     @Valid @ModelAttribute("form") RequestUpdateForm form,
                                     BindingResult bindingResult,
-                                    ProjectUpdateContext projectUpdateContext,
+                                    RegulatorProjectUpdateContext regulatorProjectUpdateContext,
                                     AuthenticatedUserAccount user) {
-    bindingResult = regulatorProjectUpdateService.validate(form, bindingResult);
+    bindingResult = regulatorUpdateRequestService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        regulatorProjectUpdateService.getRequestUpdateModelAndView(projectUpdateContext.getProjectDetails(), user, form),
+        regulatorUpdateRequestService.getRequestUpdateModelAndView(regulatorProjectUpdateContext.getProjectDetails(), user, form),
         form,
         () -> {
-          regulatorProjectUpdateService.startRegulatorRequestedUpdate(projectUpdateContext.getProjectDetails(), form, user);
+          regulatorUpdateRequestService.requestUpdate(regulatorProjectUpdateContext.getProjectDetails(), form, user);
           return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(null, null));
         }
     );
