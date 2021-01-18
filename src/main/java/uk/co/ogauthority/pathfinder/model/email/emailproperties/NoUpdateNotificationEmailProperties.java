@@ -37,6 +37,6 @@ public class NoUpdateNotificationEmailProperties extends ProjectUpdateEmailPrope
 
   @Override
   public int hashCode() {
-    return Objects.hash(noUpdateReason);
+    return Objects.hash(super.hashCode(), noUpdateReason);
   }
 }

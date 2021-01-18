@@ -47,6 +47,6 @@ public class ProjectUpdateEmailProperties extends EmailProperties {
 
   @Override
   public int hashCode() {
-    return Objects.hash(projectName, serviceLoginUrl);
+    return Objects.hash(super.hashCode(), projectName, serviceLoginUrl);
   }
 }
