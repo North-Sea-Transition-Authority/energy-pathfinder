@@ -122,6 +122,8 @@ public class DashboardProjectItemViewTest {
     assertThat(view.getFieldName()).isEqualTo(dashboardProjectItem.getFieldName());
     assertThat(view.getOperatorName()).isEqualTo(dashboardProjectItem.getOperatorName());
     assertThat(view.getStatus()).isEqualTo(dashboardProjectItem.getStatus().getDisplayName());
+    assertThat(view.isUpdateRequested()).isEqualTo(dashboardProjectItem.isUpdateRequested());
+    assertThat(view.getUpdateDeadlineDate()).isEqualTo(DateUtil.formatDate(dashboardProjectItem.getUpdateDeadlineDate()));
   }
 
   private void assertLinkMatches(DashboardProjectItem dashboardProjectItem, DashboardLink link, String prompt, String url) {
