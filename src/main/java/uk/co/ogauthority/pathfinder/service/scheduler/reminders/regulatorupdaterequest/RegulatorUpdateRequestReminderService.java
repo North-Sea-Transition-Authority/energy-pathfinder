@@ -1,0 +1,58 @@
+package uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest;
+
+import org.quartz.SchedulerException;
+import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.ProjectUpdateEmailProperties;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.scheduler.ReminderType;
+import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.email.EmailService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.scheduler.PathfinderReminderScheduler;
+
+@Service
+public class RegulatorUpdateRequestReminderService {
+
+  public static final String JOB_GROUP_NAME = "REGULATOR_UPDATE_REMINDER_GROUP";
+  public static final String TRIGGER_GROUP_NAME = "REGULATOR_UPDATE_REMINDER_TRIGGER";
+
+  //TODO PAT-172 replace dummy service with actual service
+  //TODO do we want a generic data model to go with this that stores the job details?
+  private final ProjectService projectService;
+  private final PathfinderReminderScheduler pathfinderReminderScheduler;
+  private final EmailLinkService emailLinkService;
+  private final EmailService emailService;
+
+  public RegulatorUpdateRequestReminderService(ProjectService projectService,
+                                               PathfinderReminderScheduler pathfinderReminderScheduler,
+                                               EmailLinkService emailLinkService,
+                                               EmailService emailService) {
+    this.projectService = projectService;
+    this.pathfinderReminderScheduler = pathfinderReminderScheduler;
+    this.emailLinkService = emailLinkService;
+    this.emailService = emailService;
+  }
+
+  public void scheduleUpdateReminderJob(ProjectDetail detail) throws SchedulerException { //TODO separate scheduler??
+    pathfinderReminderScheduler.scheduleReminder(
+        detail,
+        ReminderType.REGULATOR_UPDATE_REQUEST_DEADLINE_REMINDER,
+        RegulatorUpdateRequestReminderJob.class
+    );
+    pathfinderReminderScheduler.scheduleReminder(
+        detail,
+        ReminderType.REGULATOR_UPDATE_REQUEST_AFTER_DEADLINE_REMINDER,
+        RegulatorUpdateRequestReminderJob.class //TODO own class for this
+    );
+    pathfinderReminderScheduler.unscheduleReminder(detail, ReminderType.REGULATOR_UPDATE_REQUEST_DEADLINE_REMINDER);
+  }
+
+  public void sendReminderEmail(int projectId) {
+    var properties = new ProjectUpdateEmailProperties(
+        "This was sent by quartz as a reminder proof of concept",
+        emailLinkService.getWorkAreaUrl()
+    );
+    emailService.sendEmail(properties, "dummy@address.com");
+  }
+
+}
