@@ -8,6 +8,6 @@ RUN apk add --update tzdata \
 && echo "${TZONE}" > /etc/timezone \
 && ln -sf /usr/share/zoneinfo/${TZONE} /etc/localtime
 
-ENV SPRING_PROFILES_ACTIVE=production
+ENV SPRING_PROFILES_ACTIVE=production,test-email
 
 ENTRYPOINT exec java $JAVA_OPTS -jar app.jar

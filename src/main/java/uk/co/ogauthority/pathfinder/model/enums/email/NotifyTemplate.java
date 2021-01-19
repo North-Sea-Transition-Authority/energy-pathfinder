@@ -6,6 +6,7 @@ package uk.co.ogauthority.pathfinder.model.enums.email;
 public enum NotifyTemplate {
 
   PROJECT_UPDATE_SUBMITTED("PROJECT_UPDATE_SUBMITTED_V1"),
+  NO_UPDATE_NOTIFICATION("NO_UPDATE_NOTIFICATION_V1"),
   EMAIL_DELIVERY_FAILED("EMAIL_DELIVERY_FAILED_V1");
 
   private final String templateName;

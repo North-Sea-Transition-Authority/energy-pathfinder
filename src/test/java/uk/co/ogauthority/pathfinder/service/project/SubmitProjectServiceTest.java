@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -22,6 +23,7 @@ import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSubmissionSummaryV
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSummaryView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
+import uk.co.ogauthority.pathfinder.service.email.RegulatorEmailService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSubmissionSummaryViewService;
@@ -52,6 +54,9 @@ public class SubmitProjectServiceTest {
   @Mock
   private AwardedContractService awardedContractService;
 
+  @Mock
+  private RegulatorEmailService regulatorEmailService;
+
   private SubmitProjectService submitProjectService;
 
   private final static ProjectDetail PROJECT_DETAIL = ProjectUtil.getProjectDetails();
@@ -63,8 +68,10 @@ public class SubmitProjectServiceTest {
         projectCleanUpService,
         projectSummaryViewService,
         projectSubmissionSummaryViewService,
-        List.of(projectInformationService, awardedContractService)
+        List.of(projectInformationService, awardedContractService),
+        regulatorEmailService
     );
+    when(projectDetailsRepository.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
   @Test
@@ -80,6 +87,27 @@ public class SubmitProjectServiceTest {
 
     verify(projectDetailsRepository, times(1)).save(projectDetail);
     verify(projectCleanUpService, times(1)).removeProjectSectionDataIfNotRelevant(projectDetail);
+  }
+
+  @Test
+  public void submitProject_UpdateEmailNotSentIfVersionOne() {
+    var projectDetail = PROJECT_DETAIL;
+    var authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount();
+
+    submitProjectService.submitProject(projectDetail, authenticatedUserAccount);
+
+    verify(regulatorEmailService, times(0)).sendUpdateSubmitConfirmationEmail(projectDetail);
+  }
+
+  @Test
+  public void submitProject_UpdateEmailSentIfNotVersionOne() {
+    var projectDetail = PROJECT_DETAIL;
+    projectDetail.setVersion(2);
+    var authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount();
+
+    submitProjectService.submitProject(projectDetail, authenticatedUserAccount);
+
+    verify(regulatorEmailService, times(1)).sendUpdateSubmitConfirmationEmail(projectDetail);
   }
 
   @Test
