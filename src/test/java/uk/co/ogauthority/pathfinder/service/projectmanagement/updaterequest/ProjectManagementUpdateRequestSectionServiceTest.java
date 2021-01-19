@@ -50,7 +50,7 @@ public class ProjectManagementUpdateRequestSectionServiceTest {
   }
 
   @Test
-  public void getSection_whenCurrentVersionAndUpdateRequest_thenReturnView() {
+  public void getSection_whenUpdateRequest_thenReturnView() {
     var regulatorUpdateRequest = ProjectUpdateTestUtil.createRegulatorUpdateRequest();
 
     when(regulatorUpdateRequestService.getUpdateRequest(projectDetail)).thenReturn(Optional.of(regulatorUpdateRequest));
@@ -69,22 +69,7 @@ public class ProjectManagementUpdateRequestSectionServiceTest {
   }
 
   @Test
-  public void getSection_whenNotCurrentVersion_thenReturnView() {
-    var previousVersionProjectDetail = ProjectUtil.getProjectDetails();
-    previousVersionProjectDetail.setIsCurrentVersion(false);
-
-    verify(regulatorUpdateRequestService, never()).getUpdateRequest(previousVersionProjectDetail);
-
-    var section = projectManagementUpdateRequestSectionService.getSection(projectDetail, authenticatedUser);
-    assertThat(section.getTemplatePath()).isEqualTo(ProjectManagementUpdateRequestSectionService.TEMPLATE_PATH);
-    assertThat(section.getDisplayOrder()).isEqualTo(ProjectManagementUpdateRequestSectionService.DISPLAY_ORDER);
-    assertThat(section.getSectionType()).isEqualTo(ProjectManagementUpdateRequestSectionService.SECTION_TYPE);
-
-    assertThat(section.getTemplateModel()).isEmpty();
-  }
-
-  @Test
-  public void getSection_whenCurrentVersionAndNoUpdateRequest_thenNoView() {
+  public void getSection_whenNoUpdateRequest_thenNoView() {
     when(regulatorUpdateRequestService.getUpdateRequest(projectDetail)).thenReturn(Optional.empty());
 
     var section = projectManagementUpdateRequestSectionService.getSection(projectDetail, authenticatedUser);

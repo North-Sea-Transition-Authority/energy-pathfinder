@@ -45,17 +45,15 @@ public class ProjectManagementUpdateRequestSectionService implements ProjectMana
   public ProjectManagementSection getSection(ProjectDetail projectDetail, AuthenticatedUserAccount user) {
     Map<String, Object> summaryModel = new HashMap<>();
 
-    if (projectDetail.getIsCurrentVersion()) {
-      regulatorUpdateRequestService.getUpdateRequest(projectDetail).ifPresent(regulatorUpdateRequest -> {
-        var requestedByUser = webUserAccountService.getWebUserAccountOrError(
-            regulatorUpdateRequest.getRequestedByWuaId());
-        summaryModel.put("regulatorUpdateRequestView", RegulatorUpdateRequestViewUtil.from(
-            regulatorUpdateRequest,
-            requestedByUser
-        ));
-        summaryModel.put("service", serviceProperties);
-      });
-    }
+    regulatorUpdateRequestService.getUpdateRequest(projectDetail).ifPresent(regulatorUpdateRequest -> {
+      var requestedByUser = webUserAccountService.getWebUserAccountOrError(
+          regulatorUpdateRequest.getRequestedByWuaId());
+      summaryModel.put("regulatorUpdateRequestView", RegulatorUpdateRequestViewUtil.from(
+          regulatorUpdateRequest,
+          requestedByUser
+      ));
+      summaryModel.put("service", serviceProperties);
+    });
 
     return new ProjectManagementSection(
         TEMPLATE_PATH,
