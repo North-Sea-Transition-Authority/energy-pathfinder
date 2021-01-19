@@ -47,7 +47,7 @@ public class RegulatorUpdateRequestReminderService {
     pathfinderReminderScheduler.unscheduleReminder(detail, ReminderType.REGULATOR_UPDATE_REQUEST_DEADLINE_REMINDER);
   }
 
-  public void sendReminderEmail(int projectId) {
+  void sendReminderEmail(int projectId) {
     var properties = new ProjectUpdateEmailProperties(
         "This was sent by quartz as a reminder proof of concept",
         emailLinkService.getWorkAreaUrl()
