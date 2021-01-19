@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.model.view.dashboard;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.time.Instant;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
@@ -27,6 +28,9 @@ public class DashboardProjectItemView {
 
   private String status;
 
+  private boolean updateRequested;
+
+  private String updateDeadlineDate;
 
   public static DashboardProjectItemView from(DashboardProjectItem dashboardProjectItem) {
     var formattedCreatedDateTime = DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime());
@@ -50,7 +54,9 @@ public class DashboardProjectItemView {
             ? dashboardProjectItem.getFieldName()
             : StringDisplayUtil.NOT_SET_TEXT,
         dashboardProjectItem.getOperatorName(),
-        status
+        status,
+        dashboardProjectItem.isUpdateRequested(),
+        DateUtil.formatDate(dashboardProjectItem.getUpdateDeadlineDate())
       );
   }
 
@@ -85,13 +91,17 @@ public class DashboardProjectItemView {
                                    String fieldStage,
                                    String fieldName,
                                    String operatorName,
-                                   String status) {
+                                   String status,
+                                   boolean updateRequested,
+                                   String updateDeadlineDate) {
     this.dashboardLink = dashboardLink;
     this.projectTitle = projectTitle;
     this.fieldStage = fieldStage;
     this.fieldName = fieldName;
     this.operatorName = operatorName;
     this.status = status;
+    this.updateRequested = updateRequested;
+    this.updateDeadlineDate = updateDeadlineDate;
   }
 
   public DashboardLink getDashboardLink() {
@@ -140,5 +150,21 @@ public class DashboardProjectItemView {
 
   public void setStatus(String status) {
     this.status = status;
+  }
+
+  public boolean isUpdateRequested() {
+    return updateRequested;
+  }
+
+  public void setUpdateRequested(boolean updateRequested) {
+    this.updateRequested = updateRequested;
+  }
+
+  public String getUpdateDeadlineDate() {
+    return updateDeadlineDate;
+  }
+
+  public void setUpdateDeadlineDate(String updateDeadlineDate) {
+    this.updateDeadlineDate = updateDeadlineDate;
   }
 }
