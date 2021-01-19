@@ -15,6 +15,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
+import uk.co.ogauthority.pathfinder.service.email.RegulatorEmailService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSubmissionSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
@@ -26,26 +27,25 @@ public class SubmitProjectService {
   public static final String PROJECT_SUBMIT_CONFIRMATION_TEMPLATE_PATH = "project/summary/submitConfirmation";
 
   private final ProjectDetailsRepository projectDetailsRepository;
-
   private final ProjectCleanUpService projectCleanUpService;
-
   private final ProjectSummaryViewService projectSummaryViewService;
-
   private final ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService;
-
   private final List<ProjectFormSectionService> projectFormSectionServices;
+  private final RegulatorEmailService regulatorEmailService;
 
   @Autowired
   public SubmitProjectService(ProjectDetailsRepository projectDetailsRepository,
                               ProjectCleanUpService projectCleanUpService,
                               ProjectSummaryViewService projectSummaryViewService,
                               ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService,
-                              List<ProjectFormSectionService> projectFormSectionServices) {
+                              List<ProjectFormSectionService> projectFormSectionServices,
+                              RegulatorEmailService regulatorEmailService) {
     this.projectDetailsRepository = projectDetailsRepository;
     this.projectCleanUpService = projectCleanUpService;
     this.projectSummaryViewService = projectSummaryViewService;
     this.projectSubmissionSummaryViewService = projectSubmissionSummaryViewService;
     this.projectFormSectionServices = projectFormSectionServices;
+    this.regulatorEmailService = regulatorEmailService;
   }
 
   @Transactional
@@ -56,7 +56,8 @@ public class SubmitProjectService {
     projectDetail.setStatus(ProjectStatus.QA);
     projectDetail.setSubmittedByWua(user.getWuaId());
     projectDetail.setSubmittedInstant(Instant.now());
-    projectDetailsRepository.save(projectDetail);
+    var updatedDetail = projectDetailsRepository.save(projectDetail);
+    sendProjectUpdateSubmittedEmail(updatedDetail);
   }
 
   public boolean isProjectValid(ProjectDetail projectDetail) {
@@ -101,5 +102,11 @@ public class SubmitProjectService {
         .addObject("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)));
 
     return modelAndView;
+  }
+
+  private void sendProjectUpdateSubmittedEmail(ProjectDetail detail) {
+    if (!detail.isFirstVersion()) {
+      regulatorEmailService.sendUpdateSubmitConfirmationEmail(detail);
+    }
   }
 }

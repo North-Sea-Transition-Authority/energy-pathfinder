@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.entity.dashboard;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
@@ -38,6 +39,10 @@ public class DashboardProjectItem {
   @ManyToOne
   @JoinColumn(name = "operator_org_grp_id")
   private PortalOrganisationGroup organisationGroup;
+
+  private boolean updateRequested;
+
+  private LocalDate updateDeadlineDate;
 
   private Instant sortKey;
 
@@ -81,6 +86,14 @@ public class DashboardProjectItem {
     return organisationGroup;
   }
 
+  public boolean isUpdateRequested() {
+    return updateRequested;
+  }
+
+  public LocalDate getUpdateDeadlineDate() {
+    return updateDeadlineDate;
+  }
+
   public void setProjectId(Integer projectId) {
     this.projectId = projectId;
   }
@@ -116,6 +129,14 @@ public class DashboardProjectItem {
   public void setOrganisationGroup(
       PortalOrganisationGroup organisationGroup) {
     this.organisationGroup = organisationGroup;
+  }
+
+  public void setUpdateRequested(boolean updateRequested) {
+    this.updateRequested = updateRequested;
+  }
+
+  public void setUpdateDeadlineDate(LocalDate updateDeadlineDate) {
+    this.updateDeadlineDate = updateDeadlineDate;
   }
 
   public Instant getSortKey() {

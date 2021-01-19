@@ -52,6 +52,7 @@ public class ProductionEmailServiceImpl implements EmailService {
 
         Map<String, String> personalisation = emailProperties.getEmailPersonalisation();
         personalisation.put("SERVICE_NAME", serviceName);
+        personalisation.put("SUBJECT_PREFIX", "");
 
         if (emailValidator.isValid(toEmailAddress)) {
           notificationClient.sendEmail(templateId.get(), toEmailAddress, personalisation, reference, emailReplyToId);

@@ -29,6 +29,7 @@ import uk.co.ogauthority.pathfinder.model.form.projectupdate.ProvideNoUpdateForm
 import uk.co.ogauthority.pathfinder.model.view.projectupdate.ProjectNoUpdateSummaryView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.NoUpdateNotificationRepository;
+import uk.co.ogauthority.pathfinder.service.email.RegulatorEmailService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -61,6 +62,9 @@ public class OperatorProjectUpdateServiceTest {
   @Mock
   private BreadcrumbService breadcrumbService;
 
+  @Mock
+  private RegulatorEmailService regulatorEmailService;
+
   private OperatorProjectUpdateService operatorProjectUpdateService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
@@ -75,6 +79,7 @@ public class OperatorProjectUpdateServiceTest {
         noUpdateNotificationRepository,
         projectNoUpdateSummaryService,
         projectHeaderSummaryService,
+        regulatorEmailService,
         validationService,
         breadcrumbService
     );
@@ -135,6 +140,49 @@ public class OperatorProjectUpdateServiceTest {
     assertThat(noUpdateNotification.getRegulatorReason()).isEqualTo(form.getRegulatorReason());
 
     verify(noUpdateNotificationRepository, times(1)).save(noUpdateNotification);
+    verify(regulatorEmailService, times(1)).sendNoUpdateNotificationEmail(projectDetail, noUpdateNotification.getRegulatorReason());
+  }
+
+  @Test
+  public void createNoUpdateNotification_emailSent() {
+    var projectUpdate = new ProjectUpdate();
+
+    when(projectUpdateService.startUpdate(projectDetail, projectDetail.getStatus(), authenticatedUser, ProjectUpdateType.OPERATOR_INITIATED)).thenReturn(
+        projectUpdate
+    );
+
+    var form = new ProvideNoUpdateForm();
+    form.setSupplyChainReason("Test supply chain reason");
+    form.setRegulatorReason("Test regulator reason");
+
+    var noUpdateNotification = operatorProjectUpdateService.createNoUpdateNotification(
+        projectDetail,
+        authenticatedUser,
+        form
+    );
+
+    verify(regulatorEmailService, times(1)).sendNoUpdateNotificationEmail(projectDetail, noUpdateNotification.getRegulatorReason());
+  }
+
+  @Test
+  public void createNoUpdateNotification_emailNoRegulatorReason() {
+    var projectUpdate = new ProjectUpdate();
+
+    when(projectUpdateService.startUpdate(projectDetail, projectDetail.getStatus(), authenticatedUser, ProjectUpdateType.OPERATOR_INITIATED)).thenReturn(
+        projectUpdate
+    );
+
+    var form = new ProvideNoUpdateForm();
+    form.setSupplyChainReason("Test supply chain reason");
+    form.setRegulatorReason(null);
+
+    var noUpdateNotification = operatorProjectUpdateService.createNoUpdateNotification(
+        projectDetail,
+        authenticatedUser,
+        form
+    );
+
+    verify(regulatorEmailService, times(1)).sendNoUpdateNotificationEmail(projectDetail, noUpdateNotification.getSupplyChainReason());
   }
 
   @Test

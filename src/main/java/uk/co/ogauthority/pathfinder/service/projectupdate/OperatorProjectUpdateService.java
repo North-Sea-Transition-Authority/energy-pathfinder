@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.ProvideNoUpdateForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.NoUpdateNotificationRepository;
+import uk.co.ogauthority.pathfinder.service.email.RegulatorEmailService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -36,6 +37,7 @@ public class OperatorProjectUpdateService {
   private final NoUpdateNotificationRepository noUpdateNotificationRepository;
   private final ProjectNoUpdateSummaryViewService projectNoUpdateSummaryViewService;
   private final ProjectHeaderSummaryService projectHeaderSummaryService;
+  private final RegulatorEmailService regulatorEmailService;
   private final ValidationService validationService;
   private final BreadcrumbService breadcrumbService;
 
@@ -46,6 +48,7 @@ public class OperatorProjectUpdateService {
       NoUpdateNotificationRepository noUpdateNotificationRepository,
       ProjectNoUpdateSummaryViewService projectNoUpdateSummaryViewService,
       ProjectHeaderSummaryService projectHeaderSummaryService,
+      RegulatorEmailService regulatorEmailService,
       ValidationService validationService,
       BreadcrumbService breadcrumbService) {
     this.projectUpdateService = projectUpdateService;
@@ -53,6 +56,7 @@ public class OperatorProjectUpdateService {
     this.noUpdateNotificationRepository = noUpdateNotificationRepository;
     this.projectNoUpdateSummaryViewService = projectNoUpdateSummaryViewService;
     this.projectHeaderSummaryService = projectHeaderSummaryService;
+    this.regulatorEmailService = regulatorEmailService;
     this.validationService = validationService;
     this.breadcrumbService = breadcrumbService;
   }
@@ -83,7 +87,14 @@ public class OperatorProjectUpdateService {
     noUpdateNotification.setProjectUpdate(projectUpdate);
     noUpdateNotification.setSupplyChainReason(form.getSupplyChainReason());
     noUpdateNotification.setRegulatorReason(form.getRegulatorReason());
-    return noUpdateNotificationRepository.save(noUpdateNotification);
+    noUpdateNotification = noUpdateNotificationRepository.save(noUpdateNotification);
+
+    regulatorEmailService.sendNoUpdateNotificationEmail(
+        projectDetail,
+        form.getRegulatorReason() != null ? form.getRegulatorReason() : form.getSupplyChainReason()
+    );
+
+    return noUpdateNotification;
   }
 
   public ModelAndView getProjectUpdateModelAndView(Integer projectId) {

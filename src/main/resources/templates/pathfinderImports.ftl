@@ -18,3 +18,4 @@
 <#import 'macros/inlineInputAction.ftl' as inlineInputAction>
 <#import 'macros/multiLineText.ftl' as multiLineText>
 <#import 'macros/noEscapeHtml.ftl' as noEscapeHtml>
+<#import 'macros/tag.ftl' as tag>

@@ -15,6 +15,12 @@ public class ProjectUpdateEmailProperties extends EmailProperties {
     this.serviceLoginUrl = serviceLoginUrl;
   }
 
+  public ProjectUpdateEmailProperties(NotifyTemplate template, String projectName, String serviceLoginUrl) {
+    super(template);
+    this.projectName = projectName;
+    this.serviceLoginUrl = serviceLoginUrl;
+  }
+
   @Override
   public Map<String, String> getEmailPersonalisation() {
     Map<String, String> emailPersonalisation = super.getEmailPersonalisation();
@@ -25,10 +31,13 @@ public class ProjectUpdateEmailProperties extends EmailProperties {
 
   @Override
   public boolean equals(Object o) {
+    if (!super.equals(o)) {
+      return false;
+    }
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (getClass() != o.getClass()) {
       return false;
     }
     ProjectUpdateEmailProperties that = (ProjectUpdateEmailProperties) o;
@@ -38,6 +47,6 @@ public class ProjectUpdateEmailProperties extends EmailProperties {
 
   @Override
   public int hashCode() {
-    return Objects.hash(projectName, serviceLoginUrl);
+    return Objects.hash(super.hashCode(), projectName, serviceLoginUrl);
   }
 }

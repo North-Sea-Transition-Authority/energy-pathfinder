@@ -9,6 +9,8 @@ $govuk-assets-path: "../../govuk-frontend/govuk/assets/";
 /// FDS master stylesheet
 @import "../templates/fds/all";
 
+@import "components/all";
+
 @import "helpers/all";
 
 @import "patterns/all";

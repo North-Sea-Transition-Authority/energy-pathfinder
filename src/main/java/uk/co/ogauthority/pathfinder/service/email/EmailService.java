@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.email;
 
-
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
+
 
 public interface EmailService {
 
@@ -11,6 +11,7 @@ public interface EmailService {
    * @param toEmailAddress The email address to send the email to
    */
   void sendEmail(EmailProperties emailProperties, String toEmailAddress);
+
 
   /**
    * Method to send an email to a single recipient.

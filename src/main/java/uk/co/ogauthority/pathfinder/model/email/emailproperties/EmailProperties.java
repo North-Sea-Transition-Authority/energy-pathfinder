@@ -25,6 +25,12 @@ public class EmailProperties {
     this.signOffIdentifier = DEFAULT_SIGN_OFF_IDENTIFIER;
   }
 
+  public EmailProperties(NotifyTemplate template, String recipientIdentifier) {
+    this.template = template;
+    this.recipientIdentifier = recipientIdentifier;
+    this.signOffIdentifier = DEFAULT_SIGN_OFF_IDENTIFIER;
+  }
+
   public EmailProperties(NotifyTemplate template, String recipientIdentifier, String signOffIdentifier) {
     this.template = template;
     this.recipientIdentifier = recipientIdentifier;

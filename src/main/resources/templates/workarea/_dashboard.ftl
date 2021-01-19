@@ -27,6 +27,15 @@
   <div class="dashboard-item">
     <h3 class="dashboard-item__heading">
       <@userAction.userAction userAction=dashboardItem.dashboardLink/>
+      <#if dashboardItem.updateRequested>
+        <@tag.tag tagClasses="govuk-tag--orange govuk-tag--float-right">
+          <#if dashboardItem.updateDeadlineDate?has_content>
+            Update due by ${dashboardItem.updateDeadlineDate}
+          <#else>
+            Update requested
+          </#if>
+        </@tag.tag>
+      </#if>
       <#if showOperator>
         <span class="govuk-caption-m">${dashboardItem.operatorName}</span>
       </#if>
