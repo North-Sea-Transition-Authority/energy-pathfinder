@@ -54,6 +54,48 @@ public class DashboardProjectItemViewTest {
   }
 
   @Test
+  public void from_allFieldsSetCorrectly_whenDraftAndFirstVersion() {
+    var dashboardProjectItem = DashboardProjectItemTestUtil.getDashboardProjectItem(ProjectStatus.DRAFT);
+    dashboardProjectItem.setVersion(1);
+
+    var expectedUrl = getTaskListUrl(dashboardProjectItem.getProjectId());
+
+    var view = DashboardProjectItemView.from(dashboardProjectItem);
+    var title = dashboardProjectItem.getProjectTitle();
+    var screenReaderText = String.format(DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
+
+    assertThat(view.getProjectTitle()).isEqualTo(title);
+    assertCommonFieldsMatch(dashboardProjectItem, view);
+    assertLinkMatches(
+        dashboardProjectItem,
+        DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText),
+        title,
+        expectedUrl
+    );
+  }
+
+  @Test
+  public void from_allFieldsSetCorrectly_whenDraftAndNotFirstVersion() {
+    var dashboardProjectItem = DashboardProjectItemTestUtil.getDashboardProjectItem(ProjectStatus.DRAFT);
+    dashboardProjectItem.setVersion(2);
+
+    var expectedUrl = getProjectManagementPageUrl(dashboardProjectItem.getProjectId());
+
+    var view = DashboardProjectItemView.from(dashboardProjectItem);
+    var title = dashboardProjectItem.getProjectTitle();
+    var screenReaderText = String.format(DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
+
+    assertThat(view.getProjectTitle()).isEqualTo(title);
+    assertCommonFieldsMatch(dashboardProjectItem, view);
+    assertLinkMatches(
+        dashboardProjectItem,
+        DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText),
+        title,
+        expectedUrl
+    );
+  }
+
+  @Test
   public void from_allFieldsSetCorrectly_whenQA() {
     var dashboardProjectItem = DashboardProjectItemTestUtil.getDashboardProjectItem(ProjectStatus.QA);
 

@@ -26,6 +26,8 @@ public class DashboardProjectItem {
   @Enumerated(EnumType.STRING)
   private ProjectStatus status;
 
+  private Integer version;
+
   private String projectTitle;
 
   @Enumerated(EnumType.STRING)
@@ -60,6 +62,10 @@ public class DashboardProjectItem {
 
   public ProjectStatus getStatus() {
     return status;
+  }
+
+  public Integer getVersion() {
+    return version;
   }
 
   public String getProjectTitle() {
@@ -108,6 +114,10 @@ public class DashboardProjectItem {
 
   public void setStatus(ProjectStatus status) {
     this.status = status;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
   }
 
   public void setProjectTitle(String projectTitle) {

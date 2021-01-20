@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.projectmanagement.action;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -10,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.projectarchive.ArchiveProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.OperatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
@@ -17,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateContextService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -24,6 +27,9 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OperatorActionServiceTest {
+
+  @Mock
+  private ProjectService projectService;
 
   @Mock
   private ProjectActionService projectActionService;
@@ -44,6 +50,7 @@ public class OperatorActionServiceTest {
   @Before
   public void setup() {
     operatorActionService = new OperatorActionService(
+        projectService,
         projectActionService,
         projectContextService,
         operatorProjectUpdateContextService
@@ -51,12 +58,27 @@ public class OperatorActionServiceTest {
   }
 
   @Test
-  public void getActions_whenCannotUpdate() {
+  public void getActions_whenCannotUpdateAndCannotResumeUpdate() {
     when(operatorProjectUpdateContextService.canBuildContext(projectDetail, authenticatedUser, OperatorUpdateController.class)).thenReturn(false);
 
     var actions = operatorActionService.getActions(projectDetail, authenticatedUser);
 
     assertThat(actions).isEmpty();
+  }
+
+  @Test
+  public void getActions_whenCannotUpdateAndCanResumeUpdate() {
+    var latestProjectDetail = ProjectUtil.getProjectDetails();
+
+    when(operatorProjectUpdateContextService.canBuildContext(projectDetail, authenticatedUser, OperatorUpdateController.class)).thenReturn(false);
+    when(projectService.getLatestDetailOrError(project.getId())).thenReturn(latestProjectDetail);
+    when(projectContextService.canBuildContext(latestProjectDetail, authenticatedUser, TaskListController.class)).thenReturn(true);
+
+    var actions = operatorActionService.getActions(projectDetail, authenticatedUser);
+
+    assertThat(actions).containsExactly(
+        operatorActionService.getResumeUpdateAction(project.getId())
+    );
   }
 
   @Test
