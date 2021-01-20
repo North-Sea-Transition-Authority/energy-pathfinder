@@ -25,29 +25,80 @@ public class ProjectAssessmentFormValidatorTest {
   }
 
   @Test
-  public void validate_whenValidForm_thenNoErrors() {
+  public void validate_whenNotReadyToBePublished_thenNoErrors() {
     var form = ProjectAssessmentTestUtil.createProjectAssessmentForm();
-    var errors = new BeanPropertyBindingResult(form, "form");
+    form.setReadyToBePublished(false);
 
-    ValidationUtils.invokeValidator(projectAssessmentFormValidator, form, errors);
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectAssessmentValidationHint = new ProjectAssessmentValidationHint(true);
+
+    ValidationUtils.invokeValidator(projectAssessmentFormValidator, form, errors, projectAssessmentValidationHint);
 
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     assertThat(fieldErrors).isEmpty();
   }
 
   @Test
-  public void validate_whenReadyToBePublishedAndUpdateRequiredMissing_thenError() {
+  public void validate_whenReadyToBePublishedAndCanRequestUpdateAndUpdateRequiredNull_thenError() {
     var form = ProjectAssessmentTestUtil.createProjectAssessmentForm();
     form.setReadyToBePublished(true);
     form.setUpdateRequired(null);
 
     var errors = new BeanPropertyBindingResult(form, "form");
+    var projectAssessmentValidationHint = new ProjectAssessmentValidationHint(true);
 
-    ValidationUtils.invokeValidator(projectAssessmentFormValidator, form, errors);
+    ValidationUtils.invokeValidator(projectAssessmentFormValidator, form, errors, projectAssessmentValidationHint);
 
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     assertThat(fieldErrors).containsExactly(
         entry("updateRequired", Set.of("updateRequired" + FieldValidationErrorCodes.INVALID.getCode()))
     );
+  }
+
+  @Test
+  public void validate_whenReadyToBePublishedAndCanRequestUpdateAndUpdateRequiredNotNull_thenNoErrors() {
+    var form = ProjectAssessmentTestUtil.createProjectAssessmentForm();
+    form.setReadyToBePublished(true);
+    form.setUpdateRequired(false);
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectAssessmentValidationHint = new ProjectAssessmentValidationHint(true);
+
+    ValidationUtils.invokeValidator(projectAssessmentFormValidator, form, errors, projectAssessmentValidationHint);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    assertThat(fieldErrors).isEmpty();
+  }
+
+  @Test
+  public void validate_whenReadyToBePublishedAndCannotRequestUpdateAndUpdateRequiredNotNull_thenError() {
+    var form = ProjectAssessmentTestUtil.createProjectAssessmentForm();
+    form.setReadyToBePublished(true);
+    form.setUpdateRequired(true);
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectAssessmentValidationHint = new ProjectAssessmentValidationHint(false);
+
+    ValidationUtils.invokeValidator(projectAssessmentFormValidator, form, errors, projectAssessmentValidationHint);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    assertThat(fieldErrors).containsExactly(
+        entry("updateRequired", Set.of("updateRequired" + FieldValidationErrorCodes.INVALID.getCode()))
+    );
+  }
+
+  @Test
+  public void validate_whenReadyToBePublishedAndCannotRequestUpdateAndUpdateRequiredNull_thenNoErrors() {
+    var form = ProjectAssessmentTestUtil.createProjectAssessmentForm();
+    form.setReadyToBePublished(true);
+    form.setUpdateRequired(null);
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectAssessmentValidationHint = new ProjectAssessmentValidationHint(false);
+
+    ValidationUtils.invokeValidator(projectAssessmentFormValidator, form, errors, projectAssessmentValidationHint);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    assertThat(fieldErrors).isEmpty();
   }
 }

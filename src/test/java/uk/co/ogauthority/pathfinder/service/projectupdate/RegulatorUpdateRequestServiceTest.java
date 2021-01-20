@@ -42,6 +42,9 @@ public class RegulatorUpdateRequestServiceTest {
   private RegulatorUpdateRequestRepository regulatorUpdateRequestRepository;
 
   @Mock
+  private ProjectUpdateService projectUpdateService;
+
+  @Mock
   private ProjectHeaderSummaryService projectHeaderSummaryService;
 
   @Mock
@@ -64,6 +67,7 @@ public class RegulatorUpdateRequestServiceTest {
   public void setup() {
     regulatorUpdateRequestService = new RegulatorUpdateRequestService(
         regulatorUpdateRequestRepository,
+        projectUpdateService,
         projectHeaderSummaryService,
         requestUpdateFormValidator,
         validationService,
@@ -129,6 +133,28 @@ public class RegulatorUpdateRequestServiceTest {
     when(regulatorUpdateRequestRepository.findByProjectDetail(projectDetail)).thenReturn(Optional.empty());
 
     assertThat(regulatorUpdateRequestService.getUpdateRequest(projectDetail)).isEmpty();
+  }
+
+  @Test
+  public void canRequestUpdate_whenUpdateInProgress_thenFalse() {
+    when(projectUpdateService.isUpdateInProgress(project)).thenReturn(true);
+
+    assertThat(regulatorUpdateRequestService.canRequestUpdate(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void canRequestUpdate_whenUpdateRequested_thenFalse() {
+    when(regulatorUpdateRequestRepository.existsByProjectDetail(projectDetail)).thenReturn(true);
+
+    assertThat(regulatorUpdateRequestService.canRequestUpdate(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void canRequestUpdate_whenUpdateNotInProgressAndUpdateNotRequested_thenTrue() {
+    when(projectUpdateService.isUpdateInProgress(project)).thenReturn(false);
+    when(regulatorUpdateRequestRepository.existsByProjectDetail(projectDetail)).thenReturn(false);
+
+    assertThat(regulatorUpdateRequestService.canRequestUpdate(projectDetail)).isTrue();
   }
 
   @Test
