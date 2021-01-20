@@ -69,7 +69,7 @@ public class ProjectManagementViewService {
         .collect(Collectors.toMap(
             projectVersionDto -> Integer.toString(projectVersionDto.getVersion()),
             projectVersionDto -> String.format(
-                "(%s) Submitted: %s",
+                "(%s) Submitted: %s" + (projectVersionDto.isNoUpdate() ? " (No change)" : ""),
                 projectVersionDto.getVersion(),
                 DateUtil.formatInstant(projectVersionDto.getSubmittedInstant())
             ),

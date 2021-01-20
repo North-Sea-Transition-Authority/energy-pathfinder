@@ -8,9 +8,12 @@ public class ProjectVersionDto {
 
   private final Instant submittedInstant;
 
-  public ProjectVersionDto(int version, Instant submittedInstant) {
+  private final boolean noUpdate;
+
+  public ProjectVersionDto(int version, Instant submittedInstant, boolean noUpdate) {
     this.version = version;
     this.submittedInstant = submittedInstant;
+    this.noUpdate = noUpdate;
   }
 
   public int getVersion() {
@@ -19,5 +22,9 @@ public class ProjectVersionDto {
 
   public Instant getSubmittedInstant() {
     return submittedInstant;
+  }
+
+  public boolean isNoUpdate() {
+    return noUpdate;
   }
 }
