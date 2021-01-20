@@ -13,7 +13,7 @@ public class ProjectAssessmentFormValidator implements SmartValidator {
 
   public static final String MISSING_UPDATE_REQUIRED_ERROR = "Select yes if the project requires an update";
   public static final String CANNOT_PROVIDE_UPDATE_REQUIRED_ERROR
-      = "Cannot provide value for update required when an update is already in progress";
+      = "Cannot request an update when an update is already in progress";
 
   @Override
   public void validate(Object target, Errors errors, Object... validationHints) {
