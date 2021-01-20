@@ -16,6 +16,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
+import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
@@ -142,6 +143,7 @@ public class WorkAreaServiceTest {
         entry("dashboardProjectItemViews", dashboardProjectItemViews),
         entry("startProjectButton", link),
         entry("filterType", filterType),
+        entry("clearFilterUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkAreaClearFilter(null, null))),
         entry("resultSize", dashboardProjectItemViews.size()),
         entry("form", form),
         entry("statuses", ProjectStatus.getAllAsMap()),

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
+import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
@@ -38,6 +39,7 @@ public class WorkAreaService {
     return new ModelAndView(WORK_AREA_TEMPLATE_PATH)
         .addObject("startProjectButton", getStartProjectLinkButton(user))
         .addObject("filterType", filterType)
+        .addObject("clearFilterUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkAreaClearFilter(null, null)))
         .addObject("form", form)
         .addObject("statuses", ProjectStatus.getAllAsMap())
         .addObject("fieldStages", FieldStage.getAllAsMap())

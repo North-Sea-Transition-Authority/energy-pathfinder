@@ -1,8 +1,8 @@
 <#include '../layout.ftl'/>
 
-<#macro dashboardFilters filterType="">
+<#macro dashboardFilters clearFilterUrl filterType="">
   <@fdsSearch.searchFilter>
-    <@fdsSearch.searchFilterList filterButtonItemText="projects">
+    <@fdsSearch.searchFilterList filterButtonItemText="projects" clearFilterUrl=springUrl(clearFilterUrl)>
       <#if filterType == "REGULATOR">
         <@regulatorFilters/>
       <#else>

@@ -4,11 +4,11 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
@@ -48,10 +48,10 @@ public class WorkAreaController {
   @GetMapping("/work-area/clear-filter")
   public ModelAndView getWorkAreaClearFilter(
       AuthenticatedUserAccount user,
-      SessionStatus status
+      @ModelAttribute("dashboardFilter") DashboardFilter filter
   ) {
-    status.setComplete();//Allow cleanup of session attributes
-    return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(user, getDefaultFilter(user)));
+    filter.clearFilter();
+    return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(user, null));
   }
 
   @ModelAttribute("dashboardFilter")

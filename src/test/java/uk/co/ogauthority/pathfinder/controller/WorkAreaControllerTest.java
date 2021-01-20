@@ -97,6 +97,17 @@ public class WorkAreaControllerTest extends AbstractControllerTest {
   }
 
   @Test
+  public void getWorkAreaClearFilter() throws Exception {
+    var session = mockMvc.perform(get(ReverseRouter.route(on(WorkAreaController.class).getWorkAreaClearFilter(authenticatedUser, null)))
+        .with(authenticatedUserAndSession(authenticatedUser))
+        .sessionAttr("dashboardFilter", new DashboardFilter(List.of(ProjectStatus.DRAFT))))
+        .andExpect(status().is3xxRedirection())
+        .andReturn().getRequest().getSession();
+
+    assertThat(session.getAttribute("dashboardFilter")).isEqualTo(new DashboardFilter());
+  }
+
+  @Test
   public void filterPreferences_setInModel() throws Exception {
     var filter = new DashboardFilter();
     filter.setProjectTitle(TITLE);
