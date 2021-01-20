@@ -10,6 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
+import uk.co.ogauthority.pathfinder.model.dto.project.ProjectVersionDto;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagementPageSectionType;
 import uk.co.ogauthority.pathfinder.model.form.projectmanagement.ProjectManagementForm;
@@ -68,11 +69,7 @@ public class ProjectManagementViewService {
         .stream()
         .collect(Collectors.toMap(
             projectVersionDto -> Integer.toString(projectVersionDto.getVersion()),
-            projectVersionDto -> String.format(
-                "(%s) Submitted: %s",
-                projectVersionDto.getVersion(),
-                DateUtil.formatInstant(projectVersionDto.getSubmittedInstant())
-            ),
+            this::getViewableVersionDescription,
             (x, y) -> y,
             LinkedHashMap::new));
 
@@ -86,5 +83,14 @@ public class ProjectManagementViewService {
         .addObject("form", form)
         .addObject("viewVersionUrl", ReverseRouter.route(on(ManageProjectController.class)
             .updateProjectVersion(project.getId(), null, null, null)));
+  }
+
+  String getViewableVersionDescription(ProjectVersionDto projectVersionDto) {
+    return String.format(
+        "(%s) Submitted: %s %s",
+        projectVersionDto.getVersion(),
+        DateUtil.formatInstant(projectVersionDto.getSubmittedInstant()),
+        (projectVersionDto.isNoUpdate() ? " (No change)" : "")
+    );
   }
 }

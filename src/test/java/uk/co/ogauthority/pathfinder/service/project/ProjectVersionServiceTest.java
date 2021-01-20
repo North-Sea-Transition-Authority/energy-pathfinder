@@ -38,8 +38,8 @@ public class ProjectVersionServiceTest {
   @Test
   public void getSubmittedProjectVersionDtos() {
     var projectVersionDtos = List.of(
-        new ProjectVersionDto(1, Instant.now()),
-        new ProjectVersionDto(2, Instant.now())
+        new ProjectVersionDto(1, Instant.now(), false),
+        new ProjectVersionDto(2, Instant.now(), true)
     );
 
     when(projectDetailsRepository.getSubmittedProjectVersionDtos(PROJECT_ID)).thenReturn(projectVersionDtos);

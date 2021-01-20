@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.projectupdate;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,6 +96,10 @@ public class OperatorProjectUpdateService {
     );
 
     return noUpdateNotification;
+  }
+
+  public Optional<NoUpdateNotification> getNoUpdateNotificationByUpdateToDetail(ProjectDetail projectDetail) {
+    return noUpdateNotificationRepository.findByProjectUpdate_ToDetail(projectDetail);
   }
 
   public ModelAndView getProjectUpdateModelAndView(Integer projectId) {

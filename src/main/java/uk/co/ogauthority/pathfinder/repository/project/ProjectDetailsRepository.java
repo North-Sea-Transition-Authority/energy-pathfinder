@@ -43,8 +43,11 @@ public interface ProjectDetailsRepository extends CrudRepository<ProjectDetail, 
   @Query("SELECT new uk.co.ogauthority.pathfinder.model.dto.project.ProjectVersionDto(" +
          "  pd.version" +
          ", pd.submittedInstant" +
+         ", CASE WHEN nun IS NOT NULL THEN TRUE ELSE false END" +
          ") " +
          "FROM ProjectDetail pd " +
+         "LEFT JOIN ProjectUpdate pu ON pu.toDetail = pd " +
+         "LEFT JOIN NoUpdateNotification nun ON nun.projectUpdate = pu " +
          "WHERE pd.project.id = :projectId " +
          "AND pd.status IN(" +
          "  uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus.QA" +

@@ -186,6 +186,22 @@ public class OperatorProjectUpdateServiceTest {
   }
 
   @Test
+  public void getNoUpdateNotificationByUpdateToDetail_whenFound_thenReturn() {
+    var noUpdateNotification = new NoUpdateNotification();
+
+    when(noUpdateNotificationRepository.findByProjectUpdate_ToDetail(projectDetail)).thenReturn(Optional.of(noUpdateNotification));
+
+    assertThat(operatorProjectUpdateService.getNoUpdateNotificationByUpdateToDetail(projectDetail)).contains(noUpdateNotification);
+  }
+
+  @Test
+  public void getNoUpdateNotificationByUpdateToDetail_whenFound_thenEmptyOptionalReturned() {
+    when(noUpdateNotificationRepository.findByProjectUpdate_ToDetail(projectDetail)).thenReturn(Optional.empty());
+
+    assertThat(operatorProjectUpdateService.getNoUpdateNotificationByUpdateToDetail(projectDetail)).isEmpty();
+  }
+
+  @Test
   public void getProjectUpdateModelAndView() {
     var modelAndView = operatorProjectUpdateService.getProjectUpdateModelAndView(PROJECT_ID);
 
