@@ -1,13 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.view.dashboard;
 
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-
-import java.time.Instant;
-import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
-import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
 import uk.co.ogauthority.pathfinder.model.form.useraction.DashboardLink;
-import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
@@ -66,15 +61,15 @@ public class DashboardProjectItemView {
     switch (status) {
       case DRAFT:
         if (dashboardProjectItem.getVersion() == 1) {
-          url = ReverseRouter.route(on(TaskListController.class).viewTaskList(dashboardProjectItem.getProjectId(), null));
+          url = ControllerUtils.getBackToTaskListUrl(dashboardProjectItem.getProjectId());
         } else {
-          url = ReverseRouter.route(on(ManageProjectController.class).getProject(dashboardProjectItem.getProjectId(), null, null, null));
+          url = ControllerUtils.getProjectManagementUrl(dashboardProjectItem.getProjectId());
         }
         break;
       case QA:
       case ARCHIVED:
       case PUBLISHED:
-        url = ReverseRouter.route(on(ManageProjectController.class).getProject(dashboardProjectItem.getProjectId(), null, null, null));
+        url = ControllerUtils.getProjectManagementUrl(dashboardProjectItem.getProjectId());
         break;
       default:
         throw new IllegalStateException(String.format("Project with id %s has unsupported status %s",
