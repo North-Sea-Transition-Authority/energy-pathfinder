@@ -27,6 +27,7 @@ import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContext;
 import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequestService;
 
 @Controller
 @ProjectStatusCheck(
@@ -40,12 +41,15 @@ public class ProjectAssessmentController extends ProjectFormPageController {
   public static final String PAGE_NAME = "Project assessment";
 
   private final ProjectAssessmentService projectAssessmentService;
+  private final RegulatorUpdateRequestService regulatorUpdateRequestService;
 
   public ProjectAssessmentController(BreadcrumbService breadcrumbService,
                                      ControllerHelperService controllerHelperService,
-                                     ProjectAssessmentService projectAssessmentService) {
+                                     ProjectAssessmentService projectAssessmentService,
+                                     RegulatorUpdateRequestService regulatorUpdateRequestService) {
     super(breadcrumbService, controllerHelperService);
     this.projectAssessmentService = projectAssessmentService;
+    this.regulatorUpdateRequestService = regulatorUpdateRequestService;
   }
 
   @GetMapping
@@ -65,15 +69,17 @@ public class ProjectAssessmentController extends ProjectFormPageController {
                                               BindingResult bindingResult,
                                               ProjectAssessmentContext projectAssessmentContext,
                                               AuthenticatedUserAccount user) {
-    bindingResult = projectAssessmentService.validate(form, bindingResult);
+    var projectDetail = projectAssessmentContext.getProjectDetails();
+    bindingResult = projectAssessmentService.validate(form, bindingResult, projectDetail);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        projectAssessmentService.getProjectAssessmentModelAndView(projectAssessmentContext.getProjectDetails(), user, form),
+        projectAssessmentService.getProjectAssessmentModelAndView(projectDetail, user, form),
         form,
         () -> {
-          projectAssessmentService.createProjectAssessment(projectAssessmentContext.getProjectDetails(), user, form);
+          projectAssessmentService.createProjectAssessment(projectDetail, user, form);
 
-          if (!BooleanUtils.isTrue(form.getReadyToBePublished()) || BooleanUtils.isTrue(form.getUpdateRequired())) {
+          if ((!BooleanUtils.isTrue(form.getReadyToBePublished()) || BooleanUtils.isTrue(form.getUpdateRequired()))
+              && regulatorUpdateRequestService.canRequestUpdate(projectDetail)) {
             return ReverseRouter.redirect(on(RegulatorUpdateController.class).getRequestUpdate(projectId, null, null));
           }
           return ReverseRouter.redirect(on(ManageProjectController.class).getProject(projectId, null, null, null));

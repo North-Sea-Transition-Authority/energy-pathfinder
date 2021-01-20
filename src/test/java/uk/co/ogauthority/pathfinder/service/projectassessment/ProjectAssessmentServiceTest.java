@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.projectassessment;
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -25,11 +26,13 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.projectassessment.ProjectQuality;
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentForm;
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentFormValidator;
+import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentValidationHint;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectassessment.ProjectAssessmentRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.projectpublishing.ProjectPublishingService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequestService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectAssessmentTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -51,6 +54,9 @@ public class ProjectAssessmentServiceTest {
   private BreadcrumbService breadcrumbService;
 
   @Mock
+  private RegulatorUpdateRequestService regulatorUpdateRequestService;
+
+  @Mock
   private ProjectPublishingService projectPublishingService;
 
   @Mock
@@ -68,6 +74,7 @@ public class ProjectAssessmentServiceTest {
         validationService,
         projectAssessmentFormValidator,
         breadcrumbService,
+        regulatorUpdateRequestService,
         projectPublishingService,
         projectHeaderSummaryService
     );
@@ -165,18 +172,19 @@ public class ProjectAssessmentServiceTest {
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
-    projectAssessmentService.validate(form, bindingResult);
+    projectAssessmentService.validate(form, bindingResult, projectDetail);
 
-    verify(projectAssessmentFormValidator, times(1)).validate(form, bindingResult);
+    verify(projectAssessmentFormValidator, times(1)).validate(eq(form), eq(bindingResult), any(ProjectAssessmentValidationHint.class));
     verify(validationService, times(1)).validate(form, bindingResult, ValidationType.FULL);
   }
 
   @Test
-  public void getProjectAssessmentModelAndView() {
+  public void getProjectAssessmentModelAndView_whenCanRequestUpdate() {
     var projectId = projectDetail.getProject().getId();
     var projectHeaderHtml = "html";
 
     when(projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, authenticatedUser)).thenReturn(projectHeaderHtml);
+    when(regulatorUpdateRequestService.canRequestUpdate(projectDetail)).thenReturn(true);
 
     var form = new ProjectAssessmentForm();
 
@@ -185,6 +193,30 @@ public class ProjectAssessmentServiceTest {
     assertThat(modelAndView.getModel()).containsExactly(
         entry("pageName", ProjectAssessmentController.PAGE_NAME),
         entry("projectHeaderHtml", projectHeaderHtml),
+        entry("canRequestUpdate", true),
+        entry("form", form),
+        entry("projectQualities", ProjectQuality.getAllAsMap()),
+        entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)))
+    );
+    verify(breadcrumbService, times(1)).fromManageProject(projectId, modelAndView, ProjectAssessmentController.PAGE_NAME);
+  }
+
+  @Test
+  public void getProjectAssessmentModelAndView_whenCanNotRequestUpdate() {
+    var projectId = projectDetail.getProject().getId();
+    var projectHeaderHtml = "html";
+
+    when(projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, authenticatedUser)).thenReturn(projectHeaderHtml);
+    when(regulatorUpdateRequestService.canRequestUpdate(projectDetail)).thenReturn(false);
+
+    var form = new ProjectAssessmentForm();
+
+    var modelAndView = projectAssessmentService.getProjectAssessmentModelAndView(projectDetail, authenticatedUser, form);
+
+    assertThat(modelAndView.getModel()).containsExactly(
+        entry("pageName", ProjectAssessmentController.PAGE_NAME),
+        entry("projectHeaderHtml", projectHeaderHtml),
+        entry("canRequestUpdate", false),
         entry("form", form),
         entry("projectQualities", ProjectQuality.getAllAsMap()),
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)))

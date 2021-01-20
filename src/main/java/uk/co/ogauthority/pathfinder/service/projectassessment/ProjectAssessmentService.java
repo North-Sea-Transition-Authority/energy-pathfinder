@@ -18,11 +18,13 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.projectassessment.ProjectQuality;
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentForm;
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentFormValidator;
+import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentValidationHint;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectassessment.ProjectAssessmentRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.projectpublishing.ProjectPublishingService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequestService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
@@ -32,6 +34,7 @@ public class ProjectAssessmentService {
   private final ValidationService validationService;
   private final ProjectAssessmentFormValidator projectAssessmentFormValidator;
   private final BreadcrumbService breadcrumbService;
+  private final RegulatorUpdateRequestService regulatorUpdateRequestService;
   private final ProjectPublishingService projectPublishingService;
   private final ProjectHeaderSummaryService projectHeaderSummaryService;
 
@@ -40,12 +43,14 @@ public class ProjectAssessmentService {
                                   ValidationService validationService,
                                   ProjectAssessmentFormValidator projectAssessmentFormValidator,
                                   BreadcrumbService breadcrumbService,
+                                  RegulatorUpdateRequestService regulatorUpdateRequestService,
                                   ProjectPublishingService projectPublishingService,
                                   ProjectHeaderSummaryService projectHeaderSummaryService) {
     this.projectAssessmentRepository = projectAssessmentRepository;
     this.validationService = validationService;
     this.projectAssessmentFormValidator = projectAssessmentFormValidator;
     this.breadcrumbService = breadcrumbService;
+    this.regulatorUpdateRequestService = regulatorUpdateRequestService;
     this.projectPublishingService = projectPublishingService;
     this.projectHeaderSummaryService = projectHeaderSummaryService;
   }
@@ -76,8 +81,12 @@ public class ProjectAssessmentService {
     return getProjectAssessment(projectDetail).isPresent();
   }
 
-  public BindingResult validate(ProjectAssessmentForm form, BindingResult bindingResult) {
-    projectAssessmentFormValidator.validate(form, bindingResult);
+  public BindingResult validate(ProjectAssessmentForm form, BindingResult bindingResult, ProjectDetail projectDetail) {
+    projectAssessmentFormValidator.validate(
+        form,
+        bindingResult,
+        new ProjectAssessmentValidationHint(regulatorUpdateRequestService.canRequestUpdate(projectDetail))
+    );
     return validationService.validate(form, bindingResult, ValidationType.FULL);
   }
 
@@ -88,6 +97,7 @@ public class ProjectAssessmentService {
     var modelAndView = new ModelAndView("projectassessment/projectAssessment")
         .addObject("pageName", ProjectAssessmentController.PAGE_NAME)
         .addObject("projectHeaderHtml", projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, user))
+        .addObject("canRequestUpdate", regulatorUpdateRequestService.canRequestUpdate(projectDetail))
         .addObject("form", form)
         .addObject("projectQualities", ProjectQuality.getAllAsMap())
         .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)));

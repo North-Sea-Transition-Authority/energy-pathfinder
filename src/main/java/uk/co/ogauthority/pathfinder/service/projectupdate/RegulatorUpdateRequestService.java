@@ -30,6 +30,7 @@ public class RegulatorUpdateRequestService {
   public static final String REQUEST_UPDATE_TEMPLATE_PATH = "projectupdate/requestUpdate";
 
   private final RegulatorUpdateRequestRepository regulatorUpdateRequestRepository;
+  private final ProjectUpdateService projectUpdateService;
   private final ProjectHeaderSummaryService projectHeaderSummaryService;
   private final RequestUpdateFormValidator requestUpdateFormValidator;
   private final ValidationService validationService;
@@ -38,11 +39,13 @@ public class RegulatorUpdateRequestService {
   @Autowired
   public RegulatorUpdateRequestService(
       RegulatorUpdateRequestRepository regulatorUpdateRequestRepository,
+      ProjectUpdateService projectUpdateService,
       ProjectHeaderSummaryService projectHeaderSummaryService,
       RequestUpdateFormValidator requestUpdateFormValidator,
       ValidationService validationService,
       BreadcrumbService breadcrumbService) {
     this.regulatorUpdateRequestRepository = regulatorUpdateRequestRepository;
+    this.projectUpdateService = projectUpdateService;
     this.projectHeaderSummaryService = projectHeaderSummaryService;
     this.requestUpdateFormValidator = requestUpdateFormValidator;
     this.validationService = validationService;
@@ -74,6 +77,11 @@ public class RegulatorUpdateRequestService {
 
   public Optional<RegulatorUpdateRequest> getUpdateRequest(ProjectDetail projectDetail) {
     return regulatorUpdateRequestRepository.findByProjectDetail(projectDetail);
+  }
+
+  public boolean canRequestUpdate(ProjectDetail projectDetail) {
+    return !projectUpdateService.isUpdateInProgress(projectDetail.getProject())
+        && !hasUpdateBeenRequested(projectDetail);
   }
 
   public ModelAndView getRequestUpdateModelAndView(ProjectDetail projectDetail,AuthenticatedUserAccount user, RequestUpdateForm form) {

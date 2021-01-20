@@ -1,27 +1,49 @@
 package uk.co.ogauthority.pathfinder.model.form.projectassessment;
 
+import java.util.Arrays;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
 import org.springframework.validation.ValidationUtils;
+import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
 
 @Component
 public class ProjectAssessmentFormValidator implements SmartValidator {
 
   public static final String MISSING_UPDATE_REQUIRED_ERROR = "Select yes if the project requires an update";
+  public static final String CANNOT_PROVIDE_UPDATE_REQUIRED_ERROR
+      = "Cannot request an update when an update is already in progress";
 
   @Override
   public void validate(Object target, Errors errors, Object... validationHints) {
     var form = (ProjectAssessmentForm) target;
 
+    ProjectAssessmentValidationHint projectAssessmentValidationHint = Arrays.stream(validationHints)
+        .filter(hint -> hint.getClass().equals(ProjectAssessmentValidationHint.class))
+        .map(ProjectAssessmentValidationHint.class::cast)
+        .findFirst()
+        .orElseThrow(
+            () -> new ActionNotAllowedException("Expected ProjectAssessmentValidationHint to be provided")
+        );
+
     if (BooleanUtils.isTrue(form.getReadyToBePublished())) {
-      ValidationUtils.rejectIfEmptyOrWhitespace(
-          errors,
-          "updateRequired",
-          "updateRequired.invalid",
-          MISSING_UPDATE_REQUIRED_ERROR
-      );
+      if (projectAssessmentValidationHint.isCanRequestUpdate()) {
+        ValidationUtils.rejectIfEmptyOrWhitespace(
+            errors,
+            "updateRequired",
+            "updateRequired.invalid",
+            MISSING_UPDATE_REQUIRED_ERROR
+        );
+      } else {
+        if (form.getUpdateRequired() != null) {
+          errors.rejectValue(
+              "updateRequired",
+              "updateRequired.invalid",
+              CANNOT_PROVIDE_UPDATE_REQUIRED_ERROR
+          );
+        }
+      }
     }
   }
 
