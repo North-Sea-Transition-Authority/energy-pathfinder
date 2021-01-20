@@ -30,6 +30,8 @@ import uk.co.ogauthority.pathfinder.model.enums.scheduler.ReminderType;
 public class PathfinderReminderScheduler implements ReminderScheduler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PathfinderReminderScheduler.class);
+  public static final String JOB_NAME_SUFFIX = "_JOB_";
+  public static final String TRIGGER_NAME_SUFFIX = "_TR_";
   private final Scheduler scheduler;
 
   @Autowired
@@ -66,7 +68,7 @@ public class PathfinderReminderScheduler implements ReminderScheduler {
   @Override
   public void scheduleReminder(ProjectDetail detail, ReminderType reminderType, Class<? extends Job> jobClass,
                                LocalDateTime localDateTime) throws SchedulerException {
-    //TODO Same as above but with relative date call to getFirstTriggerDateTime
+    //TODO PAT-242/243 Same as above but with relative date call to getFirstTriggerDateTime
   }
 
   @Override
@@ -76,7 +78,7 @@ public class PathfinderReminderScheduler implements ReminderScheduler {
     // This allows some investigation of failed jobs after the fact instead of removing all traces
     scheduler.unscheduleJobs(triggerKeys);
     LOGGER.info(
-        "Unscheduled jobs for notification with id: {} and trigger group: {}",
+        "Unscheduled jobs for project with id: {} and trigger group: {}",
         detail.getProject().getId(),
         reminderType.getTriggerGroupName()
     );
@@ -84,22 +86,27 @@ public class PathfinderReminderScheduler implements ReminderScheduler {
 
   @Override
   public TriggerKey createTriggerKey(ProjectDetail detail, ReminderType reminderType) {
-    return new TriggerKey(reminderType.getTriggerNamePrefix() + detail.getProject().getId(), reminderType.getTriggerGroupName());
+    return new TriggerKey(
+        String.format("%S%S%S", reminderType.getTriggerNamePrefix(), TRIGGER_NAME_SUFFIX, detail.getProject().getId()),
+        reminderType.getTriggerGroupName()
+    );
   }
 
   @Override
   public JobKey createJobKey(ProjectDetail detail, ReminderType reminderType) {
-    return new JobKey(reminderType.getJobNamePrefix() + detail.getProject().getId(), reminderType.getJobGroupName());
+    return new JobKey(
+        String.format("%S%S%S", reminderType.getJobNamePrefix(), JOB_NAME_SUFFIX, detail.getProject().getId()),
+        reminderType.getJobGroupName()
+    );
   }
 
-  private ZonedDateTime getFirstTriggerDateTime(ReminderType reminderType) {
+  ZonedDateTime getFirstTriggerDateTime(ReminderType reminderType) {
     var reminderOffset = reminderType.getReminderOffset();
     var scheduledDateTime = LocalDateTime.now();
     scheduledDateTime = reminderOffset.getReminderOffsetType().equals(ReminderOffsetType.PLUS)
         ? scheduledDateTime.plus(reminderOffset.getNumberOfUnits(), reminderOffset.getUnits())
         : scheduledDateTime.minus(reminderOffset.getNumberOfUnits(), reminderOffset.getUnits());
 
-    int currentYear = LocalDateTime.now().getYear();
     return ZonedDateTime.ofLocal(
         LocalDateTime.of(
             scheduledDateTime.getYear(),

@@ -20,11 +20,15 @@ public class RegulatorUpdateRequestReminderJob extends QuartzJobBean {
 
   @Override
   protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+    var projectId = context.getJobDetail().getJobDataMap().getInt("projectId");
     try {
-      var projectId = context.getJobDetail().getJobDataMap().getInt("projectId");
       executeJob(projectId);
     } catch (Exception e) {
-      LOGGER.error("Regulator update request reminder Job execution failed", e);
+      LOGGER.error(
+          "Regulator update request reminder Job execution failed for project with id: {}",
+          projectId,
+          e
+      );
       throw new JobExecutionException(e);
     }
   }

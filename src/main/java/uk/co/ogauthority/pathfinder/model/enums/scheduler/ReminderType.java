@@ -4,15 +4,15 @@ import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdater
 
 public enum ReminderType {
   REGULATOR_UPDATE_REQUEST_DEADLINE_REMINDER(
-      "REG_UPDATE_DEADLINE_TR_",
-      "REG_UPDATE_DEADLINE_JOB_",
+      "REG_UPDATE_DEADLINE",
+      "REG_UPDATE_DEADLINE",
       RegulatorUpdateRequestReminderService.JOB_GROUP_NAME,
       RegulatorUpdateRequestReminderService.TRIGGER_GROUP_NAME,
       ReminderOffset.ONE_WEEK_FROM_DATE
   ),
   REGULATOR_UPDATE_REQUEST_AFTER_DEADLINE_REMINDER(
-      "REG_UPDATE_AFTER_DEADLINE_TR_",
-      "REG_UPDATE_AFTER_DEADLINE_JOB_",
+      "REG_UPDATE_AFTER_DEADLINE",
+      "REG_UPDATE_AFTER_DEADLINE",
       RegulatorUpdateRequestReminderService.JOB_GROUP_NAME,
       RegulatorUpdateRequestReminderService.TRIGGER_GROUP_NAME,
       ReminderOffset.ONE_DAY_FROM_DATE
