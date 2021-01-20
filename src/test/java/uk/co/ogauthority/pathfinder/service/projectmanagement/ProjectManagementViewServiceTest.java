@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import org.junit.Before;
@@ -13,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.model.dto.project.ProjectVersionDto;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagementPageSectionType;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementSection;
@@ -22,6 +24,7 @@ import uk.co.ogauthority.pathfinder.service.project.ProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.rendering.TemplateRenderingService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
+import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectManagementViewServiceTest {
@@ -73,5 +76,21 @@ public class ProjectManagementViewServiceTest {
     var projectManagementView = (ProjectManagementView) modelAndView.getModel().get("projectManagementView");
     assertThat(projectManagementView.getStaticContentHtml()).isEqualTo(stubRender);
     assertThat(projectManagementView.getVersionContentHtml()).isEqualTo(stubRender + stubRender);
+  }
+
+  @Test
+  public void getViewableVersionDescription_noChange() {
+    var now = Instant.now();
+    var dto = new ProjectVersionDto(2, now, true);
+    var desc = projectManagementViewService.getViewableVersionDescription(dto);
+    assertThat(desc).isEqualTo(String.format("(%s) Submitted: %s %s", dto.getVersion(), DateUtil.formatInstant(dto.getSubmittedInstant()), " (No change)"));
+  }
+
+  @Test
+  public void getViewableVersionDescription_regularUpdate() {
+    var now = Instant.now();
+    var dto = new ProjectVersionDto(2, now, false);
+    var desc = projectManagementViewService.getViewableVersionDescription(dto);
+    assertThat(desc).isEqualTo(String.format("(%s) Submitted: %s %s", dto.getVersion(), DateUtil.formatInstant(dto.getSubmittedInstant()), ""));
   }
 }

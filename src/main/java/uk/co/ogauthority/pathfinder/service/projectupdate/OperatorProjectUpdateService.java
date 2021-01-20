@@ -99,7 +99,7 @@ public class OperatorProjectUpdateService {
   }
 
   public Optional<NoUpdateNotification> getNoUpdateNotificationByUpdateToDetail(ProjectDetail projectDetail) {
-    return noUpdateNotificationRepository.findByUpdateToDetail(projectDetail);
+    return noUpdateNotificationRepository.findByProjectUpdate_ToDetail(projectDetail);
   }
 
   public ModelAndView getProjectUpdateModelAndView(Integer projectId) {
