@@ -40,6 +40,15 @@ public class DashboardFilter implements Serializable {
     this.projectStatusList = form.getProjectStatusList();
   }
 
+  public void clearFilter() {
+    operatorName = null;
+    projectTitle = null;
+    field = null;
+    fieldStages = null;
+    ukcsAreas = null;
+    projectStatusList = null;
+  }
+
   public String getOperatorName() {
     return operatorName;
   }

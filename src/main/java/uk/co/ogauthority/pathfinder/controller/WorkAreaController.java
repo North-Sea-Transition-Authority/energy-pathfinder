@@ -48,11 +48,9 @@ public class WorkAreaController {
   @GetMapping("/work-area/clear-filter")
   public ModelAndView getWorkAreaClearFilter(
       AuthenticatedUserAccount user,
-      Model model
+      @ModelAttribute("dashboardFilter") DashboardFilter filter
   ) {
-    // Set the filter in the model to an empty filter to avoid getDefaultFilter
-    // being called when dashboard filter is not present in the model
-    model.addAttribute("dashboardFilter", new DashboardFilter());
+    filter.clearFilter();
     return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(user, null));
   }
 
