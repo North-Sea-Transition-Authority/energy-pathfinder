@@ -8,7 +8,7 @@
   </#if>
   <#if tenderViews?has_content>
     <#list tenderViews as view>
-      <@tenderSummary.upcomingTenderSummary view=view showHeader=true showActions=true showTag=false />
+      <@tenderSummary.upcomingTenderSummary view=view showHeader=true showActions=true />
     </#list>
   <#else>
     <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="upcoming tender" linkUrl=springUrl(projectSetupUrl)/>

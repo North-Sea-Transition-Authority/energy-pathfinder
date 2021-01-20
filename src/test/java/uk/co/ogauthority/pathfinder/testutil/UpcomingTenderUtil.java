@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
@@ -11,7 +12,6 @@ import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
-import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class UpcomingTenderUtil {
@@ -70,12 +70,11 @@ public class UpcomingTenderUtil {
     view.setEstimatedTenderDate(DateUtil.formatDate(ESTIMATED_TENDER_DATE));
     view.setContractBand(CONTRACT_BAND.getDisplayName());
 
-    ContactDetailView contactDetailView = new ContactDetailView();
-    contactDetailView.setName(CONTACT_NAME);
-    contactDetailView.setPhoneNumber(PHONE_NUMBER);
-    contactDetailView.setJobTitle(JOB_TITLE);
-    contactDetailView.setEmailAddress(EMAIL);
-    view.setContactDetailView(contactDetailView);
+    view.setContactName(CONTACT_NAME);
+    view.setContactPhoneNumber(PHONE_NUMBER);
+    view.setContactJobTitle(JOB_TITLE);
+    view.setContactEmailAddress(EMAIL);
+    view.setUploadedFileViews(Collections.emptyList());
 
     return view;
   }

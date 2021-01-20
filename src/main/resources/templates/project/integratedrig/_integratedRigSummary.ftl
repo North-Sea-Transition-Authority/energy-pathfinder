@@ -11,7 +11,9 @@
   <@summaryViewWrapper.summaryViewItemWrapper
     idPrefix="integrated-rig"
     headingPrefix="Integrated rig"
-    summaryView=integratedRigView
+    displayOrder=integratedRigView.displayOrder
+    isValid=integratedRigView.valid!""
+    summaryLinkList=integratedRigView.summaryLinks
     showHeader=showHeader
     showActions=showActions
     headingSize=headingSize

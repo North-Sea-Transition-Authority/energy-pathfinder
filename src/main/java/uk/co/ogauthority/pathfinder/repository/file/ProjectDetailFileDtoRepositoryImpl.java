@@ -76,7 +76,7 @@ public class ProjectDetailFileDtoRepositoryImpl implements ProjectDetailFileDtoR
         .setParameter("fileId", fileId)
         .setParameter("fileStatus", FileUploadStatus.CURRENT)
         .setParameter("fileLinkStatus", linkStatus)
-        .setParameter("allFileLinkStatus", FileLinkStatus.ALL)
+        .setParameter("allFileLinkStatus", FileLinkStatus.ALL.toString())
         .getSingleResult();
   }
 

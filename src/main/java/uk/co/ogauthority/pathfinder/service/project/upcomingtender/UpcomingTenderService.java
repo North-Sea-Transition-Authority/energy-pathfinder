@@ -13,6 +13,7 @@ import uk.co.ogauthority.pathfinder.config.file.FileDeleteResult;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -202,6 +203,10 @@ public class UpcomingTenderService implements ProjectFormSectionService {
 
   public List<UpcomingTender> getUpcomingTendersForDetail(ProjectDetail detail) {
     return upcomingTenderRepository.findByProjectDetailOrderByIdAsc(detail);
+  }
+
+  public List<UpcomingTender> getUpcomingTendersForProjectVersion(Project project, Integer version) {
+    return upcomingTenderRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version);
   }
 
   /**

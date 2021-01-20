@@ -2,20 +2,17 @@ package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity;
 
 import java.util.List;
 import java.util.Objects;
-import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
+import uk.co.ogauthority.pathfinder.model.view.ContactDetailProjectSummaryItem;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
-import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 
-public class CollaborationOpportunityView extends ProjectSummaryItem {
+public class CollaborationOpportunityView extends ContactDetailProjectSummaryItem {
 
   private StringWithTag function;
 
   private String descriptionOfWork;
 
   private String urgentResponseNeeded;
-
-  private ContactDetailView contactDetailView;
 
   private List<UploadedFileView> uploadedFileViews;
 
@@ -52,14 +49,6 @@ public class CollaborationOpportunityView extends ProjectSummaryItem {
     this.urgentResponseNeeded = urgentResponseNeeded;
   }
 
-  public ContactDetailView getContactDetailView() {
-    return contactDetailView;
-  }
-
-  public void setContactDetailView(ContactDetailView contactDetailView) {
-    this.contactDetailView = contactDetailView;
-  }
-
   public List<UploadedFileView> getUploadedFileViews() {
     return uploadedFileViews;
   }
@@ -84,7 +73,6 @@ public class CollaborationOpportunityView extends ProjectSummaryItem {
     return Objects.equals(function, that.function)
         && Objects.equals(descriptionOfWork, that.descriptionOfWork)
         && Objects.equals(urgentResponseNeeded, that.urgentResponseNeeded)
-        && Objects.equals(contactDetailView, that.contactDetailView)
         && Objects.equals(uploadedFileViews, that.uploadedFileViews);
   }
 
@@ -95,7 +83,6 @@ public class CollaborationOpportunityView extends ProjectSummaryItem {
         function,
         descriptionOfWork,
         urgentResponseNeeded,
-        contactDetailView,
         uploadedFileViews
     );
   }

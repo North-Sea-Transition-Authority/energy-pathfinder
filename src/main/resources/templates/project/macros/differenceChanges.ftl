@@ -23,11 +23,13 @@
 </#macro>
 
 <#macro _diffLink diffedLinkText diffedLinkUrl>
-  <@fdsAction.link
-    linkText=diffedLinkText
-    linkClass="govuk-link govuk-link--button"
-    linkUrl=springUrl(diffedLinkUrl)
-  />
+ <@_diffChangesValueWrapper>
+    <@fdsAction.link
+      linkText=diffedLinkText
+      linkClass="govuk-link"
+      linkUrl=springUrl(diffedLinkUrl)
+    />
+ </@_diffChangesValueWrapper>
 </#macro>
 
 <#macro _rawValueWrapper>
@@ -45,20 +47,30 @@
   </@_rawValueWrapper>
 </#macro>
 
+<#macro _diffChangesValueWrapper>
+  <span class="diff-changes__value">
+    <#nested />
+  </span>
+</#macro>
+
 <#macro _diffValue noAutoEscapeFlagValue="false" value="" tag="" multiLineTextBlockClass="">
   <#if noAutoEscapeFlagValue=="true">
-    <span class="diff-changes__value">
+    <@_diffChangesValueWrapper>
       <#noautoesc>${value}</#noautoesc>
-    </span>
+    </@_diffChangesValueWrapper>
   <#else>
-    <span class="diff-changes__value">
+    <@_diffChangesValueWrapper>
+      <#--
+        It is important that this macro call is on one line to avoid extra carriage returns being shown
+        on the screen due to new lines being preserved within the macro
+      -->
       <!--
         It is important that this macro call is on one line to avoid extra carriage returns being shown
         on the screen due to new lines being preserved within the macro
       -->
       <@multiLineText.multiLineText blockClass=multiLineTextBlockClass>${value}</@multiLineText.multiLineText>
-    </span>
-    <#if tag.displayName?has_content>
+    </@_diffChangesValueWrapper>
+    <#if tag?has_content && tag.displayName?has_content>
       <strong class="govuk-tag">
         ${tag.displayName}
       </strong>
@@ -121,10 +133,7 @@
   <#if differenceType == "DELETED">
     <@_diffChanges>
       <@_diffChangesDelete>
-        <@_diffLink
-          diffedLinkText=diffedLinkText.previousValue
-          diffedLinkUrl=diffedLinkUrl.previousValue
-        />
+        <@_diffValue value=diffedLinkText.previousValue />
       </@_diffChangesDelete>
     </@_diffChanges>
   </#if>

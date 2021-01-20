@@ -87,6 +87,33 @@ public class DifferenceService {
                                                                List<T> previousList,
                                                                Function<T, V> getCurrentItemLinkToPrevious,
                                                                Function<T, V> getPreviousItemLinkToCurrent) {
+    return differentiateComplexLists(
+        currentList,
+        previousList,
+        Set.of(),
+        getCurrentItemLinkToPrevious,
+        getPreviousItemLinkToCurrent
+    );
+  }
+
+  /**
+   * Return a list of diffed object maps by comparing two lists.
+   * The final list contains diffed items common between each list, items which do not exist in the current but do in
+   * the previous list and items which do not exist in the previous list but do in the current.
+   *
+   * @param currentList current list of items to compare
+   * @param previousList previous list of items to compare
+   * @param ignoreFieldNames if provided, do not diff field where name is within set
+   * @param getCurrentItemLinkToPrevious when looping the current list, how can the item object be mapped to an item in the "previous" list
+   * @param getPreviousItemLinkToCurrent when looping the previous list, how can the item object be mapped to an item in the "current" list
+   * @param <T> each list for comparison contains objects of the this type
+   * @param <V> the return type of the getCurrentItemLinkToPrevious and getPreviousItemLinkToCurrent function to map between lists
+   */
+  public <T, V> List<Map<String, ?>> differentiateComplexLists(List<T> currentList,
+                                                               List<T> previousList,
+                                                               Set<String> ignoreFieldNames,
+                                                               Function<T, V> getCurrentItemLinkToPrevious,
+                                                               Function<T, V> getPreviousItemLinkToCurrent) {
 
 
     List<Map<String, ?>> listOfItemDiffs = new ArrayList<>();
@@ -107,10 +134,10 @@ public class DifferenceService {
 
       if (previousListItemOptional.isPresent()) {
         // Compare all the item fields
-        itemDiffMap = differentiate(currentListItem, previousListItemOptional.get());
+        itemDiffMap = differentiate(currentListItem, previousListItemOptional.get(), ignoreFieldNames);
       } else {
         // This item didn't exist in the previous version so it must be newly added
-        itemDiffMap = createdAddedObject(currentListItem);
+        itemDiffMap = createdAddedObject(currentListItem, ignoreFieldNames);
       }
       listOfItemDiffs.add(itemDiffMap);
 
@@ -129,7 +156,7 @@ public class DifferenceService {
 
       if (currentItemOptional.isEmpty()) {
         // This item exists in the previous list but not the current list. It must have been deleted.
-        Map<String, ?> itemDiffMap = createdDeletedObject(previousItem);
+        Map<String, ?> itemDiffMap = createdDeletedObject(previousItem, ignoreFieldNames);
         listOfItemDiffs.add(itemDiffMap);
       }
     }
@@ -141,25 +168,33 @@ public class DifferenceService {
    * Return a object with all fields marked as added.
    *
    * @param addedObject The object to show as added.
+   * @param ignoreFieldNames if provided, do not diff field where name is within set
    * @return A map of all fields on the object to an ADDED DiffType.
    */
-  private Map<String, Object> createdAddedObject(Object addedObject) {
+  private Map<String, Object> createdAddedObject(Object addedObject, Set<String> ignoreFieldNames) {
 
     Map<String, Object> diffResult = new HashMap<>();
 
     doWithField(addedObject.getClass(), field -> {
-      var attributeName = addedObject.getClass().getSimpleName() + "_" + field.getName();
-      var currentField = getFieldValue(field, addedObject);
+      var processField = !ignoreFieldNames.contains(field.getName());
 
-      var diffType = ComparisonType.findComparisonType(field.getType());
-      // Workaround for Diffable Lists. There is no specific diff strategy for diffed objects containing lists
-      // As a workaround for the "added object" case where we dont bother doing a real diff, we need to recreate the compare() special case
-      // contained in {@link this::compare} in order to get our output model correctly populated
-      if (diffType.equals(ComparisonType.LIST)) {
-        compare(diffResult, attributeName, currentField, List.of(), field);
-      } else {
-        var comparisonStrategy = diffType.getComparisonStrategy();
-        diffResult.put(attributeName, comparisonStrategy.createAddedDiffedField(currentField));
+      if (processField) {
+
+        var attributeName = addedObject.getClass().getSimpleName() + "_" + field.getName();
+        var currentField = getFieldValue(field, addedObject);
+
+        var diffType = ComparisonType.findComparisonType(field.getType());
+        // Workaround for Diffable Lists. There is no specific diff strategy for diffed objects containing lists
+        // As a workaround for the "added object" case where we dont bother doing a real diff,
+        // we need to recreate the compare() special case contained in {@link this::compare} in order to
+        // get our output model correctly populated
+        if (diffType.equals(ComparisonType.LIST)) {
+          compare(diffResult, attributeName, currentField, List.of(), field);
+        } else {
+          var comparisonStrategy = diffType.getComparisonStrategy();
+          diffResult.put(attributeName, comparisonStrategy.createAddedDiffedField(currentField));
+        }
+
       }
 
     });
@@ -173,22 +208,27 @@ public class DifferenceService {
    * @param deletedObject The object to show as deleted.
    * @return A map of all fields on the object to an DELETED DiffType.
    */
-  private Map<String, Object> createdDeletedObject(Object deletedObject) {
+  private Map<String, Object> createdDeletedObject(Object deletedObject, Set<String> ignoreFieldNames) {
 
     Map<String, Object> diffResult = new HashMap<>();
 
     doWithField(deletedObject.getClass(), field -> {
-      var attributeName = createAttributeName(deletedObject.getClass(), field);
-      var deletedField = getFieldValue(field, deletedObject);
-      var comparisonType = ComparisonType.findComparisonType(field.getType());
-      // Workaround for Diffable Lists. There is no specific diff strategy for diffed objects containing lists
-      // As a workaround for the "deleted object" case where we dont bother doing a real diff, we need to recreate the diff special case
-      // contained in {@link this::compare} in order to get our output model correctly populated
-      if (comparisonType.equals(ComparisonType.LIST)) {
-        compare(diffResult, attributeName, List.of(), deletedField, field);
-      } else {
-        var comparisonStrategy = comparisonType.getComparisonStrategy();
-        diffResult.put(attributeName, comparisonStrategy.createDeletedDiffedField(deletedField));
+      var processField = !ignoreFieldNames.contains(field.getName());
+
+      if (processField) {
+
+        var attributeName = createAttributeName(deletedObject.getClass(), field);
+        var deletedField = getFieldValue(field, deletedObject);
+        var comparisonType = ComparisonType.findComparisonType(field.getType());
+        // Workaround for Diffable Lists. There is no specific diff strategy for diffed objects containing lists
+        // As a workaround for the "deleted object" case where we dont bother doing a real diff, we need to recreate the diff special case
+        // contained in {@link this::compare} in order to get our output model correctly populated
+        if (comparisonType.equals(ComparisonType.LIST)) {
+          compare(diffResult, attributeName, List.of(), deletedField, field);
+        } else {
+          var comparisonStrategy = comparisonType.getComparisonStrategy();
+          diffResult.put(attributeName, comparisonStrategy.createDeletedDiffedField(deletedField));
+        }
       }
     });
 
@@ -221,7 +261,10 @@ public class DifferenceService {
    * @param currentValue  the value now
    * @param previousValue the value previously
    */
-  private void compare(Map<String, Object> diffResult, String attributeName, Object currentValue, Object previousValue,
+  private void compare(Map<String, Object> diffResult,
+                       String attributeName,
+                       Object currentValue,
+                       Object previousValue,
                        Field valueField) {
 
     var comparisonType = ComparisonType.findComparisonType(valueField.getType());

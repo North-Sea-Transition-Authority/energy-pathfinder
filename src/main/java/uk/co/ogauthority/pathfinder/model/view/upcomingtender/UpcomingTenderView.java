@@ -1,13 +1,13 @@
 package uk.co.ogauthority.pathfinder.model.view.upcomingtender;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
+import uk.co.ogauthority.pathfinder.model.view.ContactDetailProjectSummaryItem;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
-import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 
-public class UpcomingTenderView extends ProjectSummaryItem {
+public class UpcomingTenderView extends ContactDetailProjectSummaryItem {
 
   private StringWithTag tenderFunction;
 
@@ -17,9 +17,11 @@ public class UpcomingTenderView extends ProjectSummaryItem {
 
   private String contractBand;
 
-  private ContactDetailView contactDetailView;
-
   private List<UploadedFileView> uploadedFileViews;
+
+  public UpcomingTenderView() {
+    this.uploadedFileViews = new ArrayList<>();
+  }
 
   public UpcomingTenderView(
       Integer displayOrder,
@@ -63,14 +65,6 @@ public class UpcomingTenderView extends ProjectSummaryItem {
     this.contractBand = contractBand;
   }
 
-  public ContactDetailView getContactDetailView() {
-    return contactDetailView;
-  }
-
-  public void setContactDetailView(ContactDetailView contactDetailView) {
-    this.contactDetailView = contactDetailView;
-  }
-
   public List<UploadedFileView> getUploadedFileViews() {
     return uploadedFileViews;
   }
@@ -96,7 +90,6 @@ public class UpcomingTenderView extends ProjectSummaryItem {
         && Objects.equals(descriptionOfWork, that.descriptionOfWork)
         && Objects.equals(estimatedTenderDate, that.estimatedTenderDate)
         && Objects.equals(contractBand, that.contractBand)
-        && Objects.equals(contactDetailView, that.contactDetailView)
         && Objects.equals(uploadedFileViews, that.uploadedFileViews);
   }
 
@@ -108,7 +101,6 @@ public class UpcomingTenderView extends ProjectSummaryItem {
         descriptionOfWork,
         estimatedTenderDate,
         contractBand,
-        contactDetailView,
         uploadedFileViews
     );
   }

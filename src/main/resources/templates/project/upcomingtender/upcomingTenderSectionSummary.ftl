@@ -2,13 +2,13 @@
 <#import '_upcomingTenderSummary.ftl' as upcomingTenderSummary>
 
 <@sectionSummaryWrapper.sectionSummaryWrapper sectionId=sectionId sectionTitle=sectionTitle>
-  <#if upcomingTenderViews?has_content>
-    <#list upcomingTenderViews as upcomingTenderView>
-      <@upcomingTenderSummary.upcomingTenderSummary
-        view=upcomingTenderView
+  <#if upcomingTenderDiffModel?has_content>
+    <#list upcomingTenderDiffModel as upcomingTenderDiff>
+      <@upcomingTenderSummary.upcomingTenderDiffSummary
+        diffModel=upcomingTenderDiff.upcomingTenderDiff
+        files=upcomingTenderDiff.upcomingTenderFiles
         showHeader=true
         showActions=false
-        showTag=true
         headingSize="h3"
         headingClass="govuk-heading-m"
       />

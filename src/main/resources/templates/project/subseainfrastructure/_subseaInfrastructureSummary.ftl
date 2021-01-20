@@ -4,7 +4,9 @@
   <@summaryViewWrapper.summaryViewItemWrapper
     idPrefix="subsea-infrastructure"
     headingPrefix="Subsea infrastructure"
-    summaryView=subseaInfrastructureView
+    displayOrder=subseaInfrastructureView.displayOrder
+    isValid=subseaInfrastructureView.valid!""
+    summaryLinkList=subseaInfrastructureView.summaryLinks
     showHeader=showHeader
     showActions=showActions
     headingSize=headingSize

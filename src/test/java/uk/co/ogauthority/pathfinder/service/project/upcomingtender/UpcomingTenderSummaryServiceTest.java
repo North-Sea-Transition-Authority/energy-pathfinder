@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
+import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderViewUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
@@ -158,11 +159,10 @@ public class UpcomingTenderSummaryServiceTest {
     assertThat(view.getEstimatedTenderDate()).isEqualTo(DateUtil.formatDate(tender.getEstimatedTenderDate()));
     assertThat(view.getContractBand()).isEqualTo(tender.getContractBand().getDisplayName());
 
-    var contactDetailView = view.getContactDetailView();
-    assertThat(contactDetailView.getName()).isEqualTo(tender.getContactName());
-    assertThat(contactDetailView.getPhoneNumber()).isEqualTo(tender.getPhoneNumber());
-    assertThat(contactDetailView.getJobTitle()).isEqualTo(tender.getJobTitle());
-    assertThat(contactDetailView.getEmailAddress()).isEqualTo(tender.getEmailAddress());
+    assertThat(view.getContactName()).isEqualTo(tender.getContactName());
+    assertThat(view.getContactPhoneNumber()).isEqualTo(tender.getPhoneNumber());
+    assertThat(view.getContactJobTitle()).isEqualTo(tender.getJobTitle());
+    assertThat(view.getContactEmailAddress()).isEqualTo(tender.getEmailAddress());
 
     assertThat(view.getSummaryLinks()).extracting(SummaryLink::getLinkText).containsExactly(
         SummaryLinkText.EDIT.getDisplayName(),
@@ -182,5 +182,41 @@ public class UpcomingTenderSummaryServiceTest {
     when(upcomingTenderService.canShowInTaskList(details)).thenReturn(false);
 
     assertThat(upcomingTenderSummaryService.canShowInTaskList(details)).isFalse();
+  }
+
+  @Test
+  public void getSummaryViews_withProjectAndVersion_whenFound_thenReturnPopulatedList() {
+
+    final var upcomingTender = UpcomingTenderUtil.getUpcomingTender(details);
+
+    final var project = details.getProject();
+    final var version = details.getVersion();
+
+    when(upcomingTenderService.getUpcomingTendersForProjectVersion(project, version))
+        .thenReturn(List.of(upcomingTender));
+
+    final var result = upcomingTenderSummaryService.getSummaryViews(project, version);
+
+    assertThat(result).hasSize(1);
+
+    final var upcomingTenderView = result.get(0);
+
+    assertThat(upcomingTenderView.getTenderFunction().getValue()).isEqualTo(upcomingTender.getTenderFunction().getDisplayName());
+    assertThat(upcomingTenderView.getTenderFunction().getTag()).isEqualTo(Tag.NONE);
+    checkCommonFields(upcomingTenderView, upcomingTender);
+
+  }
+
+  @Test
+  public void getSummaryViews_withProjectAndVersion_whenNotFound_thenReturnEmptyList() {
+
+    final var project = details.getProject();
+    final var version = details.getVersion();
+
+    when(upcomingTenderService.getUpcomingTendersForProjectVersion(project, version))
+        .thenReturn(Collections.emptyList());
+
+    final var result = upcomingTenderSummaryService.getSummaryViews(project, version);
+    assertThat(result).isEmpty();
   }
 }

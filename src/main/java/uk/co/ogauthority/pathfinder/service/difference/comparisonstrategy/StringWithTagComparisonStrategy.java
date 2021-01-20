@@ -15,6 +15,11 @@ public class StringWithTagComparisonStrategy implements ComparisonStrategy<Strin
 
   @Override
   public StringWithTag objectAsType(Object value) {
+
+    if (value == null) {
+      return new StringWithTag();
+    }
+
     if (value instanceof StringWithTag) {
       return (StringWithTag) value;
     }
@@ -24,7 +29,11 @@ public class StringWithTagComparisonStrategy implements ComparisonStrategy<Strin
 
   @Override
   public DiffedField compareType(StringWithTag currentValue, StringWithTag previousValue) {
-    DiffedField diffedField = stringComparisonStrategy.compareType(currentValue.getValue(), previousValue.getValue());
+
+    var currentStringValue = (currentValue.getValue() != null) ? currentValue.getValue() : "";
+    var previousStringValue = (previousValue.getValue() != null) ? previousValue.getValue() : "";
+    DiffedField diffedField = stringComparisonStrategy.compareType(currentStringValue, previousStringValue);
+
     diffedField.setCurrentValueTag(currentValue.getTag());
     diffedField.setPreviousValueTag(previousValue.getTag());
     return diffedField;

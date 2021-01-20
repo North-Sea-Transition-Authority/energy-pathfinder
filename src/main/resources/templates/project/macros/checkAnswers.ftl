@@ -17,24 +17,87 @@
   </@fdsCheckAnswers.checkAnswersRowNoAction>
 </#macro>
 
-<#macro checkAnswersUploadedFileViewNoActions uploadedFileView>
+<#macro checkAnswersUploadedFileViewNoActions fileUrlFieldValue fileNameFieldValue fileDescriptionFieldValue>
   <@fdsCheckAnswers.checkAnswersRowNoAction keyText="Document">
-    <#if uploadedFileView?has_content>
-      <@fdsAction.link linkText=uploadedFileView.fileName linkUrl=springUrl(uploadedFileView.fileUrl) />
+    <#if fileUrlFieldValue?has_content && fileNameFieldValue?has_content>
+      <@fdsAction.link linkText=fileNameFieldValue linkUrl=springUrl(fileUrlFieldValue) />
     </#if>
   </@fdsCheckAnswers.checkAnswersRowNoAction>
   <@fdsCheckAnswers.checkAnswersRowNoAction keyText="Document description">
-    <#if uploadedFileView?has_content>
-      ${uploadedFileView.fileDescription}
+    <#if fileDescriptionFieldValue?has_content>
+      ${fileDescriptionFieldValue}
     </#if>
   </@fdsCheckAnswers.checkAnswersRowNoAction>
 </#macro>
 
+<#macro diffedCheckAnswersUploadedFileViewNoAction fileUrlFieldValue fileNameFieldValue fileDescriptionFieldValue>
+  <@fdsCheckAnswers.checkAnswersRowNoAction keyText="Document">
+    <#if fileUrlFieldValue?has_content && fileNameFieldValue?has_content>
+      <@differenceChanges.renderDifferenceLink
+        differenceType=fileUrlFieldValue.differenceType
+        diffedLinkText=fileNameFieldValue
+        diffedLinkUrl=fileUrlFieldValue
+      />
+    </#if>
+  </@fdsCheckAnswers.checkAnswersRowNoAction>
+  <@diffedCheckAnswersRowNoActions prompt="Document description" diffedField=fileDescriptionFieldValue />
+</#macro>
+
+<#macro checkAnswersStandardOrDiffUploadedFileViewRow
+  fileUrlFieldValue
+  fileNameFieldValue
+  fileDescriptionFieldValue
+  isDiffedField
+>
+  <#if isDiffedField>
+    <@diffedCheckAnswersUploadedFileViewNoAction
+      fileUrlFieldValue=fileUrlFieldValue
+      fileNameFieldValue=fileNameFieldValue
+      fileDescriptionFieldValue=fileDescriptionFieldValue
+    />
+  <#else>
+    <@checkAnswersUploadedFileViewNoActions
+      fileUrlFieldValue=fileUrlFieldValue
+      fileNameFieldValue=fileNameFieldValue
+      fileDescriptionFieldValue=fileDescriptionFieldValue
+    />
+  </#if>
+
+</#macro>
+
 <#macro diffedCheckAnswersRowNoActions prompt diffedField multiLineTextBlockClass="">
   <@checkAnswersRowNoActionsWithNested prompt=prompt>
-    <@differenceChanges.renderDifference
-      diffedField=diffedField
+    <#if diffedField?has_content>
+      <@differenceChanges.renderDifference
+        diffedField=diffedField
+        multiLineTextBlockClass=multiLineTextBlockClass
+      />
+    </#if>
+  </@checkAnswersRowNoActionsWithNested>
+</#macro>
+
+<#macro checkAnswersStandardOrDiffRow prompt fieldValue isDiffedField multiLineTextBlockClass="">
+  <#if isDiffedField>
+    <@diffedCheckAnswersRowNoActions
+      prompt=prompt
+      diffedField=fieldValue
       multiLineTextBlockClass=multiLineTextBlockClass
     />
-  </@checkAnswersRowNoActionsWithNested>
+  <#else>
+    <@checkAnswersRowNoActions prompt=prompt value=fieldValue />
+  </#if>
+</#macro>
+
+<#macro checkAnswersStandardNestedOrDiffRow prompt fieldValue isDiffedField multiLineTextBlockClass="">
+  <#if isDiffedField>
+    <@diffedCheckAnswersRowNoActions
+      prompt=prompt
+      diffedField=fieldValue
+      multiLineTextBlockClass=multiLineTextBlockClass
+    />
+  <#else>
+    <@checkAnswersRowNoActionsWithNested prompt=prompt>
+      <#nested/>
+    </@checkAnswersRowNoActionsWithNested>
+  </#if>
 </#macro>

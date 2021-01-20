@@ -4,7 +4,9 @@
   <@summaryViewWrapper.summaryViewItemWrapper
     idPrefix="pipeline"
     headingPrefix="Pipeline"
-    summaryView=decommissionedPipelineView
+    displayOrder=decommissionedPipelineView.displayOrder
+    isValid=decommissionedPipelineView.valid!""
+    summaryLinkList=decommissionedPipelineView.summaryLinks
     showHeader=showHeader
     showActions=showActions
     headingSize=headingSize

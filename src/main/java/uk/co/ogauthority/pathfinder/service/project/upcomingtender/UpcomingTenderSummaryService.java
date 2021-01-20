@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -32,6 +33,13 @@ public class UpcomingTenderSummaryService {
   public List<UpcomingTenderView> getSummaryViews(ProjectDetail detail) {
     return createUpcomingTenderViews(
         upcomingTenderService.getUpcomingTendersForDetail(detail),
+        ValidationType.NO_VALIDATION
+    );
+  }
+
+  public List<UpcomingTenderView> getSummaryViews(Project project, Integer version) {
+    return createUpcomingTenderViews(
+        upcomingTenderService.getUpcomingTendersForProjectVersion(project, version),
         ValidationType.NO_VALIDATION
     );
   }

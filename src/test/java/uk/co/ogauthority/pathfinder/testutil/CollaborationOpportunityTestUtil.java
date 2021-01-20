@@ -10,7 +10,6 @@ import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityView;
-import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
@@ -64,12 +63,10 @@ public class CollaborationOpportunityTestUtil {
     view.setIsValid(isValid);
     view.setFunction(new StringWithTag(FUNCTION.getDisplayName(), Tag.NONE));
     view.setUrgentResponseNeeded(StringDisplayUtil.yesNoFromBoolean(URGENT_RESPONSE_NEEDED));
-    var contactDetailsView = new ContactDetailView();
-    contactDetailsView.setName(CONTACT_NAME);
-    contactDetailsView.setPhoneNumber(PHONE_NUMBER);
-    contactDetailsView.setJobTitle(JOB_TITLE);
-    contactDetailsView.setEmailAddress(EMAIL);
-    view.setContactDetailView(contactDetailsView);
+    view.setContactName(CONTACT_NAME);
+    view.setContactPhoneNumber(PHONE_NUMBER);
+    view.setContactJobTitle(JOB_TITLE);
+    view.setContactEmailAddress(EMAIL);
     return view;
   }
 

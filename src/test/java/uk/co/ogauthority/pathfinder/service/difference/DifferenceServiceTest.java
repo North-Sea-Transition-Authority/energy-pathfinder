@@ -385,4 +385,23 @@ public class DifferenceServiceTest {
 
   }
 
+  @Test
+  public void differentiateComplexLists_ignoresFieldsWithinIgnoreSet(){
+
+    var allFieldNames = Arrays.stream(FieldUtils.getAllFields(SimpleDifferenceTestClass.class))
+        .map(Field::getName)
+        .collect(toSet());
+
+    List<Map<String, ?>> diffResult = differenceService.differentiateComplexLists(
+        List.of(simpleObjectCurrent),
+        List.of(simpleObjectPrevious),
+        allFieldNames,
+        SimpleDifferenceTestClass::getIntegerField,
+        SimpleDifferenceTestClass::getIntegerField
+    );
+
+    assertThat(diffResult.get(0)).isEmpty();
+
+  }
+
 }

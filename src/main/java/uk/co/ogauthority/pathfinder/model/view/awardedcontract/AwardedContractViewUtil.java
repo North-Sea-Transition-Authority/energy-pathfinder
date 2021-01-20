@@ -9,7 +9,6 @@ import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
-import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
@@ -45,8 +44,10 @@ public class AwardedContractViewUtil {
         : null;
     awardedContractView.setContractBand(contractBand);
 
-    var contactDetailView = ContactDetailViewUtil.from(awardedContract);
-    awardedContractView.setContactDetailView(contactDetailView);
+    awardedContractView.setContactName(awardedContract.getContactName());
+    awardedContractView.setContactPhoneNumber(awardedContract.getPhoneNumber());
+    awardedContractView.setContactJobTitle(awardedContract.getJobTitle());
+    awardedContractView.setContactEmailAddress(awardedContract.getEmailAddress());
 
     var summaryLinks = new ArrayList<SummaryLink>();
     summaryLinks.add(getEditLink(projectId, awardedContract.getId()));

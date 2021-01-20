@@ -9,7 +9,6 @@ import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
-import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
@@ -19,7 +18,6 @@ public class CollaborationOpportunityViewUtil {
   private CollaborationOpportunityViewUtil() {
     throw new IllegalStateException("CollaborationOpportunityViewUtil is a utility class and should not be instantiated");
   }
-
 
   public static CollaborationOpportunityView createView(
       CollaborationOpportunity opportunity,
@@ -40,12 +38,11 @@ public class CollaborationOpportunityViewUtil {
     );
     view.setDescriptionOfWork(opportunity.getDescriptionOfWork());
     view.setUrgentResponseNeeded(StringDisplayUtil.yesNoFromBoolean(opportunity.getUrgentResponseNeeded()));
-    ContactDetailView contactDetailView = new ContactDetailView();
-    contactDetailView.setName(opportunity.getName());
-    contactDetailView.setPhoneNumber(opportunity.getPhoneNumber());
-    contactDetailView.setEmailAddress(opportunity.getEmailAddress());
-    contactDetailView.setJobTitle(opportunity.getJobTitle());
-    view.setContactDetailView(contactDetailView);
+
+    view.setContactName(opportunity.getName());
+    view.setContactPhoneNumber(opportunity.getPhoneNumber());
+    view.setContactEmailAddress(opportunity.getEmailAddress());
+    view.setContactJobTitle(opportunity.getJobTitle());
 
     view.setUploadedFileViews(uploadedFileViews);
 

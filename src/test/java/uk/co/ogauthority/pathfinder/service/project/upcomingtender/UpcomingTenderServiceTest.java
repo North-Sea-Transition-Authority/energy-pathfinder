@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -346,5 +347,34 @@ public class UpcomingTenderServiceTest {
         eq(toProjectDetail),
         anyMap()
     );
+  }
+
+  @Test
+  public void getUpcomingTendersForProjectVersion_whenFound_thenReturnPopulatedList() {
+
+    final var upcomingTender = UpcomingTenderUtil.getUpcomingTender(detail);
+    final var upcomingTenderList = List.of(upcomingTender);
+
+    final var project = detail.getProject();
+    final var version = detail.getVersion();
+
+    when(upcomingTenderRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
+        .thenReturn(upcomingTenderList);
+
+    var result = upcomingTenderService.getUpcomingTendersForProjectVersion(project, version);
+    assertThat(result).containsExactly(upcomingTenderList.get(0));
+  }
+
+  @Test
+  public void getUpcomingTendersForProjectVersion_whenNotFound_thenReturnEmptyList() {
+
+    final var project = detail.getProject();
+    final var version = detail.getVersion();
+
+    when(upcomingTenderRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
+        .thenReturn(Collections.emptyList());
+
+    var result = upcomingTenderService.getUpcomingTendersForProjectVersion(project, version);
+    assertThat(result).isEmpty();
   }
 }

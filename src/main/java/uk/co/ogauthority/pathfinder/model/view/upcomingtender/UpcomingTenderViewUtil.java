@@ -9,7 +9,6 @@ import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
-import uk.co.ogauthority.pathfinder.model.view.contactdetail.ContactDetailView;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -30,25 +29,27 @@ public class UpcomingTenderViewUtil {
         projectId
     );
 
-    tender.setTenderFunction(
-        upcomingTender.getTenderFunction() != null
-            ? new StringWithTag(upcomingTender.getTenderFunction().getDisplayName(), Tag.NONE)
-            : new StringWithTag(upcomingTender.getManualTenderFunction(), Tag.NOT_FROM_LIST)
-    );
+    var tenderFunction = new StringWithTag();
+
+    if (upcomingTender.getTenderFunction() != null) {
+      tenderFunction = new StringWithTag(upcomingTender.getTenderFunction().getDisplayName(), Tag.NONE);
+    } else if (upcomingTender.getManualTenderFunction() != null) {
+      tenderFunction = new StringWithTag(upcomingTender.getManualTenderFunction(), Tag.NOT_FROM_LIST);
+    }
+
+    tender.setTenderFunction(tenderFunction);
     tender.setDescriptionOfWork(upcomingTender.getDescriptionOfWork());
     tender.setEstimatedTenderDate(DateUtil.formatDate(upcomingTender.getEstimatedTenderDate()));
     tender.setContractBand(
         upcomingTender.getContractBand() != null
             ? upcomingTender.getContractBand().getDisplayName()
-            : null
+            : ""
     );
 
-    ContactDetailView contactDetailView = new ContactDetailView();
-    contactDetailView.setName(upcomingTender.getName());
-    contactDetailView.setPhoneNumber(upcomingTender.getPhoneNumber());
-    contactDetailView.setEmailAddress(upcomingTender.getEmailAddress());
-    contactDetailView.setJobTitle(upcomingTender.getJobTitle());
-    tender.setContactDetailView(contactDetailView);
+    tender.setContactName(upcomingTender.getName());
+    tender.setContactPhoneNumber(upcomingTender.getPhoneNumber());
+    tender.setContactEmailAddress(upcomingTender.getEmailAddress());
+    tender.setContactJobTitle(upcomingTender.getJobTitle());
 
     var editLink = new SummaryLink(
         SummaryLinkText.EDIT.getDisplayName(),

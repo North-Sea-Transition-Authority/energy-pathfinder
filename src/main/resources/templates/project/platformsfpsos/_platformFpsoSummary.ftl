@@ -4,7 +4,9 @@
   <@summaryViewWrapper.summaryViewItemWrapper
     idPrefix="platform-fpso"
     headingPrefix="Platform or FPSO"
-    summaryView=view
+    displayOrder=view.displayOrder
+    isValid=view.valid!""
+    summaryLinkList=view.summaryLinks
     showHeader=showHeader
     showActions=showActions
     headingSize=headingSize
