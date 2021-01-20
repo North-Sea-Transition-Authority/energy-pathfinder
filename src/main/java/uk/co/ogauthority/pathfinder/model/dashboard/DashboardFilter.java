@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.model.dashboard;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -85,5 +86,27 @@ public class DashboardFilter implements Serializable {
 
   public void setProjectStatusList(List<ProjectStatus> projectStatusList) {
     this.projectStatusList = projectStatusList;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    DashboardFilter that = (DashboardFilter) o;
+    return Objects.equals(operatorName, that.operatorName)
+        && Objects.equals(projectTitle, that.projectTitle)
+        && Objects.equals(field, that.field)
+        && Objects.equals(fieldStages, that.fieldStages)
+        && Objects.equals(ukcsAreas, that.ukcsAreas)
+        && Objects.equals(projectStatusList, that.projectStatusList);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(operatorName, projectTitle, field, fieldStages, ukcsAreas, projectStatusList);
   }
 }
