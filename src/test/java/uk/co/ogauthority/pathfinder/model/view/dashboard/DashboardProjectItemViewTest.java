@@ -58,6 +58,8 @@ public class DashboardProjectItemViewTest {
     var dashboardProjectItem = DashboardProjectItemTestUtil.getDashboardProjectItem(ProjectStatus.DRAFT);
     dashboardProjectItem.setVersion(1);
 
+    var expectedUrl = getTaskListUrl(dashboardProjectItem.getProjectId());
+
     var view = DashboardProjectItemView.from(dashboardProjectItem);
     var title = dashboardProjectItem.getProjectTitle();
     var screenReaderText = String.format(DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
@@ -68,7 +70,7 @@ public class DashboardProjectItemViewTest {
         dashboardProjectItem,
         DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText),
         title,
-        getTaskListUrl(dashboardProjectItem.getProjectId())
+        expectedUrl
     );
   }
 
@@ -77,6 +79,8 @@ public class DashboardProjectItemViewTest {
     var dashboardProjectItem = DashboardProjectItemTestUtil.getDashboardProjectItem(ProjectStatus.DRAFT);
     dashboardProjectItem.setVersion(2);
 
+    var expectedUrl = getProjectManagementPageUrl(dashboardProjectItem.getProjectId());
+
     var view = DashboardProjectItemView.from(dashboardProjectItem);
     var title = dashboardProjectItem.getProjectTitle();
     var screenReaderText = String.format(DashboardProjectItemView.SCREEN_READER_TEXT, DateUtil.formatInstant(dashboardProjectItem.getCreatedDatetime()));
@@ -87,7 +91,7 @@ public class DashboardProjectItemViewTest {
         dashboardProjectItem,
         DashboardProjectItemView.getLink(dashboardProjectItem, title, screenReaderText),
         title,
-        getProjectManagementPageUrl(dashboardProjectItem.getProjectId())
+        expectedUrl
     );
   }
 
