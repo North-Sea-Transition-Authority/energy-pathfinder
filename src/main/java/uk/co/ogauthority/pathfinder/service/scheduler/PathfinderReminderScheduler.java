@@ -40,7 +40,11 @@ public class PathfinderReminderScheduler implements ReminderScheduler {
   }
 
   @Override
-  public void scheduleReminder(ProjectDetail detail, ReminderType reminderType, Class<? extends Job> jobClass) throws SchedulerException {
+  public void scheduleReminder(
+      ProjectDetail detail,
+      ReminderType reminderType,
+      Class<? extends Job> jobClass
+  ) throws SchedulerException {
     ZonedDateTime firstTriggerDatetime = getFirstTriggerDateTime(reminderType);
 
     JobKey jobKey = createJobKey(detail, reminderType);
@@ -66,8 +70,11 @@ public class PathfinderReminderScheduler implements ReminderScheduler {
   }
 
   @Override
-  public void scheduleReminder(ProjectDetail detail, ReminderType reminderType, Class<? extends Job> jobClass,
-                               LocalDateTime localDateTime) throws SchedulerException {
+  public void scheduleReminder(ProjectDetail detail,
+                               ReminderType reminderType,
+                               Class<? extends Job> jobClass,
+                               LocalDateTime localDateTime
+  ) throws SchedulerException {
     //TODO PAT-242/243 Same as above but with relative date call to getFirstTriggerDateTime
   }
 
