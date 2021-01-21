@@ -5,11 +5,11 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
+import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.project.InputEntryType;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedwell.DecommissionedWellType;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedwell.WellMechanicalStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedwell.WellOperationalStatus;
-import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarter;
 
 @Entity
 @Table(name = "decommissioned_wells")

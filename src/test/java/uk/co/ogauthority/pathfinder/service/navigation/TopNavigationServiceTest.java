@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
+import uk.co.ogauthority.pathfinder.controller.quarterlystatistics.QuarterlyStatisticsController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.navigation.TopNavigationItem;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
@@ -33,6 +34,7 @@ public class TopNavigationServiceTest {
   private AuthenticatedUserAccount teamAdministrationOnlyUser;
   private AuthenticatedUserAccount regulatorAdminUser;
   private AuthenticatedUserAccount organisationAdministratorUser;
+  private AuthenticatedUserAccount quarterlyStatisticsViewer;
 
   @Before
   public void topNavigationServiceTestSetup() {
@@ -46,9 +48,11 @@ public class TopNavigationServiceTest {
         UserPrivilege.PATHFINDER_WORK_AREA,
         UserPrivilege.PATHFINDER_PROJECT_CREATE
     ));
+    quarterlyStatisticsViewer = UserTestingUtil.getAuthenticatedUserAccount(List.of(UserPrivilege.PATHFINDER_STATISTIC_VIEWER));
 
     when(systemAccessServiceMock.canAccessWorkArea(any())).thenReturn(false);
     when(systemAccessServiceMock.canViewTeam(any())).thenReturn(false);
+    when(systemAccessServiceMock.canAccessQuarterlyStatistics(any())).thenReturn(false);
   }
 
   @Test
@@ -78,17 +82,30 @@ public class TopNavigationServiceTest {
   }
 
   @Test
+  public void getTopNavigationItems_whenOnlyQuarterlyStatistics_thenOnlyQuarterlyStatisticsNavItem() {
+    when(systemAccessServiceMock.canAccessQuarterlyStatistics(any())).thenReturn(true);
+
+    List<TopNavigationItem> navigationItems = topNavigationService.getTopNavigationItems(
+        quarterlyStatisticsViewer
+    );
+    assertThat(navigationItems).hasSize(1);
+    assertThat(navigationItems.get(0).getDisplayName()).isEqualTo(QuarterlyStatisticsController.QUARTERLY_STATISTICS_TITLE);
+  }
+
+  @Test
   public void getTopNavigationItems_whenRegulatorUserAndHaveAllPrivileges_thenAllNavItems() {
     when(systemAccessServiceMock.canAccessWorkArea(regulatorAdminUser)).thenReturn(true);
     when(systemAccessServiceMock.canViewTeam(regulatorAdminUser)).thenReturn(true);
     when(teamServiceMock.isPersonMemberOfRegulatorTeam(regulatorAdminUser.getLinkedPerson())).thenReturn(true);
+    when(systemAccessServiceMock.canAccessQuarterlyStatistics(any())).thenReturn(true);
 
     List<TopNavigationItem> navigationItems = topNavigationService.getTopNavigationItems(regulatorAdminUser);
     assertThat(navigationItems)
         .extracting(TopNavigationItem::getDisplayName)
         .containsExactly(
             TopNavigationService.WORK_AREA_TITLE,
-            TopNavigationService.MANAGE_TEAM_TITLE
+            TopNavigationService.MANAGE_TEAM_TITLE,
+            QuarterlyStatisticsController.QUARTERLY_STATISTICS_TITLE
         );
   }
 

@@ -8,9 +8,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
+import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
-import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarter;
 
 @Entity
 @Table(name = "project_information")

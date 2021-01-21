@@ -1,0 +1,54 @@
+.statistic-container {
+  grid-template-columns: repeat(3, minmax(20%, 1fr));
+  grid-template-rows: 1fr;
+  grid-gap: 1rem;
+  display: grid;
+
+  &__item {
+    padding: 1rem;
+    background-color: #f8f8f8;
+    border: 1px #f3f2f1 solid;
+    display: grid;
+    grid-auto-flow: row;
+    grid-template-rows: auto auto auto minmax(1rem,auto) 1fr;
+    grid-template-columns: 1fr;
+    grid-row-gap: .5rem;
+
+    .statistic {
+      width: 100%;
+      display: block;
+      clear: both;
+
+      &__prompt {
+        display: inline-block;
+        float: left;
+        margin-bottom: 0;
+        @extend %govuk-body-s;
+      }
+
+      &__value-wrapper {
+        position: relative;
+        display: block;
+        clear: both;
+        float: left;
+      }
+
+      &__value {
+        @extend %govuk-heading-m;
+        margin-bottom: 0;
+        padding-top: 0;
+        font-weight: normal;
+      }
+
+      &__tag {
+        @extend %govuk-heading-m;
+        display: inline-block;
+        float: left;
+        margin-top: -0.2rem;
+        margin-bottom: 0;
+        padding-top: 0;
+        padding-left: 1rem;
+      }
+    }
+  }
+}

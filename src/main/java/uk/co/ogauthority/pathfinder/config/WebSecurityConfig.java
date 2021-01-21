@@ -60,6 +60,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .mvcMatchers("/api/**")
           .hasAnyAuthority(systemAccessService.getWorkAreaGrantedAuthorities())
 
+        .mvcMatchers("/quarterly-statistics")
+          .hasAnyAuthority(systemAccessService.getQuarterlyStatisticsGrantedAuthorities())
+
         .anyRequest()
           .authenticated();
 

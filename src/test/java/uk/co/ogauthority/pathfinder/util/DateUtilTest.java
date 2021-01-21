@@ -4,10 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarter;
+import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DateUtilTest {
@@ -51,5 +52,60 @@ public class DateUtilTest {
     var year = 2020;
     var expected = "";
     assertThat(DateUtil.getDateFromQuarterYear(null, year)).isEqualTo(expected);
+  }
+
+  @Test
+  public void isOnOrBefore_whenBefore_thenTrue() {
+    final var maxInstant = Instant.now();
+    final var instantToTest = maxInstant.minus(1, ChronoUnit.DAYS);
+    assertThat(DateUtil.isOnOrBefore(instantToTest, maxInstant)).isTrue();
+  }
+
+  @Test
+  public void isOnOrBefore_whenOn_thenTrue() {
+    final var maxInstant = Instant.now();
+    assertThat(DateUtil.isOnOrBefore(maxInstant, maxInstant)).isTrue();
+  }
+
+  @Test
+  public void isOnOrBefore_whenAfter_thenFalse() {
+    final var maxInstant = Instant.now();
+    final var instantToTest = maxInstant.plus(1, ChronoUnit.DAYS);
+    assertThat(DateUtil.isOnOrBefore(instantToTest, maxInstant)).isFalse();
+  }
+
+  @Test
+  public void isOnOrAfter_whenAfter_thenTrue() {
+    final var maxInstant = Instant.now();
+    final var instantToTest = maxInstant.plus(1, ChronoUnit.DAYS);
+    assertThat(DateUtil.isOnOrAfter(instantToTest, maxInstant)).isTrue();
+  }
+
+  @Test
+  public void isOnOrAfter_whenOn_thenTrue() {
+    final var maxInstant = Instant.now();
+    assertThat(DateUtil.isOnOrAfter(maxInstant, maxInstant)).isTrue();
+  }
+
+  @Test
+  public void isOnOrAfter_whenBefore_thenFalse() {
+    final var maxInstant = Instant.now();
+    final var instantToTest = maxInstant.minus(1, ChronoUnit.DAYS);
+    assertThat(DateUtil.isOnOrAfter(instantToTest, maxInstant)).isFalse();
+  }
+
+  @Test
+  public void getQuarterFromLocalDate() {
+    final var firstQuarterDate = LocalDate.of(2021, 1, 1);
+    assertThat(DateUtil.getQuarterFromLocalDate(firstQuarterDate)).isEqualTo(Quarter.Q1);
+
+    final var secondQuarterDate = LocalDate.of(2021, 4, 1);
+    assertThat(DateUtil.getQuarterFromLocalDate(secondQuarterDate)).isEqualTo(Quarter.Q2);
+
+    final var thirdQuarterDate = LocalDate.of(2021, 7, 1);
+    assertThat(DateUtil.getQuarterFromLocalDate(thirdQuarterDate)).isEqualTo(Quarter.Q3);
+
+    final var fourthQuarterDate = LocalDate.of(2021, 10, 1);
+    assertThat(DateUtil.getQuarterFromLocalDate(fourthQuarterDate)).isEqualTo(Quarter.Q4);
   }
 }

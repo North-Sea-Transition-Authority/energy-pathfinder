@@ -20,6 +20,10 @@ public class SystemAccessService {
       UserPrivilege.PATHFINDER_TEAM_VIEWER
   );
 
+  public static final Set<UserPrivilege> QUARTERLY_STATISTICS_PRIVILEGES = Set.of(
+      UserPrivilege.PATHFINDER_STATISTIC_VIEWER
+  );
+
   /**
    * For use in WebSecurityConfig. In other instances call canAccessWorkArea
    */
@@ -48,6 +52,14 @@ public class SystemAccessService {
 
   public boolean canCreateProject(AuthenticatedUserAccount user) {
     return hasRelevantPrivilege(user, CREATE_PROJECT_PRIVILEGES);
+  }
+
+  public boolean canAccessQuarterlyStatistics(AuthenticatedUserAccount user) {
+    return hasRelevantPrivilege(user, QUARTERLY_STATISTICS_PRIVILEGES);
+  }
+
+  public String[] getQuarterlyStatisticsGrantedAuthorities() {
+    return getGrantedAuthorities(QUARTERLY_STATISTICS_PRIVILEGES);
   }
 
   private String[] getGrantedAuthorities(Set<UserPrivilege> userPrivileges) {

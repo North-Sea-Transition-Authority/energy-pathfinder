@@ -4,8 +4,10 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.IsoFields;
 import java.time.temporal.Temporal;
-import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarter;
+import java.util.Arrays;
+import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 
 public class DateUtil {
 
@@ -36,6 +38,24 @@ public class DateUtil {
       return String.format("Q%s %d", quarter.getDisplayValue(), year);
     }
     return "";
+  }
+
+  public static boolean isOnOrBefore(Instant instantToCheck, Instant maxInstant) {
+    return instantToCheck.isBefore(maxInstant) || instantToCheck.equals(maxInstant);
+  }
+
+  public static boolean isOnOrAfter(Instant instantToCheck, Instant minInstant) {
+    return instantToCheck.isAfter(minInstant) || instantToCheck.equals(minInstant);
+  }
+
+  public static Quarter getQuarterFromLocalDate(LocalDate localDate) {
+    var quarterIndex = localDate.get(IsoFields.QUARTER_OF_YEAR);
+    return Arrays.stream(Quarter.values())
+        .filter(quarter -> quarter.getDisplayValue().equals(quarterIndex))
+        .findFirst()
+        .orElseThrow(() -> new RuntimeException(
+            String.format("Could not determine current quarter using index %s", quarterIndex))
+        );
   }
 
 }
