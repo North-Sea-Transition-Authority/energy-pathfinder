@@ -20,3 +20,4 @@
 <#import 'macros/noEscapeHtml.ftl' as noEscapeHtml>
 <#import 'macros/statistic.ftl' as statistic>
 <#import 'macros/tag.ftl' as tag>
+<#import 'macros/panel.ftl' as panel>
