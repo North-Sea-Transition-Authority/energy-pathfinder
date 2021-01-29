@@ -2,25 +2,49 @@
 
 <@sectionSummaryWrapper.sectionSummaryWrapper sectionId=sectionId sectionTitle=sectionTitle>
   <@fdsCheckAnswers.checkAnswers>
-    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Field">
-      <#if projectLocationView.field?has_content>
-        <@stringWithTag.stringWithTag stringWithTag=projectLocationView.field />
-      </#if>
-    </@checkAnswers.checkAnswersRowNoActionsWithNested>
-    <@checkAnswers.checkAnswersRowNoActions prompt="Field type" value=projectLocationView.fieldType!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Maximum water depth" value=projectLocationView.maximumWaterDepth!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Approved Field Development Plan" value=projectLocationView.approvedFieldDevelopmentPlan?has_content?then(projectLocationView.approvedFieldDevelopmentPlan?string("Yes", "No"), "") />
-    <#if projectLocationView.approvedFieldDevelopmentPlan?has_content && projectLocationView.approvedFieldDevelopmentPlan>
-      <@checkAnswers.checkAnswersRowNoActions prompt="FDP approval date" value=projectLocationView.approvedFdpDate!"" />
+    <@checkAnswers.diffedCheckAnswersRowNoActions
+      prompt="Field"
+      diffedField=projectLocationDiffModel.ProjectLocationView_field
+    />
+    <@checkAnswers.diffedCheckAnswersRowNoActions
+      prompt="Field type"
+      diffedField=projectLocationDiffModel.ProjectLocationView_fieldType
+    />
+    <@checkAnswers.diffedCheckAnswersRowNoActions
+      prompt="Maximum water depth"
+      diffedField=projectLocationDiffModel.ProjectLocationView_maximumWaterDepth
+    />
+    <@checkAnswers.diffedCheckAnswersRowNoActions
+      prompt="Approved Field Development Plan"
+      diffedField=projectLocationDiffModel.ProjectLocationView_approvedFieldDevelopmentPlan
+    />
+    <#if hasApprovedFieldDevelopmentPlan>
+      <@checkAnswers.diffedCheckAnswersRowNoActions
+        prompt="FDP approval date"
+        diffedField=projectLocationDiffModel.ProjectLocationView_approvedFdpDate
+      />
     </#if>
-    <@checkAnswers.checkAnswersRowNoActions prompt="Approved Decommissioning Program" value=projectLocationView.approvedDecomProgram?has_content?then(projectLocationView.approvedDecomProgram?string("Yes", "No"), "") />
-    <#if projectLocationView.approvedDecomProgram?has_content && projectLocationView.approvedDecomProgram>
-      <@checkAnswers.checkAnswersRowNoActions prompt="DP approval date" value=projectLocationView.approvedDecomProgramDate!"" />
+    <@checkAnswers.diffedCheckAnswersRowNoActions
+      prompt="Approved Decommissioning Program"
+      diffedField=projectLocationDiffModel.ProjectLocationView_approvedDecomProgram
+    />
+    <#if hasApprovedDecomProgram>
+      <@checkAnswers.diffedCheckAnswersRowNoActions
+        prompt="DP approval date"
+        diffedField=projectLocationDiffModel.ProjectLocationView_approvedDecomProgramDate
+      />
     </#if>
-    <@checkAnswers.checkAnswersRowNoActions prompt="UKCS area" value=projectLocationView.ukcsArea!"" />
+    <@checkAnswers.diffedCheckAnswersRowNoActions
+      prompt="UKCS area"
+      diffedField=projectLocationDiffModel.ProjectLocationView_ukcsArea
+    />
     <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Licence blocks">
-      <#list projectLocationView.licenceBlocks as licenceBlock>
-        <div>${licenceBlock}</div>
+      <#list projectLocationDiffModel.ProjectLocationView_licenceBlocks as diffedLicenceBlock>
+        <div>
+          <@differenceChanges.renderDifference
+            diffedField=diffedLicenceBlock
+          />
+        </div>
       </#list>
     </@checkAnswers.checkAnswersRowNoActionsWithNested>
   </@fdsCheckAnswers.checkAnswers>

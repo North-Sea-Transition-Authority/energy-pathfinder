@@ -1,7 +1,8 @@
 package uk.co.ogauthority.pathfinder.service.project.location;
 
-import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -16,6 +17,8 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationView;
 import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationViewUtil;
+import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
+import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -28,6 +31,9 @@ public class ProjectLocationSectionSummaryServiceTest {
   @Mock
   private ProjectLocationBlocksService projectLocationBlocksService;
 
+  @Mock
+  private DifferenceService differenceService;
+
   private ProjectLocationSectionSummaryService projectLocationSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -37,43 +43,74 @@ public class ProjectLocationSectionSummaryServiceTest {
   public void setup() {
     projectLocationSectionSummaryService = new ProjectLocationSectionSummaryService(
         projectLocationService,
-        projectLocationBlocksService
+        projectLocationBlocksService,
+        differenceService
     );
   }
 
   @Test
   public void getSummary() {
-    when(projectLocationService.findByProjectDetail(detail)).thenReturn(Optional.of(projectLocation));
+    when(projectLocationService.getProjectLocationByProjectDetail(detail)).thenReturn(Optional.of(projectLocation));
+
+    var previousProjectLocation = ProjectLocationTestUtil.getProjectLocation_withManualField(detail);
+
+    when(projectLocationService.getProjectLocationByProjectAndVersion(
+        detail.getProject(),
+        detail.getVersion() - 1
+    )).thenReturn(Optional.of(previousProjectLocation));
+
     var sectionSummary = projectLocationSectionSummaryService.getSummary(detail);
+
     var model = sectionSummary.getTemplateModel();
     assertThat(sectionSummary.getDisplayOrder()).isEqualTo(ProjectLocationSectionSummaryService.DISPLAY_ORDER);
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectLocationSectionSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectLocationSectionSummaryService.TEMPLATE_PATH);
 
-    var projectLocationView = ProjectLocationViewUtil.from(projectLocation, Collections.emptyList());
+    var currentProjectLocationView = ProjectLocationViewUtil.from(projectLocation, Collections.emptyList());
+    var previousProjectLocationView = ProjectLocationViewUtil.from(previousProjectLocation, Collections.emptyList());
 
-    assertThat(model).containsOnly(
-        entry("sectionTitle", ProjectLocationSectionSummaryService.PAGE_NAME),
-        entry("sectionId", ProjectLocationSectionSummaryService.SECTION_ID),
-        entry("projectLocationView", projectLocationView)
-    );
+    assertModelProperties(sectionSummary);
+    assertInteractions(currentProjectLocationView, previousProjectLocationView);
   }
 
   @Test
   public void getSummary_noProjectLocation() {
-    when(projectLocationService.findByProjectDetail(detail)).thenReturn(Optional.empty());
+    when(projectLocationService.getProjectLocationByProjectDetail(detail)).thenReturn(Optional.empty());
+
+    when(projectLocationService.getProjectLocationByProjectAndVersion(
+        detail.getProject(),
+        detail.getVersion() - 1
+    )).thenReturn(Optional.empty());
+
     var sectionSummary = projectLocationSectionSummaryService.getSummary(detail);
-    var model = sectionSummary.getTemplateModel();
-    assertThat(sectionSummary.getDisplayOrder()).isEqualTo(ProjectLocationSectionSummaryService.DISPLAY_ORDER);
-    assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectLocationSectionSummaryService.SECTION_LINK));
-    assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectLocationSectionSummaryService.TEMPLATE_PATH);
+    assertModelProperties(sectionSummary);
+    assertInteractions(new ProjectLocationView(), new ProjectLocationView());
+  }
 
-    var projectLocationView = new ProjectLocationView();
+  private void assertModelProperties(ProjectSectionSummary projectSectionSummary) {
+    assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(ProjectLocationSectionSummaryService.DISPLAY_ORDER);
+    assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectLocationSectionSummaryService.SECTION_LINK));
+    assertThat(projectSectionSummary.getTemplatePath()).isEqualTo(ProjectLocationSectionSummaryService.TEMPLATE_PATH);
 
-    assertThat(model).containsOnly(
-        entry("sectionTitle", ProjectLocationSectionSummaryService.PAGE_NAME),
-        entry("sectionId", ProjectLocationSectionSummaryService.SECTION_ID),
-        entry("projectLocationView", projectLocationView)
+    var model = projectSectionSummary.getTemplateModel();
+
+    assertThat(model).containsOnlyKeys(
+        "sectionTitle",
+        "sectionId",
+        "projectLocationDiffModel",
+        "hasApprovedFieldDevelopmentPlan",
+        "hasApprovedDecomProgram"
+    );
+
+    assertThat(model).containsEntry("sectionTitle", ProjectLocationSectionSummaryService.PAGE_NAME);
+    assertThat(model).containsEntry("sectionId", ProjectLocationSectionSummaryService.SECTION_ID);
+  }
+
+  private void assertInteractions(ProjectLocationView currentProjectLocationView,
+                                  ProjectLocationView previousProjectLocationView) {
+    verify(differenceService, times(1)).differentiate(
+        currentProjectLocationView,
+        previousProjectLocationView
     );
   }
 }

@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
@@ -59,7 +60,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
 
   @Transactional
   public ProjectLocation createOrUpdate(ProjectDetail detail, ProjectLocationForm form) {
-    var projectLocation = findByProjectDetail(detail).orElse(new ProjectLocation(detail));
+    var projectLocation = getProjectLocationByProjectDetail(detail).orElse(new ProjectLocation(detail));
 
     if (SearchSelectorService.isManualEntry(form.getField())) {
       projectLocation.setManualFieldName(SearchSelectorService.removePrefix(form.getField()));
@@ -97,12 +98,16 @@ public class ProjectLocationService implements ProjectFormSectionService {
     projectLocationBlocksService.createOrUpdateBlocks(licenceBlockIds, projectLocation);
   }
 
-  public Optional<ProjectLocation> findByProjectDetail(ProjectDetail detail) {
+  public Optional<ProjectLocation> getProjectLocationByProjectDetail(ProjectDetail detail) {
     return projectLocationRepository.findByProjectDetail(detail);
   }
 
+  public Optional<ProjectLocation> getProjectLocationByProjectAndVersion(Project project, Integer version) {
+    return projectLocationRepository.findByProjectDetail_ProjectAndProjectDetail_Version(project, version);
+  }
+
   public ProjectLocation getOrError(ProjectDetail detail) {
-    return findByProjectDetail(detail).orElseThrow(
+    return getProjectLocationByProjectDetail(detail).orElseThrow(
         () -> new PathfinderEntityNotFoundException(
             String.format("Unable to find ProjectLocation for projectDetail with id: %d", detail.getId())
         )
@@ -111,7 +116,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
 
 
   public ProjectLocationForm getForm(ProjectDetail detail) {
-    return findByProjectDetail(detail)
+    return getProjectLocationByProjectDetail(detail)
         .map(this::getForm).orElse(new ProjectLocationForm());
   }
 
@@ -194,7 +199,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
   }
 
   private List<ProjectLocationBlockView> getBlockViewsForLocation(ProjectDetail detail, ValidationType validationType) {
-    var location = findByProjectDetail(detail);
+    var location = getProjectLocationByProjectDetail(detail);
     return location.isPresent()
         ? projectLocationBlocksService.getBlockViewsForLocation(location.get(), validationType)
         : Collections.emptyList();
@@ -231,7 +236,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
                                                   List<ProjectLocationBlockView> views,
                                                   ValidationType validationType
   ) {
-    findByProjectDetail(detail).ifPresent(location -> {
+    getProjectLocationByProjectDetail(detail).ifPresent(location -> {
       var missingViews = form.getLicenceBlocks().stream() //find out which ones are missing
           // (this will also avoid looking for duplicates)
           .filter(ref -> views.stream().noneMatch(view -> view.getCompositeKey().equals(ref)))
@@ -254,7 +259,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
-    findByProjectDetail(projectDetail).ifPresent(projectLocation -> {
+    getProjectLocationByProjectDetail(projectDetail).ifPresent(projectLocation -> {
       projectLocationBlocksService.deleteBlocks(projectLocation);
       projectLocationRepository.delete(projectLocation);
     });

@@ -362,6 +362,46 @@ public class ProjectLocationServiceTest {
   }
 
   @Test
+  public void getProjectLocationByProjectDetail_whenFound_thenReturn() {
+    projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(details);
+
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectLocation));
+
+    assertThat(projectLocationService.getProjectLocationByProjectDetail(details)).contains(projectLocation);
+  }
+
+  @Test
+  public void getProjectLocationByProjectDetail_whenNotFound_thenReturnEmpty() {
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
+
+    assertThat(projectLocationService.getProjectLocationByProjectDetail(details)).isEmpty();
+  }
+
+  @Test
+  public void getProjectLocationByProjectAndVersion_whenFound_thenReturn() {
+    projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(details);
+
+    var project = details.getProject();
+    var version = details.getVersion() -  1;
+
+    when(projectLocationRepository.findByProjectDetail_ProjectAndProjectDetail_Version(project, version))
+        .thenReturn(Optional.of(projectLocation));
+
+    assertThat(projectLocationService.getProjectLocationByProjectAndVersion(project, version)).contains(projectLocation);
+  }
+
+  @Test
+  public void getProjectLocationByProjectAndVersion_whenNotFound_thenReturnEmpty() {
+    var project = details.getProject();
+    var version = details.getVersion() -  1;
+
+    when(projectLocationRepository.findByProjectDetail_ProjectAndProjectDetail_Version(project, version))
+        .thenReturn(Optional.empty());
+
+    assertThat(projectLocationService.getProjectLocationByProjectAndVersion(project, version)).isEmpty();
+  }
+
+  @Test
   public void removeSectionData_whenLocationNotFound_thenNoDelete() {
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
 
