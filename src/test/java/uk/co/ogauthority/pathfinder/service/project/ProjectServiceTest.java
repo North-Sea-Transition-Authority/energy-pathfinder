@@ -109,6 +109,28 @@ public class ProjectServiceTest {
   }
 
   @Test
+  public void getDetail_whenFound_thenReturn() {
+    var project = projectDetail.getProject();
+    var version = projectDetail.getVersion();
+
+    when(projectDetailsRepository.findByProjectIdAndVersion(project.getId(), version))
+        .thenReturn(Optional.of(projectDetail));
+
+    assertThat(projectService.getDetail(project, version)).contains(projectDetail);
+  }
+
+  @Test
+  public void getDetail_whenNotFound_thenReturnEmpty() {
+    var project = projectDetail.getProject();
+    var version = projectDetail.getVersion();
+
+    when(projectDetailsRepository.findByProjectIdAndVersion(project.getId(), version))
+        .thenReturn(Optional.empty());
+
+    assertThat(projectService.getDetail(project, version)).isEmpty();
+  }
+
+  @Test
   public void getDetailOrError_whenExists_thenReturn() {
     when(projectDetailsRepository.findByProjectIdAndVersion(PROJECT_ID, PROJECT_VERSION)).thenReturn(
         Optional.of(projectDetail)

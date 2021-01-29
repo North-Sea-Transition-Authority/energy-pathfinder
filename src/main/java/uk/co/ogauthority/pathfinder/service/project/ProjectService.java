@@ -57,6 +57,10 @@ public class ProjectService {
     );
   }
 
+  public Optional<ProjectDetail> getDetail(Project project, Integer version) {
+    return projectDetailsRepository.findByProjectIdAndVersion(project.getId(), version);
+  }
+
   public ProjectDetail getDetailOrError(Integer projectId, Integer version) {
     return projectDetailsRepository.findByProjectIdAndVersion(projectId, version)
         .orElseThrow(() -> new PathfinderEntityNotFoundException(

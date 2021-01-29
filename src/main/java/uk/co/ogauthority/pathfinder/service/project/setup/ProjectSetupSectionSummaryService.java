@@ -1,8 +1,10 @@
 package uk.co.ogauthority.pathfinder.service.project.setup;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,8 @@ import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.
 import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.setup.ProjectSetupSummaryItem;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
+import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
@@ -28,11 +32,17 @@ public class ProjectSetupSectionSummaryService implements ProjectSectionSummaryS
   );
 
 
+  private final ProjectService projectService;
   private final ProjectSetupService projectSetupService;
+  private final DifferenceService differenceService;
 
   @Autowired
-  public ProjectSetupSectionSummaryService(ProjectSetupService projectSetupService) {
+  public ProjectSetupSectionSummaryService(ProjectService projectService,
+                                           ProjectSetupService projectSetupService,
+                                           DifferenceService differenceService) {
+    this.projectService = projectService;
     this.projectSetupService = projectSetupService;
+    this.differenceService = differenceService;
   }
 
   @Override
@@ -40,20 +50,48 @@ public class ProjectSetupSectionSummaryService implements ProjectSectionSummaryS
     Map<String, Object> summaryModel = new HashMap<>();
     summaryModel.put("sectionTitle", PAGE_NAME);
     summaryModel.put("sectionId", SECTION_ID);
-    var answers = getAllSummaryItems(projectSetupService.isDecomRelated(detail));
-
-    projectSetupService.getProjectTaskListSetup(detail).ifPresent(
-        ts -> ts.getTaskListAnswers().forEach(
-            a -> setAnswer(a, answers)
-        ));
-
-    summaryModel.put("answers", answers);
+    var summaryItems = getSummaryItems(detail);
+    summaryModel.put("projectSetupDiffModel", getProjectSetupDifferenceModel(
+        detail,
+        summaryItems
+    ));
     return new ProjectSectionSummary(
         List.of(SECTION_LINK),
         TEMPLATE_PATH,
         summaryModel,
         DISPLAY_ORDER
     );
+  }
+
+  private List<Map<String, ?>> getProjectSetupDifferenceModel(
+      ProjectDetail projectDetail,
+      List<ProjectSetupSummaryItem> summaryItems
+  ) {
+    var previousSummaryItems = projectService.getDetail(
+        projectDetail.getProject(),
+        projectDetail.getVersion() - 1
+    )
+        .map(this::getSummaryItems)
+        .orElse(Collections.emptyList());
+
+    return differenceService.differentiateComplexLists(
+        summaryItems,
+        previousSummaryItems,
+        Set.of("question"),
+        ProjectSetupSummaryItem::getQuestion,
+        ProjectSetupSummaryItem::getQuestion
+    );
+  }
+
+  protected List<ProjectSetupSummaryItem> getSummaryItems(ProjectDetail projectDetail) {
+    var answers = getAllSummaryItems(projectSetupService.isDecomRelated(projectDetail));
+
+    projectSetupService.getProjectTaskListSetup(projectDetail).ifPresent(
+        ts -> ts.getTaskListAnswers().forEach(
+            a -> setAnswer(a, answers)
+        ));
+
+    return answers;
   }
 
   private List<ProjectSetupSummaryItem> getAllSummaryItems(boolean isDecomRelated) {

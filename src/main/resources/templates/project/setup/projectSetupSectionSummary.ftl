@@ -2,8 +2,11 @@
 
 <@sectionSummaryWrapper.sectionSummaryWrapper sectionId=sectionId sectionTitle=sectionTitle>
   <@fdsCheckAnswers.checkAnswers >
-    <#list answers as answer>
-      <@checkAnswers.checkAnswersRowNoActions prompt=answer.prompt value=answer.answerValue!"" />
+    <#list projectSetupDiffModel as projectSetupDiff>
+      <@checkAnswers.diffedCheckAnswersRowNoActions
+        prompt=projectSetupDiff.ProjectSetupSummaryItem_prompt.currentValue
+        diffedField=projectSetupDiff.ProjectSetupSummaryItem_answerValue
+      />
     </#list>
   </@fdsCheckAnswers.checkAnswers>
 </@sectionSummaryWrapper.sectionSummaryWrapper>
