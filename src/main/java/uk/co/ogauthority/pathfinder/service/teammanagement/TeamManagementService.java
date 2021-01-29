@@ -39,6 +39,7 @@ import uk.co.ogauthority.pathfinder.model.team.TeamType;
 import uk.co.ogauthority.pathfinder.model.teammanagement.TeamMemberView;
 import uk.co.ogauthority.pathfinder.model.teammanagement.TeamRoleView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.email.TeamManagementEmailService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 
 @Service
@@ -48,13 +49,16 @@ public class TeamManagementService {
   private static final Logger LOGGER = LoggerFactory.getLogger(TeamManagementService.class);
 
   private final TeamService teamService;
+  private final TeamManagementEmailService teamManagementEmailService;
   private final PersonRepository personRepository;
   private final WebUserAccountRepository webUserAccountRepository;
 
   public TeamManagementService(TeamService teamService,
+                               TeamManagementEmailService teamManagementEmailService,
                                PersonRepository personRepository,
                                WebUserAccountRepository webUserAccountRepository) {
     this.teamService = teamService;
+    this.teamManagementEmailService = teamManagementEmailService;
     this.personRepository = personRepository;
     this.webUserAccountRepository = webUserAccountRepository;
   }
@@ -273,7 +277,9 @@ public class TeamManagementService {
 
     if (!isAlreadyTeamMember) {
       // Only send a notification email if the user was not already in the team
-      notifyNewTeamUser(team, person, selectedRoles);
+      notifyNewTeamUser(team, person, selectedRoles, actionPerformedBy);
+    } else {
+      notifyTeamRolesUpdated(team, person, selectedRoles, actionPerformedBy);
     }
   }
 
@@ -291,6 +297,7 @@ public class TeamManagementService {
         ));
       } else {
         teamService.removePersonFromTeam(team, person, actionPerformedBy);
+        notifyTeamUserRemoved(team, person, actionPerformedBy);
       }
     } else {
       throw new RuntimeException(String.format("PersonId %s is not a member of resId %s", person.getId(), team.getId()));
@@ -339,10 +346,22 @@ public class TeamManagementService {
         .collect(Collectors.toList());
   }
 
+  private String getStringTeamRoles(List<Role> selectedRoles) {
+    return selectedRoles.stream()
+        .map(Role::getTitle)
+        .collect(Collectors.joining(", "));
+  }
 
-  public void notifyNewTeamUser(Team team, Person person, List<Role> selectedRoles) {
-    // TODO PAT-63/PAT-68 - email notifications
-    LOGGER.info("== TODO Email notification - Team member added ==");
+  public void notifyNewTeamUser(Team team, Person person, List<Role> selectedRoles, WebUserAccount addedByUser) {
+    teamManagementEmailService.sendAddedToTeamEmail(team, person, getStringTeamRoles(selectedRoles), addedByUser);
+  }
+
+  public void notifyTeamRolesUpdated(Team team, Person person, List<Role> selectedRoles, WebUserAccount updatedByUser) {
+    teamManagementEmailService.sendTeamRolesUpdatedEmail(team, person, getStringTeamRoles(selectedRoles), updatedByUser);
+  }
+
+  public void notifyTeamUserRemoved(Team team, Person person, WebUserAccount removedByUser) {
+    teamManagementEmailService.sendRemovedFromTeamEmail(team, person, removedByUser);
   }
 
   /**

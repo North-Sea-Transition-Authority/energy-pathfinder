@@ -325,7 +325,7 @@ public class PortalTeamManagementControllerTest extends TeamManagementContextAbs
         .andExpect(model().attributeHasErrors("form"));
 
     verify(teamManagementService, times(0)).updateUserRoles(any(), any(), any(), any());
-    verify(teamManagementService, times(0)).notifyNewTeamUser(any(), any(), any());
+    verify(teamManagementService, times(0)).notifyNewTeamUser(any(), any(), any(), any());
   }
 
   @Test
@@ -340,7 +340,7 @@ public class PortalTeamManagementControllerTest extends TeamManagementContextAbs
         .andExpect(status().isForbidden());
 
     verify(teamManagementService, times(0)).updateUserRoles(any(), any(), any(), any());
-    verify(teamManagementService, times(0)).notifyNewTeamUser(any(), any(), any());
+    verify(teamManagementService, times(0)).notifyNewTeamUser(any(), any(), any(), any());
   }
 
 

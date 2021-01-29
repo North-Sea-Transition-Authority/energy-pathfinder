@@ -42,6 +42,7 @@ import uk.co.ogauthority.pathfinder.model.team.Role;
 import uk.co.ogauthority.pathfinder.model.team.Team;
 import uk.co.ogauthority.pathfinder.model.team.TeamMember;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.email.TeamManagementEmailService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -53,6 +54,9 @@ public class TeamManagementServiceTest {
   private TeamService teamService;
 
   @Mock
+  private TeamManagementEmailService teamManagementEmailService;
+
+  @Mock
   private PersonRepository personRepository;
 
   @Mock
@@ -61,6 +65,8 @@ public class TeamManagementServiceTest {
   private RegulatorTeam regulatorTeam;
   private Role regTeamAdminRole;
   private Role regTeamSomeOtherRole;
+  private List<Role> organisationRoles;
+  private String organisationRolesCsv;
   private TeamMember regulatorPersonRegulatorTeamMember;
   private TeamMember otherRegulatorPersonTeamMember;
   private OrganisationTeam organisationTeam1;
@@ -88,12 +94,22 @@ public class TeamManagementServiceTest {
   @Before
   public void setUp() {
 
-    teamManagementService = new TeamManagementService(teamService, personRepository, webUserAccountRepository);
+    teamManagementService = new TeamManagementService(
+        teamService,
+        teamManagementEmailService,
+        personRepository,
+        webUserAccountRepository
+    );
 
     regulatorTeam = TeamTestingUtil.getRegulatorTeam();
 
     regTeamAdminRole = TeamTestingUtil.getTeamAdminRole();
     regTeamSomeOtherRole = TeamTestingUtil.generateRole("SOME_ROLE", 999);
+    organisationRoles = List.of(
+        TeamTestingUtil.generateRole("FIRST_ROLE", 10),
+        TeamTestingUtil.generateRole("SECOND_ROLE", 20)
+    );
+    organisationRolesCsv = "FIRST_ROLE, SECOND_ROLE";
 
     regulatorTeamAdminPerson = new Person(1, "reg", "person", "reg@person.com", "0");
     regulatorPersonRegulatorTeamMember = new TeamMember(regulatorTeam, regulatorTeamAdminPerson, Set.of(regTeamAdminRole));
@@ -234,6 +250,27 @@ public class TeamManagementServiceTest {
 
     assertThat(selectableViews.get(2).getRoleName()).isEqualTo(thirdRole.getName());
     assertThat(selectableViews.get(2).getDisplaySequence()).isEqualTo(thirdRole.getDisplaySequence());
+  }
+
+  @Test
+  public void notifyNewTeamUser() {
+    teamManagementService.notifyNewTeamUser(organisationTeam1, organisationPerson, organisationRoles, organisationUser);
+
+    verify(teamManagementEmailService, times(1)).sendAddedToTeamEmail(organisationTeam1, organisationPerson, organisationRolesCsv, organisationUser);
+  }
+
+  @Test
+  public void notifyTeamRolesUpdated() {
+    teamManagementService.notifyTeamRolesUpdated(organisationTeam1, organisationPerson, organisationRoles, organisationUser);
+
+    verify(teamManagementEmailService, times(1)).sendTeamRolesUpdatedEmail(organisationTeam1, organisationPerson, organisationRolesCsv, organisationUser);
+  }
+
+  @Test
+  public void notifyTeamUserRemoved() {
+    teamManagementService.notifyTeamUserRemoved(organisationTeam1, organisationPerson, organisationUser);
+
+    verify(teamManagementEmailService, times(1)).sendRemovedFromTeamEmail(organisationTeam1, organisationPerson, organisationUser);
   }
 
   @Test

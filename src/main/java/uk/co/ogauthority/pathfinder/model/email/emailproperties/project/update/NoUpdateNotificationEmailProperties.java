@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.email.emailproperties;
+package uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update;
 
 import java.util.Map;
 import java.util.Objects;

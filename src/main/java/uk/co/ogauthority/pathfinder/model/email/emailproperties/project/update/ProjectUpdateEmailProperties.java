@@ -1,7 +1,8 @@
-package uk.co.ogauthority.pathfinder.model.email.emailproperties;
+package uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update;
 
 import java.util.Map;
 import java.util.Objects;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplate;
 
 public class ProjectUpdateEmailProperties extends EmailProperties {

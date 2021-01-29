@@ -2,7 +2,7 @@ package uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdate
 
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.ProjectUpdateEmailProperties;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.ProjectUpdateEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.scheduler.ReminderType;
 import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
