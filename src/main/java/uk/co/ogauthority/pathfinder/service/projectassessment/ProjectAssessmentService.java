@@ -15,7 +15,6 @@ import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectCo
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.projectassessment.ProjectAssessment;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.enums.projectassessment.ProjectQuality;
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentForm;
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentValidationHint;
@@ -61,7 +60,6 @@ public class ProjectAssessmentService {
                                                    ProjectAssessmentForm form) {
     var projectAssessment = new ProjectAssessment();
     projectAssessment.setProjectDetail(projectDetail);
-    projectAssessment.setProjectQuality(form.getProjectQuality());
     projectAssessment.setReadyToBePublished(form.getReadyToBePublished());
     projectAssessment.setUpdateRequired(form.getUpdateRequired());
     projectAssessment.setAssessedInstant(Instant.now());
@@ -99,7 +97,6 @@ public class ProjectAssessmentService {
         .addObject("projectHeaderHtml", projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, user))
         .addObject("canRequestUpdate", regulatorUpdateRequestService.canRequestUpdate(projectDetail))
         .addObject("form", form)
-        .addObject("projectQualities", ProjectQuality.getAllAsMap())
         .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)));
     breadcrumbService.fromManageProject(projectId, modelAndView, ProjectAssessmentController.PAGE_NAME);
     return modelAndView;

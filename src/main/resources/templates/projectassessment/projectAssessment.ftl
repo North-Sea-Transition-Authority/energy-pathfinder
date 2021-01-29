@@ -10,7 +10,6 @@
   <h2 class="govuk-heading-l">${pageName}</h2>
 
   <@fdsForm.htmlForm>
-    <@fdsRadio.radio path="form.projectQuality" labelText="What is the quality of the project?" radioItems=projectQualities />
     <#if !canRequestUpdate>
       <@fdsInsetText.insetText insetTextClass="govuk-inset-text--yellow">
         An update is already in progress for this project. As a result you will not be able to request an update as part of this assessment
