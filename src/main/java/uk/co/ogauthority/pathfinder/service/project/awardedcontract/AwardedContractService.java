@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContract;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -145,6 +146,10 @@ public class AwardedContractService implements ProjectFormSectionService {
 
   public List<AwardedContract> getAwardedContracts(ProjectDetail projectDetail) {
     return awardedContractRepository.findByProjectDetailOrderByIdAsc(projectDetail);
+  }
+
+  public List<AwardedContract> getAwardedContractsByProjectAndVersion(Project project, Integer version) {
+    return awardedContractRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version);
   }
 
   public AwardedContract getAwardedContract(Integer awardedContractId, ProjectDetail projectDetail) {

@@ -272,6 +272,33 @@ public class AwardedContractServiceTest {
   }
 
   @Test
+  public void getAwardedContracts() {
+    var awardedContracts = List.of(
+        AwardedContractTestUtil.createAwardedContract(),
+        AwardedContractTestUtil.createAwardedContract()
+    );
+
+    when(awardedContractRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(awardedContracts);
+
+    assertThat(awardedContractService.getAwardedContracts(detail)).isEqualTo(awardedContracts);
+  }
+
+  @Test
+  public void getAwardedContractsByProjectAndVersion() {
+    var project = detail.getProject();
+    var version = detail.getVersion();
+    var awardedContracts = List.of(
+        AwardedContractTestUtil.createAwardedContract(),
+        AwardedContractTestUtil.createAwardedContract()
+    );
+
+    when(awardedContractRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
+        .thenReturn(awardedContracts);
+
+    assertThat(awardedContractService.getAwardedContractsByProjectAndVersion(project, version)).isEqualTo(awardedContracts);
+  }
+
+  @Test
   public void deleteAwardedContract() {
     var awardedContract = AwardedContractTestUtil.createAwardedContract();
     awardedContractService.deleteAwardedContract(awardedContract);

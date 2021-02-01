@@ -65,7 +65,7 @@
 
 </#macro>
 
-<#macro diffedCheckAnswersRowNoActions prompt diffedField multiLineTextBlockClass="">
+<#macro diffedCheckAnswersRowNoActions prompt diffedField multiLineTextBlockClass="govuk-body">
   <@checkAnswersRowNoActionsWithNested prompt=prompt>
     <#if diffedField?has_content>
       <@differenceChanges.renderDifference
@@ -76,7 +76,7 @@
   </@checkAnswersRowNoActionsWithNested>
 </#macro>
 
-<#macro checkAnswersStandardOrDiffRow prompt fieldValue isDiffedField multiLineTextBlockClass="">
+<#macro checkAnswersStandardOrDiffRow prompt fieldValue isDiffedField multiLineTextBlockClass="govuk-body">
   <#if isDiffedField>
     <@diffedCheckAnswersRowNoActions
       prompt=prompt
@@ -88,7 +88,7 @@
   </#if>
 </#macro>
 
-<#macro checkAnswersStandardNestedOrDiffRow prompt fieldValue isDiffedField multiLineTextBlockClass="">
+<#macro checkAnswersStandardNestedOrDiffRow prompt fieldValue isDiffedField multiLineTextBlockClass="govuk-body">
   <#if isDiffedField>
     <@diffedCheckAnswersRowNoActions
       prompt=prompt

@@ -11,7 +11,6 @@
         awardedContractView=awardedContractView
         showActions=true
         showHeader=true
-        showTag=false
       />
     </#list>
     <#else>

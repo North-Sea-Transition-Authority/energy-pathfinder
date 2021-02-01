@@ -9,7 +9,6 @@
     <@checkAnswers.diffedCheckAnswersRowNoActions
       prompt="Project summary"
       diffedField=projectInformationDiffModel.ProjectInformationView_projectSummary
-      multiLineTextBlockClass="govuk-body"
     />
     <@checkAnswers.diffedCheckAnswersRowNoActions
       prompt="Field stage"
