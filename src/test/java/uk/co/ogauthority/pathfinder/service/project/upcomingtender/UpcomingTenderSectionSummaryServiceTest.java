@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.project.upcomingtender;
 
-import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -17,7 +16,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;

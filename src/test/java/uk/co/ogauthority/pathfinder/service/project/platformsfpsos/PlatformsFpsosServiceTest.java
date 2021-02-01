@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -131,6 +132,51 @@ public class PlatformsFpsosServiceTest {
     var existingPlatformFpso = platformFpso;
     platformsFpsosService.updatePlatformFpso(detail, existingPlatformFpso, form);
     assertCommonFieldsMatch(existingPlatformFpso, form);
+  }
+
+  @Test
+  public void getPlatformsFpsosByProjectDetail_whenPlatformsFpsos_thenReturnPopulatedList() {
+    var platformsFpsos = List.of(
+        PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(detail),
+        PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved_manualStructure(detail)
+    );
+
+    when(platformFpsoRepository.findAllByProjectDetailOrderByIdAsc(detail)).thenReturn(platformsFpsos);
+
+    assertThat(platformsFpsosService.getPlatformsFpsosByProjectDetail(detail)).isEqualTo(platformsFpsos);
+  }
+
+  @Test
+  public void getPlatformsFpsosByProjectDetail_whenNoPlatformsFpsos_thenReturnEmptyList() {
+    when(platformFpsoRepository.findAllByProjectDetailOrderByIdAsc(detail)).thenReturn(Collections.emptyList());
+
+    assertThat(platformsFpsosService.getPlatformsFpsosByProjectDetail(detail)).isEmpty();
+  }
+
+  @Test
+  public void getPlatformsFpsosByProjectAndVersion_whenPlatformsFpsos_thenReturnPopulatedList() {
+    var project = detail.getProject();
+    var version = detail.getVersion();
+    var platformsFpsos = List.of(
+        PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(detail),
+        PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved_manualStructure(detail)
+    );
+
+    when(platformFpsoRepository.findAllByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
+        .thenReturn(platformsFpsos);
+
+    assertThat(platformsFpsosService.getPlatformsFpsosByProjectAndVersion(project, version)).isEqualTo(platformsFpsos);
+  }
+
+  @Test
+  public void getPlatformsFpsosByProjectAndVersion_whenNoPlatformsFpsos_thenReturnEmptyList() {
+    var project = detail.getProject();
+    var version = detail.getVersion();
+
+    when(platformFpsoRepository.findAllByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
+        .thenReturn(Collections.emptyList());
+
+    assertThat(platformsFpsosService.getPlatformsFpsosByProjectAndVersion(project, version)).isEmpty();
   }
 
   @Test

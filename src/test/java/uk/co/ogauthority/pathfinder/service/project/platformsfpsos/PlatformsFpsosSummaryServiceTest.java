@@ -39,7 +39,7 @@ public class PlatformsFpsosSummaryServiceTest {
   @Before
   public void setUp() {
     platformsFpsosSummaryService = new PlatformsFpsosSummaryService(platformsFpsosService);
-    when(platformsFpsosService.getPlatformsFpsosForDetail(detail)).thenReturn(
+    when(platformsFpsosService.getPlatformsFpsosByProjectDetail(detail)).thenReturn(
         List.of(platformFpso, platformFpsoWithoutSubstructuresRemoved)
     );
   }

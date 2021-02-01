@@ -30,7 +30,7 @@ public class PlatformsFpsosSummaryService {
 
   public List<PlatformFpsoView> getSummaryViews(ProjectDetail detail) {
     return createPlatformFpsoViews(
-        platformsFpsosService.getPlatformsFpsosForDetail(detail),
+        platformsFpsosService.getPlatformsFpsosByProjectDetail(detail),
         detail.getProject().getId(),
         ValidationType.NO_VALIDATION
     );
@@ -38,7 +38,7 @@ public class PlatformsFpsosSummaryService {
 
   public List<PlatformFpsoView> getValidatedSummaryViews(ProjectDetail detail) {
     return createPlatformFpsoViews(
-        platformsFpsosService.getPlatformsFpsosForDetail(detail),
+        platformsFpsosService.getPlatformsFpsosByProjectDetail(detail),
         detail.getProject().getId(),
         ValidationType.FULL
     );

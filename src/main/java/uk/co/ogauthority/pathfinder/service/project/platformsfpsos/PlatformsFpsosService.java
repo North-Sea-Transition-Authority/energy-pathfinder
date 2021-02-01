@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -106,8 +107,12 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
     platformFpsoRepository.delete(platformFpso);
   }
 
-  public List<PlatformFpso> getPlatformsFpsosForDetail(ProjectDetail detail) {
+  public List<PlatformFpso> getPlatformsFpsosByProjectDetail(ProjectDetail detail) {
     return platformFpsoRepository.findAllByProjectDetailOrderByIdAsc(detail);
+  }
+
+  public List<PlatformFpso> getPlatformsFpsosByProjectAndVersion(Project project, Integer version) {
+    return platformFpsoRepository.findAllByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version);
   }
 
   public PlatformFpso getOrError(Integer platformFpsoId) {
@@ -178,7 +183,7 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
 
   @Override
   public boolean isComplete(ProjectDetail detail) {
-    var platformsFpsos = getPlatformsFpsosForDetail(detail);
+    var platformsFpsos = getPlatformsFpsosByProjectDetail(detail);
     return !platformsFpsos.isEmpty() && platformsFpsos.stream().allMatch(p -> isValid(p, ValidationType.FULL));
   }
 
@@ -195,7 +200,7 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
   @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
     entityDuplicationService.duplicateEntitiesAndSetNewParent(
-        getPlatformsFpsosForDetail(fromDetail),
+        getPlatformsFpsosByProjectDetail(fromDetail),
         toDetail,
         PlatformFpso.class
     );

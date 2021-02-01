@@ -30,6 +30,9 @@ public class PlatformFpsoView extends ProjectSummaryItem {
 
   private String futurePlans;
 
+  public PlatformFpsoView() {
+  }
+
   public PlatformFpsoView(Integer id,
                           Integer displayOrder,
                           Integer projectId

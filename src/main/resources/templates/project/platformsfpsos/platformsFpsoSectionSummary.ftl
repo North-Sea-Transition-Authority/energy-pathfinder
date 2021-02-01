@@ -2,15 +2,15 @@
 <#import '_platformFpsoSummary.ftl' as platformFpsoSummary>
 
 <@sectionSummaryWrapper.sectionSummaryWrapper sectionId=sectionId sectionTitle=sectionTitle>
-  <#if platformFpsoViews?has_content>
-    <#list platformFpsoViews as platformFpsoView>
-      <@platformFpsoSummary.platformFpsoSummary
-        view=platformFpsoView
+  <#if platformFpsoDiffModel?has_content>
+    <#list platformFpsoDiffModel as platformFpsoDiff>
+      <@platformFpsoSummary.platformFpsoDiffSummary
+        diffModel=platformFpsoDiff.platformFpsoDiff
+        areSubstructuresExpectedToBeRemoved=platformFpsoDiff.areSubstructuresExpectedToBeRemoved
         showHeader=true
         showActions=false
         headingSize="h3"
         headingClass="govuk-heading-m"
-        showTag=true
       />
     </#list>
   <#else>
