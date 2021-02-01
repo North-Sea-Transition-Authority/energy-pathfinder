@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.integratedrig.IntegratedRig;
 
@@ -13,6 +14,8 @@ public interface IntegratedRigRepository extends CrudRepository<IntegratedRig, I
   Optional<IntegratedRig> findByIdAndProjectDetail(Integer integratedRigId, ProjectDetail projectDetail);
 
   List<IntegratedRig> findByProjectDetailOrderByIdAsc(ProjectDetail projectDetail);
+
+  List<IntegratedRig> findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(Project project, Integer version);
 
   void deleteAllByProjectDetail(ProjectDetail projectDetail);
 }

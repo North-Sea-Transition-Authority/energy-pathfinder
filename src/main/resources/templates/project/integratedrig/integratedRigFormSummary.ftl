@@ -11,7 +11,6 @@
         integratedRigView=integratedRigView
         showHeader=true
         showActions=true
-        showTag=false
       />
     </#list>
     <#else>

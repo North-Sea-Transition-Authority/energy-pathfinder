@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.integratedrig.IntegratedRig;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -107,6 +108,10 @@ public class IntegratedRigService implements ProjectFormSectionService {
 
   public List<IntegratedRig> getIntegratedRigs(ProjectDetail projectDetail) {
     return integratedRigRepository.findByProjectDetailOrderByIdAsc(projectDetail);
+  }
+
+  public List<IntegratedRig> getIntegratedRigsByProjectAndVersion(Project project, Integer version) {
+    return integratedRigRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version);
   }
 
   public boolean isValid(IntegratedRig integratedRig, ValidationType validationType) {

@@ -61,6 +61,38 @@ public class IntegratedRigSummaryServiceTest {
   }
 
   @Test
+  public void getIntegratedRigSummaryViewsByProjectAndVersion_whenViews_thenReturnPopulatedList() {
+    var project = projectDetail.getProject();
+    var version = projectDetail.getVersion();
+    var integratedRig = IntegratedRigTestUtil.createIntegratedRig_withManualFacility();
+
+    when(integratedRigService.getIntegratedRigsByProjectAndVersion(project, version)).thenReturn(
+        List.of(integratedRig)
+    );
+
+    var results = integratedRigSummaryService.getIntegratedRigSummaryViewsByProjectAndVersion(project, version);
+
+    assertThat(results).hasSize(1);
+    var integratedRigView = results.get(0);
+    assertThat(integratedRigView.getId()).isEqualTo(integratedRig.getId());
+    assertThat(integratedRigView.getProjectId()).isEqualTo(integratedRig.getProjectDetail().getProject().getId());
+    assertThat(integratedRigView.isValid()).isTrue();
+  }
+
+  @Test
+  public void getIntegratedRigSummaryViewsByProjectAndVersion_whenNoViews_thenReturnEmptyList() {
+    var project = projectDetail.getProject();
+    var version = projectDetail.getVersion();
+
+    when(integratedRigService.getIntegratedRigsByProjectAndVersion(project, version)).thenReturn(
+        List.of()
+    );
+
+    var results = integratedRigSummaryService.getIntegratedRigSummaryViewsByProjectAndVersion(project, version);
+    assertThat(results).isEmpty();
+  }
+
+  @Test
   public void getIntegratedRigSummaryView_whenFound_thenViewReturned() {
 
     final var integratedRigId = 1;

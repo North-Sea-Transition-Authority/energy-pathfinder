@@ -2,12 +2,14 @@ package uk.co.ogauthority.pathfinder.service.project.setup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -70,7 +72,13 @@ public class ProjectSetupSectionSummaryServiceTest {
     assertThat(modelMap).containsEntry("sectionTitle", ProjectSetupSectionSummaryService.PAGE_NAME);
     assertThat(modelMap).containsEntry("sectionId", ProjectSetupSectionSummaryService.SECTION_ID);
 
-    verify(differenceService, times(1)).differentiateComplexLists(any(), any(), any(), any(), any());
+    verify(differenceService, times(1)).differentiateComplexLists(
+        any(),
+        any(),
+        eq(Set.of("question")),
+        any(),
+        any()
+    );
   }
 
   @Test

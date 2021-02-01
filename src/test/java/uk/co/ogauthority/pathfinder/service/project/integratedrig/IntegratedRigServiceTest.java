@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
@@ -259,6 +260,32 @@ public class IntegratedRigServiceTest {
 
     var integratedRigs = integratedRigService.getIntegratedRigs(projectDetail);
     assertThat(integratedRigs).isEmpty();
+  }
+
+  @Test
+  public void getIntegratedRigsByProjectAndVersion_whenExist_thenReturnList() {
+    var project = projectDetail.getProject();
+    var version = projectDetail.getVersion();
+    var integratedRigs = List.of(
+        IntegratedRigTestUtil.createIntegratedRig_withDevUkFacility(),
+        IntegratedRigTestUtil.createIntegratedRig_withManualFacility()
+    );
+
+    when(integratedRigRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
+        .thenReturn(integratedRigs);
+
+    assertThat(integratedRigService.getIntegratedRigsByProjectAndVersion(project, version)).isEqualTo(integratedRigs);
+  }
+
+  @Test
+  public void getIntegratedRigsByProjectAndVersion_whenNoneExist_thenEmptyList() {
+    var project = projectDetail.getProject();
+    var version = projectDetail.getVersion();
+
+    when(integratedRigRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
+        .thenReturn(Collections.emptyList());
+
+    assertThat(integratedRigService.getIntegratedRigsByProjectAndVersion(project, version)).isEmpty();
   }
 
   @Test

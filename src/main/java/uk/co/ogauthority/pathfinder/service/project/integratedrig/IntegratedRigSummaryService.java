@@ -6,7 +6,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.integratedrig.IntegratedRig;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.model.view.integratedrig.IntegratedRigView;
@@ -32,6 +34,13 @@ public class IntegratedRigSummaryService {
     return constructIntegratedRigViews(projectDetail, ValidationType.NO_VALIDATION);
   }
 
+  public List<IntegratedRigView> getIntegratedRigSummaryViewsByProjectAndVersion(Project project, Integer version) {
+    return constructIntegratedRigViews(
+        integratedRigService.getIntegratedRigsByProjectAndVersion(project, version),
+        ValidationType.NO_VALIDATION
+    );
+  }
+
   public IntegratedRigView getIntegratedRigSummaryView(Integer integratedRigId,
                                                        ProjectDetail projectDetail,
                                                        Integer displayOrder) {
@@ -54,10 +63,12 @@ public class IntegratedRigSummaryService {
     return SummaryUtil.validateViews(new ArrayList<>(integratedRigViews));
   }
 
-  private List<IntegratedRigView> constructIntegratedRigViews(ProjectDetail projectDetail,
-                                                              ValidationType validationType) {
-    var integratedRigs = integratedRigService.getIntegratedRigs(projectDetail);
+  private List<IntegratedRigView> constructIntegratedRigViews(ProjectDetail projectDetail, ValidationType validationType) {
+    return constructIntegratedRigViews(integratedRigService.getIntegratedRigs(projectDetail), validationType);
+  }
 
+  private List<IntegratedRigView> constructIntegratedRigViews(List<IntegratedRig> integratedRigs,
+                                                              ValidationType validationType) {
     return IntStream.range(0, integratedRigs.size())
         .mapToObj(index -> {
 

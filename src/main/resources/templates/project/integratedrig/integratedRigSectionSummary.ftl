@@ -2,13 +2,12 @@
 <#import '_integratedRigSummary.ftl' as integratedRigSummary>
 
 <@sectionSummaryWrapper.sectionSummaryWrapper sectionId=sectionId sectionTitle=sectionTitle>
-  <#if integratedRigViews?has_content>
-    <#list integratedRigViews as integratedRigView>
-      <@integratedRigSummary.integratedRigSummary
-        integratedRigView=integratedRigView
+  <#if integratedRigDiffModel?has_content>
+    <#list integratedRigDiffModel as integratedRigDiff>
+      <@integratedRigSummary.integratedRigDiffSummary
+        integratedRigDiff=integratedRigDiff
         showHeader=true
         showActions=false
-        showTag=true
         headingSize="h3"
         headingClass="govuk-heading-m"
       />
