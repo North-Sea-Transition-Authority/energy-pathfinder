@@ -23,7 +23,6 @@ import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectCo
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.projectassessment.ProjectAssessment;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.enums.projectassessment.ProjectQuality;
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentForm;
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentValidationHint;
@@ -94,7 +93,6 @@ public class ProjectAssessmentServiceTest {
         form
     );
 
-    assertThat(projectAssessment.getProjectQuality()).isEqualTo(form.getProjectQuality());
     assertThat(projectAssessment.getReadyToBePublished()).isEqualTo(form.getReadyToBePublished());
     assertThat(projectAssessment.getUpdateRequired()).isEqualTo(form.getUpdateRequired());
     assertThat(projectAssessment.getAssessedInstant()).isNotNull();
@@ -115,7 +113,6 @@ public class ProjectAssessmentServiceTest {
         form
     );
 
-    assertThat(projectAssessment.getProjectQuality()).isEqualTo(form.getProjectQuality());
     assertThat(projectAssessment.getReadyToBePublished()).isEqualTo(form.getReadyToBePublished());
     assertThat(projectAssessment.getUpdateRequired()).isEqualTo(form.getUpdateRequired());
     assertThat(projectAssessment.getAssessedInstant()).isNotNull();
@@ -195,7 +192,6 @@ public class ProjectAssessmentServiceTest {
         entry("projectHeaderHtml", projectHeaderHtml),
         entry("canRequestUpdate", true),
         entry("form", form),
-        entry("projectQualities", ProjectQuality.getAllAsMap()),
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)))
     );
     verify(breadcrumbService, times(1)).fromManageProject(projectId, modelAndView, ProjectAssessmentController.PAGE_NAME);
@@ -218,7 +214,6 @@ public class ProjectAssessmentServiceTest {
         entry("projectHeaderHtml", projectHeaderHtml),
         entry("canRequestUpdate", false),
         entry("form", form),
-        entry("projectQualities", ProjectQuality.getAllAsMap()),
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)))
     );
     verify(breadcrumbService, times(1)).fromManageProject(projectId, modelAndView, ProjectAssessmentController.PAGE_NAME);

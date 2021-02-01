@@ -14,11 +14,6 @@ public class ProjectAssessmentViewUtil {
   public static ProjectAssessmentView from(ProjectAssessment projectAssessment,
                                            WebUserAccount assessor) {
     var projectAssessmentView = new ProjectAssessmentView();
-    projectAssessmentView.setProjectQuality(
-        projectAssessment.getProjectQuality() != null
-            ? projectAssessment.getProjectQuality().getDisplayName()
-            : null
-    );
     projectAssessmentView.setReadyToBePublished(projectAssessment.getReadyToBePublished());
     projectAssessmentView.setUpdateRequired(
         BooleanUtils.isTrue(projectAssessment.getReadyToBePublished())

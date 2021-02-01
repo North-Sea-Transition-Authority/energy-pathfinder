@@ -4,8 +4,6 @@ import java.util.Objects;
 
 public class ProjectAssessmentView {
 
-  private String projectQuality;
-
   private Boolean readyToBePublished;
 
   private Boolean updateRequired;
@@ -13,14 +11,6 @@ public class ProjectAssessmentView {
   private String assessmentDate;
 
   private String assessedByUser;
-
-  public String getProjectQuality() {
-    return projectQuality;
-  }
-
-  public void setProjectQuality(String projectQuality) {
-    this.projectQuality = projectQuality;
-  }
 
   public Boolean getReadyToBePublished() {
     return readyToBePublished;
@@ -63,8 +53,7 @@ public class ProjectAssessmentView {
       return false;
     }
     ProjectAssessmentView that = (ProjectAssessmentView) o;
-    return Objects.equals(projectQuality, that.projectQuality)
-        && Objects.equals(readyToBePublished, that.readyToBePublished)
+    return Objects.equals(readyToBePublished, that.readyToBePublished)
         && Objects.equals(updateRequired, that.updateRequired)
         && Objects.equals(assessmentDate, that.assessmentDate)
         && Objects.equals(assessedByUser, that.assessedByUser);
@@ -73,7 +62,6 @@ public class ProjectAssessmentView {
   @Override
   public int hashCode() {
     return Objects.hash(
-        projectQuality,
         readyToBePublished,
         updateRequired,
         assessmentDate,

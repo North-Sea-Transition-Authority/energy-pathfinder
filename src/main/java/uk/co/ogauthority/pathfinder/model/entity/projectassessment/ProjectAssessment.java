@@ -3,18 +3,12 @@ package uk.co.ogauthority.pathfinder.model.entity.projectassessment;
 import java.time.Instant;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
-import uk.co.ogauthority.pathfinder.model.enums.projectassessment.ProjectQuality;
 
 @Entity
 @Table(name = "project_assessments")
 public class ProjectAssessment extends ProjectDetailEntity {
-
-  @Enumerated(EnumType.STRING)
-  private ProjectQuality projectQuality;
 
   private Boolean readyToBePublished;
 
@@ -24,15 +18,6 @@ public class ProjectAssessment extends ProjectDetailEntity {
   private Instant assessedInstant;
 
   private Integer assessorWuaId;
-
-  public ProjectQuality getProjectQuality() {
-    return projectQuality;
-  }
-
-  public void setProjectQuality(
-      ProjectQuality projectQuality) {
-    this.projectQuality = projectQuality;
-  }
 
   public Boolean getReadyToBePublished() {
     return readyToBePublished;
