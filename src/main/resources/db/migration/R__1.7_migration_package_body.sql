@@ -1649,6 +1649,51 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   END create_project_update_record;
 
   /**
+    Procedure to create a record in the project_archive_details table in the new model for p_new_project_detail_id
+    @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+    @param p_new_project_detail_id The detail id the publish record should be associated to
+   */
+  PROCEDURE create_project_archive_record(
+    p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , p_new_project_detail_id IN ${datasource.user}.project_details.id%TYPE
+  )
+  IS
+
+    K_DESTINATION_TABLE_NAME CONSTANT VARCHAR2(30) := 'PROJECT_ARCHIVE_DETAILS';
+
+    l_new_archive_detail_id ${datasource.user}.project_archive_details.id%TYPE;
+
+  BEGIN
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message => 'Creating ' || K_DESTINATION_TABLE_NAME || ' record for legacy project detail with ID ' || p_legacy_project_detail_id
+    );
+
+    INSERT INTO ${datasource.user}.project_archive_details(
+      project_detail_id
+    , archive_reason
+    )
+    VALUES(
+      p_new_project_detail_id
+    , 'Project archived in legacy Project Pathfinder service'
+    ) RETURNING id INTO l_new_archive_detail_id;
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message => 'Created new ' || K_DESTINATION_TABLE_NAME || ' record with id => ' || l_new_archive_detail_id
+    );
+
+  EXCEPTION WHEN OTHERS THEN
+    raise_exception_with_trace(
+      p_message_prefix => 'ERROR in create_project_archive_record(' || CHR(10)
+        || '  p_legacy_project_detail_id => ' || p_legacy_project_detail_id || CHR(10)
+        || ', p_new_project_detail_id => ' || p_new_project_detail_id || CHR(10)
+        || ')'
+    );
+  END create_project_archive_record;
+
+  /**
     Procedure to create all of the detail records and associated form data for a given legacy project.
     @param p_legacy_project_id The id of the legacy project
     @parma p_new_project_id The id of the project p_legacy_project_id has been mapped to in the new service model
@@ -1715,6 +1760,13 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
         , p_new_project_detail_id => l_new_project_detail_id
         , p_published_datetime => l_new_detail_submitted_date
         , p_published_by_wua => l_new_detail_submitted_by_wua
+        );
+
+      ELSIF l_new_detail_status = K_NEW_ARCHIVED_STATUS THEN
+
+        create_project_archive_record(
+          p_legacy_project_detail_id => l_legacy_project_detail_id
+        , p_new_project_detail_id => l_new_project_detail_id
         );
 
       END IF;

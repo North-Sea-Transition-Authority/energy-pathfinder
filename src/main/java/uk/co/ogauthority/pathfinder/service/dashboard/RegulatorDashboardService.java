@@ -11,7 +11,11 @@ import uk.co.ogauthority.pathfinder.repository.dashboard.RegulatorDashboardProje
 @Service
 public class RegulatorDashboardService {
 
-  public static final List<ProjectStatus> REGULATOR_PROJECT_ACCESS_STATUSES = List.of(ProjectStatus.PUBLISHED, ProjectStatus.QA);
+  public static final List<ProjectStatus> REGULATOR_PROJECT_ACCESS_STATUSES = List.of(
+      ProjectStatus.PUBLISHED,
+      ProjectStatus.QA,
+      ProjectStatus.ARCHIVED
+  );
 
   private final RegulatorDashboardProjectItemRepository regulatorDashboardProjectItemRepository;
   private final DashboardFilterService filterService;
