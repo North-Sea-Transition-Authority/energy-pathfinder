@@ -11,12 +11,14 @@ import org.springframework.core.MethodParameter;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.HandlerMapping;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.communication.CommunicationJourney;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.team.annotation.TeamManagementPermissionCheck;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.service.communication.CommunicationJourneyStage;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.team.teammanagementcontext.TeamManagementPermission;
 
@@ -24,6 +26,7 @@ public class ArgumentResolverUtil {
 
   public static final String PROJECT_ID_PARAM = "projectId";
   public static final String RESOURCE_ID_PARAM = "resId";
+  public static final String COMMUNICATION_ID_PARAM = "communicationId";
 
   private ArgumentResolverUtil() {
     throw new IllegalStateException("ArgumentResolverUtil is a utility class and should not be instantiated");
@@ -139,5 +142,22 @@ public class ArgumentResolverUtil {
         Objects.requireNonNull(methodParameter.getMethod()).getAnnotation(TeamManagementPermissionCheck.class))
         .map(permissionCheck -> Arrays.stream(permissionCheck.permissions()).collect(Collectors.toSet()))
         .orElse(Set.of());
+  }
+
+  public static CommunicationJourneyStage getCommunicationJourneyStage(MethodParameter methodParameter) {
+    var methodLevelProjectDetailVersionType = Optional.ofNullable(
+        methodParameter.getMethodAnnotation(CommunicationJourney.class))
+        .map(CommunicationJourney::journeyStage);
+
+    return methodLevelProjectDetailVersionType.orElseGet(() -> Optional.ofNullable(
+        methodParameter.getContainingClass().getAnnotation(CommunicationJourney.class))
+        .map(CommunicationJourney::journeyStage)
+        .orElseThrow(() -> new RuntimeException(
+            String.format(
+                "Unable to find CommunicationJourney annotation while calling %s within %s",
+                methodParameter.toString(),
+                methodParameter.getContainingClass().getName()
+            ))
+        ));
   }
 }

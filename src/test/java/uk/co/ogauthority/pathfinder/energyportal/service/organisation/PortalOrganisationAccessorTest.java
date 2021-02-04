@@ -2,8 +2,10 @@ package uk.co.ogauthority.pathfinder.energyportal.service.organisation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -15,12 +17,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationUnit;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationUnitDetail;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeamUsagePurpose;
 import uk.co.ogauthority.pathfinder.energyportal.repository.organisation.PortalOrganisationGroupRepository;
 import uk.co.ogauthority.pathfinder.energyportal.repository.organisation.PortalOrganisationUnitDetailRepository;
 import uk.co.ogauthority.pathfinder.energyportal.repository.organisation.PortalOrganisationUnitRepository;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.dto.organisation.OrganisationUnitDetailDto;
 import uk.co.ogauthority.pathfinder.model.dto.organisation.OrganisationUnitId;
+import uk.co.ogauthority.pathfinder.model.team.TeamType;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -383,5 +387,25 @@ public class PortalOrganisationAccessorTest {
 
     var result = portalOrganisationAccessor.getOrganisationGroupsWhereIdIn(organisationGroupIdList);
     assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void getAllOrganisationGroupsWithAssociatedTeamType_whenResults_thenReturnList() {
+    when(organisationGroupRepository.findByExistenceOfPortalTeam(any(), eq(PortalTeamUsagePurpose.PRIMARY_DATA)))
+        .thenReturn(List.of(organisationGroup));
+
+    var results = portalOrganisationAccessor.getAllOrganisationGroupsWithAssociatedTeamType(TeamType.ORGANISATION);
+
+    assertThat(results).containsExactly(organisationGroup);
+  }
+
+  @Test
+  public void getAllOrganisationGroupsWithAssociatedTeamType_whenNoResults_thenEmptyList() {
+    when(organisationGroupRepository.findByExistenceOfPortalTeam(any(), eq(PortalTeamUsagePurpose.PRIMARY_DATA)))
+        .thenReturn(Collections.emptyList());
+
+    var results = portalOrganisationAccessor.getAllOrganisationGroupsWithAssociatedTeamType(TeamType.ORGANISATION);
+
+    assertThat(results).isEmpty();
   }
 }

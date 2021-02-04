@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
+import uk.co.ogauthority.pathfinder.controller.communication.CommunicationController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
@@ -18,6 +19,7 @@ import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.Subs
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.communication.CommunicationModelService;
 
 @Service
 public class BreadcrumbService {
@@ -146,6 +148,51 @@ public class BreadcrumbService {
     String route = ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null));
     map.put(route, "Manage project");
     return map;
+  }
+
+  public void fromCommunicationSummary(ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, communicationSummary(), thisPage);
+  }
+
+  private Map<String, String> communicationSummary() {
+    Map<String, String> breadcrumbs = workArea();
+    breadcrumbs.put(
+        ReverseRouter.route(on(CommunicationController.class).getCommunicationSummary(null)),
+        CommunicationModelService.COMMUNICATION_SUMMARY_PAGE_TITLE);
+    return breadcrumbs;
+  }
+
+  public void fromCommunicationEmailContent(Integer communicationId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, emailContent(communicationId), thisPage);
+  }
+
+  private Map<String, String> emailContent(Integer communicationId) {
+    Map<String, String> breadcrumbs = communicationSummary();
+    breadcrumbs.put(
+        ReverseRouter.route(on(CommunicationController.class).getCommunicationContent(
+            communicationId,
+            null,
+            null
+        )),
+        CommunicationModelService.COMMUNICATION_CONTENT_PAGE_TITLE);
+    return breadcrumbs;
+  }
+
+  public void fromCommunicationOrganisationGroupSelect(Integer communicationId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, organisationGroupSelect(communicationId), thisPage);
+  }
+
+  private Map<String, String> organisationGroupSelect(Integer communicationId) {
+    Map<String, String> breadcrumbs = emailContent(communicationId);
+    breadcrumbs.put(
+        ReverseRouter.route(on(CommunicationController.class).getOperatorSelectForCommunication(
+            communicationId,
+            null,
+            null
+        )),
+        CommunicationModelService.OPERATOR_BREADCRUMB_TITLE
+    );
+    return breadcrumbs;
   }
 
   private void addAttrs(ModelAndView modelAndView, Map<String, String> breadcrumbs, String currentPage) {

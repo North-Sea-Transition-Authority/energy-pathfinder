@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.model.entity.UserSession;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
 import uk.co.ogauthority.pathfinder.service.UserSessionService;
+import uk.co.ogauthority.pathfinder.service.communication.CommunicationJourneyService;
 import uk.co.ogauthority.pathfinder.service.navigation.TopNavigationService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
@@ -71,6 +72,9 @@ public abstract class TeamManagementContextAbstractControllerTest {
 
   @MockBean
   protected RegulatorProjectUpdateContextService regulatorProjectUpdateContextService;
+
+  @MockBean
+  protected CommunicationJourneyService communicationJourneyService;
 
   @Autowired
   protected TeamManagementContextService teamManagementContextService;

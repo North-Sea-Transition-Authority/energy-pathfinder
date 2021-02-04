@@ -15,6 +15,7 @@ import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.controller.quarterlystatistics.QuarterlyStatisticsController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.navigation.TopNavigationItem;
+import uk.co.ogauthority.pathfinder.service.communication.CommunicationModelService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -35,6 +36,7 @@ public class TopNavigationServiceTest {
   private AuthenticatedUserAccount regulatorAdminUser;
   private AuthenticatedUserAccount organisationAdministratorUser;
   private AuthenticatedUserAccount quarterlyStatisticsViewer;
+  private AuthenticatedUserAccount communicationsUser;
 
   @Before
   public void topNavigationServiceTestSetup() {
@@ -49,6 +51,7 @@ public class TopNavigationServiceTest {
         UserPrivilege.PATHFINDER_PROJECT_CREATE
     ));
     quarterlyStatisticsViewer = UserTestingUtil.getAuthenticatedUserAccount(List.of(UserPrivilege.PATHFINDER_STATISTIC_VIEWER));
+    communicationsUser = UserTestingUtil.getAuthenticatedUserAccount(List.of(UserPrivilege.PATHFINDER_COMMUNICATIONS));
 
     when(systemAccessServiceMock.canAccessWorkArea(any())).thenReturn(false);
     when(systemAccessServiceMock.canViewTeam(any())).thenReturn(false);
@@ -93,11 +96,23 @@ public class TopNavigationServiceTest {
   }
 
   @Test
+  public void getTopNavigationItems_whenOnlyCommunications_thenOnlyCommunicationsNavItem() {
+    when(systemAccessServiceMock.canAccessCommunications(any())).thenReturn(true);
+
+    List<TopNavigationItem> navigationItems = topNavigationService.getTopNavigationItems(
+        communicationsUser
+    );
+    assertThat(navigationItems).hasSize(1);
+    assertThat(navigationItems.get(0).getDisplayName()).isEqualTo(CommunicationModelService.COMMUNICATION_SUMMARY_PAGE_TITLE);
+  }
+
+  @Test
   public void getTopNavigationItems_whenRegulatorUserAndHaveAllPrivileges_thenAllNavItems() {
     when(systemAccessServiceMock.canAccessWorkArea(regulatorAdminUser)).thenReturn(true);
     when(systemAccessServiceMock.canViewTeam(regulatorAdminUser)).thenReturn(true);
     when(teamServiceMock.isPersonMemberOfRegulatorTeam(regulatorAdminUser.getLinkedPerson())).thenReturn(true);
     when(systemAccessServiceMock.canAccessQuarterlyStatistics(any())).thenReturn(true);
+    when(systemAccessServiceMock.canAccessCommunications(any())).thenReturn(true);
 
     List<TopNavigationItem> navigationItems = topNavigationService.getTopNavigationItems(regulatorAdminUser);
     assertThat(navigationItems)
@@ -105,7 +120,8 @@ public class TopNavigationServiceTest {
         .containsExactly(
             TopNavigationService.WORK_AREA_TITLE,
             TopNavigationService.MANAGE_TEAM_TITLE,
-            QuarterlyStatisticsController.QUARTERLY_STATISTICS_TITLE
+            QuarterlyStatisticsController.QUARTERLY_STATISTICS_TITLE,
+            CommunicationModelService.COMMUNICATION_SUMMARY_PAGE_TITLE
         );
   }
 

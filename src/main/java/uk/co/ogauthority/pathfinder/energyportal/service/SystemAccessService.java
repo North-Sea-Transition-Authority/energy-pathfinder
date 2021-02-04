@@ -24,6 +24,10 @@ public class SystemAccessService {
       UserPrivilege.PATHFINDER_STATISTIC_VIEWER
   );
 
+  public static final Set<UserPrivilege> COMMUNICATION_PRIVILEGES = Set.of(
+      UserPrivilege.PATHFINDER_COMMUNICATIONS
+  );
+
   /**
    * For use in WebSecurityConfig. In other instances call canAccessWorkArea
    */
@@ -60,6 +64,14 @@ public class SystemAccessService {
 
   public String[] getQuarterlyStatisticsGrantedAuthorities() {
     return getGrantedAuthorities(QUARTERLY_STATISTICS_PRIVILEGES);
+  }
+
+  public boolean canAccessCommunications(AuthenticatedUserAccount user) {
+    return hasRelevantPrivilege(user, COMMUNICATION_PRIVILEGES);
+  }
+
+  public String[] getCommunicationsGrantedAuthorities() {
+    return getGrantedAuthorities(COMMUNICATION_PRIVILEGES);
   }
 
   private String[] getGrantedAuthorities(Set<UserPrivilege> userPrivileges) {

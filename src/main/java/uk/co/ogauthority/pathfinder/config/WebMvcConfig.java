@@ -8,6 +8,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.co.ogauthority.pathfinder.mvc.ResponseBufferSizeHandlerInterceptor;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.AuthenticatedUserAccountArgumentResolver;
+import uk.co.ogauthority.pathfinder.mvc.argumentresolver.CommunicationContextArgumentResolver;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.OperatorProjectUpdateContextArgumentResolver;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ProjectAssessmentContextArgumentResolver;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ProjectContextArgumentResolver;
@@ -23,18 +24,21 @@ public class WebMvcConfig implements WebMvcConfigurer {
   private final OperatorProjectUpdateContextArgumentResolver operatorProjectUpdateContextArgumentResolver;
   private final RegulatorProjectUpdateContextArgumentResolver regulatorProjectUpdateContextArgumentResolver;
   private final TeamManagementContextArgumentResolver teamManagementContextArgumentResolver;
+  private final CommunicationContextArgumentResolver communicationContextArgumentResolver;
 
   @Autowired
   public WebMvcConfig(ProjectContextArgumentResolver projectContextArgumentResolver,
                       ProjectAssessmentContextArgumentResolver projectAssessmentContextArgumentResolver,
                       OperatorProjectUpdateContextArgumentResolver operatorProjectUpdateContextArgumentResolver,
                       RegulatorProjectUpdateContextArgumentResolver regulatorProjectUpdateContextArgumentResolver,
-                      TeamManagementContextArgumentResolver teamManagementContextArgumentResolver) {
+                      TeamManagementContextArgumentResolver teamManagementContextArgumentResolver,
+                      CommunicationContextArgumentResolver communicationContextArgumentResolver) {
     this.projectContextArgumentResolver = projectContextArgumentResolver;
     this.projectAssessmentContextArgumentResolver = projectAssessmentContextArgumentResolver;
     this.operatorProjectUpdateContextArgumentResolver = operatorProjectUpdateContextArgumentResolver;
     this.regulatorProjectUpdateContextArgumentResolver = regulatorProjectUpdateContextArgumentResolver;
     this.teamManagementContextArgumentResolver = teamManagementContextArgumentResolver;
+    this.communicationContextArgumentResolver = communicationContextArgumentResolver;
   }
 
   @Override
@@ -46,6 +50,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     resolvers.add(operatorProjectUpdateContextArgumentResolver);
     resolvers.add(regulatorProjectUpdateContextArgumentResolver);
     resolvers.add(teamManagementContextArgumentResolver);
+    resolvers.add(communicationContextArgumentResolver);
   }
 
   @Override

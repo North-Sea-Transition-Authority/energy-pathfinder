@@ -6,7 +6,7 @@
 
 <#macro statisticContainerItem headingText>
   <div class="statistic-container__item">
-    <h3 class="govuk-heading-m">${headingText}</h3>
+    <h2 class="govuk-heading-m">${headingText}</h2>
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
         <#nested/>

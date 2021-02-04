@@ -1,0 +1,25 @@
+.communication-summary {
+
+  $border-colour: #bfc1c3;
+
+  border: 1px solid $border-colour;
+
+  &__row {
+    border: 1px solid $border-colour;
+  }
+
+  &__key {
+    color: #6f777b;
+    font-weight: 400;
+    padding: 1rem;
+    text-align: left;
+  }
+
+  &__value {
+    padding: 1rem;
+  }
+
+  &__placeholder {
+    background: #fd0;
+  }
+}

@@ -15,12 +15,14 @@ import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationUnit;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationUnitDetail;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeamUsagePurpose;
 import uk.co.ogauthority.pathfinder.energyportal.repository.organisation.PortalOrganisationGroupRepository;
 import uk.co.ogauthority.pathfinder.energyportal.repository.organisation.PortalOrganisationUnitDetailRepository;
 import uk.co.ogauthority.pathfinder.energyportal.repository.organisation.PortalOrganisationUnitRepository;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.dto.organisation.OrganisationUnitDetailDto;
 import uk.co.ogauthority.pathfinder.model.dto.organisation.OrganisationUnitId;
+import uk.co.ogauthority.pathfinder.model.team.TeamType;
 
 /**
  * API to interact with Portal Organisations. This service should not be polluted with business logic, and
@@ -168,6 +170,18 @@ public class PortalOrganisationAccessor {
         .orElseThrow(() -> new PathfinderEntityNotFoundException(
             String.format("unable to find organisation group with id %d", orgGrpId))
         );
+  }
+
+  /**
+   * Get a list of PortalOrganisationGroup which have a portal team of type teamType.
+   * @param teamType The type of team organisations need to have to be returned
+   * @return a list of PortalOrganisationGroup which have a portal team of type teamType
+   */
+  public List<PortalOrganisationGroup> getAllOrganisationGroupsWithAssociatedTeamType(TeamType teamType) {
+    return organisationGroupRepository.findByExistenceOfPortalTeam(
+        teamType.getPortalTeamType(),
+        PortalTeamUsagePurpose.PRIMARY_DATA
+    );
   }
 
 }

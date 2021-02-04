@@ -34,7 +34,7 @@ public class SystemAccessServiceTest {
   }
 
   @Test
-  public void getViewTeamGrantedAuthorities() throws Exception {
+  public void getViewTeamGrantedAuthorities() {
     assertGrantedAuthorities(
         SystemAccessService.VIEW_TEAM_PRIVILEGES,
         systemAccessService::getViewTeamGrantedAuthorities
@@ -50,7 +50,7 @@ public class SystemAccessServiceTest {
   }
 
   @Test
-  public void getWorkAreaGrantedAuthorities() throws Exception {
+  public void getWorkAreaGrantedAuthorities() {
     assertGrantedAuthorities(
         SystemAccessService.WORK_AREA_PRIVILEGES,
         systemAccessService::getWorkAreaGrantedAuthorities
@@ -66,7 +66,7 @@ public class SystemAccessServiceTest {
   }
 
   @Test
-  public void getCreateProjectGrantedAuthorities() throws Exception {
+  public void getCreateProjectGrantedAuthorities() {
     assertGrantedAuthorities(
         SystemAccessService.CREATE_PROJECT_PRIVILEGES,
         systemAccessService::getCreateProjectGrantedAuthorities
@@ -82,10 +82,26 @@ public class SystemAccessServiceTest {
   }
 
   @Test
-  public void getQuarterlyStatisticsGrantedAuthorities() throws Exception {
+  public void getQuarterlyStatisticsGrantedAuthorities() {
     assertGrantedAuthorities(
         SystemAccessService.QUARTERLY_STATISTICS_PRIVILEGES,
         systemAccessService::getQuarterlyStatisticsGrantedAuthorities
+    );
+  }
+
+  @Test
+  public void canAccessCommunications() {
+    AuthTestingUtil.testPrivilegeBasedAuthenticationFunction(
+        Set.of(UserPrivilege.PATHFINDER_COMMUNICATIONS),
+        systemAccessService::canAccessCommunications
+    );
+  }
+
+  @Test
+  public void getCommunicationsGrantedAuthorities() {
+    assertGrantedAuthorities(
+        SystemAccessService.COMMUNICATION_PRIVILEGES,
+        systemAccessService::getCommunicationsGrantedAuthorities
     );
   }
 

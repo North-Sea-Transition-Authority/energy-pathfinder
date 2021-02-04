@@ -11,6 +11,8 @@ public class EmailProperties {
 
   public static final String DEFAULT_RECIPIENT_IDENTIFIER = "Pathfinder user";
   public static final String DEFAULT_SIGN_OFF_IDENTIFIER = "OGA pathfinder team";
+  public static final String DEFAULT_GREETING_TEXT = "Dear";
+  public static final String DEFAULT_SIGN_OFF_TEXT = "Kind regards";
 
   private final NotifyTemplate template;
   private final String recipientIdentifier;

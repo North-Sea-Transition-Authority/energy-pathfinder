@@ -18,22 +18,22 @@
 
 <#macro regulatorFilters>
   <@fdsSearch.searchFilterItem itemName="Project operator">
-    <@fdsSearch.searchTextInput path="form.operatorName" labelText="Project operator"/>
+    <@fdsSearch.searchTextInput path="form.operatorName" labelText="Project operator" labelClass="govuk-visually-hidden"/>
   </@fdsSearch.searchFilterItem>
   <@defaultFilters/>
 </#macro>
 
 <#macro defaultFilters>
   <@fdsSearch.searchFilterItem itemName="Project title">
-    <@fdsSearch.searchTextInput path="form.projectTitle" labelText="Project title"/>
+    <@fdsSearch.searchTextInput path="form.projectTitle" labelText="Project title" labelClass="govuk-visually-hidden"/>
   </@fdsSearch.searchFilterItem>
   <@fdsSearch.searchFilterItem itemName="Field stage">
     <@fdsSearch.searchCheckboxes path="form.fieldStages" checkboxes=fieldStages/>
   </@fdsSearch.searchFilterItem>
   <@fdsSearch.searchFilterItem itemName="Field">
-    <@fdsSearch.searchTextInput path="form.field" labelText="Field"/>
+    <@fdsSearch.searchTextInput path="form.field" labelText="Field" labelClass="govuk-visually-hidden"/>
   </@fdsSearch.searchFilterItem>
-  <@fdsSearch.searchFilterItem itemName="UKCS Area">
+  <@fdsSearch.searchFilterItem itemName="UKCS area">
     <@fdsSearch.searchCheckboxes path="form.ukcsAreas" checkboxes=ukcsAreas/>
   </@fdsSearch.searchFilterItem>
   <@fdsSearch.searchFilterItem itemName="Status">
