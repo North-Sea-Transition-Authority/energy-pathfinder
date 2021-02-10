@@ -201,7 +201,7 @@ public class UpcomingTenderFileLinkService extends FileLinkService {
   private List<UpcomingTenderFileLink> mapFileLinkEntityList(List<? extends FileLinkEntity> fileLinkEntities) {
     return fileLinkEntities
         .stream()
-        .map(fileLinkEntity -> (UpcomingTenderFileLink) fileLinkEntity)
+        .map(UpcomingTenderFileLink.class::cast)
         .collect(Collectors.toList());
   }
 

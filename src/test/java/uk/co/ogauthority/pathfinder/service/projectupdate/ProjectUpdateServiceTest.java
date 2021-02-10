@@ -119,12 +119,12 @@ public class ProjectUpdateServiceTest {
     var update = new ProjectUpdate();
     when(projectUpdateRepository.findByToDetail(projectDetail)).thenReturn(Optional.of(update));
     var returnedUpdate = projectUpdateService.getByToDetail(projectDetail);
-    assertThat(returnedUpdate.get()).isEqualTo(update);
+    assertThat(returnedUpdate).contains(update);
   }
 
   @Test
   public void getByToDetail_notFound() {
     when(projectUpdateRepository.findByToDetail(projectDetail)).thenReturn(Optional.empty());
-    assertThat(projectUpdateService.getByToDetail(projectDetail)).isEqualTo(Optional.empty());
+    assertThat(projectUpdateService.getByToDetail(projectDetail)).isEmpty();
   }
 }

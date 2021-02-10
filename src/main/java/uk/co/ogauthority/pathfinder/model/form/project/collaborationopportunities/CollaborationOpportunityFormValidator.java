@@ -21,7 +21,7 @@ public class CollaborationOpportunityFormValidator implements SmartValidator {
 
     CollaborationOpportunityValidationHint collaborationOpportunityValidationHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(CollaborationOpportunityValidationHint.class))
-        .map(hint -> ((CollaborationOpportunityValidationHint) hint))
+        .map(CollaborationOpportunityValidationHint.class::cast)
         .findFirst()
         .orElseThrow(
             () -> new ActionNotAllowedException("Expected CollaborationOpportunityValidationHint to be provided")

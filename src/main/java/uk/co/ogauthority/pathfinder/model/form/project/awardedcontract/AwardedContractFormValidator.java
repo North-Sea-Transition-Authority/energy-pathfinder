@@ -36,7 +36,7 @@ public class AwardedContractFormValidator implements SmartValidator {
 
     var awardedContractValidationHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(AwardedContractValidationHint.class))
-        .map(hint -> ((AwardedContractValidationHint) hint))
+        .map(AwardedContractValidationHint.class::cast)
         .findFirst()
         .orElseThrow(
             () -> new ActionNotAllowedException("Expected AwardedContractValidationHint validation hint to be provided")

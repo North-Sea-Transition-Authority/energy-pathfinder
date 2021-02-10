@@ -35,20 +35,20 @@ public class MinMaxDateInputValidator implements SmartValidator {
 
     var inputLabel = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(FormInputLabel.class))
-        .map(hint -> ((FormInputLabel) hint))
+        .map(FormInputLabel.class::cast)
         .findFirst()
         .orElse(new FormInputLabel(DEFAULT_INPUT_LABEL_TEXT));
 
     var yearLabels = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(MinMaxYearLabelsHint.class))
-        .map(hint -> ((MinMaxYearLabelsHint) hint))
+        .map(MinMaxYearLabelsHint.class::cast)
         .findFirst()
         .orElse(new MinMaxYearLabelsHint(MIN_YEAR_TEXT, MAX_YEAR_TEXT));
 
     //Check for emptyMinMaxDateAcceptable hint
     Optional<EmptyMinMaxDateAcceptableHint> emptyMinMaxDateAcceptableHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(EmptyMinMaxDateAcceptableHint.class))
-        .map(hint -> ((EmptyMinMaxDateAcceptableHint) hint))
+        .map(EmptyMinMaxDateAcceptableHint.class::cast)
         .findFirst();
 
     //Can fill in either of the year fields (or none) if doing partial validation
@@ -93,7 +93,7 @@ public class MinMaxDateInputValidator implements SmartValidator {
 
     ValidationUtil.extractImplementedValidationHints(validationHints)
         .stream()
-        .map(hint -> (ValidationHint) hint)
+        .map(ValidationHint.class::cast)
         .filter(hint -> !hint.isValid(minMaxDateInput))
         .forEach(hint ->
             errors.rejectValue(

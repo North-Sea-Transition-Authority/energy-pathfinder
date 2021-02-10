@@ -35,7 +35,7 @@ public class DefaultErrorController implements ErrorController {
   public ModelAndView handleError(HttpServletRequest request) {
 
     Optional<Integer> statusCode = Optional.ofNullable(request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE))
-        .map(e -> (Integer) e);
+        .map(Integer.class::cast);
 
     var viewName = statusCode.map(this::getViewName).orElse(ErrorView.DEFAULT_ERROR.getViewName());
     var modelAndView = new ModelAndView(viewName);

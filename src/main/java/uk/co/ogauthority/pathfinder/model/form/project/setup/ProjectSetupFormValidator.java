@@ -13,7 +13,7 @@ public class ProjectSetupFormValidator implements SmartValidator {
   public void validate(Object target, Errors errors, Object... validationHints) {
     ProjectSetupFormValidationHint validationHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(ProjectSetupFormValidationHint.class))
-        .map(hint -> ((ProjectSetupFormValidationHint) hint))
+        .map(ProjectSetupFormValidationHint.class::cast)
         .findFirst()
         .orElseThrow(
             () -> new ActionNotAllowedException("Expected ProjectSetupFormValidationHint to be provided")

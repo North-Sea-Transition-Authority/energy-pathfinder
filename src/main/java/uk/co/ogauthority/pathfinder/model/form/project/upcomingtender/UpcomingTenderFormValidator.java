@@ -31,7 +31,7 @@ public class UpcomingTenderFormValidator implements SmartValidator {
 
     UpcomingTenderValidationHint upcomingTenderValidationHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(UpcomingTenderValidationHint.class))
-        .map(hint -> ((UpcomingTenderValidationHint) hint))
+        .map(UpcomingTenderValidationHint.class::cast)
         .findFirst()
         .orElseThrow(
             () -> new ActionNotAllowedException("Expected UpcomingTenderValidationHint validation hint to be provided")

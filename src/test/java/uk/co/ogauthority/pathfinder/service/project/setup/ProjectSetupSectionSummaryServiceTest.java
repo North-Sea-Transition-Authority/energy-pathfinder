@@ -67,10 +67,9 @@ public class ProjectSetupSectionSummaryServiceTest {
         "sectionTitle",
         "sectionId",
         "projectSetupDiffModel"
-    );
-
-    assertThat(modelMap).containsEntry("sectionTitle", ProjectSetupSectionSummaryService.PAGE_NAME);
-    assertThat(modelMap).containsEntry("sectionId", ProjectSetupSectionSummaryService.SECTION_ID);
+    )
+        .containsEntry("sectionTitle", ProjectSetupSectionSummaryService.PAGE_NAME)
+        .containsEntry("sectionId", ProjectSetupSectionSummaryService.SECTION_ID);
 
     verify(differenceService, times(1)).differentiateComplexLists(
         any(),

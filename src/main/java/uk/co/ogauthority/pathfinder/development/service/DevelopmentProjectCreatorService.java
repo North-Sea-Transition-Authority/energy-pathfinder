@@ -2,7 +2,7 @@ package uk.co.ogauthority.pathfinder.development.service;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public class DevelopmentProjectCreatorService {
   public static final LocalDate APPROVED_FDP_DATE = LocalDate.now().withDayOfMonth(1);
   public static final Boolean APPROVED_DECOM_PROGRAM = false;
   public static final UkcsArea UKCS_AREA =  UkcsArea.WOS;
-  public static final List<String> LICENCE_BLOCKS = Arrays.asList("16/29b1629b666"); //16/29b
+  public static final List<String> LICENCE_BLOCKS = Collections.singletonList("16/29b1629b666"); //16/29b
 
   private final StartProjectService startProjectService;
   private final ProjectInformationService projectInformationService;

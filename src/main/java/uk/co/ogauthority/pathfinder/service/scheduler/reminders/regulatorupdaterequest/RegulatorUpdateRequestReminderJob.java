@@ -24,12 +24,12 @@ public class RegulatorUpdateRequestReminderJob extends QuartzJobBean {
     try {
       executeJob(projectId);
     } catch (Exception e) {
-      LOGGER.error(
-          "Regulator update request reminder Job execution failed for project with id: {}",
-          projectId,
-          e
+      final var errorMessage = String.format(
+          "Regulator update request reminder Job execution failed for project with id: %d",
+          projectId
       );
-      throw new JobExecutionException(e);
+      LOGGER.error(errorMessage, e);
+      throw new JobExecutionException(errorMessage, e);
     }
   }
 

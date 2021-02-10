@@ -34,7 +34,7 @@ public class RegulatorUpdateRequestViewUtilTest {
     var regulatorUpdateRequestView = RegulatorUpdateRequestViewUtil.from(regulatorUpdateRequest, requestedByUser);
 
     checkCommonFields(regulatorUpdateRequest, regulatorUpdateRequestView, requestedByUser);
-    assertThat(regulatorUpdateRequestView.getDeadlineDate()).isEqualTo("");
+    assertThat(regulatorUpdateRequestView.getDeadlineDate()).isEmpty();
   }
 
   private static void checkCommonFields(RegulatorUpdateRequest regulatorUpdateRequest,

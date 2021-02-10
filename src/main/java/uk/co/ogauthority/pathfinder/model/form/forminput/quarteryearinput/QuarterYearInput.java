@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput;
 
-import com.google.common.annotations.VisibleForTesting;
 import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -36,7 +35,6 @@ public class QuarterYearInput {
 
   public QuarterYearInput() {}
 
-  @VisibleForTesting
   public QuarterYearInput(Quarter quarter, String year) {
     this.quarter = quarter;
     this.year = year;

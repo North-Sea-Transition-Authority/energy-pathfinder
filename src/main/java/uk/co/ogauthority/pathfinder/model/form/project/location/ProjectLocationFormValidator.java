@@ -30,7 +30,7 @@ public class ProjectLocationFormValidator implements SmartValidator {
 
     ProjectLocationValidationHint projectLocationValidationHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(ProjectLocationValidationHint.class))
-        .map(hint -> ((ProjectLocationValidationHint) hint))
+        .map(ProjectLocationValidationHint.class::cast)
         .findFirst()
         .orElseThrow(
             () -> new ActionNotAllowedException("Expected ProjectLocationValidationHint validation hint to be provided")

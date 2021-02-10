@@ -204,7 +204,7 @@ public class CollaborationOpportunityFileLinkService extends FileLinkService {
   private List<CollaborationOpportunityFileLink> mapFileLinkEntityList(List<? extends FileLinkEntity> fileLinkEntities) {
     return fileLinkEntities
         .stream()
-        .map(fileLinkEntity -> (CollaborationOpportunityFileLink) fileLinkEntity)
+        .map(CollaborationOpportunityFileLink.class::cast)
         .collect(Collectors.toList());
   }
 

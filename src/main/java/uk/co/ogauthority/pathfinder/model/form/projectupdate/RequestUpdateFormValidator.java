@@ -30,7 +30,7 @@ public class RequestUpdateFormValidator implements SmartValidator {
 
     RequestUpdateValidationHint requestUpdateValidationHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(RequestUpdateValidationHint.class))
-        .map(hint -> ((RequestUpdateValidationHint) hint))
+        .map(RequestUpdateValidationHint.class::cast)
         .findFirst()
         .orElseThrow(
             () -> new ActionNotAllowedException("Expected RequestUpdateValidationHint validation hint to be provided")

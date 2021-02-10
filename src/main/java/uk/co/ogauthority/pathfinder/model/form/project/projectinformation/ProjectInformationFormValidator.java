@@ -44,7 +44,7 @@ public class ProjectInformationFormValidator implements SmartValidator {
 
     ProjectInformationValidationHint projectInformationValidationHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(ProjectInformationValidationHint.class))
-        .map(hint -> ((ProjectInformationValidationHint) hint))
+        .map(ProjectInformationValidationHint.class::cast)
         .findFirst()
         .orElseThrow(
             () -> new ActionNotAllowedException("Expected ProjectInformationValidationHint validation hint to be provided")

@@ -30,7 +30,7 @@ public class PlatformFpsoFormValidator implements SmartValidator {
 
     var platformFpsoValidationHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(PlatformFpsoValidationHint.class))
-        .map(hint -> ((PlatformFpsoValidationHint) hint))
+        .map(PlatformFpsoValidationHint.class::cast)
         .findFirst()
         .orElseThrow(
             () -> new ActionNotAllowedException("Expected PlatformFpsoValidationHint to be provided")

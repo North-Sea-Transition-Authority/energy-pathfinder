@@ -36,7 +36,7 @@ public class SubseaInfrastructureFormValidator implements SmartValidator {
 
     var subseaInfrastructureValidationHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(SubseaInfrastructureValidationHint.class))
-        .map(hint -> ((SubseaInfrastructureValidationHint) hint))
+        .map(SubseaInfrastructureValidationHint.class::cast)
         .findFirst()
         .orElseThrow(
             () -> new ActionNotAllowedException("Expected SubseaInfrastructureValidationHint to be provided")

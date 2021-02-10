@@ -25,7 +25,7 @@ public class DecommissionedPipelineFormValidator implements SmartValidator {
 
     var decommissionedPipelineValidationHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(DecommissionedPipelineValidationHint.class))
-        .map(hint -> ((DecommissionedPipelineValidationHint) hint))
+        .map(DecommissionedPipelineValidationHint.class::cast)
         .findFirst()
         .orElseThrow(
             () -> new ActionNotAllowedException("Expected DecommissionedPipelineValidationHint to be provided")

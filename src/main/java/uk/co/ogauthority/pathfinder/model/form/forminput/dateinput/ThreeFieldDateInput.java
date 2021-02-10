@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.model.form.forminput.dateinput;
 
-import com.google.common.annotations.VisibleForTesting;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -28,7 +27,6 @@ public class ThreeFieldDateInput extends DateInputCommonAccessor implements Date
     this.day = localDate != null ? String.valueOf(localDate.getDayOfMonth()) : null;
   }
 
-  @VisibleForTesting
   public ThreeFieldDateInput(Integer year, Integer month, Integer day) {
     this.year = year != null ? String.valueOf(year) : null;
     this.month = month != null ? String.valueOf(month) : null;

@@ -36,7 +36,7 @@ public class DecommissionedWellFormValidator implements SmartValidator {
 
     var decommissionedWellValidationHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(DecommissionedWellValidationHint.class))
-        .map(hint -> ((DecommissionedWellValidationHint) hint))
+        .map(DecommissionedWellValidationHint.class::cast)
         .findFirst()
         .orElseThrow(
             () -> new ActionNotAllowedException(

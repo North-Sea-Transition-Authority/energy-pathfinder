@@ -45,7 +45,7 @@ public class QuarterYearInputValidator implements SmartValidator {
     var isEmptyQuarterYearAcceptable = validationHintList
         .stream()
         .filter(hint -> hint.getClass().equals(EmptyQuarterYearAcceptableHint.class))
-        .map(hint -> (EmptyQuarterYearAcceptableHint) hint)
+        .map(EmptyQuarterYearAcceptableHint.class::cast)
         .findFirst()
         .isPresent();
 
@@ -71,7 +71,7 @@ public class QuarterYearInputValidator implements SmartValidator {
 
         ValidationUtil.extractImplementedValidationHints(validationHints)
             .stream()
-            .map(hint -> (ValidationHint) hint)
+            .map(ValidationHint.class::cast)
             .filter(hint -> !hint.isValid(quarterYearInput))
             .forEach(hint ->
                 addQuarterYearErrors(

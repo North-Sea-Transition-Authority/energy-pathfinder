@@ -60,7 +60,7 @@ public class ValidationUtil {
   public static FormInputLabel extractFormInputLabelFromHints(Object[] validationHints) {
     return Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(FormInputLabel.class))
-        .map(hint -> ((FormInputLabel) hint))
+        .map(FormInputLabel.class::cast)
         .findFirst()
         .orElse(null);
   }

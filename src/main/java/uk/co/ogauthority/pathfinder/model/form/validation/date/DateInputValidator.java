@@ -55,7 +55,7 @@ public class DateInputValidator implements SmartValidator {
 
     var inputLabel = Arrays.stream(objects)
         .filter(hint -> hint.getClass().equals(FormInputLabel.class))
-        .map(hint -> ((FormInputLabel) hint))
+        .map(FormInputLabel.class::cast)
         .findFirst()
         .orElse(new FormInputLabel(DEFAULT_INPUT_LABEL_TEXT));
 
@@ -63,7 +63,7 @@ public class DateInputValidator implements SmartValidator {
 
     Optional<EmptyDateAcceptableHint> emptyDateAcceptableHint = Arrays.stream(objects)
         .filter(hint -> hint.getClass().equals(EmptyDateAcceptableHint.class))
-        .map(hint -> ((EmptyDateAcceptableHint) hint))
+        .map(EmptyDateAcceptableHint.class::cast)
         .findFirst();
 
     //If there's no EmptyDateAcceptableHint then check the date exists
@@ -92,7 +92,7 @@ public class DateInputValidator implements SmartValidator {
         // only do additional validation when the date is valid
         ValidationUtil.extractImplementedValidationHints(objects)
             .stream()
-            .map(hint -> (ValidationHint) hint)
+            .map(ValidationHint.class::cast)
             .filter(hint -> !hint.isValid(dateInput))
             .forEach(hint ->
                 addDateErrors(

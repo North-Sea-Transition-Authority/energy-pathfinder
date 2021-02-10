@@ -114,9 +114,9 @@ public class QuarterlyStatisticsServiceTest {
   @Test
   public void getQuarterlyStatisticsModelAndView() {
     final var modelMap = quarterlyStatisticsService.getQuarterlyStatisticsModelAndView().getModel();
-    assertThat(modelMap).containsOnlyKeys("pageTitle", "quarterlyStatistics");
+    assertThat(modelMap).containsOnlyKeys("pageTitle", "quarterlyStatistics")
+        .containsEntry("pageTitle", QuarterlyStatisticsController.QUARTERLY_STATISTICS_TITLE);
 
-    assertThat(modelMap).containsEntry("pageTitle", QuarterlyStatisticsController.QUARTERLY_STATISTICS_TITLE);
     // check list contains an item for each field stage
     assertThat((List<FieldStageQuarterlyStatistic>)modelMap.get("quarterlyStatistics")).hasSize(FieldStage.values().length);
   }
