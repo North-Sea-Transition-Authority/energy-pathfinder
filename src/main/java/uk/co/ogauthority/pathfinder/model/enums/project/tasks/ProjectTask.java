@@ -6,10 +6,10 @@ import java.util.stream.Stream;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedpipeline.DecommissionedPipelineController;
-import uk.co.ogauthority.pathfinder.controller.project.decommissionedwell.DecommissionedWellController;
 import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedRigController;
 import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationController;
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
+import uk.co.ogauthority.pathfinder.controller.project.plugabandonmentschedule.PlugAbandonmentScheduleController;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
 import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProjectOperatorController;
 import uk.co.ogauthority.pathfinder.controller.project.setup.ProjectSetupController;
@@ -20,10 +20,10 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
 import uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline.DecommissionedPipelineService;
-import uk.co.ogauthority.pathfinder.service.project.decommissionedwell.DecommissionedWellService;
 import uk.co.ogauthority.pathfinder.service.project.integratedrig.IntegratedRigService;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
+import uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule.PlugAbandonmentScheduleService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
@@ -79,9 +79,9 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       70
   ),
   WELLS(
-      DecommissionedWellController.TASK_LIST_NAME,
-      DecommissionedWellController.class,
-      DecommissionedWellService.class,
+      PlugAbandonmentScheduleController.TASK_LIST_NAME,
+      PlugAbandonmentScheduleController.class,
+      PlugAbandonmentScheduleService.class,
       80
   ),
   PLATFORM_FPSO(
@@ -167,7 +167,7 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       case COLLABORATION_OPPORTUNITIES:
         return ReverseRouter.route(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null));
       case WELLS:
-        return ReverseRouter.route(on(DecommissionedWellController.class).viewWellsToBeDecommissioned(projectId, null));
+        return ReverseRouter.route(on(PlugAbandonmentScheduleController.class).viewPlugAbandonmentSchedules(projectId, null));
       case PLATFORM_FPSO:
         return ReverseRouter.route(on(PlatformsFpsosController.class).viewPlatformsFpsos(projectId, null));
       case INTEGRATED_RIGS:
