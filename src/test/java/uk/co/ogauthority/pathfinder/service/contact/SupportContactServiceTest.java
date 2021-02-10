@@ -24,7 +24,7 @@ public class SupportContactServiceTest {
   public void getSupportContactsTest() {
     List<ServiceContactDetail> contacts = supportContactService.getSupportContactList();
 
-    assertThat(contacts).containsExactlyInAnyOrder(ServiceContactDetail.TECHNICAL_SUPPORT, ServiceContactDetail.BUSINESS_SUPPORT);
+    assertThat(contacts).containsExactly(ServiceContactDetail.BUSINESS_SUPPORT, ServiceContactDetail.TECHNICAL_SUPPORT);
   }
 
   @Test

@@ -6,7 +6,7 @@ public enum ServiceContactDetail {
       "Business support",
       "OGA",
       "pathfinder@ogauthority.co.uk",
-      "", // TODO
+      "",
       "For example, questions about filling in your project and the information you need to provide",
       true,
       10
