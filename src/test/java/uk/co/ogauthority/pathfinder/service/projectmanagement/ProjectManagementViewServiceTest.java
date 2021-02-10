@@ -76,16 +76,17 @@ public class ProjectManagementViewServiceTest {
     assertThat(modelAndView.getViewName()).isEqualTo(ProjectManagementViewService.TEMPLATE_PATH);
 
     var model = modelAndView.getModel();
-    assertThat(model).containsOnlyKeys(
-        "projectManagementView",
-        "backLinkUrl",
-        "viewableVersions",
-        "form",
-        "viewVersionUrl"
-    );
-    assertThat(model).containsEntry("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)));
-    assertThat(model).containsEntry("viewVersionUrl", ReverseRouter.route(on(ManageProjectController.class)
-        .updateProjectVersion(project.getId(), null, null, null)));
+    assertThat(model)
+        .containsOnlyKeys(
+            "projectManagementView",
+            "backLinkUrl",
+            "viewableVersions",
+            "form",
+            "viewVersionUrl"
+        )
+        .containsEntry("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
+        .containsEntry("viewVersionUrl", ReverseRouter.route(on(ManageProjectController.class)
+            .updateProjectVersion(project.getId(), null, null, null)));
   }
 
   @Test
@@ -97,16 +98,17 @@ public class ProjectManagementViewServiceTest {
     assertThat(modelAndView.getViewName()).isEqualTo(ProjectManagementViewService.TEMPLATE_PATH);
 
     var model = modelAndView.getModel();
-    assertThat(model).containsOnlyKeys(
-        "projectManagementView",
-        "backLinkUrl",
-        "viewableVersions",
-        "form",
-        "viewVersionUrl"
-    );
-    assertThat(model).containsEntry("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)));
-    assertThat(model).containsEntry("viewVersionUrl", ReverseRouter.route(on(ManageProjectController.class)
-        .updateProjectVersion(project.getId(), null, null, null)));
+    assertThat(model)
+        .containsOnlyKeys(
+            "projectManagementView",
+            "backLinkUrl",
+            "viewableVersions",
+            "form",
+            "viewVersionUrl"
+        )
+        .containsEntry("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
+        .containsEntry("viewVersionUrl", ReverseRouter.route(on(ManageProjectController.class)
+            .updateProjectVersion(project.getId(), null, null, null)));
   }
 
   @Test
@@ -122,16 +124,17 @@ public class ProjectManagementViewServiceTest {
     assertThat(modelAndView.getViewName()).isEqualTo(ProjectManagementViewService.TEMPLATE_PATH);
 
     var model = modelAndView.getModel();
-    assertThat(model).containsOnlyKeys(
-        "projectManagementView",
-        "backLinkUrl",
-        "viewableVersions",
-        "form",
-        "viewVersionUrl"
-    );
-    assertThat(model).containsEntry("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)));
-    assertThat(model).containsEntry("viewVersionUrl", ReverseRouter.route(on(ManageProjectController.class)
-        .updateProjectVersion(project.getId(), null, null, null)));
+    assertThat(model)
+        .containsOnlyKeys(
+            "projectManagementView",
+            "backLinkUrl",
+            "viewableVersions",
+            "form",
+            "viewVersionUrl"
+        )
+        .containsEntry("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
+        .containsEntry("viewVersionUrl", ReverseRouter.route(on(ManageProjectController.class)
+            .updateProjectVersion(project.getId(), null, null, null)));
   }
 
   @Test
