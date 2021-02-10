@@ -21,7 +21,7 @@ public class SupportContactServiceTest {
   }
 
   @Test
-  public void getSupportContactsTest() {
+  public void getSupportContactList() {
     List<ServiceContactDetail> contacts = supportContactService.getSupportContactList();
 
     assertThat(contacts).containsExactly(ServiceContactDetail.BUSINESS_SUPPORT, ServiceContactDetail.TECHNICAL_SUPPORT);
