@@ -14,7 +14,7 @@
   </p>
   <@errorReference reference=errorRef!>
     <ul class="govuk-list">
-      <li>${technicalSupportContact.displayName}</li>
+      <li>${technicalSupportContact.serviceName}</li>
       <li>${technicalSupportContact.phoneNumber}</li>
       <li>
         <@fdsAction.link

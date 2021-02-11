@@ -66,6 +66,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .mvcMatchers("/communications/**")
           .hasAnyAuthority(systemAccessService.getCommunicationsGrantedAuthorities())
 
+        .mvcMatchers("/contact")
+          .permitAll()
+
         .anyRequest()
           .authenticated();
 

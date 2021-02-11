@@ -16,7 +16,7 @@
     If the web address is correct or you selected a link or button, contact the service desk using the details below:
   </p>
   <ul class="govuk-list">
-    <li>${technicalSupportContact.displayName}</li>
+    <li>${technicalSupportContact.serviceName}</li>
     <li>${technicalSupportContact.phoneNumber}</li>
     <li>
         <@fdsAction.link
