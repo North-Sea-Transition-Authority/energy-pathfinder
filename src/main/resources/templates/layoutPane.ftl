@@ -54,7 +54,7 @@
         <#--Footer -->
         <#local footerMetaContent>
           <@fdsFooter.footerMeta footerMetaHiddenHeading="Support links">
-            <@fdsFooter.footerMetaLink linkText="Contact" linkUrl=springUrl("/contact")/>
+            <@fdsFooter.footerMetaLink linkText="Contact" linkUrl=springUrl(contactUrl)/>
           </@fdsFooter.footerMeta>
         </#local>
         <@fdsFooter.footer wrapperWidth=wrapperWidth metaLinks=true footerMetaContent=footerMetaContent/>
