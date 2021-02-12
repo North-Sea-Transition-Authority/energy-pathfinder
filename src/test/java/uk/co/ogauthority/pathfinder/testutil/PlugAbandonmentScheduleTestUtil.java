@@ -1,8 +1,11 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
+import java.util.Collections;
 import uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedule.PlugAbandonmentSchedule;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.plugabandonmentschedule.PlugAbandonmentScheduleForm;
+import uk.co.ogauthority.pathfinder.model.view.plugabandonmentschedule.PlugAbandonmentScheduleView;
+import uk.co.ogauthority.pathfinder.model.view.plugabandonmentschedule.PlugAbandonmentScheduleViewUtil;
 
 public class PlugAbandonmentScheduleTestUtil {
 
@@ -28,5 +31,14 @@ public class PlugAbandonmentScheduleTestUtil {
     plugAbandonmentSchedule.setEarliestStartYear(EARLIEST_PLUG_ABANDONMENT_START_YEAR);
     plugAbandonmentSchedule.setLatestCompletionYear(LATEST_PLUG_ABANDONMENT_COMPLETION_YEAR);
     return plugAbandonmentSchedule;
+  }
+
+  public static PlugAbandonmentScheduleView createPlugAbandonmentScheduleView() {
+    return createPlugAbandonmentScheduleView(1, true);
+  }
+
+  public static PlugAbandonmentScheduleView createPlugAbandonmentScheduleView(int displayOrder, boolean isValid) {
+    var plugAbandonmentSchedule = createPlugAbandonmentSchedule();
+    return PlugAbandonmentScheduleViewUtil.from(plugAbandonmentSchedule, Collections.emptyList(), displayOrder, isValid);
   }
 }

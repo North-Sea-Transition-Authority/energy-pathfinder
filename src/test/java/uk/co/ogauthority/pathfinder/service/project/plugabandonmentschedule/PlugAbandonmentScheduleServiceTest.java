@@ -164,6 +164,16 @@ public class PlugAbandonmentScheduleServiceTest {
   }
 
   @Test
+  public void deletePlugAbandonmentSchedule() {
+    var plugAbandonmentSchedule = new PlugAbandonmentSchedule();
+
+    plugAbandonmentScheduleService.deletePlugAbandonmentSchedule(plugAbandonmentSchedule);
+
+    verify(plugAbandonmentWellService, times(1)).deletePlugAbandonmentScheduleWells(plugAbandonmentSchedule);
+    verify(plugAbandonmentScheduleRepository, times(1)).delete(plugAbandonmentSchedule);
+  }
+
+  @Test
   public void getForm() {
     var plugAbandonmentSchedule = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
 
@@ -275,27 +285,6 @@ public class PlugAbandonmentScheduleServiceTest {
         toProjectDetail,
         PlugAbandonmentSchedule.class
     );
-  }
-
-  @Test
-  public void getPlugAbandonmentScheduleSummaryModelAndView() {
-    var projectId = detail.getProject().getId();
-
-    var modelAndView = plugAbandonmentScheduleService.getPlugAbandonmentScheduleSummaryModelAndView(
-        projectId
-    );
-
-    assertThat(modelAndView.getViewName()).isEqualTo(PlugAbandonmentScheduleService.SUMMARY_TEMPLATE_PATH);
-    assertThat(modelAndView.getModel()).containsExactly(
-        entry("pageName", PlugAbandonmentScheduleController.SUMMARY_PAGE_NAME),
-        entry(
-            "addPlugAbandonmentScheduleUrl",
-            ReverseRouter.route(on(PlugAbandonmentScheduleController.class).addPlugAbandonmentSchedule(projectId, null))
-        ),
-        entry("projectSetupUrl", ControllerUtils.getProjectSetupUrl(projectId))
-    );
-
-    verify(breadcrumbService, times(1)).fromTaskList(projectId, modelAndView, PlugAbandonmentScheduleController.TASK_LIST_NAME);
   }
 
   @Test
