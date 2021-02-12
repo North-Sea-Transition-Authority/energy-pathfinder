@@ -58,4 +58,13 @@ public class DateUtil {
         );
   }
 
+  public static boolean isInCurrentQuarter(Instant instantToCheck) {
+    final var currentQuarter = getQuarterFromLocalDate(LocalDate.now());
+    final var quarterStartInstant = currentQuarter.getStartDateAsInstant();
+    final var quarterEndInstant = currentQuarter.getEndDateAsInstant();
+
+    return DateUtil.isOnOrAfter(instantToCheck, quarterStartInstant)
+        && DateUtil.isOnOrBefore(instantToCheck, quarterEndInstant);
+  }
+
 }

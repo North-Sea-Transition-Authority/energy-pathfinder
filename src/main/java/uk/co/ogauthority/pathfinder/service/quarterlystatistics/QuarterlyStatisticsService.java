@@ -1,81 +1,94 @@
 package uk.co.ogauthority.pathfinder.service.quarterlystatistics;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.quarterlystatistics.QuarterlyStatisticsController;
-import uk.co.ogauthority.pathfinder.model.entity.quarterlystatistics.ReportableProject;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
-import uk.co.ogauthority.pathfinder.repository.quarterlystatistics.ReportableProjectRepository;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @Service
 public class QuarterlyStatisticsService {
 
-  private final ReportableProjectRepository reportableProjectRepository;
+  private final ReportableProjectService reportableProjectService;
 
   @Autowired
-  public QuarterlyStatisticsService(ReportableProjectRepository reportableProjectRepository) {
-    this.reportableProjectRepository = reportableProjectRepository;
+  public QuarterlyStatisticsService(ReportableProjectService reportableProjectService) {
+    this.reportableProjectService = reportableProjectService;
   }
 
   public ModelAndView getQuarterlyStatisticsModelAndView() {
+
+    final var reportableProjectViews = reportableProjectService.getReportableProjectViews();
+
     return new ModelAndView("quarterlystatistics/quarterlyStatistics")
         .addObject("pageTitle", QuarterlyStatisticsController.QUARTERLY_STATISTICS_TITLE)
-        .addObject("quarterlyStatistics", getQuarterlyStatisticsByFieldStage());
+        .addObject("fieldStageStatistics", getQuarterlyStatisticsByFieldStage(reportableProjectViews))
+        .addObject("operatorReportableProjects", getReportableProjectsByOperator(reportableProjectViews));
   }
 
-  public List<FieldStageQuarterlyStatistic> getQuarterlyStatisticsByFieldStage() {
+  protected List<FieldStageStatistic> getQuarterlyStatisticsByFieldStage(
+      List<ReportableProjectView> reportableProjects
+  ) {
 
-    final var reportableProjectsByFieldStage = getReportableProjects()
+    final var reportableProjectViewsByFieldStage = reportableProjects
         .stream()
-        .collect(Collectors.groupingBy(ReportableProject::getFieldStage));
+        .collect(Collectors.groupingBy(ReportableProjectView::getFieldStage));
 
-    List<FieldStageQuarterlyStatistic> fieldStageQuarterlyStatistics = new ArrayList<>();
+    List<FieldStageStatistic> fieldStageStatistics = new ArrayList<>();
 
     Arrays.stream(FieldStage.values()).forEach(fieldStage -> {
       var totalProjectsForFieldStage = 0;
       var totalProjectUpdatedForFieldStage = 0;
-      var hasReportableProjects = reportableProjectsByFieldStage.containsKey(fieldStage);
+      var hasReportableProjects = reportableProjectViewsByFieldStage.containsKey(fieldStage);
 
       if (hasReportableProjects) {
-        var reportableProjects = reportableProjectsByFieldStage.get(fieldStage);
-        totalProjectsForFieldStage = reportableProjects.size();
-        totalProjectUpdatedForFieldStage = getReportableProjectsForCurrentQuarter(reportableProjects).size();
+        var fieldStageReportableProjects = reportableProjectViewsByFieldStage.get(fieldStage);
+        totalProjectsForFieldStage = fieldStageReportableProjects.size();
+        totalProjectUpdatedForFieldStage = getReportableProjectsForCurrentQuarter(fieldStageReportableProjects).size();
       }
 
-      var quarterlyStatistic = new FieldStageQuarterlyStatistic(
+      var quarterlyStatistic = new FieldStageStatistic(
           fieldStage.getDisplayName(),
           totalProjectsForFieldStage,
           totalProjectUpdatedForFieldStage
       );
 
-      fieldStageQuarterlyStatistics.add(quarterlyStatistic);
+      fieldStageStatistics.add(quarterlyStatistic);
     });
 
-    return fieldStageQuarterlyStatistics;
+    return fieldStageStatistics;
   }
 
-  private List<ReportableProject> getReportableProjects() {
-    return reportableProjectRepository.findAll();
-  }
-
-  private List<ReportableProject> getReportableProjectsForCurrentQuarter(List<ReportableProject> reportableProjects) {
-    final var currentQuarter = DateUtil.getQuarterFromLocalDate(LocalDate.now());
-    return reportableProjects
+  /**
+   * Get a map of operator name to list of published projects belonging to that operator.
+   * @param reportableProjectViews a list of published project
+   * @return a map of operator name to list of published projects belonging to that operator
+   */
+  protected Map<String, List<ReportableProjectView>> getReportableProjectsByOperator(
+      List<ReportableProjectView> reportableProjectViews
+  ) {
+    return reportableProjectViews
         .stream()
-        .filter(reportableProject -> {
-          final var projectUpdatedDatetime = reportableProject.getLastUpdatedDatetime();
-          final var quarterStartInstant = currentQuarter.getStartDateAsInstant();
-          final var quarterEndInstant = currentQuarter.getEndDateAsInstant();
-          return DateUtil.isOnOrAfter(projectUpdatedDatetime, quarterStartInstant)
-                  && DateUtil.isOnOrBefore(projectUpdatedDatetime, quarterEndInstant);
-        })
+        .sorted(Comparator.comparing(ReportableProjectView::getOperatorName)
+            .thenComparing(reportableProjectView -> reportableProjectView.getProjectTitle().toLowerCase())
+        )
+        .collect(Collectors.groupingBy(ReportableProjectView::getOperatorName, LinkedHashMap::new, Collectors.toList()));
+  }
+
+  private List<ReportableProjectView> getReportableProjectsForCurrentQuarter(
+      List<ReportableProjectView> reportableProjectViews
+  ) {
+    return reportableProjectViews
+        .stream()
+        .filter(reportableProjectView -> DateUtil.isInCurrentQuarter(reportableProjectView.getLastUpdatedDatetime()))
         .collect(Collectors.toList());
   }
 }

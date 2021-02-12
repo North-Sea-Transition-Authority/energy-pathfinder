@@ -1,26 +1,21 @@
 <#include '../layout.ftl'>
+<#import '_fieldStageStatistics.ftl' as fieldStageStatistic>
+<#import '_operatorProjects.ftl' as operatorProjects>
 
 <@defaultPage htmlTitle=pageTitle pageHeading=pageTitle topNavigation=true twoThirdsColumn=false>
   <@fdsInsetText.insetText>
     <p class="govuk-body">The quarterly statistics only include published projects</p>
   </@fdsInsetText.insetText>
-  <@statistic.statisticContainer>
-    <#list quarterlyStatistics as quarterlyStatistic>
-      <@statistic.statisticContainerItem headingText=quarterlyStatistic.fieldStage>
-        <@statistic.statistic prompt="Total projects" value=quarterlyStatistic.totalProjects />
-        <@statistic.statistic
-          prompt="Updated this quarter"
-          value=quarterlyStatistic.totalProjectsUpdateThisQuarter
-          promptClasses="govuk-!-margin-top-2"
-        >
-          <div class="statistic__tag">
-            <@tag.tag tagClasses="govuk-tag--blue">
-              ${quarterlyStatistic.percentageOfProjectsUpdated?string(',###.##')}% of total
-            </@tag.tag>
-          </div>
-        </@statistic.statistic>
-      </@statistic.statisticContainerItem>
-    </#list>
-  </@statistic.statisticContainer>
+  <@fdsTabs.tabs tabsHeading="Quarterly statistics">
+    <@fdsTabs.tabList>
+      <@fdsTabs.tab tabLabel="Overview" tabAnchor="overview" tabSelected=true/>
+      <@fdsTabs.tab tabLabel="Operators" tabAnchor="operators" tabSelected=false/>
+    </@fdsTabs.tabList>
+    <@fdsTabs.tabContent tabAnchor="overview" tabSelected=true>
+      <@fieldStageStatistic._fieldStageStatistics fieldStageStatistics=fieldStageStatistics />
+    </@fdsTabs.tabContent>
+    <@fdsTabs.tabContent tabAnchor="operators" tabSelected=false>
+      <@operatorProjects._operators operatorProjectMap=operatorReportableProjects />
+    </@fdsTabs.tabContent>
+  </@fdsTabs.tabs>
 </@defaultPage>
-

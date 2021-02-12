@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.quarterlystatistics;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -15,32 +15,34 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.controller.quarterlystatistics.QuarterlyStatisticsController;
-import uk.co.ogauthority.pathfinder.model.entity.quarterlystatistics.ReportableProject;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
-import uk.co.ogauthority.pathfinder.repository.quarterlystatistics.ReportableProjectRepository;
+import uk.co.ogauthority.pathfinder.testutil.ReportableProjectTestUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuarterlyStatisticsServiceTest {
 
   @Mock
-  private ReportableProjectRepository reportableProjectRepository;
+  private ReportableProjectService reportableProjectService;
 
   private QuarterlyStatisticsService quarterlyStatisticsService;
 
   @Before
   public void setup() {
-    quarterlyStatisticsService = new QuarterlyStatisticsService(reportableProjectRepository);
+    quarterlyStatisticsService = new QuarterlyStatisticsService(reportableProjectService);
   }
 
   @Test
   public void getQuarterlyStatisticsByFieldStage_whenNoReportableProjects_allFieldStagesReturnedWithZeroValues() {
 
-    when(reportableProjectRepository.findAll()).thenReturn(Collections.emptyList());
-    final var statistics = quarterlyStatisticsService.getQuarterlyStatisticsByFieldStage();
+    final List<ReportableProjectView> reportableProjects = Collections.emptyList();
+
+    final var statistics = quarterlyStatisticsService.getQuarterlyStatisticsByFieldStage(
+        reportableProjects
+    );
 
     final var fieldStagesFromStatistics = statistics
         .stream()
-        .map(FieldStageQuarterlyStatistic::getFieldStage)
+        .map(FieldStageStatistic::getFieldStage)
         .collect(Collectors.toList());
 
     final var fieldStagesFromEnum = Arrays.stream(FieldStage.values())
@@ -60,22 +62,25 @@ public class QuarterlyStatisticsServiceTest {
   @Test
   public void getQuarterlyStatisticsByFieldStage_assertProjectTotalIsCorrect() {
 
-    final var reportableProject1 = createReportableProject(FieldStage.DEVELOPMENT);
-    final var reportableProject2 = createReportableProject(FieldStage.DEVELOPMENT);
-    final var reportableProject3 = createReportableProject(FieldStage.DECOMMISSIONING);
+    final var reportableProjectView1 = ReportableProjectTestUtil.createReportableProjectView(FieldStage.DEVELOPMENT);
+    final var reportableProjectView2 = ReportableProjectTestUtil.createReportableProjectView(FieldStage.DEVELOPMENT);
+    final var reportableProjectView3 = ReportableProjectTestUtil.createReportableProjectView(FieldStage.DECOMMISSIONING);
 
-    when(reportableProjectRepository.findAll()).thenReturn(List.of(
-        reportableProject1,
-        reportableProject2,
-        reportableProject3
-    ));
-    final var statistics = quarterlyStatisticsService.getQuarterlyStatisticsByFieldStage();
+    final var reportableProjectViews = List.of(
+        reportableProjectView1,
+        reportableProjectView2,
+        reportableProjectView3
+    );
 
-    assertThat(getFieldStageQuarterlyStatistic(statistics, FieldStage.DEVELOPMENT).getTotalProjects()).isEqualTo(2);
-    assertThat(getFieldStageQuarterlyStatistic(statistics, FieldStage.DECOMMISSIONING).getTotalProjects()).isEqualTo(1);
-    assertThat(getFieldStageQuarterlyStatistic(statistics, FieldStage.DISCOVERY).getTotalProjects()).isZero();
-    assertThat(getFieldStageQuarterlyStatistic(statistics, FieldStage.OPERATIONS).getTotalProjects()).isZero();
-    assertThat(getFieldStageQuarterlyStatistic(statistics, FieldStage.ENERGY_TRANSITION).getTotalProjects()).isZero();
+    final var statistics = quarterlyStatisticsService.getQuarterlyStatisticsByFieldStage(
+        reportableProjectViews
+    );
+
+    assertThat(getFieldStageStatistic(statistics, FieldStage.DEVELOPMENT).getTotalProjects()).isEqualTo(2);
+    assertThat(getFieldStageStatistic(statistics, FieldStage.DECOMMISSIONING).getTotalProjects()).isEqualTo(1);
+    assertThat(getFieldStageStatistic(statistics, FieldStage.DISCOVERY).getTotalProjects()).isZero();
+    assertThat(getFieldStageStatistic(statistics, FieldStage.OPERATIONS).getTotalProjects()).isZero();
+    assertThat(getFieldStageStatistic(statistics, FieldStage.ENERGY_TRANSITION).getTotalProjects()).isZero();
   }
 
   @Test
@@ -84,26 +89,45 @@ public class QuarterlyStatisticsServiceTest {
     final var timeInCurrentQuarter = Instant.now();
     final var timeNotInCurrentQuarter = Instant.now().minus(100, ChronoUnit.DAYS);
 
-    final var reportableProject1 = createReportableProject(FieldStage.DISCOVERY, 1, timeInCurrentQuarter);
-    final var reportableProject2 = createReportableProject(FieldStage.DISCOVERY, 2, timeInCurrentQuarter);
-    final var reportableProject3 = createReportableProject(FieldStage.DECOMMISSIONING, 3, timeNotInCurrentQuarter);
-    final var reportableProject4 = createReportableProject(FieldStage.DECOMMISSIONING, 4, timeInCurrentQuarter);
+    final var reportableProjectView1 = ReportableProjectTestUtil.createReportableProjectView(
+        FieldStage.DISCOVERY,
+        1,
+        timeInCurrentQuarter
+    );
+    final var reportableProjectView2 = ReportableProjectTestUtil.createReportableProjectView(
+        FieldStage.DISCOVERY,
+        2,
+        timeInCurrentQuarter
+    );
+    final var reportableProjectView3 = ReportableProjectTestUtil.createReportableProjectView(
+        FieldStage.DECOMMISSIONING,
+        3,
+        timeNotInCurrentQuarter
+    );
+    final var reportableProjectView4 = ReportableProjectTestUtil.createReportableProjectView(
+        FieldStage.DECOMMISSIONING,
+        4,
+        timeInCurrentQuarter
+    );
 
-    when(reportableProjectRepository.findAll()).thenReturn(List.of(
-        reportableProject1,
-        reportableProject2,
-        reportableProject3,
-        reportableProject4
-    ));
-    final var statistics = quarterlyStatisticsService.getQuarterlyStatisticsByFieldStage();
+    final var reportableProjectViews = List.of(
+        reportableProjectView1,
+        reportableProjectView2,
+        reportableProjectView3,
+        reportableProjectView4
+    );
 
-    final var discoveryStat = getFieldStageQuarterlyStatistic(statistics, FieldStage.DISCOVERY);
+    final var statistics = quarterlyStatisticsService.getQuarterlyStatisticsByFieldStage(
+        reportableProjectViews
+    );
+
+    final var discoveryStat = getFieldStageStatistic(statistics, FieldStage.DISCOVERY);
 
     assertThat(discoveryStat.getTotalProjects()).isEqualTo(2);
     assertThat(discoveryStat.getTotalProjectsUpdateThisQuarter()).isEqualTo(2);
     assertThat(discoveryStat.getPercentageOfProjectsUpdated()).isEqualTo(100.0);
 
-    final var decommissioningStat = getFieldStageQuarterlyStatistic(statistics, FieldStage.DECOMMISSIONING);
+    final var decommissioningStat = getFieldStageStatistic(statistics, FieldStage.DECOMMISSIONING);
 
     assertThat(decommissioningStat.getTotalProjects()).isEqualTo(2);
     assertThat(decommissioningStat.getTotalProjectsUpdateThisQuarter()).isEqualTo(1);
@@ -114,34 +138,49 @@ public class QuarterlyStatisticsServiceTest {
   @Test
   public void getQuarterlyStatisticsModelAndView() {
     final var modelMap = quarterlyStatisticsService.getQuarterlyStatisticsModelAndView().getModel();
-    assertThat(modelMap).containsOnlyKeys("pageTitle", "quarterlyStatistics")
+    assertThat(modelMap)
+        .containsOnlyKeys("pageTitle", "fieldStageStatistics", "operatorReportableProjects")
         .containsEntry("pageTitle", QuarterlyStatisticsController.QUARTERLY_STATISTICS_TITLE);
-
-    // check list contains an item for each field stage
-    assertThat((List<FieldStageQuarterlyStatistic>)modelMap.get("quarterlyStatistics")).hasSize(FieldStage.values().length);
   }
 
-  private ReportableProject createReportableProject(FieldStage fieldStage) {
-    return createReportableProject(fieldStage, 1, Instant.now());
+  @Test
+  public void getReportableProjectsByOperator_whenNoResults_thenEmptyMap() {
+    final var result = quarterlyStatisticsService.getReportableProjectsByOperator(Collections.emptyList());
+    assertThat(result).isEmpty();
   }
 
-  private ReportableProject createReportableProject(FieldStage fieldStage,
-                                                    int projectDetailId,
-                                                    Instant lastUpdateDatetime) {
-    var reportableProject = new ReportableProject();
-    reportableProject.setFieldStage(fieldStage);
-    reportableProject.setProjectDetailId(projectDetailId);
-    reportableProject.setLastUpdatedDatetime(lastUpdateDatetime);
-    return reportableProject;
+  @Test
+  public void getReportableProjectsByOperator_whenResults_thenGroupedByOperatorOrderedByProjectName() {
+
+    final var operatorA = "operator a";
+    final var operatorB = "operator b";
+
+    var reportableProjectView1 = ReportableProjectTestUtil.createReportableProjectView(operatorB, "A project");
+    var reportableProjectView2 = ReportableProjectTestUtil.createReportableProjectView(operatorA, "B project");
+    var reportableProjectView3 = ReportableProjectTestUtil.createReportableProjectView(operatorA, "a project");
+
+    final var reportableProjectViews = List.of(
+        reportableProjectView1,
+        reportableProjectView2,
+        reportableProjectView3
+    );
+
+    final var result = quarterlyStatisticsService.getReportableProjectsByOperator(
+        reportableProjectViews
+    );
+    assertThat(result).containsExactly(
+        entry(operatorA, List.of(reportableProjectView3, reportableProjectView2)),
+        entry(operatorB, List.of(reportableProjectView1))
+    );
   }
 
-  private FieldStageQuarterlyStatistic getFieldStageQuarterlyStatistic(
-      List<FieldStageQuarterlyStatistic> fieldStageQuarterlyStatistics,
+  private FieldStageStatistic getFieldStageStatistic(
+      List<FieldStageStatistic> fieldStageStatistics,
       FieldStage fieldStage
   ) {
-    return fieldStageQuarterlyStatistics
+    return fieldStageStatistics
         .stream()
-        .filter(fieldStageQuarterlyStatistic -> fieldStageQuarterlyStatistic.getFieldStage().equals(fieldStage.getDisplayName()))
+        .filter(fieldStageStatistic -> fieldStageStatistic.getFieldStage().equals(fieldStage.getDisplayName()))
         .findFirst()
         .orElse(null);
   }

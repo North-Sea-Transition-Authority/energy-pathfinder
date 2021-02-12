@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.quarterlystatistics;
 
-public class FieldStageQuarterlyStatistic {
+public class FieldStageStatistic {
 
   private final String fieldStage;
 
@@ -10,9 +10,9 @@ public class FieldStageQuarterlyStatistic {
 
   private final double percentageOfProjectsUpdated;
 
-  public FieldStageQuarterlyStatistic(String fieldStage,
-                                      int totalProjects,
-                                      int totalProjectsUpdateThisQuarter) {
+  public FieldStageStatistic(String fieldStage,
+                             int totalProjects,
+                             int totalProjectsUpdateThisQuarter) {
     this.fieldStage = fieldStage;
     this.totalProjects = totalProjects;
     this.totalProjectsUpdateThisQuarter = totalProjectsUpdateThisQuarter;

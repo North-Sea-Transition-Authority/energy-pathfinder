@@ -108,4 +108,14 @@ public class DateUtilTest {
     final var fourthQuarterDate = LocalDate.of(2021, 10, 1);
     assertThat(DateUtil.getQuarterFromLocalDate(fourthQuarterDate)).isEqualTo(Quarter.Q4);
   }
+
+  @Test
+  public void isInCurrentQuarter_whenInCurrentQuarter() {
+    assertThat(DateUtil.isInCurrentQuarter(Instant.now())).isTrue();
+  }
+
+  @Test
+  public void isInCurrentQuarter_whenNotInCurrentQuarter() {
+    assertThat(DateUtil.isInCurrentQuarter(Instant.now().minus(200, ChronoUnit.DAYS))).isFalse();
+  }
 }

@@ -22,6 +22,12 @@ public class ReportableProject {
 
   private Instant lastUpdatedDatetime;
 
+  private String operatorName;
+
+  private String projectTitle;
+
+  private Integer projectId;
+
   public Integer getProjectDetailId() {
     return projectDetailId;
   }
@@ -44,5 +50,29 @@ public class ReportableProject {
 
   public void setLastUpdatedDatetime(Instant lastUpdatedDatetime) {
     this.lastUpdatedDatetime = lastUpdatedDatetime;
+  }
+
+  public String getOperatorName() {
+    return operatorName;
+  }
+
+  public void setOperatorName(String operatorName) {
+    this.operatorName = operatorName;
+  }
+
+  public String getProjectTitle() {
+    return projectTitle;
+  }
+
+  public void setProjectTitle(String projectTitle) {
+    this.projectTitle = projectTitle;
+  }
+
+  public Integer getProjectId() {
+    return projectId;
+  }
+
+  public void setProjectId(Integer projectId) {
+    this.projectId = projectId;
   }
 }
