@@ -17,7 +17,6 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedule.PlugAbandonmentSchedule;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -39,7 +38,7 @@ public class PlugAbandonmentScheduleController extends ProjectFormPageController
 
   public static final String TASK_LIST_NAME = "Wells";
   public static final String SUMMARY_PAGE_NAME = "Wells to be decommissioned";
-  public static final String FORM_PAGE_NAME = "Plug abandonment schedule";
+  public static final String FORM_PAGE_NAME = "Plug and abandonment schedule";
 
   private final PlugAbandonmentScheduleService plugAbandonmentScheduleService;
   private final PlugAbandonmentWellService plugAbandonmentWellService;
@@ -148,7 +147,7 @@ public class PlugAbandonmentScheduleController extends ProjectFormPageController
     return getPlugAbandonmentScheduleModelAndView(
         projectId,
         form,
-        plugAbandonmentWellService.getWellboreViews(plugAbandonmentSchedule)
+        plugAbandonmentWellService.getWellboreViewsFromSchedule(plugAbandonmentSchedule)
     );
   }
 

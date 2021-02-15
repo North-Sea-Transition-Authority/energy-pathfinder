@@ -17,7 +17,7 @@
       path="form.wells"
       alreadyAdded=alreadyAddedWells
       title="Wells"
-      itemName="Wells"
+      itemName="Well"
       noItemText="No wells added"
       invalidItemText="This well is invalid"
       addToListId="well-table"

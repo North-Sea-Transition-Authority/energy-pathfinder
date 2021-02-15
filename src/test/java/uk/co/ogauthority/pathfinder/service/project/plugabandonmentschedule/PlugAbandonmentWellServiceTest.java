@@ -66,6 +66,29 @@ public class PlugAbandonmentWellServiceTest {
   }
 
   @Test
+  public void deletePlugAbandonmentScheduleWells_singlePlugAbandonmentSchedule() {
+    var plugAbandonmentSchedule = new PlugAbandonmentSchedule();
+
+    plugAbandonmentWellService.deletePlugAbandonmentScheduleWells(plugAbandonmentSchedule);
+
+    verify(plugAbandonmentWellRepository, times(1)).deleteAllByPlugAbandonmentSchedule(plugAbandonmentSchedule);
+  }
+
+  @Test
+  public void deletePlugAbandonmentScheduleWells_plugAbandonmentScheduleList() {
+    var plugAbandonmentSchedules = List.of(
+        new PlugAbandonmentSchedule(),
+        new PlugAbandonmentSchedule()
+    );
+
+    plugAbandonmentWellService.deletePlugAbandonmentScheduleWells(plugAbandonmentSchedules);
+
+    for (PlugAbandonmentSchedule plugAbandonmentSchedule : plugAbandonmentSchedules) {
+      verify(plugAbandonmentWellRepository, times(1)).deleteAllByPlugAbandonmentSchedule(plugAbandonmentSchedule);
+    }
+  }
+
+  @Test
   public void getWellboreViews() {
     var plugAbandonmentSchedule = new PlugAbandonmentSchedule();
     var plugAbandonmentSchedule1 = PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(
@@ -80,7 +103,7 @@ public class PlugAbandonmentWellServiceTest {
         plugAbandonmentSchedule2
     ));
 
-    var wellboreViews = plugAbandonmentWellService.getWellboreViews(plugAbandonmentSchedule);
+    var wellboreViews = plugAbandonmentWellService.getWellboreViewsFromSchedule(plugAbandonmentSchedule);
     assertWellboreViewMatchesWellbore(wellboreViews.get(0), plugAbandonmentSchedule2);
     assertWellboreViewMatchesWellbore(wellboreViews.get(1), plugAbandonmentSchedule1);
   }

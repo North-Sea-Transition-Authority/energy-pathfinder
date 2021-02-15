@@ -1,6 +1,6 @@
 <#include '../../layout.ftl'>
 <@defaultPage htmlTitle=pageName pageHeading=pageName breadcrumbs=true>
-  <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="well" linkUrl=springUrl(projectSetupUrl)/>
+  <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="well added to a plug and abandonment schedule" linkUrl=springUrl(projectSetupUrl)/>
   <@fdsAction.link
     linkText="Add plug abandonment schedule"
     linkUrl=springUrl(addPlugAbandonmentScheduleUrl)

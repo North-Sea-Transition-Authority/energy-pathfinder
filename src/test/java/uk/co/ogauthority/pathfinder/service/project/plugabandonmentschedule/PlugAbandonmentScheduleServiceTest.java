@@ -233,9 +233,19 @@ public class PlugAbandonmentScheduleServiceTest {
 
   @Test
   public void removeSectionData_verifyInteractions() {
+    var plugAbandonmentSchedules = List.of(
+        PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(),
+        PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule()
+    );
+
+    when(plugAbandonmentScheduleRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(
+        plugAbandonmentSchedules
+    );
+
     plugAbandonmentScheduleService.removeSectionData(detail);
 
-    verify(plugAbandonmentScheduleRepository, times(1)).deleteAllByProjectDetail(detail);
+    verify(plugAbandonmentWellService, times(1)).deletePlugAbandonmentScheduleWells(plugAbandonmentSchedules);
+    verify(plugAbandonmentScheduleRepository, times(1)).deleteAll(plugAbandonmentSchedules);
   }
 
   @Test

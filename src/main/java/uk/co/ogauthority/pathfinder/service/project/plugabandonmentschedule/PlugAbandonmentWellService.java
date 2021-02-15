@@ -45,17 +45,30 @@ public class PlugAbandonmentWellService {
     plugAbandonmentWellRepository.saveAll(plugAbandonmentWells);
   }
 
-  public List<WellboreView> getWellboreViews(PlugAbandonmentSchedule plugAbandonmentSchedule) {
-    return plugAbandonmentWellRepository.findAllByPlugAbandonmentSchedule(plugAbandonmentSchedule)
+  @Transactional
+  public void deletePlugAbandonmentScheduleWells(PlugAbandonmentSchedule plugAbandonmentSchedule) {
+    plugAbandonmentWellRepository.deleteAllByPlugAbandonmentSchedule(plugAbandonmentSchedule);
+  }
+
+  public void deletePlugAbandonmentScheduleWells(List<PlugAbandonmentSchedule> plugAbandonmentSchedules) {
+    plugAbandonmentSchedules.forEach(this::deletePlugAbandonmentScheduleWells);
+  }
+
+  public List<WellboreView> getWellboreViewsFromSchedule(PlugAbandonmentSchedule plugAbandonmentSchedule) {
+    var wellbores = plugAbandonmentWellRepository.findAllByPlugAbandonmentSchedule(plugAbandonmentSchedule)
         .stream()
-        .map(this::convertToWellboreView)
-        .sorted(Comparator.comparing(WellboreView::getName))
+        .map(PlugAbandonmentWell::getWellbore)
         .collect(Collectors.toList());
+
+    return getWellboreViews(wellbores);
   }
 
   public List<WellboreView> getWellboreViewsFromForm(PlugAbandonmentScheduleForm form) {
-    return getWellbores(form.getWells())
-        .stream()
+    return getWellboreViews(getWellbores(form.getWells()));
+  }
+
+  private List<WellboreView> getWellboreViews(List<Wellbore> wellbores) {
+    return wellbores.stream()
         .map(this::convertToWellboreView)
         .sorted(Comparator.comparing(WellboreView::getName))
         .collect(Collectors.toList());
@@ -63,10 +76,6 @@ public class PlugAbandonmentWellService {
 
   private List<Wellbore> getWellbores(List<Integer> wellboreIds) {
     return wellboreService.getWellboresByIdsIn(wellboreIds);
-  }
-
-  private WellboreView convertToWellboreView(PlugAbandonmentWell plugAbandonmentWell) {
-    return convertToWellboreView(plugAbandonmentWell.getWellbore());
   }
 
   private WellboreView convertToWellboreView(Wellbore wellbore) {

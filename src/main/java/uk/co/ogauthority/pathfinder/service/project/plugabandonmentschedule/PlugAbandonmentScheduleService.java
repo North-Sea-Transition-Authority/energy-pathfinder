@@ -130,7 +130,9 @@ public class PlugAbandonmentScheduleService implements ProjectFormSectionService
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
-    plugAbandonmentScheduleRepository.deleteAllByProjectDetail(projectDetail);
+    var plugAbandonmentSchedules = getPlugAbandonmentSchedulesForProjectDetail(projectDetail);
+    plugAbandonmentWellService.deletePlugAbandonmentScheduleWells(plugAbandonmentSchedules);
+    plugAbandonmentScheduleRepository.deleteAll(plugAbandonmentSchedules);
   }
 
   @Override
