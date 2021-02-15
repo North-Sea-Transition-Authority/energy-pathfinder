@@ -32,6 +32,33 @@
   </@summaryViewWrapper.summaryViewItemWrapper>
 </#macro>
 
+<#macro plugAbandonmentScheduleDiffSummary
+  plugAbandonmentScheduleDiff
+  showHeader=false
+  showActions=false
+  headingSize=defaultHeadingSize
+  headingClass=defaultHeadingClass
+>
+  <@summaryViewWrapper.summaryViewItemWrapper
+    idPrefix=idPrefix
+    headingPrefix=headingPrefix
+    displayOrder=plugAbandonmentScheduleDiff.PlugAbandonmentScheduleView_displayOrder.currentValue
+    isValid=true
+    summaryLinkList=[]
+    showHeader=showHeader
+    showActions=showActions
+    headingSize=headingSize
+    headingClass=headingClass
+  >
+    <@_plugAbandonmentScheduleSummaryFields
+      useDiffedField=true
+      earliestStartYear=plugAbandonmentScheduleDiff.PlugAbandonmentScheduleView_earliestStartYear
+      latestCompletionYear=plugAbandonmentScheduleDiff.PlugAbandonmentScheduleView_latestCompletionYear
+      wells=plugAbandonmentScheduleDiff.PlugAbandonmentScheduleView_wells
+    />
+  </@summaryViewWrapper.summaryViewItemWrapper>
+</#macro>
+
 <#macro _plugAbandonmentScheduleSummaryFields
   useDiffedField
   earliestStartYear=""

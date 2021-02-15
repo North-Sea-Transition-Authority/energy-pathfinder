@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.plugabandonmentschedule.PlugAbandonmentScheduleController;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedule.PlugAbandonmentSchedule;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -46,6 +47,14 @@ public class PlugAbandonmentScheduleSummaryService {
   
   public List<PlugAbandonmentScheduleView> getPlugAbandonmentScheduleSummaryViews(ProjectDetail projectDetail) {
     return constructPlugAbandonmentScheduleViews(projectDetail, ValidationType.NO_VALIDATION);
+  }
+
+  public List<PlugAbandonmentScheduleView> getPlugAbandonmentScheduleSummaryViewsByProjectAndVersion(Project project,
+                                                                                                     Integer version) {
+    return constructPlugAbandonmentScheduleViews(
+        plugAbandonmentScheduleService.getPlugAbandonmentSchedulesByProjectAndVersion(project, version),
+        ValidationType.NO_VALIDATION
+    );
   }
 
   public PlugAbandonmentScheduleView getPlugAbandonmentScheduleSummaryView(Integer plugAbandonmentScheduleId,

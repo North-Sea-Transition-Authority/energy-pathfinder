@@ -79,6 +79,38 @@ public class PlugAbandonmentScheduleSummaryServiceTest {
   }
 
   @Test
+  public void getPlugAbandonmentScheduleSummaryViewsByProjectAndVersion_whenViews_thenReturnPopulatedList() {
+    var project = projectDetail.getProject();
+    var version = projectDetail.getVersion();
+    var plugAbandonmentSchedule = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
+
+    when(plugAbandonmentScheduleService.getPlugAbandonmentSchedulesByProjectAndVersion(project, version)).thenReturn(
+        List.of(plugAbandonmentSchedule)
+    );
+
+    var results = plugAbandonmentScheduleSummaryService.getPlugAbandonmentScheduleSummaryViewsByProjectAndVersion(project, version);
+
+    assertThat(results).hasSize(1);
+    var plugAbandonmentScheduleView = results.get(0);
+    assertThat(plugAbandonmentScheduleView.getId()).isEqualTo(plugAbandonmentSchedule.getId());
+    assertThat(plugAbandonmentScheduleView.getProjectId()).isEqualTo(plugAbandonmentSchedule.getProjectDetail().getProject().getId());
+    assertThat(plugAbandonmentScheduleView.isValid()).isTrue();
+  }
+
+  @Test
+  public void getPlugAbandonmentScheduleSummaryViewsByProjectAndVersion_whenNoViews_thenReturnEmptyList() {
+    var project = projectDetail.getProject();
+    var version = projectDetail.getVersion();
+
+    when(plugAbandonmentScheduleService.getPlugAbandonmentSchedulesByProjectAndVersion(project, version)).thenReturn(
+        List.of()
+    );
+
+    var results = plugAbandonmentScheduleSummaryService.getPlugAbandonmentScheduleSummaryViewsByProjectAndVersion(project, version);
+    assertThat(results).isEmpty();
+  }
+
+  @Test
   public void getPlugAbandonmentScheduleSummaryView_whenFound_thenViewReturned() {
 
     final var plugAbandonmentScheduleId = 1;
