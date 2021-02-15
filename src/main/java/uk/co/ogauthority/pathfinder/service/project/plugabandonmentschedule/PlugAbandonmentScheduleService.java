@@ -1,9 +1,13 @@
 package uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.controller.project.plugabandonmentschedule.PlugAbandonmentScheduleController;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedule.PlugAbandonmentSchedule;
@@ -13,16 +17,23 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxD
 import uk.co.ogauthority.pathfinder.model.form.project.plugabandonmentschedule.PlugAbandonmentScheduleForm;
 import uk.co.ogauthority.pathfinder.model.form.project.plugabandonmentschedule.PlugAbandonmentScheduleFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.plugabandonmentschedule.PlugAbandonmentScheduleValidationHint;
+import uk.co.ogauthority.pathfinder.model.view.wellbore.WellboreView;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.plugabandonmentschedule.PlugAbandonmentScheduleRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.service.wellbore.WellboreService;
+import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
 @Service
 public class PlugAbandonmentScheduleService implements ProjectFormSectionService {
+
+  public static final String SUMMARY_TEMPLATE_PATH = "project/plugabandonmentschedule/plugAbandonmentScheduleSummary";
+  public static final String TEMPLATE_PATH = "project/plugabandonmentschedule/plugAbandonmentSchedule";
 
   private final WellboreService wellboreService;
   private final ValidationService validationService;
@@ -31,6 +42,7 @@ public class PlugAbandonmentScheduleService implements ProjectFormSectionService
   private final PlugAbandonmentWellService plugAbandonmentWellService;
   private final ProjectSetupService projectSetupService;
   private final EntityDuplicationService entityDuplicationService;
+  private final BreadcrumbService breadcrumbService;
 
   public PlugAbandonmentScheduleService(WellboreService wellboreService,
                                         ValidationService validationService,
@@ -38,7 +50,8 @@ public class PlugAbandonmentScheduleService implements ProjectFormSectionService
                                         PlugAbandonmentScheduleRepository plugAbandonmentScheduleRepository,
                                         PlugAbandonmentWellService plugAbandonmentWellService,
                                         ProjectSetupService projectSetupService,
-                                        EntityDuplicationService entityDuplicationService) {
+                                        EntityDuplicationService entityDuplicationService,
+                                        BreadcrumbService breadcrumbService) {
     this.wellboreService = wellboreService;
     this.validationService = validationService;
     this.plugAbandonmentScheduleFormValidator = plugAbandonmentScheduleFormValidator;
@@ -46,6 +59,7 @@ public class PlugAbandonmentScheduleService implements ProjectFormSectionService
     this.plugAbandonmentWellService = plugAbandonmentWellService;
     this.projectSetupService = projectSetupService;
     this.entityDuplicationService = entityDuplicationService;
+    this.breadcrumbService = breadcrumbService;
   }
 
   public String getWellboreRestUrl() {
@@ -148,5 +162,51 @@ public class PlugAbandonmentScheduleService implements ProjectFormSectionService
     );
 
     // TODO: PAT-451
+  }
+
+  public ModelAndView getPlugAbandonmentScheduleSummaryModelAndView(Integer projectId) {
+    var modelAndView = new ModelAndView(SUMMARY_TEMPLATE_PATH)
+        .addObject("pageName", PlugAbandonmentScheduleController.SUMMARY_PAGE_NAME)
+        .addObject("addPlugAbandonmentScheduleUrl",
+            ReverseRouter.route(on(PlugAbandonmentScheduleController.class).addPlugAbandonmentSchedule(projectId, null))
+        )
+        .addObject("projectSetupUrl", ControllerUtils.getProjectSetupUrl(projectId));
+
+    breadcrumbService.fromTaskList(projectId, modelAndView, PlugAbandonmentScheduleController.TASK_LIST_NAME);
+
+    return modelAndView;
+  }
+
+  public ModelAndView getPlugAbandonmentScheduleModelAndView(Integer projectId,
+                                                             PlugAbandonmentScheduleForm form) {
+    return getPlugAbandonmentScheduleModelAndView(
+        projectId,
+        form,
+        plugAbandonmentWellService.getWellboreViewsFromForm(form)
+    );
+  }
+
+  public ModelAndView getPlugAbandonmentScheduleModelAndView(Integer projectId,
+                                                             PlugAbandonmentScheduleForm form,
+                                                             PlugAbandonmentSchedule plugAbandonmentSchedule) {
+    return getPlugAbandonmentScheduleModelAndView(
+        projectId,
+        form,
+        plugAbandonmentWellService.getWellboreViewsFromSchedule(plugAbandonmentSchedule)
+    );
+  }
+
+  public ModelAndView getPlugAbandonmentScheduleModelAndView(Integer projectId,
+                                                             PlugAbandonmentScheduleForm form,
+                                                             List<WellboreView> wellboreViews) {
+    var modelAndView = new ModelAndView(TEMPLATE_PATH)
+        .addObject("form", form)
+        .addObject("pageName", PlugAbandonmentScheduleController.FORM_PAGE_NAME)
+        .addObject("alreadyAddedWells", wellboreViews)
+        .addObject("wellsRestUrl", getWellboreRestUrl());
+
+    breadcrumbService.fromPlugAbandonmentSchedule(projectId, modelAndView, PlugAbandonmentScheduleController.FORM_PAGE_NAME);
+
+    return modelAndView;
   }
 }

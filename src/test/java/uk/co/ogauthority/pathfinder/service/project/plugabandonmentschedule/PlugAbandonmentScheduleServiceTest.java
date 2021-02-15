@@ -1,10 +1,12 @@
 package uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule;
 
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.ogauthority.pathfinder.controller.project.plugabandonmentschedule.PlugAbandonmentScheduleController;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedule.PlugAbandonmentSchedule;
@@ -22,13 +25,17 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.plugabandonmentschedule.PlugAbandonmentScheduleForm;
 import uk.co.ogauthority.pathfinder.model.form.project.plugabandonmentschedule.PlugAbandonmentScheduleFormValidator;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.plugabandonmentschedule.PlugAbandonmentScheduleRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.service.wellbore.WellboreService;
 import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentScheduleTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.WellboreTestUtil;
+import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PlugAbandonmentScheduleServiceTest {
@@ -54,6 +61,9 @@ public class PlugAbandonmentScheduleServiceTest {
   @Mock
   private EntityDuplicationService entityDuplicationService;
 
+  @Mock
+  private BreadcrumbService breadcrumbService;
+
   private PlugAbandonmentScheduleService plugAbandonmentScheduleService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -67,7 +77,8 @@ public class PlugAbandonmentScheduleServiceTest {
         plugAbandonmentScheduleRepository,
         plugAbandonmentWellService,
         projectSetupService,
-        entityDuplicationService
+        entityDuplicationService,
+        breadcrumbService
     );
 
     when(plugAbandonmentScheduleRepository.save(any(PlugAbandonmentSchedule.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
@@ -266,4 +277,124 @@ public class PlugAbandonmentScheduleServiceTest {
     );
   }
 
+  @Test
+  public void getPlugAbandonmentScheduleSummaryModelAndView() {
+    var projectId = detail.getProject().getId();
+
+    var modelAndView = plugAbandonmentScheduleService.getPlugAbandonmentScheduleSummaryModelAndView(
+        projectId
+    );
+
+    assertThat(modelAndView.getViewName()).isEqualTo(PlugAbandonmentScheduleService.SUMMARY_TEMPLATE_PATH);
+    assertThat(modelAndView.getModel()).containsExactly(
+        entry("pageName", PlugAbandonmentScheduleController.SUMMARY_PAGE_NAME),
+        entry(
+            "addPlugAbandonmentScheduleUrl",
+            ReverseRouter.route(on(PlugAbandonmentScheduleController.class).addPlugAbandonmentSchedule(projectId, null))
+        ),
+        entry("projectSetupUrl", ControllerUtils.getProjectSetupUrl(projectId))
+    );
+
+    verify(breadcrumbService, times(1)).fromTaskList(projectId, modelAndView, PlugAbandonmentScheduleController.TASK_LIST_NAME);
+  }
+
+  @Test
+  public void getPlugAbandonmentScheduleModelAndView_withForm() {
+    var projectId = detail.getProject().getId();
+    var form = new PlugAbandonmentScheduleForm();
+    var wellboreViews = List.of(
+        WellboreTestUtil.createWellboreView(),
+        WellboreTestUtil.createWellboreView()
+    );
+
+    when(plugAbandonmentWellService.getWellboreViewsFromForm(form)).thenReturn(wellboreViews);
+    when(wellboreService.getWellboreRestUrl()).thenReturn("testurl");
+
+    var modelAndView = plugAbandonmentScheduleService.getPlugAbandonmentScheduleModelAndView(
+        projectId,
+        form
+    );
+
+    assertThat(modelAndView.getViewName()).isEqualTo(PlugAbandonmentScheduleService.TEMPLATE_PATH);
+    assertThat(modelAndView.getModel()).containsExactly(
+        entry("form", form),
+        entry("pageName", PlugAbandonmentScheduleController.FORM_PAGE_NAME),
+        entry("alreadyAddedWells", wellboreViews),
+        entry("wellsRestUrl", plugAbandonmentScheduleService.getWellboreRestUrl())
+    );
+
+    verify(breadcrumbService, times(1)).fromPlugAbandonmentSchedule(
+        projectId,
+        modelAndView,
+        PlugAbandonmentScheduleController.FORM_PAGE_NAME
+    );
+  }
+
+  @Test
+  public void getPlugAbandonmentScheduleModelAndView_withPlugAbandonmentSchedule() {
+    var projectId = detail.getProject().getId();
+    var form = new PlugAbandonmentScheduleForm();
+    var wellboreViews = List.of(
+        WellboreTestUtil.createWellboreView(),
+        WellboreTestUtil.createWellboreView()
+    );
+    var plugAbandonmentSchedule = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
+
+    when(plugAbandonmentWellService.getWellboreViewsFromSchedule(plugAbandonmentSchedule)).thenReturn(
+        wellboreViews
+    );
+    when(wellboreService.getWellboreRestUrl()).thenReturn("testurl");
+
+    var modelAndView = plugAbandonmentScheduleService.getPlugAbandonmentScheduleModelAndView(
+        projectId,
+        form,
+        plugAbandonmentSchedule
+    );
+
+    assertThat(modelAndView.getViewName()).isEqualTo(PlugAbandonmentScheduleService.TEMPLATE_PATH);
+    assertThat(modelAndView.getModel()).containsExactly(
+        entry("form", form),
+        entry("pageName", PlugAbandonmentScheduleController.FORM_PAGE_NAME),
+        entry("alreadyAddedWells", wellboreViews),
+        entry("wellsRestUrl", plugAbandonmentScheduleService.getWellboreRestUrl())
+    );
+
+    verify(breadcrumbService, times(1)).fromPlugAbandonmentSchedule(
+        projectId,
+        modelAndView,
+        PlugAbandonmentScheduleController.FORM_PAGE_NAME
+    );
+  }
+
+  @Test
+  public void getPlugAbandonmentScheduleModelAndView_withWellboreViews() {
+    var projectId = detail.getProject().getId();
+    var form = new PlugAbandonmentScheduleForm();
+    var wellboreViews = List.of(
+        WellboreTestUtil.createWellboreView(),
+        WellboreTestUtil.createWellboreView()
+    );
+
+    when(wellboreService.getWellboreRestUrl()).thenReturn("testurl");
+
+    var modelAndView = plugAbandonmentScheduleService.getPlugAbandonmentScheduleModelAndView(
+        projectId,
+        form,
+        wellboreViews
+    );
+
+    assertThat(modelAndView.getViewName()).isEqualTo(PlugAbandonmentScheduleService.TEMPLATE_PATH);
+    assertThat(modelAndView.getModel()).containsExactly(
+        entry("form", form),
+        entry("pageName", PlugAbandonmentScheduleController.FORM_PAGE_NAME),
+        entry("alreadyAddedWells", wellboreViews),
+        entry("wellsRestUrl", plugAbandonmentScheduleService.getWellboreRestUrl())
+    );
+
+    verify(breadcrumbService, times(1)).fromPlugAbandonmentSchedule(
+        projectId,
+        modelAndView,
+        PlugAbandonmentScheduleController.FORM_PAGE_NAME
+    );
+  }
 }

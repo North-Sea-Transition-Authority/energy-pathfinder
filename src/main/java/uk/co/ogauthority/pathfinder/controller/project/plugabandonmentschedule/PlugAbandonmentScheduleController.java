@@ -3,7 +3,6 @@ package uk.co.ogauthority.pathfinder.controller.project.plugabandonmentschedule;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.Collections;
-import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,18 +16,14 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
-import uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedule.PlugAbandonmentSchedule;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.plugabandonmentschedule.PlugAbandonmentScheduleForm;
-import uk.co.ogauthority.pathfinder.model.view.wellbore.WellboreView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule.PlugAbandonmentScheduleService;
-import uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule.PlugAbandonmentWellService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
-import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
@@ -41,28 +36,29 @@ public class PlugAbandonmentScheduleController extends ProjectFormPageController
   public static final String FORM_PAGE_NAME = "Plug and abandonment schedule";
 
   private final PlugAbandonmentScheduleService plugAbandonmentScheduleService;
-  private final PlugAbandonmentWellService plugAbandonmentWellService;
 
   @Autowired
   public PlugAbandonmentScheduleController(BreadcrumbService breadcrumbService,
                                            ControllerHelperService controllerHelperService,
-                                           PlugAbandonmentScheduleService plugAbandonmentScheduleService,
-                                           PlugAbandonmentWellService plugAbandonmentWellService) {
+                                           PlugAbandonmentScheduleService plugAbandonmentScheduleService) {
     super(breadcrumbService, controllerHelperService);
     this.plugAbandonmentScheduleService = plugAbandonmentScheduleService;
-    this.plugAbandonmentWellService = plugAbandonmentWellService;
   }
 
   @GetMapping
   public ModelAndView viewPlugAbandonmentSchedules(@PathVariable("projectId") Integer projectId,
                                                    ProjectContext projectContext) {
-    return getPlugAbandonmentScheduleSummaryModelAndView(projectId);
+    return plugAbandonmentScheduleService.getPlugAbandonmentScheduleSummaryModelAndView(projectId);
   }
 
   @GetMapping("/plug-abandonment-schedule")
   public ModelAndView addPlugAbandonmentSchedule(@PathVariable("projectId") Integer projectId,
                                                  ProjectContext projectContext) {
-    return getPlugAbandonmentScheduleModelAndView(projectId, new PlugAbandonmentScheduleForm(), Collections.emptyList());
+    return plugAbandonmentScheduleService.getPlugAbandonmentScheduleModelAndView(
+        projectId,
+        new PlugAbandonmentScheduleForm(),
+        Collections.emptyList()
+    );
   }
 
   @PostMapping("/plug-abandonment-schedule")
@@ -74,7 +70,7 @@ public class PlugAbandonmentScheduleController extends ProjectFormPageController
     bindingResult = plugAbandonmentScheduleService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getPlugAbandonmentScheduleModelAndView(projectId, form),
+        plugAbandonmentScheduleService.getPlugAbandonmentScheduleModelAndView(projectId, form),
         form,
         () -> {
           plugAbandonmentScheduleService.createPlugAbandonmentSchedule(form, projectContext.getProjectDetails());
@@ -92,7 +88,11 @@ public class PlugAbandonmentScheduleController extends ProjectFormPageController
         projectContext.getProjectDetails()
     );
     var form = plugAbandonmentScheduleService.getForm(plugAbandonmentSchedule);
-    return getPlugAbandonmentScheduleModelAndView(projectId, form, plugAbandonmentSchedule);
+    return plugAbandonmentScheduleService.getPlugAbandonmentScheduleModelAndView(
+        projectId,
+        form,
+        plugAbandonmentSchedule
+    );
   }
 
   @PostMapping("/plug-abandonment-schedule/{plugAbandonmentScheduleId}/edit")
@@ -105,7 +105,7 @@ public class PlugAbandonmentScheduleController extends ProjectFormPageController
     bindingResult = plugAbandonmentScheduleService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getPlugAbandonmentScheduleModelAndView(projectId, form),
+        plugAbandonmentScheduleService.getPlugAbandonmentScheduleModelAndView(projectId, form),
         form,
         () -> {
           plugAbandonmentScheduleService.updatePlugAbandonmentSchedule(
@@ -116,53 +116,6 @@ public class PlugAbandonmentScheduleController extends ProjectFormPageController
           return getPlugAbandonmentSchedulesSummaryRedirect(projectId);
         }
     );
-  }
-
-  private ModelAndView getPlugAbandonmentScheduleSummaryModelAndView(Integer projectId) {
-    var modelAndView = new ModelAndView("project/plugabandonmentschedule/plugAbandonmentScheduleSummary")
-        .addObject("pageName", SUMMARY_PAGE_NAME)
-        .addObject("addPlugAbandonmentScheduleUrl",
-            ReverseRouter.route(on(PlugAbandonmentScheduleController.class).addPlugAbandonmentSchedule(projectId, null))
-        )
-        .addObject("projectSetupUrl", ControllerUtils.getProjectSetupUrl(projectId));
-
-    breadcrumbService.fromTaskList(projectId, modelAndView, TASK_LIST_NAME);
-
-    return modelAndView;
-  }
-
-
-  private ModelAndView getPlugAbandonmentScheduleModelAndView(Integer projectId,
-                                                              PlugAbandonmentScheduleForm form) {
-    return getPlugAbandonmentScheduleModelAndView(
-        projectId,
-        form,
-        plugAbandonmentWellService.getWellboreViewsFromForm(form)
-    );
-  }
-
-  private ModelAndView getPlugAbandonmentScheduleModelAndView(Integer projectId,
-                                                              PlugAbandonmentScheduleForm form,
-                                                              PlugAbandonmentSchedule plugAbandonmentSchedule) {
-    return getPlugAbandonmentScheduleModelAndView(
-        projectId,
-        form,
-        plugAbandonmentWellService.getWellboreViewsFromSchedule(plugAbandonmentSchedule)
-    );
-  }
-
-  private ModelAndView getPlugAbandonmentScheduleModelAndView(Integer projectId,
-                                                              PlugAbandonmentScheduleForm form,
-                                                              List<WellboreView> wellboreViews) {
-    var modelAndView = new ModelAndView("project/plugabandonmentschedule/plugAbandonmentSchedule")
-        .addObject("form", form)
-        .addObject("pageName", FORM_PAGE_NAME)
-        .addObject("alreadyAddedWells", wellboreViews)
-        .addObject("wellsRestUrl", plugAbandonmentScheduleService.getWellboreRestUrl());
-
-    breadcrumbService.fromPlugAbandonmentSchedule(projectId, modelAndView, FORM_PAGE_NAME);
-
-    return modelAndView;
   }
 
   private ModelAndView getPlugAbandonmentSchedulesSummaryRedirect(Integer projectId) {

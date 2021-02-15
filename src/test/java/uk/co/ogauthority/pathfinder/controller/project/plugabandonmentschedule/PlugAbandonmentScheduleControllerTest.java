@@ -24,6 +24,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
@@ -212,6 +213,8 @@ public class PlugAbandonmentScheduleControllerTest extends ProjectContextAbstrac
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
     when(plugAbandonmentScheduleService.validate(any(), any(), eq(ValidationType.FULL))).thenReturn(bindingResult);
 
+    when(plugAbandonmentScheduleService.getPlugAbandonmentScheduleModelAndView(eq(PROJECT_ID), any())).thenReturn(new ModelAndView());
+
     mockMvc.perform(
         post(ReverseRouter.route(on(PlugAbandonmentScheduleController.class)
             .createPlugAbandonmentSchedule(PROJECT_ID, form, bindingResult, ValidationType.FULL, null)
@@ -381,6 +384,8 @@ public class PlugAbandonmentScheduleControllerTest extends ProjectContextAbstrac
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
     when(plugAbandonmentScheduleService.validate(any(), any(), eq(ValidationType.FULL))).thenReturn(bindingResult);
+
+    when(plugAbandonmentScheduleService.getPlugAbandonmentScheduleModelAndView(eq(PROJECT_ID), any())).thenReturn(new ModelAndView());
 
     mockMvc.perform(
         post(ReverseRouter.route(on(PlugAbandonmentScheduleController.class)

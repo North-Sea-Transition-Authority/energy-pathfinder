@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
 import uk.co.ogauthority.pathfinder.model.entity.wellbore.Wellbore;
+import uk.co.ogauthority.pathfinder.model.view.wellbore.WellboreView;
 
 public class WellboreTestUtil {
 
@@ -17,5 +18,9 @@ public class WellboreTestUtil {
 
   public static Wellbore createWellbore(String registrationNo) {
     return new Wellbore(ID, registrationNo);
+  }
+
+  public static WellboreView createWellboreView() {
+    return new WellboreView(ID, REGISTRATION_NO, true);
   }
 }
