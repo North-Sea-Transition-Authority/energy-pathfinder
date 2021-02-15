@@ -1,6 +1,7 @@
 <#--Import statements-->
 <#import 'header.ftl' as applicationHeader>
 <#import 'project/macros/contactDetails.ftl' as contactDetails>
+<#import 'project/macros/decomissioningPeriodCheckAnswers.ftl' as decomissioningPeriodCheckAnswers>
 <#import 'project/macros/differenceChanges.ftl' as differenceChanges>
 <#import 'project/macros/emptySectionSummaryInset.ftl' as emptySectionSummaryInset>
 <#import 'project/macros/quarterYearInput.ftl' as quarterYear>

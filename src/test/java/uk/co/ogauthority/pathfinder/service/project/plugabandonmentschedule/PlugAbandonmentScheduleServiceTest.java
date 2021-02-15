@@ -33,6 +33,7 @@ import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.service.wellbore.WellboreService;
 import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentScheduleTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentWellTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.WellboreTestUtil;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
@@ -177,11 +178,24 @@ public class PlugAbandonmentScheduleServiceTest {
   public void getForm() {
     var plugAbandonmentSchedule = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
 
+    var plugAbandonmentWell1 =  PlugAbandonmentWellTestUtil.createPlugAbandonmentWell();
+    var plugAbandonmentWell2 =  PlugAbandonmentWellTestUtil.createPlugAbandonmentWell();
+
+    when(plugAbandonmentWellService.getPlugAbandonmentWells(plugAbandonmentSchedule)).thenReturn(List.of(
+        plugAbandonmentWell1,
+        plugAbandonmentWell2
+    ));
+
     var form = plugAbandonmentScheduleService.getForm(plugAbandonmentSchedule);
 
     var plugAbandonmentDate = form.getPlugAbandonmentDate();
     assertThat(plugAbandonmentDate.getMinYear()).isEqualTo(Integer.toString(plugAbandonmentSchedule.getEarliestStartYear()));
     assertThat(plugAbandonmentDate.getMaxYear()).isEqualTo(Integer.toString(plugAbandonmentSchedule.getLatestCompletionYear()));
+
+    assertThat(form.getWells()).containsExactly(
+        plugAbandonmentWell1.getWellbore().getId(),
+        plugAbandonmentWell2.getWellbore().getId()
+    );
   }
 
   private void checkCommonEntityFields(PlugAbandonmentScheduleForm form,

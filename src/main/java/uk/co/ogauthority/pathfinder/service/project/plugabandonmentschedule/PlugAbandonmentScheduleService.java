@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -121,6 +122,11 @@ public class PlugAbandonmentScheduleService implements ProjectFormSectionService
         StringDisplayUtil.getValueAsStringOrNull(plugAbandonmentSchedule.getLatestCompletionYear())
     ));
 
+    var plugAbandonmentWells = plugAbandonmentWellService.getPlugAbandonmentWells(plugAbandonmentSchedule);
+    form.setWells(plugAbandonmentWells.stream()
+        .map(plugAbandonmentWell -> plugAbandonmentWell.getWellbore().getId())
+        .collect(Collectors.toList()));
+
     return form;
   }
 
@@ -147,8 +153,10 @@ public class PlugAbandonmentScheduleService implements ProjectFormSectionService
   }
 
   @Override
-  public boolean isComplete(ProjectDetail detail) {
-    return false;
+  public boolean isComplete(ProjectDetail projectDetail) {
+    var plugAbandonmentSchedules = getPlugAbandonmentSchedulesForProjectDetail(projectDetail);
+    return !plugAbandonmentSchedules.isEmpty() && plugAbandonmentSchedules.stream()
+        .allMatch(integratedRig -> isValid(integratedRig, ValidationType.FULL));
   }
 
   @Override

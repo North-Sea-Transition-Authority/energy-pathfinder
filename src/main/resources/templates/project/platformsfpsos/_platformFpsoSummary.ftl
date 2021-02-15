@@ -111,7 +111,7 @@
     fieldValue=topsideFpsoMass
     isDiffedField=useDiffedField
   />
-  <@_decomissioningPeriodCheckAnswers
+  <@decomissioningPeriodCheckAnswers.decomissioningPeriodCheckAnswers
     useDiffedField=useDiffedField
     prompt="Expected topside removal period"
     earliestYear=topsideRemovalEarliestYear
@@ -133,7 +133,7 @@
       fieldValue=substructureRemovalMass
       isDiffedField=useDiffedField
     />
-    <@_decomissioningPeriodCheckAnswers
+    <@decomissioningPeriodCheckAnswers.decomissioningPeriodCheckAnswers
       useDiffedField=useDiffedField
       prompt="Substructure removal years"
       earliestYear=substructureRemovalEarliestYear
@@ -155,21 +155,4 @@
     fieldValue=futurePlans
     isDiffedField=useDiffedField
   />
-</#macro>
-
-<#macro _decomissioningPeriodCheckAnswers useDiffedField prompt earliestYear latestYear>
-  <@checkAnswers.checkAnswersRowNoActionsWithNested prompt=prompt>
-    <#if useDiffedField>
-      <@differenceChanges.renderDifference
-        diffedField=earliestYear
-      />
-      <br/>
-      <@differenceChanges.renderDifference
-        diffedField=latestYear
-      />
-    <#else>
-      <div>${earliestYear}</div>
-      <div>${latestYear}</div>
-    </#if>
-  </@checkAnswers.checkAnswersRowNoActionsWithNested>
 </#macro>

@@ -38,7 +38,7 @@
   latestCompletionYear=""
   wells=""
 >
-  <@_decomissioningPeriodCheckAnswers
+  <@decomissioningPeriodCheckAnswers.decomissioningPeriodCheckAnswers
     useDiffedField=useDiffedField
     prompt="Plug abandonment period"
     earliestYear=earliestStartYear
@@ -57,21 +57,4 @@
         </div>
       </#list>
     </@checkAnswers.checkAnswersRowNoActionsWithNested>
-</#macro>
-
-<#macro _decomissioningPeriodCheckAnswers useDiffedField prompt earliestYear latestYear>
-  <@checkAnswers.checkAnswersRowNoActionsWithNested prompt=prompt>
-    <#if useDiffedField>
-      <@differenceChanges.renderDifference
-        diffedField=earliestYear
-      />
-      <br/>
-      <@differenceChanges.renderDifference
-        diffedField=latestYear
-      />
-    <#else>
-      <div>${earliestYear}</div>
-      <div>${latestYear}</div>
-    </#if>
-  </@checkAnswers.checkAnswersRowNoActionsWithNested>
 </#macro>
