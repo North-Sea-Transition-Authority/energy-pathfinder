@@ -34,12 +34,12 @@ public class PlugAbandonmentWellService {
     var wellbores = getWellbores(wellboreIds);
     var plugAbandonmentWells = new ArrayList<PlugAbandonmentWell>();
 
-    wellbores.forEach((wellbore) -> {
+    for (Wellbore wellbore : wellbores) {
       var plugAbandonmentWell = new PlugAbandonmentWell();
       plugAbandonmentWell.setPlugAbandonmentSchedule(plugAbandonmentSchedule);
       plugAbandonmentWell.setWellbore(wellbore);
       plugAbandonmentWells.add(plugAbandonmentWell);
-    });
+    }
 
     plugAbandonmentWellRepository.deleteAllByPlugAbandonmentSchedule(plugAbandonmentSchedule);
     plugAbandonmentWellRepository.saveAll(plugAbandonmentWells);

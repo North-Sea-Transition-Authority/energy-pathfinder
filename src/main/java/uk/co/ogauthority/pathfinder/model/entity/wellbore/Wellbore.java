@@ -40,6 +40,6 @@ public class Wellbore implements SearchSelectable {
 
   @Override
   public String getSelectionText() {
-    return registrationNo;
+    return getRegistrationNo();
   }
 }
