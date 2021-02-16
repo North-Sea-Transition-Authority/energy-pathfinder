@@ -12,9 +12,9 @@ import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedpipeline.DecommissionedPipelineController;
-import uk.co.ogauthority.pathfinder.controller.project.decommissionedwell.DecommissionedWellController;
 import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedRigController;
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
+import uk.co.ogauthority.pathfinder.controller.project.plugabandonmentschedule.PlugAbandonmentScheduleController;
 import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.SubseaInfrastructureController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
@@ -57,17 +57,17 @@ public class BreadcrumbService {
     return map;
   }
 
-  public void fromDecommissionedWells(Integer projectId, ModelAndView modelAndView, String thisPage) {
-    addAttrs(modelAndView, decommissionedWells(projectId), thisPage);
+  public void fromPlugAbandonmentSchedule(Integer projectId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, plugAbandonmentSchedule(projectId), thisPage);
   }
 
-  private Map<String, String> decommissionedWells(Integer projectId) {
+  private Map<String, String> plugAbandonmentSchedule(Integer projectId) {
     var map = taskList(projectId);
-    String route = ReverseRouter.route(on(DecommissionedWellController.class).viewWellsToBeDecommissioned(
+    String route = ReverseRouter.route(on(PlugAbandonmentScheduleController.class).viewPlugAbandonmentSchedules(
         projectId,
         null
     ));
-    map.put(route, DecommissionedWellController.TASK_LIST_NAME);
+    map.put(route, PlugAbandonmentScheduleController.TASK_LIST_NAME);
     return map;
   }
 
