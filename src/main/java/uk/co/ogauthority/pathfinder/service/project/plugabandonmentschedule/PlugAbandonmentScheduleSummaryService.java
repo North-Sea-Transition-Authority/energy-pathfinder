@@ -25,11 +25,11 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @Service
 public class PlugAbandonmentScheduleSummaryService {
 
-  public static final String SUMMARY_TEMPLATE_PATH = "project/plugabandonmentschedule/plugAbandonmentScheduleSummary";
+  public static final String SUMMARY_TEMPLATE_PATH = "project/plugabandonmentschedule/plugAbandonmentScheduleFormSummary";
 
   public static final String ERROR_FIELD_NAME = "plug-abandonment-schedule-%d";
-  public static final String ERROR_MESSAGE = "Plug abandonment schedule %d is incomplete";
-  public static final String EMPTY_LIST_ERROR = "You must add at least one plug abandonment schedule";
+  public static final String ERROR_MESSAGE = "Plug and abandonment schedule %d is incomplete";
+  public static final String EMPTY_LIST_ERROR = "You must add at least one plug and abandonment schedule";
   
   private final PlugAbandonmentScheduleService plugAbandonmentScheduleService;
   private final PlugAbandonmentWellService plugAbandonmentWellService;

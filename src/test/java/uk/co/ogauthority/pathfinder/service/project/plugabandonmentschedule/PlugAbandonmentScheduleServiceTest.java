@@ -400,4 +400,29 @@ public class PlugAbandonmentScheduleServiceTest {
         PlugAbandonmentScheduleController.FORM_PAGE_NAME
     );
   }
+
+  @Test
+  public void removePlugAbandonmentScheduleModelAndView() {
+    var projectId = detail.getProject().getId();
+    var plugAbandonmentScheduleView = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentScheduleView();
+
+    var modelAndView = plugAbandonmentScheduleService.removePlugAbandonmentScheduleModelAndView(
+        projectId,
+        plugAbandonmentScheduleView
+    );
+
+    assertThat(modelAndView.getViewName()).isEqualTo(PlugAbandonmentScheduleService.REMOVE_TEMPLATE_PATH);
+    assertThat(modelAndView.getModel()).containsExactly(
+        entry("plugAbandonmentScheduleView", plugAbandonmentScheduleView),
+        entry("cancelUrl",
+            ReverseRouter.route(on(PlugAbandonmentScheduleController.class).viewPlugAbandonmentSchedules(projectId, null))),
+        entry("pageName", PlugAbandonmentScheduleController.REMOVE_PAGE_NAME)
+    );
+
+    verify(breadcrumbService, times(1)).fromPlugAbandonmentSchedule(
+        projectId,
+        modelAndView,
+        PlugAbandonmentScheduleController.REMOVE_PAGE_NAME
+    );
+  }
 }

@@ -34,7 +34,7 @@ import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 @Service
 public class PlugAbandonmentScheduleService implements ProjectFormSectionService {
 
-  public static final String TEMPLATE_PATH = "project/plugabandonmentschedule/plugAbandonmentSchedule";
+  public static final String TEMPLATE_PATH = "project/plugabandonmentschedule/plugAbandonmentScheduleForm";
   public static final String REMOVE_TEMPLATE_PATH = "project/plugabandonmentschedule/removePlugAbandonmentSchedule";
 
   private final WellboreService wellboreService;
@@ -156,7 +156,7 @@ public class PlugAbandonmentScheduleService implements ProjectFormSectionService
   public boolean isComplete(ProjectDetail projectDetail) {
     var plugAbandonmentSchedules = getPlugAbandonmentSchedulesForProjectDetail(projectDetail);
     return !plugAbandonmentSchedules.isEmpty() && plugAbandonmentSchedules.stream()
-        .allMatch(integratedRig -> isValid(integratedRig, ValidationType.FULL));
+        .allMatch(plugAbandonmentSchedule -> isValid(plugAbandonmentSchedule, ValidationType.FULL));
   }
 
   @Override
@@ -216,18 +216,15 @@ public class PlugAbandonmentScheduleService implements ProjectFormSectionService
   }
 
   public ModelAndView removePlugAbandonmentScheduleModelAndView(Integer projectId,
-                                                                 PlugAbandonmentScheduleView plugAbandonmentScheduleView) {
+                                                                PlugAbandonmentScheduleView plugAbandonmentScheduleView) {
     var modelAndView = new ModelAndView(REMOVE_TEMPLATE_PATH)
         .addObject("plugAbandonmentScheduleView", plugAbandonmentScheduleView)
-        .addObject("cancelUrl", getPlugAbandonmentSchedulesSummaryUrl(projectId))
+        .addObject("cancelUrl",
+            ReverseRouter.route(on(PlugAbandonmentScheduleController.class).viewPlugAbandonmentSchedules(projectId, null)))
         .addObject("pageName", PlugAbandonmentScheduleController.REMOVE_PAGE_NAME);
 
     breadcrumbService.fromPlugAbandonmentSchedule(projectId, modelAndView, PlugAbandonmentScheduleController.REMOVE_PAGE_NAME);
 
     return modelAndView;
-  }
-
-  private String getPlugAbandonmentSchedulesSummaryUrl(Integer projectId) {
-    return ReverseRouter.route(on(PlugAbandonmentScheduleController.class).viewPlugAbandonmentSchedules(projectId, null));
   }
 }

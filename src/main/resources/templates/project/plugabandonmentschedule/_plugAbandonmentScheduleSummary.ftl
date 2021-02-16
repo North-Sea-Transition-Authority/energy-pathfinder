@@ -1,7 +1,7 @@
 <#include '../../layout.ftl'>
 
 <#assign idPrefix = "plug-abandonment-schedule" />
-<#assign headingPrefix = "Plug abandonment schedule" />
+<#assign headingPrefix = "Plug and abandonment schedule" />
 <#assign defaultHeadingSize = "h2" />
 <#assign defaultHeadingClass = "govuk-heading-l" />
 

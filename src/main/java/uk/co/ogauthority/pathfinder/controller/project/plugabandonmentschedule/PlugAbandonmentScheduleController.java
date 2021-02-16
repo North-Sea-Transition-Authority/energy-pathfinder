@@ -37,7 +37,7 @@ public class PlugAbandonmentScheduleController extends ProjectFormPageController
   public static final String TASK_LIST_NAME = "Wells";
   public static final String SUMMARY_PAGE_NAME = "Wells to be decommissioned";
   public static final String FORM_PAGE_NAME = "Plug and abandonment schedule";
-  public static final String REMOVE_PAGE_NAME = "Remove plug abandonment schedule";
+  public static final String REMOVE_PAGE_NAME = "Remove and plug abandonment schedule";
 
   private final PlugAbandonmentScheduleService plugAbandonmentScheduleService;
   private final PlugAbandonmentScheduleSummaryService plugAbandonmentScheduleSummaryService;
