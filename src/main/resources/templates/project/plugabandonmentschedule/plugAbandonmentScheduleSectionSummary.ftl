@@ -13,6 +13,6 @@
       />
     </#list>
   <#else>
-    <@emptySectionSummaryInset.emptySectionSummaryInset itemText="integrated rigs"/>
+    <@emptySectionSummaryInset.emptySectionSummaryInset itemText="plug and abandonment schedules"/>
   </#if>
 </@sectionSummaryWrapper.sectionSummaryWrapper>
