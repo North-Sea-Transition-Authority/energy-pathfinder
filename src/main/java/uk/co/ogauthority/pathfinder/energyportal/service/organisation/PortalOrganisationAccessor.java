@@ -184,4 +184,14 @@ public class PortalOrganisationAccessor {
     );
   }
 
+  public List<PortalOrganisationGroup> getAllOrganisationGroupsWithAssociatedTeamTypeAndNameContaining(TeamType teamType,
+                                                                                                       String searchTerm
+  ) {
+    return organisationGroupRepository.findByExistenceOfPortalTeamAndNameContaining(
+        teamType.getPortalTeamType(),
+        PortalTeamUsagePurpose.PRIMARY_DATA,
+        searchTerm
+    );
+  }
+
 }

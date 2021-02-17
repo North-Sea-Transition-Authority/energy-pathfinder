@@ -23,4 +23,15 @@ public interface PortalOrganisationGroupRepository extends CrudRepository<Portal
          "AND (ptu.purpose = :usagePurpose)")
   List<PortalOrganisationGroup> findByExistenceOfPortalTeam(@Param("portalTeamType") String portalTeamType,
                                                             @Param("usagePurpose") PortalTeamUsagePurpose portalTeamUsagePurpose);
+
+  @Query("SELECT pog " +
+         "FROM PortalTeam pt " +
+         "JOIN PortalTeamUsage ptu ON ptu.portalTeam = pt " +
+         "JOIN PortalOrganisationGroup pog ON pog.urefValue = ptu.uref " +
+         "WHERE pt.portalTeamType.type = :portalTeamType " +
+         "AND (ptu.purpose = :usagePurpose) " +
+         "AND lower(pog.name) LIKE LOWER(concat('%', :searchTerm, '%'))")
+  List<PortalOrganisationGroup> findByExistenceOfPortalTeamAndNameContaining(@Param("portalTeamType") String portalTeamType,
+                                                                             @Param("usagePurpose") PortalTeamUsagePurpose usagePurpose,
+                                                                             @Param("searchTerm") String searchTerm);
 }

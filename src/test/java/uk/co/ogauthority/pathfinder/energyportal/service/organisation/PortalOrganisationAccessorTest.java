@@ -408,4 +408,30 @@ public class PortalOrganisationAccessorTest {
 
     assertThat(results).isEmpty();
   }
+
+  @Test
+  public void getAllOrganisationGroupsWithAssociatedTeamTypeAndNameContaining_whenResults_thenReturnList() {
+    when(organisationGroupRepository.findByExistenceOfPortalTeamAndNameContaining(any(), eq(PortalTeamUsagePurpose.PRIMARY_DATA), any()))
+        .thenReturn(List.of(organisationGroup));
+
+    var results = portalOrganisationAccessor.getAllOrganisationGroupsWithAssociatedTeamTypeAndNameContaining(
+        TeamType.ORGANISATION,
+        "test"
+    );
+
+    assertThat(results).containsExactly(organisationGroup);
+  }
+
+  @Test
+  public void getAllOrganisationGroupsWithAssociatedTeamTypeAndNameContaining_whenNoResults_thenEmptyList() {
+    when(organisationGroupRepository.findByExistenceOfPortalTeamAndNameContaining(any(), eq(PortalTeamUsagePurpose.PRIMARY_DATA), any()))
+        .thenReturn(Collections.emptyList());
+
+    var results = portalOrganisationAccessor.getAllOrganisationGroupsWithAssociatedTeamTypeAndNameContaining(
+        TeamType.ORGANISATION,
+        "test"
+    );
+
+    assertThat(results).isEmpty();
+  }
 }

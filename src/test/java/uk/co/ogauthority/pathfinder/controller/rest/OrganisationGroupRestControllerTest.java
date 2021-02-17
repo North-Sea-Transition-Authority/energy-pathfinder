@@ -101,4 +101,23 @@ public class OrganisationGroupRestControllerTest extends AbstractControllerTest 
     verify(searchSelectorService, times(0)).search(SEARCH_TERM, List.of());
   }
 
+  @Test
+  public void searchPathfinderOrganisations_whenAuthenticated_thenAccess() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(OrganisationGroupRestController.class).searchPathfinderOrganisations(SEARCH_TERM)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isOk());
+
+    verify(searchSelectorService, times(1)).search(SEARCH_TERM, List.of());
+  }
+
+  @Test
+  public void searchPathfinderOrganisations_whenUnauthenticated_thenNoAccess() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(OrganisationGroupRestController.class).searchPathfinderOrganisations(SEARCH_TERM)))
+        .with(authenticatedUserAndSession(unauthenticatedUser)))
+        .andExpect(status().isForbidden());
+
+    verify(searchSelectorService, times(0)).search(SEARCH_TERM, List.of());
+  }
 }

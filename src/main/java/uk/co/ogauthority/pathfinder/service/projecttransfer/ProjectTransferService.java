@@ -133,7 +133,7 @@ public class ProjectTransferService {
         .addObject("form", form)
         .addObject("preselectedOperator", getPreSelectedOrgGroup(form))
         .addObject("operatorsRestUrl", SearchSelectorService.route(on(OrganisationGroupRestController.class)
-            .searchOrganisations(null)))
+            .searchPathfinderOrganisations(null)))
         .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class)
             .getProject(projectId, null, null, null)));
     breadcrumbService.fromManageProject(projectId, modelAndView, ProjectTransferController.PAGE_NAME);

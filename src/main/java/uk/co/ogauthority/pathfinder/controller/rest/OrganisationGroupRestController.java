@@ -12,6 +12,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchResult;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationRole;
+import uk.co.ogauthority.pathfinder.model.team.TeamType;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 
@@ -52,6 +53,17 @@ public class OrganisationGroupRestController {
         searchSelectorService.search(
             searchTerm,
             portalOrganisationAccessor.findOrganisationGroupsWhereNameContains(searchTerm)
+        )
+    );
+  }
+
+  @GetMapping("/pathfinder-organisations")
+  @ResponseBody
+  public RestSearchResult searchPathfinderOrganisations(@Nullable @RequestParam("term") String searchTerm) {
+    return new RestSearchResult(
+        searchSelectorService.search(
+            searchTerm,
+            portalOrganisationAccessor.getAllOrganisationGroupsWithAssociatedTeamTypeAndNameContaining(TeamType.ORGANISATION, searchTerm)
         )
     );
   }

@@ -217,7 +217,7 @@ public class ProjectTransferServiceTest {
         entry("form", form),
         entry("preselectedOperator", projectTransferService.getPreSelectedOrgGroup(form)),
         entry("operatorsRestUrl", SearchSelectorService.route(on(OrganisationGroupRestController.class)
-            .searchOrganisations(null))),
+            .searchPathfinderOrganisations(null))),
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class)
             .getProject(projectId, null, null, null)))
     );
