@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,6 +72,9 @@ public class PortalTeamAccessorIntegrationTest {
   private final String NO_MEMBER_SCOPED_TEAM_NAME = "Org2Team";
   private final String NO_MEMBER_SCOPED_TEAM_DESCRIPTION = "Org2TeamDescription";
   private final String NO_MEMBER_SCOPED_TEAM_UREF = constructOrgGroupUref(30);
+
+  private final PortalOrganisationGroup PORTAL_ORGANISATION_GROUP_NO_TEAM =
+      TeamTestingUtil.generateOrganisationGroup(20, "name", "short name");
 
   @Autowired
   private PersonRepository personRepository;
@@ -439,6 +443,86 @@ public class PortalTeamAccessorIntegrationTest {
         SCOPED_TEAM_NAME,
         SCOPED_TEAM_PORTAL_TYPE_DESCRIPTION
     );
+  }
+
+  @Test
+  @Transactional
+  public void findPortalTeamByOrganisationGroupsIn_whenFound_thenReturnPopulatedList() {
+
+    final var organisationGroupList = List.of(PORTAL_ORGANISATION_GROUP);
+    final var resultingPortalTeams = portalTeamAccessor.findPortalTeamByOrganisationGroupsIn(organisationGroupList);
+
+    assertThat(resultingPortalTeams).hasSize(organisationGroupList.size());
+    assertPortalTeamInstanceDtoMappingAsExpected(
+        resultingPortalTeams.get(0),
+        constructOrgGroupUref(PORTAL_ORGANISATION_GROUP.getOrgGrpId()),
+        SCOPED_TEAM_RES_ID,
+        SCOPED_TEAM_PORTAL_TYPE,
+        SCOPED_TEAM_NAME,
+        SCOPED_TEAM_PORTAL_TYPE_DESCRIPTION
+    );
+  }
+
+  @Test
+  @Transactional
+  public void findPortalTeamByOrganisationGroupsIn_whenNotFound_thenReturnEmptyList() {
+    final var organisationGroupList = List.of(PORTAL_ORGANISATION_GROUP_NO_TEAM);
+
+    final var resultingPortalTeams = portalTeamAccessor.findPortalTeamByOrganisationGroupsIn(organisationGroupList);
+    assertThat(resultingPortalTeams).isEmpty();
+  }
+
+  @Test
+  @Transactional
+  public void getPortalTeamMemberPeople_whenFound_thenReturnPersonList() {
+    final var resourceIds = List.of(SCOPED_TEAM_RES_ID);
+    final var peopleIds = portalTeamAccessor.getPortalTeamMemberPeople(resourceIds)
+        .stream()
+        .map(Person::getId)
+        .collect(Collectors.toList());
+
+    assertThat(peopleIds).containsExactlyInAnyOrder(
+        scopedTeamMemberPerson_1Role.getId(),
+        scopedTeamMemberPerson_2Roles.getId()
+    );
+  }
+
+  @Test
+  @Transactional
+  public void getPortalTeamMemberPeople_whenPersonInMultipleTeams_thenDistinctPersonList() {
+
+    final var resourceIds = List.of(SCOPED_TEAM_RES_ID, UNSCOPED_TEAM_RES_ID);
+
+    insertTeamMember(UNSCOPED_TEAM_RES_ID, scopedTeamMemberPerson_1Role.getId());
+    insertTeamMemberRoleForTeamMember(
+        UNSCOPED_TEAM_RES_ID,
+        scopedTeamMemberPerson_1Role.getId(),
+        UNSCOPED_TEAM_PORTAL_TYPE,
+        ExampleTeamRole.ROLE_WITH_PRIVILEGE
+    );
+
+    final var peopleIds = portalTeamAccessor.getPortalTeamMemberPeople(resourceIds)
+        .stream()
+        .map(Person::getId)
+        .collect(Collectors.toList());
+
+    assertThat(peopleIds).containsExactlyInAnyOrder(
+        scopedTeamMemberPerson_1Role.getId(),
+        scopedTeamMemberPerson_2Roles.getId(),
+        unscopedTeamMemberPerson_2Roles.getId()
+    );
+  }
+
+  @Test
+  @Transactional
+  public void getPortalTeamMemberPeople_whenNotFound_thenReturnEmptyList() {
+    final var resourceIds = List.of(-1);
+    final var peopleIds = portalTeamAccessor.getPortalTeamMemberPeople(resourceIds)
+        .stream()
+        .map(Person::getId)
+        .collect(Collectors.toList());
+
+    assertThat(peopleIds).isEmpty();
   }
 
   private void assertPortalTeamInstanceDtoMappingAsExpected(PortalTeamDto portalTeamDto,

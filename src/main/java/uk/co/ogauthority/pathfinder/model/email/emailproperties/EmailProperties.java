@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.model.email.emailproperties;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplate;
 
 /**
@@ -68,5 +69,25 @@ public class EmailProperties {
 
     return emailPersonalisation;
 
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    EmailProperties that = (EmailProperties) o;
+    return Objects.equals(template, that.template)
+        && Objects.equals(recipientIdentifier, that.recipientIdentifier)
+        && Objects.equals(signOffIdentifier, that.signOffIdentifier);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(template, recipientIdentifier, signOffIdentifier);
   }
 }

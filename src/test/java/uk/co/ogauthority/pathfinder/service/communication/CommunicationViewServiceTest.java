@@ -100,7 +100,7 @@ public class CommunicationViewServiceTest {
 
     var communication = CommunicationTestUtil.getCompleteCommunication();
     communication.setRecipientType(RecipientType.OPERATORS);
-    communication.setStatus(CommunicationStatus.COMPLETE);
+    communication.setStatus(CommunicationStatus.SENDING);
     communication.setSubmittedDatetime(Instant.now());
     communication.setSubmittedByWuaId(1);
 

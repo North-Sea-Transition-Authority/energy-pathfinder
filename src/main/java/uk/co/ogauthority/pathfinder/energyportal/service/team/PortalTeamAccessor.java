@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,6 @@ import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeamTyp
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeamUsagePurpose;
 import uk.co.ogauthority.pathfinder.energyportal.repository.team.PortalTeamRepository;
 import uk.co.ogauthority.pathfinder.model.team.TeamType;
-
 
 @Service
 public class PortalTeamAccessor {
@@ -381,6 +381,42 @@ public class PortalTeamAccessor {
     } catch (NoResultException e) {
       return Optional.empty();
     }
+  }
+
+  public List<PortalTeamDto> findPortalTeamByOrganisationGroupsIn(List<PortalOrganisationGroup> portalOrganisationGroups) {
+
+    final var portalOrganisationGroupIds = portalOrganisationGroups
+        .stream()
+        .map(PortalOrganisationGroup::getOrgGrpId)
+        .collect(Collectors.toList());
+
+    return entityManager.createQuery("" +
+            "SELECT new uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto(" +
+            "  pt.resId, pt.name, pt.description, ptt.type, ptu.uref " +
+            ") " +
+            "FROM PortalTeam pt " +
+            "JOIN PortalTeamType ptt ON pt.portalTeamType = ptt " +
+            "LEFT JOIN PortalTeamUsage ptu ON ptu.portalTeam = pt " +
+            "LEFT JOIN PortalOrganisationGroup pog ON pog.urefValue = ptu.uref " +
+            "WHERE ptt.type = :portalTeamType " +
+            "AND pog.orgGrpId IN (:organisationGroupIds)",
+        PortalTeamDto.class)
+        .setParameter("portalTeamType", TeamType.ORGANISATION.getPortalTeamType())
+        .setParameter("organisationGroupIds", portalOrganisationGroupIds)
+        .getResultList();
+  }
+
+  public List<Person> getPortalTeamMemberPeople(List<Integer> resourceIds) {
+    return entityManager.createQuery("" +
+            // Distinct to avoid returning the same person multiple times if they are in multiple teams
+            "SELECT DISTINCT p " +
+            "FROM PortalTeamMember ptm " +
+            "JOIN PortalTeam pt ON pt = ptm.portalTeam " +
+            "JOIN Person p ON p.id = ptm.personId " +
+            "WHERE ptm.portalTeam.resId IN :portalTeamIds ",
+        Person.class)
+        .setParameter("portalTeamIds", resourceIds)
+        .getResultList();
   }
 
   @Transactional

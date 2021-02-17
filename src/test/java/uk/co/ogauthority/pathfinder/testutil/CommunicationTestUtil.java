@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.testutil;
 
 import java.time.Instant;
 import uk.co.ogauthority.pathfinder.model.entity.communication.Communication;
+import uk.co.ogauthority.pathfinder.model.entity.communication.CommunicationRecipient;
 import uk.co.ogauthority.pathfinder.model.enums.communication.CommunicationStatus;
 import uk.co.ogauthority.pathfinder.model.enums.communication.RecipientType;
 import uk.co.ogauthority.pathfinder.model.form.communication.CommunicationForm;
@@ -67,6 +68,14 @@ public class CommunicationTestUtil {
         SUBMITTED_BY_EMAIL,
         FORMATTED_SUBMITTED_DATE
     );
+  }
+
+  public static CommunicationRecipient getCommunicationRecipient(String sentToEmailAddress) {
+    var communicationRecipient = new CommunicationRecipient();
+    communicationRecipient.setCommunication(getCompleteCommunication());
+    communicationRecipient.setSentToEmailAddress(sentToEmailAddress);
+    communicationRecipient.setSentInstant(Instant.now());
+    return communicationRecipient;
   }
 
   private static Communication getCompleteCommunication(RecipientType recipientType,

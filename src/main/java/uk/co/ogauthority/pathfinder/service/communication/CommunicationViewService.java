@@ -44,7 +44,11 @@ public class CommunicationViewService {
 
   public SentCommunicationView getSentCommunicationView(Communication communication) {
 
-    if (communication.getStatus().equals(CommunicationStatus.COMPLETE)) {
+    final var communicationStatus = communication.getStatus();
+
+    if (communicationStatus.equals(CommunicationStatus.COMPLETE)
+        || communicationStatus.equals(CommunicationStatus.SENDING)
+    ) {
 
       var userAccount = webUserAccountService.getWebUserAccountOrError(communication.getSubmittedByWuaId());
 

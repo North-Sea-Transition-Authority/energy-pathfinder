@@ -2,11 +2,13 @@ package uk.co.ogauthority.pathfinder.service.communication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +23,8 @@ import uk.co.ogauthority.pathfinder.model.enums.communication.CommunicationStatu
 import uk.co.ogauthority.pathfinder.model.enums.communication.RecipientType;
 import uk.co.ogauthority.pathfinder.model.form.communication.CommunicationForm;
 import uk.co.ogauthority.pathfinder.repository.communication.CommunicationRepository;
+import uk.co.ogauthority.pathfinder.service.scheduler.SchedulerService;
+import uk.co.ogauthority.pathfinder.service.scheduler.communication.CommunicationJob;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.CommunicationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -37,11 +41,19 @@ public class CommunicationServiceTest {
   @Mock
   private OrganisationGroupCommunicationService organisationGroupCommunicationService;
 
+  @Mock
+  private SchedulerService schedulerService;
+
   private CommunicationService communicationService;
 
   @Before
   public void setup() {
-    communicationService = new CommunicationService(validationService, communicationRepository, organisationGroupCommunicationService);
+    communicationService = new CommunicationService(
+        validationService,
+        communicationRepository,
+        organisationGroupCommunicationService,
+        schedulerService
+    );
 
     when(communicationRepository.save(any(Communication.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
   }
@@ -163,15 +175,15 @@ public class CommunicationServiceTest {
   }
 
   @Test
-  public void finaliseCommunication() {
+  public void submitCommunication() {
     final var communication = CommunicationTestUtil.getCompleteCommunication();
     final var user = UserTestingUtil.getAuthenticatedUserAccount();
 
-    var result = communicationService.finaliseCommunication(communication, user);
+    var result = communicationService.submitCommunication(communication, user);
 
     assertThat(result.getSubmittedByWuaId()).isEqualTo(user.getWuaId());
     assertThat(result.getSubmittedDatetime()).isNotNull();
-    assertThat(result.getStatus()).isEqualTo(CommunicationStatus.COMPLETE);
+    assertThat(result.getStatus()).isEqualTo(CommunicationStatus.SENDING);
   }
 
   @Test
@@ -185,4 +197,29 @@ public class CommunicationServiceTest {
     assertThat(result.getLatestCommunicationJourneyStatus()).isEqualTo(journeyStage);
   }
 
+  @Test
+  public void finaliseCommunication_verifyInteractions() {
+    final var communication = CommunicationTestUtil.getCompleteCommunication();
+    communication.setStatus(CommunicationStatus.COMPLETE);
+
+    communicationService.finaliseCommunication(communication, UserTestingUtil.getAuthenticatedUserAccount());
+
+    verify(communicationRepository, times(1)).save(communication);
+
+    var jobData = new HashMap<String, Object>();
+    jobData.put("communicationId", communication.getId());
+
+    verify(schedulerService, times(1)).scheduleJob(any(), eq(jobData), eq(CommunicationJob.class));
+  }
+
+  @Test
+  public void setCommunicationComplete() {
+    final var communication = CommunicationTestUtil.getCompleteCommunication();
+    communication.setStatus(CommunicationStatus.SENDING);
+
+    final var result = communicationService.setCommunicationComplete(communication);
+    assertThat(result.getStatus()).isEqualTo(CommunicationStatus.COMPLETE);
+
+    verify(communicationRepository, times(1)).save(communication);
+  }
 }

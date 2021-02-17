@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.communication;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,8 @@ import uk.co.ogauthority.pathfinder.model.enums.communication.CommunicationStatu
 import uk.co.ogauthority.pathfinder.model.enums.communication.RecipientType;
 import uk.co.ogauthority.pathfinder.model.form.communication.CommunicationForm;
 import uk.co.ogauthority.pathfinder.repository.communication.CommunicationRepository;
+import uk.co.ogauthority.pathfinder.service.scheduler.SchedulerService;
+import uk.co.ogauthority.pathfinder.service.scheduler.communication.CommunicationJob;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
@@ -22,14 +25,17 @@ public class CommunicationService {
   private final ValidationService validationService;
   private final CommunicationRepository communicationRepository;
   private final OrganisationGroupCommunicationService organisationGroupCommunicationService;
+  private final SchedulerService schedulerService;
 
   @Autowired
   public CommunicationService(ValidationService validationService,
                               CommunicationRepository communicationRepository,
-                              OrganisationGroupCommunicationService organisationGroupCommunicationService) {
+                              OrganisationGroupCommunicationService organisationGroupCommunicationService,
+                              SchedulerService schedulerService) {
     this.validationService = validationService;
     this.communicationRepository = communicationRepository;
     this.organisationGroupCommunicationService = organisationGroupCommunicationService;
+    this.schedulerService = schedulerService;
   }
 
   public BindingResult validateCommunicationForm(CommunicationForm communicationForm,
@@ -93,12 +99,35 @@ public class CommunicationService {
     return form;
   }
 
-  @Transactional
-  public Communication finaliseCommunication(Communication communication, AuthenticatedUserAccount user) {
-    communication.setStatus(CommunicationStatus.COMPLETE);
+  protected Communication submitCommunication(Communication communication, AuthenticatedUserAccount user) {
+    communication.setStatus(CommunicationStatus.SENDING);
     communication.setLatestCommunicationJourneyStatus(CommunicationJourneyStatus.REVIEW_AND_SEND);
     communication.setSubmittedByWuaId(user.getWuaId());
     communication.setSubmittedDatetime(Instant.now());
     return communicationRepository.save(communication);
+  }
+
+  protected Communication setCommunicationComplete(Communication communication) {
+    communication.setStatus(CommunicationStatus.COMPLETE);
+    return communicationRepository.save(communication);
+  }
+
+  @Transactional
+  public void finaliseCommunication(Communication communication, AuthenticatedUserAccount user) {
+    submitCommunication(communication, user);
+    scheduleCommunication(communication);
+  }
+
+  private void scheduleCommunication(Communication communication) {
+
+    final var jobIdentifier = String.format(
+        "CommunicationService.scheduleCommunication-communication-%s",
+        communication.getId()
+    );
+
+    var jobData = new HashMap<String, Object>();
+    jobData.put("communicationId", communication.getId());
+
+    schedulerService.scheduleJob(jobIdentifier, jobData, CommunicationJob.class);
   }
 }

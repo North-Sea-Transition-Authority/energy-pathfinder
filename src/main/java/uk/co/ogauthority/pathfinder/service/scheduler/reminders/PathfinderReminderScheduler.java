@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.scheduler;
+package uk.co.ogauthority.pathfinder.service.scheduler.reminders;
 
 import static org.quartz.JobBuilder.newJob;
 

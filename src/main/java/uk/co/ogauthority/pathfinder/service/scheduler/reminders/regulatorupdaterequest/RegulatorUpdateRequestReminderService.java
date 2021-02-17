@@ -7,7 +7,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.scheduler.ReminderType;
 import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
-import uk.co.ogauthority.pathfinder.service.scheduler.PathfinderReminderScheduler;
+import uk.co.ogauthority.pathfinder.service.scheduler.reminders.PathfinderReminderScheduler;
 
 @Service
 public class RegulatorUpdateRequestReminderService {
