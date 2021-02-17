@@ -150,6 +150,7 @@
     <@fdsFooter.footer wrapperWidth=wrapperWidth metaLinks=true footerMetaContent=footerMetaContent/>
 
     <#--Custom scripts-->
+    <script src="<@spring.url '/assets/static/js/pathfinder/checkboxToggler.js'/>"></script>
 
   </@genericLayout>
 </#macro>

@@ -24,4 +24,8 @@
   &__placeholder {
     background: #fd0;
   }
+
+  &__recipient-list .govuk-details {
+    margin-bottom: 0;
+  }
 }

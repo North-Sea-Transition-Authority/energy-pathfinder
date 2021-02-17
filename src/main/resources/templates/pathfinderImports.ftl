@@ -14,6 +14,7 @@
 <#import 'project/macros/sidebarSectionLink.ftl' as sideBarSectionLink>
 <#import 'project/macros/stringWithTag.ftl' as stringWithTag>
 <#import 'project/macros/sectionSummaryWrapper.ftl' as sectionSummaryWrapper>
+<#import 'macros/checkboxtoggler/checkboxToggler.ftl' as checkboxToggler>
 <#import 'macros/useraction/userAction.ftl' as userAction>
 <#import 'macros/defaultPageWithSidebar.ftl' as defaultPageWithSidebar>
 <#import 'macros/inlineInputAction.ftl' as inlineInputAction>

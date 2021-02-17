@@ -12,7 +12,17 @@
       </tr>
       <tr class="communication-summary__row">
         <th class="communication-summary__key">To</th>
-        <td class="communication-summary__value">${recipients}</td>
+        <td class="communication-summary__value">
+          <#if recipients?length &gt; 100>
+            <div class="communication-summary__recipient-list">
+              <@fdsDetails.summaryDetails summaryTitle="Show email recipients">
+                ${recipients}
+              </@fdsDetails.summaryDetails>
+            </div>
+            <#else>
+              ${recipients}
+          </#if>
+        </td>
       </tr>
       <tr class="communication-summary__row">
         <th class="communication-summary__key">Subject</th>

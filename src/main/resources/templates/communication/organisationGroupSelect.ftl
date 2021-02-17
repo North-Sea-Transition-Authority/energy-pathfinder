@@ -1,16 +1,29 @@
 <#include '../layout.ftl'>
 
-<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle topNavigation=true twoThirdsColumn=true breadcrumbs=true>
+<@defaultPage htmlTitle=pageTitle pageHeading="" topNavigation=true twoThirdsColumn=true breadcrumbs=true>
   <#if errorList?has_content>
     <@fdsError.errorSummary errorItems=errorList />
   </#if>
 
   <@fdsForm.htmlForm>
-    <@fdsCheckbox.checkboxes
-      path="form.organisationGroups"
-      checkboxes=organisationGroups
-      smallCheckboxes=true
-    />
+    <#assign checkboxContainerId="organisation-group-select" />
+    <div id="${checkboxContainerId}">
+      <@fdsFieldset.fieldset legendHeading=pageTitle legendHeadingClass="govuk-fieldset__legend--xl">
+        <@checkboxToggler.checkboxToggler
+          checkboxContainerId=checkboxContainerId
+          prefixText="Select"
+          selectAllLinkText="all"
+          selectAllScreenReaderText="Select all of the available operators"
+          selectNoneLinkText="none"
+          selectNoneScreenReaderText="Select none of the available operators"
+        />
+        <@fdsCheckbox.checkboxes
+          path="form.organisationGroups"
+          checkboxes=organisationGroups
+          smallCheckboxes=true
+        />
+      </@fdsFieldset.fieldset>
+    </div>
     <@fdsAction.submitButtons
       primaryButtonText="Next"
       linkSecondaryAction=true
