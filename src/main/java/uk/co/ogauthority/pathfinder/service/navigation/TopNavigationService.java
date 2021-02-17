@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
-import uk.co.ogauthority.pathfinder.controller.communication.CommunicationController;
+import uk.co.ogauthority.pathfinder.controller.communication.CommunicationSummaryController;
 import uk.co.ogauthority.pathfinder.controller.quarterlystatistics.QuarterlyStatisticsController;
 import uk.co.ogauthority.pathfinder.controller.team.ManageTeamController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
@@ -56,8 +56,8 @@ public class TopNavigationService {
 
     if (systemAccessService.canAccessCommunications(user)) {
       navigationItems.add(new TopNavigationItem(
-          CommunicationModelService.COMMUNICATION_SUMMARY_PAGE_TITLE,
-          ReverseRouter.route(on(CommunicationController.class).getCommunicationSummary(null)))
+          CommunicationModelService.COMMUNICATIONS_SUMMARY_PAGE_TITLE,
+          ReverseRouter.route(on(CommunicationSummaryController.class).getCommunicationsSummary(null)))
       );
     }
 

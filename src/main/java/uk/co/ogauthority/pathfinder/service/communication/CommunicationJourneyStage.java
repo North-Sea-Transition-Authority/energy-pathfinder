@@ -23,6 +23,11 @@ public enum CommunicationJourneyStage {
           CommunicationJourneyStatus.EMAIL_CONTENT_SUBSCRIBERS,
           CommunicationJourneyStatus.REVIEW_AND_SEND
       )
+  ),
+  SUMMARY(
+      Set.of(RecipientType.values()),
+      Set.of(CommunicationStatus.COMPLETE),
+      Set.of(CommunicationJourneyStatus.values())
   );
 
   private final Set<RecipientType> permittedRecipientTypes;

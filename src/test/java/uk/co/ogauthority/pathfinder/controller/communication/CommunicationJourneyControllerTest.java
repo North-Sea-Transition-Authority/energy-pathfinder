@@ -35,8 +35,8 @@ import uk.co.ogauthority.pathfinder.service.communication.OrganisationGroupCommu
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(CommunicationController.class)
-public class CommunicationControllerTest extends AbstractControllerTest {
+@WebMvcTest(CommunicationJourneyController.class)
+public class CommunicationJourneyControllerTest extends AbstractControllerTest {
 
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       SystemAccessService.COMMUNICATION_PRIVILEGES
@@ -70,22 +70,8 @@ public class CommunicationControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  public void getCommunicationSummary_whenAuthenticated_thenAccess() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(on(CommunicationController.class).getCommunicationSummary(null)))
-        .with(authenticatedUserAndSession(authenticatedUser)))
-        .andExpect(status().isOk());
-  }
-
-  @Test
-  public void getCommunicationSummary_whenUnauthenticated_thenNoAccess() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(on(CommunicationController.class).getCommunicationSummary(null)))
-        .with(authenticatedUserAndSession(unauthenticatedUser)))
-        .andExpect(status().isForbidden());
-  }
-
-  @Test
   public void getCommunicationContent_whenAuthenticated_thenAccess() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(on(CommunicationController.class).getCommunicationContent(
+    mockMvc.perform(get(ReverseRouter.route(on(CommunicationJourneyController.class).getCommunicationContent(
         communicationId,
         null,
         null
@@ -96,7 +82,7 @@ public class CommunicationControllerTest extends AbstractControllerTest {
 
   @Test
   public void getCommunicationContent_whenUnauthenticated_thenNoAccess() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(on(CommunicationController.class).getCommunicationContent(
+    mockMvc.perform(get(ReverseRouter.route(on(CommunicationJourneyController.class).getCommunicationContent(
         communicationId,
         null,
         null
@@ -107,7 +93,7 @@ public class CommunicationControllerTest extends AbstractControllerTest {
 
   @Test
   public void saveCommunicationContent_whenUnauthenticated_thenNoAccess() throws Exception {
-    mockMvc.perform(post(ReverseRouter.route(on(CommunicationController.class).saveCommunicationContent(
+    mockMvc.perform(post(ReverseRouter.route(on(CommunicationJourneyController.class).saveCommunicationContent(
         null,
         null,
         null,
@@ -129,7 +115,7 @@ public class CommunicationControllerTest extends AbstractControllerTest {
     when(communicationService.getCommunicationOrError(communicationId)).thenReturn(communication);
     when(communicationService.updateCommunication(any(), any(), any(), any())).thenReturn(communication);
 
-    mockMvc.perform(post(ReverseRouter.route(on(CommunicationController.class).saveCommunicationContent(
+    mockMvc.perform(post(ReverseRouter.route(on(CommunicationJourneyController.class).saveCommunicationContent(
         communicationId,
         null,
         null,
@@ -156,7 +142,7 @@ public class CommunicationControllerTest extends AbstractControllerTest {
 
     when(communicationModelService.getCommunicationContentModelAndView(any())).thenReturn(new ModelAndView());
 
-    mockMvc.perform(post(ReverseRouter.route(on(CommunicationController.class).saveCommunicationContent(
+    mockMvc.perform(post(ReverseRouter.route(on(CommunicationJourneyController.class).saveCommunicationContent(
         communicationId,
         null,
         null,
@@ -181,7 +167,7 @@ public class CommunicationControllerTest extends AbstractControllerTest {
 
     when(communicationService.updateCommunication(any(), any(), any(), any())).thenReturn(communication);
 
-    mockMvc.perform(post(ReverseRouter.route(on(CommunicationController.class).saveCommunicationContent(
+    mockMvc.perform(post(ReverseRouter.route(on(CommunicationJourneyController.class).saveCommunicationContent(
         communicationId,
         null,
         null,
@@ -207,7 +193,7 @@ public class CommunicationControllerTest extends AbstractControllerTest {
 
     when(communicationService.updateCommunication(any(), any(), any(), any())).thenReturn(communication);
 
-    mockMvc.perform(post(ReverseRouter.route(on(CommunicationController.class).saveCommunicationContent(
+    mockMvc.perform(post(ReverseRouter.route(on(CommunicationJourneyController.class).saveCommunicationContent(
         communicationId,
         null,
         null,
@@ -224,7 +210,7 @@ public class CommunicationControllerTest extends AbstractControllerTest {
 
   @Test
   public void getOperatorSelectForCommunication_whenAuthenticated_thenAccess() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(on(CommunicationController.class).getOperatorSelectForCommunication(
+    mockMvc.perform(get(ReverseRouter.route(on(CommunicationJourneyController.class).getOperatorSelectForCommunication(
         communicationId,
         null,
         null
@@ -235,7 +221,7 @@ public class CommunicationControllerTest extends AbstractControllerTest {
 
   @Test
   public void getOperatorSelectForCommunication_whenUnauthenticated_thenNoAccess() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(on(CommunicationController.class).getOperatorSelectForCommunication(
+    mockMvc.perform(get(ReverseRouter.route(on(CommunicationJourneyController.class).getOperatorSelectForCommunication(
         communicationId,
         null,
         null
@@ -252,7 +238,7 @@ public class CommunicationControllerTest extends AbstractControllerTest {
 
     when(communicationService.getCommunicationOrError(communicationId)).thenReturn(communication);
 
-    mockMvc.perform(post(ReverseRouter.route(on(CommunicationController.class).saveOperatorSelectForCommunication(
+    mockMvc.perform(post(ReverseRouter.route(on(CommunicationJourneyController.class).saveOperatorSelectForCommunication(
         communicationId,
         null,
         null,
@@ -272,7 +258,7 @@ public class CommunicationControllerTest extends AbstractControllerTest {
 
     when(communicationService.getCommunicationOrError(communicationId)).thenReturn(communication);
 
-    mockMvc.perform(post(ReverseRouter.route(on(CommunicationController.class).saveOperatorSelectForCommunication(
+    mockMvc.perform(post(ReverseRouter.route(on(CommunicationJourneyController.class).saveOperatorSelectForCommunication(
         communicationId,
         null,
         null,
@@ -297,7 +283,7 @@ public class CommunicationControllerTest extends AbstractControllerTest {
 
     when(communicationModelService.getOperatorSelectForCommunication(any(), any())).thenReturn(new ModelAndView());
 
-    mockMvc.perform(post(ReverseRouter.route(on(CommunicationController.class).saveOperatorSelectForCommunication(
+    mockMvc.perform(post(ReverseRouter.route(on(CommunicationJourneyController.class).saveOperatorSelectForCommunication(
         communicationId,
         null,
         null,
@@ -313,7 +299,7 @@ public class CommunicationControllerTest extends AbstractControllerTest {
 
   @Test
   public void getCommunicationConfirmation_whenAuthenticated_thenAccess() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(on(CommunicationController.class).getCommunicationConfirmation(
+    mockMvc.perform(get(ReverseRouter.route(on(CommunicationJourneyController.class).getCommunicationConfirmation(
         communicationId,
         null,
         null
@@ -324,7 +310,7 @@ public class CommunicationControllerTest extends AbstractControllerTest {
 
   @Test
   public void getCommunicationConfirmation_whenUnauthenticated_thenNoAccess() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(on(CommunicationController.class).getCommunicationConfirmation(
+    mockMvc.perform(get(ReverseRouter.route(on(CommunicationJourneyController.class).getCommunicationConfirmation(
         communicationId,
         null,
         null
@@ -338,7 +324,7 @@ public class CommunicationControllerTest extends AbstractControllerTest {
 
     when(communicationService.getCommunicationOrError(any())).thenReturn(communication);
 
-    mockMvc.perform(post(ReverseRouter.route(on(CommunicationController.class).saveCommunicationConfirmation(
+    mockMvc.perform(post(ReverseRouter.route(on(CommunicationJourneyController.class).saveCommunicationConfirmation(
         communicationId,
         null,
         null
@@ -353,7 +339,7 @@ public class CommunicationControllerTest extends AbstractControllerTest {
 
     when(communicationService.getCommunicationOrError(any())).thenReturn(communication);
 
-    mockMvc.perform(post(ReverseRouter.route(on(CommunicationController.class).saveCommunicationConfirmation(
+    mockMvc.perform(post(ReverseRouter.route(on(CommunicationJourneyController.class).saveCommunicationConfirmation(
         communicationId,
         null,
         null

@@ -30,7 +30,7 @@ import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 
 @Controller
 @RequestMapping("/communications")
-public class CommunicationController {
+public class CommunicationJourneyController {
 
   private final CommunicationModelService communicationModelService;
   private final CommunicationService communicationService;
@@ -38,19 +38,14 @@ public class CommunicationController {
   private final OrganisationGroupCommunicationService organisationGroupCommunicationService;
 
   @Autowired
-  public CommunicationController(CommunicationModelService communicationModelService,
-                                 CommunicationService communicationService,
-                                 ControllerHelperService controllerHelperService,
-                                 OrganisationGroupCommunicationService organisationGroupCommunicationService) {
+  public CommunicationJourneyController(CommunicationModelService communicationModelService,
+                                        CommunicationService communicationService,
+                                        ControllerHelperService controllerHelperService,
+                                        OrganisationGroupCommunicationService organisationGroupCommunicationService) {
     this.communicationModelService = communicationModelService;
     this.communicationService = communicationService;
     this.controllerHelperService = controllerHelperService;
     this.organisationGroupCommunicationService = organisationGroupCommunicationService;
-  }
-
-  @GetMapping
-  public ModelAndView getCommunicationSummary(AuthenticatedUserAccount user) {
-    return communicationModelService.getCommunicationSummaryModelAndView();
   }
 
   @PostMapping("/communication")
@@ -60,7 +55,7 @@ public class CommunicationController {
         CommunicationStatus.DRAFT,
         user
     );
-    return ReverseRouter.redirect(on(CommunicationController.class).getCommunicationContent(
+    return ReverseRouter.redirect(on(CommunicationJourneyController.class).getCommunicationContent(
         communication.getId(),
         null,
         null
@@ -146,7 +141,7 @@ public class CommunicationController {
         () -> {
           organisationGroupCommunicationService.saveOrganisationGroupCommunication(form, communication);
           communicationService.updateCommunicationJourneyStatus(communication, CommunicationJourneyStatus.OPERATOR_SELECT);
-          return ReverseRouter.redirect(on(CommunicationController.class).getCommunicationConfirmation(
+          return ReverseRouter.redirect(on(CommunicationJourneyController.class).getCommunicationConfirmation(
               communicationId,
               null,
               null
@@ -169,18 +164,18 @@ public class CommunicationController {
                                                     CommunicationContext communicationContext,
                                                     AuthenticatedUserAccount user) {
     communicationService.finaliseCommunication(communicationContext.getCommunication(), user);
-    return ReverseRouter.redirect(on(CommunicationController.class).getCommunicationSummary(null));
+    return ReverseRouter.redirect(on(CommunicationSummaryController.class).getCommunicationsSummary(null));
   }
 
   private ModelAndView getCommunicationNextUrl(Communication communication) {
     if (RecipientType.OPERATORS.equals(communication.getRecipientType())) {
-      return ReverseRouter.redirect(on(CommunicationController.class).getOperatorSelectForCommunication(
+      return ReverseRouter.redirect(on(CommunicationJourneyController.class).getOperatorSelectForCommunication(
           communication.getId(),
           null,
           null
       ));
     } else {
-      return ReverseRouter.redirect(on(CommunicationController.class).getCommunicationConfirmation(
+      return ReverseRouter.redirect(on(CommunicationJourneyController.class).getCommunicationConfirmation(
           communication.getId(),
           null,
           null

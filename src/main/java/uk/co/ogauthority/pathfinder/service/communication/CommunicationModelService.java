@@ -5,15 +5,13 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
-import uk.co.ogauthority.pathfinder.config.ServiceProperties;
-import uk.co.ogauthority.pathfinder.controller.communication.CommunicationController;
+import uk.co.ogauthority.pathfinder.controller.communication.CommunicationJourneyController;
+import uk.co.ogauthority.pathfinder.controller.communication.CommunicationSummaryController;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.communication.Communication;
 import uk.co.ogauthority.pathfinder.model.enums.communication.RecipientType;
 import uk.co.ogauthority.pathfinder.model.form.communication.CommunicationForm;
@@ -25,7 +23,8 @@ import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 @Service
 public class CommunicationModelService {
 
-  public static final String COMMUNICATION_SUMMARY_PAGE_TITLE = "Communications";
+  public static final String COMMUNICATIONS_SUMMARY_PAGE_TITLE = "Communications";
+  public static final String COMMUNICATION_SUMMARY_PAGE_TITLE = "Communication";
   public static final String COMMUNICATION_CONTENT_PAGE_TITLE = "Send new email";
   public static final String OPERATOR_BREADCRUMB_TITLE = "Operators";
   public static final String OPERATOR_SELECT_PAGE_TITLE = "Which operators should receive this email?";
@@ -33,29 +32,25 @@ public class CommunicationModelService {
 
   private final BreadcrumbService breadcrumbService;
   private final PortalOrganisationAccessor portalOrganisationAccessor;
-  private final OrganisationGroupCommunicationService organisationGroupCommunicationService;
-  private final ServiceProperties serviceProperties;
+  private final CommunicationViewService communicationViewService;
 
   @Autowired
   public CommunicationModelService(BreadcrumbService breadcrumbService,
                                    PortalOrganisationAccessor portalOrganisationAccessor,
-                                   OrganisationGroupCommunicationService organisationGroupCommunicationService,
-                                   ServiceProperties serviceProperties
-                                   ) {
+                                   CommunicationViewService communicationViewService) {
     this.breadcrumbService = breadcrumbService;
     this.portalOrganisationAccessor = portalOrganisationAccessor;
-    this.organisationGroupCommunicationService = organisationGroupCommunicationService;
-    this.serviceProperties = serviceProperties;
+    this.communicationViewService = communicationViewService;
   }
 
-  public ModelAndView getCommunicationSummaryModelAndView() {
-    var modelAndView = new ModelAndView("communication/communicationSummary")
-        .addObject("pageTitle", CommunicationModelService.COMMUNICATION_SUMMARY_PAGE_TITLE)
+  public ModelAndView getCommunicationsSummaryModelAndView() {
+    var modelAndView = new ModelAndView("communication/communicationsSummary")
+        .addObject("pageTitle", CommunicationModelService.COMMUNICATIONS_SUMMARY_PAGE_TITLE)
         .addObject("addCommunicationUrl",
-            ReverseRouter.route(on(CommunicationController.class).startCommunicationJourney(null))
+            ReverseRouter.route(on(CommunicationJourneyController.class).startCommunicationJourney(null))
         );
 
-    breadcrumbService.fromWorkArea(modelAndView, CommunicationModelService.COMMUNICATION_SUMMARY_PAGE_TITLE);
+    breadcrumbService.fromWorkArea(modelAndView, CommunicationModelService.COMMUNICATIONS_SUMMARY_PAGE_TITLE);
 
     return modelAndView;
   }
@@ -66,10 +61,10 @@ public class CommunicationModelService {
         .addObject("recipientTypes", RecipientType.getAllAsMap())
         .addObject("form", communicationForm)
         .addObject("cancelUrl",
-            ReverseRouter.route(on(CommunicationController.class).getCommunicationSummary(null))
+            ReverseRouter.route(on(CommunicationSummaryController.class).getCommunicationsSummary(null))
         );
 
-    breadcrumbService.fromCommunicationSummary(modelAndView, CommunicationModelService.COMMUNICATION_CONTENT_PAGE_TITLE);
+    breadcrumbService.fromCommunicationsSummary(modelAndView, CommunicationModelService.COMMUNICATION_CONTENT_PAGE_TITLE);
     return modelAndView;
   }
 
@@ -93,7 +88,7 @@ public class CommunicationModelService {
     var modelAndView = new ModelAndView("communication/organisationGroupSelect")
         .addObject("pageTitle", CommunicationModelService.OPERATOR_SELECT_PAGE_TITLE)
         .addObject("previousUrl",
-            ReverseRouter.route(on(CommunicationController.class).getCommunicationContent(
+            ReverseRouter.route(on(CommunicationJourneyController.class).getCommunicationContent(
                 communication.getId(),
                 null,
                 null
@@ -117,13 +112,9 @@ public class CommunicationModelService {
 
     var modelAndView = new ModelAndView("communication/confirmation")
         .addObject("pageTitle", CommunicationModelService.COMMUNICATION_CONFIRM_PAGE_TITLE)
-        .addObject("communication", communication)
-        .addObject("recipientString", getRecipientNames(communication))
-        .addObject("greetingText", EmailProperties.DEFAULT_GREETING_TEXT)
-        .addObject("signOffText", EmailProperties.DEFAULT_SIGN_OFF_TEXT)
-        .addObject("signOffIdentifier", EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER);
+        .addObject("communicationView", communicationViewService.getCommunicationView(communication));
 
-    var previousUrl = ReverseRouter.route(on(CommunicationController.class).getCommunicationContent(
+    var previousUrl = ReverseRouter.route(on(CommunicationJourneyController.class).getCommunicationContent(
         communicationId,
         null,
         null
@@ -136,7 +127,7 @@ public class CommunicationModelService {
           CommunicationModelService.COMMUNICATION_CONFIRM_PAGE_TITLE
       );
 
-      previousUrl = ReverseRouter.route(on(CommunicationController.class).getOperatorSelectForCommunication(
+      previousUrl = ReverseRouter.route(on(CommunicationJourneyController.class).getOperatorSelectForCommunication(
           communicationId,
           null,
           null
@@ -154,27 +145,18 @@ public class CommunicationModelService {
     return modelAndView;
   }
 
-  private String getRecipientNames(Communication communication) {
+  public ModelAndView getCommunicationSummaryModelAndView(Communication communication) {
+    var modelAndView = new ModelAndView("communication/communicationSummary")
+        .addObject("pageTitle", COMMUNICATION_SUMMARY_PAGE_TITLE)
+        .addObject("sentCommunicationView",
+            communicationViewService.getSentCommunicationView(communication)
+        )
+        .addObject("communicationsUrl",
+            ReverseRouter.route(on(CommunicationSummaryController.class).getCommunicationsSummary(null))
+        );
 
-    var recipientNames = "";
+    breadcrumbService.fromCommunicationsSummary(modelAndView, COMMUNICATION_SUMMARY_PAGE_TITLE);
 
-    if (communication.getRecipientType().equals(RecipientType.OPERATORS)) {
-      var organisationRecipients = organisationGroupCommunicationService.getOrganisationGroupCommunications(communication)
-          .stream()
-          .map(organisationGroupCommunication -> organisationGroupCommunication.getOrganisationGroup().getName())
-          .sorted()
-          .collect(Collectors.toList());
-
-      recipientNames = StringUtils.join(organisationRecipients, ", ");
-    } else if (communication.getRecipientType().equals(RecipientType.SUBSCRIBERS)) {
-      recipientNames = String.format("%s subscribers", serviceProperties.getServiceName());
-    } else {
-      throw new RuntimeException(
-          String.format("Could not determine recipient type for communication with id %d", communication.getId())
-      );
-    }
-
-    return recipientNames;
+    return modelAndView;
   }
-
 }

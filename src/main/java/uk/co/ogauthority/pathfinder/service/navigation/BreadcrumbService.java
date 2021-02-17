@@ -7,7 +7,8 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
-import uk.co.ogauthority.pathfinder.controller.communication.CommunicationController;
+import uk.co.ogauthority.pathfinder.controller.communication.CommunicationJourneyController;
+import uk.co.ogauthority.pathfinder.controller.communication.CommunicationSummaryController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
@@ -150,15 +151,15 @@ public class BreadcrumbService {
     return map;
   }
 
-  public void fromCommunicationSummary(ModelAndView modelAndView, String thisPage) {
-    addAttrs(modelAndView, communicationSummary(), thisPage);
+  public void fromCommunicationsSummary(ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, communicationsSummary(), thisPage);
   }
 
-  private Map<String, String> communicationSummary() {
+  private Map<String, String> communicationsSummary() {
     Map<String, String> breadcrumbs = workArea();
     breadcrumbs.put(
-        ReverseRouter.route(on(CommunicationController.class).getCommunicationSummary(null)),
-        CommunicationModelService.COMMUNICATION_SUMMARY_PAGE_TITLE);
+        ReverseRouter.route(on(CommunicationSummaryController.class).getCommunicationsSummary(null)),
+        CommunicationModelService.COMMUNICATIONS_SUMMARY_PAGE_TITLE);
     return breadcrumbs;
   }
 
@@ -167,9 +168,9 @@ public class BreadcrumbService {
   }
 
   private Map<String, String> emailContent(Integer communicationId) {
-    Map<String, String> breadcrumbs = communicationSummary();
+    Map<String, String> breadcrumbs = communicationsSummary();
     breadcrumbs.put(
-        ReverseRouter.route(on(CommunicationController.class).getCommunicationContent(
+        ReverseRouter.route(on(CommunicationJourneyController.class).getCommunicationContent(
             communicationId,
             null,
             null
@@ -185,7 +186,7 @@ public class BreadcrumbService {
   private Map<String, String> organisationGroupSelect(Integer communicationId) {
     Map<String, String> breadcrumbs = emailContent(communicationId);
     breadcrumbs.put(
-        ReverseRouter.route(on(CommunicationController.class).getOperatorSelectForCommunication(
+        ReverseRouter.route(on(CommunicationJourneyController.class).getOperatorSelectForCommunication(
             communicationId,
             null,
             null

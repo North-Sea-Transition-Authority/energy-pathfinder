@@ -2,7 +2,9 @@
 
   $border-colour: #bfc1c3;
 
-  border: 1px solid $border-colour;
+  &__body {
+    border: 1px solid $border-colour;
+  }
 
   &__row {
     border: 1px solid $border-colour;

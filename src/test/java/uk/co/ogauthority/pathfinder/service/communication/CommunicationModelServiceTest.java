@@ -7,25 +7,24 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.LinkedHashMap;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.ui.ModelMap;
-import uk.co.ogauthority.pathfinder.config.ServiceProperties;
-import uk.co.ogauthority.pathfinder.controller.communication.CommunicationController;
+import uk.co.ogauthority.pathfinder.controller.communication.CommunicationJourneyController;
+import uk.co.ogauthority.pathfinder.controller.communication.CommunicationSummaryController;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.communication.Communication;
-import uk.co.ogauthority.pathfinder.model.entity.communication.OrganisationGroupCommunication;
 import uk.co.ogauthority.pathfinder.model.enums.communication.RecipientType;
 import uk.co.ogauthority.pathfinder.model.form.communication.CommunicationForm;
 import uk.co.ogauthority.pathfinder.model.form.communication.OrganisationGroupSelectorForm;
 import uk.co.ogauthority.pathfinder.model.team.TeamType;
+import uk.co.ogauthority.pathfinder.model.view.communication.CommunicationView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.testutil.CommunicationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -38,10 +37,7 @@ public class CommunicationModelServiceTest {
   private PortalOrganisationAccessor portalOrganisationAccessor;
 
   @Mock
-  private OrganisationGroupCommunicationService organisationGroupCommunicationService;
-
-  @Mock
-  private ServiceProperties serviceProperties;
+  private CommunicationViewService communicationViewService;
 
   private CommunicationModelService communicationModelService;
 
@@ -50,17 +46,16 @@ public class CommunicationModelServiceTest {
     communicationModelService = new CommunicationModelService(
         breadcrumbService,
         portalOrganisationAccessor,
-        organisationGroupCommunicationService,
-        serviceProperties
+        communicationViewService
     );
   }
 
   @Test
-  public void getCommunicationSummaryModelAndView() {
-    var modelAndView = communicationModelService.getCommunicationSummaryModelAndView();
+  public void getCommunicationsSummaryModelAndView() {
+    var modelAndView = communicationModelService.getCommunicationsSummaryModelAndView();
     assertThat(modelAndView.getModelMap()).containsExactly(
-        entry("pageTitle", CommunicationModelService.COMMUNICATION_SUMMARY_PAGE_TITLE),
-        entry("addCommunicationUrl", ReverseRouter.route(on(CommunicationController.class).startCommunicationJourney(null)))
+        entry("pageTitle", CommunicationModelService.COMMUNICATIONS_SUMMARY_PAGE_TITLE),
+        entry("addCommunicationUrl", ReverseRouter.route(on(CommunicationJourneyController.class).startCommunicationJourney(null)))
     );
   }
 
@@ -72,7 +67,7 @@ public class CommunicationModelServiceTest {
         entry("pageTitle", CommunicationModelService.COMMUNICATION_CONTENT_PAGE_TITLE),
         entry("recipientTypes", RecipientType.getAllAsMap()),
         entry("form", communicationForm),
-        entry("cancelUrl", ReverseRouter.route(on(CommunicationController.class).getCommunicationSummary(null)))
+        entry("cancelUrl", ReverseRouter.route(on(CommunicationSummaryController.class).getCommunicationsSummary(null)))
     );
   }
 
@@ -108,7 +103,7 @@ public class CommunicationModelServiceTest {
 
     assertThat(modelAndView.getModelMap()).containsExactly(
         entry("pageTitle", CommunicationModelService.OPERATOR_SELECT_PAGE_TITLE),
-        entry("previousUrl", ReverseRouter.route(on(CommunicationController.class).getCommunicationContent(
+        entry("previousUrl", ReverseRouter.route(on(CommunicationJourneyController.class).getCommunicationContent(
             communication.getId(),
             null,
             null
@@ -132,29 +127,15 @@ public class CommunicationModelServiceTest {
     communication.setId(1);
     communication.setRecipientType(RecipientType.OPERATORS);
 
-    var organisationGroupCommunication1 = new OrganisationGroupCommunication();
-    organisationGroupCommunication1.setOrganisationGroup(TeamTestingUtil.generateOrganisationGroup(2, "B company", "B company"));
-
-    var organisationGroupCommunication2 = new OrganisationGroupCommunication();
-    organisationGroupCommunication2.setOrganisationGroup(TeamTestingUtil.generateOrganisationGroup(1, "A company", "A company"));
-
-    final var organisationGroupCommunications = List.of(organisationGroupCommunication1,organisationGroupCommunication2);
-
-    when(organisationGroupCommunicationService.getOrganisationGroupCommunications(communication))
-       .thenReturn(organisationGroupCommunications);
+    final var communicationView = CommunicationTestUtil.getCommunicationView();
+    when(communicationViewService.getCommunicationView(communication)).thenReturn(communicationView);
 
     var modelAndView = communicationModelService.getCommunicationConfirmation(communication);
 
-    var expectedRecipientList = List.of(
-        organisationGroupCommunication2.getOrganisationGroup().getSelectionText(),
-        organisationGroupCommunication1.getOrganisationGroup().getSelectionText()
-    );
-
     assertConfirmationModelProperties(
         modelAndView.getModelMap(),
-        communication,
-        StringUtils.join(expectedRecipientList, ", "),
-        ReverseRouter.route(on(CommunicationController.class).getOperatorSelectForCommunication(
+        communicationView,
+        ReverseRouter.route(on(CommunicationJourneyController.class).getOperatorSelectForCommunication(
             communication.getId(),
             null,
             null
@@ -168,16 +149,15 @@ public class CommunicationModelServiceTest {
     communication.setId(1);
     communication.setRecipientType(RecipientType.SUBSCRIBERS);
 
-    final var serviceName = "TEST SERVICE NAME";
-    when(serviceProperties.getServiceName()).thenReturn(serviceName);
+    final var communicationView = CommunicationTestUtil.getCommunicationView();
+    when(communicationViewService.getCommunicationView(communication)).thenReturn(communicationView);
 
     var modelAndView = communicationModelService.getCommunicationConfirmation(communication);
 
     assertConfirmationModelProperties(
         modelAndView.getModelMap(),
-        communication,
-        String.format("%s subscribers", serviceName),
-        ReverseRouter.route(on(CommunicationController.class).getCommunicationContent(
+        communicationView,
+        ReverseRouter.route(on(CommunicationJourneyController.class).getCommunicationContent(
             communication.getId(),
             null,
             null
@@ -185,17 +165,27 @@ public class CommunicationModelServiceTest {
     );
   }
 
+  @Test
+  public void getCommunicationSummaryModelAndView() {
+    final var communication = CommunicationTestUtil.getCompleteCommunication();
+    final var communicationView = CommunicationTestUtil.getSentCommunicationView();
+    when(communicationViewService.getSentCommunicationView(communication)).thenReturn(communicationView);
+
+    final var modelAndView = communicationModelService.getCommunicationSummaryModelAndView(communication);
+
+    assertThat(modelAndView.getModelMap()).containsExactly(
+        entry("pageTitle", CommunicationModelService.COMMUNICATION_SUMMARY_PAGE_TITLE),
+        entry("sentCommunicationView", communicationView),
+        entry("communicationsUrl", ReverseRouter.route(on(CommunicationSummaryController.class).getCommunicationsSummary(null)))
+    );
+  }
+
   private void assertConfirmationModelProperties(ModelMap modelMap,
-                                                 Communication communication,
-                                                 String recipientString,
+                                                 CommunicationView communicationView,
                                                  String previousUrl) {
     assertThat(modelMap).containsExactly(
         entry("pageTitle", CommunicationModelService.COMMUNICATION_CONFIRM_PAGE_TITLE),
-        entry("communication", communication),
-        entry("recipientString", recipientString),
-        entry("greetingText", EmailProperties.DEFAULT_GREETING_TEXT),
-        entry("signOffText", EmailProperties.DEFAULT_SIGN_OFF_TEXT),
-        entry("signOffIdentifier", EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER),
+        entry("communicationView", communicationView),
         entry("previousUrl", previousUrl)
     );
   }

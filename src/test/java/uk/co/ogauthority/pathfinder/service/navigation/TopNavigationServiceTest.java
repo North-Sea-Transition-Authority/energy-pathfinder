@@ -103,7 +103,7 @@ public class TopNavigationServiceTest {
         communicationsUser
     );
     assertThat(navigationItems).hasSize(1);
-    assertThat(navigationItems.get(0).getDisplayName()).isEqualTo(CommunicationModelService.COMMUNICATION_SUMMARY_PAGE_TITLE);
+    assertThat(navigationItems.get(0).getDisplayName()).isEqualTo(CommunicationModelService.COMMUNICATIONS_SUMMARY_PAGE_TITLE);
   }
 
   @Test
@@ -121,7 +121,7 @@ public class TopNavigationServiceTest {
             TopNavigationService.WORK_AREA_TITLE,
             TopNavigationService.MANAGE_TEAM_TITLE,
             QuarterlyStatisticsController.QUARTERLY_STATISTICS_TITLE,
-            CommunicationModelService.COMMUNICATION_SUMMARY_PAGE_TITLE
+            CommunicationModelService.COMMUNICATIONS_SUMMARY_PAGE_TITLE
         );
   }
 

@@ -1,7 +1,10 @@
 <#include '../layout.ftl'>
+<#import '_communicationSummaryView.ftl' as communicationSummary>
 
 <@defaultPage htmlTitle=pageTitle pageHeading=pageTitle topNavigation=true twoThirdsColumn=true breadcrumbs=true>
-  <@fdsForm.htmlForm springUrl(addCommunicationUrl)>
-    <@fdsAction.button buttonText="Send new email" start=false buttonClass="govuk-button govuk-button--blue" />
-  </@fdsForm.htmlForm>
+  <@communicationSummary.sentCommunicationSummary sentCommunicationView=sentCommunicationView />
+  <@fdsAction.link
+    linkText="Back to communications"
+    linkUrl=springUrl(communicationsUrl)
+    linkClass="govuk-link--button"/>
 </@defaultPage>
