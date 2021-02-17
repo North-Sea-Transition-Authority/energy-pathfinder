@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,10 +36,12 @@ import uk.co.ogauthority.pathfinder.model.form.project.plugabandonmentschedule.P
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule.PlugAbandonmentScheduleService;
-import uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule.PlugAbandonmentWellService;
+import uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule.PlugAbandonmentScheduleSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
+import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentScheduleTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(
@@ -49,12 +52,13 @@ public class PlugAbandonmentScheduleControllerTest extends ProjectContextAbstrac
 
   private static final Integer PROJECT_ID = 1;
   private static final Integer PLUG_ABANDONMENT_SCHEDULE_ID = 2;
+  private static final Integer DISPLAY_ORDER = 2;
 
   @MockBean
   private PlugAbandonmentScheduleService plugAbandonmentScheduleService;
 
   @MockBean
-  private PlugAbandonmentWellService plugAbandonmentWellService;
+  private PlugAbandonmentScheduleSummaryService plugAbandonmentScheduleSummaryService;
 
   private AuthenticatedUserAccount authenticatedUser;
 
@@ -89,6 +93,74 @@ public class PlugAbandonmentScheduleControllerTest extends ProjectContextAbstrac
         on(PlugAbandonmentScheduleController.class).viewPlugAbandonmentSchedules(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void savePlugAbandonmentSchedules_whenUnauthenticated_thenNoAccess() throws Exception {
+    var plugAbandonmentScheduleViews = List.of(
+        PlugAbandonmentScheduleTestUtil.createPlugAbandonmentScheduleView(),
+        PlugAbandonmentScheduleTestUtil.createPlugAbandonmentScheduleView()
+    );
+
+    when(plugAbandonmentScheduleSummaryService.getValidatedPlugAbandonmentScheduleSummaryViews(projectDetail)).thenReturn(plugAbandonmentScheduleViews);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(PlugAbandonmentScheduleController.class)
+            .savePlugAbandonmentSchedules(PROJECT_ID, null)
+        ))
+            .with(authenticatedUserAndSession(unauthenticatedUser))
+            .with(csrf()))
+        .andExpect(status().isForbidden());
+
+    verify(plugAbandonmentScheduleSummaryService, times(0)).validateViews(any());
+  }
+
+  @Test
+  public void savePlugAbandonmentSchedules_whenValid_thenRedirect() throws Exception {
+    var plugAbandonmentScheduleViews = List.of(
+        PlugAbandonmentScheduleTestUtil.createPlugAbandonmentScheduleView(),
+        PlugAbandonmentScheduleTestUtil.createPlugAbandonmentScheduleView()
+    );
+
+    when(plugAbandonmentScheduleSummaryService.getValidatedPlugAbandonmentScheduleSummaryViews(projectDetail)).thenReturn(plugAbandonmentScheduleViews);
+    when(plugAbandonmentScheduleSummaryService.validateViews(plugAbandonmentScheduleViews)).thenReturn(ValidationResult.VALID);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(PlugAbandonmentScheduleController.class)
+            .savePlugAbandonmentSchedules(PROJECT_ID, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf()))
+        .andExpect(status().is3xxRedirection());
+
+    verify(plugAbandonmentScheduleSummaryService, times(1)).validateViews(any());
+  }
+
+  @Test
+  public void savePlugAbandonmentSchedules_whenInvalid_thenReturnSummaryModelAndView() throws Exception {
+    var plugAbandonmentScheduleViews = List.of(
+        PlugAbandonmentScheduleTestUtil.createPlugAbandonmentScheduleView(),
+        PlugAbandonmentScheduleTestUtil.createPlugAbandonmentScheduleView()
+    );
+
+    when(plugAbandonmentScheduleSummaryService.getValidatedPlugAbandonmentScheduleSummaryViews(projectDetail)).thenReturn(plugAbandonmentScheduleViews);
+    when(plugAbandonmentScheduleSummaryService.validateViews(plugAbandonmentScheduleViews)).thenReturn(ValidationResult.INVALID);
+    when(plugAbandonmentScheduleSummaryService.getPlugAbandonmentScheduleSummaryModelAndView(
+        PROJECT_ID,
+        plugAbandonmentScheduleViews,
+        ValidationResult.INVALID
+    )).thenReturn(new ModelAndView());
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(PlugAbandonmentScheduleController.class)
+            .savePlugAbandonmentSchedules(PROJECT_ID, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf()))
+        .andExpect(status().isOk());
+
+    verify(plugAbandonmentScheduleSummaryService, times(1)).validateViews(any());
+    verify(plugAbandonmentScheduleSummaryService, times(1)).getPlugAbandonmentScheduleSummaryModelAndView(any(), any(), any());
   }
 
   @Test
@@ -407,4 +479,90 @@ public class PlugAbandonmentScheduleControllerTest extends ProjectContextAbstrac
     verify(plugAbandonmentScheduleService, times(0)).updatePlugAbandonmentSchedule(any(), any(), any());
   }
 
+  @Test
+  public void removePlugAbandonmentScheduleConfirmation_whenUnauthenticated_thenNoAccess() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(PlugAbandonmentScheduleController.class).removePlugAbandonmentScheduleConfirmation(
+            PROJECT_ID,
+            PLUG_ABANDONMENT_SCHEDULE_ID,
+            DISPLAY_ORDER,
+            null
+        )))
+        .with(authenticatedUserAndSession(unauthenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void removePlugAbandonmentScheduleConfirmation_whenAuthenticated_thenAccess() throws Exception {
+
+    when(plugAbandonmentScheduleSummaryService.getPlugAbandonmentScheduleSummaryView(
+        PLUG_ABANDONMENT_SCHEDULE_ID,
+        projectDetail,
+        DISPLAY_ORDER
+    )).thenReturn(
+        PlugAbandonmentScheduleTestUtil.createPlugAbandonmentScheduleView()
+    );
+
+    mockMvc.perform(get(ReverseRouter.route(
+        on(PlugAbandonmentScheduleController.class).removePlugAbandonmentScheduleConfirmation(
+            PROJECT_ID,
+            PLUG_ABANDONMENT_SCHEDULE_ID,
+            DISPLAY_ORDER,
+            null
+        )))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  public void removePlugAbandonmentSchedule_whenAuthenticated_thenAccess() throws Exception {
+
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    var plugAbandonmentSchedule = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
+
+    when(plugAbandonmentScheduleService.getPlugAbandonmentScheduleOrError(any(), any())).thenReturn(
+        plugAbandonmentSchedule
+    );
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(PlugAbandonmentScheduleController.class)
+            .removePlugAbandonmentSchedule(PROJECT_ID, PLUG_ABANDONMENT_SCHEDULE_ID, DISPLAY_ORDER, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().is3xxRedirection());
+
+    verify(plugAbandonmentScheduleService, times(1)).deletePlugAbandonmentSchedule(plugAbandonmentSchedule);
+
+  }
+
+  @Test
+  public void removePlugAbandonmentSchedule_whenUnauthenticated_thenNoAccess() throws Exception {
+
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    var plugAbandonmentSchedule = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
+
+    when(plugAbandonmentScheduleService.getPlugAbandonmentScheduleOrError(any(), any())).thenReturn(
+        plugAbandonmentSchedule
+    );
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(PlugAbandonmentScheduleController.class)
+            .removePlugAbandonmentSchedule(PROJECT_ID, PLUG_ABANDONMENT_SCHEDULE_ID, DISPLAY_ORDER, null)
+        ))
+            .with(authenticatedUserAndSession(unauthenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().isForbidden());
+
+    verify(plugAbandonmentScheduleService, times(0)).deletePlugAbandonmentSchedule(plugAbandonmentSchedule);
+
+  }
 }

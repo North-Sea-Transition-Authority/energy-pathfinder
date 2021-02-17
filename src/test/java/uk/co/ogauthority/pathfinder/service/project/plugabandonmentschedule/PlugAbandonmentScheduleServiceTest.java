@@ -33,6 +33,7 @@ import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.service.wellbore.WellboreService;
 import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentScheduleTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentWellTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.WellboreTestUtil;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
@@ -164,14 +165,37 @@ public class PlugAbandonmentScheduleServiceTest {
   }
 
   @Test
+  public void deletePlugAbandonmentSchedule() {
+    var plugAbandonmentSchedule = new PlugAbandonmentSchedule();
+
+    plugAbandonmentScheduleService.deletePlugAbandonmentSchedule(plugAbandonmentSchedule);
+
+    verify(plugAbandonmentWellService, times(1)).deletePlugAbandonmentScheduleWells(plugAbandonmentSchedule);
+    verify(plugAbandonmentScheduleRepository, times(1)).delete(plugAbandonmentSchedule);
+  }
+
+  @Test
   public void getForm() {
     var plugAbandonmentSchedule = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
+
+    var plugAbandonmentWell1 =  PlugAbandonmentWellTestUtil.createPlugAbandonmentWell();
+    var plugAbandonmentWell2 =  PlugAbandonmentWellTestUtil.createPlugAbandonmentWell();
+
+    when(plugAbandonmentWellService.getPlugAbandonmentWells(plugAbandonmentSchedule)).thenReturn(List.of(
+        plugAbandonmentWell1,
+        plugAbandonmentWell2
+    ));
 
     var form = plugAbandonmentScheduleService.getForm(plugAbandonmentSchedule);
 
     var plugAbandonmentDate = form.getPlugAbandonmentDate();
     assertThat(plugAbandonmentDate.getMinYear()).isEqualTo(Integer.toString(plugAbandonmentSchedule.getEarliestStartYear()));
     assertThat(plugAbandonmentDate.getMaxYear()).isEqualTo(Integer.toString(plugAbandonmentSchedule.getLatestCompletionYear()));
+
+    assertThat(form.getWells()).containsExactly(
+        plugAbandonmentWell1.getWellbore().getId(),
+        plugAbandonmentWell2.getWellbore().getId()
+    );
   }
 
   private void checkCommonEntityFields(PlugAbandonmentScheduleForm form,
@@ -278,27 +302,6 @@ public class PlugAbandonmentScheduleServiceTest {
   }
 
   @Test
-  public void getPlugAbandonmentScheduleSummaryModelAndView() {
-    var projectId = detail.getProject().getId();
-
-    var modelAndView = plugAbandonmentScheduleService.getPlugAbandonmentScheduleSummaryModelAndView(
-        projectId
-    );
-
-    assertThat(modelAndView.getViewName()).isEqualTo(PlugAbandonmentScheduleService.SUMMARY_TEMPLATE_PATH);
-    assertThat(modelAndView.getModel()).containsExactly(
-        entry("pageName", PlugAbandonmentScheduleController.SUMMARY_PAGE_NAME),
-        entry(
-            "addPlugAbandonmentScheduleUrl",
-            ReverseRouter.route(on(PlugAbandonmentScheduleController.class).addPlugAbandonmentSchedule(projectId, null))
-        ),
-        entry("projectSetupUrl", ControllerUtils.getProjectSetupUrl(projectId))
-    );
-
-    verify(breadcrumbService, times(1)).fromTaskList(projectId, modelAndView, PlugAbandonmentScheduleController.TASK_LIST_NAME);
-  }
-
-  @Test
   public void getPlugAbandonmentScheduleModelAndView_withForm() {
     var projectId = detail.getProject().getId();
     var form = new PlugAbandonmentScheduleForm();
@@ -395,6 +398,31 @@ public class PlugAbandonmentScheduleServiceTest {
         projectId,
         modelAndView,
         PlugAbandonmentScheduleController.FORM_PAGE_NAME
+    );
+  }
+
+  @Test
+  public void removePlugAbandonmentScheduleModelAndView() {
+    var projectId = detail.getProject().getId();
+    var plugAbandonmentScheduleView = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentScheduleView();
+
+    var modelAndView = plugAbandonmentScheduleService.removePlugAbandonmentScheduleModelAndView(
+        projectId,
+        plugAbandonmentScheduleView
+    );
+
+    assertThat(modelAndView.getViewName()).isEqualTo(PlugAbandonmentScheduleService.REMOVE_TEMPLATE_PATH);
+    assertThat(modelAndView.getModel()).containsExactly(
+        entry("plugAbandonmentScheduleView", plugAbandonmentScheduleView),
+        entry("cancelUrl",
+            ReverseRouter.route(on(PlugAbandonmentScheduleController.class).viewPlugAbandonmentSchedules(projectId, null))),
+        entry("pageName", PlugAbandonmentScheduleController.REMOVE_PAGE_NAME)
+    );
+
+    verify(breadcrumbService, times(1)).fromPlugAbandonmentSchedule(
+        projectId,
+        modelAndView,
+        PlugAbandonmentScheduleController.REMOVE_PAGE_NAME
     );
   }
 }

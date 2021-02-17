@@ -5,6 +5,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -86,6 +87,32 @@ public class PlugAbandonmentWellServiceTest {
     for (PlugAbandonmentSchedule plugAbandonmentSchedule : plugAbandonmentSchedules) {
       verify(plugAbandonmentWellRepository, times(1)).deleteAllByPlugAbandonmentSchedule(plugAbandonmentSchedule);
     }
+  }
+
+  @Test
+  public void getPlugAbandonmentWells_whenExist_thenReturnPopulatedList() {
+    var plugAbandonmentSchedule = new PlugAbandonmentSchedule();
+    var plugAbandonmentWells = List.of(
+        PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(),
+        PlugAbandonmentWellTestUtil.createPlugAbandonmentWell()
+    );
+
+    when(plugAbandonmentWellRepository.findAllByPlugAbandonmentSchedule(plugAbandonmentSchedule)).thenReturn(
+        plugAbandonmentWells
+    );
+
+    assertThat(plugAbandonmentWellService.getPlugAbandonmentWells(plugAbandonmentSchedule)).isEqualTo(plugAbandonmentWells);
+  }
+
+  @Test
+  public void getPlugAbandonmentWells_whenNoneExist_thenReturnEmptyList() {
+    var plugAbandonmentSchedule = new PlugAbandonmentSchedule();
+
+    when(plugAbandonmentWellRepository.findAllByPlugAbandonmentSchedule(plugAbandonmentSchedule)).thenReturn(
+        Collections.emptyList()
+    );
+
+    assertThat(plugAbandonmentWellService.getPlugAbandonmentWells(plugAbandonmentSchedule)).isEmpty();
   }
 
   @Test

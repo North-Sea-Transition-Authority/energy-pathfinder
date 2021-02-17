@@ -54,6 +54,10 @@ public class PlugAbandonmentWellService {
     plugAbandonmentSchedules.forEach(this::deletePlugAbandonmentScheduleWells);
   }
 
+  public List<PlugAbandonmentWell> getPlugAbandonmentWells(PlugAbandonmentSchedule plugAbandonmentSchedule) {
+    return plugAbandonmentWellRepository.findAllByPlugAbandonmentSchedule(plugAbandonmentSchedule);
+  }
+
   public List<WellboreView> getWellboreViewsFromSchedule(PlugAbandonmentSchedule plugAbandonmentSchedule) {
     var wellbores = plugAbandonmentWellRepository.findAllByPlugAbandonmentSchedule(plugAbandonmentSchedule)
         .stream()
