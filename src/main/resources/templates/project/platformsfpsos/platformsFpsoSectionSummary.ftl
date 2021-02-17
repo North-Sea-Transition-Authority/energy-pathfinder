@@ -6,6 +6,7 @@
     <#list platformFpsoDiffModel as platformFpsoDiff>
       <@platformFpsoSummary.platformFpsoDiffSummary
         diffModel=platformFpsoDiff.platformFpsoDiff
+        fpso=platformFpsoDiff.fpso
         areSubstructuresExpectedToBeRemoved=platformFpsoDiff.areSubstructuresExpectedToBeRemoved
         showHeader=true
         showActions=false

@@ -6,6 +6,10 @@ import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 
 public class PlatformFpsoView extends ProjectSummaryItem {
 
+  private Boolean fpso;
+
+  private String infrastructureType;
+
   private StringWithTag platformFpso;
 
   private String topsideFpsoMass;
@@ -41,6 +45,22 @@ public class PlatformFpsoView extends ProjectSummaryItem {
     this.id = id;
     this.displayOrder = displayOrder;
     this.projectId = projectId;
+  }
+
+  public Boolean isFpso() {
+    return fpso;
+  }
+
+  public void setFpso(Boolean fpso) {
+    this.fpso = fpso;
+  }
+
+  public String getInfrastructureType() {
+    return infrastructureType;
+  }
+
+  public void setInfrastructureType(String infrastructureType) {
+    this.infrastructureType = infrastructureType;
   }
 
   public StringWithTag getPlatformFpso() {

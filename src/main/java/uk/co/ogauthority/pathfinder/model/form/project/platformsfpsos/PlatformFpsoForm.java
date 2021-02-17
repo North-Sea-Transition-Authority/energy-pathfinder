@@ -1,8 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.FuturePlans;
+import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.PlatformFpsoInfrastructureType;
 import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.SubstructureRemovalPremise;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
@@ -11,8 +11,16 @@ import uk.co.ogauthority.pathfinder.model.form.validation.positivewholenumber.Po
 
 public class PlatformFpsoForm {
 
-  @NotEmpty(message = "Select a platform or FPSO", groups = FullValidation.class)
-  private String structure;
+  @NotNull(message = "Select the type of infrastructure", groups = FullValidation.class)
+  private PlatformFpsoInfrastructureType infrastructureType;
+
+  private String platformStructure;
+
+  private String fpsoStructure;
+
+  private String fpsoType;
+
+  private String fpsoDimensions;
 
   @NotNull(message = "Enter a topside/FPSO mass", groups = FullValidation.class)
   @PositiveWholeNumber(messagePrefix = "Topside/FPSO mass", groups = {FullValidation.class, PartialValidation.class})
@@ -30,21 +38,48 @@ public class PlatformFpsoForm {
 
   private MinMaxDateInput substructureRemovalYears;
 
-  @NotEmpty(message = "Enter an FPSO type", groups = FullValidation.class)
-  private String fpsoType;
-
-  @NotEmpty(message = "Enter the FPSO dimensions", groups = FullValidation.class)
-  private String fpsoDimensions;
-
   @NotNull(message = "Select the future plans", groups = FullValidation.class)
   private FuturePlans futurePlans;
 
-  public String getStructure() {
-    return structure;
+  public PlatformFpsoInfrastructureType getInfrastructureType() {
+    return infrastructureType;
   }
 
-  public void setStructure(String structure) {
-    this.structure = structure;
+  public void setInfrastructureType(
+      PlatformFpsoInfrastructureType infrastructureType) {
+    this.infrastructureType = infrastructureType;
+  }
+
+  public String getPlatformStructure() {
+    return platformStructure;
+  }
+
+  public void setPlatformStructure(String platformStructure) {
+    this.platformStructure = platformStructure;
+  }
+
+  public String getFpsoStructure() {
+    return fpsoStructure;
+  }
+
+  public void setFpsoStructure(String fpsoStructure) {
+    this.fpsoStructure = fpsoStructure;
+  }
+
+  public String getFpsoType() {
+    return fpsoType;
+  }
+
+  public void setFpsoType(String fpsoType) {
+    this.fpsoType = fpsoType;
+  }
+
+  public String getFpsoDimensions() {
+    return fpsoDimensions;
+  }
+
+  public void setFpsoDimensions(String fpsoDimensions) {
+    this.fpsoDimensions = fpsoDimensions;
   }
 
   public Integer getTopsideFpsoMass() {
@@ -96,22 +131,6 @@ public class PlatformFpsoForm {
   public void setSubstructureRemovalYears(
       MinMaxDateInput substructureRemovalYears) {
     this.substructureRemovalYears = substructureRemovalYears;
-  }
-
-  public String getFpsoType() {
-    return fpsoType;
-  }
-
-  public void setFpsoType(String fpsoType) {
-    this.fpsoType = fpsoType;
-  }
-
-  public String getFpsoDimensions() {
-    return fpsoDimensions;
-  }
-
-  public void setFpsoDimensions(String fpsoDimensions) {
-    this.fpsoDimensions = fpsoDimensions;
   }
 
   public FuturePlans getFuturePlans() {

@@ -9,12 +9,17 @@ import org.springframework.validation.SmartValidator;
 import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.PlatformFpsoInfrastructureType;
 import uk.co.ogauthority.pathfinder.model.form.validation.minmaxdate.MinMaxDateInputValidator;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 
 @Component
 public class PlatformFpsoFormValidator implements SmartValidator {
 
+  public static final String MISSING_PLATFORM_ERROR = "Select a platform";
+  public static final String MISSING_FPSO_ERROR = "Select an FPSO";
+  public static final String MISSING_FPSO_TYPE_ERROR = "Enter an FPSO type";
+  public static final String MISSING_FPSO_DIMENSIONS_ERROR = "Enter the FPSO dimensions";
   public static final String MISSING_SUBSTRUCTURE_REMOVAL_MASS_ERROR = "Enter a substructure removal mass";
   public static final String MISSING_SUBSTRUCTURE_REMOVAL_PREMISE_ERROR = "Enter a substructure removal premise";
   private final MinMaxDateInputValidator minMaxDateInputValidator;
@@ -36,6 +41,44 @@ public class PlatformFpsoFormValidator implements SmartValidator {
             () -> new ActionNotAllowedException("Expected PlatformFpsoValidationHint to be provided")
         );
 
+    final var validationType = platformFpsoValidationHint.getValidationType();
+
+    var infrastructureType = form.getInfrastructureType();
+
+    if (PlatformFpsoInfrastructureType.PLATFORM.equals(infrastructureType)) {
+
+      if (ValidationType.FULL.equals(validationType)) {
+        ValidationUtils.rejectIfEmptyOrWhitespace(
+            errors,
+            "platformStructure",
+            "platformStructure.invalid",
+            MISSING_PLATFORM_ERROR
+        );
+      }
+    } else if (PlatformFpsoInfrastructureType.FPSO.equals(infrastructureType)) {
+
+      if (ValidationType.FULL.equals(validationType)) {
+        ValidationUtils.rejectIfEmptyOrWhitespace(
+            errors,
+            "fpsoStructure",
+            "fpsoStructure.invalid",
+            MISSING_FPSO_ERROR
+        );
+        ValidationUtils.rejectIfEmptyOrWhitespace(
+            errors,
+            "fpsoType",
+            "fpsoType.invalid",
+            MISSING_FPSO_TYPE_ERROR
+        );
+        ValidationUtils.rejectIfEmptyOrWhitespace(
+            errors,
+            "fpsoDimensions",
+            "fpsoDimensions.invalid",
+            MISSING_FPSO_DIMENSIONS_ERROR
+        );
+      }
+    }
+
     ValidationUtil.invokeNestedValidator(
         errors,
         minMaxDateInputValidator,
@@ -54,7 +97,7 @@ public class PlatformFpsoFormValidator implements SmartValidator {
           platformFpsoValidationHint.getSubstructureRemovalHints()
       );
 
-      if (platformFpsoValidationHint.getValidationType().equals(ValidationType.FULL)) {
+      if (ValidationType.FULL.equals(validationType)) {
         ValidationUtils.rejectIfEmptyOrWhitespace(
             errors,
             "substructureRemovalMass",

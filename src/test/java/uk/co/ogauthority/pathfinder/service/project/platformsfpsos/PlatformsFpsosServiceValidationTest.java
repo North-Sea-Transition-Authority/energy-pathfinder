@@ -48,7 +48,7 @@ public class PlatformsFpsosServiceValidationTest {
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
 
-  private final PlatformFpso platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(details);
+  private final PlatformFpso platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndSubstructuresRemoved(details);
 
   @Before
   public void setUp() {
@@ -72,8 +72,8 @@ public class PlatformsFpsosServiceValidationTest {
 
   @Test
   public void isValid_incompleteForm() {
-    var invalidPlatformFpso = PlatformFpsoTestUtil.getPlatformFpso_NoSubstructuresRemoved(details);
-    invalidPlatformFpso.setStructure(null);
+    var invalidPlatformFpso = PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndNoSubstructuresRemoved(details);
+    invalidPlatformFpso.setInfrastructureType(null);
     assertThat(platformsFpsosService.isValid(invalidPlatformFpso, ValidationType.FULL)).isFalse();
   }
 

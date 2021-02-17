@@ -27,7 +27,12 @@
   >
     <@_platformFpsoSummaryFields
       useDiffedField=false
+      fpso=view.fpso
+      infrastructureTypePrompt=view.infrastructureType
+      infrastructureType=view.infrastructureType
       platformFpso=view.platformFpso
+      fpsoType=view.fpsoType
+      fpsoDimensions=view.fpsoDimensions
       topsideFpsoMass=view.topsideFpsoMass
       topsideRemovalEarliestYear=view.topsideRemovalEarliestYear
       topsideRemovalLatestYear=view.topsideRemovalLatestYear
@@ -37,8 +42,6 @@
       substructureRemovalMass=view.substructureRemovalMass
       substructureRemovalEarliestYear=view.substructureRemovalEarliestYear
       substructureRemovalLatestYear=view.substructureRemovalLatestYear
-      fpsoType=view.fpsoType
-      fpsoDimensions=view.fpsoDimensions
       futurePlans=view.futurePlans
     />
   </@summaryViewWrapper.summaryViewItemWrapper>
@@ -46,6 +49,7 @@
 
 <#macro platformFpsoDiffSummary
   diffModel
+  fpso
   areSubstructuresExpectedToBeRemoved
   platformFpsoName=defaultPlatformFpsoName
   showHeader=false
@@ -66,7 +70,12 @@
   >
     <@_platformFpsoSummaryFields
       useDiffedField=true
+      fpso=fpso
+      infrastructureTypePrompt=diffModel.PlatformFpsoView_infrastructureType.currentValue
+      infrastructureType=diffModel.PlatformFpsoView_infrastructureType
       platformFpso=diffModel.PlatformFpsoView_platformFpso
+      fpsoType=diffModel.PlatformFpsoView_fpsoType
+      fpsoDimensions=diffModel.PlatformFpsoView_fpsoDimensions
       topsideFpsoMass=diffModel.PlatformFpsoView_topsideFpsoMass
       topsideRemovalEarliestYear=diffModel.PlatformFpsoView_topsideRemovalEarliestYear
       topsideRemovalLatestYear=diffModel.PlatformFpsoView_topsideRemovalLatestYear
@@ -76,8 +85,6 @@
       substructureRemovalMass=diffModel.PlatformFpsoView_substructureRemovalMass
       substructureRemovalEarliestYear=diffModel.PlatformFpsoView_substructureRemovalEarliestYear
       substructureRemovalLatestYear=diffModel.PlatformFpsoView_substructureRemovalLatestYear
-      fpsoType=diffModel.PlatformFpsoView_fpsoType
-      fpsoDimensions=diffModel.PlatformFpsoView_fpsoDimensions
       futurePlans=diffModel.PlatformFpsoView_futurePlans
     />
   </@summaryViewWrapper.summaryViewItemWrapper>
@@ -85,7 +92,12 @@
 
 <#macro _platformFpsoSummaryFields
   useDiffedField
+  fpso=false
+  infrastructureTypePrompt=""
+  infrastructureType=""
   platformFpso=""
+  fpsoType=""
+  fpsoDimensions=""
   topsideFpsoMass=""
   topsideRemovalEarliestYear=""
   topsideRemovalLatestYear=""
@@ -95,17 +107,34 @@
   substructureRemovalMass=""
   substructureRemovalEarliestYear=""
   substructureRemovalLatestYear=""
-  fpsoType=""
-  fpsoDimensions=""
   futurePlans=""
 >
-  <@checkAnswers.checkAnswersStandardNestedOrDiffRow
+  <@checkAnswers.checkAnswersStandardOrDiffRow
     prompt="Platform or FPSO"
-    fieldValue=platformFpso
+    fieldValue=infrastructureType
     isDiffedField=useDiffedField
-  >
-    <@stringWithTag.stringWithTag stringWithTag=platformFpso />
-  </@checkAnswers.checkAnswersStandardNestedOrDiffRow>
+  />
+  <#if infrastructureTypePrompt?has_content>
+    <@checkAnswers.checkAnswersStandardNestedOrDiffRow
+      prompt=infrastructureTypePrompt
+      fieldValue=platformFpso
+      isDiffedField=useDiffedField
+    >
+      <@stringWithTag.stringWithTag stringWithTag=platformFpso />
+    </@checkAnswers.checkAnswersStandardNestedOrDiffRow>
+  </#if>
+  <#if fpso>
+    <@checkAnswers.checkAnswersStandardOrDiffRow
+      prompt="FPSO type"
+      fieldValue=fpsoType
+      isDiffedField=useDiffedField
+      />
+    <@checkAnswers.checkAnswersStandardOrDiffRow
+      prompt="FPSO dimensions"
+      fieldValue=fpsoDimensions
+      isDiffedField=useDiffedField
+    />
+  </#if>
   <@checkAnswers.checkAnswersStandardOrDiffRow
     prompt="Topside/FPSO removal mass"
     fieldValue=topsideFpsoMass
@@ -140,16 +169,6 @@
       latestYear=substructureRemovalLatestYear
     />
   </#if>
-  <@checkAnswers.checkAnswersStandardOrDiffRow
-    prompt="FPSO type"
-    fieldValue=fpsoType
-    isDiffedField=useDiffedField
-  />
-  <@checkAnswers.checkAnswersStandardOrDiffRow
-    prompt="FPSO dimensions"
-    fieldValue=fpsoDimensions
-    isDiffedField=useDiffedField
-  />
   <@checkAnswers.checkAnswersStandardOrDiffRow
     prompt="Future plans"
     fieldValue=futurePlans

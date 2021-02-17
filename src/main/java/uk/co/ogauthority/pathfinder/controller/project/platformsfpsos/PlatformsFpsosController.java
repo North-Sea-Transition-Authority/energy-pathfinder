@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.FuturePlans;
+import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.PlatformFpsoInfrastructureType;
 import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.SubstructureRemovalPremise;
 import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFpsoForm;
 import uk.co.ogauthority.pathfinder.model.view.platformfpso.PlatformFpsoView;
@@ -166,6 +167,12 @@ public class PlatformsFpsosController extends ProjectFormPageController {
   private ModelAndView getPlatformFpsoFormModelAndView(Integer projectId, PlatformFpsoForm form) {
     var modelAndView = new ModelAndView("project/platformsfpsos/platformsFpsosForm")
         .addObject("form", form)
+        .addObject("platformInfrastructureType",
+            PlatformFpsoInfrastructureType.getEntryAsMap(PlatformFpsoInfrastructureType.PLATFORM)
+        )
+        .addObject("fpsoInfrastructureType",
+            PlatformFpsoInfrastructureType.getEntryAsMap(PlatformFpsoInfrastructureType.FPSO)
+        )
         .addObject("facilitiesUrl", SearchSelectorService.route(on(DevUkRestController.class).searchFacilitiesWithManualEntry(null)))
         .addObject("mtUnit", MeasurementUnits.METRIC_TONNE)
         .addObject("preselectedStructure", platformsFpsosService.getPreselectedStructure(form))

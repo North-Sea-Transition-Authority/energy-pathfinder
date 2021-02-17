@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
+import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.PlatformFpsoInfrastructureType;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
@@ -31,6 +32,12 @@ public class PlatformFpsoViewUtil {
         platformFpso.getId(),
         displayOrder,
         projectId
+    );
+
+    view.setFpso(PlatformFpsoInfrastructureType.FPSO.equals(platformFpso.getInfrastructureType()));
+    view.setInfrastructureType(platformFpso.getInfrastructureType() != null
+        ? platformFpso.getInfrastructureType().getDisplayName()
+        : ""
     );
 
     view.setPlatformFpso(platformFpso.getStructure() != null

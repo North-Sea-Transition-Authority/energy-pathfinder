@@ -57,7 +57,7 @@ public class PlatformsFpsosControllerTest extends ProjectContextAbstractControll
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
-  private final PlatformFpso platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(detail);
+  private final PlatformFpso platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndSubstructuresRemoved(detail);
 
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
@@ -131,7 +131,7 @@ public class PlatformsFpsosControllerTest extends ProjectContextAbstractControll
 
   @Test
   public void authenticatedUser_hasAccessToPlatformsFpsosEdit() throws Exception {
-    when(platformsFpsosService.getForm(platformFpso)).thenReturn(PlatformFpsoTestUtil.getPlatformFpsoForm_withSubstructuresToBeRemoved());
+    when(platformsFpsosService.getForm(platformFpso)).thenReturn(PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatformAndSubstructuresToBeRemoved());
     mockMvc.perform(get(ReverseRouter.route(
         on(PlatformsFpsosController.class).editPlatformFpso(PROJECT_ID, PLATFORM_FPSO_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))

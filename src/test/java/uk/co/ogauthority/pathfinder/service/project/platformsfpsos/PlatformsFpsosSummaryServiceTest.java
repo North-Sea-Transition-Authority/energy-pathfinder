@@ -32,9 +32,9 @@ public class PlatformsFpsosSummaryServiceTest {
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
-  private final PlatformFpso platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved_manualStructure(detail);
+  private final PlatformFpso platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndSubstructuresRemoved_manualStructure(detail);
 
-  private final PlatformFpso platformFpsoWithoutSubstructuresRemoved = PlatformFpsoTestUtil.getPlatformFpso_NoSubstructuresRemoved(detail);
+  private final PlatformFpso platformFpsoWithoutSubstructuresRemoved = PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndNoSubstructuresRemoved(detail);
 
   @Before
   public void setUp() {

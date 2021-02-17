@@ -94,6 +94,7 @@ public class PlatformsFpsosSectionSummaryService implements ProjectSectionSummar
       );
 
       platformFpsoModel.put("platformFpsoDiff", platformFpsoDiffModel);
+      platformFpsoModel.put("fpso", platformFpsoView.isFpso());
       platformFpsoModel.put("areSubstructuresExpectedToBeRemoved",
           Boolean.TRUE.equals(platformFpsoView.getSubstructuresExpectedToBeRemoved()));
 

@@ -12,11 +12,15 @@ import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkFacility;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.FuturePlans;
+import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.PlatformFpsoInfrastructureType;
 import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.SubstructureRemovalPremise;
 
 @Entity
 @Table(name = "platforms_fpsos")
 public class PlatformFpso extends ProjectDetailEntity {
+
+  @Enumerated(EnumType.STRING)
+  private PlatformFpsoInfrastructureType infrastructureType;
 
   @ManyToOne
   @JoinColumn(name = "facility_id")
@@ -71,6 +75,15 @@ public class PlatformFpso extends ProjectDetailEntity {
   public PlatformFpso(ProjectDetail projectDetail, String manualStructureName) {
     this.projectDetail = projectDetail;
     this.manualStructureName = manualStructureName;
+  }
+
+  public PlatformFpsoInfrastructureType getInfrastructureType() {
+    return infrastructureType;
+  }
+
+  public void setInfrastructureType(
+      PlatformFpsoInfrastructureType infrastructureType) {
+    this.infrastructureType = infrastructureType;
   }
 
   public DevUkFacility getStructure() {

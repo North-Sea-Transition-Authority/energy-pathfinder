@@ -14,6 +14,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.PlatformFpsoInfrastructureType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFpsoForm;
@@ -70,16 +71,35 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
   }
 
   private PlatformFpso setCommonFields(PlatformFpso platformFpso, PlatformFpsoForm form) {
-    if (SearchSelectorService.isManualEntry(form.getStructure())) {
-      platformFpso.setManualStructureName(SearchSelectorService.removePrefix(form.getStructure()));
+    var infrastructureType = form.getInfrastructureType();
+    platformFpso.setInfrastructureType(infrastructureType);
+
+    String structure;
+    if (PlatformFpsoInfrastructureType.PLATFORM.equals(infrastructureType)) {
+      structure = form.getPlatformStructure();
+    } else {
+      structure = form.getFpsoStructure();
+    }
+
+    if (SearchSelectorService.isManualEntry(structure)) {
+      platformFpso.setManualStructureName(SearchSelectorService.removePrefix(structure));
       platformFpso.setStructure(null);
-    } else if (form.getStructure() != null) {
-      platformFpso.setStructure(devUkFacilitiesService.getOrError(Integer.parseInt(form.getStructure())));
+    } else if (structure != null) {
+      platformFpso.setStructure(devUkFacilitiesService.getOrError(Integer.parseInt(structure)));
       platformFpso.setManualStructureName(null);
     } else {
       platformFpso.setManualStructureName(null);
       platformFpso.setStructure(null);
     }
+
+    if (PlatformFpsoInfrastructureType.FPSO.equals(infrastructureType)) {
+      platformFpso.setFpsoType(form.getFpsoType());
+      platformFpso.setFpsoDimensions(form.getFpsoDimensions());
+    } else {
+      platformFpso.setFpsoType(null);
+      platformFpso.setFpsoDimensions(null);
+    }
+
     platformFpso.setTopsideFpsoMass(form.getTopsideFpsoMass());
     platformFpso.setEarliestRemovalYear(form.getTopsideRemovalYears().getMinYear());
     platformFpso.setLatestRemovalYear(form.getTopsideRemovalYears().getMaxYear());
@@ -95,8 +115,6 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
       platformFpso.setSubStructureRemovalEarliestYear(null);
       platformFpso.setSubStructureRemovalLatestYear(null);
     }
-    platformFpso.setFpsoType(form.getFpsoType());
-    platformFpso.setFpsoDimensions(form.getFpsoDimensions());
     platformFpso.setFuturePlans(form.getFuturePlans());
 
     return platformFpso;
@@ -134,11 +152,24 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
   public PlatformFpsoForm getForm(PlatformFpso platformFpso) {
     var form = new PlatformFpsoForm();
 
+    var infrastructureType = platformFpso.getInfrastructureType();
+    form.setInfrastructureType(infrastructureType);
+
     if (platformFpso.getStructure() != null) {
-      form.setStructure(platformFpso.getStructure().getId().toString());
+      if (PlatformFpsoInfrastructureType.PLATFORM.equals(infrastructureType)) {
+        form.setPlatformStructure(platformFpso.getStructure().getId().toString());
+      } else {
+        form.setFpsoStructure(platformFpso.getStructure().getId().toString());
+      }
     } else if (platformFpso.getManualStructureName() != null) {
-      form.setStructure(SearchSelectorService.getValueWithManualEntryPrefix(platformFpso.getManualStructureName()));
+      if (PlatformFpsoInfrastructureType.PLATFORM.equals(infrastructureType)) {
+        form.setPlatformStructure(SearchSelectorService.getValueWithManualEntryPrefix(platformFpso.getManualStructureName()));
+      } else {
+        form.setFpsoStructure(SearchSelectorService.getValueWithManualEntryPrefix(platformFpso.getManualStructureName()));
+      }
     }
+    form.setFpsoType(platformFpso.getFpsoType());
+    form.setFpsoDimensions(platformFpso.getFpsoDimensions());
     form.setTopsideFpsoMass(platformFpso.getTopsideFpsoMass());
     form.setTopsideRemovalYears(
         new MinMaxDateInput(platformFpso.getEarliestRemovalYear(), platformFpso.getLatestRemovalYear())
@@ -149,8 +180,6 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
     form.setSubstructureRemovalYears(
         new MinMaxDateInput(platformFpso.getSubStructureRemovalEarliestYear(), platformFpso.getSubStructureRemovalLatestYear())
     );
-    form.setFpsoType(platformFpso.getFpsoType());
-    form.setFpsoDimensions(platformFpso.getFpsoDimensions());
     form.setFuturePlans(platformFpso.getFuturePlans());
     return form;
   }
@@ -163,22 +192,32 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
   }
 
   public Map<String, String> getPreselectedStructure(PlatformFpsoForm form) {
-    if (form.getStructure() != null) {
-      return SearchSelectorService.isManualEntry(form.getStructure())
+    var structure = getStructure(form);
+
+    if (structure != null) {
+      return SearchSelectorService.isManualEntry(structure)
           ? searchSelectorService.buildPrePopulatedSelections(
-              Collections.singletonList(form.getStructure()),
-              Map.of(form.getStructure(), form.getStructure())
+              Collections.singletonList(structure),
+              Map.of(structure, structure)
             )
           : searchSelectorService.buildPrePopulatedSelections(
-              Collections.singletonList(form.getStructure()),
+              Collections.singletonList(structure),
               Map.of(
-                form.getStructure(),
-                devUkFacilitiesService.getOrError(Integer.parseInt(form.getStructure())).getFacilityName()
+                  structure,
+                devUkFacilitiesService.getOrError(Integer.parseInt(structure)).getFacilityName()
               )
             );
 
     }
     return Map.of();
+  }
+
+  private String getStructure(PlatformFpsoForm form) {
+    if (PlatformFpsoInfrastructureType.PLATFORM.equals(form.getInfrastructureType())) {
+      return form.getPlatformStructure();
+    } else {
+      return form.getFpsoStructure();
+    }
   }
 
   @Override

@@ -54,7 +54,7 @@ public class PlatformsFpsosServiceTest {
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
-  private final PlatformFpso platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(detail);
+  private final PlatformFpso platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndSubstructuresRemoved(detail);
 
   @Before
   public void setUp() {
@@ -73,8 +73,19 @@ public class PlatformsFpsosServiceTest {
   }
 
   @Test
-  public void createPlatformFpso() {
-    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withSubstructuresToBeRemoved();
+  public void createPlatformFpso_platform() {
+    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatformAndSubstructuresToBeRemoved();
+    when(devUkFacilitiesService.getOrError(any())).thenReturn(PlatformFpsoTestUtil.FACILITY);
+    var platformFpso = platformsFpsosService.createPlatformFpso(detail, form);
+    assertThat(platformFpso.getProjectDetail()).isEqualTo(detail);
+    assertThat(platformFpso.getStructure()).isEqualTo(PlatformFpsoTestUtil.FACILITY);
+    assertThat(platformFpso.getManualStructureName()).isNull();
+    assertCommonFieldsMatch(platformFpso, form);
+  }
+
+  @Test
+  public void createPlatformFpso_fpso() {
+    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpsoAndSubstructuresToBeRemoved();
     when(devUkFacilitiesService.getOrError(any())).thenReturn(PlatformFpsoTestUtil.FACILITY);
     var platformFpso = platformsFpsosService.createPlatformFpso(detail, form);
     assertThat(platformFpso.getProjectDetail()).isEqualTo(detail);
@@ -85,7 +96,7 @@ public class PlatformsFpsosServiceTest {
 
   @Test
   public void createPlatformFpso_noSubStructureExpectedToBeRemoved() {
-    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_noSubstructuresToBeRemoved();
+    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatformAndNoSubstructuresToBeRemoved();
     when(devUkFacilitiesService.getOrError(any())).thenReturn(PlatformFpsoTestUtil.FACILITY);
     var platformFpso = platformsFpsosService.createPlatformFpso(detail, form);
     assertThat(platformFpso.getProjectDetail()).isEqualTo(detail);
@@ -96,29 +107,41 @@ public class PlatformsFpsosServiceTest {
 
   @Test
   public void createPlatformFpso_manualStructure() {
-    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withSubstructuresToBeRemoved_manualStructure();
+    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatformAndSubstructuresToBeRemoved_manualStructure();
     var platformFpso = platformsFpsosService.createPlatformFpso(detail, form);
     assertThat(platformFpso.getProjectDetail()).isEqualTo(detail);
     assertThat(platformFpso.getStructure()).isNull();
-    assertThat(platformFpso.getManualStructureName()).isEqualTo(SearchSelectorService.removePrefix(form.getStructure()));
+    assertThat(platformFpso.getManualStructureName()).isEqualTo(SearchSelectorService.removePrefix(form.getPlatformStructure()));
     assertCommonFieldsMatch(platformFpso, form);
   }
 
   @Test
   public void createPlatformFpso_noSubStructureExpectedToBeRemoved_manualStructure() {
-    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_noSubstructuresToBeRemoved_manualStructure();
+    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatformAndNoSubstructuresToBeRemoved_manualStructure();
     var platformFpso = platformsFpsosService.createPlatformFpso(detail, form);
     assertThat(platformFpso.getProjectDetail()).isEqualTo(detail);
     assertThat(platformFpso.getStructure()).isNull();
-    assertThat(platformFpso.getManualStructureName()).isEqualTo(SearchSelectorService.removePrefix(form.getStructure()));
+    assertThat(platformFpso.getManualStructureName()).isEqualTo(SearchSelectorService.removePrefix(form.getPlatformStructure()));
     assertCommonFieldsMatch(platformFpso, form);
   }
 
   @Test
-  public void updatePlatformFpso() {
+  public void updatePlatformFpso_platform() {
     var newStructure = "new structure";
-    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withSubstructuresToBeRemoved();
-    form.setStructure(SearchSelectorService.getValueWithManualEntryPrefix(newStructure));
+    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatformAndSubstructuresToBeRemoved();
+    form.setPlatformStructure(SearchSelectorService.getValueWithManualEntryPrefix(newStructure));
+    var existingPlatformFpso = platformFpso;
+    platformsFpsosService.updatePlatformFpso(detail, existingPlatformFpso, form);
+    assertThat(existingPlatformFpso.getManualStructureName()).isEqualTo(newStructure);
+    assertThat(existingPlatformFpso.getStructure()).isNull();
+    assertCommonFieldsMatch(existingPlatformFpso, form);
+  }
+
+  @Test
+  public void updatePlatformFpso_fpso() {
+    var newStructure = "new structure";
+    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpsoAndSubstructuresToBeRemoved();
+    form.setFpsoStructure(SearchSelectorService.getValueWithManualEntryPrefix(newStructure));
     var existingPlatformFpso = platformFpso;
     platformsFpsosService.updatePlatformFpso(detail, existingPlatformFpso, form);
     assertThat(existingPlatformFpso.getManualStructureName()).isEqualTo(newStructure);
@@ -128,7 +151,7 @@ public class PlatformsFpsosServiceTest {
 
   @Test
   public void updatePlatformFpso_removeSubstructures() {
-    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_noSubstructuresToBeRemoved();
+    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatformAndNoSubstructuresToBeRemoved();
     var existingPlatformFpso = platformFpso;
     platformsFpsosService.updatePlatformFpso(detail, existingPlatformFpso, form);
     assertCommonFieldsMatch(existingPlatformFpso, form);
@@ -137,8 +160,8 @@ public class PlatformsFpsosServiceTest {
   @Test
   public void getPlatformsFpsosByProjectDetail_whenPlatformsFpsos_thenReturnPopulatedList() {
     var platformsFpsos = List.of(
-        PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(detail),
-        PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved_manualStructure(detail)
+        PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndSubstructuresRemoved(detail),
+        PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndSubstructuresRemoved_manualStructure(detail)
     );
 
     when(platformFpsoRepository.findAllByProjectDetailOrderByIdAsc(detail)).thenReturn(platformsFpsos);
@@ -158,8 +181,8 @@ public class PlatformsFpsosServiceTest {
     var project = detail.getProject();
     var version = detail.getVersion();
     var platformsFpsos = List.of(
-        PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved(detail),
-        PlatformFpsoTestUtil.getPlatformFpso_withSubstructuresRemoved_manualStructure(detail)
+        PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndSubstructuresRemoved(detail),
+        PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndSubstructuresRemoved_manualStructure(detail)
     );
 
     when(platformFpsoRepository.findAllByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
@@ -180,20 +203,46 @@ public class PlatformsFpsosServiceTest {
   }
 
   @Test
-  public void getForm() {
+  public void getForm_platform() {
+    var platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndSubstructuresRemoved(detail);
     var form = platformsFpsosService.getForm(platformFpso);
-    assertThat(form.getStructure()).isEqualTo(platformFpso.getStructure().getId().toString());
+    assertThat(form.getPlatformStructure()).isEqualTo(platformFpso.getStructure().getId().toString());
+    assertThat(form.getFpsoStructure()).isNull();
     assertCommonFormFieldsMatch(form, platformFpso);
   }
 
   @Test
-  public void getForm_manualEntry() {
+  public void getForm_platformAndManualEntry() {
+    var platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndSubstructuresRemoved(detail);
     var newStructure = "new structure";
     var existingPlatformFpso = platformFpso;
     existingPlatformFpso.setManualStructureName(newStructure);
     existingPlatformFpso.setStructure(null);
     var form = platformsFpsosService.getForm(existingPlatformFpso);
-    assertThat(form.getStructure()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(existingPlatformFpso.getManualStructureName()));
+    assertThat(form.getPlatformStructure()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(existingPlatformFpso.getManualStructureName()));
+    assertThat(form.getFpsoStructure()).isNull();
+    assertCommonFormFieldsMatch(form, existingPlatformFpso);
+  }
+
+  @Test
+  public void getForm_fpso() {
+    var platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withFpsoAndSubstructuresRemoved(detail);
+    var form = platformsFpsosService.getForm(platformFpso);
+    assertThat(form.getPlatformStructure()).isNull();
+    assertThat(form.getFpsoStructure()).isEqualTo(platformFpso.getStructure().getId().toString());
+    assertCommonFormFieldsMatch(form, platformFpso);
+  }
+
+  @Test
+  public void getForm_fpsoAndManualEntry() {
+    var platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withFpsoAndSubstructuresRemoved(detail);
+    var newStructure = "new structure";
+    var existingPlatformFpso = platformFpso;
+    existingPlatformFpso.setManualStructureName(newStructure);
+    existingPlatformFpso.setStructure(null);
+    var form = platformsFpsosService.getForm(existingPlatformFpso);
+    assertThat(form.getPlatformStructure()).isNull();
+    assertThat(form.getFpsoStructure()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(existingPlatformFpso.getManualStructureName()));
     assertCommonFormFieldsMatch(form, existingPlatformFpso);
   }
 
@@ -226,6 +275,8 @@ public class PlatformsFpsosServiceTest {
   }
 
   private void assertCommonFieldsMatch(PlatformFpso platformFpso, PlatformFpsoForm form) {
+    assertThat(platformFpso.getFpsoType()).isEqualTo(form.getFpsoType());
+    assertThat(platformFpso.getFpsoDimensions()).isEqualTo(form.getFpsoDimensions());
     assertThat(platformFpso.getTopsideFpsoMass()).isEqualTo(form.getTopsideFpsoMass());
     assertThat(platformFpso.getEarliestRemovalYear()).isEqualTo(form.getTopsideRemovalYears().getMinYear());
     assertThat(platformFpso.getLatestRemovalYear()).isEqualTo(form.getTopsideRemovalYears().getMaxYear());
@@ -242,12 +293,12 @@ public class PlatformsFpsosServiceTest {
       assertThat(platformFpso.getSubStructureRemovalEarliestYear()).isNull();
       assertThat(platformFpso.getSubStructureRemovalLatestYear()).isNull();
     }
-    assertThat(platformFpso.getFpsoType()).isEqualTo(form.getFpsoType());
-    assertThat(platformFpso.getFpsoDimensions()).isEqualTo(form.getFpsoDimensions());
     assertThat(platformFpso.getFuturePlans()).isEqualTo(form.getFuturePlans());
   }
 
   private void assertCommonFormFieldsMatch(PlatformFpsoForm form, PlatformFpso platformFpso) {
+    assertThat(form.getFpsoType()).isEqualTo(platformFpso.getFpsoType());
+    assertThat(form.getFpsoDimensions()).isEqualTo(platformFpso.getFpsoDimensions());
     assertThat(form.getTopsideFpsoMass()).isEqualTo(platformFpso.getTopsideFpsoMass());
     assertThat(form.getTopsideRemovalYears().getMinYear()).isEqualTo(platformFpso.getEarliestRemovalYear());
     assertThat(form.getTopsideRemovalYears().getMaxYear()).isEqualTo(platformFpso.getLatestRemovalYear());
@@ -256,8 +307,6 @@ public class PlatformsFpsosServiceTest {
     assertThat(form.getSubstructureRemovalMass()).isEqualTo(platformFpso.getSubstructureRemovalMass());
     assertThat(form.getSubstructureRemovalYears().getMinYear()).isEqualTo(platformFpso.getSubStructureRemovalEarliestYear());
     assertThat(form.getSubstructureRemovalYears().getMaxYear()).isEqualTo(platformFpso.getSubStructureRemovalLatestYear());
-    assertThat(form.getFpsoType()).isEqualTo(platformFpso.getFpsoType());
-    assertThat(form.getFpsoDimensions()).isEqualTo(platformFpso.getFpsoDimensions());
     assertThat(form.getFuturePlans()).isEqualTo(platformFpso.getFuturePlans());
   }
 
@@ -286,7 +335,7 @@ public class PlatformsFpsosServiceTest {
     final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
     final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
 
-    final var platformsFpsos = List.of(PlatformFpsoTestUtil.getPlatformFpso_NoSubstructuresRemoved(fromProjectDetail));
+    final var platformsFpsos = List.of(PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndNoSubstructuresRemoved(fromProjectDetail));
     when(platformFpsoRepository.findAllByProjectDetailOrderByIdAsc(fromProjectDetail)).thenReturn(platformsFpsos);
 
     platformsFpsosService.copySectionData(fromProjectDetail, toProjectDetail);
