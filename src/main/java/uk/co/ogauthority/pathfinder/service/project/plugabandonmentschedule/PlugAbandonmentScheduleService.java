@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.plugabandonmentschedule.PlugAbandonmentScheduleController;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedule.PlugAbandonmentSchedule;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -150,6 +151,10 @@ public class PlugAbandonmentScheduleService implements ProjectFormSectionService
 
   public List<PlugAbandonmentSchedule> getPlugAbandonmentSchedulesForProjectDetail(ProjectDetail projectDetail) {
     return plugAbandonmentScheduleRepository.findByProjectDetailOrderByIdAsc(projectDetail);
+  }
+
+  public List<PlugAbandonmentSchedule> getPlugAbandonmentSchedulesByProjectAndVersion(Project project, Integer version) {
+    return plugAbandonmentScheduleRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version);
   }
 
   @Override

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
@@ -252,6 +253,32 @@ public class PlugAbandonmentScheduleServiceTest {
     final var result = plugAbandonmentScheduleService.getPlugAbandonmentSchedulesForProjectDetail(detail);
 
     assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void getPlugAbandonmentSchedulesByProjectAndVersion_whenResults_thenReturnPopulatedList() {
+    var project = detail.getProject();
+    var version = detail.getVersion();
+    var plugAbandonmentSchedules = List.of(
+        PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(),
+        PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule()
+    );
+
+    when(plugAbandonmentScheduleRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
+        .thenReturn(plugAbandonmentSchedules);
+
+    assertThat(plugAbandonmentScheduleService.getPlugAbandonmentSchedulesByProjectAndVersion(project, version)).isEqualTo(plugAbandonmentSchedules);
+  }
+
+  @Test
+  public void getPlugAbandonmentSchedulesByProjectAndVersion_whenNoResults_thenReturnEmptyList() {
+    var project = detail.getProject();
+    var version = detail.getVersion();
+
+    when(plugAbandonmentScheduleRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
+        .thenReturn(Collections.emptyList());
+
+    assertThat(plugAbandonmentScheduleService.getPlugAbandonmentSchedulesByProjectAndVersion(project, version)).isEmpty();
   }
 
   @Test
