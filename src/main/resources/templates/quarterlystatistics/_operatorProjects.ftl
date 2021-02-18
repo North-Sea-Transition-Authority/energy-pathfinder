@@ -87,7 +87,7 @@
       </tbody>
     </table>
     <@fdsInsetText.insetText insetTextClass="operator-projects__inset operator-projects__inset--hide">
-      <p class="govuk-body">All published projects for this operators have been updated in the current quarter</p>
+      <p class="govuk-body">All published projects for this operator have been updated in the current quarter</p>
     </@fdsInsetText.insetText>
   </div>
 </#macro>
