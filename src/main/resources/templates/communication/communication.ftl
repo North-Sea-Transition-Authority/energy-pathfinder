@@ -1,6 +1,14 @@
 <#include '../layout.ftl'>
 
-<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle topNavigation=true twoThirdsColumn=true breadcrumbs=true>
+<@defaultPage
+  htmlTitle=pageTitle
+  pageHeading=pageTitle
+  topNavigation=true
+  twoThirdsColumn=true
+  breadcrumbs=false
+  backLink=true
+  backLinkUrl=springUrl(cancelUrl)
+>
   <#if errorList?has_content>
     <@fdsError.errorSummary errorItems=errorList />
   </#if>
@@ -18,7 +26,7 @@
       hintText="Enter the body of the email without a greeting or signature. This will be automatically added before sending the email."
     />
     <@fdsAction.submitButtons
-      primaryButtonText="Next"
+      primaryButtonText="Continue"
       linkSecondaryAction=true
       secondaryLinkText="Cancel"
       linkSecondaryActionUrl=springUrl(cancelUrl)

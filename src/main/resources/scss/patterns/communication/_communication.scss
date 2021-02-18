@@ -1,6 +1,7 @@
 .communication-summary {
 
-  $border-colour: #bfc1c3;
+  $border-colour: govuk-colour("mid-grey");
+  $padding: govuk-spacing(4);
 
   &__body {
     border: 1px solid $border-colour;
@@ -11,18 +12,18 @@
   }
 
   &__key {
-    color: #6f777b;
+    color: govuk-colour("dark-grey");
     font-weight: 400;
-    padding: 1rem;
+    padding: $padding;
     text-align: left;
   }
 
   &__value {
-    padding: 1rem;
+    padding: $padding;
   }
 
   &__placeholder {
-    background: #fd0;
+    background: govuk-colour("yellow");
   }
 
   &__recipient-list .govuk-details {

@@ -7,7 +7,6 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
-import uk.co.ogauthority.pathfinder.controller.communication.CommunicationJourneyController;
 import uk.co.ogauthority.pathfinder.controller.communication.CommunicationSummaryController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
@@ -160,39 +159,6 @@ public class BreadcrumbService {
     breadcrumbs.put(
         ReverseRouter.route(on(CommunicationSummaryController.class).getCommunicationsSummary(null)),
         CommunicationModelService.COMMUNICATIONS_SUMMARY_PAGE_TITLE);
-    return breadcrumbs;
-  }
-
-  public void fromCommunicationEmailContent(Integer communicationId, ModelAndView modelAndView, String thisPage) {
-    addAttrs(modelAndView, emailContent(communicationId), thisPage);
-  }
-
-  private Map<String, String> emailContent(Integer communicationId) {
-    Map<String, String> breadcrumbs = communicationsSummary();
-    breadcrumbs.put(
-        ReverseRouter.route(on(CommunicationJourneyController.class).getCommunicationContent(
-            communicationId,
-            null,
-            null
-        )),
-        CommunicationModelService.COMMUNICATION_CONTENT_PAGE_TITLE);
-    return breadcrumbs;
-  }
-
-  public void fromCommunicationOrganisationGroupSelect(Integer communicationId, ModelAndView modelAndView, String thisPage) {
-    addAttrs(modelAndView, organisationGroupSelect(communicationId), thisPage);
-  }
-
-  private Map<String, String> organisationGroupSelect(Integer communicationId) {
-    Map<String, String> breadcrumbs = emailContent(communicationId);
-    breadcrumbs.put(
-        ReverseRouter.route(on(CommunicationJourneyController.class).getOperatorSelectForCommunication(
-            communicationId,
-            null,
-            null
-        )),
-        CommunicationModelService.OPERATOR_BREADCRUMB_TITLE
-    );
     return breadcrumbs;
   }
 

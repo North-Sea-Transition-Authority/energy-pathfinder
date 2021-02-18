@@ -75,14 +75,13 @@ public class CommunicationJourneyService {
   private boolean hasPermittedCommunicationStatus(Communication communication,
                                                   CommunicationJourneyStage communicationJourneyStage) {
     final var permittedStatuses = communicationJourneyStage.getPermittedCommunicationStatuses();
-    return permittedStatuses.isEmpty() || (communication.getStatus() != null
-        && permittedStatuses.contains(communication.getStatus()));
+    return communication.getStatus() != null && permittedStatuses.contains(communication.getStatus());
   }
 
   private boolean hasPermittedJourneyStatus(Communication communication,
                                             CommunicationJourneyStage communicationJourneyStage) {
     final var permittedJourneyStages = communicationJourneyStage.getPermittedCommunicationJourneyStatuses();
-    return permittedJourneyStages.isEmpty() || (communication.getLatestCommunicationJourneyStatus() != null
-        && permittedJourneyStages.contains(communication.getLatestCommunicationJourneyStatus()));
+    return communication.getLatestCommunicationJourneyStatus() != null
+        && permittedJourneyStages.contains(communication.getLatestCommunicationJourneyStatus());
   }
 }
