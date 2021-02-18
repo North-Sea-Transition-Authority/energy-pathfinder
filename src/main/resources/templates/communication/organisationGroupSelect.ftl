@@ -1,6 +1,14 @@
 <#include '../layout.ftl'>
 
-<@defaultPage htmlTitle=pageTitle pageHeading="" topNavigation=true twoThirdsColumn=true breadcrumbs=true>
+<@defaultPage
+  htmlTitle=pageTitle
+  pageHeading=""
+  topNavigation=true
+  twoThirdsColumn=true
+  breadcrumbs=false
+  backLink=true
+  backLinkUrl=springUrl(previousUrl)
+>
   <#if errorList?has_content>
     <@fdsError.errorSummary errorItems=errorList />
   </#if>
@@ -25,9 +33,9 @@
       </@fdsFieldset.fieldset>
     </div>
     <@fdsAction.submitButtons
-      primaryButtonText="Next"
+      primaryButtonText="Continue"
       linkSecondaryAction=true
-      secondaryLinkText="Previous"
+      secondaryLinkText="Cancel"
       linkSecondaryActionUrl=springUrl(previousUrl)
     />
   </@fdsForm.htmlForm>

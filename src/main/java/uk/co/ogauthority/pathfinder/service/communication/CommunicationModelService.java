@@ -56,16 +56,13 @@ public class CommunicationModelService {
   }
 
   public ModelAndView getCommunicationContentModelAndView(CommunicationForm communicationForm) {
-    var modelAndView = new ModelAndView("communication/communication")
+    return new ModelAndView("communication/communication")
         .addObject("pageTitle", CommunicationModelService.COMMUNICATION_CONTENT_PAGE_TITLE)
         .addObject("recipientTypes", RecipientType.getAllAsMap())
         .addObject("form", communicationForm)
         .addObject("cancelUrl",
             ReverseRouter.route(on(CommunicationSummaryController.class).getCommunicationsSummary(null))
         );
-
-    breadcrumbService.fromCommunicationsSummary(modelAndView, CommunicationModelService.COMMUNICATION_CONTENT_PAGE_TITLE);
-    return modelAndView;
   }
 
   public ModelAndView getOperatorSelectForCommunication(Communication communication,
@@ -85,7 +82,7 @@ public class CommunicationModelService {
             )
         );
 
-    var modelAndView = new ModelAndView("communication/organisationGroupSelect")
+    return new ModelAndView("communication/organisationGroupSelect")
         .addObject("pageTitle", CommunicationModelService.OPERATOR_SELECT_PAGE_TITLE)
         .addObject("previousUrl",
             ReverseRouter.route(on(CommunicationJourneyController.class).getCommunicationContent(
@@ -96,14 +93,6 @@ public class CommunicationModelService {
         )
         .addObject("organisationGroups", organisationGroupMap)
         .addObject("form", form);
-
-    breadcrumbService.fromCommunicationEmailContent(
-        communication.getId(),
-        modelAndView,
-        CommunicationModelService.OPERATOR_BREADCRUMB_TITLE
-    );
-
-    return modelAndView;
   }
 
   public ModelAndView getCommunicationConfirmation(Communication communication) {
@@ -114,30 +103,20 @@ public class CommunicationModelService {
         .addObject("pageTitle", CommunicationModelService.COMMUNICATION_CONFIRM_PAGE_TITLE)
         .addObject("communicationView", communicationViewService.getCommunicationView(communication));
 
-    var previousUrl = ReverseRouter.route(on(CommunicationJourneyController.class).getCommunicationContent(
-        communicationId,
-        null,
-        null
-    ));
+    var previousUrl = "";
 
     if (communication.getRecipientType().equals(RecipientType.OPERATORS)) {
-      breadcrumbService.fromCommunicationOrganisationGroupSelect(
-          communicationId,
-          modelAndView,
-          CommunicationModelService.COMMUNICATION_CONFIRM_PAGE_TITLE
-      );
-
       previousUrl = ReverseRouter.route(on(CommunicationJourneyController.class).getOperatorSelectForCommunication(
           communicationId,
           null,
           null
       ));
     } else {
-      breadcrumbService.fromCommunicationEmailContent(
+      previousUrl = ReverseRouter.route(on(CommunicationJourneyController.class).getCommunicationContent(
           communicationId,
-          modelAndView,
-          CommunicationModelService.COMMUNICATION_CONFIRM_PAGE_TITLE
-      );
+          null,
+          null
+      ));
     }
 
     modelAndView.addObject("previousUrl", previousUrl);

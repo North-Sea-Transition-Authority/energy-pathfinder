@@ -55,6 +55,10 @@ public class PlatformFpsoView extends ProjectSummaryItem {
     this.fpso = fpso;
   }
 
+  public Boolean getFpso() {
+    return isFpso();
+  }
+
   public String getInfrastructureType() {
     return infrastructureType;
   }

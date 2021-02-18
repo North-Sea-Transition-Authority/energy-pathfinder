@@ -6,5 +6,5 @@
   <@fdsAction.link
     linkText="Back to communications"
     linkUrl=springUrl(communicationsUrl)
-    linkClass="govuk-link--button"/>
+    linkClass="govuk-link govuk-link--button"/>
 </@defaultPage>
