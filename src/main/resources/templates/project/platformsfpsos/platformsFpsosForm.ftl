@@ -18,7 +18,7 @@
           selectorMinInputLength=3
           labelText="Which platform is being decommissioned?"
           restUrl=springUrl(facilitiesUrl)
-          preselectedItems=preselectedStructure!{}
+          preselectedItems=preselectedPlatformStructure!{}
           nestingPath="form.infrastructureType"
         />
       </@fdsRadio.radioItem>
@@ -28,7 +28,7 @@
           selectorMinInputLength=3
           labelText="Which FPSO is being decommissioned?"
           restUrl=springUrl(facilitiesUrl)
-          preselectedItems=preselectedStructure!{}
+          preselectedItems=preselectedFpsoStructure!{}
           nestingPath="form.infrastructureType"
         />
         <@fdsTextInput.textInput
