@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.testutil;
 
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
+import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
@@ -13,6 +14,7 @@ public class ProjectInformationUtil {
   public static final String PROJECT_TITLE = "PROJECT TITLE";
   public static final String PROJECT_SUMMARY = "SUMMARY";
   public static final FieldStage FIELD_STAGE = FieldStage.DECOMMISSIONING;
+  public static final EnergyTransitionCategory ENERGY_TRANSITION_CATEGORY = EnergyTransitionCategory.HYDROGEN;
   public static final String CONTACT_NAME = ContactDetailsTestUtil.CONTACT_NAME;
   public static final String PHONE_NUMBER = ContactDetailsTestUtil.PHONE_NUMBER;
   public static final String JOB_TITLE = ContactDetailsTestUtil.JOB_TITLE;
@@ -49,6 +51,7 @@ public class ProjectInformationUtil {
     form.setDiscoveryFirstProductionDate(new QuarterYearInput(null, null));
     form.setDecomWorkStartDate(new QuarterYearInput(Quarter.Q1, "2020"));
     form.setProductionCessationDate(new ThreeFieldDateInput(2020, 1, 1));
+    form.setEnergyTransitionCategory(ENERGY_TRANSITION_CATEGORY);
 
     return form;
   }

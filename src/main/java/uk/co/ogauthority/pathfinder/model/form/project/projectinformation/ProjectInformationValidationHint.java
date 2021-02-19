@@ -59,4 +59,8 @@ public final class ProjectInformationValidationHint {
   private boolean isPartialValidation(ValidationType validationType) {
     return validationType.equals(ValidationType.PARTIAL);
   }
+
+  public ValidationType getValidationType() {
+    return validationType;
+  }
 }

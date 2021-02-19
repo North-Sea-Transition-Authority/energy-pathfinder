@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
+import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
@@ -70,6 +71,7 @@ public class ProjectInformationViewUtilTest {
     assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isNull();
     assertThat(projectInformationView.getDecomWorkStartDate()).isNull();
     assertThat(projectInformationView.getDecomProductionCessationDate()).isNull();
+    assertThat(projectInformationView.getEnergyTransitionCategory()).isNull();
   }
 
   @Test
@@ -95,6 +97,7 @@ public class ProjectInformationViewUtilTest {
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
     assertThat(projectInformationView.getDecomWorkStartDate()).isNull();
     assertThat(projectInformationView.getDecomProductionCessationDate()).isNull();
+    assertThat(projectInformationView.getEnergyTransitionCategory()).isNull();
   }
 
   @Test
@@ -124,6 +127,29 @@ public class ProjectInformationViewUtilTest {
     assertThat(projectInformationView.getDecomProductionCessationDate()).isEqualTo(DateUtil.formatDate(productionCessationDate));
     assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isNull();
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
+    assertThat(projectInformationView.getEnergyTransitionCategory()).isNull();
+  }
+
+  @Test
+  public void from_whenEnergyTransitionFieldStage() {
+
+    final var fieldStage = FieldStage.ENERGY_TRANSITION;
+
+    final var energyTransitionCategory = EnergyTransitionCategory.HYDROGEN;
+
+    projectInformation.setFieldStage(fieldStage);
+    projectInformation.setEnergyTransitionCategory(energyTransitionCategory);
+
+    var projectInformationView = ProjectInformationViewUtil.from(projectInformation);
+
+    assertCommonProperties(projectInformationView, projectInformation);
+    assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
+
+    assertThat(projectInformationView.getEnergyTransitionCategory()).isEqualTo(energyTransitionCategory.getDisplayName());
+    assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
+    assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isNull();
+    assertThat(projectInformationView.getDecomWorkStartDate()).isNull();
+    assertThat(projectInformationView.getDecomProductionCessationDate()).isNull();
   }
 
   @Test
@@ -141,5 +167,6 @@ public class ProjectInformationViewUtilTest {
     assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isNull();
     assertThat(projectInformationView.getDecomWorkStartDate()).isNull();
     assertThat(projectInformationView.getDecomProductionCessationDate()).isNull();
+    assertThat(projectInformationView.getEnergyTransitionCategory()).isNull();
   }
 }

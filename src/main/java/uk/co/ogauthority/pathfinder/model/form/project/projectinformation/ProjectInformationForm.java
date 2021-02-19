@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.model.form.project.projectinformation;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
@@ -30,6 +31,8 @@ public class ProjectInformationForm {
   private QuarterYearInput decomWorkStartDate;
 
   private ThreeFieldDateInput productionCessationDate;
+
+  private EnergyTransitionCategory energyTransitionCategory;
 
   @Valid
   private ContactDetailForm contactDetail;
@@ -89,6 +92,15 @@ public class ProjectInformationForm {
   public void setProductionCessationDate(
       ThreeFieldDateInput productionCessationDate) {
     this.productionCessationDate = productionCessationDate;
+  }
+
+  public EnergyTransitionCategory getEnergyTransitionCategory() {
+    return energyTransitionCategory;
+  }
+
+  public void setEnergyTransitionCategory(
+      EnergyTransitionCategory energyTransitionCategory) {
+    this.energyTransitionCategory = energyTransitionCategory;
   }
 
   public QuarterYearInput getDevelopmentFirstProductionDate() {

@@ -9,6 +9,7 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
+import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
 
@@ -44,6 +45,9 @@ public class ProjectInformation extends ProjectDetailEntity implements ContactDe
   private Integer decomWorkStartDateYear;
 
   private LocalDate productionCessationDate;
+
+  @Enumerated(EnumType.STRING)
+  private EnergyTransitionCategory energyTransitionCategory;
 
   public FieldStage getFieldStage() {
     return fieldStage;
@@ -147,5 +151,14 @@ public class ProjectInformation extends ProjectDetailEntity implements ContactDe
 
   public void setProductionCessationDate(LocalDate productionCessationDate) {
     this.productionCessationDate = productionCessationDate;
+  }
+
+  public EnergyTransitionCategory getEnergyTransitionCategory() {
+    return energyTransitionCategory;
+  }
+
+  public void setEnergyTransitionCategory(
+      EnergyTransitionCategory energyTransitionCategory) {
+    this.energyTransitionCategory = energyTransitionCategory;
   }
 }

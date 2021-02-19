@@ -30,7 +30,8 @@ public class ProjectInformationService implements ProjectFormSectionService {
   private static final Set<FieldStage> FIELD_STAGES_WITH_HIDDEN_INPUTS = Set.of(
       FieldStage.DECOMMISSIONING,
       FieldStage.DEVELOPMENT,
-      FieldStage.DISCOVERY
+      FieldStage.DISCOVERY,
+      FieldStage.ENERGY_TRANSITION
   );
 
   private final ProjectInformationRepository projectInformationRepository;
@@ -94,6 +95,14 @@ public class ProjectInformationService implements ProjectFormSectionService {
 
   private void clearProductionCessationDate(ProjectInformationForm form) {
     form.setProductionCessationDate(null);
+  }
+
+  private void clearEnergyTransitionCategory(ProjectInformation projectInformation) {
+    projectInformation.setEnergyTransitionCategory(null);
+  }
+
+  private void clearEnergyTransitionCategory(ProjectInformationForm form) {
+    form.setEnergyTransitionCategory(null);
   }
 
   public Optional<ProjectInformation> getProjectInformationByProjectAndVersion(Project project, Integer version) {
@@ -160,6 +169,7 @@ public class ProjectInformationService implements ProjectFormSectionService {
       clearFirstProductionDate(projectInformation);
       clearDecomWorkStartDate(projectInformation);
       clearProductionCessationDate(projectInformation);
+      clearEnergyTransitionCategory(projectInformation);
     } else if (fieldStage.equals(FieldStage.DISCOVERY)) {
 
       form.getDiscoveryFirstProductionDate()
@@ -172,6 +182,7 @@ public class ProjectInformationService implements ProjectFormSectionService {
       // These inputs are hidden if discovery field stage
       clearDecomWorkStartDate(projectInformation);
       clearProductionCessationDate(projectInformation);
+      clearEnergyTransitionCategory(projectInformation);
 
     } else if (fieldStage.equals(FieldStage.DEVELOPMENT)) {
       form.getDevelopmentFirstProductionDate()
@@ -184,6 +195,7 @@ public class ProjectInformationService implements ProjectFormSectionService {
       // These inputs are hidden if development field stage
       clearDecomWorkStartDate(projectInformation);
       clearProductionCessationDate(projectInformation);
+      clearEnergyTransitionCategory(projectInformation);
 
     } else if (fieldStage.equals(FieldStage.DECOMMISSIONING)) {
 
@@ -199,7 +211,15 @@ public class ProjectInformationService implements ProjectFormSectionService {
 
       // These inputs are hidden if decommissioning field stage
       clearFirstProductionDate(projectInformation);
+      clearEnergyTransitionCategory(projectInformation);
 
+    } else if (fieldStage.equals(FieldStage.ENERGY_TRANSITION)) {
+      projectInformation.setEnergyTransitionCategory(form.getEnergyTransitionCategory());
+
+      // These inputs are hidden if energy transition field stage
+      clearFirstProductionDate(projectInformation);
+      clearDecomWorkStartDate(projectInformation);
+      clearProductionCessationDate(projectInformation);
     }
   }
 
@@ -211,14 +231,17 @@ public class ProjectInformationService implements ProjectFormSectionService {
       clearFirstProductionDate(form);
       clearDecomWorkStartDate(form);
       clearProductionCessationDate(form);
+      clearEnergyTransitionCategory(form);
     } else if (fieldStage.equals(FieldStage.DISCOVERY)) {
       form.setDiscoveryFirstProductionDate(getFirstProductionDate(projectInformation));
       clearDecomWorkStartDate(form);
       clearProductionCessationDate(form);
+      clearEnergyTransitionCategory(form);
     } else if (fieldStage.equals(FieldStage.DEVELOPMENT)) {
       form.setDevelopmentFirstProductionDate(getFirstProductionDate(projectInformation));
       clearDecomWorkStartDate(form);
       clearProductionCessationDate(form);
+      clearEnergyTransitionCategory(form);
     } else if (fieldStage.equals(FieldStage.DECOMMISSIONING)) {
       var decomWorkStartDate = new QuarterYearInput();
       decomWorkStartDate.setQuarter(projectInformation.getDecomWorkStartDateQuarter());
@@ -228,6 +251,13 @@ public class ProjectInformationService implements ProjectFormSectionService {
       form.setProductionCessationDate(new ThreeFieldDateInput(projectInformation.getProductionCessationDate()));
 
       clearFirstProductionDate(form);
+      clearEnergyTransitionCategory(form);
+    } else if (fieldStage.equals(FieldStage.ENERGY_TRANSITION)) {
+      form.setEnergyTransitionCategory(projectInformation.getEnergyTransitionCategory());
+
+      clearFirstProductionDate(form);
+      clearDecomWorkStartDate(form);
+      clearProductionCessationDate(form);
     }
   }
 

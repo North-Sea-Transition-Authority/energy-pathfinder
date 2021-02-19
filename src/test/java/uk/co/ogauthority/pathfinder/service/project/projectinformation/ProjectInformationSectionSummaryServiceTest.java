@@ -94,7 +94,8 @@ public class ProjectInformationSectionSummaryServiceTest {
         "projectInformationDiffModel",
         "isDevelopmentFieldStage",
         "isDiscoveryFieldStage",
-        "isDecommissioningFieldStage"
+        "isDecommissioningFieldStage",
+        "isEnergyTransitionFieldStage"
     );
 
     assertThat(model).containsEntry("sectionTitle", ProjectInformationSectionSummaryService.PAGE_NAME);

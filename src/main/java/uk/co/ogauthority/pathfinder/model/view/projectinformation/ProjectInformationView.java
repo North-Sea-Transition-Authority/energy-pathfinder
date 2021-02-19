@@ -18,6 +18,8 @@ public class ProjectInformationView {
 
   private String decomProductionCessationDate;
 
+  private String energyTransitionCategory;
+
   private String contactName;
 
   private String contactPhoneNumber;
@@ -80,6 +82,14 @@ public class ProjectInformationView {
 
   public void setDecomProductionCessationDate(String decomProductionCessationDate) {
     this.decomProductionCessationDate = decomProductionCessationDate;
+  }
+
+  public String getEnergyTransitionCategory() {
+    return energyTransitionCategory;
+  }
+
+  public void setEnergyTransitionCategory(String energyTransitionCategory) {
+    this.energyTransitionCategory = energyTransitionCategory;
   }
 
   public String getContactName() {
