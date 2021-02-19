@@ -2,7 +2,11 @@
 
 <#macro dashboardFilters clearFilterUrl filterType="">
   <@fdsSearch.searchFilter>
-    <@fdsSearch.searchFilterList filterButtonItemText="projects" clearFilterUrl=springUrl(clearFilterUrl)>
+    <@fdsSearch.searchFilterList
+      filterButtonItemText="projects"
+      filterButtonClass="govuk-button govuk-button--blue"
+      clearFilterUrl=springUrl(clearFilterUrl)
+    >
       <#if filterType == "REGULATOR">
         <@regulatorFilters/>
       <#else>
