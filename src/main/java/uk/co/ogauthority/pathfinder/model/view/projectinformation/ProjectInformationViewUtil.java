@@ -35,6 +35,8 @@ public class ProjectInformationViewUtil {
         setDiscoveryFields(projectInformationView, projectInformation);
       } else if (fieldStage.equals(FieldStage.DECOMMISSIONING)) {
         setDecommissioningFields(projectInformationView, projectInformation);
+      } else if (fieldStage.equals(FieldStage.ENERGY_TRANSITION)) {
+        setEnergyTransitionFields(projectInformationView, projectInformation);
       }
     }
 
@@ -62,6 +64,16 @@ public class ProjectInformationViewUtil {
 
     final var productionCessationDate = DateUtil.formatDate(projectInformation.getProductionCessationDate());
     projectInformationView.setDecomProductionCessationDate(productionCessationDate);
+  }
+
+  private static void setEnergyTransitionFields(ProjectInformationView projectInformationView,
+                                                ProjectInformation projectInformation) {
+    var energyTransitionCategory = projectInformation.getEnergyTransitionCategory();
+    projectInformationView.setEnergyTransitionCategory(
+        energyTransitionCategory != null
+            ? energyTransitionCategory.getDisplayName()
+            : ""
+    );
   }
 
   private static String getFirstProductionDate(ProjectInformation projectInformation) {

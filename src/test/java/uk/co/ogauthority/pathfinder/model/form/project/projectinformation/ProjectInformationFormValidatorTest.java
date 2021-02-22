@@ -17,6 +17,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
@@ -259,6 +260,52 @@ public class ProjectInformationFormValidatorTest {
         ),
         entry("productionCessationDate.month", Set.of("")),
         entry("productionCessationDate.year", Set.of(""))
+    );
+  }
+
+  @Test
+  public void validate_whenEnergyTransitionFieldStageAndEmptyHiddenQuestionsWithPartialValidation_thenValid() {
+    var form = ProjectInformationUtil.getCompleteForm();
+    form.setFieldStage(FieldStage.ENERGY_TRANSITION);
+    form.setEnergyTransitionCategory(null);
+
+    var errors = getErrors(form, ValidationType.PARTIAL);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+
+    assertThat(fieldErrors).isEmpty();
+  }
+
+  @Test
+  public void validate_whenEnergyTransitionFieldStageAndValidHiddenQuestionsWithFullValidation_thenValid() {
+    var form = ProjectInformationUtil.getCompleteForm();
+    form.setFieldStage(FieldStage.ENERGY_TRANSITION);
+    form.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
+
+    var errors = getErrors(form, ValidationType.FULL);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+
+    assertThat(fieldErrors).isEmpty();
+  }
+
+  @Test
+  public void validate_whenEnergyTransitionFieldStageAndEmptyHiddenQuestionsWithFullValidation_thenInvalid() {
+    var form = ProjectInformationUtil.getCompleteForm();
+    form.setFieldStage(FieldStage.ENERGY_TRANSITION);
+    form.setEnergyTransitionCategory(null);
+
+    var errors = getErrors(form, ValidationType.FULL);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).containsExactly(
+        entry("energyTransitionCategory", Set.of("energyTransitionCategory.invalid"))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("energyTransitionCategory", Set.of(ProjectInformationFormValidator.MISSING_ENERGY_TRANSITION_CATEGORY_ERROR))
     );
   }
 

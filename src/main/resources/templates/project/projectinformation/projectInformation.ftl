@@ -49,7 +49,14 @@
           optionalLabel=true
         />
       </@fdsRadio.radioItem>
-      <@fdsRadio.radioItem path="form.fieldStage" itemMap=energyTransitionFieldStage itemHintText=energyTransitionFieldStageDescription/>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=energyTransitionFieldStage itemHintText=energyTransitionFieldStageDescription>
+        <@fdsRadio.radio
+          path="form.energyTransitionCategory"
+          labelText="Energy transition category"
+          radioItems=energyTransitionCategories
+          nestingPath="form.fieldStage"
+        />
+      </@fdsRadio.radioItem>
     </@fdsRadio.radioGroup>
 
     <@contactDetails.standardContactDetails path="form.contactDetail"/>

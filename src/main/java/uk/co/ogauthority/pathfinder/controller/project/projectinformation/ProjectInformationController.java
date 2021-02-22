@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
@@ -89,6 +90,7 @@ public class ProjectInformationController extends ProjectFormPageController {
         .addObject("decommissioningFieldStageDescription", FieldStage.DECOMMISSIONING.getDescription())
         .addObject("energyTransitionFieldStage", FieldStage.getEntryAsMap(FieldStage.ENERGY_TRANSITION))
         .addObject("energyTransitionFieldStageDescription", FieldStage.ENERGY_TRANSITION.getDescription())
+        .addObject("energyTransitionCategories", EnergyTransitionCategory.getAllAsMap())
         .addObject("quarters", Quarter.getAllAsMap());
 
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);

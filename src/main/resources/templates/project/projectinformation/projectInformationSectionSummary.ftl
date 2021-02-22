@@ -36,6 +36,12 @@
         diffedField=projectInformationDiffModel.ProjectInformationView_decomProductionCessationDate
       />
     </#if>
+    <#if isEnergyTransitionFieldStage>
+      <@checkAnswers.diffedCheckAnswersRowNoActions
+        prompt="Energy transition category"
+        diffedField=projectInformationDiffModel.ProjectInformationView_energyTransitionCategory
+      />
+    </#if>
     <@checkAnswers.diffedCheckAnswersRowNoActions
       prompt="Name"
       diffedField=projectInformationDiffModel.ProjectInformationView_contactName
