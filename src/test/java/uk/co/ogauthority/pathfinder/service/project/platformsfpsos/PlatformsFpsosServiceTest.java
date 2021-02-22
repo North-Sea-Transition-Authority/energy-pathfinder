@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.project.platformsfpsos;
 
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -14,19 +15,23 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkFacility;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.PlatformFpsoInfrastructureType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFpsoForm;
 import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFpsoFormValidator;
+import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.platformsfpsos.PlatformFpsoRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.testutil.DevUkTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.PlatformFpsoTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -308,6 +313,104 @@ public class PlatformsFpsosServiceTest {
     assertThat(form.getSubstructureRemovalYears().getMinYear()).isEqualTo(platformFpso.getSubStructureRemovalEarliestYear());
     assertThat(form.getSubstructureRemovalYears().getMaxYear()).isEqualTo(platformFpso.getSubStructureRemovalLatestYear());
     assertThat(form.getFuturePlans()).isEqualTo(platformFpso.getFuturePlans());
+  }
+
+  @Test
+  public void getPreselectedPlatformStructure_whenPlatformAndPlatformStructureIsNull_thenEmptyMap() {
+    var form = new PlatformFpsoForm();
+    form.setInfrastructureType(PlatformFpsoInfrastructureType.PLATFORM);
+    form.setPlatformStructure(null);
+
+    var result = platformsFpsosService.getPreselectedPlatformStructure(form);
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void getPreselectedPlatformStructure_whenPlatformAndPlatformStructureIsManualEntry_thenManualEntryResult() {
+    final String manualFormValue = SearchSelectablePrefix.FREE_TEXT_PREFIX + "my manual platform structure";
+    var form = new PlatformFpsoForm();
+    form.setInfrastructureType(PlatformFpsoInfrastructureType.PLATFORM);
+    form.setPlatformStructure(manualFormValue);
+
+    var result = platformsFpsosService.getPreselectedPlatformStructure(form);
+    assertThat(result).containsExactly(
+        entry(manualFormValue, SearchSelectorService.removePrefix(manualFormValue))
+    );
+  }
+
+  @Test
+  public void getPreselectedPlatformStructure_whenPlatformAndPlatformStructureIsFromListEntry_thenFromListResult() {
+    final Integer fromListSelectionId = 1234;
+    final DevUkFacility facility = DevUkTestUtil.getDevUkFacility(fromListSelectionId, "A DevUK facility");
+    var form = new PlatformFpsoForm();
+    form.setInfrastructureType(PlatformFpsoInfrastructureType.PLATFORM);
+    form.setPlatformStructure(String.valueOf(fromListSelectionId));
+
+    when(devUkFacilitiesService.getOrError(fromListSelectionId))
+        .thenReturn(facility);
+
+    var result = platformsFpsosService.getPreselectedPlatformStructure(form);
+    assertThat(result).containsExactly(
+        entry(facility.getSelectionId(), facility.getSelectionText())
+    );
+  }
+
+  @Test
+  public void getPreselectedPlatformStructure_whenNotPlatform_thenEmptyMap() {
+    var form = new PlatformFpsoForm();
+    form.setInfrastructureType(PlatformFpsoInfrastructureType.FPSO);
+
+    var result = platformsFpsosService.getPreselectedPlatformStructure(form);
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void getPreselectedFpsoStructure_whenFpsoAndFpsoStructureIsNull_thenEmptyMap() {
+    var form = new PlatformFpsoForm();
+    form.setInfrastructureType(PlatformFpsoInfrastructureType.FPSO);
+    form.setFpsoStructure(null);
+
+    var result = platformsFpsosService.getPreselectedFpsoStructure(form);
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void getPreselectedFpsoStructure_whenFpsoAndFpsoStructureIsManualEntry_thenManualEntryResult() {
+    final String manualFormValue = SearchSelectablePrefix.FREE_TEXT_PREFIX + "my manual platform structure";
+    var form = new PlatformFpsoForm();
+    form.setInfrastructureType(PlatformFpsoInfrastructureType.FPSO);
+    form.setFpsoStructure(manualFormValue);
+
+    var result = platformsFpsosService.getPreselectedFpsoStructure(form);
+    assertThat(result).containsExactly(
+        entry(manualFormValue, SearchSelectorService.removePrefix(manualFormValue))
+    );
+  }
+
+  @Test
+  public void getPreselectedFpsoStructure_whenFpsoAndFpsoStructureIsFromListEntry_thenFromListResult() {
+    final Integer fromListSelectionId = 1234;
+    final DevUkFacility facility = DevUkTestUtil.getDevUkFacility(fromListSelectionId, "A DevUK facility");
+    var form = new PlatformFpsoForm();
+    form.setInfrastructureType(PlatformFpsoInfrastructureType.FPSO);
+    form.setFpsoStructure(String.valueOf(fromListSelectionId));
+
+    when(devUkFacilitiesService.getOrError(fromListSelectionId))
+        .thenReturn(facility);
+
+    var result = platformsFpsosService.getPreselectedFpsoStructure(form);
+    assertThat(result).containsExactly(
+        entry(facility.getSelectionId(), facility.getSelectionText())
+    );
+  }
+
+  @Test
+  public void getPreselectedPlatformStructure_whenNotFpso_thenEmptyMap() {
+    var form = new PlatformFpsoForm();
+    form.setInfrastructureType(PlatformFpsoInfrastructureType.PLATFORM);
+
+    var result = platformsFpsosService.getPreselectedFpsoStructure(form);
+    assertThat(result).isEmpty();
   }
 
   @Test

@@ -175,7 +175,8 @@ public class PlatformsFpsosController extends ProjectFormPageController {
         )
         .addObject("facilitiesUrl", SearchSelectorService.route(on(DevUkRestController.class).searchFacilitiesWithManualEntry(null)))
         .addObject("mtUnit", MeasurementUnits.METRIC_TONNE)
-        .addObject("preselectedStructure", platformsFpsosService.getPreselectedStructure(form))
+        .addObject("preselectedPlatformStructure", platformsFpsosService.getPreselectedPlatformStructure(form))
+        .addObject("preselectedFpsoStructure", platformsFpsosService.getPreselectedFpsoStructure(form))
         .addObject("substructureRemovalPremiseMap", SubstructureRemovalPremise.getAllAsMap())
         .addObject("futurePlansMap", FuturePlans.getAllAsMap());
     breadcrumbService.fromPlatformsFpsos(projectId, modelAndView, FORM_PAGE_NAME);

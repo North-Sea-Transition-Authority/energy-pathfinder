@@ -191,9 +191,21 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
     return !bindingResult.hasErrors();
   }
 
-  public Map<String, String> getPreselectedStructure(PlatformFpsoForm form) {
-    var structure = getStructure(form);
+  public Map<String, String> getPreselectedPlatformStructure(PlatformFpsoForm form) {
+    if (PlatformFpsoInfrastructureType.PLATFORM.equals(form.getInfrastructureType())) {
+      return getPreselectedStructure(form.getPlatformStructure());
+    }
+    return Map.of();
+  }
 
+  public Map<String, String> getPreselectedFpsoStructure(PlatformFpsoForm form) {
+    if (PlatformFpsoInfrastructureType.FPSO.equals(form.getInfrastructureType())) {
+      return getPreselectedStructure(form.getFpsoStructure());
+    }
+    return Map.of();
+  }
+
+  private Map<String, String> getPreselectedStructure(String structure) {
     if (structure != null) {
       return SearchSelectorService.isManualEntry(structure)
           ? searchSelectorService.buildPrePopulatedSelections(
@@ -204,20 +216,12 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
               Collections.singletonList(structure),
               Map.of(
                   structure,
-                devUkFacilitiesService.getOrError(Integer.parseInt(structure)).getFacilityName()
+                  devUkFacilitiesService.getOrError(Integer.parseInt(structure)).getFacilityName()
               )
             );
 
     }
     return Map.of();
-  }
-
-  private String getStructure(PlatformFpsoForm form) {
-    if (PlatformFpsoInfrastructureType.PLATFORM.equals(form.getInfrastructureType())) {
-      return form.getPlatformStructure();
-    } else {
-      return form.getFpsoStructure();
-    }
   }
 
   @Override
