@@ -14,6 +14,7 @@ public class EmailProperties {
   public static final String DEFAULT_SIGN_OFF_IDENTIFIER = "OGA pathfinder team";
   public static final String DEFAULT_GREETING_TEXT = "Dear";
   public static final String DEFAULT_SIGN_OFF_TEXT = "Kind regards";
+  public static final String DEFAULT_SERVICE_LOGIN_TEXT = "To see more details please log in to the service";
 
   private final NotifyTemplate template;
   private final String recipientIdentifier;
@@ -64,7 +65,9 @@ public class EmailProperties {
 
     // TEST_EMAIL set to "no" by default and only set to "yes" in the TestNotifyServiceImpl
     emailPersonalisation.put("TEST_EMAIL", "no");
+    emailPersonalisation.put("GREETING_TEXT", EmailProperties.DEFAULT_GREETING_TEXT);
     emailPersonalisation.put("RECIPIENT_IDENTIFIER", recipientIdentifier);
+    emailPersonalisation.put("SIGN_OFF_TEXT", EmailProperties.DEFAULT_SIGN_OFF_TEXT);
     emailPersonalisation.put("SIGN_OFF_IDENTIFIER", signOffIdentifier);
 
     return emailPersonalisation;

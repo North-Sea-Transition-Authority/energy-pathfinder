@@ -30,6 +30,7 @@ public class TeamRolesUpdatedEmailProperties extends EmailProperties {
     emailPersonalisation.put("UPDATED_BY_USER_NAME", updatedByUserName);
     emailPersonalisation.put("ROLES_CSV", rolesCsv);
     emailPersonalisation.put("SERVICE_LOGIN_URL", serviceLoginUrl);
+    emailPersonalisation.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
     return emailPersonalisation;
   }
 }

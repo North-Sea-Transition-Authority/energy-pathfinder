@@ -32,8 +32,6 @@ public final class CommunicationEmailProperties extends EmailProperties {
     Map<String, String> emailPersonalisation = super.getEmailPersonalisation();
     emailPersonalisation.put("SUBJECT", subject);
     emailPersonalisation.put("BODY", body);
-    emailPersonalisation.put("GREETING_TEXT", EmailProperties.DEFAULT_GREETING_TEXT);
-    emailPersonalisation.put("SIGN_OFF_TEXT", EmailProperties.DEFAULT_SIGN_OFF_TEXT);
     return emailPersonalisation;
   }
 

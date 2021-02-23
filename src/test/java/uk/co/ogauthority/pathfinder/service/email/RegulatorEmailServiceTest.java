@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.N
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.ProjectUpdateEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
+import uk.co.ogauthority.pathfinder.testutil.EmailPropertyTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -62,14 +63,10 @@ public class RegulatorEmailServiceTest {
     ArgumentCaptor<EmailProperties> emailCaptor = ArgumentCaptor.forClass(EmailProperties.class);
     verify(emailService, times(1)).sendEmail(emailCaptor.capture(), eq(REGULATOR_SHARED_EMAIL));
     ProjectUpdateEmailProperties emailProperties = (ProjectUpdateEmailProperties) emailCaptor.getValue();
-    assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(
-      Map.of("PROJECT_NAME", PROJECT_NAME,
-             "SERVICE_LOGIN_URL", SERVICE_LOGIN_URL,
-             "TEST_EMAIL", "no",
-             "RECIPIENT_IDENTIFIER", EmailProperties.DEFAULT_RECIPIENT_IDENTIFIER,
-             "SIGN_OFF_IDENTIFIER", EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
-          )
-    );
+
+    var expectedEmailProperties = getCommonEmailProperties();
+
+    assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(expectedEmailProperties);
   }
 
   @Test
@@ -80,20 +77,28 @@ public class RegulatorEmailServiceTest {
 
     ArgumentCaptor<EmailProperties> emailCaptor = ArgumentCaptor.forClass(EmailProperties.class);
     verify(emailService, times(1)).sendEmail(emailCaptor.capture(), eq(REGULATOR_SHARED_EMAIL));
+
     NoUpdateNotificationEmailProperties emailProperties = (NoUpdateNotificationEmailProperties) emailCaptor.getValue();
-    assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(
-        Map.of("PROJECT_NAME", PROJECT_NAME,
-            "NO_UPDATE_REASON", noUpdateReason,
-            "SERVICE_LOGIN_URL", SERVICE_LOGIN_URL,
-            "TEST_EMAIL", "no",
-            "RECIPIENT_IDENTIFIER", EmailProperties.DEFAULT_RECIPIENT_IDENTIFIER,
-            "SIGN_OFF_IDENTIFIER", EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
-        )
-    );
+
+    var expectedEmailProperties = getCommonEmailProperties();
+    expectedEmailProperties.put("NO_UPDATE_REASON", noUpdateReason);
+
+    assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(expectedEmailProperties);
   }
 
   @Test
   public void getRegulatorSharedMailboxAddress() {
     assertThat(regulatorEmailService.getRegulatorSharedMailboxAddress()).isEqualTo(REGULATOR_SHARED_EMAIL);
+  }
+
+  private Map<String, String> getCommonEmailProperties() {
+    var commonEmailProperties = EmailPropertyTestUtil.getDefaultEmailPersonalisation(
+        EmailProperties.DEFAULT_RECIPIENT_IDENTIFIER,
+        EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
+    );
+    commonEmailProperties.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
+    commonEmailProperties.put("SERVICE_LOGIN_URL", SERVICE_LOGIN_URL);
+    commonEmailProperties.put("PROJECT_NAME", PROJECT_NAME);
+    return commonEmailProperties;
   }
 }

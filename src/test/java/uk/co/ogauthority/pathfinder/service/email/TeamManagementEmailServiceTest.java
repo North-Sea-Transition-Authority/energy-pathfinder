@@ -6,7 +6,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.email.emailproperties.teammanagement.A
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.teammanagement.RemovedFromTeamEmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.teammanagement.TeamRolesUpdatedEmailProperties;
 import uk.co.ogauthority.pathfinder.model.team.Team;
+import uk.co.ogauthority.pathfinder.testutil.EmailPropertyTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -71,17 +71,18 @@ public class TeamManagementEmailServiceTest {
   }
 
   private void assertAddedToTeamEmailProperties(AddedToTeamEmailProperties emailProperties, String teamName) {
-    assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(
-        Map.of(
-            "TEAM_NAME", teamName,
-            "ADDED_BY_USER_NAME", ACTION_PERFORMED_BY_USER.getFullName(),
-            "ROLES_CSV", ROLES_CSV,
-            "SERVICE_LOGIN_URL", emailLinkService.getWorkAreaUrl(),
-            "TEST_EMAIL", "no",
-            "RECIPIENT_IDENTIFIER", PERSON.getForename(),
-            "SIGN_OFF_IDENTIFIER", EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
-        )
+
+    var expectedEmailProperties = EmailPropertyTestUtil.getDefaultEmailPersonalisation(
+        PERSON.getForename(),
+        EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
     );
+    expectedEmailProperties.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
+    expectedEmailProperties.put("TEAM_NAME", teamName);
+    expectedEmailProperties.put("ADDED_BY_USER_NAME", ACTION_PERFORMED_BY_USER.getFullName());
+    expectedEmailProperties.put("ROLES_CSV", ROLES_CSV);
+    expectedEmailProperties.put("SERVICE_LOGIN_URL", emailLinkService.getWorkAreaUrl());
+
+    assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(expectedEmailProperties);
   }
 
   @Test
@@ -105,17 +106,18 @@ public class TeamManagementEmailServiceTest {
   }
 
   private void assertTeamRolesUpdatedEmailProperties(TeamRolesUpdatedEmailProperties emailProperties, String teamName) {
-    assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(
-        Map.of(
-            "TEAM_NAME", teamName,
-            "UPDATED_BY_USER_NAME", ACTION_PERFORMED_BY_USER.getFullName(),
-            "ROLES_CSV", ROLES_CSV,
-            "SERVICE_LOGIN_URL", emailLinkService.getWorkAreaUrl(),
-            "TEST_EMAIL", "no",
-            "RECIPIENT_IDENTIFIER", PERSON.getForename(),
-            "SIGN_OFF_IDENTIFIER", EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
-        )
+
+    var expectedEmailProperties = EmailPropertyTestUtil.getDefaultEmailPersonalisation(
+        PERSON.getForename(),
+        EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
     );
+    expectedEmailProperties.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
+    expectedEmailProperties.put("TEAM_NAME", teamName);
+    expectedEmailProperties.put("UPDATED_BY_USER_NAME", ACTION_PERFORMED_BY_USER.getFullName());
+    expectedEmailProperties.put("ROLES_CSV", ROLES_CSV);
+    expectedEmailProperties.put("SERVICE_LOGIN_URL", emailLinkService.getWorkAreaUrl());
+
+    assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(expectedEmailProperties);
   }
 
   @Test
@@ -139,14 +141,13 @@ public class TeamManagementEmailServiceTest {
   }
 
   private void assertRemovedFromTeamEmailProperties(RemovedFromTeamEmailProperties emailProperties, String teamName) {
-    assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(
-        Map.of(
-            "TEAM_NAME", teamName,
-            "REMOVED_BY_USER_NAME", ACTION_PERFORMED_BY_USER.getFullName(),
-            "TEST_EMAIL", "no",
-            "RECIPIENT_IDENTIFIER", PERSON.getForename(),
-            "SIGN_OFF_IDENTIFIER", EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
-        )
+    var expectedEmailProperties = EmailPropertyTestUtil.getDefaultEmailPersonalisation(
+        PERSON.getForename(),
+        EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
     );
+    expectedEmailProperties.put("TEAM_NAME", teamName);
+    expectedEmailProperties.put("REMOVED_BY_USER_NAME", ACTION_PERFORMED_BY_USER.getFullName());
+
+    assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(expectedEmailProperties);
   }
 }
