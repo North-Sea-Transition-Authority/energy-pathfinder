@@ -42,9 +42,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     http
       .authorizeRequests()
 
-        .mvcMatchers("/actuator/health")
-          .permitAll()
-
         .mvcMatchers("/work-area")
           .hasAnyAuthority(systemAccessService.getWorkAreaGrantedAuthorities())
 
@@ -53,9 +50,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         .mvcMatchers("/start-project", "/project-operator-select")
           .hasAnyAuthority(systemAccessService.getCreateProjectGrantedAuthorities())
-
-        .mvcMatchers("/session-info", "/notify/callback")
-          .permitAll()
 
         .mvcMatchers("/api/**")
           .hasAnyAuthority(systemAccessService.getWorkAreaGrantedAuthorities())
@@ -66,13 +60,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .mvcMatchers("/communications/**")
           .hasAnyAuthority(systemAccessService.getCommunicationsGrantedAuthorities())
 
-        .mvcMatchers("/contact")
+        .mvcMatchers("/actuator/health", "/session-info", "/notify/callback", "/contact", "/subscribe")
           .permitAll()
 
         .anyRequest()
           .authenticated();
 
-    http.csrf().ignoringAntMatchers("/notify/callback");
+    http.csrf().ignoringAntMatchers("/notify/callback", "/subscribe");
 
     try {
       // Redirect to FOX for login if the request is unauthenticated.
