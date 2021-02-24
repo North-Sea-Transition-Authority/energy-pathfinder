@@ -116,43 +116,39 @@ public class PlugAbandonmentWellServiceTest {
   }
 
   @Test
-  public void getWellboreViews() {
+  public void getWellboreViewsFromScheduleSorted() {
     var plugAbandonmentSchedule = new PlugAbandonmentSchedule();
-    var plugAbandonmentSchedule1 = PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(
-        WellboreTestUtil.createWellbore("16/01- 2")
-    );
-    var plugAbandonmentSchedule2 = PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(
-        WellboreTestUtil.createWellbore("16/01- 1")
+
+    when(plugAbandonmentWellRepository.findAllByPlugAbandonmentSchedule(plugAbandonmentSchedule)).thenReturn(
+        PlugAbandonmentWellTestUtil.getUnorderedPlugAbandonmentWells()
     );
 
-    when(plugAbandonmentWellRepository.findAllByPlugAbandonmentSchedule(plugAbandonmentSchedule)).thenReturn(List.of(
-        plugAbandonmentSchedule1,
-        plugAbandonmentSchedule2
-    ));
-
-    var wellboreViews = plugAbandonmentWellService.getWellboreViewsFromSchedule(plugAbandonmentSchedule);
-    assertWellboreViewMatchesWellbore(wellboreViews.get(0), plugAbandonmentSchedule2);
-    assertWellboreViewMatchesWellbore(wellboreViews.get(1), plugAbandonmentSchedule1);
+    var wellboreViews = plugAbandonmentWellService.getWellboreViewsFromScheduleSorted(plugAbandonmentSchedule);
+    var orderedPlugAbandonmentWells = PlugAbandonmentWellTestUtil.getOrderedPlugAbandonmentWells();
+    for (var i = 0; i < wellboreViews.size(); i++) {
+      var wellboreView = wellboreViews.get(i);
+      var plugAbandonmentWell = orderedPlugAbandonmentWells.get(i);
+      assertWellboreViewMatchesWellbore(wellboreView, plugAbandonmentWell.getWellbore());
+    }
   }
 
   @Test
-  public void getWellboreViewsFromForm() {
+  public void getWellboreViewsFromFormSorted() {
     var form = new PlugAbandonmentScheduleForm();
-    var wellboreIds = List.of(1, 2);
+    var wellboreIds = List.of(1, 2, 3);
     form.setWells(wellboreIds);
 
-    var wellbore1 = WellboreTestUtil.createWellbore("16/01- 2");
-    var wellbore2 = WellboreTestUtil.createWellbore("16/01- 1");
+    when(wellboreService.getWellboresByIdsIn(wellboreIds)).thenReturn(
+        WellboreTestUtil.getUnorderedWellbores()
+    );
 
-    when(wellboreService.getWellboresByIdsIn(wellboreIds)).thenReturn(List.of(wellbore1, wellbore2));
-
-    var wellboreViews = plugAbandonmentWellService.getWellboreViewsFromForm(form);
-    assertWellboreViewMatchesWellbore(wellboreViews.get(0), wellbore2);
-    assertWellboreViewMatchesWellbore(wellboreViews.get(1), wellbore1);
-  }
-
-  private void assertWellboreViewMatchesWellbore(WellboreView wellboreView, PlugAbandonmentWell plugAbandonmentWell) {
-    assertWellboreViewMatchesWellbore(wellboreView, plugAbandonmentWell.getWellbore());
+    var wellboreViews = plugAbandonmentWellService.getWellboreViewsFromFormSorted(form);
+    var orderedWellbores = WellboreTestUtil.getOrderedWellbores();
+    for (var i = 0; i < wellboreViews.size(); i++) {
+      var wellboreView = wellboreViews.get(i);
+      var wellbore = orderedWellbores.get(i);
+      assertWellboreViewMatchesWellbore(wellboreView, wellbore);
+    }
   }
 
   private void assertWellboreViewMatchesWellbore(WellboreView wellboreView, Wellbore wellbore) {

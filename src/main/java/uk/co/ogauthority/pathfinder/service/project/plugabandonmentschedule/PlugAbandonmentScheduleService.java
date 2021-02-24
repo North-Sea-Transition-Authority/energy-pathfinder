@@ -192,7 +192,7 @@ public class PlugAbandonmentScheduleService implements ProjectFormSectionService
     return getPlugAbandonmentScheduleModelAndView(
         projectId,
         form,
-        plugAbandonmentWellService.getWellboreViewsFromForm(form)
+        plugAbandonmentWellService.getWellboreViewsFromFormSorted(form)
     );
   }
 
@@ -202,7 +202,7 @@ public class PlugAbandonmentScheduleService implements ProjectFormSectionService
     return getPlugAbandonmentScheduleModelAndView(
         projectId,
         form,
-        plugAbandonmentWellService.getWellboreViewsFromSchedule(plugAbandonmentSchedule)
+        plugAbandonmentWellService.getWellboreViewsFromScheduleSorted(plugAbandonmentSchedule)
     );
   }
 

@@ -29,14 +29,10 @@ public class PlugAbandonmentScheduleViewUtilTest {
     var plugAbandonmentSchedule = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
     plugAbandonmentSchedule.setEarliestStartYear(2019);
     plugAbandonmentSchedule.setLatestCompletionYear(2020);
-    var plugAbandonmentWells = List.of(
-        PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(),
-        PlugAbandonmentWellTestUtil.createPlugAbandonmentWell()
-    );
 
     var plugAbandonmentScheduleView = PlugAbandonmentScheduleViewUtil.from(
         plugAbandonmentSchedule,
-        plugAbandonmentWells,
+        PlugAbandonmentWellTestUtil.getUnorderedPlugAbandonmentWells(),
         DISPLAY_ORDER,
         IS_VALID
     );
@@ -48,7 +44,13 @@ public class PlugAbandonmentScheduleViewUtilTest {
         String.format(PlugAbandonmentScheduleViewUtil.LATEST_COMPLETION_YEAR_TEXT, plugAbandonmentSchedule.getLatestCompletionYear())
     );
 
-    checkCommonFields(plugAbandonmentScheduleView, plugAbandonmentSchedule, plugAbandonmentWells, DISPLAY_ORDER, IS_VALID);
+    checkCommonFields(
+        plugAbandonmentScheduleView,
+        plugAbandonmentSchedule,
+        PlugAbandonmentWellTestUtil.getOrderedPlugAbandonmentWells(),
+        DISPLAY_ORDER,
+        IS_VALID
+    );
   }
 
   @Test
@@ -57,14 +59,10 @@ public class PlugAbandonmentScheduleViewUtilTest {
     var plugAbandonmentSchedule = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
     plugAbandonmentSchedule.setEarliestStartYear(null);
     plugAbandonmentSchedule.setLatestCompletionYear(null);
-    var plugAbandonmentWells = List.of(
-        PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(),
-        PlugAbandonmentWellTestUtil.createPlugAbandonmentWell()
-    );
 
     var plugAbandonmentScheduleView = PlugAbandonmentScheduleViewUtil.from(
         plugAbandonmentSchedule,
-        plugAbandonmentWells,
+        PlugAbandonmentWellTestUtil.getUnorderedPlugAbandonmentWells(),
         DISPLAY_ORDER,
         IS_VALID
     );
@@ -76,51 +74,61 @@ public class PlugAbandonmentScheduleViewUtilTest {
         String.format(PlugAbandonmentScheduleViewUtil.LATEST_COMPLETION_YEAR_TEXT, PlugAbandonmentScheduleViewUtil.DEFAULT_YEAR_TEXT)
     );
 
-    checkCommonFields(plugAbandonmentScheduleView, plugAbandonmentSchedule, plugAbandonmentWells, DISPLAY_ORDER, IS_VALID);
+    checkCommonFields(
+        plugAbandonmentScheduleView,
+        plugAbandonmentSchedule,
+        PlugAbandonmentWellTestUtil.getOrderedPlugAbandonmentWells(),
+        DISPLAY_ORDER,
+        IS_VALID
+    );
   }
 
   @Test
   public void from_whenIsValidTrue_thenIsValidInViewTrue() {
     final var plugAbandonmentSchedule = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
-    final var plugAbandonmentWells = List.of(
-        PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(),
-        PlugAbandonmentWellTestUtil.createPlugAbandonmentWell()
-    );
     final var isValid = IS_VALID;
     final var plugAbandonmentScheduleView = PlugAbandonmentScheduleViewUtil.from(
         plugAbandonmentSchedule,
-        plugAbandonmentWells,
+        PlugAbandonmentWellTestUtil.getUnorderedPlugAbandonmentWells(),
         DISPLAY_ORDER,
         isValid
     );
-    checkCommonFields(plugAbandonmentScheduleView, plugAbandonmentSchedule, plugAbandonmentWells, DISPLAY_ORDER, isValid);
+    checkCommonFields(
+        plugAbandonmentScheduleView,
+        plugAbandonmentSchedule,
+        PlugAbandonmentWellTestUtil.getOrderedPlugAbandonmentWells(),
+        DISPLAY_ORDER,
+        isValid
+    );
   }
 
   @Test
   public void from_whenIsValidFalse_thenIsValidInViewFalse() {
     final var plugAbandonmentSchedule = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
-    final var plugAbandonmentWells = List.of(
-        PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(),
-        PlugAbandonmentWellTestUtil.createPlugAbandonmentWell()
-    );
     final var isValid = false;
     final var plugAbandonmentScheduleView = PlugAbandonmentScheduleViewUtil.from(
         plugAbandonmentSchedule,
-        plugAbandonmentWells,
+        PlugAbandonmentWellTestUtil.getUnorderedPlugAbandonmentWells(),
         DISPLAY_ORDER,
         isValid
     );
-    checkCommonFields(plugAbandonmentScheduleView, plugAbandonmentSchedule, plugAbandonmentWells, DISPLAY_ORDER, isValid);
+    checkCommonFields(
+        plugAbandonmentScheduleView,
+        plugAbandonmentSchedule,
+        PlugAbandonmentWellTestUtil.getOrderedPlugAbandonmentWells(),
+        DISPLAY_ORDER,
+        isValid
+    );
   }
 
   private void checkCommonFields(PlugAbandonmentScheduleView plugAbandonmentScheduleView,
                                  PlugAbandonmentSchedule plugAbandonmentSchedule,
-                                 List<PlugAbandonmentWell> plugAbandonmentWells,
+                                 List<PlugAbandonmentWell> plugAbandonmentWellsInExpectedOrder,
                                  Integer displayOrder,
                                  boolean isValid) {
     assertThat(plugAbandonmentScheduleView.getId()).isEqualTo(plugAbandonmentSchedule.getId());
     assertThat(plugAbandonmentScheduleView.getDisplayOrder()).isEqualTo(displayOrder);
-    assertThat(plugAbandonmentScheduleView.getWells()).isEqualTo(plugAbandonmentWells.stream()
+    assertThat(plugAbandonmentScheduleView.getWells()).isEqualTo(plugAbandonmentWellsInExpectedOrder.stream()
         .map(plugAbandonmentWell -> plugAbandonmentWell.getWellbore().getRegistrationNo())
         .collect(Collectors.toList()));
     assertThat(plugAbandonmentScheduleView.getValid()).isEqualTo(isValid);

@@ -58,23 +58,23 @@ public class PlugAbandonmentWellService {
     return plugAbandonmentWellRepository.findAllByPlugAbandonmentSchedule(plugAbandonmentSchedule);
   }
 
-  public List<WellboreView> getWellboreViewsFromSchedule(PlugAbandonmentSchedule plugAbandonmentSchedule) {
+  public List<WellboreView> getWellboreViewsFromScheduleSorted(PlugAbandonmentSchedule plugAbandonmentSchedule) {
     var wellbores = plugAbandonmentWellRepository.findAllByPlugAbandonmentSchedule(plugAbandonmentSchedule)
         .stream()
         .map(PlugAbandonmentWell::getWellbore)
         .collect(Collectors.toList());
 
-    return getWellboreViews(wellbores);
+    return getWellboreViewsSorted(wellbores);
   }
 
-  public List<WellboreView> getWellboreViewsFromForm(PlugAbandonmentScheduleForm form) {
-    return getWellboreViews(getWellbores(form.getWells()));
+  public List<WellboreView> getWellboreViewsFromFormSorted(PlugAbandonmentScheduleForm form) {
+    return getWellboreViewsSorted(getWellbores(form.getWells()));
   }
 
-  private List<WellboreView> getWellboreViews(List<Wellbore> wellbores) {
+  private List<WellboreView> getWellboreViewsSorted(List<Wellbore> wellbores) {
     return wellbores.stream()
         .map(this::convertToWellboreView)
-        .sorted(Comparator.comparing(WellboreView::getName))
+        .sorted(Comparator.comparing(WellboreView::getSortKey))
         .collect(Collectors.toList());
   }
 
@@ -83,6 +83,6 @@ public class PlugAbandonmentWellService {
   }
 
   private WellboreView convertToWellboreView(Wellbore wellbore) {
-    return new WellboreView(wellbore.getId(), wellbore.getRegistrationNo(), true);
+    return new WellboreView(wellbore, true);
   }
 }

@@ -2,7 +2,9 @@ package uk.co.ogauthority.pathfinder.service.wellbore;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.rest.WellboreRestController;
@@ -25,8 +27,11 @@ public class WellboreService {
   }
 
   public List<RestSearchItem> searchWellboresWithWellRegistrationNoContaining(String searchTerm) {
-    var searchableList = findByWellRegistrationNoContaining(searchTerm);
-    return searchSelectorService.search(searchTerm, searchableList);
+    var searchableList = findByWellRegistrationNoContaining(searchTerm)
+        .stream()
+        .sorted(Comparator.comparing(Wellbore::getSortKey))
+        .collect(Collectors.toList());
+    return searchSelectorService.search(searchTerm, searchableList, false);
   }
 
   private List<Wellbore> findByWellRegistrationNoContaining(String searchTerm) {

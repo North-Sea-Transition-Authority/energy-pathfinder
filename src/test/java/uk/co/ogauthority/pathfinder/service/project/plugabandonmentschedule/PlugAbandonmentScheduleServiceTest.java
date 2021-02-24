@@ -37,7 +37,6 @@ import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentScheduleTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentWellTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.WellboreTestUtil;
-import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PlugAbandonmentScheduleServiceTest {
@@ -337,7 +336,7 @@ public class PlugAbandonmentScheduleServiceTest {
         WellboreTestUtil.createWellboreView()
     );
 
-    when(plugAbandonmentWellService.getWellboreViewsFromForm(form)).thenReturn(wellboreViews);
+    when(plugAbandonmentWellService.getWellboreViewsFromFormSorted(form)).thenReturn(wellboreViews);
     when(wellboreService.getWellboreRestUrl()).thenReturn("testurl");
 
     var modelAndView = plugAbandonmentScheduleService.getPlugAbandonmentScheduleModelAndView(
@@ -370,7 +369,7 @@ public class PlugAbandonmentScheduleServiceTest {
     );
     var plugAbandonmentSchedule = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
 
-    when(plugAbandonmentWellService.getWellboreViewsFromSchedule(plugAbandonmentSchedule)).thenReturn(
+    when(plugAbandonmentWellService.getWellboreViewsFromScheduleSorted(plugAbandonmentSchedule)).thenReturn(
         wellboreViews
     );
     when(wellboreService.getWellboreRestUrl()).thenReturn("testurl");

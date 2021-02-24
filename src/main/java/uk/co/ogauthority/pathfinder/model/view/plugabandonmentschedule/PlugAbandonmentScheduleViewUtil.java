@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.model.view.plugabandonmentschedule;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.controller.project.plugabandonmentschedule.PlugAbandonmentScheduleController;
@@ -52,6 +53,7 @@ public class PlugAbandonmentScheduleViewUtil {
     plugAbandonmentScheduleView.setLatestCompletionYear(String.format(LATEST_COMPLETION_YEAR_TEXT, latestCompletionYear));
 
     plugAbandonmentScheduleView.setWells(plugAbandonmentWells.stream()
+        .sorted(Comparator.comparing(plugAbandonmentWell -> plugAbandonmentWell.getWellbore().getSortKey()))
         .map(plugAbandonmentWell -> plugAbandonmentWell.getWellbore().getRegistrationNo())
         .collect(Collectors.toList()));
 
