@@ -8,7 +8,7 @@
   </#if>
 
   <@fdsInsetText.insetText>
-    Subscribing to the pathfinder newsletter will result in you receiving an email once a month detailing the projects which have been created or updated
+    Subscribers will receive an email once a month showing new or updated Pathfinder projects
   </@fdsInsetText.insetText>
 
   <@fdsForm.htmlForm>
