@@ -67,8 +67,10 @@ public class SubscriptionServiceTest {
   }
 
   @Test
-  public void subscribe_whenNotSubscribed_thenSubscribe() {
+  public void subscribe_whenNotSubscribedAndOtherRelationToPathfinder_thenSubscribe() {
     var form = SubscriptionTestUtil.createSubscribeForm();
+    form.setRelationToPathfinder(RelationToPathfinder.OTHER);
+    form.setSubscribeReason("Subscribe reason");
 
     when(subscriberRepository.existsByEmailAddress(form.getEmailAddress())).thenReturn(false);
 
@@ -84,6 +86,29 @@ public class SubscriptionServiceTest {
     assertThat(subscriber.getEmailAddress()).isEqualTo(form.getEmailAddress());
     assertThat(subscriber.getRelationToPathfinder()).isEqualTo(form.getRelationToPathfinder());
     assertThat(subscriber.getSubscribeReason()).isEqualTo(form.getSubscribeReason());
+    assertThat(subscriber.getSubscribedInstant()).isNotNull();
+  }
+
+  @Test
+  public void subscribe_whenNotSubscribedAndNotOtherRelationToPathfinder_thenSubscribe() {
+    var form = SubscriptionTestUtil.createSubscribeForm();
+    form.setRelationToPathfinder(RelationToPathfinder.SUPPLY_CHAIN);
+    form.setSubscribeReason("Subscribe reason");
+
+    when(subscriberRepository.existsByEmailAddress(form.getEmailAddress())).thenReturn(false);
+
+    subscriptionService.subscribe(form);
+
+    ArgumentCaptor<Subscriber> subscriberCaptor = ArgumentCaptor.forClass(Subscriber.class);
+    verify(subscriberRepository, times(1)).save(subscriberCaptor.capture());
+    var subscriber = subscriberCaptor.getValue();
+
+    assertThat(subscriber.getUuid()).isNotNull();
+    assertThat(subscriber.getForename()).isEqualTo(form.getForename());
+    assertThat(subscriber.getSurname()).isEqualTo(form.getSurname());
+    assertThat(subscriber.getEmailAddress()).isEqualTo(form.getEmailAddress());
+    assertThat(subscriber.getRelationToPathfinder()).isEqualTo(form.getRelationToPathfinder());
+    assertThat(subscriber.getSubscribeReason()).isNull();
     assertThat(subscriber.getSubscribedInstant()).isNotNull();
   }
 

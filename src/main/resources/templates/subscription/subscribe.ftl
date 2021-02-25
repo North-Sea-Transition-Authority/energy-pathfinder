@@ -12,8 +12,8 @@
   </@fdsInsetText.insetText>
 
   <@fdsForm.htmlForm>
-    <@fdsTextInput.textInput path="form.forename" labelText="Forename" />
-    <@fdsTextInput.textInput path="form.surname" labelText="Surname" />
+    <@fdsTextInput.textInput path="form.forename" labelText="First name" />
+    <@fdsTextInput.textInput path="form.surname" labelText="Last name" />
     <@fdsTextInput.textInput path="form.emailAddress" labelText="Email address" />
     <@fdsRadio.radioGroup
       labelText="Relation to Pathfinder"

@@ -3,20 +3,20 @@ package uk.co.ogauthority.pathfinder.model.form.subscription;
 import javax.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.enums.subscription.RelationToPathfinder;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
-import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
+import uk.co.ogauthority.pathfinder.model.form.validation.email.ValidEmail;
 import uk.co.ogauthority.pathfinder.model.form.validation.lengthrestrictedstring.LengthRestrictedString;
 
 public class SubscribeForm {
 
-  @LengthRestrictedString(messagePrefix = "Your forename", groups = {FullValidation.class, PartialValidation.class})
-  @NotNull(message = "Enter your forename", groups = FullValidation.class)
+  @LengthRestrictedString(messagePrefix = "Your first name", groups = {FullValidation.class})
+  @NotNull(message = "Enter your first name", groups = FullValidation.class)
   private String forename;
 
-  @LengthRestrictedString(messagePrefix = "Your forename", groups = {FullValidation.class, PartialValidation.class})
-  @NotNull(message = "Enter your surname", groups = FullValidation.class)
+  @LengthRestrictedString(messagePrefix = "Your last name", groups = {FullValidation.class})
+  @NotNull(message = "Enter your last name", groups = FullValidation.class)
   private String surname;
 
-  @LengthRestrictedString(messagePrefix = "Your email address", groups = {FullValidation.class, PartialValidation.class})
+  @ValidEmail(messagePrefix = "Your email address", groups = {FullValidation.class})
   @NotNull(message = "Enter your email address", groups = FullValidation.class)
   private String emailAddress;
 

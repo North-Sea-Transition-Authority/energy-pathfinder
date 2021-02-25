@@ -50,7 +50,9 @@ public class SubscriptionService {
     subscriber.setSurname(form.getSurname());
     subscriber.setEmailAddress(form.getEmailAddress());
     subscriber.setRelationToPathfinder(form.getRelationToPathfinder());
-    subscriber.setSubscribeReason(form.getSubscribeReason());
+    if (RelationToPathfinder.OTHER.equals(form.getRelationToPathfinder())) {
+      subscriber.setSubscribeReason(form.getSubscribeReason());
+    }
     subscriber.setSubscribedInstant(Instant.now());
     subscriberRepository.save(subscriber);
   }
