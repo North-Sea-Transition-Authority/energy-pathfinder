@@ -15,7 +15,7 @@ public class WellboreTestUtil {
   public static final String BLOCK_SUFFIX = "b";
   public static final String PLATFORM_LETTER = "A";
   public static final String DRILLING_SEQ_NUMBER = "1";
-  public static final String SUFFIX = "";
+  public static final String WELL_SUFFIX = "";
 
   private WellboreTestUtil() {
     throw new IllegalStateException("WellboreTestUtil is a utility class and should not be instantiated");
@@ -57,7 +57,7 @@ public class WellboreTestUtil {
         BLOCK_SUFFIX,
         PLATFORM_LETTER,
         DRILLING_SEQ_NUMBER,
-        SUFFIX
+        WELL_SUFFIX
     );
   }
 
@@ -67,7 +67,7 @@ public class WellboreTestUtil {
                                         String blockSuffix,
                                         String platformLetter,
                                         String drillingSeqNumber,
-                                        String suffix) {
+                                        String wellSuffix) {
     return new Wellbore(
         ID,
         registrationNo,
@@ -76,7 +76,7 @@ public class WellboreTestUtil {
         blockSuffix,
         platformLetter,
         drillingSeqNumber,
-        suffix
+        wellSuffix
     );
   }
 
