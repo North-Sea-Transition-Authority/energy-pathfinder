@@ -8,7 +8,7 @@
   </#if>
 
   <@fdsInsetText.insetText>
-    Subscribers will receive an email once a month showing new or updated Pathfinder projects
+    Subscribers will receive an email once a month showing new or updated ${service.serviceName} projects
   </@fdsInsetText.insetText>
 
   <@fdsForm.htmlForm>
@@ -16,7 +16,7 @@
     <@fdsTextInput.textInput path="form.surname" labelText="Last name" />
     <@fdsTextInput.textInput path="form.emailAddress" labelText="Email address" />
     <@fdsRadio.radioGroup
-      labelText="Relation to Pathfinder"
+      labelText="Relation to ${service.serviceName}"
       path="form.relationToPathfinder"
       hiddenContent=true
     >
