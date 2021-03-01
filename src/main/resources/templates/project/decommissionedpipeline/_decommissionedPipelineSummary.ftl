@@ -1,9 +1,20 @@
 <#include '../../layout.ftl'>
 
-<#macro decommissionedPipelineSummary decommissionedPipelineView showHeader=false showActions=false headingSize="h2" headingClass="govuk-heading-l">
+<#assign idPrefix = "pipeline" />
+<#assign headingPrefix = "Pipeline" />
+<#assign defaultHeadingSize = "h2" />
+<#assign defaultHeadingClass = "govuk-heading-l" />
+
+<#macro decommissionedPipelineSummary
+  decommissionedPipelineView
+  showHeader=false
+  showActions=false
+  headingSize=defaultHeadingSize
+  headingClass=defaultHeadingClass
+>
   <@summaryViewWrapper.summaryViewItemWrapper
-    idPrefix="pipeline"
-    headingPrefix="Pipeline"
+    idPrefix=idPrefix
+    headingPrefix=headingPrefix
     displayOrder=decommissionedPipelineView.displayOrder
     isValid=decommissionedPipelineView.valid!""
     summaryLinkList=decommissionedPipelineView.summaryLinks
@@ -12,14 +23,81 @@
     headingSize=headingSize
     headingClass=headingClass
   >
-    <@checkAnswers.checkAnswersRowNoActions prompt="Pipeline" value=decommissionedPipelineView.pipeline!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Material type" value=decommissionedPipelineView.materialType!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Pipeline status" value=decommissionedPipelineView.status!"" />
-    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Expected decommissioning period">
-      ${decommissionedPipelineView.decommissioningEarliestYear!""}
-      <br/>
-      ${decommissionedPipelineView.decommissioningLatestYear!""}
-    </@checkAnswers.checkAnswersRowNoActionsWithNested>
-    <@checkAnswers.checkAnswersRowNoActions prompt="Removal premise" value=decommissionedPipelineView.removalPremise!"" />
+    <@_decommissionedPipelineSummaryFields
+      useDiffedField=false
+      pipeline=decommissionedPipelineView.pipeline
+      materialType=decommissionedPipelineView.materialType
+      status=decommissionedPipelineView.status
+      decommissioningEarliestYear=decommissionedPipelineView.decommissioningEarliestYear
+      decommissioningLatestYear=decommissionedPipelineView.decommissioningLatestYear
+      removalPremise=decommissionedPipelineView.removalPremise
+    />
   </@summaryViewWrapper.summaryViewItemWrapper>
+</#macro>
+
+<#macro decommissionedPipelineDiffSummary
+  decommissionedPipelineDiff
+  showHeader=false
+  showActions=false
+  headingSize=defaultHeadingSize
+  headingClass=defaultHeadingClass
+>
+  <@summaryViewWrapper.summaryViewItemWrapper
+    idPrefix=idPrefix
+    headingPrefix=headingPrefix
+    displayOrder=decommissionedPipelineDiff.DecommissionedPipelineView_displayOrder.currentValue
+    isValid=true
+    summaryLinkList=[]
+    showHeader=showHeader
+    showActions=showActions
+    headingSize=headingSize
+    headingClass=headingClass
+  >
+    <@_decommissionedPipelineSummaryFields
+      useDiffedField=true
+      pipeline=decommissionedPipelineDiff.DecommissionedPipelineView_pipeline
+      materialType=decommissionedPipelineDiff.DecommissionedPipelineView_materialType
+      status=decommissionedPipelineDiff.DecommissionedPipelineView_status
+      decommissioningEarliestYear=decommissionedPipelineDiff.DecommissionedPipelineView_decommissioningEarliestYear
+      decommissioningLatestYear=decommissionedPipelineDiff.DecommissionedPipelineView_decommissioningLatestYear
+      removalPremise=decommissionedPipelineDiff.DecommissionedPipelineView_removalPremise
+    />
+  </@summaryViewWrapper.summaryViewItemWrapper>
+</#macro>
+
+<#macro _decommissionedPipelineSummaryFields
+  useDiffedField
+  pipeline=""
+  materialType=""
+  status=""
+  decommissioningEarliestYear=""
+  decommissioningLatestYear=""
+  removalPremise=""
+>
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Pipeline"
+    fieldValue=pipeline
+    isDiffedField=useDiffedField
+  />
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Material type"
+    fieldValue=materialType
+    isDiffedField=useDiffedField
+  />
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Pipeline status"
+    fieldValue=status
+    isDiffedField=useDiffedField
+  />
+  <@decomissioningPeriodCheckAnswers.decomissioningPeriodCheckAnswers
+    useDiffedField=useDiffedField
+    prompt="Expected decommissioning period"
+    earliestYear=decommissioningEarliestYear
+    latestYear=decommissioningLatestYear
+  />
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Removal premise"
+    fieldValue=removalPremise
+    isDiffedField=useDiffedField
+  />
 </#macro>

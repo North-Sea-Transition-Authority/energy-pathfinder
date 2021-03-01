@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.decommissionedpipeline.DecommissionedPipeline;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -114,6 +115,10 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
 
   public List<DecommissionedPipeline> getDecommissionedPipelines(ProjectDetail projectDetail) {
     return decommissionedPipelineRepository.findByProjectDetailOrderByIdAsc(projectDetail);
+  }
+
+  public List<DecommissionedPipeline> getDecommissionedPipelinesByProjectAndVersion(Project project, Integer version) {
+    return decommissionedPipelineRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version);
   }
 
   public boolean isValid(DecommissionedPipeline decommissionedPipeline, ValidationType validationType) {

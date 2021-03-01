@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
@@ -208,6 +209,32 @@ public class DecommissionedPipelineServiceTest {
 
     var decommissionedPipelines = decommissionedPipelineService.getDecommissionedPipelines(projectDetail);
     assertThat(decommissionedPipelines).isEmpty();
+  }
+
+  @Test
+  public void getDecommissionedPipelinesByProjectAndVersion_whenExist_thenReturnList() {
+    var project = projectDetail.getProject();
+    var version = projectDetail.getVersion();
+    var decommissionedPipelines = List.of(
+        DecommissionedPipelineTestUtil.createDecommissionedPipeline(),
+        DecommissionedPipelineTestUtil.createDecommissionedPipeline()
+    );
+
+    when(decommissionedPipelineRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
+        .thenReturn(decommissionedPipelines);
+
+    assertThat(decommissionedPipelineService.getDecommissionedPipelinesByProjectAndVersion(project, version)).isEqualTo(decommissionedPipelines);
+  }
+
+  @Test
+  public void getDecommissionedPipelinesByProjectAndVersion_whenNoneExist_thenEmptyList() {
+    var project = projectDetail.getProject();
+    var version = projectDetail.getVersion();
+
+    when(decommissionedPipelineRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
+        .thenReturn(Collections.emptyList());
+
+    assertThat(decommissionedPipelineService.getDecommissionedPipelinesByProjectAndVersion(project, version)).isEmpty();
   }
 
   @Test
