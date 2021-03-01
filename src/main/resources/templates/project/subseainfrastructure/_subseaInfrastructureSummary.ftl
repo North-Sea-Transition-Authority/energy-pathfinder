@@ -1,9 +1,20 @@
 <#include '../../layout.ftl'>
 
-<#macro subseaInfrastructureSummary subseaInfrastructureView showHeader=false showActions=false headingSize="h2" headingClass="govuk-heading-l" showTag=false>
+<#assign idPrefix = "subsea-infrastructure" />
+<#assign headingPrefix = "Subsea infrastructure" />
+<#assign defaultHeadingSize = "h2" />
+<#assign defaultHeadingClass = "govuk-heading-l" />
+
+<#macro subseaInfrastructureSummary
+  subseaInfrastructureView
+  showHeader=false
+  showActions=false
+  headingSize=defaultHeadingSize
+  headingClass=defaultHeadingClass
+>
   <@summaryViewWrapper.summaryViewItemWrapper
-    idPrefix="subsea-infrastructure"
-    headingPrefix="Subsea infrastructure"
+    idPrefix=idPrefix
+    headingPrefix=headingPrefix
     displayOrder=subseaInfrastructureView.displayOrder
     isValid=subseaInfrastructureView.valid!""
     summaryLinkList=subseaInfrastructureView.summaryLinks
@@ -12,46 +23,141 @@
     headingSize=headingSize
     headingClass=headingClass
   >
-    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Host structure">
-      <#if showTag>
-        <@stringWithTag.stringWithTag stringWithTag=subseaInfrastructureView.structure />
-      <#else>
-        ${subseaInfrastructureView.structure.value!""}
-      </#if>
-    </@checkAnswers.checkAnswersRowNoActionsWithNested>
-    <@checkAnswers.checkAnswersRowNoActions prompt="Description" value=subseaInfrastructureView.description!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Structure status" value=subseaInfrastructureView.status!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Type of infrastructure" value=subseaInfrastructureView.infrastructureType!"" />
-    <#if subseaInfrastructureView.concreteMattress>
-      <@checkAnswers.checkAnswersRowNoActions
-        prompt="Number of mattresses to decommission"
-        value=subseaInfrastructureView.numberOfMattresses!""
-      />
-      <@checkAnswers.checkAnswersRowNoActions
-        prompt="Total estimated mass"
-        value=subseaInfrastructureView.totalEstimatedMattressMass!""
-      />
-    </#if>
-    <#if subseaInfrastructureView.subseaStructure>
-      <@checkAnswers.checkAnswersRowNoActions
-        prompt="Total estimated mass"
-        value=subseaInfrastructureView.totalEstimatedSubseaMass!""
-      />
-    </#if>
-    <#if subseaInfrastructureView.otherInfrastructure>
-      <@checkAnswers.checkAnswersRowNoActions
-        prompt="Type of subsea structure being decommissioned"
-        value=subseaInfrastructureView.otherInfrastructureType!""
-      />
-      <@checkAnswers.checkAnswersRowNoActions
-        prompt="Total estimated mass"
-        value=subseaInfrastructureView.totalEstimatedOtherMass!""
-      />
-    </#if>
-    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Expected decommissioning period">
-      ${subseaInfrastructureView.earliestDecommissioningStartYear!""}
-      <br/>
-      ${subseaInfrastructureView.latestDecommissioningCompletionYear!""}
-    </@checkAnswers.checkAnswersRowNoActionsWithNested>
+    <@_subseaInfrastructureSummaryFields
+      useDiffedField=false
+      structure=subseaInfrastructureView.structure
+      description=subseaInfrastructureView.description
+      status=subseaInfrastructureView.status
+      infrastructureType=subseaInfrastructureView.infrastructureType
+      concreteMattress=subseaInfrastructureView.concreteMattress
+      numberOfMattresses=subseaInfrastructureView.numberOfMattresses
+      totalEstimatedMattressMass=subseaInfrastructureView.totalEstimatedMattressMass
+      subseaStructure=subseaInfrastructureView.subseaStructure
+      totalEstimatedSubseaMass=subseaInfrastructureView.totalEstimatedSubseaMass
+      otherInfrastructure=subseaInfrastructureView.otherInfrastructure
+      otherInfrastructureType=subseaInfrastructureView.otherInfrastructureType
+      totalEstimatedOtherMass=subseaInfrastructureView.totalEstimatedOtherMass
+      earliestDecommissioningStartYear=subseaInfrastructureView.earliestDecommissioningStartYear
+      latestDecommissioningCompletionYear=subseaInfrastructureView.latestDecommissioningCompletionYear
+    />
   </@summaryViewWrapper.summaryViewItemWrapper>
+</#macro>
+
+<#macro subseaInfrastructureDiffSummary
+  diffModel
+  concreteMattress
+  subseaStructure
+  otherInfrastructure
+  showHeader=false
+  showActions=false
+  headingSize=defaultHeadingSize
+  headingClass=defaultHeadingClass
+>
+  <@summaryViewWrapper.summaryViewItemWrapper
+    idPrefix=idPrefix
+    headingPrefix=headingPrefix
+    displayOrder=diffModel.SubseaInfrastructureView_displayOrder.currentValue
+    isValid=true
+    summaryLinkList=[]
+    showHeader=showHeader
+    showActions=showActions
+    headingSize=headingSize
+    headingClass=headingClass
+  >
+    <@_subseaInfrastructureSummaryFields
+      useDiffedField=true
+      structure=diffModel.SubseaInfrastructureView_structure
+      description=diffModel.SubseaInfrastructureView_description
+      status=diffModel.SubseaInfrastructureView_status
+      infrastructureType=diffModel.SubseaInfrastructureView_infrastructureType
+      concreteMattress=concreteMattress
+      numberOfMattresses=diffModel.SubseaInfrastructureView_numberOfMattresses
+      totalEstimatedMattressMass=diffModel.SubseaInfrastructureView_totalEstimatedMattressMass
+      subseaStructure=subseaStructure
+      totalEstimatedSubseaMass=diffModel.SubseaInfrastructureView_totalEstimatedSubseaMass
+      otherInfrastructure=otherInfrastructure
+      otherInfrastructureType=diffModel.SubseaInfrastructureView_otherInfrastructureType
+      totalEstimatedOtherMass=diffModel.SubseaInfrastructureView_totalEstimatedOtherMass
+      earliestDecommissioningStartYear=diffModel.SubseaInfrastructureView_earliestDecommissioningStartYear
+      latestDecommissioningCompletionYear=diffModel.SubseaInfrastructureView_latestDecommissioningCompletionYear
+    />
+  </@summaryViewWrapper.summaryViewItemWrapper>
+</#macro>
+
+<#macro _subseaInfrastructureSummaryFields
+  useDiffedField
+  structure=""
+  description=""
+  status=""
+  infrastructureType=""
+  concreteMattress=false
+  numberOfMattresses=""
+  totalEstimatedMattressMass=""
+  subseaStructure=false
+  totalEstimatedSubseaMass=""
+  otherInfrastructure=false
+  otherInfrastructureType=""
+  totalEstimatedOtherMass=""
+  earliestDecommissioningStartYear=""
+  latestDecommissioningCompletionYear=""
+>
+  <@checkAnswers.checkAnswersStandardNestedOrDiffRow
+    prompt="Host structure"
+    fieldValue=structure
+    isDiffedField=useDiffedField
+  >
+    <@stringWithTag.stringWithTag stringWithTag=structure />
+  </@checkAnswers.checkAnswersStandardNestedOrDiffRow>
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Description"
+    fieldValue=description
+    isDiffedField=useDiffedField
+  />
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Structure status"
+    fieldValue=status
+    isDiffedField=useDiffedField
+  />
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Type of infrastructure"
+    fieldValue=infrastructureType
+    isDiffedField=useDiffedField
+  />
+  <#if concreteMattress>
+    <@checkAnswers.checkAnswersStandardOrDiffRow
+      prompt="Number of mattresses to decommission"
+      fieldValue=numberOfMattresses
+      isDiffedField=useDiffedField
+    />
+    <@checkAnswers.checkAnswersStandardOrDiffRow
+      prompt="Total estimated mass"
+      fieldValue=totalEstimatedMattressMass
+      isDiffedField=useDiffedField
+    />
+  </#if>
+  <#if subseaStructure>
+    <@checkAnswers.checkAnswersStandardOrDiffRow
+      prompt="Total estimated mass"
+      fieldValue=totalEstimatedSubseaMass
+      isDiffedField=useDiffedField
+    />
+  </#if>
+  <#if otherInfrastructure>
+    <@checkAnswers.checkAnswersStandardOrDiffRow
+      prompt="Type of subsea structure being decommissioned"
+      fieldValue=otherInfrastructureType
+      isDiffedField=useDiffedField
+    />
+    <@checkAnswers.checkAnswersStandardOrDiffRow
+      prompt="Total estimated mass"
+      fieldValue=totalEstimatedOtherMass
+      isDiffedField=useDiffedField
+    />
+  </#if>
+  <@decomissioningPeriodCheckAnswers.decomissioningPeriodCheckAnswers
+    useDiffedField=useDiffedField
+    prompt="Expected decommissioning period"
+    earliestYear=earliestDecommissioningStartYear
+    latestYear=latestDecommissioningCompletionYear
+  />
 </#macro>

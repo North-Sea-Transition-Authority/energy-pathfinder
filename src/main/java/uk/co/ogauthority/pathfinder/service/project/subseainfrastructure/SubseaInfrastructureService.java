@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.subseainfrastructure.SubseaInfrastructure;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -169,6 +170,10 @@ public class SubseaInfrastructureService implements ProjectFormSectionService {
 
   public List<SubseaInfrastructure> getSubseaInfrastructures(ProjectDetail projectDetail) {
     return subseaInfrastructureRepository.findByProjectDetailOrderByIdAsc(projectDetail);
+  }
+
+  public List<SubseaInfrastructure> getSubseaInfrastructuresByProjectAndVersion(Project project, Integer version) {
+    return subseaInfrastructureRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version);
   }
 
   public boolean isValid(SubseaInfrastructure subseaInfrastructure, ValidationType validationType) {
