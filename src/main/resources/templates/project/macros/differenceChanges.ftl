@@ -70,7 +70,7 @@
       -->
       <@multiLineText.multiLineText blockClass=multiLineTextBlockClass>${value}</@multiLineText.multiLineText>
     </@_diffChangesValueWrapper>
-    <#if tag?has_content && tag.displayName?has_content>
+    <#if value?has_content && tag?has_content && tag.displayName?has_content>
       <strong class="govuk-tag">
         ${tag.displayName}
       </strong>
