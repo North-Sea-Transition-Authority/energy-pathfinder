@@ -1,9 +1,6 @@
 <#include '../../layout.ftl'>
 
-<@defaultPage htmlTitle="Upcoming tender" pageHeading="Upcoming tender" breadcrumbs=true>
-  <#if errorList?has_content>
-      <@fdsError.errorSummary errorItems=errorList />
-  </#if>
+<@defaultPage htmlTitle="Upcoming tender" pageHeading="Upcoming tender" breadcrumbs=true errorItems=errorList>
 
   <@fdsForm.htmlForm>
     <@fdsSearchSelector.searchSelectorRest path="form.tenderFunction" selectorMinInputLength=0 labelText="What function is the tender for?" restUrl=springUrl(tenderRestUrl)  preselectedItems=preSelectedFunction!{} />

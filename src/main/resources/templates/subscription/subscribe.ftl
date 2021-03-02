@@ -2,10 +2,7 @@
 
 <#assign pageHeading = "Subscribe to newsletter">
 
-<@defaultPage htmlTitle=pageHeading pageHeading=pageHeading breadcrumbs=false topNavigation=false>
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
+<@defaultPage htmlTitle=pageHeading pageHeading=pageHeading breadcrumbs=false topNavigation=false errorItems=errorList>
 
   <@fdsInsetText.insetText>
     Subscribers will receive an email once a month showing new or updated ${service.serviceName} projects

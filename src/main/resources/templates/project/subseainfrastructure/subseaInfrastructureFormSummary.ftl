@@ -1,10 +1,7 @@
 <#include '../../layout.ftl'>
 <#import '_subseaInfrastructureSummary.ftl' as subseaInfrastructureSummary>
 
-<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true>
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
+<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true errorItems=errorList>
   <#if subseaInfrastructureViews?has_content>
     <#list subseaInfrastructureViews as subseaInfrastructureView>
       <@subseaInfrastructureSummary.subseaInfrastructureSummary

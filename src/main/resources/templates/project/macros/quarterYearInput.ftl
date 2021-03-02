@@ -58,7 +58,7 @@
       nestingPath=nestingPath
     >
       <@spring.bind quarterPath/>
-      <#local quarterId=spring.status.expression?replace('[','')?replace(']','')>
+      <#local quarterId=fdsUtil.sanitiseId(spring.status.expression)>
       <#local quarterName=spring.status.expression>
       <#local quarterValue=spring.stringStatusValue>
 
@@ -88,7 +88,7 @@
         </div>
 
         <@spring.bind yearPath/>
-        <#local yearId=spring.status.expression?replace('[','')?replace(']','')>
+        <#local yearId=fdsUtil.sanitiseId(spring.status.expression)>
         <#local yearName=spring.status.expression>
         <#local yearValue=spring.stringStatusValue>
         <div class="govuk-date-input__item">

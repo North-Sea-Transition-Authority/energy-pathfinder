@@ -8,11 +8,8 @@
   breadcrumbs=false
   backLink=true
   backLinkUrl=springUrl(cancelUrl)
+  errorItems=errorList
 >
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
-
   <@fdsForm.htmlForm>
     <@fdsRadio.radio
       path="form.recipientType"

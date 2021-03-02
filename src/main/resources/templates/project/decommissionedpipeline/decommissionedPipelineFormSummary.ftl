@@ -1,10 +1,7 @@
 <#include '../../layout.ftl'>
 <#import '_decommissionedPipelineSummary.ftl' as decommissionedPipelineSummary>
 
-<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true>
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
+<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true errorItems=errorList>
   <#if decommissionedPipelineViews?has_content>
     <#list decommissionedPipelineViews as decommissionedPipelineView>
       <@decommissionedPipelineSummary.decommissionedPipelineSummary

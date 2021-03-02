@@ -1,10 +1,8 @@
 <#include '../../layout.ftl'>
 <#import '_awardedContractSummary.ftl' as awardedContractSummary>
 
-<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true>
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
+<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true errorItems=errorList>
+
   <#if awardedContractViews?has_content>
     <#list awardedContractViews as awardedContractView>
       <@awardedContractSummary.awardedContractSummary

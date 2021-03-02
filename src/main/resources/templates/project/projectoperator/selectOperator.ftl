@@ -1,10 +1,6 @@
 <#include '../../layout.ftl'>
 
-<@defaultPage htmlTitle="Select an operator" backLink=backLink breadcrumbs=breadCrumbs  twoThirdsColumn=true>
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
-
+<@defaultPage htmlTitle="Select an operator" backLink=backLink breadcrumbs=breadCrumbs twoThirdsColumn=true errorItems=errorList>
   <@fdsForm.htmlForm>
     <@fdsSearchSelector.searchSelectorRest path="form.organisationGroup" labelText="Who is the operator for the project?" pageHeading=true labelHeadingClass="govuk-label--l" selectorMinInputLength=0 restUrl=springUrl(operatorsRestUrl)  preselectedItems=preselectedOperator!{} />
 

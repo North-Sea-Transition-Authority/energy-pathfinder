@@ -1,12 +1,7 @@
 <#include '../../layout.ftl'>
 
-<@defaultPage htmlTitle=pageName pageHeading=pageName breadcrumbs=true>
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
-
+<@defaultPage htmlTitle=pageName pageHeading=pageName breadcrumbs=true errorItems=errorList>
   <@fdsForm.htmlForm>
-
     <@fdsTextInput.textInput path="form.projectTitle" labelText="What is the project title?"/>
     <@fdsTextarea.textarea path="form.projectSummary" labelText="Provide a summary of the project"  />
     <@fdsDetails.summaryDetails summaryTitle="What should I provide for the summary of the project?">

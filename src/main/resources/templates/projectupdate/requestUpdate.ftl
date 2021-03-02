@@ -2,10 +2,7 @@
 
 <#assign title = "Request update" />
 
-<@defaultPage htmlTitle=title pageHeading="" breadcrumbs=true fullWidthColumn=true>
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
+<@defaultPage htmlTitle=title pageHeading="" breadcrumbs=true fullWidthColumn=true errorItems=errorList>
 
   <@noEscapeHtml.noEscapeHtml html=projectHeaderHtml />
 

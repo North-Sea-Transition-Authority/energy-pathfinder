@@ -1,11 +1,8 @@
 <#include '../../layout.ftl'>
 <#import './_upcomingTenderSummary.ftl' as tenderSummary>
 
-<@defaultPage htmlTitle="Upcoming tenders" pageHeading="Upcoming tenders" breadcrumbs=true>
+<@defaultPage htmlTitle="Upcoming tenders" pageHeading="Upcoming tenders" breadcrumbs=true errorItems=errorSummary>
 
-  <#if errorSummary?has_content>
-    <@fdsError.errorSummary errorItems=errorSummary />
-  </#if>
   <#if tenderViews?has_content>
     <#list tenderViews as view>
       <@tenderSummary.upcomingTenderSummary view=view showHeader=true showActions=true />

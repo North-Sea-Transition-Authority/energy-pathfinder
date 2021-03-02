@@ -1,9 +1,6 @@
 <#include '../layout.ftl'>
 
-<@defaultPage htmlTitle="Add user to ${groupName}" backLink=true topNavigation=showTopNav twoThirdsColumn=true>
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
+<@defaultPage htmlTitle="Add user to ${groupName}" backLink=true topNavigation=showTopNav twoThirdsColumn=true errorItems=errorList>
   <@fdsForm.htmlForm>
     <@fdsTextInput.textInput
       path="form.userIdentifier"

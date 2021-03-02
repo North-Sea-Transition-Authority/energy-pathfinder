@@ -1,10 +1,7 @@
 <#include '../../layout.ftl'>
 <#import '_plugAbandonmentScheduleSummary.ftl' as plugAbandonmentScheduleSummary>
 
-<@defaultPage htmlTitle=pageName pageHeading=pageName breadcrumbs=true>
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
+<@defaultPage htmlTitle=pageName pageHeading=pageName breadcrumbs=true errorItems=errorList>
   <#if plugAbandonmentScheduleViews?has_content>
     <#list plugAbandonmentScheduleViews as plugAbandonmentScheduleView>
       <@plugAbandonmentScheduleSummary.plugAbandonmentScheduleSummary

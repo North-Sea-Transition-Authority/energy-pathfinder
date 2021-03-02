@@ -1,11 +1,7 @@
 <#include '../../layout.ftl'>
 <#include '../macros/minMaxDateInput.ftl'>
 
-<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true>
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
-
+<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true errorItems=errorList>
   <@fdsForm.htmlForm>
     <@fdsSearchSelector.searchSelectorRest
       path="form.pipeline"

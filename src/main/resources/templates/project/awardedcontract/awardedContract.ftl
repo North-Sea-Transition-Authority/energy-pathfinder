@@ -1,10 +1,6 @@
 <#include '../../layout.ftl'>
 
-<@defaultPage htmlTitle="Awarded contract" pageHeading="Awarded contract" breadcrumbs=true>
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
-
+<@defaultPage htmlTitle="Awarded contract" pageHeading="Awarded contract" breadcrumbs=true errorItems=errorList>
   <@fdsForm.htmlForm>
     <@fdsTextInput.textInput path="form.contractorName" labelText="Contractor name"/>
     <@fdsSearchSelector.searchSelectorRest

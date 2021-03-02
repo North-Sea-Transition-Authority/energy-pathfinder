@@ -3,6 +3,7 @@
 <#--FDS Layout-->
 <#include 'fds/objects/layouts/generic.ftl'>
 <#import 'fds/objects/grid/grid.ftl' as grid>
+<#import 'fds/utilities/utilities.ftl' as fdsUtil>
 
 <#include 'pathfinderImports.ftl'>
 
@@ -40,6 +41,7 @@
   headerLogo="GOVUK_CREST"
   errorCheck=false
   noIndex=false
+  errorItems=[]
 >
   <@genericLayout htmlTitle=htmlTitle htmlAppTitle=service.serviceName errorCheck=errorCheck noIndex=noIndex>
 
@@ -89,42 +91,78 @@
       <#if fullWidthColumn>
         <@grid.gridRow>
           <@grid.fullColumn>
-            <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
+            <@defaultHeading
+              caption=caption
+              captionClass=captionClass
+              pageHeading=pageHeading
+              pageHeadingClass=pageHeadingClass
+              errorItems=errorItems
+            />
             <#nested>
           </@grid.fullColumn>
         </@grid.gridRow>
       <#elseif oneHalfColumn>
         <@grid.gridRow>
           <@grid.oneHalfColumn>
-            <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
+            <@defaultHeading
+              caption=caption
+              captionClass=captionClass
+              pageHeading=pageHeading
+              pageHeadingClass=pageHeadingClass
+              errorItems=errorItems
+            />
             <#nested>
           </@grid.oneHalfColumn>
         </@grid.gridRow>
       <#elseif oneThirdColumn>
         <@grid.gridRow>
           <@grid.oneThirdColumn>
-            <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
+            <@defaultHeading
+              caption=caption
+              captionClass=captionClass
+              pageHeading=pageHeading
+              pageHeadingClass=pageHeadingClass
+              errorItems=errorItems
+            />
             <#nested>
           </@grid.oneThirdColumn>
         </@grid.gridRow>
       <#elseif twoThirdsColumn>
         <@grid.gridRow>
           <@grid.twoThirdsColumn>
-            <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
+            <@defaultHeading
+              caption=caption
+              captionClass=captionClass
+              pageHeading=pageHeading
+              pageHeadingClass=pageHeadingClass
+              errorItems=errorItems
+            />
             <#nested>
           </@grid.twoThirdsColumn>
         </@grid.gridRow>
       <#elseif oneQuarterColumn>
         <@grid.gridRow>
           <@grid.oneQuarterColumn>
-            <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
+            <@defaultHeading
+              caption=caption
+              captionClass=captionClass
+              pageHeading=pageHeading
+              pageHeadingClass=pageHeadingClass
+              errorItems=errorItems
+            />
             <#nested>
           </@grid.oneQuarterColumn>
         </@grid.gridRow>
       <#elseif twoThirdsOneThirdColumn>
         <@grid.gridRow>
           <@grid.twoThirdsColumn>
-            <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
+            <@defaultHeading
+              caption=caption
+              captionClass=captionClass
+              pageHeading=pageHeading
+              pageHeadingClass=pageHeadingClass
+              errorItems=errorItems
+            />
             <#nested>
           </@grid.twoThirdsColumn>
           <@grid.oneThirdColumn>
@@ -132,7 +170,13 @@
           </@grid.oneThirdColumn>
         </@grid.gridRow>
       <#else>
-        <@defaultHeading caption=caption captionClass=captionClass pageHeading=pageHeading pageHeadingClass=pageHeadingClass/>
+        <@defaultHeading
+          caption=caption
+          captionClass=captionClass
+          pageHeading=pageHeading
+          pageHeadingClass=pageHeadingClass
+          errorItems=errorItems
+        />
         <#nested>
       </#if>
     </main>

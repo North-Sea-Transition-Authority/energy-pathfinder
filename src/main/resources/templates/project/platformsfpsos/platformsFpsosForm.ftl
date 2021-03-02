@@ -1,11 +1,7 @@
 <#include '../../layout.ftl'>
 <#include '../macros/minMaxDateInput.ftl'>
 
-<@defaultPage htmlTitle="Platform or FPSO" pageHeading="Platform or FPSO" breadcrumbs=true >
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
-
+<@defaultPage htmlTitle="Platform or FPSO" pageHeading="Platform or FPSO" breadcrumbs=true errorItems=errorList>
   <@fdsForm.htmlForm>
     <@fdsRadio.radioGroup
       labelText="Are you decommissioning a platform or FPSO?"

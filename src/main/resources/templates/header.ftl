@@ -1,4 +1,5 @@
 <#-- Header Component https://design-system.service.gov.uk/components/header/ -->
+<#include 'layout.ftl'/>
 
 <#function springUrl url>
   <#local springUrl>

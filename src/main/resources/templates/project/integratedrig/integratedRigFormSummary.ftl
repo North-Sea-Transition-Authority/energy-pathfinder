@@ -1,10 +1,7 @@
 <#include '../../layout.ftl'>
 <#import '_integratedRigSummary.ftl' as integratedRigSummary>
 
-<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true>
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
+<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true errorItems=errorList>
   <#if integratedRigViews?has_content>
     <#list integratedRigViews as integratedRigView>
       <@integratedRigSummary.integratedRigSummary

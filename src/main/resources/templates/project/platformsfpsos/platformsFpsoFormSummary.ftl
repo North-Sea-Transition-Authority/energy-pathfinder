@@ -1,24 +1,33 @@
 <#include '../../layout.ftl'>
 <#import './_platformFpsoSummary.ftl' as platformFpsoSummary/>
 
-<@defaultPage htmlTitle=pageName pageHeading=pageName breadcrumbs=true>
-    <#if errorSummary?has_content>
-        <@fdsError.errorSummary errorItems=errorSummary />
-    </#if>
-    <#if views?has_content>
-      <#list views as view>
-        <@platformFpsoSummary.platformFpsoSummary
-          view=view
-          platformFpsoName=platformFpsoName
-          showHeader=true
-          showActions=true
-        />
-      </#list>
-    <#else>
-      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="platform or FPSO" linkUrl=springUrl(projectSetupUrl)/>
-    </#if>
-  <@fdsAction.link linkText="Add platform or FPSO" linkUrl=springUrl(addPlatformFpsoUrl) linkClass="govuk-button govuk-button--blue"/>
+<@defaultPage htmlTitle=pageName pageHeading=pageName breadcrumbs=true errorItems=errorSummary>
+  <#if views?has_content>
+    <#list views as view>
+      <@platformFpsoSummary.platformFpsoSummary
+        view=view
+        platformFpsoName=platformFpsoName
+        showHeader=true
+        showActions=true
+      />
+    </#list>
+  <#else>
+    <@setupProjectGuidance.minimumRequirementNotMetInset
+      itemRequiredText="platform or FPSO"
+      linkUrl=springUrl(projectSetupUrl)
+    />
+  </#if>
+  <@fdsAction.link
+    linkText="Add platform or FPSO"
+    linkUrl=springUrl(addPlatformFpsoUrl)
+    linkClass="govuk-button govuk-button--blue"
+  />
   <@fdsForm.htmlForm>
-      <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryLinkText="Back to task list" linkSecondaryAction=true linkSecondaryActionUrl=springUrl(backToTaskListUrl) />
+    <@fdsAction.submitButtons
+      primaryButtonText="Save and complete"
+      secondaryLinkText="Back to task list"
+      linkSecondaryAction=true
+      linkSecondaryActionUrl=springUrl(backToTaskListUrl)
+    />
   </@fdsForm.htmlForm>
 </@defaultPage>

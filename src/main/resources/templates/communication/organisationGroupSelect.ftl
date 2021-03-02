@@ -8,11 +8,8 @@
   breadcrumbs=false
   backLink=true
   backLinkUrl=springUrl(previousUrl)
+  errorItems=errorList
 >
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
-
   <@fdsForm.htmlForm>
     <#assign checkboxContainerId="organisation-group-select" />
     <div id="${checkboxContainerId}">

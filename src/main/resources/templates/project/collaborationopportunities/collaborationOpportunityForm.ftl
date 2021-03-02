@@ -1,10 +1,6 @@
 <#include '../../layout.ftl'>
 
-<@defaultPage htmlTitle="Collaboration opportunity" pageHeading="Collaboration opportunity" breadcrumbs=true>
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
-
+<@defaultPage htmlTitle="Collaboration opportunity" pageHeading="Collaboration opportunity" breadcrumbs=true errorItems=errorList>
   <@fdsForm.htmlForm>
     <@fdsSearchSelector.searchSelectorRest path="form.function" selectorMinInputLength=0 labelText="What function is the collaboration opportunity for?" restUrl=springUrl(collaborationFunctionRestUrl)  preselectedItems=preselectedCollaboration!{} />
     <@fdsTextarea.textarea

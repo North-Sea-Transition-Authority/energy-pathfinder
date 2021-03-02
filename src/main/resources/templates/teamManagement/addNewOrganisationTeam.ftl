@@ -1,10 +1,12 @@
 <#include '../layout.ftl'>
 
-<@defaultPage htmlTitle="Add new ${teamTypeDisplayName} team" backLink=true topNavigation=showTopNav twoThirdsColumn=true>
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
-
+<@defaultPage
+  htmlTitle="Add new ${teamTypeDisplayName} team"
+  backLink=true
+  topNavigation=showTopNav
+  twoThirdsColumn=true
+  errorItems=errorList
+>
   <@fdsForm.htmlForm>
     <@fdsSearchSelector.searchSelectorRest
       path="form.organisationGroup"

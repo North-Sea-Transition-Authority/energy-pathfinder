@@ -135,7 +135,7 @@ public class CommunicationJourneyController {
         bindingResult,
         communicationModelService.getOperatorSelectForCommunication(
             communication,
-            new OrganisationGroupSelectorForm()
+            form
         ),
         form,
         () -> {

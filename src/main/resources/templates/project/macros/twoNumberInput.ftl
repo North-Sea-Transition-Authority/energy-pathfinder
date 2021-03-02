@@ -69,7 +69,7 @@
 
   <@spring.bind path/>
 
-  <#local id=spring.status.expression?replace('[','')?replace(']','')>
+  <#local id=fdsUtil.sanitiseId(spring.status.expression)>
   <#local name=spring.status.expression>
   <#local value=spring.stringStatusValue>
   <#local hasError=(spring.status.errorMessages?size > 0)>

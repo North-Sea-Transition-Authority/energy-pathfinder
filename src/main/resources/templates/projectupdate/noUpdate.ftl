@@ -2,10 +2,7 @@
 
 <#assign title = "Confirm no changes required">
 
-<@defaultPage htmlTitle=title breadcrumbs=true fullWidthColumn=true>
-  <#if errorList?has_content>
-    <@fdsError.errorSummary errorItems=errorList />
-  </#if>
+<@defaultPage htmlTitle=title breadcrumbs=true fullWidthColumn=true errorItems=errorList>
 
   <@noEscapeHtml.noEscapeHtml html=projectHeaderHtml />
 

@@ -10,7 +10,9 @@
 <@defaultPageWithSidebar.defaultPageWithSidebar
   pageHeading=pageHeading
   themeHeading="Check your answers for all sections on the project"
-  sidebarSectionLinks=projectSummaryView.sidebarSectionLinks>
+  sidebarSectionLinks=projectSummaryView.sidebarSectionLinks
+  isSidebarSticky=true
+>
 
   <#if !isProjectValid>
     <@_invalidProjectInset />
