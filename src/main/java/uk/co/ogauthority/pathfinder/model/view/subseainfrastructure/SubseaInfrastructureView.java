@@ -28,11 +28,11 @@ public class SubseaInfrastructureView extends ProjectSummaryItem {
 
   private String latestDecommissioningCompletionYear;
 
-  private boolean isConcreteMattress;
+  private Boolean isConcreteMattress;
 
-  private boolean isSubseaStructure;
+  private Boolean isSubseaStructure;
 
-  private boolean isOtherInfrastructure;
+  private Boolean isOtherInfrastructure;
 
   public StringWithTag getStructure() {
     return structure;
@@ -122,27 +122,27 @@ public class SubseaInfrastructureView extends ProjectSummaryItem {
     this.latestDecommissioningCompletionYear = latestDecommissioningCompletionYear;
   }
 
-  public boolean getConcreteMattress() {
+  public Boolean getConcreteMattress() {
     return isConcreteMattress;
   }
 
-  public void setConcreteMattress(boolean concreteMattress) {
+  public void setConcreteMattress(Boolean concreteMattress) {
     isConcreteMattress = concreteMattress;
   }
 
-  public boolean getSubseaStructure() {
+  public Boolean getSubseaStructure() {
     return isSubseaStructure;
   }
 
-  public void setSubseaStructure(boolean subseaStructure) {
+  public void setSubseaStructure(Boolean subseaStructure) {
     isSubseaStructure = subseaStructure;
   }
 
-  public boolean getOtherInfrastructure() {
+  public Boolean getOtherInfrastructure() {
     return isOtherInfrastructure;
   }
 
-  public void setOtherInfrastructure(boolean otherInfrastructure) {
+  public void setOtherInfrastructure(Boolean otherInfrastructure) {
     isOtherInfrastructure = otherInfrastructure;
   }
 
@@ -158,10 +158,7 @@ public class SubseaInfrastructureView extends ProjectSummaryItem {
       return false;
     }
     SubseaInfrastructureView that = (SubseaInfrastructureView) o;
-    return isConcreteMattress == that.isConcreteMattress
-        && isSubseaStructure == that.isSubseaStructure
-        && isOtherInfrastructure == that.isOtherInfrastructure
-        && Objects.equals(structure, that.structure)
+    return Objects.equals(structure, that.structure)
         && Objects.equals(description, that.description)
         && Objects.equals(status, that.status)
         && Objects.equals(infrastructureType, that.infrastructureType)
@@ -172,7 +169,10 @@ public class SubseaInfrastructureView extends ProjectSummaryItem {
         && Objects.equals(totalEstimatedOtherMass, that.totalEstimatedOtherMass)
         && Objects.equals(earliestDecommissioningStartYear, that.earliestDecommissioningStartYear)
         && Objects.equals(latestDecommissioningCompletionYear, that.latestDecommissioningCompletionYear)
-        && Objects.equals(summaryLinks, that.summaryLinks);
+        && Objects.equals(summaryLinks, that.summaryLinks)
+        && Objects.equals(isConcreteMattress, that.isConcreteMattress)
+        && Objects.equals(isSubseaStructure, that.isSubseaStructure)
+        && Objects.equals(isOtherInfrastructure, that.isOtherInfrastructure);
   }
 
   @Override

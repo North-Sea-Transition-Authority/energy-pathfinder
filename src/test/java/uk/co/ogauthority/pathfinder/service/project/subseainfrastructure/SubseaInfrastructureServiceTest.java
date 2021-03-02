@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
@@ -606,6 +607,32 @@ public class SubseaInfrastructureServiceTest {
 
     var subseaInfrastructures = subseaInfrastructureService.getSubseaInfrastructures(projectDetail);
     assertThat(subseaInfrastructures).isEmpty();
+  }
+
+  @Test
+  public void getSubseaInfrastructuresByProjectAndVersion_whenExist_thenReturnList() {
+    var project = projectDetail.getProject();
+    var version = projectDetail.getVersion();
+    var subseaInfrastructures = List.of(
+        SubseaInfrastructureTestUtil.createSubseaInfrastructure_withSubseaStructure(),
+        SubseaInfrastructureTestUtil.createSubseaInfrastructure_withConcreteMattresses()
+    );
+
+    when(subseaInfrastructureRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
+        .thenReturn(subseaInfrastructures);
+
+    assertThat(subseaInfrastructureService.getSubseaInfrastructuresByProjectAndVersion(project, version)).isEqualTo(subseaInfrastructures);
+  }
+
+  @Test
+  public void getSubseaInfrastructuresByProjectAndVersion_whenNoneExist_thenEmptyList() {
+    var project = projectDetail.getProject();
+    var version = projectDetail.getVersion();
+
+    when(subseaInfrastructureRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
+        .thenReturn(Collections.emptyList());
+
+    assertThat(subseaInfrastructureService.getSubseaInfrastructuresByProjectAndVersion(project, version)).isEmpty();
   }
 
   @Test
