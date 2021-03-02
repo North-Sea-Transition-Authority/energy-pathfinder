@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.energyportal.service.webuser;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,10 @@ public class WebUserAccountService {
   public WebUserAccount getWebUserAccountOrError(Integer wuaId) {
     return getWebUserAccount(wuaId)
         .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format("Unable to find WebUserAccount with ID %s", wuaId)));
+  }
+
+  public List<WebUserAccount> getWebUserAccounts(List<Integer> webUserAccountIds) {
+    return webUserAccountRepository.findAllByWuaIdIn(webUserAccountIds);
   }
 
   private Optional<WebUserAccount> getWebUserAccount(Integer wuaId) {

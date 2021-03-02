@@ -1,4 +1,4 @@
-.dashboard-item {
+@mixin pathfinder-list-item {
 
   &__heading {
     @include govuk-responsive-margin(0, 'bottom');

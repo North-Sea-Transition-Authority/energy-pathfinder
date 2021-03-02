@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -200,7 +201,7 @@ public class CommunicationServiceTest {
   @Test
   public void finaliseCommunication_verifyInteractions() {
     final var communication = CommunicationTestUtil.getCompleteCommunication();
-    communication.setStatus(CommunicationStatus.COMPLETE);
+    communication.setStatus(CommunicationStatus.SENT);
 
     communicationService.finaliseCommunication(communication, UserTestingUtil.getAuthenticatedUserAccount());
 
@@ -218,8 +219,29 @@ public class CommunicationServiceTest {
     communication.setStatus(CommunicationStatus.SENDING);
 
     final var result = communicationService.setCommunicationComplete(communication);
-    assertThat(result.getStatus()).isEqualTo(CommunicationStatus.COMPLETE);
+    assertThat(result.getStatus()).isEqualTo(CommunicationStatus.SENT);
 
     verify(communicationRepository, times(1)).save(communication);
+  }
+
+  @Test
+  public void getCommunicationsWithStatuses_whenFound_thenReturnPopulatedList() {
+    final var communication = CommunicationTestUtil.getCompleteCommunication();
+    final var statuses = List.of(communication.getStatus());
+
+    when(communicationRepository.findAllByStatusIn(statuses)).thenReturn(List.of(communication));
+
+    final var communications = communicationService.getCommunicationsWithStatuses(statuses);
+    assertThat(communications).containsExactly(communication);
+  }
+
+  @Test
+  public void getCommunicationsWithStatuses_whenNotFound_thenReturnEmptyList() {
+
+    final var statuses = List.of(CommunicationStatus.DRAFT);
+    when(communicationRepository.findAllByStatusIn(statuses)).thenReturn(List.of());
+
+    final var communications = communicationService.getCommunicationsWithStatuses(statuses);
+    assertThat(communications).isEmpty();
   }
 }

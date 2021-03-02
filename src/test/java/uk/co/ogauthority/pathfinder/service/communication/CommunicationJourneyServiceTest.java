@@ -34,6 +34,7 @@ public class CommunicationJourneyServiceTest {
   @Test
   public void checkJourneyStage_whenPermittedRecipientType_thenReturn() {
     communication.setRecipientType(RecipientType.OPERATORS);
+    communication.setStatus(CommunicationStatus.DRAFT);
     communication.setLatestCommunicationJourneyStatus(CommunicationJourneyStatus.EMAIL_CONTENT_OPERATORS);
 
     var result = communicationJourneyService.checkJourneyStage(
@@ -67,7 +68,7 @@ public class CommunicationJourneyServiceTest {
 
   @Test(expected = AccessDeniedException.class)
   public void checkJourneyStage_whenNoPermittedCommunicationStatus_thenAccessDenied() {
-    communication.setStatus(CommunicationStatus.COMPLETE);
+    communication.setStatus(CommunicationStatus.SENT);
 
     communicationJourneyService.checkJourneyStage(
         communication,
@@ -78,6 +79,7 @@ public class CommunicationJourneyServiceTest {
   @Test
   public void checkJourneyStage_whenPermittedJourneyStatus_thenReturn() {
     communication.setLatestCommunicationJourneyStatus(CommunicationJourneyStatus.OPERATOR_SELECT);
+    communication.setStatus(CommunicationStatus.DRAFT);
 
     var result = communicationJourneyService.checkJourneyStage(
         communication,

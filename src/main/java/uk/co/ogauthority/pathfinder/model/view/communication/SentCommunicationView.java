@@ -1,46 +1,42 @@
 package uk.co.ogauthority.pathfinder.model.view.communication;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
+import uk.co.ogauthority.pathfinder.controller.communication.CommunicationSummaryController;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+
 public class SentCommunicationView extends CommunicationView {
 
   private final String submittedByUserName;
 
-  private final String submittedByEmailAddress;
-
   private final String formattedDateSent;
 
-  public SentCommunicationView(String senderName,
-                               String recipientCsv,
-                               String subject,
-                               String body,
-                               String greetingText,
-                               String signOffText,
-                               String signOffIdentifier,
+  private final String communicationUrl;
+
+  public SentCommunicationView(int communicationId,
+                               EmailView emailView,
+                               String recipientType,
                                String submittedByUserName,
-                               String submittedByEmailAddress,
                                String formattedDateSent) {
-    super(
-        senderName,
-        recipientCsv,
-        subject,
-        body,
-        greetingText,
-        signOffText,
-        signOffIdentifier
-    );
+    super(communicationId, emailView, recipientType);
     this.submittedByUserName = submittedByUserName;
-    this.submittedByEmailAddress = submittedByEmailAddress;
     this.formattedDateSent = formattedDateSent;
+    this.communicationUrl = ReverseRouter.route(on(CommunicationSummaryController.class).getCommunicationSummary(
+        communicationId,
+        null,
+        null
+    ));
   }
 
   public String getSubmittedByUserName() {
     return submittedByUserName;
   }
 
-  public String getSubmittedByEmailAddress() {
-    return submittedByEmailAddress;
-  }
-
   public String getFormattedDateSent() {
     return formattedDateSent;
+  }
+
+  public String getCommunicationUrl() {
+    return communicationUrl;
   }
 }

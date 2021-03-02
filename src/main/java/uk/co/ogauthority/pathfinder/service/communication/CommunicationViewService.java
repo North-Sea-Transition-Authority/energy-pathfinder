@@ -1,67 +1,89 @@
 package uk.co.ogauthority.pathfinder.service.communication;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.communication.Communication;
 import uk.co.ogauthority.pathfinder.model.enums.communication.CommunicationStatus;
 import uk.co.ogauthority.pathfinder.model.enums.communication.RecipientType;
 import uk.co.ogauthority.pathfinder.model.view.communication.CommunicationView;
+import uk.co.ogauthority.pathfinder.model.view.communication.EmailView;
 import uk.co.ogauthority.pathfinder.model.view.communication.SentCommunicationView;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @Service
 public class CommunicationViewService {
 
+  private static final List<CommunicationStatus> VIEWABLE_COMMUNICATION_STATUSES = List.of(
+      CommunicationStatus.SENDING,
+      CommunicationStatus.SENT
+  );
+
+  private final CommunicationService communicationService;
   private final OrganisationGroupCommunicationService organisationGroupCommunicationService;
   private final ServiceProperties serviceProperties;
   private final WebUserAccountService webUserAccountService;
 
   @Autowired
-  public CommunicationViewService(OrganisationGroupCommunicationService organisationGroupCommunicationService,
+  public CommunicationViewService(CommunicationService communicationService,
+                                  OrganisationGroupCommunicationService organisationGroupCommunicationService,
                                   ServiceProperties serviceProperties,
                                   WebUserAccountService webUserAccountService) {
+    this.communicationService = communicationService;
     this.organisationGroupCommunicationService = organisationGroupCommunicationService;
     this.serviceProperties = serviceProperties;
     this.webUserAccountService = webUserAccountService;
   }
 
-  public CommunicationView getCommunicationView(Communication communication) {
-    return new CommunicationView(
+  protected CommunicationView getCommunicationView(Communication communication) {
+    final var emailView = getEmailView(
         serviceProperties.getServiceName(),
-        getRecipientNames(communication),
+        getRecipientList(communication),
         communication.getEmailSubject(),
-        communication.getEmailBody(),
-        EmailProperties.DEFAULT_GREETING_TEXT,
-        EmailProperties.DEFAULT_SIGN_OFF_TEXT,
-        EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
+        communication.getEmailBody()
+    );
+    return new CommunicationView(
+        communication.getId(),
+        emailView,
+        communication.getRecipientType() != null ? communication.getRecipientType().getDisplayName() : ""
     );
   }
 
-  public SentCommunicationView getSentCommunicationView(Communication communication) {
+  protected SentCommunicationView getSentCommunicationView(Communication communication) {
+    final var userAccount = webUserAccountService.getWebUserAccountOrError(
+        communication.getSubmittedByWuaId()
+    );
+    return getSentCommunicationView(communication, userAccount);
+  }
+
+  protected SentCommunicationView getSentCommunicationView(Communication communication, WebUserAccount userAccount) {
 
     final var communicationStatus = communication.getStatus();
 
-    if (communicationStatus.equals(CommunicationStatus.COMPLETE)
+    if (communicationStatus.equals(CommunicationStatus.SENT)
         || communicationStatus.equals(CommunicationStatus.SENDING)
     ) {
 
-      var userAccount = webUserAccountService.getWebUserAccountOrError(communication.getSubmittedByWuaId());
+      final var emailView = getEmailView(
+          serviceProperties.getServiceName(),
+          getRecipientList(communication),
+          communication.getEmailSubject(),
+          communication.getEmailBody()
+      );
 
       return new SentCommunicationView(
-          serviceProperties.getServiceName(),
-          getRecipientNames(communication),
-          communication.getEmailSubject(),
-          communication.getEmailBody(),
-          EmailProperties.DEFAULT_GREETING_TEXT,
-          EmailProperties.DEFAULT_SIGN_OFF_TEXT,
-          EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER,
+          communication.getId(),
+          emailView,
+          communication.getRecipientType().getDisplayName(),
           userAccount.getFullName(),
-          userAccount.getEmailAddress(),
           DateUtil.formatInstant(communication.getSubmittedDatetime())
       );
     } else {
@@ -73,22 +95,66 @@ public class CommunicationViewService {
     }
   }
 
-  private String getRecipientNames(Communication communication) {
+  protected List<SentCommunicationView> getSentCommunicationViews() {
 
-    var recipientNames = "";
+    final var communications = communicationService.getCommunicationsWithStatuses(
+        VIEWABLE_COMMUNICATION_STATUSES
+    );
+
+    if (!communications.isEmpty()) {
+
+      // extract out the list of web user account ids and get them in one database call
+      final var wuaIds = communications
+          .stream()
+          .map(Communication::getSubmittedByWuaId)
+          .collect(Collectors.toList());
+
+      final var webUserAccounts = webUserAccountService.getWebUserAccounts(wuaIds)
+          .stream()
+          .collect(Collectors.toMap(WebUserAccount::getWuaId, webUserAccount -> webUserAccount));
+
+      return communications
+          .stream()
+          .sorted(Comparator.comparing(Communication::getSubmittedDatetime).reversed())
+          .map(communication -> getSentCommunicationView(
+              communication,
+              webUserAccounts.get(communication.getSubmittedByWuaId())
+          ))
+          .collect(Collectors.toList());
+    }
+
+    return Collections.emptyList();
+  }
+
+  private List<String> getRecipientList(Communication communication) {
+
+    List<String> recipientList = new ArrayList<>();
 
     if (communication.getRecipientType().equals(RecipientType.OPERATORS)) {
-      var organisationRecipients = organisationGroupCommunicationService.getOrganisationGroupCommunications(communication)
+      recipientList = organisationGroupCommunicationService.getOrganisationGroupCommunications(communication)
           .stream()
           .map(organisationGroupCommunication -> organisationGroupCommunication.getOrganisationGroup().getName())
           .sorted()
           .collect(Collectors.toList());
-
-      recipientNames = StringUtils.join(organisationRecipients, ", ");
     } else if (communication.getRecipientType().equals(RecipientType.SUBSCRIBERS)) {
-      recipientNames = String.format("%s subscribers", serviceProperties.getServiceName());
+      recipientList = List.of(String.format("%s subscribers", serviceProperties.getServiceName()));
     }
 
-    return recipientNames;
+    return recipientList;
+  }
+
+  private EmailView getEmailView(String senderName,
+                                 List<String> recipients,
+                                 String subject,
+                                 String body) {
+    return new EmailView(
+        senderName,
+        recipients,
+        subject,
+        EmailProperties.DEFAULT_GREETING_TEXT,
+        body,
+        EmailProperties.DEFAULT_SIGN_OFF_TEXT,
+        EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
+    );
   }
 }

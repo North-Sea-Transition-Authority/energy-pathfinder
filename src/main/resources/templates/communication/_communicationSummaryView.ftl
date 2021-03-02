@@ -1,6 +1,6 @@
 <#include '../layout.ftl'>
 
-<#macro _communicationSummary senderName recipients subject greetingText body signOffText signOffIdentifier>
+<#macro _communicationSummary senderName recipientList subject greetingText body signOffText signOffIdentifier>
   <table class="govuk-table communication-summary">
     <caption class="govuk-table__caption govuk-visually-hidden">
       The following information describes the details of an email with the subject ${subject}
@@ -13,15 +13,15 @@
       <tr class="communication-summary__row">
         <th class="communication-summary__key">To</th>
         <td class="communication-summary__value">
-          <#if recipients?length &gt; 100>
-            <div class="communication-summary__recipient-list">
+          <div class="communication-summary__recipient-list">
+            <#if recipientList?size &gt; 5>
               <@fdsDetails.summaryDetails summaryTitle="Show email recipients">
-                ${recipients}
+                <@_recipientList recipientList=recipientList />
               </@fdsDetails.summaryDetails>
-            </div>
-            <#else>
-              ${recipients}
-          </#if>
+              <#else>
+                <@_recipientList recipientList=recipientList />
+            </#if>
+          </div>
         </td>
       </tr>
       <tr class="communication-summary__row">
@@ -43,36 +43,40 @@
   </table>
 </#macro>
 
+<#macro _recipientList recipientList>
+  <ul class="govuk-list">
+    <#list recipientList as recipient>
+      <li>${recipient}</li>
+    </#list>
+  </ul>
+</#macro>
+
 <#macro communicationSummary communicationView>
+  <#assign emailView = communicationView.emailView />
   <@_communicationSummary
-    senderName=communicationView.senderName
-    recipients=communicationView.recipientCsv
-    subject=communicationView.subject
-    greetingText=communicationView.greetingText
-    body=communicationView.body
-    signOffText=communicationView.signOffText
-    signOffIdentifier=communicationView.signOffIdentifier
+    senderName=emailView.senderName
+    recipientList=emailView.recipientList
+    subject=emailView.subject
+    greetingText=emailView.greetingText
+    body=emailView.body
+    signOffText=emailView.signOffText
+    signOffIdentifier=emailView.signOffIdentifier
   />
 </#macro>
 
 <#macro sentCommunicationSummary sentCommunicationView>
-  <#assign emailAddressLink>
-    <@fdsAction.link
-      linkText="${sentCommunicationView.submittedByEmailAddress}"
-      linkUrl="mailto:${sentCommunicationView.submittedByEmailAddress}"
-    />
-  </#assign>
   <@fdsDataItems.dataItem>
     <@fdsDataItems.dataValues key="Date sent" value=sentCommunicationView.formattedDateSent />
-    <@fdsDataItems.dataValues key="Sent by" value="${sentCommunicationView.submittedByUserName} ${emailAddressLink}" />
+    <@fdsDataItems.dataValues key="Sent by" value=sentCommunicationView.submittedByUserName />
   </@fdsDataItems.dataItem>
+  <#assign emailView = sentCommunicationView.emailView />
   <@_communicationSummary
-    senderName=sentCommunicationView.senderName
-    recipients=sentCommunicationView.recipientCsv
-    subject=sentCommunicationView.subject
-    greetingText=sentCommunicationView.greetingText
-    body=sentCommunicationView.body
-    signOffText=sentCommunicationView.signOffText
-    signOffIdentifier=sentCommunicationView.signOffIdentifier
+    senderName=emailView.senderName
+    recipientList=emailView.recipientList
+    subject=emailView.subject
+    greetingText=emailView.greetingText
+    body=emailView.body
+    signOffText=emailView.signOffText
+    signOffIdentifier=emailView.signOffIdentifier
   />
 </#macro>

@@ -5,7 +5,7 @@
   htmlTitle=pageTitle
   pageHeading=pageTitle
   topNavigation=true
-  twoThirdsColumn=true
+  fullWidthColumn=true
   breadcrumbs=false
   backLink=true
   backLinkUrl=springUrl(previousUrl)

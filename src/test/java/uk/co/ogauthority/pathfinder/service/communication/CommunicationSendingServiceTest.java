@@ -106,7 +106,7 @@ public class CommunicationSendingServiceTest {
   @Test(expected = RuntimeException.class)
   public void sendCommunication_whenNoRecipientType_thenException() {
     var communication = CommunicationTestUtil.getCompleteCommunication();
-    communication.setStatus(CommunicationStatus.COMPLETE);
+    communication.setStatus(CommunicationStatus.SENT);
     communication.setRecipientType(null);
 
     when(communicationService.getCommunicationOrError(communication.getId())).thenReturn(communication);

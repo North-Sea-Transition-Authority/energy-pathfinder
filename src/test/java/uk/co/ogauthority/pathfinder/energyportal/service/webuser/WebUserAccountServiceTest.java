@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.energyportal.service.webuser;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,5 +52,21 @@ public class WebUserAccountServiceTest {
     );
 
     webUserAccountService.getWebUserAccountOrError(WUA_ID);
+  }
+
+  @Test
+  public void getWebUserAccounts_whenFound_thenReturnPopulatedList() {
+    final var webUserAccountIds = List.of(webUserAccount.getWuaId());
+    when(webUserAccountRepository.findAllByWuaIdIn(webUserAccountIds)).thenReturn(List.of(webUserAccount));
+    final var result = webUserAccountService.getWebUserAccounts(webUserAccountIds);
+    assertThat(result).containsExactly(webUserAccount);
+  }
+
+  @Test
+  public void getWebUserAccounts_whenNotFound_thenReturnEmptyList() {
+    final var webUserAccountIds = List.of(webUserAccount.getWuaId());
+    when(webUserAccountRepository.findAllByWuaIdIn(webUserAccountIds)).thenReturn(List.of());
+    final var result = webUserAccountService.getWebUserAccounts(webUserAccountIds);
+    assertThat(result).isEmpty();
   }
 }

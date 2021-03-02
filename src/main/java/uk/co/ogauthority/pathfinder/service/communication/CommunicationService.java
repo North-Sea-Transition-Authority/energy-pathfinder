@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.communication;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,10 @@ public class CommunicationService {
     this.communicationRepository = communicationRepository;
     this.organisationGroupCommunicationService = organisationGroupCommunicationService;
     this.schedulerService = schedulerService;
+  }
+
+  protected List<Communication> getCommunicationsWithStatuses(List<CommunicationStatus> communicationStatuses) {
+    return communicationRepository.findAllByStatusIn(communicationStatuses);
   }
 
   public BindingResult validateCommunicationForm(CommunicationForm communicationForm,
@@ -108,7 +113,7 @@ public class CommunicationService {
   }
 
   protected Communication setCommunicationComplete(Communication communication) {
-    communication.setStatus(CommunicationStatus.COMPLETE);
+    communication.setStatus(CommunicationStatus.SENT);
     return communicationRepository.save(communication);
   }
 

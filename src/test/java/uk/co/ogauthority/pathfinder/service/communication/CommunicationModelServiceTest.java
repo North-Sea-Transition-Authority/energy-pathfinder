@@ -53,9 +53,16 @@ public class CommunicationModelServiceTest {
   @Test
   public void getCommunicationsSummaryModelAndView() {
     var modelAndView = communicationModelService.getCommunicationsSummaryModelAndView();
-    assertThat(modelAndView.getModelMap()).containsExactly(
-        entry("pageTitle", CommunicationModelService.COMMUNICATIONS_SUMMARY_PAGE_TITLE),
-        entry("addCommunicationUrl", ReverseRouter.route(on(CommunicationJourneyController.class).startCommunicationJourney(null)))
+    assertThat(modelAndView.getModelMap()).containsOnlyKeys(
+        "pageTitle",
+        "addCommunicationUrl",
+        "sentCommunicationViews"
+    );
+
+    final var modelMap = modelAndView.getModelMap();
+    assertThat(modelMap.get("pageTitle")).isEqualTo(CommunicationModelService.COMMUNICATIONS_SUMMARY_PAGE_TITLE);
+    assertThat(modelMap.get("addCommunicationUrl")).isEqualTo(
+        ReverseRouter.route(on(CommunicationJourneyController.class).startCommunicationJourney(null))
     );
   }
 

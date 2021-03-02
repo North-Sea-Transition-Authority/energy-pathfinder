@@ -1,62 +1,52 @@
 package uk.co.ogauthority.pathfinder.model.view.communication;
 
+import uk.co.ogauthority.pathfinder.model.enums.communication.RecipientType;
+
 public class CommunicationView {
 
-  private final String senderName;
+  private final int communicationId;
 
-  private final String recipientCsv;
+  private final EmailView emailView;
 
-  private final String subject;
+  private final String recipientType;
 
-  private final String body;
+  private final boolean isOperatorRecipientType;
 
-  private final String greetingText;
+  private final boolean isSubscriberRecipientType;
 
-  private final String signOffText;
-
-  private final String signOffIdentifier;
-
-  public CommunicationView(String senderName,
-                           String recipientCsv,
-                           String subject,
-                           String body,
-                           String greetingText,
-                           String signOffText,
-                           String signOffIdentifier) {
-    this.senderName = senderName;
-    this.recipientCsv = recipientCsv;
-    this.subject = subject;
-    this.body = body;
-    this.greetingText = greetingText;
-    this.signOffText = signOffText;
-    this.signOffIdentifier = signOffIdentifier;
+  public CommunicationView(int communicationId, EmailView emailView, String recipientType) {
+    this.communicationId = communicationId;
+    this.emailView = emailView;
+    this.recipientType = recipientType.toUpperCase();
+    this.isOperatorRecipientType = (RecipientType.OPERATORS.getDisplayName().equals(recipientType));
+    this.isSubscriberRecipientType = (RecipientType.SUBSCRIBERS.getDisplayName().equals(recipientType));
   }
 
-  public String getSenderName() {
-    return senderName;
+  public int getCommunicationId() {
+    return communicationId;
   }
 
-  public String getRecipientCsv() {
-    return recipientCsv;
+  public EmailView getEmailView() {
+    return emailView;
   }
 
-  public String getSubject() {
-    return subject;
+  public String getRecipientType() {
+    return recipientType;
   }
 
-  public String getBody() {
-    return body;
+  public boolean isOperatorRecipientType() {
+    return isOperatorRecipientType;
   }
 
-  public String getGreetingText() {
-    return greetingText;
+  public boolean getOperatorRecipientType() {
+    return isOperatorRecipientType();
   }
 
-  public String getSignOffText() {
-    return signOffText;
+  public boolean isSubscriberRecipientType() {
+    return isSubscriberRecipientType;
   }
 
-  public String getSignOffIdentifier() {
-    return signOffIdentifier;
+  public boolean getSubscriberRecipientType() {
+    return isSubscriberRecipientType();
   }
 }

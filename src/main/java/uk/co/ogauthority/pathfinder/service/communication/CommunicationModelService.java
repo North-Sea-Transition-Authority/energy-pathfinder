@@ -26,7 +26,6 @@ public class CommunicationModelService {
   public static final String COMMUNICATIONS_SUMMARY_PAGE_TITLE = "Communications";
   public static final String COMMUNICATION_SUMMARY_PAGE_TITLE = "Communication";
   public static final String COMMUNICATION_CONTENT_PAGE_TITLE = "Send new email";
-  public static final String OPERATOR_BREADCRUMB_TITLE = "Operators";
   public static final String OPERATOR_SELECT_PAGE_TITLE = "Which operators should receive this email?";
   public static final String COMMUNICATION_CONFIRM_PAGE_TITLE = "Review and send";
 
@@ -48,7 +47,8 @@ public class CommunicationModelService {
         .addObject("pageTitle", CommunicationModelService.COMMUNICATIONS_SUMMARY_PAGE_TITLE)
         .addObject("addCommunicationUrl",
             ReverseRouter.route(on(CommunicationJourneyController.class).startCommunicationJourney(null))
-        );
+        )
+        .addObject("sentCommunicationViews", communicationViewService.getSentCommunicationViews());
 
     breadcrumbService.fromWorkArea(modelAndView, CommunicationModelService.COMMUNICATIONS_SUMMARY_PAGE_TITLE);
 

@@ -26,7 +26,7 @@ public enum CommunicationJourneyStage {
   ),
   SUMMARY(
       Set.of(RecipientType.values()),
-      Set.of(CommunicationStatus.SENDING, CommunicationStatus.COMPLETE),
+      Set.of(CommunicationStatus.SENDING, CommunicationStatus.SENT),
       Set.of(CommunicationJourneyStatus.values())
   );
 

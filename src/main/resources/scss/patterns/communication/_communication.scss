@@ -26,7 +26,16 @@
     background: govuk-colour("yellow");
   }
 
-  &__recipient-list .govuk-details {
-    margin-bottom: 0;
+  &__recipient-list {
+
+    $margin-bottom: 0;
+
+    .govuk-details {
+      margin-bottom: $margin-bottom;
+    }
+
+    .govuk-list {
+      margin-bottom: $margin-bottom;
+    }
   }
 }

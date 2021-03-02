@@ -1,0 +1,8 @@
+.communication-list {
+
+  @include pathfinder-list;
+
+  .communication-item {
+    @include pathfinder-list-item;
+  }
+}
