@@ -1,5 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.subscription;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,11 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.controller.subscription.SubscriptionController;
+import uk.co.ogauthority.pathfinder.exception.SubscriberNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.subscription.RelationToPathfinder;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeFormValidator;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.subscription.SubscriberRepository;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
@@ -19,7 +24,9 @@ import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 public class SubscriptionService {
 
   public static final String SUBSCRIBE_TEMPLATE_PATH = "subscription/subscribe";
-  public static final String SUBSCRIBE_SUCCESS_TEMPLATE_PATH = "subscription/subscribeSuccess";
+  public static final String SUBSCRIBE_CONFIRMATION_TEMPLATE_PATH = "subscription/subscribeConfirmation";
+  public static final String UNSUBSCRIBE_TEMPLATE_PATH = "subscription/unsubscribe";
+  public static final String UNSUBSCRIBE_CONFIRMATION_TEMPLATE_PATH = "subscription/unsubscribeConfirmation";
 
   private final SubscriberRepository subscriberRepository;
   private final ValidationService validationService;
@@ -37,6 +44,19 @@ public class SubscriptionService {
 
   public boolean isSubscribed(String emailAddress) {
     return subscriberRepository.existsByEmailAddress(emailAddress);
+  }
+
+  public UUID verifyIsSubscribed(String subscriberUuid) {
+    UUID uuid;
+    try {
+      uuid = UUID.fromString(subscriberUuid);
+    } catch (IllegalArgumentException exception) {
+      throw new SubscriberNotFoundException(String.format("Unable to convert %s to UUID", subscriberUuid));
+    }
+    if (!subscriberRepository.existsByUuid(uuid)) {
+      throw new SubscriberNotFoundException(String.format("Unable to find subscriber with UUID %s", subscriberUuid));
+    }
+    return uuid;
   }
 
   @Transactional
@@ -57,6 +77,11 @@ public class SubscriptionService {
     subscriberRepository.save(subscriber);
   }
 
+  @Transactional
+  public void unsubscribe(UUID subscriberUuid) {
+    subscriberRepository.deleteByUuid(subscriberUuid);
+  }
+
   public BindingResult validate(SubscribeForm form, BindingResult bindingResult) {
     subscribeFormValidator.validate(form, bindingResult);
     return validationService.validate(form, bindingResult, ValidationType.FULL);
@@ -70,7 +95,16 @@ public class SubscriptionService {
         .addObject("otherRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OTHER));
   }
 
-  public ModelAndView getSubscribeSuccessModelAndView() {
-    return new ModelAndView(SUBSCRIBE_SUCCESS_TEMPLATE_PATH);
+  public ModelAndView getSubscribeConfirmationModelAndView() {
+    return new ModelAndView(SUBSCRIBE_CONFIRMATION_TEMPLATE_PATH);
+  }
+
+  public ModelAndView getUnsubscribeModelAndView() {
+    return new ModelAndView(UNSUBSCRIBE_TEMPLATE_PATH);
+  }
+
+  public ModelAndView getUnsubscribeConfirmationModelAndView() {
+    return new ModelAndView(UNSUBSCRIBE_CONFIRMATION_TEMPLATE_PATH)
+        .addObject("resubscribeUrl", ReverseRouter.route(on(SubscriptionController.class).getSubscribe()));
   }
 }

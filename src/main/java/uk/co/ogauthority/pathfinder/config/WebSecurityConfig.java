@@ -60,13 +60,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .mvcMatchers("/communications/**")
           .hasAnyAuthority(systemAccessService.getCommunicationsGrantedAuthorities())
 
-        .mvcMatchers("/actuator/health", "/session-info", "/notify/callback", "/contact", "/subscribe")
+        .mvcMatchers("/actuator/health", "/session-info", "/notify/callback", "/contact", "/subscribe", "/unsubscribe/**")
           .permitAll()
 
         .anyRequest()
           .authenticated();
 
-    http.csrf().ignoringAntMatchers("/notify/callback", "/subscribe");
+    http.csrf().ignoringAntMatchers("/notify/callback", "/subscribe", "/unsubscribe/**");
 
     try {
       // Redirect to FOX for login if the request is unauthenticated.
