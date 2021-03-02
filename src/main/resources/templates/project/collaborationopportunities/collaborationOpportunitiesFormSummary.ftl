@@ -11,7 +11,6 @@
           view=view
           showHeader=true
           showActions=true
-          showTag=false
         />
       </#list>
     <#else>

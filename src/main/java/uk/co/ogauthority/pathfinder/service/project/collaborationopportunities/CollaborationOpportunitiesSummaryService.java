@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -34,6 +35,13 @@ public class CollaborationOpportunitiesSummaryService {
   public List<CollaborationOpportunityView> getSummaryViews(ProjectDetail detail) {
     return createCollaborationOpportunityViews(
         collaborationOpportunitiesService.getOpportunitiesForDetail(detail),
+        ValidationType.NO_VALIDATION
+    );
+  }
+
+  public List<CollaborationOpportunityView> getSummaryViews(Project project, Integer version) {
+    return createCollaborationOpportunityViews(
+        collaborationOpportunitiesService.getOpportunitiesForProjectVersion(project, version),
         ValidationType.NO_VALIDATION
     );
   }
