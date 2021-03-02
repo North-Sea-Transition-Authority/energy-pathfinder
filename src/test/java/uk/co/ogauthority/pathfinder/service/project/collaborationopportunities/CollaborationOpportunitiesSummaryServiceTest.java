@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -17,6 +16,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunit
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityView;
 import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -124,5 +124,41 @@ public class CollaborationOpportunitiesSummaryServiceTest {
     when(collaborationOpportunitiesService.canShowInTaskList(detail)).thenReturn(false);
 
     assertThat(collaborationOpportunitiesSummaryService.canShowInTaskList(detail)).isFalse();
+  }
+
+  @Test
+  public void getSummaryViews_withProjectAndVersion_whenFound_thenReturnPopulatedList() {
+
+    final var collaborationOpportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
+
+    final var project = detail.getProject();
+    final var version = detail.getVersion();
+
+    when(collaborationOpportunitiesService.getOpportunitiesForProjectVersion(project, version))
+        .thenReturn(List.of(collaborationOpportunity));
+
+    final var result = collaborationOpportunitiesSummaryService.getSummaryViews(project, version);
+
+    assertThat(result).hasSize(1);
+
+    final var collaborationOpportunityView = result.get(0);
+
+    assertThat(collaborationOpportunityView.getFunction().getValue()).isEqualTo(collaborationOpportunity.getFunction().getDisplayName());
+    assertThat(collaborationOpportunityView.getFunction().getTag()).isEqualTo(Tag.NONE);
+    checkCommonFields(collaborationOpportunityView, collaborationOpportunity);
+
+  }
+
+  @Test
+  public void getSummaryViews_withProjectAndVersion_whenNotFound_thenReturnEmptyList() {
+
+    final var project = detail.getProject();
+    final var version = detail.getVersion();
+
+    when(collaborationOpportunitiesService.getOpportunitiesForProjectVersion(project, version))
+        .thenReturn(Collections.emptyList());
+
+    final var result = collaborationOpportunitiesSummaryService.getSummaryViews(project, version);
+    assertThat(result).isEmpty();
   }
 }

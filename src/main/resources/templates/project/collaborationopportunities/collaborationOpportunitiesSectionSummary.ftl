@@ -2,13 +2,13 @@
 <#import '_collaborationOpportunitySummary.ftl' as collaborationOpportunitySummary>
 
 <@sectionSummaryWrapper.sectionSummaryWrapper sectionId=sectionId sectionTitle=sectionTitle>
-  <#if collaborationOpportunityViews?has_content>
-    <#list collaborationOpportunityViews as collaborationOpportunityView>
-      <@collaborationOpportunitySummary.collaborationOpportunitySummary
-        view=collaborationOpportunityView
+  <#if collaborationOpportunityDiffModel?has_content>
+    <#list collaborationOpportunityDiffModel as collaborationOpportunityDiff>
+      <@collaborationOpportunitySummary.collaborationOpportunityDiffSummary
+        diffModel=collaborationOpportunityDiff.collaborationOpportunityDiff
+        files=collaborationOpportunityDiff.collaborationOpportunityFiles
         showHeader=true
         showActions=false
-        showTag=true
         headingSize="h3"
         headingClass="govuk-heading-m"
       />

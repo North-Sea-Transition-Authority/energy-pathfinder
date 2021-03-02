@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -270,6 +271,35 @@ public class CollaborationOpportunitiesServiceTest {
         anyMap()
     );
 
+  }
+
+  @Test
+  public void getOpportunitiesForProjectVersion_whenFound_thenReturnPopulatedList() {
+
+    final var collaborationOpportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
+    final var collaborationOpportunityList = List.of(collaborationOpportunity);
+
+    final var project = detail.getProject();
+    final var version = detail.getVersion();
+
+    when(collaborationOpportunitiesRepository.findAllByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
+        .thenReturn(collaborationOpportunityList);
+
+    var result = collaborationOpportunitiesService.getOpportunitiesForProjectVersion(project, version);
+    assertThat(result).containsExactly(collaborationOpportunityList.get(0));
+  }
+
+  @Test
+  public void getOpportunitiesForProjectVersion_whenNotFound_thenReturnEmptyList() {
+
+    final var project = detail.getProject();
+    final var version = detail.getVersion();
+
+    when(collaborationOpportunitiesRepository.findAllByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
+        .thenReturn(Collections.emptyList());
+
+    var result = collaborationOpportunitiesService.getOpportunitiesForProjectVersion(project, version);
+    assertThat(result).isEmpty();
   }
 
 }

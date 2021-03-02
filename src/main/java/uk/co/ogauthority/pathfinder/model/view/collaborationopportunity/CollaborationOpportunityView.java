@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.view.ContactDetailProjectSummaryItem;
@@ -15,6 +16,10 @@ public class CollaborationOpportunityView extends ContactDetailProjectSummaryIte
   private String urgentResponseNeeded;
 
   private List<UploadedFileView> uploadedFileViews;
+
+  public CollaborationOpportunityView() {
+    this.uploadedFileViews = new ArrayList<>();
+  }
 
   public CollaborationOpportunityView(Integer displayOrder,
                                       Integer id,

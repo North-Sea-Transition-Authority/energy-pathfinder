@@ -1,16 +1,20 @@
 <#include '../../layout.ftl'/>
 
+<#assign defaultHeadingPrefix = "Collaboration opportunity" />
+<#assign idPrefix = "collaboration-opportunity" />
+<#assign defaultHeadingSize = "h2" />
+<#assign defaultHeadingClass = "govuk-heading-l" />
+
 <#macro collaborationOpportunitySummary
   view
-  opportunityName="Collaboration opportunity"
+  opportunityName=defaultHeadingPrefix
   showHeader=false
   showActions=false
-  showTag=false
-  headingSize="h2"
-  headingClass="govuk-heading-l"
+  headingSize=defaultHeadingSize
+  headingClass=defaultHeadingClass
 >
   <@summaryViewWrapper.summaryViewItemWrapper
-    idPrefix="collaboration-opportunity"
+    idPrefix=idPrefix
     headingPrefix=opportunityName
     displayOrder=view.displayOrder
     isValid=view.valid!""
@@ -20,23 +24,112 @@
     headingSize=headingSize
     headingClass=headingClass
   >
-    <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Opportunity function">
-      <#if showTag>
-        <@stringWithTag.stringWithTag stringWithTag=view.function />
-      <#else>
-        ${view.function.value!""}
-      </#if>
-    </@checkAnswers.checkAnswersRowNoActionsWithNested>
-    <@checkAnswers.checkAnswersRowNoActions prompt="Description of work" value=view.descriptionOfWork!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Urgent response required" value=view.urgentResponseNeeded!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Name" value=view.contactName!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Phone number" value=view.contactPhoneNumber!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Job title" value=view.contactJobTitle!"" />
-    <@checkAnswers.checkAnswersRowNoActions prompt="Email address" value=view.contactEmailAddress!"" />
-    <@checkAnswers.checkAnswersUploadedFileViewNoActions
-      fileUrlFieldValue=(view.uploadedFileViews[0].fileUrl)!""
-      fileNameFieldValue=(view.uploadedFileViews[0].fileName)!""
-      fileDescriptionFieldValue=(view.uploadedFileViews[0].fileDescription)!""
+    <@_collaborationOpportunitySummaryFields
+      useDiffedField=false
+      function=view.function
+      descriptionOfWork=view.descriptionOfWork
+      urgentResponseNeeded=view.urgentResponseNeeded
+      contactName=view.contactName
+      contactPhoneNumber=view.contactPhoneNumber
+      contactJobTitle=view.contactJobTitle
+      contactEmailAddress=view.contactEmailAddress
+      uploadedFileUrl=(view.uploadedFileViews[0].fileUrl)!""
+      uploadedFileName=(view.uploadedFileViews[0].fileName)!""
+      uploadedFileDescription=(view.uploadedFileViews[0].fileDescription)!""
     />
   </@summaryViewWrapper.summaryViewItemWrapper>
+</#macro>
+
+<#macro collaborationOpportunityDiffSummary
+  diffModel
+  files=[]
+  opportunityName=defaultHeadingPrefix
+  showHeader=false
+  showActions=false
+  headingSize=defaultHeadingSize
+  headingClass=defaultHeadingClass
+>
+  <@summaryViewWrapper.summaryViewItemWrapper
+    idPrefix=idPrefix
+    headingPrefix=opportunityName
+    displayOrder=diffModel.CollaborationOpportunityView_displayOrder.currentValue
+    isValid=true
+    summaryLinkList=[]
+    showHeader=showHeader
+    showActions=showActions
+    headingSize=headingSize
+    headingClass=headingClass
+  >
+    <@_collaborationOpportunitySummaryFields
+      useDiffedField=true
+      function=diffModel.CollaborationOpportunityView_function
+      descriptionOfWork=diffModel.CollaborationOpportunityView_descriptionOfWork
+      urgentResponseNeeded=diffModel.CollaborationOpportunityView_urgentResponseNeeded
+      contactName=diffModel.CollaborationOpportunityView_contactName
+      contactPhoneNumber=diffModel.CollaborationOpportunityView_contactPhoneNumber
+      contactJobTitle=diffModel.CollaborationOpportunityView_contactJobTitle
+      contactEmailAddress=diffModel.CollaborationOpportunityView_contactEmailAddress
+      uploadedFileUrl=(files[0].UploadedFileView_fileUrl)!""
+      uploadedFileName=(files[0].UploadedFileView_fileName)!""
+      uploadedFileDescription=(files[0].UploadedFileView_fileDescription)!""
+    />
+  </@summaryViewWrapper.summaryViewItemWrapper>
+</#macro>
+
+<#macro _collaborationOpportunitySummaryFields
+  useDiffedField
+  function=""
+  descriptionOfWork=""
+  urgentResponseNeeded=""
+  contactName=""
+  contactPhoneNumber=""
+  contactJobTitle=""
+  contactEmailAddress=""
+  uploadedFileUrl=""
+  uploadedFileName=""
+  uploadedFileDescription=""
+>
+  <@checkAnswers.checkAnswersStandardNestedOrDiffRow
+    prompt="Opportunity function"
+    fieldValue=function
+    isDiffedField=useDiffedField
+  >
+    <@stringWithTag.stringWithTag stringWithTag=function />
+  </@checkAnswers.checkAnswersStandardNestedOrDiffRow>
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Description of work"
+    fieldValue=descriptionOfWork
+    isDiffedField=useDiffedField
+  />
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Urgent response required"
+    fieldValue=urgentResponseNeeded
+    isDiffedField=useDiffedField
+  />
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Name"
+    fieldValue=contactName
+    isDiffedField=useDiffedField
+  />
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Phone number"
+    fieldValue=contactPhoneNumber
+    isDiffedField=useDiffedField
+  />
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Job title"
+    fieldValue=contactJobTitle
+    isDiffedField=useDiffedField
+  />
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Email address"
+    fieldValue=contactEmailAddress
+    isDiffedField=useDiffedField
+  />
+  <@checkAnswers.checkAnswersStandardOrDiffUploadedFileViewRow
+    fileUrlFieldValue=uploadedFileUrl
+    fileNameFieldValue=uploadedFileName
+    fileDescriptionFieldValue=uploadedFileDescription
+    isDiffedField=useDiffedField
+  />
 </#macro>
