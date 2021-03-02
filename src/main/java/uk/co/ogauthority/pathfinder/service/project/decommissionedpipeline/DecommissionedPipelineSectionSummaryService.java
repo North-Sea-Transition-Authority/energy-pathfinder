@@ -3,16 +3,20 @@ package uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedpipeline.DecommissionedPipelineController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.decommissionedpipeline.DecommissionedPipeline;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
+import uk.co.ogauthority.pathfinder.model.view.decommissionedpipeline.DecommissionedPipelineView;
 import uk.co.ogauthority.pathfinder.model.view.decommissionedpipeline.DecommissionedPipelineViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
+import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
@@ -28,10 +32,13 @@ public class DecommissionedPipelineSectionSummaryService implements ProjectSecti
   public static final int DISPLAY_ORDER = ProjectTask.PIPELINES.getDisplayOrder();
 
   private final DecommissionedPipelineService decommissionedPipelineService;
+  private final DifferenceService differenceService;
 
   @Autowired
-  public DecommissionedPipelineSectionSummaryService(DecommissionedPipelineService decommissionedPipelineService) {
+  public DecommissionedPipelineSectionSummaryService(DecommissionedPipelineService decommissionedPipelineService,
+                                                     DifferenceService differenceService) {
     this.decommissionedPipelineService = decommissionedPipelineService;
+    this.differenceService = differenceService;
   }
 
   @Override
@@ -45,7 +52,40 @@ public class DecommissionedPipelineSectionSummaryService implements ProjectSecti
     summaryModel.put("sectionTitle", PAGE_NAME);
     summaryModel.put("sectionId", SECTION_ID);
     var decommissionedPipelines = decommissionedPipelineService.getDecommissionedPipelines(detail);
-    var decommissionedPipelineViews = IntStream.range(0, decommissionedPipelines.size())
+    var decommissionedPipelineViews = getDecommissionedPipelineViews(decommissionedPipelines);
+    summaryModel.put("decommissionedPipelineDiffModel", getDecommissionedPipelineDifferenceModel(
+        detail,
+        decommissionedPipelineViews
+    ));
+    return new ProjectSectionSummary(
+        List.of(SECTION_LINK),
+        TEMPLATE_PATH,
+        summaryModel,
+        DISPLAY_ORDER
+    );
+  }
+
+  private List<Map<String, ?>> getDecommissionedPipelineDifferenceModel(
+      ProjectDetail projectDetail,
+      List<DecommissionedPipelineView> currentDecommissionedPipelineViews
+  ) {
+    var previousDecommissionedPipelines = decommissionedPipelineService.getDecommissionedPipelinesByProjectAndVersion(
+        projectDetail.getProject(),
+        projectDetail.getVersion() - 1
+    );
+    var previousDecommissionedPipelineViews = getDecommissionedPipelineViews(previousDecommissionedPipelines);
+
+    return differenceService.differentiateComplexLists(
+        currentDecommissionedPipelineViews,
+        previousDecommissionedPipelineViews,
+        Set.of("summaryLinks"),
+        DecommissionedPipelineView::getDisplayOrder,
+        DecommissionedPipelineView::getDisplayOrder
+    );
+  }
+
+  private List<DecommissionedPipelineView> getDecommissionedPipelineViews(List<DecommissionedPipeline> decommissionedPipelines) {
+    return IntStream.range(0, decommissionedPipelines.size())
         .mapToObj(index -> {
           var decommissionedPipeline = decommissionedPipelines.get(index);
           var displayIndex = index + 1;
@@ -53,12 +93,5 @@ public class DecommissionedPipelineSectionSummaryService implements ProjectSecti
           return DecommissionedPipelineViewUtil.from(decommissionedPipeline, displayIndex);
         })
         .collect(Collectors.toList());
-    summaryModel.put("decommissionedPipelineViews", decommissionedPipelineViews);
-    return new ProjectSectionSummary(
-        List.of(SECTION_LINK),
-        TEMPLATE_PATH,
-        summaryModel,
-        DISPLAY_ORDER
-    );
   }
 }

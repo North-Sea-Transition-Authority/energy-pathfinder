@@ -2,10 +2,10 @@
 <#import '_decommissionedPipelineSummary.ftl' as decommissionedPipelineSummary>
 
 <@sectionSummaryWrapper.sectionSummaryWrapper sectionId=sectionId sectionTitle=sectionTitle>
-  <#if decommissionedPipelineViews?has_content>
-    <#list decommissionedPipelineViews as decommissionedPipelineView>
-      <@decommissionedPipelineSummary.decommissionedPipelineSummary
-        decommissionedPipelineView=decommissionedPipelineView
+  <#if decommissionedPipelineDiffModel?has_content>
+    <#list decommissionedPipelineDiffModel as decommissionedPipelineDiff>
+      <@decommissionedPipelineSummary.decommissionedPipelineDiffSummary
+        decommissionedPipelineDiff=decommissionedPipelineDiff
         showHeader=true
         showActions=false
         headingSize="h3"
