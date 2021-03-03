@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.communication.Communication;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.communication.CommunicationStatus;
@@ -69,6 +70,9 @@ public class CommunicationService {
     communicationEntity.setEmailBody(communicationForm.getBody());
     communicationEntity.setStatus(status);
     communicationEntity.setLatestCommunicationJourneyStatus(communicationJourneyStatus);
+    communicationEntity.setGreetingText(EmailProperties.DEFAULT_GREETING_TEXT);
+    communicationEntity.setSignOffText(EmailProperties.DEFAULT_SIGN_OFF_TEXT);
+    communicationEntity.setSignOffIdentifier(EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER);
     communicationEntity = communicationRepository.save(communicationEntity);
 
     if (RecipientType.SUBSCRIBERS.equals(communicationEntity.getRecipientType())) {

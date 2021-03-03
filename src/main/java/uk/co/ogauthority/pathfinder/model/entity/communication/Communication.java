@@ -47,6 +47,12 @@ public class Communication {
   @Column(name = "latest_journey_status")
   private CommunicationJourneyStatus latestCommunicationJourneyStatus;
 
+  private String greetingText;
+
+  private String signOffText;
+
+  private String signOffIdentifier;
+
   public Integer getId() {
     return id;
   }
@@ -127,6 +133,30 @@ public class Communication {
     this.latestCommunicationJourneyStatus = latestCommunicationJourneyStatus;
   }
 
+  public String getGreetingText() {
+    return greetingText;
+  }
+
+  public void setGreetingText(String greetingText) {
+    this.greetingText = greetingText;
+  }
+
+  public String getSignOffText() {
+    return signOffText;
+  }
+
+  public void setSignOffText(String signOffText) {
+    this.signOffText = signOffText;
+  }
+
+  public String getSignOffIdentifier() {
+    return signOffIdentifier;
+  }
+
+  public void setSignOffIdentifier(String signOffIdentifier) {
+    this.signOffIdentifier = signOffIdentifier;
+  }
+
   @Override
   public boolean equals(Object o) {
 
@@ -148,7 +178,10 @@ public class Communication {
         && Objects.equals(createdByWuaId, communication.createdByWuaId)
         && Objects.equals(submittedDatetime, communication.submittedDatetime)
         && Objects.equals(submittedByWuaId, communication.submittedByWuaId)
-        && Objects.equals(latestCommunicationJourneyStatus, communication.latestCommunicationJourneyStatus);
+        && Objects.equals(latestCommunicationJourneyStatus, communication.latestCommunicationJourneyStatus)
+        && Objects.equals(greetingText, communication.greetingText)
+        && Objects.equals(signOffText, communication.signOffText)
+        && Objects.equals(signOffIdentifier, communication.signOffIdentifier);
   }
 
   @Override
@@ -163,7 +196,10 @@ public class Communication {
         createdByWuaId,
         submittedDatetime,
         submittedByWuaId,
-        latestCommunicationJourneyStatus
+        latestCommunicationJourneyStatus,
+        greetingText,
+        signOffText,
+        signOffIdentifier
     );
   }
 }

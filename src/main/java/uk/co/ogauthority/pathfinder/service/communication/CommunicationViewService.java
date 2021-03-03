@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.communication.Communication;
 import uk.co.ogauthority.pathfinder.model.enums.communication.CommunicationStatus;
 import uk.co.ogauthority.pathfinder.model.enums.communication.RecipientType;
@@ -44,12 +43,7 @@ public class CommunicationViewService {
   }
 
   protected CommunicationView getCommunicationView(Communication communication) {
-    final var emailView = getEmailView(
-        serviceProperties.getServiceName(),
-        getRecipientList(communication),
-        communication.getEmailSubject(),
-        communication.getEmailBody()
-    );
+    final var emailView = getEmailView(communication);
     return new CommunicationView(
         communication.getId(),
         emailView,
@@ -72,12 +66,7 @@ public class CommunicationViewService {
         || communicationStatus.equals(CommunicationStatus.SENDING)
     ) {
 
-      final var emailView = getEmailView(
-          serviceProperties.getServiceName(),
-          getRecipientList(communication),
-          communication.getEmailSubject(),
-          communication.getEmailBody()
-      );
+      final var emailView = getEmailView(communication);
 
       return new SentCommunicationView(
           communication.getId(),
@@ -143,18 +132,15 @@ public class CommunicationViewService {
     return recipientList;
   }
 
-  private EmailView getEmailView(String senderName,
-                                 List<String> recipients,
-                                 String subject,
-                                 String body) {
+  private EmailView getEmailView(Communication communication) {
     return new EmailView(
-        senderName,
-        recipients,
-        subject,
-        EmailProperties.DEFAULT_GREETING_TEXT,
-        body,
-        EmailProperties.DEFAULT_SIGN_OFF_TEXT,
-        EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
+        serviceProperties.getServiceName(),
+        getRecipientList(communication),
+        communication.getEmailSubject(),
+        communication.getGreetingText(),
+        communication.getEmailBody(),
+        communication.getSignOffText(),
+        communication.getSignOffIdentifier()
     );
   }
 }

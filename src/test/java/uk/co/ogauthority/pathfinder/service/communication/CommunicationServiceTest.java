@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.communication.Communication;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.communication.CommunicationStatus;
@@ -147,6 +148,9 @@ public class CommunicationServiceTest {
     assertThat(communication.getEmailBody()).isEqualTo(communicationForm.getBody());
     assertThat(communication.getStatus()).isEqualTo(communicationStatus);
     assertThat(communication.getLatestCommunicationJourneyStatus()).isEqualTo(communicationCommunicationJourneyStatus);
+    assertThat(communication.getGreetingText()).isEqualTo(EmailProperties.DEFAULT_GREETING_TEXT);
+    assertThat(communication.getSignOffText()).isEqualTo(EmailProperties.DEFAULT_SIGN_OFF_TEXT);
+    assertThat(communication.getSignOffIdentifier()).isEqualTo(EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER);
   }
 
   @Test
