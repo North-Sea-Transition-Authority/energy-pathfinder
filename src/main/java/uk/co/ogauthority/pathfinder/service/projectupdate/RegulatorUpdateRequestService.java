@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.form.projectupdate.RequestUpdateFormVa
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.RequestUpdateValidationHint;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.RegulatorUpdateRequestRepository;
+import uk.co.ogauthority.pathfinder.service.email.OperatorEmailService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -33,6 +34,7 @@ public class RegulatorUpdateRequestService {
   private final ProjectUpdateService projectUpdateService;
   private final ProjectHeaderSummaryService projectHeaderSummaryService;
   private final RequestUpdateFormValidator requestUpdateFormValidator;
+  private final OperatorEmailService operatorEmailService;
   private final ValidationService validationService;
   private final BreadcrumbService breadcrumbService;
 
@@ -42,12 +44,14 @@ public class RegulatorUpdateRequestService {
       ProjectUpdateService projectUpdateService,
       ProjectHeaderSummaryService projectHeaderSummaryService,
       RequestUpdateFormValidator requestUpdateFormValidator,
+      OperatorEmailService operatorEmailService,
       ValidationService validationService,
       BreadcrumbService breadcrumbService) {
     this.regulatorUpdateRequestRepository = regulatorUpdateRequestRepository;
     this.projectUpdateService = projectUpdateService;
     this.projectHeaderSummaryService = projectHeaderSummaryService;
     this.requestUpdateFormValidator = requestUpdateFormValidator;
+    this.operatorEmailService = operatorEmailService;
     this.validationService = validationService;
     this.breadcrumbService = breadcrumbService;
   }
@@ -68,7 +72,15 @@ public class RegulatorUpdateRequestService {
     regulatorUpdateRequest.setDeadlineDate(form.getDeadlineDate().createDateOrNull());
     regulatorUpdateRequest.setRequestedByWuaId(requestedByUser.getWuaId());
     regulatorUpdateRequest.setRequestedInstant(Instant.now());
-    return regulatorUpdateRequestRepository.save(regulatorUpdateRequest);
+    regulatorUpdateRequest = regulatorUpdateRequestRepository.save(regulatorUpdateRequest);
+
+    operatorEmailService.sendUpdateRequestedEmail(
+        projectDetail,
+        form.getUpdateReason(),
+        form.getDeadlineDate().createDateOrNull()
+    );
+
+    return regulatorUpdateRequest;
   }
 
   public boolean hasUpdateBeenRequested(ProjectDetail projectDetail) {

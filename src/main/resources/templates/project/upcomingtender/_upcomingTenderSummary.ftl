@@ -130,7 +130,7 @@
     isDiffedField=useDiffedField
   />
   <@checkAnswers.checkAnswersStandardOrDiffRow
-    prompt="Email Address"
+    prompt="Email address"
     fieldValue=contactEmailAddress
     isDiffedField=useDiffedField
   />

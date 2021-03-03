@@ -29,6 +29,7 @@ import uk.co.ogauthority.pathfinder.model.form.projectupdate.RequestUpdateForm;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.RequestUpdateFormValidator;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.RegulatorUpdateRequestRepository;
+import uk.co.ogauthority.pathfinder.service.email.OperatorEmailService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -51,6 +52,9 @@ public class RegulatorUpdateRequestServiceTest {
   private RequestUpdateFormValidator requestUpdateFormValidator;
 
   @Mock
+  private OperatorEmailService operatorEmailService;
+
+  @Mock
   private ValidationService validationService;
 
   @Mock
@@ -70,6 +74,7 @@ public class RegulatorUpdateRequestServiceTest {
         projectUpdateService,
         projectHeaderSummaryService,
         requestUpdateFormValidator,
+        operatorEmailService,
         validationService,
         breadcrumbService
     );
@@ -103,6 +108,7 @@ public class RegulatorUpdateRequestServiceTest {
     assertThat(regulatorRequestedUpdate.getRequestedInstant()).isNotNull();
 
     verify(regulatorUpdateRequestRepository, times(1)).save(regulatorRequestedUpdate);
+    verify(operatorEmailService, times(1)).sendUpdateRequestedEmail(projectDetail, form.getUpdateReason(), form.getDeadlineDate().createDateOrNull());
   }
 
   @Test
