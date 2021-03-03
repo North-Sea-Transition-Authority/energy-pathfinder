@@ -35,8 +35,16 @@ public class TestEmailConfiguration {
                                                 EmailValidator emailValidator,
                                                 // NB: the ":" means the default value will be an empty string when not specified
                                                 @Value("#{'${email.testRecipientList:}'.split(';')}") List<String> testRecipientList,
-                                                @Value("${service.name}") String serviceName
+                                                @Value("${service.name}") String serviceName,
+                                                @Value("${service.customer.mnemonic}") String customerMnemonic
   ) {
-    return new TestEmailServiceImpl(notifyTemplateService, notificationClient, emailValidator, testRecipientList, serviceName);
+    return new TestEmailServiceImpl(
+        notifyTemplateService,
+        notificationClient,
+        emailValidator,
+        testRecipientList,
+        serviceName,
+        customerMnemonic
+    );
   }
 }

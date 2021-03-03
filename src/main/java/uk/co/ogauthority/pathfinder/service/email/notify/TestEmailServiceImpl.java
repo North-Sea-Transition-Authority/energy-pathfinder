@@ -25,18 +25,20 @@ public class TestEmailServiceImpl implements EmailService {
   private final EmailValidator emailValidator;
   private static final Logger LOGGER = LoggerFactory.getLogger(TestEmailServiceImpl.class);
   private final String serviceName;
+  private final String customerMnemonic;
 
   public TestEmailServiceImpl(NotifyTemplateService notifyTemplateService,
                               NotificationClient notificationClient,
                               EmailValidator emailValidator,
                               List<String> testRecipientList,
-                              String serviceName
-  ) {
+                              String serviceName,
+                              String customerMnemonic) {
     this.notificationClient = notificationClient;
     this.notifyTemplateService = notifyTemplateService;
     this.emailValidator = emailValidator;
     this.testRecipientList = testRecipientList;
     this.serviceName = serviceName;
+    this.customerMnemonic = customerMnemonic;
   }
 
   @Override
@@ -59,6 +61,7 @@ public class TestEmailServiceImpl implements EmailService {
       personalisation.put("TEST_EMAIL", "yes");
       personalisation.put("SUBJECT_PREFIX", "**TEST EMAIL**");
       personalisation.put("SERVICE_NAME", serviceName);
+      personalisation.put("CUSTOMER_MNEMONIC", customerMnemonic);
 
       // If we have test recipients send the email to each
       testRecipientList.stream()

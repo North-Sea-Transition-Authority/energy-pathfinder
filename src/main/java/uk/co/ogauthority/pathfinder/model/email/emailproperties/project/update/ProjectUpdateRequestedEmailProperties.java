@@ -29,7 +29,10 @@ public class ProjectUpdateRequestedEmailProperties extends EmailProperties {
     Map<String, String> emailPersonalisation = super.getEmailPersonalisation();
     emailPersonalisation.put("PROJECT_NAME", projectName);
     emailPersonalisation.put("UPDATE_REASON", updateReason);
-    emailPersonalisation.put("DEADLINE_TEXT", deadlineDate.equals("") ? "" : "An update to this project is due by " + deadlineDate);
+    emailPersonalisation.put("DEADLINE_TEXT",
+        deadlineDate.equals("") ? "" : String.format("An update to this project is due by %s.", deadlineDate)
+    );
+    emailPersonalisation.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
     emailPersonalisation.put("PROJECT_URL", projectUrl);
     return emailPersonalisation;
   }

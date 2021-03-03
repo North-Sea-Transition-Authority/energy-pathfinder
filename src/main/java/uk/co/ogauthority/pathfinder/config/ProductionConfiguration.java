@@ -31,7 +31,14 @@ public class ProductionConfiguration {
   public ProductionEmailServiceImpl productionNotifyService(NotifyTemplateService notifyTemplateService,
                                                             NotificationClient notificationClient,
                                                             EmailValidator emailValidator,
-                                                            @Value("${service.name}") String serviceName) {
-    return new ProductionEmailServiceImpl(notifyTemplateService, notificationClient, emailValidator, serviceName);
+                                                            @Value("${service.name}") String serviceName,
+                                                            @Value("${service.customer.mnemonic}") String customerMnemonic) {
+    return new ProductionEmailServiceImpl(
+        notifyTemplateService,
+        notificationClient,
+        emailValidator,
+        serviceName,
+        customerMnemonic
+    );
   }
 }

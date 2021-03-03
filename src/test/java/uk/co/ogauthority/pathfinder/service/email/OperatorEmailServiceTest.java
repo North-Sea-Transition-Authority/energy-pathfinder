@@ -100,9 +100,9 @@ public class OperatorEmailServiceTest {
       );
       expectedEmailProperties.put("PROJECT_NAME", projectName);
       expectedEmailProperties.put("UPDATE_REASON", updateReason);
-      expectedEmailProperties.put("DEADLINE_TEXT", "An update to this project is due by " + DateUtil.formatDate(deadlineDate));
+      expectedEmailProperties.put("DEADLINE_TEXT", String.format("An update to this project is due by %s.", DateUtil.formatDate(deadlineDate)));
+      expectedEmailProperties.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
       expectedEmailProperties.put("PROJECT_URL", projectUrl);
-
       assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(expectedEmailProperties);
     });
   }
@@ -125,6 +125,7 @@ public class OperatorEmailServiceTest {
       expectedEmailProperties.put("PROJECT_NAME", projectName);
       expectedEmailProperties.put("UPDATE_REASON", updateReason);
       expectedEmailProperties.put("DEADLINE_TEXT", "");
+      expectedEmailProperties.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
       expectedEmailProperties.put("PROJECT_URL", projectUrl);
 
       assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(expectedEmailProperties);

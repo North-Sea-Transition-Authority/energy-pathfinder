@@ -22,15 +22,18 @@ public class ProductionEmailServiceImpl implements EmailService {
   private final EmailValidator emailValidator;
   private static final Logger LOGGER = LoggerFactory.getLogger(ProductionEmailServiceImpl.class);
   private final String serviceName;
+  private final String customerMnemonic;
 
   public ProductionEmailServiceImpl(NotifyTemplateService notifyTemplateService,
                                     NotificationClient notificationClient,
                                     EmailValidator emailValidator,
-                                    String serviceName) {
+                                    String serviceName,
+                                    String customerMnemonic) {
     this.notificationClient = notificationClient;
     this.notifyTemplateService = notifyTemplateService;
     this.emailValidator = emailValidator;
     this.serviceName = serviceName;
+    this.customerMnemonic = customerMnemonic;
   }
 
   @Override
@@ -52,6 +55,7 @@ public class ProductionEmailServiceImpl implements EmailService {
 
         Map<String, String> personalisation = emailProperties.getEmailPersonalisation();
         personalisation.put("SERVICE_NAME", serviceName);
+        personalisation.put("CUSTOMER_MNEMONIC", customerMnemonic);
         personalisation.put("SUBJECT_PREFIX", "");
 
         if (emailValidator.isValid(toEmailAddress)) {
