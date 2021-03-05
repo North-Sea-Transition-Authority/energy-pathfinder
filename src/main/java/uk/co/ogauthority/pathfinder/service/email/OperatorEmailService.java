@@ -5,8 +5,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.team.PortalTeamAccessor;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.ProjectTransferredFromOperatorEmailProperties;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.ProjectTransferredToOperatorEmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.ProjectUpdateRequestedEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
@@ -38,23 +41,64 @@ public class OperatorEmailService {
   }
 
   public void sendUpdateRequestedEmail(ProjectDetail projectDetail, String updateReason, LocalDate deadlineDate) {
+    var projectTitle = projectInformationService.getProjectTitle(projectDetail);
+    var formattedDeadlineDate = DateUtil.formatDate(deadlineDate);
+    var projectUrl = emailLinkService.generateProjectManagementUrl(projectDetail.getProject());
+
     var teamMemberPeople = getOrganisationGroupPeople(projectDetail);
 
     teamMemberPeople.forEach(person -> {
       var emailProperties = new ProjectUpdateRequestedEmailProperties(
           person.getForename(),
-          projectInformationService.getProjectTitle(projectDetail),
+          projectTitle,
           updateReason,
-          DateUtil.formatDate(deadlineDate),
-          emailLinkService.generateProjectManagementUrl(projectDetail.getProject())
+          formattedDeadlineDate,
+          projectUrl
       );
       emailService.sendEmail(emailProperties, person.getEmailAddress());
     });
   }
 
+  public void sendProjectTransferEmails(ProjectDetail projectDetail,
+                                        PortalOrganisationGroup fromOrganisationGroup,
+                                        PortalOrganisationGroup toOrganisationGroup,
+                                        String transferReason) {
+    var projectTitle = projectInformationService.getProjectTitle(projectDetail);
+    var projectUrl = emailLinkService.generateProjectManagementUrl(projectDetail.getProject());
+
+    var fromOrganisationGroupName = fromOrganisationGroup.getName();
+    var toOrganisationGroupName = toOrganisationGroup.getName();
+
+    var fromTeamMemberPeople = getOrganisationGroupPeople(fromOrganisationGroup);
+    fromTeamMemberPeople.forEach(person -> {
+      var transferredFromEmailProperties = new ProjectTransferredFromOperatorEmailProperties(
+          person.getForename(),
+          projectTitle,
+          transferReason,
+          toOrganisationGroupName
+      );
+      emailService.sendEmail(transferredFromEmailProperties, person.getEmailAddress());
+    });
+
+    var toTeamMemberPeople = getOrganisationGroupPeople(toOrganisationGroup);
+    toTeamMemberPeople.forEach(person -> {
+      var transferredToEmailProperties = new ProjectTransferredToOperatorEmailProperties(
+          person.getForename(),
+          projectTitle,
+          transferReason,
+          fromOrganisationGroupName,
+          projectUrl
+      );
+      emailService.sendEmail(transferredToEmailProperties, person.getEmailAddress());
+    });
+  }
+
   private List<Person> getOrganisationGroupPeople(ProjectDetail projectDetail) {
     var projectOperator = projectOperatorService.getProjectOperatorByProjectDetailOrError(projectDetail);
-    var organisationGroup = projectOperator.getOrganisationGroup();
+    return getOrganisationGroupPeople(projectOperator.getOrganisationGroup());
+  }
+
+  private List<Person> getOrganisationGroupPeople(PortalOrganisationGroup organisationGroup) {
     var portalTeamDto = portalTeamAccessor.findPortalTeamByOrganisationGroup(organisationGroup)
         .orElseThrow(() -> new PathfinderEntityNotFoundException(
             String.format("Unable to find portal team for organisation group with org grp id %s", organisationGroup.getOrgGrpId())));

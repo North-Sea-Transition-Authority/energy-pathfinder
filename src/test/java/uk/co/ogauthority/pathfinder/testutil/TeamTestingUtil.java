@@ -28,7 +28,11 @@ public class TeamTestingUtil {
   }
 
   public static OrganisationTeam getOrganisationTeam(PortalOrganisationGroup organisationGroup) {
-    return new OrganisationTeam(200, "ORG_TEAM_NAME", "ORG_TEAM_DESCRIPTION", organisationGroup);
+    return getOrganisationTeam(200, organisationGroup);
+  }
+
+  public static OrganisationTeam getOrganisationTeam(int id, PortalOrganisationGroup organisationGroup) {
+    return new OrganisationTeam(id, "ORG_TEAM_NAME", "ORG_TEAM_DESCRIPTION", organisationGroup);
   }
 
   public static OrganisationTeam getOrganisationTeam(int id, String organisationTeamName) {

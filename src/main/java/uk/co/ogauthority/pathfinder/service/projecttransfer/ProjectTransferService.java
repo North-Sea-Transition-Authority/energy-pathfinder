@@ -24,6 +24,7 @@ import uk.co.ogauthority.pathfinder.model.form.projecttransfer.ProjectTransferFo
 import uk.co.ogauthority.pathfinder.model.form.projecttransfer.ProjectTransferValidationHint;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projecttransfer.ProjectTransferRepository;
+import uk.co.ogauthority.pathfinder.service.email.OperatorEmailService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.CancelDraftProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
@@ -47,6 +48,7 @@ public class ProjectTransferService {
   private final ValidationService validationService;
   private final ProjectTransferFormValidator projectTransferFormValidator;
   private final BreadcrumbService breadcrumbService;
+  private final OperatorEmailService operatorEmailService;
 
   @Autowired
   public ProjectTransferService(
@@ -59,7 +61,8 @@ public class ProjectTransferService {
       CancelDraftProjectVersionService cancelDraftProjectVersionService,
       ValidationService validationService,
       ProjectTransferFormValidator projectTransferFormValidator,
-      BreadcrumbService breadcrumbService) {
+      BreadcrumbService breadcrumbService,
+      OperatorEmailService operatorEmailService) {
     this.projectTransferRepository = projectTransferRepository;
     this.projectOperatorService = projectOperatorService;
     this.projectUpdateService = projectUpdateService;
@@ -70,6 +73,7 @@ public class ProjectTransferService {
     this.validationService = validationService;
     this.projectTransferFormValidator = projectTransferFormValidator;
     this.breadcrumbService = breadcrumbService;
+    this.operatorEmailService = operatorEmailService;
   }
 
   @Transactional
@@ -93,7 +97,16 @@ public class ProjectTransferService {
     projectTransfer.setTransferReason(form.getTransferReason());
     projectTransfer.setTransferredInstant(Instant.now());
     projectTransfer.setTransferredByWuaId(user.getWuaId());
-    return projectTransferRepository.save(projectTransfer);
+    projectTransfer = projectTransferRepository.save(projectTransfer);
+
+    operatorEmailService.sendProjectTransferEmails(
+        newProjectDetail,
+        fromOrganisationGroup,
+        toOrganisationGroup,
+        form.getTransferReason()
+    );
+
+    return projectTransfer;
   }
 
   public Optional<ProjectTransfer> getProjectTransfer(ProjectDetail projectDetail) {
