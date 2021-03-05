@@ -25,16 +25,22 @@ public enum ViewableTeamType {
       20
   );
 
+  private final String identifier;
   private final String linkText;
   private final String linkHint;
   private final String linkUrl;
   private final int displayOrder;
 
   ViewableTeamType(String linkText, String linkHint, String linkUrl, int displayOrder) {
+    this.identifier = name();
     this.linkText = linkText;
     this.linkHint = linkHint;
     this.linkUrl = linkUrl;
     this.displayOrder = displayOrder;
+  }
+
+  public String getIdentifier() {
+    return identifier;
   }
 
   public String getLinkText() {
