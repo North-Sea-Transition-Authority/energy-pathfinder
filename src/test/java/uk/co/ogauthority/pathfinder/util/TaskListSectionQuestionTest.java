@@ -20,8 +20,8 @@ public class TaskListSectionQuestionTest {
       ProjectTask.WELLS,
       ProjectTask.PLATFORM_FPSO,
       ProjectTask.INTEGRATED_RIGS,
-      ProjectTask.SUBSEA_INFRASTRUCTURE,
-      ProjectTask.PIPELINES
+      ProjectTask.SUBSEA_INFRASTRUCTURE
+      // ProjectTask.PIPELINES // Pipelines disabled: PAT-457
   );
 
   private static final List<ProjectTask> NON_DECOM_TASKS = List.of(

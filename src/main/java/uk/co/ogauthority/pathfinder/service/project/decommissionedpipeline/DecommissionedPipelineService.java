@@ -169,7 +169,8 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
 
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
-    return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.PIPELINES);
+    // return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.PIPELINES);
+    return false; // Pipelines disabled: PAT-457
   }
 
   @Override

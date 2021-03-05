@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -269,17 +270,25 @@ public class DecommissionedPipelineServiceTest {
     decommissionedPipelineService.getDecommissionedPipelineOrError(DECOMMISSIONED_PIPELINE_ID, projectDetail);
   }
 
+  // Pipelines disabled: PAT-457
   @Test
-  public void canShowInTaskList_true() {
-    when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.PIPELINES)).thenReturn(true);
-    assertThat(decommissionedPipelineService.canShowInTaskList(projectDetail)).isTrue();
+  public void canShowInTaskList() {
+    assertThat(decommissionedPipelineService.canShowInTaskList(projectDetail)).isFalse();
+
+    verify(projectSetupService, never()).taskSelectedForProjectDetail(projectDetail, ProjectTask.PIPELINES);
   }
 
-  @Test
-  public void canShowInTaskList_false() {
-    when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.PIPELINES)).thenReturn(false);
-    assertThat(decommissionedPipelineService.canShowInTaskList(projectDetail)).isFalse();
-  }
+  // @Test
+  // public void canShowInTaskList_true() {
+  //   when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.PIPELINES)).thenReturn(true);
+  //   assertThat(decommissionedPipelineService.canShowInTaskList(projectDetail)).isTrue();
+  // }
+  //
+  // @Test
+  // public void canShowInTaskList_false() {
+  //   when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.PIPELINES)).thenReturn(false);
+  //   assertThat(decommissionedPipelineService.canShowInTaskList(projectDetail)).isFalse();
+  // }
 
   @Test
   public void removeSectionData_verifyInteractions() {

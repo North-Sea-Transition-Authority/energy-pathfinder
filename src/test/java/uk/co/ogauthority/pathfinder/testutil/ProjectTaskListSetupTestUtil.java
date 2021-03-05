@@ -32,16 +32,16 @@ public class ProjectTaskListSetupTestUtil {
       TaskListSectionAnswer.WELLS_YES,
       TaskListSectionAnswer.PLATFORM_FPSO_NO,
       TaskListSectionAnswer.INTEGRATED_RIGS_NO,
-      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
-      TaskListSectionAnswer.PIPELINES_NO
+      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES
+      // TaskListSectionAnswer.PIPELINES_NO // Pipelines disabled: PAT-457
   );
 
   public static final List<TaskListSectionAnswer> ONLY_DECOM_ANSWERS = List.of(
       TaskListSectionAnswer.WELLS_YES,
       TaskListSectionAnswer.PLATFORM_FPSO_NO,
       TaskListSectionAnswer.INTEGRATED_RIGS_NO,
-      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
-      TaskListSectionAnswer.PIPELINES_NO
+      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES
+      // TaskListSectionAnswer.PIPELINES_NO // Pipelines disabled: PAT-457
   );
 
   public static final List<TaskListSectionQuestion> ONLY_DECOM_SECTIONS = List.of(
@@ -76,7 +76,7 @@ public class ProjectTaskListSetupTestUtil {
     form.setPlatformsFpsosIncluded(TaskListSectionAnswer.PLATFORM_FPSO_NO);
     form.setSubseaInfrastructureIncluded(TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES);
     form.setIntegratedRigsIncluded(TaskListSectionAnswer.INTEGRATED_RIGS_NO);
-    form.setPipelinesIncluded(TaskListSectionAnswer.PIPELINES_NO);
+    // form.setPipelinesIncluded(TaskListSectionAnswer.PIPELINES_NO); // Pipelines disabled: PAT-457
     return form;
   }
 

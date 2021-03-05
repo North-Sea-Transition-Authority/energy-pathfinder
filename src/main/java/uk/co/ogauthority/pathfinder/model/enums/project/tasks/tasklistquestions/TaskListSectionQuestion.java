@@ -76,16 +76,17 @@ public enum TaskListSectionQuestion {
       TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
       TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_NO,
       true
-  ),
-  PIPELINES(
-      ProjectTask.PIPELINES,
-      "Are pipelines being decommissioned on this project?",
-      "Pipelines to be decommissioned",
-      "form.pipelinesIncluded",
-      TaskListSectionAnswer.PIPELINES_YES,
-      TaskListSectionAnswer.PIPELINES_NO,
-      true
   );
+  // Pipelines disabled: PAT-457
+  // PIPELINES(
+  //     ProjectTask.PIPELINES,
+  //     "Are pipelines being decommissioned on this project?",
+  //     "Pipelines to be decommissioned",
+  //     "form.pipelinesIncluded",
+  //     TaskListSectionAnswer.PIPELINES_YES,
+  //     TaskListSectionAnswer.PIPELINES_NO,
+  //     true
+  // );
 
   private final ProjectTask projectTask;
   private final String displayName;
