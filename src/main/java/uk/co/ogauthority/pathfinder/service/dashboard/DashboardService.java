@@ -15,7 +15,11 @@ import uk.co.ogauthority.pathfinder.service.team.TeamService;
 @Service
 public class DashboardService {
 
-  public static final List<ProjectStatus> OPERATOR_STATUS_DEFAULTS = List.of(ProjectStatus.DRAFT);
+  public static final List<ProjectStatus> OPERATOR_STATUS_DEFAULTS = List.of(
+      ProjectStatus.DRAFT,
+      ProjectStatus.QA,
+      ProjectStatus.PUBLISHED
+  );
   public static final List<ProjectStatus> REGULATOR_STATUS_DEFAULTS = List.of(ProjectStatus.QA);
 
   private final TeamService teamService;
