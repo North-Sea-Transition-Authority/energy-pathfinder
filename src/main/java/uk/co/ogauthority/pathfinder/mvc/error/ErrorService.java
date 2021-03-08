@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.model.enums.contact.ServiceContactDetail;
+import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 
 @Service
 public class ErrorService {
@@ -44,6 +45,7 @@ public class ErrorService {
 
   private void addContactDetails(ModelAndView modelAndView) {
     modelAndView.addObject("technicalSupportContact", ServiceContactDetail.TECHNICAL_SUPPORT);
+    modelAndView.addObject("contactUrl", ControllerUtils.getContactUrl());
   }
 
   private void addServiceProperties(ModelAndView modelAndView) {

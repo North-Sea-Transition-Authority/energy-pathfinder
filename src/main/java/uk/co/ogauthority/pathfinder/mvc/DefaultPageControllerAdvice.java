@@ -1,7 +1,5 @@
 package uk.co.ogauthority.pathfinder.mvc;
 
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
@@ -12,9 +10,9 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import uk.co.ogauthority.pathfinder.auth.CurrentUserView;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
-import uk.co.ogauthority.pathfinder.controller.contact.ContactInformationController;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
 import uk.co.ogauthority.pathfinder.service.navigation.TopNavigationService;
+import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.SecurityUtil;
 
 @ControllerAdvice
@@ -57,7 +55,7 @@ public class DefaultPageControllerAdvice {
 
   private void addCommonUrls(Model model) {
     model.addAttribute("foxLogoutUrl", foxUrlService.getFoxLogoutUrl());
-    model.addAttribute("contactUrl", ReverseRouter.route(on(ContactInformationController.class).getContactInformation()));
+    model.addAttribute("contactUrl", ControllerUtils.getContactUrl());
   }
 
   private void addServiceSpecificAttributes(Model model) {
