@@ -1,7 +1,5 @@
 package uk.co.ogauthority.pathfinder.controller.rest;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -44,23 +42,32 @@ public class PipelineRestControllerTest extends AbstractControllerTest {
     unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
   }
 
+  // Pipelines disabled: PAT-457
   @Test
-  public void searchPipelines_whenAuthenticated_thenAccess() throws Exception {
+  public void searchPipelines_whenAuthenticated_thenNotFound() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
         on(PipelineRestController.class).searchPipelines(SEARCH_TERM)))
         .with(authenticatedUserAndSession(authenticatedUser)))
-        .andExpect(status().isOk());
-
-    verify(pipelineService, times(1)).searchPipelinesWithNameContaining(SEARCH_TERM);
+        .andExpect(status().isNotFound());
   }
 
-  @Test
-  public void searchPipelines_whenUnauthenticated_thenForbidden() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(
-        on(PipelineRestController.class).searchPipelines(SEARCH_TERM)))
-        .with(authenticatedUserAndSession(unauthenticatedUser)))
-        .andExpect(status().isForbidden());
-
-    verify(pipelineService, times(0)).searchPipelinesWithNameContaining(SEARCH_TERM);
-  }
+  // @Test
+  // public void searchPipelines_whenAuthenticated_thenAccess() throws Exception {
+  //   mockMvc.perform(get(ReverseRouter.route(
+  //       on(PipelineRestController.class).searchPipelines(SEARCH_TERM)))
+  //       .with(authenticatedUserAndSession(authenticatedUser)))
+  //       .andExpect(status().isOk());
+  //
+  //   verify(pipelineService, times(1)).searchPipelinesWithNameContaining(SEARCH_TERM);
+  // }
+  //
+  // @Test
+  // public void searchPipelines_whenUnauthenticated_thenForbidden() throws Exception {
+  //   mockMvc.perform(get(ReverseRouter.route(
+  //       on(PipelineRestController.class).searchPipelines(SEARCH_TERM)))
+  //       .with(authenticatedUserAndSession(unauthenticatedUser)))
+  //       .andExpect(status().isForbidden());
+  //
+  //   verify(pipelineService, times(0)).searchPipelinesWithNameContaining(SEARCH_TERM);
+  // }
 }
