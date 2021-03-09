@@ -18,6 +18,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.service.team.PortalTeamAccessor;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.OutgoingOperatorProjectTransferEmailProperties;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.IncomingOperatorProjectTransferEmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.ProjectUpdateRequestedEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
@@ -125,6 +127,73 @@ public class OperatorEmailServiceTest {
       expectedEmailProperties.put("PROJECT_NAME", projectName);
       expectedEmailProperties.put("UPDATE_REASON", updateReason);
       expectedEmailProperties.put("DEADLINE_TEXT", "");
+      expectedEmailProperties.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
+      expectedEmailProperties.put("PROJECT_URL", projectUrl);
+
+      assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(expectedEmailProperties);
+    });
+  }
+
+  @Test
+  public void sendProjectTransferEmails() {
+    var fromOrganisationGroup = ProjectOperatorTestUtil.getOrgGroup("Old operator");
+    var toOrganisationGroup = ProjectOperatorTestUtil.getOrgGroup("New operator");
+    var transferReason = "Test transfer reason";
+
+    var fromTeamMemberPeople = List.of(
+        new Person(1, "From team", "Member 1", "fromteammember1@example.com", "123"),
+        new Person(2, "From team", "Member 2", "fromteammember2@example.com", "123")
+    );
+    var toTeamMemberPeople = List.of(
+        new Person(1, "To team", "Member 1", "toteammember1@example.com", "123"),
+        new Person(2, "To team", "Member 2", "toteammember2@example.com", "123")
+    );
+
+    var fromTeam = TeamTestingUtil.getOrganisationTeam(200, fromOrganisationGroup);
+    var toTeam = TeamTestingUtil.getOrganisationTeam(400, toOrganisationGroup);
+
+    var fromPortalTeamDto = TeamTestingUtil.portalTeamDtoFrom(fromTeam);
+    var toPortalTeamDto = TeamTestingUtil.portalTeamDtoFrom(toTeam);
+
+    when(portalTeamAccessor.findPortalTeamByOrganisationGroup(fromOrganisationGroup)).thenReturn(
+        Optional.of(fromPortalTeamDto)
+    );
+    when(portalTeamAccessor.findPortalTeamByOrganisationGroup(toOrganisationGroup)).thenReturn(
+        Optional.of(toPortalTeamDto)
+    );
+    when(portalTeamAccessor.getPortalTeamMemberPeople(List.of(fromPortalTeamDto.getResId()))).thenReturn(fromTeamMemberPeople);
+    when(portalTeamAccessor.getPortalTeamMemberPeople(List.of(toPortalTeamDto.getResId()))).thenReturn(toTeamMemberPeople);
+
+    operatorEmailService.sendProjectTransferEmails(projectDetail, fromOrganisationGroup, toOrganisationGroup, transferReason);
+
+    fromTeamMemberPeople.forEach(person -> {
+      ArgumentCaptor<EmailProperties> emailCaptor = ArgumentCaptor.forClass(EmailProperties.class);
+      verify(emailService, times(1)).sendEmail(emailCaptor.capture(), eq(person.getEmailAddress()));
+      OutgoingOperatorProjectTransferEmailProperties emailProperties = (OutgoingOperatorProjectTransferEmailProperties) emailCaptor.getValue();
+
+      var expectedEmailProperties = EmailPropertyTestUtil.getDefaultEmailPersonalisation(
+          person.getForename(),
+          EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
+      );
+      expectedEmailProperties.put("PROJECT_NAME", projectName);
+      expectedEmailProperties.put("TRANSFER_REASON", transferReason);
+      expectedEmailProperties.put("NEW_OPERATOR_NAME", toOrganisationGroup.getName());
+
+      assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(expectedEmailProperties);
+    });
+
+    toTeamMemberPeople.forEach(person -> {
+      ArgumentCaptor<EmailProperties> emailCaptor = ArgumentCaptor.forClass(EmailProperties.class);
+      verify(emailService, times(1)).sendEmail(emailCaptor.capture(), eq(person.getEmailAddress()));
+      IncomingOperatorProjectTransferEmailProperties emailProperties = (IncomingOperatorProjectTransferEmailProperties) emailCaptor.getValue();
+
+      var expectedEmailProperties = EmailPropertyTestUtil.getDefaultEmailPersonalisation(
+          person.getForename(),
+          EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
+      );
+      expectedEmailProperties.put("PROJECT_NAME", projectName);
+      expectedEmailProperties.put("TRANSFER_REASON", transferReason);
+      expectedEmailProperties.put("PREVIOUS_OPERATOR_NAME", fromOrganisationGroup.getName());
       expectedEmailProperties.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
       expectedEmailProperties.put("PROJECT_URL", projectUrl);
 

@@ -31,6 +31,7 @@ import uk.co.ogauthority.pathfinder.model.form.projecttransfer.ProjectTransferFo
 import uk.co.ogauthority.pathfinder.model.form.projecttransfer.ProjectTransferValidationHint;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projecttransfer.ProjectTransferRepository;
+import uk.co.ogauthority.pathfinder.service.email.OperatorEmailService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.CancelDraftProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
@@ -75,6 +76,9 @@ public class ProjectTransferServiceTest {
   @Mock
   private BreadcrumbService breadcrumbService;
 
+  @Mock
+  private OperatorEmailService operatorEmailService;
+
   @Captor
   private ArgumentCaptor<ProjectTransferValidationHint> projectTransferValidationHintArgumentCaptor;
 
@@ -96,7 +100,8 @@ public class ProjectTransferServiceTest {
         cancelDraftProjectVersionService,
         validationService,
         projectTransferFormValidator,
-        breadcrumbService
+        breadcrumbService,
+        operatorEmailService
     );
 
     when(projectTransferRepository.save(any(ProjectTransfer.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
@@ -136,6 +141,13 @@ public class ProjectTransferServiceTest {
     assertThat(projectTransfer.getTransferredByWuaId()).isEqualTo(authenticatedUser.getWuaId());
 
     verify(projectTransferRepository, times(1)).save(projectTransfer);
+
+    verify(operatorEmailService, times(1)).sendProjectTransferEmails(
+        newProjectDetail,
+        fromOrganisationGroup,
+        toOrganisationGroup,
+        form.getTransferReason()
+    );
   }
 
   @Test
