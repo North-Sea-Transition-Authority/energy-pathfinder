@@ -5,7 +5,7 @@ import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplate;
 
-public class ProjectTransferEmailProperties extends EmailProperties {
+class ProjectTransferEmailProperties extends EmailProperties {
 
   private final String projectName;
   private final String transferReason;

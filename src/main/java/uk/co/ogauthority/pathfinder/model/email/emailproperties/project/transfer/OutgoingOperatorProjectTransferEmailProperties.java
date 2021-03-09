@@ -4,15 +4,15 @@ import java.util.Map;
 import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplate;
 
-public class ProjectTransferredFromOperatorEmailProperties extends ProjectTransferEmailProperties {
+public class OutgoingOperatorProjectTransferEmailProperties extends ProjectTransferEmailProperties {
 
   private final String newOperatorName;
 
-  public ProjectTransferredFromOperatorEmailProperties(String recipientName,
-                                                       String projectName,
-                                                       String transferReason,
-                                                       String newOperatorName) {
-    super(NotifyTemplate.PROJECT_TRANSFERRED_FROM_OPERATOR, recipientName, projectName, transferReason);
+  public OutgoingOperatorProjectTransferEmailProperties(String recipientName,
+                                                        String projectName,
+                                                        String transferReason,
+                                                        String newOperatorName) {
+    super(NotifyTemplate.OUTGOING_OPERATOR_PROJECT_TRANSFER_V1, recipientName, projectName, transferReason);
     this.newOperatorName = newOperatorName;
   }
 
@@ -34,7 +34,7 @@ public class ProjectTransferredFromOperatorEmailProperties extends ProjectTransf
     if (getClass() != o.getClass()) {
       return false;
     }
-    ProjectTransferredFromOperatorEmailProperties that = (ProjectTransferredFromOperatorEmailProperties) o;
+    OutgoingOperatorProjectTransferEmailProperties that = (OutgoingOperatorProjectTransferEmailProperties) o;
     return Objects.equals(newOperatorName, that.newOperatorName);
   }
 

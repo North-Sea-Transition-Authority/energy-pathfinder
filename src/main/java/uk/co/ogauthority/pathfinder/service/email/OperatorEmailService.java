@@ -2,14 +2,15 @@ package uk.co.ogauthority.pathfinder.service.email;
 
 import java.time.LocalDate;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.team.PortalTeamAccessor;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.ProjectTransferredFromOperatorEmailProperties;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.ProjectTransferredToOperatorEmailProperties;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.IncomingOperatorProjectTransferEmailProperties;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.OutgoingOperatorProjectTransferEmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.ProjectUpdateRequestedEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
@@ -69,12 +70,14 @@ public class OperatorEmailService {
     var fromOrganisationGroupName = fromOrganisationGroup.getName();
     var toOrganisationGroupName = toOrganisationGroup.getName();
 
+    var emailTransferReason = StringUtils.removeEnd(transferReason, ".");
+
     var fromTeamMemberPeople = getOrganisationGroupPeople(fromOrganisationGroup);
     fromTeamMemberPeople.forEach(person -> {
-      var transferredFromEmailProperties = new ProjectTransferredFromOperatorEmailProperties(
+      var transferredFromEmailProperties = new OutgoingOperatorProjectTransferEmailProperties(
           person.getForename(),
           projectTitle,
-          transferReason,
+          emailTransferReason,
           toOrganisationGroupName
       );
       emailService.sendEmail(transferredFromEmailProperties, person.getEmailAddress());
@@ -82,10 +85,10 @@ public class OperatorEmailService {
 
     var toTeamMemberPeople = getOrganisationGroupPeople(toOrganisationGroup);
     toTeamMemberPeople.forEach(person -> {
-      var transferredToEmailProperties = new ProjectTransferredToOperatorEmailProperties(
+      var transferredToEmailProperties = new IncomingOperatorProjectTransferEmailProperties(
           person.getForename(),
           projectTitle,
-          transferReason,
+          emailTransferReason,
           fromOrganisationGroupName,
           projectUrl
       );

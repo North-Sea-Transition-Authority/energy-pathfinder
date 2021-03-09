@@ -5,17 +5,17 @@ import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplate;
 
-public class ProjectTransferredToOperatorEmailProperties extends ProjectTransferEmailProperties {
+public class IncomingOperatorProjectTransferEmailProperties extends ProjectTransferEmailProperties {
 
   private final String previousOperatorName;
   private final String projectUrl;
 
-  public ProjectTransferredToOperatorEmailProperties(String recipientName,
-                                                     String projectName,
-                                                     String transferReason,
-                                                     String previousOperatorName,
-                                                     String projectUrl) {
-    super(NotifyTemplate.PROJECT_TRANSFERRED_TO_OPERATOR, recipientName, projectName, transferReason);
+  public IncomingOperatorProjectTransferEmailProperties(String recipientName,
+                                                        String projectName,
+                                                        String transferReason,
+                                                        String previousOperatorName,
+                                                        String projectUrl) {
+    super(NotifyTemplate.INCOMING_OPERATOR_PROJECT_TRANSFER_V1, recipientName, projectName, transferReason);
     this.previousOperatorName = previousOperatorName;
     this.projectUrl = projectUrl;
   }
@@ -40,7 +40,7 @@ public class ProjectTransferredToOperatorEmailProperties extends ProjectTransfer
     if (getClass() != o.getClass()) {
       return false;
     }
-    ProjectTransferredToOperatorEmailProperties that = (ProjectTransferredToOperatorEmailProperties) o;
+    IncomingOperatorProjectTransferEmailProperties that = (IncomingOperatorProjectTransferEmailProperties) o;
     return Objects.equals(previousOperatorName, that.previousOperatorName)
         && Objects.equals(projectUrl, that.projectUrl);
   }

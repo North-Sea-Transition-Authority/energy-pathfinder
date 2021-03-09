@@ -18,8 +18,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.service.team.PortalTeamAccessor;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.ProjectTransferredFromOperatorEmailProperties;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.ProjectTransferredToOperatorEmailProperties;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.OutgoingOperatorProjectTransferEmailProperties;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.IncomingOperatorProjectTransferEmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.ProjectUpdateRequestedEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
@@ -169,7 +169,7 @@ public class OperatorEmailServiceTest {
     fromTeamMemberPeople.forEach(person -> {
       ArgumentCaptor<EmailProperties> emailCaptor = ArgumentCaptor.forClass(EmailProperties.class);
       verify(emailService, times(1)).sendEmail(emailCaptor.capture(), eq(person.getEmailAddress()));
-      ProjectTransferredFromOperatorEmailProperties emailProperties = (ProjectTransferredFromOperatorEmailProperties) emailCaptor.getValue();
+      OutgoingOperatorProjectTransferEmailProperties emailProperties = (OutgoingOperatorProjectTransferEmailProperties) emailCaptor.getValue();
 
       var expectedEmailProperties = EmailPropertyTestUtil.getDefaultEmailPersonalisation(
           person.getForename(),
@@ -185,7 +185,7 @@ public class OperatorEmailServiceTest {
     toTeamMemberPeople.forEach(person -> {
       ArgumentCaptor<EmailProperties> emailCaptor = ArgumentCaptor.forClass(EmailProperties.class);
       verify(emailService, times(1)).sendEmail(emailCaptor.capture(), eq(person.getEmailAddress()));
-      ProjectTransferredToOperatorEmailProperties emailProperties = (ProjectTransferredToOperatorEmailProperties) emailCaptor.getValue();
+      IncomingOperatorProjectTransferEmailProperties emailProperties = (IncomingOperatorProjectTransferEmailProperties) emailCaptor.getValue();
 
       var expectedEmailProperties = EmailPropertyTestUtil.getDefaultEmailPersonalisation(
           person.getForename(),
