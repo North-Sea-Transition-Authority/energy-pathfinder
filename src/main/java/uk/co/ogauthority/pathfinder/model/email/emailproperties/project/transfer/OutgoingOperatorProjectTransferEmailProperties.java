@@ -12,7 +12,7 @@ public class OutgoingOperatorProjectTransferEmailProperties extends ProjectTrans
                                                         String projectName,
                                                         String transferReason,
                                                         String newOperatorName) {
-    super(NotifyTemplate.OUTGOING_OPERATOR_PROJECT_TRANSFER_V1, recipientName, projectName, transferReason);
+    super(NotifyTemplate.OUTGOING_OPERATOR_PROJECT_TRANSFER, recipientName, projectName, transferReason);
     this.newOperatorName = newOperatorName;
   }
 

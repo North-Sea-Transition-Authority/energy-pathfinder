@@ -15,7 +15,7 @@ public class IncomingOperatorProjectTransferEmailProperties extends ProjectTrans
                                                         String transferReason,
                                                         String previousOperatorName,
                                                         String projectUrl) {
-    super(NotifyTemplate.INCOMING_OPERATOR_PROJECT_TRANSFER_V1, recipientName, projectName, transferReason);
+    super(NotifyTemplate.INCOMING_OPERATOR_PROJECT_TRANSFER, recipientName, projectName, transferReason);
     this.previousOperatorName = previousOperatorName;
     this.projectUrl = projectUrl;
   }
