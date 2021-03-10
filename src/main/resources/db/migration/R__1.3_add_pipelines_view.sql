@@ -3,5 +3,4 @@ SELECT
   NULL id
 , NULL name
 FROM dual
-WHERE 1=2
-CONNECT BY LEVEL <= 10;
+WHERE 1=2;

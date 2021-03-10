@@ -5,14 +5,12 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.decommissionedpipeline.DecommissionedPipeline;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineForm;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineFormValidator;
@@ -122,10 +120,12 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
   }
 
   public boolean isValid(DecommissionedPipeline decommissionedPipeline, ValidationType validationType) {
-    var form = getForm(decommissionedPipeline);
-    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
-    bindingResult = validate(form, bindingResult, validationType);
-    return !bindingResult.hasErrors();
+    // Pipelines disabled: PAT-457
+    // var form = getForm(decommissionedPipeline);
+    // BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    // bindingResult = validate(form, bindingResult, validationType);
+    // return !bindingResult.hasErrors();
+    return true;
   }
 
   @Transactional
@@ -180,10 +180,11 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
 
   @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
-    entityDuplicationService.duplicateEntitiesAndSetNewParent(
-        getDecommissionedPipelines(fromDetail),
-        toDetail,
-        DecommissionedPipeline.class
-    );
+    // Pipelines disabled: PAT-457
+    // entityDuplicationService.duplicateEntitiesAndSetNewParent(
+    //     getDecommissionedPipelines(fromDetail),
+    //     toDetail,
+    //     DecommissionedPipeline.class
+    // );
   }
 }
