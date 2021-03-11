@@ -87,10 +87,6 @@ public class SubscriptionService {
   @Transactional
   public void unsubscribe(UUID subscriberUuid) {
     subscriberRepository.deleteByUuid(subscriberUuid);
-    AuditService.audit(
-        AuditEvent.UNSUBSCRIBE_REQUEST,
-        String.format(AuditEvent.UNSUBSCRIBE_REQUEST.getMessage(), subscriberUuid.toString())
-    );
   }
 
   public BindingResult validate(SubscribeForm form, BindingResult bindingResult) {

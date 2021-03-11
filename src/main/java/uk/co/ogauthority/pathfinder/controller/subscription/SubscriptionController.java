@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
+import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.subscription.SubscriptionService;
 
@@ -52,12 +54,20 @@ public class SubscriptionController {
 
   @GetMapping("/unsubscribe/{subscriberUuid}")
   public ModelAndView getUnsubscribe(@PathVariable("subscriberUuid") String subscriberUuid) {
+    AuditService.audit(
+        AuditEvent.UNSUBSCRIBE_GET_REQUEST,
+        String.format(AuditEvent.UNSUBSCRIBE_GET_REQUEST.getMessage(), subscriberUuid)
+    );
     subscriptionService.verifyIsSubscribed(subscriberUuid);
     return subscriptionService.getUnsubscribeModelAndView();
   }
 
   @PostMapping("/unsubscribe/{subscriberUuid}")
   public ModelAndView unsubscribe(@PathVariable("subscriberUuid") String subscriberUuid) {
+    AuditService.audit(
+        AuditEvent.UNSUBSCRIBE_POST_REQUEST,
+        String.format(AuditEvent.UNSUBSCRIBE_GET_REQUEST.getMessage(), subscriberUuid)
+    );
     var uuid = subscriptionService.verifyIsSubscribed(subscriberUuid);
     subscriptionService.unsubscribe(uuid);
     return subscriptionService.getUnsubscribeConfirmationModelAndView();
