@@ -13,7 +13,7 @@ public enum AuditEvent {
   UPCOMING_TENDER_UPDATED(AuditLevel.INFO, "Upcoming tender with id: %d updated for projectDetail with id: %d"),
   COLLABORATION_OPPORTUNITY_UPDATED(AuditLevel.INFO, "Collaboration opportunity with id: %d updated for projectDetail with id: %d"),
   AWARDED_CONTRACT_UPDATED(AuditLevel.INFO, "Awarded contract with id: %d updated for projectDetail with id: %d"),
-  DECOMMISSIONED_WELL_UPDATED(AuditLevel.INFO, "Decommissioning schedule with id: %d updated for projectDetail with id: %d"),
+  P_AND_A_SCHEDULE_UPDATED(AuditLevel.INFO, "Decommissioning schedule with id: %d updated for projectDetail with id: %d"),
   PLATFORM_FPSO_UPDATED(AuditLevel.INFO, "Platform or FPSO with id: %d updated for projectDetail with id: %d"),
   INTEGRATED_RIG_UPDATED(AuditLevel.INFO, "Integrated rig with id: %d updated for projectDetail with id: %d"),
   PIPELINE_UPDATED(AuditLevel.INFO, "Pipeline with id: %d updated for projectDetail with id: %d"),

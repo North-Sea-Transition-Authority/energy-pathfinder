@@ -113,9 +113,9 @@ public class PlugAbandonmentScheduleController extends ProjectFormPageController
               projectContext.getProjectDetails()
           );
           AuditService.audit(
-              AuditEvent.DECOMMISSIONED_WELL_UPDATED,
+              AuditEvent.P_AND_A_SCHEDULE_UPDATED,
               String.format(
-                  AuditEvent.DECOMMISSIONED_WELL_UPDATED.getMessage(),
+                  AuditEvent.P_AND_A_SCHEDULE_UPDATED.getMessage(),
                   plugAbandonmentSchedule.getId(),
                   projectContext.getProjectDetails().getId()
               )
