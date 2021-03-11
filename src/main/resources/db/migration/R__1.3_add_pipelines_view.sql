@@ -1,6 +1,6 @@
 CREATE OR REPLACE VIEW ${datasource.user}.pipelines AS
 SELECT
-  rownum id
-, 'Pipeline ' || rownum name
+  NULL id
+, NULL name
 FROM dual
-CONNECT BY LEVEL <= 10;
+WHERE 1=2;

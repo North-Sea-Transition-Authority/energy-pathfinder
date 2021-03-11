@@ -130,9 +130,10 @@ public class ProjectSetupService implements ProjectFormSectionService {
         getAnswerForQuestion(taskListSetup.getTaskListAnswers(), TaskListSectionQuestion.INTEGRATED_RIGS)
     );
 
-    form.setPipelinesIncluded(
-        getAnswerForQuestion(taskListSetup.getTaskListAnswers(), TaskListSectionQuestion.PIPELINES)
-    );
+    // Pipelines disabled: PAT-457
+    // form.setPipelinesIncluded(
+    //     getAnswerForQuestion(taskListSetup.getTaskListAnswers(), TaskListSectionQuestion.PIPELINES)
+    // );
   }
 
   private TaskListSectionAnswer getAnswerForQuestion(List<TaskListSectionAnswer> answers, TaskListSectionQuestion question) {

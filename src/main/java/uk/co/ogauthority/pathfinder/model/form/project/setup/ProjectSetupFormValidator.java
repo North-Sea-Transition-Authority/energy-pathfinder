@@ -33,9 +33,10 @@ public class ProjectSetupFormValidator implements SmartValidator {
       ValidationUtils.rejectIfEmpty(errors, "integratedRigsIncluded", "integratedRigsIncluded.invalid",
           ProjectSetupFormValidationHint.INTEGRATED_RIGS_REQUIRED_TEXT
       );
-      ValidationUtils.rejectIfEmpty(errors, "pipelinesIncluded", "pipelinesIncluded.invalid",
-          ProjectSetupFormValidationHint.PIPELINES_REQUIRED_TEXT
-      );
+      // Pipelines disabled: PAT-457
+      // ValidationUtils.rejectIfEmpty(errors, "pipelinesIncluded", "pipelinesIncluded.invalid",
+      //     ProjectSetupFormValidationHint.PIPELINES_REQUIRED_TEXT
+      // );
     }
   }
 

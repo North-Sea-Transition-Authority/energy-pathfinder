@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -269,17 +270,25 @@ public class DecommissionedPipelineServiceTest {
     decommissionedPipelineService.getDecommissionedPipelineOrError(DECOMMISSIONED_PIPELINE_ID, projectDetail);
   }
 
+  // Pipelines disabled: PAT-457
   @Test
-  public void canShowInTaskList_true() {
-    when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.PIPELINES)).thenReturn(true);
-    assertThat(decommissionedPipelineService.canShowInTaskList(projectDetail)).isTrue();
+  public void canShowInTaskList() {
+    assertThat(decommissionedPipelineService.canShowInTaskList(projectDetail)).isFalse();
+
+    verify(projectSetupService, never()).taskSelectedForProjectDetail(projectDetail, ProjectTask.PIPELINES);
   }
 
-  @Test
-  public void canShowInTaskList_false() {
-    when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.PIPELINES)).thenReturn(false);
-    assertThat(decommissionedPipelineService.canShowInTaskList(projectDetail)).isFalse();
-  }
+  // @Test
+  // public void canShowInTaskList_true() {
+  //   when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.PIPELINES)).thenReturn(true);
+  //   assertThat(decommissionedPipelineService.canShowInTaskList(projectDetail)).isTrue();
+  // }
+  //
+  // @Test
+  // public void canShowInTaskList_false() {
+  //   when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.PIPELINES)).thenReturn(false);
+  //   assertThat(decommissionedPipelineService.canShowInTaskList(projectDetail)).isFalse();
+  // }
 
   @Test
   public void removeSectionData_verifyInteractions() {
@@ -294,16 +303,27 @@ public class DecommissionedPipelineServiceTest {
     final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
     final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
 
-    final var pipelines = List.of(DecommissionedPipelineTestUtil.createDecommissionedPipeline());
-
-    when(decommissionedPipelineRepository.findByProjectDetailOrderByIdAsc(fromProjectDetail)).thenReturn(pipelines);
-
     decommissionedPipelineService.copySectionData(fromProjectDetail, toProjectDetail);
 
-    verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
-        pipelines,
-        toProjectDetail,
-        DecommissionedPipeline.class
-    );
+    verify(entityDuplicationService, never()).duplicateEntitiesAndSetNewParent(any(), any(), any());
   }
+
+  // @Test
+  // public void copySectionData_verifyDuplicationServiceInteraction() {
+  //
+  //   final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+  //   final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+  //
+  //   final var pipelines = List.of(DecommissionedPipelineTestUtil.createDecommissionedPipeline());
+  //
+  //   when(decommissionedPipelineRepository.findByProjectDetailOrderByIdAsc(fromProjectDetail)).thenReturn(pipelines);
+  //
+  //   decommissionedPipelineService.copySectionData(fromProjectDetail, toProjectDetail);
+  //
+  //   verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
+  //       pipelines,
+  //       toProjectDetail,
+  //       DecommissionedPipeline.class
+  //   );
+  // }
 }
