@@ -27,11 +27,13 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusC
 import uk.co.ogauthority.pathfinder.controller.rest.TenderFunctionRestController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
@@ -123,11 +125,21 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
         getUpcomingTenderModelAndView(projectContext.getProjectDetails(), form),
         form,
         () -> {
-          upcomingTenderService.createUpcomingTender(
+          var tender = upcomingTenderService.createUpcomingTender(
               projectContext.getProjectDetails(),
               form,
               projectContext.getUserAccount()
           );
+
+          AuditService.audit(
+              AuditEvent.UPCOMING_TENDER_UPDATED,
+              String.format(
+                  AuditEvent.UPCOMING_TENDER_UPDATED.getMessage(),
+                  tender.getId(),
+                  projectContext.getProjectDetails().getId()
+              )
+          );
+
           return ReverseRouter.redirect(on(UpcomingTendersController.class).viewUpcomingTenders(projectId, null));
         }
     );

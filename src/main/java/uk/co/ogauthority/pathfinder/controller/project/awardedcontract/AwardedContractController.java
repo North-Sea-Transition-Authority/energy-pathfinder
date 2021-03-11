@@ -19,11 +19,13 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.ContractFunctionRestController;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractForm;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
@@ -104,7 +106,15 @@ public class AwardedContractController extends ProjectFormPageController {
         getAwardedContractModelAndView(projectId, form),
         form,
         () -> {
-          awardedContractService.createAwardedContract(projectContext.getProjectDetails(), form);
+          var contract = awardedContractService.createAwardedContract(projectContext.getProjectDetails(), form);
+          AuditService.audit(
+              AuditEvent.AWARDED_CONTRACT_UPDATED,
+              String.format(
+                  AuditEvent.AWARDED_CONTRACT_UPDATED.getMessage(),
+                  contract.getId(),
+                  projectContext.getProjectDetails().getId()
+              )
+          );
           return getAwardedContractSummaryRedirect(projectId);
         }
     );
