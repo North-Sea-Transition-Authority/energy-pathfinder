@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project.tasks;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.GeneralPurposeProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.tasks.TaskListEntry;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -87,6 +89,11 @@ public class TaskListEntryFactoryTest {
     @Override
     public String getDisplayName() {
       return TaskListTestUtil.DEFAULT_PROJECT_TASK.getDisplayName();
+    }
+
+    @Override
+    public Set<ProjectType> getRelatedProjectTypes() {
+      return TaskListTestUtil.DEFAULT_PROJECT_TASK.getRelatedProjectTypes();
     }
 
     @Override

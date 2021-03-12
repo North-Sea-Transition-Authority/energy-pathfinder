@@ -26,6 +26,7 @@ import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationBlockView
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -286,6 +287,11 @@ public class ProjectLocationService implements ProjectFormSectionService {
         ProjectLocationBlock.class
     );
 
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail) {
+    return ProjectService.isInfrastructureProject(detail);
   }
 
 }

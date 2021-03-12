@@ -8,11 +8,10 @@ import uk.co.ogauthority.pathfinder.model.view.tasks.TaskListEntry;
 import uk.co.ogauthority.pathfinder.model.view.tasks.TaskListGroup;
 
 public class TaskListTestUtil {
-  public static final int DEFUALT_DISPLAY_ORDER = 1;
+
   public static final ProjectTaskGroup DEFAULT_PROJECT_GROUP = ProjectTaskGroup.COMMERCIAL_INFORMATION;
   public static final ProjectTask DEFAULT_PROJECT_TASK = ProjectTask.AWARDED_CONTRACTS;
   public static final boolean IS_COMPLETE = true;
-  public static final boolean USE_COMPLETED_LABELS = true;
   public static final ProjectDetail PROJECT_DETAIL = ProjectUtil.getProjectDetails();
 
   public static TaskListEntry getTaskListEntry() {

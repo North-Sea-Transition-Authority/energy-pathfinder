@@ -30,6 +30,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.enums.TopNavigationType;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
@@ -207,6 +208,25 @@ public class SelectOperatorServiceTest {
         toProjectDetail,
         ProjectOperator.class
     );
+  }
+
+  @Test
+  public void canShowInTaskList_whenInfrastructureProject_thenTrue() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
+    assertThat(selectOperatorService.canShowInTaskList(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_whenNotInfrastructureProject_thenFalse() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
+    assertThat(selectOperatorService.canShowInTaskList(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void canShowInTaskList_whenNullProjectType_thenFalse() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+    projectDetail.setProjectType(null);
+    assertThat(selectOperatorService.canShowInTaskList(projectDetail)).isFalse();
   }
 
 }

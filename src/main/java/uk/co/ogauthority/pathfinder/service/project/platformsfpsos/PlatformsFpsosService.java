@@ -232,7 +232,7 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
 
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
-    return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.PLATFORM_FPSO);
+    return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.PLATFORM_FPSO);
   }
 
   @Override

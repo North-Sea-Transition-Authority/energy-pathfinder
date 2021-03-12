@@ -22,6 +22,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocatio
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
@@ -36,7 +37,6 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectLocationServiceTest {
-
 
   @Mock
   private ProjectLocationRepository projectLocationRepository;
@@ -460,6 +460,25 @@ public class ProjectLocationServiceTest {
         toLocation,
         ProjectLocationBlock.class
     );
+  }
+
+  @Test
+  public void canShowInTaskList_whenInfrastructureProject_thenTrue() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
+    assertThat(projectLocationService.canShowInTaskList(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_whenNotInfrastructureProject_thenFalse() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
+    assertThat(projectLocationService.canShowInTaskList(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void canShowInTaskList_whenNullProjectType_thenFalse() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+    projectDetail.setProjectType(null);
+    assertThat(projectLocationService.canShowInTaskList(projectDetail)).isFalse();
   }
 
   private void checkCommonFieldsMatch(ProjectLocation projectLocation) {

@@ -161,7 +161,7 @@ public class IntegratedRigService implements ProjectFormSectionService {
 
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
-    return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.INTEGRATED_RIGS);
+    return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.INTEGRATED_RIGS);
   }
 
   @Override

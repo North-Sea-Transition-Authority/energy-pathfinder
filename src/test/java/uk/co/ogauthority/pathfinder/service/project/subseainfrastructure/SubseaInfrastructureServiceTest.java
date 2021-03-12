@@ -669,13 +669,13 @@ public class SubseaInfrastructureServiceTest {
 
   @Test
   public void canShowInTaskList_true() {
-    when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.SUBSEA_INFRASTRUCTURE)).thenReturn(true);
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.SUBSEA_INFRASTRUCTURE)).thenReturn(true);
     assertThat(subseaInfrastructureService.canShowInTaskList(projectDetail)).isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
-    when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.SUBSEA_INFRASTRUCTURE)).thenReturn(false);
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.SUBSEA_INFRASTRUCTURE)).thenReturn(false);
     assertThat(subseaInfrastructureService.canShowInTaskList(projectDetail)).isFalse();
   }
 

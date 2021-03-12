@@ -275,7 +275,7 @@ public class DecommissionedPipelineServiceTest {
   public void canShowInTaskList() {
     assertThat(decommissionedPipelineService.canShowInTaskList(projectDetail)).isFalse();
 
-    verify(projectSetupService, never()).taskSelectedForProjectDetail(projectDetail, ProjectTask.PIPELINES);
+    verify(projectSetupService, never()).taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.PIPELINES);
   }
 
   // @Test

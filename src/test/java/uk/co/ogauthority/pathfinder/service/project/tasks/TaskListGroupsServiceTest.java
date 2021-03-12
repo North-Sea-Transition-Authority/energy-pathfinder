@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTaskGroup;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -40,18 +41,24 @@ public class TaskListGroupsServiceTest {
   }
 
   @Test
-  public void getTaskListGroups_correctNumberOfGroups() {
+  public void getTaskListGroups_whenInfrastructure_correctNumberOfGroups() {
+    detail.setProjectType(ProjectType.INFRASTRUCTURE);
     var groups = taskListGroupsService.getTaskListGroups(detail);
     assertThat(groups.size()).isEqualTo(ProjectTaskGroup.asList().size() + 1); //+1 for review and submit
+  }
+
+  @Test
+  public void getTaskListGroups_whenForwardWorkPlan_correctNumberOfGroups() {
+    detail.setProjectType(ProjectType.FORWARD_WORK_PLAN);
+    var groups = taskListGroupsService.getTaskListGroups(detail);
+    assertThat(groups.size()).isEqualTo(1); // 1 for review and submit
   }
 
   @Test
   public void getTaskListGroups_correctOrder() {
     var groups = taskListGroupsService.getTaskListGroups(detail);
     IntStream.range(0, groups.size())
-        .forEach(index -> {
-          assertThat(groups.get(index).getDisplayOrder()).isEqualTo(index + 1);
-        });
+        .forEach(index -> assertThat(groups.get(index).getDisplayOrder()).isEqualTo(index + 1));
   }
 
   @Test

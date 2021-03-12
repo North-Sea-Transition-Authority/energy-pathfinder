@@ -14,7 +14,7 @@ public interface ProjectFormSectionService {
    * @return True if entry should be shown.
    */
   default boolean canShowInTaskList(ProjectDetail detail) {
-    return true;
+    return false;
   }
 
   /**

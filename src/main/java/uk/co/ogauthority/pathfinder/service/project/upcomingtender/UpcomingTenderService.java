@@ -237,7 +237,7 @@ public class UpcomingTenderService implements ProjectFormSectionService {
 
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
-    return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS);
+    return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS);
   }
 
   @Override

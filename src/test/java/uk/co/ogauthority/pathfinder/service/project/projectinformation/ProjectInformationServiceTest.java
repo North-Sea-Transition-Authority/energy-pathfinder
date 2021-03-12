@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
@@ -576,5 +577,24 @@ public class ProjectInformationServiceTest {
     var result = projectInformationService.getProjectInformationByProjectAndVersion(project, version);
 
     assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void canShowInTaskList_whenInfrastructureProject_thenTrue() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
+    assertThat(projectInformationService.canShowInTaskList(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_whenNotInfrastructureProject_thenFalse() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
+    assertThat(projectInformationService.canShowInTaskList(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void canShowInTaskList_whenNullProjectType_thenFalse() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+    projectDetail.setProjectType(null);
+    assertThat(projectInformationService.canShowInTaskList(projectDetail)).isFalse();
   }
 }

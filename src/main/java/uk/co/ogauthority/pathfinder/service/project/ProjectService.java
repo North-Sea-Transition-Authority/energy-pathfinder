@@ -9,6 +9,7 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectRepository;
 
@@ -109,5 +110,9 @@ public class ProjectService {
 
   public void deleteProject(Project project) {
     projectRepository.delete(project);
+  }
+
+  public static boolean isInfrastructureProject(ProjectDetail projectDetail) {
+    return ProjectType.INFRASTRUCTURE.equals(projectDetail.getProjectType());
   }
 }

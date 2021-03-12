@@ -220,13 +220,12 @@ public class PlatformsFpsosServiceTest {
   public void getForm_platformAndManualEntry() {
     var platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndSubstructuresRemoved(detail);
     var newStructure = "new structure";
-    var existingPlatformFpso = platformFpso;
-    existingPlatformFpso.setManualStructureName(newStructure);
-    existingPlatformFpso.setStructure(null);
-    var form = platformsFpsosService.getForm(existingPlatformFpso);
-    assertThat(form.getPlatformStructure()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(existingPlatformFpso.getManualStructureName()));
+    platformFpso.setManualStructureName(newStructure);
+    platformFpso.setStructure(null);
+    var form = platformsFpsosService.getForm(platformFpso);
+    assertThat(form.getPlatformStructure()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(platformFpso.getManualStructureName()));
     assertThat(form.getFpsoStructure()).isNull();
-    assertCommonFormFieldsMatch(form, existingPlatformFpso);
+    assertCommonFormFieldsMatch(form, platformFpso);
   }
 
   @Test
@@ -415,13 +414,13 @@ public class PlatformsFpsosServiceTest {
 
   @Test
   public void canShowInTaskList_true() {
-    when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.PLATFORM_FPSO)).thenReturn(true);
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.PLATFORM_FPSO)).thenReturn(true);
     assertThat(platformsFpsosService.canShowInTaskList(detail)).isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
-    when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.PLATFORM_FPSO)).thenReturn(false);
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.PLATFORM_FPSO)).thenReturn(false);
     assertThat(platformsFpsosService.canShowInTaskList(detail)).isFalse();
   }
 

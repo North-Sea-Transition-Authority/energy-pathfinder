@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.Projec
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
@@ -286,5 +287,10 @@ public class ProjectInformationService implements ProjectFormSectionService {
         toDetail,
         ProjectInformation.class
     );
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail) {
+    return ProjectService.isInfrastructureProject(detail);
   }
 }

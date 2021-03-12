@@ -296,13 +296,13 @@ public class UpcomingTenderServiceTest {
 
   @Test
   public void canShowInTaskList_true() {
-    when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(true);
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(true);
     assertThat(upcomingTenderService.canShowInTaskList(detail)).isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
-    when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(false);
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(false);
     assertThat(upcomingTenderService.canShowInTaskList(detail)).isFalse();
   }
 

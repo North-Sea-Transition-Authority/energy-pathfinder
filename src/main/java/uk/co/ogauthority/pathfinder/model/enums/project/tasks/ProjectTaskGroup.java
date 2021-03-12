@@ -5,12 +5,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 
 public enum ProjectTaskGroup {
 
   PROJECT_OPERATOR(
       ProjectTask.PROJECT_OPERATOR.getDisplayName(),
       List.of(ProjectTask.PROJECT_OPERATOR),
+      Set.of(ProjectType.INFRASTRUCTURE),
       1
   ),
   PREPARE_PROJECT(
@@ -20,6 +22,7 @@ public enum ProjectTaskGroup {
           ProjectTask.PROJECT_LOCATION,
           ProjectTask.PROJECT_SETUP
       ),
+      Set.of(ProjectType.INFRASTRUCTURE),
       2
   ),
   COMMERCIAL_INFORMATION(
@@ -29,6 +32,7 @@ public enum ProjectTaskGroup {
           ProjectTask.AWARDED_CONTRACTS,
           ProjectTask.COLLABORATION_OPPORTUNITIES
       ),
+      Set.of(ProjectType.INFRASTRUCTURE),
       3
   ),
   DECOMMISSIONING_SCHEDULES(
@@ -40,17 +44,23 @@ public enum ProjectTaskGroup {
           ProjectTask.SUBSEA_INFRASTRUCTURE,
           ProjectTask.PIPELINES
       ),
+      Set.of(ProjectType.INFRASTRUCTURE),
       4
   );
 
 
   private final String displayName;
   private final List<ProjectTask> tasks;
+  private final Set<ProjectType> relatedProjectTypes;
   private final int displayOrder;
 
-  ProjectTaskGroup(String displayName, List<ProjectTask> tasks, int displayOrder) {
+  ProjectTaskGroup(String displayName,
+                   List<ProjectTask> tasks,
+                   Set<ProjectType> relatedProjectTypes,
+                   int displayOrder) {
     this.displayName = displayName;
     this.tasks = tasks;
+    this.relatedProjectTypes = relatedProjectTypes;
     this.displayOrder = displayOrder;
   }
 
@@ -73,5 +83,9 @@ public enum ProjectTaskGroup {
 
   public Set<ProjectTask> getProjectTaskSet() {
     return new HashSet<>(tasks);
+  }
+
+  public Set<ProjectType> getRelatedProjectTypes() {
+    return relatedProjectTypes;
   }
 }

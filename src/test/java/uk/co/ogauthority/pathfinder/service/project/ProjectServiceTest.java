@@ -15,6 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectRepository;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -200,5 +201,23 @@ public class ProjectServiceTest {
     projectService.deleteProject(project);
 
     verify(projectRepository, times(1)).delete(project);
+  }
+
+  @Test
+  public void isInfrastructureProject_whenInfrastructure_thenTrue() {
+    projectDetail.setProjectType(ProjectType.INFRASTRUCTURE);
+    assertThat(ProjectService.isInfrastructureProject(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void isInfrastructureProject_whenNotInfrastructure_thenFalse() {
+    projectDetail.setProjectType(ProjectType.FORWARD_WORK_PLAN);
+    assertThat(ProjectService.isInfrastructureProject(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void isInfrastructureProject_whenNullType_thenFalse() {
+    projectDetail.setProjectType(null);
+    assertThat(ProjectService.isInfrastructureProject(projectDetail)).isFalse();
   }
 }

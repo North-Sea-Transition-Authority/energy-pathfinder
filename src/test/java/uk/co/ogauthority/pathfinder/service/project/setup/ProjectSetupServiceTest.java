@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.tasks.ProjectTaskListSetup;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionQuestion;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupForm;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupFormValidator;
@@ -29,6 +30,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectIn
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectTaskListSetupTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TaskListTestUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectSetupServiceTest {
@@ -297,6 +299,61 @@ public class ProjectSetupServiceTest {
         toProjectDetail,
         ProjectTaskListSetup.class
     );
+  }
+
+  @Test
+  public void canShowInTaskList_whenInfrastructureProject_thenTrue() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
+    assertThat(projectSetupService.canShowInTaskList(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_whenNotInfrastructureProject_thenFalse() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
+    assertThat(projectSetupService.canShowInTaskList(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void canShowInTaskList_whenNullProjectType_thenFalse() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+    projectDetail.setProjectType(null);
+    assertThat(projectSetupService.canShowInTaskList(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void taskValidAndSelectedForProjectDetail_whenValidAndNotSelected_thenFalse() {
+    final var task = TaskListTestUtil.DEFAULT_PROJECT_TASK;
+    final var projectTypeForTask = task.getRelatedProjectTypes().stream().findFirst().orElse(ProjectType.INFRASTRUCTURE);
+    final var projectDetail = ProjectUtil.getProjectDetails(projectTypeForTask);
+
+    when(projectTaskListSetupRepository.findByProjectDetail(projectDetail)).thenReturn(Optional.empty());
+
+    final var isValidAndSelected = projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, task);
+    assertThat(isValidAndSelected).isEqualTo(false);
+  }
+
+  @Test
+  public void taskValidAndSelectedForProjectDetail_whenNotValidAndNotSelected_thenFalse() {
+    final var task = TaskListTestUtil.DEFAULT_PROJECT_TASK;
+    final var projectDetail = ProjectUtil.getProjectDetails();
+    projectDetail.setProjectType(null);
+
+    when(projectTaskListSetupRepository.findByProjectDetail(projectDetail)).thenReturn(Optional.empty());
+
+    final var isValidAndSelected = projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, task);
+    assertThat(isValidAndSelected).isEqualTo(false);
+  }
+
+  @Test
+  public void taskValidAndSelectedForProjectDetail_whenValidAndSelected_thenTrue() {
+    final var task = TaskListTestUtil.DEFAULT_PROJECT_TASK;
+    final var projectTypeForTask = task.getRelatedProjectTypes().stream().findFirst().orElse(ProjectType.INFRASTRUCTURE);
+    final var projectDetail = ProjectUtil.getProjectDetails(projectTypeForTask);
+
+    when(projectTaskListSetupRepository.findByProjectDetail(projectDetail)).thenReturn(Optional.of(setup));
+
+    final var isValidAndSelected = projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, task);
+    assertThat(isValidAndSelected).isEqualTo(true);
   }
 
   private void checkCommonFieldsMatch(ProjectSetupForm formToCheckAgainst, ProjectSetupForm resultingForm) {
