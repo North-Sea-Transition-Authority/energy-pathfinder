@@ -76,6 +76,7 @@ public class SubseaInfrastructureControllerTest extends ProjectContextAbstractCo
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
 
     when(subseaInfrastructureService.getFacilityRestUrl()).thenReturn("testUrl");
+    when(subseaInfrastructureService.createSubseaInfrastructure(any(), any())).thenReturn(SubseaInfrastructureTestUtil.createSubseaInfrastructure_withConcreteMattresses());
   }
 
   @Test
