@@ -9,7 +9,7 @@ public class AuditService {
   public static final String UNAUTHENTICATED_USER = "Unauthenticated user";
   private static final Logger LOGGER = LoggerFactory.getLogger(AuditService.class);
 
-  public static String audit(AuditEvent auditEvent, String message) {
+  public static void audit(AuditEvent auditEvent, String message) {
     var userIdentifier = SecurityUtil.getAuthenticatedUserFromSecurityContext()
         .map(wua -> String.format("%s - %d", wua.getFullName(), wua.getWuaId()))
         .orElse(UNAUTHENTICATED_USER);
@@ -29,8 +29,6 @@ public class AuditService {
       default:
         throw new IllegalStateException("Unexpected AuditLevel value: " + auditEvent.getAuditLevel());
     }
-
-    return auditMessage;
   }
 
 }
