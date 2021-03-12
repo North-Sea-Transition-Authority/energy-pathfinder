@@ -142,6 +142,14 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
               projectContext.getProjectDetails(),
               form
           );
+          AuditService.audit(
+              AuditEvent.SUBSEA_INFRASTRUCTURE_UPDATED,
+              String.format(
+                  AuditEvent.SUBSEA_INFRASTRUCTURE_UPDATED.getMessage(),
+                  subseaInfrastructureId,
+                  projectContext.getProjectDetails().getId()
+              )
+          );
           return getSubseaInfrastructureSummaryRedirect(projectId);
         }
     );
@@ -172,6 +180,14 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
     );
 
     subseaInfrastructureService.deleteSubseaInfrastructure(subseaInfrastructureView);
+    AuditService.audit(
+        AuditEvent.SUBSEA_INFRASTRUCTURE_REMOVED,
+        String.format(
+            AuditEvent.SUBSEA_INFRASTRUCTURE_REMOVED.getMessage(),
+            subseaInfrastructureId,
+            projectContext.getProjectDetails().getId()
+        )
+    );
 
     return getSubseaInfrastructureSummaryRedirect(projectId);
   }

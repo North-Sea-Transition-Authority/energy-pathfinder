@@ -175,11 +175,20 @@ public class CollaborationOpportunitiesController extends PathfinderFileUploadCo
         getCollaborationOpportunityModelAndView(projectContext.getProjectDetails(), form),
         form,
         () -> {
-          collaborationOpportunitiesService.updateCollaborationOpportunity(
+          var collabOp = collaborationOpportunitiesService.updateCollaborationOpportunity(
               opportunity,
               form,
               projectContext.getUserAccount()
           );
+          AuditService.audit(
+              AuditEvent.COLLABORATION_OPPORTUNITY_UPDATED,
+              String.format(
+                  AuditEvent.COLLABORATION_OPPORTUNITY_UPDATED.getMessage(),
+                  collabOp.getId(),
+                  projectContext.getProjectDetails().getId()
+              )
+          );
+
           return ReverseRouter.redirect(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null));
         }
     );
@@ -208,6 +217,14 @@ public class CollaborationOpportunitiesController extends PathfinderFileUploadCo
                                                      ProjectContext projectContext) {
     var opportunity = collaborationOpportunitiesService.getOrError(opportunityId);
     collaborationOpportunitiesService.delete(opportunity);
+    AuditService.audit(
+        AuditEvent.COLLABORATION_OPPORTUNITY_REMOVED,
+        String.format(
+            AuditEvent.COLLABORATION_OPPORTUNITY_REMOVED.getMessage(),
+            opportunityId,
+            projectContext.getProjectDetails().getId()
+        )
+    );
     return ReverseRouter.redirect(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null));
   }
 

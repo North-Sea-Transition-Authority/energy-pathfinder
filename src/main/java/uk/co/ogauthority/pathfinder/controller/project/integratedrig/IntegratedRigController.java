@@ -140,6 +140,14 @@ public class IntegratedRigController extends ProjectFormPageController {
               projectContext.getProjectDetails(),
               form
           );
+          AuditService.audit(
+              AuditEvent.INTEGRATED_RIG_UPDATED,
+              String.format(
+                  AuditEvent.INTEGRATED_RIG_UPDATED.getMessage(),
+                  integratedRigId,
+                  projectContext.getProjectDetails().getId()
+              )
+          );
           return getIntegratedRigSummaryRedirect(projectId);
         }
     );
@@ -170,6 +178,14 @@ public class IntegratedRigController extends ProjectFormPageController {
     );
 
     integratedRigService.deleteIntegratedRig(integratedRigView);
+    AuditService.audit(
+        AuditEvent.INTEGRATED_RIG_REMOVED,
+        String.format(
+            AuditEvent.INTEGRATED_RIG_REMOVED.getMessage(),
+            integratedRigId,
+            projectContext.getProjectDetails().getId()
+        )
+    );
 
     return getIntegratedRigSummaryRedirect(projectId);
   }

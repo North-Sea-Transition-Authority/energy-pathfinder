@@ -74,6 +74,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
     when(awardedContractService.createAwardedContract(any(), any())).thenReturn(AwardedContractTestUtil.createAwardedContract());
+    when(awardedContractService.updateAwardedContract(any(), any(), any())).thenReturn(AwardedContractTestUtil.createAwardedContract());
   }
 
   @Test

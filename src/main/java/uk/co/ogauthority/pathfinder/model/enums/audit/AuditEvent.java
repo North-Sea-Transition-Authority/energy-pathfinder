@@ -11,13 +11,21 @@ public enum AuditEvent {
   LOCATION_INFORMATION_UPDATED(AuditLevel.INFO, "Location information updated for projectDetail with id: %d"),
   PROJECT_SETUP_UPDATED(AuditLevel.INFO, "Project setup information updated for projectDetail with id: %d"),
   UPCOMING_TENDER_UPDATED(AuditLevel.INFO, "Upcoming tender with id: %d updated for projectDetail with id: %d"),
+  UPCOMING_TENDER_REMOVED(AuditLevel.INFO, "Upcoming tender with id: %d removed for projectDetail with id: %d"),
   COLLABORATION_OPPORTUNITY_UPDATED(AuditLevel.INFO, "Collaboration opportunity with id: %d updated for projectDetail with id: %d"),
+  COLLABORATION_OPPORTUNITY_REMOVED(AuditLevel.INFO, "Collaboration opportunity with id: %d removed for projectDetail with id: %d"),
   AWARDED_CONTRACT_UPDATED(AuditLevel.INFO, "Awarded contract with id: %d updated for projectDetail with id: %d"),
+  AWARDED_CONTRACT_REMOVED(AuditLevel.INFO, "Awarded contract with id: %d removed for projectDetail with id: %d"),
   P_AND_A_SCHEDULE_UPDATED(AuditLevel.INFO, "Decommissioning schedule with id: %d updated for projectDetail with id: %d"),
+  P_AND_A_SCHEDULE_REMOVED(AuditLevel.INFO, "Decommissioning schedule with id: %d removed for projectDetail with id: %d"),
   PLATFORM_FPSO_UPDATED(AuditLevel.INFO, "Platform or FPSO with id: %d updated for projectDetail with id: %d"),
+  PLATFORM_FPSO_REMOVED(AuditLevel.INFO, "Platform or FPSO with id: %d removed for projectDetail with id: %d"),
   INTEGRATED_RIG_UPDATED(AuditLevel.INFO, "Integrated rig with id: %d updated for projectDetail with id: %d"),
+  INTEGRATED_RIG_REMOVED(AuditLevel.INFO, "Integrated rig with id: %d removed for projectDetail with id: %d"),
   PIPELINE_UPDATED(AuditLevel.INFO, "Pipeline with id: %d updated for projectDetail with id: %d"),
-  SUBSEA_INFRASTRUCTURE_UPDATED(AuditLevel.INFO, "Subsea infrastructure with id: %d updated for projectDetail with id: %d");
+  PIPELINE_REMOVED(AuditLevel.INFO, "Pipeline with id: %d removed for projectDetail with id: %d"),
+  SUBSEA_INFRASTRUCTURE_UPDATED(AuditLevel.INFO, "Subsea infrastructure with id: %d updated for projectDetail with id: %d"),
+  SUBSEA_INFRASTRUCTURE_REMOVED(AuditLevel.INFO, "Subsea infrastructure with id: %d removed for projectDetail with id: %d");
 
   private final AuditLevel auditLevel;
   private final String message;

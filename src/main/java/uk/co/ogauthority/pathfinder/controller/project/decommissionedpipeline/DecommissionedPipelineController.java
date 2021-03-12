@@ -141,6 +141,15 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
               projectContext.getProjectDetails(),
               form
           );
+          AuditService.audit(
+              AuditEvent.PIPELINE_UPDATED,
+              String.format(
+                  AuditEvent.PIPELINE_UPDATED.getMessage(),
+                  decommissionedPipelineId,
+                  projectContext.getProjectDetails().getId()
+              )
+          );
+
           return getDecommissionedPipelineSummaryRedirect(projectId);
         }
     );
@@ -171,6 +180,14 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
     );
 
     decommissionedPipelineService.deleteDecommissionedPipeline(decommissionedPipeline);
+    AuditService.audit(
+        AuditEvent.PIPELINE_REMOVED,
+        String.format(
+            AuditEvent.PIPELINE_REMOVED.getMessage(),
+            decommissionedPipelineId,
+            projectContext.getProjectDetails().getId()
+        )
+    );
 
     return getDecommissionedPipelineSummaryRedirect(projectId);
   }

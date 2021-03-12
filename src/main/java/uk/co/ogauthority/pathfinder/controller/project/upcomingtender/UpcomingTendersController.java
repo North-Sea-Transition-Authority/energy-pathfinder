@@ -170,7 +170,15 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
         getUpcomingTenderModelAndView(projectContext.getProjectDetails(), form),
         form,
         () -> {
-          upcomingTenderService.updateUpcomingTender(upcomingTender, form, projectContext.getUserAccount());
+          var tender = upcomingTenderService.updateUpcomingTender(upcomingTender, form, projectContext.getUserAccount());
+          AuditService.audit(
+              AuditEvent.UPCOMING_TENDER_UPDATED,
+              String.format(
+                  AuditEvent.UPCOMING_TENDER_UPDATED.getMessage(),
+                  tender.getId(),
+                  projectContext.getProjectDetails().getId()
+              )
+          );
           return ReverseRouter.redirect(on(UpcomingTendersController.class).viewUpcomingTenders(projectId, null));
         }
     );
@@ -197,6 +205,14 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
                                            ProjectContext projectContext) {
     var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
     upcomingTenderService.delete(upcomingTender);
+    AuditService.audit(
+        AuditEvent.UPCOMING_TENDER_REMOVED,
+        String.format(
+            AuditEvent.UPCOMING_TENDER_REMOVED.getMessage(),
+            upcomingTenderId,
+            projectContext.getProjectDetails().getId()
+        )
+    );
     return ReverseRouter.redirect(on(UpcomingTendersController.class).viewUpcomingTenders(projectId, null));
   }
 

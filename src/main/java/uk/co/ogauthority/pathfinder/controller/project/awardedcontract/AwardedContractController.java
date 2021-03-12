@@ -133,7 +133,16 @@ public class AwardedContractController extends ProjectFormPageController {
         getAwardedContractModelAndView(projectId, form),
         form,
         () -> {
-          awardedContractService.updateAwardedContract(awardedContractId, projectContext.getProjectDetails(), form);
+          var contract = awardedContractService.updateAwardedContract(awardedContractId, projectContext.getProjectDetails(), form);
+          AuditService.audit(
+              AuditEvent.AWARDED_CONTRACT_UPDATED,
+              String.format(
+                  AuditEvent.AWARDED_CONTRACT_UPDATED.getMessage(),
+                  contract.getId(),
+                  projectContext.getProjectDetails().getId()
+              )
+          );
+
           return getAwardedContractSummaryRedirect(projectId);
         }
     );
@@ -141,14 +150,22 @@ public class AwardedContractController extends ProjectFormPageController {
 
   @PostMapping("/awarded-contract/{awardedContractId}/remove/{displayOrder}")
   public ModelAndView removeAwardedContract(@PathVariable("projectId") Integer projectId,
-                                            @PathVariable("awardedContractId") Integer awardedProjectId,
+                                            @PathVariable("awardedContractId") Integer awardedContractId,
                                             @PathVariable("displayOrder") Integer displayOrder,
                                             ProjectContext projectContext) {
     var awardedContract = awardedContractService.getAwardedContract(
-        awardedProjectId,
+        awardedContractId,
         projectContext.getProjectDetails()
     );
     awardedContractService.deleteAwardedContract(awardedContract);
+    AuditService.audit(
+        AuditEvent.AWARDED_CONTRACT_REMOVED,
+        String.format(
+            AuditEvent.AWARDED_CONTRACT_REMOVED.getMessage(),
+            awardedContractId,
+            projectContext.getProjectDetails().getId()
+        )
+    );
     return getAwardedContractSummaryRedirect(projectId);
   }
 

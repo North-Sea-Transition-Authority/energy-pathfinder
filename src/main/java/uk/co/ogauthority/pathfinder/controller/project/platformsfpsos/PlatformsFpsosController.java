@@ -146,6 +146,14 @@ public class PlatformsFpsosController extends ProjectFormPageController {
         form,
         () -> {
           platformsFpsosService.updatePlatformFpso(projectContext.getProjectDetails(), platformFpso, form);
+          AuditService.audit(
+              AuditEvent.PLATFORM_FPSO_UPDATED,
+              String.format(
+                  AuditEvent.PLATFORM_FPSO_UPDATED.getMessage(),
+                  platformFpsoId,
+                  projectContext.getProjectDetails().getId()
+              )
+          );
           return ReverseRouter.redirect(on(PlatformsFpsosController.class).viewPlatformsFpsos(projectId, null));
         }
     );
@@ -171,6 +179,14 @@ public class PlatformsFpsosController extends ProjectFormPageController {
                                          ProjectContext projectContext) {
     var platformFpso = platformsFpsosService.getOrError(platformFpsoId);
     platformsFpsosService.delete(platformFpso);
+    AuditService.audit(
+        AuditEvent.PLATFORM_FPSO_REMOVED,
+        String.format(
+            AuditEvent.PLATFORM_FPSO_REMOVED.getMessage(),
+            platformFpsoId,
+            projectContext.getProjectDetails().getId()
+        )
+    );
     return ReverseRouter.redirect(on(PlatformsFpsosController.class).viewPlatformsFpsos(projectId, null));
   }
 

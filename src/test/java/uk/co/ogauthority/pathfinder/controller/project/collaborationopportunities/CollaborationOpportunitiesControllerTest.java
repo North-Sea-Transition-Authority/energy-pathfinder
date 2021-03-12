@@ -84,6 +84,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
     );
     when(collaborationOpportunitiesSummaryService.getView(opportunity, DISPLAY_ORDER)).thenReturn(collaborationOpportunityView);
     when(collaborationOpportunitiesService.createCollaborationOpportunity(any(), any(), any())).thenReturn(CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail));
+    when(collaborationOpportunitiesService.updateCollaborationOpportunity(any(), any(), any())).thenReturn(CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail));
   }
 
   @Test
