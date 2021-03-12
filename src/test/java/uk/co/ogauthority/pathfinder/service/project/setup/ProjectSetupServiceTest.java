@@ -329,7 +329,7 @@ public class ProjectSetupServiceTest {
     when(projectTaskListSetupRepository.findByProjectDetail(projectDetail)).thenReturn(Optional.empty());
 
     final var isValidAndSelected = projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, task);
-    assertThat(isValidAndSelected).isEqualTo(false);
+    assertThat(isValidAndSelected).isFalse();
   }
 
   @Test
@@ -341,7 +341,7 @@ public class ProjectSetupServiceTest {
     when(projectTaskListSetupRepository.findByProjectDetail(projectDetail)).thenReturn(Optional.empty());
 
     final var isValidAndSelected = projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, task);
-    assertThat(isValidAndSelected).isEqualTo(false);
+    assertThat(isValidAndSelected).isFalse();
   }
 
   @Test
@@ -353,7 +353,7 @@ public class ProjectSetupServiceTest {
     when(projectTaskListSetupRepository.findByProjectDetail(projectDetail)).thenReturn(Optional.of(setup));
 
     final var isValidAndSelected = projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, task);
-    assertThat(isValidAndSelected).isEqualTo(true);
+    assertThat(isValidAndSelected).isTrue();
   }
 
   private void checkCommonFieldsMatch(ProjectSetupForm formToCheckAgainst, ProjectSetupForm resultingForm) {
