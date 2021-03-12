@@ -454,6 +454,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     , submitted_by_wua
     , is_migrated
     , created_datetime
+    , project_type
     )
     VALUES(
       p_new_project_id
@@ -465,6 +466,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     , p_created_by_wua
     , 1
     , p_submitted_datetime
+    , 'INFRASTRUCTURE'
     )
     RETURNING
       id

@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.testutil;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
 
 public class ProjectUtil {
@@ -16,13 +17,18 @@ public class ProjectUtil {
     return getProjectDetails(STATUS);
   }
 
-  public static ProjectDetail getProjectDetails(ProjectStatus status) {
+  public static ProjectDetail getProjectDetails(ProjectStatus projectStatus) {
+    return getProjectDetails(projectStatus, ProjectType.INFRASTRUCTURE);
+  }
+
+  public static ProjectDetail getProjectDetails(ProjectStatus projectStatus, ProjectType projectType) {
     var projectDetail = new ProjectDetail(
         getProject(),
-        status,
+        projectStatus,
         WUA,
         StartProjectService.FIRST_VERSION,
-        StartProjectService.CURRENT_VERSION
+        StartProjectService.CURRENT_VERSION,
+        projectType
     );
     projectDetail.setId(PROJECT_DETAIL_ID);
     return projectDetail;
