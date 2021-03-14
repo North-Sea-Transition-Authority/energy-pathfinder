@@ -14,10 +14,12 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.communication.CommunicationJourney;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.controller.team.annotation.TeamManagementPermissionCheck;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.communication.CommunicationJourneyStage;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.team.teammanagementcontext.TeamManagementPermission;
@@ -159,5 +161,24 @@ public class ArgumentResolverUtil {
                 methodParameter.getContainingClass().getName()
             ))
         ));
+  }
+
+  public static Set<ProjectType> getProjectTypesCheck(MethodParameter methodParameter) {
+
+    var methodLevelPermissions = Optional.ofNullable(
+        methodParameter.getMethodAnnotation(ProjectTypeCheck.class)
+    )
+        .map(p -> Arrays.stream(p.types()).collect(Collectors.toSet()))
+        .orElse(Set.of());
+
+    if (!methodLevelPermissions.isEmpty()) {
+      return methodLevelPermissions;
+    }
+
+    return Optional.ofNullable(
+        methodParameter.getContainingClass().getAnnotation(ProjectTypeCheck.class)
+    )
+        .map(p -> Arrays.stream(p.types()).collect(Collectors.toSet()))
+        .orElse(Set.of());
   }
 }

@@ -15,9 +15,11 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.projectarchive.ArchiveProjectForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
@@ -31,6 +33,7 @@ import uk.co.ogauthority.pathfinder.service.projectarchive.ArchiveProjectService
     projectDetailVersionType = ProjectDetailVersionType.LATEST_SUBMITTED_VERSION
 )
 @ProjectFormPagePermissionCheck(permissions = {ProjectPermission.ARCHIVE})
+@ProjectTypeCheck(types = ProjectType.INFRASTRUCTURE)
 @RequestMapping("/project/{projectId}/archive")
 public class ArchiveProjectController {
 

@@ -16,7 +16,9 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.ProvideNoUpdateForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
@@ -26,7 +28,8 @@ import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateS
 
 @Controller
 @ProjectStatusCheck(status = {ProjectStatus.QA, ProjectStatus.PUBLISHED})
-@ProjectFormPagePermissionCheck(permissions = {ProjectPermission.PROVIDE_UPDATE})
+@ProjectFormPagePermissionCheck(permissions = ProjectPermission.PROVIDE_UPDATE)
+@ProjectTypeCheck(types = { ProjectType.INFRASTRUCTURE, ProjectType.FORWARD_WORK_PLAN })
 @RequestMapping("/project/{projectId}")
 public class OperatorUpdateController {
 

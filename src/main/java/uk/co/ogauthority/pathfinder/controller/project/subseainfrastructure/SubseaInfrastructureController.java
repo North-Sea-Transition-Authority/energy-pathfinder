@@ -17,10 +17,12 @@ import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.InfrastructureStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureType;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaStructureMass;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.SubseaInfrastructureForm;
@@ -37,6 +39,7 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
+@ProjectTypeCheck(types = ProjectType.INFRASTRUCTURE)
 @RequestMapping("/project/{projectId}/subsea-infrastructures")
 public class SubseaInfrastructureController extends ProjectFormPageController {
 

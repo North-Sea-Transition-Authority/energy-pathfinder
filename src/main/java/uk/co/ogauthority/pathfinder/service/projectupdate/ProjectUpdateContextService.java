@@ -8,6 +8,7 @@ import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 
@@ -29,9 +30,10 @@ public class ProjectUpdateContextService {
                                  Class<?> controllerClass) {
     var statusCheck = projectContextService.getProjectStatusesForClass(controllerClass);
     var permissionCheck = projectContextService.getProjectPermissionsForClass(controllerClass);
+    final var allowedProjectTypes = projectContextService.getProjectTypesForClass(controllerClass);
 
     try {
-      buildProjectUpdateContext(detail, user, statusCheck, permissionCheck);
+      buildProjectUpdateContext(detail, user, statusCheck, permissionCheck, allowedProjectTypes);
       return true;
     } catch (AccessDeniedException exception) {
       return false;
@@ -41,7 +43,8 @@ public class ProjectUpdateContextService {
   public ProjectUpdateContext buildProjectUpdateContext(ProjectDetail detail,
                                                         AuthenticatedUserAccount user,
                                                         Set<ProjectStatus> statusCheck,
-                                                        Set<ProjectPermission> permissionCheck) {
+                                                        Set<ProjectPermission> permissionCheck,
+                                                        Set<ProjectType> allowedProjectTypes) {
     var project = detail.getProject();
 
     if (projectUpdateService.isUpdateInProgress(project)) {
@@ -57,7 +60,8 @@ public class ProjectUpdateContextService {
         detail,
         user,
         statusCheck,
-        permissionCheck
+        permissionCheck,
+        allowedProjectTypes
     );
 
     return new ProjectUpdateContext(

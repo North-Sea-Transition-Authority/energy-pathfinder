@@ -24,11 +24,13 @@ import uk.co.ogauthority.pathfinder.controller.file.PathfinderFileUploadControll
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.TenderFunctionRestController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -46,6 +48,7 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
+@ProjectTypeCheck(types = ProjectType.INFRASTRUCTURE)
 @RequestMapping("/project/{projectId}/upcoming-tenders")
 public class UpcomingTendersController extends PathfinderFileUploadController {
 

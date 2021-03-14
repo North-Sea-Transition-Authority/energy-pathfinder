@@ -41,11 +41,14 @@ public class RegulatorProjectUpdateContextArgumentResolver implements HandlerMet
     var statusCheck = ArgumentResolverUtil.getProjectStatusCheck(parameter);
     var permissionCheck = ArgumentResolverUtil.getProjectFormPagePermissionCheck(parameter);
 
+    final var allowedProjectTypes = ArgumentResolverUtil.getProjectTypesCheck(parameter);
+
     return regulatorProjectUpdateContextService.buildProjectUpdateContext(
         detail,
         user,
         statusCheck,
-        permissionCheck
+        permissionCheck,
+        allowedProjectTypes
     );
   }
 }

@@ -16,9 +16,11 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.projecttransfer.ProjectTransferForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
@@ -32,7 +34,8 @@ import uk.co.ogauthority.pathfinder.service.projecttransfer.ProjectTransferServi
     status = { ProjectStatus.QA, ProjectStatus.PUBLISHED },
     projectDetailVersionType = ProjectDetailVersionType.LATEST_SUBMITTED_VERSION
 )
-@ProjectFormPagePermissionCheck(permissions = {ProjectPermission.TRANSFER})
+@ProjectFormPagePermissionCheck(permissions = ProjectPermission.TRANSFER)
+@ProjectTypeCheck(types = ProjectType.INFRASTRUCTURE)
 @RequestMapping("/project/{projectId}/change-operator")
 public class ProjectTransferController extends ProjectFormPageController {
 

@@ -7,6 +7,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
@@ -32,7 +33,8 @@ public class RegulatorProjectUpdateContextService extends ProjectUpdateContextSe
   public RegulatorProjectUpdateContext buildProjectUpdateContext(ProjectDetail detail,
                                                                  AuthenticatedUserAccount user,
                                                                  Set<ProjectStatus> statusCheck,
-                                                                 Set<ProjectPermission> permissionCheck) {
+                                                                 Set<ProjectPermission> permissionCheck,
+                                                                 Set<ProjectType> allowedProjectTypes) {
     // This check to get the latest submitted detail is a safety check, in case
     // detail is not the latest submitted detail.
     var latestSubmittedDetail = projectService.getLatestSubmittedDetailOrError(detail.getProject().getId());
@@ -50,7 +52,8 @@ public class RegulatorProjectUpdateContextService extends ProjectUpdateContextSe
         detail,
         user,
         statusCheck,
-        permissionCheck
+        permissionCheck,
+        allowedProjectTypes
     );
 
     return new RegulatorProjectUpdateContext(projectUpdateContext);

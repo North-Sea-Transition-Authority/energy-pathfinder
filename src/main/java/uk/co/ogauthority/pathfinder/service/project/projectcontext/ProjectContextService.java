@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 
@@ -33,9 +35,10 @@ public class ProjectContextService {
                                  Class<?> controllerClass) {
     var statusCheck = getProjectStatusesForClass(controllerClass);
     var permissionCheck = getProjectPermissionsForClass(controllerClass);
+    final var allowedProjectTypes = getProjectTypesForClass(controllerClass);
 
     try {
-      buildProjectContext(detail, user, statusCheck, permissionCheck);
+      buildProjectContext(detail, user, statusCheck, permissionCheck, allowedProjectTypes);
       return true;
     } catch (AccessDeniedException exception) {
       return false;
@@ -45,19 +48,21 @@ public class ProjectContextService {
   /**
    * Do some preliminary access checks and return the project context if the checks pass.
    *
-   * @param detail          Detail to build the context for.
-   * @param user            User accessing the project.
-   * @param statusCheck     What status the project should be in.
-   *                        (accessed via {@link uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck} annotation).
+   * @param detail Detail to build the context for.
+   * @param user User accessing the project.
+   * @param statusCheck What status the project should be in.
+   *                    (accessed via {@link uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck})
    * @param permissionCheck what permissions the user should have to view the detail
-   *                        (accessed via
-   *                        {@link uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck} annotation).
+   *                        (accessed via {@link uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck})
+   * @param allowedProjectTypes the set of allow project types
+   *                            (accessed via {@link uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck})
    * @return the project context if checks pass else throw AccessDeniedException
    */
   public ProjectContext buildProjectContext(ProjectDetail detail,
                                             AuthenticatedUserAccount user,
                                             Set<ProjectStatus> statusCheck,
-                                            Set<ProjectPermission> permissionCheck) {
+                                            Set<ProjectPermission> permissionCheck,
+                                            Set<ProjectType> allowedProjectTypes) {
     if (!projectOperatorService.isUserInProjectTeamOrRegulator(detail, user)) {
       throw new AccessDeniedException(
           String.format(
@@ -71,19 +76,28 @@ public class ProjectContextService {
       throw new AccessDeniedException(
           String.format(
               "Project with status: %s does not match required statuses: %s",
-              detail.getStatus().getDisplayName(),
+              (detail.getStatus() != null) ? detail.getStatus().getDisplayName() : "null",
               statusCheck.stream().map(ProjectStatus::getDisplayName).collect(Collectors.joining(",")))
       );
     }
 
     var userPermissions = getUserProjectPermissions(user);
 
-
     if (userPermissions.stream().noneMatch(permissionCheck::contains)) {
       throw new AccessDeniedException(
           String.format(
               "User does not have the required permissions: %s",
               permissionCheck.stream().map(Enum::name).collect(Collectors.joining(",")))
+      );
+    }
+
+    if (!projectTypeMatches(detail, allowedProjectTypes)) {
+      throw new AccessDeniedException(
+          String.format(
+              "Project with type: %s does not match required types: %s",
+              (detail.getProjectType() != null) ? detail.getProjectType() : "null",
+              allowedProjectTypes.stream().map(ProjectType::name).collect(Collectors.joining(","))
+          )
       );
     }
 
@@ -110,9 +124,16 @@ public class ProjectContextService {
     }
   }
 
-  public boolean projectStatusMatches(ProjectDetail detail,
-                                      Set<ProjectStatus> status) {
-    return status.contains(detail.getStatus());
+  private boolean projectStatusMatches(ProjectDetail detail,
+                                      Set<ProjectStatus> allowedProjectStatuses) {
+    final var projectStatus = detail.getStatus();
+    return projectStatus != null && allowedProjectStatuses.contains(projectStatus);
+  }
+
+  private boolean projectTypeMatches(ProjectDetail projectDetail,
+                                     Set<ProjectType> allowedProjectTypes) {
+    final var projectType = projectDetail.getProjectType();
+    return projectType != null && allowedProjectTypes.contains(projectType);
   }
 
   public Set<ProjectPermission> getUserProjectPermissions(AuthenticatedUserAccount user) {
@@ -133,6 +154,14 @@ public class ProjectContextService {
     return Arrays.stream(clazz.getAnnotations())
         .filter(annotation -> annotation.annotationType().equals(ProjectFormPagePermissionCheck.class))
         .map(annotation -> Arrays.stream(((ProjectFormPagePermissionCheck) annotation).permissions()).collect(Collectors.toSet()))
+        .findFirst()
+        .orElse(Set.of());
+  }
+
+  public Set<ProjectType> getProjectTypesForClass(Class<?> clazz) {
+    return Arrays.stream(clazz.getAnnotations())
+        .filter(annotation -> annotation.annotationType().equals(ProjectTypeCheck.class))
+        .map(annotation -> Arrays.stream(((ProjectTypeCheck) annotation).types()).collect(Collectors.toSet()))
         .findFirst()
         .orElse(Set.of());
   }

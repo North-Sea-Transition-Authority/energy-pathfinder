@@ -14,12 +14,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
@@ -46,6 +48,8 @@ public class ProjectContextServiceTest {
 
   private final Set<ProjectPermission> projectPermissions = Set.of(ProjectPermission.EDIT, ProjectPermission.SUBMIT);
 
+  private final Set<ProjectType> allowedProjectTypes = Set.of(ProjectType.INFRASTRUCTURE);
+
   @Before
   public void setUp() throws Exception {
     projectContextService = new ProjectContextService(
@@ -65,16 +69,6 @@ public class ProjectContextServiceTest {
         ProjectPermission.EDIT,
         ProjectPermission.SUBMIT
     );
-  }
-
-  @Test
-  public void projectStatusMatches_whenMatch() {
-    assertThat(projectContextService.projectStatusMatches(detail, Set.of(ProjectStatus.DRAFT))).isTrue();
-  }
-
-  @Test
-  public void projectStatusMatches_whenNotMatched() {
-    assertThat(projectContextService.projectStatusMatches(detail, Set.of(ProjectStatus.QA))).isFalse();
   }
 
   @Test
@@ -120,8 +114,9 @@ public class ProjectContextServiceTest {
         detail,
         authenticatedUser,
         Set.of(ProjectStatus.DRAFT),
-        projectPermissions
-        );
+        projectPermissions,
+        allowedProjectTypes
+    );
     assertThat(context.getProjectDetails()).isEqualTo(detail);
     assertThat(context.getUserAccount()).isEqualTo(authenticatedUser);
     assertThat(context.getProjectPermissions()).containsExactlyInAnyOrder(
@@ -139,7 +134,8 @@ public class ProjectContextServiceTest {
         detail,
         authenticatedUser,
         Set.of(ProjectStatus.DRAFT),
-        projectPermissions
+        projectPermissions,
+        allowedProjectTypes
     );
   }
 
@@ -150,18 +146,106 @@ public class ProjectContextServiceTest {
         detail,
         authenticatedUser,
         Set.of(ProjectStatus.QA),
-        projectPermissions
+        projectPermissions,
+        allowedProjectTypes
+    );
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  public void buildProjectContext_whenNullProjectStatus_thenAccessDeniedException() {
+
+    detail.setStatus(null);
+
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+
+    projectContextService.buildProjectContext(
+        detail,
+        authenticatedUser,
+        Set.of(ProjectStatus.QA),
+        projectPermissions,
+        allowedProjectTypes
     );
   }
 
   @Test(expected = AccessDeniedException.class)
   public void buildProjectContext_whenNoPermissions() {
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(true);
-    var context = projectContextService.buildProjectContext(
+    projectContextService.buildProjectContext(
         detail,
         unAuthenticatedUser,
         Set.of(ProjectStatus.DRAFT),
-        projectPermissions
+        projectPermissions,
+        allowedProjectTypes
+    );
+  }
+
+  @Test
+  public void buildProjectContext_whenCorrectProjectType_thenReturn() {
+
+    final var projectType = ProjectType.INFRASTRUCTURE;
+    detail.setProjectType(projectType);
+
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+
+    projectContextService.buildProjectContext(
+        detail,
+        authenticatedUser,
+        Set.of(ProjectStatus.DRAFT),
+        projectPermissions,
+        Set.of(projectType)
+    );
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  public void buildProjectContext_whenIncorrectProjectType_thenAccessDeniedException() {
+
+    final var expectedProjectType = ProjectType.INFRASTRUCTURE;
+    final var detailProjectType = ProjectType.FORWARD_WORK_PLAN;
+    detail.setProjectType(detailProjectType);
+
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+
+    projectContextService.buildProjectContext(
+        detail,
+        authenticatedUser,
+        Set.of(ProjectStatus.DRAFT),
+        projectPermissions,
+        Set.of(expectedProjectType)
+    );
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  public void buildProjectContext_whenEmptyProjectTypeSet_thenAccessDeniedException() {
+
+    Set<ProjectType> expectedProjectTypes = Set.of();
+    final var detailProjectType = ProjectType.FORWARD_WORK_PLAN;
+    detail.setProjectType(detailProjectType);
+
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+
+    projectContextService.buildProjectContext(
+        detail,
+        authenticatedUser,
+        Set.of(ProjectStatus.DRAFT),
+        projectPermissions,
+        expectedProjectTypes
+    );
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  public void buildProjectContext_whenProjectTypeNull_thenAccessDeniedException() {
+
+    Set<ProjectType> expectedProjectTypes = Set.of(ProjectType.INFRASTRUCTURE);
+    detail.setProjectType(null);
+
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+
+    projectContextService.buildProjectContext(
+        detail,
+        authenticatedUser,
+        Set.of(ProjectStatus.DRAFT),
+        projectPermissions,
+        expectedProjectTypes
     );
   }
 
@@ -208,7 +292,23 @@ public class ProjectContextServiceTest {
     );
   }
 
+  @Test
+  public void getProjectTypesForClass_whenNoTypes_thenEmptySet() {
+    assertThat(projectContextService.getProjectTypesForClass(Object.class)).isEmpty();
+  }
+
+  @Test
+  public void getProjectTypesForClass_whenTypes_thenPopulatedSet() {
+    var allowedProjectTypes = projectContextService.getProjectTypesForClass(TestClassWithContextAnnotations.class);
+
+    assertThat(allowedProjectTypes).containsExactlyInAnyOrder(
+        ProjectType.INFRASTRUCTURE,
+        ProjectType.FORWARD_WORK_PLAN
+    );
+  }
+
   @ProjectStatusCheck(status = ProjectStatus.DRAFT)
+  @ProjectTypeCheck(types = ProjectType.INFRASTRUCTURE)
   @ProjectFormPagePermissionCheck
   private static final class TestController {}
 }
