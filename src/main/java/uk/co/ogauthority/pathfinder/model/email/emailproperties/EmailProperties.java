@@ -10,8 +10,11 @@ import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplate;
  */
 public class EmailProperties {
 
-  public static final String DEFAULT_RECIPIENT_IDENTIFIER = "Pathfinder user";
-  public static final String DEFAULT_SIGN_OFF_IDENTIFIER = "OGA Pathfinder team";
+  private static final String SERVICE_NAME = "Energy Pathfinder";
+  private static final String CUSTOMER_MNEMONIC = "OGA";
+
+  public static final String DEFAULT_RECIPIENT_IDENTIFIER = String.format("%s user", SERVICE_NAME);
+  public static final String DEFAULT_SIGN_OFF_IDENTIFIER = String.format("%s %s team", CUSTOMER_MNEMONIC, SERVICE_NAME);
   public static final String DEFAULT_GREETING_TEXT = "Dear";
   public static final String DEFAULT_SIGN_OFF_TEXT = "Kind regards";
   public static final String DEFAULT_SERVICE_LOGIN_TEXT = "To see more details please log in to the service";

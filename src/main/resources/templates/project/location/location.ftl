@@ -53,7 +53,8 @@
     />
     <@fdsDetails.summaryDetails summaryTitle="Why is a block not allowed on my project?">
       <p class="govuk-body">
-        You can only include blocks on your project that exist on a production licence. If a block has been wholly or partially relinquished since it was added to your Pathfinder project it will need to be removed
+        You can only include blocks on your project that exist on a production licence. If a block has been wholly
+        or partially relinquished since it was added to your ${service.serviceName} project it will need to be removed
       </p>
     </@fdsDetails.summaryDetails>
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
