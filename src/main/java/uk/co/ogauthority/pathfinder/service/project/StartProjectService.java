@@ -8,6 +8,7 @@ import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.Porta
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectRepository;
 
@@ -40,7 +41,14 @@ public class StartProjectService {
   @Transactional
   public ProjectDetail startProject(AuthenticatedUserAccount user, PortalOrganisationGroup organisationGroup) {
     var project = new Project();
-    var projectDetails = new ProjectDetail(project, ProjectStatus.DRAFT, user.getWuaId(), FIRST_VERSION, CURRENT_VERSION);
+    var projectDetails = new ProjectDetail(
+        project,
+        ProjectStatus.DRAFT,
+        user.getWuaId(),
+        FIRST_VERSION,
+        CURRENT_VERSION,
+        ProjectType.INFRASTRUCTURE
+    );
     projectRepository.save(project);
     projectDetailsRepository.save(projectDetails);
     projectOperatorService.createOrUpdateProjectOperator(projectDetails, organisationGroup);

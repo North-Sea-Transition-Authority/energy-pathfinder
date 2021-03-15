@@ -14,6 +14,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectRepository;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
@@ -66,5 +67,6 @@ public class StartProjectServiceTest {
     assertThat(projectDetails.getStatus()).isEqualTo(ProjectStatus.DRAFT);
     assertThat(projectDetails.getVersion()).isEqualTo(1);
     assertThat(projectDetails.getIsCurrentVersion()).isTrue();
+    assertThat(projectDetails.getProjectType()).isEqualTo(ProjectType.INFRASTRUCTURE);
   }
 }

@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.entityduplication.ParentEntity;
 
 @Entity
@@ -45,6 +46,9 @@ public class ProjectDetail implements ParentEntity {
 
   private Instant createdDatetime;
 
+  @Enumerated(EnumType.STRING)
+  private ProjectType projectType;
+
   public ProjectDetail() {
   }
 
@@ -52,13 +56,15 @@ public class ProjectDetail implements ParentEntity {
                        ProjectStatus status,
                        Integer createdByWua,
                        Integer version,
-                       boolean isCurrentVersion) {
+                       boolean isCurrentVersion,
+                       ProjectType projectType) {
     this.project = project;
     this.status = status;
     this.createdByWua = createdByWua;
     this.version = version;
     this.isCurrentVersion = isCurrentVersion;
     this.createdDatetime = Instant.now();
+    this.projectType = projectType;
   }
 
   public Integer getId() {
@@ -137,6 +143,14 @@ public class ProjectDetail implements ParentEntity {
     return FIRST_VERSION.equals(version);
   }
 
+  public ProjectType getProjectType() {
+    return projectType;
+  }
+
+  public void setProjectType(ProjectType projectType) {
+    this.projectType = projectType;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -154,11 +168,23 @@ public class ProjectDetail implements ParentEntity {
         && Objects.equals(createdByWua, projectDetail.createdByWua)
         && Objects.equals(submittedInstant, projectDetail.submittedInstant)
         && Objects.equals(submittedByWua, projectDetail.submittedByWua)
-        && Objects.equals(createdDatetime, projectDetail.createdDatetime);
+        && Objects.equals(createdDatetime, projectDetail.createdDatetime)
+        && Objects.equals(projectType, projectDetail.projectType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, project, status, version, isCurrentVersion, createdByWua, submittedInstant, submittedByWua, createdDatetime);
+    return Objects.hash(
+        id,
+        project,
+        status,
+        version,
+        isCurrentVersion,
+        createdByWua,
+        submittedInstant,
+        submittedByWua,
+        createdDatetime,
+        projectType
+    );
   }
 }

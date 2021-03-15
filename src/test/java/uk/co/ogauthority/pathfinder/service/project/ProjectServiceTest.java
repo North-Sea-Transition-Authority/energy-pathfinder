@@ -180,6 +180,7 @@ public class ProjectServiceTest {
     assertThat(newProjectDetail.getIsCurrentVersion()).isTrue();
     assertThat(newProjectDetail.getVersion()).isEqualTo(fromProjectDetail.getVersion() + 1);
     assertThat(newProjectDetail.getCreatedDatetime()).isNotNull();
+    assertThat(newProjectDetail.getProjectType()).isEqualTo(fromProjectDetail.getProjectType());
 
     verify(projectDetailsRepository, times(1)).save(fromProjectDetail);
     verify(projectDetailsRepository, times(1)).save(newProjectDetail);

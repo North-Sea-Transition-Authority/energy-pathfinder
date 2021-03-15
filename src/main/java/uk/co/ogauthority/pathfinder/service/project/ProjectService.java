@@ -78,7 +78,8 @@ public class ProjectService {
         newStatus,
         userAccount.getWuaId(),
         fromDetail.getVersion() + 1,
-        true
+        true,
+        fromDetail.getProjectType()
     );
 
     if (newStatus.equals(ProjectStatus.QA)
