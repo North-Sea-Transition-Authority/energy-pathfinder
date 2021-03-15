@@ -24,6 +24,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupFormVal
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.tasks.ProjectTaskListSetupRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -212,10 +213,16 @@ public class ProjectSetupService implements ProjectFormSectionService {
     }
   }
 
-  public boolean taskSelectedForProjectDetail(ProjectDetail detail, ProjectTask task) {
-    return projectTaskListSetupRepository.findByProjectDetail(detail)
+  public boolean taskValidAndSelectedForProjectDetail(ProjectDetail detail, ProjectTask task) {
+
+    final var taskValidForProjectType = (detail.getProjectType() != null)
+        && task.getRelatedProjectTypes().contains(detail.getProjectType());
+
+    final var taskSelectedInProjectSetup = projectTaskListSetupRepository.findByProjectDetail(detail)
         .map(setup -> setup.getTaskListSections().stream().anyMatch(q -> q.getProjectTask().equals(task)))
         .orElse(false);
+
+    return taskValidForProjectType && taskSelectedInProjectSetup;
   }
 
   boolean isDecomRelated(ProjectDetail detail) {
@@ -242,6 +249,11 @@ public class ProjectSetupService implements ProjectFormSectionService {
         toDetail,
         ProjectTaskListSetup.class
     );
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail) {
+    return ProjectService.isInfrastructureProject(detail);
   }
 
 }

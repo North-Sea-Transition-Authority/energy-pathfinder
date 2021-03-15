@@ -344,7 +344,7 @@ public class SubseaInfrastructureService implements ProjectFormSectionService {
 
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
-    return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.SUBSEA_INFRASTRUCTURE);
+    return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.SUBSEA_INFRASTRUCTURE);
   }
 
   @Override

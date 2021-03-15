@@ -21,6 +21,10 @@ public class ProjectUtil {
     return getProjectDetails(projectStatus, ProjectType.INFRASTRUCTURE);
   }
 
+  public static ProjectDetail getProjectDetails(ProjectType projectType) {
+    return getProjectDetails(STATUS, projectType);
+  }
+
   public static ProjectDetail getProjectDetails(ProjectStatus projectStatus, ProjectType projectType) {
     var projectDetail = new ProjectDetail(
         getProject(),

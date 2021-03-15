@@ -322,13 +322,13 @@ public class IntegratedRigServiceTest {
 
   @Test
   public void canShowInTaskList_true() {
-    when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.INTEGRATED_RIGS)).thenReturn(true);
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.INTEGRATED_RIGS)).thenReturn(true);
     assertThat(integratedRigService.canShowInTaskList(projectDetail)).isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
-    when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.INTEGRATED_RIGS)).thenReturn(false);
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.INTEGRATED_RIGS)).thenReturn(false);
     assertThat(integratedRigService.canShowInTaskList(projectDetail)).isFalse();
   }
 

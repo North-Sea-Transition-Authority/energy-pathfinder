@@ -235,7 +235,7 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
 
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
-    return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES);
+    return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES);
   }
 
   @Override

@@ -282,13 +282,13 @@ public class PlugAbandonmentScheduleServiceTest {
 
   @Test
   public void canShowInTaskList_true() {
-    when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.WELLS)).thenReturn(true);
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.WELLS)).thenReturn(true);
     assertThat(plugAbandonmentScheduleService.canShowInTaskList(detail)).isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
-    when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.WELLS)).thenReturn(false);
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.WELLS)).thenReturn(false);
     assertThat(plugAbandonmentScheduleService.canShowInTaskList(detail)).isFalse();
   }
 

@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.model.enums.project.tasks;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Set;
 import java.util.stream.Stream;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
@@ -16,6 +17,7 @@ import uk.co.ogauthority.pathfinder.controller.project.setup.ProjectSetupControl
 import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.SubseaInfrastructureController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
@@ -40,87 +42,102 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       ChangeProjectOperatorController.PAGE_NAME,
       ChangeProjectOperatorController.class,
       SelectOperatorService.class,
+      Set.of(ProjectType.INFRASTRUCTURE),
       1
   ),
   PROJECT_INFORMATION(
       ProjectInformationController.PAGE_NAME,
       ProjectInformationController.class,
       ProjectInformationService.class,
+      Set.of(ProjectType.INFRASTRUCTURE),
       20
   ),
   PROJECT_LOCATION(
       ProjectLocationController.PAGE_NAME,
       ProjectLocationController.class,
       ProjectLocationService.class,
+      Set.of(ProjectType.INFRASTRUCTURE),
       30
   ),
   PROJECT_SETUP(
       ProjectSetupController.PAGE_NAME,
       ProjectSetupController.class,
       ProjectSetupService.class,
+      Set.of(ProjectType.INFRASTRUCTURE),
       40
   ),
   UPCOMING_TENDERS(
       UpcomingTendersController.PAGE_NAME,
       UpcomingTendersController.class,
       UpcomingTenderService.class,
+      Set.of(ProjectType.INFRASTRUCTURE),
       50
   ),
   AWARDED_CONTRACTS(
       AwardedContractController.PAGE_NAME,
       AwardedContractController.class,
       AwardedContractService.class,
+      Set.of(ProjectType.INFRASTRUCTURE),
       60
   ),
   COLLABORATION_OPPORTUNITIES(
       CollaborationOpportunitiesController.PAGE_NAME,
       CollaborationOpportunitiesController.class,
       CollaborationOpportunitiesService.class,
+      Set.of(ProjectType.INFRASTRUCTURE),
       70
   ),
   WELLS(
       PlugAbandonmentScheduleController.TASK_LIST_NAME,
       PlugAbandonmentScheduleController.class,
       PlugAbandonmentScheduleService.class,
+      Set.of(ProjectType.INFRASTRUCTURE),
       80
   ),
   PLATFORM_FPSO(
       PlatformsFpsosController.TASK_LIST_NAME,
       PlatformsFpsosController.class,
       PlatformsFpsosService.class,
+      Set.of(ProjectType.INFRASTRUCTURE),
       90
   ),
   INTEGRATED_RIGS(
       IntegratedRigController.TASK_LIST_NAME,
       IntegratedRigController.class,
       IntegratedRigService.class,
+      Set.of(ProjectType.INFRASTRUCTURE),
       100
   ),
   SUBSEA_INFRASTRUCTURE(
       SubseaInfrastructureController.TASK_LIST_NAME,
       SubseaInfrastructureController.class,
       SubseaInfrastructureService.class,
+      Set.of(ProjectType.INFRASTRUCTURE),
       110
   ),
   PIPELINES(
       DecommissionedPipelineController.TASK_LIST_NAME,
       DecommissionedPipelineController.class,
       DecommissionedPipelineService.class,
+      Set.of(ProjectType.INFRASTRUCTURE),
       120
   );
 
   private final String displayName;
   private final Class controllerClass;
   private final Class<? extends ProjectFormSectionService> serviceClass;
+  private final Set<ProjectType> relatedProjectTypes;
   private final int displayOrder;
 
   ProjectTask(String displayName,
               Class controllerClass,
               Class<? extends ProjectFormSectionService> serviceClass,
+              Set<ProjectType> relatedProjectTypes,
               int displayOrder) {
     this.displayName = displayName;
     this.controllerClass = controllerClass;
     this.serviceClass = serviceClass;
+    this.relatedProjectTypes = relatedProjectTypes;
     this.displayOrder = displayOrder;
   }
 
@@ -146,6 +163,11 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
   @Override
   public String getDisplayName() {
     return displayName;
+  }
+
+  @Override
+  public Set<ProjectType> getRelatedProjectTypes() {
+    return relatedProjectTypes;
   }
 
   @Override

@@ -22,6 +22,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -170,5 +171,10 @@ public class SelectOperatorService implements ProjectFormSectionService {
         toDetail,
         ProjectOperator.class
     );
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail) {
+    return ProjectService.isInfrastructureProject(detail);
   }
 }

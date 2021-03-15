@@ -1,8 +1,10 @@
 package uk.co.ogauthority.pathfinder.model.enums.project.tasks;
 
 
+import java.util.Set;
 import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 
 public interface GeneralPurposeProjectTask {
@@ -21,5 +23,7 @@ public interface GeneralPurposeProjectTask {
   String getDisplayName();
 
   String getTaskLandingPageRoute(Project project);
+
+  Set<ProjectType> getRelatedProjectTypes();
 
 }

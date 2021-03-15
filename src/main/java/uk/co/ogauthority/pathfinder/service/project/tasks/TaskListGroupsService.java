@@ -35,7 +35,10 @@ public class TaskListGroupsService {
     Set<ProjectTask> tasks = new HashSet<>(getProjectTasksForDetail(detail));
 
     var groups = ProjectTaskGroup.asList().stream()
-        .filter(taskGroup -> !SetUtils.intersection(taskGroup.getProjectTaskSet(), tasks).isEmpty())
+        .filter(taskGroup ->
+            taskGroup.getRelatedProjectTypes().contains(detail.getProjectType())
+            && !SetUtils.intersection(taskGroup.getProjectTaskSet(), tasks).isEmpty()
+        )
         .map(group -> {
           // per group, filter out tasks that are not shown.
           var visibleTasksInGroup = group.getTasks().stream()
@@ -76,7 +79,10 @@ public class TaskListGroupsService {
 
   private List<ProjectTask> getProjectTasksForDetail(ProjectDetail detail) {
     return ProjectTask.stream()
-        .filter(task -> projectTaskService.canShowTask(task, detail))
+        .filter(task ->
+            task.getRelatedProjectTypes().contains(detail.getProjectType())
+            && projectTaskService.canShowTask(task, detail)
+        )
         .collect(Collectors.toList());
   }
 }

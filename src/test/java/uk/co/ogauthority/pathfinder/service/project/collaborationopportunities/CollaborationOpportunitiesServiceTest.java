@@ -217,13 +217,13 @@ public class CollaborationOpportunitiesServiceTest {
 
   @Test
   public void canShowInTaskList_true() {
-    when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(true);
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(true);
     assertThat(collaborationOpportunitiesService.canShowInTaskList(detail)).isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
-    when(projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(false);
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(false);
     assertThat(collaborationOpportunitiesService.canShowInTaskList(detail)).isFalse();
   }
 

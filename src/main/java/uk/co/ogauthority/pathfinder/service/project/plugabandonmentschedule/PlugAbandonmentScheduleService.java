@@ -166,7 +166,7 @@ public class PlugAbandonmentScheduleService implements ProjectFormSectionService
 
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
-    return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.WELLS);
+    return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.WELLS);
   }
 
   @Override
