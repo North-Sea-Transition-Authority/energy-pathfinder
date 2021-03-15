@@ -24,7 +24,6 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
-import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationBlockView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -99,7 +98,6 @@ public class ProjectLocationController extends ProjectFormPageController {
         .addObject("blocksRestUrl", SearchSelectorService.route(on(LicenceBlocksRestController.class).searchLicenceBlocks(null)))
         .addObject("form", form)
         .addObject("fieldTypeMap", FieldType.getAllAsMap())
-        .addObject("ukcsAreaMap", UkcsArea.getAllAsMap())
         .addObject("alreadyAddedBlocks", blockViews)
         .addObject("preselectedField", locationService.getPreSelectedField(form))
         .addObject("waterDepthUnit", MeasurementUnits.METRES);

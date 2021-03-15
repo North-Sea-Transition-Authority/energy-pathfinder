@@ -2,8 +2,11 @@ package uk.co.ogauthority.pathfinder.model.entity.devuk;
 
 import com.google.common.annotations.VisibleForTesting;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import org.hibernate.annotations.Immutable;
+import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
 
 @Entity(name = "devuk_fields")
@@ -19,14 +22,18 @@ public class DevUkField implements SearchSelectable {
 
   private Integer operatorOuId;
 
+  @Enumerated(EnumType.STRING)
+  private UkcsArea ukcsArea;
+
   public DevUkField() {
   }
 
   @VisibleForTesting
-  public DevUkField(int fieldId, String fieldName, int status) {
+  public DevUkField(int fieldId, String fieldName, int status, UkcsArea ukcsArea) {
     this.fieldId = fieldId;
     this.fieldName = fieldName;
     this.status = status;
+    this.ukcsArea = ukcsArea;
   }
 
 
@@ -60,6 +67,14 @@ public class DevUkField implements SearchSelectable {
 
   public void setOperatorOuId(Integer operatorOuId) {
     this.operatorOuId = operatorOuId;
+  }
+
+  public UkcsArea getUkcsArea() {
+    return ukcsArea;
+  }
+
+  public void setUkcsArea(UkcsArea ukcsArea) {
+    this.ukcsArea = ukcsArea;
   }
 
   @Override

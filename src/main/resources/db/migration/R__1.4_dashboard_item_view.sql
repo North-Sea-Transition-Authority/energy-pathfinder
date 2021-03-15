@@ -10,15 +10,8 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
     , pd.version
     , pi.project_title
     , pi.field_stage
-    , COALESCE(
-      (
-        SELECT f.field_name
-        FROM ${datasource.user}.devuk_fields f
-        WHERE f.field_id = pl.field_id
-      )
-      , pl.manual_field_name
-      ) field_name
-    , pl.ukcs_area
+    , df.field_name
+    , df.ukcs_area
     , po.operator_org_grp_id
     , COALESCE(pd.submitted_datetime, pd.created_datetime, p.created_datetime) sort_key
     , pd.is_current_version
@@ -37,6 +30,7 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
     JOIN ${datasource.user}.project_operators po ON po.project_detail_id = pd.id
     LEFT JOIN ${datasource.user}.project_information pi ON pi.project_detail_id = pd.id
     LEFT JOIN ${datasource.user}.project_locations pl ON pl.project_detail_id = pd.id
+    LEFT JOIN ${datasource.user}.devuk_fields df ON df.field_id = pl.field_id
     )
     , regulator_requested_updates AS (
     SELECT

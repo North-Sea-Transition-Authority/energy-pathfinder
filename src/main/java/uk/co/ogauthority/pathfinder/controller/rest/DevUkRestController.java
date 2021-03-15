@@ -27,7 +27,7 @@ public class DevUkRestController {
   @GetMapping("/fields")
   @ResponseBody
   public RestSearchResult searchFields(@RequestParam("term") String searchTerm) {
-    return new RestSearchResult(devUkFieldService.findActiveByFieldNameWithManualEntry(searchTerm));
+    return new RestSearchResult(devUkFieldService.searchFieldsWithNameContaining(searchTerm));
   }
 
   @GetMapping("/facilities")

@@ -12,7 +12,6 @@ import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkField;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
-import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 import uk.co.ogauthority.pathfinder.service.entityduplication.ParentEntity;
 
 @Entity
@@ -22,8 +21,6 @@ public class ProjectLocation extends ProjectDetailEntity implements ParentEntity
   @ManyToOne
   @JoinColumn(name = "field_id")
   private DevUkField field;
-
-  private String manualFieldName;
 
   @Enumerated(EnumType.STRING)
   private FieldType fieldType;
@@ -39,9 +36,6 @@ public class ProjectLocation extends ProjectDetailEntity implements ParentEntity
 
   private LocalDate approvedDecomProgramDate;
 
-  @Enumerated(EnumType.STRING)
-  private UkcsArea ukcsArea;
-
   public ProjectLocation() {
   }
 
@@ -54,25 +48,12 @@ public class ProjectLocation extends ProjectDetailEntity implements ParentEntity
     this.field = field;
   }
 
-  public ProjectLocation(ProjectDetail projectDetail, String manualFieldName) {
-    this.projectDetail = projectDetail;
-    this.manualFieldName = manualFieldName;
-  }
-
   public DevUkField getField() {
     return field;
   }
 
   public void setField(DevUkField fieldId) {
     this.field = fieldId;
-  }
-
-  public String getManualFieldName() {
-    return manualFieldName;
-  }
-
-  public void setManualFieldName(String manualFieldName) {
-    this.manualFieldName = manualFieldName;
   }
 
   public FieldType getFieldType() {
@@ -121,13 +102,5 @@ public class ProjectLocation extends ProjectDetailEntity implements ParentEntity
 
   public void setApprovedDecomProgramDate(LocalDate approvedDecomProgramDate) {
     this.approvedDecomProgramDate = approvedDecomProgramDate;
-  }
-
-  public UkcsArea getUkcsArea() {
-    return ukcsArea;
-  }
-
-  public void setUkcsArea(UkcsArea ukcsArea) {
-    this.ukcsArea = ukcsArea;
   }
 }

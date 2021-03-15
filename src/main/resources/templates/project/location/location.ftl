@@ -39,7 +39,6 @@
       </@fdsRadio.radioYes>
       <@fdsRadio.radioNo path="form.approvedDecomProgram"/>
     </@fdsRadio.radioGroup>
-    <@fdsSelect.select path="form.ukcsArea" labelText="What UKCS area is this project located in?" options=ukcsAreaMap/>
     <@fdsAddToList.addToList
       path="form.licenceBlocks"
       alreadyAdded=alreadyAddedBlocks
