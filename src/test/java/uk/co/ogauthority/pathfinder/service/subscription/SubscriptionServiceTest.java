@@ -26,6 +26,7 @@ import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeFormValidator;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.subscription.SubscriberRepository;
+import uk.co.ogauthority.pathfinder.service.email.SubscriberEmailService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.SubscriptionTestUtil;
 
@@ -39,6 +40,9 @@ public class SubscriptionServiceTest {
   private ValidationService validationService;
 
   @Mock
+  private SubscriberEmailService subscriberEmailService;
+
+  @Mock
   private SubscribeFormValidator subscribeFormValidator;
 
   private SubscriptionService subscriptionService;
@@ -48,6 +52,7 @@ public class SubscriptionServiceTest {
     subscriptionService = new SubscriptionService(
         subscriberRepository,
         validationService,
+        subscriberEmailService,
         subscribeFormValidator
     );
 
@@ -121,6 +126,8 @@ public class SubscriptionServiceTest {
     assertThat(subscriber.getRelationToPathfinder()).isEqualTo(form.getRelationToPathfinder());
     assertThat(subscriber.getSubscribeReason()).isEqualTo(form.getSubscribeReason());
     assertThat(subscriber.getSubscribedInstant()).isNotNull();
+
+    verify(subscriberEmailService, times(1)).sendSubscribedEmail(form.getForename(), form.getEmailAddress(), subscriber.getUuid());
   }
 
   @Test
@@ -144,6 +151,8 @@ public class SubscriptionServiceTest {
     assertThat(subscriber.getRelationToPathfinder()).isEqualTo(form.getRelationToPathfinder());
     assertThat(subscriber.getSubscribeReason()).isNull();
     assertThat(subscriber.getSubscribedInstant()).isNotNull();
+
+    verify(subscriberEmailService, times(1)).sendSubscribedEmail(form.getForename(), form.getEmailAddress(), subscriber.getUuid());
   }
 
   @Test

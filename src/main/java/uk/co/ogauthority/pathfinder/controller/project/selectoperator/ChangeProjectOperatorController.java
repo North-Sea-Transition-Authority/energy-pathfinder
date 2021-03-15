@@ -18,10 +18,12 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.model.enums.TopNavigationType;
+import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
@@ -78,7 +80,13 @@ public class ChangeProjectOperatorController extends ProjectFormPageController {
               Integer.parseInt(form.getOrganisationGroup())
           );
           selectOperatorService.updateProjectOperator(projectContext.getProjectDetails(), portalOrganisationGroup);
-
+          AuditService.audit(
+              AuditEvent.PROJECT_OPERATOR_UPDATED,
+              String.format(
+                  AuditEvent.PROJECT_OPERATOR_UPDATED.getMessage(),
+                  portalOrganisationGroup.getOrgGrpId(),projectContext.getProjectDetails().getId()
+              )
+          );
           return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
         });
   }

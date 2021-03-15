@@ -22,13 +22,14 @@ import uk.co.ogauthority.pathfinder.controller.rest.DevUkRestController;
 import uk.co.ogauthority.pathfinder.controller.rest.LicenceBlocksRestController;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationBlockView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
@@ -82,6 +83,13 @@ public class ProjectLocationController extends ProjectFormPageController {
           var projectLocation = locationService.createOrUpdate(projectContext.getProjectDetails(), form);
           locationService.createOrUpdateBlocks(form.getLicenceBlocks(), projectLocation);
 
+          AuditService.audit(
+              AuditEvent.LOCATION_INFORMATION_UPDATED,
+              String.format(
+                  AuditEvent.LOCATION_INFORMATION_UPDATED.getMessage(),
+                  projectContext.getProjectDetails().getId()
+              )
+          );
           return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
         });
   }
@@ -93,7 +101,6 @@ public class ProjectLocationController extends ProjectFormPageController {
         .addObject("blocksRestUrl", SearchSelectorService.route(on(LicenceBlocksRestController.class).searchLicenceBlocks(null)))
         .addObject("form", form)
         .addObject("fieldTypeMap", FieldType.getAllAsMap())
-        .addObject("ukcsAreaMap", UkcsArea.getAllAsMap())
         .addObject("alreadyAddedBlocks", blockViews)
         .addObject("preselectedField", locationService.getPreSelectedField(form))
         .addObject("waterDepthUnit", MeasurementUnits.METRES);

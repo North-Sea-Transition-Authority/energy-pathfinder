@@ -13,11 +13,14 @@ import uk.co.ogauthority.pathfinder.controller.subscription.SubscriptionControll
 import uk.co.ogauthority.pathfinder.exception.SubscriberNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.subscription.RelationToPathfinder;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeFormValidator;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.subscription.SubscriberRepository;
+import uk.co.ogauthority.pathfinder.service.audit.AuditService;
+import uk.co.ogauthority.pathfinder.service.email.SubscriberEmailService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
@@ -30,15 +33,18 @@ public class SubscriptionService {
 
   private final SubscriberRepository subscriberRepository;
   private final ValidationService validationService;
+  private final SubscriberEmailService subscriberEmailService;
   private final SubscribeFormValidator subscribeFormValidator;
 
   @Autowired
   public SubscriptionService(
       SubscriberRepository subscriberRepository,
       ValidationService validationService,
+      SubscriberEmailService subscriberEmailService,
       SubscribeFormValidator subscribeFormValidator) {
     this.subscriberRepository = subscriberRepository;
     this.validationService = validationService;
+    this.subscriberEmailService = subscriberEmailService;
     this.subscribeFormValidator = subscribeFormValidator;
   }
 
@@ -75,6 +81,12 @@ public class SubscriptionService {
     }
     subscriber.setSubscribedInstant(Instant.now());
     subscriberRepository.save(subscriber);
+    subscriberEmailService.sendSubscribedEmail(form.getForename(), form.getEmailAddress(), subscriber.getUuid());
+
+    AuditService.audit(
+        AuditEvent.SUBSCRIBER_SIGN_UP_REQUEST,
+        String.format(AuditEvent.SUBSCRIBER_SIGN_UP_REQUEST.getMessage(), subscriber.getId())
+    );
   }
 
   @Transactional

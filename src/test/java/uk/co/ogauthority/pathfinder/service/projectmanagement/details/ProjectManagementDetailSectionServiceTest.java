@@ -49,7 +49,7 @@ public class ProjectManagementDetailSectionServiceTest {
   @Test
   public void getSection() {
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
-    var projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(projectDetail);
+    var projectLocation = ProjectLocationTestUtil.getProjectLocation(projectDetail);
     var submitterAccount = UserTestingUtil.getAuthenticatedUserAccount();
 
     when(projectInformationService.getProjectInformationOrError(projectDetail)).thenReturn(projectInformation);

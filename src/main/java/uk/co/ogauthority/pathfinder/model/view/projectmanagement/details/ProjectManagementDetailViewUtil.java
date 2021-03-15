@@ -22,7 +22,7 @@ public class ProjectManagementDetailViewUtil {
 
     var field = projectLocation.getField() != null
         ? projectLocation.getField().getFieldName()
-        : projectLocation.getManualFieldName();
+        : null;
     projectManagementDetailView.setField(field);
 
     projectManagementDetailView.setStatus(projectDetail.getStatus().getDisplayName());

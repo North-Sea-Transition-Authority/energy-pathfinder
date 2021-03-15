@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.integratedrig.IntegratedRigIntentionToReactivate;
@@ -26,6 +27,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.integratedrig.Integrated
 import uk.co.ogauthority.pathfinder.model.form.project.integratedrig.IntegratedRigForm;
 import uk.co.ogauthority.pathfinder.model.view.integratedrig.IntegratedRigView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.integratedrig.IntegratedRigService;
@@ -109,7 +111,15 @@ public class IntegratedRigController extends ProjectFormPageController {
         getIntegratedRigModelAndView(projectId, form),
         form,
         () -> {
-          integratedRigService.createIntegratedRig(projectContext.getProjectDetails(), form);
+          var rig = integratedRigService.createIntegratedRig(projectContext.getProjectDetails(), form);
+          AuditService.audit(
+              AuditEvent.INTEGRATED_RIG_UPDATED,
+              String.format(
+                  AuditEvent.INTEGRATED_RIG_UPDATED.getMessage(),
+                  rig.getId(),
+                  projectContext.getProjectDetails().getId()
+              )
+          );
           return getIntegratedRigSummaryRedirect(projectId);
         }
     );
@@ -132,6 +142,14 @@ public class IntegratedRigController extends ProjectFormPageController {
               integratedRigId,
               projectContext.getProjectDetails(),
               form
+          );
+          AuditService.audit(
+              AuditEvent.INTEGRATED_RIG_UPDATED,
+              String.format(
+                  AuditEvent.INTEGRATED_RIG_UPDATED.getMessage(),
+                  integratedRigId,
+                  projectContext.getProjectDetails().getId()
+              )
           );
           return getIntegratedRigSummaryRedirect(projectId);
         }
@@ -163,6 +181,14 @@ public class IntegratedRigController extends ProjectFormPageController {
     );
 
     integratedRigService.deleteIntegratedRig(integratedRigView);
+    AuditService.audit(
+        AuditEvent.INTEGRATED_RIG_REMOVED,
+        String.format(
+            AuditEvent.INTEGRATED_RIG_REMOVED.getMessage(),
+            integratedRigId,
+            projectContext.getProjectDetails().getId()
+        )
+    );
 
     return getIntegratedRigSummaryRedirect(projectId);
   }

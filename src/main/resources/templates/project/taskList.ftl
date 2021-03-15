@@ -6,7 +6,9 @@
   <#assign cancelDraftLinkText = "Cancel draft project">
 </#if>
 
-<@defaultPage htmlTitle="Pathfinder project task list" pageHeading="Pathfinder project" breadcrumbs=true>
+<#assign serviceName = service.serviceName/>
+
+<@defaultPage htmlTitle="${serviceName} project task list" pageHeading="${serviceName} project" breadcrumbs=true>
   <@fdsAction.link
     linkText=cancelDraftLinkText
     linkUrl=springUrl(cancelDraftUrl)

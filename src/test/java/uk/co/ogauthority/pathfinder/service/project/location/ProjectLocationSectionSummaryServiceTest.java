@@ -37,7 +37,7 @@ public class ProjectLocationSectionSummaryServiceTest {
   private ProjectLocationSectionSummaryService projectLocationSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
-  private final ProjectLocation projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(detail);
+  private final ProjectLocation projectLocation = ProjectLocationTestUtil.getProjectLocation(detail);
 
   @Before
   public void setup() {
@@ -52,7 +52,7 @@ public class ProjectLocationSectionSummaryServiceTest {
   public void getSummary() {
     when(projectLocationService.getProjectLocationByProjectDetail(detail)).thenReturn(Optional.of(projectLocation));
 
-    var previousProjectLocation = ProjectLocationTestUtil.getProjectLocation_withManualField(detail);
+    var previousProjectLocation = ProjectLocationTestUtil.getProjectLocation(detail);
 
     when(projectLocationService.getProjectLocationByProjectAndVersion(
         detail.getProject(),

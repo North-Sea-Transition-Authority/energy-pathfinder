@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusC
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.InfrastructureStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
@@ -28,6 +29,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.Sub
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.SubseaInfrastructureForm;
 import uk.co.ogauthority.pathfinder.model.view.subseainfrastructure.SubseaInfrastructureView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
@@ -111,7 +113,15 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
         getSubseaInfrastructureModelAndView(projectId, form),
         form,
         () -> {
-          subseaInfrastructureService.createSubseaInfrastructure(projectContext.getProjectDetails(), form);
+          var subseaInfrastructure = subseaInfrastructureService.createSubseaInfrastructure(projectContext.getProjectDetails(), form);
+          AuditService.audit(
+              AuditEvent.SUBSEA_INFRASTRUCTURE_UPDATED,
+              String.format(
+                  AuditEvent.SUBSEA_INFRASTRUCTURE_UPDATED.getMessage(),
+                  subseaInfrastructure.getId(),
+                  projectContext.getProjectDetails().getId()
+              )
+          );
           return getSubseaInfrastructureSummaryRedirect(projectId);
         }
     );
@@ -134,6 +144,14 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
               subseaInfrastructureId,
               projectContext.getProjectDetails(),
               form
+          );
+          AuditService.audit(
+              AuditEvent.SUBSEA_INFRASTRUCTURE_UPDATED,
+              String.format(
+                  AuditEvent.SUBSEA_INFRASTRUCTURE_UPDATED.getMessage(),
+                  subseaInfrastructureId,
+                  projectContext.getProjectDetails().getId()
+              )
           );
           return getSubseaInfrastructureSummaryRedirect(projectId);
         }
@@ -165,6 +183,14 @@ public class SubseaInfrastructureController extends ProjectFormPageController {
     );
 
     subseaInfrastructureService.deleteSubseaInfrastructure(subseaInfrastructureView);
+    AuditService.audit(
+        AuditEvent.SUBSEA_INFRASTRUCTURE_REMOVED,
+        String.format(
+            AuditEvent.SUBSEA_INFRASTRUCTURE_REMOVED.getMessage(),
+            subseaInfrastructureId,
+            projectContext.getProjectDetails().getId()
+        )
+    );
 
     return getSubseaInfrastructureSummaryRedirect(projectId);
   }

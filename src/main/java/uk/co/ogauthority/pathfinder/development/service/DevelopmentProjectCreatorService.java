@@ -155,7 +155,6 @@ public class DevelopmentProjectCreatorService {
     form.setApprovedFdpDate(new ThreeFieldDateInput(APPROVED_FDP_DATE));
     form.setApprovedDecomProgram(APPROVED_DECOM_PROGRAM);
     form.setApprovedDecomProgramDate(new ThreeFieldDateInput(null, null, null));
-    form.setUkcsArea(UKCS_AREA);
     form.setLicenceBlocks(LICENCE_BLOCKS);
     return form;
   }

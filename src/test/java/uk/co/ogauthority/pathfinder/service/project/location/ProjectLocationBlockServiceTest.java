@@ -65,7 +65,7 @@ public class ProjectLocationBlockServiceTest {
 
   private static final ProjectDetail DETAIL = ProjectUtil.getProjectDetails();
 
-  private static final ProjectLocation PROJECT_LOCATION = ProjectLocationTestUtil.getProjectLocation_withField(DETAIL);
+  private static final ProjectLocation PROJECT_LOCATION = ProjectLocationTestUtil.getProjectLocation(DETAIL);
 
   public static final List<ProjectLocationBlock> PROJECT_LOCATION_BLOCKS = List.of(
       LicenceBlockTestUtil.getProjectLocationBlock(PROJECT_LOCATION, BLOCKS.get(0)),

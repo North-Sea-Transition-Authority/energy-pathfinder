@@ -19,10 +19,12 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusC
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
@@ -78,6 +80,14 @@ public class ProjectSetupController extends ProjectFormPageController {
               projectContext.getProjectDetails(),
               form
           );
+          AuditService.audit(
+              AuditEvent.PROJECT_SETUP_UPDATED,
+              String.format(
+                  AuditEvent.PROJECT_SETUP_UPDATED.getMessage(),
+                  projectContext.getProjectDetails().getId()
+              )
+          );
+
           return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
         }
     );

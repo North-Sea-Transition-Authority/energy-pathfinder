@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.InfrastructureStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
@@ -27,6 +28,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedpipeline.P
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineForm;
 import uk.co.ogauthority.pathfinder.model.view.decommissionedpipeline.DecommissionedPipelineView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline.DecommissionedPipelineService;
@@ -112,7 +114,15 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
         getDecommissionedPipelineModelAndView(projectId, form),
         form,
         () -> {
-          decommissionedPipelineService.createDecommissionedPipeline(projectContext.getProjectDetails(), form);
+          var pipeline = decommissionedPipelineService.createDecommissionedPipeline(projectContext.getProjectDetails(), form);
+          AuditService.audit(
+              AuditEvent.PIPELINE_UPDATED,
+              String.format(
+                  AuditEvent.PIPELINE_UPDATED.getMessage(),
+                  pipeline.getId(),
+                  projectContext.getProjectDetails().getId()
+              )
+          );
           return getDecommissionedPipelineSummaryRedirect(projectId);
         }
     );
@@ -136,6 +146,15 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
               projectContext.getProjectDetails(),
               form
           );
+          AuditService.audit(
+              AuditEvent.PIPELINE_UPDATED,
+              String.format(
+                  AuditEvent.PIPELINE_UPDATED.getMessage(),
+                  decommissionedPipelineId,
+                  projectContext.getProjectDetails().getId()
+              )
+          );
+
           return getDecommissionedPipelineSummaryRedirect(projectId);
         }
     );
@@ -166,6 +185,14 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
     );
 
     decommissionedPipelineService.deleteDecommissionedPipeline(decommissionedPipeline);
+    AuditService.audit(
+        AuditEvent.PIPELINE_REMOVED,
+        String.format(
+            AuditEvent.PIPELINE_REMOVED.getMessage(),
+            decommissionedPipelineId,
+            projectContext.getProjectDetails().getId()
+        )
+    );
 
     return getDecommissionedPipelineSummaryRedirect(projectId);
   }

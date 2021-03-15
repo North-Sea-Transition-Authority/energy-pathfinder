@@ -28,11 +28,13 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeChe
 import uk.co.ogauthority.pathfinder.controller.rest.CollaborationOpportunityRestController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
@@ -130,11 +132,20 @@ public class CollaborationOpportunitiesController extends PathfinderFileUploadCo
         getCollaborationOpportunityModelAndView(projectContext.getProjectDetails(), form),
         form,
         () -> {
-          collaborationOpportunitiesService.createCollaborationOpportunity(
+          var collabOp = collaborationOpportunitiesService.createCollaborationOpportunity(
               projectContext.getProjectDetails(),
               form,
               projectContext.getUserAccount()
           );
+          AuditService.audit(
+              AuditEvent.COLLABORATION_OPPORTUNITY_UPDATED,
+              String.format(
+                  AuditEvent.COLLABORATION_OPPORTUNITY_UPDATED.getMessage(),
+                  collabOp.getId(),
+                  projectContext.getProjectDetails().getId()
+              )
+          );
+
           return ReverseRouter.redirect(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null));
         }
     );
@@ -167,11 +178,20 @@ public class CollaborationOpportunitiesController extends PathfinderFileUploadCo
         getCollaborationOpportunityModelAndView(projectContext.getProjectDetails(), form),
         form,
         () -> {
-          collaborationOpportunitiesService.updateCollaborationOpportunity(
+          var collabOp = collaborationOpportunitiesService.updateCollaborationOpportunity(
               opportunity,
               form,
               projectContext.getUserAccount()
           );
+          AuditService.audit(
+              AuditEvent.COLLABORATION_OPPORTUNITY_UPDATED,
+              String.format(
+                  AuditEvent.COLLABORATION_OPPORTUNITY_UPDATED.getMessage(),
+                  collabOp.getId(),
+                  projectContext.getProjectDetails().getId()
+              )
+          );
+
           return ReverseRouter.redirect(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null));
         }
     );
@@ -200,6 +220,14 @@ public class CollaborationOpportunitiesController extends PathfinderFileUploadCo
                                                      ProjectContext projectContext) {
     var opportunity = collaborationOpportunitiesService.getOrError(opportunityId);
     collaborationOpportunitiesService.delete(opportunity);
+    AuditService.audit(
+        AuditEvent.COLLABORATION_OPPORTUNITY_REMOVED,
+        String.format(
+            AuditEvent.COLLABORATION_OPPORTUNITY_REMOVED.getMessage(),
+            opportunityId,
+            projectContext.getProjectDetails().getId()
+        )
+    );
     return ReverseRouter.redirect(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null));
   }
 
