@@ -9,6 +9,10 @@ public class AuditService {
   public static final String UNAUTHENTICATED_USER = "Unauthenticated user";
   private static final Logger LOGGER = LoggerFactory.getLogger(AuditService.class);
 
+  private AuditService() {
+    throw new IllegalStateException("AuditService is a static utility class and should not be instantiated");
+  }
+
   public static void audit(AuditEvent auditEvent, String message) {
     var userIdentifier = SecurityUtil.getAuthenticatedUserFromSecurityContext()
         .map(wua -> String.format("%s - %d", wua.getFullName(), wua.getWuaId()))
