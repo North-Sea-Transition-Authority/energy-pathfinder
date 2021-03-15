@@ -187,13 +187,15 @@ public class ProjectContextServiceTest {
 
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
 
-    projectContextService.buildProjectContext(
+    final var context = projectContextService.buildProjectContext(
         detail,
         authenticatedUser,
         Set.of(ProjectStatus.DRAFT),
         projectPermissions,
         Set.of(projectType)
     );
+
+    assertThat(context.getProjectDetails()).isEqualTo(detail);
   }
 
   @Test(expected = AccessDeniedException.class)
