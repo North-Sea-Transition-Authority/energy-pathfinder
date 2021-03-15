@@ -16,8 +16,10 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.RequestUpdateForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
@@ -30,7 +32,8 @@ import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequest
     status = { ProjectStatus.QA, ProjectStatus.PUBLISHED },
     projectDetailVersionType = ProjectDetailVersionType.LATEST_SUBMITTED_VERSION
 )
-@ProjectFormPagePermissionCheck(permissions = {ProjectPermission.REQUEST_UPDATE})
+@ProjectFormPagePermissionCheck(permissions = ProjectPermission.REQUEST_UPDATE)
+@ProjectTypeCheck(types = { ProjectType.INFRASTRUCTURE, ProjectType.FORWARD_WORK_PLAN })
 @RequestMapping("/project/{projectId}")
 public class RegulatorUpdateController {
 

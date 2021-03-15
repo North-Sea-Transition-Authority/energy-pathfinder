@@ -14,10 +14,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
-import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectDetailVersionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
@@ -39,6 +39,7 @@ public class ProjectUpdateContextServiceTest {
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
   private final Set<ProjectStatus> projectStatuses = Set.of(ProjectStatus.QA);
   private final Set<ProjectPermission> projectPermissions = Set.of(ProjectPermission.PROVIDE_ASSESSMENT);
+  private final Set<ProjectType> allowedProjectTypes = Set.of(projectDetail.getProjectType());
 
   @Before
   public void setup() {
@@ -47,11 +48,12 @@ public class ProjectUpdateContextServiceTest {
         projectUpdateService
     );
 
-    when(projectContextService.buildProjectContext(any(), any(), any(), any()))
+    when(projectContextService.buildProjectContext(any(), any(), any(), any(), any()))
         .thenAnswer(invocation -> new ProjectContext(invocation.getArgument(0), invocation.getArgument(3), invocation.getArgument(1)));
 
     when(projectContextService.getProjectStatusesForClass(TestController.class)).thenReturn(projectStatuses);
     when(projectContextService.getProjectPermissionsForClass(TestController.class)).thenReturn(projectPermissions);
+    when(projectContextService.getProjectTypesForClass(TestController.class)).thenReturn(allowedProjectTypes);
   }
 
   @Test
@@ -66,7 +68,13 @@ public class ProjectUpdateContextServiceTest {
 
     assertThat(result).isTrue();
 
-    verify(projectContextService, times(1)).buildProjectContext(projectDetail, authenticatedUser, projectStatuses, projectPermissions);
+    verify(projectContextService, times(1)).buildProjectContext(
+        projectDetail,
+        authenticatedUser,
+        projectStatuses,
+        projectPermissions,
+        allowedProjectTypes
+    );
   }
 
   @Test
@@ -81,7 +89,13 @@ public class ProjectUpdateContextServiceTest {
 
     assertThat(result).isFalse();
 
-    verify(projectContextService, times(0)).buildProjectContext(projectDetail, authenticatedUser, projectStatuses, projectPermissions);
+    verify(projectContextService, times(0)).buildProjectContext(
+        projectDetail,
+        authenticatedUser,
+        projectStatuses,
+        projectPermissions,
+        allowedProjectTypes
+    );
   }
 
   @Test
@@ -92,7 +106,8 @@ public class ProjectUpdateContextServiceTest {
         projectDetail,
         authenticatedUser,
         projectStatuses,
-        projectPermissions
+        projectPermissions,
+        allowedProjectTypes
     );
 
     assertThat(projectAssessmentContext.getProjectDetails()).isEqualTo(projectDetail);
@@ -108,7 +123,8 @@ public class ProjectUpdateContextServiceTest {
         projectDetail,
         authenticatedUser,
         projectStatuses,
-        projectPermissions
+        projectPermissions,
+        allowedProjectTypes
     );
   }
 

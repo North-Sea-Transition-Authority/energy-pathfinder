@@ -13,6 +13,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
@@ -34,6 +35,7 @@ public class OperatorProjectUpdateContextServiceTest {
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
   private final Set<ProjectStatus> projectStatuses = Set.of(ProjectStatus.QA);
   private final Set<ProjectPermission> projectPermissions = Set.of(ProjectPermission.PROVIDE_UPDATE);
+  private final Set<ProjectType> allowedProjectTypes = Set.of(projectDetail.getProjectType());
 
   @Before
   public void setup() {
@@ -42,7 +44,7 @@ public class OperatorProjectUpdateContextServiceTest {
         projectUpdateService
     );
 
-    when(projectContextService.buildProjectContext(any(), any(), any(), any()))
+    when(projectContextService.buildProjectContext(any(), any(), any(), any(), any()))
         .thenAnswer(invocation -> new ProjectContext(invocation.getArgument(0), invocation.getArgument(3), invocation.getArgument(1)));
   }
 
@@ -52,7 +54,8 @@ public class OperatorProjectUpdateContextServiceTest {
         projectDetail,
         authenticatedUser,
         projectStatuses,
-        projectPermissions
+        projectPermissions,
+        allowedProjectTypes
     );
 
     assertThat(operatorProjectUpdateContext.getProjectDetails()).isEqualTo(projectDetail);

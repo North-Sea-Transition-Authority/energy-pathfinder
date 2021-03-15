@@ -14,6 +14,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
@@ -42,6 +43,7 @@ public class RegulatorProjectUpdateContextServiceTest {
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
   private final Set<ProjectStatus> projectStatuses = Set.of(ProjectStatus.QA);
   private final Set<ProjectPermission> projectPermissions = Set.of(ProjectPermission.REQUEST_UPDATE);
+  private final Set<ProjectType> allowedProjectTypes = Set.of(projectDetail.getProjectType());
 
   @Before
   public void setup() {
@@ -54,7 +56,7 @@ public class RegulatorProjectUpdateContextServiceTest {
 
     when(projectService.getLatestSubmittedDetailOrError(projectDetail.getProject().getId())).thenReturn(projectDetail);
 
-    when(projectContextService.buildProjectContext(any(), any(), any(), any()))
+    when(projectContextService.buildProjectContext(any(), any(), any(), any(), any()))
         .thenAnswer(invocation -> new ProjectContext(invocation.getArgument(0), invocation.getArgument(3), invocation.getArgument(1)));
   }
 
@@ -66,7 +68,8 @@ public class RegulatorProjectUpdateContextServiceTest {
         projectDetail,
         authenticatedUser,
         projectStatuses,
-        projectPermissions
+        projectPermissions,
+        allowedProjectTypes
     );
 
     assertThat(regulatorProjectUpdateContext.getProjectDetails()).isEqualTo(projectDetail);
@@ -82,7 +85,8 @@ public class RegulatorProjectUpdateContextServiceTest {
         projectDetail,
         authenticatedUser,
         projectStatuses,
-        projectPermissions
+        projectPermissions,
+        allowedProjectTypes
     );
   }
 }
