@@ -7,6 +7,10 @@
       diffedField=projectLocationDiffModel.ProjectLocationView_field
     />
     <@checkAnswers.diffedCheckAnswersRowNoActions
+      prompt="Field UKCS area"
+      diffedField=projectLocationDiffModel.ProjectLocationView_ukcsArea
+    />
+    <@checkAnswers.diffedCheckAnswersRowNoActions
       prompt="Field type"
       diffedField=projectLocationDiffModel.ProjectLocationView_fieldType
     />
@@ -34,10 +38,6 @@
         diffedField=projectLocationDiffModel.ProjectLocationView_approvedDecomProgramDate
       />
     </#if>
-    <@checkAnswers.diffedCheckAnswersRowNoActions
-      prompt="UKCS area"
-      diffedField=projectLocationDiffModel.ProjectLocationView_ukcsArea
-    />
     <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Licence blocks">
       <#list projectLocationDiffModel.ProjectLocationView_licenceBlocks as diffedLicenceBlock>
         <div>

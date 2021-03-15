@@ -31,26 +31,24 @@ public class DevUkFieldServiceTest {
   }
 
   @Test
-  public void searchFieldsWithNameContainingWithManualEntry_entryAdded() {
+  public void searchFieldsWithNameContaining() {
     var searchTerm = "field";
     var field = DevUkTestUtil.getDevUkField();
     when(devUkFieldRepository.findAllByStatusInAndFieldNameContainingIgnoreCase(DevUkFieldService.ACTIVE_STATUS_LIST, searchTerm)).thenReturn(
         Collections.singletonList(field)
     );
-    var results = devUkFieldService.findActiveByFieldNameWithManualEntry(searchTerm);
-    assertThat(results.size()).isEqualTo(2);
+    var results = devUkFieldService.searchFieldsWithNameContaining(searchTerm);
+    assertThat(results.size()).isEqualTo(1);
     assertThat(results.get(0).getText()).isEqualToIgnoringCase(field.getFieldName());
-    assertThat(results.get(1).getText()).isEqualToIgnoringCase(searchTerm);
   }
 
   @Test
-  public void searchFieldsWithNameContainingWithManualEntry_entryAdded_whenNoResults() {
+  public void searchFieldsWithNameContaining_whenNoResults() {
     var searchTerm = "fac";
     when(devUkFieldRepository.findAllByStatusInAndFieldNameContainingIgnoreCase(DevUkFieldService.ACTIVE_STATUS_LIST, searchTerm)).thenReturn(
         Collections.emptyList()
     );
-    var results = devUkFieldService.findActiveByFieldNameWithManualEntry(searchTerm);
-    assertThat(results.size()).isEqualTo(1);
-    assertThat(results.get(0).getText()).isEqualToIgnoringCase(searchTerm);
+    var results = devUkFieldService.searchFieldsWithNameContaining(searchTerm);
+    assertThat(results).isEmpty();
   }
 }

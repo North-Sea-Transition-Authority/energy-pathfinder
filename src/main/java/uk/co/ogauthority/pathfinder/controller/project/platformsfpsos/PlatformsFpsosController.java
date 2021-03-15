@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusC
 import uk.co.ogauthority.pathfinder.controller.rest.DevUkRestController;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.FuturePlans;
 import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.PlatformFpsoInfrastructureType;
@@ -26,6 +27,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.Substruct
 import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFpsoForm;
 import uk.co.ogauthority.pathfinder.model.view.platformfpso.PlatformFpsoView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
@@ -104,7 +106,15 @@ public class PlatformsFpsosController extends ProjectFormPageController {
         getPlatformFpsoFormModelAndView(projectId, form),
         form,
         () -> {
-          platformsFpsosService.createPlatformFpso(projectContext.getProjectDetails(), form);
+          var platformFpso = platformsFpsosService.createPlatformFpso(projectContext.getProjectDetails(), form);
+          AuditService.audit(
+              AuditEvent.PLATFORM_FPSO_UPDATED,
+              String.format(
+                  AuditEvent.PLATFORM_FPSO_UPDATED.getMessage(),
+                  platformFpso.getId(),
+                  projectContext.getProjectDetails().getId()
+              )
+          );
           return ReverseRouter.redirect(on(PlatformsFpsosController.class).viewPlatformsFpsos(projectId, null));
         }
     );
@@ -136,6 +146,14 @@ public class PlatformsFpsosController extends ProjectFormPageController {
         form,
         () -> {
           platformsFpsosService.updatePlatformFpso(projectContext.getProjectDetails(), platformFpso, form);
+          AuditService.audit(
+              AuditEvent.PLATFORM_FPSO_UPDATED,
+              String.format(
+                  AuditEvent.PLATFORM_FPSO_UPDATED.getMessage(),
+                  platformFpsoId,
+                  projectContext.getProjectDetails().getId()
+              )
+          );
           return ReverseRouter.redirect(on(PlatformsFpsosController.class).viewPlatformsFpsos(projectId, null));
         }
     );
@@ -161,6 +179,14 @@ public class PlatformsFpsosController extends ProjectFormPageController {
                                          ProjectContext projectContext) {
     var platformFpso = platformsFpsosService.getOrError(platformFpsoId);
     platformsFpsosService.delete(platformFpso);
+    AuditService.audit(
+        AuditEvent.PLATFORM_FPSO_REMOVED,
+        String.format(
+            AuditEvent.PLATFORM_FPSO_REMOVED.getMessage(),
+            platformFpsoId,
+            projectContext.getProjectDetails().getId()
+        )
+    );
     return ReverseRouter.redirect(on(PlatformsFpsosController.class).viewPlatformsFpsos(projectId, null));
   }
 

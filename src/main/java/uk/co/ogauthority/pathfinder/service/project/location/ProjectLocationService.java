@@ -63,15 +63,10 @@ public class ProjectLocationService implements ProjectFormSectionService {
   public ProjectLocation createOrUpdate(ProjectDetail detail, ProjectLocationForm form) {
     var projectLocation = getProjectLocationByProjectDetail(detail).orElse(new ProjectLocation(detail));
 
-    if (SearchSelectorService.isManualEntry(form.getField())) {
-      projectLocation.setManualFieldName(SearchSelectorService.removePrefix(form.getField()));
-      projectLocation.setField(null);
-    } else if (form.getField() != null) {
+    if (form.getField() != null) {
       projectLocation.setField(fieldService.findById(Integer.parseInt(form.getField())));
-      projectLocation.setManualFieldName(null);
     } else { //The form has no data so clear the existing values
       projectLocation.setField(null);
-      projectLocation.setManualFieldName(null);
     }
 
     projectLocation.setFieldType(form.getFieldType());
@@ -90,7 +85,6 @@ public class ProjectLocationService implements ProjectFormSectionService {
             ? form.getApprovedDecomProgramDate().createDateOrNull()
             : null
     );
-    projectLocation.setUkcsArea(form.getUkcsArea());
 
     return projectLocationRepository.save(projectLocation);
   }
@@ -130,9 +124,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
   private ProjectLocationForm getForm(ProjectLocation projectLocation) {
     var form = new ProjectLocationForm();
 
-    if (projectLocation.getManualFieldName() != null) {
-      form.setField(SearchSelectorService.getValueWithManualEntryPrefix(projectLocation.getManualFieldName()));
-    } else if (projectLocation.getField() != null) {
+    if (projectLocation.getField() != null) {
       form.setField(projectLocation.getField().getFieldId().toString());
     }
 
@@ -144,7 +136,6 @@ public class ProjectLocationService implements ProjectFormSectionService {
 
     form.setApprovedFieldDevelopmentPlan(projectLocation.getApprovedFieldDevelopmentPlan());
     form.setApprovedFdpDate(new ThreeFieldDateInput(projectLocation.getApprovedFdpDate()));
-    form.setUkcsArea(projectLocation.getUkcsArea());
     projectLocationBlocksService.addBlocksToForm(form, projectLocation);
 
     return form;

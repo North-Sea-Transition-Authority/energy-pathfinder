@@ -18,9 +18,11 @@ import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.plugabandonmentschedule.PlugAbandonmentScheduleForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule.PlugAbandonmentScheduleService;
@@ -106,7 +108,18 @@ public class PlugAbandonmentScheduleController extends ProjectFormPageController
         plugAbandonmentScheduleService.getPlugAbandonmentScheduleModelAndView(projectId, form),
         form,
         () -> {
-          plugAbandonmentScheduleService.createPlugAbandonmentSchedule(form, projectContext.getProjectDetails());
+          var plugAbandonmentSchedule = plugAbandonmentScheduleService.createPlugAbandonmentSchedule(
+              form,
+              projectContext.getProjectDetails()
+          );
+          AuditService.audit(
+              AuditEvent.P_AND_A_SCHEDULE_UPDATED,
+              String.format(
+                  AuditEvent.P_AND_A_SCHEDULE_UPDATED.getMessage(),
+                  plugAbandonmentSchedule.getId(),
+                  projectContext.getProjectDetails().getId()
+              )
+          );
           return getPlugAbandonmentSchedulesSummaryRedirect(projectId);
         }
     );
@@ -141,10 +154,18 @@ public class PlugAbandonmentScheduleController extends ProjectFormPageController
         plugAbandonmentScheduleService.getPlugAbandonmentScheduleModelAndView(projectId, form),
         form,
         () -> {
-          plugAbandonmentScheduleService.updatePlugAbandonmentSchedule(
+          var plugAbandonmentSchedule = plugAbandonmentScheduleService.updatePlugAbandonmentSchedule(
               plugAbandonmentScheduleId,
               projectContext.getProjectDetails(),
               form
+          );
+          AuditService.audit(
+              AuditEvent.P_AND_A_SCHEDULE_UPDATED,
+              String.format(
+                  AuditEvent.P_AND_A_SCHEDULE_UPDATED.getMessage(),
+                  plugAbandonmentSchedule.getId(),
+                  projectContext.getProjectDetails().getId()
+              )
           );
           return getPlugAbandonmentSchedulesSummaryRedirect(projectId);
         }
@@ -176,6 +197,14 @@ public class PlugAbandonmentScheduleController extends ProjectFormPageController
     );
 
     plugAbandonmentScheduleService.deletePlugAbandonmentSchedule(plugAbandonmentSchedule);
+    AuditService.audit(
+        AuditEvent.P_AND_A_SCHEDULE_REMOVED,
+        String.format(
+            AuditEvent.P_AND_A_SCHEDULE_REMOVED.getMessage(),
+            plugAbandonmentScheduleId,
+            projectContext.getProjectDetails().getId()
+        )
+    );
 
     return getPlugAbandonmentSchedulesSummaryRedirect(projectId);
   }

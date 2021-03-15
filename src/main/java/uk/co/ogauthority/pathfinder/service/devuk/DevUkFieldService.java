@@ -35,13 +35,13 @@ public class DevUkFieldService {
   /**
    * Find the fields with statuses in ACTIVE_STATUS_LIST matching the search term.
    * Include the searchTerm param as a manual entry
-   * @param fieldName a whole or partial fieldname
+   * @param searchTerm a whole or partial fieldname
    * @return list of matching DevUkField entities
    */
-  public List<RestSearchItem> findActiveByFieldNameWithManualEntry(String fieldName) {
-    return searchSelectorService.searchWithManualEntry(
-        fieldName,
-        findActiveByFieldName(fieldName)
+  public List<RestSearchItem> searchFieldsWithNameContaining(String searchTerm) {
+    return searchSelectorService.search(
+        searchTerm,
+        findActiveByFieldName(searchTerm)
     );
   }
 

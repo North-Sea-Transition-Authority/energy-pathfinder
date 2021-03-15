@@ -5,11 +5,11 @@ import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
-import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
-import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class ProjectLocationViewUtil {
+
+  public static final String UKCS_AREA_NOT_SET_MESSAGE = "Not set in DEVUK";
 
   private ProjectLocationViewUtil() {
     throw new IllegalStateException("ProjectLocationViewUtil is a util class and should not be instantiated");
@@ -18,10 +18,17 @@ public class ProjectLocationViewUtil {
   public static ProjectLocationView from(ProjectLocation projectLocation, List<ProjectLocationBlock> projectLocationBlocks) {
     var projectLocationView = new ProjectLocationView();
 
-    var field = projectLocation.getField() != null
-        ? new StringWithTag(projectLocation.getField().getFieldName(), Tag.NONE)
-        : new StringWithTag(projectLocation.getManualFieldName(), Tag.NOT_FROM_LIST);
-    projectLocationView.setField(field);
+    var field = projectLocation.getField();
+
+    var fieldName = field != null
+        ? field.getFieldName()
+        : null;
+    projectLocationView.setField(fieldName);
+
+    var ukcsArea = field != null && field.getUkcsArea() != null
+        ? field.getUkcsArea().getDisplayName()
+        : UKCS_AREA_NOT_SET_MESSAGE;
+    projectLocationView.setUkcsArea(ukcsArea);
 
     var fieldType = projectLocation.getFieldType() != null
         ? projectLocation.getFieldType().getDisplayName()
@@ -35,11 +42,6 @@ public class ProjectLocationViewUtil {
     projectLocationView.setApprovedFdpDate(DateUtil.formatDate(projectLocation.getApprovedFdpDate()));
     projectLocationView.setApprovedDecomProgram(projectLocation.getApprovedDecomProgram());
     projectLocationView.setApprovedDecomProgramDate(DateUtil.formatDate(projectLocation.getApprovedDecomProgramDate()));
-
-    var ukcsArea = projectLocation.getUkcsArea() != null
-        ? projectLocation.getUkcsArea().getDisplayName()
-        : null;
-    projectLocationView.setUkcsArea(ukcsArea);
 
     projectLocationView.setLicenceBlocks(projectLocationBlocks.stream()
         .map(ProjectLocationBlock::getBlockReference)

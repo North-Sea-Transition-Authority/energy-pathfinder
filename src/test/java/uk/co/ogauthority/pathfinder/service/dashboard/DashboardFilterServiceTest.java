@@ -159,7 +159,7 @@ public class DashboardFilterServiceTest {
 
   @Test
   public void UkcsAreaMatches_whenFilterSet_filterDoesNotMatch() {
-    filter.setUkcsAreas(List.of(UkcsArea.EIS, UkcsArea.CNS));
+    filter.setUkcsAreas(List.of(UkcsArea.IS, UkcsArea.CNS));
     assertThat(dashboardFilterService.ukcsAreaMatches(UKCS_ITEM, filter)).isFalse();
   }
 

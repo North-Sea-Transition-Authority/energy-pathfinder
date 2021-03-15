@@ -20,7 +20,7 @@ public class SubscribeForm {
   @NotNull(message = "Enter your email address", groups = FullValidation.class)
   private String emailAddress;
 
-  @NotNull(message = "Select your relation to pathfinder", groups = FullValidation.class)
+  @NotNull(message = "Select your relation to Energy Pathfinder", groups = FullValidation.class)
   private RelationToPathfinder relationToPathfinder;
 
   private String subscribeReason;
