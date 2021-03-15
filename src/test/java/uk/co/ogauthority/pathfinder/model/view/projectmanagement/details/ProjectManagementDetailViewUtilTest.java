@@ -34,7 +34,7 @@ public class ProjectManagementDetailViewUtilTest {
   @Test
   public void from_withFieldFromList() {
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
-    var projectLocation = ProjectLocationTestUtil.getProjectLocation_withField(projectDetail);
+    var projectLocation = ProjectLocationTestUtil.getProjectLocation(projectDetail);
     var submitterAccount = UserTestingUtil.getAuthenticatedUserAccount();
 
     var projectManagementDetailView = ProjectManagementDetailViewUtil.from(
@@ -46,22 +46,5 @@ public class ProjectManagementDetailViewUtilTest {
 
     checkCommonFields(projectManagementDetailView, projectInformation, submitterAccount);
     assertThat(projectManagementDetailView.getField()).isEqualTo(projectLocation.getField().getFieldName());
-  }
-
-  @Test
-  public void from_withManualField() {
-    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
-    var projectLocation = ProjectLocationTestUtil.getProjectLocation_withManualField(projectDetail);
-    var submitterAccount = UserTestingUtil.getAuthenticatedUserAccount();
-
-    var projectManagementDetailView = ProjectManagementDetailViewUtil.from(
-        projectDetail,
-        projectInformation,
-        projectLocation,
-        submitterAccount
-    );
-
-    checkCommonFields(projectManagementDetailView, projectInformation, submitterAccount);
-    assertThat(projectManagementDetailView.getField()).isEqualTo(projectLocation.getManualFieldName());
   }
 }

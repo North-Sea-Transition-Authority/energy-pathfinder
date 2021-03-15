@@ -5,7 +5,6 @@ import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
-import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
@@ -32,9 +31,6 @@ public class ProjectLocationForm {
   private Boolean approvedDecomProgram;
 
   private ThreeFieldDateInput approvedDecomProgramDate;
-
-  @NotNull(message = "Select a UKCS area", groups = FullValidation.class)
-  private UkcsArea ukcsArea;
 
   @NotEmpty(message = "Select at least one licence block", groups = FullValidation.class)
   private List<String> licenceBlocks = Collections.emptyList();
@@ -112,14 +108,6 @@ public class ProjectLocationForm {
 
   public void setLicenceBlocks(List<String> licenceBlocks) {
     this.licenceBlocks = licenceBlocks;
-  }
-
-  public UkcsArea getUkcsArea() {
-    return ukcsArea;
-  }
-
-  public void setUkcsArea(UkcsArea ukcsArea) {
-    this.ukcsArea = ukcsArea;
   }
 
   public String getLicenceBlocksSelect() {

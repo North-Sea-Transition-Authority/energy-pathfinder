@@ -55,7 +55,7 @@ public class DevUkRestControllerTest extends AbstractControllerTest {
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
 
-    verify(devUkFieldService, times(1)).findActiveByFieldNameWithManualEntry(SEARCH_TERM);
+    verify(devUkFieldService, times(1)).searchFieldsWithNameContaining(SEARCH_TERM);
   }
 
   @Test
@@ -65,7 +65,7 @@ public class DevUkRestControllerTest extends AbstractControllerTest {
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
 
-    verify(devUkFieldService, times(0)).findActiveByFieldNameWithManualEntry(SEARCH_TERM);
+    verify(devUkFieldService, times(0)).searchFieldsWithNameContaining(SEARCH_TERM);
   }
 
   @Test

@@ -1,8 +1,9 @@
 CREATE OR REPLACE VIEW ${datasource.user}.devuk_fields AS
 SELECT
-  f.field_identifier field_id
-, f.name field_name
-, fov.operator_id operator_ou_id
-, f.status
-FROM devukmgr.fields f
-LEFT JOIN devukmgr.field_operator_view fov ON f.field_identifier = fov.field_id;
+  andf.field_id
+, andf.field_name
+, andf.operator_ou_id
+, andf.status
+, andf.ukcs_area
+FROM devukmgr.api_non_deleted_fields andf
+WHERE andf.ukcs_area != 'LAND';

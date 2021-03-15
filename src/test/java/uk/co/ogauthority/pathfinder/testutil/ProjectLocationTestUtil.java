@@ -16,7 +16,8 @@ public class ProjectLocationTestUtil {
   public static final Integer FIELD_ID = 1;
   public static final String FIELD_NAME = "FieldName";
   public static final Integer FIELD_STATUS = 500;
-  public static final DevUkField FIELD = new DevUkField(FIELD_ID, FIELD_NAME, FIELD_STATUS);
+  public static final UkcsArea FIELD_UKCS_AREA = UkcsArea.CNS;
+  public static final DevUkField FIELD = new DevUkField(FIELD_ID, FIELD_NAME, FIELD_STATUS, FIELD_UKCS_AREA);
   public static final String MANUAL_FIELD_NAME = SearchSelectablePrefix.FREE_TEXT_PREFIX + "ManualFieldName";
   public static final String MANUAL_FIELD_NAME_NO_PREFIX = "ManualFieldName";
   public static final FieldType FIELD_TYPE = FieldType.CARBON_STORAGE;
@@ -27,16 +28,7 @@ public class ProjectLocationTestUtil {
   public static final UkcsArea UKCS_AREA =  UkcsArea.WOS;
   public static final List<String> LICENCE_BLOCKS = List.of("12/34", "12/56");
 
-  public static ProjectLocation getProjectLocation_withManualField(ProjectDetail details) {
-    var projectLocation = new ProjectLocation(
-        details,
-        MANUAL_FIELD_NAME_NO_PREFIX
-    );
-    setCommonFields(projectLocation);
-    return projectLocation;
-  }
-
-  public static ProjectLocation getProjectLocation_withField(ProjectDetail details) {
+  public static ProjectLocation getProjectLocation(ProjectDetail details) {
     var projectLocation =  new ProjectLocation(
         details,
         FIELD
@@ -45,13 +37,7 @@ public class ProjectLocationTestUtil {
     return projectLocation;
   }
 
-  public static ProjectLocationForm getCompletedForm_manualField() {
-    var form = new ProjectLocationForm(MANUAL_FIELD_NAME);
-    setCommonFields(form);
-    return form;
-  }
-
-  public static ProjectLocationForm getCompletedForm_withField() {
+  public static ProjectLocationForm getCompletedForm() {
     var form = new ProjectLocationForm(FIELD_ID.toString());
     setCommonFields(form);
     return form;
@@ -72,7 +58,6 @@ public class ProjectLocationTestUtil {
     projectLocation.setApprovedFdpDate(APPROVED_FDP_DATE);
     projectLocation.setApprovedDecomProgram(APPROVED_DECOM_PROGRAM);
     projectLocation.setApprovedDecomProgramDate(null);
-    projectLocation.setUkcsArea(UKCS_AREA);
   }
 
   private static void setCommonFields(ProjectLocationForm form) {
@@ -82,7 +67,6 @@ public class ProjectLocationTestUtil {
     form.setApprovedFdpDate(new ThreeFieldDateInput(APPROVED_FDP_DATE));
     form.setApprovedDecomProgram(APPROVED_DECOM_PROGRAM);
     form.setApprovedDecomProgramDate(new ThreeFieldDateInput(null, null, null));
-    form.setUkcsArea(UKCS_AREA);
     form.setLicenceBlocks(LICENCE_BLOCKS);
   }
 }

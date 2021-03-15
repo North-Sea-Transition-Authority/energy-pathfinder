@@ -53,7 +53,6 @@ public class StartProjectService {
     projectDetailsRepository.save(projectDetails);
     projectOperatorService.createOrUpdateProjectOperator(projectDetails, organisationGroup);
 
-    //TODO PAT-130 audit
     return projectDetails;
   }
 

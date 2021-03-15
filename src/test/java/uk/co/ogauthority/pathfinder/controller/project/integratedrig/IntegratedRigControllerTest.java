@@ -76,6 +76,7 @@ public class IntegratedRigControllerTest extends ProjectContextAbstractControlle
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
 
     when(integratedRigService.getFacilityRestUrl()).thenReturn("testUrl");
+    when(integratedRigService.createIntegratedRig(any(), any())).thenReturn(IntegratedRigTestUtil.createIntegratedRig_withDevUkFacility());
   }
 
   @Test

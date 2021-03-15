@@ -92,6 +92,11 @@ public abstract class ProjectContextAbstractControllerTest {
 
     when(userSessionService.getAndValidateSession(any(), anyBoolean())).thenReturn(Optional.of(new UserSession()));
 
+    when(serviceProperties.getServiceName()).thenReturn("service-name");
+    when(serviceProperties.getCustomerMnemonic()).thenReturn("customer-mnemonic");
+    when(serviceProperties.getCustomerName()).thenReturn("customer-name");
+    when(serviceProperties.getStackTraceEnabled()).thenReturn(false);
+
   }
 
   @TestConfiguration

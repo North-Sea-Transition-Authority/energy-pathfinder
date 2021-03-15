@@ -3,11 +3,10 @@ package uk.co.ogauthority.pathfinder.model.view.location;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 
 public class ProjectLocationView {
 
-  private StringWithTag field;
+  private String field;
 
   private String fieldType;
 
@@ -25,11 +24,11 @@ public class ProjectLocationView {
 
   private List<String> licenceBlocks = new ArrayList<>();
 
-  public StringWithTag getField() {
+  public String getField() {
     return field;
   }
 
-  public void setField(StringWithTag field) {
+  public void setField(String field) {
     this.field = field;
   }
 
