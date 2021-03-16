@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
+import java.sql.SQLException;
 import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,9 +29,12 @@ import org.springframework.validation.FieldError;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
+import uk.co.ogauthority.pathfinder.model.entity.file.UploadedFile;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -39,6 +43,7 @@ import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderSummaryService;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFileTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -62,6 +67,8 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
+  private final ProjectDetailFile PROJECT_DETAIL_FILE = ProjectFileTestUtil.getProjectDetailFile(detail);
+
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       SystemAccessService.CREATE_PROJECT_PRIVILEGES);
@@ -71,9 +78,10 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
   private final UpcomingTender upcomingTender = UpcomingTenderUtil.getUpcomingTender(detail);
 
   @Before
-  public void setUp() {
+  public void setUp() throws SQLException {
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(detail);
     when(upcomingTenderService.getOrError(UPCOMING_TENDER_ID)).thenReturn(upcomingTender);
+    UploadedFile file = ProjectFileTestUtil.getUploadedFile();
 
     var upcomingTenderView = UpcomingTenderViewUtil.createUpComingTenderView(
         upcomingTender,
@@ -86,6 +94,8 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(false);
     when(upcomingTenderService.createUpcomingTender(any(), any(), any())).thenReturn(UpcomingTenderUtil.getUpcomingTender(detail));
     when(upcomingTenderService.updateUpcomingTender(any(), any(), any())).thenReturn(UpcomingTenderUtil.getUpcomingTender(detail));
+    when(projectDetailFileService.getProjectDetailFileByProjectDetailAndFileId(any(), any())).thenReturn(PROJECT_DETAIL_FILE);
+    when(projectDetailFileService.getUploadedFileById(ProjectFileTestUtil.FILE_ID)).thenReturn(file);
   }
 
 
@@ -286,5 +296,30 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
     verify(upcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
     verify(upcomingTenderService, times(1)).updateUpcomingTender(any(), any(), any());
+  }
+
+  @Test
+  public void handleDownload_draftProject() throws Exception {
+    makeDownloadRequest(ProjectStatus.DRAFT);
+  }
+
+  @Test
+  public void handleDownload_qaProject() throws Exception {
+    makeDownloadRequest(ProjectStatus.QA);
+  }
+
+  @Test
+  public void handleDownload_publishedProject() throws Exception {
+    makeDownloadRequest(ProjectStatus.PUBLISHED);
+  }
+
+  private void makeDownloadRequest(ProjectStatus status) throws Exception {
+    var customStatusProject = detail;
+    customStatusProject.setStatus(status);
+    when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(customStatusProject);
+    mockMvc.perform(get(ReverseRouter.route(
+        on(UpcomingTendersController.class).handleDownload(PROJECT_ID, ProjectFileTestUtil.FILE_ID, null)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isOk());
   }
 }

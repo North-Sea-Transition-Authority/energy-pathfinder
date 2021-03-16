@@ -235,6 +235,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
   }
 
   @GetMapping("/upcoming-tender/files/download/{fileId}")
+  @ProjectStatusCheck(status = {ProjectStatus.DRAFT, ProjectStatus.QA, ProjectStatus.PUBLISHED})
   @ResponseBody
   public ResponseEntity<Resource> handleDownload(@PathVariable("projectId") Integer projectId,
                                                  @PathVariable("fileId") String fileId,
