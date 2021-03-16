@@ -313,6 +313,11 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
     makeDownloadRequest(ProjectStatus.PUBLISHED);
   }
 
+  @Test
+  public void handleDownload_archivedProject() throws Exception {
+    makeDownloadRequest(ProjectStatus.ARCHIVED);
+  }
+
   private void makeDownloadRequest(ProjectStatus status) throws Exception {
     var customStatusProject = detail;
     customStatusProject.setStatus(status);
