@@ -25,25 +25,7 @@
         <@firstProductionDate path="form.developmentFirstProductionDate" nestingPath="form.fieldStage"/>
       </@fdsRadio.radioItem>
       <@fdsRadio.radioItem path="form.fieldStage" itemMap=operationsFieldStage itemHintText=operationsFieldStageDescription/>
-      <@fdsRadio.radioItem path="form.fieldStage" itemMap=decommissioningFieldStage itemHintText=decommissioningFieldStageDescription>
-        <@quarterYear.standardQuarterYearInput
-          quarterYearInputPath="form.decomWorkStartDate"
-          legendHeading="What is the decommissioning work start date?"
-          quarterOptions=quarters
-          formId="decomWorkStartDate"
-          hintText="If you don’t know the exact date, provide an estimated date"
-          nestingPath="form.fieldStage"
-        />
-        <@fdsDateInput.dateInput
-          dayPath="form.productionCessationDate.day"
-          monthPath="form.productionCessationDate.month"
-          yearPath="form.productionCessationDate.year"
-          labelText="What is the production cessation date?"
-          formId="productionCessationDate-day-month-year"
-          nestingPath="form.fieldStage"
-          optionalLabel=true
-        />
-      </@fdsRadio.radioItem>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=decommissioningFieldStage itemHintText=decommissioningFieldStageDescription/>
       <@fdsRadio.radioItem path="form.fieldStage" itemMap=energyTransitionFieldStage itemHintText=energyTransitionFieldStageDescription>
         <@fdsRadio.radio
           path="form.energyTransitionCategory"

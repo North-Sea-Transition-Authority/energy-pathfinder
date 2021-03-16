@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.projectinformation;
 
-import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -38,13 +37,6 @@ public class ProjectInformation extends ProjectDetailEntity implements ContactDe
   private Quarter firstProductionDateQuarter;
 
   private Integer firstProductionDateYear;
-
-  @Enumerated(EnumType.STRING)
-  private Quarter decomWorkStartDateQuarter;
-
-  private Integer decomWorkStartDateYear;
-
-  private LocalDate productionCessationDate;
 
   @Enumerated(EnumType.STRING)
   private EnergyTransitionCategory energyTransitionCategory;
@@ -127,30 +119,6 @@ public class ProjectInformation extends ProjectDetailEntity implements ContactDe
 
   public void setFirstProductionDateYear(Integer firstProductionDateYear) {
     this.firstProductionDateYear = firstProductionDateYear;
-  }
-
-  public Quarter getDecomWorkStartDateQuarter() {
-    return decomWorkStartDateQuarter;
-  }
-
-  public void setDecomWorkStartDateQuarter(Quarter decomWorkStartDateQuarter) {
-    this.decomWorkStartDateQuarter = decomWorkStartDateQuarter;
-  }
-
-  public Integer getDecomWorkStartDateYear() {
-    return decomWorkStartDateYear;
-  }
-
-  public void setDecomWorkStartDateYear(Integer decomWorkStartDateYear) {
-    this.decomWorkStartDateYear = decomWorkStartDateYear;
-  }
-
-  public LocalDate getProductionCessationDate() {
-    return productionCessationDate;
-  }
-
-  public void setProductionCessationDate(LocalDate productionCessationDate) {
-    this.productionCessationDate = productionCessationDate;
   }
 
   public EnergyTransitionCategory getEnergyTransitionCategory() {
