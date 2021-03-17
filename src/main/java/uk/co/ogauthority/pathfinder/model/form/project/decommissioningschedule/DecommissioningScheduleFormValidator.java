@@ -63,7 +63,7 @@ public class DecommissioningScheduleFormValidator implements SmartValidator {
           decommissioningScheduleValidationHint.getEstimatedDecommissioningStartDateValidationHints()
       );
     } else if (DecommissioningStartDateType.UNKNOWN.equals(decommissioningStartDateType)
-        && !ValidationType.PARTIAL.equals(decommissioningScheduleValidationHint.getValidationType())) {
+        && ValidationType.FULL.equals(decommissioningScheduleValidationHint.getValidationType())) {
       ValidationUtils.rejectIfEmptyOrWhitespace(
           errors,
           "decommissioningStartDateNotProvidedReason",
@@ -90,7 +90,7 @@ public class DecommissioningScheduleFormValidator implements SmartValidator {
           decommissioningScheduleValidationHint.getEstimatedCessationOfProductionDateValidationHints()
       );
     } else if (CessationOfProductionDateType.UNKNOWN.equals(cessationOfProductionDateType)
-        && !ValidationType.PARTIAL.equals(decommissioningScheduleValidationHint.getValidationType())) {
+        && ValidationType.FULL.equals(decommissioningScheduleValidationHint.getValidationType())) {
       ValidationUtils.rejectIfEmptyOrWhitespace(
           errors,
           "cessationOfProductionDateNotProvidedReason",

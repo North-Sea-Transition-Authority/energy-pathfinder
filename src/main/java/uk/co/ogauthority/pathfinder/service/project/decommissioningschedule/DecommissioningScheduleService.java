@@ -93,14 +93,15 @@ public class DecommissioningScheduleService implements ProjectFormSectionService
     }
 
     if (DecommissioningStartDateType.ESTIMATED.equals(decommissioningStartDateType)) {
+      var estimatedDecommissioningStartDate = form.getEstimatedDecommissioningStartDate();
       decommissioningSchedule.setEstimatedDecommissioningStartDateQuarter(
-          form.getEstimatedDecommissioningStartDate() != null
-              ? form.getEstimatedDecommissioningStartDate().getQuarter()
+          estimatedDecommissioningStartDate != null
+              ? estimatedDecommissioningStartDate.getQuarter()
               : null
       );
       decommissioningSchedule.setEstimatedDecommissioningStartDateYear(
-          form.getEstimatedDecommissioningStartDate() != null
-              ? Integer.parseInt(form.getEstimatedDecommissioningStartDate().getYear())
+          estimatedDecommissioningStartDate != null && estimatedDecommissioningStartDate.getYear() != null
+              ? Integer.parseInt(estimatedDecommissioningStartDate.getYear())
               : null
       );
     } else {
@@ -133,14 +134,15 @@ public class DecommissioningScheduleService implements ProjectFormSectionService
     }
 
     if (CessationOfProductionDateType.ESTIMATED.equals(cessationOfProductionDateType)) {
+      var estimatedCessationOfProductionDate = form.getEstimatedCessationOfProductionDate();
       decommissioningSchedule.setEstimatedCessationOfProductionDateQuarter(
-          form.getEstimatedCessationOfProductionDate() != null
-              ? form.getEstimatedCessationOfProductionDate().getQuarter()
+          estimatedCessationOfProductionDate != null
+              ? estimatedCessationOfProductionDate.getQuarter()
               : null
       );
       decommissioningSchedule.setEstimatedCessationOfProductionDateYear(
-          form.getEstimatedCessationOfProductionDate() != null
-              ? Integer.parseInt(form.getEstimatedCessationOfProductionDate().getYear())
+          estimatedCessationOfProductionDate != null && estimatedCessationOfProductionDate.getYear() != null
+              ? Integer.parseInt(estimatedCessationOfProductionDate.getYear())
               : null
       );
     } else {
@@ -200,7 +202,9 @@ public class DecommissioningScheduleService implements ProjectFormSectionService
       form.setEstimatedDecommissioningStartDate(
           new QuarterYearInput(
               decommissioningSchedule.getEstimatedDecommissioningStartDateQuarter(),
-              Integer.toString(decommissioningSchedule.getEstimatedDecommissioningStartDateYear())
+              decommissioningSchedule.getEstimatedDecommissioningStartDateYear() != null
+                  ? Integer.toString(decommissioningSchedule.getEstimatedDecommissioningStartDateYear())
+                  : null
           )
       );
     } else {
@@ -232,7 +236,9 @@ public class DecommissioningScheduleService implements ProjectFormSectionService
       form.setEstimatedCessationOfProductionDate(
           new QuarterYearInput(
               decommissioningSchedule.getEstimatedCessationOfProductionDateQuarter(),
-              Integer.toString(decommissioningSchedule.getEstimatedCessationOfProductionDateYear())
+              decommissioningSchedule.getEstimatedCessationOfProductionDateYear() != null
+                  ? Integer.toString(decommissioningSchedule.getEstimatedCessationOfProductionDateYear())
+                  : null
           )
       );
     } else {
