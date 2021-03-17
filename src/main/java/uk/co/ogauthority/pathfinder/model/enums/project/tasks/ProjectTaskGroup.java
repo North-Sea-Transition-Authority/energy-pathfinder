@@ -38,6 +38,7 @@ public enum ProjectTaskGroup {
   DECOMMISSIONING_SCHEDULES(
       "Decommissioning schedules",
       List.of(
+          ProjectTask.DECOMMISSIONING_SCHEDULE,
           ProjectTask.WELLS,
           ProjectTask.PLATFORM_FPSO,
           ProjectTask.INTEGRATED_RIGS,

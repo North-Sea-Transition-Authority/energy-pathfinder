@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedpipeline.DecommissionedPipelineController;
+import uk.co.ogauthority.pathfinder.controller.project.decommissioningschedule.DecommissioningScheduleController;
 import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedRigController;
 import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationController;
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
@@ -22,6 +23,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
 import uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline.DecommissionedPipelineService;
+import uk.co.ogauthority.pathfinder.service.project.decommissioningschedule.DecommissioningScheduleService;
 import uk.co.ogauthority.pathfinder.service.project.integratedrig.IntegratedRigService;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
@@ -87,40 +89,47 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       Set.of(ProjectType.INFRASTRUCTURE),
       70
   ),
+  DECOMMISSIONING_SCHEDULE(
+      DecommissioningScheduleController.PAGE_NAME,
+      DecommissioningScheduleController.class,
+      DecommissioningScheduleService.class,
+      Set.of(ProjectType.INFRASTRUCTURE),
+      80
+  ),
   WELLS(
       PlugAbandonmentScheduleController.TASK_LIST_NAME,
       PlugAbandonmentScheduleController.class,
       PlugAbandonmentScheduleService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      80
+      90
   ),
   PLATFORM_FPSO(
       PlatformsFpsosController.TASK_LIST_NAME,
       PlatformsFpsosController.class,
       PlatformsFpsosService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      90
+      100
   ),
   INTEGRATED_RIGS(
       IntegratedRigController.TASK_LIST_NAME,
       IntegratedRigController.class,
       IntegratedRigService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      100
+      110
   ),
   SUBSEA_INFRASTRUCTURE(
       SubseaInfrastructureController.TASK_LIST_NAME,
       SubseaInfrastructureController.class,
       SubseaInfrastructureService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      110
+      120
   ),
   PIPELINES(
       DecommissionedPipelineController.TASK_LIST_NAME,
       DecommissionedPipelineController.class,
       DecommissionedPipelineService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      120
+      130
   );
 
   private final String displayName;
@@ -188,6 +197,8 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
         return ReverseRouter.route(on(AwardedContractController.class).viewAwardedContracts(projectId, null));
       case COLLABORATION_OPPORTUNITIES:
         return ReverseRouter.route(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null));
+      case DECOMMISSIONING_SCHEDULE:
+        return ReverseRouter.route(on(DecommissioningScheduleController.class).getDecommissioningSchedule(projectId, null));
       case WELLS:
         return ReverseRouter.route(on(PlugAbandonmentScheduleController.class).viewPlugAbandonmentSchedules(projectId, null));
       case PLATFORM_FPSO:
