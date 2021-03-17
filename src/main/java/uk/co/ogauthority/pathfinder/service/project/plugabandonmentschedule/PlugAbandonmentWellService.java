@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import uk.co.ogauthority.pathfinder.model.entity.wellbore.Wellbore;
 import uk.co.ogauthority.pathfinder.model.form.project.plugabandonmentschedule.PlugAbandonmentScheduleForm;
 import uk.co.ogauthority.pathfinder.model.view.wellbore.WellboreView;
 import uk.co.ogauthority.pathfinder.repository.project.plugabandonmentschedule.PlugAbandonmentWellRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.wellbore.WellboreService;
 
 @Service
@@ -20,13 +22,16 @@ public class PlugAbandonmentWellService {
 
   private final PlugAbandonmentWellRepository plugAbandonmentWellRepository;
   private final WellboreService wellboreService;
+  private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
   public PlugAbandonmentWellService(
       PlugAbandonmentWellRepository plugAbandonmentWellRepository,
-      WellboreService wellboreService) {
+      WellboreService wellboreService,
+      EntityDuplicationService entityDuplicationService) {
     this.plugAbandonmentWellRepository = plugAbandonmentWellRepository;
     this.wellboreService = wellboreService;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
   @Transactional
@@ -84,5 +89,15 @@ public class PlugAbandonmentWellService {
 
   private WellboreView convertToWellboreView(Wellbore wellbore) {
     return new WellboreView(wellbore, true);
+  }
+
+  public void copyPlugAbandonmentWells(Map<PlugAbandonmentSchedule, PlugAbandonmentSchedule> duplicatedPlugAbandonmentScheduleLookup) {
+    duplicatedPlugAbandonmentScheduleLookup.forEach((originalPlugAbandonmentSchedule, duplicatedPlugAbandonmentSchedule) ->
+        entityDuplicationService.duplicateEntitiesAndSetNewParent(
+            getPlugAbandonmentWells(originalPlugAbandonmentSchedule),
+            duplicatedPlugAbandonmentSchedule,
+            PlugAbandonmentWell.class
+        )
+    );
   }
 }

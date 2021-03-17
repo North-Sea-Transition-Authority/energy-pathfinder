@@ -3,10 +3,11 @@ package uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedul
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
+import uk.co.ogauthority.pathfinder.service.entityduplication.ParentEntity;
 
 @Entity
 @Table(name = "plug_abandonment_schedules")
-public class PlugAbandonmentSchedule extends ProjectDetailEntity {
+public class PlugAbandonmentSchedule extends ProjectDetailEntity implements ParentEntity {
 
   private Integer earliestStartYear;
 

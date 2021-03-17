@@ -178,13 +178,17 @@ public class PlugAbandonmentScheduleService implements ProjectFormSectionService
 
   @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
-    entityDuplicationService.duplicateEntitiesAndSetNewParent(
+    var duplicatedPlugAbandonmentScheduleEntities = entityDuplicationService.duplicateEntitiesAndSetNewParent(
         getPlugAbandonmentSchedulesForProjectDetail(fromDetail),
         toDetail,
         PlugAbandonmentSchedule.class
     );
 
-    // TODO: PAT-451
+    var duplicatedPlugAbandonmentScheduleEntityMap = entityDuplicationService.createDuplicatedEntityPairingMap(
+        duplicatedPlugAbandonmentScheduleEntities
+    );
+
+    plugAbandonmentWellService.copyPlugAbandonmentWells(duplicatedPlugAbandonmentScheduleEntityMap);
   }
 
   public ModelAndView getPlugAbandonmentScheduleModelAndView(Integer projectId,

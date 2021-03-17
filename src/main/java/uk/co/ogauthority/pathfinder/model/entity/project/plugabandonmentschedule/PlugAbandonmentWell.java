@@ -8,10 +8,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.wellbore.Wellbore;
+import uk.co.ogauthority.pathfinder.service.entityduplication.ChildEntity;
 
 @Entity
 @Table(name = "plug_abandonment_wells")
-public class PlugAbandonmentWell {
+public class PlugAbandonmentWell implements ChildEntity<Integer, PlugAbandonmentSchedule> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,5 +45,20 @@ public class PlugAbandonmentWell {
 
   public void setWellbore(Wellbore wellbore) {
     this.wellbore = wellbore;
+  }
+
+  @Override
+  public void clearId() {
+    this.id = null;
+  }
+
+  @Override
+  public void setParent(PlugAbandonmentSchedule parentEntity) {
+    this.plugAbandonmentSchedule = parentEntity;
+  }
+
+  @Override
+  public PlugAbandonmentSchedule getParent() {
+    return plugAbandonmentSchedule;
   }
 }
