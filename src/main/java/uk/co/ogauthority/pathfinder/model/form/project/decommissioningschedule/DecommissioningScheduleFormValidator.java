@@ -18,9 +18,9 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 public class DecommissioningScheduleFormValidator implements SmartValidator {
 
   public static final String MISSING_DECOMMISSIONING_START_DATE_NOT_PROVIDED_REASON_ERROR =
-      "Enter the reason why you are unable to provide this information";
+      "Enter the reason why you are unable to provide the decommissioning start date";
   public static final String MISSING_CESSATION_OF_PRODUCTION_DATE_NOT_PROVIDED_REASON_ERROR =
-      "Enter the reason why you are unable to provide this information";
+      "Enter the reason why you are unable to provide the Cessation of Production date";
 
   private final DateInputValidator dateInputValidator;
   private final QuarterYearInputValidator quarterYearInputValidator;
