@@ -10,8 +10,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import static uk.co.ogauthority.pathfinder.testutil.ProjectFileTestUtil.FILE_ID;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
+import java.sql.SQLException;
 import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,9 +31,12 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
+import uk.co.ogauthority.pathfinder.model.entity.file.UploadedFile;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -41,6 +46,7 @@ import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.C
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFileTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -62,6 +68,8 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
+  private final ProjectDetailFile PROJECT_DETAIL_FILE = ProjectFileTestUtil.getProjectDetailFile(detail);
+
   private final CollaborationOpportunity opportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
 
 
@@ -71,11 +79,12 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
   private static final AuthenticatedUserAccount unAuthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   @Before
-  public void setUp() {
+  public void setUp() throws SQLException {
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(detail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(false);
     when(collaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID)).thenReturn(opportunity);
+    UploadedFile file = ProjectFileTestUtil.getUploadedFile();
 
     var collaborationOpportunityView = CollaborationOpportunityViewUtil.createView(
         opportunity,
@@ -85,6 +94,8 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
     when(collaborationOpportunitiesSummaryService.getView(opportunity, DISPLAY_ORDER)).thenReturn(collaborationOpportunityView);
     when(collaborationOpportunitiesService.createCollaborationOpportunity(any(), any(), any())).thenReturn(CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail));
     when(collaborationOpportunitiesService.updateCollaborationOpportunity(any(), any(), any())).thenReturn(CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail));
+    when(projectDetailFileService.getProjectDetailFileByProjectDetailAndFileId(any(), any())).thenReturn(PROJECT_DETAIL_FILE);
+    when(projectDetailFileService.getUploadedFileById(FILE_ID)).thenReturn(file);
   }
 
   @Test
@@ -284,6 +295,36 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
 
     verify(collaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
     verify(collaborationOpportunitiesService, times(1)).updateCollaborationOpportunity(any(), any(), any());
+  }
+
+  @Test
+  public void handleDownload_draftProject() throws Exception {
+    makeDownloadRequest(ProjectStatus.DRAFT);
+  }
+
+  @Test
+  public void handleDownload_qaProject() throws Exception {
+    makeDownloadRequest(ProjectStatus.QA);
+  }
+
+  @Test
+  public void handleDownload_publishedProject() throws Exception {
+    makeDownloadRequest(ProjectStatus.PUBLISHED);
+  }
+
+  @Test
+  public void handleDownload_archivedProject() throws Exception {
+    makeDownloadRequest(ProjectStatus.ARCHIVED);
+  }
+
+  private void makeDownloadRequest(ProjectStatus status) throws Exception {
+    var customStatusProject = detail;
+    customStatusProject.setStatus(status);
+    when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(customStatusProject);
+    mockMvc.perform(get(ReverseRouter.route(
+        on(CollaborationOpportunitiesController.class).handleDownload(PROJECT_ID, ProjectFileTestUtil.FILE_ID, null)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isOk());
   }
 
 }
