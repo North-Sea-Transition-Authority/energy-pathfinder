@@ -71,6 +71,14 @@ public class DecommissioningScheduleService implements ProjectFormSectionService
 
     decommissioningSchedule.setProjectDetail(projectDetail);
 
+    setDecommissioningScheduleDecomData(decommissioningSchedule, form);
+    setDecommissioningScheduleCopData(decommissioningSchedule, form);
+
+    return decommissioningScheduleRepository.save(decommissioningSchedule);
+  }
+
+  private void setDecommissioningScheduleDecomData(DecommissioningSchedule decommissioningSchedule,
+                                                   DecommissioningScheduleForm form) {
     var decommissioningStartDateType = form.getDecommissioningStartDateType();
     decommissioningSchedule.setDecommissioningStartDateType(decommissioningStartDateType);
 
@@ -107,7 +115,10 @@ public class DecommissioningScheduleService implements ProjectFormSectionService
     } else {
       decommissioningSchedule.setDecommissioningStartDateNotProvidedReason(null);
     }
+  }
 
+  private void setDecommissioningScheduleCopData(DecommissioningSchedule decommissioningSchedule,
+                                                 DecommissioningScheduleForm form) {
     var cessationOfProductionDateType = form.getCessationOfProductionDateType();
     decommissioningSchedule.setCessationOfProductionDateType(cessationOfProductionDateType);
 
@@ -144,8 +155,6 @@ public class DecommissioningScheduleService implements ProjectFormSectionService
     } else {
       decommissioningSchedule.setCessationOfProductionDateNotProvidedReason(null);
     }
-
-    return decommissioningScheduleRepository.save(decommissioningSchedule);
   }
 
   public Optional<DecommissioningSchedule> getDecommissioningSchedule(ProjectDetail projectDetail) {
@@ -170,7 +179,12 @@ public class DecommissioningScheduleService implements ProjectFormSectionService
 
   private DecommissioningScheduleForm getForm(DecommissioningSchedule decommissioningSchedule) {
     var form = new DecommissioningScheduleForm();
+    setFormDecomData(form, decommissioningSchedule);
+    setFormCopData(form, decommissioningSchedule);
+    return form;
+  }
 
+  private void setFormDecomData(DecommissioningScheduleForm form, DecommissioningSchedule decommissioningSchedule) {
     var decommissioningStartDateType = decommissioningSchedule.getDecommissioningStartDateType();
     form.setDecommissioningStartDateType(decommissioningStartDateType);
 
@@ -200,7 +214,9 @@ public class DecommissioningScheduleService implements ProjectFormSectionService
     } else {
       form.setDecommissioningStartDateNotProvidedReason(null);
     }
+  }
 
+  private void setFormCopData(DecommissioningScheduleForm form, DecommissioningSchedule decommissioningSchedule) {
     var cessationOfProductionDateType = decommissioningSchedule.getCessationOfProductionDateType();
     form.setCessationOfProductionDateType(cessationOfProductionDateType);
 
@@ -230,8 +246,6 @@ public class DecommissioningScheduleService implements ProjectFormSectionService
     } else {
       form.setCessationOfProductionDateNotProvidedReason(null);
     }
-
-    return form;
   }
 
   public ModelAndView getDecommissioningScheduleModelAndView(Integer projectId, DecommissioningScheduleForm form) {

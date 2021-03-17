@@ -44,6 +44,20 @@ public class DecommissioningScheduleSectionSummaryServiceTest {
   }
 
   @Test
+  public void canShowSection_whenCanShowInTaskList_thenTrue() {
+    when(decommissioningScheduleService.canShowInTaskList(projectDetail)).thenReturn(true);
+
+    assertThat(decommissioningScheduleSectionSummaryService.canShowSection(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
+    when(decommissioningScheduleService.canShowInTaskList(projectDetail)).thenReturn(false);
+
+    assertThat(decommissioningScheduleSectionSummaryService.canShowSection(projectDetail)).isFalse();
+  }
+
+  @Test
   public void getSummary() {
     when(decommissioningScheduleService.getDecommissioningSchedule(projectDetail)).thenReturn(Optional.of(decommissioningSchedule));
 

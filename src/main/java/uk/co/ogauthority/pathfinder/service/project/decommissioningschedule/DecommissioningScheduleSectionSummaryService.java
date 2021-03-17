@@ -39,6 +39,11 @@ public class DecommissioningScheduleSectionSummaryService implements ProjectSect
   }
 
   @Override
+  public boolean canShowSection(ProjectDetail detail) {
+    return decommissioningScheduleService.canShowInTaskList(detail);
+  }
+
+  @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
     Map<String, Object> summaryModel = new HashMap<>();
     summaryModel.put("sectionTitle", PAGE_NAME);
