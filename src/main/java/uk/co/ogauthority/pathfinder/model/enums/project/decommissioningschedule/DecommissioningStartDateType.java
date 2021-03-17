@@ -7,7 +7,7 @@ public enum DecommissioningStartDateType {
 
   EXACT("I know the decommissioning work start date"),
   ESTIMATED("I have an estimated decommissioning work start date"),
-  UNKNOWN("I am unable to provide this information at this time");
+  UNKNOWN("I am unable to provide the decommissioning work start date at this time");
 
   private final String displayName;
 

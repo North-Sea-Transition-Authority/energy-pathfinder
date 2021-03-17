@@ -12,7 +12,7 @@
           dayPath="form.exactDecommissioningStartDate.day"
           monthPath="form.exactDecommissioningStartDate.month"
           yearPath="form.exactDecommissioningStartDate.year"
-          labelText=""
+          labelText="What is the decommissioning work start date?"
           formId="exactDecommissioningStartDate-day-month-year"
           nestingPath="form.decommissioningStartDateType"
         />
@@ -20,17 +20,17 @@
       <@fdsRadio.radioItem path="form.decommissioningStartDateType" itemMap=estimatedDecommissioningStartDateType>
         <@quarterYear.standardQuarterYearInput
           quarterYearInputPath="form.estimatedDecommissioningStartDate"
-          legendHeading=""
+          legendHeading="What is the estimated decommissioning work start date?"
           quarterOptions=quarters
           formId="estimatedDecommissioningStartDate"
-          hintText="If you don’t know the exact date, provide an estimated date"
+          hintText=""
           nestingPath="form.decommissioningStartDateType"
         />
       </@fdsRadio.radioItem>
       <@fdsRadio.radioItem path="form.decommissioningStartDateType" itemMap=unknownDecommissioningStartDateType>
         <@fdsTextarea.textarea
           path="form.decommissioningStartDateNotProvidedReason"
-          labelText="Provide a reason why you are unable to provide this information at this time"
+          labelText="Provide a reason why you are unable to provide the decommissioning work start date"
           nestingPath="form.decommissioningStartDateType"
         />
       </@fdsRadio.radioItem>
@@ -45,7 +45,7 @@
           dayPath="form.exactCessationOfProductionDate.day"
           monthPath="form.exactCessationOfProductionDate.month"
           yearPath="form.exactCessationOfProductionDate.year"
-          labelText=""
+          labelText="What is the CoP date?"
           formId="exactCessationOfProductionDate-day-month-year"
           nestingPath="form.cessationOfProductionDateType"
         />
@@ -53,17 +53,17 @@
       <@fdsRadio.radioItem path="form.cessationOfProductionDateType" itemMap=estimatedCessationOfProductionDateType>
         <@quarterYear.standardQuarterYearInput
           quarterYearInputPath="form.estimatedCessationOfProductionDate"
-          legendHeading=""
+          legendHeading="What is the estimated CoP date?"
           quarterOptions=quarters
           formId="estimatedCessationOfProductionDate"
-          hintText="If you don’t know the exact date, provide an estimated date"
+          hintText=""
           nestingPath="form.cessationOfProductionDateType"
         />
       </@fdsRadio.radioItem>
       <@fdsRadio.radioItem path="form.cessationOfProductionDateType" itemMap=unknownCessationOfProductionDateType>
         <@fdsTextarea.textarea
           path="form.cessationOfProductionDateNotProvidedReason"
-          labelText="Provide a reason why you are unable to provide this information at this time"
+          labelText="Provide a reason why you are unable to provide the CoP date"
           nestingPath="form.cessationOfProductionDateType"
         />
       </@fdsRadio.radioItem>

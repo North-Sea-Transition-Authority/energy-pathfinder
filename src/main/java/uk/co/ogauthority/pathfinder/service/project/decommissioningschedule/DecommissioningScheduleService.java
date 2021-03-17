@@ -24,6 +24,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.decommissioningschedule.D
 import uk.co.ogauthority.pathfinder.repository.project.decommissioningschedule.DecommissioningScheduleRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -286,7 +287,7 @@ public class DecommissioningScheduleService implements ProjectFormSectionService
 
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
-    return projectInformationService.isDecomRelated(detail);
+    return ProjectService.isInfrastructureProject(detail) && projectInformationService.isDecomRelated(detail);
   }
 
   @Override

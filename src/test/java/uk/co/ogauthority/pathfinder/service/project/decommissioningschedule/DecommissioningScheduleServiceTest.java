@@ -4,6 +4,7 @@ import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,6 +26,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.decommissioningschedule
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissioningschedule.CessationOfProductionDateType;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissioningschedule.DecommissioningStartDateType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
@@ -497,14 +499,23 @@ public class DecommissioningScheduleServiceTest {
   }
 
   @Test
-  public void canShowInTaskList_whenDecomRelated_thenTrue() {
+  public void canShowInTaskList_whenNotInfrastructureProject_thenFalse() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
+
+    assertThat(decommissioningScheduleService.canShowInTaskList(projectDetail)).isFalse();
+
+    verify(projectInformationService, never()).isDecomRelated(projectDetail);
+  }
+
+  @Test
+  public void canShowInTaskList_whenInfrastructureProjectAndDecomRelated_thenTrue() {
     when(projectInformationService.isDecomRelated(projectDetail)).thenReturn(true);
 
     assertThat(decommissioningScheduleService.canShowInTaskList(projectDetail)).isTrue();
   }
 
   @Test
-  public void canShowInTaskList_whenNotDecomRelated_thenFalse() {
+  public void canShowInTaskList_whenInfrastructureProjectAndNotDecomRelated_thenFalse() {
     when(projectInformationService.isDecomRelated(projectDetail)).thenReturn(false);
 
     assertThat(decommissioningScheduleService.canShowInTaskList(projectDetail)).isFalse();

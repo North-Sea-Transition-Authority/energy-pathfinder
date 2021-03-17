@@ -7,7 +7,7 @@ public enum CessationOfProductionDateType {
 
   EXACT("I know the CoP date"),
   ESTIMATED("I have an estimated CoP date"),
-  UNKNOWN("I am unable to provide this information at this time");
+  UNKNOWN("I am unable to provide the CoP date at this time");
 
   private final String displayName;
 
