@@ -739,21 +739,21 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   /**
     Utility procedure to sanitise the legacy devuk field data into a format for the new service model.
     The rules are:
-    - If both po_legacy_devuk_field_id and po_legacy_manual_field_name are populated, then NULL po_legacy_manual_field_name
-      so we only persist po_legacy_devuk_field_id in the new model
-    - If po_legacy_manual_field_name is populated then try to lookup a devuk field id which exactly matches po_legacy_manual_field_name
+    - If both po_legacy_devuk_field_id and p_legacy_manual_field_name are populated only persist p_legacy_devuk_field_id in the new model
+    - If p_legacy_manual_field_name is populated then try to lookup a devuk field id which exactly matches p_legacy_manual_field_name
     @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
-    @param po_legacy_devuk_field_id The devuk field id from the legacy model
-    @param po_legacy_manual_field_name The manual field name from the legacy model
+    @param p_legacy_devuk_field_id The devuk field id from the legacy model
+    @param p_legacy_manual_field_name The manual field name from the legacy model
+    @return the id of the devuk field if we found a match or NULL if we cannot find a match
    */
-  PROCEDURE sanitise_legacy_field_inputs(
+  FUNCTION sanitise_legacy_field_inputs(
     p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
-  , po_legacy_devuk_field_id IN OUT ${datasource.migration-user}.legacy_project_data.devuk_field_id%TYPE
-  , po_legacy_manual_field_name IN OUT ${datasource.migration-user}.legacy_project_data.manual_field_name%TYPE
-  )
+  , p_legacy_devuk_field_id IN ${datasource.migration-user}.legacy_project_data.devuk_field_id%TYPE
+  , p_legacy_manual_field_name IN ${datasource.migration-user}.legacy_project_data.manual_field_name%TYPE
+  ) RETURN ${datasource.user}.project_locations.field_id%TYPE
   IS
 
-    l_devuk_field_id_lookup ${datasource.user}.project_locations.field_id%TYPE;
+    l_sanitised_devuk_field_id ${datasource.user}.project_locations.field_id%TYPE;
 
   BEGIN
 
@@ -761,28 +761,21 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       p_legacy_project_detail_id => p_legacy_project_detail_id
     , p_system_message =>
         'Starting sanitise_legacy_field_inputs for legacy project detail with ID ' || p_legacy_project_detail_id
-        || 'with inputs po_legacy_devuk_field_id => ' || COALESCE(TO_CHAR(po_legacy_devuk_field_id), 'NULL')
-        || ', po_legacy_manual_field_name => ' || COALESCE(po_legacy_manual_field_name, 'NULL')
+        || 'with inputs p_legacy_devuk_field_id => ' || COALESCE(TO_CHAR(p_legacy_devuk_field_id), 'NULL')
+        || ', p_legacy_manual_field_name => ' || COALESCE(p_legacy_manual_field_name, 'NULL')
     );
 
-    IF po_legacy_devuk_field_id IS NOT NULL THEN
+    IF p_legacy_devuk_field_id IS NOT NULL THEN
 
-      -- If operator has selected the devuk field, don't set the manual field name.
-      -- There are hundreds of cases on live where both are set and we want to take the devuk id over the free text name.
-      po_legacy_manual_field_name := NULL;
+      l_sanitised_devuk_field_id := p_legacy_devuk_field_id;
 
-    ELSIF po_legacy_manual_field_name IS NOT NULL THEN
+    ELSIF p_legacy_manual_field_name IS NOT NULL THEN
 
       -- If a manual field name is entered and we don't have a devuk field id, try an exact match lookup from devuk
       -- to see if we can find a field with the same name. Preference would be to store the devuk id if possible.
-      l_devuk_field_id_lookup := lookup_field_id_from_freetext(
-        p_legacy_manual_entry_field => po_legacy_manual_field_name
+      l_sanitised_devuk_field_id := lookup_field_id_from_freetext(
+        p_legacy_manual_entry_field => p_legacy_manual_field_name
       );
-
-      IF l_devuk_field_id_lookup IS NOT NULL THEN
-        po_legacy_devuk_field_id := l_devuk_field_id_lookup;
-        po_legacy_manual_field_name := NULL;
-      END IF;
 
     END IF;
 
@@ -790,9 +783,10 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       p_legacy_project_detail_id => p_legacy_project_detail_id
     , p_system_message =>
           'Finished sanitise_legacy_field_inputs for legacy project detail with ID ' || p_legacy_project_detail_id
-          || ' with outputs po_legacy_devuk_field_id => ' || COALESCE(TO_CHAR(po_legacy_devuk_field_id), 'NULL')
-          || ', po_legacy_manual_field_name => ' || COALESCE(po_legacy_manual_field_name, 'NULL')
+          || ' with output l_sanitised_devuk_field_id => ' || COALESCE(TO_CHAR(l_sanitised_devuk_field_id), 'NULL')
     );
+
+    RETURN l_sanitised_devuk_field_id;
 
   END sanitise_legacy_field_inputs;
 
@@ -947,8 +941,10 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     l_new_project_location_id ${datasource.user}.project_locations.id%TYPE;
 
-    l_devuk_field_id ${datasource.migration-user}.legacy_project_data.devuk_field_id%TYPE;
-    l_manual_field_name ${datasource.migration-user}.legacy_project_data.manual_field_name%TYPE;
+    l_legacy_devuk_field_id ${datasource.migration-user}.legacy_project_data.devuk_field_id%TYPE;
+    l_legacy_manual_field_name ${datasource.migration-user}.legacy_project_data.manual_field_name%TYPE;
+    l_sanitised_field_id ${datasource.user}.project_locations.field_id%TYPE;
+
     l_field_type ${datasource.migration-user}.legacy_project_data.field_type%TYPE;
     l_fdp_approved ${datasource.migration-user}.legacy_project_data.fdp_approved%TYPE;
 
@@ -969,18 +965,18 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     , lpd.fdp_approved
     , lpd.water_depth
     INTO
-      l_devuk_field_id
-    , l_manual_field_name
+      l_legacy_devuk_field_id
+    , l_legacy_manual_field_name
     , l_field_type
     , l_fdp_approved
     , l_legacy_water_depth
     FROM ${datasource.migration-user}.legacy_project_data lpd
     WHERE lpd.legacy_project_detail_id = p_legacy_project_detail_id;
 
-    sanitise_legacy_field_inputs(
+    l_sanitised_field_id := sanitise_legacy_field_inputs(
       p_legacy_project_detail_id => p_legacy_project_detail_id
-    , po_legacy_devuk_field_id => l_devuk_field_id
-    , po_legacy_manual_field_name => l_manual_field_name
+    , p_legacy_devuk_field_id => l_legacy_devuk_field_id
+    , p_legacy_manual_field_name => l_legacy_manual_field_name
     );
 
     l_sanitised_water_depth := get_water_depth_value(
@@ -991,15 +987,13 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     INSERT INTO ${datasource.user}.project_locations(
       project_detail_id
     , field_id
-    , manual_field_name
     , maximum_water_depth
     , field_type
     , approved_fdp
     )
     VALUES(
       p_new_project_detail_id
-    , l_devuk_field_id
-    , l_manual_field_name
+    , l_sanitised_field_id
     , l_sanitised_water_depth
     , l_field_type
     , l_fdp_approved
