@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +20,9 @@ import uk.co.ogauthority.pathfinder.model.entity.wellbore.Wellbore;
 import uk.co.ogauthority.pathfinder.model.form.project.plugabandonmentschedule.PlugAbandonmentScheduleForm;
 import uk.co.ogauthority.pathfinder.model.view.wellbore.WellboreView;
 import uk.co.ogauthority.pathfinder.repository.project.plugabandonmentschedule.PlugAbandonmentWellRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.wellbore.WellboreService;
+import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentScheduleTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentWellTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.WellboreTestUtil;
 
@@ -32,13 +35,17 @@ public class PlugAbandonmentWellServiceTest {
   @Mock
   private WellboreService wellboreService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private PlugAbandonmentWellService plugAbandonmentWellService;
 
   @Before
   public void setup() {
     plugAbandonmentWellService = new PlugAbandonmentWellService(
         plugAbandonmentWellRepository,
-        wellboreService
+        wellboreService,
+        entityDuplicationService
     );
   }
 
@@ -155,5 +162,49 @@ public class PlugAbandonmentWellServiceTest {
     assertThat(wellboreView.getId()).isEqualTo(Integer.toString(wellbore.getId()));
     assertThat(wellboreView.getName()).isEqualTo(wellbore.getRegistrationNo());
     assertThat(wellboreView.isValid()).isTrue();
+  }
+
+  @Test
+  public void copyPlugAbandonmentWells() {
+    var originalPlugAbandonmentSchedule1 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
+    var originalPlugAbandonmentSchedule2 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
+
+    var duplicatedPlugAbandonmentSchedule1 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
+    var duplicatedPlugAbandonmentSchedule2 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
+
+    var duplicatedPlugAbandonmentScheduleLookup = Map.of(
+        originalPlugAbandonmentSchedule1,
+        duplicatedPlugAbandonmentSchedule1,
+        originalPlugAbandonmentSchedule2,
+        duplicatedPlugAbandonmentSchedule2
+    );
+
+    var originalPlugAbandonmentSchedule1Wells = List.of(
+        PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(),
+        PlugAbandonmentWellTestUtil.createPlugAbandonmentWell()
+    );
+    var originalPlugAbandonmentSchedule2Wells = List.of(
+        PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(),
+        PlugAbandonmentWellTestUtil.createPlugAbandonmentWell()
+    );
+    when(plugAbandonmentWellRepository.findAllByPlugAbandonmentSchedule(originalPlugAbandonmentSchedule1)).thenReturn(
+        originalPlugAbandonmentSchedule1Wells
+    );
+    when(plugAbandonmentWellRepository.findAllByPlugAbandonmentSchedule(originalPlugAbandonmentSchedule2)).thenReturn(
+        originalPlugAbandonmentSchedule2Wells
+    );
+
+    plugAbandonmentWellService.copyPlugAbandonmentWells(duplicatedPlugAbandonmentScheduleLookup);
+
+    verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
+        originalPlugAbandonmentSchedule1Wells,
+        duplicatedPlugAbandonmentSchedule1,
+        PlugAbandonmentWell.class
+    );
+    verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
+        originalPlugAbandonmentSchedule2Wells,
+        duplicatedPlugAbandonmentSchedule2,
+        PlugAbandonmentWell.class
+    );
   }
 }

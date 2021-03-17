@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule;
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -325,6 +326,8 @@ public class PlugAbandonmentScheduleServiceTest {
         toProjectDetail,
         PlugAbandonmentSchedule.class
     );
+
+    verify(plugAbandonmentWellService, times(1)).copyPlugAbandonmentWells(anyMap());
   }
 
   @Test
