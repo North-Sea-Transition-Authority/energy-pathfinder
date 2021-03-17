@@ -2,15 +2,14 @@ package uk.co.ogauthority.pathfinder.model.view.projectinformation;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import java.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
+import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
-import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -69,8 +68,6 @@ public class ProjectInformationViewUtilTest {
     );
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isEqualTo(expectedFirstProductionDate);
     assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isNull();
-    assertThat(projectInformationView.getDecomWorkStartDate()).isNull();
-    assertThat(projectInformationView.getDecomProductionCessationDate()).isNull();
     assertThat(projectInformationView.getEnergyTransitionCategory()).isNull();
   }
 
@@ -95,8 +92,6 @@ public class ProjectInformationViewUtilTest {
     );
     assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isEqualTo(expectedFirstProductionDate);
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
-    assertThat(projectInformationView.getDecomWorkStartDate()).isNull();
-    assertThat(projectInformationView.getDecomProductionCessationDate()).isNull();
     assertThat(projectInformationView.getEnergyTransitionCategory()).isNull();
   }
 
@@ -105,26 +100,13 @@ public class ProjectInformationViewUtilTest {
 
     final var fieldStage = FieldStage.DECOMMISSIONING;
 
-    final var decomWorkStartDateQuarter = Quarter.Q1;
-    final var decomWorkStartDateYear = 2020;
-    final var productionCessationDate = LocalDate.now();
-
     projectInformation.setFieldStage(fieldStage);
-    projectInformation.setDecomWorkStartDateQuarter(decomWorkStartDateQuarter);
-    projectInformation.setDecomWorkStartDateYear(decomWorkStartDateYear);
-    projectInformation.setProductionCessationDate(productionCessationDate);
 
     var projectInformationView = ProjectInformationViewUtil.from(projectInformation);
 
     assertCommonProperties(projectInformationView, projectInformation);
     assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
 
-    var expectedDecomWorkStartDate = DateUtil.getDateFromQuarterYear(
-        decomWorkStartDateQuarter,
-        decomWorkStartDateYear
-    );
-    assertThat(projectInformationView.getDecomWorkStartDate()).isEqualTo(expectedDecomWorkStartDate);
-    assertThat(projectInformationView.getDecomProductionCessationDate()).isEqualTo(DateUtil.formatDate(productionCessationDate));
     assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isNull();
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
     assertThat(projectInformationView.getEnergyTransitionCategory()).isNull();
@@ -148,8 +130,6 @@ public class ProjectInformationViewUtilTest {
     assertThat(projectInformationView.getEnergyTransitionCategory()).isEqualTo(energyTransitionCategory.getDisplayName());
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
     assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isNull();
-    assertThat(projectInformationView.getDecomWorkStartDate()).isNull();
-    assertThat(projectInformationView.getDecomProductionCessationDate()).isNull();
   }
 
   @Test
@@ -165,8 +145,6 @@ public class ProjectInformationViewUtilTest {
     assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
     assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isNull();
-    assertThat(projectInformationView.getDecomWorkStartDate()).isNull();
-    assertThat(projectInformationView.getDecomProductionCessationDate()).isNull();
     assertThat(projectInformationView.getEnergyTransitionCategory()).isNull();
   }
 }

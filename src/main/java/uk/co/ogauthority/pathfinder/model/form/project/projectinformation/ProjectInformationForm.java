@@ -6,7 +6,6 @@ import javax.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
@@ -27,10 +26,6 @@ public class ProjectInformationForm {
   private QuarterYearInput discoveryFirstProductionDate;
 
   private QuarterYearInput developmentFirstProductionDate;
-
-  private QuarterYearInput decomWorkStartDate;
-
-  private ThreeFieldDateInput productionCessationDate;
 
   private EnergyTransitionCategory energyTransitionCategory;
 
@@ -75,23 +70,6 @@ public class ProjectInformationForm {
 
   public void setDiscoveryFirstProductionDate(QuarterYearInput discoveryFirstProductionDate) {
     this.discoveryFirstProductionDate = discoveryFirstProductionDate;
-  }
-
-  public QuarterYearInput getDecomWorkStartDate() {
-    return decomWorkStartDate;
-  }
-
-  public void setDecomWorkStartDate(QuarterYearInput decomWorkStartDate) {
-    this.decomWorkStartDate = decomWorkStartDate;
-  }
-
-  public ThreeFieldDateInput getProductionCessationDate() {
-    return productionCessationDate;
-  }
-
-  public void setProductionCessationDate(
-      ThreeFieldDateInput productionCessationDate) {
-    this.productionCessationDate = productionCessationDate;
   }
 
   public EnergyTransitionCategory getEnergyTransitionCategory() {

@@ -26,16 +26,6 @@
         diffedField=projectInformationDiffModel.ProjectInformationView_discoveryFirstProductionDate
       />
     </#if>
-    <#if isDecommissioningFieldStage>
-      <@checkAnswers.diffedCheckAnswersRowNoActions
-        prompt="Decommissioning work start date"
-        diffedField=projectInformationDiffModel.ProjectInformationView_decomWorkStartDate
-      />
-      <@checkAnswers.diffedCheckAnswersRowNoActions
-        prompt="Decommissioning production cessation date"
-        diffedField=projectInformationDiffModel.ProjectInformationView_decomProductionCessationDate
-      />
-    </#if>
     <#if isEnergyTransitionFieldStage>
       <@checkAnswers.diffedCheckAnswersRowNoActions
         prompt="Energy transition category"

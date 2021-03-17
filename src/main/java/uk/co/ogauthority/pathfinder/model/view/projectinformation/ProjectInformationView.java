@@ -14,10 +14,6 @@ public class ProjectInformationView {
 
   private String discoveryFirstProductionDate;
 
-  private String decomWorkStartDate;
-
-  private String decomProductionCessationDate;
-
   private String energyTransitionCategory;
 
   private String contactName;
@@ -66,22 +62,6 @@ public class ProjectInformationView {
 
   public void setDiscoveryFirstProductionDate(String discoveryFirstProductionDate) {
     this.discoveryFirstProductionDate = discoveryFirstProductionDate;
-  }
-
-  public String getDecomWorkStartDate() {
-    return decomWorkStartDate;
-  }
-
-  public void setDecomWorkStartDate(String decomWorkStartDate) {
-    this.decomWorkStartDate = decomWorkStartDate;
-  }
-
-  public String getDecomProductionCessationDate() {
-    return decomProductionCessationDate;
-  }
-
-  public void setDecomProductionCessationDate(String decomProductionCessationDate) {
-    this.decomProductionCessationDate = decomProductionCessationDate;
   }
 
   public String getEnergyTransitionCategory() {
@@ -140,8 +120,6 @@ public class ProjectInformationView {
         && Objects.equals(that.getFieldStage(), getFieldStage())
         && Objects.equals(that.getDevelopmentFirstProductionDate(), getDevelopmentFirstProductionDate())
         && Objects.equals(that.getDiscoveryFirstProductionDate(), getDiscoveryFirstProductionDate())
-        && Objects.equals(that.getDecomWorkStartDate(), getDecomWorkStartDate())
-        && Objects.equals(that.getDecomProductionCessationDate(), getDecomProductionCessationDate())
         && Objects.equals(that.getContactName(), getContactName())
         && Objects.equals(that.getContactPhoneNumber(), getContactPhoneNumber())
         && Objects.equals(that.getContactJobTitle(), getContactJobTitle())
@@ -156,8 +134,6 @@ public class ProjectInformationView {
         getFieldStage(),
         getDevelopmentFirstProductionDate(),
         getDiscoveryFirstProductionDate(),
-        getDecomWorkStartDate(),
-        getDecomProductionCessationDate(),
         getContactName(),
         getContactPhoneNumber(),
         getContactJobTitle(),

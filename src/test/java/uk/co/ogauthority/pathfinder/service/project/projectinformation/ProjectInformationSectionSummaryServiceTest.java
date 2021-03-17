@@ -94,7 +94,6 @@ public class ProjectInformationSectionSummaryServiceTest {
         "projectInformationDiffModel",
         "isDevelopmentFieldStage",
         "isDiscoveryFieldStage",
-        "isDecommissioningFieldStage",
         "isEnergyTransitionFieldStage"
     );
 

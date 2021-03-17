@@ -10,7 +10,6 @@ import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.model.form.validation.quarteryear.QuarterYearInputValidator;
@@ -71,24 +70,6 @@ public class ProjectInformationFormValidator implements SmartValidator {
             projectInformationValidationHint,
             errors
         );
-      } else if (BooleanUtils.isTrue(fieldStage.equals(FieldStage.DECOMMISSIONING))) {
-        ValidationUtil.invokeNestedValidator(
-            errors,
-            quarterYearInputValidator,
-            "decomWorkStartDate",
-            form.getDecomWorkStartDate(),
-            projectInformationValidationHint.getDecomWorkStartDateValidationHints()
-        );
-
-        if (hasProductionCessationDateBeenEntered(form.getProductionCessationDate())) {
-          ValidationUtil.invokeNestedValidator(
-              errors,
-              dateInputValidator,
-              "productionCessationDate",
-              form.getProductionCessationDate(),
-              projectInformationValidationHint.getProductionCessationDateValidationHints()
-          );
-        }
       } else if (BooleanUtils.isTrue(fieldStage.equals(FieldStage.ENERGY_TRANSITION))) {
         if (ValidationType.FULL.equals(projectInformationValidationHint.getValidationType())) {
           ValidationUtils.rejectIfEmptyOrWhitespace(
@@ -100,16 +81,6 @@ public class ProjectInformationFormValidator implements SmartValidator {
         }
       }
     }
-  }
-
-  private boolean hasProductionCessationDateBeenEntered(ThreeFieldDateInput productionCessationDate) {
-    return (
-        productionCessationDate != null
-            && (
-              productionCessationDate.getDay() != null
-              || productionCessationDate.getMonth() != null
-              || productionCessationDate.getYear() != null
-            ));
   }
 
   private void validateFirstProductionDate(String formTarget,

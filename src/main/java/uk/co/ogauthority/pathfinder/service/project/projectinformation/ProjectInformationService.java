@@ -14,7 +14,6 @@ import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.Proj
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationFormValidator;
@@ -79,23 +78,6 @@ public class ProjectInformationService implements ProjectFormSectionService {
 
   private void clearFirstProductionDate(ProjectInformationForm form) {
     form.setDiscoveryFirstProductionDate(null);
-  }
-
-  private void clearDecomWorkStartDate(ProjectInformation projectInformation) {
-    projectInformation.setDecomWorkStartDateYear(null);
-    projectInformation.setDecomWorkStartDateQuarter(null);
-  }
-
-  private void clearDecomWorkStartDate(ProjectInformationForm form) {
-    form.setDecomWorkStartDate(null);
-  }
-
-  private void clearProductionCessationDate(ProjectInformation projectInformation) {
-    projectInformation.setProductionCessationDate(null);
-  }
-
-  private void clearProductionCessationDate(ProjectInformationForm form) {
-    form.setProductionCessationDate(null);
   }
 
   private void clearEnergyTransitionCategory(ProjectInformation projectInformation) {
@@ -168,8 +150,6 @@ public class ProjectInformationService implements ProjectFormSectionService {
     if (fieldStage == null || !FIELD_STAGES_WITH_HIDDEN_INPUTS.contains(fieldStage)) {
       // These inputs are hidden if field stage is not discovery, development or decommissioning
       clearFirstProductionDate(projectInformation);
-      clearDecomWorkStartDate(projectInformation);
-      clearProductionCessationDate(projectInformation);
       clearEnergyTransitionCategory(projectInformation);
     } else if (fieldStage.equals(FieldStage.DISCOVERY)) {
 
@@ -181,8 +161,6 @@ public class ProjectInformationService implements ProjectFormSectionService {
           });
 
       // These inputs are hidden if discovery field stage
-      clearDecomWorkStartDate(projectInformation);
-      clearProductionCessationDate(projectInformation);
       clearEnergyTransitionCategory(projectInformation);
 
     } else if (fieldStage.equals(FieldStage.DEVELOPMENT)) {
@@ -194,22 +172,9 @@ public class ProjectInformationService implements ProjectFormSectionService {
           });
 
       // These inputs are hidden if development field stage
-      clearDecomWorkStartDate(projectInformation);
-      clearProductionCessationDate(projectInformation);
       clearEnergyTransitionCategory(projectInformation);
 
     } else if (fieldStage.equals(FieldStage.DECOMMISSIONING)) {
-
-      form.getDecomWorkStartDate()
-          .create()
-          .ifPresent(quarterYearInput -> {
-            projectInformation.setDecomWorkStartDateQuarter(quarterYearInput.getQuarter());
-            projectInformation.setDecomWorkStartDateYear(Integer.parseInt(quarterYearInput.getYear()));
-          });
-
-      var productionCessationDate = form.getProductionCessationDate();
-      projectInformation.setProductionCessationDate(productionCessationDate.createDateOrNull());
-
       // These inputs are hidden if decommissioning field stage
       clearFirstProductionDate(projectInformation);
       clearEnergyTransitionCategory(projectInformation);
@@ -219,8 +184,6 @@ public class ProjectInformationService implements ProjectFormSectionService {
 
       // These inputs are hidden if energy transition field stage
       clearFirstProductionDate(projectInformation);
-      clearDecomWorkStartDate(projectInformation);
-      clearProductionCessationDate(projectInformation);
     }
   }
 
@@ -230,35 +193,20 @@ public class ProjectInformationService implements ProjectFormSectionService {
 
     if (fieldStage == null || !FIELD_STAGES_WITH_HIDDEN_INPUTS.contains(fieldStage)) {
       clearFirstProductionDate(form);
-      clearDecomWorkStartDate(form);
-      clearProductionCessationDate(form);
       clearEnergyTransitionCategory(form);
     } else if (fieldStage.equals(FieldStage.DISCOVERY)) {
       form.setDiscoveryFirstProductionDate(getFirstProductionDate(projectInformation));
-      clearDecomWorkStartDate(form);
-      clearProductionCessationDate(form);
       clearEnergyTransitionCategory(form);
     } else if (fieldStage.equals(FieldStage.DEVELOPMENT)) {
       form.setDevelopmentFirstProductionDate(getFirstProductionDate(projectInformation));
-      clearDecomWorkStartDate(form);
-      clearProductionCessationDate(form);
       clearEnergyTransitionCategory(form);
     } else if (fieldStage.equals(FieldStage.DECOMMISSIONING)) {
-      var decomWorkStartDate = new QuarterYearInput();
-      decomWorkStartDate.setQuarter(projectInformation.getDecomWorkStartDateQuarter());
-      decomWorkStartDate.setYear(projectInformation.getDecomWorkStartDateYear());
-      form.setDecomWorkStartDate(decomWorkStartDate);
-
-      form.setProductionCessationDate(new ThreeFieldDateInput(projectInformation.getProductionCessationDate()));
-
       clearFirstProductionDate(form);
       clearEnergyTransitionCategory(form);
     } else if (fieldStage.equals(FieldStage.ENERGY_TRANSITION)) {
       form.setEnergyTransitionCategory(projectInformation.getEnergyTransitionCategory());
 
       clearFirstProductionDate(form);
-      clearDecomWorkStartDate(form);
-      clearProductionCessationDate(form);
     }
   }
 

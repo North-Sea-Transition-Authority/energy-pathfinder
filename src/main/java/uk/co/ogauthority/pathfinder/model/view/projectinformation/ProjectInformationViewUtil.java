@@ -33,8 +33,6 @@ public class ProjectInformationViewUtil {
         setDevelopmentFields(projectInformationView, projectInformation);
       } else if (fieldStage.equals(FieldStage.DISCOVERY)) {
         setDiscoveryFields(projectInformationView, projectInformation);
-      } else if (fieldStage.equals(FieldStage.DECOMMISSIONING)) {
-        setDecommissioningFields(projectInformationView, projectInformation);
       } else if (fieldStage.equals(FieldStage.ENERGY_TRANSITION)) {
         setEnergyTransitionFields(projectInformationView, projectInformation);
       }
@@ -51,19 +49,6 @@ public class ProjectInformationViewUtil {
   private static void setDiscoveryFields(ProjectInformationView projectInformationView,
                                          ProjectInformation projectInformation) {
     projectInformationView.setDiscoveryFirstProductionDate(getFirstProductionDate(projectInformation));
-  }
-
-  private static void setDecommissioningFields(ProjectInformationView projectInformationView,
-                                               ProjectInformation projectInformation) {
-
-    final var workStartDate = DateUtil.getDateFromQuarterYear(
-        projectInformation.getDecomWorkStartDateQuarter(),
-        projectInformation.getDecomWorkStartDateYear()
-    );
-    projectInformationView.setDecomWorkStartDate(workStartDate);
-
-    final var productionCessationDate = DateUtil.formatDate(projectInformation.getProductionCessationDate());
-    projectInformationView.setDecomProductionCessationDate(productionCessationDate);
   }
 
   private static void setEnergyTransitionFields(ProjectInformationView projectInformationView,

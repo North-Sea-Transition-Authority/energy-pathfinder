@@ -4,8 +4,6 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
-import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 
@@ -49,8 +47,6 @@ public class ProjectInformationUtil {
     form.setContactDetail(contactDetailForm);
     form.setDevelopmentFirstProductionDate(new QuarterYearInput(null, null));
     form.setDiscoveryFirstProductionDate(new QuarterYearInput(null, null));
-    form.setDecomWorkStartDate(new QuarterYearInput(Quarter.Q1, "2020"));
-    form.setProductionCessationDate(new ThreeFieldDateInput(2020, 1, 1));
     form.setEnergyTransitionCategory(ENERGY_TRANSITION_CATEGORY);
 
     return form;

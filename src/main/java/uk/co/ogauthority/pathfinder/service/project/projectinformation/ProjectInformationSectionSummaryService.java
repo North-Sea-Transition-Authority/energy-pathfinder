@@ -56,7 +56,6 @@ public class ProjectInformationSectionSummaryService implements ProjectSectionSu
     final var fieldStage = projectInformationView.getFieldStage();
     summaryModel.put("isDevelopmentFieldStage", FieldStage.DEVELOPMENT.getDisplayName().equals(fieldStage));
     summaryModel.put("isDiscoveryFieldStage", FieldStage.DISCOVERY.getDisplayName().equals(fieldStage));
-    summaryModel.put("isDecommissioningFieldStage", FieldStage.DECOMMISSIONING.getDisplayName().equals(fieldStage));
     summaryModel.put("isEnergyTransitionFieldStage", FieldStage.ENERGY_TRANSITION.getDisplayName().equals(fieldStage));
 
     return new ProjectSectionSummary(

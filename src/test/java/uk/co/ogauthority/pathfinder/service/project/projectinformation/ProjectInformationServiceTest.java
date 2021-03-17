@@ -17,13 +17,13 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
+import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
-import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationFormValidator;
@@ -112,8 +112,6 @@ public class ProjectInformationServiceTest {
 
     // the following should not be persisted
     form.setDevelopmentFirstProductionDate(notPersistedQuarterYearInput);
-    form.setDecomWorkStartDate(notPersistedQuarterYearInput);
-    form.setProductionCessationDate(new ThreeFieldDateInput(LocalDate.now()));
     form.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
 
     when(projectInformationRepository.findByProjectDetail(details))
@@ -124,9 +122,6 @@ public class ProjectInformationServiceTest {
     assertThat(projectInformation.getFieldStage()).isEqualTo(FieldStage.DISCOVERY);
     assertThat(projectInformation.getFirstProductionDateQuarter()).isEqualTo(persistedQuarterYearInput.getQuarter());
     assertThat(projectInformation.getFirstProductionDateYear()).isEqualTo(Integer.parseInt(persistedQuarterYearInput.getYear()));
-    assertThat(projectInformation.getDecomWorkStartDateQuarter()).isNull();
-    assertThat(projectInformation.getDecomWorkStartDateYear()).isNull();
-    assertThat(projectInformation.getProductionCessationDate()).isNull();
     assertThat(projectInformation.getEnergyTransitionCategory()).isNull();
   }
 
@@ -142,8 +137,6 @@ public class ProjectInformationServiceTest {
 
     // the following should not be persisted
     form.setDiscoveryFirstProductionDate(notPersistedQuarterYearInput);
-    form.setDecomWorkStartDate(notPersistedQuarterYearInput);
-    form.setProductionCessationDate(new ThreeFieldDateInput(LocalDate.now()));
     form.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
 
     when(projectInformationRepository.findByProjectDetail(details))
@@ -154,41 +147,6 @@ public class ProjectInformationServiceTest {
     assertThat(projectInformation.getFieldStage()).isEqualTo(FieldStage.DEVELOPMENT);
     assertThat(projectInformation.getFirstProductionDateQuarter()).isEqualTo(persistedQuarterYearInput.getQuarter());
     assertThat(projectInformation.getFirstProductionDateYear()).isEqualTo(Integer.parseInt(persistedQuarterYearInput.getYear()));
-    assertThat(projectInformation.getDecomWorkStartDateQuarter()).isNull();
-    assertThat(projectInformation.getDecomWorkStartDateYear()).isNull();
-    assertThat(projectInformation.getProductionCessationDate()).isNull();
-    assertThat(projectInformation.getEnergyTransitionCategory()).isNull();
-  }
-
-  @Test
-  public void createOrUpdate_whenDecommissioningFieldStage_thenHiddenFieldsSaved() {
-
-    var form = ProjectInformationUtil.getCompleteForm();
-    form.setFieldStage(FieldStage.DECOMMISSIONING);
-
-    var persistedQuarterYearInput = new QuarterYearInput(Quarter.Q1, "2020");
-    var notPersistedQuarterYearInput = new QuarterYearInput(Quarter.Q2, "2021");
-    var persistedThreeFieldDateInput = new ThreeFieldDateInput(LocalDate.now());
-
-    form.setDecomWorkStartDate(persistedQuarterYearInput);
-    form.setProductionCessationDate(persistedThreeFieldDateInput);
-
-    // the following should not be persisted
-    form.setDiscoveryFirstProductionDate(notPersistedQuarterYearInput);
-    form.setDevelopmentFirstProductionDate(notPersistedQuarterYearInput);
-    form.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
-
-    when(projectInformationRepository.findByProjectDetail(details))
-        .thenReturn(Optional.of(ProjectInformationUtil.getProjectInformation_withCompleteDetails(details)));
-
-    projectInformation = projectInformationService.createOrUpdate(details, form);
-
-    assertThat(projectInformation.getFieldStage()).isEqualTo(FieldStage.DECOMMISSIONING);
-    assertThat(projectInformation.getDecomWorkStartDateQuarter()).isEqualTo(persistedQuarterYearInput.getQuarter());
-    assertThat(projectInformation.getDecomWorkStartDateYear()).isEqualTo(Integer.parseInt(persistedQuarterYearInput.getYear()));
-    assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
-    assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
-    assertThat(projectInformation.getProductionCessationDate()).isEqualTo(persistedThreeFieldDateInput.createDateOrNull());
     assertThat(projectInformation.getEnergyTransitionCategory()).isNull();
   }
 
@@ -206,8 +164,6 @@ public class ProjectInformationServiceTest {
     // the following should not be persisted
     form.setDiscoveryFirstProductionDate(notPersistedQuarterYearInput);
     form.setDevelopmentFirstProductionDate(notPersistedQuarterYearInput);
-    form.setDecomWorkStartDate(notPersistedQuarterYearInput);
-    form.setProductionCessationDate(notPersistedThreeFieldDateInput);
 
     when(projectInformationRepository.findByProjectDetail(details))
         .thenReturn(Optional.of(ProjectInformationUtil.getProjectInformation_withCompleteDetails(details)));
@@ -215,11 +171,8 @@ public class ProjectInformationServiceTest {
     projectInformation = projectInformationService.createOrUpdate(details, form);
 
     assertThat(projectInformation.getFieldStage()).isEqualTo(FieldStage.ENERGY_TRANSITION);
-    assertThat(projectInformation.getDecomWorkStartDateQuarter()).isNull();
-    assertThat(projectInformation.getDecomWorkStartDateYear()).isNull();
     assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
     assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
-    assertThat(projectInformation.getProductionCessationDate()).isNull();
     assertThat(projectInformation.getEnergyTransitionCategory()).isEqualTo(EnergyTransitionCategory.HYDROGEN);
   }
 
@@ -230,13 +183,10 @@ public class ProjectInformationServiceTest {
     form.setFieldStage(null);
 
     var notPersistedQuarterYearInput = new QuarterYearInput(Quarter.Q2, "2021");
-    var notPersistedThreeFieldDateInput = new ThreeFieldDateInput(LocalDate.now());
 
     // the following should not be persisted
     form.setDiscoveryFirstProductionDate(notPersistedQuarterYearInput);
     form.setDevelopmentFirstProductionDate(notPersistedQuarterYearInput);
-    form.setDecomWorkStartDate(notPersistedQuarterYearInput);
-    form.setProductionCessationDate(notPersistedThreeFieldDateInput);
     form.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
 
     when(projectInformationRepository.findByProjectDetail(details))
@@ -245,11 +195,8 @@ public class ProjectInformationServiceTest {
     projectInformation = projectInformationService.createOrUpdate(details, form);
 
     assertThat(projectInformation.getFieldStage()).isNull();
-    assertThat(projectInformation.getDecomWorkStartDateQuarter()).isNull();
-    assertThat(projectInformation.getDecomWorkStartDateYear()).isNull();
     assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
     assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
-    assertThat(projectInformation.getProductionCessationDate()).isNull();
     assertThat(projectInformation.getEnergyTransitionCategory()).isNull();
   }
 
@@ -346,9 +293,6 @@ public class ProjectInformationServiceTest {
 
     // The following should not be populated to the forms
     var invalidPersistedDecomWorkStartDate = new QuarterYearInput(Quarter.Q2, "2021");
-    projectInformation.setDecomWorkStartDateQuarter(invalidPersistedDecomWorkStartDate.getQuarter());
-    projectInformation.setDecomWorkStartDateYear(Integer.parseInt(invalidPersistedDecomWorkStartDate.getYear()));
-    projectInformation.setProductionCessationDate(LocalDate.now());
     projectInformation.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
 
     when(projectInformationRepository.findByProjectDetail(details))
@@ -360,8 +304,6 @@ public class ProjectInformationServiceTest {
     assertThat(form.getDiscoveryFirstProductionDate()).isEqualTo(persistedFirstProductionDate);
 
     assertThat(form.getDevelopmentFirstProductionDate()).isNull();
-    assertThat(form.getDecomWorkStartDate()).isNull();
-    assertThat(form.getProductionCessationDate()).isNull();
     assertThat(form.getEnergyTransitionCategory()).isNull();
   }
 
@@ -376,10 +318,6 @@ public class ProjectInformationServiceTest {
     projectInformation.setFirstProductionDateYear(Integer.parseInt(persistedFirstProductionDate.getYear()));
 
     // The following should not be populated to the forms
-    var invalidPersistedDecomWorkStartDate = new QuarterYearInput(Quarter.Q2, "2021");
-    projectInformation.setDecomWorkStartDateQuarter(invalidPersistedDecomWorkStartDate.getQuarter());
-    projectInformation.setDecomWorkStartDateYear(Integer.parseInt(invalidPersistedDecomWorkStartDate.getYear()));
-    projectInformation.setProductionCessationDate(LocalDate.now());
     projectInformation.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
 
     when(projectInformationRepository.findByProjectDetail(details))
@@ -390,41 +328,6 @@ public class ProjectInformationServiceTest {
     assertThat(form.getFieldStage()).isEqualTo(FieldStage.DEVELOPMENT);
     assertThat(form.getDevelopmentFirstProductionDate()).isEqualTo(persistedFirstProductionDate);
 
-    assertThat(form.getDiscoveryFirstProductionDate()).isNull();
-    assertThat(form.getDecomWorkStartDate()).isNull();
-    assertThat(form.getProductionCessationDate()).isNull();
-    assertThat(form.getEnergyTransitionCategory()).isNull();
-  }
-
-  @Test
-  public void getForm_whenDecommissioningFieldStage_thenHiddenFieldsPopulated() {
-
-    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
-    projectInformation.setFieldStage(FieldStage.DECOMMISSIONING);
-
-    var persistedDecomWorkStartDate = new QuarterYearInput(Quarter.Q1, "2020");
-    projectInformation.setDecomWorkStartDateQuarter(persistedDecomWorkStartDate.getQuarter());
-    projectInformation.setDecomWorkStartDateYear(Integer.parseInt(persistedDecomWorkStartDate.getYear()));
-
-    var persistedProductionCessationDate = LocalDate.now();
-    projectInformation.setProductionCessationDate(persistedProductionCessationDate);
-
-    // The following should not be populated to the forms
-    var invalidPersistedFirstProductionDate = new QuarterYearInput(Quarter.Q2, "2021");
-    projectInformation.setFirstProductionDateQuarter(invalidPersistedFirstProductionDate.getQuarter());
-    projectInformation.setFirstProductionDateYear(Integer.parseInt(invalidPersistedFirstProductionDate.getYear()));
-    projectInformation.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
-
-    when(projectInformationRepository.findByProjectDetail(details))
-        .thenReturn(Optional.of(projectInformation));
-
-    ProjectInformationForm form = projectInformationService.getForm(details);
-
-    assertThat(form.getFieldStage()).isEqualTo(FieldStage.DECOMMISSIONING);
-    assertThat(form.getDecomWorkStartDate()).isEqualTo(persistedDecomWorkStartDate);
-    assertThat(form.getProductionCessationDate()).isEqualTo(new ThreeFieldDateInput(persistedProductionCessationDate));
-
-    assertThat(form.getDevelopmentFirstProductionDate()).isNull();
     assertThat(form.getDiscoveryFirstProductionDate()).isNull();
     assertThat(form.getEnergyTransitionCategory()).isNull();
   }
@@ -438,13 +341,6 @@ public class ProjectInformationServiceTest {
     projectInformation.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
 
     // The following should not be populated to the forms
-    var invalidPersistedDecomWorkStartDate = new QuarterYearInput(Quarter.Q1, "2020");
-    projectInformation.setDecomWorkStartDateQuarter(invalidPersistedDecomWorkStartDate.getQuarter());
-    projectInformation.setDecomWorkStartDateYear(Integer.parseInt(invalidPersistedDecomWorkStartDate.getYear()));
-
-    var invalidPersistedProductionCessationDate = LocalDate.now();
-    projectInformation.setProductionCessationDate(invalidPersistedProductionCessationDate);
-
     var invalidPersistedFirstProductionDate = new QuarterYearInput(Quarter.Q2, "2021");
     projectInformation.setFirstProductionDateQuarter(invalidPersistedFirstProductionDate.getQuarter());
     projectInformation.setFirstProductionDateYear(Integer.parseInt(invalidPersistedFirstProductionDate.getYear()));
@@ -457,8 +353,6 @@ public class ProjectInformationServiceTest {
     assertThat(form.getFieldStage()).isEqualTo(FieldStage.ENERGY_TRANSITION);
     assertThat(form.getEnergyTransitionCategory()).isEqualTo(EnergyTransitionCategory.HYDROGEN);
 
-    assertThat(form.getDecomWorkStartDate()).isNull();
-    assertThat(form.getProductionCessationDate()).isNull();
     assertThat(form.getDevelopmentFirstProductionDate()).isNull();
     assertThat(form.getDiscoveryFirstProductionDate()).isNull();
   }
@@ -472,13 +366,6 @@ public class ProjectInformationServiceTest {
     // The following should not be populated to the forms
     projectInformation.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
 
-    var invalidPersistedDecomWorkStartDate = new QuarterYearInput(Quarter.Q1, "2020");
-    projectInformation.setDecomWorkStartDateQuarter(invalidPersistedDecomWorkStartDate.getQuarter());
-    projectInformation.setDecomWorkStartDateYear(Integer.parseInt(invalidPersistedDecomWorkStartDate.getYear()));
-
-    var invalidPersistedProductionCessationDate = LocalDate.now();
-    projectInformation.setProductionCessationDate(invalidPersistedProductionCessationDate);
-
     var invalidPersistedFirstProductionDate = new QuarterYearInput(Quarter.Q2, "2021");
     projectInformation.setFirstProductionDateQuarter(invalidPersistedFirstProductionDate.getQuarter());
     projectInformation.setFirstProductionDateYear(Integer.parseInt(invalidPersistedFirstProductionDate.getYear()));
@@ -489,8 +376,6 @@ public class ProjectInformationServiceTest {
     ProjectInformationForm form = projectInformationService.getForm(details);
 
     assertThat(form.getFieldStage()).isNull();
-    assertThat(form.getDecomWorkStartDate()).isNull();
-    assertThat(form.getProductionCessationDate()).isNull();
     assertThat(form.getDevelopmentFirstProductionDate()).isNull();
     assertThat(form.getDiscoveryFirstProductionDate()).isNull();
     assertThat(form.getEnergyTransitionCategory()).isNull();
