@@ -2205,4 +2205,195 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
   END migrate_unmapped_project_data;
 
+  /**
+    @return a UUID for a subscriber
+   */
+  FUNCTION generate_subscriber_uuid
+  RETURN ${datasource.user}.subscribers.uuid%TYPE
+  IS
+
+    l_uuid ${datasource.user}.subscribers.uuid%TYPE;
+
+  BEGIN
+
+    SELECT LOWER(
+      REGEXP_REPLACE(
+        RAWTOHEX(SYS_GUID())
+      , '([A-F0-9]{8})([A-F0-9]{4})([A-F0-9]{4})([A-F0-9]{4})([A-F0-9]{12})', '\1-\2-\3-\4-\5'
+      )
+    )
+    INTO l_uuid
+    FROM dual;
+
+    RETURN l_uuid;
+
+  END generate_subscriber_uuid;
+
+  /**
+    Logging procedure to log subscriber migration status
+    @param p_legacy_resource_person_id the resource person id for the legacy subscriber
+    @param p_migration_status the status of the subscriber migration
+    @param p_system_message the message to append to the log
+    @param p_new_subscriber_id the id of the subscriber in the new model
+   */
+  PROCEDURE log_subscriber_migration(
+    p_legacy_resource_person_id IN ${datasource.migration-user}.subscriber_migration_log.legacy_resource_person_id%TYPE
+  , p_migration_status IN ${datasource.migration-user}.subscriber_migration_log.migration_status%TYPE DEFAULT NULL
+  , p_system_message IN ${datasource.migration-user}.subscriber_migration_log.system_message%TYPE
+  , p_new_subscriber_id IN ${datasource.migration-user}.subscriber_migration_log.new_subscriber_id%TYPE DEFAULT NULL
+  )
+  IS
+
+    PRAGMA AUTONOMOUS_TRANSACTION;
+
+  BEGIN
+
+    UPDATE ${datasource.migration-user}.subscriber_migration_log sml
+    SET
+      sml.migration_status = COALESCE(p_migration_status, sml.migration_status)
+    , sml.system_message = sml.system_message || CHR(10) || TO_CHAR(SYSTIMESTAMP) || ': ' || p_system_message || CHR(10)
+    , sml.new_subscriber_id = COALESCE(p_new_subscriber_id, sml.new_subscriber_id)
+    WHERE sml.legacy_resource_person_id = p_legacy_resource_person_id;
+
+    COMMIT;
+
+  END log_subscriber_migration;
+
+  /**
+    Procedure to migrate a single subscriber from the legacy service model to the new service model
+    @param p_resource_person_id the resource person id for the legacy subscriber
+    @param p_forename the forename of the legacy subscriber
+    @parma p_surname the surname of the legacy subscriber
+    @param p_email_address the email address of the legacy subscriber
+   */
+  PROCEDURE migrate_subscriber(
+    p_resource_person_id IN ${datasource.migration-user}.legacy_subscribers.resource_person_id%TYPE
+  , p_forename IN ${datasource.migration-user}.legacy_subscribers.forename%TYPE
+  , p_surname IN ${datasource.migration-user}.legacy_subscribers.surname%TYPE
+  , p_email_address IN ${datasource.migration-user}.legacy_subscribers.email_address%TYPE
+  )
+  IS
+
+    K_RELATION_TO_PATHFINDER CONSTANT ${datasource.user}.subscribers.relation_to_pathfinder%TYPE := 'OTHER';
+    K_SUBSCRIBE_REASON CONSTANT ${datasource.user}.subscribers.subscribe_reason%TYPE := 'Subscriber migrated from legacy pathfinder service';
+
+    l_subscriber_uuid ${datasource.user}.subscribers.uuid%TYPE;
+
+    l_new_subscriber_id ${datasource.user}.subscribers.id%TYPE;
+
+  BEGIN
+
+    log_subscriber_migration(
+      p_legacy_resource_person_id => p_resource_person_id
+    , p_migration_status => K_PROCESSING_MIGRATION_STATUS
+    , p_system_message => 'Starting migration of subscriber with p_resource_person_id ' || p_resource_person_id
+    );
+
+    SAVEPOINT sp_before_subscriber_migration;
+
+    l_subscriber_uuid := generate_subscriber_uuid();
+
+    INSERT INTO ${datasource.user}.subscribers(
+      uuid
+    , forename
+    , surname
+    , email_address
+    , relation_to_pathfinder
+    , subscribe_reason
+    , subscribed_datetime
+    )
+    VALUES(
+      l_subscriber_uuid
+    , p_forename
+    , p_surname
+    , p_email_address
+    , K_RELATION_TO_PATHFINDER
+    , K_SUBSCRIBE_REASON
+    , SYSTIMESTAMP
+    )
+    RETURNING id INTO l_new_subscriber_id;
+
+    log_subscriber_migration(
+      p_legacy_resource_person_id => p_resource_person_id
+    , p_migration_status => K_COMPLETE_MIGRATION_STATUS
+    , p_system_message => 'Completed migration of subscriber with p_resource_person_id ' || p_resource_person_id
+    , p_new_subscriber_id => l_new_subscriber_id
+    );
+
+    COMMIT;
+
+  EXCEPTION WHEN OTHERS THEN
+
+    ROLLBACK TO sp_before_subscriber_migration;
+
+    log_subscriber_migration(
+      p_legacy_resource_person_id => p_resource_person_id
+    , p_migration_status => K_ERROR_MIGRATION_STATUS
+    , p_system_message =>
+        'Error migrating legacy subscriber with ID ' || p_resource_person_id || '. '
+        || CHR(10) || 'Failed with error:' || CHR(10) || dbms_utility.format_error_stack() || CHR(10) || dbms_utility.format_error_backtrace()
+    );
+
+  END migrate_subscriber;
+
+  /**
+    Procedure to populate the log of subscribers to migrate. Each subscriber will have a status of pending.
+   */
+  PROCEDURE populate_subscriber_log
+  IS
+  BEGIN
+
+    INSERT INTO ${datasource.migration-user}.subscriber_migration_log(
+      legacy_resource_person_id
+    , migration_status
+    , system_message
+    )
+    SELECT
+      ls.resource_person_id
+    , K_PENDING_MIGRATION_STATUS
+    , EMPTY_CLOB()
+    FROM ${datasource.migration-user}.legacy_subscribers ls
+    -- Safety check to not populate with duplicate subscribers
+    WHERE ls.resource_person_id NOT IN (
+      SELECT sml.legacy_resource_person_id
+      FROM ${datasource.migration-user}.subscriber_migration_log sml
+    );
+
+    COMMIT;
+
+  END populate_subscriber_log;
+
+  /**
+    Procedure to migrate all legacy subscribers to the new model
+   */
+  PROCEDURE migrate_subscriber_data
+  IS
+
+  BEGIN
+
+    populate_subscriber_log();
+
+    FOR legacy_subscriber IN (
+      SELECT
+        ls.resource_person_id
+      , ls.forename
+      , ls.surname
+      , ls.email_address
+      FROM ${datasource.migration-user}.legacy_subscribers ls
+      JOIN ${datasource.migration-user}.subscriber_migration_log sml ON sml.legacy_resource_person_id = ls.resource_person_id
+      WHERE sml.migration_status = K_PENDING_MIGRATION_STATUS
+    )
+    LOOP
+
+      migrate_subscriber(
+        p_resource_person_id => legacy_subscriber.resource_person_id
+      , p_forename => legacy_subscriber.forename
+      , p_surname => legacy_subscriber.surname
+      , p_email_address => legacy_subscriber.email_address
+      );
+
+    END LOOP;
+
+  END migrate_subscriber_data;
+
 END migration;

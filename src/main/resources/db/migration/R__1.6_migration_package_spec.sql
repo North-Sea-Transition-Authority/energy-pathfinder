@@ -43,4 +43,9 @@ CREATE OR REPLACE PACKAGE ${datasource.migration-user}.migration AS
    */
   PROCEDURE migrate_unmapped_project_data;
 
+  /**
+    Procedure to migrate the legacy subscribers into the new data model
+   */
+  PROCEDURE migrate_subscriber_data;
+
 END migration;

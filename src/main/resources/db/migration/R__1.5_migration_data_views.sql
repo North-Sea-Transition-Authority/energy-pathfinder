@@ -127,3 +127,16 @@ CREATE OR REPLACE VIEW ${datasource.migration-user}.unmapped_legacy_comments AS 
     , comment_type VARCHAR2(4000) PATH 'ancestor-or-self::COMMENT_LIST/../name()'
   ) xt
 );
+
+
+CREATE OR REPLACE FORCE VIEW ${datasource.migration-user}.legacy_subscribers AS (
+  SELECT
+    nr.resource_person_id
+  , xrph.forename
+  , xrph.surname
+  , xrph.portal_email_address email_address
+  FROM decmgr.newsletter_recipients nr
+  JOIN decmgr.xview_resource_people_history xrph ON xrph.rp_id = nr.resource_person_id AND xrph.status_control = 'C'
+  WHERE nr.newsletter_type = 'PATHFINDER'
+  AND nr.status = 'SUBSCRIBED'
+);
