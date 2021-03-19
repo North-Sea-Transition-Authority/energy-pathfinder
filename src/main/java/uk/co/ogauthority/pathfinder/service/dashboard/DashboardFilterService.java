@@ -38,6 +38,7 @@ public class DashboardFilterService {
 
     return dashboardItems.stream().filter(compositePredicate)
         .sorted(Comparator.comparing(DashboardProjectItem::getSortKey).reversed())
+        .sorted(Comparator.comparing(DashboardProjectItem::getUpdateSortKey).reversed())
         .collect(Collectors.toList());
   }
 

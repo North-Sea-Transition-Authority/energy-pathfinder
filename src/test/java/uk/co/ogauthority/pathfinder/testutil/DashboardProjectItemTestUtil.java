@@ -20,6 +20,7 @@ public class DashboardProjectItemTestUtil {
   public static final UkcsArea UKCS_AREA = UkcsArea.WOS;
   public static final PortalOrganisationGroup ORGANISATION_GROUP = ProjectOperatorTestUtil.ORG_GROUP;
   public static final Instant SORT_KEY = Instant.now();
+  public static final Instant UPDATE_SORT_KEY = Instant.now();
 
   public static DashboardProjectItem getDashboardProjectItem() {
     return getDashboardProjectItem(PROJECT_TITLE, FIELD_STAGE, FIELD_NAME, UKCS_AREA, PROJECT_STATUS, ORGANISATION_GROUP);
@@ -69,6 +70,7 @@ public class DashboardProjectItemTestUtil {
     dashboardProjectItem.setUkcsArea(ukcsArea);
     dashboardProjectItem.setOrganisationGroup(organisationGroup);
     dashboardProjectItem.setSortKey(SORT_KEY);
+    dashboardProjectItem.setUpdateSortKey(UPDATE_SORT_KEY);
 
     return dashboardProjectItem;
   }

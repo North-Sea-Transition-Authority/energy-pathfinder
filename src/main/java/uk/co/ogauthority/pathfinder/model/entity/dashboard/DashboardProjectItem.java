@@ -48,6 +48,8 @@ public class DashboardProjectItem {
 
   private Instant sortKey;
 
+  private Instant updateSortKey;
+
   public Integer getProjectId() {
     return projectId;
   }
@@ -155,5 +157,13 @@ public class DashboardProjectItem {
 
   public void setSortKey(Instant sortKey) {
     this.sortKey = sortKey;
+  }
+
+  public Instant getUpdateSortKey() {
+    return updateSortKey;
+  }
+
+  public void setUpdateSortKey(Instant updateSortKey) {
+    this.updateSortKey = updateSortKey;
   }
 }

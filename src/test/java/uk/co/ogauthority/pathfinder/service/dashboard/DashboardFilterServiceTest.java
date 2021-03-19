@@ -283,4 +283,21 @@ public class DashboardFilterServiceTest {
     var results = dashboardFilterService.filter(List.of(thirdDashboardItem, secondDashboardItem, firstDashboardItem), filter);
     assertThat(results).containsExactly(firstDashboardItem, secondDashboardItem, thirdDashboardItem);
   }
+
+
+  @Test
+  public void filter_orderedCorrectly_updateSortKeySet() {
+    var firstDashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    var secondDashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    var thirdDashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+
+    //A more recent submitted project is prioritised lower than the project with the update sort key set
+    //A project with an equal sort key is prioritised lower than the project with the update sort key set
+    firstDashboardItem.setUpdateSortKey(Instant.now().plus(1, ChronoUnit.DAYS));
+    secondDashboardItem.setSortKey(Instant.now().plus(2, ChronoUnit.DAYS));
+    thirdDashboardItem.setSortKey(Instant.now().plus(1, ChronoUnit.DAYS));
+
+    var results = dashboardFilterService.filter(List.of(thirdDashboardItem, secondDashboardItem, firstDashboardItem), filter);
+    assertThat(results).containsExactly(firstDashboardItem, secondDashboardItem, thirdDashboardItem);
+  }
 }
