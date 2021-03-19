@@ -18,6 +18,7 @@ public enum TaskListSectionQuestion {
       ProjectTask.UPCOMING_TENDERS,
       "Do you have any upcoming tenders on this project?",
       "Upcoming tenders",
+      "",
       "form.upcomingTendersIncluded",
       TaskListSectionAnswer.UPCOMING_TENDERS_YES,
       TaskListSectionAnswer.UPCOMING_TENDERS_NO,
@@ -27,6 +28,7 @@ public enum TaskListSectionQuestion {
       ProjectTask.AWARDED_CONTRACTS,
       "Do you have any awarded contracts on this project?",
       "Awarded contracts",
+      "",
       "form.awardedContractsIncluded",
       TaskListSectionAnswer.AWARDED_CONTRACTS_YES,
       TaskListSectionAnswer.AWARDED_CONTRACTS_NO,
@@ -36,6 +38,7 @@ public enum TaskListSectionQuestion {
       ProjectTask.COLLABORATION_OPPORTUNITIES,
       "Do you have any collaboration opportunities on this project?",
       "Collaboration opportunities",
+      "This area is for operators to use when seeking engagement with the supply chain to offer solutions to aid project delivery",
       "form.collaborationOpportunitiesIncluded",
       TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_YES,
       TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_NO,
@@ -45,6 +48,7 @@ public enum TaskListSectionQuestion {
       ProjectTask.WELLS,
       "Are wells being decommissioned on this project?",
       "Wells to be decommissioned",
+      "",
       "form.wellsIncluded",
       TaskListSectionAnswer.WELLS_YES,
       TaskListSectionAnswer.WELLS_NO,
@@ -52,8 +56,10 @@ public enum TaskListSectionQuestion {
   ),
   PLATFORM_FPSO(
       ProjectTask.PLATFORM_FPSO,
-      "Are platforms or floating production storage and offloading units being decommissioned on this project?",
+      "Are platforms or FPSO type units being decommissioned on this project?",
       "Platforms or floating production storage and offloading units to be decommissioned",
+      "FPSO type units include Floating Production Storage and Offloading units (FPSO), " +
+          "Floating Production Facilities (FPF), Floating Storage Units (FSU)",
       "form.platformsFpsosIncluded",
       TaskListSectionAnswer.PLATFORM_FPSO_YES,
       TaskListSectionAnswer.PLATFORM_FPSO_NO,
@@ -61,8 +67,9 @@ public enum TaskListSectionQuestion {
   ),
   INTEGRATED_RIGS(
       ProjectTask.INTEGRATED_RIGS,
-      "Do you have any integrated rigs on this project?",
+      "Do any of the platforms on this project have an integrated (in-built/permanent) drilling rig?",
       "Integrated rigs to be decommissioned",
+      "",
       "form.integratedRigsIncluded",
       TaskListSectionAnswer.INTEGRATED_RIGS_YES,
       TaskListSectionAnswer.INTEGRATED_RIGS_NO,
@@ -72,6 +79,7 @@ public enum TaskListSectionQuestion {
       ProjectTask.SUBSEA_INFRASTRUCTURE,
       "Is subsea infrastructure being decommissioned on this project?",
       "Subsea infrastructure to be decommissioned",
+      "",
       "form.subseaInfrastructureIncluded",
       TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
       TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_NO,
@@ -82,6 +90,7 @@ public enum TaskListSectionQuestion {
   //     ProjectTask.PIPELINES,
   //     "Are pipelines being decommissioned on this project?",
   //     "Pipelines to be decommissioned",
+  //     "",
   //     "form.pipelinesIncluded",
   //     TaskListSectionAnswer.PIPELINES_YES,
   //     TaskListSectionAnswer.PIPELINES_NO,
@@ -91,6 +100,7 @@ public enum TaskListSectionQuestion {
   private final ProjectTask projectTask;
   private final String displayName;
   private final String prompt;
+  private final String guidance;
   private final String formField;
   private final TaskListSectionAnswer yesAnswer;
   private final TaskListSectionAnswer noAnswer;
@@ -99,6 +109,7 @@ public enum TaskListSectionQuestion {
   TaskListSectionQuestion(ProjectTask projectTask,
                           String displayName,
                           String prompt,
+                          String guidance,
                           String formField,
                           TaskListSectionAnswer yesAnswer,
                           TaskListSectionAnswer noAnswer,
@@ -106,6 +117,7 @@ public enum TaskListSectionQuestion {
     this.projectTask = projectTask;
     this.displayName = displayName;
     this.prompt = prompt;
+    this.guidance = guidance;
     this.formField = formField;
     this.yesAnswer = yesAnswer;
     this.noAnswer = noAnswer;
@@ -122,6 +134,10 @@ public enum TaskListSectionQuestion {
 
   public String getPrompt() {
     return prompt;
+  }
+
+  public String getGuidance() {
+    return guidance;
   }
 
   public String getFormField() {
