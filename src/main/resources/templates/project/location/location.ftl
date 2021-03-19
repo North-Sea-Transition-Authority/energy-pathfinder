@@ -39,16 +39,16 @@
       </@fdsRadio.radioYes>
       <@fdsRadio.radioNo path="form.approvedDecomProgram"/>
     </@fdsRadio.radioGroup>
+    <h2 class="govuk-heading-m">Licence blocks</h2>
     <@fdsAddToList.addToList
       path="form.licenceBlocks"
       alreadyAdded=alreadyAddedBlocks
-      title="Licence blocks"
       itemName="Licence block"
       noItemText="No licence blocks added"
       invalidItemText="This licence block is invalid"
       addToListId="licence-block-table"
-      selectorLabelText="Which licence blocks is this project located in?"
-      selectorHintText="For example 44/15"
+      selectorLabelText="Add a licence block"
+      selectorHintText="For example 44/15. You can add more than one block."
       restUrl=springUrl(blocksRestUrl)
     />
     <@fdsDetails.summaryDetails summaryTitle="Why is a block not allowed on my project?">
