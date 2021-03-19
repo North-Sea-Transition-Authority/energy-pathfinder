@@ -9,7 +9,7 @@ import uk.co.ogauthority.pathfinder.model.form.validation.minmaxdate.MinMaxDateI
 
 public final class PlugAbandonmentScheduleValidationHint {
 
-  public static final FormInputLabel PLUG_ABANDONMENT_DATE_LABEL = new FormInputLabel("plug and abandonment date");
+  public static final FormInputLabel PLUG_ABANDONMENT_DATE_LABEL = new FormInputLabel("well decommissioning date");
   public static final MinMaxYearLabelsHint PLUG_ABANDONMENT_YEAR_LABELS = new MinMaxYearLabelsHint("earliest", "latest");
   public static final MaxYearMustBeInFutureHint PLUG_ABANDONMENT_MAX_YEAR_HINT = new MaxYearMustBeInFutureHint(
       PLUG_ABANDONMENT_DATE_LABEL,

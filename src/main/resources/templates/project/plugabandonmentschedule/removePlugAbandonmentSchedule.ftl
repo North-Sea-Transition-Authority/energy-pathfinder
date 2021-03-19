@@ -3,7 +3,7 @@
 
 <@defaultPage
   htmlTitle=pageName
-  pageHeading="Are you sure you want to remove plug and abandonment schedule ${displayOrder}?"
+  pageHeading="Are you sure you want to remove well decommissioning schedule ${displayOrder}?"
   breadcrumbs=true
   twoThirdsColumn=true
 >

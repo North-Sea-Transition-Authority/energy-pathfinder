@@ -67,7 +67,7 @@
 >
   <@decomissioningPeriodCheckAnswers.decomissioningPeriodCheckAnswers
     useDiffedField=useDiffedField
-    prompt="Plug abandonment period"
+    prompt="Well decommissioning period"
     earliestYear=earliestStartYear
     latestYear=latestCompletionYear
   />

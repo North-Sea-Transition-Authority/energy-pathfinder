@@ -13,6 +13,6 @@
       />
     </#list>
   <#else>
-    <@emptySectionSummaryInset.emptySectionSummaryInset itemText="plug and abandonment schedules"/>
+    <@emptySectionSummaryInset.emptySectionSummaryInset itemText="well decommissioning schedules"/>
   </#if>
 </@sectionSummaryWrapper.sectionSummaryWrapper>
