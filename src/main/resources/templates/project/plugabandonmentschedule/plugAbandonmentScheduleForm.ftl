@@ -5,15 +5,16 @@
     <@minMaxDate.minMaxDateInput
       minFormPath="form.plugAbandonmentDate.minYear"
       maxFormPath="form.plugAbandonmentDate.maxYear"
-      labelText="Provide the period in which the plug and abandonment is expected to take place"
+      labelText="Provide the period in which the well decommissioning is expected to take place"
       altMinLabel="Earliest start year"
       altMaxLabel="Latest completion year"
       formId="plug-abandonment-date-min-max"
     />
+    <h2 class="govuk-heading-m">Wells</h2>
     <@fdsAddToList.addToList
       path="form.wells"
       alreadyAdded=alreadyAddedWells
-      title="Wells"
+      title=""
       itemName="Well"
       noItemText="No wells added"
       invalidItemText="This well is invalid"

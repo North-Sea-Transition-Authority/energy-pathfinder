@@ -21,7 +21,7 @@
     <@fileUpload.fileUploadWithFieldSet
       id="upcoming-tender-file-upload-id"
       path="form.uploadedFileWithDescriptionForms"
-      legendHeading="Tender document"
+      legendHeading="Supporting document"
       fieldsetHint="Optionally add a document to provide additional information for the supply chain"
       legendHeadingSize="h2"
       multipleFileUpload=false

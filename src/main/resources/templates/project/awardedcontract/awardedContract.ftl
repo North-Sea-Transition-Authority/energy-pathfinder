@@ -23,7 +23,7 @@
       path="form.contractBand"
       radioItems=contractBands
     />
-    <@contactDetails.standardContactDetails path="form.contactDetail" legendHeading="Contract contact details"/>
+    <@contactDetails.standardContactDetails path="form.contactDetail" legendHeading="Contractor contact details"/>
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
   </@fdsForm.htmlForm>
 </@defaultPage>

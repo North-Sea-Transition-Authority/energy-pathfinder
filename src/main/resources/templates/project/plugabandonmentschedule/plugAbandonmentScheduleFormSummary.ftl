@@ -14,7 +14,7 @@
       <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="wells to a well decommissioning schedule" linkUrl=springUrl(projectSetupUrl)/>
   </#if>
   <@fdsAction.link
-    linkText="Add plug and abandonment schedule"
+    linkText="Add well decommissioning schedule"
     linkUrl=springUrl(addPlugAbandonmentScheduleUrl)
     linkClass="govuk-button govuk-button--blue"
   />
