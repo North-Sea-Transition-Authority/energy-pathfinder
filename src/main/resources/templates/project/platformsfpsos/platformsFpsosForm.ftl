@@ -52,7 +52,7 @@
       formId="topsides-fpso-removal"
     />
 
-    <@fdsRadio.radioGroup path="form.substructureExpectedToBeRemoved" labelText="Is substructure removal expected to be within scope?”" hiddenContent=true>
+    <@fdsRadio.radioGroup path="form.substructureExpectedToBeRemoved" labelText="Is substructure removal expected to be within scope?" hiddenContent=true>
       <@fdsRadio.radioYes path="form.substructureExpectedToBeRemoved">
         <@fdsRadio.radio path="form.substructureRemovalPremise" nestingPath="form.substructureExpectedToBeRemoved" labelText="Substructure removal premise" radioItems=substructureRemovalPremiseMap/>
         <@fdsTextInput.textInput path="form.substructureRemovalMass" nestingPath="form.substructureExpectedToBeRemoved" labelText="Estimated substructure removal mass" suffix=mtUnit.plural suffixScreenReaderPrompt=mtUnit.screenReaderSuffix inputClass="govuk-input--width-4" />
