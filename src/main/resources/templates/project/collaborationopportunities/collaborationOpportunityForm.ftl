@@ -8,7 +8,7 @@
       labelText="Provide a detailed description of the work"
       hintText="If the work is urgent, select Yes to the urgent response question below and note the deadline for responses in the description of the work"
     />
-    <@fdsRadio.radioGroup path="form.urgentResponseNeeded" labelText="Is an urgent response required from the supply chain?">
+    <@fdsRadio.radioGroup path="form.urgentResponseNeeded" labelText="Does this collaboration opportunity need to be resolved in under 1 month?">
       <@fdsRadio.radioYes path="form.urgentResponseNeeded"/>
       <@fdsRadio.radioNo path="form.urgentResponseNeeded"/>
     </@fdsRadio.radioGroup>
@@ -16,7 +16,7 @@
     <@fileUpload.fileUploadWithFieldSet
       id="collaboration-opportunity-file-upload-id"
       path="form.uploadedFileWithDescriptionForms"
-      legendHeading="Opportunity document"
+      legendHeading="Supporting document"
       fieldsetHint="Optionally add a document to provide additional information for the supply chain"
       legendHeadingSize="h2"
       multipleFileUpload=false

@@ -10,10 +10,11 @@
       altMaxLabel="Latest completion year"
       formId="plug-abandonment-date-min-max"
     />
+    <h2 class="govuk-heading-m">Wells</h2>
     <@fdsAddToList.addToList
       path="form.wells"
       alreadyAdded=alreadyAddedWells
-      title="Wells"
+      title=""
       itemName="Well"
       noItemText="No wells added"
       invalidItemText="This well is invalid"
