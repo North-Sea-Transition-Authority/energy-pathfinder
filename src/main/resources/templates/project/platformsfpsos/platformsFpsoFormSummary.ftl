@@ -13,7 +13,7 @@
     </#list>
   <#else>
     <@setupProjectGuidance.minimumRequirementNotMetInset
-      itemRequiredText="platform or FPSO"
+      itemRequiredText="platforms or FPSOs"
       linkUrl=springUrl(projectSetupUrl)
     />
   </#if>

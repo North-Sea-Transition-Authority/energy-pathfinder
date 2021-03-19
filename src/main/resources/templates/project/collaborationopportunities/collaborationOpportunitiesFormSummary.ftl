@@ -11,7 +11,7 @@
       />
     </#list>
   <#else>
-    <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="collaboration opportunity" linkUrl=springUrl(projectSetupUrl)/>
+    <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="collaboration opportunities" linkUrl=springUrl(projectSetupUrl)/>
   </#if>
   <@fdsAction.link linkText="Add collaboration opportunity" linkUrl=springUrl(addCollaborationOpportunityUrl) linkClass="govuk-button govuk-button--blue"/>
   <@fdsForm.htmlForm>
