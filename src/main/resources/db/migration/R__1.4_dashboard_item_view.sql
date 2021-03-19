@@ -37,6 +37,7 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
       pd.project_id
     , rur.id update_request_id
     , rur.deadline_date
+    , rur.requested_datetime
     FROM project_data pd
     JOIN ${datasource.user}.regulator_update_requests rur ON rur.project_detail_id = pd.project_detail_id AND pd.is_latest_submitted_version = 1
     )
@@ -55,6 +56,14 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
         FROM regulator_requested_updates rru
         WHERE rru.project_id = pd.project_id
       ) update_deadline_date
+    , COALESCE(
+        (
+          SELECT COALESCE(rru.deadline_date, rru.requested_datetime)
+          FROM regulator_requested_updates rru
+          WHERE rru.project_id = pd.project_id
+        )
+      , TO_TIMESTAMP ('01-01-1900 00:00:00.000000', 'DD-MM-YYYY HH24:MI:SS.FF')
+      ) update_sort_key
     FROM project_data pd
   )
 );
