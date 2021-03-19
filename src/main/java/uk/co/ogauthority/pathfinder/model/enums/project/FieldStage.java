@@ -6,10 +6,9 @@ import java.util.Map;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
 public enum FieldStage {
-  DISCOVERY("Discovery", "Early phase before FDP approval"),
-  DEVELOPMENT("Development", "FDP has been approved"),
-  OPERATIONS("Operations", "Field now operational"),
-  DECOMMISSIONING("Decommissioning", "Decommissioning planning commenced either pre/post COP"),
+  DISCOVERY("Discovery", "Exploration phase"),
+  DEVELOPMENT("Development", "Industry engagement throughout project development cycle up to first oil"),
+  DECOMMISSIONING("Decommissioning", "Decommissioning planning commenced either pre/post Cessation of Production"),
   ENERGY_TRANSITION("Energy transition", "");
 
   private final String displayName;

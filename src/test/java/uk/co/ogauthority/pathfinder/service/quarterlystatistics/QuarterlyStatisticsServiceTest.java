@@ -79,7 +79,6 @@ public class QuarterlyStatisticsServiceTest {
     assertThat(getFieldStageStatistic(statistics, FieldStage.DEVELOPMENT).getTotalProjects()).isEqualTo(2);
     assertThat(getFieldStageStatistic(statistics, FieldStage.DECOMMISSIONING).getTotalProjects()).isEqualTo(1);
     assertThat(getFieldStageStatistic(statistics, FieldStage.DISCOVERY).getTotalProjects()).isZero();
-    assertThat(getFieldStageStatistic(statistics, FieldStage.OPERATIONS).getTotalProjects()).isZero();
     assertThat(getFieldStageStatistic(statistics, FieldStage.ENERGY_TRANSITION).getTotalProjects()).isZero();
   }
 

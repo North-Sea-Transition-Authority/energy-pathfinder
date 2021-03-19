@@ -135,7 +135,7 @@ public class ProjectInformationViewUtilTest {
   @Test
   public void from_whenFieldStageWithNoHiddenContent() {
 
-    final var fieldStage = FieldStage.OPERATIONS;
+    final var fieldStage = FieldStage.DECOMMISSIONING;
 
     projectInformation.setFieldStage(fieldStage);
 

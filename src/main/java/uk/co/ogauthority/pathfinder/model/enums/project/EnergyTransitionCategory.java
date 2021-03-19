@@ -9,7 +9,7 @@ public enum EnergyTransitionCategory {
   CARBON_CAPTURE_UTILISATION_AND_STORAGE("Carbon capture, utilisation and storage (CCUS)"),
   ELECTRIFICATION("Electrification"),
   HYDROGEN("Hydrogen"),
-  OFFSHORE_WIND("Offshore wind");
+  OFFSHORE_POWER_GENERATION("Offshore power generation");
 
   private final String displayName;
 

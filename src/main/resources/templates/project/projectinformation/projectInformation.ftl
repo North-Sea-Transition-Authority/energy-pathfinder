@@ -7,9 +7,16 @@
     <@fdsDetails.summaryDetails summaryTitle="What should I provide for the summary of the project?">
       <p class="govuk-body">Provide a description of the project and future plans and include the following where appropriate:</p>
       <ul class="govuk-list govuk-list--bullet">
-        <li>location in UKCS and type of structure, for example: steel platform, FPSO, Subsea manifold</li>
-        <li>current stage of project, for example: Pre-Feed, COP</li>
-        <li>timing/schedule for work, for example: dates for FID, FDP approval, COP, Decommissioning Programme approval</li>
+        <li>location in UKCS and high level scope/infrastructure summary</li>
+        <li>current stage of the project, for example: Pre-Feed, Cessation of Production</li>
+        <li>
+          current view of the timing/schedule for upcoming work, including key constraints, for example:
+          <ul class="govuk-list govuk-list--bullet">
+            <li>estimated year when the platform will go cold following well decommissioning</li>
+            <li>market engagement plan, for example when will tenders come to the market</li>
+          </ul>
+        </li>
+        <li>receptiveness to campaign/aggregation proposals</li>
       </ul>
     </@fdsDetails.summaryDetails>
 
@@ -24,7 +31,6 @@
       <@fdsRadio.radioItem path="form.fieldStage" itemMap=developmentFieldStage itemHintText=developmentFieldStageDescription>
         <@firstProductionDate path="form.developmentFirstProductionDate" nestingPath="form.fieldStage"/>
       </@fdsRadio.radioItem>
-      <@fdsRadio.radioItem path="form.fieldStage" itemMap=operationsFieldStage itemHintText=operationsFieldStageDescription/>
       <@fdsRadio.radioItem path="form.fieldStage" itemMap=decommissioningFieldStage itemHintText=decommissioningFieldStageDescription/>
       <@fdsRadio.radioItem path="form.fieldStage" itemMap=energyTransitionFieldStage itemHintText=energyTransitionFieldStageDescription>
         <@fdsRadio.radio
