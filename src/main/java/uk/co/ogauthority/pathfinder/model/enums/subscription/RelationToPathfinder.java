@@ -5,6 +5,7 @@ import java.util.Map;
 
 public enum RelationToPathfinder {
 
+  DEVELOPER("Developer"),
   SUPPLY_CHAIN("Supply chain"),
   OPERATOR("Operator"),
   OTHER("Other");

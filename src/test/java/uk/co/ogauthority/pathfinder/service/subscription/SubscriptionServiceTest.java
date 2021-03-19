@@ -197,7 +197,8 @@ public class SubscriptionServiceTest {
         entry("form", form),
         entry("supplyChainRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.SUPPLY_CHAIN)),
         entry("operatorRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OPERATOR)),
-        entry("otherRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OTHER))
+        entry("otherRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OTHER)),
+        entry("developerRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.DEVELOPER))
     );
   }
 

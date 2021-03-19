@@ -1,28 +1,29 @@
 <#include '../layout.ftl'>
+<#import '_subscribeSummary.ftl' as subscribe>
 
-<#assign pageHeading = "Subscribe to newsletter">
+<#assign serviceName = service.serviceName>
+<#assign pageHeading = "Subscribe to ${serviceName}">
 
-<@defaultPage htmlTitle=pageHeading pageHeading=pageHeading breadcrumbs=false topNavigation=false errorItems=errorList>
+<@defaultPage htmlTitle=pageHeading pageHeading=pageHeading breadcrumbs=false topNavigation=false errorItems=errorList pageHeadingClass="govuk-heading-l">
 
-  <@fdsInsetText.insetText>
-    Subscribers will receive an email once a month showing new or updated ${service.serviceName} projects
-  </@fdsInsetText.insetText>
+  <@subscribe._subscriptionSummaryText pronoun="Subscribers"/>
 
   <@fdsForm.htmlForm>
     <@fdsTextInput.textInput path="form.forename" labelText="First name" />
     <@fdsTextInput.textInput path="form.surname" labelText="Last name" />
     <@fdsTextInput.textInput path="form.emailAddress" labelText="Email address" />
     <@fdsRadio.radioGroup
-      labelText="Relation to ${service.serviceName}"
+      labelText="Relation to ${serviceName}"
       path="form.relationToPathfinder"
       hiddenContent=true
     >
-      <@fdsRadio.radioItem path="form.relationToPathfinder" itemMap=supplyChainRelation isFirstItem=true />
+      <@fdsRadio.radioItem path="form.relationToPathfinder" itemMap=developerRelation isFirstItem=true />
       <@fdsRadio.radioItem path="form.relationToPathfinder" itemMap=operatorRelation />
+      <@fdsRadio.radioItem path="form.relationToPathfinder" itemMap=supplyChainRelation />
       <@fdsRadio.radioItem path="form.relationToPathfinder" itemMap=otherRelation>
         <@fdsTextarea.textarea
           path="form.subscribeReason"
-          labelText="Reason for subscribing"
+          labelText="Describe your relation to ${serviceName}"
           nestingPath="form.relationToPathfinder"
         />
       </@fdsRadio.radioItem>

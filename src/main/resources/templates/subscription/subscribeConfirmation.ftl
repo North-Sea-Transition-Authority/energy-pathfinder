@@ -1,12 +1,14 @@
 <#include '../layout.ftl'>
+<#import '_subscribeSummary.ftl' as subscribe>
 
-<#assign pageHeading = "Subscribed" />
+<#assign serviceName = service.serviceName />
+<#assign pageHeading = "${serviceName} subscription" />
 
 <@defaultPage htmlTitle=pageHeading pageHeading="" breadcrumbs=false topNavigation=false>
   <@fdsFlash.flash
-    flashTitle="You have been subscribed to the ${service.serviceName} newsletter"
+    flashTitle="You have successfully subscribed to ${serviceName}"
     flashClass="fds-flash--green"
   >
-    <p class="govuk-body">You'll receive an email once a month showing new or updated ${service.serviceName} projects</p>
+    <@subscribe._subscriptionSummaryText pronoun="You" contentHasBottomMargin=false />
   </@fdsFlash.flash>
 </@defaultPage>

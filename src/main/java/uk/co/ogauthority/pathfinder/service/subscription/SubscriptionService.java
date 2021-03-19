@@ -104,7 +104,8 @@ public class SubscriptionService {
         .addObject("form", form)
         .addObject("supplyChainRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.SUPPLY_CHAIN))
         .addObject("operatorRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OPERATOR))
-        .addObject("otherRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OTHER));
+        .addObject("otherRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OTHER))
+        .addObject("developerRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.DEVELOPER));
   }
 
   public ModelAndView getSubscribeConfirmationModelAndView() {
