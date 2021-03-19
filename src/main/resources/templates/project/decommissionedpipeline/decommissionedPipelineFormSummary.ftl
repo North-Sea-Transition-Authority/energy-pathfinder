@@ -11,7 +11,7 @@
       />
     </#list>
     <#else>
-      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="pipeline" linkUrl=springUrl(projectSetupUrl)/>
+      <@setupProjectGuidance.minimumRequirementNotMetInset itemRequiredText="pipelines" linkUrl=springUrl(projectSetupUrl)/>
   </#if>
   <@fdsAction.link
     linkText="Add pipeline"
