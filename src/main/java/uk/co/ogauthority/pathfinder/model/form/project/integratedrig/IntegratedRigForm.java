@@ -11,7 +11,6 @@ public class IntegratedRigForm {
   @NotEmpty(message = "Select a structure", groups = FullValidation.class)
   private String structure;
 
-  @NotEmpty(message = "Enter the name of the integrated rig", groups = FullValidation.class)
   private String name;
 
   @NotNull(message = "Select the status of the integrated rig", groups = FullValidation.class)
