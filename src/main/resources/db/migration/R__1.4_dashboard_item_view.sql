@@ -62,7 +62,7 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
           FROM regulator_requested_updates rru
           WHERE rru.project_id = pd.project_id
         )
-      , SYSDATE-99999
+      , TO_TIMESTAMP ('01-01-1900 00:00:00.000000', 'DD-MM-YYYY HH24:MI:SS.FF')
       ) update_sort_key
     FROM project_data pd
   )
