@@ -10,9 +10,6 @@ public enum FieldType {
   GAS("Gas"),
   OIL_GAS("Oil/gas"),
   CONDENSATE("Condensate"),
-  OIL_CONDENSATE("Oil condensate"),
-  GAS_CONDENSATE("Gas condensate"),
-  OIL_GAS_CONDENSATE("Oil/gas condensate"),
   GAS_STORAGE("Gas storage"),
   CARBON_STORAGE("Carbon storage");
 

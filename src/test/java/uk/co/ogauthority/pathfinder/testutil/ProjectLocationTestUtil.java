@@ -10,7 +10,6 @@ import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
 import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
-import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 
 public class ProjectLocationTestUtil {
   public static final Integer FIELD_ID = 1;
@@ -18,14 +17,11 @@ public class ProjectLocationTestUtil {
   public static final Integer FIELD_STATUS = 500;
   public static final UkcsArea FIELD_UKCS_AREA = UkcsArea.CNS;
   public static final DevUkField FIELD = new DevUkField(FIELD_ID, FIELD_NAME, FIELD_STATUS, FIELD_UKCS_AREA);
-  public static final String MANUAL_FIELD_NAME = SearchSelectablePrefix.FREE_TEXT_PREFIX + "ManualFieldName";
-  public static final String MANUAL_FIELD_NAME_NO_PREFIX = "ManualFieldName";
   public static final FieldType FIELD_TYPE = FieldType.CARBON_STORAGE;
   public static final Integer WATER_DEPTH = 90;
   public static final Boolean APPROVED_FDP_PLAN = true;
   public static final LocalDate APPROVED_FDP_DATE = LocalDate.now().withDayOfMonth(1);
   public static final Boolean APPROVED_DECOM_PROGRAM = false;
-  public static final UkcsArea UKCS_AREA =  UkcsArea.WOS;
   public static final List<String> LICENCE_BLOCKS = List.of("12/34", "12/56");
 
   public static ProjectLocation getProjectLocation(ProjectDetail details) {
