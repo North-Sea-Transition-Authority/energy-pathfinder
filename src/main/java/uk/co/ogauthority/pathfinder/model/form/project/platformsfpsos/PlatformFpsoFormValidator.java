@@ -20,7 +20,7 @@ public class PlatformFpsoFormValidator implements SmartValidator {
   public static final String MISSING_FPSO_ERROR = "Select an FPSO";
   public static final String MISSING_FPSO_TYPE_ERROR = "Enter an FPSO type";
   public static final String MISSING_FPSO_DIMENSIONS_ERROR = "Enter the FPSO dimensions";
-  public static final String MISSING_SUBSTRUCTURE_REMOVAL_MASS_ERROR = "Enter a substructure removal mass";
+  public static final String MISSING_SUBSTRUCTURE_REMOVAL_MASS_ERROR = "Enter an estimated substructure removal mass";
   public static final String MISSING_SUBSTRUCTURE_REMOVAL_PREMISE_ERROR = "Enter a substructure removal premise";
   private final MinMaxDateInputValidator minMaxDateInputValidator;
 

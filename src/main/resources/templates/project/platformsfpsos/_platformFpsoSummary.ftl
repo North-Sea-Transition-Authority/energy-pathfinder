@@ -147,7 +147,7 @@
     latestYear=topsideRemovalLatestYear
   />
   <@checkAnswers.checkAnswersStandardOrDiffRow
-    prompt="Substructures expected to be removed"
+    prompt="Substructure removal expected to be within scope"
     fieldValue=substructuresExpectedToBeRemoved
     isDiffedField=useDiffedField
   />
@@ -158,7 +158,7 @@
       isDiffedField=useDiffedField
     />
     <@checkAnswers.checkAnswersStandardOrDiffRow
-      prompt="Substructure removal mass"
+      prompt="Estimated substructure removal mass"
       fieldValue=substructureRemovalMass
       isDiffedField=useDiffedField
     />

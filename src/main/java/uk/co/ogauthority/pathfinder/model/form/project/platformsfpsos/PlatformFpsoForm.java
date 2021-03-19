@@ -28,12 +28,12 @@ public class PlatformFpsoForm {
 
   private MinMaxDateInput topsideRemovalYears;
 
-  @NotNull(message = "Select if substructures are expected to be removed", groups = FullValidation.class)
+  @NotNull(message = "Select if substructure removal expected to be within scope", groups = FullValidation.class)
   private Boolean substructureExpectedToBeRemoved;
 
   private SubstructureRemovalPremise substructureRemovalPremise;
 
-  @PositiveWholeNumber(messagePrefix = "Substructure removal mass", groups = {FullValidation.class, PartialValidation.class})
+  @PositiveWholeNumber(messagePrefix = "Estimated substructure removal mass", groups = {FullValidation.class, PartialValidation.class})
   private Integer substructureRemovalMass;
 
   private MinMaxDateInput substructureRemovalYears;
