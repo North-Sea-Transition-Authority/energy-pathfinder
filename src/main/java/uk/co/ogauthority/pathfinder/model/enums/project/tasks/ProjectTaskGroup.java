@@ -36,7 +36,7 @@ public enum ProjectTaskGroup {
       3
   ),
   DECOMMISSIONING_SCHEDULES(
-      "Decommissioning schedules",
+      "Decommissioning scope and schedules",
       List.of(
           ProjectTask.DECOMMISSIONING_SCHEDULE,
           ProjectTask.WELLS,

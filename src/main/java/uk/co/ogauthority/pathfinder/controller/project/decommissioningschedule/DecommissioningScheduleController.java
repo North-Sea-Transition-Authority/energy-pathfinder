@@ -34,7 +34,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 @RequestMapping("/project/{projectId}/decommissioning-schedule")
 public class DecommissioningScheduleController extends ProjectFormPageController {
 
-  public static final String PAGE_NAME = "Decommissioning scope and schedules";
+  public static final String PAGE_NAME = "Decommissioning schedule";
 
   private final DecommissioningScheduleService decommissioningScheduleService;
 
