@@ -56,10 +56,9 @@ public enum TaskListSectionQuestion {
   ),
   PLATFORM_FPSO(
       ProjectTask.PLATFORM_FPSO,
-      "Are platforms or FPSO type units being decommissioned on this project?",
+      "Are platforms or floating units such as FPSOs being decommissioned on this project?",
       "Platforms or floating production storage and offloading units to be decommissioned",
-      "FPSO type units include Floating Production Storage and Offloading units (FPSO), " +
-          "Floating Production Facilities (FPF), Floating Storage Units (FSU)",
+      "",
       "form.platformsFpsosIncluded",
       TaskListSectionAnswer.PLATFORM_FPSO_YES,
       TaskListSectionAnswer.PLATFORM_FPSO_NO,

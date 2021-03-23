@@ -11,7 +11,7 @@
     />
     <@fdsTextInput.textInput path="form.name" labelText="What is the name of the integrated rig?" hintText="For situations where more than one integrated rig is present on a structure. For example, North Rig" optionalLabel=true />
     <@fdsRadio.radio path="form.status" labelText="What is the status of the integrated rig?" radioItems=integratedRigStatuses/>
-    <@fdsRadio.radio path="form.intentionToReactivate" labelText="Do you have any intention to reactivate the integrated rig for well abandonment activity?" radioItems=integratedRigIntentionsToReactivate/>
+    <@fdsRadio.radio path="form.intentionToReactivate" labelText="Do you have any intention to reactivate the integrated rig for well decommissioning activity?" radioItems=integratedRigIntentionsToReactivate/>
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
   </@fdsForm.htmlForm>
 </@defaultPage>

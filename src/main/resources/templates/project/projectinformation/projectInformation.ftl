@@ -8,7 +8,7 @@
       <p class="govuk-body">Provide a description of the project and future plans and include the following where appropriate:</p>
       <ul class="govuk-list govuk-list--bullet">
         <li>location in UKCS and high level scope/infrastructure summary</li>
-        <li>current stage of the project, for example: Pre-Feed, Cessation of Production</li>
+        <li>current stage of the project, for example: Pre-Feed, decommissioning</li>
         <li>
           current view of the timing/schedule for upcoming work, including key constraints, for example:
           <ul class="govuk-list govuk-list--bullet">

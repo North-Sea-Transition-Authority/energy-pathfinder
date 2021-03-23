@@ -18,6 +18,9 @@
     linkUrl=springUrl(addPlugAbandonmentScheduleUrl)
     linkClass="govuk-button govuk-button--blue"
   />
+  <@fdsDetails.summaryDetails summaryTitle="When should I add more than one decommissioning schedule?">
+    <p class="govuk-body">It is useful to add multiple well decommissioning schedules in situations where a subset of wells ceases to be operational before others or where there are both platform wells and subsea wells to be decommissioned</p>
+  </@fdsDetails.summaryDetails>
   <@fdsForm.htmlForm>
     <@fdsAction.submitButtons
       primaryButtonText="Save and complete"
