@@ -21,8 +21,8 @@ public class ProjectTaskListSetupTestUtil {
   public static final List<TaskListSectionQuestion> DECOM_SECTIONS = List.of(
       TaskListSectionQuestion.UPCOMING_TENDERS,
       TaskListSectionQuestion.AWARDED_CONTRACTS,
-      TaskListSectionQuestion.WELLS,
-      TaskListSectionQuestion.SUBSEA_INFRASTRUCTURE
+      TaskListSectionQuestion.WELLS
+      // TaskListSectionQuestion.SUBSEA_INFRASTRUCTURE // Subsea infrastructure disabled: PAT-495
   );
 
   public static final List<TaskListSectionAnswer> DECOM_ANSWERS = List.of(
@@ -31,22 +31,22 @@ public class ProjectTaskListSetupTestUtil {
       TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_NO,
       TaskListSectionAnswer.WELLS_YES,
       TaskListSectionAnswer.PLATFORM_FPSO_NO,
-      TaskListSectionAnswer.INTEGRATED_RIGS_NO,
-      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES
+      TaskListSectionAnswer.INTEGRATED_RIGS_NO
+      // TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES // Subsea infrastructure disabled: PAT-495
       // TaskListSectionAnswer.PIPELINES_NO // Pipelines disabled: PAT-457
   );
 
   public static final List<TaskListSectionAnswer> ONLY_DECOM_ANSWERS = List.of(
       TaskListSectionAnswer.WELLS_YES,
       TaskListSectionAnswer.PLATFORM_FPSO_NO,
-      TaskListSectionAnswer.INTEGRATED_RIGS_NO,
-      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES
+      TaskListSectionAnswer.INTEGRATED_RIGS_NO
+      // TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES // Subsea infrastructure disabled: PAT-495
       // TaskListSectionAnswer.PIPELINES_NO // Pipelines disabled: PAT-457
   );
 
   public static final List<TaskListSectionQuestion> ONLY_DECOM_SECTIONS = List.of(
-      TaskListSectionQuestion.WELLS,
-      TaskListSectionQuestion.SUBSEA_INFRASTRUCTURE
+      TaskListSectionQuestion.WELLS
+      // TaskListSectionQuestion.SUBSEA_INFRASTRUCTURE // Subsea infrastructure disabled: PAT-495
   );
 
 
@@ -74,7 +74,7 @@ public class ProjectTaskListSetupTestUtil {
     var form = getProjectSetupForm_nonDecom();
     form.setWellsIncluded(TaskListSectionAnswer.WELLS_YES);
     form.setPlatformsFpsosIncluded(TaskListSectionAnswer.PLATFORM_FPSO_NO);
-    form.setSubseaInfrastructureIncluded(TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES);
+    // form.setSubseaInfrastructureIncluded(TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES); // Subsea infrastructure disabled: PAT-495
     form.setIntegratedRigsIncluded(TaskListSectionAnswer.INTEGRATED_RIGS_NO);
     // form.setPipelinesIncluded(TaskListSectionAnswer.PIPELINES_NO); // Pipelines disabled: PAT-457
     return form;

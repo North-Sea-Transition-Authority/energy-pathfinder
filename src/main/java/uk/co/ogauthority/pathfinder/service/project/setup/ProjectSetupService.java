@@ -123,9 +123,10 @@ public class ProjectSetupService implements ProjectFormSectionService {
         getAnswerForQuestion(taskListSetup.getTaskListAnswers(), TaskListSectionQuestion.PLATFORM_FPSO)
     );
 
-    form.setSubseaInfrastructureIncluded(
-        getAnswerForQuestion(taskListSetup.getTaskListAnswers(), TaskListSectionQuestion.SUBSEA_INFRASTRUCTURE)
-    );
+    // Subsea infrastructure disabled: PAT-495
+    // form.setSubseaInfrastructureIncluded(
+    //     getAnswerForQuestion(taskListSetup.getTaskListAnswers(), TaskListSectionQuestion.SUBSEA_INFRASTRUCTURE)
+    // );
 
     form.setIntegratedRigsIncluded(
         getAnswerForQuestion(taskListSetup.getTaskListAnswers(), TaskListSectionQuestion.INTEGRATED_RIGS)

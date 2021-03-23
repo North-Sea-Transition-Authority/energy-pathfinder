@@ -6,7 +6,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
@@ -14,7 +13,6 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.subseainfrastructure.SubseaInfrastructure;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureType;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.ConcreteMattressForm;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.OtherSubseaStructureForm;
@@ -177,10 +175,12 @@ public class SubseaInfrastructureService implements ProjectFormSectionService {
   }
 
   public boolean isValid(SubseaInfrastructure subseaInfrastructure, ValidationType validationType) {
-    var form = getForm(subseaInfrastructure);
-    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
-    bindingResult = validate(form, bindingResult, validationType);
-    return !bindingResult.hasErrors();
+    // Subsea infrastructure disabled: PAT-495
+    // var form = getForm(subseaInfrastructure);
+    // BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    // bindingResult = validate(form, bindingResult, validationType);
+    // return !bindingResult.hasErrors();
+    return true;
   }
 
   @Transactional
@@ -344,7 +344,8 @@ public class SubseaInfrastructureService implements ProjectFormSectionService {
 
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
-    return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.SUBSEA_INFRASTRUCTURE);
+    // return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.SUBSEA_INFRASTRUCTURE);
+    return false; // Subsea infrastructure disabled: PAT-495
   }
 
   @Override
@@ -354,10 +355,11 @@ public class SubseaInfrastructureService implements ProjectFormSectionService {
 
   @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
-    entityDuplicationService.duplicateEntitiesAndSetNewParent(
-        getSubseaInfrastructures(fromDetail),
-        toDetail,
-        SubseaInfrastructure.class
-    );
+    // Subsea infrastructure disabled: PAT-495
+    // entityDuplicationService.duplicateEntitiesAndSetNewParent(
+    //     getSubseaInfrastructures(fromDetail),
+    //     toDetail,
+    //     SubseaInfrastructure.class
+    // );
   }
 }

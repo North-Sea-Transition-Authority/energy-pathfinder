@@ -1,7 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.project.subseainfrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -84,12 +83,20 @@ public class SubseaInfrastructureValidationServiceTest {
     assertThat(subseaInfrastructureService.isValid(subseaInfrastructure, ValidationType.PARTIAL)).isTrue();
   }
 
+  // Subsea infrastructure disabled: PAT-495
   @Test
-  public void isValid_whenIncompleteAndFullValidation_thenFalse() {
+  public void isValid_whenIncompleteAndFullValidation_thenTrue() {
     var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withManualFacility();
     subseaInfrastructure.setDescription(null);
-    assertThat(subseaInfrastructureService.isValid(subseaInfrastructure, ValidationType.FULL)).isFalse();
+    assertThat(subseaInfrastructureService.isValid(subseaInfrastructure, ValidationType.FULL)).isTrue();
   }
+
+  // @Test
+  // public void isValid_whenIncompleteAndFullValidation_thenFalse() {
+  //   var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withManualFacility();
+  //   subseaInfrastructure.setDescription(null);
+  //   assertThat(subseaInfrastructureService.isValid(subseaInfrastructure, ValidationType.FULL)).isFalse();
+  // }
 
   @Test
   public void isComplete_whenComplete_thenTrue() {
@@ -102,15 +109,26 @@ public class SubseaInfrastructureValidationServiceTest {
   }
 
   @Test
-  public void isComplete_whenIncomplete_thenFalse() {
+  public void isComplete_whenIncomplete_thenTrue() {
     var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withManualFacility();
     subseaInfrastructure.setDescription(null);
 
     when(subseaInfrastructureRepository.findByProjectDetailOrderByIdAsc(projectDetail))
         .thenReturn(List.of(subseaInfrastructure));
 
-    assertThat(subseaInfrastructureService.isComplete(projectDetail)).isFalse();
+    assertThat(subseaInfrastructureService.isComplete(projectDetail)).isTrue();
   }
+
+  // @Test
+  // public void isComplete_whenIncomplete_thenFalse() {
+  //   var subseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withManualFacility();
+  //   subseaInfrastructure.setDescription(null);
+  //
+  //   when(subseaInfrastructureRepository.findByProjectDetailOrderByIdAsc(projectDetail))
+  //       .thenReturn(List.of(subseaInfrastructure));
+  //
+  //   assertThat(subseaInfrastructureService.isComplete(projectDetail)).isFalse();
+  // }
 
   @Test
   public void isComplete_whenNotSubseaInfrastructure_thenFalse() {
@@ -122,7 +140,7 @@ public class SubseaInfrastructureValidationServiceTest {
   }
 
   @Test
-  public void isComplete_whenOneCompleteAndOneIncomplete_thenFalse() {
+  public void isComplete_whenOneCompleteAndOneIncomplete_thenTrue() {
 
     var incompleteSubseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withManualFacility();
     incompleteSubseaInfrastructure.setDescription(null);
@@ -132,6 +150,20 @@ public class SubseaInfrastructureValidationServiceTest {
     when(subseaInfrastructureRepository.findByProjectDetailOrderByIdAsc(projectDetail))
         .thenReturn(List.of(incompleteSubseaInfrastructure, completeSubseaInfrastructure));
 
-    assertThat(subseaInfrastructureService.isComplete(projectDetail)).isFalse();
+    assertThat(subseaInfrastructureService.isComplete(projectDetail)).isTrue();
   }
+
+  // @Test
+  // public void isComplete_whenOneCompleteAndOneIncomplete_thenFalse() {
+  //
+  //   var incompleteSubseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withManualFacility();
+  //   incompleteSubseaInfrastructure.setDescription(null);
+  //
+  //   var completeSubseaInfrastructure = SubseaInfrastructureTestUtil.createSubseaInfrastructure_withManualFacility();
+  //
+  //   when(subseaInfrastructureRepository.findByProjectDetailOrderByIdAsc(projectDetail))
+  //       .thenReturn(List.of(incompleteSubseaInfrastructure, completeSubseaInfrastructure));
+  //
+  //   assertThat(subseaInfrastructureService.isComplete(projectDetail)).isFalse();
+  // }
 }

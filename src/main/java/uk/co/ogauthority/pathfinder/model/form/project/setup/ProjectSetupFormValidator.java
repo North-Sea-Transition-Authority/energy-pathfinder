@@ -27,9 +27,10 @@ public class ProjectSetupFormValidator implements SmartValidator {
       ValidationUtils.rejectIfEmpty(errors, "platformsFpsosIncluded", "platformsFpsosIncluded.invalid",
           ProjectSetupFormValidationHint.PLATFORMS_FPSOS_REQUIRED_TEXT
       );
-      ValidationUtils.rejectIfEmpty(errors, "subseaInfrastructureIncluded", "subseaInfrastructureIncluded.invalid",
-          ProjectSetupFormValidationHint.SUBSEA_INFRASTRUCTURE_REQUIRED_TEXT
-      );
+      // Subsea infrastructure disabled: PAT-495
+      // ValidationUtils.rejectIfEmpty(errors, "subseaInfrastructureIncluded", "subseaInfrastructureIncluded.invalid",
+      //     ProjectSetupFormValidationHint.SUBSEA_INFRASTRUCTURE_REQUIRED_TEXT
+      // );
       ValidationUtils.rejectIfEmpty(errors, "integratedRigsIncluded", "integratedRigsIncluded.invalid",
           ProjectSetupFormValidationHint.INTEGRATED_RIGS_REQUIRED_TEXT
       );

@@ -5,6 +5,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,6 +44,7 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @ProjectFormPagePermissionCheck
 @ProjectTypeCheck(types = ProjectType.INFRASTRUCTURE)
 @RequestMapping("/project/{projectId}/subsea-infrastructures")
+@Profile("subsea-infrastructure") // PAT-495
 public class SubseaInfrastructureController extends ProjectFormPageController {
 
   public static final String TASK_LIST_NAME = "Subsea infrastructure";
