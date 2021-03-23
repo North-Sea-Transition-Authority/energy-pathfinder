@@ -58,11 +58,11 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
       ) update_deadline_date
     , COALESCE(
         (
-          SELECT COALESCE(rru.deadline_date, rru.requested_datetime)
+          SELECT rru.deadline_date
           FROM regulator_requested_updates rru
           WHERE rru.project_id = pd.project_id
         )
-      , TO_TIMESTAMP ('01-01-1900 00:00:00.000000', 'DD-MM-YYYY HH24:MI:SS.FF')
+      , TO_TIMESTAMP ('01-01-4000 00:00:00.000000', 'DD-MM-YYYY HH24:MI:SS.FF')
       ) update_sort_key
     FROM project_data pd
   )

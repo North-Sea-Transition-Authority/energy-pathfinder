@@ -284,20 +284,24 @@ public class DashboardFilterServiceTest {
     assertThat(results).containsExactly(firstDashboardItem, secondDashboardItem, thirdDashboardItem);
   }
 
-
   @Test
   public void filter_orderedCorrectly_updateSortKeySet() {
-    var firstDashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
-    var secondDashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
-    var thirdDashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    final var earliestDate = Instant.now();
+    final var latestDate = earliestDate.plus(1, ChronoUnit.DAYS);
 
-    //A more recent submitted project is prioritised lower than the project with the update sort key set
-    //A project with an equal sort key is prioritised lower than the project with the update sort key set
-    firstDashboardItem.setUpdateSortKey(Instant.now().plus(1, ChronoUnit.DAYS));
-    secondDashboardItem.setSortKey(Instant.now().plus(2, ChronoUnit.DAYS));
-    thirdDashboardItem.setSortKey(Instant.now().plus(1, ChronoUnit.DAYS));
+    var earliestUpdateRequestDashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    earliestUpdateRequestDashboardItem.setUpdateSortKey(earliestDate);
+    var latestUpdateRequestDashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    latestUpdateRequestDashboardItem.setUpdateSortKey(latestDate);
+    var noUpdateRequestDashboardItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    noUpdateRequestDashboardItem.setUpdateSortKey(Instant.MAX);
+    noUpdateRequestDashboardItem.setSortKey(earliestDate);
 
-    var results = dashboardFilterService.filter(List.of(thirdDashboardItem, secondDashboardItem, firstDashboardItem), filter);
-    assertThat(results).containsExactly(firstDashboardItem, secondDashboardItem, thirdDashboardItem);
+    var results = dashboardFilterService.filter(List.of(
+        noUpdateRequestDashboardItem,
+        latestUpdateRequestDashboardItem,
+        earliestUpdateRequestDashboardItem
+    ), filter);
+    assertThat(results).containsExactly(earliestUpdateRequestDashboardItem, latestUpdateRequestDashboardItem, noUpdateRequestDashboardItem);
   }
 }
