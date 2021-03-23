@@ -27,7 +27,7 @@
   <div class="communication-item">
     <h3 class="communication-item__heading">
       <@fdsAction.link
-        linkText="Subject: ${communicationView.emailView.subject}"
+        linkText="${communicationView.emailView.subject}"
         linkUrl=springUrl(communicationView.communicationUrl)
         linkClass="govuk-link govuk-!-font-size-24 govuk-link--no-visited-state"
       />

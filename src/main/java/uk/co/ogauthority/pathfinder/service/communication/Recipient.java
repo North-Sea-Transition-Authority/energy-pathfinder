@@ -18,8 +18,8 @@ final class Recipient {
   }
 
   Recipient(String emailAddress,
-                   String forename,
-                   String surname) {
+            String forename,
+            String surname) {
     this.emailAddress = emailAddress;
     this.forename = forename;
     this.surname = surname;

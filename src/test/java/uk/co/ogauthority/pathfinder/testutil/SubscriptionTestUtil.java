@@ -1,5 +1,8 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
+import java.time.Instant;
+import java.util.UUID;
+import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
 import uk.co.ogauthority.pathfinder.model.enums.subscription.RelationToPathfinder;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
 
@@ -23,5 +26,23 @@ public class SubscriptionTestUtil {
     subscribeForm.setRelationToPathfinder(RELATION_TO_PATHFINDER);
     subscribeForm.setSubscribeReason(SUBSCRIBE_REASON);
     return subscribeForm;
+  }
+
+  public static Subscriber createSubscriber() {
+    final var subscriber = new Subscriber();
+    subscriber.setForename(FORENAME);
+    subscriber.setSurname(SURNAME);
+    subscriber.setEmailAddress(EMAIL_ADDRESS);
+    subscriber.setRelationToPathfinder(RELATION_TO_PATHFINDER);
+    subscriber.setSubscribeReason(SUBSCRIBE_REASON);
+    subscriber.setUuid(UUID.randomUUID());
+    subscriber.setSubscribedInstant(Instant.now());
+    return subscriber;
+  }
+
+  public static Subscriber createSubscriber(String emailAddress) {
+    final var subscriber = createSubscriber();
+    subscriber.setEmailAddress(emailAddress);
+    return subscriber;
   }
 }

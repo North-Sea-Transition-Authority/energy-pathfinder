@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.communication.CommunicationEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.communication.Communication;
 import uk.co.ogauthority.pathfinder.model.entity.communication.CommunicationRecipient;
+import uk.co.ogauthority.pathfinder.model.enums.communication.RecipientType;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
 
 @Service
@@ -46,6 +47,11 @@ class CommunicationEmailService {
       communicationRecipients.add(communicationRecipient);
     });
 
-    communicationRecipientService.saveCommunicationRecipients(communicationRecipients);
+    // For GDPR reasons don't log the subscriber details to the communication recipients
+    // table. If they unsubscribe we would have to remove their email address from this table as
+    // we don't have a good reason to store the email address.
+    if (!communication.getRecipientType().equals(RecipientType.SUBSCRIBERS)) {
+      communicationRecipientService.saveCommunicationRecipients(communicationRecipients);
+    }
   }
 }

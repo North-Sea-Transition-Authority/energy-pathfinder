@@ -15,7 +15,9 @@ import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.service.team.PortalTeamAccessor;
 import uk.co.ogauthority.pathfinder.model.enums.communication.CommunicationStatus;
 import uk.co.ogauthority.pathfinder.model.enums.communication.RecipientType;
+import uk.co.ogauthority.pathfinder.service.subscription.SubscriberAccessor;
 import uk.co.ogauthority.pathfinder.testutil.CommunicationTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.SubscriptionTestUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CommunicationSendingServiceTest {
@@ -32,6 +34,9 @@ public class CommunicationSendingServiceTest {
   @Mock
   private CommunicationEmailService communicationEmailService;
 
+  @Mock
+  private SubscriberAccessor subscriberAccessor;
+
   private CommunicationSendingService communicationSendingService;
 
   @Before
@@ -40,7 +45,8 @@ public class CommunicationSendingServiceTest {
         communicationService,
         organisationGroupCommunicationService,
         portalTeamAccessor,
-        communicationEmailService
+        communicationEmailService,
+        subscriberAccessor
     );
   }
 
@@ -80,6 +86,33 @@ public class CommunicationSendingServiceTest {
     when(communicationService.getCommunicationOrError(communication.getId())).thenReturn(communication);
 
     communicationSendingService.sendCommunication(communication.getId());
+  }
+
+  @Test
+  public void sendCommunication_whenDraftSubscriberCommunication_verifyInteractions() {
+    var communication = CommunicationTestUtil.getCompleteCommunication();
+    communication.setRecipientType(RecipientType.SUBSCRIBERS);
+    communication.setStatus(CommunicationStatus.SENDING);
+
+    when(communicationService.getCommunicationOrError(communication.getId())).thenReturn(communication);
+
+    final var subscriber1 = SubscriptionTestUtil.createSubscriber("someone@example.com");
+    final var subscriber2 = SubscriptionTestUtil.createSubscriber("someone.else@example.com");
+    final var subscribers = List.of(subscriber1, subscriber2);
+
+    when(subscriberAccessor.getAllSubscribers()).thenReturn(subscribers);
+
+    communicationSendingService.sendCommunication(communication.getId());
+
+    verify(subscriberAccessor, times(1)).getAllSubscribers();
+
+    verify(communicationEmailService, times(1)).sendCommunicationEmail(
+        communication,
+        List.of(
+            new Recipient(subscriber1.getEmailAddress(), subscriber1.getForename(), subscriber1.getSurname()),
+            new Recipient(subscriber2.getEmailAddress(), subscriber2.getForename(), subscriber2.getSurname())
+        )
+    );
   }
 
   @Test(expected = RuntimeException.class)

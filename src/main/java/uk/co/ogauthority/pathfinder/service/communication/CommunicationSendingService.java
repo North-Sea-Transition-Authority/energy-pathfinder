@@ -10,8 +10,10 @@ import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto;
 import uk.co.ogauthority.pathfinder.energyportal.service.team.PortalTeamAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.communication.Communication;
 import uk.co.ogauthority.pathfinder.model.entity.communication.OrganisationGroupCommunication;
+import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
 import uk.co.ogauthority.pathfinder.model.enums.communication.CommunicationStatus;
 import uk.co.ogauthority.pathfinder.model.enums.communication.RecipientType;
+import uk.co.ogauthority.pathfinder.service.subscription.SubscriberAccessor;
 
 @Service
 public class CommunicationSendingService {
@@ -20,16 +22,19 @@ public class CommunicationSendingService {
   private final OrganisationGroupCommunicationService organisationGroupCommunicationService;
   private final PortalTeamAccessor portalTeamAccessor;
   private final CommunicationEmailService communicationEmailService;
+  private final SubscriberAccessor subscriberAccessor;
 
   @Autowired
   public CommunicationSendingService(CommunicationService communicationService,
                                      OrganisationGroupCommunicationService organisationGroupCommunicationService,
                                      PortalTeamAccessor portalTeamAccessor,
-                                     CommunicationEmailService communicationEmailService) {
+                                     CommunicationEmailService communicationEmailService,
+                                     SubscriberAccessor subscriberAccessor) {
     this.communicationService = communicationService;
     this.organisationGroupCommunicationService = organisationGroupCommunicationService;
     this.portalTeamAccessor = portalTeamAccessor;
     this.communicationEmailService = communicationEmailService;
+    this.subscriberAccessor = subscriberAccessor;
   }
 
   @Transactional
@@ -60,7 +65,7 @@ public class CommunicationSendingService {
     if (recipientType.equals(RecipientType.OPERATORS)) {
       recipients.addAll(getOrganisationRecipients(communication));
     } else if (recipientType.equals(RecipientType.SUBSCRIBERS)) {
-      // TODO get list of subscribers once PAT-454 is implemented and data set available
+      recipients.addAll(getSubscriberRecipients());
     } else {
       throw new RuntimeException(String.format(
           "Unknown recipient type for communication with id %d",
@@ -88,5 +93,20 @@ public class CommunicationSendingService {
         .stream()
         .map(Recipient::new)
         .collect(Collectors.toList());
+  }
+
+  private List<Recipient> getSubscriberRecipients() {
+    return subscriberAccessor.getAllSubscribers()
+        .stream()
+        .map(this::convertSubscriberToRecipient)
+        .collect(Collectors.toList());
+  }
+
+  private Recipient convertSubscriberToRecipient(Subscriber subscriber) {
+    return new Recipient(
+        subscriber.getEmailAddress(),
+        subscriber.getForename(),
+        subscriber.getSurname()
+    );
   }
 }
