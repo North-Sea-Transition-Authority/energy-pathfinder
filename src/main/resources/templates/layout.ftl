@@ -188,6 +188,7 @@
     <#--Footer-->
     <#local footerMetaContent>
       <@fdsFooter.footerMeta footerMetaHiddenHeading="Support links">
+        <@fdsFooter.footerMetaLink linkText="Accessibility statement" linkUrl=springUrl(accessibilityStatementUrl)/>
         <@fdsFooter.footerMetaLink linkText="Contact" linkUrl=springUrl(contactUrl)/>
       </@fdsFooter.footerMeta>
     </#local>

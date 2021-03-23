@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import uk.co.ogauthority.pathfinder.auth.CurrentUserView;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
+import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
 import uk.co.ogauthority.pathfinder.service.navigation.TopNavigationService;
-import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.SecurityUtil;
 
 @ControllerAdvice
@@ -22,16 +22,19 @@ public class DefaultPageControllerAdvice {
   private final ServiceProperties serviceProperties;
   private final TopNavigationService topNavigationService;
   private final HttpServletRequest request;
+  private final FooterService footerService;
 
   @Autowired
   public DefaultPageControllerAdvice(FoxUrlService foxUrlService,
                                      ServiceProperties serviceProperties,
                                      TopNavigationService topNavigationService,
-                                     HttpServletRequest request) {
+                                     HttpServletRequest request,
+                                     FooterService footerService) {
     this.foxUrlService = foxUrlService;
     this.serviceProperties = serviceProperties;
     this.topNavigationService = topNavigationService;
     this.request = request;
+    this.footerService = footerService;
   }
 
   @InitBinder
@@ -55,7 +58,7 @@ public class DefaultPageControllerAdvice {
 
   private void addCommonUrls(Model model) {
     model.addAttribute("foxLogoutUrl", foxUrlService.getFoxLogoutUrl());
-    model.addAttribute("contactUrl", ControllerUtils.getContactUrl());
+    footerService.addFooterUrlsToModel(model);
   }
 
   private void addServiceSpecificAttributes(Model model) {

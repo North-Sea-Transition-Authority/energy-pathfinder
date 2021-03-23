@@ -60,7 +60,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .mvcMatchers("/communications/**")
           .hasAnyAuthority(systemAccessService.getCommunicationsGrantedAuthorities())
 
-        .mvcMatchers("/actuator/health", "/session-info", "/notify/callback", "/contact", "/subscribe", "/unsubscribe/**")
+        .mvcMatchers(
+            "/actuator/health",
+            "/session-info",
+            "/notify/callback",
+            "/contact",
+            "/subscribe",
+            "/unsubscribe/**",
+            "/accessibility-statement"
+        )
           .permitAll()
 
         .anyRequest()

@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -19,6 +20,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.model.entity.UserSession;
+import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
 import uk.co.ogauthority.pathfinder.service.UserSessionService;
 import uk.co.ogauthority.pathfinder.service.communication.CommunicationJourneyService;
@@ -79,6 +81,9 @@ public abstract class ProjectAssessmentContextAbstractControllerTest {
   @MockBean
   protected CommunicationJourneyService communicationJourneyService;
 
+  @MockBean
+  protected FooterService footerService;
+
   @Before
   public void projectContextAbstractControllerTestSetUp() {
     mockMvc = MockMvcBuilders
@@ -91,6 +96,9 @@ public abstract class ProjectAssessmentContextAbstractControllerTest {
     when(foxUrlService.getFoxRegistrationUrl()).thenReturn("test-registration-url");
 
     when(userSessionService.getAndValidateSession(any(), anyBoolean())).thenReturn(Optional.of(new UserSession()));
+
+    doCallRealMethod().when(footerService).addFooterUrlsToModelAndView(any());
+    doCallRealMethod().when(footerService).addFooterUrlsToModel(any());
 
   }
 

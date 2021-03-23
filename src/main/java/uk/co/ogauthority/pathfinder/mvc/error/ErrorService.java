@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.model.enums.contact.ServiceContactDetail;
-import uk.co.ogauthority.pathfinder.util.ControllerUtils;
+import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
 
 @Service
 public class ErrorService {
@@ -17,10 +17,13 @@ public class ErrorService {
   private static final Logger LOGGER = LoggerFactory.getLogger(ErrorService.class);
 
   private final ServiceProperties serviceProperties;
+  private final FooterService footerService;
 
   @Autowired
-  public ErrorService(ServiceProperties serviceProperties) {
+  public ErrorService(ServiceProperties serviceProperties,
+                      FooterService footerService) {
     this.serviceProperties = serviceProperties;
+    this.footerService = footerService;
   }
 
   private String getErrorReference() {
@@ -43,9 +46,8 @@ public class ErrorService {
     LOGGER.error("Caught unhandled exception (errorRef {})", errorReference, throwable);
   }
 
-  private void addContactDetails(ModelAndView modelAndView) {
+  private void addTechnicalSupportContactDetails(ModelAndView modelAndView) {
     modelAndView.addObject("technicalSupportContact", ServiceContactDetail.TECHNICAL_SUPPORT);
-    modelAndView.addObject("contactUrl", ControllerUtils.getContactUrl());
   }
 
   private void addServiceProperties(ModelAndView modelAndView) {
@@ -55,8 +57,9 @@ public class ErrorService {
   public ModelAndView addErrorAttributesToModel(ModelAndView modelAndView, Throwable throwable) {
     addStackTraceToModel(modelAndView, throwable);
     addErrorReference(modelAndView, throwable);
-    addContactDetails(modelAndView);
+    addTechnicalSupportContactDetails(modelAndView);
     addServiceProperties(modelAndView);
+    footerService.addFooterUrlsToModelAndView(modelAndView);
     return modelAndView;
   }
 }
