@@ -29,6 +29,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationF
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
@@ -57,6 +58,9 @@ public class ProjectLocationServiceTest {
   ProjectLocationBlocksService projectLocationBlocksService;
 
   @Mock
+  private ProjectInformationService projectInformationService;
+
+  @Mock
   private EntityDuplicationService entityDuplicationService;
 
   private ProjectLocationService projectLocationService;
@@ -74,6 +78,7 @@ public class ProjectLocationServiceTest {
         validationService,
         projectLocationFormValidator,
         projectLocationBlocksService,
+        projectInformationService,
         entityDuplicationService
     );
     when(projectLocationRepository.save(any(ProjectLocation.class)))
@@ -407,9 +412,21 @@ public class ProjectLocationServiceTest {
   }
 
   @Test
-  public void canShowInTaskList_whenInfrastructureProject_thenTrue() {
+  public void canShowInTaskList_whenInfrastructureProjectAndNotEnergyTransitionProject_thenTrue() {
     var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
+
+    when(projectInformationService.isEnergyTransitionProject(projectDetail)).thenReturn(false);
+
     assertThat(projectLocationService.canShowInTaskList(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_whenInfrastructureProjectAndEnergyTransitionProject_thenFalse() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
+
+    when(projectInformationService.isEnergyTransitionProject(projectDetail)).thenReturn(true);
+
+    assertThat(projectLocationService.canShowInTaskList(projectDetail)).isFalse();
   }
 
   @Test

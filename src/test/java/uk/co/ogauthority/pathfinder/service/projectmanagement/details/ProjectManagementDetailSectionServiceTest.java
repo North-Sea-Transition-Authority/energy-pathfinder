@@ -53,6 +53,7 @@ public class ProjectManagementDetailSectionServiceTest {
     var submitterAccount = UserTestingUtil.getAuthenticatedUserAccount();
 
     when(projectInformationService.getProjectInformationOrError(projectDetail)).thenReturn(projectInformation);
+    when(projectInformationService.isEnergyTransitionProject(projectInformation)).thenReturn(false);
     when(projectLocationService.getOrError(projectDetail)).thenReturn(projectLocation);
     when(webUserAccountService.getWebUserAccountOrError(projectDetail.getSubmittedByWua())).thenReturn(submitterAccount);
 
@@ -65,6 +66,7 @@ public class ProjectManagementDetailSectionServiceTest {
         projectDetail,
         projectInformation,
         projectLocation,
+        false,
         submitterAccount
     );
     assertThat(section.getTemplateModel()).containsExactly(
