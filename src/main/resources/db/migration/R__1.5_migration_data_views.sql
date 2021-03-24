@@ -128,7 +128,6 @@ CREATE OR REPLACE VIEW ${datasource.migration-user}.unmapped_legacy_comments AS 
   ) xt
 );
 
-
 CREATE OR REPLACE FORCE VIEW ${datasource.migration-user}.legacy_subscribers AS (
   SELECT
     nr.resource_person_id
@@ -139,4 +138,26 @@ CREATE OR REPLACE FORCE VIEW ${datasource.migration-user}.legacy_subscribers AS 
   JOIN decmgr.xview_resource_people_history xrph ON xrph.rp_id = nr.resource_person_id AND xrph.status_control = 'C'
   WHERE nr.newsletter_type = 'PATHFINDER'
   AND nr.status = 'SUBSCRIBED'
+);
+
+CREATE OR REPLACE FORCE VIEW ${datasource.migration-user}.legacy_teams AS (
+  -- regulator team
+  SELECT
+    r.id legacy_resource_id
+  , xr.res_type resource_type
+  , NULL scoped_uref
+  FROM decmgr.resources r
+  JOIN decmgr.xview_resources xr ON xr.res_id = r.id
+  WHERE r.res_type = 'PATH_ADMIN_TEAM'
+  UNION
+  -- organisation teams
+  SELECT
+    ruc.res_id
+  , xr.res_type
+  , ruc.uref
+  FROM decmgr.resource_usages_current ruc
+  JOIN decmgr.current_organisation_groups cog ON cog.id || '++REGORGGRP' = ruc.uref
+  JOIN decmgr.xview_resources xr ON xr.res_id = ruc.res_id
+  WHERE cog.org_grp_type = 'REG'
+  AND xr.res_type = 'PATH_OPERATOR_TEAM'
 );

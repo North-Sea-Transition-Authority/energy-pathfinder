@@ -2396,4 +2396,289 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
   END migrate_subscriber_data;
 
+  /**
+    Logging procedure to log team migration status
+    @param p_legacy_resource_id the resource id for the legacy team
+    @param p_migration_status the status of the team migration
+    @param p_system_message the message to append to the log
+    @param p_new_resource_id the id of the resource in the new model
+   */
+  PROCEDURE log_team_migration(
+    p_legacy_resource_id IN ${datasource.migration-user}.team_migration_log.legacy_resource_id%TYPE
+  , p_migration_status IN ${datasource.migration-user}.team_migration_log.migration_status%TYPE DEFAULT NULL
+  , p_system_message IN ${datasource.migration-user}.team_migration_log.system_message%TYPE
+  , p_new_resource_id IN ${datasource.migration-user}.team_migration_log.new_resource_id%TYPE DEFAULT NULL
+  )
+    IS
+
+    PRAGMA AUTONOMOUS_TRANSACTION;
+
+  BEGIN
+
+    UPDATE ${datasource.migration-user}.team_migration_log tml
+    SET
+      tml.migration_status = COALESCE(p_migration_status, tml.migration_status)
+    , tml.system_message = tml.system_message || CHR(10) || TO_CHAR(SYSTIMESTAMP) || ': ' || p_system_message || CHR(10)
+    , tml.new_resource_id = COALESCE(p_new_resource_id, tml.new_resource_id)
+    WHERE tml.legacy_resource_id = p_legacy_resource_id;
+
+    COMMIT;
+
+  END log_team_migration;
+
+  /**
+    Procedure to populate the log of teams to migrate. Each team will have a status of pending.
+   */
+  PROCEDURE populate_team_log
+  IS
+  BEGIN
+
+    INSERT INTO ${datasource.migration-user}.team_migration_log(
+      legacy_resource_id
+    , migration_status
+    , system_message
+    )
+    SELECT
+      lt.legacy_resource_id
+    , K_PENDING_MIGRATION_STATUS
+    , EMPTY_CLOB()
+    FROM ${datasource.migration-user}.legacy_teams lt
+    -- Safety check to not populate with duplicate teams
+    WHERE lt.legacy_resource_id NOT IN (
+      SELECT tml.legacy_resource_id
+      FROM ${datasource.migration-user}.team_migration_log tml
+    );
+
+    COMMIT;
+
+  END populate_team_log;
+
+  PROCEDURE migrate_team_users
+  IS
+
+    l_legacy_regulator_resource_id NUMBER;
+    l_new_regulator_resource_id NUMBER;
+    l_new_org_grp_resource_id NUMBER;
+
+    /**
+      @return a map of regulator roles with the key being the legacy role and the value
+      being the list of roles they map to in the new model
+     */
+    FUNCTION create_regulator_role_map
+    RETURN role_migration_type
+    IS
+
+      l_regulator_role_map role_migration_type;
+
+    BEGIN
+
+      l_regulator_role_map('RESOURCE_COORDINATOR') := bpmmgr.varchar2_list_type('RESOURCE_COORDINATOR', 'ORGANISATION_MANAGER', 'PROJECT_ADMINISTRATOR');
+      l_regulator_role_map('PATH_COMMENTER') := bpmmgr.varchar2_list_type('PROJECT_VIEWER');
+      l_regulator_role_map('PATH_VIEWER') := bpmmgr.varchar2_list_type('PROJECT_VIEWER');
+
+      RETURN l_regulator_role_map;
+
+    END create_regulator_role_map;
+
+    /**
+      @return a map of organisation roles with the key being the legacy role and the value
+      being the list of roles they map to in the new model
+     */
+    FUNCTION create_organisation_role_map
+    RETURN role_migration_type
+    IS
+
+      l_organisation_role_map role_migration_type;
+
+    BEGIN
+
+      l_organisation_role_map('SYSTEM_USER') := bpmmgr.varchar2_list_type('PROJECT_SUBMITTER');
+
+      RETURN l_organisation_role_map;
+
+    END create_organisation_role_map;
+
+    /**
+      Procedure to migrate a team into the new pathfinder service
+      @param p_legacy_resource_id The id of the legacy resource
+      @param p_new_resource_id The id of the new resource
+      @param p_role_migration_type A map of legacy roles to new roles
+     */
+    PROCEDURE migrate_team(
+      p_legacy_resource_id IN NUMBER
+    , p_new_resource_id IN NUMBER
+    , p_role_migration_type IN role_migration_type
+    )
+    IS
+
+      l_new_team_roles bpmmgr.varchar2_list_type := bpmmgr.varchar2_list_type();
+      l_mapped_role_list bpmmgr.varchar2_list_type := bpmmgr.varchar2_list_type();
+      l_new_role_already_mapped NUMBER;
+
+    BEGIN
+
+      SAVEPOINT sp_before_team_migration;
+
+      log_team_migration(
+        p_legacy_resource_id => p_legacy_resource_id
+      , p_migration_status => K_PROCESSING_MIGRATION_STATUS
+      , p_system_message => 'Starting migration of legacy resource with p_legacy_resource_id ' || p_legacy_resource_id
+      , p_new_resource_id => p_new_resource_id
+      );
+
+      FOR person IN (
+        SELECT
+          rmc.person_id id
+        , stagg(rmc.role_name) legacy_roles
+        FROM decmgr.resource_members_current rmc
+        JOIN securemgr.web_user_accounts wua ON wua.id = rmc.wua_id
+        WHERE rmc.res_id = p_legacy_resource_id
+        AND wua.account_status = 'ACTIVE'
+        AND NOT EXISTS (
+          -- Not already migrated
+          SELECT DISTINCT new_resource.person_id
+          FROM decmgr.resource_members_current new_resource
+          WHERE new_resource.res_id = p_new_resource_id
+          AND new_resource.person_id = rmc.person_id
+        )
+        GROUP BY rmc.person_id
+      )
+      LOOP
+
+        log_team_migration(
+          p_legacy_resource_id => p_legacy_resource_id
+        , p_migration_status => K_PROCESSING_MIGRATION_STATUS
+        , p_system_message => 'Starting migration of legacy person with id ' || person.id || ' into resource with id ' || p_new_resource_id
+        , p_new_resource_id => p_new_resource_id
+        );
+
+        l_new_team_roles := bpmmgr.varchar2_list_type();
+
+        FOR legacy_role IN (
+          SELECT t.column_value name
+          FROM TABLE(person.legacy_roles) t
+        )
+        LOOP
+
+          l_mapped_role_list := p_role_migration_type(legacy_role.name);
+
+          FOR idx IN l_mapped_role_list.FIRST..l_mapped_role_list.LAST LOOP
+
+            -- check if the mapped role already exists in the l_new_team_roles list the
+            -- user already has. Only add if it is a new role.
+            SELECT COUNT(*)
+            INTO l_new_role_already_mapped
+            FROM TABLE(l_new_team_roles) t
+            WHERE t.column_value = l_mapped_role_list(idx);
+
+            IF l_new_role_already_mapped = 0 THEN
+
+              l_new_team_roles.EXTEND;
+              l_new_team_roles(l_new_team_roles.LAST) := l_mapped_role_list(idx);
+
+            END IF;
+
+          END LOOP;
+
+        END LOOP;
+
+        decmgr.contact.add_members_to_roles(
+          p_res_id => p_new_resource_id
+        , p_role_name_list => l_new_team_roles
+        , p_person_id_list => bpmmgr.number_list_type(person.id)
+        , p_requesting_wua_id => 1
+        );
+
+        log_team_migration(
+          p_legacy_resource_id => p_legacy_resource_id
+        , p_migration_status => K_PROCESSING_MIGRATION_STATUS
+        , p_system_message => 'Finished migrating legacy person with id ' || person.id || ' into resource with id ' || p_new_resource_id
+        , p_new_resource_id => p_new_resource_id
+        );
+
+      END LOOP;
+
+      COMMIT;
+
+      log_team_migration(
+        p_legacy_resource_id => p_legacy_resource_id
+      , p_migration_status => K_COMPLETE_MIGRATION_STATUS
+      , p_system_message => 'Finished migrating legacy resource with id ' || p_legacy_resource_id || ' into resource with id ' || p_new_resource_id
+      , p_new_resource_id => p_new_resource_id
+      );
+
+    EXCEPTION WHEN OTHERS THEN
+
+      ROLLBACK TO SAVEPOINT sp_before_team_migration;
+
+      log_team_migration(
+        p_legacy_resource_id => p_legacy_resource_id
+      , p_migration_status => K_ERROR_MIGRATION_STATUS
+      , p_system_message =>
+            'Error migrating legacy resource with ID ' || p_legacy_resource_id || '. '
+            || CHR(10) || 'Failed with error:' || CHR(10) || dbms_utility.format_error_stack() || CHR(10) || dbms_utility.format_error_backtrace()
+      );
+
+    END migrate_team;
+
+  BEGIN
+
+    populate_team_log();
+
+    SELECT r.id
+    INTO l_new_regulator_resource_id
+    FROM decmgr.resources r
+    WHERE r.res_type = K_NEW_REGULATOR_TEAM;
+
+    SELECT lt.legacy_resource_id
+    INTO l_legacy_regulator_resource_id
+    FROM ${datasource.migration-user}.legacy_teams lt
+    WHERE lt.resource_type = K_LEGACY_REGULATOR_TEAM;
+
+    migrate_team(
+      p_legacy_resource_id => l_legacy_regulator_resource_id
+    , p_new_resource_id => l_new_regulator_resource_id
+    , p_role_migration_type => create_regulator_role_map()
+    );
+
+    FOR legacy_org_grp_resource IN (
+      SELECT
+        lt.legacy_resource_id id
+      , lt.scoped_uref uref
+      FROM ${datasource.migration-user}.legacy_teams lt
+      JOIN ${datasource.migration-user}.team_migration_log tml ON tml.legacy_resource_id = lt.legacy_resource_id
+      WHERE tml.migration_status = K_PENDING_MIGRATION_STATUS
+      AND lt.resource_type = K_LEGACY_ORGANISATION_TEAM
+    )
+    LOOP
+
+      BEGIN
+
+        SELECT r.id
+        INTO l_new_org_grp_resource_id
+        FROM decmgr.resources r
+        JOIN decmgr.resource_usages_current ruc ON ruc.res_id = r.id
+        WHERE r.res_type = K_NEW_ORGANISATION_TEAM
+        AND ruc.uref = legacy_org_grp_resource.uref;
+
+        migrate_team(
+          p_legacy_resource_id => legacy_org_grp_resource.id
+        , p_new_resource_id => l_new_org_grp_resource_id
+        , p_role_migration_type => create_organisation_role_map()
+        );
+
+      EXCEPTION WHEN NO_DATA_FOUND THEN
+
+        log_team_migration(
+          p_legacy_resource_id => legacy_org_grp_resource.id
+        , p_migration_status => K_ERROR_MIGRATION_STATUS
+        , p_system_message => 'Could not find new resource for legacy resource with ID ' || legacy_org_grp_resource.id || '. '
+        );
+
+      END;
+
+    END LOOP;
+
+  END migrate_team_users;
+
 END migration;

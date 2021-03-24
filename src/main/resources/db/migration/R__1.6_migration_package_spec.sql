@@ -10,7 +10,15 @@ CREATE OR REPLACE PACKAGE ${datasource.migration-user}.migration AS
 
   K_OPERATOR_INITIATED_UPDATE CONSTANT VARCHAR2(4000) := 'OPERATOR_INITIATED';
 
+  K_LEGACY_REGULATOR_TEAM CONSTANT VARCHAR2(4000) := 'PATH_ADMIN_TEAM';
+  K_NEW_REGULATOR_TEAM CONSTANT VARCHAR2(4000) := 'PATHFINDER_REGULATOR_TEAM';
+  K_LEGACY_ORGANISATION_TEAM CONSTANT VARCHAR2(4000) := 'PATH_OPERATOR_TEAM';
+  K_NEW_ORGANISATION_TEAM CONSTANT VARCHAR2(4000) := 'PATHFINDER_ORGANISATION_TEAM';
+
   TYPE project_detail_status_type IS TABLE OF VARCHAR2(4000)
+  INDEX BY VARCHAR2(4000);
+
+  TYPE role_migration_type IS TABLE OF bpmmgr.varchar2_list_type
   INDEX BY VARCHAR2(4000);
 
   /**
@@ -47,5 +55,10 @@ CREATE OR REPLACE PACKAGE ${datasource.migration-user}.migration AS
     Procedure to migrate the legacy subscribers into the new data model
    */
   PROCEDURE migrate_subscriber_data;
+
+  /**
+    Procedure to migrate the legacy team users into the new teams
+   */
+  PROCEDURE migrate_team_users;
 
 END migration;
