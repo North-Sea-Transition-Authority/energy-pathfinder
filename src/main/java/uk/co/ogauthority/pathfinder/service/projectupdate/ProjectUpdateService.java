@@ -75,9 +75,9 @@ public class ProjectUpdateService {
                                                ProjectStatus status,
                                                AuthenticatedUserAccount userAccount) {
     final var newDetail = projectService.createNewProjectDetailVersion(fromDetail, status, userAccount);
-    projectFormSectionServices.forEach(
-        projectFormSectionService -> projectFormSectionService.copySectionData(fromDetail, newDetail)
-    );
+    projectFormSectionServices.stream()
+        .filter(projectFormSectionService -> projectFormSectionService.canShowInTaskList(fromDetail))
+        .forEach(projectFormSectionService -> projectFormSectionService.copySectionData(fromDetail, newDetail));
     return newDetail;
   }
 

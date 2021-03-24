@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.projectupdate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -66,16 +67,35 @@ public class ProjectUpdateServiceTest {
   }
 
   @Test
-  public void createNewProjectVersion_verifyServiceInteractions() {
+  public void createNewProjectVersion_whenAllShownInTaskList_verifyServiceInteractions() {
 
     final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
     final var user = UserTestingUtil.getAuthenticatedUserAccount();
+
+    when(projectInformationService.canShowInTaskList(fromProjectDetail)).thenReturn(true);
+    when(awardedContractService.canShowInTaskList(fromProjectDetail)).thenReturn(true);
 
     projectUpdateService.createNewProjectVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
 
     verify(projectService, times(1)).createNewProjectDetailVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
     verify(projectInformationService, times(1)).copySectionData(eq(fromProjectDetail), any());
     verify(awardedContractService, times(1)).copySectionData(eq(fromProjectDetail), any());
+  }
+
+  @Test
+  public void createNewProjectVersion_whenNotAllShownInTaskList_verifyServiceInteractions() {
+
+    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+    final var user = UserTestingUtil.getAuthenticatedUserAccount();
+
+    when(projectInformationService.canShowInTaskList(fromProjectDetail)).thenReturn(true);
+    when(awardedContractService.canShowInTaskList(fromProjectDetail)).thenReturn(false);
+
+    projectUpdateService.createNewProjectVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
+
+    verify(projectService, times(1)).createNewProjectDetailVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
+    verify(projectInformationService, times(1)).copySectionData(eq(fromProjectDetail), any());
+    verify(awardedContractService, never()).copySectionData(eq(fromProjectDetail), any());
   }
 
   @Test
