@@ -1,0 +1,11 @@
+@mixin pathfinder-list {
+
+  border-top: 1px solid $govuk-border-colour;
+
+  &__item {
+    border-bottom: 1px solid $govuk-border-colour;
+    padding-bottom: 0;
+    @include govuk-responsive-padding(2, "top");
+    @include govuk-responsive-padding(1, "bottom");
+  }
+}

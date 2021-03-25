@@ -1,0 +1,26 @@
+<#include '../../layout.ftl'>
+<#include '../macros/minMaxDateInput.ftl'>
+
+<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true errorItems=errorList>
+  <@fdsForm.htmlForm>
+    <@fdsSearchSelector.searchSelectorRest
+      path="form.pipeline"
+      selectorMinInputLength=1
+      labelText="What is the pipeline number?"
+      restUrl=springUrl(pipelineRestUrl)
+      preselectedItems=preSelectedPipelineMap!{}
+    />
+    <@fdsTextInput.textInput path="form.materialType" labelText="What is the material type of the pipeline?"/>
+    <@fdsRadio.radio path="form.status" labelText="What is the status of the pipeline?" radioItems=pipelineStatuses/>
+    <@minMaxDateInput
+      minFormPath="form.decommissioningDate.minYear"
+      maxFormPath="form.decommissioningDate.maxYear"
+      labelText="Provide the period in which the decommissioning is expected to take place"
+      altMinLabel="Earliest start year"
+      altMaxLabel="Latest completion year"
+      formId="decommissioning-period"
+    />
+    <@fdsRadio.radio path="form.removalPremise" labelText="Pipeline removal premise" radioItems=pipelineRemovalPremises/>
+    <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
+  </@fdsForm.htmlForm>
+</@defaultPage>

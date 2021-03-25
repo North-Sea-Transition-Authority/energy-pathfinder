@@ -1,0 +1,164 @@
+package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.List;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
+import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
+import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityView;
+import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
+import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
+
+@RunWith(MockitoJUnitRunner.class)
+public class CollaborationOpportunitiesSummaryServiceTest {
+  @Mock
+  private CollaborationOpportunitiesService collaborationOpportunitiesService;
+
+  @Mock
+  private CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService;
+
+  private CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService;
+
+  private final ProjectDetail detail = ProjectUtil.getProjectDetails();
+
+  private final CollaborationOpportunity opportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
+
+  private final CollaborationOpportunity manualEntryOpportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity_manualEntry(detail);
+
+  @Before
+  public void setUp() {
+    collaborationOpportunitiesSummaryService = new CollaborationOpportunitiesSummaryService(
+        collaborationOpportunitiesService,
+        collaborationOpportunityFileLinkService
+    );
+    when(collaborationOpportunitiesService.getOpportunitiesForDetail(detail)).thenReturn(
+        List.of(opportunity, manualEntryOpportunity)
+    );
+  }
+
+
+  @Test
+  public void getValidatedSummaryViews_allValid() {
+    when(collaborationOpportunitiesService.isValid(any(), any())).thenReturn(true);
+    var views = collaborationOpportunitiesSummaryService.getValidatedSummaryViews(detail);
+    assertThat(views.size()).isEqualTo(2);
+    var view1 = views.get(0);
+    var view2 = views.get(1);
+    assertThat(view1.isValid()).isTrue();
+    assertThat(view2.isValid()).isTrue();
+  }
+
+  @Test
+  public void getValidatedSummaryViews_containsInvalidEntry() {
+    when(collaborationOpportunitiesService.isValid(opportunity, ValidationType.FULL)).thenReturn(true);
+    var views = collaborationOpportunitiesSummaryService.getValidatedSummaryViews(detail);
+    assertThat(views.size()).isEqualTo(2);
+    var view1 = views.get(0);
+    var view2 = views.get(1);
+    assertThat(view1.isValid()).isTrue();
+    assertThat(view2.isValid()).isFalse();
+  }
+
+  @Test
+  public void getErrors() {
+    var views = List.of(
+        CollaborationOpportunityTestUtil.getView(UpcomingTenderUtil.DISPLAY_ORDER, true),
+        CollaborationOpportunityTestUtil.getView(2, false),
+        CollaborationOpportunityTestUtil.getView(3, false)
+    );
+    var errors = collaborationOpportunitiesSummaryService.getErrors(views);
+    assertThat(errors.size()).isEqualTo(2);
+    assertThat(errors.get(0).getDisplayOrder()).isEqualTo(2);
+    assertThat(errors.get(0).getFieldName()).isEqualTo(String.format(CollaborationOpportunitiesSummaryService.ERROR_FIELD_NAME, 2));
+    assertThat(errors.get(0).getErrorMessage()).isEqualTo(String.format(CollaborationOpportunitiesSummaryService.ERROR_MESSAGE, 2));
+    assertThat(errors.get(1).getDisplayOrder()).isEqualTo(3);
+    assertThat(errors.get(1).getFieldName()).isEqualTo(String.format(CollaborationOpportunitiesSummaryService.ERROR_FIELD_NAME, 3));
+    assertThat(errors.get(1).getErrorMessage()).isEqualTo(String.format(CollaborationOpportunitiesSummaryService.ERROR_MESSAGE, 3));
+  }
+
+  @Test
+  public void getErrors_emptyList() {
+    var errors = collaborationOpportunitiesSummaryService.getErrors(Collections.emptyList());
+    assertThat(errors.size()).isEqualTo(1);
+    assertThat(errors.get(0).getDisplayOrder()).isEqualTo(1);
+    assertThat(errors.get(0).getFieldName()).isEqualTo(CollaborationOpportunitiesSummaryService.EMPTY_LIST_ERROR);
+    assertThat(errors.get(0).getErrorMessage()).isEqualTo(CollaborationOpportunitiesSummaryService.EMPTY_LIST_ERROR);
+  }
+
+  private void checkCommonFields(CollaborationOpportunityView view, CollaborationOpportunity opportunity) {
+    assertThat(view.getDescriptionOfWork()).isEqualTo(opportunity.getDescriptionOfWork());
+    assertThat(view.getUrgentResponseNeeded()).isEqualTo(StringDisplayUtil.yesNoFromBoolean(opportunity.getUrgentResponseNeeded()));
+    assertThat(view.getContactName()).isEqualTo(opportunity.getContactName());
+    assertThat(view.getContactPhoneNumber()).isEqualTo(opportunity.getPhoneNumber());
+    assertThat(view.getContactJobTitle()).isEqualTo(opportunity.getJobTitle());
+    assertThat(view.getContactEmailAddress()).isEqualTo(opportunity.getEmailAddress());
+    assertThat(view.getSummaryLinks()).extracting(SummaryLink::getLinkText).containsExactly(
+        SummaryLinkText.EDIT.getDisplayName(),
+        SummaryLinkText.DELETE.getDisplayName()
+    );
+  }
+
+  @Test
+  public void canShowInTaskList_whenCanShowInTaskList_thenTrue() {
+    when(collaborationOpportunitiesService.canShowInTaskList(detail)).thenReturn(true);
+
+    assertThat(collaborationOpportunitiesSummaryService.canShowInTaskList(detail)).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_whenCannotShowInTaskList_thenFalse() {
+    when(collaborationOpportunitiesService.canShowInTaskList(detail)).thenReturn(false);
+
+    assertThat(collaborationOpportunitiesSummaryService.canShowInTaskList(detail)).isFalse();
+  }
+
+  @Test
+  public void getSummaryViews_withProjectAndVersion_whenFound_thenReturnPopulatedList() {
+
+    final var collaborationOpportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
+
+    final var project = detail.getProject();
+    final var version = detail.getVersion();
+
+    when(collaborationOpportunitiesService.getOpportunitiesForProjectVersion(project, version))
+        .thenReturn(List.of(collaborationOpportunity));
+
+    final var result = collaborationOpportunitiesSummaryService.getSummaryViews(project, version);
+
+    assertThat(result).hasSize(1);
+
+    final var collaborationOpportunityView = result.get(0);
+
+    assertThat(collaborationOpportunityView.getFunction().getValue()).isEqualTo(collaborationOpportunity.getFunction().getDisplayName());
+    assertThat(collaborationOpportunityView.getFunction().getTag()).isEqualTo(Tag.NONE);
+    checkCommonFields(collaborationOpportunityView, collaborationOpportunity);
+
+  }
+
+  @Test
+  public void getSummaryViews_withProjectAndVersion_whenNotFound_thenReturnEmptyList() {
+
+    final var project = detail.getProject();
+    final var version = detail.getVersion();
+
+    when(collaborationOpportunitiesService.getOpportunitiesForProjectVersion(project, version))
+        .thenReturn(Collections.emptyList());
+
+    final var result = collaborationOpportunitiesSummaryService.getSummaryViews(project, version);
+    assertThat(result).isEmpty();
+  }
+}

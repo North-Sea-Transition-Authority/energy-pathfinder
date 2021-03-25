@@ -1,0 +1,40 @@
+@mixin display-none {
+  display: none;
+}
+
+.operator-projects {
+
+  &__table {
+
+    &--hide {
+      @include display-none;
+    }
+  }
+
+  &__no-update-required-row {
+
+    &--hide {
+      @include display-none;
+    }
+
+  }
+
+  &__inset {
+
+    margin-top: 0;
+
+    &--hide {
+      @include display-none;
+    }
+  }
+
+  &__tag {
+    margin-left: auto;
+    margin-right: 12rem;
+  }
+
+  &__updated-date {
+    display: flex;
+  }
+
+}

@@ -1,0 +1,103 @@
+plugins {
+  id 'org.springframework.boot' version '2.3.1.RELEASE'
+  id 'java'
+  id 'jacoco'
+  id 'checkstyle'
+  id 'war'
+  id 'org.sonarqube' version '2.8'
+  id "org.owasp.dependencycheck" version "6.1.2"
+}
+
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'org.owasp.dependencycheck'
+
+group = 'uk.co.fivium'
+version = System.getenv("DRONE_BRANCH") ? System.getenv("DRONE_BRANCH").replaceAll("[/\\-]", "_") : "LOCAL-SNAPSHOT"
+sourceCompatibility = '11'
+
+tasks {
+  bootJar {
+    archiveFileName.set("${rootProject.name}.jar")
+  }
+}
+
+repositories {
+  mavenCentral()
+  maven {
+    url("http://nexus.fivium.local:8081/repository/maven-releases/")
+  }
+  maven {
+    url  "https://dl.bintray.com/gov-uk-notify/maven"
+  }
+}
+
+dependencies {
+
+  providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+
+  implementation 'org.springframework.boot:spring-boot-starter'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+  implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
+  implementation ('org.springframework.boot:spring-boot-starter-quartz') {
+    exclude group: 'com.zaxxer', module: 'HikariCP-java7'
+    // workaround for https://github.com/spring-projects/spring-boot/issues/16489
+  }
+
+  compile 'org.flywaydb:flyway-core:5.2.1-FIVIUM'
+  compile 'com.oracle:ojdbc7:12.1.0.2'
+  compile 'org.springframework.session:spring-session-jdbc'
+  compile('uk.gov.service.notify:notifications-java-client:3.12.0-RELEASE')
+
+  compile 'com.google.guava:guava:28.1-jre'
+  compile 'org.apache.commons:commons-lang3:3.9'
+  compile 'org.apache.commons:commons-collections4:4.4'
+  compile group: 'commons-validator', name: 'commons-validator', version: '1.7'
+  compile group: 'com.googlecode.libphonenumber', name: 'libphonenumber', version: '8.12.8'
+  compile group: 'fi.solita.clamav', name: 'clamav-client', version: '1.0.1'
+
+  testCompile 'com.h2database:h2:1.4.197'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.security:spring-security-test'
+}
+
+checkstyle {
+  config = rootProject.resources.text.fromFile('ide/checkstyle.xml')
+  toolVersion '8.28'
+  ignoreFailures = false
+  maxWarnings = 0
+}
+
+tasks.jacocoTestReport {
+  reports {
+    xml.enabled(true)
+    html.enabled(false)
+  }
+}
+
+dependencyCheck {
+  data {
+    // Point to a persisted volume in drone, to avoid having to re-download the whole CVE database each run.
+    // Comment this out to run locally
+    directory='/var/nvd-db'
+  }
+}
+
+sonarqube {
+  properties {
+    property("sonar.projectKey", "fiviumuk_pathfinder")
+    property("sonar.host.url", "https://sonarcloud.io")
+    property("sonar.login", System.getenv("SONAR_TOKEN"))
+    property("sonar.organization", "fivium")
+    property("sonar.branch.name", System.getenv("DRONE_BRANCH"))
+    if (System.getenv("DRONE_BRANCH").startsWith("feature")) {
+      property("sonar.branch.target", "develop")
+    }
+    property("sonar.exclusions", "src/test/**, src/main/resources/public/assets/**, fivium-design-system-core/**, src/main/resources/templates/fds/**, build/**")
+    property("sonar.sources", "src")
+  }
+}

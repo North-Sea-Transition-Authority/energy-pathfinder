@@ -1,0 +1,55 @@
+package uk.co.ogauthority.pathfinder.controller.project;
+
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.project.selectoperator.SelectProjectOperatorController;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
+
+@Controller
+public class StartProjectController {
+
+
+  private final StartProjectService startProjectService;
+  private final TeamService teamService;
+
+  @Autowired
+  public StartProjectController(StartProjectService startProjectService,
+                                TeamService teamService) {
+    this.startProjectService = startProjectService;
+    this.teamService = teamService;
+  }
+
+  @GetMapping("/start-project")
+  public ModelAndView startPage(AuthenticatedUserAccount user) {
+    return new ModelAndView("project/startPage")
+        .addObject("startActionUrl", ReverseRouter.route(on(StartProjectController.class).startProject(user)));
+  }
+
+  /**
+   * If a user is in multiple teams direct them to a page to choose which team the project is for.
+   * If they are in a single team create a project for that team.
+   * @param user the user creating the project.
+   * @return task list or the select a team page.
+   */
+  @PostMapping("/start-project")
+  public ModelAndView startProject(AuthenticatedUserAccount user) {
+    //if in multiple teams redirect to the team select
+    var organisationTeams = teamService.getOrganisationTeamsPersonIsMemberOf(user.getLinkedPerson());
+
+    if (organisationTeams.size() > 1) {
+      return ReverseRouter.redirect(on(SelectProjectOperatorController.class).selectOperator(null));
+    }
+
+    //User is in one team so start project
+    var projectDetail = startProjectService.startProject(user, organisationTeams.get(0).getPortalOrganisationGroup());
+    return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectDetail.getProject().getId(), null));
+  }
+}

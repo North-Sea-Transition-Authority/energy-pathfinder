@@ -1,0 +1,1 @@
+GRANT SELECT, INSERT ON ${datasource.user}.project_archive_details TO ${datasource.migration-user};
