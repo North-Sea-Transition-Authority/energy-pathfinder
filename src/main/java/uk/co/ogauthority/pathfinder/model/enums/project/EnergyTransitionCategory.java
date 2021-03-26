@@ -6,7 +6,7 @@ import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
 public enum EnergyTransitionCategory {
 
-  CARBON_CAPTURE_UTILISATION_AND_STORAGE("Carbon capture, utilisation and storage (CCUS)"),
+  CARBON_CAPTURE_UTILISATION_AND_STORAGE("Carbon capture and storage (CCS)"),
   ELECTRIFICATION("Electrification"),
   HYDROGEN("Hydrogen"),
   OFFSHORE_POWER_GENERATION("Offshore power generation");
