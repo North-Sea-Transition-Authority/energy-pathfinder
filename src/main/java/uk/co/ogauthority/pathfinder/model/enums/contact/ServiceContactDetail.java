@@ -7,6 +7,7 @@ public enum ServiceContactDetail {
       "OGA",
       "pathfinder@ogauthority.co.uk",
       "",
+      "https://www.ogauthority.co.uk/supply-chain/energy-pathfinder/",
       "For example, questions about filling in your project and the information you need to provide",
       true,
       10
@@ -16,6 +17,7 @@ public enum ServiceContactDetail {
       "UKOP service desk",
       "ukop@ogauthority.co.uk",
       "0300 067 1682",
+      "",
       "For example, unexpected problems using the service or system errors being received",
       true,
       20
@@ -29,6 +31,8 @@ public enum ServiceContactDetail {
 
   private final String phoneNumber;
 
+  private final String guidanceUrl;
+
   private final String description;
 
   private final boolean shownOnContactPage;
@@ -39,6 +43,7 @@ public enum ServiceContactDetail {
                        String serviceName,
                        String emailAddress,
                        String phoneNumber,
+                       String guidanceUrl,
                        String description,
                        boolean shownOnContactPage,
                        int displayOrder) {
@@ -46,6 +51,7 @@ public enum ServiceContactDetail {
     this.serviceName = serviceName;
     this.emailAddress = emailAddress;
     this.phoneNumber = phoneNumber;
+    this.guidanceUrl = guidanceUrl;
     this.description = description;
     this.shownOnContactPage = shownOnContactPage;
     this.displayOrder = displayOrder;
@@ -65,6 +71,10 @@ public enum ServiceContactDetail {
 
   public String getPhoneNumber() {
     return phoneNumber;
+  }
+
+  public String getGuidanceUrl() {
+    return guidanceUrl;
   }
 
   public String getDescription() {
