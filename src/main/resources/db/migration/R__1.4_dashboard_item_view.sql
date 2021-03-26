@@ -58,7 +58,9 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
       ) update_deadline_date
     , COALESCE(
         (
-          SELECT rru.deadline_date
+          -- We use the year 3999 as the constant here to ensure projects which have an update
+          -- request without a deadline date appear before projects without an update request
+          SELECT COALESCE(rru.deadline_date, TO_TIMESTAMP ('01-01-3999 00:00:00.000000', 'DD-MM-YYYY HH24:MI:SS.FF'))
           FROM regulator_requested_updates rru
           WHERE rru.project_id = pd.project_id
         )
