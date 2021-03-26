@@ -16,7 +16,7 @@
       <li>Email: <@fdsAction.link linkText=serviceContact.emailAddress linkUrl="mailto:${serviceContact.emailAddress}"/></li>
     </#if>
     <#if serviceContact.guidanceUrl?has_content>
-      <li>Online guidance: <@fdsAction.link linkText=serviceContact.guidanceUrl linkUrl=serviceContact.guidanceUrl/></li>
+      <li>Online guidance: <@fdsAction.link linkText=serviceContact.guidanceUrl linkUrl=serviceContact.guidanceUrl openInNewTab=true /></li>
     </#if>
   </ul>
 </#macro>
