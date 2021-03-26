@@ -15,17 +15,19 @@ public class ProjectManagementDetailViewUtil {
   public static ProjectManagementDetailView from(ProjectDetail projectDetail,
                                                  ProjectInformation projectInformation,
                                                  ProjectLocation projectLocation,
+                                                 boolean isEnergyTransitionProject,
                                                  WebUserAccount submitterAccount) {
     var projectManagementDetailView = new ProjectManagementDetailView();
 
     projectManagementDetailView.setFieldStage(projectInformation.getFieldStage().getDisplayName());
 
-    var field = projectLocation.getField() != null
+    var field = projectLocation != null && projectLocation.getField() != null
         ? projectLocation.getField().getFieldName()
         : null;
     projectManagementDetailView.setField(field);
 
     projectManagementDetailView.setStatus(projectDetail.getStatus().getDisplayName());
+    projectManagementDetailView.setIsEnergyTransitionProject(isEnergyTransitionProject);
     projectManagementDetailView.setSubmissionDate(DateUtil.formatInstant(projectDetail.getSubmittedInstant()));
     projectManagementDetailView.setSubmittedByUser(submitterAccount.getFullName());
     projectManagementDetailView.setSubmittedByUserEmail(submitterAccount.getEmailAddress());

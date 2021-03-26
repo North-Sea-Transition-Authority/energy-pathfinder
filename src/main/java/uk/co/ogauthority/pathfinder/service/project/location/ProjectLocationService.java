@@ -27,6 +27,7 @@ import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationR
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -40,6 +41,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
   private final ValidationService validationService;
   private final ProjectLocationFormValidator projectLocationFormValidator;
   private final ProjectLocationBlocksService projectLocationBlocksService;
+  private final ProjectInformationService projectInformationService;
   private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
@@ -49,6 +51,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
                                 ValidationService validationService,
                                 ProjectLocationFormValidator projectLocationFormValidator,
                                 ProjectLocationBlocksService projectLocationBlocksService,
+                                ProjectInformationService projectInformationService,
                                 EntityDuplicationService entityDuplicationService) {
     this.projectLocationRepository = projectLocationRepository;
     this.fieldService = fieldService;
@@ -56,6 +59,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
     this.validationService = validationService;
     this.projectLocationFormValidator = projectLocationFormValidator;
     this.projectLocationBlocksService = projectLocationBlocksService;
+    this.projectInformationService = projectInformationService;
     this.entityDuplicationService = entityDuplicationService;
   }
 
@@ -282,7 +286,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
 
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
-    return ProjectService.isInfrastructureProject(detail);
+    return ProjectService.isInfrastructureProject(detail) && !projectInformationService.isEnergyTransitionProject(detail);
   }
 
 }

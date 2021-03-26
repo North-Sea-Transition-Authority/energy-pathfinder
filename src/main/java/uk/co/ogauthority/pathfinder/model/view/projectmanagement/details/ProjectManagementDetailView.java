@@ -10,6 +10,8 @@ public class ProjectManagementDetailView {
 
   private String status;
 
+  private boolean isEnergyTransitionProject;
+
   private String submissionDate;
 
   private String submittedByUser;
@@ -38,6 +40,14 @@ public class ProjectManagementDetailView {
 
   public void setStatus(String status) {
     this.status = status;
+  }
+
+  public boolean getIsEnergyTransitionProject() {
+    return isEnergyTransitionProject;
+  }
+
+  public void setIsEnergyTransitionProject(boolean isEnergyTransitionProject) {
+    this.isEnergyTransitionProject = isEnergyTransitionProject;
   }
 
   public String getSubmissionDate() {
@@ -76,6 +86,7 @@ public class ProjectManagementDetailView {
     return Objects.equals(fieldStage, that.fieldStage)
         && Objects.equals(field, that.field)
         && Objects.equals(status, that.status)
+        && Objects.equals(isEnergyTransitionProject, that.isEnergyTransitionProject)
         && Objects.equals(submissionDate, that.submissionDate)
         && Objects.equals(submittedByUser, that.submittedByUser)
         && Objects.equals(submittedByUserEmail, that.submittedByUserEmail);
@@ -87,6 +98,7 @@ public class ProjectManagementDetailView {
         fieldStage,
         field,
         status,
+        isEnergyTransitionProject,
         submissionDate,
         submittedByUser,
         submittedByUserEmail

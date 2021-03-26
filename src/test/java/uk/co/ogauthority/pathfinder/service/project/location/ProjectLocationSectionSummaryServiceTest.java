@@ -49,6 +49,20 @@ public class ProjectLocationSectionSummaryServiceTest {
   }
 
   @Test
+  public void canShowSection_whenCanShowInTaskList_thenTrue() {
+    when(projectLocationService.canShowInTaskList(detail)).thenReturn(true);
+
+    assertThat(projectLocationSectionSummaryService.canShowSection(detail)).isTrue();
+  }
+
+  @Test
+  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
+    when(projectLocationService.canShowInTaskList(detail)).thenReturn(false);
+
+    assertThat(projectLocationSectionSummaryService.canShowSection(detail)).isFalse();
+  }
+
+  @Test
   public void getSummary() {
     when(projectLocationService.getProjectLocationByProjectDetail(detail)).thenReturn(Optional.of(projectLocation));
 

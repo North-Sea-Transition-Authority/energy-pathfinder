@@ -482,4 +482,74 @@ public class ProjectInformationServiceTest {
     projectDetail.setProjectType(null);
     assertThat(projectInformationService.canShowInTaskList(projectDetail)).isFalse();
   }
+
+  @Test
+  public void isDecomRelated_whenDecommissioningFieldStage_thenTrue() {
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
+    projectInformation.setFieldStage(FieldStage.DECOMMISSIONING);
+
+    when(projectInformationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectInformation));
+
+    assertThat(projectInformationService.isDecomRelated(details)).isTrue();
+  }
+
+  @Test
+  public void isDecomRelated_whenNotDecommissioningFieldStage_thenFalse() {
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
+    projectInformation.setFieldStage(FieldStage.DISCOVERY);
+
+    when(projectInformationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectInformation));
+
+    assertThat(projectInformationService.isDecomRelated(details)).isFalse();
+  }
+
+  @Test
+  public void isDecomRelated_whenNoProjectInformation_thenFalse() {
+    when(projectInformationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
+
+    assertThat(projectInformationService.isDecomRelated(details)).isFalse();
+  }
+
+  @Test
+  public void isEnergyTransitionProject_whenProjectDetailAndEnergyTransitionFieldStage_thenTrue() {
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
+    projectInformation.setFieldStage(FieldStage.ENERGY_TRANSITION);
+
+    when(projectInformationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectInformation));
+
+    assertThat(projectInformationService.isEnergyTransitionProject(details)).isTrue();
+  }
+
+  @Test
+  public void isEnergyTransitionProject_whenProjectDetailAndNotEnergyTransitionFieldStage_thenFalse() {
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
+    projectInformation.setFieldStage(FieldStage.DISCOVERY);
+
+    when(projectInformationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectInformation));
+
+    assertThat(projectInformationService.isEnergyTransitionProject(details)).isFalse();
+  }
+
+  @Test
+  public void isEnergyTransitionProject_whenProjectDetailAndNoProjectInformation_thenFalse() {
+    when(projectInformationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
+
+    assertThat(projectInformationService.isEnergyTransitionProject(details)).isFalse();
+  }
+
+  @Test
+  public void isEnergyTransitionProject_whenProjectInformationAndEnergyTransitionFieldStage_thenTrue() {
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
+    projectInformation.setFieldStage(FieldStage.ENERGY_TRANSITION);
+
+    assertThat(projectInformationService.isEnergyTransitionProject(projectInformation)).isTrue();
+  }
+
+  @Test
+  public void isEnergyTransitionProject_whenProjectInformationAndNotEnergyTransitionFieldStage_thenFalse() {
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
+    projectInformation.setFieldStage(FieldStage.DISCOVERY);
+
+    assertThat(projectInformationService.isEnergyTransitionProject(projectInformation)).isFalse();
+  }
 }

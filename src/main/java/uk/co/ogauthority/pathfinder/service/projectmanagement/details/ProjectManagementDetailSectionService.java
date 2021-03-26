@@ -40,13 +40,15 @@ public class ProjectManagementDetailSectionService implements ProjectManagementS
     Map<String, Object> summaryModel = new HashMap<>();
 
     var projectInformation = projectInformationService.getProjectInformationOrError(projectDetail);
-    var projectLocation = projectLocationService.getOrError(projectDetail);
+    var isEnergyTransitionProject = projectInformationService.isEnergyTransitionProject(projectInformation);
+    var projectLocation = !isEnergyTransitionProject ? projectLocationService.getOrError(projectDetail) : null;
     var submitterAccount = webUserAccountService.getWebUserAccountOrError(projectDetail.getSubmittedByWua());
 
     var projectManagementDetailView = ProjectManagementDetailViewUtil.from(
         projectDetail,
         projectInformation,
         projectLocation,
+        isEnergyTransitionProject,
         submitterAccount
     );
     summaryModel.put("projectManagementDetailView", projectManagementDetailView);
