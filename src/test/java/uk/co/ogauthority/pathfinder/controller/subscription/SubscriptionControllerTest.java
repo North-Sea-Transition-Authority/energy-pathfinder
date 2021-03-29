@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.UUID;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -19,10 +20,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.subscription.SubscriptionService;
+import uk.co.ogauthority.pathfinder.testutil.MetricsProviderTestUtil;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(SubscriptionController.class)
@@ -32,6 +35,15 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
 
   @MockBean
   private SubscriptionService subscriptionService;
+
+  @MockBean
+  private MetricsProvider metricsProvider;
+
+  @Before
+  public void setUp() throws Exception {
+    when(metricsProvider.getSubscribePageHitCounter()).thenReturn(MetricsProviderTestUtil.getNoOpCounter());
+    when(metricsProvider.getUnSubscribePageHitCounter()).thenReturn(MetricsProviderTestUtil.getNoOpCounter());
+  }
 
   @Test
   public void getSubscribe() throws Exception {
