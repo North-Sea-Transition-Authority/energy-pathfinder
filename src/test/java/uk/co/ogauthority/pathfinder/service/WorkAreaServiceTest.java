@@ -6,6 +6,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import io.micrometer.core.instrument.Meter;
+import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.noop.NoopTimer;
 import java.util.List;
 import java.util.Set;
 import org.junit.Before;
@@ -16,6 +19,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
+import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
@@ -40,6 +44,9 @@ public class WorkAreaServiceTest {
   @Mock
   private DashboardService dashboardService;
 
+  @Mock
+  private MetricsProvider metricsProvider;
+
   private WorkAreaService workAreaService;
 
   private static final AuthenticatedUserAccount workAreaOnlyUser = UserTestingUtil.getAuthenticatedUserAccount(
@@ -56,8 +63,11 @@ public class WorkAreaServiceTest {
 
   @Before
   public void setUp() throws Exception {
-    workAreaService = new WorkAreaService(dashboardService);
+    workAreaService = new WorkAreaService(dashboardService, metricsProvider);
     when(dashboardService.getDashboardProjectItemViewsForUser(any(), any(), any())).thenReturn(dashboardProjectItemViews);
+    when(metricsProvider.getDashboardTimer()).thenReturn(
+          new NoopTimer(new Meter.Id("foo", Tags.empty(), null, null, Meter.Type.TIMER))
+        );
   }
 
   @Test
