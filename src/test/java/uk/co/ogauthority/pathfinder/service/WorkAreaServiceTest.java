@@ -6,9 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.Tags;
-import io.micrometer.core.instrument.noop.NoopTimer;
 import java.util.List;
 import java.util.Set;
 import org.junit.Before;
@@ -36,6 +33,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.dashboard.DashboardService;
 import uk.co.ogauthority.pathfinder.testutil.DashboardFilterTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.MetricsProviderTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -65,9 +63,7 @@ public class WorkAreaServiceTest {
   public void setUp() throws Exception {
     workAreaService = new WorkAreaService(dashboardService, metricsProvider);
     when(dashboardService.getDashboardProjectItemViewsForUser(any(), any(), any())).thenReturn(dashboardProjectItemViews);
-    when(metricsProvider.getDashboardTimer()).thenReturn(
-          new NoopTimer(new Meter.Id("foo", Tags.empty(), null, null, Meter.Type.TIMER))
-        );
+    when(metricsProvider.getDashboardTimer()).thenReturn(MetricsProviderTestUtil.getNoOpTimer());
   }
 
   @Test

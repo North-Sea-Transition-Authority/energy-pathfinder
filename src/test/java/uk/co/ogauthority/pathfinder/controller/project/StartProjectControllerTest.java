@@ -10,9 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.Tags;
-import io.micrometer.core.instrument.noop.NoopCounter;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +25,7 @@ import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
+import uk.co.ogauthority.pathfinder.testutil.MetricsProviderTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
@@ -52,9 +50,7 @@ public class StartProjectControllerTest extends AbstractControllerTest {
 
   @Before
   public void setUp() throws Exception {
-    when(metricsProvider.getProjectStartCounter()).thenReturn(
-        new NoopCounter(new Meter.Id("foo", Tags.empty(), null, null, Meter.Type.COUNTER))
-    );
+    when(metricsProvider.getProjectStartCounter()).thenReturn(MetricsProviderTestUtil.getNoOpCounter());
   }
 
   @Test

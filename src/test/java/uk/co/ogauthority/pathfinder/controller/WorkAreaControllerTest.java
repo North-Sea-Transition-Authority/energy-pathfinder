@@ -20,6 +20,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
@@ -30,6 +31,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.WorkAreaService;
 import uk.co.ogauthority.pathfinder.service.dashboard.DashboardService;
 import uk.co.ogauthority.pathfinder.testutil.DashboardFilterTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.MetricsProviderTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
@@ -49,6 +51,9 @@ public class WorkAreaControllerTest extends AbstractControllerTest {
   @MockBean
   private DashboardService dashboardService;
 
+  @MockBean
+  private MetricsProvider metricsProvider;
+
   @Autowired
   private WorkAreaService workAreaService;
 
@@ -64,6 +69,7 @@ public class WorkAreaControllerTest extends AbstractControllerTest {
   public void setUp() throws Exception {
     when(dashboardService.getDefaultFilterForUser(authenticatedUser))
         .thenReturn(new DashboardFilter(DashboardService.OPERATOR_STATUS_DEFAULTS));
+    when(metricsProvider.getDashboardTimer()).thenReturn(MetricsProviderTestUtil.getNoOpTimer());
   }
 
   @Test
