@@ -1,0 +1,1 @@
+GRANT SELECT, INSERT ON ${datasource.user}.decommissioning_schedules TO ${datasource.migration-user};

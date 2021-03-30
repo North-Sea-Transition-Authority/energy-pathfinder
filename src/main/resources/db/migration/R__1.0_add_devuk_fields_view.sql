@@ -6,4 +6,4 @@ SELECT
 , andf.status
 , andf.ukcs_area
 FROM devukmgr.api_non_deleted_fields andf
-WHERE andf.ukcs_area != 'LAND';
+WHERE (andf.ukcs_area != 'LAND' OR andf.ukcs_area IS NULL);
