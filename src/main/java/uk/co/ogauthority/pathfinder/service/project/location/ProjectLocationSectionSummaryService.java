@@ -41,6 +41,11 @@ public class ProjectLocationSectionSummaryService implements ProjectSectionSumma
   }
 
   @Override
+  public boolean canShowSection(ProjectDetail detail) {
+    return projectLocationService.canShowInTaskList(detail);
+  }
+
+  @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
     Map<String, Object> summaryModel = new HashMap<>();
     summaryModel.put("sectionTitle", PAGE_NAME);

@@ -21,6 +21,929 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   END raise_exception_with_trace;
 
   /**
+    Utility procedure to create a row in the migration_check_log table of type p_migration_type. Logs will be
+    appended for when p_migration_type is provided to the log procedure
+    @param p_migration_type An identifier for the migration check record
+   */
+  PROCEDURE create_migration_check_log(
+    p_migration_type IN ${datasource.migration-user}.migration_check_log.migration_type%TYPE
+  )
+  IS
+
+    PRAGMA AUTONOMOUS_TRANSACTION;
+
+  BEGIN
+
+    INSERT INTO ${datasource.migration-user}.migration_check_log(
+      migration_type
+    )
+    VALUES(
+      p_migration_type
+    );
+
+    COMMIT;
+
+  END create_migration_check_log;
+
+  /**
+    Utility procedure to append p_log_message to the log of a migration_check_log record
+    @param p_migration_type The identifier of the migration_check_log record to append the log too
+    @param p_log_message The log message to append to the migration_check_log record
+   */
+  PROCEDURE log_migration_check(
+    p_migration_type IN ${datasource.migration-user}.migration_check_log.migration_type%TYPE
+  , p_log_message IN VARCHAR2
+  )
+    IS
+
+    PRAGMA AUTONOMOUS_TRANSACTION;
+
+  BEGIN
+
+    UPDATE ${datasource.migration-user}.migration_check_log mcl
+    SET mcl.check_output = mcl.check_output || CHR(10) || p_log_message || CHR(10)
+    WHERE mcl.migration_type = p_migration_type;
+
+    IF SQL%ROWCOUNT != 1 THEN
+
+      raise_exception_with_trace(
+        p_message_prefix => 'Could not find single migration_check_log record to update with type p_migration_type => ' || p_migration_type
+      );
+
+    END IF;
+
+    COMMIT;
+
+  END log_migration_check;
+
+  /**
+    Utility procedure to run the subscriber migration checks and log the output to the migration_check_log table
+   */
+  PROCEDURE run_subscriber_checks
+  IS
+
+    K_SUBSCRIBER_MIGRATION_TYPE CONSTANT ${datasource.migration-user}.migration_check_log.migration_type%TYPE := 'SUBSCRIBERS';
+
+    TYPE subscriber_inconsistency_rec IS RECORD (
+      forename VARCHAR2(4000)
+    , surname VARCHAR2(4000)
+    , email_address VARCHAR2(4000)
+    );
+
+    TYPE subscriber_inconsistencies IS TABLE OF subscriber_inconsistency_rec;
+
+    l_all_migrations_completed VARCHAR2(4000);
+
+    l_total_legacy_subscribers NUMBER;
+    l_total_migrated_subscribers NUMBER;
+    l_number_of_rows_correct VARCHAR2(4000);
+
+    l_migration_issues subscriber_inconsistencies;
+    l_subscriber subscriber_inconsistency_rec;
+    l_no_migration_inconsistencies VARCHAR2(4000);
+
+  BEGIN
+
+    create_migration_check_log(p_migration_type => K_SUBSCRIBER_MIGRATION_TYPE);
+
+    log_migration_check(
+      p_migration_type => K_SUBSCRIBER_MIGRATION_TYPE
+    , p_log_message => 'STARTING SUBSCRIBER MIGRATION CHECKS'
+    );
+
+    SELECT DECODE(COUNT(*), 0, K_MIGRATION_CHECK_PASS, K_MIGRATION_CHECK_FAIL)
+    INTO l_all_migrations_completed
+    FROM ${datasource.migration-user}.subscriber_migration_log sml
+    WHERE sml.migration_status != K_COMPLETE_MIGRATION_STATUS;
+
+    log_migration_check(
+      p_migration_type => K_SUBSCRIBER_MIGRATION_TYPE
+    , p_log_message => 'CHECK 1 - All migrations have status of ' || K_COMPLETE_MIGRATION_STATUS || ': ' || l_all_migrations_completed
+    );
+
+    FOR incomplete_migration IN (
+      SELECT
+        sml.id
+      , sml.migration_status
+      FROM ${datasource.migration-user}.subscriber_migration_log sml
+      WHERE sml.migration_status != K_COMPLETE_MIGRATION_STATUS
+    )
+    LOOP
+
+      log_migration_check(
+        p_migration_type => K_SUBSCRIBER_MIGRATION_TYPE
+      , p_log_message => 'subscriber_migration_log entry with ID ' || incomplete_migration.id || ' has migration_status ' || incomplete_migration.migration_status
+      );
+
+    END LOOP;
+
+    SELECT COUNT(*)
+    INTO l_total_legacy_subscribers
+    FROM ${datasource.migration-user}.legacy_subscribers ls;
+
+    SELECT COUNT(*)
+    INTO l_total_migrated_subscribers
+    FROM ${datasource.user}.subscribers s;
+
+    IF l_total_legacy_subscribers = l_total_migrated_subscribers THEN
+      l_number_of_rows_correct := K_MIGRATION_CHECK_PASS;
+    ELSE
+      l_number_of_rows_correct := K_MIGRATION_CHECK_FAIL;
+    END IF;
+
+    log_migration_check(
+      p_migration_type => K_SUBSCRIBER_MIGRATION_TYPE
+    , p_log_message => 'CHECK 2 - All legacy rows have been migrated: ' || l_number_of_rows_correct || CHR(10) || CHR(10)
+        || 'Total legacy subscribers: ' || l_total_legacy_subscribers || CHR(10) || CHR(10)
+        || 'Total migrated subscribers:' || l_total_migrated_subscribers
+    );
+
+    SELECT
+      ls.forename
+    , ls.surname
+    , ls.email_address
+    BULK COLLECT INTO l_migration_issues
+    FROM ${datasource.migration-user}.legacy_subscribers ls
+    MINUS
+    SELECT
+      s.forename
+    , s.surname
+    , s.email_address
+    FROM ${datasource.user}.subscribers s;
+
+    IF l_migration_issues.COUNT = 0 THEN
+      l_no_migration_inconsistencies := K_MIGRATION_CHECK_PASS;
+    ELSE
+      l_no_migration_inconsistencies := K_MIGRATION_CHECK_FAIL;
+    END IF;
+
+    log_migration_check(
+      p_migration_type => K_SUBSCRIBER_MIGRATION_TYPE
+    , p_log_message => 'CHECK 3 - No inconsistencies between legacy and migrated data: ' || l_no_migration_inconsistencies
+    );
+
+    FOR migration_issue_idx IN 1..l_migration_issues.COUNT LOOP
+
+      l_subscriber := l_migration_issues(migration_issue_idx);
+
+      log_migration_check(
+        p_migration_type => K_SUBSCRIBER_MIGRATION_TYPE
+      , p_log_message => 'FORENAME: ' || l_subscriber.forename || ', SURNAME: ' || l_subscriber.surname || ', EMAIL_ADDRESS: ' || l_subscriber.email_address
+      );
+
+    END LOOP;
+
+    log_migration_check(
+      p_migration_type => K_SUBSCRIBER_MIGRATION_TYPE
+    , p_log_message => 'FINISHED SUBSCRIBER MIGRATION CHECKS'
+    );
+
+  END run_subscriber_checks;
+
+  /**
+    Utility procedure to run the team migration checks and log the output to the migration_check_log table
+   */
+  PROCEDURE run_team_migration_checks
+  IS
+
+    K_TEAM_MIGRATION_TYPE CONSTANT ${datasource.migration-user}.migration_check_log.migration_type%TYPE := 'TEAMS';
+
+    l_all_migrations_completed VARCHAR2(4000);
+
+    l_missing_people bpmmgr.number_list_type;
+    l_migration_check VARCHAR2(4000);
+
+  BEGIN
+
+    create_migration_check_log(p_migration_type => K_TEAM_MIGRATION_TYPE);
+
+    log_migration_check(
+      p_migration_type => K_TEAM_MIGRATION_TYPE
+    , p_log_message => 'STARTING TEAMS MIGRATION CHECKS'
+    );
+
+    SELECT DECODE(COUNT(*), 0, K_MIGRATION_CHECK_PASS, K_MIGRATION_CHECK_FAIL)
+    INTO l_all_migrations_completed
+    FROM ${datasource.migration-user}.team_migration_log tml
+    WHERE tml.migration_status !=  K_COMPLETE_MIGRATION_STATUS;
+
+    log_migration_check(
+      p_migration_type => K_TEAM_MIGRATION_TYPE
+    , p_log_message => 'CHECK 1 - All migrations have status of ' || K_COMPLETE_MIGRATION_STATUS || ': ' || l_all_migrations_completed
+    );
+
+    FOR incomplete_migration IN (
+      SELECT
+        tml.id
+      , tml.migration_status
+      FROM ${datasource.migration-user}.team_migration_log tml
+      WHERE tml.migration_status != K_COMPLETE_MIGRATION_STATUS
+    )
+    LOOP
+
+      log_migration_check(
+        p_migration_type => K_TEAM_MIGRATION_TYPE
+      , p_log_message => 'team_migration_log entry with ID ' || incomplete_migration.id || ' has migration_status ' || incomplete_migration.migration_status
+      );
+
+    END LOOP;
+
+    log_migration_check(
+      p_migration_type => K_TEAM_MIGRATION_TYPE
+    , p_log_message => 'CHECK 2 - No inconsistencies between legacy and migrated teams'
+    );
+
+    FOR team IN (
+      SELECT
+        lt.legacy_resource_id
+      , tml.new_resource_id
+      , COALESCE(cog.name, lt.resource_type) name
+      FROM ${datasource.migration-user}.legacy_teams lt
+      JOIN ${datasource.migration-user}.team_migration_log tml ON tml.legacy_resource_id = lt.legacy_resource_id
+      LEFT JOIN decmgr.resource_usages_current ruc ON ruc.res_id = tml.legacy_resource_id
+      LEFT JOIN decmgr.current_organisation_groups cog ON cog.id || '++REGORGGRP' = ruc.uref
+    )
+    LOOP
+
+      SELECT rmc.person_id
+      BULK COLLECT INTO l_missing_people
+      FROM decmgr.resource_members_current rmc
+      JOIN securemgr.web_user_accounts wua ON wua.id = rmc.wua_id
+      WHERE rmc.res_id = team.legacy_resource_id
+      AND wua.account_status = 'ACTIVE'
+      MINUS
+      SELECT rmc.person_id
+      FROM decmgr.resource_members_current rmc
+      JOIN securemgr.web_user_accounts wua ON wua.id = rmc.wua_id
+      WHERE rmc.res_id = team.new_resource_id
+      AND wua.account_status = 'ACTIVE';
+
+      IF l_missing_people.COUNT = 0 THEN
+        l_migration_check := K_MIGRATION_CHECK_PASS;
+      ELSE
+        l_migration_check := K_MIGRATION_CHECK_FAIL;
+      END IF;
+
+      log_migration_check(
+        p_migration_type => K_TEAM_MIGRATION_TYPE
+      , p_log_message => team.name || ' - No inconsistencies between legacy and migrated team: ' || l_migration_check
+      );
+
+      IF l_missing_people.COUNT != 0 THEN
+
+        log_migration_check(
+          p_migration_type => K_TEAM_MIGRATION_TYPE
+        , p_log_message => l_missing_people.COUNT || ' people present in legacy team but missing from new team'
+        );
+
+      END IF;
+
+    END LOOP;
+
+    log_migration_check(
+      p_migration_type => K_TEAM_MIGRATION_TYPE
+    , p_log_message => 'FINISHED TEAMS MIGRATION CHECKS'
+    );
+
+  END run_team_migration_checks;
+
+  /**
+    Utility procedure to run the team migration checks and log the output to the migration_check_log table
+   */
+  PROCEDURE run_project_migration_checks
+  IS
+
+    K_PROJECT_MIGRATION_TYPE CONSTANT ${datasource.migration-user}.migration_check_log.migration_type%TYPE := 'PROJECTS';
+
+    l_project_migrations_completed VARCHAR2(4000);
+    l_detail_migrations_completed VARCHAR2(4000);
+
+    PROCEDURE run_project_count_checks(
+      p_check_number IN NUMBER
+    )
+    IS
+
+      l_legacy_project_count NUMBER;
+      l_legacy_project_detail_count NUMBER;
+      l_migrated_project_count NUMBER;
+      l_migrated_detail_count NUMBER;
+      l_migration_check VARCHAR2(4000);
+
+    BEGIN
+
+      SELECT
+        COUNT(DISTINCT lpd.legacy_project_id)
+      , COUNT(DISTINCT lpd.legacy_project_detail_id)
+      INTO
+        l_legacy_project_count
+      , l_legacy_project_detail_count
+      FROM ${datasource.migration-user}.legacy_project_data lpd;
+
+      SELECT COUNT(*)
+      INTO l_migrated_project_count
+      FROM ${datasource.user}.projects p;
+
+      SELECT COUNT(*)
+      INTO l_migrated_detail_count
+      FROM ${datasource.user}.project_details pd;
+
+      IF (l_legacy_project_count = l_migrated_project_count) AND l_legacy_project_detail_count = l_migrated_detail_count THEN
+        l_migration_check := K_MIGRATION_CHECK_PASS;
+      ELSE
+        l_migration_check := K_MIGRATION_CHECK_FAIL;
+      END IF;
+
+      log_migration_check(
+        p_migration_type => K_PROJECT_MIGRATION_TYPE
+      , p_log_message =>
+          'CHECK ' || p_check_number || ' - No inconsistencies between legacy and migrated project counts: ' || l_migration_check || CHR(10) || CHR(10) ||
+          'Total legacy projects: ' || l_legacy_project_count || CHR(10) || CHR(10) ||
+          'Total migrated projects: ' || l_migrated_project_count || CHR(10) || CHR(10) ||
+          'Total legacy project details: ' || l_legacy_project_detail_count || CHR(10) || CHR(10) ||
+          'Total migrated project details: ' || l_migrated_detail_count
+      );
+
+    END run_project_count_checks;
+
+    PROCEDURE run_project_status_checks(
+      p_check_number IN NUMBER
+    )
+    IS
+
+      TYPE status_inconsistency_record IS RECORD (
+        legacy_project_detail_id NUMBER
+      , status VARCHAR2(4000)
+      );
+
+      TYPE status_inconsistencies IS TABLE OF status_inconsistency_record;
+
+      l_status_inconsistencies status_inconsistencies;
+      l_status_inconsistency status_inconsistency_record;
+
+      l_migration_check VARCHAR2(4000);
+
+    BEGIN
+
+      SELECT
+        ppd.id legacy_project_detail_id
+      , DECODE(
+          ppd.status
+        , 'CURRENT', K_NEW_PUBLISHED_STATUS
+        , 'HISTORICAL', K_NEW_PUBLISHED_STATUS
+        , 'ARCHIVED', K_NEW_ARCHIVED_STATUS
+        ) status
+      BULK COLLECT INTO l_status_inconsistencies
+      FROM decmgr.path_project_details ppd
+      MINUS
+      SELECT
+        pdml.legacy_project_detail_id
+      , pd.status
+      FROM ${datasource.migration-user}.project_detail_migration_log pdml
+      JOIN ${datasource.user}.project_details pd ON pd.id = pdml.new_project_detail_id;
+
+      IF l_status_inconsistencies.COUNT = 0 THEN
+        l_migration_check := K_MIGRATION_CHECK_PASS;
+      ELSE
+        l_migration_check := K_MIGRATION_CHECK_FAIL;
+      END IF;
+
+      log_migration_check(
+        p_migration_type => K_PROJECT_MIGRATION_TYPE
+      , p_log_message => 'CHECK ' || p_check_number || ' - No inconsistencies between legacy and migrated project statuses: ' || l_migration_check
+      );
+
+      FOR status_inconsistency_idx IN 1..l_status_inconsistencies.COUNT LOOP
+
+        l_status_inconsistency := l_status_inconsistencies(status_inconsistency_idx);
+
+        log_migration_check(
+          p_migration_type => K_PROJECT_MIGRATION_TYPE
+        , p_log_message =>
+            'Legacy project detail with ID ' || l_status_inconsistency.legacy_project_detail_id || ' and status ' ||
+            l_status_inconsistency.status || ' does not have matched status in new model'
+        );
+
+      END LOOP;
+
+    END run_project_status_checks;
+
+    PROCEDURE run_project_operator_checks(
+      p_check_number IN NUMBER
+    )
+    IS
+
+      TYPE operator_inconsistency_record IS RECORD (
+        legacy_project_detail_id NUMBER
+      , operator_org_group_id NUMBER
+      );
+
+      TYPE operator_inconsistencies IS TABLE OF operator_inconsistency_record;
+
+      l_operator_inconsistencies operator_inconsistencies;
+      l_operator_inconsistency operator_inconsistency_record;
+
+      l_migration_check VARCHAR2(4000);
+
+    BEGIN
+
+      SELECT
+        lpd.legacy_project_detail_id
+      , lpd.operator_org_group_id
+      BULK COLLECT INTO l_operator_inconsistencies
+      FROM ${datasource.migration-user}.legacy_project_data lpd
+      MINUS
+      SELECT
+        pdml.legacy_project_detail_id
+      , po.operator_org_grp_id
+      FROM ${datasource.migration-user}.project_detail_migration_log pdml
+      JOIN ${datasource.user}.project_operators po ON po.project_detail_id = pdml.new_project_detail_id;
+
+      IF l_operator_inconsistencies.COUNT = 0 THEN
+        l_migration_check := K_MIGRATION_CHECK_PASS;
+      ELSE
+        l_migration_check := K_MIGRATION_CHECK_FAIL;
+      END IF;
+
+      log_migration_check(
+        p_migration_type => K_PROJECT_MIGRATION_TYPE
+      , p_log_message => 'CHECK ' || p_check_number || ' - No inconsistencies between legacy and migrated project operators: ' || l_migration_check
+      );
+
+      FOR operator_inconsistency_idx IN 1..l_operator_inconsistencies.COUNT LOOP
+
+        l_operator_inconsistency := l_operator_inconsistencies(operator_inconsistency_idx);
+
+        log_migration_check(
+          p_migration_type => K_PROJECT_MIGRATION_TYPE
+        , p_log_message =>
+            'Legacy project detail with ID ' || l_operator_inconsistency.legacy_project_detail_id || ' and operator ' ||
+            l_operator_inconsistency.operator_org_group_id || ' does not have same operator in new model'
+        );
+
+      END LOOP;
+
+    END run_project_operator_checks;
+
+    PROCEDURE run_project_information_checks(
+      p_check_number IN NUMBER
+    )
+    IS
+
+      TYPE info_inconsistency_record IS RECORD (
+        legacy_project_detail_id NUMBER
+      , project_title VARCHAR2(4000)
+      , project_summary VARCHAR2(4000)
+      , field_stage VARCHAR2(4000)
+      , contact_name VARCHAR2(4000)
+      , contact_email_address VARCHAR2(4000)
+      , contact_job_title VARCHAR2(4000)
+      , contact_tel_number VARCHAR2(4000)
+      , first_production_date_quarter VARCHAR2(4000)
+      , first_production_date_year NUMBER
+      );
+
+      TYPE information_inconsistencies IS TABLE OF info_inconsistency_record;
+
+      l_information_inconsistencies information_inconsistencies;
+      l_information_inconsistency info_inconsistency_record;
+
+      l_migration_check VARCHAR2(4000);
+
+    BEGIN
+
+      SELECT
+        lpd.legacy_project_detail_id
+      , lpd.project_title
+        -- this is only possible due to a 4000 character
+        -- restriction in PATH_PROJECT_MANAGE schema
+      , TO_CHAR(lpd.project_summary) project_summary
+      , DECODE(
+          lpd.field_stage
+        , 'CURRENT_PROJECT', 'DEVELOPMENT'
+        , 'DECOMMISSIONING', 'DECOMMISSIONING'
+        , 'DISCOVERY', 'DISCOVERY'
+        ) field_stage
+      , lpd.project_contact_name
+      , lpd.project_contact_email_address
+      , lpd.project_contact_job_title
+      , lpd.project_contact_tel_number
+      , DECODE(
+          lpd.first_production_quarter
+        , 0, NULL -- map 0 to NULL to cater for project having NS selected
+        , NULL, NULL -- map NULL to NULL
+        , 'Q' || lpd.first_production_quarter -- map the quarter value to Q1, Q2, Q3, Q4
+        ) first_production_quarter
+      , lpd.first_production_year
+      BULK COLLECT INTO l_information_inconsistencies
+      FROM ${datasource.migration-user}.legacy_project_data lpd
+      MINUS
+      SELECT
+        pdml.legacy_project_detail_id
+      , pi.project_title
+      , TO_CHAR(pi.project_summary)
+      , pi.field_stage
+      , pi.contact_name
+      , pi.email_address
+      , pi.job_title
+      , pi.phone_number
+      , pi.first_production_date_quarter
+      , pi.first_production_date_year
+      FROM ${datasource.migration-user}.project_detail_migration_log pdml
+      JOIN ${datasource.user}.project_information pi ON pi.project_detail_id = pdml.new_project_detail_id;
+
+      IF l_information_inconsistencies.COUNT = 0 THEN
+        l_migration_check := K_MIGRATION_CHECK_PASS;
+      ELSE
+        l_migration_check := K_MIGRATION_CHECK_FAIL;
+      END IF;
+
+      log_migration_check(
+        p_migration_type => K_PROJECT_MIGRATION_TYPE
+      , p_log_message => 'CHECK ' || p_check_number || ' - No inconsistencies between legacy and migrated project information: ' || l_migration_check
+      );
+
+      FOR information_inconsistency_idx IN 1..l_information_inconsistencies.COUNT LOOP
+
+        l_information_inconsistency := l_information_inconsistencies(information_inconsistency_idx);
+
+        log_migration_check(
+          p_migration_type => K_PROJECT_MIGRATION_TYPE
+        , p_log_message =>
+            'Legacy project detail with ID ' || l_information_inconsistency.legacy_project_detail_id ||
+            ' has project information data inconsistencies in the new model'
+        );
+
+      END LOOP;
+
+    END run_project_information_checks;
+
+    PROCEDURE run_project_location_checks(
+      p_check_number IN NUMBER
+    )
+    IS
+
+      TYPE location_inconsistency_record IS RECORD (
+        legacy_project_detail_id NUMBER
+      , field_type VARCHAR2(4000)
+      , fdp_approved NUMBER
+      );
+
+      TYPE location_inconsistencies IS TABLE OF location_inconsistency_record;
+
+      l_location_inconsistencies location_inconsistencies;
+      l_location_inconsistency location_inconsistency_record;
+
+      l_migration_check VARCHAR2(4000);
+
+    BEGIN
+
+      SELECT
+        lpd.legacy_project_detail_id
+      , DECODE(
+          lpd.field_type
+        , 'OIL_CONDENSATE', NULL
+        , 'GAS_CONDENSATE', NULL
+        , 'OIL_GAS_CONDENSATE', NULL
+        , lpd.field_type
+        ) field_type
+      , lpd.fdp_approved
+      BULK COLLECT INTO l_location_inconsistencies
+      FROM ${datasource.migration-user}.legacy_project_data lpd
+      MINUS
+      SELECT
+        pdml.legacy_project_detail_id
+      , pl.field_type
+      , pl.approved_fdp
+      FROM ${datasource.migration-user}.project_detail_migration_log pdml
+      JOIN ${datasource.user}.project_locations pl ON pl.project_detail_id = pdml.new_project_detail_id;
+
+      IF l_location_inconsistencies.COUNT = 0 THEN
+        l_migration_check := K_MIGRATION_CHECK_PASS;
+      ELSE
+        l_migration_check := K_MIGRATION_CHECK_FAIL;
+      END IF;
+
+      log_migration_check(
+        p_migration_type => K_PROJECT_MIGRATION_TYPE
+      , p_log_message => 'CHECK ' || p_check_number || ' - No inconsistencies between legacy and migrated project location: ' || l_migration_check
+      );
+
+      FOR location_inconsistency_idx IN 1..l_location_inconsistencies.COUNT LOOP
+
+        l_location_inconsistency := l_location_inconsistencies(location_inconsistency_idx);
+
+        log_migration_check(
+            p_migration_type => K_PROJECT_MIGRATION_TYPE
+          , p_log_message =>
+              'Legacy project detail with ID ' || l_location_inconsistency.legacy_project_detail_id ||
+              ' has project location data inconsistencies in the new model. FIELD_TYPE: ' || COALESCE(l_location_inconsistency.field_type, 'NULL') ||
+              ' FDP_APPROVED: ' || l_location_inconsistency.fdp_approved
+          );
+
+      END LOOP;
+
+    END run_project_location_checks;
+
+    PROCEDURE run_awarded_contracts_checks(
+      p_check_number IN NUMBER
+    )
+    IS
+
+      TYPE contract_inconsistency_record IS RECORD (
+        legacy_project_detail_id NUMBER
+      , contractor_name VARCHAR2(4000)
+      , description_of_work VARCHAR2(4000)
+      , date_awarded DATE
+      , contract_band VARCHAR2(4000)
+      , contact_name VARCHAR2(4000)
+      , contact_telephone_no VARCHAR2(4000)
+      , contact_email_address VARCHAR2(4000)
+      );
+
+      TYPE contract_inconsistencies IS TABLE OF contract_inconsistency_record;
+
+      l_contract_inconsistencies contract_inconsistencies;
+      l_contract_inconsistency contract_inconsistency_record;
+
+      l_migration_check VARCHAR2(4000);
+
+      l_legacy_contract_count NUMBER;
+      l_migrated_contract_count NUMBER;
+
+    BEGIN
+
+      SELECT COUNT(*)
+      INTO l_legacy_contract_count
+      FROM ${datasource.migration-user}.legacy_project_contracts lpc;
+
+      SELECT COUNT(*)
+      INTO l_migrated_contract_count
+      FROM ${datasource.user}.awarded_contracts co;
+
+      IF l_legacy_contract_count = l_migrated_contract_count THEN
+        l_migration_check := K_MIGRATION_CHECK_PASS;
+      ELSE
+        l_migration_check := K_MIGRATION_CHECK_FAIL;
+      END IF;
+
+      log_migration_check(
+        p_migration_type => K_PROJECT_MIGRATION_TYPE
+      , p_log_message =>
+          'CHECK ' || p_check_number || ' PART 1 - All legacy awarded contracts have been migrated: ' || l_migration_check || CHR(10) || CHR(10) ||
+          'Total legacy awarded contracts: ' || l_legacy_contract_count || CHR(10) || CHR(10) ||
+          'Total migrated awarded contracts: ' || l_migrated_contract_count
+
+      );
+
+      SELECT
+        lpc.legacy_project_detail_id
+      , lpc.contractor_name
+      , TO_CHAR(lpc.description_of_work) description_of_work
+      , lpc.date_awarded
+      , DECODE(
+          lpc.contract_band
+        , 'SMALL', 'LESS_THAN_25M'
+        , 'MEDIUM', 'LESS_THAN_25M'
+        , 'LARGE', 'GREATER_THAN_OR_EQUAL_TO_25M'
+        , NULL
+        ) contract_band
+      , DECODE(
+          lpc.contact_name
+        , 'Not Specified', NULL
+        , lpc.contact_name
+        ) contact_name
+      , lpc.contact_telephone_no
+      , lpc.contact_email_address
+      BULK COLLECT INTO l_contract_inconsistencies
+      FROM ${datasource.migration-user}.legacy_project_contracts lpc
+      MINUS
+      SELECT
+        pdml.legacy_project_detail_id
+      , ac.contractor_name
+      , TO_CHAR(ac.description_of_work)
+      , ac.date_awarded
+      , ac.contract_band
+      , ac.contact_name
+      , ac.phone_number
+      , ac.email_address
+      FROM ${datasource.migration-user}.project_detail_migration_log pdml
+      JOIN ${datasource.user}.awarded_contracts ac ON ac.project_detail_id = pdml.new_project_detail_id;
+
+      IF l_contract_inconsistencies.COUNT = 0 THEN
+        l_migration_check := K_MIGRATION_CHECK_PASS;
+      ELSE
+        l_migration_check := K_MIGRATION_CHECK_FAIL;
+      END IF;
+
+      log_migration_check(
+        p_migration_type => K_PROJECT_MIGRATION_TYPE
+      , p_log_message => 'CHECK ' || p_check_number || ' PART 2 - No inconsistencies between legacy and migrated awarded contracts: ' || l_migration_check
+      );
+
+      FOR contract_inconsistency_idx IN 1..l_contract_inconsistencies.COUNT LOOP
+
+        l_contract_inconsistency := l_contract_inconsistencies(contract_inconsistency_idx);
+
+        log_migration_check(
+          p_migration_type => K_PROJECT_MIGRATION_TYPE
+        , p_log_message =>
+            'Legacy project detail with ID ' || l_contract_inconsistency.legacy_project_detail_id ||
+            ' has awarded contract data inconsistencies in the new model. DESCRIPTION_OF_WORK: ' || l_contract_inconsistency.description_of_work ||
+            ' DATE_AWARDED: ' || l_contract_inconsistency.date_awarded
+        );
+
+      END LOOP;
+
+    END run_awarded_contracts_checks;
+
+    PROCEDURE run_collaboration_ops_checks(
+      p_check_number IN NUMBER
+    )
+    IS
+
+      TYPE collab_inconsistency_record IS RECORD (
+        legacy_project_detail_id NUMBER
+      , description_of_work VARCHAR2(4000)
+      , contact_name VARCHAR2(4000)
+      , contact_telephone_no VARCHAR2(4000)
+      , contact_email_address VARCHAR2(4000)
+      );
+
+      TYPE collaboration_inconsistencies IS TABLE OF collab_inconsistency_record;
+
+      l_collab_op_inconsistencies collaboration_inconsistencies;
+      l_collab_op_inconsistency collab_inconsistency_record;
+
+      l_migration_check VARCHAR2(4000);
+
+      l_legacy_collab_ops_count NUMBER;
+      l_migrated_collap_ops_count NUMBER;
+
+    BEGIN
+
+      SELECT COUNT(*)
+      INTO l_legacy_collab_ops_count
+      FROM ${datasource.migration-user}.legacy_project_challenges lpc;
+
+      SELECT COUNT(*)
+      INTO l_migrated_collap_ops_count
+      FROM ${datasource.user}.collaboration_opportunities co;
+
+      IF l_legacy_collab_ops_count = l_migrated_collap_ops_count THEN
+        l_migration_check := K_MIGRATION_CHECK_PASS;
+      ELSE
+        l_migration_check := K_MIGRATION_CHECK_FAIL;
+      END IF;
+
+      log_migration_check(
+        p_migration_type => K_PROJECT_MIGRATION_TYPE
+      , p_log_message =>
+          'CHECK ' || p_check_number || ' PART 1 - All legacy collaboration opportunities have been migrated: ' || l_migration_check || CHR(10) || CHR(10) ||
+          'Total legacy collaboration ops: ' || l_legacy_collab_ops_count || CHR(10) || CHR(10) ||
+          'Total migrated collaboration ops: ' || l_migrated_collap_ops_count
+      );
+
+      SELECT
+        lpc.legacy_project_detail_id
+      , TO_CHAR(lpc.description_of_work) description_of_work
+      , lpc.contact_name
+      , lpc.contact_telephone_no
+      , lpc.contact_email_address
+      BULK COLLECT INTO l_collab_op_inconsistencies
+      FROM ${datasource.migration-user}.legacy_project_challenges lpc
+      MINUS
+      SELECT
+        pdml.legacy_project_detail_id
+      , TO_CHAR(co.description_of_work)
+      , co.contact_name
+      , co.phone_number
+      , co.email_address
+      FROM ${datasource.migration-user}.project_detail_migration_log pdml
+      JOIN ${datasource.user}.collaboration_opportunities co ON co.project_detail_id = pdml.new_project_detail_id;
+
+      IF l_collab_op_inconsistencies.COUNT = 0 THEN
+        l_migration_check := K_MIGRATION_CHECK_PASS;
+      ELSE
+        l_migration_check := K_MIGRATION_CHECK_FAIL;
+      END IF;
+
+      log_migration_check(
+        p_migration_type => K_PROJECT_MIGRATION_TYPE
+      , p_log_message => 'CHECK ' || p_check_number || ' PART 2 - No inconsistencies between legacy and migrated awarded contracts: ' || l_migration_check
+      );
+
+      FOR collab_op_inconsistency_idx IN 1..l_collab_op_inconsistencies.COUNT LOOP
+
+        l_collab_op_inconsistency := l_collab_op_inconsistencies(collab_op_inconsistency_idx);
+
+        log_migration_check(
+          p_migration_type => K_PROJECT_MIGRATION_TYPE
+        , p_log_message =>
+            'Legacy project detail with ID ' || l_collab_op_inconsistency.legacy_project_detail_id ||
+            ' has collaboration opportunity data inconsistencies in the new model. DESCRIPTION_OF_WORK: ' || l_collab_op_inconsistency.description_of_work
+        );
+
+      END LOOP;
+
+    END run_collaboration_ops_checks;
+
+  BEGIN
+
+    create_migration_check_log(p_migration_type => K_PROJECT_MIGRATION_TYPE);
+
+    log_migration_check(
+      p_migration_type => K_PROJECT_MIGRATION_TYPE
+    , p_log_message => 'STARTING PROJECTS MIGRATION CHECKS'
+    );
+
+    SELECT DECODE(COUNT(*), 0, K_MIGRATION_CHECK_PASS, K_MIGRATION_CHECK_FAIL)
+    INTO l_project_migrations_completed
+    FROM ${datasource.migration-user}.project_migration_log pml
+    WHERE pml.migration_status !=  K_COMPLETE_MIGRATION_STATUS;
+
+    log_migration_check(
+      p_migration_type => K_PROJECT_MIGRATION_TYPE
+    , p_log_message => 'CHECK 1 - All project master migrations have status of ' || K_COMPLETE_MIGRATION_STATUS || ': ' || l_project_migrations_completed
+    );
+
+    FOR incomplete_migration IN (
+      SELECT
+        pml.id
+      , pml.migration_status
+      FROM ${datasource.migration-user}.project_migration_log pml
+      WHERE pml.migration_status != K_COMPLETE_MIGRATION_STATUS
+    )
+    LOOP
+
+      log_migration_check(
+        p_migration_type => K_PROJECT_MIGRATION_TYPE
+      , p_log_message => 'project_migration_log entry with ID ' || incomplete_migration.id || ' has migration_status ' || incomplete_migration.migration_status
+      );
+
+    END LOOP;
+
+    SELECT DECODE(COUNT(*), 0, K_MIGRATION_CHECK_PASS, K_MIGRATION_CHECK_FAIL)
+    INTO l_detail_migrations_completed
+    FROM ${datasource.migration-user}.project_detail_migration_log pdml
+    WHERE pdml.migration_status !=  K_COMPLETE_MIGRATION_STATUS;
+
+    log_migration_check(
+      p_migration_type => K_PROJECT_MIGRATION_TYPE
+    , p_log_message => 'CHECK 2 - All project detail migrations have status of ' || K_COMPLETE_MIGRATION_STATUS || ': ' || l_detail_migrations_completed
+    );
+
+    FOR incomplete_migration IN (
+      SELECT
+        pml.id
+      , pml.migration_status
+      FROM ${datasource.migration-user}.project_detail_migration_log pml
+      WHERE pml.migration_status != K_COMPLETE_MIGRATION_STATUS
+    )
+    LOOP
+
+      log_migration_check(
+        p_migration_type => K_PROJECT_MIGRATION_TYPE
+      , p_log_message => 'project_detail_migration_log entry with ID ' || incomplete_migration.id || ' has migration_status ' || incomplete_migration.migration_status
+      );
+
+    END LOOP;
+
+    run_project_count_checks(
+      p_check_number => 3
+    );
+
+    run_project_status_checks(
+      p_check_number => 4
+    );
+
+    run_project_operator_checks(
+      p_check_number => 5
+    );
+
+    run_project_information_checks(
+      p_check_number => 6
+    );
+
+    run_project_location_checks(
+      p_check_number => 7
+    );
+
+    run_awarded_contracts_checks(
+      p_check_number => 8
+    );
+
+    run_collaboration_ops_checks(
+      p_check_number => 9
+    );
+
+    log_migration_check(
+      p_migration_type => K_PROJECT_MIGRATION_TYPE
+    , p_log_message => 'FINISHED PROJECTS MIGRATION CHECKS'
+    );
+
+  END run_project_migration_checks;
+
+  /**
     @return a populated map of legacy project detail statuses and the status they map to in the new model.
    */
   FUNCTION get_project_detail_status_map
@@ -606,6 +1529,52 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   END create_project_operator_record;
 
   /**
+    Procedure to create a record in the decommissioning_schedules table in the new service model.
+    @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
+    @param p_new_project_detail_id The detail id the decommissioning_schedules record should be associated to
+   */
+  PROCEDURE create_decom_schedule_record(
+    p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
+  , p_new_project_detail_id IN ${datasource.user}.project_details.id%TYPE
+  )
+  IS
+
+    K_DESTINATION_TABLE_NAME CONSTANT VARCHAR2(30) := 'DECOMMISSIONING_SCHEDULES';
+
+    l_new_decom_schedule_id ${datasource.user}.decommissioning_schedules.id%TYPE;
+
+  BEGIN
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message => 'Creating ' || K_DESTINATION_TABLE_NAME || ' record for legacy project detail with ID ' || p_legacy_project_detail_id
+    );
+
+    INSERT INTO ${datasource.user}.decommissioning_schedules (
+      project_detail_id
+    )
+    VALUES(
+      p_new_project_detail_id
+    )
+    RETURNING id INTO l_new_decom_schedule_id;
+
+    log_project_detail_migration(
+      p_legacy_project_detail_id => p_legacy_project_detail_id
+    , p_system_message => 'Created new ' || K_DESTINATION_TABLE_NAME || ' record with id ' || l_new_decom_schedule_id
+    );
+
+  EXCEPTION WHEN OTHERS THEN
+
+    raise_exception_with_trace(
+      p_message_prefix => 'ERROR in create_decom_schedule_record(' || CHR(10)
+        || '  p_legacy_project_detail_id => ' || p_legacy_project_detail_id || CHR(10)
+        || ', p_new_project_detail_id => ' || p_new_project_detail_id || CHR(10)
+        || ')'
+    );
+
+  END create_decom_schedule_record;
+
+  /**
     Procedure to create a record in the project_information table in the new service model.
     @param p_legacy_project_detail_id The id of the legacy project detail record we are migrating
     @param p_new_project_detail_id The detail id the publish record should be associated to
@@ -696,6 +1665,15 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       p_legacy_project_detail_id => p_legacy_project_detail_id
     , p_system_message => 'Created new ' || K_DESTINATION_TABLE_NAME || ' record with id ' || l_new_project_information_id
     );
+
+    IF l_field_stage = 'DECOMMISSIONING' THEN
+
+      create_decom_schedule_record(
+        p_legacy_project_detail_id => p_legacy_project_detail_id
+      , p_new_project_detail_id => p_new_project_detail_id
+      );
+
+    END IF;
 
   EXCEPTION WHEN OTHERS THEN
     raise_exception_with_trace(
@@ -961,7 +1939,13 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     SELECT
       lpd.devuk_field_id
     , lpd.manual_field_name
-    , lpd.field_type
+    , DECODE(
+        lpd.field_type
+      , 'OIL_CONDENSATE', NULL
+      , 'GAS_CONDENSATE', NULL
+      , 'OIL_GAS_CONDENSATE', NULL
+      , lpd.field_type
+      )
     , lpd.fdp_approved
     , lpd.water_depth
     INTO
@@ -1881,6 +2865,8 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     END LOOP;
 
+    run_project_migration_checks();
+
   END migrate_projects;
 
   /**
@@ -2394,6 +3380,8 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     END LOOP;
 
+    run_subscriber_checks();
+
   END migrate_subscriber_data;
 
   /**
@@ -2678,6 +3666,8 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       END;
 
     END LOOP;
+
+    run_team_migration_checks();
 
   END migrate_team_users;
 

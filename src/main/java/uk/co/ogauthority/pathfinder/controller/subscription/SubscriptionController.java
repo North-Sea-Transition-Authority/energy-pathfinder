@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
 import uk.co.ogauthority.pathfinder.service.audit.AuditService;
@@ -20,17 +21,20 @@ public class SubscriptionController {
 
   private final SubscriptionService subscriptionService;
   private final ControllerHelperService controllerHelperService;
+  private final MetricsProvider metricsProvider;
 
   @Autowired
   public SubscriptionController(
       SubscriptionService subscriptionService,
-      ControllerHelperService controllerHelperService) {
+      ControllerHelperService controllerHelperService, MetricsProvider metricsProvider) {
     this.subscriptionService = subscriptionService;
     this.controllerHelperService = controllerHelperService;
+    this.metricsProvider = metricsProvider;
   }
 
   @GetMapping("/subscribe")
   public ModelAndView getSubscribe() {
+    metricsProvider.getSubscribePageHitCounter().increment();
     return subscriptionService.getSubscribeModelAndView(new SubscribeForm());
   }
 
@@ -54,6 +58,7 @@ public class SubscriptionController {
 
   @GetMapping("/unsubscribe/{subscriberUuid}")
   public ModelAndView getUnsubscribe(@PathVariable("subscriberUuid") String subscriberUuid) {
+    metricsProvider.getUnSubscribePageHitCounter().increment();
     AuditService.audit(
         AuditEvent.UNSUBSCRIBE_GET_REQUEST,
         String.format(AuditEvent.UNSUBSCRIBE_GET_REQUEST.getMessage(), subscriberUuid)

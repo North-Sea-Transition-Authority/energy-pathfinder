@@ -70,14 +70,12 @@ public class OperatorEmailService {
     var fromOrganisationGroupName = fromOrganisationGroup.getName();
     var toOrganisationGroupName = toOrganisationGroup.getName();
 
-    var emailTransferReason = StringUtils.removeEnd(transferReason, ".");
-
     var fromTeamMemberPeople = getOrganisationGroupPeople(fromOrganisationGroup);
     fromTeamMemberPeople.forEach(person -> {
       var transferredFromEmailProperties = new OutgoingOperatorProjectTransferEmailProperties(
           person.getForename(),
           projectTitle,
-          emailTransferReason,
+          transferReason,
           toOrganisationGroupName
       );
       emailService.sendEmail(transferredFromEmailProperties, person.getEmailAddress());
@@ -88,7 +86,7 @@ public class OperatorEmailService {
       var transferredToEmailProperties = new IncomingOperatorProjectTransferEmailProperties(
           person.getForename(),
           projectTitle,
-          emailTransferReason,
+          transferReason,
           fromOrganisationGroupName,
           projectUrl
       );

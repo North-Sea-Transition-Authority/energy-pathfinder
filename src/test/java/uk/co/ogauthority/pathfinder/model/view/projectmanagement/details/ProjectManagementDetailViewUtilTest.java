@@ -21,12 +21,14 @@ public class ProjectManagementDetailViewUtilTest {
 
   private static void checkCommonFields(ProjectManagementDetailView projectManagementDetailView,
                                         ProjectInformation projectInformation,
+                                        boolean isEnergyTransitionProject,
                                         AuthenticatedUserAccount submitterAccount) {
     assertThat(projectManagementDetailView.getFieldStage()).isEqualTo(
         projectInformation.getFieldStage().getDisplayName());
     assertThat(projectManagementDetailView.getStatus()).isEqualTo(projectDetail.getStatus().getDisplayName());
     assertThat(projectManagementDetailView.getSubmissionDate()).isEqualTo(
         DateUtil.formatInstant(projectDetail.getSubmittedInstant()));
+    assertThat(projectManagementDetailView.getIsEnergyTransitionProject()).isEqualTo(isEnergyTransitionProject);
     assertThat(projectManagementDetailView.getSubmittedByUser()).isEqualTo(submitterAccount.getFullName());
     assertThat(projectManagementDetailView.getSubmittedByUserEmail()).isEqualTo(submitterAccount.getEmailAddress());
   }
@@ -41,10 +43,11 @@ public class ProjectManagementDetailViewUtilTest {
         projectDetail,
         projectInformation,
         projectLocation,
+        false,
         submitterAccount
     );
 
-    checkCommonFields(projectManagementDetailView, projectInformation, submitterAccount);
+    checkCommonFields(projectManagementDetailView, projectInformation, false, submitterAccount);
     assertThat(projectManagementDetailView.getField()).isEqualTo(projectLocation.getField().getFieldName());
   }
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.controller.project.selectoperator.SelectProjectOperatorController;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
@@ -19,12 +20,15 @@ public class StartProjectController {
 
   private final StartProjectService startProjectService;
   private final TeamService teamService;
+  private final MetricsProvider metricsProvider;
 
   @Autowired
   public StartProjectController(StartProjectService startProjectService,
-                                TeamService teamService) {
+                                TeamService teamService,
+                                MetricsProvider metricsProvider) {
     this.startProjectService = startProjectService;
     this.teamService = teamService;
+    this.metricsProvider = metricsProvider;
   }
 
   @GetMapping("/start-project")
@@ -50,6 +54,7 @@ public class StartProjectController {
 
     //User is in one team so start project
     var projectDetail = startProjectService.startProject(user, organisationTeams.get(0).getPortalOrganisationGroup());
+    metricsProvider.getProjectStartCounter().increment();
     return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectDetail.getProject().getId(), null));
   }
 }

@@ -2,11 +2,14 @@ package uk.co.ogauthority.pathfinder.service;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import com.google.common.base.Stopwatch;
+import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
+import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
@@ -26,15 +29,21 @@ public class WorkAreaService {
   public static final String LINK_BUTTON_TEXT = "Create project";
 
   private final DashboardService dashboardService;
+  private final MetricsProvider metricsProvider;
 
   @Autowired
-  public WorkAreaService(DashboardService dashboardService) {
+  public WorkAreaService(DashboardService dashboardService, MetricsProvider metricsProvider) {
     this.dashboardService = dashboardService;
+    this.metricsProvider = metricsProvider;
   }
 
   public ModelAndView getWorkAreaModelAndViewForUser(AuthenticatedUserAccount user, DashboardFilter filter, DashboardFilterForm form) {
+    var dashboardStopwatch = Stopwatch.createStarted();
     var filterType = dashboardService.getDashboardFilterType(user);
     var dashboardProjectItemViews =  dashboardService.getDashboardProjectItemViewsForUser(user, filterType, filter);
+
+    var elapsedMs = dashboardStopwatch.elapsed(TimeUnit.MILLISECONDS);
+    metricsProvider.getDashboardTimer().record(elapsedMs, TimeUnit.MILLISECONDS);
 
     return new ModelAndView(WORK_AREA_TEMPLATE_PATH)
         .addObject("startProjectButton", getStartProjectLinkButton(user))

@@ -10,15 +10,13 @@
   <ul class="govuk-list">
     <li>${serviceContact.serviceName}</li>
     <#if serviceContact.phoneNumber?has_content>
-      <li>${serviceContact.phoneNumber}</li>
+      <li>Telephone: ${serviceContact.phoneNumber}</li>
     </#if>
     <#if serviceContact.emailAddress?has_content>
-      <li>
-        <@fdsAction.link
-          linkText=serviceContact.emailAddress
-          linkUrl="mailto:${serviceContact.emailAddress}"
-        />
-      </li>
+      <li>Email: <@fdsAction.link linkText=serviceContact.emailAddress linkUrl="mailto:${serviceContact.emailAddress}"/></li>
+    </#if>
+    <#if serviceContact.guidanceUrl?has_content>
+      <li>Online guidance: <@fdsAction.link linkText=serviceContact.guidanceUrl linkUrl=serviceContact.guidanceUrl openInNewTab=true /></li>
     </#if>
   </ul>
 </#macro>
