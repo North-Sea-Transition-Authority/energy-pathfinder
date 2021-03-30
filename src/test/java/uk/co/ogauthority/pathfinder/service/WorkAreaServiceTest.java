@@ -16,6 +16,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
+import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
@@ -32,6 +33,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.dashboard.DashboardService;
 import uk.co.ogauthority.pathfinder.testutil.DashboardFilterTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.MetricsProviderTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -39,6 +41,9 @@ public class WorkAreaServiceTest {
 
   @Mock
   private DashboardService dashboardService;
+
+  @Mock
+  private MetricsProvider metricsProvider;
 
   private WorkAreaService workAreaService;
 
@@ -56,8 +61,9 @@ public class WorkAreaServiceTest {
 
   @Before
   public void setUp() throws Exception {
-    workAreaService = new WorkAreaService(dashboardService);
+    workAreaService = new WorkAreaService(dashboardService, metricsProvider);
     when(dashboardService.getDashboardProjectItemViewsForUser(any(), any(), any())).thenReturn(dashboardProjectItemViews);
+    when(metricsProvider.getDashboardTimer()).thenReturn(MetricsProviderTestUtil.getNoOpTimer());
   }
 
   @Test
