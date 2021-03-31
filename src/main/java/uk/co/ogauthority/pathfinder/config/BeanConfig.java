@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.config;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.time.Clock;
@@ -45,6 +46,10 @@ public class BeanConfig {
     return Clock.systemDefaultZone();
   }
 
+  @Bean
+  public MetricsProvider metricsProvider(MeterRegistry meterRegistry) {
+    return new MetricsProvider(meterRegistry);
+  }
 
   @Bean
   public FilterRegistrationBean<FoxSessionFilter> foxSessionFilterRegistration(FoxSessionFilter foxSessionFilter) {
