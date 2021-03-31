@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,6 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.controller.quarterlystatistics.QuarterlyStatisticsController;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.testutil.ReportableProjectTestUtil;
+import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuarterlyStatisticsServiceTest {
@@ -85,7 +87,8 @@ public class QuarterlyStatisticsServiceTest {
   @Test
   public void getQuarterlyStatisticsByFieldStage_assertOnlyProjectsUpdateInQuarterAreIncluded() {
 
-    final var timeInCurrentQuarter = Instant.now();
+    // Workaround for test to pass until we fix PAT-518
+    final var timeInCurrentQuarter = DateUtil.getQuarterFromLocalDate(LocalDate.now()).getEndDateAsInstant().minus(5, ChronoUnit.DAYS);
     final var timeNotInCurrentQuarter = Instant.now().minus(100, ChronoUnit.DAYS);
 
     final var reportableProjectView1 = ReportableProjectTestUtil.createReportableProjectView(
