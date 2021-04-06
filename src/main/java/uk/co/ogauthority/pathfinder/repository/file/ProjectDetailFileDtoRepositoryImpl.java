@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.repository.file;
 
+import java.util.Arrays;
 import java.util.List;
 import javax.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,11 @@ import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 
 public class ProjectDetailFileDtoRepositoryImpl implements ProjectDetailFileDtoRepository {
 
+  private static final List<FileUploadStatus> ALL_FILE_UPLOAD_STATUSES = Arrays.asList(FileUploadStatus.values());
+  private static final List<FileUploadStatus> CURRENT_FILE_UPLOAD_STATUSES = List.of(FileUploadStatus.CURRENT);
+
   private final EntityManager entityManager;
+
 
   @Autowired
   public ProjectDetailFileDtoRepositoryImpl(EntityManager entityManager) {
@@ -54,7 +59,36 @@ public class ProjectDetailFileDtoRepositoryImpl implements ProjectDetailFileDtoR
                                                                                             String fileId,
                                                                                             ProjectDetailFilePurpose purpose,
                                                                                             FileLinkStatus linkStatus) {
-    return entityManager.createQuery("" +
+    return findFileViewByProjectDetailAndFIleIdAndPurposeAndFileLinkStatusAndFileStatusIn(
+        detail,
+        fileId,
+        purpose,
+        linkStatus,
+        ALL_FILE_UPLOAD_STATUSES
+    );
+  }
+
+  @Override
+  public UploadedFileView findCurrentAsFileViewByProjectDetailAndFileIdAndPurposeAndFileLinkStatus(ProjectDetail detail, String fileId,
+                                                                                                   ProjectDetailFilePurpose purpose,
+                                                                                                   FileLinkStatus linkStatus) {
+    return findFileViewByProjectDetailAndFIleIdAndPurposeAndFileLinkStatusAndFileStatusIn(
+        detail,
+        fileId,
+        purpose,
+        linkStatus,
+        CURRENT_FILE_UPLOAD_STATUSES
+    );
+  }
+
+  private UploadedFileView findFileViewByProjectDetailAndFIleIdAndPurposeAndFileLinkStatusAndFileStatusIn(
+      ProjectDetail detail,
+      String fileId,
+      ProjectDetailFilePurpose purpose,
+      FileLinkStatus linkStatus,
+      List<FileUploadStatus> fileStatusList
+  ) {
+    return entityManager.createQuery(
             "SELECT new uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView(" +
             "  uf.fileId" +
             ", uf.fileName" +
@@ -66,7 +100,7 @@ public class ProjectDetailFileDtoRepositoryImpl implements ProjectDetailFileDtoR
             "FROM ProjectDetailFile pf " +
             "JOIN UploadedFile uf ON pf.fileId = uf.fileId " +
             "WHERE pf.fileId = :fileId " +
-            "AND uf.status = :fileStatus " +
+            "AND uf.status IN (:fileStatusList) " +
             "AND pf.projectDetail = :projectDetail " +
             "AND pf.purpose = :purpose " +
             "AND (pf.fileLinkStatus = :fileLinkStatus OR :fileLinkStatus = :allFileLinkStatus)",
@@ -74,7 +108,7 @@ public class ProjectDetailFileDtoRepositoryImpl implements ProjectDetailFileDtoR
         .setParameter("projectDetail", detail)
         .setParameter("purpose", purpose)
         .setParameter("fileId", fileId)
-        .setParameter("fileStatus", FileUploadStatus.CURRENT)
+        .setParameter("fileStatusList", fileStatusList)
         .setParameter("fileLinkStatus", linkStatus)
         .setParameter("allFileLinkStatus", FileLinkStatus.ALL.toString())
         .getSingleResult();
