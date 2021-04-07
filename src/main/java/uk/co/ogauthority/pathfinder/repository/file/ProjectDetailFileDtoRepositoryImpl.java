@@ -59,7 +59,7 @@ public class ProjectDetailFileDtoRepositoryImpl implements ProjectDetailFileDtoR
                                                                                             String fileId,
                                                                                             ProjectDetailFilePurpose purpose,
                                                                                             FileLinkStatus linkStatus) {
-    return findFileViewByProjectDetailAndFIleIdAndPurposeAndFileLinkStatusAndFileStatusIn(
+    return findFileViewByProjectDetailAndFileIdAndPurposeAndFileLinkStatusAndFileStatusIn(
         detail,
         fileId,
         purpose,
@@ -69,10 +69,11 @@ public class ProjectDetailFileDtoRepositoryImpl implements ProjectDetailFileDtoR
   }
 
   @Override
-  public UploadedFileView findCurrentAsFileViewByProjectDetailAndFileIdAndPurposeAndFileLinkStatus(ProjectDetail detail, String fileId,
+  public UploadedFileView findCurrentAsFileViewByProjectDetailAndFileIdAndPurposeAndFileLinkStatus(ProjectDetail detail,
+                                                                                                   String fileId,
                                                                                                    ProjectDetailFilePurpose purpose,
                                                                                                    FileLinkStatus linkStatus) {
-    return findFileViewByProjectDetailAndFIleIdAndPurposeAndFileLinkStatusAndFileStatusIn(
+    return findFileViewByProjectDetailAndFileIdAndPurposeAndFileLinkStatusAndFileStatusIn(
         detail,
         fileId,
         purpose,
@@ -81,7 +82,7 @@ public class ProjectDetailFileDtoRepositoryImpl implements ProjectDetailFileDtoR
     );
   }
 
-  private UploadedFileView findFileViewByProjectDetailAndFIleIdAndPurposeAndFileLinkStatusAndFileStatusIn(
+  private UploadedFileView findFileViewByProjectDetailAndFileIdAndPurposeAndFileLinkStatusAndFileStatusIn(
       ProjectDetail detail,
       String fileId,
       ProjectDetailFilePurpose purpose,
