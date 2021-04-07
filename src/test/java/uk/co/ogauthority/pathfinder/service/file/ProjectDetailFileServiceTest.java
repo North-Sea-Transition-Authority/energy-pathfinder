@@ -78,8 +78,8 @@ public class ProjectDetailFileServiceTest {
     projectDetailFileService = new ProjectDetailFileService(
         fileUploadService,
         projectDetailFileRepository,
-        entityDuplicationService
-    );
+        entityDuplicationService,
+        projectService);
 
     projectDetail = ProjectUtil.getProjectDetails();
     file = new ProjectDetailFile();
