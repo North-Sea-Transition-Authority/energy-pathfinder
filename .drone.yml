@@ -56,11 +56,8 @@ steps:
       repo: quay.io/fivium/pathfinder
       tags:
         - develop
-    environment:
-      DOCKER_USERNAME:
-        from_secret: docker_username
-      DOCKER_PASSWORD:
-        from_secret: docker_password
+      config:
+        from_secret: docker_config
     when:
       branch:
         - develop
@@ -74,11 +71,8 @@ steps:
       repo: quay.io/fivium/pathfinder
       tags:
         - ${DRONE_BRANCH/\//-}-${DRONE_BUILD_NUMBER}
-    environment:
-      DOCKER_USERNAME:
-        from_secret: docker_username
-      DOCKER_PASSWORD:
-        from_secret: docker_password
+      config:
+        from_secret: docker_config
     when:
       branch:
         - master
