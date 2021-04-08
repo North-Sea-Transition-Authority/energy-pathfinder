@@ -246,14 +246,16 @@ public class CollaborationOpportunitiesController extends PathfinderFileUploadCo
 
   }
 
-  @GetMapping("/collaboration-opportunity/files/download/{fileId}")
+  @GetMapping("{projectVersion}/collaboration-opportunity/files/download/{fileId}")
   @ProjectStatusCheck(status = {ProjectStatus.DRAFT, ProjectStatus.QA, ProjectStatus.PUBLISHED, ProjectStatus.ARCHIVED})
   @ResponseBody
   public ResponseEntity<Resource> handleDownload(@PathVariable("projectId") Integer projectId,
+                                                 @PathVariable("projectVersion") Integer projectVersion,
                                                  @PathVariable("fileId") String fileId,
                                                  ProjectContext projectContext) {
-    var file = projectDetailFileService.getProjectDetailFileByProjectDetailAndFileId(
-        projectContext.getProjectDetails(),
+    var file = projectDetailFileService.getProjectDetailFileByProjectDetailVersionAndFileId(
+        projectContext.getProjectDetails().getProject(),
+        projectVersion,
         fileId
     );
     return serveFile(file);

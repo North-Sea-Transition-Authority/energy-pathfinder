@@ -62,6 +62,7 @@ public abstract class PathfinderFileUploadController {
         )),
         ReverseRouter.route(on(purpose.getFileControllerClass()).handleDownload(
             projectDetail.getProject().getId(),
+            projectDetail.getVersion(),
             null,
             null
         )),
@@ -96,6 +97,7 @@ public abstract class PathfinderFileUploadController {
                                                 ProjectContext projectContext);
 
   public abstract ResponseEntity<Resource> handleDownload(@PathVariable("projectId") Integer projectId,
+                                                          @PathVariable("projectVersion") Integer projectVersion,
                                                           @PathVariable("fileId") String fileId,
                                                           ProjectContext projectContext);
 

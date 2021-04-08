@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import uk.co.ogauthority.pathfinder.config.file.FileDeleteResult;
 import uk.co.ogauthority.pathfinder.config.file.FileUploadResult;
 import uk.co.ogauthority.pathfinder.config.file.UploadErrorType;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
@@ -34,12 +36,14 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDesc
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.repository.file.ProjectDetailFileRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectDetailFileServiceTest {
 
   private final String FILE_ID = "1234567890qwertyuiop";
+  private static final Integer PROJECT_VERSION = 1;
 
   @Mock
   private ProjectDetailFileRepository projectDetailFileRepository;
@@ -49,6 +53,9 @@ public class ProjectDetailFileServiceTest {
 
   @Mock
   private EntityDuplicationService entityDuplicationService;
+
+  @Mock
+  private ProjectService projectService;
 
   @Captor
   private ArgumentCaptor<ProjectDetailFile> projectDetailFileArgumentCaptor;
@@ -78,7 +85,8 @@ public class ProjectDetailFileServiceTest {
     projectDetailFileService = new ProjectDetailFileService(
         fileUploadService,
         projectDetailFileRepository,
-        entityDuplicationService
+        entityDuplicationService,
+        projectService
     );
 
     projectDetail = ProjectUtil.getProjectDetails();
@@ -390,4 +398,56 @@ public class ProjectDetailFileServiceTest {
     verify(entityDuplicationService, times(1)).createDuplicatedEntityPairingMap(any());
   }
 
+
+  @Test
+  public void getProjectDetailFileByProjectDetailAndFileId_whenFoundCorrectFileReturned() {
+    var file = new ProjectDetailFile();
+    when(projectDetailFileRepository.findByProjectDetailAndFileId(projectDetail, file.getFileId())).thenReturn(
+        Optional.of(file)
+    );
+    var returnedFile = projectDetailFileService.getProjectDetailFileByProjectDetailAndFileId(
+        projectDetail, 
+        file.getFileId()
+    );
+    assertThat(returnedFile).isEqualTo(file);
+  }
+
+  @Test(expected = PathfinderEntityNotFoundException.class)
+  public void getProjectDetailFileByProjectDetailAndFileId_whenNotFoundThenError() {
+    when(projectDetailFileRepository.findByProjectDetailAndFileId(projectDetail, file.getFileId())).thenReturn(
+        Optional.empty()
+    );
+    projectDetailFileService.getProjectDetailFileByProjectDetailAndFileId(
+        projectDetail,
+        file.getFileId()
+    );
+  }
+
+  @Test
+  public void getProjectDetailFileByProjectDetailVersionAndFileId_whenFoundCorrectFileReturned() {
+    var file = new ProjectDetailFile();
+    when(projectDetailFileRepository.findByProjectDetailAndFileId(projectDetail, file.getFileId())).thenReturn(
+        Optional.of(file)
+    );
+    when(projectService.getDetailOrError(projectDetail.getProject().getId(), PROJECT_VERSION)).thenReturn(projectDetail);
+    var returnedFile = projectDetailFileService.getProjectDetailFileByProjectDetailVersionAndFileId(
+        projectDetail.getProject(),
+        PROJECT_VERSION,
+        file.getFileId()
+    );
+    assertThat(returnedFile).isEqualTo(file);
+  }
+
+  @Test(expected = PathfinderEntityNotFoundException.class)
+  public void getProjectDetailFileByProjectDetailVersionAndFileId_whenNotFoundThenError() {
+    when(projectService.getDetailOrError(projectDetail.getProject().getId(), PROJECT_VERSION)).thenReturn(projectDetail);
+    when(projectDetailFileRepository.findByProjectDetailAndFileId(projectDetail, file.getFileId())).thenReturn(
+        Optional.empty()
+    );
+    projectDetailFileService.getProjectDetailFileByProjectDetailVersionAndFileId(
+        projectDetail.getProject(),
+        PROJECT_VERSION,
+        file.getFileId()
+    );
+  }
 }
