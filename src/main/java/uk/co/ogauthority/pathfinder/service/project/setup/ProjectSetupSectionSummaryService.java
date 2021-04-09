@@ -111,4 +111,9 @@ public class ProjectSetupSectionSummaryService implements ProjectSectionSummaryS
         .findFirst() //Will only have answered each question once
         .ifPresent(a -> a.setAnswerValue(answer.getAnswerValue()));
   }
+
+  @Override
+  public boolean canShowSection(ProjectDetail detail) {
+    return projectSetupService.canShowInTaskList(detail);
+  }
 }
