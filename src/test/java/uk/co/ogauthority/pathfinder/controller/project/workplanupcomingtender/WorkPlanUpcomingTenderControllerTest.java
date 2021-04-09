@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -15,9 +16,8 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
-import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderService;
@@ -31,10 +31,10 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 )
 public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstractControllerTest {
 
-  @MockBean
-  private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
+  private static final Integer PROJECT_ID = 1;
 
-  private ProjectDetail projectDetail;
+  @MockBean
+  protected WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
   private AuthenticatedUserAccount authenticatedUser;
 
@@ -42,17 +42,20 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
 
   @Before
   public void setup() {
-    projectDetail = ProjectUtil.getProjectDetails();
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
     authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.CREATE_PROJECT_PRIVILEGES);
     unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
+    when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
 
   }
 
   @Test
   public void authenticatedUser_hasAccessToUpcomingTender() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(WorkPlanUpcomingTenderController.class).viewUpcomingTender(PROJECT_ID, null)))
+        on(WorkPlanUpcomingTenderController.class).viewUpcomingTenders(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -60,8 +63,8 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
   @Test
   public void unAuthenticatedUser_cannotAccessUpcomingTender() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(UpcomingTendersController.class).addUpcomingTender(PROJECT_ID, null)))
-        .with(authenticatedUserAndSession(unAuthenticatedUser)))
+        on(WorkPlanUpcomingTenderController.class).viewUpcomingTenders(PROJECT_ID, null)))
+        .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }
 }
