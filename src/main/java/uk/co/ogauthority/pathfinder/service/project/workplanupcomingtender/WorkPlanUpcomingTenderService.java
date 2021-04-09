@@ -5,22 +5,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 
 @Service
 public class WorkPlanUpcomingTenderService implements ProjectFormSectionService {
 
-  public static final String TEMPLATE_PATH = "project/workplanupcomingtender/workPlanUpcomingTender";
+  public static final String TEMPLATE_PATH = "project/workplanupcomingtender/workPlanUpcomingTenderFormSummary";
+
+  private final BreadcrumbService breadcrumbService;
 
   @Autowired
-  public WorkPlanUpcomingTenderService() {
-
+  public WorkPlanUpcomingTenderService(BreadcrumbService breadcrumbService) {
+    this.breadcrumbService = breadcrumbService;
   }
 
   public ModelAndView getUpcomingTendersModelAndView(Integer projectId) {
     var modelAndView = new ModelAndView(TEMPLATE_PATH)
-        .addObject("pagename", WorkPlanUpcomingTenderController.PAGE_NAME);
+        .addObject("pageName", WorkPlanUpcomingTenderController.PAGE_NAME);
+    breadcrumbService.fromTaskList(projectId, modelAndView, WorkPlanUpcomingTenderController.PAGE_NAME);
     return modelAndView;
   }
 
