@@ -10,6 +10,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusC
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderService;
 
@@ -21,6 +22,7 @@ import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkP
 public class WorkPlanUpcomingTenderController {
 
   public static final String PAGE_NAME = "Upcoming tenders";
+  public static final String PAGE_NAME_SINGULAR = "Upcoming tender";
 
   private final WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
@@ -34,5 +36,12 @@ public class WorkPlanUpcomingTenderController {
   public ModelAndView viewUpcomingTenders(@PathVariable("projectId") Integer projectId,
                                           ProjectContext projectContext) {
     return workPlanUpcomingTenderService.getUpcomingTendersModelAndView(projectId);
+  }
+
+  @GetMapping("/upcoming-tender")
+  public ModelAndView addUpcomingTender(@PathVariable("projectId") Integer projectId,
+                                        ProjectContext projectContext) {
+    return workPlanUpcomingTenderService.getViewUpcomingTendersModelAndView(projectContext.getProjectDetails(),
+        new WorkPlanUpcomingTenderForm());
   }
 }

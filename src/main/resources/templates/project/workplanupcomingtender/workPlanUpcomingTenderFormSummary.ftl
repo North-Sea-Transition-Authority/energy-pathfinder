@@ -2,4 +2,6 @@
 
 <@defaultPage htmlTitle=pageName pageHeading=pageName breadcrumbs=true>
 
+    <@fdsAction.link linkText="Add new upcoming tender" linkUrl=springUrl(addUpcomingTenderUrl) linkClass="govuk-button govuk-button--blue"/>
+
 </@defaultPage>
