@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -111,9 +113,14 @@ public class DateUtilTest {
 
   @Test
   public void isInCurrentQuarter_whenInCurrentQuarter() {
-    // Workaround for test to pass until we fix PAT-518
-    final var timeInCurrentQuarter = DateUtil.getQuarterFromLocalDate(LocalDate.now()).getEndDateAsInstant().minus(5, ChronoUnit.DAYS);
+    final var timeInCurrentQuarter = DateUtil.getQuarterFromLocalDate(LocalDate.now()).getEndDateAsInstant();
     assertThat(DateUtil.isInCurrentQuarter(timeInCurrentQuarter)).isTrue();
+  }
+
+  @Test
+  public void isInCurrentQuarter_lastDayOfQuarter_atEndOfDay() {
+    final var timeInCurrentQuarter = LocalDateTime.of(2021, 6, 30, 23, 59, 59, 999999999).atZone(ZoneId.systemDefault()).toInstant();
+    assertThat(Quarter.Q2.getEndDateAsInstant()).isEqualTo(timeInCurrentQuarter);
   }
 
   @Test

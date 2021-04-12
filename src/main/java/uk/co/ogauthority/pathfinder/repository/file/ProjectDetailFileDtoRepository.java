@@ -18,6 +18,11 @@ public interface ProjectDetailFileDtoRepository {
                                                                                      ProjectDetailFilePurpose purpose,
                                                                                      FileLinkStatus linkStatus);
 
+  UploadedFileView findCurrentAsFileViewByProjectDetailAndFileIdAndPurposeAndFileLinkStatus(ProjectDetail detail,
+                                                                                            String fileId,
+                                                                                            ProjectDetailFilePurpose purpose,
+                                                                                            FileLinkStatus linkStatus);
+
   List<ProjectDetailFile> findAllByProjectDetailAndFilePurposeAndIdNotIn(ProjectDetail detail,
                                                                          ProjectDetailFilePurpose purpose,
                                                                          Iterable<Integer> projectDetailFileIdsToExclude);

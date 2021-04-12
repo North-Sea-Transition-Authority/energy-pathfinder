@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
 import uk.co.ogauthority.pathfinder.model.entity.file.UploadedFile;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadMultipleFilesWithDescriptionForm;
@@ -27,6 +28,7 @@ import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.file.ProjectDetailFileRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 
 @Service
 public class ProjectDetailFileService {
@@ -34,14 +36,17 @@ public class ProjectDetailFileService {
   private final FileUploadService fileUploadService;
   private final ProjectDetailFileRepository projectDetailFileRepository;
   private final EntityDuplicationService entityDuplicationService;
+  private final ProjectService projectService;
 
   @Autowired
   public ProjectDetailFileService(FileUploadService fileUploadService,
                                   ProjectDetailFileRepository projectDetailFileRepository,
-                                  EntityDuplicationService entityDuplicationService) {
+                                  EntityDuplicationService entityDuplicationService,
+                                  ProjectService projectService) {
     this.fileUploadService = fileUploadService;
     this.projectDetailFileRepository = projectDetailFileRepository;
     this.entityDuplicationService = entityDuplicationService;
+    this.projectService = projectService;
   }
 
   /**
@@ -242,6 +247,7 @@ public class ProjectDetailFileService {
   private String getDownloadUrl(ProjectDetail projectDetail, ProjectDetailFilePurpose purpose, String fileId) {
     return ReverseRouter.route(on(purpose.getFileControllerClass()).handleDownload(
         projectDetail.getProject().getId(),
+        projectDetail.getVersion(),
         fileId,
         null
     ));
@@ -290,6 +296,19 @@ public class ProjectDetailFileService {
             "Couldn't find a ProjectDetailFile for project detail with ID: %s and fileId: %s",
             projectDetail.getId(),
             fileId)));
+  }
+
+  public ProjectDetailFile getProjectDetailFileByProjectDetailVersionAndFileId(Project project,
+                                                                               Integer projectDetailVersion,
+                                                                               String fileId) {
+    var detail = projectService.getDetailOrError(project.getId(), projectDetailVersion);
+    return projectDetailFileRepository.findByProjectDetailAndFileId(detail, fileId)
+        .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format(
+            "Couldn't find a ProjectDetailFile for project detail with ID: %s and version %s and fileId: %s",
+            detail.getId(),
+            projectDetailVersion,
+            fileId))
+        );
   }
 
   /**

@@ -14,6 +14,7 @@ import uk.co.ogauthority.pathfinder.model.view.projectoperator.ProjectOperatorVi
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
@@ -30,12 +31,15 @@ public class ProjectOperatorSectionSummaryService implements ProjectSectionSumma
 
   private final ProjectOperatorService projectOperatorService;
   private final DifferenceService differenceService;
+  private final SelectOperatorService selectOperatorService;
 
   @Autowired
   public ProjectOperatorSectionSummaryService(ProjectOperatorService projectOperatorService,
-                                              DifferenceService differenceService) {
+                                              DifferenceService differenceService,
+                                              SelectOperatorService selectOperatorService) {
     this.projectOperatorService = projectOperatorService;
     this.differenceService = differenceService;
+    this.selectOperatorService = selectOperatorService;
   }
 
   @Override
@@ -68,5 +72,10 @@ public class ProjectOperatorSectionSummaryService implements ProjectSectionSumma
         .orElse(new ProjectOperatorView());
 
     return differenceService.differentiate(currentProjectOperatorView, previousProjectOperatorView);
+  }
+
+  @Override
+  public boolean canShowSection(ProjectDetail detail) {
+    return selectOperatorService.canShowInTaskList(detail);
   }
 }
