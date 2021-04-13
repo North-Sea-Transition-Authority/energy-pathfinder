@@ -47,6 +47,14 @@ public enum ProjectTaskGroup {
       ),
       Set.of(ProjectType.INFRASTRUCTURE),
       4
+  ),
+  WORK_PLAN_COMMERCIAL_INFORMATION(
+      "Commercial information",
+      List.of(
+          ProjectTask.WORK_PLAN_UPCOMING_TENDERS
+      ),
+      Set.of(ProjectType.FORWARD_WORK_PLAN),
+      1
   );
 
 

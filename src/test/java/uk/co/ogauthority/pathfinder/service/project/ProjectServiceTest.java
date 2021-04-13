@@ -220,4 +220,22 @@ public class ProjectServiceTest {
     projectDetail.setProjectType(null);
     assertThat(ProjectService.isInfrastructureProject(projectDetail)).isFalse();
   }
+
+  @Test
+  public void isForwardWorkPlanProject_whenWorkPlan_thenTrue() {
+    projectDetail.setProjectType(ProjectType.FORWARD_WORK_PLAN);
+    assertThat(ProjectService.isForwardWorkPlanProject(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void isForwardWorkPlanProject_whenNotWorkPlan_thenFalse() {
+    projectDetail.setProjectType(ProjectType.INFRASTRUCTURE);
+    assertThat(ProjectService.isForwardWorkPlanProject(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void isForwardWorkPlanProject_whenNullType_thenFalse() {
+    projectDetail.setProjectType(null);
+    assertThat(ProjectService.isForwardWorkPlanProject(projectDetail)).isFalse();
+  }
 }
