@@ -56,6 +56,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
   private static final Integer PROJECT_ID = 1;
   private static final Integer COLLABORATION_OPPORTUNITY_ID = 1;
   private static final Integer DISPLAY_ORDER = 1;
+  private static final Integer PROJECT_VERSION = 1;
 
   @MockBean
   private CollaborationOpportunitiesService collaborationOpportunitiesService;
@@ -94,7 +95,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
     when(collaborationOpportunitiesSummaryService.getView(opportunity, DISPLAY_ORDER)).thenReturn(collaborationOpportunityView);
     when(collaborationOpportunitiesService.createCollaborationOpportunity(any(), any(), any())).thenReturn(CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail));
     when(collaborationOpportunitiesService.updateCollaborationOpportunity(any(), any(), any())).thenReturn(CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail));
-    when(projectDetailFileService.getProjectDetailFileByProjectDetailAndFileId(any(), any())).thenReturn(PROJECT_DETAIL_FILE);
+    when(projectDetailFileService.getProjectDetailFileByProjectDetailVersionAndFileId(any(), any(), any())).thenReturn(PROJECT_DETAIL_FILE);
     when(projectDetailFileService.getUploadedFileById(FILE_ID)).thenReturn(file);
   }
 
@@ -322,7 +323,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
     customStatusProject.setStatus(status);
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(customStatusProject);
     mockMvc.perform(get(ReverseRouter.route(
-        on(CollaborationOpportunitiesController.class).handleDownload(PROJECT_ID, ProjectFileTestUtil.FILE_ID, null)))
+        on(CollaborationOpportunitiesController.class).handleDownload(PROJECT_ID, PROJECT_VERSION, ProjectFileTestUtil.FILE_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }

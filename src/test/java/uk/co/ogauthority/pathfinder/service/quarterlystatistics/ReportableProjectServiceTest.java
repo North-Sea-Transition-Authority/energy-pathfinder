@@ -65,8 +65,7 @@ public class ReportableProjectServiceTest {
 
     var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.DEVELOPMENT);
 
-    // Workaround for test to pass until we fix PAT-518
-    final var timeInCurrentQuarter = DateUtil.getQuarterFromLocalDate(LocalDate.now()).getEndDateAsInstant().minus(5, ChronoUnit.DAYS);
+    final var timeInCurrentQuarter = DateUtil.getQuarterFromLocalDate(LocalDate.now()).getEndDateAsInstant();
     reportableProject.setLastUpdatedDatetime(timeInCurrentQuarter);
 
     when(reportableProjectRepository.findAll()).thenReturn(List.of(reportableProject));
