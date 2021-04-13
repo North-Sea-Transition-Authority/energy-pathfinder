@@ -20,7 +20,7 @@ public class WorkPlanUpcomingTenderRestController {
     this.workPlanUpcomingTenderService = workPlanUpcomingTenderService;
   }
 
-  @GetMapping("/department")
+  @GetMapping("/departments")
   public RestSearchResult searchTenderDepartments(@Nullable @RequestParam("term") String searchTerm) {
     return new RestSearchResult(workPlanUpcomingTenderService.findDepartmentTenderLikeWithManualEntry(searchTerm));
   }

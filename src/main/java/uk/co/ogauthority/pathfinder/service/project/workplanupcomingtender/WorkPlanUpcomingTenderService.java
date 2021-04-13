@@ -5,19 +5,24 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.controller.rest.WorkPlanUpcomingTenderRestController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
+import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
+import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderValidationHint;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
 public class WorkPlanUpcomingTenderService implements ProjectFormSectionService {
@@ -26,12 +31,19 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
 
   private final BreadcrumbService breadcrumbService;
   private final FunctionService functionService;
+  private final ValidationService validationService;
+  private final WorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator;
+
 
   @Autowired
   public WorkPlanUpcomingTenderService(BreadcrumbService breadcrumbService,
-                                       FunctionService functionService) {
+                                       FunctionService functionService,
+                                       ValidationService validationService,
+                                       WorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator) {
     this.breadcrumbService = breadcrumbService;
     this.functionService = functionService;
+    this.validationService = validationService;
+    this.workPlanUpcomingTenderFormValidator = workPlanUpcomingTenderFormValidator;
   }
 
   public ModelAndView getUpcomingTendersModelAndView(Integer projectId) {
@@ -58,6 +70,13 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
 
   public List<RestSearchItem> findDepartmentTenderLikeWithManualEntry(String searchTerm) {
     return functionService.findFunctionsLikeWithManualEntry(searchTerm, FunctionType.WORK_PLAN_UPCOMING_TENDER);
+  }
+
+  public BindingResult validate(WorkPlanUpcomingTenderForm form,
+                                BindingResult bindingResult,
+                                ValidationType validationType) {
+    workPlanUpcomingTenderFormValidator.validate(form, bindingResult, new WorkPlanUpcomingTenderValidationHint(validationType));
+    return validationService.validate(form, bindingResult, validationType);
   }
 
   @Override
