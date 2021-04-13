@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +25,7 @@ public class WorkPlanUpcomingTenderController {
 
   private final WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
+  @Autowired
   public WorkPlanUpcomingTenderController(
       WorkPlanUpcomingTenderService workPlanUpcomingTenderService) {
 

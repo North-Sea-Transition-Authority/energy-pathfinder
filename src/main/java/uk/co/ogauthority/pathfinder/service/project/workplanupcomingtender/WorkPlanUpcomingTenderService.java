@@ -40,11 +40,11 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
-
+    //TODO method will be implemented with PAT-470
   }
 
   @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
-
+    //TODO method will be implemented with PAT-535
   }
 }
