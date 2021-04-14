@@ -3,20 +3,25 @@ package uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.controller.rest.WorkPlanUpcomingTenderRestController;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderValidationHint;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.WorkPlanUpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
@@ -33,17 +38,23 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
   private final FunctionService functionService;
   private final ValidationService validationService;
   private final WorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator;
+  private final WorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository;
+  private final SearchSelectorService searchSelectorService;
 
 
   @Autowired
   public WorkPlanUpcomingTenderService(BreadcrumbService breadcrumbService,
                                        FunctionService functionService,
                                        ValidationService validationService,
-                                       WorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator) {
+                                       WorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator,
+                                       WorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository,
+                                       SearchSelectorService searchSelectorService) {
     this.breadcrumbService = breadcrumbService;
     this.functionService = functionService;
     this.validationService = validationService;
     this.workPlanUpcomingTenderFormValidator = workPlanUpcomingTenderFormValidator;
+    this.workPlanUpcomingTenderRepository = workPlanUpcomingTenderRepository;
+    this.searchSelectorService = searchSelectorService;
   }
 
   public ModelAndView getUpcomingTendersModelAndView(Integer projectId) {
@@ -77,6 +88,43 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
                                 ValidationType validationType) {
     workPlanUpcomingTenderFormValidator.validate(form, bindingResult, new WorkPlanUpcomingTenderValidationHint(validationType));
     return validationService.validate(form, bindingResult, validationType);
+  }
+
+  @Transactional
+  public WorkPlanUpcomingTender createUpcomingTender(ProjectDetail detail,
+                                                     WorkPlanUpcomingTenderForm form) {
+    var upcomingTender = new WorkPlanUpcomingTender(detail);
+    setCommonFields(upcomingTender, form);
+    upcomingTender = workPlanUpcomingTenderRepository.save(upcomingTender);
+
+    return upcomingTender;
+  }
+
+  private void setCommonFields(WorkPlanUpcomingTender upcomingTender, WorkPlanUpcomingTenderForm form) {
+
+    searchSelectorService.mapSearchSelectorFormEntryToEntity(
+        form.getDepartmentType(),
+        Function.values(),
+        upcomingTender::setManualDepartmentType,
+        upcomingTender::setDepartmentType
+    );
+
+    upcomingTender.setDescriptionOfWork(form.getDescriptionOfWork());
+    upcomingTender.setEstimatedTenderDate(form.getEstimatedTenderDate().createDateOrNull());
+
+    var contactDetailsForm = form.getContactDetail();
+    upcomingTender.setContactName(contactDetailsForm.getName());
+    upcomingTender.setPhoneNumber(contactDetailsForm.getPhoneNumber());
+    upcomingTender.setJobTitle(contactDetailsForm.getJobTitle());
+    upcomingTender.setEmailAddress(contactDetailsForm.getEmailAddress());
+  }
+
+  public WorkPlanUpcomingTender getOrError(Integer upcomingTenderId) {
+    return workPlanUpcomingTenderRepository.findById(upcomingTenderId).orElseThrow(() ->
+        new PathfinderEntityNotFoundException(
+            String.format("Unable to find tender with id: %s", upcomingTenderId)
+        )
+    );
   }
 
   @Override
