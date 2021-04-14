@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.model.enums;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Map;
@@ -53,14 +54,11 @@ public enum Quarter {
   }
 
   public Instant getStartDateAsInstant() {
-    return getDateAsInstant(getStartDate());
+    return getStartDate().atStartOfDay(ZoneId.systemDefault()).toInstant();
   }
 
   public Instant getEndDateAsInstant() {
-    return getDateAsInstant(getEndDate());
+    return getEndDate().atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant();
   }
 
-  private Instant getDateAsInstant(LocalDate localDate) {
-    return localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
-  }
 }

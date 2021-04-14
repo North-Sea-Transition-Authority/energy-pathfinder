@@ -55,6 +55,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
   private static final Integer PROJECT_ID = 1;
   private static final Integer UPCOMING_TENDER_ID = 1;
   private static final Integer DISPLAY_ORDER = 1;
+  private static final Integer PROJECT_VERSION = 1;
 
   @MockBean
   private UpcomingTenderService upcomingTenderService;
@@ -94,7 +95,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(false);
     when(upcomingTenderService.createUpcomingTender(any(), any(), any())).thenReturn(UpcomingTenderUtil.getUpcomingTender(detail));
     when(upcomingTenderService.updateUpcomingTender(any(), any(), any())).thenReturn(UpcomingTenderUtil.getUpcomingTender(detail));
-    when(projectDetailFileService.getProjectDetailFileByProjectDetailAndFileId(any(), any())).thenReturn(PROJECT_DETAIL_FILE);
+    when(projectDetailFileService.getProjectDetailFileByProjectDetailVersionAndFileId(any(), any(), any())).thenReturn(PROJECT_DETAIL_FILE);
     when(projectDetailFileService.getUploadedFileById(ProjectFileTestUtil.FILE_ID)).thenReturn(file);
   }
 
@@ -323,7 +324,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
     customStatusProject.setStatus(status);
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(customStatusProject);
     mockMvc.perform(get(ReverseRouter.route(
-        on(UpcomingTendersController.class).handleDownload(PROJECT_ID, ProjectFileTestUtil.FILE_ID, null)))
+        on(UpcomingTendersController.class).handleDownload(PROJECT_ID, PROJECT_VERSION, ProjectFileTestUtil.FILE_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }

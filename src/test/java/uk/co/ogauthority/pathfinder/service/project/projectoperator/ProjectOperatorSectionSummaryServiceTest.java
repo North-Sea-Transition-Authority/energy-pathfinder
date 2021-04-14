@@ -13,11 +13,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.projectoperator.ProjectOperatorView;
 import uk.co.ogauthority.pathfinder.model.view.projectoperator.ProjectOperatorViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
@@ -31,23 +33,27 @@ public class ProjectOperatorSectionSummaryServiceTest {
   @Mock
   private DifferenceService differenceService;
 
+  @Mock
+  private SelectOperatorService selectOperatorService;
+
   private ProjectOperatorSectionSummaryService projectOperatorSectionSummaryService;
+
+  private final ProjectDetail details = ProjectUtil.getProjectDetails();
 
   @Before
   public void setup() {
     projectOperatorSectionSummaryService = new ProjectOperatorSectionSummaryService(
         projectOperatorService,
-        differenceService
+        differenceService,
+        selectOperatorService
     );
   }
 
   @Test
   public void getSummary_whenProjectOperatorExists_thenProjectOperatorViewPopulated() {
 
-    final var projectDetail = ProjectUtil.getProjectDetails();
-
     final var currentProjectOperator = ProjectOperatorTestUtil.getOperator(
-        projectDetail,
+        details,
         TeamTestingUtil.generateOrganisationGroup(
             10,
             "TEST",
@@ -57,7 +63,7 @@ public class ProjectOperatorSectionSummaryServiceTest {
     final var currentProjectOperatorView = ProjectOperatorViewUtil.from(currentProjectOperator);
 
     final var previousProjectOperator = ProjectOperatorTestUtil.getOperator(
-        projectDetail,
+        details,
         TeamTestingUtil.generateOrganisationGroup(
           20,
           "TEST2",
@@ -66,16 +72,16 @@ public class ProjectOperatorSectionSummaryServiceTest {
     );
     final var previousProjectOperatorView = ProjectOperatorViewUtil.from(previousProjectOperator);
 
-    when(projectOperatorService.getProjectOperatorByProjectDetail(projectDetail))
+    when(projectOperatorService.getProjectOperatorByProjectDetail(details))
         .thenReturn(Optional.of(currentProjectOperator));
 
     when(projectOperatorService.getProjectOperatorByProjectAndVersion(
-        projectDetail.getProject(),
-        projectDetail.getVersion() - 1
+        details.getProject(),
+        details.getVersion() - 1
     ))
         .thenReturn(Optional.of(previousProjectOperator));
 
-    final var sectionSummary = projectOperatorSectionSummaryService.getSummary(projectDetail);
+    final var sectionSummary = projectOperatorSectionSummaryService.getSummary(details);
 
     assertModelProperties(sectionSummary);
     assertInteractions(currentProjectOperatorView, previousProjectOperatorView);
@@ -84,17 +90,16 @@ public class ProjectOperatorSectionSummaryServiceTest {
   @Test
   public void getSummary_whenProjectOperatorNotExist_thenProjectOperatorViewNotPopulated() {
 
-    final var projectDetail = ProjectUtil.getProjectDetails();
     final var currentProjectOperatorView = new ProjectOperatorView();
     final var previousProjectOperatorView = new ProjectOperatorView();
 
-    when(projectOperatorService.getProjectOperatorByProjectDetail(projectDetail))
+    when(projectOperatorService.getProjectOperatorByProjectDetail(details))
         .thenReturn(Optional.empty());
 
-    when(projectOperatorService.getProjectOperatorByProjectAndVersion(projectDetail.getProject(), projectDetail.getVersion()-1))
+    when(projectOperatorService.getProjectOperatorByProjectAndVersion(details.getProject(), details.getVersion()-1))
         .thenReturn(Optional.empty());
 
-    final var sectionSummary = projectOperatorSectionSummaryService.getSummary(projectDetail);
+    final var sectionSummary = projectOperatorSectionSummaryService.getSummary(details);
 
     assertModelProperties(sectionSummary);
     assertInteractions(currentProjectOperatorView, previousProjectOperatorView);
@@ -121,6 +126,20 @@ public class ProjectOperatorSectionSummaryServiceTest {
 
   private void assertInteractions(ProjectOperatorView currentProjectOperatorView, ProjectOperatorView previousProjectOperatorView) {
     verify(differenceService, times(1)).differentiate(currentProjectOperatorView, previousProjectOperatorView);
+  }
+
+  @Test
+  public void canShowSection_whenCanShowInTaskList_thenTrue() {
+    when(selectOperatorService.canShowInTaskList(details)).thenReturn(true);
+
+    assertThat(projectOperatorSectionSummaryService.canShowSection(details)).isTrue();
+  }
+
+  @Test
+  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
+    when(selectOperatorService.canShowInTaskList(details)).thenReturn(false);
+
+    assertThat(projectOperatorSectionSummaryService.canShowSection(details)).isFalse();
   }
 
 }

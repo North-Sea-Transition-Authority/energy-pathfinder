@@ -87,8 +87,7 @@ public class QuarterlyStatisticsServiceTest {
   @Test
   public void getQuarterlyStatisticsByFieldStage_assertOnlyProjectsUpdateInQuarterAreIncluded() {
 
-    // Workaround for test to pass until we fix PAT-518
-    final var timeInCurrentQuarter = DateUtil.getQuarterFromLocalDate(LocalDate.now()).getEndDateAsInstant().minus(5, ChronoUnit.DAYS);
+    final var timeInCurrentQuarter = DateUtil.getQuarterFromLocalDate(LocalDate.now()).getEndDateAsInstant();
     final var timeNotInCurrentQuarter = Instant.now().minus(100, ChronoUnit.DAYS);
 
     final var reportableProjectView1 = ReportableProjectTestUtil.createReportableProjectView(

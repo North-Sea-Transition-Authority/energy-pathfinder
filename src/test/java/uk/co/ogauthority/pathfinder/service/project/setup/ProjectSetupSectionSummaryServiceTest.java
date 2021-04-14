@@ -138,4 +138,18 @@ public class ProjectSetupSectionSummaryServiceTest {
     // Pipelines disabled: PAT-457
     // assertThat(summaryItems.get(7).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(7).getAnswerValue());
   }
+
+  @Test
+  public void canShowSection_whenCanShowInTaskList_thenTrue() {
+    when(projectSetupService.canShowInTaskList(details)).thenReturn(true);
+
+    assertThat(projectSetupSectionSummaryService.canShowSection(details)).isTrue();
+  }
+
+  @Test
+  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
+    when(projectSetupService.canShowInTaskList(details)).thenReturn(false);
+
+    assertThat(projectSetupSectionSummaryService.canShowSection(details)).isFalse();
+  }
 }

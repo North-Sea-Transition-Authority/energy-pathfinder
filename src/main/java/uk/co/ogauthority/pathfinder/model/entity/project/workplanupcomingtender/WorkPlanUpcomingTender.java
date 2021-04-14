@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender
 import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Lob;
 import javax.persistence.Table;
@@ -16,7 +17,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCa
 public class WorkPlanUpcomingTender
     extends ProjectDetailEntity implements ContactDetailCapture {
 
-  @Enumerated
+  @Enumerated(EnumType.STRING)
   private Function departmentType;
 
   private String manualDepartmentType;

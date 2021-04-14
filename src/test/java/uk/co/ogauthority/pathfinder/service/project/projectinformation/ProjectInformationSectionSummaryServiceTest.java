@@ -35,6 +35,8 @@ public class ProjectInformationSectionSummaryServiceTest {
 
   private ProjectInformationSectionSummaryService projectInformationSectionSummaryService;
 
+  private final ProjectDetail details = ProjectUtil.getProjectDetails();
+
   @Before
   public void setUp() throws Exception {
     projectInformationSectionSummaryService = new ProjectInformationSectionSummaryService(
@@ -109,4 +111,17 @@ public class ProjectInformationSectionSummaryServiceTest {
     );
   }
 
+  @Test
+  public void canShowSection_whenCanShowInTaskList_thenTrue() {
+    when(projectInformationService.canShowInTaskList(details)).thenReturn(true);
+
+    assertThat(projectInformationSectionSummaryService.canShowSection(details)).isTrue();
+  }
+
+  @Test
+  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
+    when(projectInformationService.canShowInTaskList(details)).thenReturn(false);
+
+    assertThat(projectInformationSectionSummaryService.canShowSection(details)).isFalse();
+  }
 }

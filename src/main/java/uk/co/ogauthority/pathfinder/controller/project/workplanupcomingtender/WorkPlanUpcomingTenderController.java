@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import javax.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +39,7 @@ public class WorkPlanUpcomingTenderController {
   private final WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
   private final ControllerHelperService controllerHelperService;
 
+  @Autowired
   public WorkPlanUpcomingTenderController(
       WorkPlanUpcomingTenderService workPlanUpcomingTenderService,
       ControllerHelperService controllerHelperService) {

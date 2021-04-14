@@ -80,4 +80,9 @@ public class ProjectInformationSectionSummaryService implements ProjectSectionSu
 
     return differenceService.differentiate(currentProjectInformationView, previousProjectInformationView);
   }
+
+  @Override
+  public boolean canShowSection(ProjectDetail detail) {
+    return projectInformationService.canShowInTaskList(detail);
+  }
 }

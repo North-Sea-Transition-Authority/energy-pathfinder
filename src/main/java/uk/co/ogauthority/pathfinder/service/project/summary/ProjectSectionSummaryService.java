@@ -6,7 +6,7 @@ import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 public interface ProjectSectionSummaryService {
 
   default boolean canShowSection(ProjectDetail detail) {
-    return true;
+    return false;
   }
 
   ProjectSectionSummary getSummary(ProjectDetail detail);
