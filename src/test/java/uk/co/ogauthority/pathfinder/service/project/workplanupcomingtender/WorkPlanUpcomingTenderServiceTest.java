@@ -13,7 +13,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
+import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.WorkPlanUpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -22,6 +27,21 @@ public class WorkPlanUpcomingTenderServiceTest {
   @Mock
   private BreadcrumbService breadcrumbService;
 
+  @Mock
+  private FunctionService functionService;
+
+  @Mock
+  private ValidationService validationService;
+
+  @Mock
+  private WorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator;
+
+  @Mock
+  private WorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository;
+
+  @Mock
+  private SearchSelectorService searchSelectorService;
+
   private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
@@ -29,7 +49,12 @@ public class WorkPlanUpcomingTenderServiceTest {
   @Before
   public void setup() {
     workPlanUpcomingTenderService = new WorkPlanUpcomingTenderService(
-        breadcrumbService
+        breadcrumbService,
+        functionService,
+        validationService,
+        workPlanUpcomingTenderFormValidator,
+        workPlanUpcomingTenderRepository,
+        searchSelectorService
     );
   }
 
@@ -41,7 +66,8 @@ public class WorkPlanUpcomingTenderServiceTest {
 
     assertThat(modelAndView.getViewName()).isEqualTo(WorkPlanUpcomingTenderService.TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
-        entry("pageName", WorkPlanUpcomingTenderController.PAGE_NAME)
+        entry("pageName", WorkPlanUpcomingTenderController.PAGE_NAME),
+        entry("addUpcomingTenderUrl", "/project/1/work-plan-upcoming-tenders/upcoming-tender")
     );
 
     verify(breadcrumbService, times(1)).fromTaskList(projectId, modelAndView, WorkPlanUpcomingTenderController.PAGE_NAME);
