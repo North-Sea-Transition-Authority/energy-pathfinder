@@ -13,6 +13,7 @@ import org.quartz.TriggerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.exception.JobSchedulingException;
 
 @Service
 public class SchedulerService {
@@ -44,11 +45,19 @@ public class SchedulerService {
 
   }
 
-  private void scheduleJob(JobDetail jobDetail, Trigger trigger) {
+  public void scheduleJob(JobDetail jobDetail, Trigger trigger) {
     try {
       scheduler.scheduleJob(jobDetail, trigger);
     } catch (SchedulerException ex) {
-      throw new RuntimeException(String.format("Error scheduling job with key %s", jobDetail.getKey()), ex);
+      throw new JobSchedulingException(String.format("Error scheduling job with key %s", jobDetail.getKey()), ex);
+    }
+  }
+
+  public boolean doesJobWithKeyExist(JobKey jobKey) {
+    try {
+      return scheduler.checkExists(jobKey);
+    } catch (SchedulerException se) {
+      return false;
     }
   }
 }
