@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static java.util.Map.entry;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +15,7 @@ import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.Wo
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.WorkPlanUpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
@@ -67,7 +69,8 @@ public class WorkPlanUpcomingTenderServiceTest {
     assertThat(modelAndView.getViewName()).isEqualTo(WorkPlanUpcomingTenderService.TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
         entry("pageName", WorkPlanUpcomingTenderController.PAGE_NAME),
-        entry("addUpcomingTenderUrl", "/project/1/work-plan-upcoming-tenders/upcoming-tender")
+        entry("addUpcomingTenderUrl", ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).addUpcomingTender(projectId, null))
+        )
     );
 
     verify(breadcrumbService, times(1)).fromTaskList(projectId, modelAndView, WorkPlanUpcomingTenderController.PAGE_NAME);

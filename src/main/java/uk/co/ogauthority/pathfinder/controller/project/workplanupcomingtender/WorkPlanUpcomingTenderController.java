@@ -57,8 +57,10 @@ public class WorkPlanUpcomingTenderController {
   @GetMapping("/upcoming-tender")
   public ModelAndView addUpcomingTender(@PathVariable("projectId") Integer projectId,
                                         ProjectContext projectContext) {
-    return workPlanUpcomingTenderService.getViewUpcomingTendersModelAndView(projectContext.getProjectDetails(),
-        new WorkPlanUpcomingTenderForm());
+    return workPlanUpcomingTenderService.getViewUpcomingTendersModelAndView(
+        projectContext.getProjectDetails(),
+        new WorkPlanUpcomingTenderForm()
+    );
   }
 
   @PostMapping("/upcoming-tender")
@@ -79,9 +81,9 @@ public class WorkPlanUpcomingTenderController {
           );
 
           AuditService.audit(
-              AuditEvent.UPCOMING_TENDER_UPDATED,
+              AuditEvent.WORK_PLAN_UPCOMING_TENDER_UPDATED,
               String.format(
-                  AuditEvent.UPCOMING_TENDER_UPDATED.getMessage(),
+                  AuditEvent.WORK_PLAN_UPCOMING_TENDER_UPDATED.getMessage(),
                   tender.getId(),
                   projectContext.getProjectDetails().getId()
               )

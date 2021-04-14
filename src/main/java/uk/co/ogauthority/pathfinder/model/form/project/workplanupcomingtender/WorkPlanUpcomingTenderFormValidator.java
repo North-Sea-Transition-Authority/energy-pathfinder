@@ -32,7 +32,7 @@ public class WorkPlanUpcomingTenderFormValidator implements SmartValidator {
         .map(WorkPlanUpcomingTenderValidationHint.class::cast)
         .findFirst()
         .orElseThrow(
-            () -> new ActionNotAllowedException("Expected WorkPlanUpcomingTenderValidationHint validation hint to be provided")
+            () -> new ActionNotAllowedException("Expected WorkPlanUpcomingTenderValidationHint to be provided")
         );
 
     ValidationUtil.invokeNestedValidator(

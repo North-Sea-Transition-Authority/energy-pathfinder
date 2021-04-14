@@ -2,7 +2,13 @@
 
 <@defaultPage htmlTitle=pageNameSingular pageHeading=pageNameSingular breadcrumbs=true errorItems=errorList>
   <@fdsForm.htmlForm>
-    <@fdsSearchSelector.searchSelectorRest path="form.departmentType" selectorMinInputLength=0 labelText="What department is the tender for?" restUrl=springUrl(departmentTenderRestUrl)  preselectedItems={} />
+    <@fdsSearchSelector.searchSelectorRest
+      path="form.departmentType"
+      selectorMinInputLength=0
+      labelText="What department is the tender for?"
+      restUrl=springUrl(departmentTenderRestUrl)
+      preselectedItems={}
+    />
     <@fdsTextarea.textarea path="form.descriptionOfWork" labelText="Provide a detailed description of the work"/>
     <@fdsDateInput.dateInput
       dayPath="form.estimatedTenderDate.day"

@@ -74,8 +74,11 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
         .addObject("departmentTenderRestUrl", SearchSelectorService.route(
             on(WorkPlanUpcomingTenderRestController.class).searchTenderDepartments(null)
         ));
-    breadcrumbService.fromWorkPlanUpcomingTenders(projectDetail.getProject().getId(), modelAndView,
-        WorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR);
+    breadcrumbService.fromWorkPlanUpcomingTenders(
+        projectDetail.getProject().getId(),
+        modelAndView,
+        WorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR
+    );
     return modelAndView;
   }
 
@@ -117,14 +120,6 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     upcomingTender.setPhoneNumber(contactDetailsForm.getPhoneNumber());
     upcomingTender.setJobTitle(contactDetailsForm.getJobTitle());
     upcomingTender.setEmailAddress(contactDetailsForm.getEmailAddress());
-  }
-
-  public WorkPlanUpcomingTender getOrError(Integer upcomingTenderId) {
-    return workPlanUpcomingTenderRepository.findById(upcomingTenderId).orElseThrow(() ->
-        new PathfinderEntityNotFoundException(
-            String.format("Unable to find tender with id: %s", upcomingTenderId)
-        )
-    );
   }
 
   @Override

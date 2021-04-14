@@ -8,7 +8,7 @@ import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
 public class WorkPlanUpcomingTenderForm {
 
-  @NotEmpty(message = "Select a department type", groups = FullValidation.class)
+  @NotEmpty(message = "Select a department", groups = FullValidation.class)
   private String departmentType;
 
   @NotEmpty(message = "Enter a description of the work", groups = FullValidation.class)
