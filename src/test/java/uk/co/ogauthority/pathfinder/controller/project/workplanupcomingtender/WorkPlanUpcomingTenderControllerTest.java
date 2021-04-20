@@ -23,6 +23,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
@@ -65,6 +67,7 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
     when(workPlanUpcomingTenderService.createUpcomingTender(any(), any())).thenReturn(WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail));
+    when(workPlanUpcomingTenderService.getViewUpcomingTendersModelAndView(eq(projectDetail), any())).thenReturn(new ModelAndView(""));
   }
 
   @Test
@@ -120,6 +123,29 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
     verify(workPlanUpcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
     verify(workPlanUpcomingTenderService, times(1)).createUpcomingTender(any(), any());
   }
+
+   @Test
+   public void saveUpcomingTender_fullValidation_invalid() throws Exception {
+     MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+     add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+     }};
+
+     var bindingResult = new BeanPropertyBindingResult(WorkPlanUpcomingTenderForm.class, "form");
+     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
+     when(workPlanUpcomingTenderService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+     mockMvc.perform(
+         post(ReverseRouter.route(on(WorkPlanUpcomingTenderController.class)
+             .saveUpcomingTender(PROJECT_ID, null, null, null, null)
+         ))
+             .with(authenticatedUserAndSession(authenticatedUser))
+             .with(csrf())
+             .params(completeParams))
+         .andExpect(status().is2xxSuccessful());
+
+     verify(workPlanUpcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+     verify(workPlanUpcomingTenderService, times(0)).createUpcomingTender(any(), any());
+   }
 
   @Test
   public void saveUpcomingTender_partialValidation() throws Exception {
