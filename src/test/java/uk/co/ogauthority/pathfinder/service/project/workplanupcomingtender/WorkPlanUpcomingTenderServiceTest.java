@@ -102,6 +102,7 @@ public class WorkPlanUpcomingTenderServiceTest {
     assertThat(modelAndView.getModel()).containsExactly(
         entry("pageNameSingular", WorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR),
         entry("form", form),
+        entry("preSelectedFunction", workPlanUpcomingTenderService.getPreSelectedFunction(form)),
         entry("departmentTenderRestUrl", SearchSelectorService.route(on(WorkPlanUpcomingTenderRestController.class).searchTenderDepartments(null))
         ));
 
@@ -154,6 +155,14 @@ public class WorkPlanUpcomingTenderServiceTest {
     assertThat(results.size()).isEqualTo(1);
     assertThat(results.get(0).getId()).isEqualTo(SearchSelectablePrefix.FREE_TEXT_PREFIX+manualEntry);
   }
+
+  /**
+  @Test
+  public void getPreSelectedFunction_verifyInteractions() {
+    final var form = new WorkPlanUpcomingTenderForm();
+    workPlanUpcomingTenderService.getPreSelectedFunction(form);
+    verify(searchSelectorService, times(1)).getPreSelectedSearchSelectorValue(form.getDepartmentType(), Function.values());
+  }**/
 
   @Test
   public void isComplete_whenInvalid_thenFalse() {
