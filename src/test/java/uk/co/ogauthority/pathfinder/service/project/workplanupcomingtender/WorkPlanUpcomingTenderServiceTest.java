@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
@@ -104,6 +105,7 @@ public class WorkPlanUpcomingTenderServiceTest {
         entry("pageNameSingular", WorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR),
         entry("form", form),
         entry("preSelectedFunction", workPlanUpcomingTenderService.getPreSelectedFunction(form)),
+        entry("contractBands", WorkPlanUpcomingTenderContractBand.getAllAsMap()),
         entry("departmentTenderRestUrl", SearchSelectorService.route(on(WorkPlanUpcomingTenderRestController.class).searchTenderDepartments(null))
         ));
 
@@ -137,12 +139,13 @@ public class WorkPlanUpcomingTenderServiceTest {
   }
 
   private void checkCommonFields(WorkPlanUpcomingTenderForm form, WorkPlanUpcomingTender newUpcomingTender) {
-    assertThat(newUpcomingTender.getDescriptionOfWork()).isEqualTo(UpcomingTenderUtil.DESCRIPTION_OF_WORK);
+    assertThat(newUpcomingTender.getDescriptionOfWork()).isEqualTo(WorkPlanUpcomingTenderUtil.DESCRIPTION_OF_WORK);
     assertThat(newUpcomingTender.getEstimatedTenderDate()).isEqualTo(form.getEstimatedTenderDate().createDateOrNull());
-    assertThat(newUpcomingTender.getContactName()).isEqualTo(UpcomingTenderUtil.CONTACT_NAME);
-    assertThat(newUpcomingTender.getPhoneNumber()).isEqualTo(UpcomingTenderUtil.PHONE_NUMBER);
-    assertThat(newUpcomingTender.getJobTitle()).isEqualTo(UpcomingTenderUtil.JOB_TITLE);
-    assertThat(newUpcomingTender.getEmailAddress()).isEqualTo(UpcomingTenderUtil.EMAIL);
+    assertThat(newUpcomingTender.getContractBand()).isEqualTo(WorkPlanUpcomingTenderUtil.CONTRACT_BAND);
+    assertThat(newUpcomingTender.getContactName()).isEqualTo(WorkPlanUpcomingTenderUtil.CONTACT_NAME);
+    assertThat(newUpcomingTender.getPhoneNumber()).isEqualTo(WorkPlanUpcomingTenderUtil.PHONE_NUMBER);
+    assertThat(newUpcomingTender.getJobTitle()).isEqualTo(WorkPlanUpcomingTenderUtil.JOB_TITLE);
+    assertThat(newUpcomingTender.getEmailAddress()).isEqualTo(WorkPlanUpcomingTenderUtil.EMAIL);
   }
 
   @Test
