@@ -15,6 +15,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
+import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
@@ -70,6 +71,7 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     var modelAndView = new ModelAndView("project/workplanupcomingtender/workPlanUpcomingTender")
         .addObject("pageNameSingular", WorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR)
         .addObject("form", form)
+        .addObject("contractBands", WorkPlanUpcomingTenderContractBand.getAllAsMap())
         .addObject("departmentTenderRestUrl", SearchSelectorService.route(
             on(WorkPlanUpcomingTenderRestController.class).searchTenderDepartments(null)
         ));
@@ -113,6 +115,7 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
 
     upcomingTender.setDescriptionOfWork(form.getDescriptionOfWork());
     upcomingTender.setEstimatedTenderDate(form.getEstimatedTenderDate().createDateOrNull());
+    upcomingTender.setContractBand(form.getContractBand());
 
     var contactDetailsForm = form.getContactDetail();
     upcomingTender.setContactName(contactDetailsForm.getName());
