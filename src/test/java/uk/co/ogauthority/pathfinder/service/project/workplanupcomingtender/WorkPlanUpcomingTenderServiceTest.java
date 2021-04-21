@@ -156,13 +156,35 @@ public class WorkPlanUpcomingTenderServiceTest {
     assertThat(results.get(0).getId()).isEqualTo(SearchSelectablePrefix.FREE_TEXT_PREFIX+manualEntry);
   }
 
-  /**
   @Test
-  public void getPreSelectedFunction_verifyInteractions() {
+  public void getPreSelectedFunction_whenNullDepartmentType_thenEmptyMap() {
     final var form = new WorkPlanUpcomingTenderForm();
-    workPlanUpcomingTenderService.getPreSelectedFunction(form);
-    verify(searchSelectorService, times(1)).getPreSelectedSearchSelectorValue(form.getDepartmentType(), Function.values());
-  }**/
+    var results = workPlanUpcomingTenderService.getPreSelectedFunction(form);
+    assertThat(results).isEmpty();
+  }
+
+  @Test
+  public void getPreSelectedFunction_whenDepartmentTypeFromList_thenListValueReturned() {
+    final var preSelectedDepartmentType = Function.DRILLING;
+    final var form = new WorkPlanUpcomingTenderForm();
+    form.setDepartmentType(preSelectedDepartmentType.name());
+    var results = workPlanUpcomingTenderService.getPreSelectedFunction(form);
+    assertThat(results).containsExactly(
+        entry(preSelectedDepartmentType.getSelectionId(), preSelectedDepartmentType.getSelectionText())
+    );
+  }
+
+  @Test
+  public void getPreSelectedFunction_whenDepartmentTypeNotFromList_thenManualEntryValueReturned() {
+    final var preSelectedDepartmentTypeValue = "my manual entry";
+    final var preSelectedDepartmentTypeWithPrefix = SearchSelectablePrefix.FREE_TEXT_PREFIX + preSelectedDepartmentTypeValue;
+    final var form = new WorkPlanUpcomingTenderForm();
+    form.setDepartmentType(preSelectedDepartmentTypeWithPrefix);
+    var results = workPlanUpcomingTenderService.getPreSelectedFunction(form);
+    assertThat(results).containsExactly(
+        entry(preSelectedDepartmentTypeWithPrefix, preSelectedDepartmentTypeValue)
+    );
+  }
 
   @Test
   public void isComplete_whenInvalid_thenFalse() {
