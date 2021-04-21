@@ -10,7 +10,7 @@ import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 
 public class WorkPlanUpcomingTenderUtil {
   public static final Function UPCOMING_TENDER_DEPARTMENT = Function.DRILLING;
-  public static final String MANUAL_TENDER_DEPARTMENT = SearchSelectablePrefix.FREE_TEXT_PREFIX;
+  public static final String MANUAL_TENDER_DEPARTMENT = SearchSelectablePrefix.FREE_TEXT_PREFIX + "manual department type";
   public static final String DESCRIPTION_OF_WORK = "work description";
   public static final LocalDate ESTIMATED_TENDER_DATE = LocalDate.now().plusMonths(1L);
   public static final String CONTACT_NAME = ContactDetailsTestUtil.CONTACT_NAME;

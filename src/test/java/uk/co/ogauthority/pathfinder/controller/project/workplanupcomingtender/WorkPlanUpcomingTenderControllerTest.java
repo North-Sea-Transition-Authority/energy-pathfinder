@@ -52,9 +52,9 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
   @MockBean
   private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
-  private static final AuthenticatedUserAccount unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
+  private final AuthenticatedUserAccount unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
-  private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
+  private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       SystemAccessService.CREATE_PROJECT_PRIVILEGES);
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
@@ -87,7 +87,7 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
   }
 
   @Test
-  public void authenticatedUser_hasAccessToUpcomingTenderSummary() throws Exception {
+  public void authenticatedUser_canAddUpcomingTender() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
         on(WorkPlanUpcomingTenderController.class).addUpcomingTender(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
@@ -95,7 +95,7 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
   }
 
   @Test
-  public void unAuthenticatedUser_cannotAccessUpcomingTenderSummary() throws Exception {
+  public void unAuthenticatedUser_cannotAddUpcomingTender() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
         on(WorkPlanUpcomingTenderController.class).addUpcomingTender(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
@@ -148,7 +148,7 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
    }
 
   @Test
-  public void saveUpcomingTender_partialValidation() throws Exception {
+  public void saveUpcomingTender_partialValidation_valid() throws Exception {
     MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
     }};
@@ -167,5 +167,28 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
 
     verify(workPlanUpcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
     verify(workPlanUpcomingTenderService, times(1)).createUpcomingTender(any(), any());
+  }
+
+  @Test
+  public void saveUpcomingTender_partialValidation_invalid() throws Exception {
+    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
+    }};
+
+    var bindingResult = new BeanPropertyBindingResult(WorkPlanUpcomingTenderForm.class, "form");
+    bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
+    when(workPlanUpcomingTenderService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(WorkPlanUpcomingTenderController.class)
+            .saveUpcomingTender(PROJECT_ID, null, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeLaterParams))
+        .andExpect(status().is2xxSuccessful());
+
+    verify(workPlanUpcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(workPlanUpcomingTenderService, times(0)).createUpcomingTender(any(), any());
   }
 }

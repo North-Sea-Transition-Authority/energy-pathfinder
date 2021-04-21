@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -34,10 +35,11 @@ public class BreadCrumbServiceTest {
   public void fromWorkPlanUpcomingTenders() {
     var projectId = new ProjectDetail().getId();
     var modelAndView = new ModelAndView();
+    var pageName = WorkPlanUpcomingTenderController.PAGE_NAME;
 
-    breadcrumbService.fromWorkPlanUpcomingTenders(projectId, modelAndView, "Upcoming Tender");
+    breadcrumbService.fromWorkPlanUpcomingTenders(projectId, modelAndView, pageName);
     assertThat(modelAndView.getModel()).containsOnlyKeys("crumbList", "currentPage");
-    assertThat(modelAndView.getModel()).containsEntry("currentPage", "Upcoming Tender");
+    assertThat(modelAndView.getModel()).containsEntry("currentPage", pageName);
     var breadcrumbMap = (Map<String, String>) modelAndView.getModel().get("crumbList");
     assertThat(breadcrumbMap).containsValues("Work area", "Task list", "Upcoming tenders");
   }

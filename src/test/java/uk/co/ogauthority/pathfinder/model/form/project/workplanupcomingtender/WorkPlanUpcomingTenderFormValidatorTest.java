@@ -39,53 +39,85 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
   }
 
   @Test
-  public void validate_completeForm_isValid() {
+  public void validate_whenFullValidationAndCompleteForm_thenNoErrors() {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
-    var errors = new BeanPropertyBindingResult(form, "form");
-
-    var upcomingTenderValidationHint = new WorkPlanUpcomingTenderValidationHint(ValidationType.FULL);
-    ValidationUtils.invokeValidator(validator, form, errors, upcomingTenderValidationHint);
-
-    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
-
-    assertThat(fieldErrors).isEmpty();
+    var fieldErrors = validateFormAndGetErrors(form, ValidationType.FULL);
+    assertBindingResultHasNoErrors(fieldErrors);
   }
 
   @Test
-  public void validate_inCompleteForm_isValid_withEmptyDate() {
+  public void validate_whenPartialValidationAndCompleteForm_thenNoErrors() {
+    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var fieldErrors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
+    assertBindingResultHasNoErrors(fieldErrors);
+  }
+
+  @Test
+  public void validate_whenFullValidationAndNullTenderDate_thenErrors() {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setEstimatedTenderDate(new ThreeFieldDateInput(null));
-    var errors = new BeanPropertyBindingResult(form, "form");
-
-    var upcomingTenderValidationHint = new WorkPlanUpcomingTenderValidationHint(ValidationType.PARTIAL);
-    ValidationUtils.invokeValidator(validator, form, errors, upcomingTenderValidationHint);
-
-    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
-
-    assertThat(fieldErrors).isEmpty();
+    var fieldErrors = validateFormAndGetErrors(form, ValidationType.FULL);
+    assertCommonFieldErrorCodesAndMessages(
+        fieldErrors,
+        DateInputValidator.DAY_INVALID_CODE,
+        DateInputValidator.MONTH_INVALID_CODE,
+        DateInputValidator.YEAR_INVALID_CODE,
+        "Enter an " + WorkPlanUpcomingTenderValidationHint.ESTIMATED_TENDER_LABEL.getLabel() + " "
+    );
   }
 
   @Test
-  public void validate_inCompleteForm_isInValid_withPastDate() {
+  public void validate_whenPartialValidationAndNullTenderDate_thenNoErrors() {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
-    form.setEstimatedTenderDate(new ThreeFieldDateInput(LocalDate.now().minusDays(1L)));
-    var errors = new BeanPropertyBindingResult(form, "form");
-
-    var upcomingTenderValidationHint = new WorkPlanUpcomingTenderValidationHint(ValidationType.FULL);
-    ValidationUtils.invokeValidator(validator, form, errors, upcomingTenderValidationHint);
-
-    checkCommonFieldErrorsAndMessages(errors);
+    form.setEstimatedTenderDate(new ThreeFieldDateInput(null));
+    var fieldErrors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
+    assertBindingResultHasNoErrors(fieldErrors);
   }
 
   @Test
-  public void validate_completeForm_dateIsNotInFuture_isInvalid() {
+  public void validate_whenFullValidationAndTenderDateInPast_thenErrors() {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setEstimatedTenderDate(new ThreeFieldDateInput(LocalDate.now().minusDays(1L)));
-    var errors = new BeanPropertyBindingResult(form, "form");
+    var fieldErrors = validateFormAndGetErrors(form, ValidationType.FULL);
+    assertCommonFieldErrorCodesAndMessages(
+        fieldErrors,
+        DateInputValidator.DAY_AFTER_DATE_CODE,
+        DateInputValidator.MONTH_AFTER_DATE_CODE,
+        DateInputValidator.YEAR_AFTER_DATE_CODE,
+        WorkPlanUpcomingTenderValidationHint.ESTIMATED_TENDER_LABEL.getInitCappedLabel()
+            + " must be after " + WorkPlanUpcomingTenderValidationHint.DATE_ERROR_LABEL
+    );
+  }
 
-    var upcomingTenderValidationHint = new WorkPlanUpcomingTenderValidationHint(ValidationType.FULL);
-    ValidationUtils.invokeValidator(validator, form, errors, upcomingTenderValidationHint);
-    checkCommonFieldErrorsAndMessages(errors);
+  @Test
+  public void validate_whenPartialValidationAndTenderDateInPast_thenErrors() {
+    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    form.setEstimatedTenderDate(new ThreeFieldDateInput(LocalDate.now().minusDays(1L)));
+    var fieldErrors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
+    assertCommonFieldErrorCodesAndMessages(
+        fieldErrors,
+        DateInputValidator.DAY_AFTER_DATE_CODE,
+        DateInputValidator.MONTH_AFTER_DATE_CODE,
+        DateInputValidator.YEAR_AFTER_DATE_CODE,
+        WorkPlanUpcomingTenderValidationHint.ESTIMATED_TENDER_LABEL.getInitCappedLabel()
+            + " must be after " + WorkPlanUpcomingTenderValidationHint.DATE_ERROR_LABEL
+    );
+  }
+
+  @Test
+  public void validate_whenFullValidationAndTenderDateInFuture_thenNoErrors() {
+    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    form.setEstimatedTenderDate(new ThreeFieldDateInput(LocalDate.now().plusDays(1L)));
+    var fieldErrors = validateFormAndGetErrors(form, ValidationType.FULL);
+    assertBindingResultHasNoErrors(fieldErrors);
+  }
+
+  @Test
+  public void validate_whenPartialValidationAndTenderDateInFuture_thenNoErrors() {
+    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    form.setEstimatedTenderDate(new ThreeFieldDateInput(LocalDate.now().plusDays(1L)));
+    var fieldErrors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
+    assertBindingResultHasNoErrors(fieldErrors);
   }
 
   @Test(expected = ActionNotAllowedException.class)
@@ -95,23 +127,35 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
     ValidationUtils.invokeValidator(validator, form, errors);
   }
 
-  private void checkCommonFieldErrorsAndMessages(BeanPropertyBindingResult errors) {
+  private void assertCommonFieldErrorCodesAndMessages(BeanPropertyBindingResult errors,
+                                                      String expectedDayErrorCode,
+                                                      String expectedMonthErrorCode,
+                                                      String expectedYearErrorCode,
+                                                      String expectedDayErrorMessage) {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors.size()).isPositive();
-    assertThat(fieldErrors).contains(
-        entry("estimatedTenderDate.day", Set.of(DateInputValidator.DAY_AFTER_DATE_CODE)),
-        entry("estimatedTenderDate.month", Set.of(DateInputValidator.MONTH_AFTER_DATE_CODE)),
-        entry("estimatedTenderDate.year", Set.of(DateInputValidator.YEAR_AFTER_DATE_CODE))
+    assertThat(fieldErrors).containsExactly(
+        entry("estimatedTenderDate.day", Set.of(expectedDayErrorCode)),
+        entry("estimatedTenderDate.month", Set.of(expectedMonthErrorCode)),
+        entry("estimatedTenderDate.year", Set.of(expectedYearErrorCode))
     );
-
     assertThat(fieldErrorMessages).contains(
-        entry("estimatedTenderDate.day", Set.of(
-            WorkPlanUpcomingTenderValidationHint.ESTIMATED_TENDER_LABEL.getInitCappedLabel() + " must be after " + WorkPlanUpcomingTenderValidationHint.DATE_ERROR_LABEL)
-        ),
+        entry("estimatedTenderDate.day", Set.of(expectedDayErrorMessage)),
         entry("estimatedTenderDate.month", Set.of("")),
         entry("estimatedTenderDate.year", Set.of(""))
     );
+  }
+
+  private void assertBindingResultHasNoErrors(BeanPropertyBindingResult fieldErrors) {
+    assertThat(ValidatorTestingUtil.extractErrors(fieldErrors)).isEmpty();
+  }
+
+  private BeanPropertyBindingResult validateFormAndGetErrors(WorkPlanUpcomingTenderForm form,
+                                                            ValidationType validationType) {
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var upcomingTenderValidationHint = new WorkPlanUpcomingTenderValidationHint(validationType);
+    ValidationUtils.invokeValidator(validator, form, errors, upcomingTenderValidationHint);
+    return errors;
   }
 }

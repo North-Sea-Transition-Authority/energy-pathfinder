@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
@@ -117,6 +118,7 @@ public class WorkPlanUpcomingTenderServiceTest {
     );
     assertThat(newUpcomingTenders.getProjectDetail()).isEqualTo(projectDetail);
     assertThat(newUpcomingTenders.getDepartmentType()).isEqualTo(WorkPlanUpcomingTenderUtil.UPCOMING_TENDER_DEPARTMENT);
+    assertThat(newUpcomingTenders.getManualDepartmentType()).isNull();
     checkCommonFields(form, newUpcomingTenders);
   }
 
@@ -128,6 +130,8 @@ public class WorkPlanUpcomingTenderServiceTest {
         form
     );
     assertThat(newUpcomingTender.getProjectDetail()).isEqualTo(detail);
+    assertThat(newUpcomingTender.getManualDepartmentType()).isEqualTo(SearchSelectorService.removePrefix(WorkPlanUpcomingTenderUtil.MANUAL_TENDER_DEPARTMENT));
+    assertThat(newUpcomingTender.getDepartmentType()).isNull();
     checkCommonFields(form, newUpcomingTender);
   }
 
@@ -143,16 +147,18 @@ public class WorkPlanUpcomingTenderServiceTest {
   @Test
   public void findDepartmentTenderLikeWithManualEntry() {
     var results = workPlanUpcomingTenderService.findDepartmentTenderLikeWithManualEntry(Function.DRILLING.getDisplayName());
-    assertThat(results.size()).isEqualTo(1);
-    assertThat(results.get(0).getId()).isEqualTo(Function.DRILLING.name());
+    assertThat(results)
+        .extracting(RestSearchItem::getId)
+        .containsExactly(Function.DRILLING.name());
   }
 
   @Test
   public void findDepartmentTenderLikeWithManualEntry_withManualEntry() {
     var manualEntry = "manual entry";
     var results = workPlanUpcomingTenderService.findDepartmentTenderLikeWithManualEntry(manualEntry);
-    assertThat(results.size()).isEqualTo(1);
-    assertThat(results.get(0).getId()).isEqualTo(SearchSelectablePrefix.FREE_TEXT_PREFIX+manualEntry);
+    assertThat(results)
+        .extracting(RestSearchItem::getId)
+        .containsExactly(SearchSelectablePrefix.FREE_TEXT_PREFIX+manualEntry);
   }
 
   @Test
