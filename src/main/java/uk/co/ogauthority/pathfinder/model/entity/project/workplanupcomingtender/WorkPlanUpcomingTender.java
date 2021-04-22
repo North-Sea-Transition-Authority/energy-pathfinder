@@ -10,6 +10,7 @@ import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
+import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
 
 @Entity
@@ -35,6 +36,9 @@ public class WorkPlanUpcomingTender
   private String jobTitle;
 
   private String emailAddress;
+
+  @Enumerated(EnumType.STRING)
+  private WorkPlanUpcomingTenderContractBand contractBand;
 
   public WorkPlanUpcomingTender() {
   }
@@ -113,5 +117,13 @@ public class WorkPlanUpcomingTender
   @Override
   public String getName() {
     return getContactName();
+  }
+
+  public WorkPlanUpcomingTenderContractBand getContractBand() {
+    return contractBand;
+  }
+
+  public void setContractBand(WorkPlanUpcomingTenderContractBand contractBand) {
+    this.contractBand = contractBand;
   }
 }
