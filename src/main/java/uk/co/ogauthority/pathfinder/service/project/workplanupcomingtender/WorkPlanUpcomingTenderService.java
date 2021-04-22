@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
+import java.util.Map;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -70,6 +71,7 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     var modelAndView = new ModelAndView("project/workplanupcomingtender/workPlanUpcomingTender")
         .addObject("pageNameSingular", WorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR)
         .addObject("form", form)
+        .addObject("preSelectedFunction", getPreSelectedFunction(form))
         .addObject("departmentTenderRestUrl", SearchSelectorService.route(
             on(WorkPlanUpcomingTenderRestController.class).searchTenderDepartments(null)
         ));
@@ -119,6 +121,10 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     upcomingTender.setPhoneNumber(contactDetailsForm.getPhoneNumber());
     upcomingTender.setJobTitle(contactDetailsForm.getJobTitle());
     upcomingTender.setEmailAddress(contactDetailsForm.getEmailAddress());
+  }
+
+  public Map<String, String> getPreSelectedFunction(WorkPlanUpcomingTenderForm form) {
+    return searchSelectorService.getPreSelectedSearchSelectorValue(form.getDepartmentType(), Function.values());
   }
 
   @Override

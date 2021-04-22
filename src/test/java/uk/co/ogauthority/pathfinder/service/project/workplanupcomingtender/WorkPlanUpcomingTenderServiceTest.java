@@ -103,6 +103,7 @@ public class WorkPlanUpcomingTenderServiceTest {
     assertThat(modelAndView.getModel()).containsExactly(
         entry("pageNameSingular", WorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR),
         entry("form", form),
+        entry("preSelectedFunction", workPlanUpcomingTenderService.getPreSelectedFunction(form)),
         entry("departmentTenderRestUrl", SearchSelectorService.route(on(WorkPlanUpcomingTenderRestController.class).searchTenderDepartments(null))
         ));
 
@@ -159,6 +160,36 @@ public class WorkPlanUpcomingTenderServiceTest {
     assertThat(results)
         .extracting(RestSearchItem::getId)
         .containsExactly(SearchSelectablePrefix.FREE_TEXT_PREFIX+manualEntry);
+  }
+
+  @Test
+  public void getPreSelectedFunction_whenNullDepartmentType_thenEmptyMap() {
+    final var form = new WorkPlanUpcomingTenderForm();
+    var results = workPlanUpcomingTenderService.getPreSelectedFunction(form);
+    assertThat(results).isEmpty();
+  }
+
+  @Test
+  public void getPreSelectedFunction_whenDepartmentTypeFromList_thenListValueReturned() {
+    final var preSelectedDepartmentType = Function.DRILLING;
+    final var form = new WorkPlanUpcomingTenderForm();
+    form.setDepartmentType(preSelectedDepartmentType.name());
+    var results = workPlanUpcomingTenderService.getPreSelectedFunction(form);
+    assertThat(results).containsExactly(
+        entry(preSelectedDepartmentType.getSelectionId(), preSelectedDepartmentType.getSelectionText())
+    );
+  }
+
+  @Test
+  public void getPreSelectedFunction_whenDepartmentTypeNotFromList_thenManualEntryValueReturned() {
+    final var preSelectedDepartmentTypeValue = "my manual entry";
+    final var preSelectedDepartmentTypeWithPrefix = SearchSelectablePrefix.FREE_TEXT_PREFIX + preSelectedDepartmentTypeValue;
+    final var form = new WorkPlanUpcomingTenderForm();
+    form.setDepartmentType(preSelectedDepartmentTypeWithPrefix);
+    var results = workPlanUpcomingTenderService.getPreSelectedFunction(form);
+    assertThat(results).containsExactly(
+        entry(preSelectedDepartmentTypeWithPrefix, preSelectedDepartmentTypeValue)
+    );
   }
 
   @Test

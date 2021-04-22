@@ -7,7 +7,7 @@
       selectorMinInputLength=0
       labelText="What department is the tender for?"
       restUrl=springUrl(departmentTenderRestUrl)
-      preselectedItems={}
+      preselectedItems=preSelectedFunction!{}
     />
     <@fdsTextarea.textarea path="form.descriptionOfWork" labelText="Provide a detailed description of the work"/>
     <@fdsDateInput.dateInput
