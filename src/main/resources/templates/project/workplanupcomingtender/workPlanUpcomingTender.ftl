@@ -18,9 +18,9 @@
       formId="estimatedTenderDate-day-month-year"
     />
     <@fdsRadio.radio
-    labelText="Contract band"
-    path="form.contractBand"
-    radioItems=contractBands
+      labelText="Contract band"
+      path="form.contractBand"
+      radioItems=contractBands
     />
     <@contactDetails.standardContactDetails path="form.contactDetail" legendHeading="Tender contact details"/>
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
