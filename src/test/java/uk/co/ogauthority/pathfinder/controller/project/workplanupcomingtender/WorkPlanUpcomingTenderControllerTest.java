@@ -29,13 +29,16 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
+import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderService;
+import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderSummaryService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
@@ -48,9 +51,13 @@ import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
 public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstractControllerTest {
 
   private static final Integer PROJECT_ID = 1;
+  private static final Integer DISPLAY_ORDER = 1;
 
   @MockBean
   private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
+
+  @MockBean
+  private WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
 
   private final AuthenticatedUserAccount unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
@@ -59,15 +66,22 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
 
+  private final WorkPlanUpcomingTender workPlanUpcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
 
   @Before
   public void setup() {
+
+    var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+        workPlanUpcomingTender,
+        DISPLAY_ORDER
+    );
 
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
     when(workPlanUpcomingTenderService.createUpcomingTender(any(), any())).thenReturn(WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail));
-    when(workPlanUpcomingTenderService.getViewUpcomingTendersModelAndView(eq(projectDetail), any())).thenReturn(new ModelAndView(""));
+    when(workPlanUpcomingTenderService.getUpcomingTendersFormModelAndView(eq(projectDetail), any())).thenReturn(new ModelAndView(""));
+    when(workPlanUpcomingTenderSummaryService.getUpcomingTenderView(workPlanUpcomingTender, DISPLAY_ORDER)).thenReturn(upcomingTenderView);
   }
 
   @Test

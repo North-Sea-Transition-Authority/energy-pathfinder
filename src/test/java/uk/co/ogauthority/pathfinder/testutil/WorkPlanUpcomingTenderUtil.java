@@ -8,6 +8,10 @@ import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderCo
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
+import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderView;
+import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class WorkPlanUpcomingTenderUtil {
   public static final Function UPCOMING_TENDER_DEPARTMENT = Function.DRILLING;
@@ -19,6 +23,9 @@ public class WorkPlanUpcomingTenderUtil {
   public static final String PHONE_NUMBER = ContactDetailsTestUtil.PHONE_NUMBER;
   public static final String JOB_TITLE = ContactDetailsTestUtil.JOB_TITLE;
   public static final String EMAIL = ContactDetailsTestUtil.EMAIL;
+
+  public static final Integer ID = 1;
+  public static final Integer PROJECT_ID = 1;
 
   public static WorkPlanUpcomingTenderForm getCompleteForm() {
     var form = new WorkPlanUpcomingTenderForm();
@@ -70,5 +77,24 @@ public class WorkPlanUpcomingTenderUtil {
         EMAIL
     );
     form.setContactDetail(contactDetailForm);
+  }
+
+  public static WorkPlanUpcomingTenderView getView(Integer displayOrder, boolean isValid) {
+    var view = new WorkPlanUpcomingTenderView(
+        displayOrder,
+        ID,
+        PROJECT_ID
+    );
+    view.setIsValid(isValid);
+    view.setTenderDepartment(new StringWithTag(UPCOMING_TENDER_DEPARTMENT.getDisplayName(), Tag.NONE));
+    view.setEstimatedTenderDate(DateUtil.formatDate(ESTIMATED_TENDER_DATE));
+    view.setContractBand(CONTRACT_BAND.getDisplayName());
+
+    view.setContactName(CONTACT_NAME);
+    view.setContactPhoneNumber(PHONE_NUMBER);
+    view.setContactJobTitle(JOB_TITLE);
+    view.setContactEmailAddress(EMAIL);
+
+    return view;
   }
 }

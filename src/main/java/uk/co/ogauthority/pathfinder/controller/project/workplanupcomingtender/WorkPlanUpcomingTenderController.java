@@ -25,6 +25,7 @@ import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderService;
+import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderSummaryService;
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
@@ -37,27 +38,32 @@ public class WorkPlanUpcomingTenderController {
   public static final String PAGE_NAME_SINGULAR = "Upcoming tender";
 
   private final WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
+  private final WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
   private final ControllerHelperService controllerHelperService;
 
   @Autowired
   public WorkPlanUpcomingTenderController(
       WorkPlanUpcomingTenderService workPlanUpcomingTenderService,
+      WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService,
       ControllerHelperService controllerHelperService) {
 
     this.workPlanUpcomingTenderService = workPlanUpcomingTenderService;
+    this.workPlanUpcomingTenderSummaryService = workPlanUpcomingTenderSummaryService;
     this.controllerHelperService = controllerHelperService;
   }
 
   @GetMapping
   public ModelAndView viewUpcomingTenders(@PathVariable("projectId") Integer projectId,
                                           ProjectContext projectContext) {
-    return workPlanUpcomingTenderService.getUpcomingTendersModelAndView(projectId);
+    return workPlanUpcomingTenderService.getUpcomingTendersModelAndView(
+        projectId,
+        workPlanUpcomingTenderSummaryService.getSummaryViews(projectContext.getProjectDetails()));
   }
 
   @GetMapping("/upcoming-tender")
   public ModelAndView addUpcomingTender(@PathVariable("projectId") Integer projectId,
                                         ProjectContext projectContext) {
-    return workPlanUpcomingTenderService.getViewUpcomingTendersModelAndView(
+    return workPlanUpcomingTenderService.getUpcomingTendersFormModelAndView(
         projectContext.getProjectDetails(),
         new WorkPlanUpcomingTenderForm()
     );
@@ -72,7 +78,7 @@ public class WorkPlanUpcomingTenderController {
     bindingResult = workPlanUpcomingTenderService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        workPlanUpcomingTenderService.getViewUpcomingTendersModelAndView(projectContext.getProjectDetails(), form),
+        workPlanUpcomingTenderService.getUpcomingTendersFormModelAndView(projectContext.getProjectDetails(), form),
         form,
         () -> {
           var tender = workPlanUpcomingTenderService.createUpcomingTender(
