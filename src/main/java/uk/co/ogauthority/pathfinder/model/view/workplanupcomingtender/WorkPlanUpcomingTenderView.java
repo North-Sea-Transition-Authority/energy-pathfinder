@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender;
 
+import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.view.ContactDetailProjectSummaryItem;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 
@@ -51,5 +52,34 @@ public class WorkPlanUpcomingTenderView extends ContactDetailProjectSummaryItem 
 
   public void setContractBand(String contractBand) {
     this.contractBand = contractBand;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    WorkPlanUpcomingTenderView that = (WorkPlanUpcomingTenderView) o;
+    return Objects.equals(tenderDepartment, that.tenderDepartment)
+        && Objects.equals(descriptionOfWork, that.descriptionOfWork)
+        && Objects.equals(estimatedTenderDate, that.estimatedTenderDate)
+        && Objects.equals(contractBand, that.contractBand);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        super.hashCode(),
+        tenderDepartment,
+        descriptionOfWork,
+        estimatedTenderDate,
+        contractBand
+    );
   }
 }
