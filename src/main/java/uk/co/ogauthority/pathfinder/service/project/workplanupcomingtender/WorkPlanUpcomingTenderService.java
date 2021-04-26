@@ -73,8 +73,8 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     return modelAndView;
   }
 
-  public ModelAndView getUpcomingTendersFormModelAndView(ProjectDetail projectDetail,
-                                                         WorkPlanUpcomingTenderForm form) {
+  public ModelAndView getUpcomingTenderFormModelAndView(ProjectDetail projectDetail,
+                                                        WorkPlanUpcomingTenderForm form) {
     var modelAndView = new ModelAndView("project/workplanupcomingtender/workPlanUpcomingTender")
         .addObject("pageNameSingular", WorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR)
         .addObject("form", form)

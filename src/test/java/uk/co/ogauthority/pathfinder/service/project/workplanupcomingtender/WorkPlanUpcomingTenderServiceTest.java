@@ -106,7 +106,7 @@ public class WorkPlanUpcomingTenderServiceTest {
     var projectId = projectDetail.getProject().getId();
     var form = new WorkPlanUpcomingTenderForm();
 
-    var modelAndView = workPlanUpcomingTenderService.getUpcomingTendersFormModelAndView(
+    var modelAndView = workPlanUpcomingTenderService.getUpcomingTenderFormModelAndView(
         projectDetail,
         form
     );
@@ -170,14 +170,14 @@ public class WorkPlanUpcomingTenderServiceTest {
   }
 
   @Test
-  public void getForm() {
+  public void getForm_whenFromListDepartmentType_assertCorrectFormValue() {
     var form = workPlanUpcomingTenderService.getForm(upcomingTender);
     assertThat(form.getDepartmentType()).isEqualTo(upcomingTender.getDepartmentType().name());
     checkCommonFormFields(form, upcomingTender);
   }
 
   @Test
-  public void getForm_manualEntry() {
+  public void getForm_whenManualEntryDepartmentType_assertCorrectFormValue() {
     var manualDepartment = WorkPlanUpcomingTenderUtil.getUpcomingTender_manualEntry(projectDetail);
     var form = workPlanUpcomingTenderService.getForm(manualDepartment);
     assertThat(form.getDepartmentType()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(manualDepartment.getManualDepartmentType()));

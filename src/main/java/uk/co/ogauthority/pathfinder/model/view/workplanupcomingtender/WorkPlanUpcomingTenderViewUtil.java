@@ -8,7 +8,7 @@ import uk.co.ogauthority.pathfinder.util.DateUtil;
 public class WorkPlanUpcomingTenderViewUtil {
 
   private WorkPlanUpcomingTenderViewUtil() {
-    throw new IllegalStateException("UpcomingTenderViewFactory is a utility class and should not be instantiated");
+    throw new IllegalStateException("UpcomingTenderViewUtil is a utility class and should not be instantiated");
   }
 
   public static WorkPlanUpcomingTenderView createUpcomingTenderView(WorkPlanUpcomingTender workPlanUpcomingTender,
@@ -33,7 +33,7 @@ public class WorkPlanUpcomingTenderViewUtil {
     tender.setEstimatedTenderDate(DateUtil.formatDate(workPlanUpcomingTender.getEstimatedTenderDate()));
     tender.setContractBand(
         workPlanUpcomingTender.getContractBand() != null
-        ? workPlanUpcomingTender.getContractBand().getDisplayName()
+            ? workPlanUpcomingTender.getContractBand().getDisplayName()
             : ""
     );
 

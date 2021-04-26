@@ -60,7 +60,7 @@ public class WorkPlanUpcomingTenderSummaryServiceTest {
   }
 
   @Test
-  public void getSummaryViews_withProject_whenFound_thenReturnPopulatedList() {
+  public void getSummaryViews_withProjectDetail_whenTendersFound_thenReturnPopulatedList() {
 
     final var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
 
@@ -79,7 +79,7 @@ public class WorkPlanUpcomingTenderSummaryServiceTest {
   }
 
   @Test
-  public void getSummaryViews_withProject_whenNotFound_thenReturnEmptyList() {
+  public void getSummaryViews_withProjectDetail_whenNoTendersFound_thenReturnEmptyList() {
 
     when(workPlanUpcomingTenderService.getUpcomingTendersForDetail(projectDetail))
         .thenReturn(Collections.emptyList());

@@ -3,7 +3,7 @@
 
 <@defaultPage htmlTitle=pageName pageHeading=pageName breadcrumbs=true errorItems=errorSummary>
 
-    <#list tenderViews as view>
+  <#list tenderViews as view>
     <@tenderSummary.workPlanUpcomingTenderSummary view=view showHeader=true showActions=true/>
   </#list>
 

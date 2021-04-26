@@ -46,12 +46,12 @@ public class WorkPlanUpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_whenFromListTenderFunction_thenFromListStringWithTag() {
+  public void createUpComingTenderView_whenFromListTenderDepartment_thenFromListStringWithTag() {
 
-    final var tenderFunction = Function.DRILLING;
+    final var tenderDepartment = Function.DRILLING;
 
     var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
-    upcomingTender.setDepartmentType(tenderFunction);
+    upcomingTender.setDepartmentType(tenderDepartment);
     upcomingTender.setManualDepartmentType(null);
 
     final var displayOrder = 2;
@@ -62,20 +62,20 @@ public class WorkPlanUpcomingTenderViewUtilTest {
     );
 
     assertThat(upcomingTenderView.getTenderDepartment()).isEqualTo(
-        new StringWithTag(tenderFunction.getDisplayName(), Tag.NONE)
+        new StringWithTag(tenderDepartment.getDisplayName(), Tag.NONE)
     );
 
     assertCommonProperties(upcomingTenderView, upcomingTender, displayOrder);
   }
 
   @Test
-  public void createUpComingTenderView_whenNotFromListTenderFunction_thenNotFromListStringWithTag() {
+  public void createUpComingTenderView_whenNotFromListTenderDepartment_thenNotFromListStringWithTag() {
 
-    final var tenderFunction = "Manual entry";
+    final var tenderDepartment = "Manual entry";
 
     var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setDepartmentType(null);
-    upcomingTender.setManualDepartmentType(tenderFunction);
+    upcomingTender.setManualDepartmentType(tenderDepartment);
 
     final var displayOrder = 2;
 
@@ -85,7 +85,7 @@ public class WorkPlanUpcomingTenderViewUtilTest {
     );
 
     assertThat(upcomingTenderView.getTenderDepartment()).isEqualTo(
-        new StringWithTag(tenderFunction, Tag.NOT_FROM_LIST)
+        new StringWithTag(tenderDepartment, Tag.NOT_FROM_LIST)
     );
 
     assertCommonProperties(upcomingTenderView, upcomingTender, displayOrder);

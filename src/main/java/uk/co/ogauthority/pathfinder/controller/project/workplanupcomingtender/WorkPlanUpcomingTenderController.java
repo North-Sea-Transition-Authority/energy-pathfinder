@@ -63,7 +63,7 @@ public class WorkPlanUpcomingTenderController {
   @GetMapping("/upcoming-tender")
   public ModelAndView addUpcomingTender(@PathVariable("projectId") Integer projectId,
                                         ProjectContext projectContext) {
-    return workPlanUpcomingTenderService.getUpcomingTendersFormModelAndView(
+    return workPlanUpcomingTenderService.getUpcomingTenderFormModelAndView(
         projectContext.getProjectDetails(),
         new WorkPlanUpcomingTenderForm()
     );
@@ -78,7 +78,7 @@ public class WorkPlanUpcomingTenderController {
     bindingResult = workPlanUpcomingTenderService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        workPlanUpcomingTenderService.getUpcomingTendersFormModelAndView(projectContext.getProjectDetails(), form),
+        workPlanUpcomingTenderService.getUpcomingTenderFormModelAndView(projectContext.getProjectDetails(), form),
         form,
         () -> {
           var tender = workPlanUpcomingTenderService.createUpcomingTender(
