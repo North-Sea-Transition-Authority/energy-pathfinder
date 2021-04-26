@@ -47,8 +47,8 @@
       noItemText="No licence blocks added"
       invalidItemText="This licence block is invalid"
       addToListId="licence-block-table"
-      selectorLabelText="Add a licence block"
-      selectorHintText="For example 44/15. You can add more than one block."
+      selectorLabelText="Add a licence block (optional)"
+      selectorHintText="For example 44/15. You can add more than one block. Leave this blank if your project is not within a licensed area"
       restUrl=springUrl(blocksRestUrl)
     />
     <@fdsDetails.summaryDetails summaryTitle="Why is a block not allowed on my project?">
