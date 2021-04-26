@@ -62,11 +62,10 @@ public class WorkPlanUpcomingTenderServiceTest {
 
   private final WorkPlanUpcomingTender upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
 
-  private WorkPlanUpcomingTenderView tenderView = WorkPlanUpcomingTenderUtil.getView(DISPLAY_ORDER, true);
+  private final WorkPlanUpcomingTenderView tenderView = WorkPlanUpcomingTenderUtil.getView(DISPLAY_ORDER, true);
 
   @Before
   public void setup() {
-
     SearchSelectorService searchSelectorService = new SearchSelectorService();
     FunctionService functionService = new FunctionService(searchSelectorService);
 
@@ -216,6 +215,24 @@ public class WorkPlanUpcomingTenderServiceTest {
     assertThat(results)
         .extracting(RestSearchItem::getId)
         .containsExactly(Function.DRILLING.name());
+  }
+
+  @Test
+  public void getUpcomingTendersForDetail_whenNoneExist_thenEmptyList() {
+    when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(List.of());
+    var upcomingTenders = workPlanUpcomingTenderService.getUpcomingTendersForDetail(projectDetail);
+    assertThat(upcomingTenders).isEmpty();
+  }
+
+  @Test
+  public void getUpcomingTendersForDetail_whenExist_thenReturnList() {
+    var upcomingTenderManualEntry = WorkPlanUpcomingTenderUtil.getUpcomingTender_manualEntry(detail);
+
+    when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(List.of(upcomingTender, upcomingTenderManualEntry));
+
+    var upcomingTenders = workPlanUpcomingTenderService.getUpcomingTendersForDetail(projectDetail);
+
+    assertThat(upcomingTenders).containsExactly(upcomingTender, upcomingTenderManualEntry);
   }
 
   @Test

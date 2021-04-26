@@ -8,7 +8,7 @@ import uk.co.ogauthority.pathfinder.util.DateUtil;
 public class WorkPlanUpcomingTenderViewUtil {
 
   private WorkPlanUpcomingTenderViewUtil() {
-    throw new IllegalStateException("UpcomingTenderViewUtil is a utility class and should not be instantiated");
+    throw new IllegalStateException("WorkPlanUpcomingTenderViewUtil is a utility class and should not be instantiated");
   }
 
   public static WorkPlanUpcomingTenderView createUpcomingTenderView(WorkPlanUpcomingTender workPlanUpcomingTender,
