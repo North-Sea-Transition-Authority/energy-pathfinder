@@ -40,7 +40,7 @@ public class WorkPlanUpcomingTenderSummaryService {
   public List<WorkPlanUpcomingTenderView> createUpcomingTenderViews(List<WorkPlanUpcomingTender> workPlanUpcomingTenders,
                                                                     ValidationType validationType) {
     List<WorkPlanUpcomingTenderView> views = new ArrayList<>();
-    for (int i = 0; i<workPlanUpcomingTenders.size(); i++) {
+    for (int i = 0; i < workPlanUpcomingTenders.size(); i++) {
       var displayOrder = i + 1;
 
       var workPlanUpcomingTender = workPlanUpcomingTenders.get(i);
