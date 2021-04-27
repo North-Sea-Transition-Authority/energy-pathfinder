@@ -32,7 +32,6 @@ public class ProjectLocationForm {
 
   private ThreeFieldDateInput approvedDecomProgramDate;
 
-  @NotEmpty(message = "Select at least one licence block", groups = FullValidation.class)
   private List<String> licenceBlocks = Collections.emptyList();
 
   //Just here for the add to list selector
