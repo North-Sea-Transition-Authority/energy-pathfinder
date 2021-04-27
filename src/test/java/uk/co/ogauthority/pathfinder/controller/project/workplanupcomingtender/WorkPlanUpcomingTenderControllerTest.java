@@ -36,6 +36,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderService;
+import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderSummaryService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
@@ -52,6 +53,9 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
   @MockBean
   private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
+  @MockBean
+  private WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
+
   private final AuthenticatedUserAccount unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
@@ -59,15 +63,13 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
 
-
   @Before
   public void setup() {
-
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
     when(workPlanUpcomingTenderService.createUpcomingTender(any(), any())).thenReturn(WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail));
-    when(workPlanUpcomingTenderService.getViewUpcomingTendersModelAndView(eq(projectDetail), any())).thenReturn(new ModelAndView(""));
+    when(workPlanUpcomingTenderService.getUpcomingTenderFormModelAndView(eq(projectDetail), any())).thenReturn(new ModelAndView(""));
   }
 
   @Test

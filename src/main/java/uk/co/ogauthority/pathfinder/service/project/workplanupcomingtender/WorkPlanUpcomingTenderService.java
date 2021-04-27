@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
@@ -18,9 +19,12 @@ import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
+import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
+import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderValidationHint;
+import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.WorkPlanUpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
@@ -58,17 +62,19 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     this.searchSelectorService = searchSelectorService;
   }
 
-  public ModelAndView getUpcomingTendersModelAndView(Integer projectId) {
+  public ModelAndView getUpcomingTendersModelAndView(Integer projectId,
+                                                     List<WorkPlanUpcomingTenderView> tenderViews) {
     var modelAndView = new ModelAndView(TEMPLATE_PATH)
         .addObject("pageName", WorkPlanUpcomingTenderController.PAGE_NAME)
+        .addObject("tenderViews", tenderViews)
         .addObject("addUpcomingTenderUrl",
             ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).addUpcomingTender(projectId, null)));
     breadcrumbService.fromTaskList(projectId, modelAndView, WorkPlanUpcomingTenderController.PAGE_NAME);
     return modelAndView;
   }
 
-  public ModelAndView getViewUpcomingTendersModelAndView(ProjectDetail projectDetail,
-                                                         WorkPlanUpcomingTenderForm form) {
+  public ModelAndView getUpcomingTenderFormModelAndView(ProjectDetail projectDetail,
+                                                        WorkPlanUpcomingTenderForm form) {
     var modelAndView = new ModelAndView("project/workplanupcomingtender/workPlanUpcomingTender")
         .addObject("pageNameSingular", WorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR)
         .addObject("form", form)
@@ -96,6 +102,30 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     return validationService.validate(form, bindingResult, validationType);
   }
 
+  public boolean isValid(WorkPlanUpcomingTender workPlanUpcomingTender, ValidationType validationType) {
+    var form = getForm(workPlanUpcomingTender);
+    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult = validate(form, bindingResult, validationType);
+    return !bindingResult.hasErrors();
+  }
+
+  public WorkPlanUpcomingTenderForm getForm(WorkPlanUpcomingTender workPlanUpcomingTender) {
+    var form = new WorkPlanUpcomingTenderForm();
+
+    if (workPlanUpcomingTender.getDepartmentType() != null) {
+      form.setDepartmentType(workPlanUpcomingTender.getDepartmentType().name());
+    } else if (workPlanUpcomingTender.getManualDepartmentType() != null) {
+      form.setDepartmentType(SearchSelectorService.getValueWithManualEntryPrefix(workPlanUpcomingTender.getManualDepartmentType()));
+    }
+
+    form.setEstimatedTenderDate(new ThreeFieldDateInput(workPlanUpcomingTender.getEstimatedTenderDate()));
+    form.setDescriptionOfWork(workPlanUpcomingTender.getDescriptionOfWork());
+    form.setContractBand(workPlanUpcomingTender.getContractBand());
+    form.setContactDetail(new ContactDetailForm(workPlanUpcomingTender));
+
+    return form;
+  }
+
   @Transactional
   public WorkPlanUpcomingTender createUpcomingTender(ProjectDetail detail,
                                                      WorkPlanUpcomingTenderForm form) {
@@ -104,6 +134,10 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     upcomingTender = workPlanUpcomingTenderRepository.save(upcomingTender);
 
     return upcomingTender;
+  }
+
+  public List<WorkPlanUpcomingTender> getUpcomingTendersForDetail(ProjectDetail projectDetail) {
+    return workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail);
   }
 
   private void setCommonFields(WorkPlanUpcomingTender upcomingTender, WorkPlanUpcomingTenderForm form) {

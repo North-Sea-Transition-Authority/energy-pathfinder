@@ -8,15 +8,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.controller.rest.WorkPlanUpcomingTenderRestController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
@@ -24,6 +27,7 @@ import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
+import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.WorkPlanUpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
@@ -31,11 +35,12 @@ import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
-import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkPlanUpcomingTenderServiceTest {
+
+  private static final Integer DISPLAY_ORDER = 1;
 
   @Mock
   private BreadcrumbService breadcrumbService;
@@ -55,9 +60,12 @@ public class WorkPlanUpcomingTenderServiceTest {
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
 
+  private final WorkPlanUpcomingTender upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+
+  private final WorkPlanUpcomingTenderView tenderView = WorkPlanUpcomingTenderUtil.getView(DISPLAY_ORDER, true);
+
   @Before
   public void setup() {
-
     SearchSelectorService searchSelectorService = new SearchSelectorService();
     FunctionService functionService = new FunctionService(searchSelectorService);
 
@@ -77,12 +85,14 @@ public class WorkPlanUpcomingTenderServiceTest {
   @Test
   public void getUpcomingTendersModelAndView() {
     var projectId = projectDetail.getProject().getId();
+    var list = List.of(tenderView);
 
-    var modelAndView = workPlanUpcomingTenderService.getUpcomingTendersModelAndView(projectId);
+    var modelAndView = workPlanUpcomingTenderService.getUpcomingTendersModelAndView(projectId, list);
 
     assertThat(modelAndView.getViewName()).isEqualTo(WorkPlanUpcomingTenderService.TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
         entry("pageName", WorkPlanUpcomingTenderController.PAGE_NAME),
+        entry("tenderViews", list),
         entry("addUpcomingTenderUrl", ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).addUpcomingTender(projectId, null))
         )
     );
@@ -95,7 +105,7 @@ public class WorkPlanUpcomingTenderServiceTest {
     var projectId = projectDetail.getProject().getId();
     var form = new WorkPlanUpcomingTenderForm();
 
-    var modelAndView = workPlanUpcomingTenderService.getViewUpcomingTendersModelAndView(
+    var modelAndView = workPlanUpcomingTenderService.getUpcomingTenderFormModelAndView(
         projectDetail,
         form
     );
@@ -148,12 +158,81 @@ public class WorkPlanUpcomingTenderServiceTest {
     assertThat(newUpcomingTender.getEmailAddress()).isEqualTo(WorkPlanUpcomingTenderUtil.EMAIL);
   }
 
+  private void checkCommonFormFields(WorkPlanUpcomingTenderForm form, WorkPlanUpcomingTender upcomingTender) {
+    assertThat(form.getDescriptionOfWork()).isEqualTo(upcomingTender.getDescriptionOfWork());
+    assertThat(form.getEstimatedTenderDate().createDateOrNull()).isEqualTo(upcomingTender.getEstimatedTenderDate());
+    assertThat(form.getContractBand()).isEqualTo(upcomingTender.getContractBand());
+    assertThat(form.getContactDetail().getName()).isEqualTo(upcomingTender.getContactName());
+    assertThat(form.getContactDetail().getPhoneNumber()).isEqualTo(upcomingTender.getPhoneNumber());
+    assertThat(form.getContactDetail().getJobTitle()).isEqualTo(upcomingTender.getJobTitle());
+    assertThat(form.getContactDetail().getEmailAddress()).isEqualTo(upcomingTender.getEmailAddress());
+  }
+
+  @Test
+  public void getForm_whenFromListDepartmentType_assertCorrectFormValue() {
+    var form = workPlanUpcomingTenderService.getForm(upcomingTender);
+    assertThat(form.getDepartmentType()).isEqualTo(upcomingTender.getDepartmentType().name());
+    checkCommonFormFields(form, upcomingTender);
+  }
+
+  @Test
+  public void getForm_whenManualEntryDepartmentType_assertCorrectFormValue() {
+    var manualDepartment = WorkPlanUpcomingTenderUtil.getUpcomingTender_manualEntry(projectDetail);
+    var form = workPlanUpcomingTenderService.getForm(manualDepartment);
+    assertThat(form.getDepartmentType()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(manualDepartment.getManualDepartmentType()));
+    checkCommonFormFields(form, upcomingTender);
+  }
+
+  @Test
+  public void validate_partial() {
+    var form = new WorkPlanUpcomingTenderForm();
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+
+    workPlanUpcomingTenderService.validate(
+        form,
+        bindingResult,
+        ValidationType.PARTIAL
+    );
+    verify(validationService, times(1)).validate(form, bindingResult, ValidationType.PARTIAL);
+  }
+
+  @Test
+  public void validate_full() {
+    var form = new WorkPlanUpcomingTenderForm();
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+
+    workPlanUpcomingTenderService.validate(
+        form,
+        bindingResult,
+        ValidationType.FULL
+    );
+    verify(validationService, times(1)).validate(form, bindingResult, ValidationType.FULL);
+  }
+
   @Test
   public void findDepartmentTenderLikeWithManualEntry() {
     var results = workPlanUpcomingTenderService.findDepartmentTenderLikeWithManualEntry(Function.DRILLING.getDisplayName());
     assertThat(results)
         .extracting(RestSearchItem::getId)
         .containsExactly(Function.DRILLING.name());
+  }
+
+  @Test
+  public void getUpcomingTendersForDetail_whenNoneExist_thenEmptyList() {
+    when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(List.of());
+    var upcomingTenders = workPlanUpcomingTenderService.getUpcomingTendersForDetail(projectDetail);
+    assertThat(upcomingTenders).isEmpty();
+  }
+
+  @Test
+  public void getUpcomingTendersForDetail_whenExist_thenReturnList() {
+    var upcomingTenderManualEntry = WorkPlanUpcomingTenderUtil.getUpcomingTender_manualEntry(detail);
+
+    when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(List.of(upcomingTender, upcomingTenderManualEntry));
+
+    var upcomingTenders = workPlanUpcomingTenderService.getUpcomingTendersForDetail(projectDetail);
+
+    assertThat(upcomingTenders).containsExactly(upcomingTender, upcomingTenderManualEntry);
   }
 
   @Test
