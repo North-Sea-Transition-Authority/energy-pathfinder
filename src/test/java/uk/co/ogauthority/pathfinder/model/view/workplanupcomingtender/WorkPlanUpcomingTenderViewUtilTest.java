@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
+import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
@@ -164,6 +165,107 @@ public class WorkPlanUpcomingTenderViewUtilTest {
 
     assertThat(upcomingTenderView.isValid()).isFalse();
 
+    assertCommonProperties(upcomingTenderView, upcomingTender, displayOrder);
+  }
+
+  @Test
+  public void createUpcomingTenderView_whenContractTermDurationAndPeriodNull_thenContractLengthSetToEmptyString() {
+
+    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    upcomingTender.setContractTermDurationPeriod(null);
+    upcomingTender.setContractTermDuration(null);
+
+    final var displayOrder = 1;
+
+    final var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+        upcomingTender,
+        displayOrder
+    );
+
+    assertThat(upcomingTenderView.getContractLength()).isEmpty();
+    assertCommonProperties(upcomingTenderView, upcomingTender, displayOrder);
+  }
+
+  @Test
+  public void createUpcomingTenderView_whenContractTermDurationPeriodNull_thenContractLengthSetToEmptyString() {
+
+    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    upcomingTender.setContractTermDurationPeriod(null);
+    upcomingTender.setContractTermDuration(10);
+
+    final var displayOrder = 1;
+
+    final var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+        upcomingTender,
+        displayOrder
+    );
+
+    assertThat(upcomingTenderView.getContractLength()).isEmpty();
+    assertCommonProperties(upcomingTenderView, upcomingTender, displayOrder);
+  }
+
+  @Test
+  public void createUpcomingTenderView_whenContractTermDurationNull_thenContractLengthSetToEmptyString() {
+
+    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    upcomingTender.setContractTermDurationPeriod(DurationPeriod.DAYS);
+    upcomingTender.setContractTermDuration(null);
+
+    final var displayOrder = 1;
+
+    final var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+        upcomingTender,
+        displayOrder
+    );
+
+    assertThat(upcomingTenderView.getContractLength()).isEmpty();
+    assertCommonProperties(upcomingTenderView, upcomingTender, displayOrder);
+  }
+
+  @Test
+  public void createUpcomingTenderView_whenContractTermDurationAbove1AndPeriodProvided_assertPluralContractLength() {
+
+    final var contractTermDuration = 10;
+    final var contractDurationPeriod = DurationPeriod.WEEKS;
+    final var expectedContractLength = String.format(
+        "%s %s",
+        contractTermDuration,
+        contractDurationPeriod.getDisplayNamePlural().toLowerCase()
+    );
+
+    assertExpectedContractTerm(contractTermDuration, contractDurationPeriod, expectedContractLength);
+  }
+
+  @Test
+  public void createUpcomingTenderView_whenContractTermDurationEqual1AndPeriodProvided_assertSingularContractLength() {
+
+    final var contractTermDuration = 1;
+    final var contractDurationPeriod = DurationPeriod.DAYS;
+    final var expectedContractLength = String.format(
+        "%s %s",
+        contractTermDuration,
+        contractDurationPeriod.getDisplayNameSingular().toLowerCase()
+    );
+
+    assertExpectedContractTerm(contractTermDuration, contractDurationPeriod, expectedContractLength);
+  }
+
+  private void assertExpectedContractTerm(Integer contractTermDuration,
+                                          DurationPeriod contractTermDurationPeriod,
+                                          String expectedContractTermString) {
+
+    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    upcomingTender.setContractTermDurationPeriod(contractTermDurationPeriod);
+    upcomingTender.setContractTermDuration(contractTermDuration);
+
+    final var displayOrder = 1;
+
+    final var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+        upcomingTender,
+        displayOrder
+    );
+
+    assertThat(upcomingTenderView.getContractLength()).isEqualTo(expectedContractTermString);
     assertCommonProperties(upcomingTenderView, upcomingTender, displayOrder);
   }
 

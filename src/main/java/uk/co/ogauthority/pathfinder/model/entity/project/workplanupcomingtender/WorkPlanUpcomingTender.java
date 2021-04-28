@@ -9,14 +9,14 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
+import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
 
 @Entity
 @Table(name = "work_plan_upcoming_tenders")
-public class WorkPlanUpcomingTender
-    extends ProjectDetailEntity implements ContactDetailCapture {
+public class WorkPlanUpcomingTender extends ProjectDetailEntity implements ContactDetailCapture {
 
   @Enumerated(EnumType.STRING)
   private Function departmentType;
@@ -39,6 +39,11 @@ public class WorkPlanUpcomingTender
 
   @Enumerated(EnumType.STRING)
   private WorkPlanUpcomingTenderContractBand contractBand;
+
+  private Integer contractTermDuration;
+
+  @Enumerated(EnumType.STRING)
+  private DurationPeriod contractTermDurationPeriod;
 
   public WorkPlanUpcomingTender() {
   }
@@ -125,5 +130,21 @@ public class WorkPlanUpcomingTender
 
   public void setContractBand(WorkPlanUpcomingTenderContractBand contractBand) {
     this.contractBand = contractBand;
+  }
+
+  public Integer getContractTermDuration() {
+    return contractTermDuration;
+  }
+
+  public void setContractTermDuration(Integer contractTermDuration) {
+    this.contractTermDuration = contractTermDuration;
+  }
+
+  public DurationPeriod getContractTermDurationPeriod() {
+    return contractTermDurationPeriod;
+  }
+
+  public void setContractTermDurationPeriod(DurationPeriod contractTermDurationPeriod) {
+    this.contractTermDurationPeriod = contractTermDurationPeriod;
   }
 }

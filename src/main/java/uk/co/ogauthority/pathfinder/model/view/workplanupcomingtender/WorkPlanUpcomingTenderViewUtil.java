@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender;
 
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
+import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -14,7 +15,7 @@ public class WorkPlanUpcomingTenderViewUtil {
   public static WorkPlanUpcomingTenderView createUpcomingTenderView(WorkPlanUpcomingTender workPlanUpcomingTender,
                                                                     Integer displayOrder) {
     var projectId = workPlanUpcomingTender.getProjectDetail().getProject().getId();
-    var tender = new WorkPlanUpcomingTenderView(
+    var tenderView = new WorkPlanUpcomingTenderView(
         displayOrder,
         workPlanUpcomingTender.getId(),
         projectId
@@ -28,21 +29,28 @@ public class WorkPlanUpcomingTenderViewUtil {
       tenderFunction = new StringWithTag(workPlanUpcomingTender.getManualDepartmentType(), Tag.NOT_FROM_LIST);
     }
 
-    tender.setTenderDepartment(tenderFunction);
-    tender.setDescriptionOfWork(workPlanUpcomingTender.getDescriptionOfWork());
-    tender.setEstimatedTenderDate(DateUtil.formatDate(workPlanUpcomingTender.getEstimatedTenderDate()));
-    tender.setContractBand(
+    tenderView.setTenderDepartment(tenderFunction);
+    tenderView.setDescriptionOfWork(workPlanUpcomingTender.getDescriptionOfWork());
+    tenderView.setEstimatedTenderDate(DateUtil.formatDate(workPlanUpcomingTender.getEstimatedTenderDate()));
+    tenderView.setContractBand(
         workPlanUpcomingTender.getContractBand() != null
             ? workPlanUpcomingTender.getContractBand().getDisplayName()
             : ""
     );
 
-    tender.setContactName(workPlanUpcomingTender.getContactName());
-    tender.setContactPhoneNumber(workPlanUpcomingTender.getPhoneNumber());
-    tender.setContactEmailAddress(workPlanUpcomingTender.getEmailAddress());
-    tender.setContactJobTitle(workPlanUpcomingTender.getJobTitle());
+    tenderView.setContactName(workPlanUpcomingTender.getContactName());
+    tenderView.setContactPhoneNumber(workPlanUpcomingTender.getPhoneNumber());
+    tenderView.setContactEmailAddress(workPlanUpcomingTender.getEmailAddress());
+    tenderView.setContactJobTitle(workPlanUpcomingTender.getJobTitle());
+
+    var contractLength = getContractLength(
+        workPlanUpcomingTender.getContractTermDurationPeriod(),
+        workPlanUpcomingTender.getContractTermDuration()
+    );
+
+    tenderView.setContractLength(contractLength);
     
-    return tender;
+    return tenderView;
   }
 
   public static WorkPlanUpcomingTenderView createUpcomingTenderView(WorkPlanUpcomingTender workPlanUpcomingTender,
@@ -51,5 +59,23 @@ public class WorkPlanUpcomingTenderViewUtil {
     var view = createUpcomingTenderView(workPlanUpcomingTender, displayOrder);
     view.setIsValid(isValid);
     return view;
+  }
+
+  private static String getContractLength(DurationPeriod contractTermDurationPeriod,
+                                          Integer contractTermDuration) {
+
+    var contractLength = "";
+
+    if (contractTermDuration != null && contractTermDurationPeriod != null) {
+      contractLength = String.format(
+          "%s %s",
+          contractTermDuration,
+          (contractTermDuration == 1)
+              ? contractTermDurationPeriod.getDisplayNameSingular().toLowerCase()
+              : contractTermDurationPeriod.getDisplayNamePlural().toLowerCase()
+      );
+    }
+
+    return contractLength;
   }
 }

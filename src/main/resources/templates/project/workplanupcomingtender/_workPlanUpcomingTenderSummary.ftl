@@ -30,6 +30,7 @@
       descriptionOfWork=view.descriptionOfWork
       estimatedTenderDate=view.estimatedTenderDate
       contractBand=view.contractBand
+      contractLength=view.contractLength
       contactName=view.contactName
       contactPhoneNumber=view.contactPhoneNumber
       contactJobTitle=view.contactJobTitle
@@ -44,6 +45,7 @@
   descriptionOfWork=""
   estimatedTenderDate=""
   contractBand=""
+  contractLength=""
   contactName=""
   contactPhoneNumber=""
   contactJobTitle=""
@@ -69,6 +71,11 @@
   <@checkAnswers.checkAnswersStandardOrDiffRow
     prompt="Contract band"
     fieldValue=contractBand
+    isDiffedField=useDiffedField
+  />
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Contract length"
+    fieldValue=contractLength
     isDiffedField=useDiffedField
   />
   <@checkAnswers.checkAnswersStandardOrDiffRow

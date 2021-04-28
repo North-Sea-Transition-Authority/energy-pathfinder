@@ -14,6 +14,8 @@ public class WorkPlanUpcomingTenderView extends ContactDetailProjectSummaryItem 
 
   private String contractBand;
 
+  private String contractLength;
+
   public WorkPlanUpcomingTenderView(Integer displayOrder,
                                     Integer id,
                                     Integer projectId) {
@@ -54,6 +56,14 @@ public class WorkPlanUpcomingTenderView extends ContactDetailProjectSummaryItem 
     this.contractBand = contractBand;
   }
 
+  public String getContractLength() {
+    return contractLength;
+  }
+
+  public void setContractLength(String contractLength) {
+    this.contractLength = contractLength;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -69,7 +79,8 @@ public class WorkPlanUpcomingTenderView extends ContactDetailProjectSummaryItem 
     return Objects.equals(tenderDepartment, that.tenderDepartment)
         && Objects.equals(descriptionOfWork, that.descriptionOfWork)
         && Objects.equals(estimatedTenderDate, that.estimatedTenderDate)
-        && Objects.equals(contractBand, that.contractBand);
+        && Objects.equals(contractBand, that.contractBand)
+        && Objects.equals(contractLength, that.contractLength);
   }
 
   @Override
@@ -79,7 +90,8 @@ public class WorkPlanUpcomingTenderView extends ContactDetailProjectSummaryItem 
         tenderDepartment,
         descriptionOfWork,
         estimatedTenderDate,
-        contractBand
+        contractBand,
+        contractLength
     );
   }
 }

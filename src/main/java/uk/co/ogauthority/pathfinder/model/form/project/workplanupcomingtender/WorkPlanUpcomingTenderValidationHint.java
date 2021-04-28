@@ -32,4 +32,8 @@ public class WorkPlanUpcomingTenderValidationHint {
     DateInputValidator.addEmptyDateAcceptableHint(validationType, hints);
     return hints.toArray();
   }
+
+  protected ValidationType getValidationType() {
+    return validationType;
+  }
 }

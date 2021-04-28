@@ -15,6 +15,7 @@ import uk.co.ogauthority.pathfinder.controller.rest.WorkPlanUpcomingTenderRestCo
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
@@ -82,7 +83,12 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
         .addObject("contractBands", WorkPlanUpcomingTenderContractBand.getAllAsMap())
         .addObject("departmentTenderRestUrl", SearchSelectorService.route(
             on(WorkPlanUpcomingTenderRestController.class).searchTenderDepartments(null)
-        ));
+        ))
+        .addObject("contractTermPeriodDays", DurationPeriod.getEntryAsMap(DurationPeriod.DAYS))
+        .addObject("contractTermPeriodWeeks", DurationPeriod.getEntryAsMap(DurationPeriod.WEEKS))
+        .addObject("contractTermPeriodMonths", DurationPeriod.getEntryAsMap(DurationPeriod.MONTHS))
+        .addObject("contractTermPeriodYears", DurationPeriod.getEntryAsMap(DurationPeriod.YEARS));
+
     breadcrumbService.fromWorkPlanUpcomingTenders(
         projectDetail.getProject().getId(),
         modelAndView,
@@ -123,6 +129,8 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     form.setContractBand(workPlanUpcomingTender.getContractBand());
     form.setContactDetail(new ContactDetailForm(workPlanUpcomingTender));
 
+    setContractTermDurationFromEntity(workPlanUpcomingTender, form);
+
     return form;
   }
 
@@ -158,6 +166,50 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     upcomingTender.setPhoneNumber(contactDetailsForm.getPhoneNumber());
     upcomingTender.setJobTitle(contactDetailsForm.getJobTitle());
     upcomingTender.setEmailAddress(contactDetailsForm.getEmailAddress());
+
+    upcomingTender.setContractTermDurationPeriod(form.getContractTermDurationPeriod());
+    upcomingTender.setContractTermDuration(getContractTermDurationFromForm(form));
+  }
+
+  private Integer getContractTermDurationFromForm(WorkPlanUpcomingTenderForm form) {
+
+    final var durationPeriod = form.getContractTermDurationPeriod();
+
+    if (DurationPeriod.DAYS.equals(durationPeriod)) {
+      return form.getContractTermDayDuration();
+    } else if (DurationPeriod.WEEKS.equals(durationPeriod)) {
+      return form.getContractTermWeekDuration();
+    } else if (DurationPeriod.MONTHS.equals(durationPeriod)) {
+      return form.getContractTermMonthDuration();
+    } else if (DurationPeriod.YEARS.equals(durationPeriod)) {
+      return form.getContractTermYearDuration();
+    } else {
+      return null;
+    }
+  }
+
+  private void setContractTermDurationFromEntity(WorkPlanUpcomingTender workPlanUpcomingTender,
+                                                 WorkPlanUpcomingTenderForm form) {
+
+    final var durationPeriod = workPlanUpcomingTender.getContractTermDurationPeriod();
+    form.setContractTermDurationPeriod(durationPeriod);
+
+    final var duration = workPlanUpcomingTender.getContractTermDuration();
+
+    if (DurationPeriod.DAYS.equals(durationPeriod)) {
+      form.setContractTermDayDuration(duration);
+    } else if (DurationPeriod.WEEKS.equals(durationPeriod)) {
+      form.setContractTermWeekDuration(duration);
+    } else if (DurationPeriod.MONTHS.equals(durationPeriod)) {
+      form.setContractTermMonthDuration(duration);
+    } else if (DurationPeriod.YEARS.equals(durationPeriod)) {
+      form.setContractTermYearDuration(duration);
+    } else {
+      form.setContractTermDayDuration(null);
+      form.setContractTermWeekDuration(null);
+      form.setContractTermMonthDuration(null);
+      form.setContractTermYearDuration(null);
+    }
   }
 
   public Map<String, String> getPreSelectedFunction(WorkPlanUpcomingTenderForm form) {

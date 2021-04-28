@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static java.util.Map.entry;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.controller.rest.WorkPlanUpcomingTenderRestCo
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
@@ -116,8 +117,12 @@ public class WorkPlanUpcomingTenderServiceTest {
         entry("form", form),
         entry("preSelectedFunction", workPlanUpcomingTenderService.getPreSelectedFunction(form)),
         entry("contractBands", WorkPlanUpcomingTenderContractBand.getAllAsMap()),
-        entry("departmentTenderRestUrl", SearchSelectorService.route(on(WorkPlanUpcomingTenderRestController.class).searchTenderDepartments(null))
-        ));
+        entry("departmentTenderRestUrl", SearchSelectorService.route(on(WorkPlanUpcomingTenderRestController.class).searchTenderDepartments(null))),
+        entry("contractTermPeriodDays", DurationPeriod.getEntryAsMap(DurationPeriod.DAYS)),
+        entry("contractTermPeriodWeeks", DurationPeriod.getEntryAsMap(DurationPeriod.WEEKS)),
+        entry("contractTermPeriodMonths", DurationPeriod.getEntryAsMap(DurationPeriod.MONTHS)),
+        entry("contractTermPeriodYears", DurationPeriod.getEntryAsMap(DurationPeriod.YEARS))
+    );
 
     verify(breadcrumbService, times(1)).fromWorkPlanUpcomingTenders(projectId, modelAndView, WorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR);
   }
@@ -146,6 +151,135 @@ public class WorkPlanUpcomingTenderServiceTest {
     assertThat(newUpcomingTender.getManualDepartmentType()).isEqualTo(SearchSelectorService.removePrefix(WorkPlanUpcomingTenderUtil.MANUAL_TENDER_DEPARTMENT));
     assertThat(newUpcomingTender.getDepartmentType()).isNull();
     checkCommonFields(form, newUpcomingTender);
+  }
+
+  @Test
+  public void createUpcomingTender_whenNoContractTermPeriod_thenNoContractTermColumnsPopulatedInEntity() {
+    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    form.setContractTermDurationPeriod(null);
+
+    var upcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
+        detail,
+        form
+    );
+
+    assertThat(upcomingTender.getContractTermDurationPeriod()).isNull();
+    assertThat(upcomingTender.getContractTermDuration()).isNull();
+
+    checkCommonFields(form, upcomingTender);
+  }
+
+  @Test
+  public void createUpcomingTender_whenNoContractTermPeriodIsDays_thenNoContractTermColumnsPopulatedInEntity() {
+
+    final var expectedContractTermDuration = 10;
+    final var expectedContractTermDurationPeriod = DurationPeriod.DAYS;
+
+    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    form.setContractTermDurationPeriod(expectedContractTermDurationPeriod);
+    form.setContractTermDayDuration(expectedContractTermDuration);
+    form.setContractTermWeekDuration(11);
+    form.setContractTermMonthDuration(12);
+    form.setContractTermYearDuration(13);
+
+    var upcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
+        detail,
+        form
+    );
+
+    assertExpectedContractTermDurationAndPeriod(
+        upcomingTender,
+        form,
+        expectedContractTermDurationPeriod,
+        expectedContractTermDuration
+    );
+  }
+
+  @Test
+  public void createUpcomingTender_whenNoContractTermPeriodIsWeeks_thenNoContractTermColumnsPopulatedInEntity() {
+
+    final var expectedContractTermDuration = 11;
+    final var expectedContractTermDurationPeriod = DurationPeriod.WEEKS;
+
+    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    form.setContractTermDurationPeriod(expectedContractTermDurationPeriod);
+    form.setContractTermDayDuration(10);
+    form.setContractTermWeekDuration(expectedContractTermDuration);
+    form.setContractTermMonthDuration(12);
+    form.setContractTermYearDuration(13);
+
+    var upcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
+        detail,
+        form
+    );
+
+    assertExpectedContractTermDurationAndPeriod(
+        upcomingTender,
+        form,
+        expectedContractTermDurationPeriod,
+        expectedContractTermDuration
+    );
+  }
+
+  @Test
+  public void createUpcomingTender_whenNoContractTermPeriodIsMonths_thenNoContractTermColumnsPopulatedInEntity() {
+
+    final var expectedContractTermDuration = 12;
+    final var expectedContractTermDurationPeriod = DurationPeriod.MONTHS;
+
+    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    form.setContractTermDurationPeriod(expectedContractTermDurationPeriod);
+    form.setContractTermDayDuration(10);
+    form.setContractTermWeekDuration(11);
+    form.setContractTermMonthDuration(expectedContractTermDuration);
+    form.setContractTermYearDuration(13);
+
+    var upcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
+        detail,
+        form
+    );
+
+    assertExpectedContractTermDurationAndPeriod(
+        upcomingTender,
+        form,
+        expectedContractTermDurationPeriod,
+        expectedContractTermDuration
+    );
+  }
+
+  @Test
+  public void createUpcomingTender_whenNoContractTermPeriodIsYears_thenNoContractTermColumnsPopulatedInEntity() {
+
+    final var expectedContractTermDuration = 13;
+    final var expectedContractTermDurationPeriod = DurationPeriod.YEARS;
+
+    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    form.setContractTermDurationPeriod(expectedContractTermDurationPeriod);
+    form.setContractTermDayDuration(10);
+    form.setContractTermWeekDuration(11);
+    form.setContractTermMonthDuration(12);
+    form.setContractTermYearDuration(expectedContractTermDuration);
+
+    var upcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
+        detail,
+        form
+    );
+
+    assertExpectedContractTermDurationAndPeriod(
+        upcomingTender,
+        form,
+        expectedContractTermDurationPeriod,
+        expectedContractTermDuration
+    );
+  }
+
+  private void assertExpectedContractTermDurationAndPeriod(WorkPlanUpcomingTender upcomingTender,
+                                                           WorkPlanUpcomingTenderForm form,
+                                                           DurationPeriod expectedContractTermDurationPeriod,
+                                                           Integer expectedContractTermDuration) {
+    assertThat(upcomingTender.getContractTermDurationPeriod()).isEqualTo(expectedContractTermDurationPeriod);
+    assertThat(upcomingTender.getContractTermDuration()).isEqualTo(expectedContractTermDuration);
+    checkCommonFields(form, upcomingTender);
   }
 
   private void checkCommonFields(WorkPlanUpcomingTenderForm form, WorkPlanUpcomingTender newUpcomingTender) {
@@ -181,6 +315,97 @@ public class WorkPlanUpcomingTenderServiceTest {
     var form = workPlanUpcomingTenderService.getForm(manualDepartment);
     assertThat(form.getDepartmentType()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(manualDepartment.getManualDepartmentType()));
     checkCommonFormFields(form, upcomingTender);
+  }
+
+  @Test
+  public void getForm_whenDurationPeriodIsNull_thenPeriodAndDurationNullInForm() {
+
+    final var form = getFormWithContractDurationAndPeriod(null, 1);
+
+    assertThat(form.getContractTermDurationPeriod()).isNull();
+    assertThat(form.getContractTermDayDuration()).isNull();
+    assertThat(form.getContractTermWeekDuration()).isNull();
+    assertThat(form.getContractTermMonthDuration()).isNull();
+    assertThat(form.getContractTermYearDuration()).isNull();
+
+    checkCommonFields(form, upcomingTender);
+  }
+
+  @Test
+  public void getForm_whenDurationPeriodIsDaysAndDurationProvided_thenPeriodAndDurationCorrectlyPopulatedInForm() {
+
+    final var durationPeriod = DurationPeriod.DAYS;
+    final var duration = 10;
+
+    final var form = getFormWithContractDurationAndPeriod(durationPeriod, duration);
+
+    assertThat(form.getContractTermDurationPeriod()).isEqualTo(durationPeriod);
+    assertThat(form.getContractTermDayDuration()).isEqualTo(duration);
+    assertThat(form.getContractTermWeekDuration()).isNull();
+    assertThat(form.getContractTermMonthDuration()).isNull();
+    assertThat(form.getContractTermYearDuration()).isNull();
+
+    checkCommonFields(form, upcomingTender);
+  }
+
+  @Test
+  public void getForm_whenDurationPeriodIsWeeksAndDurationProvided_thenPeriodAndDurationCorrectlyPopulatedInForm() {
+
+    final var durationPeriod = DurationPeriod.WEEKS;
+    final var duration = 10;
+
+    final var form = getFormWithContractDurationAndPeriod(durationPeriod, duration);
+
+    assertThat(form.getContractTermDurationPeriod()).isEqualTo(durationPeriod);
+    assertThat(form.getContractTermWeekDuration()).isEqualTo(duration);
+    assertThat(form.getContractTermDayDuration()).isNull();
+    assertThat(form.getContractTermMonthDuration()).isNull();
+    assertThat(form.getContractTermYearDuration()).isNull();
+
+    checkCommonFields(form, upcomingTender);
+  }
+
+  @Test
+  public void getForm_whenDurationPeriodIsMonthsAndDurationProvided_thenPeriodAndDurationCorrectlyPopulatedInForm() {
+
+    final var durationPeriod = DurationPeriod.MONTHS;
+    final var duration = 10;
+
+    final var form = getFormWithContractDurationAndPeriod(durationPeriod, duration);
+
+    assertThat(form.getContractTermDurationPeriod()).isEqualTo(durationPeriod);
+    assertThat(form.getContractTermMonthDuration()).isEqualTo(duration);
+    assertThat(form.getContractTermDayDuration()).isNull();
+    assertThat(form.getContractTermWeekDuration()).isNull();
+    assertThat(form.getContractTermYearDuration()).isNull();
+
+    checkCommonFields(form, upcomingTender);
+  }
+
+  @Test
+  public void getForm_whenDurationPeriodIsYearsAndDurationProvided_thenPeriodAndDurationCorrectlyPopulatedInForm() {
+
+    final var durationPeriod = DurationPeriod.YEARS;
+    final var duration = 10;
+
+    final var form = getFormWithContractDurationAndPeriod(durationPeriod, duration);
+
+    assertThat(form.getContractTermDurationPeriod()).isEqualTo(durationPeriod);
+    assertThat(form.getContractTermYearDuration()).isEqualTo(duration);
+    assertThat(form.getContractTermDayDuration()).isNull();
+    assertThat(form.getContractTermWeekDuration()).isNull();
+    assertThat(form.getContractTermMonthDuration()).isNull();
+
+    checkCommonFields(form, upcomingTender);
+  }
+
+  private WorkPlanUpcomingTenderForm getFormWithContractDurationAndPeriod(DurationPeriod durationPeriod,
+                                                                          Integer duration) {
+    final var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    upcomingTender.setContractTermDurationPeriod(durationPeriod);
+    upcomingTender.setContractTermDuration(duration);
+
+    return workPlanUpcomingTenderService.getForm(upcomingTender);
   }
 
   @Test

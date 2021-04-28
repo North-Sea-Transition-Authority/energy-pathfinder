@@ -15,9 +15,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
@@ -28,6 +30,9 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
 
   @Mock
   private DateInputValidator dateInputValidator;
+
+  private static final String INVALID_CONTRACT_DURATION_PREFIX = WorkPlanUpcomingTenderFormValidator.INVALID_CONTRACT_DURATION_PREFIX;
+  private static final String INVALID_CONTRACT_DURATION_ERROR_CODE = WorkPlanUpcomingTenderFormValidator.INVALID_CONTRACT_DURATION_ERROR_CODE;
 
   private WorkPlanUpcomingTenderFormValidator validator;
 
@@ -57,7 +62,7 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setEstimatedTenderDate(new ThreeFieldDateInput(null));
     var fieldErrors = validateFormAndGetErrors(form, ValidationType.FULL);
-    assertCommonFieldErrorCodesAndMessages(
+    assertEstimatedTenderDateFieldErrorCodesAndMessages(
         fieldErrors,
         DateInputValidator.DAY_INVALID_CODE,
         DateInputValidator.MONTH_INVALID_CODE,
@@ -79,7 +84,7 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setEstimatedTenderDate(new ThreeFieldDateInput(LocalDate.now().minusDays(1L)));
     var fieldErrors = validateFormAndGetErrors(form, ValidationType.FULL);
-    assertCommonFieldErrorCodesAndMessages(
+    assertEstimatedTenderDateFieldErrorCodesAndMessages(
         fieldErrors,
         DateInputValidator.DAY_AFTER_DATE_CODE,
         DateInputValidator.MONTH_AFTER_DATE_CODE,
@@ -94,7 +99,7 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setEstimatedTenderDate(new ThreeFieldDateInput(LocalDate.now().minusDays(1L)));
     var fieldErrors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
-    assertCommonFieldErrorCodesAndMessages(
+    assertEstimatedTenderDateFieldErrorCodesAndMessages(
         fieldErrors,
         DateInputValidator.DAY_AFTER_DATE_CODE,
         DateInputValidator.MONTH_AFTER_DATE_CODE,
@@ -127,11 +132,152 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
     ValidationUtils.invokeValidator(validator, form, errors);
   }
 
-  private void assertCommonFieldErrorCodesAndMessages(BeanPropertyBindingResult errors,
-                                                      String expectedDayErrorCode,
-                                                      String expectedMonthErrorCode,
-                                                      String expectedYearErrorCode,
-                                                      String expectedDayErrorMessage) {
+  @Test
+  public void validate_whenContractTermDaysAndDurationNotProvidedAndFullValidation_thenErrors() {
+
+    var form = getInvalidDayDurationForm();
+
+    final var errors = validateFormAndGetErrors(form, ValidationType.FULL);
+
+    assertContractTermFieldErrorCodesAndMessages(
+        errors,
+        form,
+        "contractTermDayDuration"
+    );
+  }
+
+  @Test
+  public void validate_whenContractTermDaysAndDurationNotProvidedAndPartialValidation_thenNoErrors() {
+
+    var form = getInvalidDayDurationForm();
+
+    final var errors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
+
+    assertBindingResultHasNoErrors(errors);
+  }
+
+  private WorkPlanUpcomingTenderForm getInvalidDayDurationForm() {
+    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    form.setContractTermDurationPeriod(DurationPeriod.DAYS);
+    form.setContractTermDayDuration(null);
+    return form;
+  }
+
+  @Test
+  public void validate_whenContractTermWeeksAndDurationNotProvidedAndFullValidation_thenErrors() {
+
+    var form = getInvalidWeekDurationForm();
+
+    final var errors = validateFormAndGetErrors(form, ValidationType.FULL);
+
+    assertContractTermFieldErrorCodesAndMessages(
+        errors,
+        form,
+        "contractTermWeekDuration"
+    );
+  }
+
+  @Test
+  public void validate_whenContractTermWeeksAndDurationNotProvidedAndPartialValidation_thenNoErrors() {
+
+    var form = getInvalidWeekDurationForm();
+
+    final var errors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
+
+    assertBindingResultHasNoErrors(errors);
+  }
+
+  private WorkPlanUpcomingTenderForm getInvalidWeekDurationForm() {
+    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    form.setContractTermDurationPeriod(DurationPeriod.WEEKS);
+    form.setContractTermWeekDuration(null);
+    return form;
+  }
+
+  @Test
+  public void validate_whenContractTermMonthsAndDurationNotProvidedAndFullValidation_thenErrors() {
+
+    var form = getInvalidMonthDurationForm();
+
+    final var errors = validateFormAndGetErrors(form, ValidationType.FULL);
+
+    assertContractTermFieldErrorCodesAndMessages(
+        errors,
+        form,
+        "contractTermMonthDuration"
+    );
+  }
+
+  @Test
+  public void validate_whenContractTermMonthsAndDurationNotProvidedAndPartialValidation_thenNoErrors() {
+
+    var form = getInvalidMonthDurationForm();
+
+    final var errors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
+
+    assertBindingResultHasNoErrors(errors);
+  }
+
+  private WorkPlanUpcomingTenderForm getInvalidMonthDurationForm() {
+    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    form.setContractTermDurationPeriod(DurationPeriod.MONTHS);
+    form.setContractTermMonthDuration(null);
+    return form;
+  }
+
+  @Test
+  public void validate_whenContractTermYearsAndDurationNotProvidedAndFullValidation_thenErrors() {
+
+    var form = getInvalidYearDurationForm();
+
+    final var errors = validateFormAndGetErrors(form, ValidationType.FULL);
+
+    assertContractTermFieldErrorCodesAndMessages(
+        errors,
+        form,
+        "contractTermYearDuration"
+    );
+  }
+
+  @Test
+  public void validate_whenContractTermYearsAndDurationNotProvidedAndPartialValidation_thenNoErrors() {
+
+    var form = getInvalidYearDurationForm();
+
+    final var errors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
+
+    assertBindingResultHasNoErrors(errors);
+  }
+
+  private WorkPlanUpcomingTenderForm getInvalidYearDurationForm() {
+    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    form.setContractTermDurationPeriod(DurationPeriod.YEARS);
+    form.setContractTermYearDuration(null);
+    return form;
+  }
+
+  private void assertContractTermFieldErrorCodesAndMessages(BindingResult errors,
+                                                            WorkPlanUpcomingTenderForm form,
+                                                            String formFieldExpectingError) {
+    final var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    final var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).containsExactly(
+        entry(formFieldExpectingError, Set.of(formFieldExpectingError + INVALID_CONTRACT_DURATION_ERROR_CODE))
+    );
+
+    final var suffix = form.getContractTermDurationPeriod().getDisplayNamePlural().toLowerCase();
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry(formFieldExpectingError, Set.of(String.format("%s %s", INVALID_CONTRACT_DURATION_PREFIX, suffix)))
+    );
+  }
+
+  private void assertEstimatedTenderDateFieldErrorCodesAndMessages(BeanPropertyBindingResult errors,
+                                                                   String expectedDayErrorCode,
+                                                                   String expectedMonthErrorCode,
+                                                                   String expectedYearErrorCode,
+                                                                   String expectedDayErrorMessage) {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
@@ -148,11 +294,11 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
   }
 
   private void assertBindingResultHasNoErrors(BeanPropertyBindingResult fieldErrors) {
-    assertThat(ValidatorTestingUtil.extractErrors(fieldErrors)).isEmpty();
+    assertThat(fieldErrors.hasErrors()).isFalse();
   }
 
   private BeanPropertyBindingResult validateFormAndGetErrors(WorkPlanUpcomingTenderForm form,
-                                                            ValidationType validationType) {
+                                                             ValidationType validationType) {
     var errors = new BeanPropertyBindingResult(form, "form");
     var upcomingTenderValidationHint = new WorkPlanUpcomingTenderValidationHint(validationType);
     ValidationUtils.invokeValidator(validator, form, errors, upcomingTenderValidationHint);

@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.testutil;
 import java.time.LocalDate;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
+import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
@@ -23,6 +24,8 @@ public class WorkPlanUpcomingTenderUtil {
   public static final String PHONE_NUMBER = ContactDetailsTestUtil.PHONE_NUMBER;
   public static final String JOB_TITLE = ContactDetailsTestUtil.JOB_TITLE;
   public static final String EMAIL = ContactDetailsTestUtil.EMAIL;
+  public static final DurationPeriod CONTRACT_TERM_DURATION_PERIOD = DurationPeriod.YEARS;
+  public static final Integer CONTRACT_TERM_DURATION = 1;
 
   public static final Integer ID = 1;
   public static final Integer PROJECT_ID = 1;
@@ -59,6 +62,8 @@ public class WorkPlanUpcomingTenderUtil {
     tender.setDescriptionOfWork(DESCRIPTION_OF_WORK);
     tender.setEstimatedTenderDate(ESTIMATED_TENDER_DATE);
     tender.setContractBand(CONTRACT_BAND);
+    tender.setContractTermDuration(CONTRACT_TERM_DURATION);
+    tender.setContractTermDurationPeriod(CONTRACT_TERM_DURATION_PERIOD);
     tender.setContactName(CONTACT_NAME);
     tender.setPhoneNumber(PHONE_NUMBER);
     tender.setJobTitle(JOB_TITLE);
@@ -69,6 +74,8 @@ public class WorkPlanUpcomingTenderUtil {
     form.setDescriptionOfWork(DESCRIPTION_OF_WORK);
     form.setEstimatedTenderDate(new ThreeFieldDateInput(ESTIMATED_TENDER_DATE));
     form.setContractBand(CONTRACT_BAND);
+    form.setContractTermYearDuration(CONTRACT_TERM_DURATION);
+    form.setContractTermDurationPeriod(CONTRACT_TERM_DURATION_PERIOD);
 
     var contactDetailForm = ContactDetailsTestUtil.createContactDetailForm(
         CONTACT_NAME,
