@@ -29,17 +29,20 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
+import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderModelService;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderSummaryService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(
@@ -49,6 +52,7 @@ import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
 public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstractControllerTest {
 
   private static final Integer PROJECT_ID = 1;
+  private static final Integer UPCOMING_TENDER_ID = 1;
 
   @MockBean
   private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
@@ -56,12 +60,16 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
   @MockBean
   private WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
 
+  @MockBean
+  private WorkPlanUpcomingTenderModelService workPlanUpcomingTenderModelService;
+
   private final AuthenticatedUserAccount unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       SystemAccessService.CREATE_PROJECT_PRIVILEGES);
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
+  private final WorkPlanUpcomingTender workPlanUpcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
 
   @Before
   public void setup() {
@@ -69,7 +77,8 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
     when(workPlanUpcomingTenderService.createUpcomingTender(any(), any())).thenReturn(WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail));
-    when(workPlanUpcomingTenderService.getUpcomingTenderFormModelAndView(eq(projectDetail), any())).thenReturn(new ModelAndView(""));
+    when(workPlanUpcomingTenderService.updateUpcomingTender(any(), any())).thenReturn(WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail));
+    when(workPlanUpcomingTenderModelService.getUpcomingTenderFormModelAndView(eq(projectDetail), any())).thenReturn(new ModelAndView(""));
   }
 
   @Test
@@ -100,6 +109,23 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
   public void unAuthenticatedUser_cannotAddUpcomingTender() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
         on(WorkPlanUpcomingTenderController.class).addUpcomingTender(PROJECT_ID, null)))
+        .with(authenticatedUserAndSession(unauthenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void authenticatedUser_hasAccessToUpcomingTenderEdit() throws Exception {
+    when(workPlanUpcomingTenderService.getForm(workPlanUpcomingTender)).thenReturn(WorkPlanUpcomingTenderUtil.getCompleteForm());
+    mockMvc.perform(get(ReverseRouter.route(
+        on(WorkPlanUpcomingTenderController.class).editUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, null)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  public void unAuthenticatedUser_cannotAccessToUpcomingTenderEdit() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(WorkPlanUpcomingTenderController.class).editUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -192,5 +218,125 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
 
     verify(workPlanUpcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
     verify(workPlanUpcomingTenderService, times(0)).createUpcomingTender(any(), any());
+  }
+
+  @Test
+  public void updateUpcomingTender_partialValidation() throws Exception {
+    MultiValueMap<String, String> completeLaterParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
+    }};
+
+    var bindingResult = new BeanPropertyBindingResult(WorkPlanUpcomingTenderForm.class, "form");
+    when(workPlanUpcomingTenderService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(WorkPlanUpcomingTenderController.class)
+            .updateUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, null, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeLaterParams))
+        .andExpect(status().is3xxRedirection());
+
+    verify(workPlanUpcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(workPlanUpcomingTenderService, times(1)).updateUpcomingTender(any(), any());
+  }
+
+  @Test
+  public void updateUpcomingTender_fullValidation_invalid() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    var bindingResult = new BeanPropertyBindingResult(WorkPlanUpcomingTenderForm.class, "form");
+    bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
+    when(workPlanUpcomingTenderService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(WorkPlanUpcomingTenderController.class)
+            .updateUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, null, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().is2xxSuccessful());
+
+    verify(workPlanUpcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(workPlanUpcomingTenderService, times(0)).updateUpcomingTender(any(), any());
+  }
+
+  @Test
+  public void updateUpcomingTender_fullValidation_valid() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    var bindingResult = new BeanPropertyBindingResult(WorkPlanUpcomingTenderForm.class, "form");
+    when(workPlanUpcomingTenderService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(WorkPlanUpcomingTenderController.class)
+            .updateUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, null, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().is3xxRedirection());
+
+    verify(workPlanUpcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(workPlanUpcomingTenderService, times(1)).updateUpcomingTender(any(), any());
+
+  }
+
+  @Test
+  public void saveUpcomingTenders_unAuthenticated_thenInvalid() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(WorkPlanUpcomingTenderController.class)
+            .saveUpcomingTenders(PROJECT_ID, null)
+        ))
+            .with(authenticatedUserAndSession(unauthenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void saveUpcomingTenders_authenticatedAndInvalid_thenStayOnSummary() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    when(workPlanUpcomingTenderSummaryService.validateViews(any())).thenReturn(ValidationResult.INVALID);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(WorkPlanUpcomingTenderController.class)
+            .saveUpcomingTenders(PROJECT_ID, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  public void saveUpcomingTenders_authenticatedAndValid_thenRedirect() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    when(workPlanUpcomingTenderSummaryService.validateViews(any())).thenReturn(ValidationResult.VALID);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(WorkPlanUpcomingTenderController.class)
+            .saveUpcomingTenders(PROJECT_ID, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().is3xxRedirection());
   }
 }

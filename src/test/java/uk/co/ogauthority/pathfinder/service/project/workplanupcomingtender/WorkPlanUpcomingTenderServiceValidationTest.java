@@ -1,7 +1,9 @@
 package uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+import java.util.List;
 import javax.validation.Validation;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +17,6 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.WorkPlanUpcomingTenderRepository;
-import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -24,9 +25,6 @@ import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkPlanUpcomingTenderServiceValidationTest {
-
-  @Mock
-  private BreadcrumbService breadcrumbService;
 
   @Mock
   private FunctionService functionService;
@@ -53,7 +51,6 @@ public class WorkPlanUpcomingTenderServiceValidationTest {
     var validationService = new ValidationService(validator);
 
     workPlanUpcomingTenderService = new WorkPlanUpcomingTenderService(
-        breadcrumbService,
         functionService,
         validationService,
         workPlanUpcomingTenderFormValidator,
@@ -71,5 +68,35 @@ public class WorkPlanUpcomingTenderServiceValidationTest {
   public void isValid_whenIncompleteForm_returnsFalse() {
     upcomingTender.setJobTitle(null);
     assertThat(workPlanUpcomingTenderService.isValid(upcomingTender, ValidationType.FULL)).isFalse();
+  }
+
+  @Test
+  public void isComplete_whenInvalid_thenFalse() {
+    var upcomingTender1 = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    var upcomingTender2 = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    upcomingTender1.setJobTitle(null);
+    when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(
+        List.of(upcomingTender1, upcomingTender2)
+    );
+    var isComplete = workPlanUpcomingTenderService.isComplete(projectDetail);
+    assertThat(isComplete).isFalse();
+  }
+
+  @Test
+  public void isComplete_whenValid_thenTrue() {
+    var upcomingTender1 = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    var upcomingTender2 = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(
+        List.of(upcomingTender1, upcomingTender2)
+    );
+    var isComplete = workPlanUpcomingTenderService.isComplete(projectDetail);
+    assertThat(isComplete).isTrue();
+  }
+
+  @Test
+  public void isComplete_wheNoTenders_thenFalse() {
+    when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(List.of());
+    var isComplete = workPlanUpcomingTenderService.isComplete(projectDetail);
+    assertThat(isComplete).isFalse();
   }
 }

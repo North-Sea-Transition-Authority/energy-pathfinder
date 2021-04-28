@@ -1,9 +1,16 @@
 package uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
+import java.util.List;
+import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
+import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
+import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class WorkPlanUpcomingTenderViewUtil {
@@ -49,7 +56,18 @@ public class WorkPlanUpcomingTenderViewUtil {
     );
 
     tenderView.setContractLength(contractLength);
-    
+
+    var editLink = new SummaryLink(
+        SummaryLinkText.EDIT.getDisplayName(),
+        ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).editUpcomingTender(
+            projectId,
+            workPlanUpcomingTender.getId(),
+            null
+        ))
+    );
+
+    tenderView.setSummaryLinks(List.of(editLink));
+
     return tenderView;
   }
 

@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -12,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderView;
@@ -97,5 +99,27 @@ public class WorkPlanUpcomingTenderSummaryServiceTest {
     assertThat(view.getContactPhoneNumber()).isEqualTo(tender.getPhoneNumber());
     assertThat(view.getContactJobTitle()).isEqualTo(tender.getJobTitle());
     assertThat(view.getContactEmailAddress()).isEqualTo(tender.getEmailAddress());
+  }
+
+  @Test
+  public void getValidatedSummaryViews_allValid() {
+    when(workPlanUpcomingTenderService.isValid(any(), any())).thenReturn(true);
+    var views = workPlanUpcomingTenderSummaryService.getValidatedSummaryViews(projectDetail);
+    assertThat(views.size()).isEqualTo(2);
+    var view1 = views.get(0);
+    var view2 = views.get(1);
+    assertThat(view1.isValid()).isTrue();
+    assertThat(view2.isValid()).isTrue();
+  }
+
+  @Test
+  public void getValidatedSummaryViews_containsInvalidEntry() {
+    when(workPlanUpcomingTenderService.isValid(workPlanUpcomingTender, ValidationType.FULL)).thenReturn(true);
+    var views = workPlanUpcomingTenderSummaryService.getValidatedSummaryViews(projectDetail);
+    assertThat(views.size()).isEqualTo(2);
+    var view1 = views.get(0);
+    var view2 = views.get(1);
+    assertThat(view1.isValid()).isTrue();
+    assertThat(view2.isValid()).isFalse();
   }
 }

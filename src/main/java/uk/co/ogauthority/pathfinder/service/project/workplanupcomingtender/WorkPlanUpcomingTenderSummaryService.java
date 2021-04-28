@@ -9,9 +9,12 @@ import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderView;
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderViewUtil;
+import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Service
 public class WorkPlanUpcomingTenderSummaryService {
+
   private final WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
   @Autowired
@@ -27,6 +30,13 @@ public class WorkPlanUpcomingTenderSummaryService {
     );
   }
 
+  public List<WorkPlanUpcomingTenderView> getValidatedSummaryViews(ProjectDetail projectDetail) {
+    return createUpcomingTenderViews(
+        workPlanUpcomingTenderService.getUpcomingTendersForDetail(projectDetail),
+        ValidationType.FULL
+    );
+  }
+
   public WorkPlanUpcomingTenderView getUpcomingTenderView(WorkPlanUpcomingTender workPlanUpcomingTender, Integer displayOrder) {
     return WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(workPlanUpcomingTender, displayOrder);
   }
@@ -35,6 +45,10 @@ public class WorkPlanUpcomingTenderSummaryService {
                                                            Integer displayOrder,
                                                            boolean isValid) {
     return WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(workPlanUpcomingTender, displayOrder, isValid);
+  }
+
+  public ValidationResult validateViews(List<WorkPlanUpcomingTenderView> views) {
+    return SummaryUtil.validateViews(new ArrayList<>(views));
   }
 
   public List<WorkPlanUpcomingTenderView> createUpcomingTenderViews(List<WorkPlanUpcomingTender> workPlanUpcomingTenders,

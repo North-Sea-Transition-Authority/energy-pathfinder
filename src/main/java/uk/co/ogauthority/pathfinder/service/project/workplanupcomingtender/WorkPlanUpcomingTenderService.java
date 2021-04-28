@@ -1,34 +1,25 @@
 package uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender;
 
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-
 import java.util.List;
-import java.util.Map;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.servlet.ModelAndView;
-import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
-import uk.co.ogauthority.pathfinder.controller.rest.WorkPlanUpcomingTenderRestController;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
-import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderValidationHint;
-import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderView;
-import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.WorkPlanUpcomingTenderRepository;
-import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
@@ -38,24 +29,18 @@ import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 @Service
 public class WorkPlanUpcomingTenderService implements ProjectFormSectionService {
 
-  public static final String TEMPLATE_PATH = "project/workplanupcomingtender/workPlanUpcomingTenderFormSummary";
-
-  private final BreadcrumbService breadcrumbService;
   private final FunctionService functionService;
   private final ValidationService validationService;
   private final WorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator;
   private final WorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository;
   private final SearchSelectorService searchSelectorService;
 
-
   @Autowired
-  public WorkPlanUpcomingTenderService(BreadcrumbService breadcrumbService,
-                                       FunctionService functionService,
+  public WorkPlanUpcomingTenderService(FunctionService functionService,
                                        ValidationService validationService,
                                        WorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator,
                                        WorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository,
                                        SearchSelectorService searchSelectorService) {
-    this.breadcrumbService = breadcrumbService;
     this.functionService = functionService;
     this.validationService = validationService;
     this.workPlanUpcomingTenderFormValidator = workPlanUpcomingTenderFormValidator;
@@ -63,42 +48,16 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     this.searchSelectorService = searchSelectorService;
   }
 
-  public ModelAndView getUpcomingTendersModelAndView(Integer projectId,
-                                                     List<WorkPlanUpcomingTenderView> tenderViews) {
-    var modelAndView = new ModelAndView(TEMPLATE_PATH)
-        .addObject("pageName", WorkPlanUpcomingTenderController.PAGE_NAME)
-        .addObject("tenderViews", tenderViews)
-        .addObject("addUpcomingTenderUrl",
-            ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).addUpcomingTender(projectId, null)));
-    breadcrumbService.fromTaskList(projectId, modelAndView, WorkPlanUpcomingTenderController.PAGE_NAME);
-    return modelAndView;
-  }
-
-  public ModelAndView getUpcomingTenderFormModelAndView(ProjectDetail projectDetail,
-                                                        WorkPlanUpcomingTenderForm form) {
-    var modelAndView = new ModelAndView("project/workplanupcomingtender/workPlanUpcomingTender")
-        .addObject("pageNameSingular", WorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR)
-        .addObject("form", form)
-        .addObject("preSelectedFunction", getPreSelectedFunction(form))
-        .addObject("contractBands", WorkPlanUpcomingTenderContractBand.getAllAsMap())
-        .addObject("departmentTenderRestUrl", SearchSelectorService.route(
-            on(WorkPlanUpcomingTenderRestController.class).searchTenderDepartments(null)
-        ))
-        .addObject("contractTermPeriodDays", DurationPeriod.getEntryAsMap(DurationPeriod.DAYS))
-        .addObject("contractTermPeriodWeeks", DurationPeriod.getEntryAsMap(DurationPeriod.WEEKS))
-        .addObject("contractTermPeriodMonths", DurationPeriod.getEntryAsMap(DurationPeriod.MONTHS))
-        .addObject("contractTermPeriodYears", DurationPeriod.getEntryAsMap(DurationPeriod.YEARS));
-
-    breadcrumbService.fromWorkPlanUpcomingTenders(
-        projectDetail.getProject().getId(),
-        modelAndView,
-        WorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR
-    );
-    return modelAndView;
-  }
-
   public List<RestSearchItem> findDepartmentTenderLikeWithManualEntry(String searchTerm) {
     return functionService.findFunctionsLikeWithManualEntry(searchTerm, FunctionType.WORK_PLAN_UPCOMING_TENDER);
+  }
+
+  public WorkPlanUpcomingTender getOrError(Integer upcomingTenderId) {
+    return workPlanUpcomingTenderRepository.findById(upcomingTenderId).orElseThrow(
+        () -> new PathfinderEntityNotFoundException(
+            String.format("Unable to find tender with id: %s", upcomingTenderId)
+        )
+    );
   }
 
   public BindingResult validate(WorkPlanUpcomingTenderForm form,
@@ -138,10 +97,14 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
   public WorkPlanUpcomingTender createUpcomingTender(ProjectDetail detail,
                                                      WorkPlanUpcomingTenderForm form) {
     var upcomingTender = new WorkPlanUpcomingTender(detail);
-    setCommonFields(upcomingTender, form);
-    upcomingTender = workPlanUpcomingTenderRepository.save(upcomingTender);
+    return updateUpcomingTender(upcomingTender, form);
+  }
 
-    return upcomingTender;
+  @Transactional
+  public WorkPlanUpcomingTender updateUpcomingTender(WorkPlanUpcomingTender workPlanUpcomingTender,
+                                                     WorkPlanUpcomingTenderForm form) {
+    setCommonFields(workPlanUpcomingTender, form);
+    return workPlanUpcomingTenderRepository.save(workPlanUpcomingTender);
   }
 
   public List<WorkPlanUpcomingTender> getUpcomingTendersForDetail(ProjectDetail projectDetail) {
@@ -212,13 +175,11 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     }
   }
 
-  public Map<String, String> getPreSelectedFunction(WorkPlanUpcomingTenderForm form) {
-    return searchSelectorService.getPreSelectedSearchSelectorValue(form.getDepartmentType(), Function.values());
-  }
-
   @Override
   public boolean isComplete(ProjectDetail detail) {
-    return false;
+    var upcomingTenders = getUpcomingTendersForDetail(detail);
+    return !upcomingTenders.isEmpty() && upcomingTenders.stream()
+        .allMatch(ut -> isValid(ut, ValidationType.FULL));
   }
 
   @Override
