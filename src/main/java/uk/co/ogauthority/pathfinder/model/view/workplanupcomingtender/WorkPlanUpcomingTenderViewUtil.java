@@ -66,7 +66,17 @@ public class WorkPlanUpcomingTenderViewUtil {
         ))
     );
 
-    tenderView.setSummaryLinks(List.of(editLink));
+    var removeLink = new SummaryLink(
+        SummaryLinkText.DELETE.getDisplayName(),
+        ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).removeUpcomingTenderConfirm(
+            projectId,
+            workPlanUpcomingTender.getId(),
+            displayOrder,
+            null
+        ))
+    );
+
+    tenderView.setSummaryLinks(List.of(editLink, removeLink));
 
     return tenderView;
   }

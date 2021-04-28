@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -33,6 +34,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
+import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
@@ -53,6 +55,7 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
 
   private static final Integer PROJECT_ID = 1;
   private static final Integer UPCOMING_TENDER_ID = 1;
+  private static final Integer DISPLAY_ORDER = 1;
 
   @MockBean
   private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
@@ -73,6 +76,12 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
 
   @Before
   public void setup() {
+    when(workPlanUpcomingTenderService.getOrError(UPCOMING_TENDER_ID)).thenReturn(workPlanUpcomingTender);
+    var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+        workPlanUpcomingTender,
+        DISPLAY_ORDER
+    );
+    when(workPlanUpcomingTenderSummaryService.getUpcomingTenderView(workPlanUpcomingTender, DISPLAY_ORDER)).thenReturn(upcomingTenderView);
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
@@ -126,6 +135,22 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
   public void unAuthenticatedUser_cannotAccessToUpcomingTenderEdit() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
         on(WorkPlanUpcomingTenderController.class).editUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, null)))
+        .with(authenticatedUserAndSession(unauthenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void authenticatedUser_hasAccessToUpcomingTenderRemove() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(WorkPlanUpcomingTenderController.class).removeUpcomingTenderConfirm(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)))
+        .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  public void unAuthenticatedUser_cannotAccessUpcomingTenderRemove() throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+        on(WorkPlanUpcomingTenderController.class).removeUpcomingTenderConfirm(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -286,6 +311,42 @@ public class WorkPlanUpcomingTenderControllerTest extends ProjectContextAbstract
     verify(workPlanUpcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
     verify(workPlanUpcomingTenderService, times(1)).updateUpcomingTender(any(), any());
 
+  }
+
+  @Test
+  public void removeUpcomingTender_authenticatedUser_thenValid() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+    mockMvc.perform(
+        post(ReverseRouter.route(on(WorkPlanUpcomingTenderController.class)
+            .removeUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().is3xxRedirection());
+
+    verify(workPlanUpcomingTenderService, times(1)).getOrError(any());
+    verify(workPlanUpcomingTenderService, times(1)).delete(any());
+  }
+
+  @Test
+  public void removeUpcomingTender_unAuthenticatedUser_thenInvalid() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+    mockMvc.perform(
+        post(ReverseRouter.route(on(WorkPlanUpcomingTenderController.class)
+            .removeUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)
+        ))
+            .with(authenticatedUserAndSession(unauthenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().isForbidden());
+
+    verify(workPlanUpcomingTenderService, never()).getOrError(any());
+    verify(workPlanUpcomingTenderService, never()).delete(any());
   }
 
   @Test

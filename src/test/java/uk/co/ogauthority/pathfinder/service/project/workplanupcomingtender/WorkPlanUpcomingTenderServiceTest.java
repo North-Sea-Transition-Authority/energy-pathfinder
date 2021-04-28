@@ -467,4 +467,11 @@ public class WorkPlanUpcomingTenderServiceTest {
   public void canShowInTaskList_whenForwardWorkPlan_thenTrue() {
     assertThat(workPlanUpcomingTenderService.canShowInTaskList(projectDetail)).isTrue();
   }
+
+  @Test
+  public void delete_verifyInteractions() {
+    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    workPlanUpcomingTenderService.delete(upcomingTender);
+    verify(workPlanUpcomingTenderRepository, times(1)).delete(upcomingTender);
+  }
 }

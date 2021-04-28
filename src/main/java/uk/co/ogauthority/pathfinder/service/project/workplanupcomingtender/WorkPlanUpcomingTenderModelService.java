@@ -28,6 +28,7 @@ public class WorkPlanUpcomingTenderModelService {
 
   protected static final String SUMMARY_TEMPLATE_PATH = "project/workplanupcomingtender/workPlanUpcomingTenderFormSummary";
   protected static final String FORM_TEMPLATE_PATH = "project/workplanupcomingtender/workPlanUpcomingTender";
+  protected static final String REMOVE_TEMPLATE_PATH = "project/workplanupcomingtender/removeWorkPlanUpcomingTender";
 
   protected static final String ERROR_FIELD_NAME = "upcoming-tender-%d";
   protected static final String ERROR_MESSAGE = "Upcoming tender %d is incomplete";
@@ -85,6 +86,25 @@ public class WorkPlanUpcomingTenderModelService {
         .addObject("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectId));
 
     breadcrumbService.fromTaskList(projectId, modelAndView, WorkPlanUpcomingTenderController.PAGE_NAME);
+
+    return modelAndView;
+  }
+
+  public ModelAndView getRemoveUpcomingTenderConfirmModelAndView(
+      Integer projectId,
+      WorkPlanUpcomingTenderView workPlanUpcomingTenderView
+  ) {
+    var modelAndView = new ModelAndView(REMOVE_TEMPLATE_PATH)
+        .addObject("view", workPlanUpcomingTenderView)
+        .addObject("cancelUrl",
+            ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null))
+        );
+
+    breadcrumbService.fromWorkPlanUpcomingTenders(
+        projectId,
+        modelAndView,
+        WorkPlanUpcomingTenderController.REMOVE_PAGE_NAME
+    );
 
     return modelAndView;
   }

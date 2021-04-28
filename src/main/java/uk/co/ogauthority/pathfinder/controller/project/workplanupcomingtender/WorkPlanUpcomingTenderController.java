@@ -39,6 +39,7 @@ public class WorkPlanUpcomingTenderController {
 
   public static final String PAGE_NAME = "Upcoming tenders";
   public static final String PAGE_NAME_SINGULAR = "Upcoming tender";
+  public static final String REMOVE_PAGE_NAME = "Remove upcoming tender";
 
   private final WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
   private final WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
@@ -171,5 +172,34 @@ public class WorkPlanUpcomingTenderController {
           return ReverseRouter.redirect(on(WorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null));
         }
     );
+  }
+
+  @GetMapping("/upcoming-tender/{upcomingTenderId}/remove/{displayOrder}")
+  public ModelAndView removeUpcomingTenderConfirm(@PathVariable("projectId") Integer projectId,
+                                                  @PathVariable("upcomingTenderId") Integer upcomingTenderId,
+                                                  @PathVariable("displayOrder") Integer displayOrder,
+                                                  ProjectContext projectContext) {
+    var upcomingTender = workPlanUpcomingTenderService.getOrError(upcomingTenderId);
+    var tenderView = workPlanUpcomingTenderSummaryService.getUpcomingTenderView(upcomingTender,displayOrder);
+    return workPlanUpcomingTenderModelService.getRemoveUpcomingTenderConfirmModelAndView(projectId, tenderView);
+  }
+
+  @PostMapping("/upcoming-tender/{upcomingTenderId}/remove/{displayOrder}")
+  public ModelAndView removeUpcomingTender(@PathVariable("projectId") Integer projectId,
+                                           @PathVariable("upcomingTenderId") Integer upcomingTenderId,
+                                           @PathVariable("displayOrder") Integer displayOrder,
+                                           ProjectContext projectContext) {
+    var upcomingTender = workPlanUpcomingTenderService.getOrError(upcomingTenderId);
+    workPlanUpcomingTenderService.delete(upcomingTender);
+
+    AuditService.audit(
+        AuditEvent.WORK_PLAN_UPCOMING_TENDER_REMOVED,
+        String.format(
+            AuditEvent.WORK_PLAN_UPCOMING_TENDER_REMOVED.getMessage(),
+            upcomingTenderId,
+            projectContext.getProjectDetails().getId()
+        )
+    );
+    return ReverseRouter.redirect(on(WorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null));
   }
 }

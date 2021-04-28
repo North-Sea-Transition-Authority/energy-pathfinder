@@ -195,4 +195,25 @@ public class WorkPlanUpcomingTenderModelServiceTest {
     assertThat(errors.get(0).getErrorMessage()).isEqualTo(UpcomingTenderSummaryService.EMPTY_LIST_ERROR);
   }
 
+  @Test
+  public void getRemoveUpcomingTenderConfirmModelAndView_assertCorrectModelProperties() {
+    var projectId = projectDetail.getProject().getId();
+    var tenderView = WorkPlanUpcomingTenderUtil.getView(1, true);
+
+    var modelAndView = workPlanUpcomingTenderModelService.getRemoveUpcomingTenderConfirmModelAndView(projectId, tenderView);
+
+    assertThat(modelAndView.getViewName()).isEqualTo(WorkPlanUpcomingTenderModelService.REMOVE_TEMPLATE_PATH);
+    assertThat(modelAndView.getModel()).containsExactly(
+        entry("view", tenderView),
+        entry("cancelUrl", ReverseRouter.route(on(WorkPlanUpcomingTenderController.class)
+            .viewUpcomingTenders(projectId, null))
+        )
+    );
+
+    verify(breadcrumbService, times(1)).fromWorkPlanUpcomingTenders(
+        projectId,
+        modelAndView,
+        WorkPlanUpcomingTenderController.REMOVE_PAGE_NAME
+    );
+  }
 }

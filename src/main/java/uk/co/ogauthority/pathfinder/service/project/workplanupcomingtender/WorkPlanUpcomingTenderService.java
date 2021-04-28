@@ -175,6 +175,11 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     }
   }
 
+  @Transactional
+  public void delete(WorkPlanUpcomingTender workPlanUpcomingTender) {
+    workPlanUpcomingTenderRepository.delete(workPlanUpcomingTender);
+  }
+
   @Override
   public boolean isComplete(ProjectDetail detail) {
     var upcomingTenders = getUpcomingTendersForDetail(detail);
