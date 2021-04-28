@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +16,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.newsletter.NoProjectsUpdatedNewsletterEmailProperties;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.newsletter.ProjectsUpdatedNewsletterEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.newsletters.MonthlyNewsletter;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
 import uk.co.ogauthority.pathfinder.model.enums.NewsletterSendingResult;
@@ -39,6 +42,9 @@ public class NewsletterServiceTest {
   @Mock
   private MonthlyNewsletterRepository monthlyNewsletterRepository;
 
+  @Mock
+  private NewsletterProjectService newsletterProjectService;
+
   @Captor
   private ArgumentCaptor<MonthlyNewsletter> monthlyNewsletterArgumentCaptor;
 
@@ -52,7 +58,8 @@ public class NewsletterServiceTest {
         subscriberAccessor,
         emailLinkService,
         emailService,
-        monthlyNewsletterRepository
+        monthlyNewsletterRepository,
+        newsletterProjectService
     );
 
     when(emailLinkService.getUnsubscribeUrl(any())).thenCallRealMethod();
@@ -66,6 +73,7 @@ public class NewsletterServiceTest {
     verify(emailLinkService, times(1)).getUnsubscribeUrl(SUBSCRIBER.getUuid().toString());
     verify(emailService, times(1)).sendEmail(any(), eq(SUBSCRIBER.getEmailAddress()));
     verify(monthlyNewsletterRepository, times(1)).save(monthlyNewsletterArgumentCaptor.capture());
+    verify(newsletterProjectService, times(1)).getProjectsUpdatedInTheLastMonth();
 
     assertMonthlyNewsletterEntityHasExpectedProperties(
         monthlyNewsletterArgumentCaptor.getValue(),
@@ -81,11 +89,47 @@ public class NewsletterServiceTest {
     verify(emailLinkService, times(0)).getUnsubscribeUrl(SUBSCRIBER.getUuid().toString());
     verify(emailService, times(0)).sendEmail(any(), any());
     verify(monthlyNewsletterRepository, times(1)).save(monthlyNewsletterArgumentCaptor.capture());
+    verify(newsletterProjectService, times(1)).getProjectsUpdatedInTheLastMonth();
 
     assertMonthlyNewsletterEntityHasExpectedProperties(
         monthlyNewsletterArgumentCaptor.getValue(),
         NewsletterSendingResult.FAILURE
     );
+  }
+
+  @Test
+  public void sendNewsletterToSubscribers_whenNoProjectUpdated_assertCorrectEmailPropertiesUsed() {
+
+    when(subscriberAccessor.getAllSubscribers()).thenReturn(Collections.singletonList(SUBSCRIBER));
+    when(newsletterProjectService.getProjectsUpdatedInTheLastMonth()).thenReturn(Collections.emptyList());
+
+    newsletterService.sendNewsletterToSubscribers();
+
+    final var expectedEmailProperties = new NoProjectsUpdatedNewsletterEmailProperties(
+        SUBSCRIBER.getForename(),
+        emailLinkService.getUnsubscribeUrl(SUBSCRIBER.getUuid().toString())
+    );
+
+    verify(emailService, times(1)).sendEmail(expectedEmailProperties, SUBSCRIBER.getEmailAddress());
+  }
+
+  @Test
+  public void sendNewsletterToSubscribers_whenProjectUpdated_assertCorrectEmailPropertiesUsed() {
+
+    final var projectsUpdate = List.of("example");
+
+    when(subscriberAccessor.getAllSubscribers()).thenReturn(Collections.singletonList(SUBSCRIBER));
+    when(newsletterProjectService.getProjectsUpdatedInTheLastMonth()).thenReturn(projectsUpdate);
+
+    newsletterService.sendNewsletterToSubscribers();
+
+    final var expectedEmailProperties = new ProjectsUpdatedNewsletterEmailProperties(
+        SUBSCRIBER.getForename(),
+        emailLinkService.getUnsubscribeUrl(SUBSCRIBER.getUuid().toString()),
+        projectsUpdate
+    );
+
+    verify(emailService, times(1)).sendEmail(expectedEmailProperties, SUBSCRIBER.getEmailAddress());
   }
 
   private void assertMonthlyNewsletterEntityHasExpectedProperties(MonthlyNewsletter monthlyNewsletter,

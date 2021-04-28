@@ -17,8 +17,8 @@ public class OutgoingOperatorProjectTransferEmailProperties extends ProjectTrans
   }
 
   @Override
-  public Map<String, String> getEmailPersonalisation() {
-    Map<String, String> emailPersonalisation = super.getEmailPersonalisation();
+  public Map<String, Object> getEmailPersonalisation() {
+    var emailPersonalisation = super.getEmailPersonalisation();
     emailPersonalisation.put("NEW_OPERATOR_NAME", newOperatorName);
     return emailPersonalisation;
   }

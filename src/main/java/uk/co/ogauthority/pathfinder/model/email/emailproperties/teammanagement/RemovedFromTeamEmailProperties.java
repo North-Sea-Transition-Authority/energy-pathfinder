@@ -16,8 +16,8 @@ public class RemovedFromTeamEmailProperties extends EmailProperties {
   }
 
   @Override
-  public Map<String, String> getEmailPersonalisation() {
-    Map<String, String> emailPersonalisation = super.getEmailPersonalisation();
+  public Map<String, Object> getEmailPersonalisation() {
+    var emailPersonalisation = super.getEmailPersonalisation();
     emailPersonalisation.put("TEAM_NAME", teamName);
     emailPersonalisation.put("REMOVED_BY_USER_NAME", removedByUserName);
     return emailPersonalisation;

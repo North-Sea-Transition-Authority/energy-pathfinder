@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.quarterlystatistics;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,11 @@ public class ReportableProjectService {
         .stream()
         .map(this::convertToReportableProjectView)
         .collect(Collectors.toList());
+  }
+
+  public List<ReportableProject> getReportableProjectsUpdatedBetween(Instant earliestUpdatedDatetime,
+                                                                     Instant latestUpdatedDatetime) {
+    return reportableProjectRepository.findByLastUpdatedDatetimeBetween(earliestUpdatedDatetime, latestUpdatedDatetime);
   }
 
   private List<ReportableProject> getReportableProjects() {

@@ -1,7 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.email.notify;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -26,19 +25,22 @@ public class TestEmailServiceImpl implements EmailService {
   private static final Logger LOGGER = LoggerFactory.getLogger(TestEmailServiceImpl.class);
   private final String serviceName;
   private final String customerMnemonic;
+  private final String supplyChainInterfaceUrl;
 
   public TestEmailServiceImpl(NotifyTemplateService notifyTemplateService,
                               NotificationClient notificationClient,
                               EmailValidator emailValidator,
                               List<String> testRecipientList,
                               String serviceName,
-                              String customerMnemonic) {
+                              String customerMnemonic,
+                              String supplyChainInterfaceUrl) {
     this.notificationClient = notificationClient;
     this.notifyTemplateService = notifyTemplateService;
     this.emailValidator = emailValidator;
     this.testRecipientList = testRecipientList;
     this.serviceName = serviceName;
     this.customerMnemonic = customerMnemonic;
+    this.supplyChainInterfaceUrl = supplyChainInterfaceUrl;
   }
 
   @Override
@@ -57,11 +59,12 @@ public class TestEmailServiceImpl implements EmailService {
     if (templateId.isPresent()) {
 
       // Set the TEST_EMAIL personalisation when in the development service
-      Map<String, String> personalisation = emailProperties.getEmailPersonalisation();
+      var personalisation = emailProperties.getEmailPersonalisation();
       personalisation.put("TEST_EMAIL", "yes");
       personalisation.put("SUBJECT_PREFIX", "**TEST EMAIL**");
       personalisation.put("SERVICE_NAME", serviceName);
       personalisation.put("CUSTOMER_MNEMONIC", customerMnemonic);
+      personalisation.put("SUPPLY_CHAIN_INTERFACE_URL", supplyChainInterfaceUrl);
 
       // If we have test recipients send the email to each
       testRecipientList.stream()

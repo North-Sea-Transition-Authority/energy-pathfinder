@@ -2,7 +2,10 @@ package uk.co.ogauthority.pathfinder.util;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.YearMonth;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.IsoFields;
 import java.time.temporal.Temporal;
@@ -18,6 +21,7 @@ public class DateUtil {
   public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy");
   public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm")
       .withZone(ZoneId.systemDefault());
+  public static final ZoneOffset UTC_ZONE = ZoneOffset.UTC;
 
   private static String format(Temporal temporal, DateTimeFormatter dateTimeFormatter) {
     return temporal != null
@@ -65,6 +69,34 @@ public class DateUtil {
 
     return DateUtil.isOnOrAfter(instantToCheck, quarterStartInstant)
         && DateUtil.isOnOrBefore(instantToCheck, quarterEndInstant);
+  }
+
+  /**
+   * Returns an instant representing the start of the month for the month in dateToGetStartOfMonthFor.
+   * @param dateToGetStartOfMonthFor a local date to get the start of the month for
+   * @return an instant representing the start of the month dateToGetStartOfMonthFor is in
+   */
+  public static Instant getStartOfMonth(LocalDate dateToGetStartOfMonthFor) {
+    // use UTC as zone as dates in the database don't include the timezone
+    return getStartOfMonth(dateToGetStartOfMonthFor, UTC_ZONE);
+  }
+
+  private static Instant getStartOfMonth(LocalDate dateToGetStartOfMonthFor, ZoneOffset zoneOffset) {
+    return YearMonth.from(dateToGetStartOfMonthFor).atDay(1).atStartOfDay(zoneOffset).toInstant();
+  }
+
+  /**
+   * Returns an instant representing the end of the month for the month in dateToGetEndOfMonthFor.
+   * @param dateToGetEndOfMonthFor a local date to get the end of the month for
+   * @return an instant representing the end of the month dateToGetEndOfMonthFor is in
+   */
+  public static Instant getEndOfMonth(LocalDate dateToGetEndOfMonthFor) {
+    // use UTC as zone as dates in the database don't include the timezone
+    return getEndOfMonth(dateToGetEndOfMonthFor, UTC_ZONE);
+  }
+
+  private static Instant getEndOfMonth(LocalDate dateToGetEndOfMonthFor, ZoneOffset zoneOffset) {
+    return YearMonth.from(dateToGetEndOfMonthFor).atEndOfMonth().atTime(LocalTime.MAX).atZone(zoneOffset).toInstant();
   }
 
 }

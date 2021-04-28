@@ -23,8 +23,8 @@ public class ProjectUpdateEmailProperties extends EmailProperties {
   }
 
   @Override
-  public Map<String, String> getEmailPersonalisation() {
-    Map<String, String> emailPersonalisation = super.getEmailPersonalisation();
+  public Map<String, Object> getEmailPersonalisation() {
+    var emailPersonalisation = super.getEmailPersonalisation();
     emailPersonalisation.put("PROJECT_NAME", projectName);
     emailPersonalisation.put("SERVICE_LOGIN_URL", serviceLoginUrl);
     emailPersonalisation.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);

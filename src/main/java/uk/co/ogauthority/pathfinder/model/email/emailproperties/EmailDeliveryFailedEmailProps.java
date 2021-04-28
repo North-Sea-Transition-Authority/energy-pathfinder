@@ -20,8 +20,8 @@ public class EmailDeliveryFailedEmailProps extends EmailProperties {
   }
 
   @Override
-  public Map<String, String> getEmailPersonalisation() {
-    Map<String, String> emailPersonalisation = super.getEmailPersonalisation();
+  public Map<String, Object> getEmailPersonalisation() {
+    var emailPersonalisation = super.getEmailPersonalisation();
     emailPersonalisation.put("FAILED_EMAIL_ADDRESS", failedEmailAddress);
     emailPersonalisation.put("EMAIL_SUBJECT", originalSubject);
     emailPersonalisation.put("EMAIL_BODY", originalBody);

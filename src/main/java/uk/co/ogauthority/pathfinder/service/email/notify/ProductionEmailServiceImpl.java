@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.email.notify;
 
-import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -23,17 +22,20 @@ public class ProductionEmailServiceImpl implements EmailService {
   private static final Logger LOGGER = LoggerFactory.getLogger(ProductionEmailServiceImpl.class);
   private final String serviceName;
   private final String customerMnemonic;
+  private final String supplyChainInterfaceUrl;
 
   public ProductionEmailServiceImpl(NotifyTemplateService notifyTemplateService,
                                     NotificationClient notificationClient,
                                     EmailValidator emailValidator,
                                     String serviceName,
-                                    String customerMnemonic) {
+                                    String customerMnemonic,
+                                    String supplyChainInterfaceUrl) {
     this.notificationClient = notificationClient;
     this.notifyTemplateService = notifyTemplateService;
     this.emailValidator = emailValidator;
     this.serviceName = serviceName;
     this.customerMnemonic = customerMnemonic;
+    this.supplyChainInterfaceUrl = supplyChainInterfaceUrl;
   }
 
   @Override
@@ -53,9 +55,10 @@ public class ProductionEmailServiceImpl implements EmailService {
 
       if (templateId.isPresent()) {
 
-        Map<String, String> personalisation = emailProperties.getEmailPersonalisation();
+        var personalisation = emailProperties.getEmailPersonalisation();
         personalisation.put("SERVICE_NAME", serviceName);
         personalisation.put("CUSTOMER_MNEMONIC", customerMnemonic);
+        personalisation.put("SUPPLY_CHAIN_INTERFACE_URL", supplyChainInterfaceUrl);
         personalisation.put("SUBJECT_PREFIX", "");
 
         if (emailValidator.isValid(toEmailAddress)) {

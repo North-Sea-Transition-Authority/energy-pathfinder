@@ -14,8 +14,8 @@ public class NoUpdateNotificationEmailProperties extends ProjectUpdateEmailPrope
   }
 
   @Override
-  public Map<String, String> getEmailPersonalisation() {
-    Map<String, String> emailPersonalisation = super.getEmailPersonalisation();
+  public Map<String, Object> getEmailPersonalisation() {
+    var emailPersonalisation = super.getEmailPersonalisation();
     emailPersonalisation.put("NO_UPDATE_REASON", noUpdateReason);
     return emailPersonalisation;
   }
