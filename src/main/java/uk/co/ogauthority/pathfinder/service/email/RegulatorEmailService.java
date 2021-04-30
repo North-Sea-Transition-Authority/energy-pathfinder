@@ -36,7 +36,7 @@ public class RegulatorEmailService {
   public void sendUpdateSubmitConfirmationEmail(ProjectDetail detail) {
     var emailProps = new ProjectUpdateEmailProperties(
         projectInformationService.getProjectTitle(detail),
-        emailLinkService.getWorkAreaUrl()
+        emailLinkService.generateProjectManagementUrl(detail.getProject())
     );
     sendEmailToRegulatorSharedMailbox(emailProps);
   }
@@ -44,7 +44,7 @@ public class RegulatorEmailService {
   public void sendNoUpdateNotificationEmail(ProjectDetail detail, String noUpdateReason) {
     var emailProps = new NoUpdateNotificationEmailProperties(
         projectInformationService.getProjectTitle(detail),
-        emailLinkService.getWorkAreaUrl(),
+        emailLinkService.generateProjectManagementUrl(detail.getProject()),
         noUpdateReason
     );
     sendEmailToRegulatorSharedMailbox(emailProps);

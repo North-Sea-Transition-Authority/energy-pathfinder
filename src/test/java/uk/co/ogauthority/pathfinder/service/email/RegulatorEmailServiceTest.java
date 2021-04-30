@@ -51,7 +51,8 @@ public class RegulatorEmailServiceTest {
         REGULATOR_SHARED_EMAIL
     );
     when(projectInformationService.getProjectTitle(PROJECT_DETAIL)).thenReturn(PROJECT_NAME);
-    when(emailLinkService.getWorkAreaUrl()).thenReturn(SERVICE_LOGIN_URL);
+    when(emailLinkService.generateProjectManagementUrl(PROJECT_DETAIL.getProject())).thenReturn(SERVICE_LOGIN_URL);
+
   }
 
   @Test
