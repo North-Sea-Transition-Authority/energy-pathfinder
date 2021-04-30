@@ -86,7 +86,7 @@ public class SearchSelectorService {
   }
 
   public static String route(Object methodCall) {
-    return StringUtils.removeEnd(ReverseRouter.route(methodCall), "?term");
+    return StringUtils.stripEnd(ReverseRouter.route(methodCall), "?term");
   }
 
   /**
