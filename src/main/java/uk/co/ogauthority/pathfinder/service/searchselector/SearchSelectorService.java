@@ -24,6 +24,8 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 @Service
 public class SearchSelectorService {
 
+  protected static final String SEARCH_TERM_PARAM_NAME = "term";
+
   public List<RestSearchItem> search(String searchQuery, Collection<? extends SearchSelectable> selectableList) {
     return search(searchQuery, selectableList, true);
   }
@@ -86,7 +88,7 @@ public class SearchSelectorService {
   }
 
   public static String route(Object methodCall) {
-    return StringUtils.stripEnd(ReverseRouter.route(methodCall), "?term");
+    return StringUtils.removeEnd(ReverseRouter.route(methodCall), "?" + SEARCH_TERM_PARAM_NAME);
   }
 
   /**
