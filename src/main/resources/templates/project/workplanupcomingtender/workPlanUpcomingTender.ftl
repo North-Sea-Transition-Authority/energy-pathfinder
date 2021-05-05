@@ -10,12 +10,12 @@
       preselectedItems=preSelectedFunction!{}
     />
     <@fdsTextarea.textarea path="form.descriptionOfWork" labelText="Provide a detailed description of the work"/>
-    <@fdsDateInput.dateInput
-      dayPath="form.estimatedTenderDate.day"
-      monthPath="form.estimatedTenderDate.month"
-      yearPath="form.estimatedTenderDate.year"
-      labelText="Estimated tender date"
-      formId="estimatedTenderDate-day-month-year"
+    <@quarterYear.standardQuarterYearInput
+      quarterYearInputPath="form.estimatedTenderStartDate"
+      legendHeading="What is the estimated tender date?"
+      quarterOptions=quarters
+      formId="estimatedTenderStartDate"
+      hintText=""
     />
     <@fdsRadio.radio
       labelText="Contract band"

@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,10 +17,11 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
+import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
-import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
+import uk.co.ogauthority.pathfinder.model.form.validation.quarteryear.QuarterYearInputValidator;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
 
@@ -29,7 +29,7 @@ import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
 public class WorkPlanUpcomingTenderFormValidatorTest {
 
   @Mock
-  private DateInputValidator dateInputValidator;
+  private QuarterYearInputValidator quarterYearInputValidator;
 
   private static final String INVALID_CONTRACT_DURATION_PREFIX = WorkPlanUpcomingTenderFormValidator.INVALID_CONTRACT_DURATION_PREFIX;
   private static final String INVALID_CONTRACT_DURATION_ERROR_CODE = WorkPlanUpcomingTenderFormValidator.INVALID_CONTRACT_DURATION_ERROR_CODE;
@@ -38,9 +38,9 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
 
   @Before
   public void setUp() {
-    validator = new WorkPlanUpcomingTenderFormValidator(dateInputValidator);
-    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any());
-    when(dateInputValidator.supports(any())).thenReturn(true);
+    validator = new WorkPlanUpcomingTenderFormValidator(quarterYearInputValidator);
+    doCallRealMethod().when(quarterYearInputValidator).validate(any(), any(), any());
+    when(quarterYearInputValidator.supports(any())).thenReturn(true);
   }
 
   @Test
@@ -60,13 +60,12 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
   @Test
   public void validate_whenFullValidationAndNullTenderDate_thenErrors() {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
-    form.setEstimatedTenderDate(new ThreeFieldDateInput(null));
+    form.setEstimatedTenderStartDate(new QuarterYearInput(null, null));
     var fieldErrors = validateFormAndGetErrors(form, ValidationType.FULL);
     assertEstimatedTenderDateFieldErrorCodesAndMessages(
         fieldErrors,
-        DateInputValidator.DAY_INVALID_CODE,
-        DateInputValidator.MONTH_INVALID_CODE,
-        DateInputValidator.YEAR_INVALID_CODE,
+        QuarterYearInputValidator.QUARTER_INVALID_CODE,
+        QuarterYearInputValidator.YEAR_INVALID_CODE,
         "Enter an " + WorkPlanUpcomingTenderValidationHint.ESTIMATED_TENDER_LABEL.getLabel() + " "
     );
   }
@@ -74,45 +73,31 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
   @Test
   public void validate_whenPartialValidationAndNullTenderDate_thenNoErrors() {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
-    form.setEstimatedTenderDate(new ThreeFieldDateInput(null));
+    form.setEstimatedTenderStartDate(new QuarterYearInput(null, null));
     var fieldErrors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
     assertBindingResultHasNoErrors(fieldErrors);
   }
 
   @Test
-  public void validate_whenFullValidationAndTenderDateInPast_thenErrors() {
+  public void validate_whenFullValidationAndTenderDateInPast_thenNoErrors() {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
-    form.setEstimatedTenderDate(new ThreeFieldDateInput(LocalDate.now().minusDays(1L)));
+    form.setEstimatedTenderStartDate(new QuarterYearInput(Quarter.Q1, "2020"));
     var fieldErrors = validateFormAndGetErrors(form, ValidationType.FULL);
-    assertEstimatedTenderDateFieldErrorCodesAndMessages(
-        fieldErrors,
-        DateInputValidator.DAY_AFTER_DATE_CODE,
-        DateInputValidator.MONTH_AFTER_DATE_CODE,
-        DateInputValidator.YEAR_AFTER_DATE_CODE,
-        WorkPlanUpcomingTenderValidationHint.ESTIMATED_TENDER_LABEL.getInitCappedLabel()
-            + " must be after " + WorkPlanUpcomingTenderValidationHint.DATE_ERROR_LABEL
-    );
+    assertThat(fieldErrors.hasErrors()).isFalse();
   }
 
   @Test
-  public void validate_whenPartialValidationAndTenderDateInPast_thenErrors() {
+  public void validate_whenPartialValidationAndTenderDateInPast_thenNoErrors() {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
-    form.setEstimatedTenderDate(new ThreeFieldDateInput(LocalDate.now().minusDays(1L)));
+    form.setEstimatedTenderStartDate(new QuarterYearInput(Quarter.Q1, "2020"));
     var fieldErrors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
-    assertEstimatedTenderDateFieldErrorCodesAndMessages(
-        fieldErrors,
-        DateInputValidator.DAY_AFTER_DATE_CODE,
-        DateInputValidator.MONTH_AFTER_DATE_CODE,
-        DateInputValidator.YEAR_AFTER_DATE_CODE,
-        WorkPlanUpcomingTenderValidationHint.ESTIMATED_TENDER_LABEL.getInitCappedLabel()
-            + " must be after " + WorkPlanUpcomingTenderValidationHint.DATE_ERROR_LABEL
-    );
+    assertThat(fieldErrors.hasErrors()).isFalse();
   }
 
   @Test
   public void validate_whenFullValidationAndTenderDateInFuture_thenNoErrors() {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
-    form.setEstimatedTenderDate(new ThreeFieldDateInput(LocalDate.now().plusDays(1L)));
+    form.setEstimatedTenderStartDate(new QuarterYearInput(Quarter.Q1, "2030"));
     var fieldErrors = validateFormAndGetErrors(form, ValidationType.FULL);
     assertBindingResultHasNoErrors(fieldErrors);
   }
@@ -120,7 +105,7 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
   @Test
   public void validate_whenPartialValidationAndTenderDateInFuture_thenNoErrors() {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
-    form.setEstimatedTenderDate(new ThreeFieldDateInput(LocalDate.now().plusDays(1L)));
+    form.setEstimatedTenderStartDate(new QuarterYearInput(Quarter.Q1, "2030"));
     var fieldErrors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
     assertBindingResultHasNoErrors(fieldErrors);
   }
@@ -274,22 +259,19 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
   }
 
   private void assertEstimatedTenderDateFieldErrorCodesAndMessages(BeanPropertyBindingResult errors,
-                                                                   String expectedDayErrorCode,
-                                                                   String expectedMonthErrorCode,
+                                                                   String expectedQuarterErrorCode,
                                                                    String expectedYearErrorCode,
-                                                                   String expectedDayErrorMessage) {
+                                                                   String expectedQuarterErrorMessage) {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
     assertThat(fieldErrors).containsExactly(
-        entry("estimatedTenderDate.day", Set.of(expectedDayErrorCode)),
-        entry("estimatedTenderDate.month", Set.of(expectedMonthErrorCode)),
-        entry("estimatedTenderDate.year", Set.of(expectedYearErrorCode))
+        entry("estimatedTenderStartDate.quarter", Set.of(expectedQuarterErrorCode)),
+        entry("estimatedTenderStartDate.year", Set.of(expectedYearErrorCode))
     );
     assertThat(fieldErrorMessages).contains(
-        entry("estimatedTenderDate.day", Set.of(expectedDayErrorMessage)),
-        entry("estimatedTenderDate.month", Set.of("")),
-        entry("estimatedTenderDate.year", Set.of(""))
+        entry("estimatedTenderStartDate.quarter", Set.of(expectedQuarterErrorMessage)),
+        entry("estimatedTenderStartDate.year", Set.of(""))
     );
   }
 

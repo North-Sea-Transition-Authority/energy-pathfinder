@@ -16,6 +16,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.controller.rest.WorkPlanUpcomingTenderRestController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
@@ -77,7 +78,8 @@ public class WorkPlanUpcomingTenderModelServiceTest {
         entry("contractTermPeriodDays", DurationPeriod.getEntryAsMap(DurationPeriod.DAYS)),
         entry("contractTermPeriodWeeks", DurationPeriod.getEntryAsMap(DurationPeriod.WEEKS)),
         entry("contractTermPeriodMonths", DurationPeriod.getEntryAsMap(DurationPeriod.MONTHS)),
-        entry("contractTermPeriodYears", DurationPeriod.getEntryAsMap(DurationPeriod.YEARS))
+        entry("contractTermPeriodYears", DurationPeriod.getEntryAsMap(DurationPeriod.YEARS)),
+        entry("quarters", Quarter.getAllAsMap())
     );
 
     verify(breadcrumbService, times(1)).fromWorkPlanUpcomingTenders(

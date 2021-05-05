@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender;
 
-import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,6 +8,7 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
+import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
@@ -27,7 +27,10 @@ public class WorkPlanUpcomingTender extends ProjectDetailEntity implements Conta
   @Column(name = "description_of_work", columnDefinition = "CLOB")
   private String descriptionOfWork;
 
-  private LocalDate estimatedTenderDate;
+  @Enumerated(EnumType.STRING)
+  private Quarter estimatedTenderDateQuarter;
+
+  private Integer estimatedTenderDateYear;
 
   private String contactName;
 
@@ -76,12 +79,20 @@ public class WorkPlanUpcomingTender extends ProjectDetailEntity implements Conta
     this.descriptionOfWork = descriptionOfWork;
   }
 
-  public LocalDate getEstimatedTenderDate() {
-    return estimatedTenderDate;
+  public Quarter getEstimatedTenderDateQuarter() {
+    return estimatedTenderDateQuarter;
   }
 
-  public void setEstimatedTenderDate(LocalDate estimatedTenderDate) {
-    this.estimatedTenderDate = estimatedTenderDate;
+  public void setEstimatedTenderDateQuarter(Quarter estimatedTenderDateQuarter) {
+    this.estimatedTenderDateQuarter = estimatedTenderDateQuarter;
+  }
+
+  public Integer getEstimatedTenderDateYear() {
+    return estimatedTenderDateYear;
+  }
+
+  public void setEstimatedTenderDateYear(Integer estimatedTenderDateYear) {
+    this.estimatedTenderDateYear = estimatedTenderDateYear;
   }
 
   public String getContactName() {

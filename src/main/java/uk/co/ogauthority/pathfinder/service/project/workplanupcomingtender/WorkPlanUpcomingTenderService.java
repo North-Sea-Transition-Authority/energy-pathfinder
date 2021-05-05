@@ -15,7 +15,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderValidationHint;
@@ -83,7 +83,13 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
       form.setDepartmentType(SearchSelectorService.getValueWithManualEntryPrefix(workPlanUpcomingTender.getManualDepartmentType()));
     }
 
-    form.setEstimatedTenderDate(new ThreeFieldDateInput(workPlanUpcomingTender.getEstimatedTenderDate()));
+    form.setEstimatedTenderStartDate(new QuarterYearInput(
+        workPlanUpcomingTender.getEstimatedTenderDateQuarter(),
+        workPlanUpcomingTender.getEstimatedTenderDateYear() != null
+            ? Integer.toString(workPlanUpcomingTender.getEstimatedTenderDateYear())
+            : null
+        )
+    );
     form.setDescriptionOfWork(workPlanUpcomingTender.getDescriptionOfWork());
     form.setContractBand(workPlanUpcomingTender.getContractBand());
     form.setContactDetail(new ContactDetailForm(workPlanUpcomingTender));
@@ -121,7 +127,12 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     );
 
     upcomingTender.setDescriptionOfWork(form.getDescriptionOfWork());
-    upcomingTender.setEstimatedTenderDate(form.getEstimatedTenderDate().createDateOrNull());
+    upcomingTender.setEstimatedTenderDateQuarter(form.getEstimatedTenderStartDate().getQuarter());
+    upcomingTender.setEstimatedTenderDateYear(
+        form.getEstimatedTenderStartDate() != null && form.getEstimatedTenderStartDate().getYear() != null
+            ? Integer.parseInt(form.getEstimatedTenderStartDate().getYear())
+            : null
+    );
     upcomingTender.setContractBand(form.getContractBand());
 
     var contactDetailsForm = form.getContactDetail();

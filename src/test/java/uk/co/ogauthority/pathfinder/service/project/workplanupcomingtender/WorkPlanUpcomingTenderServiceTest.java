@@ -22,6 +22,7 @@ import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
@@ -227,7 +228,8 @@ public class WorkPlanUpcomingTenderServiceTest {
 
   private void checkCommonFields(WorkPlanUpcomingTenderForm form, WorkPlanUpcomingTender newUpcomingTender) {
     assertThat(newUpcomingTender.getDescriptionOfWork()).isEqualTo(WorkPlanUpcomingTenderUtil.DESCRIPTION_OF_WORK);
-    assertThat(newUpcomingTender.getEstimatedTenderDate()).isEqualTo(form.getEstimatedTenderDate().createDateOrNull());
+    assertThat(newUpcomingTender.getEstimatedTenderDateQuarter()).isEqualTo(WorkPlanUpcomingTenderUtil.ESTIMATED_TENDER_QUARTER);
+    assertThat(newUpcomingTender.getEstimatedTenderDateYear()).isEqualTo(WorkPlanUpcomingTenderUtil.ESTIMATED_TENDER_YEAR);
     assertThat(newUpcomingTender.getContractBand()).isEqualTo(WorkPlanUpcomingTenderUtil.CONTRACT_BAND);
     assertThat(newUpcomingTender.getContactName()).isEqualTo(WorkPlanUpcomingTenderUtil.CONTACT_NAME);
     assertThat(newUpcomingTender.getPhoneNumber()).isEqualTo(WorkPlanUpcomingTenderUtil.PHONE_NUMBER);
@@ -237,7 +239,7 @@ public class WorkPlanUpcomingTenderServiceTest {
 
   private void checkCommonFormFields(WorkPlanUpcomingTenderForm form, WorkPlanUpcomingTender upcomingTender) {
     assertThat(form.getDescriptionOfWork()).isEqualTo(upcomingTender.getDescriptionOfWork());
-    assertThat(form.getEstimatedTenderDate().createDateOrNull()).isEqualTo(upcomingTender.getEstimatedTenderDate());
+    assertThat(form.getEstimatedTenderStartDate().createOrNull()).isEqualTo(new QuarterYearInput(upcomingTender.getEstimatedTenderDateQuarter(), String.valueOf(upcomingTender.getEstimatedTenderDateYear())));
     assertThat(form.getContractBand()).isEqualTo(upcomingTender.getContractBand());
     assertThat(form.getContactDetail().getName()).isEqualTo(upcomingTender.getContactName());
     assertThat(form.getContactDetail().getPhoneNumber()).isEqualTo(upcomingTender.getPhoneNumber());

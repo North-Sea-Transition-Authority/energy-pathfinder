@@ -280,7 +280,7 @@ public class WorkPlanUpcomingTenderViewUtilTest {
       int displayOrder
   ) {
     assertThat(upcomingTenderView.getDescriptionOfWork()).isEqualTo(upcomingTender.getDescriptionOfWork());
-    assertThat(upcomingTenderView.getEstimatedTenderDate()).isEqualTo(DateUtil.formatDate(upcomingTender.getEstimatedTenderDate()));
+    assertThat(upcomingTenderView.getEstimatedTenderStartDate()).isEqualTo(DateUtil.getDateFromQuarterYear(upcomingTender.getEstimatedTenderDateQuarter(), upcomingTender.getEstimatedTenderDateYear()));
     assertThat(upcomingTenderView.getContactName()).isEqualTo(upcomingTender.getName());
     assertThat(upcomingTenderView.getContactPhoneNumber()).isEqualTo(upcomingTender.getPhoneNumber());
     assertThat(upcomingTenderView.getContactEmailAddress()).isEqualTo(upcomingTender.getEmailAddress());
