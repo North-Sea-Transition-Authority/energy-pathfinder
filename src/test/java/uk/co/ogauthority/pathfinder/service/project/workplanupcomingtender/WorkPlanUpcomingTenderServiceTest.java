@@ -217,6 +217,18 @@ public class WorkPlanUpcomingTenderServiceTest {
     );
   }
 
+  @Test
+  public void createUpcomingTender_whenEmptyForm() {
+    var form = WorkPlanUpcomingTenderUtil.getEmptyForm();
+
+    var upcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
+        projectDetail,
+        form
+    );
+    assertThat(upcomingTender.getProjectDetail()).isEqualTo(projectDetail);
+    checkAllFieldsAreNull(upcomingTender);
+  }
+
   private void assertExpectedContractTermDurationAndPeriod(WorkPlanUpcomingTender upcomingTender,
                                                            WorkPlanUpcomingTenderForm form,
                                                            DurationPeriod expectedContractTermDurationPeriod,
@@ -226,20 +238,9 @@ public class WorkPlanUpcomingTenderServiceTest {
     checkCommonFields(form, upcomingTender);
   }
 
-  private void checkCommonFields(WorkPlanUpcomingTenderForm form, WorkPlanUpcomingTender newUpcomingTender) {
-    assertThat(newUpcomingTender.getDescriptionOfWork()).isEqualTo(WorkPlanUpcomingTenderUtil.DESCRIPTION_OF_WORK);
-    assertThat(newUpcomingTender.getEstimatedTenderDateQuarter()).isEqualTo(WorkPlanUpcomingTenderUtil.ESTIMATED_TENDER_QUARTER);
-    assertThat(newUpcomingTender.getEstimatedTenderDateYear()).isEqualTo(WorkPlanUpcomingTenderUtil.ESTIMATED_TENDER_YEAR);
-    assertThat(newUpcomingTender.getContractBand()).isEqualTo(WorkPlanUpcomingTenderUtil.CONTRACT_BAND);
-    assertThat(newUpcomingTender.getContactName()).isEqualTo(WorkPlanUpcomingTenderUtil.CONTACT_NAME);
-    assertThat(newUpcomingTender.getPhoneNumber()).isEqualTo(WorkPlanUpcomingTenderUtil.PHONE_NUMBER);
-    assertThat(newUpcomingTender.getJobTitle()).isEqualTo(WorkPlanUpcomingTenderUtil.JOB_TITLE);
-    assertThat(newUpcomingTender.getEmailAddress()).isEqualTo(WorkPlanUpcomingTenderUtil.EMAIL);
-  }
-
-  private void checkCommonFormFields(WorkPlanUpcomingTenderForm form, WorkPlanUpcomingTender upcomingTender) {
+  private void checkCommonFields(WorkPlanUpcomingTenderForm form, WorkPlanUpcomingTender upcomingTender) {
     assertThat(form.getDescriptionOfWork()).isEqualTo(upcomingTender.getDescriptionOfWork());
-    assertThat(form.getEstimatedTenderStartDate().createOrNull()).isEqualTo(new QuarterYearInput(upcomingTender.getEstimatedTenderDateQuarter(), String.valueOf(upcomingTender.getEstimatedTenderDateYear())));
+    assertThat(form.getEstimatedTenderStartDate()).isEqualTo(new QuarterYearInput(upcomingTender.getEstimatedTenderDateQuarter(), String.valueOf(upcomingTender.getEstimatedTenderDateYear())));
     assertThat(form.getContractBand()).isEqualTo(upcomingTender.getContractBand());
     assertThat(form.getContactDetail().getName()).isEqualTo(upcomingTender.getContactName());
     assertThat(form.getContactDetail().getPhoneNumber()).isEqualTo(upcomingTender.getPhoneNumber());
@@ -247,11 +248,26 @@ public class WorkPlanUpcomingTenderServiceTest {
     assertThat(form.getContactDetail().getEmailAddress()).isEqualTo(upcomingTender.getEmailAddress());
   }
 
+  private void checkAllFieldsAreNull(WorkPlanUpcomingTender workPlanUpcomingTender) {
+    assertThat(workPlanUpcomingTender.getDepartmentType()).isNull();
+    assertThat(workPlanUpcomingTender.getManualDepartmentType()).isNull();
+    assertThat(workPlanUpcomingTender.getDescriptionOfWork()).isNull();
+    assertThat(workPlanUpcomingTender.getEstimatedTenderDateQuarter()).isNull();
+    assertThat(workPlanUpcomingTender.getEstimatedTenderDateYear()).isNull();
+    assertThat(workPlanUpcomingTender.getContactName()).isNull();
+    assertThat(workPlanUpcomingTender.getPhoneNumber()).isNull();
+    assertThat(workPlanUpcomingTender.getJobTitle()).isNull();
+    assertThat(workPlanUpcomingTender.getEmailAddress()).isNull();
+    assertThat(workPlanUpcomingTender.getContractBand()).isNull();
+    assertThat(workPlanUpcomingTender.getContractTermDuration()).isNull();
+    assertThat(workPlanUpcomingTender.getContractTermDurationPeriod()).isNull();
+ }
+
   @Test
   public void getForm_whenFromListDepartmentType_assertCorrectFormValue() {
     var form = workPlanUpcomingTenderService.getForm(upcomingTender);
     assertThat(form.getDepartmentType()).isEqualTo(upcomingTender.getDepartmentType().name());
-    checkCommonFormFields(form, upcomingTender);
+    checkCommonFields(form, upcomingTender);
   }
 
   @Test
@@ -259,7 +275,7 @@ public class WorkPlanUpcomingTenderServiceTest {
     var manualDepartment = WorkPlanUpcomingTenderUtil.getUpcomingTender_manualEntry(projectDetail);
     var form = workPlanUpcomingTenderService.getForm(manualDepartment);
     assertThat(form.getDepartmentType()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(manualDepartment.getManualDepartmentType()));
-    checkCommonFormFields(form, upcomingTender);
+    checkCommonFields(form, upcomingTender);
   }
 
   @Test
@@ -456,6 +472,15 @@ public class WorkPlanUpcomingTenderServiceTest {
     assertThat(existingUpcomingTender.getProjectDetail()).isEqualTo(projectDetail);
     assertThat(existingUpcomingTender.getManualDepartmentType()).isEqualTo(SearchSelectorService.removePrefix(UpcomingTenderUtil.MANUAL_TENDER_FUNCTION));
     checkCommonFields(form, existingUpcomingTender);
+  }
+
+  @Test
+  public void updateUpcomingTender_whenEmptyForm() {
+    var form = WorkPlanUpcomingTenderUtil.getEmptyForm();
+    var existingUpcomingTender = upcomingTender;
+    workPlanUpcomingTenderService.updateUpcomingTender(existingUpcomingTender, form);
+    assertThat(existingUpcomingTender.getProjectDetail()).isEqualTo(projectDetail);
+    checkAllFieldsAreNull(existingUpcomingTender);
   }
 
   @Test

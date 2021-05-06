@@ -6,6 +6,7 @@ import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
+import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
@@ -42,6 +43,13 @@ public class WorkPlanUpcomingTenderUtil {
     var form = new WorkPlanUpcomingTenderForm();
     form.setDepartmentType(MANUAL_TENDER_DEPARTMENT);
     setUpcomingTenderFields(form);
+    return form;
+  }
+
+  public static WorkPlanUpcomingTenderForm getEmptyForm() {
+    var form = new WorkPlanUpcomingTenderForm();
+    form.setEstimatedTenderStartDate(new QuarterYearInput(null, null));
+    form.setContactDetail(new ContactDetailForm());
     return form;
   }
 

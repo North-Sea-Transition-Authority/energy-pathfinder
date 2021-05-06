@@ -127,7 +127,11 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     );
 
     upcomingTender.setDescriptionOfWork(form.getDescriptionOfWork());
-    upcomingTender.setEstimatedTenderDateQuarter(form.getEstimatedTenderStartDate().getQuarter());
+    upcomingTender.setEstimatedTenderDateQuarter(
+        form.getEstimatedTenderStartDate() != null && form.getEstimatedTenderStartDate().getQuarter() != null
+            ? form.getEstimatedTenderStartDate().getQuarter()
+            : null
+    );
     upcomingTender.setEstimatedTenderDateYear(
         form.getEstimatedTenderStartDate() != null && form.getEstimatedTenderStartDate().getYear() != null
             ? Integer.parseInt(form.getEstimatedTenderStartDate().getYear())

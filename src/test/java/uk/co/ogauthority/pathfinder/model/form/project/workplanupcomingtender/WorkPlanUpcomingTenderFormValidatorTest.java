@@ -234,6 +234,24 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
     assertBindingResultHasNoErrors(errors);
   }
 
+  @Test
+  public void validate_whenEmptyFormAndPartialValidation_thenNoErrors() {
+    var form = WorkPlanUpcomingTenderUtil.getEmptyForm();
+
+    final var errors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
+
+    assertBindingResultHasNoErrors(errors);
+  }
+
+  @Test
+  public void validate_whenEmptyFormAndFullValidation_thenErrors() {
+    var form = WorkPlanUpcomingTenderUtil.getEmptyForm();
+
+    final var errors = validateFormAndGetErrors(form, ValidationType.FULL);
+
+    assertThat(errors.hasErrors()).isTrue();
+  }
+
   private WorkPlanUpcomingTenderForm getInvalidYearDurationForm() {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setContractTermDurationPeriod(DurationPeriod.YEARS);
