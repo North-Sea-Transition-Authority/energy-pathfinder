@@ -15,7 +15,6 @@
       legendHeading="What is the estimated tender date?"
       quarterOptions=quarters
       formId="estimatedTenderStartDate"
-      hintText=""
     />
     <@fdsRadio.radio
       labelText="Contract band"

@@ -18,7 +18,7 @@ public class WorkPlanUpcomingTenderValidationHint {
     this.emptyQuarterYearAcceptableHint = new EmptyQuarterYearAcceptableHint();
   }
 
-  public Object[] getTenderQuarterValidationHints() {
+  public Object[] getEstimatedTenderDateHint() {
     var hints = new ArrayList<>();
     hints.add(ESTIMATED_TENDER_LABEL);
     addEmptyQuarterYearAcceptableHint(hints, validationType);

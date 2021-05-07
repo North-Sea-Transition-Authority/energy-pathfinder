@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -97,7 +98,11 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
   @Test
   public void validate_whenFullValidationAndTenderDateInFuture_thenNoErrors() {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
-    form.setEstimatedTenderStartDate(new QuarterYearInput(Quarter.Q1, "2030"));
+    final var quarterYearInFuture = new QuarterYearInput(
+        Quarter.Q1,
+        String.valueOf(LocalDate.now().plusYears(1).getYear())
+    );
+    form.setEstimatedTenderStartDate(quarterYearInFuture);
     var fieldErrors = validateFormAndGetErrors(form, ValidationType.FULL);
     assertBindingResultHasNoErrors(fieldErrors);
   }
@@ -105,8 +110,11 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
   @Test
   public void validate_whenPartialValidationAndTenderDateInFuture_thenNoErrors() {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
-    form.setEstimatedTenderStartDate(new QuarterYearInput(Quarter.Q1, "2030"));
-    var fieldErrors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
+    final var quarterYearInFuture = new QuarterYearInput(
+        Quarter.Q1,
+        String.valueOf(LocalDate.now().plusYears(1).getYear())
+    );
+    form.setEstimatedTenderStartDate(quarterYearInFuture);    var fieldErrors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
     assertBindingResultHasNoErrors(fieldErrors);
   }
 

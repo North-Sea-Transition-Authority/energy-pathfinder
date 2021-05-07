@@ -48,7 +48,7 @@ public class WorkPlanUpcomingTenderFormValidator implements SmartValidator {
         quarterYearInputValidator,
         "estimatedTenderStartDate",
         form.getEstimatedTenderStartDate(),
-        workPlanUpcomingTenderValidationHint.getTenderQuarterValidationHints()
+        workPlanUpcomingTenderValidationHint.getEstimatedTenderDateHint()
     );
 
     final var contractTermDurationPeriod = form.getContractTermDurationPeriod();
