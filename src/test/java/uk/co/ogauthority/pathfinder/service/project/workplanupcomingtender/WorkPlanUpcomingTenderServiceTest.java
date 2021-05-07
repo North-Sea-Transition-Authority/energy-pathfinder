@@ -404,6 +404,28 @@ public class WorkPlanUpcomingTenderServiceTest {
   }
 
   @Test
+  public void getUpcomingTendersForProjectAndVersion_whenNoneExist_thenEmptyList() {
+    when(workPlanUpcomingTenderRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(
+        projectDetail.getProject(),
+        projectDetail.getVersion()
+    )).thenReturn(List.of());
+    var upcomingTenders = workPlanUpcomingTenderService.getUpcomingTendersForProjectAndVersion(projectDetail.getProject(), projectDetail.getVersion());
+    assertThat(upcomingTenders).isEmpty();
+  }
+
+  @Test
+  public void getUpcomingTendersForProjectAndVersion_whenExist_thenReturnList() {
+    var upcomingTenderManualEntry = WorkPlanUpcomingTenderUtil.getUpcomingTender_manualEntry(projectDetail);
+    var upcomingTenders = List.of(upcomingTenderManualEntry, upcomingTender);
+    when(workPlanUpcomingTenderRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(
+        projectDetail.getProject(),
+        projectDetail.getVersion()
+    )).thenReturn(upcomingTenders);
+
+    assertThat(workPlanUpcomingTenderService.getUpcomingTendersForProjectAndVersion(projectDetail.getProject(), projectDetail.getVersion())).isEqualTo(upcomingTenders);
+  }
+
+  @Test
   public void findDepartmentTenderLikeWithManualEntry_withManualEntry() {
     var manualEntry = "manual entry";
     var results = workPlanUpcomingTenderService.findDepartmentTenderLikeWithManualEntry(manualEntry);
