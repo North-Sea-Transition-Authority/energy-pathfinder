@@ -5,9 +5,11 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.controller.project.CancelDraftProjectVersionController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 
 @Service
 public class TaskListService {
@@ -16,9 +18,13 @@ public class TaskListService {
 
   private final TaskListGroupsService taskListGroupsService;
 
+  private final ServiceProperties serviceProperties;
+
   @Autowired
-  public TaskListService(TaskListGroupsService taskListGroupsService) {
+  public TaskListService(TaskListGroupsService taskListGroupsService,
+                         ServiceProperties serviceProperties) {
     this.taskListGroupsService = taskListGroupsService;
+    this.serviceProperties = serviceProperties;
   }
 
   public ModelAndView getTaskListModelAndView(ProjectDetail detail) {
@@ -26,6 +32,15 @@ public class TaskListService {
         .addObject("isUpdate", !detail.isFirstVersion())
         .addObject("groups", taskListGroupsService.getTaskListGroups(detail))
         .addObject("cancelDraftUrl", ReverseRouter.route(on(CancelDraftProjectVersionController.class)
-            .getCancelDraft(detail.getProject().getId(), null, null)));
+            .getCancelDraft(detail.getProject().getId(), null, null))
+        )
+        .addObject("taskListPageHeading", getTaskListPageHeading(detail))
+        .addObject("projectTypeDisplayName", ProjectService.getProjectTypeDisplayNameLowercase(detail));
+  }
+
+  private String getTaskListPageHeading(ProjectDetail projectDetail) {
+    return (ProjectService.isInfrastructureProject(projectDetail))
+        ? String.format("%s %s", serviceProperties.getServiceName(), ProjectService.getProjectTypeDisplayNameLowercase(projectDetail))
+        : ProjectService.getProjectTypeDisplayName(projectDetail);
   }
 }
