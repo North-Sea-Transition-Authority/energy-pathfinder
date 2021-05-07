@@ -87,6 +87,8 @@ public class SubmitProjectService {
         )
         .addObject("taskListUrl", ControllerUtils.getBackToTaskListUrl(projectId));
 
+    ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, projectDetail);
+
     return modelAndView;
   }
 
@@ -100,6 +102,8 @@ public class SubmitProjectService {
         .addObject("isUpdate", !projectDetail.isFirstVersion())
         .addObject("projectSubmissionSummaryView", projectSubmissionSummaryView)
         .addObject("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)));
+
+    ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, projectDetail);
 
     return modelAndView;
   }

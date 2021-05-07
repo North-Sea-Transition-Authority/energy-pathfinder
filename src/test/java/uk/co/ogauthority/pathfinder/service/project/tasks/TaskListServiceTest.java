@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.view.tasks.TaskListGroup;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.TaskListTestUtil;
 
@@ -102,7 +103,14 @@ public class TaskListServiceTest {
         entry("cancelDraftUrl", ReverseRouter.route(on(CancelDraftProjectVersionController.class)
             .getCancelDraft(projectDetail.getProject().getId(), null, null))),
         entry("taskListPageHeading", getExpectedTaskListHeading(projectDetail)),
-        entry("projectTypeDisplayName", ProjectService.getProjectTypeDisplayNameLowercase(projectDetail))
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
+            ProjectService.getProjectTypeDisplayName(projectDetail)
+        ),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR,
+            ProjectService.getProjectTypeDisplayNameLowercase(projectDetail)
+        )
     );
   }
 

@@ -10,6 +10,7 @@ import uk.co.ogauthority.pathfinder.controller.project.CancelDraftProjectVersion
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 
 @Service
 public class TaskListService {
@@ -28,14 +29,18 @@ public class TaskListService {
   }
 
   public ModelAndView getTaskListModelAndView(ProjectDetail detail) {
-    return new ModelAndView(TASK_LIST_TEMPLATE_PATH)
+
+    var modelAndView = new ModelAndView(TASK_LIST_TEMPLATE_PATH)
         .addObject("isUpdate", !detail.isFirstVersion())
         .addObject("groups", taskListGroupsService.getTaskListGroups(detail))
         .addObject("cancelDraftUrl", ReverseRouter.route(on(CancelDraftProjectVersionController.class)
             .getCancelDraft(detail.getProject().getId(), null, null))
         )
-        .addObject("taskListPageHeading", getTaskListPageHeading(detail))
-        .addObject("projectTypeDisplayName", ProjectService.getProjectTypeDisplayNameLowercase(detail));
+        .addObject("taskListPageHeading", getTaskListPageHeading(detail));
+
+    ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, detail);
+
+    return modelAndView;
   }
 
   private String getTaskListPageHeading(ProjectDetail projectDetail) {

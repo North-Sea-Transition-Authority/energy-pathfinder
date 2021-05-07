@@ -3,7 +3,7 @@
 <#if isUpdate>
   <#assign cancelDraftLinkText = "Cancel draft update">
 <#else>
-  <#assign cancelDraftLinkText = "Cancel draft ${projectTypeDisplayName}">
+  <#assign cancelDraftLinkText = "Cancel draft ${projectTypeDisplayNameLowercase}">
 </#if>
 
 <#assign pageTitle = taskListPageHeading />
