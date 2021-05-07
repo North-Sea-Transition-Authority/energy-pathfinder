@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.co.ogauthority.pathfinder.controller.rest.DevUkRestController;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.searchselector.ManualEntryAttribute;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
@@ -131,9 +130,26 @@ public class SearchSelectorServiceTest {
 
   @Test
   public void route() {
-    var routeOn = on(DevUkRestController.class).searchFields(null);
+    var routeOn = on(SearchSelectorTestController.class).getWithTermParam(null);
     var route = SearchSelectorService.route(routeOn);
-    assertThat(route).doesNotEndWith("term");
+    assertThat(route).doesNotEndWith(SearchSelectorService.SEARCH_TERM_PARAM_NAME);
+  }
+
+  /**
+   * There was previously a bug which stripped any matching characters in SearchSelectorService.route off of the end
+   * of the string instead of removing the entire string off of the end.
+   * This meant that any urls ending with any of the characters would also get removed.
+   * This is a smoke test to ensure this bug is never reintroduced.
+   */
+  @Test
+  public void route_whenRouteEndsIn() {
+    var searchTermCharacters = SearchSelectorService.SEARCH_TERM_PARAM_NAME.toCharArray();
+    for (char character : searchTermCharacters) {
+      var characterToTest = String.valueOf(character);
+      var routeOn = on(SearchSelectorTestController.class).getUrlEndsWith(characterToTest, null);
+      var returnedRoute = SearchSelectorService.route(routeOn);
+      assertThat(returnedRoute).isEqualTo("/ends-with-" + characterToTest);
+    }
   }
 
   @Test

@@ -41,9 +41,11 @@ public class ErrorService {
   }
 
   private void addErrorReference(ModelAndView modelAndView, Throwable throwable) {
-    var errorReference = getErrorReference();
-    modelAndView.addObject("errorRef", errorReference);
-    LOGGER.error("Caught unhandled exception (errorRef {})", errorReference, throwable);
+    if (throwable != null) {
+      var errorReference = getErrorReference();
+      modelAndView.addObject("errorRef", errorReference);
+      LOGGER.error("Caught unhandled exception (errorRef {})", errorReference, throwable);
+    }
   }
 
   private void addTechnicalSupportContactDetails(ModelAndView modelAndView) {
@@ -55,8 +57,10 @@ public class ErrorService {
   }
 
   public ModelAndView addErrorAttributesToModel(ModelAndView modelAndView, Throwable throwable) {
-    addStackTraceToModel(modelAndView, throwable);
-    addErrorReference(modelAndView, throwable);
+    if (throwable != null) {
+      addStackTraceToModel(modelAndView, throwable);
+      addErrorReference(modelAndView, throwable);
+    }
     addTechnicalSupportContactDetails(modelAndView);
     addServiceProperties(modelAndView);
     footerService.addFooterUrlsToModelAndView(modelAndView);
