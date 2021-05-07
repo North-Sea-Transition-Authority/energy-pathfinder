@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -109,6 +110,13 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
 
   public List<WorkPlanUpcomingTender> getUpcomingTendersForDetail(ProjectDetail projectDetail) {
     return workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail);
+  }
+
+  public List<WorkPlanUpcomingTender> getUpcomingTendersForProjectAndVersion(Project project, Integer version) {
+    return workPlanUpcomingTenderRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(
+        project,
+        version
+    );
   }
 
   private void setCommonFields(WorkPlanUpcomingTender upcomingTender, WorkPlanUpcomingTenderForm form) {
