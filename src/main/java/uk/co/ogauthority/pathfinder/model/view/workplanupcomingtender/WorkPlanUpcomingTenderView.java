@@ -10,7 +10,7 @@ public class WorkPlanUpcomingTenderView extends ContactDetailProjectSummaryItem 
 
   private String descriptionOfWork;
 
-  private String estimatedTenderDate;
+  private String estimatedTenderStartDate;
 
   private String contractBand;
 
@@ -40,12 +40,13 @@ public class WorkPlanUpcomingTenderView extends ContactDetailProjectSummaryItem 
     this.descriptionOfWork = descriptionOfWork;
   }
 
-  public String getEstimatedTenderDate() {
-    return estimatedTenderDate;
+  public String getEstimatedTenderStartDate() {
+    return estimatedTenderStartDate;
   }
 
-  public void setEstimatedTenderDate(String estimatedTenderDate) {
-    this.estimatedTenderDate = estimatedTenderDate;
+  public void setEstimatedTenderStartDate(
+      String estimatedTenderStartDate) {
+    this.estimatedTenderStartDate = estimatedTenderStartDate;
   }
 
   public String getContractBand() {
@@ -78,7 +79,7 @@ public class WorkPlanUpcomingTenderView extends ContactDetailProjectSummaryItem 
     WorkPlanUpcomingTenderView that = (WorkPlanUpcomingTenderView) o;
     return Objects.equals(tenderDepartment, that.tenderDepartment)
         && Objects.equals(descriptionOfWork, that.descriptionOfWork)
-        && Objects.equals(estimatedTenderDate, that.estimatedTenderDate)
+        && Objects.equals(estimatedTenderStartDate, that.estimatedTenderStartDate)
         && Objects.equals(contractBand, that.contractBand)
         && Objects.equals(contractLength, that.contractLength);
   }
@@ -89,7 +90,7 @@ public class WorkPlanUpcomingTenderView extends ContactDetailProjectSummaryItem 
         super.hashCode(),
         tenderDepartment,
         descriptionOfWork,
-        estimatedTenderDate,
+        estimatedTenderStartDate,
         contractBand,
         contractLength
     );

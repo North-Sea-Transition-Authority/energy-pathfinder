@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.positivewholenumber.PositiveWholeNumberGreaterThanZero;
@@ -19,7 +19,7 @@ public class WorkPlanUpcomingTenderForm {
   @NotEmpty(message = "Enter a description of the work", groups = FullValidation.class)
   private String descriptionOfWork;
 
-  private ThreeFieldDateInput estimatedTenderDate;
+  private QuarterYearInput estimatedTenderStartDate;
 
   @NotNull(message = "Select a contract band", groups = FullValidation.class)
   private WorkPlanUpcomingTenderContractBand contractBand;
@@ -70,13 +70,13 @@ public class WorkPlanUpcomingTenderForm {
     this.descriptionOfWork = descriptionOfWork;
   }
 
-  public ThreeFieldDateInput getEstimatedTenderDate() {
-    return estimatedTenderDate;
+  public QuarterYearInput getEstimatedTenderStartDate() {
+    return estimatedTenderStartDate;
   }
 
-  public void setEstimatedTenderDate(
-      ThreeFieldDateInput estimatedTenderDate) {
-    this.estimatedTenderDate = estimatedTenderDate;
+  public void setEstimatedTenderStartDate(
+      QuarterYearInput estimatedTenderStartDate) {
+    this.estimatedTenderStartDate = estimatedTenderStartDate;
   }
 
   public WorkPlanUpcomingTenderContractBand getContractBand() {

@@ -10,7 +10,7 @@ import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
-import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
+import uk.co.ogauthority.pathfinder.model.form.validation.quarteryear.QuarterYearInputValidator;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 
 @Component
@@ -19,11 +19,11 @@ public class WorkPlanUpcomingTenderFormValidator implements SmartValidator {
   protected static final String INVALID_CONTRACT_DURATION_PREFIX = "Enter the length of the contract in";
   protected static final String INVALID_CONTRACT_DURATION_ERROR_CODE = ".invalid";
 
-  private final DateInputValidator dateInputValidator;
+  private final QuarterYearInputValidator quarterYearInputValidator;
 
   @Autowired
-  public  WorkPlanUpcomingTenderFormValidator(DateInputValidator dateInputValidator) {
-    this.dateInputValidator = dateInputValidator;
+  public  WorkPlanUpcomingTenderFormValidator(QuarterYearInputValidator quarterYearInputValidator) {
+    this.quarterYearInputValidator = quarterYearInputValidator;
   }
 
   @Override
@@ -45,9 +45,9 @@ public class WorkPlanUpcomingTenderFormValidator implements SmartValidator {
 
     ValidationUtil.invokeNestedValidator(
         errors,
-        dateInputValidator,
-        "estimatedTenderDate",
-        form.getEstimatedTenderDate(),
+        quarterYearInputValidator,
+        "estimatedTenderStartDate",
+        form.getEstimatedTenderStartDate(),
         workPlanUpcomingTenderValidationHint.getEstimatedTenderDateHint()
     );
 

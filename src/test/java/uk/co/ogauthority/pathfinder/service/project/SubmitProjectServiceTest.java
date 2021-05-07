@@ -157,14 +157,12 @@ public class SubmitProjectServiceTest {
     final var projectDetail = PROJECT_DETAIL;
     projectDetail.setVersion(1);
 
-    final var projectId = projectDetail.getProject().getId();
-
     final var projectSummaryView = new ProjectSummaryView("test", List.of());
     when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
 
     final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail, true);
 
-    assertProjectSubmitSummaryModelAndView(projectId, modelAndView, false, true, projectSummaryView);
+    assertProjectSubmitSummaryModelAndView(projectDetail, modelAndView, false, true, projectSummaryView);
   }
 
   @Test
@@ -173,14 +171,12 @@ public class SubmitProjectServiceTest {
     final var projectDetail = PROJECT_DETAIL;
     projectDetail.setVersion(1);
 
-    final var projectId = projectDetail.getProject().getId();
-
     final var projectSummaryView = new ProjectSummaryView("test", List.of());
     when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
 
     final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail, false);
 
-    assertProjectSubmitSummaryModelAndView(projectId, modelAndView, false, false, projectSummaryView);
+    assertProjectSubmitSummaryModelAndView(projectDetail, modelAndView, false, false, projectSummaryView);
   }
 
   @Test
@@ -189,13 +185,11 @@ public class SubmitProjectServiceTest {
     final var projectDetail = PROJECT_DETAIL;
     projectDetail.setVersion(2);
 
-    final var projectId = projectDetail.getProject().getId();
-
     final var projectSummaryView = new ProjectSummaryView("test", List.of());
     when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
 
     final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail, true);
-    assertProjectSubmitSummaryModelAndView(projectId, modelAndView, true, true, projectSummaryView);
+    assertProjectSubmitSummaryModelAndView(projectDetail, modelAndView, true, true, projectSummaryView);
   }
 
   @Test
@@ -204,20 +198,21 @@ public class SubmitProjectServiceTest {
     final var projectDetail = PROJECT_DETAIL;
     projectDetail.setVersion(2);
 
-    final var projectId = projectDetail.getProject().getId();
-
     final var projectSummaryView = new ProjectSummaryView("test", List.of());
     when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
 
     final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail, false);
-    assertProjectSubmitSummaryModelAndView(projectId, modelAndView, true, false, projectSummaryView);
+    assertProjectSubmitSummaryModelAndView(projectDetail, modelAndView, true, false, projectSummaryView);
   }
 
-  private void assertProjectSubmitSummaryModelAndView(Integer projectId,
+  private void assertProjectSubmitSummaryModelAndView(ProjectDetail projectDetail,
                                                       ModelAndView modelAndView,
                                                       boolean isUpdate,
                                                       boolean isProjectValid,
                                                       ProjectSummaryView projectSummaryView) {
+
+    final var projectId = projectDetail.getProject().getId();
+
     assertThat(modelAndView.getModelMap()).containsExactly(
         entry("isUpdate", isUpdate),
         entry("isProjectValid", isProjectValid),
@@ -225,7 +220,15 @@ public class SubmitProjectServiceTest {
         entry("submitProjectUrl",
             ReverseRouter.route(on(SubmitProjectController.class).submitProject(projectId, null))
         ),
-        entry("taskListUrl", ControllerUtils.getBackToTaskListUrl(projectId))
+        entry("taskListUrl", ControllerUtils.getBackToTaskListUrl(projectId)),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
+            ProjectService.getProjectTypeDisplayName(projectDetail)
+        ),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR,
+            ProjectService.getProjectTypeDisplayNameLowercase(projectDetail)
+        )
     );
   }
 
@@ -243,7 +246,8 @@ public class SubmitProjectServiceTest {
     assertProjectSubmitConfirmationModelAndView(
         modelAndView,
         false,
-        projectSubmissionSummaryView
+        projectSubmissionSummaryView,
+        projectDetail
     );
   }
 
@@ -261,18 +265,28 @@ public class SubmitProjectServiceTest {
     assertProjectSubmitConfirmationModelAndView(
         modelAndView,
         true,
-        projectSubmissionSummaryView
+        projectSubmissionSummaryView,
+        projectDetail
     );
   }
 
   private void assertProjectSubmitConfirmationModelAndView(ModelAndView modelAndView,
                                                            boolean isUpdate,
-                                                           ProjectSubmissionSummaryView projectSubmissionSummaryView) {
+                                                           ProjectSubmissionSummaryView projectSubmissionSummaryView,
+                                                           ProjectDetail projectDetail) {
     assertThat(modelAndView.getViewName()).isEqualTo(SubmitProjectService.PROJECT_SUBMIT_CONFIRMATION_TEMPLATE_PATH);
     assertThat(modelAndView.getModelMap()).containsExactly(
         entry("isUpdate", isUpdate),
         entry("projectSubmissionSummaryView", projectSubmissionSummaryView),
-        entry("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
+        entry("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null))),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
+            ProjectService.getProjectTypeDisplayName(projectDetail)
+        ),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR,
+            ProjectService.getProjectTypeDisplayNameLowercase(projectDetail)
+        )
     );
   }
 }
