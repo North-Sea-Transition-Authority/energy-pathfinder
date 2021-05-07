@@ -1,36 +1,38 @@
 package uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.AfterDateHint;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.DateHint;
-import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.validationhint.EmptyQuarterYearAcceptableHint;
 
 public class WorkPlanUpcomingTenderValidationHint {
 
   public static final FormInputLabel ESTIMATED_TENDER_LABEL = new FormInputLabel("estimated tender date");
-  public static final String DATE_ERROR_LABEL = DateHint.TODAY_DATE_LABEL;
 
   private final ValidationType validationType;
-  private final AfterDateHint estimatedTenderDateHint;
+  private final EmptyQuarterYearAcceptableHint emptyQuarterYearAcceptableHint;
 
   public WorkPlanUpcomingTenderValidationHint(ValidationType validationType) {
     this.validationType = validationType;
-    this.estimatedTenderDateHint = new AfterDateHint(
-        ESTIMATED_TENDER_LABEL,
-        LocalDate.now(),
-        DATE_ERROR_LABEL
-    );
+    this.emptyQuarterYearAcceptableHint = new EmptyQuarterYearAcceptableHint();
   }
 
   public Object[] getEstimatedTenderDateHint() {
     var hints = new ArrayList<>();
-    hints.add(estimatedTenderDateHint);
     hints.add(ESTIMATED_TENDER_LABEL);
-    DateInputValidator.addEmptyDateAcceptableHint(validationType, hints);
+    addEmptyQuarterYearAcceptableHint(hints, validationType);
     return hints.toArray();
+  }
+
+  private void addEmptyQuarterYearAcceptableHint(List<Object> validationHints, ValidationType validationType) {
+    if (isPartialValidation(validationType)) {
+      validationHints.add(emptyQuarterYearAcceptableHint);
+    }
+  }
+
+  private boolean isPartialValidation(ValidationType validationType) {
+    return validationType.equals(ValidationType.PARTIAL);
   }
 
   protected ValidationType getValidationType() {
