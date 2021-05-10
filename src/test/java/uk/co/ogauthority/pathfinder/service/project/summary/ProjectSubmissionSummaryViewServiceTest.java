@@ -29,7 +29,8 @@ public class ProjectSubmissionSummaryViewServiceTest {
 
   @Before
   public void setup() {
-    projectSubmissionSummaryViewService = new ProjectSubmissionSummaryViewService(projectInformationService, webUserAccountService);
+    projectSubmissionSummaryViewService = new ProjectSubmissionSummaryViewService(projectInformationService, webUserAccountService,
+        projectOperatorService);
   }
 
   @Test
@@ -48,7 +49,7 @@ public class ProjectSubmissionSummaryViewServiceTest {
 
     var projectSubmissionSummaryView = projectSubmissionSummaryViewService.getProjectSubmissionSummaryView(projectDetail);
 
-    assertThat(projectSubmissionSummaryView.getProjectTitleOrOperator()).isEqualTo(projectInformation.getProjectTitle());
+    assertThat(projectSubmissionSummaryView.getProjectDisplayName()).isEqualTo(projectInformation.getProjectTitle());
     assertThat(projectSubmissionSummaryView.getFormattedSubmittedTimestamp()).isEqualTo(DateUtil.formatInstant(projectDetail.getSubmittedInstant()));
     assertThat(projectSubmissionSummaryView.getSubmittedBy()).isEqualTo(webUserAccount.getFullName());
   }

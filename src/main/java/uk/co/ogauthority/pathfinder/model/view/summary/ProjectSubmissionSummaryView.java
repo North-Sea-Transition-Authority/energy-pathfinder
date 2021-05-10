@@ -2,26 +2,26 @@ package uk.co.ogauthority.pathfinder.model.view.summary;
 
 public class ProjectSubmissionSummaryView {
 
-  private String projectTitleOrOperator;
+  private String projectDisplayName;
 
   private String formattedSubmittedTimestamp;
 
   private String submittedBy;
 
-  public ProjectSubmissionSummaryView(String projectTitleOrOperator,
+  public ProjectSubmissionSummaryView(String projectDisplayName,
                                       String formattedSubmittedTimestamp,
                                       String submittedBy) {
-    this.projectTitleOrOperator = projectTitleOrOperator;
+    this.projectDisplayName = projectDisplayName;
     this.formattedSubmittedTimestamp = formattedSubmittedTimestamp;
     this.submittedBy = submittedBy;
   }
 
-  public String getProjectTitleOrOperator() {
-    return projectTitleOrOperator;
+  public String getProjectDisplayName() {
+    return projectDisplayName;
   }
 
-  public void setProjectTitleOrOperator(String projectTitleOrOperator) {
-    this.projectTitleOrOperator = projectTitleOrOperator;
+  public void setProjectDisplayName(String projectDisplayName) {
+    this.projectDisplayName = projectDisplayName;
   }
 
   public String getFormattedSubmittedTimestamp() {
