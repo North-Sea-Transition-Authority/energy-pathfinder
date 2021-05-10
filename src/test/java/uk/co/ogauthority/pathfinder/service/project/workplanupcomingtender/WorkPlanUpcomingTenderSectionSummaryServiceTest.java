@@ -58,18 +58,26 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
 
   @Test
   public void getSummary() {
-    when(workPlanUpcomingTenderService.getUpcomingTendersForDetail(detail)).thenReturn(List.of(
-        WorkPlanUpcomingTenderUtil.getUpcomingTender(detail),
-        WorkPlanUpcomingTenderUtil.getUpcomingTender(detail)
-    ));
+    final var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(detail);
 
+    final var currentTenderList = List.of(
+        upcomingTender,
+        upcomingTender
+    );
+
+    when(workPlanUpcomingTenderService.getUpcomingTendersForDetail(detail)).thenReturn(currentTenderList);
     when(workPlanUpcomingTenderService.getUpcomingTendersForProjectAndVersion(
         detail.getProject(),
         detail.getVersion() - 1
-    )).thenReturn(List.of(
-        WorkPlanUpcomingTenderUtil.getUpcomingTender(detail),
-        WorkPlanUpcomingTenderUtil.getUpcomingTender(detail)
-    ));
+    )).thenReturn(currentTenderList);
+
+    final var previousTenderList = List.of(upcomingTender);
+
+    when(workPlanUpcomingTenderService.getUpcomingTendersForDetail(detail)).thenReturn(previousTenderList);
+    when(workPlanUpcomingTenderService.getUpcomingTendersForProjectAndVersion(
+        detail.getProject(),
+        detail.getVersion() - 1
+    )).thenReturn(previousTenderList);
 
     var sectionSummary = workPlanUpcomingTenderSectionSummaryService.getSummary(detail);
 

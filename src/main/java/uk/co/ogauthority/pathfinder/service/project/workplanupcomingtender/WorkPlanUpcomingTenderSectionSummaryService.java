@@ -37,7 +37,8 @@ public class WorkPlanUpcomingTenderSectionSummaryService implements ProjectSecti
   @Autowired
   public WorkPlanUpcomingTenderSectionSummaryService(
       WorkPlanUpcomingTenderService workPlanUpcomingTenderService,
-      DifferenceService differenceService) {
+      DifferenceService differenceService
+  ) {
     this.workPlanUpcomingTenderService = workPlanUpcomingTenderService;
     this.differenceService = differenceService;
   }

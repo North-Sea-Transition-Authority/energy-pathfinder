@@ -7,7 +7,7 @@
 
 <#macro workPlanUpcomingTenderSummary
   view
-  tenderName=defaultHeadingPrefix
+  headingPrefix=defaultHeadingPrefix
   showHeader=false
   showActions=false
   headingSize=defaultHeadingSize
@@ -15,7 +15,7 @@
 >
   <@summaryViewWrapper.summaryViewItemWrapper
     idPrefix=idPrefix
-    headingPrefix=tenderName
+    headingPrefix=headingPrefix
     displayOrder=view.displayOrder
     isValid=view.valid!""
     summaryLinkList=view.summaryLinks
@@ -106,11 +106,11 @@
   showActions=false
   headingSize=defaultHeadingSize
   headingClass=defaultHeadingClass
-  tenderName=defaultHeadingPrefix
+  headingPrefix=defaultHeadingPrefix
 >
   <@summaryViewWrapper.summaryViewItemWrapper
     idPrefix=idPrefix
-    headingPrefix=tenderName
+    headingPrefix=headingPrefix
     displayOrder=upcomingTenderDiff.WorkPlanUpcomingTenderView_displayOrder.currentValue
     isValid=true
     summaryLinkList=[]
