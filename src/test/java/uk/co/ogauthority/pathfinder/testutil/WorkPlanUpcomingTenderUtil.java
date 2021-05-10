@@ -1,12 +1,13 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
-import java.time.LocalDate;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
+import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
@@ -18,7 +19,8 @@ public class WorkPlanUpcomingTenderUtil {
   public static final Function UPCOMING_TENDER_DEPARTMENT = Function.DRILLING;
   public static final String MANUAL_TENDER_DEPARTMENT = SearchSelectablePrefix.FREE_TEXT_PREFIX + "manual department type";
   public static final String DESCRIPTION_OF_WORK = "work description";
-  public static final LocalDate ESTIMATED_TENDER_DATE = LocalDate.now().plusMonths(1L);
+  public static final Quarter ESTIMATED_TENDER_QUARTER = Quarter.Q1;
+  public static final Integer ESTIMATED_TENDER_YEAR = 2025;
   public static final WorkPlanUpcomingTenderContractBand CONTRACT_BAND = WorkPlanUpcomingTenderContractBand.GREATER_THAN_OR_EQUAL_TO_5M;
   public static final String CONTACT_NAME = ContactDetailsTestUtil.CONTACT_NAME;
   public static final String PHONE_NUMBER = ContactDetailsTestUtil.PHONE_NUMBER;
@@ -44,6 +46,13 @@ public class WorkPlanUpcomingTenderUtil {
     return form;
   }
 
+  public static WorkPlanUpcomingTenderForm getEmptyForm() {
+    var form = new WorkPlanUpcomingTenderForm();
+    form.setEstimatedTenderStartDate(new QuarterYearInput(null, null));
+    form.setContactDetail(new ContactDetailForm());
+    return form;
+  }
+
   public static WorkPlanUpcomingTender getUpcomingTender(ProjectDetail detail) {
     var tender = new WorkPlanUpcomingTender(detail);
     tender.setDepartmentType(UPCOMING_TENDER_DEPARTMENT);
@@ -60,7 +69,8 @@ public class WorkPlanUpcomingTenderUtil {
 
   private static void setUpcomingTenderFields(WorkPlanUpcomingTender tender) {
     tender.setDescriptionOfWork(DESCRIPTION_OF_WORK);
-    tender.setEstimatedTenderDate(ESTIMATED_TENDER_DATE);
+    tender.setEstimatedTenderDateQuarter(ESTIMATED_TENDER_QUARTER);
+    tender.setEstimatedTenderDateYear(ESTIMATED_TENDER_YEAR);
     tender.setContractBand(CONTRACT_BAND);
     tender.setContractTermDuration(CONTRACT_TERM_DURATION);
     tender.setContractTermDurationPeriod(CONTRACT_TERM_DURATION_PERIOD);
@@ -72,7 +82,7 @@ public class WorkPlanUpcomingTenderUtil {
 
   private static void setUpcomingTenderFields(WorkPlanUpcomingTenderForm form) {
     form.setDescriptionOfWork(DESCRIPTION_OF_WORK);
-    form.setEstimatedTenderDate(new ThreeFieldDateInput(ESTIMATED_TENDER_DATE));
+    form.setEstimatedTenderStartDate(new QuarterYearInput(ESTIMATED_TENDER_QUARTER, String.valueOf(ESTIMATED_TENDER_YEAR)));
     form.setContractBand(CONTRACT_BAND);
     form.setContractTermYearDuration(CONTRACT_TERM_DURATION);
     form.setContractTermDurationPeriod(CONTRACT_TERM_DURATION_PERIOD);
@@ -94,7 +104,7 @@ public class WorkPlanUpcomingTenderUtil {
     );
     view.setIsValid(isValid);
     view.setTenderDepartment(new StringWithTag(UPCOMING_TENDER_DEPARTMENT.getDisplayName(), Tag.NONE));
-    view.setEstimatedTenderDate(DateUtil.formatDate(ESTIMATED_TENDER_DATE));
+    view.setEstimatedTenderStartDate(DateUtil.getDateFromQuarterYear(ESTIMATED_TENDER_QUARTER, ESTIMATED_TENDER_YEAR));
     view.setContractBand(CONTRACT_BAND.getDisplayName());
 
     view.setContactName(CONTACT_NAME);

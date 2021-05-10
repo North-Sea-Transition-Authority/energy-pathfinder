@@ -119,4 +119,12 @@ public class ProjectService {
   public static boolean isForwardWorkPlanProject(ProjectDetail projectDetail) {
     return ProjectType.FORWARD_WORK_PLAN.equals(projectDetail.getProjectType());
   }
+
+  public static String getProjectTypeDisplayNameLowercase(ProjectDetail projectDetail) {
+    return projectDetail.getProjectType().getLowercaseDisplayName();
+  }
+
+  public static String getProjectTypeDisplayName(ProjectDetail projectDetail) {
+    return projectDetail.getProjectType().getDisplayName();
+  }
 }

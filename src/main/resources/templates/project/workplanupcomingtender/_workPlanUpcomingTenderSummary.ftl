@@ -28,7 +28,7 @@
       useDiffedField=false
       tenderDepartment=view.tenderDepartment
       descriptionOfWork=view.descriptionOfWork
-      estimatedTenderDate=view.estimatedTenderDate
+      estimatedTenderStartDate=view.estimatedTenderStartDate
       contractBand=view.contractBand
       contractLength=view.contractLength
       contactName=view.contactName
@@ -43,7 +43,7 @@
   useDiffedField
   tenderDepartment=""
   descriptionOfWork=""
-  estimatedTenderDate=""
+  estimatedTenderStartDate=""
   contractBand=""
   contractLength=""
   contactName=""
@@ -65,7 +65,7 @@
   />
   <@checkAnswers.checkAnswersStandardOrDiffRow
     prompt="Estimated tender date"
-    fieldValue=estimatedTenderDate
+    fieldValue=estimatedTenderStartDate
     isDiffedField=useDiffedField
   />
   <@checkAnswers.checkAnswersStandardOrDiffRow

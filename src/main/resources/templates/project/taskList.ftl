@@ -3,12 +3,12 @@
 <#if isUpdate>
   <#assign cancelDraftLinkText = "Cancel draft update">
 <#else>
-  <#assign cancelDraftLinkText = "Cancel draft project">
+  <#assign cancelDraftLinkText = "Cancel draft ${projectTypeDisplayNameLowercase}">
 </#if>
 
-<#assign serviceName = service.serviceName/>
+<#assign pageTitle = taskListPageHeading />
 
-<@defaultPage htmlTitle="${serviceName} project task list" pageHeading="${serviceName} project" breadcrumbs=true>
+<@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true>
   <@fdsAction.link
     linkText=cancelDraftLinkText
     linkUrl=springUrl(cancelDraftUrl)

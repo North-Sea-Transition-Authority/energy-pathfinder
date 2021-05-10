@@ -38,7 +38,8 @@ public class WorkPlanUpcomingTenderViewUtil {
 
     tenderView.setTenderDepartment(tenderFunction);
     tenderView.setDescriptionOfWork(workPlanUpcomingTender.getDescriptionOfWork());
-    tenderView.setEstimatedTenderDate(DateUtil.formatDate(workPlanUpcomingTender.getEstimatedTenderDate()));
+    tenderView.setEstimatedTenderStartDate(DateUtil.getDateFromQuarterYear(
+        workPlanUpcomingTender.getEstimatedTenderDateQuarter(), workPlanUpcomingTender.getEstimatedTenderDateYear()));
     tenderView.setContractBand(
         workPlanUpcomingTender.getContractBand() != null
             ? workPlanUpcomingTender.getContractBand().getDisplayName()

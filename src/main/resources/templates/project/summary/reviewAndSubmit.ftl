@@ -1,15 +1,19 @@
 <#include '../../layoutPane.ftl'>
 <#import 'projectSummary.ftl' as projectSummary/>
 
+<#assign projectTypeDisplayNameLowercase = projectTypeDisplayNameLowercase />
+
+<#assign defaultPageHeading = "Review and submit ${projectTypeDisplayNameLowercase}" />
+
 <#if isUpdate>
-  <#assign pageHeading="Review and submit project update" />
+  <#assign pageHeading="${defaultPageHeading} update" />
 <#else>
-  <#assign pageHeading="Review and submit project" />
+  <#assign pageHeading="${defaultPageHeading}" />
 </#if>
 
 <@defaultPageWithSidebar.defaultPageWithSidebar
   pageHeading=pageHeading
-  themeHeading="Check your answers for all sections on the project"
+  themeHeading="Check your answers for all sections on the ${projectTypeDisplayNameLowercase}"
   sidebarSectionLinks=projectSummaryView.sidebarSectionLinks
   isSidebarSticky=true
 >
@@ -35,7 +39,7 @@
 
 <#macro _invalidProjectInset>
   <@fdsInsetText.insetText insetTextClass="govuk-inset-text--red">
-    <p>You cannot submit your project until all sections shown on the task list are completed</p>
+    <p>You cannot submit your ${projectTypeDisplayNameLowercase} until all sections shown on the task list are completed</p>
     <@fdsAction.link linkText="Back to task list" linkUrl=springUrl(taskListUrl)/>
   </@fdsInsetText.insetText>
 </#macro>

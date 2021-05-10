@@ -1,9 +1,12 @@
 <#include '../../layout.ftl'>
 
+<#assign projectTypeDisplayName = projectTypeDisplayName />
+<#assign projectTypeDisplayNameLowercase = projectTypeDisplayNameLowercase />
+
 <#if isUpdate>
-  <#assign title = "Project update submitted">
+  <#assign title = "${projectTypeDisplayName} update submitted">
 <#else>
-  <#assign title = "Project submitted">
+  <#assign title = "${projectTypeDisplayName} submitted">
 </#if>
 
 <@defaultPage htmlTitle=title pageHeading="" breadcrumbs=false>
@@ -20,11 +23,11 @@
   <h2 class="govuk-heading-m">What happens next</h2>
 
   <p class="govuk-body">
-    Your project has been sent to the ${service.customerName!"regulator"} to review.
+    Your ${projectTypeDisplayNameLowercase} has been sent to the ${service.customerName!"regulator"} to review.
   </p>
 
   <p class="govuk-body">
-    Once reviewed your project will be published on their website.
+    Once reviewed your ${projectTypeDisplayNameLowercase} will be published on their website.
   </p>
 
   <@fdsAction.link linkClass="govuk-link govuk-!-font-size-19" linkText="Back to work area" linkUrl=springUrl(workAreaUrl)/>
