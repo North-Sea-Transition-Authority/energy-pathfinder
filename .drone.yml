@@ -33,22 +33,6 @@ steps:
       - chmod +x gradlew
       - ./gradlew test jacocoTestReport checkstyleMain bootWar bootJar sonarqube
 
-  - name: publish-build-s3
-    image: plugins/s3:linux-amd64
-    settings:
-      bucket: fivium-pathfinder-resources
-      region: eu-west-2
-      access_key:
-        from_secret: drone_oga_s3_access_key
-      secret_key:
-        from_secret: drone_oga_s3_secret_key
-      source: build/libs/*
-      target: /builds/oga
-      strip_prefix: build/libs/
-    when:
-      status: success
-      branch: [ develop, release/**, hotfix/**, master ]
-
   - name: publish-docker-develop
     image: plugins/docker:19.03.8
     settings:
@@ -111,40 +95,8 @@ steps:
     when:
       status: [ success, failure ]
 
-  - name: deploy-dev
-    image: appleboy/drone-ssh:linux-amd64
-    settings:
-      host: lemms1.fivium.local
-      username: root
-      port: 22
-      command_timeout: 300s # 5 mins
-      script:
-        - /srv/salt/decc.local/files/pathfinder/scripts/dev/pathfinder-autodeploy.py
-    environment:
-      SSH_KEY:
-        from_secret: dev_ssh_key
-    when:
-      status: success
-      branch: develop
-
-  - name: deploy-st
-    image: appleboy/drone-ssh:linux-amd64
-    settings:
-      host: lemms1.fivium.local
-      username: root
-      port: 22
-      command_timeout: 300s # 5 mins
-      script:
-        - /srv/salt/decc.local/files/pathfinder/scripts/st/pathfinder-autodeploy.py
-    environment:
-      SSH_KEY:
-        from_secret: dev_ssh_key
-    when:
-      status: success
-      branch: develop
-
   - name: deploy-dev-st
-    image: plugins/downstream
+    image: plugins/downstream:linux-amd64
     settings:
       server: https://drone.fivium.co.uk
       token:
