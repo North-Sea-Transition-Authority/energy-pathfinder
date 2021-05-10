@@ -123,7 +123,7 @@
       useDiffedField=true
       tenderDepartment=upcomingTenderDiff.WorkPlanUpcomingTenderView_tenderDepartment
       descriptionOfWork=upcomingTenderDiff.WorkPlanUpcomingTenderView_descriptionOfWork
-      estimatedTenderDate=upcomingTenderDiff.WorkPlanUpcomingTenderView_estimatedTenderDate
+      estimatedTenderStartDate=upcomingTenderDiff.WorkPlanUpcomingTenderView_estimatedTenderStartDate
       contractBand=upcomingTenderDiff.WorkPlanUpcomingTenderView_contractBand
       contractLength=upcomingTenderDiff.WorkPlanUpcomingTenderView_contractLength
       contactName=upcomingTenderDiff.WorkPlanUpcomingTenderView_contactName
