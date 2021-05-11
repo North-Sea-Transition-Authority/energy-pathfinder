@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
+import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderView;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
@@ -30,6 +31,9 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
   @Mock
   private DifferenceService differenceService;
 
+  @Mock
+  private WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
+
   private WorkPlanUpcomingTenderSectionSummaryService workPlanUpcomingTenderSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -38,7 +42,8 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
   public void setup() {
     workPlanUpcomingTenderSectionSummaryService = new WorkPlanUpcomingTenderSectionSummaryService(
         workPlanUpcomingTenderService,
-        differenceService
+        differenceService,
+        workPlanUpcomingTenderSummaryService
     );
   }
 
@@ -58,34 +63,27 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
 
   @Test
   public void getSummary() {
-    final var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(detail);
-
-    final var currentTenderList = List.of(
-        upcomingTender,
-        upcomingTender
+    final var currentTenderViewList = List.of(
+      WorkPlanUpcomingTenderUtil.getView(1, true),
+      WorkPlanUpcomingTenderUtil.getView(2, true)
     );
 
-    when(workPlanUpcomingTenderService.getUpcomingTendersForDetail(detail)).thenReturn(currentTenderList);
-    when(workPlanUpcomingTenderService.getUpcomingTendersForProjectAndVersion(
+    when(workPlanUpcomingTenderSummaryService.getSummaryViews(detail)).thenReturn(currentTenderViewList);
+
+    final var previousTenderViewList = List.of(WorkPlanUpcomingTenderUtil.getView(1, true));
+
+    when(workPlanUpcomingTenderSummaryService.getSummaryViews(
         detail.getProject(),
         detail.getVersion() - 1
-    )).thenReturn(currentTenderList);
-
-    final var previousTenderList = List.of(upcomingTender);
-
-    when(workPlanUpcomingTenderService.getUpcomingTendersForDetail(detail)).thenReturn(previousTenderList);
-    when(workPlanUpcomingTenderService.getUpcomingTendersForProjectAndVersion(
-        detail.getProject(),
-        detail.getVersion() - 1
-    )).thenReturn(previousTenderList);
+    )).thenReturn(previousTenderViewList);
 
     var sectionSummary = workPlanUpcomingTenderSectionSummaryService.getSummary(detail);
 
     assertModelProperties(sectionSummary);
 
     verify(differenceService, times(1)).differentiateComplexLists(
-        any(),
-        any(),
+        eq(currentTenderViewList),
+        eq(previousTenderViewList),
         eq(Set.of("summaryLinks")),
         any(),
         any()
@@ -94,12 +92,23 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
 
   @Test
   public void getSummary_noUpcomingTenders() {
-    when(workPlanUpcomingTenderService.getUpcomingTendersForDetail(detail)).thenReturn(Collections.emptyList());
+    List<WorkPlanUpcomingTenderView> currentTenderViewList = Collections.emptyList();
+    List<WorkPlanUpcomingTenderView> previousTenderViewList = Collections.emptyList();
+
+    when(workPlanUpcomingTenderSummaryService.getSummaryViews(detail)).thenReturn(currentTenderViewList);
+    when(workPlanUpcomingTenderSummaryService.getSummaryViews(detail.getProject(), detail.getVersion() - 1))
+        .thenReturn(previousTenderViewList);
 
     var sectionSummary = workPlanUpcomingTenderSectionSummaryService.getSummary(detail);
-
     assertModelProperties(sectionSummary);
-  }
+
+    verify(differenceService, times(1)).differentiateComplexLists(
+        eq(currentTenderViewList),
+        eq(previousTenderViewList),
+        eq(Set.of("summaryLinks")),
+        any(),
+        any()
+    );  }
 
   private void assertModelProperties(ProjectSectionSummary projectSectionSummary) {
     assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(WorkPlanUpcomingTenderSectionSummaryService.DISPLAY_ORDER);
