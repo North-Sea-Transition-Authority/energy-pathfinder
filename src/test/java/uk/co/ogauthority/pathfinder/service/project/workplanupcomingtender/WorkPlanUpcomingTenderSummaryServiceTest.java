@@ -46,6 +46,10 @@ public class WorkPlanUpcomingTenderSummaryServiceTest {
   @Test
   public void getSummaryViews() {
     var views = workPlanUpcomingTenderSummaryService.getSummaryViews(projectDetail);
+    checkCommonViewFields(views);
+  }
+
+  private void checkCommonViewFields(List<WorkPlanUpcomingTenderView> views) {
     assertThat(views.size()).isEqualTo(2);
     var view1 = views.get(0);
     var view2 = views.get(1);
@@ -59,6 +63,24 @@ public class WorkPlanUpcomingTenderSummaryServiceTest {
     assertThat(view2.getDisplayOrder()).isEqualTo(2);
     checkCommonFields(view1, workPlanUpcomingTender);
     checkCommonFields(view2, manualEntryWorkPlanUpcomingTender);
+  }
+  @Test
+  public void getSummaryViews_withProjectAndVersion_whenTendersFound_thenReturnPopulatedList() {
+
+    final var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+
+    when(workPlanUpcomingTenderService.getUpcomingTendersForProjectAndVersion(projectDetail.getProject(), projectDetail.getVersion()))
+        .thenReturn(List.of(upcomingTender));
+
+    final var result = workPlanUpcomingTenderSummaryService.getSummaryViews(projectDetail.getProject(), projectDetail.getVersion());
+
+    assertThat(result).hasSize(1);
+
+    final var upcomingTenderView = result.get(0);
+
+    assertThat(upcomingTenderView.getTenderDepartment().getValue()).isEqualTo(upcomingTender.getDepartmentType().getDisplayName());
+    assertThat(upcomingTenderView.getTenderDepartment().getTag()).isEqualTo(Tag.NONE);
+    checkCommonFields(upcomingTenderView, upcomingTender);
   }
 
   @Test
@@ -87,6 +109,16 @@ public class WorkPlanUpcomingTenderSummaryServiceTest {
         .thenReturn(Collections.emptyList());
 
     final var result = workPlanUpcomingTenderSummaryService.getSummaryViews(projectDetail);
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void getSummaryViews_withProjectAndVersion_whenNoTendersFound_thenReturnEmptyList() {
+
+    when(workPlanUpcomingTenderService.getUpcomingTendersForProjectAndVersion(projectDetail.getProject(), projectDetail.getVersion()))
+        .thenReturn(Collections.emptyList());
+
+    final var result = workPlanUpcomingTenderSummaryService.getSummaryViews(projectDetail.getProject(), projectDetail.getVersion());
     assertThat(result).isEmpty();
   }
 

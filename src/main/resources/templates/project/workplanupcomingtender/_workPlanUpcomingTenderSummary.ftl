@@ -7,7 +7,7 @@
 
 <#macro workPlanUpcomingTenderSummary
   view
-  tenderName=defaultHeadingPrefix
+  headingPrefix=defaultHeadingPrefix
   showHeader=false
   showActions=false
   headingSize=defaultHeadingSize
@@ -15,7 +15,7 @@
 >
   <@summaryViewWrapper.summaryViewItemWrapper
     idPrefix=idPrefix
-    headingPrefix=tenderName
+    headingPrefix=headingPrefix
     displayOrder=view.displayOrder
     isValid=view.valid!""
     summaryLinkList=view.summaryLinks
@@ -98,4 +98,38 @@
     fieldValue=contactEmailAddress
     isDiffedField=useDiffedField
   />
+</#macro>
+
+<#macro upcomingTenderDiffSummary
+  upcomingTenderDiff
+  showHeader=false
+  showActions=false
+  headingSize=defaultHeadingSize
+  headingClass=defaultHeadingClass
+  headingPrefix=defaultHeadingPrefix
+>
+  <@summaryViewWrapper.summaryViewItemWrapper
+    idPrefix=idPrefix
+    headingPrefix=headingPrefix
+    displayOrder=upcomingTenderDiff.WorkPlanUpcomingTenderView_displayOrder.currentValue
+    isValid=true
+    summaryLinkList=[]
+    showHeader=showHeader
+    showActions=showActions
+    headingSize=headingSize
+    headingClass=headingClass
+  >
+    <@_upcomingTenderSummaryFields
+      useDiffedField=true
+      tenderDepartment=upcomingTenderDiff.WorkPlanUpcomingTenderView_tenderDepartment
+      descriptionOfWork=upcomingTenderDiff.WorkPlanUpcomingTenderView_descriptionOfWork
+      estimatedTenderStartDate=upcomingTenderDiff.WorkPlanUpcomingTenderView_estimatedTenderStartDate
+      contractBand=upcomingTenderDiff.WorkPlanUpcomingTenderView_contractBand
+      contractLength=upcomingTenderDiff.WorkPlanUpcomingTenderView_contractLength
+      contactName=upcomingTenderDiff.WorkPlanUpcomingTenderView_contactName
+      contactPhoneNumber=upcomingTenderDiff.WorkPlanUpcomingTenderView_contactPhoneNumber
+      contactJobTitle=upcomingTenderDiff.WorkPlanUpcomingTenderView_contactJobTitle
+      contactEmailAddress=upcomingTenderDiff.WorkPlanUpcomingTenderView_contactEmailAddress
+    />
+  </@summaryViewWrapper.summaryViewItemWrapper>
 </#macro>
