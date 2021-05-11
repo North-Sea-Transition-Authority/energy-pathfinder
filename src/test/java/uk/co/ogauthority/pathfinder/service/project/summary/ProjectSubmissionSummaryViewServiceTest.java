@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -24,6 +25,9 @@ public class ProjectSubmissionSummaryViewServiceTest {
 
   @Mock
   private WebUserAccountService webUserAccountService;
+
+  @Mock
+  private ProjectOperatorService projectOperatorService;
 
   private ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService;
 
