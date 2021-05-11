@@ -108,7 +108,8 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
         eq(Set.of("summaryLinks")),
         any(),
         any()
-    );  }
+    );
+  }
 
   private void assertModelProperties(ProjectSectionSummary projectSectionSummary) {
     assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(WorkPlanUpcomingTenderSectionSummaryService.DISPLAY_ORDER);

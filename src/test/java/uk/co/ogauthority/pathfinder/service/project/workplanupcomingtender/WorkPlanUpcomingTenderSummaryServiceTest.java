@@ -41,25 +41,11 @@ public class WorkPlanUpcomingTenderSummaryServiceTest {
     when(workPlanUpcomingTenderService.getUpcomingTendersForDetail(projectDetail)).thenReturn(
         List.of(workPlanUpcomingTender, manualEntryWorkPlanUpcomingTender)
     );
-    when(workPlanUpcomingTenderService.getUpcomingTendersForProjectAndVersion(
-        projectDetail.getProject(),
-        projectDetail.getVersion()))
-        .thenReturn(List.of(
-            workPlanUpcomingTender,
-            manualEntryWorkPlanUpcomingTender
-        )
-    );
   }
 
   @Test
   public void getSummaryViews() {
     var views = workPlanUpcomingTenderSummaryService.getSummaryViews(projectDetail);
-    checkCommonViewFields(views);
-  }
-
-  @Test
-  public void getSummaryViews_withProjectDetailAndVersion() {
-    var views = workPlanUpcomingTenderSummaryService.getSummaryViews(projectDetail.getProject(), projectDetail.getVersion());
     checkCommonViewFields(views);
   }
 
