@@ -1,9 +1,10 @@
-package uk.co.ogauthority.pathfinder.model.view.projectmanagement.details;
+package uk.co.ogauthority.pathfinder.model.view.projectmanagement.details.infrastructure;
 
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkField;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.view.projectmanagement.details.ProjectManagementDetailViewUtil;
 
 public class InfrastructureProjectManagementDetailViewUtil {
 

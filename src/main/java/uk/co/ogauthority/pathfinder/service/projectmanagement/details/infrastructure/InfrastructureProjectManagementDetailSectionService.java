@@ -1,14 +1,15 @@
-package uk.co.ogauthority.pathfinder.service.projectmanagement.details;
+package uk.co.ogauthority.pathfinder.service.projectmanagement.details.infrastructure;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.model.view.projectmanagement.details.InfrastructureProjectManagementDetailViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.details.ProjectManagementDetailView;
+import uk.co.ogauthority.pathfinder.model.view.projectmanagement.details.infrastructure.InfrastructureProjectManagementDetailViewUtil;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
+import uk.co.ogauthority.pathfinder.service.projectmanagement.details.ProjectManagementDetailService;
 
 @Service
 public class InfrastructureProjectManagementDetailSectionService implements ProjectManagementDetailService {

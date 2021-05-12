@@ -1,6 +1,7 @@
-package uk.co.ogauthority.pathfinder.model.view.projectmanagement.details;
+package uk.co.ogauthority.pathfinder.model.view.projectmanagement.details.infrastructure;
 
 import java.util.Objects;
+import uk.co.ogauthority.pathfinder.model.view.projectmanagement.details.ProjectManagementDetailView;
 
 public class InfrastructureProjectManagementDetailView extends ProjectManagementDetailView {
 

@@ -12,7 +12,7 @@ public class ProjectManagementDetailViewUtil {
     );
   }
 
-  protected static void setProjectManagementDetailViewCommonFields(
+  public static void setProjectManagementDetailViewCommonFields(
       ProjectManagementDetailView projectManagementDetailView,
       ProjectDetail projectDetail,
       WebUserAccount submitterUserAccount

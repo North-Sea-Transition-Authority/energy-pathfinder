@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.projectmanagement.details;
+package uk.co.ogauthority.pathfinder.service.projectmanagement.details.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,8 +14,8 @@ import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountS
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.model.view.projectmanagement.details.InfrastructureProjectManagementDetailView;
-import uk.co.ogauthority.pathfinder.model.view.projectmanagement.details.InfrastructureProjectManagementDetailViewUtil;
+import uk.co.ogauthority.pathfinder.model.view.projectmanagement.details.infrastructure.InfrastructureProjectManagementDetailView;
+import uk.co.ogauthority.pathfinder.model.view.projectmanagement.details.infrastructure.InfrastructureProjectManagementDetailViewUtil;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;

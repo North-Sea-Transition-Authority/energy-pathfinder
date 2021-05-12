@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.view.projectmanagement.details;
+package uk.co.ogauthority.pathfinder.model.view.projectmanagement.details.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
