@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.controller.projectassessment.ProjectAssessmentController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.projectassessment.ProjectAssessment;
@@ -21,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessme
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectassessment.ProjectAssessmentRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.projectpublishing.ProjectPublishingService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequestService;
@@ -83,7 +83,10 @@ public class ProjectAssessmentService {
     projectAssessmentFormValidator.validate(
         form,
         bindingResult,
-        new ProjectAssessmentValidationHint(regulatorUpdateRequestService.canRequestUpdate(projectDetail))
+        new ProjectAssessmentValidationHint(
+            regulatorUpdateRequestService.canRequestUpdate(projectDetail),
+            projectDetail.getProjectType()
+        )
     );
     return validationService.validate(form, bindingResult, ValidationType.FULL);
   }
@@ -92,15 +95,24 @@ public class ProjectAssessmentService {
                                                        AuthenticatedUserAccount user,
                                                        ProjectAssessmentForm form) {
     var projectId = projectDetail.getProject().getId();
+
+    final var pageHeading = String.format("%s assessment", projectDetail.getProjectType().getDisplayName());
+
     var modelAndView = new ModelAndView("projectassessment/projectAssessment")
-        .addObject("pageName", ProjectAssessmentController.PAGE_NAME)
+        .addObject("pageName", pageHeading)
         .addObject("projectHeaderHtml", projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, user))
         .addObject("canRequestUpdate", regulatorUpdateRequestService.canRequestUpdate(projectDetail))
         .addObject("form", form)
-        .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)));
+        .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(
+            projectId,
+            null,
+            null,
+            null
+        )));
 
-    breadcrumbService.fromManageProject(projectDetail, modelAndView, ProjectAssessmentController.PAGE_NAME);
+    ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, projectDetail);
 
+    breadcrumbService.fromManageProject(projectDetail, modelAndView, pageHeading);
     return modelAndView;
   }
 }

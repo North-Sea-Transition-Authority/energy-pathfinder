@@ -41,8 +41,6 @@ import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequest
 @RequestMapping("/project/{projectId}/project-assessment")
 public class ProjectAssessmentController extends ProjectFormPageController {
 
-  public static final String PAGE_NAME = "Project assessment";
-
   private final ProjectAssessmentService projectAssessmentService;
   private final RegulatorUpdateRequestService regulatorUpdateRequestService;
 

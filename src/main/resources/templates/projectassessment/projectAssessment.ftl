@@ -9,13 +9,22 @@
   <@fdsForm.htmlForm>
     <#if !canRequestUpdate>
       <@fdsInsetText.insetText insetTextClass="govuk-inset-text--yellow">
-        An update is already in progress for this project. As a result you will not be able to request an update as part of this assessment
+        An update is already in progress for this ${projectTypeDisplayNameLowercase}.
+        As a result you will not be able to request an update as part of this assessment
       </@fdsInsetText.insetText>
     </#if>
-    <@fdsRadio.radioGroup path="form.readyToBePublished" labelText="Is the project ready to be published?" hiddenContent=true>
+    <@fdsRadio.radioGroup
+      path="form.readyToBePublished"
+      labelText="Is the ${projectTypeDisplayNameLowercase} ready to be published?"
+      hiddenContent=true
+    >
       <@fdsRadio.radioYes path="form.readyToBePublished">
         <#if canRequestUpdate>
-          <@fdsRadio.radioGroup path="form.updateRequired" nestingPath="form.readyToBePublished" labelText="Does this project require an update?">
+          <@fdsRadio.radioGroup
+            path="form.updateRequired"
+            nestingPath="form.readyToBePublished"
+            labelText="Does this ${projectTypeDisplayNameLowercase} require an update?"
+          >
             <@fdsRadio.radioYes path="form.updateRequired" />
             <@fdsRadio.radioNo path="form.updateRequired" />
           </@fdsRadio.radioGroup>

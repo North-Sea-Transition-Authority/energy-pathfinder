@@ -1,7 +1,7 @@
 <#include '../../layout.ftl'>
 
 <#if projectAssessmentView?has_content>
-  <h2 class="govuk-heading-l">Project assessment</h2>
+  <h2 class="govuk-heading-l">Assessment</h2>
 
   <@fdsCheckAnswers.checkAnswers>
     <@checkAnswers.checkAnswersRowNoActions prompt="Ready to be published" value=projectAssessmentView.readyToBePublished?string("Yes", "No") />
