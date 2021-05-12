@@ -1,4 +1,5 @@
 <#include '../../layout.ftl'>
+<#import '_projectSubmissionDetails.ftl' as projectSubmissionDetails>
 
 <@fdsDataItems.dataItem>
   <@fdsDataItems.dataValues key="Field stage" value=projectManagementDetailView.fieldStage!"" />
@@ -10,8 +11,8 @@
     <@fdsDataItems.dataValues key="" value="" />
   </#if>
 </@fdsDataItems.dataItem>
-<@fdsDataItems.dataItem>
-  <@fdsDataItems.dataValues key="Submission date" value=projectManagementDetailView.submissionDate />
-  <@fdsDataItems.dataValues key="Submitted by" value=projectManagementDetailView.submittedByUser />
-  <@fdsDataItems.dataValues key="Submitter email" value=projectManagementDetailView.submittedByUserEmail />
-</@fdsDataItems.dataItem>
+<@projectSubmissionDetails._projectSubmissionDetails
+  submissionDate=projectManagementDetailView.submissionDate
+  submittedByUserName=projectManagementDetailView.submittedByUser
+  submittedByUserEmailAddress=projectManagementDetailView.submittedByUserEmail
+/>

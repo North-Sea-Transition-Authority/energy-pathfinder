@@ -5,11 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
-import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
-import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
+import uk.co.ogauthority.pathfinder.service.projectmanagement.details.TestProjectManagementDetailView;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -17,37 +13,26 @@ import uk.co.ogauthority.pathfinder.util.DateUtil;
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectManagementDetailViewUtilTest {
 
-  private static final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
-
-  private static void checkCommonFields(ProjectManagementDetailView projectManagementDetailView,
-                                        ProjectInformation projectInformation,
-                                        boolean isEnergyTransitionProject,
-                                        AuthenticatedUserAccount submitterAccount) {
-    assertThat(projectManagementDetailView.getFieldStage()).isEqualTo(
-        projectInformation.getFieldStage().getDisplayName());
-    assertThat(projectManagementDetailView.getStatus()).isEqualTo(projectDetail.getStatus().getDisplayName());
-    assertThat(projectManagementDetailView.getSubmissionDate()).isEqualTo(
-        DateUtil.formatInstant(projectDetail.getSubmittedInstant()));
-    assertThat(projectManagementDetailView.getIsEnergyTransitionProject()).isEqualTo(isEnergyTransitionProject);
-    assertThat(projectManagementDetailView.getSubmittedByUser()).isEqualTo(submitterAccount.getFullName());
-    assertThat(projectManagementDetailView.getSubmittedByUserEmail()).isEqualTo(submitterAccount.getEmailAddress());
-  }
-
   @Test
-  public void from_withFieldFromList() {
-    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
-    var projectLocation = ProjectLocationTestUtil.getProjectLocation(projectDetail);
-    var submitterAccount = UserTestingUtil.getAuthenticatedUserAccount();
+  public void setProjectManagementDetailViewCommonFields_assertProperties() {
 
-    var projectManagementDetailView = ProjectManagementDetailViewUtil.from(
+    final var projectDetail = ProjectUtil.getProjectDetails();
+    final var userAccount = UserTestingUtil.getAuthenticatedUserAccount();
+
+    final var projectDetailView = new TestProjectManagementDetailView();
+
+    ProjectManagementDetailViewUtil.setProjectManagementDetailViewCommonFields(
+        projectDetailView,
         projectDetail,
-        projectInformation,
-        projectLocation,
-        false,
-        submitterAccount
+        userAccount
     );
 
-    checkCommonFields(projectManagementDetailView, projectInformation, false, submitterAccount);
-    assertThat(projectManagementDetailView.getField()).isEqualTo(projectLocation.getField().getFieldName());
+    assertThat(projectDetailView.getStatus()).isEqualTo(projectDetail.getStatus().getDisplayName());
+    assertThat(projectDetailView.getSubmissionDate()).isEqualTo(
+        DateUtil.formatInstant(projectDetail.getSubmittedInstant())
+    );
+    assertThat(projectDetailView.getSubmittedByUser()).isEqualTo(userAccount.getFullName());
+    assertThat(projectDetailView.getSubmittedByUserEmail()).isEqualTo(userAccount.getEmailAddress());
+
   }
 }

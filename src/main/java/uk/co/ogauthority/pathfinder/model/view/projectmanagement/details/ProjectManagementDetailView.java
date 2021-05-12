@@ -2,15 +2,9 @@ package uk.co.ogauthority.pathfinder.model.view.projectmanagement.details;
 
 import java.util.Objects;
 
-public class ProjectManagementDetailView {
-
-  private String fieldStage;
-
-  private String field;
+public abstract class ProjectManagementDetailView {
 
   private String status;
-
-  private boolean isEnergyTransitionProject;
 
   private String submissionDate;
 
@@ -18,36 +12,12 @@ public class ProjectManagementDetailView {
 
   private String submittedByUserEmail;
 
-  public String getFieldStage() {
-    return fieldStage;
-  }
-
-  public void setFieldStage(String fieldStage) {
-    this.fieldStage = fieldStage;
-  }
-
-  public String getField() {
-    return field;
-  }
-
-  public void setField(String field) {
-    this.field = field;
-  }
-
   public String getStatus() {
     return status;
   }
 
   public void setStatus(String status) {
     this.status = status;
-  }
-
-  public boolean getIsEnergyTransitionProject() {
-    return isEnergyTransitionProject;
-  }
-
-  public void setIsEnergyTransitionProject(boolean isEnergyTransitionProject) {
-    this.isEnergyTransitionProject = isEnergyTransitionProject;
   }
 
   public String getSubmissionDate() {
@@ -83,10 +53,7 @@ public class ProjectManagementDetailView {
       return false;
     }
     ProjectManagementDetailView that = (ProjectManagementDetailView) o;
-    return Objects.equals(fieldStage, that.fieldStage)
-        && Objects.equals(field, that.field)
-        && Objects.equals(status, that.status)
-        && Objects.equals(isEnergyTransitionProject, that.isEnergyTransitionProject)
+    return Objects.equals(status, that.status)
         && Objects.equals(submissionDate, that.submissionDate)
         && Objects.equals(submittedByUser, that.submittedByUser)
         && Objects.equals(submittedByUserEmail, that.submittedByUserEmail);
@@ -95,10 +62,7 @@ public class ProjectManagementDetailView {
   @Override
   public int hashCode() {
     return Objects.hash(
-        fieldStage,
-        field,
         status,
-        isEnergyTransitionProject,
         submissionDate,
         submittedByUser,
         submittedByUserEmail
