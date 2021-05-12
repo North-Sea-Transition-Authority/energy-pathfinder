@@ -20,7 +20,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
-import uk.co.ogauthority.pathfinder.controller.projecttransfer.ProjectTransferController;
 import uk.co.ogauthority.pathfinder.controller.rest.OrganisationGroupRestController;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -222,6 +221,11 @@ public class ProjectTransferServiceTest {
 
     var modelAndView = projectTransferService.getTransferProjectModelAndView(projectDetail, authenticatedUser, form);
 
+    final var pageHeading = String.format(
+        "Change %s operator",
+        projectDetail.getProjectType().getLowercaseDisplayName()
+    );
+
     assertThat(modelAndView.getViewName()).isEqualTo(ProjectTransferService.TRANSFER_PROJECT_TEMPLATE_PATH);
     assertThat(modelAndView.getModelMap()).containsExactly(
         entry("projectHeaderHtml", projectHeaderHtml),
@@ -231,9 +235,15 @@ public class ProjectTransferServiceTest {
         entry("operatorsRestUrl", SearchSelectorService.route(on(OrganisationGroupRestController.class)
             .searchPathfinderOrganisations(null))),
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class)
-            .getProject(projectId, null, null, null)))
+            .getProject(projectId, null, null, null))
+        ),
+        entry("pageHeading", pageHeading)
     );
 
-    verify(breadcrumbService, times(1)).fromManageProject(projectId, modelAndView, ProjectTransferController.PAGE_NAME);
+    verify(breadcrumbService, times(1)).fromManageProject(
+        projectDetail,
+        modelAndView,
+        pageHeading
+    );
   }
 }

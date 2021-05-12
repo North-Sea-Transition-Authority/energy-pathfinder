@@ -1,6 +1,6 @@
 <#include '../layout.ftl'>
 
-<#assign title = "Change project operator">
+<#assign title = pageHeading>
 
 <@defaultPage htmlTitle=title breadcrumbs=true fullWidthColumn=true errorItems=errorList>
 

@@ -13,7 +13,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
-import uk.co.ogauthority.pathfinder.controller.projecttransfer.ProjectTransferController;
 import uk.co.ogauthority.pathfinder.controller.rest.OrganisationGroupRestController;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -138,8 +137,15 @@ public class ProjectTransferService {
                                                      AuthenticatedUserAccount user,
                                                      ProjectTransferForm form) {
     var projectId = projectDetail.getProject().getId();
+
     var organisationGroup = projectOperatorService.getProjectOperatorByProjectDetailOrError(projectDetail)
         .getOrganisationGroup();
+
+    final var pageHeading = String.format(
+        "Change %s operator",
+        projectDetail.getProjectType().getLowercaseDisplayName()
+    );
+
     var modelAndView = new ModelAndView(TRANSFER_PROJECT_TEMPLATE_PATH)
         .addObject("projectHeaderHtml", projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, user))
         .addObject("currentOperator", organisationGroup.getName())
@@ -148,8 +154,11 @@ public class ProjectTransferService {
         .addObject("operatorsRestUrl", SearchSelectorService.route(on(OrganisationGroupRestController.class)
             .searchPathfinderOrganisations(null)))
         .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class)
-            .getProject(projectId, null, null, null)));
-    breadcrumbService.fromManageProject(projectId, modelAndView, ProjectTransferController.PAGE_NAME);
+            .getProject(projectId, null, null, null)))
+        .addObject("pageHeading", pageHeading);
+
+    breadcrumbService.fromManageProject(projectDetail, modelAndView, pageHeading);
+
     return modelAndView;
   }
 }

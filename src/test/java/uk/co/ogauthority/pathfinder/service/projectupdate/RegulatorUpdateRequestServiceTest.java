@@ -185,6 +185,10 @@ public class RegulatorUpdateRequestServiceTest {
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(project.getId(), null, null, null)))
     );
 
-    verify(breadcrumbService, times(1)).fromManageProject(project.getId(), modelAndView, RegulatorUpdateController.REQUEST_UPDATE_PAGE_NAME);
+    verify(breadcrumbService, times(1)).fromManageProject(
+        projectDetail,
+        modelAndView,
+        RegulatorUpdateController.REQUEST_UPDATE_PAGE_NAME
+    );
   }
 }

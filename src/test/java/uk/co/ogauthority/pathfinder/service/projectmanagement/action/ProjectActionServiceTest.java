@@ -12,7 +12,6 @@ import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
-import uk.co.ogauthority.pathfinder.model.form.useraction.UserActionWithDisplayOrder;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -33,10 +32,13 @@ public class ProjectActionServiceTest {
 
   @Test
   public void getArchiveAction_enabled() {
-    var action = projectActionService.getArchiveAction(project.getId(), ARCHIVE_ACTION_DISPLAY_ORDER);
+    var action = projectActionService.getArchiveAction(projectDetail, ARCHIVE_ACTION_DISPLAY_ORDER);
 
     var linkButton = (LinkButton) action.getUserAction();
-    assertThat(linkButton.getPrompt()).isEqualTo(ProjectActionService.ARCHIVE_ACTION_PROMPT);
+
+    final var expectedButtonPrompt = String.format("Archive %s", projectDetail.getProjectType().getLowercaseDisplayName());
+    assertThat(linkButton.getPrompt()).isEqualTo(expectedButtonPrompt);
+
     assertThat(linkButton.getUrl()).isEqualTo(
         ReverseRouter.route(on(ArchiveProjectController.class).getArchiveProject(
             project.getId(),

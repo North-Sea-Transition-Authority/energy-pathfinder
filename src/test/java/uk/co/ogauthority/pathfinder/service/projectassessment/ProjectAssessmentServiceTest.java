@@ -194,7 +194,11 @@ public class ProjectAssessmentServiceTest {
         entry("form", form),
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)))
     );
-    verify(breadcrumbService, times(1)).fromManageProject(projectId, modelAndView, ProjectAssessmentController.PAGE_NAME);
+    verify(breadcrumbService, times(1)).fromManageProject(
+        projectDetail,
+        modelAndView,
+        ProjectAssessmentController.PAGE_NAME
+    );
   }
 
   @Test
@@ -216,6 +220,10 @@ public class ProjectAssessmentServiceTest {
         entry("form", form),
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)))
     );
-    verify(breadcrumbService, times(1)).fromManageProject(projectId, modelAndView, ProjectAssessmentController.PAGE_NAME);
+    verify(breadcrumbService, times(1)).fromManageProject(
+        projectDetail,
+        modelAndView,
+        ProjectAssessmentController.PAGE_NAME
+    );
   }
 }

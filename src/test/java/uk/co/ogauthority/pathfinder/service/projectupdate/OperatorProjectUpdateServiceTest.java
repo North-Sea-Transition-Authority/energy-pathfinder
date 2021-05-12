@@ -31,6 +31,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.NoUpdateNotificationRepository;
 import uk.co.ogauthority.pathfinder.service.email.RegulatorEmailService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -203,12 +204,21 @@ public class OperatorProjectUpdateServiceTest {
 
   @Test
   public void getProjectUpdateModelAndView() {
-    var modelAndView = operatorProjectUpdateService.getProjectUpdateModelAndView(PROJECT_ID);
+    var modelAndView = operatorProjectUpdateService.getProjectUpdateModelAndView(projectDetail);
 
     assertThat(modelAndView.getViewName()).isEqualTo(OperatorProjectUpdateService.START_PAGE_TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
         entry("startActionUrl", ReverseRouter.route(on(OperatorUpdateController.class)
-            .startUpdate(PROJECT_ID, null, null)))
+            .startUpdate(projectDetail.getProject().getId(), null, null))
+        ),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
+            projectDetail.getProjectType().getDisplayName()
+        ),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR,
+            projectDetail.getProjectType().getLowercaseDisplayName()
+        )
     );
   }
 
@@ -232,7 +242,11 @@ public class OperatorProjectUpdateServiceTest {
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(PROJECT_ID, null, null, null)))
     );
 
-    verify(breadcrumbService, times(1)).fromManageProject(PROJECT_ID, modelAndView, OperatorUpdateController.NO_UPDATE_REQUIRED_PAGE_NAME);
+    verify(breadcrumbService, times(1)).fromManageProject(
+        projectDetail,
+        modelAndView,
+        OperatorUpdateController.NO_UPDATE_REQUIRED_PAGE_NAME
+    );
   }
 
   @Test

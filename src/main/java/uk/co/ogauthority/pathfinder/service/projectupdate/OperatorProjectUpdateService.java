@@ -23,6 +23,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.NoUpdateNotificationRepository;
 import uk.co.ogauthority.pathfinder.service.email.RegulatorEmailService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
@@ -102,20 +103,34 @@ public class OperatorProjectUpdateService {
     return noUpdateNotificationRepository.findByProjectUpdate_ToDetail(projectDetail);
   }
 
-  public ModelAndView getProjectUpdateModelAndView(Integer projectId) {
-    return new ModelAndView(START_PAGE_TEMPLATE_PATH)
-        .addObject("startActionUrl", ReverseRouter.route(on(OperatorUpdateController.class).startUpdate(projectId, null, null)));
+  public ModelAndView getProjectUpdateModelAndView(ProjectDetail projectDetail) {
+    final var modelAndView = new ModelAndView(START_PAGE_TEMPLATE_PATH)
+        .addObject("startActionUrl", ReverseRouter.route(on(OperatorUpdateController.class).startUpdate(
+            projectDetail.getProject().getId(),
+            null,
+            null
+        )));
+
+    ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, projectDetail);
+
+    return modelAndView;
   }
 
   public ModelAndView getProjectProvideNoUpdateModelAndView(ProjectDetail projectDetail,
                                                             AuthenticatedUserAccount user,
                                                             ProvideNoUpdateForm form) {
     var projectId = projectDetail.getProject().getId();
+
     var modelAndView = new ModelAndView(PROVIDE_NO_UPDATE_TEMPLATE_PATH)
         .addObject("projectHeaderHtml", projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, user))
         .addObject("form", form)
         .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)));
-    breadcrumbService.fromManageProject(projectId, modelAndView, OperatorUpdateController.NO_UPDATE_REQUIRED_PAGE_NAME);
+
+    breadcrumbService.fromManageProject(
+        projectDetail,
+        modelAndView,
+        OperatorUpdateController.NO_UPDATE_REQUIRED_PAGE_NAME
+    );
     return modelAndView;
   }
 

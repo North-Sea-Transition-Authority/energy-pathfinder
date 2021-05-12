@@ -104,7 +104,13 @@ public class RegulatorUpdateRequestService {
         .addObject("startActionUrl", ReverseRouter.route(on(RegulatorUpdateController.class)
             .requestUpdate(projectId, null, null, null, null)))
         .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)));
-    breadcrumbService.fromManageProject(projectId, modelAndView, RegulatorUpdateController.REQUEST_UPDATE_PAGE_NAME);
+
+    breadcrumbService.fromManageProject(
+        projectDetail,
+        modelAndView,
+        RegulatorUpdateController.REQUEST_UPDATE_PAGE_NAME
+    );
+
     return modelAndView;
   }
 }

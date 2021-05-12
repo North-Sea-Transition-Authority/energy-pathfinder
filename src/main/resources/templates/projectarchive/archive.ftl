@@ -1,6 +1,6 @@
 <#include '../layout.ftl'>
 
-<#assign title = "Archive project">
+<#assign title = pageHeading>
 
 <@defaultPage htmlTitle=title breadcrumbs=true fullWidthColumn=true errorItems=errorList>
 

@@ -37,7 +37,7 @@ import uk.co.ogauthority.pathfinder.service.projectarchive.ArchiveProjectService
 @RequestMapping("/project/{projectId}/archive")
 public class ArchiveProjectController {
 
-  public static final String ARCHIVE_PROJECT_PAGE_NAME = "Archive project";
+  public static final String ARCHIVE_PROJECT_PAGE_NAME_PREFIX = "Archive";
 
   private final ArchiveProjectService archiveProjectService;
   private final ControllerHelperService controllerHelperService;

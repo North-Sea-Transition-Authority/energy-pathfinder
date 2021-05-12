@@ -98,7 +98,9 @@ public class ProjectAssessmentService {
         .addObject("canRequestUpdate", regulatorUpdateRequestService.canRequestUpdate(projectDetail))
         .addObject("form", form)
         .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)));
-    breadcrumbService.fromManageProject(projectId, modelAndView, ProjectAssessmentController.PAGE_NAME);
+
+    breadcrumbService.fromManageProject(projectDetail, modelAndView, ProjectAssessmentController.PAGE_NAME);
+
     return modelAndView;
   }
 }

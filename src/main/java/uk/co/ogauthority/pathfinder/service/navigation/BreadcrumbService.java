@@ -19,11 +19,18 @@ import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.Subs
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.communication.CommunicationModelService;
 
 @Service
 public class BreadcrumbService {
+
+  protected static final String WORK_AREA_CRUMB_PROMPT = "Work area";
+  protected static final String TASK_LIST_CRUMB_PROMPT = "Task list";
+  protected static final String MANAGE_CRUMB_PROMPT_PREFIX = "Manage";
+  protected static final String BREADCRUMB_MAP_MODEL_ATTR_NAME = "crumbList";
+  protected static final String CURRENT_PAGE_MODEL_ATTR_NAME = "currentPage";
 
   public void fromUpcomingTenders(Integer projectId, ModelAndView modelAndView, String thisPage) {
     addAttrs(modelAndView, upcomingTenders(projectId), thisPage);
@@ -125,7 +132,10 @@ public class BreadcrumbService {
 
   private Map<String, String> workArea() {
     Map<String, String> breadcrumbs = new LinkedHashMap<>();
-    breadcrumbs.put(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)), "Work area");
+    breadcrumbs.put(
+        ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)),
+        WORK_AREA_CRUMB_PROMPT
+    );
     return breadcrumbs;
   }
 
@@ -136,18 +146,26 @@ public class BreadcrumbService {
   private Map<String, String> taskList(Integer projectId) {
     var map = workArea();
     String route = ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId, null));
-    map.put(route, "Task list");
+    map.put(route, TASK_LIST_CRUMB_PROMPT);
     return map;
   }
 
-  public void fromManageProject(Integer projectId, ModelAndView modelAndView, String thisPage) {
-    addAttrs(modelAndView, manageProject(projectId), thisPage);
+  public void fromManageProject(ProjectDetail projectDetail, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, manageProject(projectDetail), thisPage);
   }
 
-  private Map<String, String> manageProject(Integer projectId) {
-    var map = workArea();
-    String route = ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null));
-    map.put(route, "Manage project");
+  private Map<String, String> manageProject(ProjectDetail projectDetail) {
+    final var map = workArea();
+    final var route = ReverseRouter.route(on(ManageProjectController.class).getProject(
+        projectDetail.getProject().getId(),
+        null,
+        null,
+        null
+    ));
+    map.put(
+        route,
+        String.format("%s %s", MANAGE_CRUMB_PROMPT_PREFIX, projectDetail.getProjectType().getLowercaseDisplayName())
+    );
     return map;
   }
 
@@ -164,8 +182,8 @@ public class BreadcrumbService {
   }
 
   private void addAttrs(ModelAndView modelAndView, Map<String, String> breadcrumbs, String currentPage) {
-    modelAndView.addObject("crumbList", breadcrumbs);
-    modelAndView.addObject("currentPage", currentPage);
+    modelAndView.addObject(BREADCRUMB_MAP_MODEL_ATTR_NAME, breadcrumbs);
+    modelAndView.addObject(CURRENT_PAGE_MODEL_ATTR_NAME, currentPage);
   }
 
   public void fromWorkPlanUpcomingTenders(Integer projectId, ModelAndView modelAndView, String thisPage) {

@@ -137,14 +137,26 @@ public class ArchiveProjectServiceTest {
         form
     );
 
+    final var pageHeading = String.format(
+        "%s %s",
+        ArchiveProjectController.ARCHIVE_PROJECT_PAGE_NAME_PREFIX,
+        projectDetail.getProjectType().getLowercaseDisplayName()
+    );
+
     assertThat(modelAndView.getViewName()).isEqualTo(ArchiveProjectService.ARCHIVE_PROJECT_TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
         entry("projectHeaderHtml", projectHeaderHtml),
         entry("form", form),
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class)
-            .getProject(projectId, null, null, null)))
+            .getProject(projectId, null, null, null))
+        ),
+        entry("pageHeading", pageHeading)
     );
 
-    verify(breadcrumbService, times(1)).fromManageProject(projectId, modelAndView, ArchiveProjectController.ARCHIVE_PROJECT_PAGE_NAME);
+    verify(breadcrumbService, times(1)).fromManageProject(
+        projectDetail,
+        modelAndView,
+        pageHeading
+    );
   }
 }
