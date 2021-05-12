@@ -16,6 +16,7 @@ import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManageme
 import uk.co.ogauthority.pathfinder.model.view.projectupdate.RegulatorUpdateRequestView;
 import uk.co.ogauthority.pathfinder.model.view.projectupdate.RegulatorUpdateRequestViewUtil;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectManagementSectionService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequestService;
 
@@ -72,6 +73,8 @@ public class ProjectManagementNotificationSectionService implements ProjectManag
     }
 
     summaryModel.put("showUpdateInProgressNotification", showUpdateInProgressNotification);
+
+    ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(summaryModel, projectDetail);
 
     return new ProjectManagementSection(
         TEMPLATE_PATH,

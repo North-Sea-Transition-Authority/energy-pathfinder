@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementSection;
 import uk.co.ogauthority.pathfinder.model.view.projectupdate.RegulatorUpdateRequestViewUtil;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequestService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUpdateTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -73,7 +74,9 @@ public class ProjectManagementNotificationSectionServiceTest {
         entry("showRegulatorUpdateRequestNotification", false),
         entry("updateCreatedByUserName", updateCreatedByUser.getFullName()),
         entry("updateCreatedByUserEmailAddress", updateCreatedByUser.getEmailAddress()),
-        entry("showUpdateInProgressNotification", true)
+        entry("showUpdateInProgressNotification", true),
+        entry(ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR, projectDetail.getProjectType().getDisplayName()),
+        entry(ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR, projectDetail.getProjectType().getLowercaseDisplayName())
     );
 
     verify(regulatorUpdateRequestService, never()).getUpdateRequest(latestProjectDetail);
@@ -99,7 +102,9 @@ public class ProjectManagementNotificationSectionServiceTest {
         entry("showRegulatorUpdateRequestNotification", true),
         entry("regulatorUpdateRequestView", RegulatorUpdateRequestViewUtil.from(regulatorUpdateRequest, requestedByUser)),
         entry("service", serviceProperties),
-        entry("showUpdateInProgressNotification", false)
+        entry("showUpdateInProgressNotification", false),
+        entry(ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR, projectDetail.getProjectType().getDisplayName()),
+        entry(ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR, projectDetail.getProjectType().getLowercaseDisplayName())
     );
   }
 
@@ -123,7 +128,9 @@ public class ProjectManagementNotificationSectionServiceTest {
         entry("showRegulatorUpdateRequestNotification", true),
         entry("regulatorUpdateRequestView", RegulatorUpdateRequestViewUtil.from(regulatorUpdateRequest, requestedByUser)),
         entry("service", serviceProperties),
-        entry("showUpdateInProgressNotification", false)
+        entry("showUpdateInProgressNotification", false),
+        entry(ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR, projectDetail.getProjectType().getDisplayName()),
+        entry(ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR, projectDetail.getProjectType().getLowercaseDisplayName())
     );
   }
 
@@ -140,7 +147,9 @@ public class ProjectManagementNotificationSectionServiceTest {
 
     assertThat(section.getTemplateModel()).containsExactly(
         entry("showRegulatorUpdateRequestNotification", false),
-        entry("showUpdateInProgressNotification", false)
+        entry("showUpdateInProgressNotification", false),
+        entry(ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR, projectDetail.getProjectType().getDisplayName()),
+        entry(ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR, projectDetail.getProjectType().getLowercaseDisplayName())
     );
   }
 

@@ -4,6 +4,7 @@
   <@_regulatorUpdateRequestNotification
     regulatorMnemonic=service.customerMnemonic
     regulatorUpdateRequestView=regulatorUpdateRequestView
+    projectTypeDisplayNameLowercase=projectTypeDisplayNameLowercase
   />
   <#elseif showUpdateInProgressNotification>
     <@_operatorUpdateInProgressNotification
@@ -23,9 +24,13 @@
   </@fdsContactPanel.contactPanel>
 </#macro>
 
-<#macro _regulatorUpdateRequestNotification regulatorMnemonic regulatorUpdateRequestView>
+<#macro _regulatorUpdateRequestNotification
+  regulatorMnemonic
+  regulatorUpdateRequestView
+  projectTypeDisplayNameLowercase
+>
   <@panel.panel
-    headingText="The ${regulatorMnemonic} have requested an update to this project"
+    headingText="The ${regulatorMnemonic} have requested an update to this ${projectTypeDisplayNameLowercase}"
   >
     <@panel.panelSection headingText="Update reason">
       <@multiLineText.multiLineText blockClass="govuk-body">
