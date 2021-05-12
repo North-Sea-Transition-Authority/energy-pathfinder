@@ -68,7 +68,7 @@ public class SelectProjectOperatorControllerTest extends AbstractControllerTest 
     when(selectOperatorService.getOrganisationGroupOrError(any(), any())).thenReturn(
         ProjectOperatorTestUtil.ORG_GROUP
     );
-    when(startProjectService.startProject(authenticatedUser, ProjectOperatorTestUtil.ORG_GROUP)).thenReturn(
+    when(startProjectService.createInfrastructureProject(authenticatedUser, ProjectOperatorTestUtil.ORG_GROUP)).thenReturn(
         ProjectUtil.getProjectDetails()
     );
 
@@ -89,7 +89,7 @@ public class SelectProjectOperatorControllerTest extends AbstractControllerTest 
             .params(completeParams))
         .andExpect(status().is3xxRedirection());
 
-    verify(startProjectService, times(1)).startProject(any(), any());
+    verify(startProjectService, times(1)).createInfrastructureProject(any(), any());
   }
 
   @Test
@@ -118,6 +118,6 @@ public class SelectProjectOperatorControllerTest extends AbstractControllerTest 
             .params(completeParams))
         .andExpect(status().is2xxSuccessful());
 
-    verify(startProjectService, times(0)).startProject(any(), any());
+    verify(startProjectService, times(0)).createInfrastructureProject(any(), any());
   }
 }

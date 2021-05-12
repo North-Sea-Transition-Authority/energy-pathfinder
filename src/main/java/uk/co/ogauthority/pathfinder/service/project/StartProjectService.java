@@ -38,8 +38,11 @@ public class StartProjectService {
   /**
    * Create a draft project and projectOperator for the provided user.
    */
-  @Transactional
-  public ProjectDetail startProject(AuthenticatedUserAccount user, PortalOrganisationGroup organisationGroup) {
+  private ProjectDetail startProject(
+      AuthenticatedUserAccount user,
+      PortalOrganisationGroup organisationGroup,
+      ProjectType projectType
+  ) {
     var project = new Project();
     var projectDetails = new ProjectDetail(
         project,
@@ -47,7 +50,7 @@ public class StartProjectService {
         user.getWuaId(),
         FIRST_VERSION,
         CURRENT_VERSION,
-        ProjectType.INFRASTRUCTURE
+        projectType
     );
     projectRepository.save(project);
     projectDetailsRepository.save(projectDetails);
@@ -56,4 +59,19 @@ public class StartProjectService {
     return projectDetails;
   }
 
+  @Transactional
+  public ProjectDetail createInfrastructureProject(
+      AuthenticatedUserAccount user,
+      PortalOrganisationGroup organisationGroup
+  ) {
+    return startProject(user, organisationGroup, ProjectType.INFRASTRUCTURE);
+  }
+
+  @Transactional
+  public ProjectDetail createForwardWorkPlanProject(
+      AuthenticatedUserAccount user,
+      PortalOrganisationGroup organisationGroup
+  ) {
+    return startProject(user, organisationGroup, ProjectType.FORWARD_WORK_PLAN);
+  }
 }

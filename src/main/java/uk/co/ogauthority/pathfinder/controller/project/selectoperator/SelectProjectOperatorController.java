@@ -59,7 +59,7 @@ public class SelectProjectOperatorController {
         getSelectOperatorModelAndView(form),
         form,
         () -> {
-          var projectDetail = startProjectService.startProject(
+          var projectDetail = startProjectService.createInfrastructureProject(
               user,
               selectOperatorService.getOrganisationGroupOrError(user, Integer.valueOf(form.getOrganisationGroup()))
           );

@@ -94,7 +94,7 @@ public class DevelopmentProjectCreatorService {
   }
 
   private ProjectDetail createProject(AuthenticatedUserAccount user, PortalOrganisationGroup organisationGroup, ProjectStatus status) {
-    var projectDetail = startProjectService.startProject(user, organisationGroup);
+    var projectDetail = startProjectService.createInfrastructureProject(user, organisationGroup);
     projectDetail.setStatus(status);
 
     if (!status.equals(ProjectStatus.DRAFT)) {

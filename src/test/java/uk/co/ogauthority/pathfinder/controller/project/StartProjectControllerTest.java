@@ -81,7 +81,7 @@ public class StartProjectControllerTest extends AbstractControllerTest {
           .with(csrf())
         )
         .andExpect(status().is3xxRedirection());
-    verify(startProjectService, times(0)).startProject(any(), any());
+    verify(startProjectService, times(0)).createInfrastructureProject(any(), any());
   }
 
   @Test
@@ -89,7 +89,7 @@ public class StartProjectControllerTest extends AbstractControllerTest {
     when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUser.getLinkedPerson())).thenReturn(
         List.of(TeamTestingUtil.getOrganisationTeam(ProjectOperatorTestUtil.ORG_GROUP))
     );
-    when(startProjectService.startProject(authenticatedUser, ProjectOperatorTestUtil.ORG_GROUP)).thenReturn(detail);
+    when(startProjectService.createInfrastructureProject(authenticatedUser, ProjectOperatorTestUtil.ORG_GROUP)).thenReturn(detail);
 
     mockMvc.perform(
         MockMvcRequestBuilders.post(
@@ -99,6 +99,6 @@ public class StartProjectControllerTest extends AbstractControllerTest {
             .with(csrf())
     )
         .andExpect(status().is3xxRedirection());
-    verify(startProjectService, times(1)).startProject(any(), any());
+    verify(startProjectService, times(1)).createInfrastructureProject(any(), any());
   }
 }

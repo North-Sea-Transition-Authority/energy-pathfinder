@@ -53,20 +53,38 @@ public class StartProjectServiceTest {
   }
 
   @Test
-  public void startProject_correctCalls() {
-    var projectDetails = startProjectService.startProject(authenticatedUser, organisationGroup);
+  public void createInfrastructureProject_correctCalls() {
+    var projectDetails = startProjectService.createInfrastructureProject(authenticatedUser, organisationGroup);
     verify(projectRepository, times(1)).save(any());
     verify(projectDetailsRepository, times(1)).save(any());
     verify(projectOperatorService, times(1)).createOrUpdateProjectOperator(projectDetails, organisationGroup);
   }
 
   @Test
-  public void startProject_correctDetails() {
-    var projectDetails = startProjectService.startProject(authenticatedUser, organisationGroup);
+  public void createInfrastructureProject_correctDetails() {
+    var projectDetails = startProjectService.createInfrastructureProject(authenticatedUser, organisationGroup);
     assertThat(projectDetails.getCreatedByWua()).isEqualTo(authenticatedUser.getWuaId());
     assertThat(projectDetails.getStatus()).isEqualTo(ProjectStatus.DRAFT);
     assertThat(projectDetails.getVersion()).isEqualTo(1);
     assertThat(projectDetails.getIsCurrentVersion()).isTrue();
     assertThat(projectDetails.getProjectType()).isEqualTo(ProjectType.INFRASTRUCTURE);
+  }
+
+  @Test
+  public void createForwardWorkPlanProject_correctCalls() {
+    var projectDetails = startProjectService.createForwardWorkPlanProject(authenticatedUser, organisationGroup);
+    verify(projectRepository, times(1)).save(any());
+    verify(projectDetailsRepository, times(1)).save(any());
+    verify(projectOperatorService, times(1)).createOrUpdateProjectOperator(projectDetails, organisationGroup);
+  }
+
+  @Test
+  public void createForwardWorkPlanProject_correctDetails() {
+    var projectDetails = startProjectService.createForwardWorkPlanProject(authenticatedUser, organisationGroup);
+    assertThat(projectDetails.getCreatedByWua()).isEqualTo(authenticatedUser.getWuaId());
+    assertThat(projectDetails.getStatus()).isEqualTo(ProjectStatus.DRAFT);
+    assertThat(projectDetails.getVersion()).isEqualTo(1);
+    assertThat(projectDetails.getIsCurrentVersion()).isTrue();
+    assertThat(projectDetails.getProjectType()).isEqualTo(ProjectType.FORWARD_WORK_PLAN);
   }
 }

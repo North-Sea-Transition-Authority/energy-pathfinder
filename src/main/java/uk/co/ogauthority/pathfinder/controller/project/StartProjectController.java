@@ -53,7 +53,7 @@ public class StartProjectController {
     }
 
     //User is in one team so start project
-    var projectDetail = startProjectService.startProject(user, organisationTeams.get(0).getPortalOrganisationGroup());
+    var projectDetail = startProjectService.createInfrastructureProject(user, organisationTeams.get(0).getPortalOrganisationGroup());
     metricsProvider.getProjectStartCounter().increment();
     return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectDetail.getProject().getId(), null));
   }

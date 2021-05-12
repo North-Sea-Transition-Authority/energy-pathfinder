@@ -28,6 +28,7 @@ import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.model.form.useraction.UserActionType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
 import uk.co.ogauthority.pathfinder.service.teammanagement.TeamManagementService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
@@ -48,6 +49,9 @@ public class TeamCreationServiceTest {
   @Mock
   private TeamManagementService teamManagementService;
 
+  @Mock
+  private StartProjectService startProjectService;
+
   private TeamCreationService teamCreationService;
 
   private final AuthenticatedUserAccount authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount(
@@ -59,8 +63,9 @@ public class TeamCreationServiceTest {
     teamCreationService = new TeamCreationService(
         validationService,
         portalTeamAccessor,
-        portalOrganisationAccessor,
-        teamManagementService
+        teamManagementService,
+        startProjectService,
+        portalOrganisationAccessor
     );
   }
 
@@ -93,6 +98,7 @@ public class TeamCreationServiceTest {
 
     assertThat(result).isEqualTo(portalTeamDto.getResId());
     verify(portalTeamAccessor, times(0)).createOrganisationGroupTeam(organisationGroup, authenticatedUserAccount);
+    verify(startProjectService, times(0)).createForwardWorkPlanProject(authenticatedUserAccount, organisationGroup);
   }
 
   @Test
@@ -109,7 +115,7 @@ public class TeamCreationServiceTest {
 
     assertThat(result).isNotNull();
     verify(portalTeamAccessor, times(1)).createOrganisationGroupTeam(organisationGroup, authenticatedUserAccount);
-
+    verify(startProjectService, times(1)).createForwardWorkPlanProject(authenticatedUserAccount, organisationGroup);
   }
 
   @Test(expected = PathfinderEntityNotFoundException.class)
@@ -125,7 +131,7 @@ public class TeamCreationServiceTest {
     teamCreationService.getOrCreateOrganisationGroupTeam(form, authenticatedUserAccount);
 
     verify(portalTeamAccessor, times(0)).createOrganisationGroupTeam(organisationGroup, authenticatedUserAccount);
-
+    verify(startProjectService, times(0)).createForwardWorkPlanProject(authenticatedUserAccount, organisationGroup);
   }
 
   @Test
