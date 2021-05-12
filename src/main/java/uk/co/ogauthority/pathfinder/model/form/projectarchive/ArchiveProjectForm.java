@@ -4,7 +4,7 @@ import javax.validation.constraints.NotEmpty;
 
 public class ArchiveProjectForm {
 
-  @NotEmpty(message = "Enter the reason you are archiving the project")
+  @NotEmpty(message = "Enter the reason for archiving")
   private String archiveReason;
 
   public String getArchiveReason() {
