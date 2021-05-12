@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +12,7 @@ import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderView;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
@@ -30,15 +30,18 @@ public class WorkPlanUpcomingTenderSectionSummaryService implements ProjectSecti
   private final WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
   private final DifferenceService differenceService;
   private final WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
+  private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
   @Autowired
   public WorkPlanUpcomingTenderSectionSummaryService(
       WorkPlanUpcomingTenderService workPlanUpcomingTenderService,
       DifferenceService differenceService,
-      WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService) {
+      WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService,
+      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService) {
     this.workPlanUpcomingTenderService = workPlanUpcomingTenderService;
     this.differenceService = differenceService;
     this.workPlanUpcomingTenderSummaryService = workPlanUpcomingTenderSummaryService;
+    this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
   }
 
   @Override
@@ -48,9 +51,12 @@ public class WorkPlanUpcomingTenderSectionSummaryService implements ProjectSecti
 
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
-    Map<String, Object> summaryModel = new HashMap<>();
-    summaryModel.put("sectionTitle", PAGE_NAME);
-    summaryModel.put("sectionId", SECTION_ID);
+
+    final var summaryModel = projectSectionSummaryCommonModelService.getCommonSummaryModelMap(
+        detail,
+        PAGE_NAME,
+        SECTION_ID
+    );
 
     var upcomingTenderViews = workPlanUpcomingTenderSummaryService.getSummaryViews(detail);
     summaryModel.put("upcomingTendersDiffModel", getUpcomingTenderDifferenceModel(

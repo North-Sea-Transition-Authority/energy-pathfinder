@@ -18,6 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentScheduleTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -30,6 +31,9 @@ public class PlugAbandonmentScheduleSectionSummaryServiceTest {
   @Mock
   private DifferenceService differenceService;
 
+  @Mock
+  private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   private PlugAbandonmentScheduleSectionSummaryService plugAbandonmentScheduleSectionSummaryService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
@@ -38,7 +42,8 @@ public class PlugAbandonmentScheduleSectionSummaryServiceTest {
   public void setup() {
     plugAbandonmentScheduleSectionSummaryService = new PlugAbandonmentScheduleSectionSummaryService(
         plugAbandonmentScheduleSummaryService,
-        differenceService
+        differenceService,
+        projectSectionSummaryCommonModelService
     );
   }
 
@@ -73,7 +78,7 @@ public class PlugAbandonmentScheduleSectionSummaryServiceTest {
     )).thenReturn(previousPlugAbandonmentScheduleViews);
 
     final var sectionSummary = plugAbandonmentScheduleSectionSummaryService.getSummary(projectDetail);
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, projectDetail);
 
     verify(differenceService, times(1)).differentiateComplexLists(
         eq(plugAbandonmentScheduleViews),
@@ -90,7 +95,7 @@ public class PlugAbandonmentScheduleSectionSummaryServiceTest {
         Collections.emptyList()
     );
     final var sectionSummary = plugAbandonmentScheduleSectionSummaryService.getSummary(projectDetail);
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, projectDetail);
 
     verify(differenceService, times(1)).differentiateComplexLists(
         eq(Collections.emptyList()),
@@ -102,7 +107,7 @@ public class PlugAbandonmentScheduleSectionSummaryServiceTest {
   }
 
 
-  private void assertModelProperties(ProjectSectionSummary sectionSummary) {
+  private void assertModelProperties(ProjectSectionSummary sectionSummary, ProjectDetail projectDetail) {
 
     assertThat(sectionSummary.getDisplayOrder()).isEqualTo(PlugAbandonmentScheduleSectionSummaryService.DISPLAY_ORDER);
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(PlugAbandonmentScheduleSectionSummaryService.SECTION_LINK));
@@ -110,13 +115,12 @@ public class PlugAbandonmentScheduleSectionSummaryServiceTest {
 
     var model = sectionSummary.getTemplateModel();
 
-    assertThat(model).containsOnlyKeys(
-        "sectionTitle",
-        "sectionId",
-        "plugAbandonmentScheduleDiffModel"
+    verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
+        projectDetail,
+        PlugAbandonmentScheduleSectionSummaryService.PAGE_NAME,
+        PlugAbandonmentScheduleSectionSummaryService.SECTION_ID
     );
 
-    assertThat(model).containsEntry("sectionTitle", PlugAbandonmentScheduleSectionSummaryService.PAGE_NAME);
-    assertThat(model).containsEntry("sectionId", PlugAbandonmentScheduleSectionSummaryService.SECTION_ID);
+    assertThat(model).containsOnlyKeys("plugAbandonmentScheduleDiffModel");
   }
 }

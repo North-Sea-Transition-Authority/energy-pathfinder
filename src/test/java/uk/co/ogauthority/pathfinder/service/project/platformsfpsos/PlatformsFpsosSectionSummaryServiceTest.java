@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.view.platformfpso.PlatformFpsoView;
 import uk.co.ogauthority.pathfinder.model.view.platformfpso.PlatformFpsoViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.PlatformFpsoTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -32,6 +33,9 @@ public class PlatformsFpsosSectionSummaryServiceTest {
   @Mock
   private DifferenceService differenceService;
 
+  @Mock
+  private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   private PlatformsFpsosSectionSummaryService platformsFpsosSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -40,7 +44,8 @@ public class PlatformsFpsosSectionSummaryServiceTest {
   public void setup() {
     platformsFpsosSectionSummaryService = new PlatformsFpsosSectionSummaryService(
         platformsFpsosService,
-        differenceService
+        differenceService,
+        projectSectionSummaryCommonModelService
     );
   }
 
@@ -81,7 +86,7 @@ public class PlatformsFpsosSectionSummaryServiceTest {
     )).thenReturn(previousPlatformFpsos);
     var sectionSummary = platformsFpsosSectionSummaryService.getSummary(detail);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, detail);
     assertInteractions(currentPlatformFpsoViews, previousPlatformFpsoViews);
   }
 
@@ -91,26 +96,25 @@ public class PlatformsFpsosSectionSummaryServiceTest {
 
     var sectionSummary = platformsFpsosSectionSummaryService.getSummary(detail);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, detail);
 
     verify(differenceService, never()).differentiate(any(), any(), any());
   }
 
-  private void assertModelProperties(ProjectSectionSummary projectSectionSummary) {
+  private void assertModelProperties(ProjectSectionSummary projectSectionSummary, ProjectDetail projectDetail) {
     assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(PlatformsFpsosSectionSummaryService.DISPLAY_ORDER);
     assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(PlatformsFpsosSectionSummaryService.SECTION_LINK));
     assertThat(projectSectionSummary.getTemplatePath()).isEqualTo(PlatformsFpsosSectionSummaryService.TEMPLATE_PATH);
 
     var model = projectSectionSummary.getTemplateModel();
 
-    assertThat(model).containsOnlyKeys(
-        "sectionTitle",
-        "sectionId",
-        "platformFpsoDiffModel"
+    verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
+        projectDetail,
+        PlatformsFpsosSectionSummaryService.PAGE_NAME,
+        PlatformsFpsosSectionSummaryService.SECTION_ID
     );
 
-    assertThat(model).containsEntry("sectionTitle", PlatformsFpsosSectionSummaryService.PAGE_NAME);
-    assertThat(model).containsEntry("sectionId", PlatformsFpsosSectionSummaryService.SECTION_ID);
+    assertThat(model).containsOnlyKeys("platformFpsoDiffModel");
   }
 
   private void assertInteractions(List<PlatformFpsoView> currentPlatformFpsoViews,

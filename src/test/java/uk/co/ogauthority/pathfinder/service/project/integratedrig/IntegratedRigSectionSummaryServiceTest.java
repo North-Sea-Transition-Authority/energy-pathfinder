@@ -18,6 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.IntegratedRigTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -30,6 +31,9 @@ public class IntegratedRigSectionSummaryServiceTest {
   @Mock
   private DifferenceService differenceService;
 
+  @Mock
+  private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   private IntegratedRigSectionSummaryService integratedRigSectionSummaryService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
@@ -38,7 +42,8 @@ public class IntegratedRigSectionSummaryServiceTest {
   public void setup() {
     integratedRigSectionSummaryService = new IntegratedRigSectionSummaryService(
         integratedRigSummaryService,
-        differenceService
+        differenceService,
+        projectSectionSummaryCommonModelService
     );
   }
 
@@ -73,7 +78,7 @@ public class IntegratedRigSectionSummaryServiceTest {
     )).thenReturn(previousIntegratedRigViews);
 
     final var sectionSummary = integratedRigSectionSummaryService.getSummary(projectDetail);
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, projectDetail);
 
     verify(differenceService, times(1)).differentiateComplexLists(
         eq(integratedRigViews),
@@ -88,7 +93,7 @@ public class IntegratedRigSectionSummaryServiceTest {
   public void getSummary_whenNoIntegratedRigs_thenEmptyListsDiffed() {
     when(integratedRigSummaryService.getIntegratedRigSummaryViews(projectDetail)).thenReturn(Collections.emptyList());
     final var sectionSummary = integratedRigSectionSummaryService.getSummary(projectDetail);
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, projectDetail);
 
     verify(differenceService, times(1)).differentiateComplexLists(
         eq(Collections.emptyList()),
@@ -100,7 +105,7 @@ public class IntegratedRigSectionSummaryServiceTest {
   }
 
 
-  private void assertModelProperties(ProjectSectionSummary sectionSummary) {
+  private void assertModelProperties(ProjectSectionSummary sectionSummary, ProjectDetail projectDetail) {
 
     assertThat(sectionSummary.getDisplayOrder()).isEqualTo(IntegratedRigSectionSummaryService.DISPLAY_ORDER);
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(IntegratedRigSectionSummaryService.SECTION_LINK));
@@ -108,14 +113,13 @@ public class IntegratedRigSectionSummaryServiceTest {
 
     var model = sectionSummary.getTemplateModel();
 
-    assertThat(model).containsOnlyKeys(
-        "sectionTitle",
-        "sectionId",
-        "integratedRigDiffModel"
+    verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
+        projectDetail,
+        IntegratedRigSectionSummaryService.PAGE_NAME,
+        IntegratedRigSectionSummaryService.SECTION_ID
     );
 
-    assertThat(model).containsEntry("sectionTitle", IntegratedRigSectionSummaryService.PAGE_NAME);
-    assertThat(model).containsEntry("sectionId", IntegratedRigSectionSummaryService.SECTION_ID);
+    assertThat(model).containsOnlyKeys("integratedRigDiffModel");
   }
 
 }

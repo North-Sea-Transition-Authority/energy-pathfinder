@@ -18,6 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.DecommissionedPipelineTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -30,6 +31,9 @@ public class DecommissionedPipelineSectionSummaryServiceTest {
   @Mock
   private DifferenceService differenceService;
 
+  @Mock
+  private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   private DecommissionedPipelineSectionSummaryService decommissionedPipelineSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -38,7 +42,8 @@ public class DecommissionedPipelineSectionSummaryServiceTest {
   public void setup() {
     decommissionedPipelineSectionSummaryService = new DecommissionedPipelineSectionSummaryService(
         decommissionedPipelineService,
-        differenceService
+        differenceService,
+        projectSectionSummaryCommonModelService
     );
   }
 
@@ -73,7 +78,7 @@ public class DecommissionedPipelineSectionSummaryServiceTest {
 
     var sectionSummary = decommissionedPipelineSectionSummaryService.getSummary(detail);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, detail);
 
     verify(differenceService, times(1)).differentiateComplexLists(
         any(),
@@ -90,23 +95,22 @@ public class DecommissionedPipelineSectionSummaryServiceTest {
 
     var sectionSummary = decommissionedPipelineSectionSummaryService.getSummary(detail);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, detail);
   }
 
-  private void assertModelProperties(ProjectSectionSummary projectSectionSummary) {
+  private void assertModelProperties(ProjectSectionSummary projectSectionSummary, ProjectDetail projectDetail) {
     assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(DecommissionedPipelineSectionSummaryService.DISPLAY_ORDER);
     assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(DecommissionedPipelineSectionSummaryService.SECTION_LINK));
     assertThat(projectSectionSummary.getTemplatePath()).isEqualTo(DecommissionedPipelineSectionSummaryService.TEMPLATE_PATH);
 
     var model = projectSectionSummary.getTemplateModel();
 
-    assertThat(model).containsOnlyKeys(
-        "sectionTitle",
-        "sectionId",
-        "decommissionedPipelineDiffModel"
+    verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
+        projectDetail,
+        DecommissionedPipelineSectionSummaryService.PAGE_NAME,
+        DecommissionedPipelineSectionSummaryService.SECTION_ID
     );
 
-    assertThat(model).containsEntry("sectionTitle", DecommissionedPipelineSectionSummaryService.PAGE_NAME);
-    assertThat(model).containsEntry("sectionId", DecommissionedPipelineSectionSummaryService.SECTION_ID);
+    assertThat(model).containsOnlyKeys("decommissionedPipelineDiffModel");
   }
 }

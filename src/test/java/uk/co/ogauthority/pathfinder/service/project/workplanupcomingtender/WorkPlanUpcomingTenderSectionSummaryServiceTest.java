@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderView;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
 
@@ -34,6 +35,9 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
   @Mock
   private WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
 
+  @Mock
+  private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   private WorkPlanUpcomingTenderSectionSummaryService workPlanUpcomingTenderSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -43,7 +47,8 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
     workPlanUpcomingTenderSectionSummaryService = new WorkPlanUpcomingTenderSectionSummaryService(
         workPlanUpcomingTenderService,
         differenceService,
-        workPlanUpcomingTenderSummaryService
+        workPlanUpcomingTenderSummaryService,
+        projectSectionSummaryCommonModelService
     );
   }
 
@@ -79,7 +84,7 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
 
     var sectionSummary = workPlanUpcomingTenderSectionSummaryService.getSummary(detail);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, detail);
 
     verify(differenceService, times(1)).differentiateComplexLists(
         eq(currentTenderViewList),
@@ -100,7 +105,7 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
         .thenReturn(previousTenderViewList);
 
     var sectionSummary = workPlanUpcomingTenderSectionSummaryService.getSummary(detail);
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, detail);
 
     verify(differenceService, times(1)).differentiateComplexLists(
         eq(currentTenderViewList),
@@ -111,20 +116,19 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
     );
   }
 
-  private void assertModelProperties(ProjectSectionSummary projectSectionSummary) {
+  private void assertModelProperties(ProjectSectionSummary projectSectionSummary, ProjectDetail projectDetail) {
     assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(WorkPlanUpcomingTenderSectionSummaryService.DISPLAY_ORDER);
     assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(WorkPlanUpcomingTenderSectionSummaryService.SECTION_LINK));
     assertThat(projectSectionSummary.getTemplatePath()).isEqualTo(WorkPlanUpcomingTenderSectionSummaryService.TEMPLATE_PATH);
 
     var model = projectSectionSummary.getTemplateModel();
 
-    assertThat(model).containsOnlyKeys(
-        "sectionTitle",
-        "sectionId",
-        "upcomingTendersDiffModel"
-    );
+    assertThat(model).containsOnlyKeys("upcomingTendersDiffModel");
 
-    assertThat(model).containsEntry("sectionTitle", WorkPlanUpcomingTenderSectionSummaryService.PAGE_NAME);
-    assertThat(model).containsEntry("sectionId", WorkPlanUpcomingTenderSectionSummaryService.SECTION_ID);
+    verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
+        projectDetail,
+        WorkPlanUpcomingTenderSectionSummaryService.PAGE_NAME,
+        WorkPlanUpcomingTenderSectionSummaryService.SECTION_ID
+    );
   }
 }

@@ -13,6 +13,9 @@
       />
     </#list>
   <#else>
-    <@emptySectionSummaryInset.emptySectionSummaryInset itemText="upcoming tenders"/>
+    <@emptySectionSummaryInset.emptySectionSummaryInset
+      itemText="upcoming tenders"
+      projectTypeDisplayName=projectTypeDisplayNameLowercase
+    />
   </#if>
 </@sectionSummaryWrapper.sectionSummaryWrapper>

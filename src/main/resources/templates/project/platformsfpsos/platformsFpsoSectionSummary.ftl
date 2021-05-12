@@ -15,6 +15,9 @@
       />
     </#list>
   <#else>
-    <@emptySectionSummaryInset.emptySectionSummaryInset itemText="platforms or FPSOs"/>
+    <@emptySectionSummaryInset.emptySectionSummaryInset
+      itemText="platforms or FPSOs"
+      projectTypeDisplayName=projectTypeDisplayNameLowercase
+    />
   </#if>
 </@sectionSummaryWrapper.sectionSummaryWrapper>

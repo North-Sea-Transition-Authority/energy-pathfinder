@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.view.subseainfrastructure.SubseaInfras
 import uk.co.ogauthority.pathfinder.model.view.subseainfrastructure.SubseaInfrastructureViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
@@ -34,12 +35,17 @@ public class SubseaInfrastructureSectionSummaryService implements ProjectSection
 
   private final SubseaInfrastructureService subseaInfrastructureService;
   private final DifferenceService differenceService;
+  private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
   @Autowired
-  public SubseaInfrastructureSectionSummaryService(SubseaInfrastructureService subseaInfrastructureService,
-                                                   DifferenceService differenceService) {
+  public SubseaInfrastructureSectionSummaryService(
+      SubseaInfrastructureService subseaInfrastructureService,
+      DifferenceService differenceService,
+      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService
+  ) {
     this.subseaInfrastructureService = subseaInfrastructureService;
     this.differenceService = differenceService;
+    this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
   }
 
   @Override
@@ -49,9 +55,13 @@ public class SubseaInfrastructureSectionSummaryService implements ProjectSection
 
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
-    Map<String, Object> summaryModel = new HashMap<>();
-    summaryModel.put("sectionTitle", PAGE_NAME);
-    summaryModel.put("sectionId", SECTION_ID);
+
+    final var summaryModel = projectSectionSummaryCommonModelService.getCommonSummaryModelMap(
+        detail,
+        PAGE_NAME,
+        SECTION_ID
+    );
+
     var subseaInfrastructures = subseaInfrastructureService.getSubseaInfrastructures(detail);
     var subseaInfrastructureViews = getSubseaInfrastructureViews(subseaInfrastructures);
     summaryModel.put("subseaInfrastructureDiffModel", getSubseaInfrastructureDifferenceModel(

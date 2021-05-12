@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +16,7 @@ import uk.co.ogauthority.pathfinder.model.view.decommissionedpipeline.Decommissi
 import uk.co.ogauthority.pathfinder.model.view.decommissionedpipeline.DecommissionedPipelineViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
@@ -33,12 +33,17 @@ public class DecommissionedPipelineSectionSummaryService implements ProjectSecti
 
   private final DecommissionedPipelineService decommissionedPipelineService;
   private final DifferenceService differenceService;
+  private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
   @Autowired
-  public DecommissionedPipelineSectionSummaryService(DecommissionedPipelineService decommissionedPipelineService,
-                                                     DifferenceService differenceService) {
+  public DecommissionedPipelineSectionSummaryService(
+      DecommissionedPipelineService decommissionedPipelineService,
+      DifferenceService differenceService,
+      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService
+  ) {
     this.decommissionedPipelineService = decommissionedPipelineService;
     this.differenceService = differenceService;
+    this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
   }
 
   @Override
@@ -48,9 +53,13 @@ public class DecommissionedPipelineSectionSummaryService implements ProjectSecti
 
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
-    Map<String, Object> summaryModel = new HashMap<>();
-    summaryModel.put("sectionTitle", PAGE_NAME);
-    summaryModel.put("sectionId", SECTION_ID);
+
+    final var summaryModel = projectSectionSummaryCommonModelService.getCommonSummaryModelMap(
+        detail,
+        PAGE_NAME,
+        SECTION_ID
+    );
+
     var decommissionedPipelines = decommissionedPipelineService.getDecommissionedPipelines(detail);
     var decommissionedPipelineViews = getDecommissionedPipelineViews(decommissionedPipelines);
     summaryModel.put("decommissionedPipelineDiffModel", getDecommissionedPipelineDifferenceModel(

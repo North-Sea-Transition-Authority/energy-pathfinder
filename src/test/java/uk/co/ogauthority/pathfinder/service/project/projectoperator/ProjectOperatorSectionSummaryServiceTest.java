@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.project.projectoperator;
 
-import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
@@ -36,6 +36,9 @@ public class ProjectOperatorSectionSummaryServiceTest {
   @Mock
   private SelectOperatorService selectOperatorService;
 
+  @Mock
+  private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   private ProjectOperatorSectionSummaryService projectOperatorSectionSummaryService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -45,7 +48,8 @@ public class ProjectOperatorSectionSummaryServiceTest {
     projectOperatorSectionSummaryService = new ProjectOperatorSectionSummaryService(
         projectOperatorService,
         differenceService,
-        selectOperatorService
+        selectOperatorService,
+        projectSectionSummaryCommonModelService
     );
   }
 
@@ -83,7 +87,7 @@ public class ProjectOperatorSectionSummaryServiceTest {
 
     final var sectionSummary = projectOperatorSectionSummaryService.getSummary(details);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, details);
     assertInteractions(currentProjectOperatorView, previousProjectOperatorView);
   }
 
@@ -101,12 +105,12 @@ public class ProjectOperatorSectionSummaryServiceTest {
 
     final var sectionSummary = projectOperatorSectionSummaryService.getSummary(details);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, details);
     assertInteractions(currentProjectOperatorView, previousProjectOperatorView);
 
   }
 
-  private void assertModelProperties(ProjectSectionSummary sectionSummary) {
+  private void assertModelProperties(ProjectSectionSummary sectionSummary, ProjectDetail projectDetail) {
 
     assertThat(sectionSummary.getDisplayOrder()).isEqualTo(ProjectOperatorSectionSummaryService.DISPLAY_ORDER);
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectOperatorSectionSummaryService.SECTION_LINK));
@@ -114,14 +118,13 @@ public class ProjectOperatorSectionSummaryServiceTest {
 
     var model = sectionSummary.getTemplateModel();
 
-    assertThat(model).containsOnlyKeys(
-        "sectionTitle",
-        "sectionId",
-        "projectOperatorDiffModel"
+    verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
+        projectDetail,
+        ProjectOperatorSectionSummaryService.PAGE_NAME,
+        ProjectOperatorSectionSummaryService.SECTION_ID
     );
 
-    assertThat(model).contains(entry("sectionTitle", ProjectOperatorSectionSummaryService.PAGE_NAME));
-    assertThat(model).contains(entry("sectionId", ProjectOperatorSectionSummaryService.SECTION_ID));
+    assertThat(model).containsOnlyKeys("projectOperatorDiffModel");
   }
 
   private void assertInteractions(ProjectOperatorView currentProjectOperatorView, ProjectOperatorView previousProjectOperatorView) {

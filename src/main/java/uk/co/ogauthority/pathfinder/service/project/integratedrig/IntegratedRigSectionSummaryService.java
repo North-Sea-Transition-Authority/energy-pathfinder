@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.project.integratedrig;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +12,7 @@ import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.integratedrig.IntegratedRigView;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
@@ -29,12 +29,17 @@ public class IntegratedRigSectionSummaryService implements ProjectSectionSummary
 
   private final IntegratedRigSummaryService integratedRigSummaryService;
   private final DifferenceService differenceService;
+  private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
   @Autowired
-  public IntegratedRigSectionSummaryService(IntegratedRigSummaryService integratedRigSummaryService,
-                                            DifferenceService differenceService) {
+  public IntegratedRigSectionSummaryService(
+      IntegratedRigSummaryService integratedRigSummaryService,
+      DifferenceService differenceService,
+      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService
+  ) {
     this.integratedRigSummaryService = integratedRigSummaryService;
     this.differenceService = differenceService;
+    this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
   }
 
   @Override
@@ -45,9 +50,11 @@ public class IntegratedRigSectionSummaryService implements ProjectSectionSummary
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
 
-    Map<String, Object> summaryModel = new HashMap<>();
-    summaryModel.put("sectionTitle", PAGE_NAME);
-    summaryModel.put("sectionId", SECTION_ID);
+    final var summaryModel = projectSectionSummaryCommonModelService.getCommonSummaryModelMap(
+        detail,
+        PAGE_NAME,
+        SECTION_ID
+    );
 
     var integratedRigViews = integratedRigSummaryService.getIntegratedRigSummaryViews(detail);
     summaryModel.put("integratedRigDiffModel", getIntegratedRigDifferenceModel(

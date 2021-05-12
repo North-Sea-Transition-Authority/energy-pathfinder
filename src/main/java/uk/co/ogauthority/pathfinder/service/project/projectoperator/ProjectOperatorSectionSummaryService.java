@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.project.projectoperator;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
@@ -32,21 +32,29 @@ public class ProjectOperatorSectionSummaryService implements ProjectSectionSumma
   private final ProjectOperatorService projectOperatorService;
   private final DifferenceService differenceService;
   private final SelectOperatorService selectOperatorService;
+  private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
   @Autowired
-  public ProjectOperatorSectionSummaryService(ProjectOperatorService projectOperatorService,
-                                              DifferenceService differenceService,
-                                              SelectOperatorService selectOperatorService) {
+  public ProjectOperatorSectionSummaryService(
+      ProjectOperatorService projectOperatorService,
+      DifferenceService differenceService,
+      SelectOperatorService selectOperatorService,
+      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService
+  ) {
     this.projectOperatorService = projectOperatorService;
     this.differenceService = differenceService;
     this.selectOperatorService = selectOperatorService;
+    this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
   }
 
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
-    Map<String, Object> summaryModel = new HashMap<>();
-    summaryModel.put("sectionTitle", PAGE_NAME);
-    summaryModel.put("sectionId", SECTION_ID);
+
+    final var summaryModel = projectSectionSummaryCommonModelService.getCommonSummaryModelMap(
+        detail,
+        PAGE_NAME,
+        SECTION_ID
+    );
 
     summaryModel.put("projectOperatorDiffModel", getProjectOperatorDifferenceModel(detail));
 

@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityView;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -31,6 +32,9 @@ public class CollaborationOpportunitiesSectionSummaryServiceTest {
   @Mock
   private DifferenceService differenceService;
 
+  @Mock
+  private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
 
   private CollaborationOpportunitiesSectionSummaryService collaborationOpportunitiesSectionSummaryService;
@@ -39,7 +43,8 @@ public class CollaborationOpportunitiesSectionSummaryServiceTest {
   public void setup() {
     collaborationOpportunitiesSectionSummaryService = new CollaborationOpportunitiesSectionSummaryService(
         collaborationOpportunitiesSummaryService,
-        differenceService
+        differenceService,
+        projectSectionSummaryCommonModelService
     );
   }
 
@@ -74,7 +79,7 @@ public class CollaborationOpportunitiesSectionSummaryServiceTest {
     )).thenReturn(previousCollaborationOpportunityViews);
 
     final var sectionSummary = collaborationOpportunitiesSectionSummaryService.getSummary(projectDetail);
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, projectDetail);
     assertInteractions(currentCollaborationOpportunityViews, previousCollaborationOpportunityViews);
   }
 
@@ -89,25 +94,24 @@ public class CollaborationOpportunitiesSectionSummaryServiceTest {
 
     final var sectionSummary = collaborationOpportunitiesSectionSummaryService.getSummary(projectDetail);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, projectDetail);
     assertInteractions(Collections.emptyList(), Collections.emptyList());
   }
 
- private void assertModelProperties(ProjectSectionSummary sectionSummary) {
+ private void assertModelProperties(ProjectSectionSummary sectionSummary, ProjectDetail projectDetail) {
     assertThat(sectionSummary.getDisplayOrder()).isEqualTo(CollaborationOpportunitiesSectionSummaryService.DISPLAY_ORDER);
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(CollaborationOpportunitiesSectionSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(CollaborationOpportunitiesSectionSummaryService.TEMPLATE_PATH);
 
     var model = sectionSummary.getTemplateModel();
 
-    assertThat(model).containsOnlyKeys(
-        "sectionTitle",
-        "sectionId",
-        "collaborationOpportunityDiffModel"
+    verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
+        projectDetail,
+        CollaborationOpportunitiesSectionSummaryService.PAGE_NAME,
+        CollaborationOpportunitiesSectionSummaryService.SECTION_ID
     );
 
-    assertThat(model).containsEntry("sectionTitle", CollaborationOpportunitiesSectionSummaryService.PAGE_NAME);
-    assertThat(model).containsEntry("sectionId", CollaborationOpportunitiesSectionSummaryService.SECTION_ID);
+    assertThat(model).containsOnlyKeys("collaborationOpportunityDiffModel");
   }
 
   private void assertInteractions(List<CollaborationOpportunityView> currentCollaborationOpportunityViews,

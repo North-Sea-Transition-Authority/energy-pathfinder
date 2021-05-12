@@ -14,6 +14,9 @@
       />
     </#list>
     <#else>
-      <@emptySectionSummaryInset.emptySectionSummaryInset itemText="collaboration opportunities"/>
+      <@emptySectionSummaryInset.emptySectionSummaryInset
+        itemText="collaboration opportunities"
+        projectTypeDisplayName=projectTypeDisplayNameLowercase
+      />
   </#if>
 </@sectionSummaryWrapper.sectionSummaryWrapper>

@@ -15,6 +15,7 @@ import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.Collabor
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
@@ -31,13 +32,17 @@ public class CollaborationOpportunitiesSectionSummaryService implements ProjectS
 
   private final CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService;
   private final DifferenceService differenceService;
+  private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
   @Autowired
   public CollaborationOpportunitiesSectionSummaryService(
       CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService,
-      DifferenceService differenceService) {
+      DifferenceService differenceService,
+      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService
+  ) {
     this.collaborationOpportunitiesSummaryService = collaborationOpportunitiesSummaryService;
     this.differenceService = differenceService;
+    this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
   }
 
   @Override
@@ -47,9 +52,12 @@ public class CollaborationOpportunitiesSectionSummaryService implements ProjectS
 
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
-    Map<String, Object> summaryModel = new HashMap<>();
-    summaryModel.put("sectionTitle", PAGE_NAME);
-    summaryModel.put("sectionId", SECTION_ID);
+
+    final var summaryModel = projectSectionSummaryCommonModelService.getCommonSummaryModelMap(
+        detail,
+        PAGE_NAME,
+        SECTION_ID
+    );
 
     var currentCollaborationOpportunityViews = collaborationOpportunitiesSummaryService.getSummaryViews(detail);
     var previousCollaborationOpportunityViews = collaborationOpportunitiesSummaryService.getSummaryViews(
