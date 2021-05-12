@@ -38,12 +38,14 @@ public class ProjectSubmissionSummaryViewService {
 
   private String getProjectDisplayName(ProjectDetail projectDetail) {
     if (ProjectService.isForwardWorkPlanProject(projectDetail)) {
-      return String.valueOf(projectOperatorService.getProjectOperatorByProjectDetailOrError(
-          projectDetail).getOrganisationGroup().getName());
+      return projectOperatorService
+          .getProjectOperatorByProjectDetailOrError(projectDetail)
+          .getOrganisationGroup()
+          .getName();
     } else if (ProjectService.isInfrastructureProject(projectDetail)) {
-      var projectInformation = projectInformationService.getProjectInformationOrError(projectDetail);
-
-      return projectInformation.getProjectTitle();
+      return projectInformationService
+          .getProjectInformationOrError(projectDetail)
+          .getProjectTitle();
     } else {
       throw new RuntimeException(
           String.format(
