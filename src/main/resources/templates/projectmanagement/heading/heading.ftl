@@ -3,8 +3,10 @@
 <@headingWithContent
   caption=""
   captionClass=""
-  pageHeading="Project: ${projectTitle}"
+  pageHeading=headingText
   pageHeadingClass="govuk-heading-xl"
 >
-  <span class="govuk-caption-l">${projectOperator}</span>
+  <#if captionText?has_content>
+    <span class="govuk-caption-l">${captionText}</span>
+  </#if>
 </@headingWithContent>
