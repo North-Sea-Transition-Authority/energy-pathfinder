@@ -12,7 +12,7 @@
 <@defaultPage htmlTitle=title pageHeading="" breadcrumbs=false>
   <@fdsPanel.panel
     panelTitle=title
-    panelText="${projectSubmissionSummaryView.projectTitle}"
+    panelText="${projectSubmissionSummaryView.projectDisplayName}"
   />
 
   <@fdsCheckAnswers.checkAnswers>
