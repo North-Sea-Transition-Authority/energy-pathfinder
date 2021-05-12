@@ -34,6 +34,7 @@ import uk.co.ogauthority.pathfinder.service.email.OperatorEmailService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.CancelDraftProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -237,7 +238,9 @@ public class ProjectTransferServiceTest {
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class)
             .getProject(projectId, null, null, null))
         ),
-        entry("pageHeading", pageHeading)
+        entry("pageHeading", pageHeading),
+        entry(ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR, projectDetail.getProjectType().getDisplayName()),
+        entry(ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR, projectDetail.getProjectType().getLowercaseDisplayName())
     );
 
     verify(breadcrumbService, times(1)).fromManageProject(
