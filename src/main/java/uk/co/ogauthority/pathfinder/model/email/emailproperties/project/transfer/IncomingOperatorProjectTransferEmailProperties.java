@@ -21,8 +21,8 @@ public class IncomingOperatorProjectTransferEmailProperties extends ProjectTrans
   }
 
   @Override
-  public Map<String, String> getEmailPersonalisation() {
-    Map<String, String> emailPersonalisation = super.getEmailPersonalisation();
+  public Map<String, Object> getEmailPersonalisation() {
+    var emailPersonalisation = super.getEmailPersonalisation();
     emailPersonalisation.put("PREVIOUS_OPERATOR_NAME", previousOperatorName);
     emailPersonalisation.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
     emailPersonalisation.put("PROJECT_URL", projectUrl);

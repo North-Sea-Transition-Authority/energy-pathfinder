@@ -20,8 +20,8 @@ class ProjectTransferEmailProperties extends EmailProperties {
   }
 
   @Override
-  public Map<String, String> getEmailPersonalisation() {
-    Map<String, String> emailPersonalisation = super.getEmailPersonalisation();
+  public Map<String, Object> getEmailPersonalisation() {
+    var emailPersonalisation = super.getEmailPersonalisation();
     emailPersonalisation.put("PROJECT_NAME", projectName);
     emailPersonalisation.put("TRANSFER_REASON", transferReason);
     return emailPersonalisation;

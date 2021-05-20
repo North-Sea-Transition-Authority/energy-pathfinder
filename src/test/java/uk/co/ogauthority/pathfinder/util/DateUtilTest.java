@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import org.junit.Test;
@@ -126,5 +127,29 @@ public class DateUtilTest {
   @Test
   public void isInCurrentQuarter_whenNotInCurrentQuarter() {
     assertThat(DateUtil.isInCurrentQuarter(Instant.now().minus(200, ChronoUnit.DAYS))).isFalse();
+  }
+
+  @Test
+  public void getStartOfMonth_assertCorrectReturnValue() {
+    final var localDateToTest = LocalDate.of(2021, 4, 20);
+
+    final var expectedLocalDate = LocalDate.of(2021, 4, 1);
+    final var expectedLocalTime = LocalTime.MIN;
+    final var expectedReturnValue = LocalDateTime.of(expectedLocalDate, expectedLocalTime).atZone(DateUtil.UTC_ZONE).toInstant();
+
+    final var result = DateUtil.getStartOfMonth(localDateToTest);
+    assertThat(result).isEqualTo(expectedReturnValue);
+  }
+
+  @Test
+  public void getEndOfMonth_assertCorrectReturnValue() {
+    final var localDateToTest = LocalDate.of(2021, 4, 20);
+
+    final var expectedLocalDate = LocalDate.of(2021, 4, 30);
+    final var expectedLocalTime = LocalTime.MAX;
+    final var expectedReturnValue = LocalDateTime.of(expectedLocalDate, expectedLocalTime).atZone(DateUtil.UTC_ZONE).toInstant();
+
+    final var result = DateUtil.getEndOfMonth(localDateToTest);
+    assertThat(result).isEqualTo(expectedReturnValue);
   }
 }

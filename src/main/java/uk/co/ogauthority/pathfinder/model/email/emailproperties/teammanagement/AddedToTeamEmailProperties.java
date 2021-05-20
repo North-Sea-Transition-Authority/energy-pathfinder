@@ -24,8 +24,8 @@ public class AddedToTeamEmailProperties extends EmailProperties {
   }
 
   @Override
-  public Map<String, String> getEmailPersonalisation() {
-    Map<String, String> emailPersonalisation = super.getEmailPersonalisation();
+  public Map<String, Object> getEmailPersonalisation() {
+    var emailPersonalisation = super.getEmailPersonalisation();
     emailPersonalisation.put("TEAM_NAME", teamName);
     emailPersonalisation.put("ADDED_BY_USER_NAME", addedByUserName);
     emailPersonalisation.put("ROLES_CSV", rolesCsv);

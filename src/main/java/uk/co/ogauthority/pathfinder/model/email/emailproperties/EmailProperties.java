@@ -10,9 +10,8 @@ import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplate;
  */
 public class EmailProperties {
 
-  private static final String SERVICE_NAME = "Energy Pathfinder";
-  private static final String CUSTOMER_MNEMONIC = "OGA";
-
+  public static final String SERVICE_NAME = "Energy Pathfinder";
+  public static final String CUSTOMER_MNEMONIC = "OGA";
   public static final String DEFAULT_RECIPIENT_IDENTIFIER = String.format("%s user", SERVICE_NAME);
   public static final String DEFAULT_SIGN_OFF_IDENTIFIER = String.format("%s %s team", CUSTOMER_MNEMONIC, SERVICE_NAME);
   public static final String DEFAULT_GREETING_TEXT = "Dear";
@@ -62,9 +61,9 @@ public class EmailProperties {
   /**
    * Get the default email personalisation for all templates.
    */
-  public Map<String, String> getEmailPersonalisation() {
+  public Map<String, Object> getEmailPersonalisation() {
 
-    Map<String, String> emailPersonalisation = new HashMap<>();
+    var emailPersonalisation = new HashMap<String, Object>();
 
     // TEST_EMAIL set to "no" by default and only set to "yes" in the TestNotifyServiceImpl
     emailPersonalisation.put("TEST_EMAIL", "no");

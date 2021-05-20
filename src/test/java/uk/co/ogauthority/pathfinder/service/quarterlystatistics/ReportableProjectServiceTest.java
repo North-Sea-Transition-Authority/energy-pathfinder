@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.quarterlystatistics;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -94,6 +95,29 @@ public class ReportableProjectServiceTest {
 
     assertCommonDerivedFields(reportableProjectView, reportableProject);
     assertThat(reportableProjectView.hasUpdateInQuarter()).isFalse();
+  }
+
+  @Test
+  public void getReportableProjectsUpdatedBetween_whenNoResults_thenEmptyListReturned() {
+    when(reportableProjectRepository.findByLastUpdatedDatetimeBetween(any(), any())).thenReturn(Collections.emptyList());
+    final var reportableProjects = reportableProjectService.getReportableProjectsUpdatedBetween(
+        Instant.now(),
+        Instant.now()
+    );
+    assertThat(reportableProjects).isEmpty();
+  }
+
+  @Test
+  public void getReportableProjectsUpdatedBetween_whenResults_thenEmptyListReturned() {
+
+    final var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.DISCOVERY);
+    when(reportableProjectRepository.findByLastUpdatedDatetimeBetween(any(), any())).thenReturn(List.of(reportableProject));
+
+    final var reportableProjects = reportableProjectService.getReportableProjectsUpdatedBetween(
+        Instant.now(),
+        Instant.now()
+    );
+    assertThat(reportableProjects).containsExactly(reportableProject);
   }
 
   private void assertCommonDerivedFields(ReportableProjectView reportableProjectView, ReportableProject reportableProject) {

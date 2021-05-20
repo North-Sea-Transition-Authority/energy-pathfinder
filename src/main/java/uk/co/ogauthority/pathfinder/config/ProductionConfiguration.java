@@ -28,17 +28,21 @@ public class ProductionConfiguration {
    */
   @Bean
   @ConditionalOnProperty(name = "email.mode", havingValue = "production")
-  public ProductionEmailServiceImpl productionNotifyService(NotifyTemplateService notifyTemplateService,
-                                                            NotificationClient notificationClient,
-                                                            EmailValidator emailValidator,
-                                                            @Value("${service.name}") String serviceName,
-                                                            @Value("${service.customer.mnemonic}") String customerMnemonic) {
+  public ProductionEmailServiceImpl productionNotifyService(
+      NotifyTemplateService notifyTemplateService,
+      NotificationClient notificationClient,
+      EmailValidator emailValidator,
+      @Value("${service.name}") String serviceName,
+      @Value("${service.customer.mnemonic}") String customerMnemonic,
+      @Value("${service.customer.supply-chain-interface-url}") String supplyChainInterfaceUrl
+  ) {
     return new ProductionEmailServiceImpl(
         notifyTemplateService,
         notificationClient,
         emailValidator,
         serviceName,
-        customerMnemonic
+        customerMnemonic,
+        supplyChainInterfaceUrl
     );
   }
 }
