@@ -22,7 +22,7 @@ public class MonthlyNewsletterScheduler {
   private static final Logger LOGGER = LoggerFactory.getLogger(MonthlyNewsletterScheduler.class);
   private static final JobKey JOB_KEY = jobKey("MONTHLY_NEWSLETTER_JOB", "NEWSLETTER_SCHEDULER_JOBS");
   private static final TriggerKey TRIGGER_KEY = triggerKey("MONTHLY_NEWSLETTER_JOB_TRIGGER_KEY", "NEWSLETTER_SCHEDULER_TRIGGERS");
-  private static final String FIRST_OF_EVERY_MONTH_AT_6AM = "0 0 06 01 * ?";
+  private static final String FIRST_OF_EVERY_MONTH_AT_9AM = "0 0 09 01 * ?";
 
   private final SchedulerService schedulerService;
 
@@ -46,7 +46,7 @@ public class MonthlyNewsletterScheduler {
       var trigger = TriggerBuilder
           .newTrigger()
           .withIdentity(TRIGGER_KEY)
-          .withSchedule(CronScheduleBuilder.cronSchedule(FIRST_OF_EVERY_MONTH_AT_6AM))
+          .withSchedule(CronScheduleBuilder.cronSchedule(FIRST_OF_EVERY_MONTH_AT_9AM))
           .build();
 
       schedulerService.scheduleJob(jobDetail, trigger);

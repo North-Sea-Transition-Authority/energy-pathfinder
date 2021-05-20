@@ -2,6 +2,8 @@ package uk.co.ogauthority.pathfinder.service.newsletters;
 
 import java.time.Instant;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,8 @@ import uk.co.ogauthority.pathfinder.service.subscription.SubscriberAccessor;
 
 @Service
 public class NewsletterService {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(NewsletterService.class);
 
   private final SubscriberAccessor subscriberAccessor;
   private final EmailLinkService emailLinkService;
@@ -54,6 +58,7 @@ public class NewsletterService {
       setResultAndSave(newsletter, NewsletterSendingResult.SUCCESS);
 
     } catch (Exception e) {
+      LOGGER.error("Failed to send subscriber newsletter", e);
       setResultAndSave(newsletter, NewsletterSendingResult.FAILURE);
     }
   }
