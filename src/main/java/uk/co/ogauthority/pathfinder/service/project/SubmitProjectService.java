@@ -16,7 +16,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.service.email.RegulatorEmailService;
-import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSubmissionSummaryViewService;
+import uk.co.ogauthority.pathfinder.service.project.submission.ProjectSubmissionSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;

@@ -26,12 +26,13 @@ import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.ProvideNoUpdateForm;
-import uk.co.ogauthority.pathfinder.model.view.projectupdate.ProjectNoUpdateSummaryView;
+import uk.co.ogauthority.pathfinder.model.view.submission.ProjectNoUpdateSubmissionSummaryView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.NoUpdateNotificationRepository;
 import uk.co.ogauthority.pathfinder.service.email.RegulatorEmailService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
+import uk.co.ogauthority.pathfinder.service.project.submission.ProjectSubmissionSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -52,7 +53,7 @@ public class OperatorProjectUpdateServiceTest {
   private NoUpdateNotificationRepository noUpdateNotificationRepository;
 
   @Mock
-  private ProjectNoUpdateSummaryViewService projectNoUpdateSummaryService;
+  private ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService;
 
   @Mock
   private ProjectHeaderSummaryService projectHeaderSummaryService;
@@ -78,7 +79,7 @@ public class OperatorProjectUpdateServiceTest {
         projectUpdateService,
         regulatorUpdateRequestService,
         noUpdateNotificationRepository,
-        projectNoUpdateSummaryService,
+        projectSubmissionSummaryViewService,
         projectHeaderSummaryService,
         regulatorEmailService,
         validationService,
@@ -251,16 +252,24 @@ public class OperatorProjectUpdateServiceTest {
 
   @Test
   public void getProjectProvideNoUpdateConfirmationModelAndView() {
-    var projectNoUpdateSummaryView = new ProjectNoUpdateSummaryView();
+    var projectNoUpdateSummaryView = new ProjectNoUpdateSubmissionSummaryView("test", "time", "user");
 
-    when(projectNoUpdateSummaryService.getProjectNoUpdateSummaryView(projectDetail)).thenReturn(projectNoUpdateSummaryView);
+    when(projectSubmissionSummaryViewService.getProjectNoUpdateSubmissionSummaryView(projectDetail)).thenReturn(projectNoUpdateSummaryView);
 
     var modelAndView = operatorProjectUpdateService.getProjectProvideNoUpdateConfirmationModelAndView(projectDetail);
 
     assertThat(modelAndView.getViewName()).isEqualTo(OperatorProjectUpdateService.PROVIDE_NO_UPDATE_CONFIRMATION_TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
         entry("projectNoUpdateSummaryView", projectNoUpdateSummaryView),
-        entry("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
+        entry("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null))),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
+            projectDetail.getProjectType().getDisplayName()
+        ),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR,
+            projectDetail.getProjectType().getLowercaseDisplayName()
+        )
     );
   }
 

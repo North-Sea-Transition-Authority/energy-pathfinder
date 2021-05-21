@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
-import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSubmissionSummaryView;
+import uk.co.ogauthority.pathfinder.model.view.submission.ProjectSubmissionSummaryView;
 
 public class ProjectSubmissionSummaryTestUtil {
 

@@ -5,7 +5,7 @@
 <@defaultPage htmlTitle=title pageHeading="" breadcrumbs=false>
   <@fdsPanel.panel
     panelTitle=title
-    panelText="${projectNoUpdateSummaryView.projectTitle}"
+    panelText="${projectNoUpdateSummaryView.projectDisplayName}"
   />
 
   <@fdsCheckAnswers.checkAnswers>
@@ -16,7 +16,7 @@
   <h2 class="govuk-heading-m">What happens next</h2>
 
   <p class="govuk-body">
-    You will not receive further reminders this quarter to submit an update for this project.
+    You will not receive further reminders this quarter to submit an update for this ${projectTypeDisplayNameLowercase}.
   </p>
 
   <@fdsAction.link linkClass="govuk-link govuk-!-font-size-19" linkText="Back to work area" linkUrl=springUrl(workAreaUrl)/>

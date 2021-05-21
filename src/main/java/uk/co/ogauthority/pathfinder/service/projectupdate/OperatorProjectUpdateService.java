@@ -24,6 +24,7 @@ import uk.co.ogauthority.pathfinder.repository.projectupdate.NoUpdateNotificatio
 import uk.co.ogauthority.pathfinder.service.email.RegulatorEmailService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
+import uk.co.ogauthority.pathfinder.service.project.submission.ProjectSubmissionSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
@@ -37,7 +38,7 @@ public class OperatorProjectUpdateService {
   private final ProjectUpdateService projectUpdateService;
   private final RegulatorUpdateRequestService regulatorUpdateRequestService;
   private final NoUpdateNotificationRepository noUpdateNotificationRepository;
-  private final ProjectNoUpdateSummaryViewService projectNoUpdateSummaryViewService;
+  private final ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService;
   private final ProjectHeaderSummaryService projectHeaderSummaryService;
   private final RegulatorEmailService regulatorEmailService;
   private final ValidationService validationService;
@@ -48,7 +49,7 @@ public class OperatorProjectUpdateService {
       ProjectUpdateService projectUpdateService,
       RegulatorUpdateRequestService regulatorUpdateRequestService,
       NoUpdateNotificationRepository noUpdateNotificationRepository,
-      ProjectNoUpdateSummaryViewService projectNoUpdateSummaryViewService,
+      ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService,
       ProjectHeaderSummaryService projectHeaderSummaryService,
       RegulatorEmailService regulatorEmailService,
       ValidationService validationService,
@@ -56,7 +57,7 @@ public class OperatorProjectUpdateService {
     this.projectUpdateService = projectUpdateService;
     this.regulatorUpdateRequestService = regulatorUpdateRequestService;
     this.noUpdateNotificationRepository = noUpdateNotificationRepository;
-    this.projectNoUpdateSummaryViewService = projectNoUpdateSummaryViewService;
+    this.projectSubmissionSummaryViewService = projectSubmissionSummaryViewService;
     this.projectHeaderSummaryService = projectHeaderSummaryService;
     this.regulatorEmailService = regulatorEmailService;
     this.validationService = validationService;
@@ -157,9 +158,18 @@ public class OperatorProjectUpdateService {
   }
 
   public ModelAndView getProjectProvideNoUpdateConfirmationModelAndView(ProjectDetail projectDetail) {
-    return new ModelAndView(PROVIDE_NO_UPDATE_CONFIRMATION_TEMPLATE_PATH)
-        .addObject("projectNoUpdateSummaryView", projectNoUpdateSummaryViewService.getProjectNoUpdateSummaryView(projectDetail))
-        .addObject("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class)
-            .getWorkArea(null, null)));
+    final var modelAndView = new ModelAndView(PROVIDE_NO_UPDATE_CONFIRMATION_TEMPLATE_PATH)
+        .addObject(
+            "projectNoUpdateSummaryView",
+            projectSubmissionSummaryViewService.getProjectNoUpdateSubmissionSummaryView(projectDetail)
+        )
+        .addObject(
+            "workAreaUrl",
+            ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null))
+        );
+
+    ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, projectDetail);
+
+    return modelAndView;
   }
 }
