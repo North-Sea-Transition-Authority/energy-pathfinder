@@ -22,6 +22,8 @@ import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.validationhint.OnOrAfterQuarterYearHint;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.validationhint.QuarterYearHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.quarteryear.QuarterYearInputValidator;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
@@ -80,19 +82,38 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
   }
 
   @Test
-  public void validate_whenFullValidationAndTenderDateInPast_thenNoErrors() {
+  public void validate_whenFullValidationAndTenderDateInPast_thenErrors() {
     var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setEstimatedTenderStartDate(new QuarterYearInput(Quarter.Q1, "2020"));
-    var fieldErrors = validateFormAndGetErrors(form, ValidationType.FULL);
-    assertThat(fieldErrors.hasErrors()).isFalse();
+
+    assertOnOrAfterTenderDateError(form, ValidationType.FULL);
   }
 
   @Test
-  public void validate_whenPartialValidationAndTenderDateInPast_thenNoErrors() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+  public void validate_whenPartialValidationAndTenderDateInPast_thenErrors() {
+    final var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setEstimatedTenderStartDate(new QuarterYearInput(Quarter.Q1, "2020"));
-    var fieldErrors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
-    assertThat(fieldErrors.hasErrors()).isFalse();
+
+    assertOnOrAfterTenderDateError(form, ValidationType.PARTIAL);
+  }
+
+  private void assertOnOrAfterTenderDateError(WorkPlanUpcomingTenderForm form,
+                                              ValidationType validationType) {
+
+    final var fieldErrors = validateFormAndGetErrors(form, validationType);
+
+    final var expectedErrorMessage = String.format(
+        OnOrAfterQuarterYearHint.ERROR_MESSAGE_TEXT,
+        WorkPlanUpcomingTenderValidationHint.ESTIMATED_TENDER_LABEL.getInitCappedLabel(),
+        QuarterYearHint.CURRENT_QUARTER_YEAR_LABEL
+    );
+
+    assertEstimatedTenderDateFieldErrorCodesAndMessages(
+        fieldErrors,
+        QuarterYearInputValidator.QUARTER_ON_OR_AFTER_DATE_CODE,
+        QuarterYearInputValidator.YEAR_ON_OR_AFTER_DATE_CODE,
+        expectedErrorMessage
+    );
   }
 
   @Test

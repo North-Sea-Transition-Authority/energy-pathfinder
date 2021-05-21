@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.model.form.validation.quarteryear;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Set;
 import org.junit.Before;
@@ -12,11 +13,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ValidationUtils;
+import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
-import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.validationhint.EmptyQuarterYearAcceptableHint;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.validationhint.OnOrAfterQuarterYearHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 
@@ -166,6 +168,237 @@ public class QuarterYearInputValidatorTest {
     var hints = new ArrayList<>();
     QuarterYearInputValidator.addEmptyQuarterYearAcceptableHint(ValidationType.FULL, hints);
     assertThat(hints).isEmpty();
+  }
+
+  @Test
+  public void validate_whenOnOrAfterQuarterYearHintAndQuarterIsBeforeAndYearIsSame_thenError() {
+
+    final var quarter = Quarter.Q2;
+    final var beforeQuarter = Quarter.Q1;
+
+    final var onOrAfterQuarterYear = new QuarterYearInput(
+        quarter,
+        "2020"
+    );
+
+    final var pastQuarterYear = new QuarterYearInput(
+        beforeQuarter,
+        onOrAfterQuarterYear.getYear()
+    );
+
+    final var quarterYearInputToValidateAgainstLabel = "example label";
+
+    final Object[] validationHints = {
+        formInputLabel,
+        new OnOrAfterQuarterYearHint(formInputLabel, onOrAfterQuarterYear, quarterYearInputToValidateAgainstLabel)
+    };
+
+    final var expectedErrorMessage = String.format(
+        OnOrAfterQuarterYearHint.ERROR_MESSAGE_TEXT,
+        formInputLabel.getInitCappedLabel(),
+        quarterYearInputToValidateAgainstLabel
+    );
+
+    validateAndAssertExpectedErrors(
+        pastQuarterYear,
+        validationHints,
+        QuarterYearInputValidator.QUARTER_ON_OR_AFTER_DATE_CODE,
+        QuarterYearInputValidator.YEAR_ON_OR_AFTER_DATE_CODE,
+        expectedErrorMessage
+    );
+  }
+
+  @Test
+  public void validate_whenOnOrAfterQuarterYearHintAndQuarterIsSameAndYearIsBefore_thenError() {
+
+    final var year = LocalDate.now();
+    final var beforeYear = LocalDate.now().minusYears(1);
+
+    final var onOrAfterQuarterYear = new QuarterYearInput(
+        Quarter.Q2,
+        String.valueOf(year.getYear())
+    );
+
+    final var pastQuarterYear = new QuarterYearInput(
+        onOrAfterQuarterYear.getQuarter(),
+        String.valueOf(beforeYear.getYear())
+    );
+
+    final var quarterYearInputToValidateAgainstLabel = "example label";
+
+    final Object[] validationHints = {
+        formInputLabel,
+        new OnOrAfterQuarterYearHint(formInputLabel, onOrAfterQuarterYear, quarterYearInputToValidateAgainstLabel)
+    };
+
+    final var expectedErrorMessage = String.format(
+        OnOrAfterQuarterYearHint.ERROR_MESSAGE_TEXT,
+        formInputLabel.getInitCappedLabel(),
+        quarterYearInputToValidateAgainstLabel
+    );
+
+    validateAndAssertExpectedErrors(
+        pastQuarterYear,
+        validationHints,
+        QuarterYearInputValidator.QUARTER_ON_OR_AFTER_DATE_CODE,
+        QuarterYearInputValidator.YEAR_ON_OR_AFTER_DATE_CODE,
+        expectedErrorMessage
+    );
+  }
+
+  @Test
+  public void validate_whenOnOrAfterQuarterYearHintAndQuarterAndYearIsBefore_thenError() {
+
+    final var year = LocalDate.now();
+    final var beforeYear = LocalDate.now().minusYears(1);
+
+    final var quarter = Quarter.Q2;
+    final var beforeQuarter = Quarter.Q1;
+
+    final var onOrAfterQuarterYear = new QuarterYearInput(
+        quarter,
+        String.valueOf(year.getYear())
+    );
+
+    final var pastQuarterYear = new QuarterYearInput(
+        beforeQuarter,
+        String.valueOf(beforeYear.getYear())
+    );
+
+    final var quarterYearInputToValidateAgainstLabel = "example label";
+
+    final Object[] validationHints = {
+        formInputLabel,
+        new OnOrAfterQuarterYearHint(formInputLabel, onOrAfterQuarterYear, quarterYearInputToValidateAgainstLabel)
+    };
+
+    final var expectedErrorMessage = String.format(
+        OnOrAfterQuarterYearHint.ERROR_MESSAGE_TEXT,
+        formInputLabel.getInitCappedLabel(),
+        quarterYearInputToValidateAgainstLabel
+    );
+
+    validateAndAssertExpectedErrors(
+        pastQuarterYear,
+        validationHints,
+        QuarterYearInputValidator.QUARTER_ON_OR_AFTER_DATE_CODE,
+        QuarterYearInputValidator.YEAR_ON_OR_AFTER_DATE_CODE,
+        expectedErrorMessage
+    );
+  }
+
+  @Test
+  public void validate_whenOnOrAfterQuarterYearHintAndInputIsSame_thenNoError() {
+
+    final var onOrAfterQuarterYear = new QuarterYearInput(
+        Quarter.Q1,
+        "2020"
+    );
+
+    final var quarterYearToValidate = new QuarterYearInput(
+        onOrAfterQuarterYear.getQuarter(),
+        onOrAfterQuarterYear.getYear()
+    );
+
+    final var quarterYearInputToValidateAgainstLabel = "example label";
+
+    final Object[] validationHints = {
+        formInputLabel,
+        new OnOrAfterQuarterYearHint(formInputLabel, onOrAfterQuarterYear, quarterYearInputToValidateAgainstLabel)
+    };
+
+    validateAndAssertNoErrors(
+        quarterYearToValidate,
+        validationHints
+    );
+  }
+
+  @Test
+  public void validate_whenOnOrAfterQuarterYearHintAndInputQuarterIsAfterAndYearIsSame_thenNoError() {
+
+    final var onOrAfterQuarterYear = new QuarterYearInput(
+        Quarter.Q1,
+        "2020"
+    );
+
+    final var quarterYearToValidate = new QuarterYearInput(
+        Quarter.Q2,
+        onOrAfterQuarterYear.getYear()
+    );
+
+    final var quarterYearInputToValidateAgainstLabel = "example label";
+
+    final Object[] validationHints = {
+        formInputLabel,
+        new OnOrAfterQuarterYearHint(formInputLabel, onOrAfterQuarterYear, quarterYearInputToValidateAgainstLabel)
+    };
+
+    validateAndAssertNoErrors(
+        quarterYearToValidate,
+        validationHints
+    );
+  }
+
+  @Test
+  public void validate_whenOnOrAfterQuarterYearHintAndInputQuarterIsSameAndYearIsAfter_thenNoError() {
+
+    final var onOrAfterQuarterYear = new QuarterYearInput(
+        Quarter.Q1,
+        "2020"
+    );
+
+    final var quarterYearToValidate = new QuarterYearInput(
+        onOrAfterQuarterYear.getQuarter(),
+        "2021"
+    );
+
+    final var quarterYearInputToValidateAgainstLabel = "example label";
+
+    final Object[] validationHints = {
+        formInputLabel,
+        new OnOrAfterQuarterYearHint(formInputLabel, onOrAfterQuarterYear, quarterYearInputToValidateAgainstLabel)
+    };
+
+    validateAndAssertNoErrors(
+        quarterYearToValidate,
+        validationHints
+    );
+  }
+
+  private void validateAndAssertExpectedErrors(QuarterYearInput quarterYearInputToValidate,
+                                               Object[] validationHints,
+                                               String expectedQuarterErrorCode,
+                                               String expectedYearErrorCode,
+                                               String expectedErrorMessage) {
+
+    final var errors = getErrors(quarterYearInputToValidate, validationHints);
+
+    final var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    final var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    final var quarterPrefix = QuarterYearInputValidator.QUARTER;
+    final var yearPrefix = QuarterYearInputValidator.YEAR;
+
+    assertThat(fieldErrors).containsExactly(
+        entry(quarterPrefix, Set.of(expectedQuarterErrorCode)),
+        entry(yearPrefix, Set.of(expectedYearErrorCode))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry(quarterPrefix, Set.of(expectedErrorMessage)),
+        entry(yearPrefix,  Set.of(""))
+    );
+  }
+
+  private void validateAndAssertNoErrors(QuarterYearInput quarterYearInputToValidate,
+                                         Object[] validationHints) {
+    var errors = getErrors(quarterYearInputToValidate, validationHints);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).isEmpty();
+    assertThat(fieldErrorMessages).isEmpty();
   }
 
 }
