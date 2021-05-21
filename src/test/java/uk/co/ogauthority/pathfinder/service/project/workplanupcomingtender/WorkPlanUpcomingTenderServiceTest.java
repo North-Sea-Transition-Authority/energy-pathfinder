@@ -27,6 +27,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.Wo
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.WorkPlanUpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -48,6 +49,9 @@ public class WorkPlanUpcomingTenderServiceTest {
   @Mock
   private WorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
@@ -64,7 +68,8 @@ public class WorkPlanUpcomingTenderServiceTest {
         validationService,
         workPlanUpcomingTenderFormValidator,
         workPlanUpcomingTenderRepository,
-        searchSelectorService
+        searchSelectorService,
+        entityDuplicationService
     );
 
     when(workPlanUpcomingTenderRepository.save(any(WorkPlanUpcomingTender.class)))
@@ -522,5 +527,36 @@ public class WorkPlanUpcomingTenderServiceTest {
     var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     workPlanUpcomingTenderService.delete(upcomingTender);
     verify(workPlanUpcomingTenderRepository, times(1)).delete(upcomingTender);
+  }
+
+  @Test
+  public void copySectionData_verifyInteractions() {
+
+    // ensure the two and from details are different so we can
+    // verify the params are passed in correctly
+    final var fromProjectDetail = ProjectUtil.getProjectDetails();
+    fromProjectDetail.setVersion(1);
+
+    final var toProjectDetail = ProjectUtil.getProjectDetails();
+    toProjectDetail.setVersion(2);
+
+    final var existingWorkPlanTenders = List.of(
+        WorkPlanUpcomingTenderUtil.getUpcomingTender(fromProjectDetail)
+    );
+
+    when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(fromProjectDetail)).thenReturn(
+        existingWorkPlanTenders
+    );
+
+    workPlanUpcomingTenderService.copySectionData(
+        fromProjectDetail,
+        toProjectDetail
+    );
+
+    verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
+        existingWorkPlanTenders,
+        toProjectDetail,
+        WorkPlanUpcomingTender.class
+    );
   }
 }

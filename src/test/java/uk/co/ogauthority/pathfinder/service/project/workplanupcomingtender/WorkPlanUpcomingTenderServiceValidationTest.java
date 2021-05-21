@@ -17,6 +17,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.WorkPlanUpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -38,12 +39,14 @@ public class WorkPlanUpcomingTenderServiceValidationTest {
   @Mock
   private SearchSelectorService searchSelectorService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
 
   private final WorkPlanUpcomingTender upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
-
 
   @Before
   public void setup() {
@@ -55,7 +58,8 @@ public class WorkPlanUpcomingTenderServiceValidationTest {
         validationService,
         workPlanUpcomingTenderFormValidator,
         workPlanUpcomingTenderRepository,
-        searchSelectorService
+        searchSelectorService,
+        entityDuplicationService
     );
   }
 

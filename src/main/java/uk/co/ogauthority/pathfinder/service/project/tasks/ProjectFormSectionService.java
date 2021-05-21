@@ -29,4 +29,13 @@ public interface ProjectFormSectionService {
   }
 
   void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail);
+
+  /**
+   * Method to determine if the section data should always be copied.
+   * @param projectDetail the project detail being processed
+   * @return true if we should always copy this sections data, false otherwise
+   */
+  default boolean alwaysCopySectionData(ProjectDetail projectDetail) {
+    return false;
+  }
 }

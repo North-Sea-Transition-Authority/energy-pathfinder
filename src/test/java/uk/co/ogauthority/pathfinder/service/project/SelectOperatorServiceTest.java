@@ -10,8 +10,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -220,6 +222,28 @@ public class SelectOperatorServiceTest {
     var projectDetail = ProjectUtil.getProjectDetails();
     projectDetail.setProjectType(null);
     assertThat(selectOperatorService.canShowInTaskList(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void alwaysCopySectionData_smokeTestProjectTypes_assertOnlyForwardWorkPlanType() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+
+    final var projectTypesToAlwaysCopy = Set.of(ProjectType.FORWARD_WORK_PLAN);
+
+    Arrays.asList(ProjectType.values()).forEach(projectType -> {
+
+      projectDetail.setProjectType(projectType);
+
+      final var alwaysCopySectionData = selectOperatorService.alwaysCopySectionData(projectDetail);
+
+      if (projectTypesToAlwaysCopy.contains(projectType)) {
+        assertThat(alwaysCopySectionData).isTrue();
+      } else {
+        assertThat(alwaysCopySectionData).isFalse();
+      }
+
+    });
   }
 
 }

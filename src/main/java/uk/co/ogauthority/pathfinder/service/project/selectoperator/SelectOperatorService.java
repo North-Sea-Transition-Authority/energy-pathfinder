@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.enums.TopNavigationType;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
@@ -166,6 +167,11 @@ public class SelectOperatorService implements ProjectFormSectionService {
         toDetail,
         ProjectOperator.class
     );
+  }
+
+  @Override
+  public boolean alwaysCopySectionData(ProjectDetail projectDetail) {
+    return ProjectType.FORWARD_WORK_PLAN.equals(projectDetail.getProjectType());
   }
 
   @Override

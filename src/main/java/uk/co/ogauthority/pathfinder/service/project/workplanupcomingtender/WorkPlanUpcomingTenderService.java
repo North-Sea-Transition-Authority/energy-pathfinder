@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.Wo
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.WorkPlanUpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
@@ -35,18 +36,21 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
   private final WorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator;
   private final WorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository;
   private final SearchSelectorService searchSelectorService;
+  private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
   public WorkPlanUpcomingTenderService(FunctionService functionService,
                                        ValidationService validationService,
                                        WorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator,
                                        WorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository,
-                                       SearchSelectorService searchSelectorService) {
+                                       SearchSelectorService searchSelectorService,
+                                       EntityDuplicationService entityDuplicationService) {
     this.functionService = functionService;
     this.validationService = validationService;
     this.workPlanUpcomingTenderFormValidator = workPlanUpcomingTenderFormValidator;
     this.workPlanUpcomingTenderRepository = workPlanUpcomingTenderRepository;
     this.searchSelectorService = searchSelectorService;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
   public List<RestSearchItem> findDepartmentTenderLikeWithManualEntry(String searchTerm) {
@@ -217,11 +221,15 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
-    //TODO method will be implemented with PAT-470
+    //TODO method will be implemented with PAT-550
   }
 
   @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
-    //TODO method will be implemented with PAT-535
+    entityDuplicationService.duplicateEntitiesAndSetNewParent(
+        getUpcomingTendersForDetail(fromDetail),
+        toDetail,
+        WorkPlanUpcomingTender.class
+    );
   }
 }

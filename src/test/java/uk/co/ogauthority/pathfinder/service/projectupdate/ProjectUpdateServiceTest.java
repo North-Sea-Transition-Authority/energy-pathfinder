@@ -24,8 +24,6 @@ import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.ProjectUpdateRepository;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
-import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -42,10 +40,10 @@ public class ProjectUpdateServiceTest {
   private ProjectService projectService;
 
   @Mock
-  private ProjectInformationService projectInformationService;
+  private TestProjectFormSectionService testProjectFormSectionServiceA;
 
   @Mock
-  private AwardedContractService awardedContractService;
+  private TestProjectFormSectionService testProjectFormSectionServiceB;
 
   private ProjectUpdateService projectUpdateService;
 
@@ -60,42 +58,82 @@ public class ProjectUpdateServiceTest {
         projectUpdateRepository,
         projectDetailsRepository,
         projectService,
-        List.of(projectInformationService, awardedContractService)
+        List.of(testProjectFormSectionServiceA, testProjectFormSectionServiceB)
     );
 
     when(projectUpdateRepository.save(any(ProjectUpdate.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
   @Test
-  public void createNewProjectVersion_whenAllShownInTaskList_verifyServiceInteractions() {
+  public void createNewProjectVersion_whenAllShownInTaskListAndNoneAlwaysCopy_verifyServiceInteractions() {
 
     final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
     final var user = UserTestingUtil.getAuthenticatedUserAccount();
 
-    when(projectInformationService.canShowInTaskList(fromProjectDetail)).thenReturn(true);
-    when(awardedContractService.canShowInTaskList(fromProjectDetail)).thenReturn(true);
+    when(testProjectFormSectionServiceA.canShowInTaskList(fromProjectDetail)).thenReturn(true);
+    when(testProjectFormSectionServiceA.alwaysCopySectionData(fromProjectDetail)).thenReturn(false);
+
+    when(testProjectFormSectionServiceB.canShowInTaskList(fromProjectDetail)).thenReturn(true);
+    when(testProjectFormSectionServiceB.alwaysCopySectionData(fromProjectDetail)).thenReturn(false);
 
     projectUpdateService.createNewProjectVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
 
     verify(projectService, times(1)).createNewProjectDetailVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
-    verify(projectInformationService, times(1)).copySectionData(eq(fromProjectDetail), any());
-    verify(awardedContractService, times(1)).copySectionData(eq(fromProjectDetail), any());
+    verify(testProjectFormSectionServiceA, times(1)).copySectionData(eq(fromProjectDetail), any());
+    verify(testProjectFormSectionServiceB, times(1)).copySectionData(eq(fromProjectDetail), any());
   }
 
   @Test
-  public void createNewProjectVersion_whenNotAllShownInTaskList_verifyServiceInteractions() {
+  public void createNewProjectVersion_whenNotAllShownInTaskListAndNoneAlwaysCopy_verifyServiceInteractions() {
 
     final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
     final var user = UserTestingUtil.getAuthenticatedUserAccount();
 
-    when(projectInformationService.canShowInTaskList(fromProjectDetail)).thenReturn(true);
-    when(awardedContractService.canShowInTaskList(fromProjectDetail)).thenReturn(false);
+    when(testProjectFormSectionServiceA.canShowInTaskList(fromProjectDetail)).thenReturn(true);
+    when(testProjectFormSectionServiceA.alwaysCopySectionData(fromProjectDetail)).thenReturn(false);
+
+    when(testProjectFormSectionServiceB.canShowInTaskList(fromProjectDetail)).thenReturn(false);
+    when(testProjectFormSectionServiceB.alwaysCopySectionData(fromProjectDetail)).thenReturn(false);
 
     projectUpdateService.createNewProjectVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
 
     verify(projectService, times(1)).createNewProjectDetailVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
-    verify(projectInformationService, times(1)).copySectionData(eq(fromProjectDetail), any());
-    verify(awardedContractService, never()).copySectionData(eq(fromProjectDetail), any());
+    verify(testProjectFormSectionServiceA, times(1)).copySectionData(eq(fromProjectDetail), any());
+    verify(testProjectFormSectionServiceB, never()).copySectionData(eq(fromProjectDetail), any());
+  }
+
+  @Test
+  public void createNewProjectVersion_whenNoneShownInTaskListAndAllAlwaysCopy_verifyServiceInteractions() {
+
+    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+    final var user = UserTestingUtil.getAuthenticatedUserAccount();
+
+    when(testProjectFormSectionServiceA.alwaysCopySectionData(fromProjectDetail)).thenReturn(true);
+    when(testProjectFormSectionServiceB.alwaysCopySectionData(fromProjectDetail)).thenReturn(true);
+
+    projectUpdateService.createNewProjectVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
+
+    verify(projectService, times(1)).createNewProjectDetailVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
+    verify(testProjectFormSectionServiceA, times(1)).copySectionData(eq(fromProjectDetail), any());
+    verify(testProjectFormSectionServiceB, times(1)).copySectionData(eq(fromProjectDetail), any());
+  }
+
+  @Test
+  public void createNewProjectVersion_whenSomeShownInTaskListAndSomeAlwaysCopy_verifyServiceInteractions() {
+
+    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+    final var user = UserTestingUtil.getAuthenticatedUserAccount();
+
+    when(testProjectFormSectionServiceA.alwaysCopySectionData(fromProjectDetail)).thenReturn(true);
+
+    when(testProjectFormSectionServiceB.canShowInTaskList(fromProjectDetail)).thenReturn(true);
+    when(testProjectFormSectionServiceB.alwaysCopySectionData(fromProjectDetail)).thenReturn(false);
+
+    projectUpdateService.createNewProjectVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
+
+    verify(projectService, times(1)).createNewProjectDetailVersion(fromProjectDetail, ProjectStatus.DRAFT, user);
+    verify(testProjectFormSectionServiceA, times(1)).copySectionData(eq(fromProjectDetail), any());
+    verify(testProjectFormSectionServiceB, times(1)).copySectionData(eq(fromProjectDetail), any());
   }
 
   @Test
