@@ -545,4 +545,9 @@ public class DecommissioningScheduleServiceTest {
         DecommissioningSchedule.class
     );
   }
+
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(decommissioningScheduleService.alwaysCopySectionData(projectDetail)).isFalse();
+  }
 }

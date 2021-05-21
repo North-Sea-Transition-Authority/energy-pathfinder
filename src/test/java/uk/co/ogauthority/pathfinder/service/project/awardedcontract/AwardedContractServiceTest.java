@@ -342,4 +342,9 @@ public class AwardedContractServiceTest {
         AwardedContract.class
     );
   }
+
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(awardedContractService.alwaysCopySectionData(detail)).isFalse();
+  }
 }

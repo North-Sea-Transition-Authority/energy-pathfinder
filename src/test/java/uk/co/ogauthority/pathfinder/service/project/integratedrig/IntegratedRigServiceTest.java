@@ -357,4 +357,9 @@ public class IntegratedRigServiceTest {
         IntegratedRig.class
     );
   }
+
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(integratedRigService.alwaysCopySectionData(projectDetail)).isFalse();
+  }
 }

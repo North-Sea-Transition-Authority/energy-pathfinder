@@ -326,4 +326,9 @@ public class DecommissionedPipelineServiceTest {
   //       DecommissionedPipeline.class
   //   );
   // }
+
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(decommissionedPipelineService.alwaysCopySectionData(projectDetail)).isFalse();
+  }
 }

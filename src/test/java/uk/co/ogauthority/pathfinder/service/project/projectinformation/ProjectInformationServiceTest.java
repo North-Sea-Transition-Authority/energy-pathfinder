@@ -552,4 +552,9 @@ public class ProjectInformationServiceTest {
 
     assertThat(projectInformationService.isEnergyTransitionProject(projectInformation)).isFalse();
   }
+
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(projectInformationService.alwaysCopySectionData(details)).isFalse();
+  }
 }

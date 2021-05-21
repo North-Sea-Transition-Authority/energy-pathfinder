@@ -302,4 +302,9 @@ public class CollaborationOpportunitiesServiceTest {
     assertThat(result).isEmpty();
   }
 
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(collaborationOpportunitiesService.alwaysCopySectionData(detail)).isFalse();
+  }
+
 }

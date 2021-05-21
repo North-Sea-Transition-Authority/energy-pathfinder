@@ -241,13 +241,12 @@ public class PlatformsFpsosServiceTest {
   public void getForm_fpsoAndManualEntry() {
     var platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withFpsoAndSubstructuresRemoved(detail);
     var newStructure = "new structure";
-    var existingPlatformFpso = platformFpso;
-    existingPlatformFpso.setManualStructureName(newStructure);
-    existingPlatformFpso.setStructure(null);
-    var form = platformsFpsosService.getForm(existingPlatformFpso);
+    platformFpso.setManualStructureName(newStructure);
+    platformFpso.setStructure(null);
+    var form = platformsFpsosService.getForm(platformFpso);
     assertThat(form.getPlatformStructure()).isNull();
-    assertThat(form.getFpsoStructure()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(existingPlatformFpso.getManualStructureName()));
-    assertCommonFormFieldsMatch(form, existingPlatformFpso);
+    assertThat(form.getFpsoStructure()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(platformFpso.getManualStructureName()));
+    assertCommonFormFieldsMatch(form, platformFpso);
   }
 
   @Test
@@ -447,6 +446,11 @@ public class PlatformsFpsosServiceTest {
         toProjectDetail,
         PlatformFpso.class
     );
+  }
+
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(platformsFpsosService.alwaysCopySectionData(detail)).isFalse();
   }
 
 }

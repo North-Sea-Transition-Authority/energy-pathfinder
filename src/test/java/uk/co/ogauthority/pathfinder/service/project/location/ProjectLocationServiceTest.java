@@ -442,6 +442,11 @@ public class ProjectLocationServiceTest {
     assertThat(projectLocationService.canShowInTaskList(projectDetail)).isFalse();
   }
 
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(projectLocationService.alwaysCopySectionData(details)).isFalse();
+  }
+
   private void checkCommonFieldsMatch(ProjectLocation projectLocation) {
     assertThat(projectLocation.getFieldType()).isEqualTo(ProjectLocationTestUtil.FIELD_TYPE);
     assertThat(projectLocation.getMaximumWaterDepth()).isEqualTo(ProjectLocationTestUtil.WATER_DEPTH);

@@ -454,4 +454,9 @@ public class PlugAbandonmentScheduleServiceTest {
         PlugAbandonmentScheduleController.REMOVE_PAGE_NAME
     );
   }
+
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(plugAbandonmentScheduleService.alwaysCopySectionData(detail)).isFalse();
+  }
 }

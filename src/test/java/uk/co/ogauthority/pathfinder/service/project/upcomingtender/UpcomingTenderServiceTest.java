@@ -377,4 +377,9 @@ public class UpcomingTenderServiceTest {
     var result = upcomingTenderService.getUpcomingTendersForProjectVersion(project, version);
     assertThat(result).isEmpty();
   }
+
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(upcomingTenderService.alwaysCopySectionData(detail)).isFalse();
+  }
 }

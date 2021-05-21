@@ -727,4 +727,9 @@ public class SubseaInfrastructureServiceTest {
   //
   // }
 
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(subseaInfrastructureService.alwaysCopySectionData(projectDetail)).isFalse();
+  }
+
 }

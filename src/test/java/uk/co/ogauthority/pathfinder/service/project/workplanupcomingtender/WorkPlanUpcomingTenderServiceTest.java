@@ -559,4 +559,9 @@ public class WorkPlanUpcomingTenderServiceTest {
         WorkPlanUpcomingTender.class
     );
   }
+
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(workPlanUpcomingTenderService.alwaysCopySectionData(projectDetail)).isFalse();
+  }
 }
