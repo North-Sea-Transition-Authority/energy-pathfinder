@@ -52,7 +52,7 @@
   <@summaryViewWrapper.summaryViewItemWrapper
     idPrefix=idPrefix
     headingPrefix=opportunityName
-    displayOrder=diffModel.CollaborationOpportunityView_displayOrder.currentValue
+    displayOrder=diffModel.InfrastructureCollaborationOpportunityView_displayOrder.currentValue
     isValid=true
     summaryLinkList=[]
     showHeader=showHeader
@@ -62,13 +62,13 @@
   >
     <@_collaborationOpportunitySummaryFields
       useDiffedField=true
-      function=diffModel.CollaborationOpportunityView_function
-      descriptionOfWork=diffModel.CollaborationOpportunityView_descriptionOfWork
-      urgentResponseNeeded=diffModel.CollaborationOpportunityView_urgentResponseNeeded
-      contactName=diffModel.CollaborationOpportunityView_contactName
-      contactPhoneNumber=diffModel.CollaborationOpportunityView_contactPhoneNumber
-      contactJobTitle=diffModel.CollaborationOpportunityView_contactJobTitle
-      contactEmailAddress=diffModel.CollaborationOpportunityView_contactEmailAddress
+      function=diffModel.InfrastructureCollaborationOpportunityView_function
+      descriptionOfWork=diffModel.InfrastructureCollaborationOpportunityView_descriptionOfWork
+      urgentResponseNeeded=diffModel.InfrastructureCollaborationOpportunityView_urgentResponseNeeded
+      contactName=diffModel.InfrastructureCollaborationOpportunityView_contactName
+      contactPhoneNumber=diffModel.InfrastructureCollaborationOpportunityView_contactPhoneNumber
+      contactJobTitle=diffModel.InfrastructureCollaborationOpportunityView_contactJobTitle
+      contactEmailAddress=diffModel.InfrastructureCollaborationOpportunityView_contactEmailAddress
       uploadedFileUrl=(files[0].UploadedFileView_fileUrl)!""
       uploadedFileName=(files[0].UploadedFileView_fileName)!""
       uploadedFileDescription=(files[0].UploadedFileView_fileDescription)!""

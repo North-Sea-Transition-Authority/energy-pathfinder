@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity;
+package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,7 @@ import uk.co.ogauthority.pathfinder.model.view.ContactDetailProjectSummaryItem;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 
-public class CollaborationOpportunityView extends ContactDetailProjectSummaryItem {
+public class InfrastructureCollaborationOpportunityView extends ContactDetailProjectSummaryItem {
 
   private StringWithTag function;
 
@@ -17,13 +17,13 @@ public class CollaborationOpportunityView extends ContactDetailProjectSummaryIte
 
   private List<UploadedFileView> uploadedFileViews;
 
-  public CollaborationOpportunityView() {
+  public InfrastructureCollaborationOpportunityView() {
     this.uploadedFileViews = new ArrayList<>();
   }
 
-  public CollaborationOpportunityView(Integer displayOrder,
-                                      Integer id,
-                                      Integer projectId
+  public InfrastructureCollaborationOpportunityView(Integer displayOrder,
+                                                    Integer id,
+                                                    Integer projectId
   ) {
     this.displayOrder = displayOrder;
     this.id = id;
@@ -74,7 +74,7 @@ public class CollaborationOpportunityView extends ContactDetailProjectSummaryIte
     if (!super.equals(o)) {
       return false;
     }
-    CollaborationOpportunityView that = (CollaborationOpportunityView) o;
+    InfrastructureCollaborationOpportunityView that = (InfrastructureCollaborationOpportunityView) o;
     return Objects.equals(function, that.function)
         && Objects.equals(descriptionOfWork, that.descriptionOfWork)
         && Objects.equals(urgentResponseNeeded, that.urgentResponseNeeded)

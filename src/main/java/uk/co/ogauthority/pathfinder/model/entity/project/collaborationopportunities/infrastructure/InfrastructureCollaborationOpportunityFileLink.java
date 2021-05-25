@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities;
+package uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,8 +14,8 @@ import uk.co.ogauthority.pathfinder.service.file.FileLinkEntity;
 
 @Entity
 @Table(name = "collaboration_op_file_links")
-public class CollaborationOpportunityFileLink
-    implements FileLinkEntity, ChildEntity<Integer, CollaborationOpportunity> {
+public class InfrastructureCollaborationOpportunityFileLink
+    implements FileLinkEntity, ChildEntity<Integer, InfrastructureCollaborationOpportunity> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,18 +23,17 @@ public class CollaborationOpportunityFileLink
 
   @ManyToOne
   @JoinColumn(name = "opportunity_id")
-  private CollaborationOpportunity collaborationOpportunity;
+  private InfrastructureCollaborationOpportunity collaborationOpportunity;
 
   @OneToOne
   @JoinColumn(name = "project_detail_file_id")
   private ProjectDetailFile projectDetailFile;
 
-  public CollaborationOpportunity getCollaborationOpportunity() {
+  public InfrastructureCollaborationOpportunity getCollaborationOpportunity() {
     return collaborationOpportunity;
   }
 
-  public void setCollaborationOpportunity(
-      CollaborationOpportunity collaborationOpportunity) {
+  public void setCollaborationOpportunity(InfrastructureCollaborationOpportunity collaborationOpportunity) {
     this.collaborationOpportunity = collaborationOpportunity;
   }
 
@@ -58,12 +57,13 @@ public class CollaborationOpportunityFileLink
   }
 
   @Override
-  public void setParent(CollaborationOpportunity parentEntity) {
+  public void setParent(InfrastructureCollaborationOpportunity parentEntity) {
     setCollaborationOpportunity(parentEntity);
   }
 
   @Override
-  public CollaborationOpportunity getParent() {
+  public InfrastructureCollaborationOpportunity getParent() {
     return getCollaborationOpportunity();
   }
+
 }

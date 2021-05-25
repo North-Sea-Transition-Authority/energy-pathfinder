@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities;
+package uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.infrastructure;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -7,7 +7,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailFo
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadMultipleFilesWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
-public class CollaborationOpportunityForm extends UploadMultipleFilesWithDescriptionForm {
+public class InfrastructureCollaborationOpportunityForm extends UploadMultipleFilesWithDescriptionForm {
 
   @NotEmpty(message = "Select a collaboration opportunity function", groups = FullValidation.class)
   private String function;

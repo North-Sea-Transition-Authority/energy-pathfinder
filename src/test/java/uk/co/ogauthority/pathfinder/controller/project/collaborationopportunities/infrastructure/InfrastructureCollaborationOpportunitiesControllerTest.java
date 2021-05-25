@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.controller.project.collaborationopportunities;
+package uk.co.ogauthority.pathfinder.controller.project.collaborationopportunities.infrastructure;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -29,40 +29,40 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
-import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
+import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.file.UploadedFile;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
-import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
-import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityViewUtil;
+import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunityForm;
+import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure.InfrastructureCollaborationOpportunityViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
-import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
-import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesSummaryService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
-import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectFileTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(value = CollaborationOpportunitiesController.class, includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ProjectContextService.class))
-public class CollaborationOpportunitiesControllerTest extends ProjectContextAbstractControllerTest {
+@WebMvcTest(value = InfrastructureCollaborationOpportunitiesController.class, includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ProjectContextService.class))
+public class InfrastructureCollaborationOpportunitiesControllerTest extends ProjectContextAbstractControllerTest {
   private static final Integer PROJECT_ID = 1;
   private static final Integer COLLABORATION_OPPORTUNITY_ID = 1;
   private static final Integer DISPLAY_ORDER = 1;
   private static final Integer PROJECT_VERSION = 1;
 
   @MockBean
-  private CollaborationOpportunitiesService collaborationOpportunitiesService;
+  private InfrastructureCollaborationOpportunitiesService infrastructureCollaborationOpportunitiesService;
 
   @MockBean
-  private CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService;
+  private InfrastructureCollaborationOpportunitiesSummaryService infrastructureCollaborationOpportunitiesSummaryService;
 
   @MockBean
   protected ProjectDetailFileService projectDetailFileService;
@@ -71,7 +71,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
 
   private final ProjectDetailFile PROJECT_DETAIL_FILE = ProjectFileTestUtil.getProjectDetailFile(detail);
 
-  private final CollaborationOpportunity opportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
+  private final InfrastructureCollaborationOpportunity opportunity = InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
 
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
@@ -84,17 +84,19 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(detail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(false);
-    when(collaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID)).thenReturn(opportunity);
+    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID)).thenReturn(opportunity);
     UploadedFile file = ProjectFileTestUtil.getUploadedFile();
 
-    var collaborationOpportunityView = CollaborationOpportunityViewUtil.createView(
+    var collaborationOpportunityView = InfrastructureCollaborationOpportunityViewUtil.createView(
         opportunity,
         DISPLAY_ORDER,
         Collections.emptyList()
     );
-    when(collaborationOpportunitiesSummaryService.getView(opportunity, DISPLAY_ORDER)).thenReturn(collaborationOpportunityView);
-    when(collaborationOpportunitiesService.createCollaborationOpportunity(any(), any(), any())).thenReturn(CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail));
-    when(collaborationOpportunitiesService.updateCollaborationOpportunity(any(), any(), any())).thenReturn(CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail));
+    when(infrastructureCollaborationOpportunitiesSummaryService.getView(opportunity, DISPLAY_ORDER)).thenReturn(collaborationOpportunityView);
+    when(infrastructureCollaborationOpportunitiesService.createCollaborationOpportunity(any(), any(), any())).thenReturn(
+        InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail));
+    when(infrastructureCollaborationOpportunitiesService.updateCollaborationOpportunity(any(), any(), any())).thenReturn(
+        InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail));
     when(projectDetailFileService.getProjectDetailFileByProjectDetailVersionAndFileId(any(), any(), any())).thenReturn(PROJECT_DETAIL_FILE);
     when(projectDetailFileService.getUploadedFileById(FILE_ID)).thenReturn(file);
   }
@@ -102,7 +104,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
   @Test
   public void authenticatedUser_hasAccessToCollaborationOpportunity() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(CollaborationOpportunitiesController.class).addCollaborationOpportunity(PROJECT_ID, null)))
+        on(InfrastructureCollaborationOpportunitiesController.class).addCollaborationOpportunity(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -110,7 +112,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
   @Test
   public void unAuthenticatedUser_cannotAccessCollaborationOpportunity() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(CollaborationOpportunitiesController.class).addCollaborationOpportunity(PROJECT_ID, null)))
+        on(InfrastructureCollaborationOpportunitiesController.class).addCollaborationOpportunity(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -118,7 +120,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
   @Test
   public void authenticatedUser_hasAccessToCollaborationOpportunitySummary() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(PROJECT_ID, null)))
+        on(InfrastructureCollaborationOpportunitiesController.class).viewCollaborationOpportunities(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -126,7 +128,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
   @Test
   public void unAuthenticatedUser_cannotAccessCollaborationOpportunitySummary() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(PROJECT_ID, null)))
+        on(InfrastructureCollaborationOpportunitiesController.class).viewCollaborationOpportunities(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -134,7 +136,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
   @Test
   public void authenticatedUser_hasAccessToCollaborationOpportunityRemove() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(CollaborationOpportunitiesController.class).removeCollaborationOpportunityConfirm(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, DISPLAY_ORDER, null)))
+        on(InfrastructureCollaborationOpportunitiesController.class).removeCollaborationOpportunityConfirm(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, DISPLAY_ORDER, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -142,16 +144,17 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
   @Test
   public void unAuthenticatedUser_cannotAccessCollaborationOpportunityRemove() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(CollaborationOpportunitiesController.class).removeCollaborationOpportunityConfirm(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, DISPLAY_ORDER, null)))
+        on(InfrastructureCollaborationOpportunitiesController.class).removeCollaborationOpportunityConfirm(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, DISPLAY_ORDER, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }
 
   @Test
   public void authenticatedUser_hasAccessToCollaborationOpportunityEdit() throws Exception {
-    when(collaborationOpportunitiesService.getForm(opportunity)).thenReturn(CollaborationOpportunityTestUtil.getCompleteForm());
+    when(infrastructureCollaborationOpportunitiesService.getForm(opportunity)).thenReturn(
+        InfrastructureCollaborationOpportunityTestUtil.getCompleteForm());
     mockMvc.perform(get(ReverseRouter.route(
-        on(CollaborationOpportunitiesController.class).editCollaborationOpportunity(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, null)))
+        on(InfrastructureCollaborationOpportunitiesController.class).editCollaborationOpportunity(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -159,7 +162,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
   @Test
   public void unAuthenticatedUser_cannotAccessCollaborationOpportunityEdit() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(CollaborationOpportunitiesController.class).editCollaborationOpportunity(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, null)))
+        on(InfrastructureCollaborationOpportunitiesController.class).editCollaborationOpportunity(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -170,11 +173,11 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
       add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
     }};
 
-    var bindingResult = new BeanPropertyBindingResult(CollaborationOpportunityForm.class, "form");
-    when(collaborationOpportunitiesService.validate(any(), any(), any())).thenReturn(bindingResult);
+    var bindingResult = new BeanPropertyBindingResult(InfrastructureCollaborationOpportunityForm.class, "form");
+    when(infrastructureCollaborationOpportunitiesService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(CollaborationOpportunitiesController.class)
+        post(ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
             .saveCollaborationOpportunity(PROJECT_ID, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
@@ -182,8 +185,8 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
             .params(completeLaterParams))
         .andExpect(status().is3xxRedirection());
 
-    verify(collaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(collaborationOpportunitiesService, times(1)).createCollaborationOpportunity(any(), any(), any());
+    verify(infrastructureCollaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(infrastructureCollaborationOpportunitiesService, times(1)).createCollaborationOpportunity(any(), any(), any());
   }
 
   @Test
@@ -192,12 +195,12 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
 
-    var bindingResult = new BeanPropertyBindingResult(CollaborationOpportunityForm.class, "form");
+    var bindingResult = new BeanPropertyBindingResult(InfrastructureCollaborationOpportunityForm.class, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
-    when(collaborationOpportunitiesService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(infrastructureCollaborationOpportunitiesService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(CollaborationOpportunitiesController.class)
+        post(ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
             .saveCollaborationOpportunity(PROJECT_ID, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
@@ -205,8 +208,8 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
             .params(completeParams))
         .andExpect(status().is2xxSuccessful());
 
-    verify(collaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(collaborationOpportunitiesService, times(0)).createCollaborationOpportunity(any(), any(), any());
+    verify(infrastructureCollaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(infrastructureCollaborationOpportunitiesService, times(0)).createCollaborationOpportunity(any(), any(), any());
   }
 
   @Test
@@ -215,11 +218,11 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
 
-    var bindingResult = new BeanPropertyBindingResult(CollaborationOpportunityForm.class, "form");
-    when(collaborationOpportunitiesService.validate(any(), any(), any())).thenReturn(bindingResult);
+    var bindingResult = new BeanPropertyBindingResult(InfrastructureCollaborationOpportunityForm.class, "form");
+    when(infrastructureCollaborationOpportunitiesService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(CollaborationOpportunitiesController.class)
+        post(ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
             .saveCollaborationOpportunity(PROJECT_ID, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
@@ -227,8 +230,8 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
             .params(completeParams))
         .andExpect(status().is3xxRedirection());
 
-    verify(collaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(collaborationOpportunitiesService, times(1)).createCollaborationOpportunity(any(), any(), any());
+    verify(infrastructureCollaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(infrastructureCollaborationOpportunitiesService, times(1)).createCollaborationOpportunity(any(), any(), any());
   }
 
   @Test
@@ -237,11 +240,11 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
       add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
     }};
 
-    var bindingResult = new BeanPropertyBindingResult(CollaborationOpportunityForm.class, "form");
-    when(collaborationOpportunitiesService.validate(any(), any(), any())).thenReturn(bindingResult);
+    var bindingResult = new BeanPropertyBindingResult(InfrastructureCollaborationOpportunityForm.class, "form");
+    when(infrastructureCollaborationOpportunitiesService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(CollaborationOpportunitiesController.class)
+        post(ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
             .updateCollaborationOpportunity(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
@@ -249,8 +252,8 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
             .params(completeLaterParams))
         .andExpect(status().is3xxRedirection());
 
-    verify(collaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(collaborationOpportunitiesService, times(1)).updateCollaborationOpportunity(any(), any(), any());
+    verify(infrastructureCollaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(infrastructureCollaborationOpportunitiesService, times(1)).updateCollaborationOpportunity(any(), any(), any());
   }
 
   @Test
@@ -259,12 +262,12 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
 
-    var bindingResult = new BeanPropertyBindingResult(CollaborationOpportunityForm.class, "form");
+    var bindingResult = new BeanPropertyBindingResult(InfrastructureCollaborationOpportunityForm.class, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
-    when(collaborationOpportunitiesService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(infrastructureCollaborationOpportunitiesService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(CollaborationOpportunitiesController.class)
+        post(ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
             .updateCollaborationOpportunity(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
@@ -272,8 +275,8 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
             .params(completeParams))
         .andExpect(status().is2xxSuccessful());
 
-    verify(collaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(collaborationOpportunitiesService, times(0)).updateCollaborationOpportunity(any(), any(), any());
+    verify(infrastructureCollaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(infrastructureCollaborationOpportunitiesService, times(0)).updateCollaborationOpportunity(any(), any(), any());
   }
 
   @Test
@@ -282,11 +285,11 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
 
-    var bindingResult = new BeanPropertyBindingResult(CollaborationOpportunityForm.class, "form");
-    when(collaborationOpportunitiesService.validate(any(), any(), any())).thenReturn(bindingResult);
+    var bindingResult = new BeanPropertyBindingResult(InfrastructureCollaborationOpportunityForm.class, "form");
+    when(infrastructureCollaborationOpportunitiesService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(CollaborationOpportunitiesController.class)
+        post(ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
             .updateCollaborationOpportunity(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
@@ -294,8 +297,8 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
             .params(completeParams))
         .andExpect(status().is3xxRedirection());
 
-    verify(collaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(collaborationOpportunitiesService, times(1)).updateCollaborationOpportunity(any(), any(), any());
+    verify(infrastructureCollaborationOpportunitiesService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(infrastructureCollaborationOpportunitiesService, times(1)).updateCollaborationOpportunity(any(), any(), any());
   }
 
   @Test
@@ -323,7 +326,7 @@ public class CollaborationOpportunitiesControllerTest extends ProjectContextAbst
     customStatusProject.setStatus(status);
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(customStatusProject);
     mockMvc.perform(get(ReverseRouter.route(
-        on(CollaborationOpportunitiesController.class).handleDownload(PROJECT_ID, PROJECT_VERSION, ProjectFileTestUtil.FILE_ID, null)))
+        on(InfrastructureCollaborationOpportunitiesController.class).handleDownload(PROJECT_ID, PROJECT_VERSION, ProjectFileTestUtil.FILE_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }

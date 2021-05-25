@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities;
+package uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,7 +15,7 @@ import uk.co.ogauthority.pathfinder.service.file.EntityWithLinkedFile;
 
 @Entity
 @Table(name = "collaboration_opportunities")
-public class CollaborationOpportunity
+public class InfrastructureCollaborationOpportunity
     extends ProjectDetailEntity implements ContactDetailCapture, EntityWithLinkedFile, ParentEntity {
 
   @Enumerated(EnumType.STRING)
@@ -37,10 +37,10 @@ public class CollaborationOpportunity
 
   private String emailAddress;
 
-  public CollaborationOpportunity() {
+  public InfrastructureCollaborationOpportunity() {
   }
 
-  public CollaborationOpportunity(ProjectDetail projectDetail) {
+  public InfrastructureCollaborationOpportunity(ProjectDetail projectDetail) {
     this.projectDetail = projectDetail;
   }
 

@@ -1,10 +1,10 @@
-package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity;
+package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
-import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
-import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
+import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
@@ -13,19 +13,19 @@ import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
-public class CollaborationOpportunityViewUtil {
+public class InfrastructureCollaborationOpportunityViewUtil {
 
-  private CollaborationOpportunityViewUtil() {
-    throw new IllegalStateException("CollaborationOpportunityViewUtil is a utility class and should not be instantiated");
+  private InfrastructureCollaborationOpportunityViewUtil() {
+    throw new IllegalStateException("InfrastructureCollaborationOpportunityViewUtil is a utility class and should not be instantiated");
   }
 
-  public static CollaborationOpportunityView createView(
-      CollaborationOpportunity opportunity,
+  public static InfrastructureCollaborationOpportunityView createView(
+      InfrastructureCollaborationOpportunity opportunity,
       Integer displayOrder,
       List<UploadedFileView> uploadedFileViews
   ) {
     var projectId = opportunity.getProjectDetail().getProject().getId();
-    var view = new CollaborationOpportunityView(
+    var view = new InfrastructureCollaborationOpportunityView(
         displayOrder,
         opportunity.getId(),
         projectId
@@ -48,7 +48,7 @@ public class CollaborationOpportunityViewUtil {
 
     var editLink = new SummaryLink(
         SummaryLinkText.EDIT.getDisplayName(),
-        ReverseRouter.route(on(CollaborationOpportunitiesController.class).editCollaborationOpportunity(
+        ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class).editCollaborationOpportunity(
             projectId,
             opportunity.getId(),
             null
@@ -57,7 +57,7 @@ public class CollaborationOpportunityViewUtil {
 
     var removeLink = new SummaryLink(
         SummaryLinkText.DELETE.getDisplayName(),
-        ReverseRouter.route(on(CollaborationOpportunitiesController.class).removeCollaborationOpportunityConfirm(
+        ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class).removeCollaborationOpportunityConfirm(
             projectId,
             opportunity.getId(),
             displayOrder,
@@ -70,8 +70,8 @@ public class CollaborationOpportunityViewUtil {
     return view;
   }
 
-  public static CollaborationOpportunityView createView(
-      CollaborationOpportunity opportunity,
+  public static InfrastructureCollaborationOpportunityView createView(
+      InfrastructureCollaborationOpportunity opportunity,
       Integer displayOrder,
       List<UploadedFileView> uploadedFileViews,
       Boolean isValid

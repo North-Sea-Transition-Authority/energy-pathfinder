@@ -10,7 +10,7 @@ import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.communication.CommunicationSummaryController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
-import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
+import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedpipeline.DecommissionedPipelineController;
 import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedRigController;
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
@@ -43,14 +43,16 @@ public class BreadcrumbService {
     return map;
   }
 
-  public void fromCollaborationOpportunities(Integer projectId, ModelAndView modelAndView, String thisPage) {
-    addAttrs(modelAndView, collaborationOpportunities(projectId), thisPage);
+  public void fromInfrastructureCollaborationOpportunities(Integer projectId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, infrastructureCollaborationOpportunities(projectId), thisPage);
   }
 
-  private Map<String, String> collaborationOpportunities(Integer projectId) {
+  private Map<String, String> infrastructureCollaborationOpportunities(Integer projectId) {
     var map = taskList(projectId);
-    String route = ReverseRouter.route(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null));
-    map.put(route, CollaborationOpportunitiesController.PAGE_NAME);
+    String route = ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
+        .viewCollaborationOpportunities(projectId, null)
+    );
+    map.put(route, InfrastructureCollaborationOpportunitiesController.PAGE_NAME);
     return map;
   }
 

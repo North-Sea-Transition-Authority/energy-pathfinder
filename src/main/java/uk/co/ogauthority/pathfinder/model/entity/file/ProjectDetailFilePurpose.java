@@ -1,13 +1,13 @@
 package uk.co.ogauthority.pathfinder.model.entity.file;
 
 import uk.co.ogauthority.pathfinder.controller.file.PathfinderFileUploadController;
-import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
+import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 
 public enum ProjectDetailFilePurpose {
 
   UPCOMING_TENDER(UpcomingTendersController.class),
-  COLLABORATION_OPPORTUNITY(CollaborationOpportunitiesController.class),
+  COLLABORATION_OPPORTUNITY(InfrastructureCollaborationOpportunitiesController.class),
   PLACEHOLDER(UPCOMING_TENDER.getFileControllerClass());
 
   private final Class<? extends PathfinderFileUploadController> fileControllerClass;

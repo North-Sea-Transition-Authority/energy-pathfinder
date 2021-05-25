@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities;
+package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +15,7 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
@@ -23,10 +23,10 @@ import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDescriptionForm;
-import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
-import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormValidator;
-import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityValidationHint;
-import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.CollaborationOpportunitiesRepository;
+import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunityForm;
+import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunityFormValidator;
+import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunityValidationHint;
+import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
@@ -36,50 +36,52 @@ import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
-public class CollaborationOpportunitiesService implements ProjectFormSectionService {
+public class InfrastructureCollaborationOpportunitiesService implements ProjectFormSectionService {
 
 
   private final SearchSelectorService searchSelectorService;
   private final FunctionService functionService;
   private final ValidationService validationService;
-  private final CollaborationOpportunityFormValidator collaborationOpportunityFormValidator;
-  private final CollaborationOpportunitiesRepository collaborationOpportunitiesRepository;
-  private final CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService;
+  private final InfrastructureCollaborationOpportunityFormValidator infrastructureCollaborationOpportunityFormValidator;
+  private final InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository;
+  private final InfrastructureCollaborationOpportunityFileLinkService infrastructureCollaborationOpportunityFileLinkService;
   private final ProjectDetailFileService projectDetailFileService;
   private final ProjectSetupService projectSetupService;
   private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
-  public CollaborationOpportunitiesService(SearchSelectorService searchSelectorService,
-                                           FunctionService functionService,
-                                           ValidationService validationService,
-                                           CollaborationOpportunityFormValidator collaborationOpportunityFormValidator,
-                                           CollaborationOpportunitiesRepository collaborationOpportunitiesRepository,
-                                           CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService,
-                                           ProjectDetailFileService projectDetailFileService,
-                                           ProjectSetupService projectSetupService,
-                                           EntityDuplicationService entityDuplicationService) {
+  public InfrastructureCollaborationOpportunitiesService(
+      SearchSelectorService searchSelectorService,
+      FunctionService functionService,
+      ValidationService validationService,
+      InfrastructureCollaborationOpportunityFormValidator infrastructureCollaborationOpportunityFormValidator,
+      InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository,
+      InfrastructureCollaborationOpportunityFileLinkService infrastructureCollaborationOpportunityFileLinkService,
+      ProjectDetailFileService projectDetailFileService,
+      ProjectSetupService projectSetupService,
+      EntityDuplicationService entityDuplicationService
+  ) {
     this.searchSelectorService = searchSelectorService;
     this.functionService = functionService;
     this.validationService = validationService;
-    this.collaborationOpportunityFormValidator = collaborationOpportunityFormValidator;
-    this.collaborationOpportunitiesRepository = collaborationOpportunitiesRepository;
-    this.collaborationOpportunityFileLinkService = collaborationOpportunityFileLinkService;
+    this.infrastructureCollaborationOpportunityFormValidator = infrastructureCollaborationOpportunityFormValidator;
+    this.infrastructureCollaborationOpportunitiesRepository = infrastructureCollaborationOpportunitiesRepository;
+    this.infrastructureCollaborationOpportunityFileLinkService = infrastructureCollaborationOpportunityFileLinkService;
     this.projectDetailFileService = projectDetailFileService;
     this.projectSetupService = projectSetupService;
     this.entityDuplicationService = entityDuplicationService;
   }
 
 
-  public BindingResult validate(CollaborationOpportunityForm form,
+  public BindingResult validate(InfrastructureCollaborationOpportunityForm form,
                                 BindingResult bindingResult,
                                 ValidationType validationType) {
-    var collaborationOpportunityValidationHint = new CollaborationOpportunityValidationHint();
-    collaborationOpportunityFormValidator.validate(form, bindingResult, collaborationOpportunityValidationHint);
+    var collaborationOpportunityValidationHint = new InfrastructureCollaborationOpportunityValidationHint();
+    infrastructureCollaborationOpportunityFormValidator.validate(form, bindingResult, collaborationOpportunityValidationHint);
     return validationService.validate(form, bindingResult, validationType);
   }
 
-  public boolean isValid(CollaborationOpportunity opportunity, ValidationType validationType) {
+  public boolean isValid(InfrastructureCollaborationOpportunity opportunity, ValidationType validationType) {
     var form = getForm(opportunity);
     BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult = validate(form, bindingResult, validationType);
@@ -87,14 +89,16 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
   }
 
   @Transactional
-  public CollaborationOpportunity createCollaborationOpportunity(ProjectDetail detail,
-                                                                 CollaborationOpportunityForm form,
-                                                                 AuthenticatedUserAccount authenticatedUserAccount) {
-    var opportunity = new CollaborationOpportunity(detail);
+  public InfrastructureCollaborationOpportunity createCollaborationOpportunity(
+      ProjectDetail detail,
+      InfrastructureCollaborationOpportunityForm form,
+      AuthenticatedUserAccount authenticatedUserAccount
+  ) {
+    var opportunity = new InfrastructureCollaborationOpportunity(detail);
     setCommonFields(opportunity, form);
-    opportunity = collaborationOpportunitiesRepository.save(opportunity);
+    opportunity = infrastructureCollaborationOpportunitiesRepository.save(opportunity);
 
-    collaborationOpportunityFileLinkService.updateCollaborationOpportunityFileLinks(
+    infrastructureCollaborationOpportunityFileLinkService.updateCollaborationOpportunityFileLinks(
         opportunity,
         form,
         authenticatedUserAccount
@@ -104,19 +108,22 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
   }
 
   @Transactional
-  public CollaborationOpportunity updateCollaborationOpportunity(CollaborationOpportunity opportunity,
-                                                                 CollaborationOpportunityForm form,
-                                                                 AuthenticatedUserAccount authenticatedUserAccount) {
-    collaborationOpportunityFileLinkService.updateCollaborationOpportunityFileLinks(
+  public InfrastructureCollaborationOpportunity updateCollaborationOpportunity(
+      InfrastructureCollaborationOpportunity opportunity,
+      InfrastructureCollaborationOpportunityForm form,
+      AuthenticatedUserAccount authenticatedUserAccount
+  ) {
+    infrastructureCollaborationOpportunityFileLinkService.updateCollaborationOpportunityFileLinks(
         opportunity,
         form,
         authenticatedUserAccount
     );
     setCommonFields(opportunity, form);
-    return collaborationOpportunitiesRepository.save(opportunity);
+    return infrastructureCollaborationOpportunitiesRepository.save(opportunity);
   }
 
-  private void setCommonFields(CollaborationOpportunity opportunity, CollaborationOpportunityForm form) {
+  private void setCommonFields(InfrastructureCollaborationOpportunity opportunity,
+                               InfrastructureCollaborationOpportunityForm form) {
     searchSelectorService.mapSearchSelectorFormEntryToEntity(
         form.getFunction(),
         Function.values(),
@@ -135,29 +142,32 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
   }
 
   @Transactional
-  public void delete(CollaborationOpportunity opportunity) {
-    collaborationOpportunityFileLinkService.removeCollaborationOpportunityFileLinks(opportunity);
-    collaborationOpportunitiesRepository.delete(opportunity);
+  public void delete(InfrastructureCollaborationOpportunity opportunity) {
+    infrastructureCollaborationOpportunityFileLinkService.removeCollaborationOpportunityFileLinks(opportunity);
+    infrastructureCollaborationOpportunitiesRepository.delete(opportunity);
   }
 
   public List<RestSearchItem> findFunctionsLikeWithManualEntry(String searchTerm) {
     return functionService.findFunctionsLikeWithManualEntry(searchTerm, FunctionType.COLLABORATION_OPPORTUNITY);
   }
 
-  public List<CollaborationOpportunity> getOpportunitiesForDetail(ProjectDetail detail) {
-    return collaborationOpportunitiesRepository.findAllByProjectDetailOrderByIdAsc(detail);
+  public List<InfrastructureCollaborationOpportunity> getOpportunitiesForDetail(ProjectDetail detail) {
+    return infrastructureCollaborationOpportunitiesRepository.findAllByProjectDetailOrderByIdAsc(detail);
   }
 
-  public List<CollaborationOpportunity> getOpportunitiesForProjectVersion(Project project, Integer version) {
-    return collaborationOpportunitiesRepository.findAllByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version);
+  public List<InfrastructureCollaborationOpportunity> getOpportunitiesForProjectVersion(Project project, Integer version) {
+    return infrastructureCollaborationOpportunitiesRepository.findAllByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(
+        project,
+        version
+    );
   }
 
-  public Map<String, String> getPreSelectedCollaborationFunction(CollaborationOpportunityForm form) {
+  public Map<String, String> getPreSelectedCollaborationFunction(InfrastructureCollaborationOpportunityForm form) {
     return searchSelectorService.getPreSelectedSearchSelectorValue(form.getFunction(), Function.values());
   }
 
-  public CollaborationOpportunity getOrError(Integer opportunityId) {
-    return collaborationOpportunitiesRepository.findById(opportunityId)
+  public InfrastructureCollaborationOpportunity getOrError(Integer opportunityId) {
+    return infrastructureCollaborationOpportunitiesRepository.findById(opportunityId)
         .orElseThrow(
             () -> new PathfinderEntityNotFoundException(
                 String.format("Unable to find collaborationOpportunity with ID %d", opportunityId)
@@ -165,8 +175,8 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
         );
   }
 
-  public CollaborationOpportunityForm getForm(CollaborationOpportunity opportunity) {
-    var form = new CollaborationOpportunityForm();
+  public InfrastructureCollaborationOpportunityForm getForm(InfrastructureCollaborationOpportunity opportunity) {
+    var form = new InfrastructureCollaborationOpportunityForm();
 
     if (opportunity.getFunction() != null) {
       form.setFunction(opportunity.getFunction().name());
@@ -199,22 +209,23 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
 
     if (file.getFileLinkStatus().equals(FileLinkStatus.FULL)) {
       // if fully linked we need to remove the collaboration opportunity file link
-      collaborationOpportunityFileLinkService.removeCollaborationOpportunityFileLink(file);
+      infrastructureCollaborationOpportunityFileLinkService.removeCollaborationOpportunityFileLink(file);
     }
 
     return projectDetailFileService.processFileDeletion(file, webUserAccount);
   }
 
   private List<UploadFileWithDescriptionForm> getUploadedFilesFormsByCollaborationOpportunity(
-      CollaborationOpportunity collaborationOpportunity
+      InfrastructureCollaborationOpportunity infrastructureCollaborationOpportunity
   ) {
-    return collaborationOpportunityFileLinkService.getAllByCollaborationOpportunity(collaborationOpportunity)
+    return infrastructureCollaborationOpportunityFileLinkService.getAllByCollaborationOpportunity(
+        infrastructureCollaborationOpportunity)
         .stream()
         .map(collaborationOpportunityFileLink -> {
           var uploadedFileView = projectDetailFileService.getUploadedFileView(
-              collaborationOpportunity.getProjectDetail(),
+              infrastructureCollaborationOpportunity.getProjectDetail(),
               collaborationOpportunityFileLink.getProjectDetailFile().getFileId(),
-              CollaborationOpportunityFileLinkService.FILE_PURPOSE,
+              InfrastructureCollaborationOpportunityFileLinkService.FILE_PURPOSE,
               FileLinkStatus.FULL
           );
           return new UploadFileWithDescriptionForm(
@@ -241,8 +252,8 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
     final var collaborationOpportunities = getOpportunitiesForDetail(projectDetail);
-    collaborationOpportunityFileLinkService.removeCollaborationOpportunityFileLinks(collaborationOpportunities);
-    collaborationOpportunitiesRepository.deleteAll(collaborationOpportunities);
+    infrastructureCollaborationOpportunityFileLinkService.removeCollaborationOpportunityFileLinks(collaborationOpportunities);
+    infrastructureCollaborationOpportunitiesRepository.deleteAll(collaborationOpportunities);
   }
 
   @Override
@@ -251,14 +262,14 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
     final var duplicatedOpportunityEntities = entityDuplicationService.duplicateEntitiesAndSetNewParent(
         getOpportunitiesForDetail(fromDetail),
         toDetail,
-        CollaborationOpportunity.class
+        InfrastructureCollaborationOpportunity.class
     );
 
     final var duplicatedOpportunityEntityMap = entityDuplicationService.createDuplicatedEntityPairingMap(
         duplicatedOpportunityEntities
     );
 
-    collaborationOpportunityFileLinkService.copyCollaborationOpportunityFileLinkData(
+    infrastructureCollaborationOpportunityFileLinkService.copyCollaborationOpportunityFileLinkData(
         fromDetail,
         toDetail,
         duplicatedOpportunityEntityMap

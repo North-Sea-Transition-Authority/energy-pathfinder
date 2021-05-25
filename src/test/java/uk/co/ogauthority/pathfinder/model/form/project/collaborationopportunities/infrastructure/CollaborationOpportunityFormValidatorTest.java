@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities;
+package uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.infrastructure;
 
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,27 +15,27 @@ import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
-import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CollaborationOpportunityFormValidatorTest {
 
-  private final CollaborationOpportunityValidationHint hint = new CollaborationOpportunityValidationHint();
+  private final InfrastructureCollaborationOpportunityValidationHint hint = new InfrastructureCollaborationOpportunityValidationHint();
 
-  private CollaborationOpportunityFormValidator collaborationOpportunityFormValidator;
+  private InfrastructureCollaborationOpportunityFormValidator infrastructureCollaborationOpportunityFormValidator;
 
   @Before
   public void setup() {
-    collaborationOpportunityFormValidator = new CollaborationOpportunityFormValidator();
+    infrastructureCollaborationOpportunityFormValidator = new InfrastructureCollaborationOpportunityFormValidator();
   }
 
   @Test
   public void validate_whenValidFrom_thenNoErrors() {
-    final var form = CollaborationOpportunityTestUtil.getCompleteForm();
+    final var form = InfrastructureCollaborationOpportunityTestUtil.getCompleteForm();
     final var errors = new BeanPropertyBindingResult(form, "form");
 
-    ValidationUtils.invokeValidator(collaborationOpportunityFormValidator, form, errors, hint);
+    ValidationUtils.invokeValidator(infrastructureCollaborationOpportunityFormValidator, form, errors, hint);
 
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     assertThat(fieldErrors).isEmpty();
@@ -44,14 +44,14 @@ public class CollaborationOpportunityFormValidatorTest {
   @Test
   public void validate_whenTooManyFiles_thenError() {
 
-    var form = CollaborationOpportunityTestUtil.getCompleteForm();
+    var form = InfrastructureCollaborationOpportunityTestUtil.getCompleteForm();
 
     final var file = new UploadFileWithDescriptionForm("1", "description", Instant.now());
     form.setUploadedFileWithDescriptionForms(List.of(file, file));
 
     final var errors = new BeanPropertyBindingResult(form, "form");
 
-    ValidationUtils.invokeValidator(collaborationOpportunityFormValidator, form, errors, hint);
+    ValidationUtils.invokeValidator(infrastructureCollaborationOpportunityFormValidator, form, errors, hint);
 
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
 
@@ -66,14 +66,14 @@ public class CollaborationOpportunityFormValidatorTest {
   @Test
   public void validate_whenExactFileLimit_thenNoError() {
 
-    var form = CollaborationOpportunityTestUtil.getCompleteForm();
+    var form = InfrastructureCollaborationOpportunityTestUtil.getCompleteForm();
 
     final var file = new UploadFileWithDescriptionForm("1", "description", Instant.now());
     form.setUploadedFileWithDescriptionForms(List.of(file));
 
     final var errors = new BeanPropertyBindingResult(form, "form");
 
-    ValidationUtils.invokeValidator(collaborationOpportunityFormValidator, form, errors, hint);
+    ValidationUtils.invokeValidator(infrastructureCollaborationOpportunityFormValidator, form, errors, hint);
 
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     assertThat(fieldErrors).isEmpty();
@@ -81,9 +81,9 @@ public class CollaborationOpportunityFormValidatorTest {
 
   @Test(expected = ActionNotAllowedException.class)
   public void validate_whenNoValidationHint_thenException() {
-    final var form = CollaborationOpportunityTestUtil.getCompleteForm();
+    final var form = InfrastructureCollaborationOpportunityTestUtil.getCompleteForm();
     final var errors = new BeanPropertyBindingResult(form, "form");
-    ValidationUtils.invokeValidator(collaborationOpportunityFormValidator, form, errors);
+    ValidationUtils.invokeValidator(infrastructureCollaborationOpportunityFormValidator, form, errors);
   }
 
 }

@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities;
+package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
+import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
-import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityView;
+import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure.InfrastructureCollaborationOpportunityView;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
@@ -19,10 +19,10 @@ import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummar
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
-public class CollaborationOpportunitiesSectionSummaryService implements ProjectSectionSummaryService {
+public class InfrastructureCollaborationOpportunitiesSectionSummaryService implements ProjectSectionSummaryService {
 
   public static final String TEMPLATE_PATH = "project/collaborationopportunities/collaborationOpportunitiesSectionSummary.ftl";
-  public static final String PAGE_NAME = CollaborationOpportunitiesController.PAGE_NAME;
+  public static final String PAGE_NAME = InfrastructureCollaborationOpportunitiesController.PAGE_NAME;
   public static final String SECTION_ID = "collaboration-opportunities";
   public static final SidebarSectionLink SECTION_LINK = SidebarSectionLink.createAnchorLink(
       PAGE_NAME,
@@ -30,24 +30,24 @@ public class CollaborationOpportunitiesSectionSummaryService implements ProjectS
   );
   public static final int DISPLAY_ORDER = ProjectTask.COLLABORATION_OPPORTUNITIES.getDisplayOrder();
 
-  private final CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService;
+  private final InfrastructureCollaborationOpportunitiesSummaryService infrastructureCollaborationOpportunitiesSummaryService;
   private final DifferenceService differenceService;
   private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
   @Autowired
-  public CollaborationOpportunitiesSectionSummaryService(
-      CollaborationOpportunitiesSummaryService collaborationOpportunitiesSummaryService,
+  public InfrastructureCollaborationOpportunitiesSectionSummaryService(
+      InfrastructureCollaborationOpportunitiesSummaryService infrastructureCollaborationOpportunitiesSummaryService,
       DifferenceService differenceService,
       ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService
   ) {
-    this.collaborationOpportunitiesSummaryService = collaborationOpportunitiesSummaryService;
+    this.infrastructureCollaborationOpportunitiesSummaryService = infrastructureCollaborationOpportunitiesSummaryService;
     this.differenceService = differenceService;
     this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
   }
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return collaborationOpportunitiesSummaryService.canShowInTaskList(detail);
+    return infrastructureCollaborationOpportunitiesSummaryService.canShowInTaskList(detail);
   }
 
   @Override
@@ -59,8 +59,8 @@ public class CollaborationOpportunitiesSectionSummaryService implements ProjectS
         SECTION_ID
     );
 
-    var currentCollaborationOpportunityViews = collaborationOpportunitiesSummaryService.getSummaryViews(detail);
-    var previousCollaborationOpportunityViews = collaborationOpportunitiesSummaryService.getSummaryViews(
+    var currentCollaborationOpportunityViews = infrastructureCollaborationOpportunitiesSummaryService.getSummaryViews(detail);
+    var previousCollaborationOpportunityViews = infrastructureCollaborationOpportunitiesSummaryService.getSummaryViews(
         detail.getProject(),
         detail.getVersion() - 1
     );
@@ -75,7 +75,7 @@ public class CollaborationOpportunitiesSectionSummaryService implements ProjectS
           .stream()
           .filter(view -> view.getDisplayOrder().equals(collaborationOpportunityView.getDisplayOrder()))
           .findFirst()
-          .orElse(new CollaborationOpportunityView());
+          .orElse(new InfrastructureCollaborationOpportunityView());
 
       var collaborationOpportunityDiffModel = differenceService.differentiate(
           collaborationOpportunityView,

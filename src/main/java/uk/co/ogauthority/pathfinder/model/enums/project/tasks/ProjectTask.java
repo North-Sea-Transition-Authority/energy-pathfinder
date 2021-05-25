@@ -5,7 +5,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.Set;
 import java.util.stream.Stream;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
-import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
+import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedpipeline.DecommissionedPipelineController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissioningschedule.DecommissioningScheduleController;
 import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedRigController;
@@ -22,7 +22,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
-import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesService;
 import uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline.DecommissionedPipelineService;
 import uk.co.ogauthority.pathfinder.service.project.decommissioningschedule.DecommissioningScheduleService;
 import uk.co.ogauthority.pathfinder.service.project.integratedrig.IntegratedRigService;
@@ -85,9 +85,9 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       60
   ),
   COLLABORATION_OPPORTUNITIES(
-      CollaborationOpportunitiesController.PAGE_NAME,
-      CollaborationOpportunitiesController.class,
-      CollaborationOpportunitiesService.class,
+      InfrastructureCollaborationOpportunitiesController.PAGE_NAME,
+      InfrastructureCollaborationOpportunitiesController.class,
+      InfrastructureCollaborationOpportunitiesService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
       70
   ),
@@ -206,7 +206,8 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       case AWARDED_CONTRACTS:
         return ReverseRouter.route(on(AwardedContractController.class).viewAwardedContracts(projectId, null));
       case COLLABORATION_OPPORTUNITIES:
-        return ReverseRouter.route(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null));
+        return ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
+            .viewCollaborationOpportunities(projectId, null));
       case DECOMMISSIONING_SCHEDULE:
         return ReverseRouter.route(on(DecommissioningScheduleController.class).getDecommissioningSchedule(projectId, null));
       case WELLS:
