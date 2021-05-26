@@ -1,7 +1,7 @@
 <#include '../../layout.ftl'>
 <#import '_collaborationOpportunitySummary.ftl' as collaborationOpportunitySummary>
 
-<#assign title = "Are you sure you want to remove collaboration opportunity " + displayOrder/>
+<#assign title = "Are you sure you want to remove collaboration opportunity ${displayOrder}?"/>
 
 <@defaultPage htmlTitle=title pageHeading=title breadcrumbs=true>
 
