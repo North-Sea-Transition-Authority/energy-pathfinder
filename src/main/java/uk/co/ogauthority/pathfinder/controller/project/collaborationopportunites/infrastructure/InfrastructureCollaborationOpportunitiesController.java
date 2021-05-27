@@ -50,7 +50,7 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
 @ProjectTypeCheck(types = ProjectType.INFRASTRUCTURE)
-@RequestMapping("/project/{projectId}/collaboration-opportunities")
+@RequestMapping("/project/{projectId}/infrastructure/collaboration-opportunities")
 public class InfrastructureCollaborationOpportunitiesController extends PathfinderFileUploadController {
 
   public static final String PAGE_NAME = "Collaboration opportunities";

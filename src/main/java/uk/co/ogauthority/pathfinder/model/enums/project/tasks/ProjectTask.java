@@ -5,6 +5,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.Set;
 import java.util.stream.Stream;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
+import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedpipeline.DecommissionedPipelineController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissioningschedule.DecommissioningScheduleController;
@@ -22,6 +23,8 @@ import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityModelService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesService;
 import uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline.DecommissionedPipelineService;
 import uk.co.ogauthority.pathfinder.service.project.decommissioningschedule.DecommissioningScheduleService;
@@ -137,9 +140,15 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       WorkPlanUpcomingTenderController.PAGE_NAME,
       WorkPlanUpcomingTenderController.class,
       WorkPlanUpcomingTenderService.class,
-      Set.of(
-          ProjectType.FORWARD_WORK_PLAN),
-      1
+      Set.of(ProjectType.FORWARD_WORK_PLAN),
+      10
+  ),
+  WORK_PLAN_COLLABORATION_OPPORTUNITIES(
+      ForwardWorkPlanCollaborationOpportunityModelService.PAGE_NAME,
+      ForwardWorkPlanCollaborationOpportunityController.class,
+      ForwardWorkPlanCollaborationOpportunityService.class,
+      Set.of(ProjectType.FORWARD_WORK_PLAN),
+      20
   );
 
   private final String displayName;
@@ -222,6 +231,11 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
         return ReverseRouter.route(on(DecommissionedPipelineController.class).viewPipelines(projectId, null));
       case WORK_PLAN_UPCOMING_TENDERS:
         return ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null));
+      case WORK_PLAN_COLLABORATION_OPPORTUNITIES:
+        return ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class).viewCollaborationOpportunities(
+            projectId,
+            null
+        ));
       default:
         return "";
     }
