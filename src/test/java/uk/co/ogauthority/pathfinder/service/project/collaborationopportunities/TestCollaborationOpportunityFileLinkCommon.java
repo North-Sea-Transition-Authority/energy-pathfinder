@@ -1,0 +1,6 @@
+package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities;
+
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityFileLinkCommon;
+
+public class TestCollaborationOpportunityFileLinkCommon extends CollaborationOpportunityFileLinkCommon {
+}

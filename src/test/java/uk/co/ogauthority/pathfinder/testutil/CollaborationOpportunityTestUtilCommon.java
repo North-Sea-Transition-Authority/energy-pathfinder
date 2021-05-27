@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityCommon;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityFileLinkCommon;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormCommon;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
@@ -10,8 +11,7 @@ import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.Collabor
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
-class CollaborationOpportunityTestUtilCommon {
-
+public class CollaborationOpportunityTestUtilCommon {
   public static final Integer ID = 1;
   public static final Integer PROJECT_ID = 1;
   public static final Function FUNCTION = Function.DRILLING;
@@ -23,7 +23,7 @@ class CollaborationOpportunityTestUtilCommon {
   public static final String JOB_TITLE = ContactDetailsTestUtil.JOB_TITLE;
   public static final String EMAIL = ContactDetailsTestUtil.EMAIL;
 
-  protected static CollaborationOpportunityFormCommon populateCompleteForm(CollaborationOpportunityFormCommon form) {
+  public static CollaborationOpportunityFormCommon populateCompleteForm(CollaborationOpportunityFormCommon form) {
     form.setFunction(FUNCTION.name());
     setCommonFields(form);
     return form;
@@ -66,7 +66,7 @@ class CollaborationOpportunityTestUtilCommon {
     return view;
   }
 
-  protected static CollaborationOpportunityCommon populateCollaborationOpportunity(
+  public static CollaborationOpportunityCommon populateCollaborationOpportunity(
       CollaborationOpportunityCommon opportunity
   ) {
     opportunity.setFunction(FUNCTION);
@@ -80,6 +80,16 @@ class CollaborationOpportunityTestUtilCommon {
     opportunity.setManualFunction(SearchSelectorService.removePrefix(MANUAL_FUNCTION));
     setCommonFields(opportunity);
     return opportunity;
+  }
+
+  public static CollaborationOpportunityFileLinkCommon populateCollaborationOpportunityFileLink(
+      CollaborationOpportunityFileLinkCommon collaborationOpportunityFileLinkCommon
+  ) {
+    collaborationOpportunityFileLinkCommon.setId(1);
+    collaborationOpportunityFileLinkCommon.setProjectDetailFile(
+        ProjectFileTestUtil.getProjectDetailFile(ProjectUtil.getProjectDetails())
+    );
+    return collaborationOpportunityFileLinkCommon;
   }
 
   private static void setCommonFields(CollaborationOpportunityCommon opportunity) {
