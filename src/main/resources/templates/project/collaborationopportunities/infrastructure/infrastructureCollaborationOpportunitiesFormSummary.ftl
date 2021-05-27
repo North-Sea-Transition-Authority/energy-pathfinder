@@ -1,5 +1,5 @@
-<#include '../../layout.ftl'>
-<#import '_collaborationOpportunitySummary.ftl' as collaborationOpportunitySummary />
+<#include '../../../layout.ftl'>
+<#import '_infrastructureCollaborationOpportunitySummary.ftl' as collaborationOpportunitySummary />
 
 <@defaultPage htmlTitle="Collaboration opportunities" pageHeading="Collaboration opportunities" breadcrumbs=true errorItems=errorSummary>
   <#if opportunityViews?has_content>

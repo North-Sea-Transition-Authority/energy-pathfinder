@@ -1,5 +1,5 @@
-<#include '../../layout.ftl'>
-<#import '_collaborationOpportunitySummary.ftl' as collaborationOpportunitySummary>
+<#include '../../../layout.ftl'>
+<#import '_infrastructureCollaborationOpportunitySummary.ftl' as collaborationOpportunitySummary>
 
 <#assign title = "Are you sure you want to remove collaboration opportunity ${displayOrder}?"/>
 

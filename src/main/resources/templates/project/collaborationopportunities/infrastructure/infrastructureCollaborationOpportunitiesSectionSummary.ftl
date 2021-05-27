@@ -1,5 +1,5 @@
-<#include '../../layout.ftl'>
-<#import '_collaborationOpportunitySummary.ftl' as collaborationOpportunitySummary>
+<#include '../../../layout.ftl'>
+<#import '_infrastructureCollaborationOpportunitySummary.ftl' as collaborationOpportunitySummary>
 
 <@sectionSummaryWrapper.sectionSummaryWrapper sectionId=sectionId sectionTitle=sectionTitle>
   <#if collaborationOpportunityDiffModel?has_content>

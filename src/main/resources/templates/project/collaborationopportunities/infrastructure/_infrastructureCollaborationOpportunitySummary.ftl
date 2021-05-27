@@ -1,4 +1,5 @@
-<#include '../../layout.ftl'/>
+<#include '../../../layout.ftl'/>
+<#import '../_collaborationOpportunitySummaryCommon.ftl' as collaborationOpportunitySummaryCommon>
 
 <#assign defaultHeadingPrefix = "Collaboration opportunity" />
 <#assign idPrefix = "collaboration-opportunity" />
@@ -24,7 +25,7 @@
     headingSize=headingSize
     headingClass=headingClass
   >
-    <@_collaborationOpportunitySummaryFields
+    <@collaborationOpportunitySummaryCommon._collaborationOpportunitySummaryFields
       useDiffedField=false
       function=view.function
       descriptionOfWork=view.descriptionOfWork
@@ -60,7 +61,7 @@
     headingSize=headingSize
     headingClass=headingClass
   >
-    <@_collaborationOpportunitySummaryFields
+    <@collaborationOpportunitySummaryCommon._collaborationOpportunitySummaryFields
       useDiffedField=true
       function=diffModel.InfrastructureCollaborationOpportunityView_function
       descriptionOfWork=diffModel.InfrastructureCollaborationOpportunityView_descriptionOfWork
@@ -74,62 +75,4 @@
       uploadedFileDescription=(files[0].UploadedFileView_fileDescription)!""
     />
   </@summaryViewWrapper.summaryViewItemWrapper>
-</#macro>
-
-<#macro _collaborationOpportunitySummaryFields
-  useDiffedField
-  function=""
-  descriptionOfWork=""
-  urgentResponseNeeded=""
-  contactName=""
-  contactPhoneNumber=""
-  contactJobTitle=""
-  contactEmailAddress=""
-  uploadedFileUrl=""
-  uploadedFileName=""
-  uploadedFileDescription=""
->
-  <@checkAnswers.checkAnswersStandardNestedOrDiffRow
-    prompt="Opportunity function"
-    fieldValue=function
-    isDiffedField=useDiffedField
-  >
-    <@stringWithTag.stringWithTag stringWithTag=function />
-  </@checkAnswers.checkAnswersStandardNestedOrDiffRow>
-  <@checkAnswers.checkAnswersStandardOrDiffRow
-    prompt="Description of work"
-    fieldValue=descriptionOfWork
-    isDiffedField=useDiffedField
-  />
-  <@checkAnswers.checkAnswersStandardOrDiffRow
-    prompt="Urgent response required"
-    fieldValue=urgentResponseNeeded
-    isDiffedField=useDiffedField
-  />
-  <@checkAnswers.checkAnswersStandardOrDiffRow
-    prompt="Name"
-    fieldValue=contactName
-    isDiffedField=useDiffedField
-  />
-  <@checkAnswers.checkAnswersStandardOrDiffRow
-    prompt="Phone number"
-    fieldValue=contactPhoneNumber
-    isDiffedField=useDiffedField
-  />
-  <@checkAnswers.checkAnswersStandardOrDiffRow
-    prompt="Job title"
-    fieldValue=contactJobTitle
-    isDiffedField=useDiffedField
-  />
-  <@checkAnswers.checkAnswersStandardOrDiffRow
-    prompt="Email address"
-    fieldValue=contactEmailAddress
-    isDiffedField=useDiffedField
-  />
-  <@checkAnswers.checkAnswersStandardOrDiffUploadedFileViewRow
-    fileUrlFieldValue=uploadedFileUrl
-    fileNameFieldValue=uploadedFileName
-    fileDescriptionFieldValue=uploadedFileDescription
-    isDiffedField=useDiffedField
-  />
 </#macro>

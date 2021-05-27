@@ -21,7 +21,8 @@ import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummar
 @Service
 public class InfrastructureCollaborationOpportunitiesSectionSummaryService implements ProjectSectionSummaryService {
 
-  public static final String TEMPLATE_PATH = "project/collaborationopportunities/collaborationOpportunitiesSectionSummary.ftl";
+  public static final String TEMPLATE_PATH =
+      "project/collaborationopportunities/infrastructure/infrastructureCollaborationOpportunitiesSectionSummary.ftl";
   public static final String PAGE_NAME = InfrastructureCollaborationOpportunitiesController.PAGE_NAME;
   public static final String SECTION_ID = "collaboration-opportunities";
   public static final SidebarSectionLink SECTION_LINK = SidebarSectionLink.createAnchorLink(

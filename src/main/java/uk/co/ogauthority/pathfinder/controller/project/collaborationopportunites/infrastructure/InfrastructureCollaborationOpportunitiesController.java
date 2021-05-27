@@ -208,7 +208,9 @@ public class InfrastructureCollaborationOpportunitiesController extends Pathfind
                                                             ProjectContext projectContext) {
     var opportunity = infrastructureCollaborationOpportunitiesService.getOrError(opportunityId);
 
-    var modelAndView = new ModelAndView("project/collaborationopportunities/removeCollaborationOpportunity")
+    var modelAndView = new ModelAndView(
+        "project/collaborationopportunities/infrastructure/removeInfrastructureCollaborationOpportunity"
+    )
         .addObject("view", infrastructureCollaborationOpportunitiesSummaryService.getView(opportunity, displayOrder))
         .addObject("cancelUrl", ReverseRouter.route(
               on(InfrastructureCollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null))
@@ -284,7 +286,9 @@ public class InfrastructureCollaborationOpportunitiesController extends Pathfind
       ValidationResult validationResult,
       ProjectContext projectContext
   ) {
-    var modelAndView = new ModelAndView("project/collaborationopportunities/collaborationOpportunitiesFormSummary")
+    var modelAndView = new ModelAndView(
+        "project/collaborationopportunities/infrastructure/infrastructureCollaborationOpportunitiesFormSummary"
+    )
         .addObject(
             "addCollaborationOpportunityUrl",
             ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class).addCollaborationOpportunity(projectId, null))
@@ -305,7 +309,7 @@ public class InfrastructureCollaborationOpportunitiesController extends Pathfind
   private ModelAndView getCollaborationOpportunityModelAndView(ProjectDetail projectDetail,
                                                                InfrastructureCollaborationOpportunityForm form) {
     var modelAndView = createModelAndView(
-        "project/collaborationopportunities/collaborationOpportunityForm",
+        "project/collaborationopportunities/infrastructure/infrastructureCollaborationOpportunityForm",
         projectDetail,
         InfrastructureCollaborationOpportunityFileLinkService.FILE_PURPOSE,
         form
