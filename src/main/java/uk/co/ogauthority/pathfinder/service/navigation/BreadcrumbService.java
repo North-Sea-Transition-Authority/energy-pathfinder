@@ -10,6 +10,7 @@ import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.communication.CommunicationSummaryController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
+import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedpipeline.DecommissionedPipelineController;
 import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedRigController;
@@ -22,6 +23,7 @@ import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectCo
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.communication.CommunicationModelService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityModelService;
 
 @Service
 public class BreadcrumbService {
@@ -196,6 +198,18 @@ public class BreadcrumbService {
     var map = taskList(projectId);
     String route = ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null));
     map.put(route, WorkPlanUpcomingTenderController.PAGE_NAME);
+    return map;
+  }
+
+  public void fromWorkPlanCollaborations(Integer projectId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, workPlanCollaborations(projectId), thisPage);
+  }
+
+  private Map<String, String> workPlanCollaborations(Integer projectId) {
+    var map = taskList(projectId);
+    String route = ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class)
+        .viewCollaborationOpportunities(projectId, null));
+    map.put(route, ForwardWorkPlanCollaborationOpportunityModelService.PAGE_NAME);
     return map;
   }
 }
