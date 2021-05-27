@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityCommon;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
@@ -77,6 +78,13 @@ public class ForwardWorkPlanCollaborationOpportunityService
     return super.isValid(opportunity, validationType);
   }
 
+  public List<ForwardWorkPlanCollaborationOpportunity> getOpportunitiesForProjectVersion(Project project, Integer version) {
+    return forwardWorkPlanCollaborationOpportunityRepository.findAllByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(
+        project,
+        version
+    );
+  }
+
   @Transactional
   public ForwardWorkPlanCollaborationOpportunity createCollaborationOpportunity(
       ProjectDetail detail,
@@ -117,6 +125,12 @@ public class ForwardWorkPlanCollaborationOpportunityService
         opportunity
     );
     return forwardWorkPlanCollaborationOpportunityRepository.save(opportunity);
+  }
+
+  @Transactional
+  public void delete(ForwardWorkPlanCollaborationOpportunity opportunity) {
+    forwardWorkPlanCollaborationOpportunityFileLinkService.removeCollaborationOpportunityFileLinks(opportunity);
+    forwardWorkPlanCollaborationOpportunityRepository.delete(opportunity);
   }
 
   public ForwardWorkPlanCollaborationOpportunity getOrError(Integer opportunityId) {

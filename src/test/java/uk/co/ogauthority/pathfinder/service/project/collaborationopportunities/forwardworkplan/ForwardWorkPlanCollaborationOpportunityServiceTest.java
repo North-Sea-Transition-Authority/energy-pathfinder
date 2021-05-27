@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.junit.Before;
@@ -290,6 +291,60 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
   @Test
   public void alwaysCopySectionData_verifyFalse() {
     assertThat(forwardWorkPlanCollaborationOpportunityService.alwaysCopySectionData(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void getOpportunitiesForProjectVersion_whenNoResults_thenEmptyList() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+    final var project = projectDetail.getProject();
+    final var version = projectDetail.getVersion();
+
+    when(forwardWorkPlanCollaborationOpportunityRepository.findAllByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(
+        project,
+        version
+    )).thenReturn(Collections.emptyList());
+
+    final var opportunityList = forwardWorkPlanCollaborationOpportunityService.getOpportunitiesForProjectVersion(
+        project,
+        version
+    );
+
+    assertThat(opportunityList).isEmpty();
+  }
+
+  @Test
+  public void getOpportunitiesForProjectVersion_whenResults_thenPopulatedList() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+    final var project = projectDetail.getProject();
+    final var version = projectDetail.getVersion();
+
+    final var opportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
+
+    when(forwardWorkPlanCollaborationOpportunityRepository.findAllByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(
+        project,
+        version
+    )).thenReturn(List.of(opportunity));
+
+    final var opportunityList = forwardWorkPlanCollaborationOpportunityService.getOpportunitiesForProjectVersion(
+        project,
+        version
+    );
+
+    assertThat(opportunityList).containsExactly(opportunity);
+  }
+
+  @Test
+  public void delete_verifyInteractions() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+    final var opportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
+
+    forwardWorkPlanCollaborationOpportunityService.delete(opportunity);
+
+    verify(forwardWorkPlanCollaborationOpportunityFileLinkService, times(1)).removeCollaborationOpportunityFileLinks(opportunity);
+    verify(forwardWorkPlanCollaborationOpportunityRepository, times(1)).delete(opportunity);
   }
 
 }

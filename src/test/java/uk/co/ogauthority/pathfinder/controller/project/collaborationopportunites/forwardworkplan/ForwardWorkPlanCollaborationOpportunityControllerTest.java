@@ -388,4 +388,78 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
         expectedMatcher
     );
   }
+
+  @Test
+  public void removeCollaborationOpportunityConfirm_projectContextSmokeTest() {
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.GET)
+        .withProjectDetail(projectDetail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions);
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(ForwardWorkPlanCollaborationOpportunityController.class)
+            .removeCollaborationOpportunityConfirm(projectId, 1, 2, null),
+        status().isOk(),
+        status().isForbidden()
+    );
+  }
+
+  @Test
+  public void removeCollaborationOpportunity_projectContextSmokeTest() {
+
+    final var collaborationOpportunityId = 100;
+
+    removeCollaborationOpportunity_setup(collaborationOpportunityId);
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(ForwardWorkPlanCollaborationOpportunityController.class).removeCollaborationOpportunity(
+            projectId,
+            collaborationOpportunityId,
+            1,
+            null
+        ),
+        status().is3xxRedirection(),
+        status().isForbidden()
+    );
+  }
+
+  @Test
+  public void removeCollaborationOpportunity_assertRedirectionWhenPosted() {
+
+    final var collaborationOpportunityId = 200;
+
+    removeCollaborationOpportunity_setup(collaborationOpportunityId);
+
+    projectControllerTesterService.makeRequestAndAssertMatcher(
+        on(ForwardWorkPlanCollaborationOpportunityController.class).removeCollaborationOpportunity(
+            projectId,
+            collaborationOpportunityId,
+            1,
+            null
+        ),
+        status().is3xxRedirection()
+    );
+  }
+
+  private void removeCollaborationOpportunity_setup(int collaborationOpportunityId) {
+
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
+
+    final var collaborationOpportunity = new ForwardWorkPlanCollaborationOpportunity();
+
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(collaborationOpportunityId)).thenReturn(collaborationOpportunity);
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.POST)
+        .withProjectDetail(projectDetail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withRequestParam(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+  }
 }

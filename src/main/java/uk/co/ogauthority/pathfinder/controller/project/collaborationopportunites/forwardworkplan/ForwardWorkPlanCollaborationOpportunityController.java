@@ -37,6 +37,7 @@ import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.f
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityModelService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
@@ -68,7 +69,18 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
   @GetMapping
   public ModelAndView viewCollaborationOpportunities(@PathVariable("projectId") Integer projectId,
                                                      ProjectContext projectContext) {
-    return forwardWorkPlanCollaborationOpportunityModelService.getViewCollaborationOpportunitiesModelAndView(projectId);
+    return forwardWorkPlanCollaborationOpportunityModelService.getViewCollaborationOpportunitiesModelAndView(
+        projectContext.getProjectDetails(),
+        ValidationResult.NOT_VALIDATED
+    );
+  }
+
+  @PostMapping
+  public ModelAndView saveCollaborationOpportunities(@PathVariable("projectId") Integer projectId,
+                                                     ProjectContext projectContext) {
+    return forwardWorkPlanCollaborationOpportunityModelService.getSaveCollaborationOpportunitySummaryModelAndView(
+        projectContext.getProjectDetails()
+    );
   }
 
   @GetMapping("/collaboration-opportunity")
@@ -155,6 +167,38 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
               .viewCollaborationOpportunities(projectId, null));
         }
     );
+  }
+
+  @GetMapping("/collaboration-opportunity/{opportunityId}/remove/{displayOrder}")
+  public ModelAndView removeCollaborationOpportunityConfirm(@PathVariable("projectId") Integer projectId,
+                                                            @PathVariable("opportunityId") Integer opportunityId,
+                                                            @PathVariable("displayOrder") Integer displayOrder,
+                                                            ProjectContext projectContext) {
+    return forwardWorkPlanCollaborationOpportunityModelService.getRemoveCollaborationOpportunityConfirmationModelAndView(
+        projectId,
+        opportunityId,
+        displayOrder
+    );
+  }
+
+  @PostMapping("/collaboration-opportunity/{opportunityId}/remove/{displayOrder}")
+  public ModelAndView removeCollaborationOpportunity(@PathVariable("projectId") Integer projectId,
+                                                     @PathVariable("opportunityId") Integer opportunityId,
+                                                     @PathVariable("displayOrder") Integer displayOrder,
+                                                     ProjectContext projectContext) {
+    final var opportunity = forwardWorkPlanCollaborationOpportunityService.getOrError(opportunityId);
+    forwardWorkPlanCollaborationOpportunityService.delete(opportunity);
+
+    AuditService.audit(
+        AuditEvent.WORK_PLAN_COLLABORATION_REMOVED,
+        String.format(
+            AuditEvent.WORK_PLAN_COLLABORATION_REMOVED.getMessage(),
+            opportunityId,
+            projectContext.getProjectDetails().getId()
+        )
+    );
+    return ReverseRouter.redirect(on(ForwardWorkPlanCollaborationOpportunityController.class)
+        .viewCollaborationOpportunities(projectId, null));
   }
 
   @PostMapping("/collaboration-opportunity/files/upload")
