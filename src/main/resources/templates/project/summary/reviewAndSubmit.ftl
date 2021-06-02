@@ -3,7 +3,7 @@
 
 <#assign projectTypeDisplayNameLowercase = projectTypeDisplayNameLowercase />
 
-<#assign defaultPageHeading = "Review and submit ${projectTypeDisplayNameLowercase}" />
+<#assign defaultPageHeading = "Check your answers before submitting your ${projectTypeDisplayNameLowercase}" />
 
 <#if isUpdate>
   <#assign pageHeading="${defaultPageHeading} update" />
@@ -13,7 +13,7 @@
 
 <@defaultPageWithSidebar.defaultPageWithSidebar
   pageHeading=pageHeading
-  themeHeading="Check your answers for all sections on the ${projectTypeDisplayNameLowercase}"
+  themeHeading=""
   sidebarSectionLinks=projectSummaryView.sidebarSectionLinks
   isSidebarSticky=true
 >
