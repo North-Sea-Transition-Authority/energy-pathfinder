@@ -35,7 +35,7 @@
   />
 
   <#if isUpdate>
-    <@differenceChanges.toggler/>
+    <@_updateInfo />
   </#if>
   <@projectSummary.summary projectSummaryView=projectSummaryView />
 
@@ -52,5 +52,18 @@
     />
   </#if>
 
-
 </@defaultPageWithSidebar.defaultPageWithSidebar>
+
+<#macro _updateInfo>
+  <#if updateRequestReason?has_content>
+    <@fdsInsetText.insetText>
+      <h2 class="govuk-heading-l">What was I asked to update?</h2>
+      <@multiLineText.multiLineText blockClass="govuk-body">
+        ${updateRequestReason}
+      </@multiLineText.multiLineText>
+      <@differenceChanges.toggler formGroupClass="govuk-!-margin-bottom-0"/>
+    </@fdsInsetText.insetText>
+  <#else>
+    <@differenceChanges.toggler/>
+  </#if>
+</#macro>

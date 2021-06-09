@@ -12,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.RegulatorUpdateController;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRequest;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -94,6 +95,18 @@ public class RegulatorUpdateRequestService {
   public boolean canRequestUpdate(ProjectDetail projectDetail) {
     return !projectUpdateService.isUpdateInProgress(projectDetail.getProject())
         && !hasUpdateBeenRequested(projectDetail);
+  }
+
+  /** Returns the update request reason if one exists for the provided project version
+   * and an empty string if it does not.
+   * @param project we are finding the request reason from.
+   * @param version of the project.
+   * @return update request reason or an empty string.
+   */
+  public String getUpdateRequestReason(Project project, Integer version) {
+    return regulatorUpdateRequestRepository.findByProjectDetail_projectAndProjectDetail_Version(project, version)
+        .map(RegulatorUpdateRequest::getUpdateReason)
+        .orElse("");
   }
 
   public ModelAndView getRequestUpdateModelAndView(ProjectDetail projectDetail,AuthenticatedUserAccount user, RequestUpdateForm form) {

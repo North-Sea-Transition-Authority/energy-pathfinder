@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.service.email.RegulatorEmailService;
 import uk.co.ogauthority.pathfinder.service.project.submission.ProjectSubmissionSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequestService;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 
 @Service
@@ -32,6 +33,7 @@ public class SubmitProjectService {
   private final ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService;
   private final List<ProjectFormSectionService> projectFormSectionServices;
   private final RegulatorEmailService regulatorEmailService;
+  private final RegulatorUpdateRequestService regulatorUpdateRequestService;
 
   @Autowired
   public SubmitProjectService(ProjectDetailsRepository projectDetailsRepository,
@@ -39,13 +41,15 @@ public class SubmitProjectService {
                               ProjectSummaryViewService projectSummaryViewService,
                               ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService,
                               List<ProjectFormSectionService> projectFormSectionServices,
-                              RegulatorEmailService regulatorEmailService) {
+                              RegulatorEmailService regulatorEmailService,
+                              RegulatorUpdateRequestService regulatorUpdateRequestService) {
     this.projectDetailsRepository = projectDetailsRepository;
     this.projectCleanUpService = projectCleanUpService;
     this.projectSummaryViewService = projectSummaryViewService;
     this.projectSubmissionSummaryViewService = projectSubmissionSummaryViewService;
     this.projectFormSectionServices = projectFormSectionServices;
     this.regulatorEmailService = regulatorEmailService;
+    this.regulatorUpdateRequestService = regulatorUpdateRequestService;
   }
 
   @Transactional
@@ -85,6 +89,9 @@ public class SubmitProjectService {
         .addObject("submitProjectUrl",
             ReverseRouter.route(on(SubmitProjectController.class).submitProject(projectId, null))
         )
+        .addObject("updateRequestReason", regulatorUpdateRequestService.getUpdateRequestReason(
+            projectDetail.getProject(),
+            projectDetail.getVersion() - 1))
         .addObject("taskListUrl", ControllerUtils.getBackToTaskListUrl(projectId));
 
     ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, projectDetail);

@@ -164,6 +164,35 @@ public class RegulatorUpdateRequestServiceTest {
   }
 
   @Test
+  public void getUpdateRequestReason_whenFound_thenReturn() {
+    var updateReason = "test";
+    var regulatorUpdateRequest = new RegulatorUpdateRequest();
+    regulatorUpdateRequest.setUpdateReason(updateReason);
+
+    when(regulatorUpdateRequestRepository.findByProjectDetail_projectAndProjectDetail_Version(
+        project,
+        projectDetail.getVersion()))
+        .thenReturn(Optional.of(regulatorUpdateRequest));
+
+    assertThat(regulatorUpdateRequestService.getUpdateRequestReason(
+        project,
+        projectDetail.getVersion()))
+        .isEqualTo(updateReason);  }
+
+  @Test
+  public void getUpdateRequestReason_whenNotFound_thenEmptyStringReturned() {
+    when(regulatorUpdateRequestRepository.findByProjectDetail_projectAndProjectDetail_Version(
+        projectDetail.getProject(),
+        projectDetail.getVersion()))
+        .thenReturn(Optional.empty());
+
+    assertThat(regulatorUpdateRequestService.getUpdateRequestReason(
+        projectDetail.getProject(),
+        projectDetail.getVersion()))
+        .isEmpty();
+  }
+
+  @Test
   public void getRequestUpdateModelAndView() {
     var form = new RequestUpdateForm();
     var projectHeaderHtml = "html";

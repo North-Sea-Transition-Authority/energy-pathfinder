@@ -28,6 +28,7 @@ import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContr
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.submission.ProjectSubmissionSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryViewService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequestService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectSubmissionSummaryTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -57,6 +58,9 @@ public class SubmitProjectServiceTest {
   @Mock
   private RegulatorEmailService regulatorEmailService;
 
+  @Mock
+  private RegulatorUpdateRequestService regulatorUpdateRequestService;
+
   private SubmitProjectService submitProjectService;
 
   private final static ProjectDetail PROJECT_DETAIL = ProjectUtil.getProjectDetails();
@@ -69,8 +73,8 @@ public class SubmitProjectServiceTest {
         projectSummaryViewService,
         projectSubmissionSummaryViewService,
         List.of(projectInformationService, awardedContractService),
-        regulatorEmailService
-    );
+        regulatorEmailService,
+        regulatorUpdateRequestService);
     when(projectDetailsRepository.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
@@ -220,6 +224,9 @@ public class SubmitProjectServiceTest {
         entry("submitProjectUrl",
             ReverseRouter.route(on(SubmitProjectController.class).submitProject(projectId, null))
         ),
+        entry("updateRequestReason", regulatorUpdateRequestService.getUpdateRequestReason(
+            projectDetail.getProject(),
+            projectDetail.getVersion())),
         entry("taskListUrl", ControllerUtils.getBackToTaskListUrl(projectId)),
         entry(
             ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
