@@ -59,7 +59,7 @@
     <@fdsInsetText.insetText>
       <h2 class="govuk-heading-l">What was I asked to update?</h2>
       <@multiLineText.multiLineText blockClass="govuk-body">
-        ${updateRequestReason}
+        <div>${updateRequestReason}</div>
       </@multiLineText.multiLineText>
       <@differenceChanges.toggler formGroupClass="govuk-!-margin-bottom-0"/>
     </@fdsInsetText.insetText>
