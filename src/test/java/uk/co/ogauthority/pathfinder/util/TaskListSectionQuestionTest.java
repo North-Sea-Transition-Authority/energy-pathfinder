@@ -17,7 +17,6 @@ public class TaskListSectionQuestionTest {
       ProjectTask.UPCOMING_TENDERS,
       ProjectTask.AWARDED_CONTRACTS,
       ProjectTask.COLLABORATION_OPPORTUNITIES,
-      ProjectTask.CAMPAIGN_INFORMATION,
       ProjectTask.WELLS,
       ProjectTask.PLATFORM_FPSO,
       ProjectTask.INTEGRATED_RIGS
@@ -28,8 +27,7 @@ public class TaskListSectionQuestionTest {
   private static final List<ProjectTask> NON_DECOM_TASKS = List.of(
       ProjectTask.UPCOMING_TENDERS,
       ProjectTask.AWARDED_CONTRACTS,
-      ProjectTask.COLLABORATION_OPPORTUNITIES,
-      ProjectTask.CAMPAIGN_INFORMATION
+      ProjectTask.COLLABORATION_OPPORTUNITIES
   );
 
   @Test

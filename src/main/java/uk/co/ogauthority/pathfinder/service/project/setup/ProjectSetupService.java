@@ -115,10 +115,6 @@ public class ProjectSetupService implements ProjectFormSectionService {
         getAnswerForQuestion(taskListSetup.getTaskListAnswers(), TaskListSectionQuestion.COLLABORATION_OPPORTUNITIES)
     );
 
-    form.setCampaignInformationIncluded(
-        getAnswerForQuestion(taskListSetup.getTaskListAnswers(), TaskListSectionQuestion.CAMPAIGN_INFORMATION)
-    );
-
     form.setWellsIncluded(
         getAnswerForQuestion(taskListSetup.getTaskListAnswers(), TaskListSectionQuestion.WELLS)
     );
