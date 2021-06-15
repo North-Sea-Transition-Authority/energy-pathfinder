@@ -30,8 +30,7 @@ public enum ProjectTaskGroup {
       List.of(
           ProjectTask.UPCOMING_TENDERS,
           ProjectTask.AWARDED_CONTRACTS,
-          ProjectTask.COLLABORATION_OPPORTUNITIES,
-          ProjectTask.CAMPAIGN_INFORMATION
+          ProjectTask.COLLABORATION_OPPORTUNITIES
       ),
       Set.of(ProjectType.INFRASTRUCTURE),
       3

@@ -23,9 +23,7 @@ public enum TaskListSectionAnswer {
   SUBSEA_INFRASTRUCTURE_YES(StringDisplayUtil.YES),
   SUBSEA_INFRASTRUCTURE_NO(StringDisplayUtil.NO),
   PIPELINES_YES(StringDisplayUtil.YES),
-  PIPELINES_NO(StringDisplayUtil.NO),
-  CAMPAIGN_INFORMATION_YES(StringDisplayUtil.YES),
-  CAMPAIGN_INFORMATION_NO(StringDisplayUtil.NO);
+  PIPELINES_NO(StringDisplayUtil.NO);
 
   private final String answerValue;
 

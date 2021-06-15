@@ -14,15 +14,14 @@ import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupForm;
 public class ProjectTaskListSetupTestUtil {
 
   public static final List<TaskListSectionQuestion> NON_DECOM_SECTIONS = List.of(TaskListSectionQuestion.AWARDED_CONTRACTS,
-      TaskListSectionQuestion.UPCOMING_TENDERS, TaskListSectionQuestion.CAMPAIGN_INFORMATION);
+      TaskListSectionQuestion.UPCOMING_TENDERS);
 
-  public static final List<TaskListSectionAnswer> NON_DECOM_ANSWERS = List.of(TaskListSectionAnswer.AWARDED_CONTRACTS_YES, TaskListSectionAnswer.UPCOMING_TENDERS_YES, TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_NO, TaskListSectionAnswer.CAMPAIGN_INFORMATION_YES);
+  public static final List<TaskListSectionAnswer> NON_DECOM_ANSWERS = List.of(TaskListSectionAnswer.AWARDED_CONTRACTS_YES, TaskListSectionAnswer.UPCOMING_TENDERS_YES, TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_NO);
 
   public static final List<TaskListSectionQuestion> DECOM_SECTIONS = List.of(
       TaskListSectionQuestion.UPCOMING_TENDERS,
       TaskListSectionQuestion.AWARDED_CONTRACTS,
-      TaskListSectionQuestion.WELLS,
-      TaskListSectionQuestion.CAMPAIGN_INFORMATION
+      TaskListSectionQuestion.WELLS
       // TaskListSectionQuestion.SUBSEA_INFRASTRUCTURE // Subsea infrastructure disabled: PAT-495
   );
 
@@ -30,7 +29,6 @@ public class ProjectTaskListSetupTestUtil {
       TaskListSectionAnswer.UPCOMING_TENDERS_YES,
       TaskListSectionAnswer.AWARDED_CONTRACTS_YES,
       TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_NO,
-      TaskListSectionAnswer.CAMPAIGN_INFORMATION_YES,
       TaskListSectionAnswer.WELLS_YES,
       TaskListSectionAnswer.PLATFORM_FPSO_NO,
       TaskListSectionAnswer.INTEGRATED_RIGS_NO
@@ -86,6 +84,5 @@ public class ProjectTaskListSetupTestUtil {
     form.setUpcomingTendersIncluded(TaskListSectionAnswer.UPCOMING_TENDERS_YES);
     form.setAwardedContractsIncluded(TaskListSectionAnswer.AWARDED_CONTRACTS_YES);
     form.setCollaborationOpportunitiesIncluded(TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_NO);
-    form.setCampaignInformationIncluded(TaskListSectionAnswer.CAMPAIGN_INFORMATION_YES);
   }
 }
