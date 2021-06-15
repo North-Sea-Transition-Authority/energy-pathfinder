@@ -15,6 +15,9 @@ public class ProjectSetupForm {
   @NotNull(message = "Select yes if you plan to add any collaboration opportunities to your project", groups = FullValidation.class)
   private TaskListSectionAnswer collaborationOpportunitiesIncluded;
 
+  @NotNull(message = "Select yes if you plan to add any campaign information to your project", groups = FullValidation.class)
+  private TaskListSectionAnswer campaignInformationIncluded;
+
   private TaskListSectionAnswer wellsIncluded;
 
   private TaskListSectionAnswer platformsFpsosIncluded;
@@ -49,6 +52,15 @@ public class ProjectSetupForm {
 
   public void setCollaborationOpportunitiesIncluded(TaskListSectionAnswer collaborationOpportunitiesIncluded) {
     this.collaborationOpportunitiesIncluded = collaborationOpportunitiesIncluded;
+  }
+
+  public TaskListSectionAnswer getCampaignInformationIncluded() {
+    return campaignInformationIncluded;
+  }
+
+  public void setCampaignInformationIncluded(
+      TaskListSectionAnswer campaignInformationIncluded) {
+    this.campaignInformationIncluded = campaignInformationIncluded;
   }
 
   public TaskListSectionAnswer getWellsIncluded() {
