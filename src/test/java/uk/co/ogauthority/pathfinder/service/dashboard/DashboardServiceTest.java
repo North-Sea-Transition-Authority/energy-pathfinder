@@ -2,11 +2,15 @@ package uk.co.ogauthority.pathfinder.service.dashboard;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,10 +19,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.exception.UnsupportedDashboardItemServiceException;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
 import uk.co.ogauthority.pathfinder.model.enums.DashboardFilterType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.service.rendering.TemplateRenderingService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.testutil.DashboardFilterTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
@@ -28,13 +35,19 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 public class DashboardServiceTest {
 
   @Mock
-  RegulatorDashboardService regulatorDashboardService;
+  private RegulatorDashboardService regulatorDashboardService;
 
   @Mock
-  OperatorDashboardService operatorDashboardService;
+  private OperatorDashboardService operatorDashboardService;
 
   @Mock
   private TeamService teamService;
+
+  @Mock
+  private TestDashboardItemService testDashboardItemService;
+
+  @Mock
+  private TemplateRenderingService templateRenderingService;
 
   private DashboardService dashboardService;
 
@@ -51,45 +64,118 @@ public class DashboardServiceTest {
     dashboardService = new DashboardService(
         teamService,
         regulatorDashboardService,
-        operatorDashboardService
+        operatorDashboardService,
+        List.of(testDashboardItemService),
+        templateRenderingService
     );
   }
 
   @Test
-  public void getDashboardProjectItemsForUser_noResultsForRegulatorUser() {
+  public void getDashboardProjectHtmlItemsForUser_noResultsForRegulatorUser() {
     when(regulatorDashboardService.getDashboardProjectItems(filter)).thenReturn(Collections.emptyList());
-    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser, DashboardFilterType.REGULATOR, filter).size()).isZero();
+
+    final var dashboardProjectHtmlItems = dashboardService.getDashboardProjectHtmlItemsForUser(
+        authenticatedUser,
+        DashboardFilterType.REGULATOR,
+        filter
+    );
+
+    assertThat(dashboardProjectHtmlItems).isEmpty();
+
+    verify(templateRenderingService, never()).render(
+        any(),
+        anyMap(),
+        anyBoolean()
+    );
 
     verify(regulatorDashboardService, times(1)).getDashboardProjectItems(filter);
     verify(operatorDashboardService, times(0)).getDashboardProjectItems(any(), any());
   }
 
   @Test
-  public void getDashboardProjectItemViewsForUser_regulatorUserCorrectNumberOfViewsReturned() {
+  public void getDashboardProjectHtmlItemsForUser_regulatorUserCorrectNumberOfViewsReturned() {
+    when(testDashboardItemService.getSupportedProjectType()).thenReturn(qaItem.getProjectType());
     when(regulatorDashboardService.getDashboardProjectItems(filter)).thenReturn(List.of(qaItem));
-    assertThat(dashboardService.getDashboardProjectItemViewsForUser(authenticatedUser, DashboardFilterType.REGULATOR, filter).size()).isEqualTo(1);
+
+    final var dashboardProjectHtmlItems = dashboardService.getDashboardProjectHtmlItemsForUser(
+        authenticatedUser,
+        DashboardFilterType.REGULATOR,
+        filter
+    );
+
+    assertThat(dashboardProjectHtmlItems).hasSize(1);
+
+    verify(templateRenderingService, times(1)).render(
+        testDashboardItemService.getTemplatePath(),
+        new HashMap<>(testDashboardItemService.getTemplateModel(qaItem)),
+        true
+    );
 
     verify(regulatorDashboardService, times(1)).getDashboardProjectItems(filter);
     verify(operatorDashboardService, times(0)).getDashboardProjectItems(any(), any());
   }
 
+  @Test(expected = UnsupportedDashboardItemServiceException.class)
+  public void getDashboardProjectHtmlItemsForUser_whenUnsupportedProjectTypeItem_thenException() {
+
+    final var supportedProjectType = ProjectType.INFRASTRUCTURE;
+    final var unsupportedProjectType = ProjectType.FORWARD_WORK_PLAN;
+
+    dashboardProjectItem.setProjectType(unsupportedProjectType);
+
+    when(testDashboardItemService.getSupportedProjectType()).thenReturn(supportedProjectType);
+
+    when(regulatorDashboardService.getDashboardProjectItems(filter)).thenReturn(List.of(dashboardProjectItem));
+    
+    dashboardService.getDashboardProjectHtmlItemsForUser(authenticatedUser, DashboardFilterType.REGULATOR, filter);
+  }
+
   @Test
-  public void getDashboardProjectItemsForUser_noResultsForOperatorUser() {
+  public void getDashboardProjectHtmlItemsForUser_noResultsForOperatorUser() {
     when(operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson(), filter)).thenReturn(
         Collections.emptyList()
     );
-    assertThat(dashboardService.getDashboardProjectItemsForUser(authenticatedUser, DashboardFilterType.OPERATOR, filter).size()).isZero();
+
+    final var dashboardProjectHtmlItems = dashboardService.getDashboardProjectHtmlItemsForUser(
+        authenticatedUser,
+        DashboardFilterType.OPERATOR,
+        filter
+    );
+
+    assertThat(dashboardProjectHtmlItems).isEmpty();
+
+    verify(templateRenderingService, never()).render(
+        any(),
+        anyMap(),
+        anyBoolean()
+    );
 
     verify(regulatorDashboardService, times(0)).getDashboardProjectItems(any());
     verify(operatorDashboardService, times(1)).getDashboardProjectItems(any(), any());
   }
 
   @Test
-  public void getDashboardProjectItemViewsForUser_operatorUserCorrectNumberOfViewsReturned() {
+  public void getDashboardProjectHtmlItemsForUser_operatorUserCorrectNumberOfViewsReturned() {
+
+    when(testDashboardItemService.getSupportedProjectType()).thenReturn(dashboardProjectItem.getProjectType());
+
     when(operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson(), filter)).thenReturn(
         List.of(dashboardProjectItem)
     );
-    assertThat(dashboardService.getDashboardProjectItemViewsForUser(authenticatedUser, DashboardFilterType.OPERATOR, filter).size()).isEqualTo(1);
+
+    final var dashboardProjectHtmlItems = dashboardService.getDashboardProjectHtmlItemsForUser(
+        authenticatedUser,
+        DashboardFilterType.OPERATOR,
+        filter
+    );
+
+    assertThat(dashboardProjectHtmlItems).hasSize(1);
+
+    verify(templateRenderingService, times(1)).render(
+        testDashboardItemService.getTemplatePath(),
+        new HashMap<>(testDashboardItemService.getTemplateModel(dashboardProjectItem)),
+        true
+    );
 
     verify(regulatorDashboardService, times(0)).getDashboardProjectItems(any());
     verify(operatorDashboardService, times(1)).getDashboardProjectItems(any(), any());

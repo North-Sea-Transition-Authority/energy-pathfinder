@@ -40,7 +40,7 @@ public class WorkAreaService {
   public ModelAndView getWorkAreaModelAndViewForUser(AuthenticatedUserAccount user, DashboardFilter filter, DashboardFilterForm form) {
     var dashboardStopwatch = Stopwatch.createStarted();
     var filterType = dashboardService.getDashboardFilterType(user);
-    var dashboardProjectItemViews =  dashboardService.getDashboardProjectItemViewsForUser(user, filterType, filter);
+    var dashboardProjectHtmlItems =  dashboardService.getDashboardProjectHtmlItemsForUser(user, filterType, filter);
 
     var elapsedMs = dashboardStopwatch.elapsed(TimeUnit.MILLISECONDS);
     metricsProvider.getDashboardTimer().record(elapsedMs, TimeUnit.MILLISECONDS);
@@ -53,8 +53,8 @@ public class WorkAreaService {
         .addObject("statuses", ProjectStatus.getAllAsMap())
         .addObject("fieldStages", FieldStage.getAllAsMap())
         .addObject("ukcsAreas", UkcsArea.getAllAsMap())
-        .addObject("dashboardProjectItemViews", dashboardProjectItemViews)
-        .addObject("resultSize", dashboardProjectItemViews.size());
+        .addObject("dashboardProjectHtmlItems", dashboardProjectHtmlItems)
+        .addObject("resultSize", dashboardProjectHtmlItems.size());
   }
 
   public LinkButton getStartProjectLinkButton(AuthenticatedUserAccount user) {

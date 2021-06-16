@@ -25,6 +25,7 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
       , pd.version, 1
       , 0
       ) is_latest_submitted_version
+    , pd.project_type
     FROM ${datasource.user}.projects p
     JOIN ${datasource.user}.project_details pd ON pd.project_id = p.id
     JOIN ${datasource.user}.project_operators po ON po.project_detail_id = pd.id
