@@ -1,4 +1,6 @@
 <#--Import statements-->
+<#import '/spring.ftl' as spring>
+
 <#import 'header.ftl' as applicationHeader>
 <#import 'project/macros/contactDetails.ftl' as contactDetails>
 <#import 'project/macros/decomissioningPeriodCheckAnswers.ftl' as decomissioningPeriodCheckAnswers>
@@ -25,3 +27,10 @@
 <#import 'macros/tag.ftl' as tag>
 <#import 'macros/textUtil.ftl' as textUtil>
 <#import 'macros/panel.ftl' as panel>
+
+<#function springUrl url>
+  <#local springUrl>
+    <@spring.url url/>
+  </#local>
+  <#return springUrl>
+</#function>

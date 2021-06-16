@@ -13,6 +13,7 @@ import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
 import uk.co.ogauthority.pathfinder.service.navigation.TopNavigationService;
+import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.SecurityUtil;
 
 @ControllerAdvice
@@ -58,6 +59,7 @@ public class DefaultPageControllerAdvice {
 
   private void addCommonUrls(Model model) {
     model.addAttribute("foxLogoutUrl", foxUrlService.getFoxLogoutUrl());
+    model.addAttribute("serviceHomeUrl", ControllerUtils.getWorkAreaUrl());
     footerService.addFooterUrlsToModel(model);
   }
 

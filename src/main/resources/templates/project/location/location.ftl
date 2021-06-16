@@ -41,7 +41,8 @@
     </@fdsRadio.radioGroup>
     <h2 class="govuk-heading-m">Licence blocks</h2>
     <@fdsAddToList.addToList
-      path="form.licenceBlocks"
+      pathForList="form.licenceBlocks"
+      pathForSelector="form.licenceBlocksSelect"
       alreadyAdded=alreadyAddedBlocks
       itemName="Licence block"
       noItemText="No licence blocks added"

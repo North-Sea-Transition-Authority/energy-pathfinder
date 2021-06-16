@@ -1,5 +1,3 @@
-<#import '/spring.ftl' as spring>
-
 <#--FDS Layout-->
 <#include 'fds/objects/layouts/generic.ftl'>
 <#import 'fds/objects/grid/grid.ftl' as grid>
@@ -7,12 +5,14 @@
 
 <#include 'pathfinderImports.ftl'>
 
-<#function springUrl url>
-  <#local springUrl>
-    <@spring.url url/>
-  </#local>
-  <#return springUrl>
-</#function>
+<#-- @ftlvariable name="service" type="uk.co.ogauthority.pathfinder.config.ServiceProperties" -->
+<#-- @ftlvariable name="serviceHomeUrl" type="String" -->
+<#-- @ftlvariable name="navigationItems" type="java.util.List<uk.co.ogauthority.pathfinder.model.navigation.TopNavigationItem>" -->
+<#-- @ftlvariable name="currentEndPoint" type="String" -->
+<#-- @ftlvariable name="currentPage" type="String" -->
+<#-- @ftlvariable name="crumbList" type="java.util.Map<String, String>" -->
+<#-- @ftlvariable name="accessibilityStatementUrl" type="String" -->
+<#-- @ftlvariable name="contactUrl" type="String" -->
 
 <#macro defaultPage
   htmlTitle
@@ -38,15 +38,19 @@
   topNavigation=true
   wrapperWidth=false
   masthead=false
-  headerLogo="GOVUK_CREST"
+  headerLogo="GOV_CREST"
   errorCheck=false
   noIndex=false
   errorItems=[]
 >
   <@genericLayout htmlTitle=htmlTitle htmlAppTitle=service.serviceName errorCheck=errorCheck noIndex=noIndex>
 
+    <#local serviceHomeUrl = springUrl(serviceHomeUrl) />
+
     <#--Header-->
     <@applicationHeader.header
+      homePageUrl=serviceHomeUrl
+      serviceUrl=serviceHomeUrl
       topNavigation=topNavigation
       wrapperWidth=wrapperWidth
       headerLogo=headerLogo
@@ -195,7 +199,8 @@
     <@fdsFooter.footer wrapperWidth=wrapperWidth metaLinks=true footerMetaContent=footerMetaContent/>
 
     <#--Custom scripts-->
-    <script src="<@spring.url '/assets/static/js/pathfinder/checkboxToggler.js'/>"></script>
+    <#local checkboxTogglerUrl = springUrl('/assets/static/js/pathfinder/checkboxToggler.js') />
+    <script src="${checkboxTogglerUrl}"></script>
 
   </@genericLayout>
 </#macro>
