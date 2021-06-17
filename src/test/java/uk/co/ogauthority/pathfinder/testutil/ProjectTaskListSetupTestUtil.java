@@ -13,10 +13,18 @@ import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupForm;
  */
 public class ProjectTaskListSetupTestUtil {
 
-  public static final List<TaskListSectionQuestion> NON_DECOM_SECTIONS = List.of(TaskListSectionQuestion.AWARDED_CONTRACTS,
-      TaskListSectionQuestion.UPCOMING_TENDERS, TaskListSectionQuestion.CAMPAIGN_INFORMATION);
+  public static final List<TaskListSectionQuestion> NON_DECOM_SECTIONS = List.of(
+      TaskListSectionQuestion.AWARDED_CONTRACTS,
+      TaskListSectionQuestion.UPCOMING_TENDERS,
+      TaskListSectionQuestion.CAMPAIGN_INFORMATION
+  );
 
-  public static final List<TaskListSectionAnswer> NON_DECOM_ANSWERS = List.of(TaskListSectionAnswer.AWARDED_CONTRACTS_YES, TaskListSectionAnswer.UPCOMING_TENDERS_YES, TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_NO, TaskListSectionAnswer.CAMPAIGN_INFORMATION_YES);
+  public static final List<TaskListSectionAnswer> NON_DECOM_ANSWERS = List.of(
+      TaskListSectionAnswer.AWARDED_CONTRACTS_YES,
+      TaskListSectionAnswer.UPCOMING_TENDERS_YES,
+      TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_NO,
+      TaskListSectionAnswer.CAMPAIGN_INFORMATION_YES
+  );
 
   public static final List<TaskListSectionQuestion> DECOM_SECTIONS = List.of(
       TaskListSectionQuestion.UPCOMING_TENDERS,

@@ -15,7 +15,7 @@ public class ProjectSetupForm {
   @NotNull(message = "Select yes if you plan to add any collaboration opportunities to your project", groups = FullValidation.class)
   private TaskListSectionAnswer collaborationOpportunitiesIncluded;
 
-  @NotNull(message = "Select yes if you plan to add any campaign information to your project", groups = FullValidation.class)
+  @NotNull(message = "Select yes if you plan to add campaign information to your project", groups = FullValidation.class)
   private TaskListSectionAnswer campaignInformationIncluded;
 
   private TaskListSectionAnswer wellsIncluded;

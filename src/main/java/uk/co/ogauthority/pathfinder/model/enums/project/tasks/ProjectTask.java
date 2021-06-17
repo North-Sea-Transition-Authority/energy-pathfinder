@@ -227,7 +227,7 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
         return ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
             .viewCollaborationOpportunities(projectId, null));
       case CAMPAIGN_INFORMATION:
-        return ReverseRouter.route(on(CampaignInformationController.class).viewCampaignInformation(projectId, null));
+        return ReverseRouter.route(on(CampaignInformationController.class).getCampaignInformation(projectId, null));
       case DECOMMISSIONING_SCHEDULE:
         return ReverseRouter.route(on(DecommissioningScheduleController.class).getDecommissioningSchedule(projectId, null));
       case WELLS:

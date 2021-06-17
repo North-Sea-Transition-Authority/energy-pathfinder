@@ -71,7 +71,7 @@ public class CampaignInformationControllerTest extends ProjectContextAbstractCon
         .withRequiredProjectPermissions(requiredPermissions);
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
-        on(CampaignInformationController.class).viewCampaignInformation(projectId, null),
+        on(CampaignInformationController.class).getCampaignInformation(projectId, null),
         status().isOk(),
         status().isForbidden()
     );

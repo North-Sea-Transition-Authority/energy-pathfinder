@@ -10,6 +10,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusC
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.service.project.campaigninformation.CampaignInformationService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 
 @Controller
@@ -21,19 +22,16 @@ public class CampaignInformationController {
 
   public static final String PAGE_NAME = "Campaign information";
 
-  @GetMapping
-  public ModelAndView viewCampaignInformation(@PathVariable("projectId") Integer projectId,
-                                              ProjectContext projectContext) {
-    return getViewCampaignInformationModelAndView(
-        projectId,
-        projectContext
-    );
+  private final CampaignInformationService campaignInformationService;
+
+  public CampaignInformationController(
+      CampaignInformationService campaignInformationService) {
+    this.campaignInformationService = campaignInformationService;
   }
 
-  private ModelAndView getViewCampaignInformationModelAndView(
-      Integer projectId,
-      ProjectContext projectContext
-  ) {
-    return new ModelAndView("project/campaigninformation/campaignInformationFormSummary");
+  @GetMapping
+  public ModelAndView getCampaignInformation(@PathVariable("projectId") Integer projectId,
+                                             ProjectContext projectContext) {
+    return campaignInformationService.getCampaignInformationModelAndView();
   }
 }

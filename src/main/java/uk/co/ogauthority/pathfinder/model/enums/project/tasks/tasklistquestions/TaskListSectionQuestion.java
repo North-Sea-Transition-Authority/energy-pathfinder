@@ -76,7 +76,7 @@ public enum TaskListSectionQuestion {
   ),
   CAMPAIGN_INFORMATION(
       ProjectTask.CAMPAIGN_INFORMATION,
-      "Are you willing to amalgamate your work with other operators or the Supply Chain to form a campaign?",
+      "Are you willing to combine your work with other operators or the Supply Chain to form a campaign?",
       "Campaign information",
       "",
       "form.campaignInformationIncluded",
