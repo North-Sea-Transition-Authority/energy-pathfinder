@@ -178,4 +178,14 @@ public class SelectOperatorService implements ProjectFormSectionService {
   public boolean canShowInTaskList(ProjectDetail detail) {
     return ProjectService.isInfrastructureProject(detail);
   }
+
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    projectOperatorService.deleteProjectOperatorByProjectDetail(projectDetail);
+  }
+
+  @Override
+  public boolean allowSectionDataCleanUp(ProjectDetail projectDetail) {
+    return false;
+  }
 }

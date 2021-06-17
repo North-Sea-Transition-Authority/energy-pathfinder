@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.project;
+package uk.co.ogauthority.pathfinder.service.project.cleanup;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,13 @@ public class ProjectCleanUpService {
   public void removeProjectSectionDataIfNotRelevant(ProjectDetail projectDetail) {
     projectFormSectionServices
         .stream()
-        .filter(projectFormSectionService -> !projectFormSectionService.canShowInTaskList(projectDetail))
+        .filter(projectFormSectionService ->
+            // only remove section data for sections which allow clean up
+            // and are not shown in the task list
+            projectFormSectionService.allowSectionDataCleanUp(projectDetail)
+            &&
+            !projectFormSectionService.canShowInTaskList(projectDetail)
+        )
         .forEach(projectFormSectionService -> projectFormSectionService.removeSectionData(projectDetail));
   }
 }

@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.projectupdate;
+package uk.co.ogauthority.pathfinder.service;
 
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -30,5 +30,10 @@ public class TestProjectFormSectionService implements ProjectFormSectionService 
   @Override
   public boolean alwaysCopySectionData(ProjectDetail projectDetail) {
     return ProjectFormSectionService.super.alwaysCopySectionData(projectDetail);
+  }
+
+  @Override
+  public boolean allowSectionDataCleanUp(ProjectDetail projectDetail) {
+    return ProjectFormSectionService.super.allowSectionDataCleanUp(projectDetail);
   }
 }

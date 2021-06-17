@@ -38,4 +38,14 @@ public interface ProjectFormSectionService {
   default boolean alwaysCopySectionData(ProjectDetail projectDetail) {
     return false;
   }
+
+  /**
+   * Method to indicate if the section allows its data to be removed if the section
+   * is no longer relevant to project at submission time.
+   * @param projectDetail the project detail being processed
+   * @return true if the section is allowed to have its data cleaned up, false otherwise
+   */
+  default boolean allowSectionDataCleanUp(ProjectDetail projectDetail) {
+    return true;
+  }
 }

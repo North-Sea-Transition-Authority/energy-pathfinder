@@ -246,4 +246,16 @@ public class SelectOperatorServiceTest {
     });
   }
 
+  @Test
+  public void removeSectionData_verifyInteractions() {
+    selectOperatorService.removeSectionData(detail);
+    verify(projectOperatorService, times(1)).deleteProjectOperatorByProjectDetail(detail);
+  }
+
+  @Test
+  public void allowSectionDataCleanUp_verifyIsFalse() {
+    final var allowSectionDateCleanUp = selectOperatorService.allowSectionDataCleanUp(detail);
+    assertThat(allowSectionDateCleanUp).isFalse();
+  }
+
 }
