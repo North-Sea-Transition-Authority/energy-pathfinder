@@ -1,13 +1,12 @@
-package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure;
+package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
-import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure.InfrastructureCollaborationOpportunityView;
+import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationOpportunityView;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
@@ -16,25 +15,25 @@ import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummar
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
-public class InfrastructureCollaborationOpportunitiesSectionSummaryService
-    extends CollaborationOpportunitiesSectionSummaryService<InfrastructureCollaborationOpportunityView>
+public class ForwardWorkPlanCollaborationOpportunitiesSectionSummaryService
+    extends CollaborationOpportunitiesSectionSummaryService<ForwardWorkPlanCollaborationOpportunityView>
     implements ProjectSectionSummaryService {
 
   public static final String TEMPLATE_PATH =
-      "project/collaborationopportunities/infrastructure/infrastructureCollaborationOpportunitiesSectionSummary.ftl";
-  public static final String PAGE_NAME = InfrastructureCollaborationOpportunitiesController.PAGE_NAME;
+      "project/collaborationopportunities/forwardworkplan/forwardWorkPlanCollaborationOpportunitiesSectionSummary.ftl";
+  public static final String PAGE_NAME = ForwardWorkPlanCollaborationOpportunityModelService.PAGE_NAME;
   public static final String SECTION_ID = "collaboration-opportunities";
   public static final SidebarSectionLink SECTION_LINK = SidebarSectionLink.createAnchorLink(
       PAGE_NAME,
       SECTION_ID
   );
-  public static final int DISPLAY_ORDER = ProjectTask.COLLABORATION_OPPORTUNITIES.getDisplayOrder();
+  public static final int DISPLAY_ORDER = ProjectTask.WORK_PLAN_COLLABORATION_OPPORTUNITIES.getDisplayOrder();
 
-  private final InfrastructureCollaborationOpportunitiesSummaryService infrastructureCollaborationOpportunitiesSummaryService;
+  private final ForwardWorkPlanCollaborationOpportunitiesSummaryService forwardWorkPlanCollaborationOpportunitiesSummaryService;
 
   @Autowired
-  public InfrastructureCollaborationOpportunitiesSectionSummaryService(
-      InfrastructureCollaborationOpportunitiesSummaryService infrastructureCollaborationOpportunitiesSummaryService,
+  public ForwardWorkPlanCollaborationOpportunitiesSectionSummaryService(
+      ForwardWorkPlanCollaborationOpportunitiesSummaryService forwardWorkPlanCollaborationOpportunitiesSummaryService,
       DifferenceService differenceService,
       ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService
   ) {
@@ -42,32 +41,28 @@ public class InfrastructureCollaborationOpportunitiesSectionSummaryService
         projectSectionSummaryCommonModelService,
         differenceService
     );
-    this.infrastructureCollaborationOpportunitiesSummaryService = infrastructureCollaborationOpportunitiesSummaryService;
+    this.forwardWorkPlanCollaborationOpportunitiesSummaryService = forwardWorkPlanCollaborationOpportunitiesSummaryService;
   }
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return infrastructureCollaborationOpportunitiesSummaryService.canShowInTaskList(detail);
+    return forwardWorkPlanCollaborationOpportunitiesSummaryService.canShowInTaskList(detail);
   }
 
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
-    final var summaryModel = super.getSummaryModel(detail, InfrastructureCollaborationOpportunityView.class);
+    final var summaryModel = super.getSummaryModel(detail, ForwardWorkPlanCollaborationOpportunityView.class);
     return super.getProjectSectionSummary(summaryModel);
   }
 
   @Override
-  protected List<InfrastructureCollaborationOpportunityView> getCurrentCollaborationOpportunityViews(
-      ProjectDetail projectDetail
-  ) {
-    return infrastructureCollaborationOpportunitiesSummaryService.getSummaryViews(projectDetail);
+  protected List<ForwardWorkPlanCollaborationOpportunityView> getCurrentCollaborationOpportunityViews(ProjectDetail projectDetail) {
+    return forwardWorkPlanCollaborationOpportunitiesSummaryService.getSummaryViews(projectDetail);
   }
 
   @Override
-  protected List<InfrastructureCollaborationOpportunityView> getPreviousCollaborationOpportunityViews(
-      ProjectDetail projectDetail
-  ) {
-    return infrastructureCollaborationOpportunitiesSummaryService.getSummaryViews(
+  protected List<ForwardWorkPlanCollaborationOpportunityView> getPreviousCollaborationOpportunityViews(ProjectDetail projectDetail) {
+    return forwardWorkPlanCollaborationOpportunitiesSummaryService.getSummaryViews(
         projectDetail.getProject(),
         projectDetail.getVersion() - 1
     );
@@ -99,12 +94,12 @@ public class InfrastructureCollaborationOpportunitiesSectionSummaryService
   }
 
   @Override
-  protected Integer getViewDisplayOrder(InfrastructureCollaborationOpportunityView view) {
+  protected Integer getViewDisplayOrder(ForwardWorkPlanCollaborationOpportunityView view) {
     return view.getDisplayOrder();
   }
 
   @Override
-  protected List<UploadedFileView> getUploadedFileViews(InfrastructureCollaborationOpportunityView view) {
+  protected List<UploadedFileView> getUploadedFileViews(ForwardWorkPlanCollaborationOpportunityView view) {
     return view.getUploadedFileViews();
   }
 }

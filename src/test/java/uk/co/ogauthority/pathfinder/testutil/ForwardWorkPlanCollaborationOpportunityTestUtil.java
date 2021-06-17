@@ -6,6 +6,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunit
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityFileLink;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityForm;
+import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationOpportunityView;
 
 public class ForwardWorkPlanCollaborationOpportunityTestUtil {
 
@@ -51,6 +52,14 @@ public class ForwardWorkPlanCollaborationOpportunityTestUtil {
     return createCollaborationOpportunityFileLink(
         getCollaborationOpportunity(ProjectUtil.getProjectDetails()),
         new ProjectDetailFile()
+    );
+  }
+
+  public static ForwardWorkPlanCollaborationOpportunityView getView(Integer displayOrder, Boolean isValid) {
+    return (ForwardWorkPlanCollaborationOpportunityView) CollaborationOpportunityTestUtilCommon.populateView(
+        new ForwardWorkPlanCollaborationOpportunityView(),
+        displayOrder,
+        isValid
     );
   }
 }
