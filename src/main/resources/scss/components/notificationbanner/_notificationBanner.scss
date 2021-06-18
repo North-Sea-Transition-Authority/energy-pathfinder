@@ -1,0 +1,6 @@
+// Custom notification banner styles
+.govuk-notification-banner {
+  &--full-width-content > .govuk-notification-banner__content > * {
+    max-width: 100%;
+  }
+}
