@@ -1,9 +1,13 @@
 package uk.co.ogauthority.pathfinder.model.view.dashboard.forwardworkplan;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
+import uk.co.ogauthority.pathfinder.controller.project.start.forwardworkplan.ForwardWorkPlanProjectStartController;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.DashboardLink;
 import uk.co.ogauthority.pathfinder.model.view.dashboard.DashboardProjectItemViewUtil;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 
 public class ForwardWorkPlanDashboardItemViewUtil {
@@ -30,25 +34,30 @@ public class ForwardWorkPlanDashboardItemViewUtil {
   private static DashboardLink getLink(DashboardProjectItem dashboardProjectItem, String screenReaderText) {
 
     final var status = dashboardProjectItem.getStatus();
+    final var projectId = dashboardProjectItem.getProjectId();
+
     var url = "";
 
     switch (status) {
       case DRAFT:
         if (dashboardProjectItem.getVersion() == 1) {
-          //TODO PAT-466 goes to "start/manage" page instead of task list
-          url = ControllerUtils.getBackToTaskListUrl(dashboardProjectItem.getProjectId());
+          url = ReverseRouter.route(on(ForwardWorkPlanProjectStartController.class).startPage(
+              projectId,
+              null,
+              null
+          ));
         } else {
-          url = ControllerUtils.getProjectManagementUrl(dashboardProjectItem.getProjectId());
+          url = ControllerUtils.getProjectManagementUrl(projectId);
         }
         break;
       case QA:
       case ARCHIVED:
       case PUBLISHED:
-        url = ControllerUtils.getProjectManagementUrl(dashboardProjectItem.getProjectId());
+        url = ControllerUtils.getProjectManagementUrl(projectId);
         break;
       default:
         throw new IllegalStateException(String.format("Project with id %s has unsupported status %s",
-            dashboardProjectItem.getProjectId(),
+            projectId,
             status
         ));
     }

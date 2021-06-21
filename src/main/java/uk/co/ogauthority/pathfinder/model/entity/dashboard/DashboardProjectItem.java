@@ -54,6 +54,8 @@ public abstract class DashboardProjectItem {
   @Enumerated(EnumType.STRING)
   private ProjectType projectType;
 
+  private int projectTypeSortKey;
+
   public Integer getProjectId() {
     return projectId;
   }
@@ -177,5 +179,13 @@ public abstract class DashboardProjectItem {
 
   public void setProjectType(ProjectType projectType) {
     this.projectType = projectType;
+  }
+
+  public int getProjectTypeSortKey() {
+    return projectTypeSortKey;
+  }
+
+  public void setProjectTypeSortKey(int projectTypeSortKey) {
+    this.projectTypeSortKey = projectTypeSortKey;
   }
 }

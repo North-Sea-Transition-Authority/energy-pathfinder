@@ -18,7 +18,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
-import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
+import uk.co.ogauthority.pathfinder.controller.project.start.infrastructure.InfrastructureProjectStartController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
 import uk.co.ogauthority.pathfinder.model.enums.DashboardFilterType;
@@ -144,7 +144,7 @@ public class WorkAreaServiceTest {
   private void assertLinkFieldsCorrect(LinkButton link) {
     assertThat(link.getButtonType()).isEqualTo(ButtonType.PRIMARY);
     assertThat(link.getPrompt()).isEqualTo(WorkAreaService.LINK_BUTTON_TEXT);
-    assertThat(link.getUrl()).isEqualTo(ReverseRouter.route(on(StartProjectController.class).startProject(null)));
+    assertThat(link.getUrl()).isEqualTo(ReverseRouter.route(on(InfrastructureProjectStartController.class).startProject(null)));
   }
 
   private void assertModelAndViewFieldsSet(ModelAndView modelAndView, LinkButton link, DashboardFilterType filterType) {

@@ -1,12 +1,15 @@
 package uk.co.ogauthority.pathfinder.model.view.dashboard.forwardworkplan;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.controller.project.start.forwardworkplan.ForwardWorkPlanProjectStartController;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -25,7 +28,7 @@ public class ForwardWorkPlanDashboardItemViewUtilTest {
   }
 
   @Test
-  public void from_whenStatusIsDraftAndVersionIsOne_thenUrlIsTaskList() {
+  public void from_whenStatusIsDraftAndVersionIsOne_thenUrlIsStartPage() {
 
     final var dashboardProjectItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
     dashboardProjectItem.setStatus(ProjectStatus.DRAFT);
@@ -33,7 +36,7 @@ public class ForwardWorkPlanDashboardItemViewUtilTest {
 
     assertDashboardItemUrlIsExpected(
         dashboardProjectItem,
-        getTaskListUrl(dashboardProjectItem.getProjectId())
+        getStartPageUrl(dashboardProjectItem.getProjectId())
     );
   }
 
@@ -104,12 +107,12 @@ public class ForwardWorkPlanDashboardItemViewUtilTest {
     assertThat(dashboardUrl).isEqualTo(expectedUrl);
   }
 
-  private String getTaskListUrl(int projectId) {
-    return ControllerUtils.getBackToTaskListUrl(projectId);
-  }
-
   private String getManagementPageUrl(int projectId) {
     return ControllerUtils.getProjectManagementUrl(projectId);
+  }
+
+  private String getStartPageUrl(int projectId) {
+    return ReverseRouter.route(on(ForwardWorkPlanProjectStartController.class).startPage(projectId, null, null));
   }
 
 }

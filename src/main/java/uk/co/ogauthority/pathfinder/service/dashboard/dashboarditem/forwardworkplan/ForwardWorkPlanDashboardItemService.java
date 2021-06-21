@@ -7,7 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
-import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
+import uk.co.ogauthority.pathfinder.controller.project.start.infrastructure.InfrastructureProjectStartController;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.view.dashboard.DashboardProjectItemView;
@@ -58,7 +58,7 @@ public class ForwardWorkPlanDashboardItemService implements DashboardItemService
     );
     templateModel.put(
         "startInfrastructureProjectUrl",
-        ReverseRouter.route(on(StartProjectController.class).startPage(null))
+        ReverseRouter.route(on(InfrastructureProjectStartController.class).startPage(null))
     );
 
     return templateModel;

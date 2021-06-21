@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
+import uk.co.ogauthority.pathfinder.controller.project.start.infrastructure.InfrastructureProjectStartController;
 import uk.co.ogauthority.pathfinder.model.enums.TopNavigationType;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -73,7 +73,7 @@ public class SelectProjectOperatorController {
   private ModelAndView getSelectOperatorModelAndView(ProjectOperatorForm form) {
     return selectOperatorService.getSelectOperatorModelAndView(
         form,
-        ReverseRouter.route(on(StartProjectController.class).startPage(null)),
+        ReverseRouter.route(on(InfrastructureProjectStartController.class).startPage(null)),
         PRIMARY_BUTTON_TEXT,
         TopNavigationType.BACKLINK
     );

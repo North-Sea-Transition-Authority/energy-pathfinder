@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.controller.project;
+package uk.co.ogauthority.pathfinder.controller.project.start.infrastructure;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
@@ -32,8 +32,8 @@ import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(StartProjectController.class)
-public class StartProjectControllerTest extends AbstractControllerTest {
+@WebMvcTest(InfrastructureProjectStartController.class)
+public class InfrastructureProjectStartControllerTest extends AbstractControllerTest {
 
   @MockBean
   private StartProjectService startProjectService;
@@ -55,14 +55,14 @@ public class StartProjectControllerTest extends AbstractControllerTest {
 
   @Test
   public void authenticatedUser_hasAccessToStartProject() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(on(StartProjectController.class).startPage(authenticatedUser)))
+    mockMvc.perform(get(ReverseRouter.route(on(InfrastructureProjectStartController.class).startPage(null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
 
   @Test
   public void unAuthenticatedUser_cannotAccessStartProject() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(on(StartProjectController.class).startPage(unAuthenticatedUser)))
+    mockMvc.perform(get(ReverseRouter.route(on(InfrastructureProjectStartController.class).startPage(null)))
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -75,7 +75,7 @@ public class StartProjectControllerTest extends AbstractControllerTest {
     );
     mockMvc.perform(
           MockMvcRequestBuilders.post(
-              ReverseRouter.route(on(StartProjectController.class).startProject(authenticatedUser))
+              ReverseRouter.route(on(InfrastructureProjectStartController.class).startProject(null))
           )
           .with(authenticatedUserAndSession(authenticatedUser))
           .with(csrf())
@@ -93,7 +93,7 @@ public class StartProjectControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         MockMvcRequestBuilders.post(
-            ReverseRouter.route(on(StartProjectController.class).startProject(authenticatedUser))
+            ReverseRouter.route(on(InfrastructureProjectStartController.class).startProject(authenticatedUser))
         )
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())

@@ -10,7 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
-import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
+import uk.co.ogauthority.pathfinder.controller.project.start.infrastructure.InfrastructureProjectStartController;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.view.dashboard.forwardworkplan.ForwardWorkPlanDashboardItemViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -65,7 +65,7 @@ public class ForwardWorkPlanDashboardItemServiceTest {
         entry("service", serviceProperties),
         entry("infrastructureProjectLowerCaseDisplayName", ProjectType.INFRASTRUCTURE.getLowercaseDisplayName()),
         entry("forwardWorkPlanProjectLowerCaseDisplayName", ProjectType.FORWARD_WORK_PLAN.getLowercaseDisplayName()),
-        entry("startInfrastructureProjectUrl", ReverseRouter.route(on(StartProjectController.class).startPage(null)))
+        entry("startInfrastructureProjectUrl", ReverseRouter.route(on(InfrastructureProjectStartController.class).startPage(null)))
     );
   }
 
