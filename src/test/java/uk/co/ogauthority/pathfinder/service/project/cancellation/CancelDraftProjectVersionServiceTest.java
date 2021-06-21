@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.project;
+package uk.co.ogauthority.pathfinder.service.project.cancellation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
@@ -19,15 +19,18 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
+import uk.co.ogauthority.pathfinder.exception.CancelDraftProjectException;
+import uk.co.ogauthority.pathfinder.exception.CancelProjectVersionImplementationException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
+import uk.co.ogauthority.pathfinder.service.TestProjectFormSectionService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryRenderingService;
-import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -45,10 +48,13 @@ public class CancelDraftProjectVersionServiceTest {
   private ProjectSummaryRenderingService projectSummaryRenderingService;
 
   @Mock
-  private UpcomingTenderService upcomingTenderService;
+  private TestProjectFormSectionService testProjectFormSectionServiceA;
 
   @Mock
-  private PlatformsFpsosService platformsFpsosService;
+  private TestProjectFormSectionService testProjectFormSectionServiceB;
+
+  @Mock
+  private TestCancelProjectVersionService testCancelProjectVersionService;
 
   private CancelDraftProjectVersionService cancelDraftProjectVersionService;
 
@@ -63,18 +69,23 @@ public class CancelDraftProjectVersionServiceTest {
         projectService,
         projectUpdateService,
         projectSummaryRenderingService,
-        List.of(upcomingTenderService, platformsFpsosService)
+        List.of(testProjectFormSectionServiceA, testProjectFormSectionServiceB),
+        List.of(testCancelProjectVersionService)
     );
+
+    when(testCancelProjectVersionService.getSupportedProjectType()).thenReturn(projectDetail.getProjectType());
+    when(testCancelProjectVersionService.isCancellable(projectDetail)).thenReturn(true);
   }
 
   @Test
-  public void cancelDraft_whenFirstVersion() {
+  public void cancelDraft_whenFirstVersion_andSupportedServiceAndCancellable_verifyInteractions() {
+
     projectDetail.setVersion(1);
 
     cancelDraftProjectVersionService.cancelDraft(projectDetail);
 
-    verify(upcomingTenderService, times(1)).removeSectionData(projectDetail);
-    verify(platformsFpsosService, times(1)).removeSectionData(projectDetail);
+    verify(testProjectFormSectionServiceA, times(1)).removeSectionData(projectDetail);
+    verify(testProjectFormSectionServiceB, times(1)).removeSectionData(projectDetail);
 
     verify(projectUpdateService, never()).getByToDetail(projectDetail);
 
@@ -83,7 +94,7 @@ public class CancelDraftProjectVersionServiceTest {
   }
 
   @Test
-  public void cancelDraft_whenUpdate() {
+  public void cancelDraft_whenUpdate_andSupportedServiceAndCancellable_verifyInteractions() {
     projectDetail.setVersion(2);
 
     var projectUpdate = new ProjectUpdate();
@@ -96,8 +107,8 @@ public class CancelDraftProjectVersionServiceTest {
 
     cancelDraftProjectVersionService.cancelDraft(projectDetail);
 
-    verify(upcomingTenderService, times(1)).removeSectionData(projectDetail);
-    verify(platformsFpsosService, times(1)).removeSectionData(projectDetail);
+    verify(testProjectFormSectionServiceA, times(1)).removeSectionData(projectDetail);
+    verify(testProjectFormSectionServiceB, times(1)).removeSectionData(projectDetail);
 
     verify(projectUpdateService, times(1)).deleteProjectUpdate(projectUpdate);
     verify(projectService, times(1)).updateProjectDetailIsCurrentVersion(fromDetail, true);
@@ -106,12 +117,33 @@ public class CancelDraftProjectVersionServiceTest {
     verify(projectService, never()).deleteProject(project);
   }
 
+  @Test(expected = CancelDraftProjectException.class)
+  public void cancelDraft_whenIsNotCancellable_andSupportedProjectVersionImplementation_thenException() {
+    when(testCancelProjectVersionService.isCancellable(projectDetail)).thenReturn(false);
+    cancelDraftProjectVersionService.cancelDraft(projectDetail);
+  }
+
+  @Test(expected = CancelProjectVersionImplementationException.class)
+  public void cancelDraft_whenNoSupportedCancelProjectVersionImplementation_thenException() {
+
+    final var supportedProjectType = ProjectType.INFRASTRUCTURE;
+    final var unsupportedProjectType = ProjectType.FORWARD_WORK_PLAN;
+
+    projectDetail.setProjectType(unsupportedProjectType);
+
+    when(testCancelProjectVersionService.getSupportedProjectType()).thenReturn(supportedProjectType);
+
+    cancelDraftProjectVersionService.cancelDraft(projectDetail);
+  }
+
   @Test
   public void cancelDraftIfExists_whenExists() {
     var projectId = project.getId();
     var draftProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
 
     when(projectService.getLatestDetailOrError(projectId)).thenReturn(draftProjectDetail);
+    when(testCancelProjectVersionService.getSupportedProjectType()).thenReturn(draftProjectDetail.getProjectType());
+    when(testCancelProjectVersionService.isCancellable(draftProjectDetail)).thenReturn(true);
 
     var cancelDraftProjectVersionServiceSpy = spy(cancelDraftProjectVersionService);
     cancelDraftProjectVersionServiceSpy.cancelDraftIfExists(projectId);
@@ -153,6 +185,39 @@ public class CancelDraftProjectVersionServiceTest {
     var modelAndView = cancelDraftProjectVersionService.getCancelDraftModelAndView(projectDetail, authenticatedUser);
     assertCancelDraftModelAndView(modelAndView, true, projectSummaryHtml);
   }
+
+  @Test
+  public void isCancellable_whenCancellable_thenTrue() {
+    when(testCancelProjectVersionService.getSupportedProjectType()).thenReturn(projectDetail.getProjectType());
+    when(testCancelProjectVersionService.isCancellable(projectDetail)).thenReturn(true);
+
+    final var isCancellable = cancelDraftProjectVersionService.isCancellable(projectDetail);
+
+    assertThat(isCancellable).isTrue();
+  }
+
+  @Test
+  public void isCancellable_whenNotCancellable_thenFalse() {
+    when(testCancelProjectVersionService.getSupportedProjectType()).thenReturn(projectDetail.getProjectType());
+    when(testCancelProjectVersionService.isCancellable(projectDetail)).thenReturn(false);
+
+    final var isCancellable = cancelDraftProjectVersionService.isCancellable(projectDetail);
+
+    assertThat(isCancellable).isFalse();
+  }
+
+  @Test(expected = CancelProjectVersionImplementationException.class)
+  public void isCancellable_whenNoSupportedCancelProjectVersionImplementation_thenException() {
+
+    final var unsupportedProjectType = ProjectType.FORWARD_WORK_PLAN;
+    final var supportedProjectType = ProjectType.INFRASTRUCTURE;
+
+    projectDetail.setProjectType(unsupportedProjectType);
+
+    when(testCancelProjectVersionService.getSupportedProjectType()).thenReturn(supportedProjectType);
+    cancelDraftProjectVersionService.isCancellable(projectDetail);
+  }
+
 
   private void assertCancelDraftModelAndView(ModelAndView modelAndView,
                                              boolean isUpdate,

@@ -564,4 +564,20 @@ public class WorkPlanUpcomingTenderServiceTest {
   public void alwaysCopySectionData_verifyFalse() {
     assertThat(workPlanUpcomingTenderService.alwaysCopySectionData(projectDetail)).isFalse();
   }
+
+  @Test
+  public void removeSectionData_verifyInteractions() {
+
+    final var upcomingTender1 = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    final var upcomingTender2 = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+
+    final var upcomingTendersForDetail = List.of(upcomingTender1, upcomingTender2);
+
+    when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail))
+        .thenReturn(upcomingTendersForDetail);
+
+    workPlanUpcomingTenderService.removeSectionData(projectDetail);
+
+    verify(workPlanUpcomingTenderRepository, times(1)).deleteAll(upcomingTendersForDetail);
+  }
 }

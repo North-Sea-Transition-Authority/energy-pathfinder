@@ -204,4 +204,11 @@ public class ForwardWorkPlanCollaborationOpportunityService
         duplicatedOpportunityEntityMap
     );
   }
+
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    final var collaborationOpportunities = getOpportunitiesForDetail(projectDetail);
+    forwardWorkPlanCollaborationOpportunityFileLinkService.removeCollaborationOpportunityFileLinks(collaborationOpportunities);
+    forwardWorkPlanCollaborationOpportunityRepository.deleteAll(collaborationOpportunities);
+  }
 }

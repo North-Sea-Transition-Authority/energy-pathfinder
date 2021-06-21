@@ -353,4 +353,24 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
     assertThat(allowSectionDateCleanUp).isTrue();
   }
 
+  @Test
+  public void removeSectionData_verifyInteractions() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+
+    final var opportunity1 = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
+    final var opportunity2 = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
+
+    final var opportunitiesForDetail = List.of(opportunity1, opportunity2);
+
+    when(forwardWorkPlanCollaborationOpportunityRepository.findAllByProjectDetailOrderByIdAsc(projectDetail))
+        .thenReturn(opportunitiesForDetail);
+
+    forwardWorkPlanCollaborationOpportunityService.removeSectionData(projectDetail);
+
+    verify(forwardWorkPlanCollaborationOpportunityFileLinkService, times(1)).removeCollaborationOpportunityFileLinks(opportunitiesForDetail);
+    verify(forwardWorkPlanCollaborationOpportunityRepository, times(1)).deleteAll(opportunitiesForDetail);
+
+  }
+
 }

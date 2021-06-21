@@ -11,6 +11,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
+import uk.co.ogauthority.pathfinder.service.project.cancellation.CancelDraftProjectVersionService;
 
 @Service
 public class TaskListService {
@@ -21,11 +22,15 @@ public class TaskListService {
 
   private final ServiceProperties serviceProperties;
 
+  private final CancelDraftProjectVersionService cancelDraftProjectVersionService;
+
   @Autowired
   public TaskListService(TaskListGroupsService taskListGroupsService,
-                         ServiceProperties serviceProperties) {
+                         ServiceProperties serviceProperties,
+                         CancelDraftProjectVersionService cancelDraftProjectVersionService) {
     this.taskListGroupsService = taskListGroupsService;
     this.serviceProperties = serviceProperties;
+    this.cancelDraftProjectVersionService = cancelDraftProjectVersionService;
   }
 
   public ModelAndView getTaskListModelAndView(ProjectDetail detail) {
@@ -36,7 +41,8 @@ public class TaskListService {
         .addObject("cancelDraftUrl", ReverseRouter.route(on(CancelDraftProjectVersionController.class)
             .getCancelDraft(detail.getProject().getId(), null, null))
         )
-        .addObject("taskListPageHeading", getTaskListPageHeading(detail));
+        .addObject("taskListPageHeading", getTaskListPageHeading(detail))
+        .addObject("isCancellable", cancelDraftProjectVersionService.isCancellable(detail));
 
     ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, detail);
 

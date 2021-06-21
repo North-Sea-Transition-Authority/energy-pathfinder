@@ -221,7 +221,8 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
-    //TODO method will be implemented with PAT-550
+    final var upcomingTenders = getUpcomingTendersForDetail(projectDetail);
+    workPlanUpcomingTenderRepository.deleteAll(upcomingTenders);
   }
 
   @Override

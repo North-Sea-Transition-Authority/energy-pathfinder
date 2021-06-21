@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.view.tasks.TaskListGroup;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
+import uk.co.ogauthority.pathfinder.service.project.cancellation.CancelDraftProjectVersionService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.TaskListTestUtil;
 
@@ -32,6 +33,9 @@ public class TaskListServiceTest {
   @Mock
   private ServiceProperties serviceProperties;
 
+  @Mock
+  private CancelDraftProjectVersionService cancelDraftProjectVersionService;
+
   private static final String SERVICE_NAME = "Service name";
 
   private TaskListService taskListService;
@@ -40,10 +44,16 @@ public class TaskListServiceTest {
 
   @Before
   public void setup() throws Exception {
-    taskListService = new TaskListService(taskListGroupsService, serviceProperties);
+    taskListService = new TaskListService(
+        taskListGroupsService,
+        serviceProperties,
+        cancelDraftProjectVersionService
+    );
     projectDetail = ProjectUtil.getProjectDetails();
 
     when(serviceProperties.getServiceName()).thenReturn(SERVICE_NAME);
+
+    when(cancelDraftProjectVersionService.isCancellable(projectDetail)).thenReturn(false);
   }
 
   @Test
@@ -103,6 +113,7 @@ public class TaskListServiceTest {
         entry("cancelDraftUrl", ReverseRouter.route(on(CancelDraftProjectVersionController.class)
             .getCancelDraft(projectDetail.getProject().getId(), null, null))),
         entry("taskListPageHeading", getExpectedTaskListHeading(projectDetail)),
+        entry("isCancellable", false),
         entry(
             ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
             ProjectService.getProjectTypeDisplayName(projectDetail)
