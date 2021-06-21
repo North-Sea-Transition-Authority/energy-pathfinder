@@ -453,4 +453,10 @@ public class PlatformsFpsosServiceTest {
     assertThat(platformsFpsosService.alwaysCopySectionData(detail)).isFalse();
   }
 
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = platformsFpsosService.allowSectionDataCleanUp(detail);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
+
 }

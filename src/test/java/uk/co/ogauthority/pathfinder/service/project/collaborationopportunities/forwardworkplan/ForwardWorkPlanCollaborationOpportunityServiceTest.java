@@ -347,4 +347,10 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
     verify(forwardWorkPlanCollaborationOpportunityRepository, times(1)).delete(opportunity);
   }
 
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = forwardWorkPlanCollaborationOpportunityService.allowSectionDataCleanUp(projectDetail);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
+
 }

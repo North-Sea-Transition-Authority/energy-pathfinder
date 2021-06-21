@@ -362,4 +362,10 @@ public class IntegratedRigServiceTest {
   public void alwaysCopySectionData_verifyFalse() {
     assertThat(integratedRigService.alwaysCopySectionData(projectDetail)).isFalse();
   }
+
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = integratedRigService.allowSectionDataCleanUp(projectDetail);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
 }

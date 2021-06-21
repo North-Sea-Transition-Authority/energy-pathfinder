@@ -382,4 +382,10 @@ public class UpcomingTenderServiceTest {
   public void alwaysCopySectionData_verifyFalse() {
     assertThat(upcomingTenderService.alwaysCopySectionData(detail)).isFalse();
   }
+
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = upcomingTenderService.allowSectionDataCleanUp(detail);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
 }

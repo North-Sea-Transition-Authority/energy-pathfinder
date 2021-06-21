@@ -557,4 +557,10 @@ public class ProjectInformationServiceTest {
   public void alwaysCopySectionData_verifyFalse() {
     assertThat(projectInformationService.alwaysCopySectionData(details)).isFalse();
   }
+
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = projectInformationService.allowSectionDataCleanUp(details);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
 }

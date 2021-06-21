@@ -361,6 +361,12 @@ public class ProjectSetupServiceTest {
     assertThat(projectSetupService.alwaysCopySectionData(details)).isFalse();
   }
 
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = projectSetupService.allowSectionDataCleanUp(details);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
+
   private void checkCommonFieldsMatch(ProjectSetupForm formToCheckAgainst, ProjectSetupForm resultingForm) {
     assertThat(formToCheckAgainst.getUpcomingTendersIncluded()).isEqualTo(resultingForm.getUpcomingTendersIncluded());
     assertThat(formToCheckAgainst.getAwardedContractsIncluded()).isEqualTo(resultingForm.getAwardedContractsIncluded());

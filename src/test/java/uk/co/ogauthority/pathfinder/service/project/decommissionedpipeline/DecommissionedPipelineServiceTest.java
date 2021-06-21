@@ -331,4 +331,10 @@ public class DecommissionedPipelineServiceTest {
   public void alwaysCopySectionData_verifyFalse() {
     assertThat(decommissionedPipelineService.alwaysCopySectionData(projectDetail)).isFalse();
   }
+
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = decommissionedPipelineService.allowSectionDataCleanUp(projectDetail);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
 }

@@ -732,4 +732,10 @@ public class SubseaInfrastructureServiceTest {
     assertThat(subseaInfrastructureService.alwaysCopySectionData(projectDetail)).isFalse();
   }
 
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = subseaInfrastructureService.allowSectionDataCleanUp(projectDetail);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
+
 }

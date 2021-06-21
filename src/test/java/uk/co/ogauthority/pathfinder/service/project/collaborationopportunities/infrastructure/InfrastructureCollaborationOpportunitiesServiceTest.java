@@ -316,4 +316,11 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
     assertThat(infrastructureCollaborationOpportunitiesService.alwaysCopySectionData(detail)).isFalse();
   }
 
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = infrastructureCollaborationOpportunitiesService.allowSectionDataCleanUp(detail);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
+
+
 }

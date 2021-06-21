@@ -459,4 +459,10 @@ public class PlugAbandonmentScheduleServiceTest {
   public void alwaysCopySectionData_verifyFalse() {
     assertThat(plugAbandonmentScheduleService.alwaysCopySectionData(detail)).isFalse();
   }
+
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = plugAbandonmentScheduleService.allowSectionDataCleanUp(detail);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
 }

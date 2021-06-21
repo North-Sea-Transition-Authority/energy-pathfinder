@@ -347,4 +347,10 @@ public class AwardedContractServiceTest {
   public void alwaysCopySectionData_verifyFalse() {
     assertThat(awardedContractService.alwaysCopySectionData(detail)).isFalse();
   }
+
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = awardedContractService.allowSectionDataCleanUp(detail);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
 }
