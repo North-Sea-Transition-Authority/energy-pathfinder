@@ -73,6 +73,16 @@ public enum TaskListSectionQuestion {
       TaskListSectionAnswer.INTEGRATED_RIGS_YES,
       TaskListSectionAnswer.INTEGRATED_RIGS_NO,
       true
+  ),
+  CAMPAIGN_INFORMATION(
+      ProjectTask.CAMPAIGN_INFORMATION,
+      "Are you willing to combine your work with other operators or the Supply Chain to form a campaign?",
+      "Campaign information",
+      "",
+      "form.campaignInformationIncluded",
+      TaskListSectionAnswer.CAMPAIGN_INFORMATION_YES,
+      TaskListSectionAnswer.CAMPAIGN_INFORMATION_NO,
+      false
   );
   // Subsea infrastructure disabled: PAT-495
   // SUBSEA_INFRASTRUCTURE(
