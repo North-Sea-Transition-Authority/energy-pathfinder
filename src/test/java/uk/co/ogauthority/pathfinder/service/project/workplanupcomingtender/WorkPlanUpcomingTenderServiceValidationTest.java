@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import javax.validation.Validation;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanTenderSetup;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
@@ -42,6 +44,9 @@ public class WorkPlanUpcomingTenderServiceValidationTest {
   @Mock
   private EntityDuplicationService entityDuplicationService;
 
+  @Mock
+  private ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
+
   private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
@@ -59,7 +64,8 @@ public class WorkPlanUpcomingTenderServiceValidationTest {
         workPlanUpcomingTenderFormValidator,
         workPlanUpcomingTenderRepository,
         searchSelectorService,
-        entityDuplicationService
+        entityDuplicationService,
+        forwardWorkPlanTenderSetupService
     );
   }
 
@@ -75,32 +81,112 @@ public class WorkPlanUpcomingTenderServiceValidationTest {
   }
 
   @Test
-  public void isComplete_whenInvalid_thenFalse() {
-    var upcomingTender1 = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
-    var upcomingTender2 = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
-    upcomingTender1.setJobTitle(null);
-    when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(
-        List.of(upcomingTender1, upcomingTender2)
-    );
-    var isComplete = workPlanUpcomingTenderService.isComplete(projectDetail);
+  public void isComplete_whenNoSetupAnswer_thenFalse() {
+
+    when(forwardWorkPlanTenderSetupService.getForwardWorkPlanTenderSetupForDetail(projectDetail)).thenReturn(Optional.empty());
+
+    final var isComplete = workPlanUpcomingTenderService.isComplete(projectDetail);
+
     assertThat(isComplete).isFalse();
   }
 
   @Test
-  public void isComplete_whenValid_thenTrue() {
-    var upcomingTender1 = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
-    var upcomingTender2 = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
-    when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(
-        List.of(upcomingTender1, upcomingTender2)
-    );
-    var isComplete = workPlanUpcomingTenderService.isComplete(projectDetail);
+  public void isComplete_whenSetupAnswerIsNo_thenTrue() {
+
+    final var tenderSetup = new ForwardWorkPlanTenderSetup();
+    tenderSetup.setHasTendersToAdd(false);
+
+    when(forwardWorkPlanTenderSetupService.getForwardWorkPlanTenderSetupForDetail(projectDetail)).thenReturn(Optional.of(tenderSetup));
+
+    final var isComplete = workPlanUpcomingTenderService.isComplete(projectDetail);
+
     assertThat(isComplete).isTrue();
   }
 
   @Test
-  public void isComplete_wheNoTenders_thenFalse() {
+  public void isComplete_whenSetupAnswerIsYesAndNoTendersAdded_thenFalse() {
+
+    final var tenderSetup = new ForwardWorkPlanTenderSetup();
+    tenderSetup.setHasTendersToAdd(true);
+    tenderSetup.setHasOtherTendersToAdd(false);
+
+    when(forwardWorkPlanTenderSetupService.getForwardWorkPlanTenderSetupForDetail(projectDetail)).thenReturn(Optional.of(tenderSetup));
+
     when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(List.of());
-    var isComplete = workPlanUpcomingTenderService.isComplete(projectDetail);
+
+    final var isComplete = workPlanUpcomingTenderService.isComplete(projectDetail);
+
+    assertThat(isComplete).isFalse();
+  }
+
+  @Test
+  public void isComplete_whenSetupAnswerIsYesAndNotAllTendersValid_thenFalse() {
+
+    final var tenderSetup = new ForwardWorkPlanTenderSetup();
+    tenderSetup.setHasTendersToAdd(true);
+    tenderSetup.setHasOtherTendersToAdd(false);
+
+    when(forwardWorkPlanTenderSetupService.getForwardWorkPlanTenderSetupForDetail(projectDetail)).thenReturn(Optional.of(tenderSetup));
+
+    final var validUpcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    final var invalidUpcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    invalidUpcomingTender.setJobTitle(null);
+
+    when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(
+        List.of(validUpcomingTender, invalidUpcomingTender)
+    );
+
+    final var isComplete = workPlanUpcomingTenderService.isComplete(projectDetail);
+
+    assertThat(isComplete).isFalse();
+  }
+
+  @Test
+  public void isComplete_whenSetupAnswerIsYesAndAllTendersValidAndNoMoreToAdd_thenTrue() {
+
+    final var tenderSetup = new ForwardWorkPlanTenderSetup();
+    tenderSetup.setHasTendersToAdd(true);
+    tenderSetup.setHasOtherTendersToAdd(false);
+
+    when(forwardWorkPlanTenderSetupService.getForwardWorkPlanTenderSetupForDetail(projectDetail)).thenReturn(Optional.of(tenderSetup));
+
+    final var validUpcomingTender1 = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    final var validUpcomingTender2 = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+
+    when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(
+        List.of(validUpcomingTender1, validUpcomingTender2)
+    );
+
+    final var isComplete = workPlanUpcomingTenderService.isComplete(projectDetail);
+
+    assertThat(isComplete).isTrue();
+  }
+
+  @Test
+  public void isComplete_whenSetupAnswerIsYesAndMoreToAddIsYes_thenFalse() {
+
+    final var tenderSetup = new ForwardWorkPlanTenderSetup();
+    tenderSetup.setHasTendersToAdd(true);
+    tenderSetup.setHasOtherTendersToAdd(true);
+
+    when(forwardWorkPlanTenderSetupService.getForwardWorkPlanTenderSetupForDetail(projectDetail)).thenReturn(Optional.of(tenderSetup));
+
+    final var isComplete = workPlanUpcomingTenderService.isComplete(projectDetail);
+
+    assertThat(isComplete).isFalse();
+  }
+
+  @Test
+  public void isComplete_whenSetupAnswerIsYesAndMoreToAddNotSet_thenFalse() {
+
+    final var tenderSetup = new ForwardWorkPlanTenderSetup();
+    tenderSetup.setHasTendersToAdd(true);
+    tenderSetup.setHasOtherTendersToAdd(null);
+
+    when(forwardWorkPlanTenderSetupService.getForwardWorkPlanTenderSetupForDetail(projectDetail)).thenReturn(Optional.of(tenderSetup));
+
+    final var isComplete = workPlanUpcomingTenderService.isComplete(projectDetail);
+
     assertThat(isComplete).isFalse();
   }
 }

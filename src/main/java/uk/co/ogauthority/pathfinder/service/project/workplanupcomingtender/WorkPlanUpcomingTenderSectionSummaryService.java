@@ -31,17 +31,21 @@ public class WorkPlanUpcomingTenderSectionSummaryService implements ProjectSecti
   private final DifferenceService differenceService;
   private final WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
   private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+  private final ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
 
   @Autowired
   public WorkPlanUpcomingTenderSectionSummaryService(
       WorkPlanUpcomingTenderService workPlanUpcomingTenderService,
       DifferenceService differenceService,
       WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService,
-      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService) {
+      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService,
+      ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService
+  ) {
     this.workPlanUpcomingTenderService = workPlanUpcomingTenderService;
     this.differenceService = differenceService;
     this.workPlanUpcomingTenderSummaryService = workPlanUpcomingTenderSummaryService;
     this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
+    this.forwardWorkPlanTenderSetupService = forwardWorkPlanTenderSetupService;
   }
 
   @Override
@@ -59,10 +63,13 @@ public class WorkPlanUpcomingTenderSectionSummaryService implements ProjectSecti
     );
 
     var upcomingTenderViews = workPlanUpcomingTenderSummaryService.getSummaryViews(detail);
+
     summaryModel.put("upcomingTendersDiffModel", getUpcomingTenderDifferenceModel(
         detail,
         upcomingTenderViews
     ));
+
+    summaryModel.put("workPlanTenderSetupDiffModel", getUpcomingTenderSetupDifferenceModel(detail));
 
     return new ProjectSectionSummary(
         List.of(SECTION_LINK),
@@ -87,6 +94,22 @@ public class WorkPlanUpcomingTenderSectionSummaryService implements ProjectSecti
         Set.of("summaryLinks"),
         WorkPlanUpcomingTenderView::getDisplayOrder,
         WorkPlanUpcomingTenderView::getDisplayOrder
+    );
+  }
+
+  private Map<String, Object> getUpcomingTenderSetupDifferenceModel(ProjectDetail projectDetail) {
+
+    final var currentWorkPlanTenderSetupView = forwardWorkPlanTenderSetupService
+        .getTenderSetupView(projectDetail);
+
+    final var previousWorkPlanTenderSetupView = forwardWorkPlanTenderSetupService.getTenderSetupView(
+        projectDetail.getProject(),
+        projectDetail.getVersion()
+    );
+
+    return differenceService.differentiate(
+        currentWorkPlanTenderSetupView,
+        previousWorkPlanTenderSetupView
     );
   }
 }

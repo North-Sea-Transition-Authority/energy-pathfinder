@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
+import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanTenderSetupView;
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderView;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
@@ -38,6 +39,9 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
   @Mock
   private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
+  @Mock
+  private ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
+
   private WorkPlanUpcomingTenderSectionSummaryService workPlanUpcomingTenderSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -48,7 +52,8 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
         workPlanUpcomingTenderService,
         differenceService,
         workPlanUpcomingTenderSummaryService,
-        projectSectionSummaryCommonModelService
+        projectSectionSummaryCommonModelService,
+        forwardWorkPlanTenderSetupService
     );
   }
 
@@ -116,6 +121,30 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
     );
   }
 
+  @Test
+  public void getSummary_assertSetupDifferenceModel() {
+
+    final var currentSetupView = new ForwardWorkPlanTenderSetupView();
+    currentSetupView.setHasTendersToAdd("Yes");
+
+    when(forwardWorkPlanTenderSetupService.getTenderSetupView(detail)).thenReturn(currentSetupView);
+
+    final var previousSetupView = new ForwardWorkPlanTenderSetupView();
+    previousSetupView.setHasTendersToAdd("No");
+
+    when(forwardWorkPlanTenderSetupService.getTenderSetupView(
+        detail.getProject(),
+        detail.getVersion())
+    ).thenReturn(previousSetupView);
+
+    workPlanUpcomingTenderSectionSummaryService.getSummary(detail);
+
+    verify(differenceService, times(1)).differentiate(
+        currentSetupView,
+        previousSetupView
+    );
+  }
+
   private void assertModelProperties(ProjectSectionSummary projectSectionSummary, ProjectDetail projectDetail) {
     assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(WorkPlanUpcomingTenderSectionSummaryService.DISPLAY_ORDER);
     assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(WorkPlanUpcomingTenderSectionSummaryService.SECTION_LINK));
@@ -123,7 +152,7 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
 
     var model = projectSectionSummary.getTemplateModel();
 
-    assertThat(model).containsOnlyKeys("upcomingTendersDiffModel");
+    assertThat(model).containsOnlyKeys("upcomingTendersDiffModel", "workPlanTenderSetupDiffModel");
 
     verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
         projectDetail,

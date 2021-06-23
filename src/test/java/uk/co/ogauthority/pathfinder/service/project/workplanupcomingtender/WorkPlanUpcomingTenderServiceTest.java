@@ -52,6 +52,9 @@ public class WorkPlanUpcomingTenderServiceTest {
   @Mock
   private EntityDuplicationService entityDuplicationService;
 
+  @Mock
+  private ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
+
   private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
@@ -69,7 +72,8 @@ public class WorkPlanUpcomingTenderServiceTest {
         workPlanUpcomingTenderFormValidator,
         workPlanUpcomingTenderRepository,
         searchSelectorService,
-        entityDuplicationService
+        entityDuplicationService,
+        forwardWorkPlanTenderSetupService
     );
 
     when(workPlanUpcomingTenderRepository.save(any(WorkPlanUpcomingTender.class)))

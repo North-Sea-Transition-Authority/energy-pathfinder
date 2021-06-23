@@ -241,7 +241,11 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       case PIPELINES:
         return ReverseRouter.route(on(DecommissionedPipelineController.class).viewPipelines(projectId, null));
       case WORK_PLAN_UPCOMING_TENDERS:
-        return ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null));
+        return ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).getUpcomingTenderSetup(
+            projectId,
+            null,
+            null
+        ));
       case WORK_PLAN_COLLABORATION_OPPORTUNITIES:
         return ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class).viewCollaborationOpportunities(
             projectId,

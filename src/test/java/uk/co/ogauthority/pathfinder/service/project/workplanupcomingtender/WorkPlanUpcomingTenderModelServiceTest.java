@@ -21,12 +21,16 @@ import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
+import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanTenderCompletionForm;
+import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanTenderSetupForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderSummaryService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.validation.ValidationErrorOrderingService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
@@ -37,6 +41,9 @@ public class WorkPlanUpcomingTenderModelServiceTest {
 
   @Mock
   private BreadcrumbService breadcrumbService;
+
+  @Mock
+  private ValidationErrorOrderingService validationErrorOrderingService;
 
   private WorkPlanUpcomingTenderModelService workPlanUpcomingTenderModelService;
 
@@ -49,7 +56,8 @@ public class WorkPlanUpcomingTenderModelServiceTest {
 
     workPlanUpcomingTenderModelService = new WorkPlanUpcomingTenderModelService(
         breadcrumbService,
-        searchSelectorService
+        searchSelectorService,
+        validationErrorOrderingService
     );
 
     projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
@@ -97,10 +105,14 @@ public class WorkPlanUpcomingTenderModelServiceTest {
     final var tenderView = WorkPlanUpcomingTenderUtil.getView(1, true);
     final var tenderViewList = List.of(tenderView);
 
+    final var form = new ForwardWorkPlanTenderCompletionForm();
+
     var modelAndView = workPlanUpcomingTenderModelService.getViewUpcomingTendersModelAndView(
-        projectDetail.getProject().getId(),
+        projectDetail,
         tenderViewList,
-        ValidationResult.NOT_VALIDATED
+        ValidationResult.NOT_VALIDATED,
+        form,
+        ReverseRouter.emptyBindingResult()
     );
 
     assertThat(modelAndView.getViewName()).isEqualTo(WorkPlanUpcomingTenderModelService.SUMMARY_TEMPLATE_PATH);
@@ -108,25 +120,59 @@ public class WorkPlanUpcomingTenderModelServiceTest {
     assertThat(modelAndView.getModel()).containsOnlyKeys(
         "pageName",
         "tenderViews",
-        "addUpcomingTenderUrl",
         "isValid",
         "errorSummary",
-        "backToTaskListUrl"
+        "backToTaskListUrl",
+        "form",
+        ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
+        ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR
     );
 
     assertThat(modelAndView.getModel()).contains(
         entry("pageName", WorkPlanUpcomingTenderController.PAGE_NAME),
         entry("tenderViews", tenderViewList),
-        entry("addUpcomingTenderUrl",
-            ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).addUpcomingTender(projectId, null))
+        entry("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectId)),
+        entry("form", form),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
+            projectDetail.getProjectType().getDisplayName()
         ),
-        entry("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectId))
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR,
+            projectDetail.getProjectType().getLowercaseDisplayName()
+        )
     );
 
     verify(breadcrumbService, times(1)).fromTaskList(
         projectId,
         modelAndView,
         WorkPlanUpcomingTenderController.PAGE_NAME
+    );
+  }
+
+  @Test
+  public void getViewUpcomingTendersModelAndView_whenInvalidTenderViews_assertFormErrorsAreOffset() {
+
+    final var invalidTenderViews = List.of(
+        WorkPlanUpcomingTenderUtil.getView(1, false),
+        WorkPlanUpcomingTenderUtil.getView(2, false)
+    );
+
+    final var form = new ForwardWorkPlanTenderCompletionForm();
+    final var bindingResult = ReverseRouter.emptyBindingResult();
+
+    workPlanUpcomingTenderModelService.getViewUpcomingTendersModelAndView(
+        projectDetail,
+        invalidTenderViews,
+        ValidationResult.INVALID,
+        form,
+        bindingResult
+    );
+
+    verify(validationErrorOrderingService, times(1)).getErrorItemsFromBindingResult(
+        form,
+        bindingResult,
+        invalidTenderViews.size() + 1
     );
   }
 
@@ -216,6 +262,33 @@ public class WorkPlanUpcomingTenderModelServiceTest {
         projectId,
         modelAndView,
         WorkPlanUpcomingTenderController.REMOVE_PAGE_NAME
+    );
+  }
+
+  @Test
+  public void getUpcomingTenderSetupModelAndView_assertCorrectModelProperties() {
+
+    final var form = new ForwardWorkPlanTenderSetupForm();
+
+    final var resultingModel = workPlanUpcomingTenderModelService.getUpcomingTenderSetupModelAndView(
+        projectDetail,
+        form
+    );
+
+    assertThat(resultingModel.getViewName()).isEqualTo(WorkPlanUpcomingTenderModelService.SETUP_TEMPLATE_PATH);
+
+    assertThat(resultingModel.getModelMap()).containsExactly(
+        entry("pageName", WorkPlanUpcomingTenderController.PAGE_NAME),
+        entry("form", form),
+        entry("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectDetail.getProject().getId())),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
+            projectDetail.getProjectType().getDisplayName()
+        ),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR,
+            projectDetail.getProjectType().getLowercaseDisplayName()
+        )
     );
   }
 }

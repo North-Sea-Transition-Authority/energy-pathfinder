@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender;
 
 import java.util.List;
 import javax.transaction.Transactional;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -9,6 +10,7 @@ import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanTenderSetup;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
@@ -37,6 +39,7 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
   private final WorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository;
   private final SearchSelectorService searchSelectorService;
   private final EntityDuplicationService entityDuplicationService;
+  private final ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
 
   @Autowired
   public WorkPlanUpcomingTenderService(FunctionService functionService,
@@ -44,13 +47,15 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
                                        WorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator,
                                        WorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository,
                                        SearchSelectorService searchSelectorService,
-                                       EntityDuplicationService entityDuplicationService) {
+                                       EntityDuplicationService entityDuplicationService,
+                                       ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService) {
     this.functionService = functionService;
     this.validationService = validationService;
     this.workPlanUpcomingTenderFormValidator = workPlanUpcomingTenderFormValidator;
     this.workPlanUpcomingTenderRepository = workPlanUpcomingTenderRepository;
     this.searchSelectorService = searchSelectorService;
     this.entityDuplicationService = entityDuplicationService;
+    this.forwardWorkPlanTenderSetupService = forwardWorkPlanTenderSetupService;
   }
 
   public List<RestSearchItem> findDepartmentTenderLikeWithManualEntry(String searchTerm) {
@@ -209,8 +214,29 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
 
   @Override
   public boolean isComplete(ProjectDetail detail) {
-    var upcomingTenders = getUpcomingTendersForDetail(detail);
-    return !upcomingTenders.isEmpty() && upcomingTenders.stream()
+
+    final var forwardWorkPlanTenderSetup = forwardWorkPlanTenderSetupService.getForwardWorkPlanTenderSetupForDetail(detail)
+        .orElse(new ForwardWorkPlanTenderSetup());
+
+    if (forwardWorkPlanTenderSetup.getHasTendersToAdd() == null) {
+      return false;
+    } else if (BooleanUtils.isTrue(forwardWorkPlanTenderSetup.getHasTendersToAdd())) {
+      return hasNoOtherTendersToAdd(forwardWorkPlanTenderSetup) && areAllAddedTendersValid(detail);
+    } else {
+      // indicated that no tenders need to be added
+      return true;
+    }
+  }
+
+  private boolean hasNoOtherTendersToAdd(ForwardWorkPlanTenderSetup forwardWorkPlanTenderSetup) {
+    final var hasOtherTendersToAdd = forwardWorkPlanTenderSetup.getHasOtherTendersToAdd();
+    return hasOtherTendersToAdd != null && !BooleanUtils.isTrue(forwardWorkPlanTenderSetup.getHasOtherTendersToAdd());
+  }
+
+  private boolean areAllAddedTendersValid(ProjectDetail projectDetail) {
+    final var upcomingTenders = getUpcomingTendersForDetail(projectDetail);
+    return !upcomingTenders.isEmpty() && upcomingTenders
+        .stream()
         .allMatch(ut -> isValid(ut, ValidationType.FULL));
   }
 
