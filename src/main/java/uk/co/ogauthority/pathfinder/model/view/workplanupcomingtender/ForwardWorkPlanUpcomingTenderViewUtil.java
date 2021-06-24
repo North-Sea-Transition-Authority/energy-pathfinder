@@ -3,8 +3,8 @@ package uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
-import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
-import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
+import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderController;
+import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
@@ -13,16 +13,18 @@ import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
-public class WorkPlanUpcomingTenderViewUtil {
+public class ForwardWorkPlanUpcomingTenderViewUtil {
 
-  private WorkPlanUpcomingTenderViewUtil() {
-    throw new IllegalStateException("WorkPlanUpcomingTenderViewUtil is a utility class and should not be instantiated");
+  private ForwardWorkPlanUpcomingTenderViewUtil() {
+    throw new IllegalStateException(
+        "ForwardWorkPlanUpcomingTenderViewUtil is a utility class and should not be instantiated"
+    );
   }
 
-  public static WorkPlanUpcomingTenderView createUpcomingTenderView(WorkPlanUpcomingTender workPlanUpcomingTender,
-                                                                    Integer displayOrder) {
+  public static ForwardWorkPlanUpcomingTenderView createUpcomingTenderView(ForwardWorkPlanUpcomingTender workPlanUpcomingTender,
+                                                                           Integer displayOrder) {
     var projectId = workPlanUpcomingTender.getProjectDetail().getProject().getId();
-    var tenderView = new WorkPlanUpcomingTenderView(
+    var tenderView = new ForwardWorkPlanUpcomingTenderView(
         displayOrder,
         workPlanUpcomingTender.getId(),
         projectId
@@ -60,7 +62,7 @@ public class WorkPlanUpcomingTenderViewUtil {
 
     var editLink = new SummaryLink(
         SummaryLinkText.EDIT.getDisplayName(),
-        ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).editUpcomingTender(
+        ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).editUpcomingTender(
             projectId,
             workPlanUpcomingTender.getId(),
             null
@@ -69,7 +71,7 @@ public class WorkPlanUpcomingTenderViewUtil {
 
     var removeLink = new SummaryLink(
         SummaryLinkText.DELETE.getDisplayName(),
-        ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).removeUpcomingTenderConfirm(
+        ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).removeUpcomingTenderConfirm(
             projectId,
             workPlanUpcomingTender.getId(),
             displayOrder,
@@ -82,9 +84,9 @@ public class WorkPlanUpcomingTenderViewUtil {
     return tenderView;
   }
 
-  public static WorkPlanUpcomingTenderView createUpcomingTenderView(WorkPlanUpcomingTender workPlanUpcomingTender,
-                                                                    Integer displayOrder,
-                                                                    Boolean isValid) {
+  public static ForwardWorkPlanUpcomingTenderView createUpcomingTenderView(ForwardWorkPlanUpcomingTender workPlanUpcomingTender,
+                                                                           Integer displayOrder,
+                                                                           Boolean isValid) {
     var view = createUpcomingTenderView(workPlanUpcomingTender, displayOrder);
     view.setIsValid(isValid);
     return view;

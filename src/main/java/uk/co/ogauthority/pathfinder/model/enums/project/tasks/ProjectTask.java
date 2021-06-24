@@ -19,7 +19,7 @@ import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProj
 import uk.co.ogauthority.pathfinder.controller.project.setup.ProjectSetupController;
 import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.SubseaInfrastructureController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
-import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
+import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -40,7 +40,7 @@ import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.subseainfrastructure.SubseaInfrastructureService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
-import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderService;
+import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderService;
 
 /**
  * An enum to encapsulate a task list section, to be used when generating the task list for a given project.
@@ -146,9 +146,9 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       130
   ),
   WORK_PLAN_UPCOMING_TENDERS(
-      WorkPlanUpcomingTenderController.PAGE_NAME,
-      WorkPlanUpcomingTenderController.class,
-      WorkPlanUpcomingTenderService.class,
+      ForwardWorkPlanUpcomingTenderController.PAGE_NAME,
+      ForwardWorkPlanUpcomingTenderController.class,
+      ForwardWorkPlanUpcomingTenderService.class,
       Set.of(ProjectType.FORWARD_WORK_PLAN),
       10
   ),
@@ -241,7 +241,7 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       case PIPELINES:
         return ReverseRouter.route(on(DecommissionedPipelineController.class).viewPipelines(projectId, null));
       case WORK_PLAN_UPCOMING_TENDERS:
-        return ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).getUpcomingTenderSetup(
+        return ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).getUpcomingTenderSetup(
             projectId,
             null,
             null

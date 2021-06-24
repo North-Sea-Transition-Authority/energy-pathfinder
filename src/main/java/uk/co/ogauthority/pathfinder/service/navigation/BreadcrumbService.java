@@ -18,7 +18,7 @@ import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsF
 import uk.co.ogauthority.pathfinder.controller.project.plugabandonmentschedule.PlugAbandonmentScheduleController;
 import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.SubseaInfrastructureController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
-import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
+import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -196,8 +196,8 @@ public class BreadcrumbService {
 
   private Map<String, String> workPlanUpcomingTenders(Integer projectId) {
     var map = taskList(projectId);
-    String route = ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null));
-    map.put(route, WorkPlanUpcomingTenderController.PAGE_NAME);
+    String route = ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null));
+    map.put(route, ForwardWorkPlanUpcomingTenderController.PAGE_NAME);
     return map;
   }
 

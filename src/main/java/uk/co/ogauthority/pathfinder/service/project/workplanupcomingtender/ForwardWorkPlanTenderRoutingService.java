@@ -7,28 +7,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
-import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
+import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanTenderSetup;
-import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
+import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Service
 public class ForwardWorkPlanTenderRoutingService {
 
-  private final WorkPlanUpcomingTenderModelService workPlanUpcomingTenderModelService;
+  private final ForwardWorkPlanUpcomingTenderModelService workPlanUpcomingTenderModelService;
   private final ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
-  private final WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
-  private final WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
+  private final ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
+  private final ForwardWorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
   private final ForwardWorkPlanTenderCompletionService forwardWorkPlanTenderCompletionService;
 
   @Autowired
   public ForwardWorkPlanTenderRoutingService(
-      WorkPlanUpcomingTenderModelService workPlanUpcomingTenderModelService,
+      ForwardWorkPlanUpcomingTenderModelService workPlanUpcomingTenderModelService,
       ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService,
-      WorkPlanUpcomingTenderService workPlanUpcomingTenderService,
-      WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService,
+      ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService,
+      ForwardWorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService,
       ForwardWorkPlanTenderCompletionService forwardWorkPlanTenderCompletionService
   ) {
     this.workPlanUpcomingTenderModelService = workPlanUpcomingTenderModelService;
@@ -46,7 +46,7 @@ public class ForwardWorkPlanTenderRoutingService {
 
     // if user has indicated they have tenders to add and some tenders have been added, redirect to tender summary page
     if (BooleanUtils.isTrue(setupForm.getHasTendersToAdd()) && !upcomingTenders.isEmpty()) {
-      return ReverseRouter.redirect(on(WorkPlanUpcomingTenderController.class).viewUpcomingTenders(
+      return ReverseRouter.redirect(on(ForwardWorkPlanUpcomingTenderController.class).viewUpcomingTenders(
           projectDetail.getProject().getId(),
           null
       ));
@@ -65,7 +65,7 @@ public class ForwardWorkPlanTenderRoutingService {
     final var projectId = projectDetail.getProject().getId();
 
     if (BooleanUtils.isTrue(forwardWorkPlanTenderSetup.getHasTendersToAdd())) {
-      return ReverseRouter.redirect(on(WorkPlanUpcomingTenderController.class).addUpcomingTender(projectId, null));
+      return ReverseRouter.redirect(on(ForwardWorkPlanUpcomingTenderController.class).addUpcomingTender(projectId, null));
     } else {
       return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
     }
@@ -81,7 +81,7 @@ public class ForwardWorkPlanTenderRoutingService {
 
     if (tenderViews.isEmpty()) {
       forwardWorkPlanTenderCompletionService.resetHasOtherTendersToAdd(form, projectDetail);
-      return ReverseRouter.redirect(on(WorkPlanUpcomingTenderController.class).getUpcomingTenderSetup(
+      return ReverseRouter.redirect(on(ForwardWorkPlanUpcomingTenderController.class).getUpcomingTenderSetup(
           projectDetail.getProject().getId(),
           null,
           null
@@ -109,7 +109,7 @@ public class ForwardWorkPlanTenderRoutingService {
     final var projectId = projectDetail.getProject().getId();
 
     return BooleanUtils.isTrue(forwardWorkPlanTenderSetup.getHasOtherTendersToAdd())
-        ? ReverseRouter.redirect(on(WorkPlanUpcomingTenderController.class).addUpcomingTender(projectId, null))
+        ? ReverseRouter.redirect(on(ForwardWorkPlanUpcomingTenderController.class).addUpcomingTender(projectId, null))
         : ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
   }
 
@@ -122,10 +122,10 @@ public class ForwardWorkPlanTenderRoutingService {
     if (BooleanUtils.isTrue(setupForm.getHasTendersToAdd())) {
       return workPlanUpcomingTenderModelService.getUpcomingTenderFormModelAndView(
           projectDetail,
-          new WorkPlanUpcomingTenderForm()
+          new ForwardWorkPlanUpcomingTenderForm()
       );
     } else {
-      return ReverseRouter.redirect(on(WorkPlanUpcomingTenderController.class).getUpcomingTenderSetup(
+      return ReverseRouter.redirect(on(ForwardWorkPlanUpcomingTenderController.class).getUpcomingTenderSetup(
           projectDetail.getProject().getId(),
           null,
           null

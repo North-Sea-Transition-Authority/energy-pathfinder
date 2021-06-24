@@ -18,23 +18,23 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanTenderSetupView;
-import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderView;
+import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanUpcomingTenderView;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
+import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
-import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
+public class ForwardWorkPlanUpcomingTenderSectionSummaryServiceTest {
 
   @Mock
-  private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
+  private ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
   @Mock
   private DifferenceService differenceService;
 
   @Mock
-  private WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
+  private ForwardWorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
 
   @Mock
   private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
@@ -42,13 +42,13 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
   @Mock
   private ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
 
-  private WorkPlanUpcomingTenderSectionSummaryService workPlanUpcomingTenderSectionSummaryService;
+  private ForwardWorkPlanUpcomingTenderSectionSummaryService workPlanUpcomingTenderSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
   @Before
   public void setup() {
-    workPlanUpcomingTenderSectionSummaryService = new WorkPlanUpcomingTenderSectionSummaryService(
+    workPlanUpcomingTenderSectionSummaryService = new ForwardWorkPlanUpcomingTenderSectionSummaryService(
         workPlanUpcomingTenderService,
         differenceService,
         workPlanUpcomingTenderSummaryService,
@@ -74,13 +74,13 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
   @Test
   public void getSummary() {
     final var currentTenderViewList = List.of(
-      WorkPlanUpcomingTenderUtil.getView(1, true),
-      WorkPlanUpcomingTenderUtil.getView(2, true)
+      ForwardWorkPlanUpcomingTenderUtil.getView(1, true),
+      ForwardWorkPlanUpcomingTenderUtil.getView(2, true)
     );
 
     when(workPlanUpcomingTenderSummaryService.getSummaryViews(detail)).thenReturn(currentTenderViewList);
 
-    final var previousTenderViewList = List.of(WorkPlanUpcomingTenderUtil.getView(1, true));
+    final var previousTenderViewList = List.of(ForwardWorkPlanUpcomingTenderUtil.getView(1, true));
 
     when(workPlanUpcomingTenderSummaryService.getSummaryViews(
         detail.getProject(),
@@ -102,8 +102,8 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
 
   @Test
   public void getSummary_noUpcomingTenders() {
-    List<WorkPlanUpcomingTenderView> currentTenderViewList = Collections.emptyList();
-    List<WorkPlanUpcomingTenderView> previousTenderViewList = Collections.emptyList();
+    List<ForwardWorkPlanUpcomingTenderView> currentTenderViewList = Collections.emptyList();
+    List<ForwardWorkPlanUpcomingTenderView> previousTenderViewList = Collections.emptyList();
 
     when(workPlanUpcomingTenderSummaryService.getSummaryViews(detail)).thenReturn(currentTenderViewList);
     when(workPlanUpcomingTenderSummaryService.getSummaryViews(detail.getProject(), detail.getVersion() - 1))
@@ -146,9 +146,10 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
   }
 
   private void assertModelProperties(ProjectSectionSummary projectSectionSummary, ProjectDetail projectDetail) {
-    assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(WorkPlanUpcomingTenderSectionSummaryService.DISPLAY_ORDER);
-    assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(WorkPlanUpcomingTenderSectionSummaryService.SECTION_LINK));
-    assertThat(projectSectionSummary.getTemplatePath()).isEqualTo(WorkPlanUpcomingTenderSectionSummaryService.TEMPLATE_PATH);
+    assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(ForwardWorkPlanUpcomingTenderSectionSummaryService.DISPLAY_ORDER);
+    assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(
+        ForwardWorkPlanUpcomingTenderSectionSummaryService.SECTION_LINK));
+    assertThat(projectSectionSummary.getTemplatePath()).isEqualTo(ForwardWorkPlanUpcomingTenderSectionSummaryService.TEMPLATE_PATH);
 
     var model = projectSectionSummary.getTemplateModel();
 
@@ -156,8 +157,8 @@ public class WorkPlanUpcomingTenderSectionSummaryServiceTest {
 
     verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
         projectDetail,
-        WorkPlanUpcomingTenderSectionSummaryService.PAGE_NAME,
-        WorkPlanUpcomingTenderSectionSummaryService.SECTION_ID
+        ForwardWorkPlanUpcomingTenderSectionSummaryService.PAGE_NAME,
+        ForwardWorkPlanUpcomingTenderSectionSummaryService.SECTION_ID
     );
   }
 }

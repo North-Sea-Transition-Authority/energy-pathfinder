@@ -14,29 +14,29 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanTenderSetup;
-import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
+import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
-import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.WorkPlanUpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderFormValidator;
+import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
-import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class WorkPlanUpcomingTenderServiceValidationTest {
+public class ForwardWorkPlanUpcomingTenderServiceValidationTest {
 
   @Mock
   private FunctionService functionService;
 
   @Mock
-  private WorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator;
+  private ForwardWorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator;
 
   @Mock
-  private WorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository;
+  private ForwardWorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository;
 
   @Mock
   private SearchSelectorService searchSelectorService;
@@ -47,18 +47,18 @@ public class WorkPlanUpcomingTenderServiceValidationTest {
   @Mock
   private ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
 
-  private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
+  private ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
 
-  private final WorkPlanUpcomingTender upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+  private final ForwardWorkPlanUpcomingTender upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
 
   @Before
   public void setup() {
     var validator = new SpringValidatorAdapter(Validation.buildDefaultValidatorFactory().getValidator());
     var validationService = new ValidationService(validator);
 
-    workPlanUpcomingTenderService = new WorkPlanUpcomingTenderService(
+    workPlanUpcomingTenderService = new ForwardWorkPlanUpcomingTenderService(
         functionService,
         validationService,
         workPlanUpcomingTenderFormValidator,
@@ -128,8 +128,8 @@ public class WorkPlanUpcomingTenderServiceValidationTest {
 
     when(forwardWorkPlanTenderSetupService.getForwardWorkPlanTenderSetupForDetail(projectDetail)).thenReturn(Optional.of(tenderSetup));
 
-    final var validUpcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
-    final var invalidUpcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    final var validUpcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    final var invalidUpcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     invalidUpcomingTender.setJobTitle(null);
 
     when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(
@@ -150,8 +150,8 @@ public class WorkPlanUpcomingTenderServiceValidationTest {
 
     when(forwardWorkPlanTenderSetupService.getForwardWorkPlanTenderSetupForDetail(projectDetail)).thenReturn(Optional.of(tenderSetup));
 
-    final var validUpcomingTender1 = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
-    final var validUpcomingTender2 = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    final var validUpcomingTender1 = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    final var validUpcomingTender2 = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
 
     when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(
         List.of(validUpcomingTender1, validUpcomingTender2)

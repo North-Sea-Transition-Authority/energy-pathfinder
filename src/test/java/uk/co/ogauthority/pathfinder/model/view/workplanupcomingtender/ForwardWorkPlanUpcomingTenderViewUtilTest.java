@@ -7,9 +7,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
+import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
+import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
@@ -18,12 +18,12 @@ import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
-import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class WorkPlanUpcomingTenderViewUtilTest {
+public class ForwardWorkPlanUpcomingTenderViewUtilTest {
 
   private ProjectDetail projectDetail;
 
@@ -35,13 +35,13 @@ public class WorkPlanUpcomingTenderViewUtilTest {
   @Test
   public void createUpcomingTenderView_whenNoTenderDepartment_thenEmptyStringWithTag() {
 
-    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setDepartmentType(null);
     upcomingTender.setManualDepartmentType(null);
 
     final var displayOrder = 1;
 
-    final var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
         upcomingTender,
         displayOrder
     );
@@ -56,13 +56,13 @@ public class WorkPlanUpcomingTenderViewUtilTest {
 
     final var tenderDepartment = Function.DRILLING;
 
-    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setDepartmentType(tenderDepartment);
     upcomingTender.setManualDepartmentType(null);
 
     final var displayOrder = 2;
 
-    final var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
         upcomingTender,
         displayOrder
     );
@@ -79,13 +79,13 @@ public class WorkPlanUpcomingTenderViewUtilTest {
 
     final var tenderDepartment = "Manual entry";
 
-    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setDepartmentType(null);
     upcomingTender.setManualDepartmentType(tenderDepartment);
 
     final var displayOrder = 2;
 
-    final var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
         upcomingTender,
         displayOrder
     );
@@ -102,12 +102,12 @@ public class WorkPlanUpcomingTenderViewUtilTest {
 
     final var contractBand = WorkPlanUpcomingTenderContractBand.GREATER_THAN_OR_EQUAL_TO_5M;
 
-    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setContractBand(contractBand);
 
     final var displayOrder = 2;
 
-    final var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
         upcomingTender,
         displayOrder
     );
@@ -120,12 +120,12 @@ public class WorkPlanUpcomingTenderViewUtilTest {
   @Test
   public void createUpComingTenderView_whenContractBandNotProvided_thenEmptyString() {
 
-    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setContractBand(null);
 
     final var displayOrder = 2;
 
-    final var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
         upcomingTender,
         displayOrder
     );
@@ -138,12 +138,12 @@ public class WorkPlanUpcomingTenderViewUtilTest {
   @Test
   public void createUpComingTenderView_whenIsValidTrue_thenIsValidTrueInView() {
 
-    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
 
     final var displayOrder = 3;
     final var isValid = true;
 
-    final var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
         upcomingTender,
         displayOrder,
         isValid
@@ -157,12 +157,12 @@ public class WorkPlanUpcomingTenderViewUtilTest {
   @Test
   public void createUpComingTenderView_whenIsValidFalse_thenIsValidFalseInView() {
 
-    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
 
     final var displayOrder = 3;
     final var isValid = false;
 
-    final var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
         upcomingTender,
         displayOrder,
         isValid
@@ -176,13 +176,13 @@ public class WorkPlanUpcomingTenderViewUtilTest {
   @Test
   public void createUpcomingTenderView_whenContractTermDurationAndPeriodNull_thenContractLengthSetToEmptyString() {
 
-    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setContractTermDurationPeriod(null);
     upcomingTender.setContractTermDuration(null);
 
     final var displayOrder = 1;
 
-    final var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
         upcomingTender,
         displayOrder
     );
@@ -194,13 +194,13 @@ public class WorkPlanUpcomingTenderViewUtilTest {
   @Test
   public void createUpcomingTenderView_whenContractTermDurationPeriodNull_thenContractLengthSetToEmptyString() {
 
-    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setContractTermDurationPeriod(null);
     upcomingTender.setContractTermDuration(10);
 
     final var displayOrder = 1;
 
-    final var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
         upcomingTender,
         displayOrder
     );
@@ -212,13 +212,13 @@ public class WorkPlanUpcomingTenderViewUtilTest {
   @Test
   public void createUpcomingTenderView_whenContractTermDurationNull_thenContractLengthSetToEmptyString() {
 
-    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setContractTermDurationPeriod(DurationPeriod.DAYS);
     upcomingTender.setContractTermDuration(null);
 
     final var displayOrder = 1;
 
-    final var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
         upcomingTender,
         displayOrder
     );
@@ -259,13 +259,13 @@ public class WorkPlanUpcomingTenderViewUtilTest {
                                           DurationPeriod contractTermDurationPeriod,
                                           String expectedContractTermString) {
 
-    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setContractTermDurationPeriod(contractTermDurationPeriod);
     upcomingTender.setContractTermDuration(contractTermDuration);
 
     final var displayOrder = 1;
 
-    final var upcomingTenderView = WorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
         upcomingTender,
         displayOrder
     );
@@ -275,8 +275,8 @@ public class WorkPlanUpcomingTenderViewUtilTest {
   }
 
   private void assertCommonProperties(
-      WorkPlanUpcomingTenderView upcomingTenderView,
-      WorkPlanUpcomingTender upcomingTender,
+      ForwardWorkPlanUpcomingTenderView upcomingTenderView,
+      ForwardWorkPlanUpcomingTender upcomingTender,
       int displayOrder
   ) {
     assertThat(upcomingTenderView.getDescriptionOfWork()).isEqualTo(upcomingTender.getDescriptionOfWork());
@@ -290,7 +290,7 @@ public class WorkPlanUpcomingTenderViewUtilTest {
 
     final var editSummaryLink = new SummaryLink(
         SummaryLinkText.EDIT.getDisplayName(),
-        ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).editUpcomingTender(
+        ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).editUpcomingTender(
             upcomingTenderView.getProjectId(),
             upcomingTenderView.getId(),
             null
@@ -299,7 +299,7 @@ public class WorkPlanUpcomingTenderViewUtilTest {
 
     final var removeSummaryLink = new SummaryLink(
         SummaryLinkText.DELETE.getDisplayName(),
-        ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).removeUpcomingTenderConfirm(
+        ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).removeUpcomingTenderConfirm(
             upcomingTenderView.getProjectId(),
             upcomingTenderView.getId(),
             displayOrder,

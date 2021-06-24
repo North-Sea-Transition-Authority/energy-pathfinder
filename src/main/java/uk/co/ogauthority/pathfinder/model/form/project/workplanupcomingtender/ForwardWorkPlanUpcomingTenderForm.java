@@ -11,7 +11,7 @@ import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.positivewholenumber.PositiveWholeNumberGreaterThanZero;
 
-public class WorkPlanUpcomingTenderForm {
+public class ForwardWorkPlanUpcomingTenderForm {
 
   @NotEmpty(message = "Select a department", groups = FullValidation.class)
   private String departmentType;

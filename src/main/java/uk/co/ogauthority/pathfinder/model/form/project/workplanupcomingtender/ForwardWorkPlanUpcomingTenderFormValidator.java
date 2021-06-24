@@ -14,7 +14,7 @@ import uk.co.ogauthority.pathfinder.model.form.validation.quarteryear.QuarterYea
 import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 
 @Component
-public class WorkPlanUpcomingTenderFormValidator implements SmartValidator {
+public class ForwardWorkPlanUpcomingTenderFormValidator implements SmartValidator {
 
   protected static final String INVALID_CONTRACT_DURATION_PREFIX = "Enter the length of the contract in";
   protected static final String INVALID_CONTRACT_DURATION_ERROR_CODE = ".invalid";
@@ -22,7 +22,7 @@ public class WorkPlanUpcomingTenderFormValidator implements SmartValidator {
   private final QuarterYearInputValidator quarterYearInputValidator;
 
   @Autowired
-  public  WorkPlanUpcomingTenderFormValidator(QuarterYearInputValidator quarterYearInputValidator) {
+  public ForwardWorkPlanUpcomingTenderFormValidator(QuarterYearInputValidator quarterYearInputValidator) {
     this.quarterYearInputValidator = quarterYearInputValidator;
   }
 
@@ -33,11 +33,11 @@ public class WorkPlanUpcomingTenderFormValidator implements SmartValidator {
 
   @Override
   public void validate(Object target, Errors errors, Object... validationHints) {
-    var form = (WorkPlanUpcomingTenderForm) target;
+    var form = (ForwardWorkPlanUpcomingTenderForm) target;
 
-    WorkPlanUpcomingTenderValidationHint workPlanUpcomingTenderValidationHint = Arrays.stream(validationHints)
-        .filter(hint -> hint.getClass().equals(WorkPlanUpcomingTenderValidationHint.class))
-        .map(WorkPlanUpcomingTenderValidationHint.class::cast)
+    ForwardWorkPlanUpcomingTenderValidationHint workPlanUpcomingTenderValidationHint = Arrays.stream(validationHints)
+        .filter(hint -> hint.getClass().equals(ForwardWorkPlanUpcomingTenderValidationHint.class))
+        .map(ForwardWorkPlanUpcomingTenderValidationHint.class::cast)
         .findFirst()
         .orElseThrow(
             () -> new ActionNotAllowedException("Expected WorkPlanUpcomingTenderValidationHint to be provided")
@@ -88,7 +88,7 @@ public class WorkPlanUpcomingTenderFormValidator implements SmartValidator {
 
   @Override
   public boolean supports(Class<?> clazz) {
-    return clazz.equals(WorkPlanUpcomingTenderForm.class);
+    return clazz.equals(ForwardWorkPlanUpcomingTenderForm.class);
   }
 
   private boolean isFullValidation(ValidationType validationType) {

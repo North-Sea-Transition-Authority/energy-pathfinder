@@ -14,30 +14,30 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
-import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
+import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanTenderSetup;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanTenderCompletionForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanTenderSetupForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
-import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ForwardWorkPlanTenderRoutingServiceTest {
 
   @Mock
-  private WorkPlanUpcomingTenderModelService workPlanUpcomingTenderModelService;
+  private ForwardWorkPlanUpcomingTenderModelService workPlanUpcomingTenderModelService;
 
   @Mock
   private ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
 
   @Mock
-  private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
+  private ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
   @Mock
-  private WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
+  private ForwardWorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
 
   @Mock
   private ForwardWorkPlanTenderCompletionService forwardWorkPlanTenderCompletionService;
@@ -123,13 +123,13 @@ public class ForwardWorkPlanTenderRoutingServiceTest {
     setupFormWithTendersToAdd.setHasTendersToAdd(true);
 
     when(workPlanUpcomingTenderService.getUpcomingTendersForDetail(projectDetail)).thenReturn(
-        List.of(WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail))
+        List.of(ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail))
     );
 
     when(forwardWorkPlanTenderSetupService.getForwardWorkPlanTenderSetupFormFromDetail(projectDetail))
         .thenReturn(setupFormWithTendersToAdd);
 
-    final var expectedRoute = ReverseRouter.redirect(on(WorkPlanUpcomingTenderController.class).viewUpcomingTenders(
+    final var expectedRoute = ReverseRouter.redirect(on(ForwardWorkPlanUpcomingTenderController.class).viewUpcomingTenders(
         projectDetail.getProject().getId(),
         null
     )).getViewName();
@@ -145,7 +145,7 @@ public class ForwardWorkPlanTenderRoutingServiceTest {
     final var forwardWorkPlanTenderSetup = new ForwardWorkPlanTenderSetup();
     forwardWorkPlanTenderSetup.setHasTendersToAdd(true);
 
-    final var expectedRoute = ReverseRouter.redirect(on(WorkPlanUpcomingTenderController.class).addUpcomingTender(
+    final var expectedRoute = ReverseRouter.redirect(on(ForwardWorkPlanUpcomingTenderController.class).addUpcomingTender(
         projectDetail.getProject().getId(),
         null
     )).getViewName();
@@ -182,7 +182,7 @@ public class ForwardWorkPlanTenderRoutingServiceTest {
 
     when(workPlanUpcomingTenderSummaryService.getSummaryViews(projectDetail)).thenReturn(List.of());
 
-    final var expectedRoute = ReverseRouter.redirect(on(WorkPlanUpcomingTenderController.class).getUpcomingTenderSetup(
+    final var expectedRoute = ReverseRouter.redirect(on(ForwardWorkPlanUpcomingTenderController.class).getUpcomingTenderSetup(
         projectDetail.getProject().getId(),
         null,
         null
@@ -199,7 +199,7 @@ public class ForwardWorkPlanTenderRoutingServiceTest {
   public void getViewUpcomingTendersRoute_whenTendersAdded_thenTenderViewEndpoint() {
 
     final var tenderViews = List.of(
-        WorkPlanUpcomingTenderUtil.getView(1, true)
+        ForwardWorkPlanUpcomingTenderUtil.getView(1, true)
     );
 
     when(workPlanUpcomingTenderSummaryService.getSummaryViews(projectDetail)).thenReturn(tenderViews);
@@ -253,7 +253,7 @@ public class ForwardWorkPlanTenderRoutingServiceTest {
     when(forwardWorkPlanTenderSetupService.getForwardWorkPlanTenderSetupFormFromDetail(projectDetail))
         .thenReturn(setupFormWithNoTendersToAdd);
 
-    final var expectedRoute = ReverseRouter.redirect(on(WorkPlanUpcomingTenderController.class).getUpcomingTenderSetup(
+    final var expectedRoute = ReverseRouter.redirect(on(ForwardWorkPlanUpcomingTenderController.class).getUpcomingTenderSetup(
         projectDetail.getProject().getId(),
         null,
         null
@@ -273,7 +273,7 @@ public class ForwardWorkPlanTenderRoutingServiceTest {
     when(forwardWorkPlanTenderSetupService.getForwardWorkPlanTenderSetupFormFromDetail(projectDetail))
         .thenReturn(emptySetupForm);
 
-    final var expectedRoute = ReverseRouter.redirect(on(WorkPlanUpcomingTenderController.class).getUpcomingTenderSetup(
+    final var expectedRoute = ReverseRouter.redirect(on(ForwardWorkPlanUpcomingTenderController.class).getUpcomingTenderSetup(
         projectDetail.getProject().getId(),
         null,
         null
@@ -297,7 +297,7 @@ public class ForwardWorkPlanTenderRoutingServiceTest {
         projectDetail
     ).getViewName();
 
-    final var expectedRoute = ReverseRouter.redirect(on(WorkPlanUpcomingTenderController.class).addUpcomingTender(
+    final var expectedRoute = ReverseRouter.redirect(on(ForwardWorkPlanUpcomingTenderController.class).addUpcomingTender(
         projectDetail.getProject().getId(),
         null
     )).getViewName();

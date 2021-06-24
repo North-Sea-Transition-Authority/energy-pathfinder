@@ -11,13 +11,13 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.valida
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.validationhint.QuarterYearHint;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
-public class WorkPlanUpcomingTenderValidationHint {
+public class ForwardWorkPlanUpcomingTenderValidationHint {
 
   public static final FormInputLabel ESTIMATED_TENDER_LABEL = new FormInputLabel("estimated tender date");
 
   private final ValidationType validationType;
 
-  public WorkPlanUpcomingTenderValidationHint(ValidationType validationType) {
+  public ForwardWorkPlanUpcomingTenderValidationHint(ValidationType validationType) {
     this.validationType = validationType;
   }
 

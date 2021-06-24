@@ -25,57 +25,57 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarte
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.validationhint.OnOrAfterQuarterYearHint;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.validationhint.QuarterYearHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.quarteryear.QuarterYearInputValidator;
+import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
-import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class WorkPlanUpcomingTenderFormValidatorTest {
+public class ForwardWorkPlanUpcomingTenderFormValidatorTest {
 
   @Mock
   private QuarterYearInputValidator quarterYearInputValidator;
 
-  private static final String INVALID_CONTRACT_DURATION_PREFIX = WorkPlanUpcomingTenderFormValidator.INVALID_CONTRACT_DURATION_PREFIX;
-  private static final String INVALID_CONTRACT_DURATION_ERROR_CODE = WorkPlanUpcomingTenderFormValidator.INVALID_CONTRACT_DURATION_ERROR_CODE;
+  private static final String INVALID_CONTRACT_DURATION_PREFIX = ForwardWorkPlanUpcomingTenderFormValidator.INVALID_CONTRACT_DURATION_PREFIX;
+  private static final String INVALID_CONTRACT_DURATION_ERROR_CODE = ForwardWorkPlanUpcomingTenderFormValidator.INVALID_CONTRACT_DURATION_ERROR_CODE;
 
-  private WorkPlanUpcomingTenderFormValidator validator;
+  private ForwardWorkPlanUpcomingTenderFormValidator validator;
 
   @Before
   public void setUp() {
-    validator = new WorkPlanUpcomingTenderFormValidator(quarterYearInputValidator);
+    validator = new ForwardWorkPlanUpcomingTenderFormValidator(quarterYearInputValidator);
     doCallRealMethod().when(quarterYearInputValidator).validate(any(), any(), any());
     when(quarterYearInputValidator.supports(any())).thenReturn(true);
   }
 
   @Test
   public void validate_whenFullValidationAndCompleteForm_thenNoErrors() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     var fieldErrors = validateFormAndGetErrors(form, ValidationType.FULL);
     assertBindingResultHasNoErrors(fieldErrors);
   }
 
   @Test
   public void validate_whenPartialValidationAndCompleteForm_thenNoErrors() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     var fieldErrors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
     assertBindingResultHasNoErrors(fieldErrors);
   }
 
   @Test
   public void validate_whenFullValidationAndNullTenderDate_thenErrors() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setEstimatedTenderStartDate(new QuarterYearInput(null, null));
     var fieldErrors = validateFormAndGetErrors(form, ValidationType.FULL);
     assertEstimatedTenderDateFieldErrorCodesAndMessages(
         fieldErrors,
         QuarterYearInputValidator.QUARTER_INVALID_CODE,
         QuarterYearInputValidator.YEAR_INVALID_CODE,
-        "Enter an " + WorkPlanUpcomingTenderValidationHint.ESTIMATED_TENDER_LABEL.getLabel() + " "
+        "Enter an " + ForwardWorkPlanUpcomingTenderValidationHint.ESTIMATED_TENDER_LABEL.getLabel() + " "
     );
   }
 
   @Test
   public void validate_whenPartialValidationAndNullTenderDate_thenNoErrors() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setEstimatedTenderStartDate(new QuarterYearInput(null, null));
     var fieldErrors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
     assertBindingResultHasNoErrors(fieldErrors);
@@ -83,7 +83,7 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
 
   @Test
   public void validate_whenFullValidationAndTenderDateInPast_thenErrors() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setEstimatedTenderStartDate(new QuarterYearInput(Quarter.Q1, "2020"));
 
     assertOnOrAfterTenderDateError(form, ValidationType.FULL);
@@ -91,20 +91,20 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
 
   @Test
   public void validate_whenPartialValidationAndTenderDateInPast_thenErrors() {
-    final var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    final var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setEstimatedTenderStartDate(new QuarterYearInput(Quarter.Q1, "2020"));
 
     assertOnOrAfterTenderDateError(form, ValidationType.PARTIAL);
   }
 
-  private void assertOnOrAfterTenderDateError(WorkPlanUpcomingTenderForm form,
+  private void assertOnOrAfterTenderDateError(ForwardWorkPlanUpcomingTenderForm form,
                                               ValidationType validationType) {
 
     final var fieldErrors = validateFormAndGetErrors(form, validationType);
 
     final var expectedErrorMessage = String.format(
         OnOrAfterQuarterYearHint.ERROR_MESSAGE_TEXT,
-        WorkPlanUpcomingTenderValidationHint.ESTIMATED_TENDER_LABEL.getInitCappedLabel(),
+        ForwardWorkPlanUpcomingTenderValidationHint.ESTIMATED_TENDER_LABEL.getInitCappedLabel(),
         QuarterYearHint.CURRENT_QUARTER_YEAR_LABEL
     );
 
@@ -118,7 +118,7 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
 
   @Test
   public void validate_whenFullValidationAndTenderDateInFuture_thenNoErrors() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     final var quarterYearInFuture = new QuarterYearInput(
         Quarter.Q1,
         String.valueOf(LocalDate.now().plusYears(1).getYear())
@@ -130,7 +130,7 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
 
   @Test
   public void validate_whenPartialValidationAndTenderDateInFuture_thenNoErrors() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     final var quarterYearInFuture = new QuarterYearInput(
         Quarter.Q1,
         String.valueOf(LocalDate.now().plusYears(1).getYear())
@@ -141,7 +141,7 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
 
   @Test(expected = ActionNotAllowedException.class)
   public void validate_whenNoUpcomingTenderValidationHint_thenException() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     var errors = new BeanPropertyBindingResult(form, "form");
     ValidationUtils.invokeValidator(validator, form, errors);
   }
@@ -170,8 +170,8 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
     assertBindingResultHasNoErrors(errors);
   }
 
-  private WorkPlanUpcomingTenderForm getInvalidDayDurationForm() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+  private ForwardWorkPlanUpcomingTenderForm getInvalidDayDurationForm() {
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setContractTermDurationPeriod(DurationPeriod.DAYS);
     form.setContractTermDayDuration(null);
     return form;
@@ -201,8 +201,8 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
     assertBindingResultHasNoErrors(errors);
   }
 
-  private WorkPlanUpcomingTenderForm getInvalidWeekDurationForm() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+  private ForwardWorkPlanUpcomingTenderForm getInvalidWeekDurationForm() {
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setContractTermDurationPeriod(DurationPeriod.WEEKS);
     form.setContractTermWeekDuration(null);
     return form;
@@ -232,8 +232,8 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
     assertBindingResultHasNoErrors(errors);
   }
 
-  private WorkPlanUpcomingTenderForm getInvalidMonthDurationForm() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+  private ForwardWorkPlanUpcomingTenderForm getInvalidMonthDurationForm() {
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setContractTermDurationPeriod(DurationPeriod.MONTHS);
     form.setContractTermMonthDuration(null);
     return form;
@@ -265,7 +265,7 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
 
   @Test
   public void validate_whenEmptyFormAndPartialValidation_thenNoErrors() {
-    var form = WorkPlanUpcomingTenderUtil.getEmptyForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getEmptyForm();
 
     final var errors = validateFormAndGetErrors(form, ValidationType.PARTIAL);
 
@@ -274,22 +274,22 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
 
   @Test
   public void validate_whenEmptyFormAndFullValidation_thenErrors() {
-    var form = WorkPlanUpcomingTenderUtil.getEmptyForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getEmptyForm();
 
     final var errors = validateFormAndGetErrors(form, ValidationType.FULL);
 
     assertThat(errors.hasErrors()).isTrue();
   }
 
-  private WorkPlanUpcomingTenderForm getInvalidYearDurationForm() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+  private ForwardWorkPlanUpcomingTenderForm getInvalidYearDurationForm() {
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setContractTermDurationPeriod(DurationPeriod.YEARS);
     form.setContractTermYearDuration(null);
     return form;
   }
 
   private void assertContractTermFieldErrorCodesAndMessages(BindingResult errors,
-                                                            WorkPlanUpcomingTenderForm form,
+                                                            ForwardWorkPlanUpcomingTenderForm form,
                                                             String formFieldExpectingError) {
     final var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     final var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
@@ -326,10 +326,10 @@ public class WorkPlanUpcomingTenderFormValidatorTest {
     assertThat(fieldErrors.hasErrors()).isFalse();
   }
 
-  private BeanPropertyBindingResult validateFormAndGetErrors(WorkPlanUpcomingTenderForm form,
+  private BeanPropertyBindingResult validateFormAndGetErrors(ForwardWorkPlanUpcomingTenderForm form,
                                                              ValidationType validationType) {
     var errors = new BeanPropertyBindingResult(form, "form");
-    var upcomingTenderValidationHint = new WorkPlanUpcomingTenderValidationHint(validationType);
+    var upcomingTenderValidationHint = new ForwardWorkPlanUpcomingTenderValidationHint(validationType);
     ValidationUtils.invokeValidator(validator, form, errors, upcomingTenderValidationHint);
     return errors;
   }

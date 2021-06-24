@@ -1,21 +1,21 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
+import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
-import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
+import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
-import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderView;
+import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanUpcomingTenderView;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
-public class WorkPlanUpcomingTenderUtil {
+public class ForwardWorkPlanUpcomingTenderUtil {
   public static final Function UPCOMING_TENDER_DEPARTMENT = Function.DRILLING;
   public static final String MANUAL_TENDER_DEPARTMENT = SearchSelectablePrefix.FREE_TEXT_PREFIX + "manual department type";
   public static final String DESCRIPTION_OF_WORK = "work description";
@@ -32,42 +32,42 @@ public class WorkPlanUpcomingTenderUtil {
   public static final Integer ID = 1;
   public static final Integer PROJECT_ID = 1;
 
-  public static WorkPlanUpcomingTenderForm getCompleteForm() {
-    var form = new WorkPlanUpcomingTenderForm();
+  public static ForwardWorkPlanUpcomingTenderForm getCompleteForm() {
+    var form = new ForwardWorkPlanUpcomingTenderForm();
     form.setDepartmentType(UPCOMING_TENDER_DEPARTMENT.name());
     setUpcomingTenderFields(form);
     return form;
   }
 
-  public static WorkPlanUpcomingTenderForm getCompleteForm_manualEntry() {
-    var form = new WorkPlanUpcomingTenderForm();
+  public static ForwardWorkPlanUpcomingTenderForm getCompleteForm_manualEntry() {
+    var form = new ForwardWorkPlanUpcomingTenderForm();
     form.setDepartmentType(MANUAL_TENDER_DEPARTMENT);
     setUpcomingTenderFields(form);
     return form;
   }
 
-  public static WorkPlanUpcomingTenderForm getEmptyForm() {
-    var form = new WorkPlanUpcomingTenderForm();
+  public static ForwardWorkPlanUpcomingTenderForm getEmptyForm() {
+    var form = new ForwardWorkPlanUpcomingTenderForm();
     form.setEstimatedTenderStartDate(new QuarterYearInput(null, null));
     form.setContactDetail(new ContactDetailForm());
     return form;
   }
 
-  public static WorkPlanUpcomingTender getUpcomingTender(ProjectDetail detail) {
-    var tender = new WorkPlanUpcomingTender(detail);
+  public static ForwardWorkPlanUpcomingTender getUpcomingTender(ProjectDetail detail) {
+    var tender = new ForwardWorkPlanUpcomingTender(detail);
     tender.setDepartmentType(UPCOMING_TENDER_DEPARTMENT);
     setUpcomingTenderFields(tender);
     return tender;
   }
 
-  public static WorkPlanUpcomingTender getUpcomingTender_manualEntry(ProjectDetail detail) {
-    var tender = new WorkPlanUpcomingTender(detail);
+  public static ForwardWorkPlanUpcomingTender getUpcomingTender_manualEntry(ProjectDetail detail) {
+    var tender = new ForwardWorkPlanUpcomingTender(detail);
     tender.setManualDepartmentType(MANUAL_TENDER_DEPARTMENT);
     setUpcomingTenderFields(tender);
     return tender;
   }
 
-  private static void setUpcomingTenderFields(WorkPlanUpcomingTender tender) {
+  private static void setUpcomingTenderFields(ForwardWorkPlanUpcomingTender tender) {
     tender.setDescriptionOfWork(DESCRIPTION_OF_WORK);
     tender.setEstimatedTenderDateQuarter(ESTIMATED_TENDER_QUARTER);
     tender.setEstimatedTenderDateYear(ESTIMATED_TENDER_YEAR);
@@ -80,7 +80,7 @@ public class WorkPlanUpcomingTenderUtil {
     tender.setEmailAddress(EMAIL);
   }
 
-  private static void setUpcomingTenderFields(WorkPlanUpcomingTenderForm form) {
+  private static void setUpcomingTenderFields(ForwardWorkPlanUpcomingTenderForm form) {
     form.setDescriptionOfWork(DESCRIPTION_OF_WORK);
     form.setEstimatedTenderStartDate(new QuarterYearInput(ESTIMATED_TENDER_QUARTER, String.valueOf(ESTIMATED_TENDER_YEAR)));
     form.setContractBand(CONTRACT_BAND);
@@ -96,8 +96,8 @@ public class WorkPlanUpcomingTenderUtil {
     form.setContactDetail(contactDetailForm);
   }
 
-  public static WorkPlanUpcomingTenderView getView(Integer displayOrder, boolean isValid) {
-    var view = new WorkPlanUpcomingTenderView(
+  public static ForwardWorkPlanUpcomingTenderView getView(Integer displayOrder, boolean isValid) {
+    var view = new ForwardWorkPlanUpcomingTenderView(
         displayOrder,
         ID,
         PROJECT_ID

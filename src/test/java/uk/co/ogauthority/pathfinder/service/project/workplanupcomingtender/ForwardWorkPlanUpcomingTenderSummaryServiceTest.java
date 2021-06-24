@@ -12,32 +12,32 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
+import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
-import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderView;
+import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanUpcomingTenderView;
+import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
-import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class WorkPlanUpcomingTenderSummaryServiceTest {
+public class ForwardWorkPlanUpcomingTenderSummaryServiceTest {
 
   @Mock
-  private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
+  private ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
-  private WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
+  private ForwardWorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
 
-  private final WorkPlanUpcomingTender workPlanUpcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+  private final ForwardWorkPlanUpcomingTender workPlanUpcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
 
-  private final WorkPlanUpcomingTender manualEntryWorkPlanUpcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender_manualEntry(projectDetail);
+  private final ForwardWorkPlanUpcomingTender manualEntryWorkPlanUpcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender_manualEntry(projectDetail);
 
   @Before
   public void setup() {
-    workPlanUpcomingTenderSummaryService = new WorkPlanUpcomingTenderSummaryService(workPlanUpcomingTenderService);
+    workPlanUpcomingTenderSummaryService = new ForwardWorkPlanUpcomingTenderSummaryService(workPlanUpcomingTenderService);
     when(workPlanUpcomingTenderService.getUpcomingTendersForDetail(projectDetail)).thenReturn(
         List.of(workPlanUpcomingTender, manualEntryWorkPlanUpcomingTender)
     );
@@ -49,7 +49,7 @@ public class WorkPlanUpcomingTenderSummaryServiceTest {
     checkCommonViewFields(views);
   }
 
-  private void checkCommonViewFields(List<WorkPlanUpcomingTenderView> views) {
+  private void checkCommonViewFields(List<ForwardWorkPlanUpcomingTenderView> views) {
     assertThat(views.size()).isEqualTo(2);
     var view1 = views.get(0);
     var view2 = views.get(1);
@@ -67,7 +67,7 @@ public class WorkPlanUpcomingTenderSummaryServiceTest {
   @Test
   public void getSummaryViews_withProjectAndVersion_whenTendersFound_thenReturnPopulatedList() {
 
-    final var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    final var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
 
     when(workPlanUpcomingTenderService.getUpcomingTendersForProjectAndVersion(projectDetail.getProject(), projectDetail.getVersion()))
         .thenReturn(List.of(upcomingTender));
@@ -86,7 +86,7 @@ public class WorkPlanUpcomingTenderSummaryServiceTest {
   @Test
   public void getSummaryViews_withProjectDetail_whenTendersFound_thenReturnPopulatedList() {
 
-    final var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    final var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
 
     when(workPlanUpcomingTenderService.getUpcomingTendersForDetail(projectDetail))
         .thenReturn(List.of(upcomingTender));
@@ -122,7 +122,7 @@ public class WorkPlanUpcomingTenderSummaryServiceTest {
     assertThat(result).isEmpty();
   }
 
-  private void checkCommonFields(WorkPlanUpcomingTenderView view, WorkPlanUpcomingTender tender) {
+  private void checkCommonFields(ForwardWorkPlanUpcomingTenderView view, ForwardWorkPlanUpcomingTender tender) {
     assertThat(view.getDescriptionOfWork()).isEqualTo(tender.getDescriptionOfWork());
     assertThat(view.getEstimatedTenderStartDate()).isEqualTo(DateUtil.getDateFromQuarterYear(tender.getEstimatedTenderDateQuarter(), tender.getEstimatedTenderDateYear()));
     assertThat(view.getContractBand()).isEqualTo(tender.getContractBand().getDisplayName());

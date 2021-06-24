@@ -16,7 +16,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCa
 
 @Entity
 @Table(name = "work_plan_upcoming_tenders")
-public class WorkPlanUpcomingTender extends ProjectDetailEntity implements ContactDetailCapture {
+public class ForwardWorkPlanUpcomingTender extends ProjectDetailEntity implements ContactDetailCapture {
 
   @Enumerated(EnumType.STRING)
   private Function departmentType;
@@ -48,10 +48,10 @@ public class WorkPlanUpcomingTender extends ProjectDetailEntity implements Conta
   @Enumerated(EnumType.STRING)
   private DurationPeriod contractTermDurationPeriod;
 
-  public WorkPlanUpcomingTender() {
+  public ForwardWorkPlanUpcomingTender() {
   }
 
-  public WorkPlanUpcomingTender(ProjectDetail projectDetail) {
+  public ForwardWorkPlanUpcomingTender(ProjectDetail projectDetail) {
     this.projectDetail = projectDetail;
   }
 

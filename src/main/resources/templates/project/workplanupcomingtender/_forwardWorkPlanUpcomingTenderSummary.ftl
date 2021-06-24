@@ -111,7 +111,7 @@
   <@summaryViewWrapper.summaryViewItemWrapper
     idPrefix=idPrefix
     headingPrefix=headingPrefix
-    displayOrder=upcomingTenderDiff.WorkPlanUpcomingTenderView_displayOrder.currentValue
+    displayOrder=upcomingTenderDiff.ForwardWorkPlanUpcomingTenderView_displayOrder.currentValue
     isValid=true
     summaryLinkList=[]
     showHeader=showHeader
@@ -121,15 +121,15 @@
   >
     <@_upcomingTenderSummaryFields
       useDiffedField=true
-      tenderDepartment=upcomingTenderDiff.WorkPlanUpcomingTenderView_tenderDepartment
-      descriptionOfWork=upcomingTenderDiff.WorkPlanUpcomingTenderView_descriptionOfWork
-      estimatedTenderStartDate=upcomingTenderDiff.WorkPlanUpcomingTenderView_estimatedTenderStartDate
-      contractBand=upcomingTenderDiff.WorkPlanUpcomingTenderView_contractBand
-      contractLength=upcomingTenderDiff.WorkPlanUpcomingTenderView_contractLength
-      contactName=upcomingTenderDiff.WorkPlanUpcomingTenderView_contactName
-      contactPhoneNumber=upcomingTenderDiff.WorkPlanUpcomingTenderView_contactPhoneNumber
-      contactJobTitle=upcomingTenderDiff.WorkPlanUpcomingTenderView_contactJobTitle
-      contactEmailAddress=upcomingTenderDiff.WorkPlanUpcomingTenderView_contactEmailAddress
+      tenderDepartment=upcomingTenderDiff.ForwardWorkPlanUpcomingTenderView_tenderDepartment
+      descriptionOfWork=upcomingTenderDiff.ForwardWorkPlanUpcomingTenderView_descriptionOfWork
+      estimatedTenderStartDate=upcomingTenderDiff.ForwardWorkPlanUpcomingTenderView_estimatedTenderStartDate
+      contractBand=upcomingTenderDiff.ForwardWorkPlanUpcomingTenderView_contractBand
+      contractLength=upcomingTenderDiff.ForwardWorkPlanUpcomingTenderView_contractLength
+      contactName=upcomingTenderDiff.ForwardWorkPlanUpcomingTenderView_contactName
+      contactPhoneNumber=upcomingTenderDiff.ForwardWorkPlanUpcomingTenderView_contactPhoneNumber
+      contactJobTitle=upcomingTenderDiff.ForwardWorkPlanUpcomingTenderView_contactJobTitle
+      contactEmailAddress=upcomingTenderDiff.ForwardWorkPlanUpcomingTenderView_contactEmailAddress
     />
   </@summaryViewWrapper.summaryViewItemWrapper>
 </#macro>

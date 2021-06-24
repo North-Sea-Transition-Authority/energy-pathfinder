@@ -17,19 +17,19 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderService;
+import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderService;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(
     value = WorkPlanUpcomingTenderRestController.class)
-public class WorkPlanUpcomingTenderRestControllerTest extends AbstractControllerTest {
+public class ForwardWorkPlanUpcomingTenderRestControllerTest extends AbstractControllerTest {
 
   private static final String SEARCH_TERM = "searchTerm";
 
   @MockBean
-  private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
+  private ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
   private AuthenticatedUserAccount authenticatedUser;
   private AuthenticatedUserAccount unauthenticatedUser;

@@ -4,7 +4,7 @@ import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.view.ContactDetailProjectSummaryItem;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 
-public class WorkPlanUpcomingTenderView extends ContactDetailProjectSummaryItem {
+public class ForwardWorkPlanUpcomingTenderView extends ContactDetailProjectSummaryItem {
 
   private StringWithTag tenderDepartment;
 
@@ -16,9 +16,9 @@ public class WorkPlanUpcomingTenderView extends ContactDetailProjectSummaryItem 
 
   private String contractLength;
 
-  public WorkPlanUpcomingTenderView(Integer displayOrder,
-                                    Integer id,
-                                    Integer projectId) {
+  public ForwardWorkPlanUpcomingTenderView(Integer displayOrder,
+                                           Integer id,
+                                           Integer projectId) {
     this.displayOrder = displayOrder;
     this.id = id;
     this.projectId = projectId;
@@ -76,7 +76,7 @@ public class WorkPlanUpcomingTenderView extends ContactDetailProjectSummaryItem 
     if (!super.equals(o)) {
       return false;
     }
-    WorkPlanUpcomingTenderView that = (WorkPlanUpcomingTenderView) o;
+    ForwardWorkPlanUpcomingTenderView that = (ForwardWorkPlanUpcomingTenderView) o;
     return Objects.equals(tenderDepartment, that.tenderDepartment)
         && Objects.equals(descriptionOfWork, that.descriptionOfWork)
         && Objects.equals(estimatedTenderStartDate, that.estimatedTenderStartDate)

@@ -1,5 +1,5 @@
 <#include '../../layout.ftl'>
-<#import '_workPlanUpcomingTenderSummary.ftl' as upcomingTenderSummary>
+<#import '_forwardWorkPlanUpcomingTenderSummary.ftl' as upcomingTenderSummary>
 
 <#-- @ftlvariable name="sectionId" type="String" -->
 <#-- @ftlvariable name="sectionTitle" type="String" -->

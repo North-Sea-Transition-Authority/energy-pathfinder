@@ -5,21 +5,21 @@ import java.util.Map;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
+import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
-import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderView;
+import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanUpcomingTenderView;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
-public class WorkPlanUpcomingTenderSectionSummaryService implements ProjectSectionSummaryService {
+public class ForwardWorkPlanUpcomingTenderSectionSummaryService implements ProjectSectionSummaryService {
 
-  public static final String TEMPLATE_PATH = "project/workplanupcomingtender/workPlanUpcomingTenderSectionSummary.ftl";
-  public static final String PAGE_NAME = WorkPlanUpcomingTenderController.PAGE_NAME;
+  public static final String TEMPLATE_PATH = "project/workplanupcomingtender/forwardWorkPlanUpcomingTenderSectionSummary.ftl";
+  public static final String PAGE_NAME = ForwardWorkPlanUpcomingTenderController.PAGE_NAME;
   public static final String SECTION_ID = "upcomingTender";
   public static final SidebarSectionLink SECTION_LINK = SidebarSectionLink.createAnchorLink(
       PAGE_NAME,
@@ -27,17 +27,17 @@ public class WorkPlanUpcomingTenderSectionSummaryService implements ProjectSecti
   );
   public static final int DISPLAY_ORDER = ProjectTask.WORK_PLAN_UPCOMING_TENDERS.getDisplayOrder();
 
-  private final WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
+  private final ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
   private final DifferenceService differenceService;
-  private final WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
+  private final ForwardWorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
   private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
   private final ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
 
   @Autowired
-  public WorkPlanUpcomingTenderSectionSummaryService(
-      WorkPlanUpcomingTenderService workPlanUpcomingTenderService,
+  public ForwardWorkPlanUpcomingTenderSectionSummaryService(
+      ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService,
       DifferenceService differenceService,
-      WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService,
+      ForwardWorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService,
       ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService,
       ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService
   ) {
@@ -81,7 +81,7 @@ public class WorkPlanUpcomingTenderSectionSummaryService implements ProjectSecti
 
   private List<Map<String, ?>> getUpcomingTenderDifferenceModel(
       ProjectDetail projectDetail,
-      List<WorkPlanUpcomingTenderView> currentUpcomingTenderViews
+      List<ForwardWorkPlanUpcomingTenderView> currentUpcomingTenderViews
   ) {
     var previousUpcomingTenderViews = workPlanUpcomingTenderSummaryService.getSummaryViews(
         projectDetail.getProject(),
@@ -92,8 +92,8 @@ public class WorkPlanUpcomingTenderSectionSummaryService implements ProjectSecti
         currentUpcomingTenderViews,
         previousUpcomingTenderViews,
         Set.of("summaryLinks"),
-        WorkPlanUpcomingTenderView::getDisplayOrder,
-        WorkPlanUpcomingTenderView::getDisplayOrder
+        ForwardWorkPlanUpcomingTenderView::getDisplayOrder,
+        ForwardWorkPlanUpcomingTenderView::getDisplayOrder
     );
   }
 

@@ -1,9 +1,9 @@
 <#include '../../layout.ftl'>
-<#import '_workPlanUpcomingTenderSummary.ftl' as tenderSummary>
+<#import '_forwardWorkPlanUpcomingTenderSummary.ftl' as tenderSummary>
 
 <#-- @ftlvariable name="pageName" type="String" -->
 <#-- @ftlvariable name="errorSummary" type="java.util.List<uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem>" -->
-<#-- @ftlvariable name="tenderViews" type="java.util.List<uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderView>" -->
+<#-- @ftlvariable name="tenderViews" type="java.util.List<uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanUpcomingTenderView>" -->
 <#-- @ftlvariable name="backToTaskListUrl" type="String" -->
 <#-- @ftlvariable name="projectTypeDisplayNameLowercase" type="String" -->
 

@@ -11,7 +11,7 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanTenderSetup;
-import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
+import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
@@ -19,10 +19,10 @@ import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
-import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
-import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
-import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderValidationHint;
-import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.WorkPlanUpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderForm;
+import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderFormValidator;
+import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderValidationHint;
+import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
@@ -31,24 +31,24 @@ import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
-public class WorkPlanUpcomingTenderService implements ProjectFormSectionService {
+public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionService {
 
   private final FunctionService functionService;
   private final ValidationService validationService;
-  private final WorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator;
-  private final WorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository;
+  private final ForwardWorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator;
+  private final ForwardWorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository;
   private final SearchSelectorService searchSelectorService;
   private final EntityDuplicationService entityDuplicationService;
   private final ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
 
   @Autowired
-  public WorkPlanUpcomingTenderService(FunctionService functionService,
-                                       ValidationService validationService,
-                                       WorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator,
-                                       WorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository,
-                                       SearchSelectorService searchSelectorService,
-                                       EntityDuplicationService entityDuplicationService,
-                                       ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService) {
+  public ForwardWorkPlanUpcomingTenderService(FunctionService functionService,
+                                              ValidationService validationService,
+                                              ForwardWorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator,
+                                              ForwardWorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository,
+                                              SearchSelectorService searchSelectorService,
+                                              EntityDuplicationService entityDuplicationService,
+                                              ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService) {
     this.functionService = functionService;
     this.validationService = validationService;
     this.workPlanUpcomingTenderFormValidator = workPlanUpcomingTenderFormValidator;
@@ -62,7 +62,7 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     return functionService.findFunctionsLikeWithManualEntry(searchTerm, FunctionType.WORK_PLAN_UPCOMING_TENDER);
   }
 
-  public WorkPlanUpcomingTender getOrError(Integer upcomingTenderId) {
+  public ForwardWorkPlanUpcomingTender getOrError(Integer upcomingTenderId) {
     return workPlanUpcomingTenderRepository.findById(upcomingTenderId).orElseThrow(
         () -> new PathfinderEntityNotFoundException(
             String.format("Unable to find tender with id: %s", upcomingTenderId)
@@ -70,22 +70,22 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     );
   }
 
-  public BindingResult validate(WorkPlanUpcomingTenderForm form,
+  public BindingResult validate(ForwardWorkPlanUpcomingTenderForm form,
                                 BindingResult bindingResult,
                                 ValidationType validationType) {
-    workPlanUpcomingTenderFormValidator.validate(form, bindingResult, new WorkPlanUpcomingTenderValidationHint(validationType));
+    workPlanUpcomingTenderFormValidator.validate(form, bindingResult, new ForwardWorkPlanUpcomingTenderValidationHint(validationType));
     return validationService.validate(form, bindingResult, validationType);
   }
 
-  public boolean isValid(WorkPlanUpcomingTender workPlanUpcomingTender, ValidationType validationType) {
+  public boolean isValid(ForwardWorkPlanUpcomingTender workPlanUpcomingTender, ValidationType validationType) {
     var form = getForm(workPlanUpcomingTender);
     BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult = validate(form, bindingResult, validationType);
     return !bindingResult.hasErrors();
   }
 
-  public WorkPlanUpcomingTenderForm getForm(WorkPlanUpcomingTender workPlanUpcomingTender) {
-    var form = new WorkPlanUpcomingTenderForm();
+  public ForwardWorkPlanUpcomingTenderForm getForm(ForwardWorkPlanUpcomingTender workPlanUpcomingTender) {
+    var form = new ForwardWorkPlanUpcomingTenderForm();
 
     if (workPlanUpcomingTender.getDepartmentType() != null) {
       form.setDepartmentType(workPlanUpcomingTender.getDepartmentType().name());
@@ -110,31 +110,31 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
   }
 
   @Transactional
-  public WorkPlanUpcomingTender createUpcomingTender(ProjectDetail detail,
-                                                     WorkPlanUpcomingTenderForm form) {
-    var upcomingTender = new WorkPlanUpcomingTender(detail);
+  public ForwardWorkPlanUpcomingTender createUpcomingTender(ProjectDetail detail,
+                                                            ForwardWorkPlanUpcomingTenderForm form) {
+    var upcomingTender = new ForwardWorkPlanUpcomingTender(detail);
     return updateUpcomingTender(upcomingTender, form);
   }
 
   @Transactional
-  public WorkPlanUpcomingTender updateUpcomingTender(WorkPlanUpcomingTender workPlanUpcomingTender,
-                                                     WorkPlanUpcomingTenderForm form) {
+  public ForwardWorkPlanUpcomingTender updateUpcomingTender(ForwardWorkPlanUpcomingTender workPlanUpcomingTender,
+                                                            ForwardWorkPlanUpcomingTenderForm form) {
     setCommonFields(workPlanUpcomingTender, form);
     return workPlanUpcomingTenderRepository.save(workPlanUpcomingTender);
   }
 
-  public List<WorkPlanUpcomingTender> getUpcomingTendersForDetail(ProjectDetail projectDetail) {
+  public List<ForwardWorkPlanUpcomingTender> getUpcomingTendersForDetail(ProjectDetail projectDetail) {
     return workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail);
   }
 
-  public List<WorkPlanUpcomingTender> getUpcomingTendersForProjectAndVersion(Project project, Integer version) {
+  public List<ForwardWorkPlanUpcomingTender> getUpcomingTendersForProjectAndVersion(Project project, Integer version) {
     return workPlanUpcomingTenderRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(
         project,
         version
     );
   }
 
-  private void setCommonFields(WorkPlanUpcomingTender upcomingTender, WorkPlanUpcomingTenderForm form) {
+  private void setCommonFields(ForwardWorkPlanUpcomingTender upcomingTender, ForwardWorkPlanUpcomingTenderForm form) {
 
     searchSelectorService.mapSearchSelectorFormEntryToEntity(
         form.getDepartmentType(),
@@ -166,7 +166,7 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     upcomingTender.setContractTermDuration(getContractTermDurationFromForm(form));
   }
 
-  private Integer getContractTermDurationFromForm(WorkPlanUpcomingTenderForm form) {
+  private Integer getContractTermDurationFromForm(ForwardWorkPlanUpcomingTenderForm form) {
 
     final var durationPeriod = form.getContractTermDurationPeriod();
 
@@ -183,8 +183,8 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     }
   }
 
-  private void setContractTermDurationFromEntity(WorkPlanUpcomingTender workPlanUpcomingTender,
-                                                 WorkPlanUpcomingTenderForm form) {
+  private void setContractTermDurationFromEntity(ForwardWorkPlanUpcomingTender workPlanUpcomingTender,
+                                                 ForwardWorkPlanUpcomingTenderForm form) {
 
     final var durationPeriod = workPlanUpcomingTender.getContractTermDurationPeriod();
     form.setContractTermDurationPeriod(durationPeriod);
@@ -208,7 +208,7 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
   }
 
   @Transactional
-  public void delete(WorkPlanUpcomingTender workPlanUpcomingTender) {
+  public void delete(ForwardWorkPlanUpcomingTender workPlanUpcomingTender) {
     workPlanUpcomingTenderRepository.delete(workPlanUpcomingTender);
   }
 
@@ -256,7 +256,7 @@ public class WorkPlanUpcomingTenderService implements ProjectFormSectionService 
     entityDuplicationService.duplicateEntitiesAndSetNewParent(
         getUpcomingTendersForDetail(fromDetail),
         toDetail,
-        WorkPlanUpcomingTender.class
+        ForwardWorkPlanUpcomingTender.class
     );
   }
 }

@@ -7,16 +7,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchResult;
-import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderService;
+import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderService;
 
 @RestController
 @RequestMapping("/api/work-plan-upcoming-tender")
 public class WorkPlanUpcomingTenderRestController {
 
-  private final WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
+  private final ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
   @Autowired
-  public WorkPlanUpcomingTenderRestController(WorkPlanUpcomingTenderService workPlanUpcomingTenderService) {
+  public WorkPlanUpcomingTenderRestController(ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService) {
     this.workPlanUpcomingTenderService = workPlanUpcomingTenderService;
   }
 

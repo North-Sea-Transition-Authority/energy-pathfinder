@@ -22,7 +22,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanTenderCompletionForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanTenderSetupForm;
-import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
+import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
@@ -30,9 +30,9 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanTenderCompletionService;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanTenderRoutingService;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanTenderSetupService;
-import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderModelService;
-import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderService;
-import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.WorkPlanUpcomingTenderSummaryService;
+import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderModelService;
+import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderService;
+import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderSummaryService;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Controller
@@ -40,26 +40,26 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @ProjectFormPagePermissionCheck
 @ProjectTypeCheck(types = ProjectType.FORWARD_WORK_PLAN)
 @RequestMapping("/project/{projectId}/work-plan-upcoming-tenders")
-public class WorkPlanUpcomingTenderController {
+public class ForwardWorkPlanUpcomingTenderController {
 
   public static final String PAGE_NAME = "Upcoming tenders";
   public static final String PAGE_NAME_SINGULAR = "Upcoming tender";
   public static final String REMOVE_PAGE_NAME = "Remove upcoming tender";
 
-  private final WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
-  private final WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
+  private final ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
+  private final ForwardWorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
   private final ControllerHelperService controllerHelperService;
-  private final WorkPlanUpcomingTenderModelService workPlanUpcomingTenderModelService;
+  private final ForwardWorkPlanUpcomingTenderModelService workPlanUpcomingTenderModelService;
   private final ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
   private final ForwardWorkPlanTenderRoutingService forwardWorkPlanTenderRoutingService;
   private final ForwardWorkPlanTenderCompletionService forwardWorkPlanTenderCompletionService;
 
   @Autowired
-  public WorkPlanUpcomingTenderController(
-      WorkPlanUpcomingTenderService workPlanUpcomingTenderService,
-      WorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService,
+  public ForwardWorkPlanUpcomingTenderController(
+      ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService,
+      ForwardWorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService,
       ControllerHelperService controllerHelperService,
-      WorkPlanUpcomingTenderModelService workPlanUpcomingTenderModelService,
+      ForwardWorkPlanUpcomingTenderModelService workPlanUpcomingTenderModelService,
       ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService,
       ForwardWorkPlanTenderRoutingService forwardWorkPlanTenderRoutingService,
       ForwardWorkPlanTenderCompletionService forwardWorkPlanTenderCompletionService
@@ -159,7 +159,7 @@ public class WorkPlanUpcomingTenderController {
   @PostMapping("/upcoming-tender")
   public ModelAndView saveUpcomingTender(@PathVariable("projectId") Integer projectId,
                                          ProjectContext projectContext,
-                                         @Valid @ModelAttribute("form") WorkPlanUpcomingTenderForm form,
+                                         @Valid @ModelAttribute("form") ForwardWorkPlanUpcomingTenderForm form,
                                          BindingResult bindingResult,
                                          ValidationType validationType) {
     bindingResult = workPlanUpcomingTenderService.validate(form, bindingResult, validationType);
@@ -182,7 +182,7 @@ public class WorkPlanUpcomingTenderController {
               )
           );
 
-          return ReverseRouter.redirect(on(WorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null));
+          return ReverseRouter.redirect(on(ForwardWorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null));
         }
     );
   }
@@ -202,7 +202,7 @@ public class WorkPlanUpcomingTenderController {
   public ModelAndView updateUpcomingTender(@PathVariable("projectId") Integer projectId,
                                            @PathVariable("upcomingTenderId") Integer upcomingTenderId,
                                            ProjectContext projectContext,
-                                           @Valid @ModelAttribute("form") WorkPlanUpcomingTenderForm form,
+                                           @Valid @ModelAttribute("form") ForwardWorkPlanUpcomingTenderForm form,
                                            BindingResult bindingResult,
                                            ValidationType validationType) {
     var upcomingTender = workPlanUpcomingTenderService.getOrError(upcomingTenderId);
@@ -226,7 +226,7 @@ public class WorkPlanUpcomingTenderController {
               )
           );
 
-          return ReverseRouter.redirect(on(WorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null));
+          return ReverseRouter.redirect(on(ForwardWorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null));
         }
     );
   }
@@ -257,6 +257,6 @@ public class WorkPlanUpcomingTenderController {
             projectContext.getProjectDetails().getId()
         )
     );
-    return ReverseRouter.redirect(on(WorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null));
+    return ReverseRouter.redirect(on(ForwardWorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null));
   }
 }

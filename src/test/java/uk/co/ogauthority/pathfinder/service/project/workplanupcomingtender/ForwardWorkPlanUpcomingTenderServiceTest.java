@@ -16,27 +16,27 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.WorkPlanUpcomingTender;
+import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
-import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
-import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderFormValidator;
+import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderForm;
+import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
-import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.WorkPlanUpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
-import uk.co.ogauthority.pathfinder.testutil.WorkPlanUpcomingTenderUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class WorkPlanUpcomingTenderServiceTest {
+public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   private static final Integer TENDER_ID = 1;
 
@@ -44,10 +44,10 @@ public class WorkPlanUpcomingTenderServiceTest {
   private ValidationService validationService;
 
   @Mock
-  private WorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator;
+  private ForwardWorkPlanUpcomingTenderFormValidator workPlanUpcomingTenderFormValidator;
 
   @Mock
-  private WorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository;
+  private ForwardWorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository;
 
   @Mock
   private EntityDuplicationService entityDuplicationService;
@@ -55,18 +55,18 @@ public class WorkPlanUpcomingTenderServiceTest {
   @Mock
   private ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
 
-  private WorkPlanUpcomingTenderService workPlanUpcomingTenderService;
+  private ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
 
-  private final WorkPlanUpcomingTender upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+  private final ForwardWorkPlanUpcomingTender upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
 
   @Before
   public void setup() {
     SearchSelectorService searchSelectorService = new SearchSelectorService();
     FunctionService functionService = new FunctionService(searchSelectorService);
 
-    workPlanUpcomingTenderService = new WorkPlanUpcomingTenderService(
+    workPlanUpcomingTenderService = new ForwardWorkPlanUpcomingTenderService(
         functionService,
         validationService,
         workPlanUpcomingTenderFormValidator,
@@ -76,39 +76,40 @@ public class WorkPlanUpcomingTenderServiceTest {
         forwardWorkPlanTenderSetupService
     );
 
-    when(workPlanUpcomingTenderRepository.save(any(WorkPlanUpcomingTender.class)))
+    when(workPlanUpcomingTenderRepository.save(any(ForwardWorkPlanUpcomingTender.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
   @Test
   public void createUpcomingTender() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     var newUpcomingTenders = workPlanUpcomingTenderService.createUpcomingTender(
         projectDetail,
         form
     );
     assertThat(newUpcomingTenders.getProjectDetail()).isEqualTo(projectDetail);
-    assertThat(newUpcomingTenders.getDepartmentType()).isEqualTo(WorkPlanUpcomingTenderUtil.UPCOMING_TENDER_DEPARTMENT);
+    assertThat(newUpcomingTenders.getDepartmentType()).isEqualTo(ForwardWorkPlanUpcomingTenderUtil.UPCOMING_TENDER_DEPARTMENT);
     assertThat(newUpcomingTenders.getManualDepartmentType()).isNull();
     checkCommonFields(form, newUpcomingTenders);
   }
 
   @Test
   public void createUpcomingTender_manualDepartment() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm_manualEntry();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm_manualEntry();
     var newUpcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
         projectDetail,
         form
     );
     assertThat(newUpcomingTender.getProjectDetail()).isEqualTo(projectDetail);
-    assertThat(newUpcomingTender.getManualDepartmentType()).isEqualTo(SearchSelectorService.removePrefix(WorkPlanUpcomingTenderUtil.MANUAL_TENDER_DEPARTMENT));
+    assertThat(newUpcomingTender.getManualDepartmentType()).isEqualTo(SearchSelectorService.removePrefix(
+        ForwardWorkPlanUpcomingTenderUtil.MANUAL_TENDER_DEPARTMENT));
     assertThat(newUpcomingTender.getDepartmentType()).isNull();
     checkCommonFields(form, newUpcomingTender);
   }
 
   @Test
   public void createUpcomingTender_whenNoContractTermPeriod_thenNoContractTermColumnsPopulatedInEntity() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setContractTermDurationPeriod(null);
 
     var upcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
@@ -128,7 +129,7 @@ public class WorkPlanUpcomingTenderServiceTest {
     final var expectedContractTermDuration = 10;
     final var expectedContractTermDurationPeriod = DurationPeriod.DAYS;
 
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setContractTermDurationPeriod(expectedContractTermDurationPeriod);
     form.setContractTermDayDuration(expectedContractTermDuration);
     form.setContractTermWeekDuration(11);
@@ -154,7 +155,7 @@ public class WorkPlanUpcomingTenderServiceTest {
     final var expectedContractTermDuration = 11;
     final var expectedContractTermDurationPeriod = DurationPeriod.WEEKS;
 
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setContractTermDurationPeriod(expectedContractTermDurationPeriod);
     form.setContractTermDayDuration(10);
     form.setContractTermWeekDuration(expectedContractTermDuration);
@@ -180,7 +181,7 @@ public class WorkPlanUpcomingTenderServiceTest {
     final var expectedContractTermDuration = 12;
     final var expectedContractTermDurationPeriod = DurationPeriod.MONTHS;
 
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setContractTermDurationPeriod(expectedContractTermDurationPeriod);
     form.setContractTermDayDuration(10);
     form.setContractTermWeekDuration(11);
@@ -206,7 +207,7 @@ public class WorkPlanUpcomingTenderServiceTest {
     final var expectedContractTermDuration = 13;
     final var expectedContractTermDurationPeriod = DurationPeriod.YEARS;
 
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setContractTermDurationPeriod(expectedContractTermDurationPeriod);
     form.setContractTermDayDuration(10);
     form.setContractTermWeekDuration(11);
@@ -228,7 +229,7 @@ public class WorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_whenEmptyForm() {
-    var form = WorkPlanUpcomingTenderUtil.getEmptyForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getEmptyForm();
 
     var upcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
         projectDetail,
@@ -238,8 +239,8 @@ public class WorkPlanUpcomingTenderServiceTest {
     checkAllFieldsAreNull(upcomingTender);
   }
 
-  private void assertExpectedContractTermDurationAndPeriod(WorkPlanUpcomingTender upcomingTender,
-                                                           WorkPlanUpcomingTenderForm form,
+  private void assertExpectedContractTermDurationAndPeriod(ForwardWorkPlanUpcomingTender upcomingTender,
+                                                           ForwardWorkPlanUpcomingTenderForm form,
                                                            DurationPeriod expectedContractTermDurationPeriod,
                                                            Integer expectedContractTermDuration) {
     assertThat(upcomingTender.getContractTermDurationPeriod()).isEqualTo(expectedContractTermDurationPeriod);
@@ -247,7 +248,7 @@ public class WorkPlanUpcomingTenderServiceTest {
     checkCommonFields(form, upcomingTender);
   }
 
-  private void checkCommonFields(WorkPlanUpcomingTenderForm form, WorkPlanUpcomingTender upcomingTender) {
+  private void checkCommonFields(ForwardWorkPlanUpcomingTenderForm form, ForwardWorkPlanUpcomingTender upcomingTender) {
     assertThat(form.getDescriptionOfWork()).isEqualTo(upcomingTender.getDescriptionOfWork());
     assertThat(form.getEstimatedTenderStartDate()).isEqualTo(new QuarterYearInput(upcomingTender.getEstimatedTenderDateQuarter(), String.valueOf(upcomingTender.getEstimatedTenderDateYear())));
     assertThat(form.getContractBand()).isEqualTo(upcomingTender.getContractBand());
@@ -257,7 +258,7 @@ public class WorkPlanUpcomingTenderServiceTest {
     assertThat(form.getContactDetail().getEmailAddress()).isEqualTo(upcomingTender.getEmailAddress());
   }
 
-  private void checkAllFieldsAreNull(WorkPlanUpcomingTender workPlanUpcomingTender) {
+  private void checkAllFieldsAreNull(ForwardWorkPlanUpcomingTender workPlanUpcomingTender) {
     assertThat(workPlanUpcomingTender.getDepartmentType()).isNull();
     assertThat(workPlanUpcomingTender.getManualDepartmentType()).isNull();
     assertThat(workPlanUpcomingTender.getDescriptionOfWork()).isNull();
@@ -281,7 +282,7 @@ public class WorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void getForm_whenManualEntryDepartmentType_assertCorrectFormValue() {
-    var manualDepartment = WorkPlanUpcomingTenderUtil.getUpcomingTender_manualEntry(projectDetail);
+    var manualDepartment = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender_manualEntry(projectDetail);
     var form = workPlanUpcomingTenderService.getForm(manualDepartment);
     assertThat(form.getDepartmentType()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(manualDepartment.getManualDepartmentType()));
     checkCommonFields(form, upcomingTender);
@@ -369,9 +370,9 @@ public class WorkPlanUpcomingTenderServiceTest {
     checkCommonFields(form, upcomingTender);
   }
 
-  private WorkPlanUpcomingTenderForm getFormWithContractDurationAndPeriod(DurationPeriod durationPeriod,
-                                                                          Integer duration) {
-    final var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+  private ForwardWorkPlanUpcomingTenderForm getFormWithContractDurationAndPeriod(DurationPeriod durationPeriod,
+                                                                                 Integer duration) {
+    final var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setContractTermDurationPeriod(durationPeriod);
     upcomingTender.setContractTermDuration(duration);
 
@@ -380,7 +381,7 @@ public class WorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void validate_partial() {
-    var form = new WorkPlanUpcomingTenderForm();
+    var form = new ForwardWorkPlanUpcomingTenderForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
     workPlanUpcomingTenderService.validate(
@@ -393,7 +394,7 @@ public class WorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void validate_full() {
-    var form = new WorkPlanUpcomingTenderForm();
+    var form = new ForwardWorkPlanUpcomingTenderForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
     workPlanUpcomingTenderService.validate(
@@ -421,7 +422,7 @@ public class WorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void getUpcomingTendersForDetail_whenExist_thenReturnList() {
-    var upcomingTenderManualEntry = WorkPlanUpcomingTenderUtil.getUpcomingTender_manualEntry(projectDetail);
+    var upcomingTenderManualEntry = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender_manualEntry(projectDetail);
 
     when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(projectDetail)).thenReturn(List.of(upcomingTender, upcomingTenderManualEntry));
 
@@ -442,7 +443,7 @@ public class WorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void getUpcomingTendersForProjectAndVersion_whenExist_thenReturnList() {
-    var upcomingTenderManualEntry = WorkPlanUpcomingTenderUtil.getUpcomingTender_manualEntry(projectDetail);
+    var upcomingTenderManualEntry = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender_manualEntry(projectDetail);
     var upcomingTenders = List.of(upcomingTenderManualEntry, upcomingTender);
     when(workPlanUpcomingTenderRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(
         projectDetail.getProject(),
@@ -471,7 +472,7 @@ public class WorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void getOrError_whenFound_thenReturnTender() {
-    final WorkPlanUpcomingTender tender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    final ForwardWorkPlanUpcomingTender tender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     when(workPlanUpcomingTenderRepository.findById(TENDER_ID))
         .thenReturn(Optional.of(tender));
 
@@ -481,7 +482,7 @@ public class WorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void updateUpcomingTender() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setDepartmentType(Function.DRILLING.name());
     var existingUpcomingTender = upcomingTender;
     workPlanUpcomingTenderService.updateUpcomingTender(
@@ -495,7 +496,7 @@ public class WorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void updateUpcomingTender_manualFunction() {
-    var form = WorkPlanUpcomingTenderUtil.getCompleteForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setDepartmentType(null);
     form.setDepartmentType(UpcomingTenderUtil.MANUAL_TENDER_FUNCTION);
     var existingUpcomingTender = upcomingTender;
@@ -507,7 +508,7 @@ public class WorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void updateUpcomingTender_whenEmptyForm() {
-    var form = WorkPlanUpcomingTenderUtil.getEmptyForm();
+    var form = ForwardWorkPlanUpcomingTenderUtil.getEmptyForm();
     var existingUpcomingTender = upcomingTender;
     workPlanUpcomingTenderService.updateUpcomingTender(existingUpcomingTender, form);
     assertThat(existingUpcomingTender.getProjectDetail()).isEqualTo(projectDetail);
@@ -528,7 +529,7 @@ public class WorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void delete_verifyInteractions() {
-    var upcomingTender = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     workPlanUpcomingTenderService.delete(upcomingTender);
     verify(workPlanUpcomingTenderRepository, times(1)).delete(upcomingTender);
   }
@@ -545,7 +546,7 @@ public class WorkPlanUpcomingTenderServiceTest {
     toProjectDetail.setVersion(2);
 
     final var existingWorkPlanTenders = List.of(
-        WorkPlanUpcomingTenderUtil.getUpcomingTender(fromProjectDetail)
+        ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(fromProjectDetail)
     );
 
     when(workPlanUpcomingTenderRepository.findByProjectDetailOrderByIdAsc(fromProjectDetail)).thenReturn(
@@ -560,7 +561,7 @@ public class WorkPlanUpcomingTenderServiceTest {
     verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
         existingWorkPlanTenders,
         toProjectDetail,
-        WorkPlanUpcomingTender.class
+        ForwardWorkPlanUpcomingTender.class
     );
   }
 
@@ -572,8 +573,8 @@ public class WorkPlanUpcomingTenderServiceTest {
   @Test
   public void removeSectionData_verifyInteractions() {
 
-    final var upcomingTender1 = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
-    final var upcomingTender2 = WorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    final var upcomingTender1 = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+    final var upcomingTender2 = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
 
     final var upcomingTendersForDetail = List.of(upcomingTender1, upcomingTender2);
 

@@ -8,7 +8,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
-import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.WorkPlanUpcomingTenderController;
+import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.controller.rest.WorkPlanUpcomingTenderRestController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
@@ -18,8 +18,8 @@ import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderCo
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanTenderCompletionForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanTenderSetupForm;
-import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.WorkPlanUpcomingTenderForm;
-import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.WorkPlanUpcomingTenderView;
+import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderForm;
+import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanUpcomingTenderView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
@@ -30,12 +30,12 @@ import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Service
-public class WorkPlanUpcomingTenderModelService {
+public class ForwardWorkPlanUpcomingTenderModelService {
 
-  protected static final String SUMMARY_TEMPLATE_PATH = "project/workplanupcomingtender/workPlanUpcomingTenderFormSummary";
-  protected static final String FORM_TEMPLATE_PATH = "project/workplanupcomingtender/workPlanUpcomingTender";
-  protected static final String REMOVE_TEMPLATE_PATH = "project/workplanupcomingtender/removeWorkPlanUpcomingTender";
-  protected static final String SETUP_TEMPLATE_PATH = "project/workplanupcomingtender/setupWorkPlanUpcomingTenders";
+  protected static final String SUMMARY_TEMPLATE_PATH = "project/workplanupcomingtender/forwardWorkPlanUpcomingTenderFormSummary";
+  protected static final String FORM_TEMPLATE_PATH = "project/workplanupcomingtender/forwardWorkPlanUpcomingTenderForm";
+  protected static final String REMOVE_TEMPLATE_PATH = "project/workplanupcomingtender/removeForwardWorkPlanUpcomingTender";
+  protected static final String SETUP_TEMPLATE_PATH = "project/workplanupcomingtender/setupForwardWorkPlanUpcomingTenders";
 
   protected static final String ERROR_FIELD_NAME = "upcoming-tender-%d";
   protected static final String ERROR_MESSAGE = "Upcoming tender %d is incomplete";
@@ -45,18 +45,18 @@ public class WorkPlanUpcomingTenderModelService {
   private final SearchSelectorService searchSelectorService;
   private final ValidationErrorOrderingService validationErrorOrderingService;
 
-  public WorkPlanUpcomingTenderModelService(BreadcrumbService breadcrumbService,
-                                            SearchSelectorService searchSelectorService,
-                                            ValidationErrorOrderingService validationErrorOrderingService) {
+  public ForwardWorkPlanUpcomingTenderModelService(BreadcrumbService breadcrumbService,
+                                                   SearchSelectorService searchSelectorService,
+                                                   ValidationErrorOrderingService validationErrorOrderingService) {
     this.breadcrumbService = breadcrumbService;
     this.searchSelectorService = searchSelectorService;
     this.validationErrorOrderingService = validationErrorOrderingService;
   }
 
   public ModelAndView getUpcomingTenderFormModelAndView(ProjectDetail projectDetail,
-                                                        WorkPlanUpcomingTenderForm form) {
+                                                        ForwardWorkPlanUpcomingTenderForm form) {
     var modelAndView = new ModelAndView(FORM_TEMPLATE_PATH)
-        .addObject("pageNameSingular", WorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR)
+        .addObject("pageNameSingular", ForwardWorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR)
         .addObject("form", form)
         .addObject("preSelectedFunction", getPreSelectedFunction(form))
         .addObject("contractBands", WorkPlanUpcomingTenderContractBand.getAllAsMap())
@@ -72,14 +72,14 @@ public class WorkPlanUpcomingTenderModelService {
     breadcrumbService.fromWorkPlanUpcomingTenders(
         projectDetail.getProject().getId(),
         modelAndView,
-        WorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR
+        ForwardWorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR
     );
 
     return modelAndView;
   }
 
   public ModelAndView getViewUpcomingTendersModelAndView(ProjectDetail projectDetail,
-                                                         List<WorkPlanUpcomingTenderView> tenderViews,
+                                                         List<ForwardWorkPlanUpcomingTenderView> tenderViews,
                                                          ValidationResult validationResult,
                                                          ForwardWorkPlanTenderCompletionForm form,
                                                          BindingResult finaliseFormBindingResult) {
@@ -87,7 +87,7 @@ public class WorkPlanUpcomingTenderModelService {
     final var projectId = projectDetail.getProject().getId();
 
     final var modelAndView = new ModelAndView(SUMMARY_TEMPLATE_PATH)
-        .addObject("pageName", WorkPlanUpcomingTenderController.PAGE_NAME)
+        .addObject("pageName", ForwardWorkPlanUpcomingTenderController.PAGE_NAME)
         .addObject("tenderViews", tenderViews)
         .addObject("isValid", validationResult.equals(ValidationResult.VALID))
         .addObject(
@@ -99,25 +99,25 @@ public class WorkPlanUpcomingTenderModelService {
 
     ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, projectDetail);
 
-    breadcrumbService.fromTaskList(projectId, modelAndView, WorkPlanUpcomingTenderController.PAGE_NAME);
+    breadcrumbService.fromTaskList(projectId, modelAndView, ForwardWorkPlanUpcomingTenderController.PAGE_NAME);
 
     return modelAndView;
   }
 
   public ModelAndView getRemoveUpcomingTenderConfirmModelAndView(
       Integer projectId,
-      WorkPlanUpcomingTenderView workPlanUpcomingTenderView
+      ForwardWorkPlanUpcomingTenderView workPlanUpcomingTenderView
   ) {
     var modelAndView = new ModelAndView(REMOVE_TEMPLATE_PATH)
         .addObject("view", workPlanUpcomingTenderView)
         .addObject("cancelUrl",
-            ReverseRouter.route(on(WorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null))
+            ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null))
         );
 
     breadcrumbService.fromWorkPlanUpcomingTenders(
         projectId,
         modelAndView,
-        WorkPlanUpcomingTenderController.REMOVE_PAGE_NAME
+        ForwardWorkPlanUpcomingTenderController.REMOVE_PAGE_NAME
     );
 
     return modelAndView;
@@ -129,14 +129,14 @@ public class WorkPlanUpcomingTenderModelService {
     final var projectId = projectDetail.getProject().getId();
 
     final var modelAndView = new ModelAndView(SETUP_TEMPLATE_PATH)
-        .addObject("pageName", WorkPlanUpcomingTenderController.PAGE_NAME)
+        .addObject("pageName", ForwardWorkPlanUpcomingTenderController.PAGE_NAME)
         .addObject("form", form)
         .addObject("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectId));
 
     breadcrumbService.fromTaskList(
         projectId,
         modelAndView,
-        WorkPlanUpcomingTenderController.PAGE_NAME
+        ForwardWorkPlanUpcomingTenderController.PAGE_NAME
     );
 
     ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, projectDetail);
@@ -144,15 +144,15 @@ public class WorkPlanUpcomingTenderModelService {
     return modelAndView;
   }
 
-  protected Map<String, String> getPreSelectedFunction(WorkPlanUpcomingTenderForm form) {
+  protected Map<String, String> getPreSelectedFunction(ForwardWorkPlanUpcomingTenderForm form) {
     return searchSelectorService.getPreSelectedSearchSelectorValue(form.getDepartmentType(), Function.values());
   }
 
-  protected List<ErrorItem> getErrors(List<WorkPlanUpcomingTenderView> views) {
+  protected List<ErrorItem> getErrors(List<ForwardWorkPlanUpcomingTenderView> views) {
     return SummaryUtil.getErrors(new ArrayList<>(views), EMPTY_LIST_ERROR, ERROR_FIELD_NAME, ERROR_MESSAGE);
   }
 
-  private List<ErrorItem> getSummaryViewErrors(List<WorkPlanUpcomingTenderView> tenderViews,
+  private List<ErrorItem> getSummaryViewErrors(List<ForwardWorkPlanUpcomingTenderView> tenderViews,
                                                ValidationResult validationResult,
                                                ForwardWorkPlanTenderCompletionForm form,
                                                BindingResult bindingResult) {
