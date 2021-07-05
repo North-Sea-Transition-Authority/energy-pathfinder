@@ -24,6 +24,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.campaigninformation.Campa
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
+import uk.co.ogauthority.pathfinder.service.project.campaigninformation.CampaignInformationModelService;
 import uk.co.ogauthority.pathfinder.service.project.campaigninformation.CampaignInformationService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 
@@ -38,24 +39,24 @@ public class CampaignInformationController {
 
   private final ControllerHelperService controllerHelperService;
   private final CampaignInformationService campaignInformationService;
+  private final CampaignInformationModelService campaignInformationModelService;
 
   @Autowired
-  public CampaignInformationController(
-      ControllerHelperService controllerHelperService,
-      CampaignInformationService campaignInformationService) {
+  public CampaignInformationController(ControllerHelperService controllerHelperService,
+                                       CampaignInformationService campaignInformationService,
+                                       CampaignInformationModelService campaignInformationModelService) {
     this.controllerHelperService = controllerHelperService;
     this.campaignInformationService = campaignInformationService;
+    this.campaignInformationModelService = campaignInformationModelService;
   }
 
   @GetMapping
   public ModelAndView getCampaignInformation(@PathVariable("projectId") Integer projectId,
                                              ProjectContext projectContext) {
-
-    final var projectDetails = projectContext.getProjectDetails();
-
-    return campaignInformationService.getCampaignInformationModelAndView(
-        projectDetails,
-        campaignInformationService.getForm(projectDetails)
+    final var projectDetail = projectContext.getProjectDetails();
+    return campaignInformationModelService.getCampaignInformationModelAndView(
+        projectDetail,
+        campaignInformationService.getForm(projectDetail)
     );
   }
 
@@ -66,25 +67,25 @@ public class CampaignInformationController {
                                               ValidationType validationType,
                                               ProjectContext projectContext) {
 
-    final var projectDetails = projectContext.getProjectDetails();
+    final var projectDetail = projectContext.getProjectDetails();
 
-    bindingResult = campaignInformationService.validate(form, bindingResult, validationType);
+    bindingResult = campaignInformationService.validate(form, bindingResult, validationType, projectDetail);
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        campaignInformationService.getCampaignInformationModelAndView(projectDetails, form),
+        campaignInformationModelService.getCampaignInformationModelAndView(projectDetail, form),
         form,
         () -> {
           var campaignInformation = campaignInformationService.createOrUpdateCampaignInformation(
               form,
-              projectDetails
+              projectDetail
           );
           AuditService.audit(
               AuditEvent.CAMPAIGN_INFORMATION_UPDATED,
               String.format(
                   AuditEvent.CAMPAIGN_INFORMATION_UPDATED.getMessage(),
                   campaignInformation.getId(),
-                  projectDetails.getId()
+                  projectDetail.getId()
               )
           );
           return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));

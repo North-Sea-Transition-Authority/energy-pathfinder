@@ -19,7 +19,7 @@ public class CampaignInformationTestUtil {
   ) {
     var campaignInformation = new CampaignInformation();
     campaignInformation.setProjectDetail(projectDetail);
-    campaignInformation.setPublishedCampaign(publishedCampaign);
+    campaignInformation.setIsPartOfCampaign(publishedCampaign);
     campaignInformation.setScopeDescription(scopeDescription);
     return campaignInformation;
   }
@@ -33,11 +33,11 @@ public class CampaignInformationTestUtil {
   }
 
   public static CampaignInformationForm createCampaignInformationForm(
-      Boolean publishedCampaign,
+      Boolean isPartOfCampaign,
       String scopeDescription
   ) {
     var form = new CampaignInformationForm();
-    form.setPublishedCampaign(publishedCampaign);
+    form.setIsPartOfCampaign(isPartOfCampaign);
     form.setScopeDescription(scopeDescription);
     return form;
   }

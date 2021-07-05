@@ -37,6 +37,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.campaigninformation.CampaignInformationForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
+import uk.co.ogauthority.pathfinder.service.project.campaigninformation.CampaignInformationModelService;
 import uk.co.ogauthority.pathfinder.service.project.campaigninformation.CampaignInformationService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
@@ -53,6 +54,9 @@ public class CampaignInformationControllerTest extends ProjectContextAbstractCon
 
   @MockBean
   private CampaignInformationService campaignInformationService;
+
+  @MockBean
+  private CampaignInformationModelService campaignInformationModelService;
 
   private ProjectControllerTesterService projectControllerTesterService;
 
@@ -99,7 +103,7 @@ public class CampaignInformationControllerTest extends ProjectContextAbstractCon
   @Test
   public void saveCampaignInformation_projectContextSmokeTest() {
     var bindingResult = new BeanPropertyBindingResult(CampaignInformationForm.class, "form");
-    when(campaignInformationService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(campaignInformationService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
 
     projectControllerTesterService
         .withHttpRequestMethod(HttpMethod.POST)
@@ -126,7 +130,7 @@ public class CampaignInformationControllerTest extends ProjectContextAbstractCon
     var form = CampaignInformationTestUtil.createCampaignInformationForm();
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
-    when(campaignInformationService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(campaignInformationService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(CampaignInformationController.class)
@@ -136,7 +140,7 @@ public class CampaignInformationControllerTest extends ProjectContextAbstractCon
             .with(csrf())
             .params(params))
         .andExpect(status().is3xxRedirection());
-    verify(campaignInformationService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(campaignInformationService, times(1)).validate(any(), any(), eq(ValidationType.FULL), any());
     verify(campaignInformationService, times(1)).createOrUpdateCampaignInformation(any(), any());
   }
 
@@ -150,8 +154,8 @@ public class CampaignInformationControllerTest extends ProjectContextAbstractCon
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
-    when(campaignInformationService.validate(any(), any(), any())).thenReturn(bindingResult);
-    when(campaignInformationService.getCampaignInformationModelAndView(any(), any())).thenReturn(new ModelAndView());
+    when(campaignInformationService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
+    when(campaignInformationModelService.getCampaignInformationModelAndView(any(), any())).thenReturn(new ModelAndView());
 
     mockMvc.perform(
         post(ReverseRouter.route(on(CampaignInformationController.class)
@@ -161,7 +165,7 @@ public class CampaignInformationControllerTest extends ProjectContextAbstractCon
             .with(csrf())
             .params(params))
         .andExpect(status().isOk());
-    verify(campaignInformationService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(campaignInformationService, times(1)).validate(any(), any(), eq(ValidationType.FULL), any());
     verify(campaignInformationService, times(0)).createOrUpdateCampaignInformation(any(), any());
 
   }
@@ -175,7 +179,7 @@ public class CampaignInformationControllerTest extends ProjectContextAbstractCon
     var form = CampaignInformationTestUtil.createCampaignInformationForm();
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
-    when(campaignInformationService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(campaignInformationService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(CampaignInformationController.class)
@@ -186,7 +190,7 @@ public class CampaignInformationControllerTest extends ProjectContextAbstractCon
         .params(completeLaterParams))
         .andExpect(status().is3xxRedirection());
 
-    verify(campaignInformationService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(campaignInformationService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL), any());
     verify(campaignInformationService, times(1)).createOrUpdateCampaignInformation(any(), any());
   }
   @Test
@@ -199,8 +203,8 @@ public class CampaignInformationControllerTest extends ProjectContextAbstractCon
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
-    when(campaignInformationService.validate(any(), any(), any())).thenReturn(bindingResult);
-    when(campaignInformationService.getCampaignInformationModelAndView(any(), any())).thenReturn(new ModelAndView());
+    when(campaignInformationService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
+    when(campaignInformationModelService.getCampaignInformationModelAndView(any(), any())).thenReturn(new ModelAndView());
 
     mockMvc.perform(
         post(ReverseRouter.route(on(CampaignInformationController.class)
@@ -211,7 +215,7 @@ public class CampaignInformationControllerTest extends ProjectContextAbstractCon
             .params(completeLaterParams))
         .andExpect(status().isOk());
 
-    verify(campaignInformationService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(campaignInformationService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL), any());
     verify(campaignInformationService, times(0)).createOrUpdateCampaignInformation(any(), any());
 
   }

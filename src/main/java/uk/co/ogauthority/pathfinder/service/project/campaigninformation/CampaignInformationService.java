@@ -1,21 +1,22 @@
 package uk.co.ogauthority.pathfinder.service.project.campaigninformation;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.servlet.ModelAndView;
-import uk.co.ogauthority.pathfinder.controller.project.campaigninformation.CampaignInformationController;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignInformation;
+import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignProject;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.campaigninformation.CampaignInformationForm;
+import uk.co.ogauthority.pathfinder.model.form.project.campaigninformation.CampaignInformationFormValidator;
+import uk.co.ogauthority.pathfinder.model.form.project.campaigninformation.CampaignInformationValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.campaigninformation.CampaignInformationRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
-import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
-import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -23,26 +24,27 @@ import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 @Service
 public class CampaignInformationService implements ProjectFormSectionService {
 
-  public static final String FORM_TEMPLATE_PATH = "project/campaigninformation/campaignInformationForm";
-
   private final ProjectSetupService projectSetupService;
   private final CampaignInformationRepository campaignInformationRepository;
   private final ValidationService validationService;
   private final EntityDuplicationService entityDuplicationService;
-  private final BreadcrumbService breadcrumbService;
+  private final CampaignInformationFormValidator campaignInformationFormValidator;
+  private final CampaignProjectService campaignProjectService;
 
   public CampaignInformationService(
       ProjectSetupService projectSetupService,
       CampaignInformationRepository campaignInformationRepository,
       ValidationService validationService,
       EntityDuplicationService entityDuplicationService,
-      BreadcrumbService breadcrumbService
+      CampaignInformationFormValidator campaignInformationFormValidator,
+      CampaignProjectService campaignProjectService
   ) {
     this.projectSetupService = projectSetupService;
     this.campaignInformationRepository = campaignInformationRepository;
     this.validationService = validationService;
     this.entityDuplicationService = entityDuplicationService;
-    this.breadcrumbService = breadcrumbService;
+    this.campaignInformationFormValidator = campaignInformationFormValidator;
+    this.campaignProjectService = campaignProjectService;
   }
 
   @Transactional
@@ -52,20 +54,33 @@ public class CampaignInformationService implements ProjectFormSectionService {
         .orElse(new CampaignInformation());
     campaignInformation.setProjectDetail(projectDetail);
     campaignInformation.setScopeDescription(form.getScopeDescription());
-    campaignInformation.setPublishedCampaign(form.isPublishedCampaign());
-    return campaignInformationRepository.save(campaignInformation);
+    campaignInformation.setIsPartOfCampaign(form.isPartOfCampaign());
+    campaignInformation = campaignInformationRepository.save(campaignInformation);
+    campaignProjectService.persistCampaignProjects(campaignInformation, form.getProjectsIncludedInCampaign());
+    return campaignInformation;
   }
 
   public CampaignInformationForm getForm(ProjectDetail projectDetail) {
+
+    final var campaignProjects = campaignProjectService.getCampaignProjects(projectDetail);
+
     return campaignInformationRepository.findByProjectDetail(projectDetail)
-        .map(this::populateForm)
+        .map(campaignInformation -> populateForm(campaignInformation, campaignProjects))
         .orElse(new CampaignInformationForm());
   }
 
-  private CampaignInformationForm populateForm(CampaignInformation campaignInformation) {
+  private CampaignInformationForm populateForm(CampaignInformation campaignInformation,
+                                               List<CampaignProject> campaignProjects) {
     var form = new CampaignInformationForm();
     form.setScopeDescription(campaignInformation.getScopeDescription());
-    form.setPublishedCampaign(campaignInformation.isPublishedCampaign());
+    form.setIsPartOfCampaign(campaignInformation.isPartOfCampaign());
+
+    final var publishedProjectIds = campaignProjects
+        .stream()
+        .map(campaignProject -> campaignProject.getPublishedProject().getProjectId())
+        .collect(Collectors.toList());
+
+    form.setProjectsIncludedInCampaign(publishedProjectIds);
 
     return form;
   }
@@ -78,28 +93,11 @@ public class CampaignInformationService implements ProjectFormSectionService {
     );
   }
 
-  public ModelAndView getCampaignInformationModelAndView(ProjectDetail projectDetail, CampaignInformationForm form) {
-
-    final var modelAndView = new ModelAndView(FORM_TEMPLATE_PATH)
-        .addObject("pageTitle", CampaignInformationController.PAGE_NAME)
-        .addObject("form", form);
-
-    ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, projectDetail);
-
-    breadcrumbService.fromTaskList(
-        projectDetail.getProject().getId(),
-        modelAndView,
-        CampaignInformationController.PAGE_NAME
-    );
-
-    return modelAndView;
-  }
-
   @Override
   public boolean isComplete(ProjectDetail detail) {
     var form = getForm(detail);
     BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
-    bindingResult = validate(form, bindingResult, ValidationType.FULL);
+    bindingResult = validate(form, bindingResult, ValidationType.FULL, detail);
     return !bindingResult.hasErrors();
   }
 
@@ -110,23 +108,33 @@ public class CampaignInformationService implements ProjectFormSectionService {
 
   @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
-    entityDuplicationService.duplicateEntityAndSetNewParent(
-        getOrError(fromDetail),
+
+    final var fromCampaignInformation = getOrError(fromDetail);
+
+    final var toCampaignInformation = entityDuplicationService.duplicateEntityAndSetNewParent(
+        fromCampaignInformation,
         toDetail,
         CampaignInformation.class
+    );
+
+    campaignProjectService.copyCampaignProjectsToNewCampaign(
+        fromCampaignInformation,
+        toCampaignInformation
     );
   }
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
+    campaignProjectService.deleteAllCampaignProjects(projectDetail);
     campaignInformationRepository.deleteByProjectDetail(projectDetail);
   }
 
-  public BindingResult validate(
-      CampaignInformationForm form,
-      BindingResult bindingResult,
-      ValidationType validationType
-  ) {
+  public BindingResult validate(CampaignInformationForm form,
+                                BindingResult bindingResult,
+                                ValidationType validationType,
+                                ProjectDetail projectDetail) {
+    final var campaignInformationValidationHint = new CampaignInformationValidationHint(validationType, projectDetail);
+    campaignInformationFormValidator.validate(form, bindingResult, campaignInformationValidationHint);
     return validationService.validate(form, bindingResult, validationType);
   }
 }
