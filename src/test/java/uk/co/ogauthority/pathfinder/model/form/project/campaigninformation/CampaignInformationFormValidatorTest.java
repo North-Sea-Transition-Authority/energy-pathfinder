@@ -2,12 +2,19 @@ package uk.co.ogauthority.pathfinder.model.form.project.campaigninformation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
@@ -15,11 +22,15 @@ import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
+import uk.co.ogauthority.pathfinder.service.project.campaigninformation.CampaignProjectValidatorService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CampaignInformationFormValidatorTest {
+
+  @Mock
+  private CampaignProjectValidatorService campaignProjectValidatorService;
 
   private final CampaignInformationForm form = new CampaignInformationForm();
 
@@ -29,7 +40,7 @@ public class CampaignInformationFormValidatorTest {
 
   @Before
   public void setup() {
-    campaignInformationFormValidator = new CampaignInformationFormValidator();
+    campaignInformationFormValidator = new CampaignInformationFormValidator(campaignProjectValidatorService);
   }
 
   @Test
@@ -72,6 +83,8 @@ public class CampaignInformationFormValidatorTest {
     assertThat(resultingErrors).containsExactly(
         entry(PROJECT_SELECTOR_FIELD_NAME, Set.of(String.format("%s%s", PROJECT_SELECTOR_FIELD_NAME, FieldValidationErrorCodes.MIN_LENGTH_NOT_MET)))
     );
+
+    verify(campaignProjectValidatorService, never()).validateCampaignProjects(any(), anyList(), any());
   }
 
   @Test
@@ -85,6 +98,12 @@ public class CampaignInformationFormValidatorTest {
     final var resultingErrors = ValidatorTestingUtil.extractErrors(validationResult);
 
     assertThat(resultingErrors).isEmpty();
+
+    verify(campaignProjectValidatorService, times(1)).validateCampaignProjects(
+        any(),
+        eq(form.getProjectsIncludedInCampaign()),
+        any()
+    );
   }
 
   @Test
@@ -97,6 +116,8 @@ public class CampaignInformationFormValidatorTest {
     final var resultingErrors = ValidatorTestingUtil.extractErrors(validationResult);
 
     assertThat(resultingErrors).isEmpty();
+
+    verify(campaignProjectValidatorService, never()).validateCampaignProjects(any(), anyList(), any());
   }
 
   @Test
@@ -109,6 +130,8 @@ public class CampaignInformationFormValidatorTest {
     final var resultingErrors = ValidatorTestingUtil.extractErrors(validationResult);
 
     assertThat(resultingErrors).isEmpty();
+
+    verify(campaignProjectValidatorService, never()).validateCampaignProjects(any(), anyList(), any());
   }
 
   @Test
@@ -123,6 +146,12 @@ public class CampaignInformationFormValidatorTest {
 
     assertThat(resultingErrors).isEmpty();
 
+    verify(campaignProjectValidatorService, times(1)).validateCampaignProjects(
+        any(),
+        eq(form.getProjectsIncludedInCampaign()),
+        any()
+    );
+
   }
 
   @Test
@@ -136,6 +165,8 @@ public class CampaignInformationFormValidatorTest {
     final var resultingErrors = ValidatorTestingUtil.extractErrors(validationResult);
 
     assertThat(resultingErrors).isEmpty();
+
+    verify(campaignProjectValidatorService, never()).validateCampaignProjects(any(), anyList(), any());
 
   }
 

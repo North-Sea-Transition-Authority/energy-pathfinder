@@ -13,8 +13,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.controller.project.campaigninformation.CampaignInformationController;
-import uk.co.ogauthority.pathfinder.model.entity.project.PublishedProjectView;
+import uk.co.ogauthority.pathfinder.model.entity.project.SelectableProject;
 import uk.co.ogauthority.pathfinder.model.form.project.campaigninformation.CampaignInformationForm;
+import uk.co.ogauthority.pathfinder.model.view.campaigninformation.CampaignProjectView;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -44,11 +45,11 @@ public class CampaignInformationModelServiceTest {
     final var campaignInformationForm = new CampaignInformationForm();
     final var projectDetail = ProjectUtil.getProjectDetails();
 
-    final var publishedProjectRestUrl = "/example/url";
-    when(campaignProjectService.getPublishedProjectRestUrl()).thenReturn(publishedProjectRestUrl);
+    final var campaignProjectRestUrl = "/example/url";
+    when(campaignProjectService.getCampaignProjectRestUrl()).thenReturn(campaignProjectRestUrl);
 
-    final var expectedProjectViews = List.of(new PublishedProjectView());
-    when(campaignProjectService.getPublishedProjectViews(campaignInformationForm)).thenReturn(expectedProjectViews);
+    final var expectedProjectViews = List.of(new CampaignProjectView(new SelectableProject()));
+    when(campaignProjectService.getCampaignProjectViews(campaignInformationForm)).thenReturn(expectedProjectViews);
 
     final var resultingModel = campaignInformationModelService.getCampaignInformationModelAndView(
         projectDetail,
@@ -58,7 +59,7 @@ public class CampaignInformationModelServiceTest {
     assertThat(resultingModel.getModelMap()).containsExactly(
         entry("pageTitle", CampaignInformationController.PAGE_NAME),
         entry("form", campaignInformationForm),
-        entry("publishedProjectRestUrl", publishedProjectRestUrl),
+        entry("publishedProjectRestUrl", campaignProjectRestUrl),
         entry("alreadyAddedProjects", expectedProjectViews),
         entry(
             ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,

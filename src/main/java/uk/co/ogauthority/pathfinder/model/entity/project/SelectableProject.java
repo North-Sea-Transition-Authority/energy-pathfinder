@@ -8,12 +8,11 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import org.hibernate.annotations.Immutable;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
 
 @Entity
-@Table(name = "api_published_projects")
+@Table(name = "api_selectable_projects")
 @Immutable
-public class PublishedProject implements SearchSelectable {
+public class SelectableProject {
 
   @Id
   private Integer projectId;
@@ -24,6 +23,8 @@ public class PublishedProject implements SearchSelectable {
   private String operatorGroupName;
 
   private String projectDisplayName;
+
+  private boolean isPublished;
 
   public Integer getProjectId() {
     return projectId;
@@ -57,14 +58,12 @@ public class PublishedProject implements SearchSelectable {
     this.projectDisplayName = projectDisplayName;
   }
 
-  @Override
-  public String getSelectionId() {
-    return String.valueOf(getProjectId());
+  public boolean isPublished() {
+    return isPublished;
   }
 
-  @Override
-  public String getSelectionText() {
-    return getProjectDisplayName();
+  public void setPublished(boolean published) {
+    isPublished = published;
   }
 
   @Override
@@ -77,7 +76,7 @@ public class PublishedProject implements SearchSelectable {
       return false;
     }
 
-    PublishedProject that = (PublishedProject) o;
+    SelectableProject that = (SelectableProject) o;
     return Objects.equals(projectId, that.projectId)
         && Objects.equals(projectType, that.projectType)
         && Objects.equals(operatorGroupName, that.operatorGroupName)

@@ -247,4 +247,65 @@ public class ValidationErrorOrderingServiceTest {
             tuple(errorIndexOffset + 1, "secondField", "NotNull")
         );
   }
+
+  @Test
+  public void getErrorItemsFromBindingResult_whenOnlyGlobalErrors_thenAddedToEndOfList() {
+
+    final var form = new FieldOrderTestForm();
+
+    final var bindingResult = new BeanPropertyBindingResult(form, "form");
+
+    final var expectedGlobalErrorMessage = "global error message";
+    final var expectedGlobalErrorCode = "global.error";
+
+    // using reject() instead of rejectValue() makes it a globally scoped error as opposed to a field scoped error
+    bindingResult.reject(expectedGlobalErrorCode, expectedGlobalErrorMessage);
+
+    final var resultingErrorItems = validationErrorOrderingService.getErrorItemsFromBindingResult(form, bindingResult);
+
+    assertThat(resultingErrorItems)
+        .extracting(ErrorItem::getDisplayOrder, ErrorItem::getFieldName, ErrorItem::getErrorMessage)
+        .containsExactly(
+            tuple(ValidationErrorOrderingService.GLOBAL_ERROR_OFFSET, expectedGlobalErrorCode, expectedGlobalErrorMessage)
+        );
+  }
+
+  @Test
+  public void getErrorItemsFromBindingResult_whenFieldAndGlobalErrors_thenBothAddedToListWithGlobalLast() {
+
+    final var form = new FieldOrderTestForm();
+
+    final var bindingResult = new BeanPropertyBindingResult(form, "form");
+
+    final var expectedGlobalErrorMessage = "global error message";
+    final var expectedGlobalErrorCode = "global.error";
+
+    // using reject() instead of rejectValue() makes it a globally scoped error as opposed to a field scoped error
+    bindingResult.reject(expectedGlobalErrorCode, expectedGlobalErrorMessage);
+
+    final var expectedFieldErrorMessage = "field error message";
+    final var expectedFieldName = "firstField";
+
+    bindingResult.rejectValue(expectedFieldName, "invalid", expectedFieldErrorMessage);
+
+    final var resultingErrorItems = validationErrorOrderingService.getErrorItemsFromBindingResult(form, bindingResult);
+
+    assertThat(resultingErrorItems)
+        .extracting(ErrorItem::getDisplayOrder, ErrorItem::getFieldName, ErrorItem::getErrorMessage)
+        .containsExactly(
+            tuple(0, expectedFieldName, expectedFieldErrorMessage),
+            tuple(ValidationErrorOrderingService.GLOBAL_ERROR_OFFSET, expectedGlobalErrorCode, expectedGlobalErrorMessage)
+        );
+  }
+
+  @Test
+  public void getErrorItemsFromBindingResult_whenNoGlobalOrFieldErrors_thenNoErrorItems() {
+
+    final var form = new FieldOrderTestForm();
+    final var emptyBindingResult = new BeanPropertyBindingResult(form, "form");
+
+    final var resultingErrorItems = validationErrorOrderingService.getErrorItemsFromBindingResult(form, emptyBindingResult);
+
+    assertThat(resultingErrorItems).isEmpty();
+  }
 }

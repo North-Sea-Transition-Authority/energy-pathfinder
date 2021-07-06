@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import uk.co.ogauthority.pathfinder.model.entity.project.PublishedProject;
+import uk.co.ogauthority.pathfinder.model.entity.project.SelectableProject;
 import uk.co.ogauthority.pathfinder.service.entityduplication.ChildEntity;
 
 @Entity
@@ -25,7 +25,7 @@ public class CampaignProject implements ChildEntity<Integer, CampaignInformation
 
   @ManyToOne
   @JoinColumn(name = "project_id")
-  private PublishedProject publishedProject;
+  private SelectableProject project;
 
   public Integer getId() {
     return id;
@@ -39,12 +39,12 @@ public class CampaignProject implements ChildEntity<Integer, CampaignInformation
     this.campaignInformation = campaignInformation;
   }
 
-  public PublishedProject getPublishedProject() {
-    return publishedProject;
+  public SelectableProject getProject() {
+    return project;
   }
 
-  public void setPublishedProject(PublishedProject publishedProject) {
-    this.publishedProject = publishedProject;
+  public void setProject(SelectableProject project) {
+    this.project = project;
   }
 
   @Override
@@ -75,7 +75,7 @@ public class CampaignProject implements ChildEntity<Integer, CampaignInformation
     CampaignProject that = (CampaignProject) o;
     return Objects.equals(id, that.id)
         && Objects.equals(campaignInformation, that.campaignInformation)
-        && Objects.equals(publishedProject, that.publishedProject);
+        && Objects.equals(project, that.project);
   }
 
   @Override
@@ -83,7 +83,7 @@ public class CampaignProject implements ChildEntity<Integer, CampaignInformation
     return Objects.hash(
         id,
         campaignInformation,
-        publishedProject
+        project
     );
   }
 }

@@ -6,7 +6,7 @@
 <#-- @ftlvariable name="projectTypeDisplayNameLowercase" type="String" -->
 <#-- @ftlvariable name="projectTypeDisplayName" type="String" -->
 <#-- @ftlvariable name="service" type="uk.co.ogauthority.pathfinder.config.ServiceProperties" -->
-<#-- @ftlvariable name="alreadyAddedProjects" type="java.util.List<uk.co.ogauthority.pathfinder.model.entity.project.PublishedProjectView>" -->
+<#-- @ftlvariable name="alreadyAddedProjects" type="java.util.List<uk.co.ogauthority.pathfinder.model.view.campaignInformation.CampaignProjectView>" -->
 
 <@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true errorItems=errorList>
   <@fdsForm.htmlForm>

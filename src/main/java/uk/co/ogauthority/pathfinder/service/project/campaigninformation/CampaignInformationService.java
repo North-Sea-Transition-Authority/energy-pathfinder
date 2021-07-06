@@ -1,12 +1,14 @@
 package uk.co.ogauthority.pathfinder.service.project.campaigninformation;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignInformation;
 import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignProject;
@@ -77,7 +79,7 @@ public class CampaignInformationService implements ProjectFormSectionService {
 
     final var publishedProjectIds = campaignProjects
         .stream()
-        .map(campaignProject -> campaignProject.getPublishedProject().getProjectId())
+        .map(campaignProject -> campaignProject.getProject().getProjectId())
         .collect(Collectors.toList());
 
     form.setProjectsIncludedInCampaign(publishedProjectIds);
@@ -86,11 +88,19 @@ public class CampaignInformationService implements ProjectFormSectionService {
   }
 
   public CampaignInformation getOrError(ProjectDetail projectDetail) {
-    return campaignInformationRepository.findByProjectDetail(projectDetail).orElseThrow(() ->
+    return getCampaignInformationByProjectDetail(projectDetail).orElseThrow(() ->
         new PathfinderEntityNotFoundException(
-            String.format("Unable to find campaign information for project detail with id: %s", projectDetail.getId())
+            String.format("Unable to find campaign information with project detail with id: %s", projectDetail.getId())
         )
     );
+  }
+
+  protected Optional<CampaignInformation> getCampaignInformationByProjectDetail(ProjectDetail projectDetail) {
+    return campaignInformationRepository.findByProjectDetail(projectDetail);
+  }
+
+  protected Optional<CampaignInformation> getCampaignInformationByProjectAndVersion(Project project, int version) {
+    return campaignInformationRepository.findByProjectDetail_ProjectAndProjectDetail_Version(project, version);
   }
 
   @Override

@@ -24,6 +24,8 @@ import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 @Service
 public class ValidationErrorOrderingService {
 
+  protected static final int GLOBAL_ERROR_OFFSET = 999;
+
   private static final Logger LOGGER = LoggerFactory.getLogger(ValidationErrorOrderingService.class);
 
   // Replaces all square brackets and anything inside them.
@@ -47,6 +49,19 @@ public class ValidationErrorOrderingService {
                                                         int errorIndexOffset) {
 
     final var errorList = new ArrayList<ErrorItem>();
+
+    addFormErrorsToErrorList(form, bindingResult, errorIndexOffset, errorList);
+
+    addGlobalErrorsToErrorList(bindingResult, errorList);
+
+    return errorList;
+  }
+
+  private void addFormErrorsToErrorList(Object form,
+                                        BindingResult bindingResult,
+                                        int errorIndexOffset,
+                                        List<ErrorItem> errorList) {
+
     final var fieldErrors = getFieldErrorsInFormFieldOrder(form, bindingResult);
 
     IntStream.range(0, fieldErrors.size()).forEach(index -> {
@@ -63,8 +78,18 @@ public class ValidationErrorOrderingService {
       errorList.add(new ErrorItem((index + errorIndexOffset), fieldError.getField(), errorMessage));
 
     });
+  }
 
-    return errorList;
+  private void addGlobalErrorsToErrorList(BindingResult bindingResult, List<ErrorItem> errorList) {
+    bindingResult.getGlobalErrors().forEach(globalError -> {
+      final var errorItem = new ErrorItem(
+          GLOBAL_ERROR_OFFSET,
+          globalError.getCode(),
+          globalError.getDefaultMessage()
+      );
+
+      errorList.add(errorItem);
+    });
   }
 
   private Optional<String> getTypeMismatchErrorCode(FieldError fieldError) {

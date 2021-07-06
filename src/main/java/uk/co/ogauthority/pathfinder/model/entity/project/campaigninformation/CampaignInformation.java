@@ -26,7 +26,7 @@ public class CampaignInformation extends ProjectDetailEntity implements ParentEn
     return isPartOfCampaign;
   }
 
-  public void setIsPartOfCampaign(boolean publishedCampaign) {
+  public void setIsPartOfCampaign(Boolean publishedCampaign) {
     this.isPartOfCampaign = publishedCampaign;
   }
 

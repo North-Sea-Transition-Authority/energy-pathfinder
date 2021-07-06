@@ -10,27 +10,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.PublishedProject;
-import uk.co.ogauthority.pathfinder.model.entity.project.PublishedProjectView;
+import uk.co.ogauthority.pathfinder.model.entity.project.SelectableProject;
 import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignInformation;
 import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignProject;
 import uk.co.ogauthority.pathfinder.model.form.project.campaigninformation.CampaignInformationForm;
+import uk.co.ogauthority.pathfinder.model.view.campaigninformation.CampaignProjectView;
 import uk.co.ogauthority.pathfinder.repository.project.campaigninformation.CampaignProjectRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
-import uk.co.ogauthority.pathfinder.service.project.PublishedProjectAccessorService;
 
 @Service
 public class CampaignProjectService {
 
-  private final PublishedProjectAccessorService publishedProjectAccessorService;
+  private final CampaignProjectRestService campaignProjectRestService;
   private final CampaignProjectRepository campaignProjectRepository;
   private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
-  public CampaignProjectService(PublishedProjectAccessorService publishedProjectAccessorService,
+  public CampaignProjectService(CampaignProjectRestService campaignProjectRestService,
                                 CampaignProjectRepository campaignProjectRepository,
                                 EntityDuplicationService entityDuplicationService) {
-    this.publishedProjectAccessorService = publishedProjectAccessorService;
+    this.campaignProjectRestService = campaignProjectRestService;
     this.campaignProjectRepository = campaignProjectRepository;
     this.entityDuplicationService = entityDuplicationService;
   }
@@ -44,15 +43,15 @@ public class CampaignProjectService {
     final var sanitisePublishedProjectIds = sanitisePublishedProjectIds(campaignProjectIds, campaignInformation);
 
     final var projects = isProjectIncludedInCampaign
-        ? getPublishedProjectsFromIds(sanitisePublishedProjectIds)
-        : new ArrayList<PublishedProject>();
+        ? getSelectableProjectsFromIds(sanitisePublishedProjectIds)
+        : new ArrayList<SelectableProject>();
 
     final var campaignProjectsToPersist = new ArrayList<CampaignProject>();
 
     projects.forEach(project -> {
       final var campaignProject = new CampaignProject();
       campaignProject.setCampaignInformation(campaignInformation);
-      campaignProject.setPublishedProject(project);
+      campaignProject.setProject(project);
 
       campaignProjectsToPersist.add(campaignProject);
     });
@@ -64,21 +63,24 @@ public class CampaignProjectService {
     }
   }
 
-  protected List<PublishedProjectView> getPublishedProjectViews(CampaignInformationForm form) {
-    final var publishedProjects = getPublishedProjectsFromIds(form.getProjectsIncludedInCampaign())
+  protected List<CampaignProjectView> getCampaignProjectViews(CampaignInformationForm form) {
+    final var selectedCampaignProjects = getSelectableProjectsFromIds(form.getProjectsIncludedInCampaign())
         .stream()
         .sorted(Comparator.comparing(publishedProject -> publishedProject.getProjectDisplayName().toLowerCase()))
         .collect(Collectors.toList());
 
-    return publishedProjectAccessorService.convertToPublishedProjectViews(publishedProjects);
+    return selectedCampaignProjects
+        .stream()
+        .map(CampaignProjectView::new)
+        .collect(Collectors.toList());
   }
 
   protected List<CampaignProject> getCampaignProjects(ProjectDetail projectDetail) {
     return campaignProjectRepository.findAllByCampaignInformation_ProjectDetail(projectDetail);
   }
 
-  protected String getPublishedProjectRestUrl() {
-    return publishedProjectAccessorService.getPublishedInfrastructureProjectsRestUrl();
+  protected String getCampaignProjectRestUrl() {
+    return CampaignProjectRestService.getCampaignProjectRestUrl();
   }
 
   @Transactional
@@ -103,10 +105,10 @@ public class CampaignProjectService {
     );
   }
 
-  private List<PublishedProject> getPublishedProjectsFromIds(List<Integer> projectIds) {
+  private List<SelectableProject> getSelectableProjectsFromIds(List<Integer> projectIds) {
     return projectIds.isEmpty()
         ? Collections.emptyList()
-        : publishedProjectAccessorService.getPublishedProjectsByIdIn(projectIds);
+        : campaignProjectRestService.getSelectableProjectsByIdIn(projectIds);
   }
 
   private List<Integer> sanitisePublishedProjectIds(List<Integer> publishedProjectIds,

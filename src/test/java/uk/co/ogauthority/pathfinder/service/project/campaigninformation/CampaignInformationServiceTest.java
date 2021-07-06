@@ -18,7 +18,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.PublishedProject;
+import uk.co.ogauthority.pathfinder.model.entity.project.SelectableProject;
 import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignInformation;
 import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignProject;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -132,11 +132,11 @@ public class CampaignInformationServiceTest {
     final var campaignInformation = CampaignInformationTestUtil.createCampaignInformation();
     when(campaignInformationRepository.findByProjectDetail(projectDetail)).thenReturn(Optional.of(campaignInformation));
 
-    final var publishedProject = new PublishedProject();
+    final var publishedProject = new SelectableProject();
     publishedProject.setProjectId(100);
 
     final var campaignProject = new CampaignProject();
-    campaignProject.setPublishedProject(publishedProject);
+    campaignProject.setProject(publishedProject);
 
     final var campaignProjects = List.of(campaignProject);
     when(campaignProjectService.getCampaignProjects(projectDetail)).thenReturn(campaignProjects);
@@ -148,7 +148,7 @@ public class CampaignInformationServiceTest {
 
     final var publishedProjectIds = campaignProjects
         .stream()
-        .map(selectedCampaignProject -> selectedCampaignProject.getPublishedProject().getProjectId())
+        .map(selectedCampaignProject -> selectedCampaignProject.getProject().getProjectId())
         .collect(Collectors.toList());
 
     assertThat(form.getProjectsIncludedInCampaign()).isEqualTo(publishedProjectIds);
@@ -256,6 +256,59 @@ public class CampaignInformationServiceTest {
   @Test
   public void validate_partialValidation_verifyInteractions() {
     callValidateMethodAndVerifyInteractions(ValidationType.PARTIAL);
+  }
+
+  @Test
+  public void getCampaignInformationByProjectDetail_whenNotFound_thenEmptyOptional() {
+    when(campaignInformationRepository.findByProjectDetail(projectDetail)).thenReturn(Optional.empty());
+    final var result = campaignInformationService.getCampaignInformationByProjectDetail(projectDetail);
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void getCampaignInformationByProjectDetail_whenFound_thenPopulatedOptional() {
+
+    final var expectedCampaignInformation = new CampaignInformation();
+
+    when(campaignInformationRepository.findByProjectDetail(projectDetail)).thenReturn(Optional.of(expectedCampaignInformation));
+
+    final var result = campaignInformationService.getCampaignInformationByProjectDetail(projectDetail);
+
+    assertThat(result).contains(expectedCampaignInformation);
+  }
+
+  @Test
+  public void getCampaignInformationByProjectAndVersion_whenNotFound_thenEmptyOptional() {
+
+    when(campaignInformationRepository.findByProjectDetail_ProjectAndProjectDetail_Version(
+        projectDetail.getProject(),
+        projectDetail.getVersion()
+    )).thenReturn(Optional.empty());
+
+    final var result = campaignInformationService.getCampaignInformationByProjectAndVersion(
+        projectDetail.getProject(),
+        projectDetail.getVersion()
+    );
+
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void getCampaignInformationByProjectAndVersion_whenFound_thenPopulatedOptional() {
+
+    final var expectedCampaignInformation = new CampaignInformation();
+
+    when(campaignInformationRepository.findByProjectDetail_ProjectAndProjectDetail_Version(
+        projectDetail.getProject(),
+        projectDetail.getVersion()
+    )).thenReturn(Optional.of(expectedCampaignInformation));
+
+    final var result = campaignInformationService.getCampaignInformationByProjectAndVersion(
+        projectDetail.getProject(),
+        projectDetail.getVersion()
+    );
+
+    assertThat(result).contains(expectedCampaignInformation);
   }
 
   private void callValidateMethodAndVerifyInteractions(ValidationType validationType) {

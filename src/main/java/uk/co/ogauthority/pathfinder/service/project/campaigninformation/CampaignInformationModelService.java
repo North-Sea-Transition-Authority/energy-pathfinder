@@ -31,9 +31,9 @@ public class CampaignInformationModelService {
         .addObject("form", form)
         .addObject(
             "publishedProjectRestUrl",
-            campaignProjectService.getPublishedProjectRestUrl()
+            campaignProjectService.getCampaignProjectRestUrl()
         )
-        .addObject("alreadyAddedProjects", campaignProjectService.getPublishedProjectViews(form));
+        .addObject("alreadyAddedProjects", campaignProjectService.getCampaignProjectViews(form));
 
     ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, projectDetail);
 

@@ -21,21 +21,21 @@ import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.project.PublishedProjectAccessorService;
+import uk.co.ogauthority.pathfinder.service.project.campaigninformation.CampaignProjectRestService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(
-    value = PublishedProjectRestController.class,
+    value = CampaignProjectRestController.class,
     includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ProjectContextService.class)
 )
-public class PublishedProjectRestControllerTest extends AbstractControllerTest {
+public class CampaignProjectRestControllerTest extends AbstractControllerTest {
 
   private static final String SEARCH_TERM = "searchTerm";
 
   @MockBean
-  private PublishedProjectAccessorService publishedProjectAccessorService;
+  private CampaignProjectRestService campaignProjectRestService;
 
   private AuthenticatedUserAccount authenticatedUser;
   private AuthenticatedUserAccount unauthenticatedUser;
@@ -47,26 +47,26 @@ public class PublishedProjectRestControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  public void searchPublishedInfrastructureProjects_whenAuthenticated_thenAccess() throws Exception {
+  public void searchCampaignableInfrastructureProjects_whenAuthenticated_thenAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(PublishedProjectRestController.class).searchPublishedInfrastructureProjects(SEARCH_TERM)))
+        on(CampaignProjectRestController.class).searchCampaignableInfrastructureProjects(SEARCH_TERM)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
 
-    verify(publishedProjectAccessorService, times(1)).searchProjectsWithDisplayNameContaining(
+    verify(campaignProjectRestService, times(1)).searchProjectsWithDisplayNameOrOperatorGroupNameContaining(
         SEARCH_TERM,
         ProjectType.INFRASTRUCTURE
     );
   }
 
   @Test
-  public void searchPublishedInfrastructureProjects_whenUnauthenticated_thenNoAccess() throws Exception {
+  public void searchCampaignableInfrastructureProjects_whenUnauthenticated_thenNoAccess() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(PublishedProjectRestController.class).searchPublishedInfrastructureProjects(SEARCH_TERM)))
+        on(CampaignProjectRestController.class).searchCampaignableInfrastructureProjects(SEARCH_TERM)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
 
-    verify(publishedProjectAccessorService, never()).searchProjectsWithDisplayNameContaining(
+    verify(campaignProjectRestService, never()).searchProjectsWithDisplayNameOrOperatorGroupNameContaining(
         SEARCH_TERM,
         ProjectType.INFRASTRUCTURE
     );

@@ -8,23 +8,23 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchResult;
-import uk.co.ogauthority.pathfinder.service.project.PublishedProjectAccessorService;
+import uk.co.ogauthority.pathfinder.service.project.campaigninformation.CampaignProjectRestService;
 
 @RestController
-@RequestMapping("/api/published-projects")
-public class PublishedProjectRestController {
+@RequestMapping("/api/campaign-projects")
+public class CampaignProjectRestController {
 
-  private final PublishedProjectAccessorService publishedProjectAccessorService;
+  private final CampaignProjectRestService campaignProjectRestService;
 
   @Autowired
-  public PublishedProjectRestController(PublishedProjectAccessorService publishedProjectAccessorService) {
-    this.publishedProjectAccessorService = publishedProjectAccessorService;
+  public CampaignProjectRestController(CampaignProjectRestService campaignProjectRestService) {
+    this.campaignProjectRestService = campaignProjectRestService;
   }
 
   @GetMapping("/infrastructure")
   @ResponseBody
-  public RestSearchResult searchPublishedInfrastructureProjects(@RequestParam("term") String searchTerm) {
-    return new RestSearchResult(publishedProjectAccessorService.searchProjectsWithDisplayNameContaining(
+  public RestSearchResult searchCampaignableInfrastructureProjects(@RequestParam("term") String searchTerm) {
+    return new RestSearchResult(campaignProjectRestService.searchProjectsWithDisplayNameOrOperatorGroupNameContaining(
         searchTerm,
         ProjectType.INFRASTRUCTURE
     ));

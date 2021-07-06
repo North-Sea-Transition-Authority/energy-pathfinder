@@ -17,22 +17,21 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.PublishedProject;
-import uk.co.ogauthority.pathfinder.model.entity.project.PublishedProjectView;
+import uk.co.ogauthority.pathfinder.model.entity.project.SelectableProject;
 import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignInformation;
 import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignProject;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.project.campaigninformation.CampaignInformationForm;
+import uk.co.ogauthority.pathfinder.model.view.campaigninformation.CampaignProjectView;
 import uk.co.ogauthority.pathfinder.repository.project.campaigninformation.CampaignProjectRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
-import uk.co.ogauthority.pathfinder.service.project.PublishedProjectAccessorService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CampaignProjectServiceTest {
 
   @Mock
-  private PublishedProjectAccessorService publishedProjectAccessorService;
+  private CampaignProjectRestService campaignProjectRestService;
 
   @Mock
   private CampaignProjectRepository campaignProjectRepository;
@@ -49,7 +48,7 @@ public class CampaignProjectServiceTest {
   @Before
   public void setup() {
     campaignProjectService = new CampaignProjectService(
-        publishedProjectAccessorService,
+        campaignProjectRestService,
         campaignProjectRepository,
         entityDuplicationService
     );
@@ -70,7 +69,7 @@ public class CampaignProjectServiceTest {
 
     campaignProjectService.persistCampaignProjects(campaignInformation, campaignProjectsIds);
 
-    verify(publishedProjectAccessorService, never()).getPublishedProjectsByIdIn(campaignProjectsIds);
+    verify(campaignProjectRestService, never()).getSelectableProjectsByIdIn(campaignProjectsIds);
     verify(campaignProjectRepository, times(1)).deleteAllByCampaignInformation(campaignInformation);
     verify(campaignProjectRepository, never()).saveAll(anyList());
   }
@@ -82,16 +81,16 @@ public class CampaignProjectServiceTest {
 
     final var campaignProjectsIds = List.of(10, 20, 30);
 
-    when(publishedProjectAccessorService.getPublishedProjectsByIdIn(campaignProjectsIds))
+    when(campaignProjectRestService.getSelectableProjectsByIdIn(campaignProjectsIds))
         .thenReturn(List.of(
-            new PublishedProject(),
-            new PublishedProject(),
-            new PublishedProject()
+            new SelectableProject(),
+            new SelectableProject(),
+            new SelectableProject()
         ));
 
     campaignProjectService.persistCampaignProjects(campaignInformation, campaignProjectsIds);
 
-    verify(publishedProjectAccessorService, times(1)).getPublishedProjectsByIdIn(campaignProjectsIds);
+    verify(campaignProjectRestService, times(1)).getSelectableProjectsByIdIn(campaignProjectsIds);
     verify(campaignProjectRepository, times(1)).deleteAllByCampaignInformation(campaignInformation);
     verify(campaignProjectRepository, times(1)).saveAll(anyList());
   }
@@ -105,7 +104,7 @@ public class CampaignProjectServiceTest {
 
     campaignProjectService.persistCampaignProjects(campaignInformation, campaignProjectsIds);
 
-    verify(publishedProjectAccessorService, never()).getPublishedProjectsByIdIn(campaignProjectsIds);
+    verify(campaignProjectRestService, never()).getSelectableProjectsByIdIn(campaignProjectsIds);
     verify(campaignProjectRepository, times(1)).deleteAllByCampaignInformation(campaignInformation);
     verify(campaignProjectRepository, never()).saveAll(anyList());
   }
@@ -126,16 +125,16 @@ public class CampaignProjectServiceTest {
     sanitisedCampaignProjectsIds.forEach(projectId -> {
       final var campaignProject = new CampaignProject();
       campaignProject.setCampaignInformation(campaignInformation);
-      campaignProject.setPublishedProject(new PublishedProject());
+      campaignProject.setProject(new SelectableProject());
       campaignProjects.add(campaignProject);
     });
 
-    when(publishedProjectAccessorService.getPublishedProjectsByIdIn(sanitisedCampaignProjectsIds))
-        .thenReturn(List.of(new PublishedProject()));
+    when(campaignProjectRestService.getSelectableProjectsByIdIn(sanitisedCampaignProjectsIds))
+        .thenReturn(List.of(new SelectableProject()));
 
     campaignProjectService.persistCampaignProjects(campaignInformation, campaignProjectsIdsWithDuplicates);
 
-    verify(publishedProjectAccessorService, times(1)).getPublishedProjectsByIdIn(sanitisedCampaignProjectsIds);
+    verify(campaignProjectRestService, times(1)).getSelectableProjectsByIdIn(sanitisedCampaignProjectsIds);
     verify(campaignProjectRepository, times(1)).deleteAllByCampaignInformation(campaignInformation);
     verify(campaignProjectRepository, times(1)).saveAll(campaignProjects);
   }
@@ -157,48 +156,51 @@ public class CampaignProjectServiceTest {
     sanitisedCampaignProjectsIds.forEach(projectId -> {
       final var campaignProject = new CampaignProject();
       campaignProject.setCampaignInformation(campaignInformation);
-      campaignProject.setPublishedProject(new PublishedProject());
+      campaignProject.setProject(new SelectableProject());
       campaignProjects.add(campaignProject);
     });
 
-    when(publishedProjectAccessorService.getPublishedProjectsByIdIn(sanitisedCampaignProjectsIds))
-        .thenReturn(List.of(new PublishedProject()));
+    when(campaignProjectRestService.getSelectableProjectsByIdIn(sanitisedCampaignProjectsIds))
+        .thenReturn(List.of(new SelectableProject()));
 
     campaignProjectService.persistCampaignProjects(campaignInformation, campaignProjectsIdsWithCurrentProjectId);
 
-    verify(publishedProjectAccessorService, times(1)).getPublishedProjectsByIdIn(sanitisedCampaignProjectsIds);
+    verify(campaignProjectRestService, times(1)).getSelectableProjectsByIdIn(sanitisedCampaignProjectsIds);
     verify(campaignProjectRepository, times(1)).deleteAllByCampaignInformation(campaignInformation);
     verify(campaignProjectRepository, times(1)).saveAll(campaignProjects);
   }
 
   @Test
-  public void getPublishedProjectViews_whenNoResult_thenEmptyList() {
+  public void getCampaignProjectViews_whenNoResult_thenEmptyList() {
 
-    when(publishedProjectAccessorService.convertToPublishedProjectViews(anyList()))
-        .thenReturn(Collections.emptyList());
-
-    final var resultingPublishedProjectViews = campaignProjectService.getPublishedProjectViews(new CampaignInformationForm());
+    final var resultingPublishedProjectViews = campaignProjectService.getCampaignProjectViews(
+        new CampaignInformationForm()
+    );
 
     assertThat(resultingPublishedProjectViews).isEmpty();
   }
 
   @Test
-  public void getPublishedProjectViews_whenResult_thenPopulatedList() {
+  public void getCampaignProjectViews_whenResult_thenPopulatedList() {
 
-    final var publishedProjectView = new PublishedProjectView();
-    final var publishedProjectViews = List.of(publishedProjectView);
+    final var selectableProject = new SelectableProject();
+    final var campaignProjectView = new CampaignProjectView(selectableProject);
+    final var campaignProjectViews = List.of(campaignProjectView);
 
-    when(publishedProjectAccessorService.convertToPublishedProjectViews(anyList()))
-        .thenReturn(publishedProjectViews);
+    when(campaignProjectRestService.getSelectableProjectsByIdIn(anyList()))
+        .thenReturn(List.of(selectableProject));
 
-    final var resultingPublishedProjectViews = campaignProjectService.getPublishedProjectViews(new CampaignInformationForm());
+    final var populatedForm = new CampaignInformationForm();
+    populatedForm.setProjectsIncludedInCampaign(List.of(1));
 
-    assertThat(resultingPublishedProjectViews).isEqualTo(publishedProjectViews);
+    final var resultingPublishedProjectViews = campaignProjectService.getCampaignProjectViews(populatedForm);
+
+    assertThat(resultingPublishedProjectViews).isEqualTo(campaignProjectViews);
 
   }
 
   @Test
-  public void getPublishedProjectViews_verifySortOrder() {
+  public void getCampaignProjectViews_verifySortOrder() {
 
     final var firstAlphabeticallyCampaignProject = createCampaignProjectWithDisplayName("a project name");
     final var lastAlphabeticallyCampaignProject = createCampaignProjectWithDisplayName("z project name");
@@ -210,22 +212,20 @@ public class CampaignProjectServiceTest {
 
     final var unsortedCampaignProjectIds = unsortedCampaignProjectList
         .stream()
-        .map(campaignProject -> campaignProject.getPublishedProject().getProjectId())
+        .map(campaignProject -> campaignProject.getProject().getProjectId())
         .collect(Collectors.toList());
 
     final var campaignForm = new CampaignInformationForm();
     campaignForm.setProjectsIncludedInCampaign(unsortedCampaignProjectIds);
 
-    when(publishedProjectAccessorService.getPublishedProjectsByIdIn(campaignForm.getProjectsIncludedInCampaign()))
-        .thenReturn(unsortedCampaignProjectList.stream().map(CampaignProject::getPublishedProject).collect(Collectors.toList()));
+    when(campaignProjectRestService.getSelectableProjectsByIdIn(campaignForm.getProjectsIncludedInCampaign()))
+        .thenReturn(unsortedCampaignProjectList.stream().map(CampaignProject::getProject).collect(Collectors.toList()));
 
-    when(publishedProjectAccessorService.convertToPublishedProjectViews(anyList())).thenCallRealMethod();
+    final var resultingPublishedProjectViews = campaignProjectService.getCampaignProjectViews(campaignForm);
 
-    final var resultingPublishedProjectViews = campaignProjectService.getPublishedProjectViews(campaignForm);
-
-    assertThat(resultingPublishedProjectViews).extracting(PublishedProjectView::getDisplayName).containsExactly(
-        firstAlphabeticallyCampaignProject.getPublishedProject().getProjectDisplayName(),
-        lastAlphabeticallyCampaignProject.getPublishedProject().getProjectDisplayName()
+    assertThat(resultingPublishedProjectViews).extracting(campaignProjectView -> campaignProjectView.getSelectableProject().getProjectDisplayName()).containsExactly(
+        firstAlphabeticallyCampaignProject.getProject().getProjectDisplayName(),
+        lastAlphabeticallyCampaignProject.getProject().getProjectDisplayName()
     );
   }
 
@@ -254,9 +254,10 @@ public class CampaignProjectServiceTest {
   }
 
   @Test
-  public void getPublishedProjectRestUrl_verifyInteraction() {
-    campaignProjectService.getPublishedProjectRestUrl();
-    verify(publishedProjectAccessorService, times(1)).getPublishedInfrastructureProjectsRestUrl();
+  public void getCampaignProjectRestUrl() {
+    final var expectedUrl = CampaignProjectRestService.getCampaignProjectRestUrl();
+    final var resultingUrl = campaignProjectService.getCampaignProjectRestUrl();
+    assertThat(resultingUrl).isEqualTo(expectedUrl);
   }
 
   @Test
@@ -303,11 +304,11 @@ public class CampaignProjectServiceTest {
   }
 
   private CampaignProject createCampaignProjectWithDisplayName(String displayName) {
-    final var publishedProject = new PublishedProject();
+    final var publishedProject = new SelectableProject();
     publishedProject.setProjectDisplayName(displayName);
 
     final var campaignProject = new CampaignProject();
-    campaignProject.setPublishedProject(publishedProject);
+    campaignProject.setProject(publishedProject);
 
     return campaignProject;
   }

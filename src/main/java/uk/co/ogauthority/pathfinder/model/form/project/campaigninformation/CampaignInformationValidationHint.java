@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.form.project.campaigninformation;
 
 import java.util.Objects;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
@@ -28,6 +29,10 @@ public final class CampaignInformationValidationHint {
 
   public String getProjectSelectorFieldName() {
     return PROJECT_SELECTOR_FIELD_NAME;
+  }
+
+  public Project getCurrentProject() {
+    return projectDetail.getProject();
   }
 
   public ValidationType getValidationType() {
