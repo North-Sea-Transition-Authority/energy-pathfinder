@@ -76,15 +76,18 @@ public class CampaignInformationViewUtilTest {
     campaignInformation.setIsPartOfCampaign(true);
 
     final var projectDisplayName = "project display name";
+    final var operatorGroupName = "operator group name";
 
-    final var campaignProject = createCampaignProjectWithDisplayName(projectDisplayName);
+    final var campaignProject = createCampaignProjectWithDisplayName(projectDisplayName, operatorGroupName);
 
     final var resultingView = CampaignInformationViewUtil.from(
         campaignInformation,
         List.of(campaignProject)
     );
 
-    assertThat(resultingView.getCampaignProjects()).containsExactly(projectDisplayName);
+    assertThat(resultingView.getCampaignProjects()).containsExactly(
+        getCampaignProjectDisplayString(projectDisplayName, operatorGroupName)
+    );
     assertCommonViewProperties(resultingView, campaignInformation);
   }
 
@@ -107,11 +110,19 @@ public class CampaignInformationViewUtilTest {
 
     campaignInformation.setIsPartOfCampaign(true);
 
+    final var operatorGroupName = "operator group";
+
     final var firstAlphabeticallyDisplayName = "a project display name";
-    final var firstAlphabeticallyCampaignProject = createCampaignProjectWithDisplayName(firstAlphabeticallyDisplayName);
+    final var firstAlphabeticallyCampaignProject = createCampaignProjectWithDisplayName(
+        firstAlphabeticallyDisplayName,
+        operatorGroupName
+    );
 
     final var lastAlphabeticallyDisplayName = "Z project display name";
-    final var lastAlphabeticallyCampaignProject = createCampaignProjectWithDisplayName(lastAlphabeticallyDisplayName);
+    final var lastAlphabeticallyCampaignProject = createCampaignProjectWithDisplayName(
+        lastAlphabeticallyDisplayName,
+        operatorGroupName
+    );
 
     final var resultingView = CampaignInformationViewUtil.from(
         campaignInformation,
@@ -119,8 +130,8 @@ public class CampaignInformationViewUtilTest {
     );
 
     assertThat(resultingView.getCampaignProjects()).containsExactly(
-        firstAlphabeticallyDisplayName,
-        lastAlphabeticallyDisplayName
+        getCampaignProjectDisplayString(firstAlphabeticallyDisplayName, operatorGroupName),
+        getCampaignProjectDisplayString(lastAlphabeticallyDisplayName, operatorGroupName)
     );
     assertCommonViewProperties(resultingView, campaignInformation);
   }
@@ -130,15 +141,20 @@ public class CampaignInformationViewUtilTest {
     assertThat(campaignInformationView.getScopeDescription()).isEqualTo(sourceCampaignInformation.getScopeDescription());
   }
 
-  private CampaignProject createCampaignProjectWithDisplayName(String displayName) {
+  private CampaignProject createCampaignProjectWithDisplayName(String displayName, String operatorGroupName) {
 
-    final var publishedProject = new SelectableProject();
-    publishedProject.setProjectDisplayName(displayName);
+    final var selectableProject = new SelectableProject();
+    selectableProject.setProjectDisplayName(displayName);
+    selectableProject.setOperatorGroupName(operatorGroupName);
 
     final var campaignProject = new CampaignProject();
-    campaignProject.setProject(publishedProject);
+    campaignProject.setProject(selectableProject);
 
     return campaignProject;
+  }
+
+  private String getCampaignProjectDisplayString(String displayName, String operatorGroupName) {
+    return String.format("%s (%s)", displayName, operatorGroupName);
   }
 
 }

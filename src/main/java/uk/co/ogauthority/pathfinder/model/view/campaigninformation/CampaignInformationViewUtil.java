@@ -29,7 +29,7 @@ public class CampaignInformationViewUtil {
     if (BooleanUtils.isTrue(campaignInformation.isPartOfCampaign()) && !campaignProjects.isEmpty()) {
       campaignProjectDisplayNames = campaignProjects
           .stream()
-          .map(campaignProject -> campaignProject.getProject().getProjectDisplayName())
+          .map(campaignProject -> new CampaignProjectView(campaignProject.getProject()).getSelectionText())
           .sorted(Comparator.comparing(String::toLowerCase))
           .collect(Collectors.toList());
     }
