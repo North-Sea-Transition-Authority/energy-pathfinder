@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.config.file.FileDeleteResult;
 import uk.co.ogauthority.pathfinder.config.file.FileUploadResult;
 import uk.co.ogauthority.pathfinder.controller.file.PathfinderFileUploadController;
@@ -28,14 +29,20 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationCompletionForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityForm;
+import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationSetupForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationCompletionService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityFileLinkService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityModelService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationRoutingService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationSetupService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
@@ -49,6 +56,10 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
   private final ForwardWorkPlanCollaborationOpportunityModelService forwardWorkPlanCollaborationOpportunityModelService;
   private final ForwardWorkPlanCollaborationOpportunityFileLinkService forwardWorkPlanCollaborationOpportunityFileLinkService;
   private final ForwardWorkPlanCollaborationOpportunityService forwardWorkPlanCollaborationOpportunityService;
+  private final ForwardWorkPlanCollaborationRoutingService forwardWorkPlanCollaborationRoutingService;
+  private final ForwardWorkPlanCollaborationSetupService forwardWorkPlanCollaborationSetupService;
+  private final ForwardWorkPlanCollaborationOpportunitiesSummaryService forwardWorkPlanCollaborationOpportunitiesSummaryService;
+  private final ForwardWorkPlanCollaborationCompletionService forwardWorkPlanCollaborationCompletionService;
   private final ControllerHelperService controllerHelperService;
 
   @Autowired
@@ -56,6 +67,10 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
       ForwardWorkPlanCollaborationOpportunityModelService forwardWorkPlanCollaborationOpportunityModelService,
       ForwardWorkPlanCollaborationOpportunityFileLinkService forwardWorkPlanCollaborationOpportunityFileLinkService,
       ForwardWorkPlanCollaborationOpportunityService forwardWorkPlanCollaborationOpportunityService,
+      ForwardWorkPlanCollaborationRoutingService forwardWorkPlanCollaborationRoutingService,
+      ForwardWorkPlanCollaborationSetupService forwardWorkPlanCollaborationSetupService,
+      ForwardWorkPlanCollaborationOpportunitiesSummaryService forwardWorkPlanCollaborationOpportunitiesSummaryService,
+      ForwardWorkPlanCollaborationCompletionService forwardWorkPlanCollaborationCompletionService,
       ProjectDetailFileService projectDetailFileService,
       ControllerHelperService controllerHelperService
   ) {
@@ -63,31 +78,105 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
     this.forwardWorkPlanCollaborationOpportunityModelService = forwardWorkPlanCollaborationOpportunityModelService;
     this.forwardWorkPlanCollaborationOpportunityFileLinkService = forwardWorkPlanCollaborationOpportunityFileLinkService;
     this.forwardWorkPlanCollaborationOpportunityService = forwardWorkPlanCollaborationOpportunityService;
+    this.forwardWorkPlanCollaborationRoutingService = forwardWorkPlanCollaborationRoutingService;
+    this.forwardWorkPlanCollaborationSetupService = forwardWorkPlanCollaborationSetupService;
+    this.forwardWorkPlanCollaborationOpportunitiesSummaryService = forwardWorkPlanCollaborationOpportunitiesSummaryService;
+    this.forwardWorkPlanCollaborationCompletionService = forwardWorkPlanCollaborationCompletionService;
     this.controllerHelperService = controllerHelperService;
   }
 
-  @GetMapping
-  public ModelAndView viewCollaborationOpportunities(@PathVariable("projectId") Integer projectId,
-                                                     ProjectContext projectContext) {
-    return forwardWorkPlanCollaborationOpportunityModelService.getViewCollaborationOpportunitiesModelAndView(
-        projectContext.getProjectDetails(),
-        ValidationResult.NOT_VALIDATED
+  @GetMapping("/setup")
+  public ModelAndView getCollaborationOpportunitySetup(@PathVariable("projectId") Integer projectId,
+                                                       ProjectContext projectContext,
+                                                       AuthenticatedUserAccount userAccount) {
+    return forwardWorkPlanCollaborationRoutingService.getCollaborationOpportunitySetupRoute(
+        projectContext.getProjectDetails()
     );
   }
 
-  @PostMapping
-  public ModelAndView saveCollaborationOpportunities(@PathVariable("projectId") Integer projectId,
-                                                     ProjectContext projectContext) {
-    return forwardWorkPlanCollaborationOpportunityModelService.getSaveCollaborationOpportunitySummaryModelAndView(
-        projectContext.getProjectDetails()
+  @PostMapping("/setup")
+  public ModelAndView saveCollaborationSetup(@PathVariable("projectId") Integer projectId,
+                                             @Valid @ModelAttribute("form") ForwardWorkPlanCollaborationSetupForm form,
+                                             BindingResult bindingResult,
+                                             ProjectContext projectContext,
+                                             AuthenticatedUserAccount userAccount) {
+
+    final var projectDetail = projectContext.getProjectDetails();
+
+    bindingResult = forwardWorkPlanCollaborationSetupService.validate(form, bindingResult, ValidationType.FULL);
+
+    return controllerHelperService.checkErrorsAndRedirect(
+        bindingResult,
+        forwardWorkPlanCollaborationOpportunityModelService.getCollaborationSetupModelAndView(projectDetail, form),
+        form,
+        () -> {
+          final var forwardWorkPlanCollaborationSetup = forwardWorkPlanCollaborationSetupService
+              .saveForwardWorkPlanCollaborationSetup(form, projectDetail);
+
+          return forwardWorkPlanCollaborationRoutingService.getPostSaveUpcomingCollaborationsSetupRoute(
+              forwardWorkPlanCollaborationSetup,
+              projectDetail
+          );
+        }
     );
+  }
+
+  @GetMapping("/summary")
+  public ModelAndView viewCollaborationOpportunities(@PathVariable("projectId") Integer projectId,
+                                                     ProjectContext projectContext) {
+    return forwardWorkPlanCollaborationRoutingService.getViewCollaborationsRoute(projectContext.getProjectDetails());
+  }
+
+  @PostMapping("/summary")
+  public ModelAndView saveCollaborationOpportunities(@PathVariable("projectId") Integer projectId,
+                                                     @Valid @ModelAttribute("form") ForwardWorkPlanCollaborationCompletionForm form,
+                                                     BindingResult bindingResult,
+                                                     ProjectContext projectContext) {
+
+    final var projectDetail = projectContext.getProjectDetails();
+
+    final var summaryViews = forwardWorkPlanCollaborationOpportunitiesSummaryService.getValidatedSummaryViews(
+        projectDetail
+    );
+
+    final var validationResult = forwardWorkPlanCollaborationOpportunitiesSummaryService.validateViews(
+        summaryViews
+    );
+
+    bindingResult = forwardWorkPlanCollaborationCompletionService.validate(form, bindingResult, ValidationType.FULL);
+
+    if (validationResult.equals(ValidationResult.INVALID) || bindingResult.hasErrors()) {
+      return forwardWorkPlanCollaborationOpportunityModelService.getViewCollaborationOpportunitiesModelAndView(
+          projectDetail,
+          validationResult,
+          summaryViews,
+          form,
+          bindingResult
+      );
+    } else {
+
+      final var forwardWorkPlanCollaborationSetup = forwardWorkPlanCollaborationCompletionService.saveCollaborationCompletionForm(
+          form,
+          projectDetail
+      );
+
+      return forwardWorkPlanCollaborationRoutingService.getPostSaveCollaborationsRoute(
+          forwardWorkPlanCollaborationSetup,
+          projectDetail
+      );
+    }
   }
 
   @GetMapping("/collaboration-opportunity")
   public ModelAndView addCollaborationOpportunity(@PathVariable("projectId") Integer projectId,
                                                   ProjectContext projectContext) {
     final var form = new ForwardWorkPlanCollaborationOpportunityForm();
-    return getCollaborationOpportunityModelAndView(form, projectContext.getProjectDetails());
+    final var projectDetail = projectContext.getProjectDetails();
+    return forwardWorkPlanCollaborationRoutingService.getAddCollaborationOpportunityRoute(
+        getFileUploadModelAndView(form, projectDetail),
+        form,
+        projectDetail
+    );
   }
 
   @PostMapping("/collaboration-opportunity")
@@ -246,16 +335,21 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
   private ModelAndView getCollaborationOpportunityModelAndView(ForwardWorkPlanCollaborationOpportunityForm form,
                                                                ProjectDetail projectDetail) {
 
-    final var modelAndView = createModelAndView(
-        ForwardWorkPlanCollaborationOpportunityModelService.FORM_TEMPLATE_PATH,
-        projectDetail,
-        ForwardWorkPlanCollaborationOpportunityFileLinkService.FILE_PURPOSE,
-        form
-    );
+    final var modelAndView = getFileUploadModelAndView(form, projectDetail);
     return forwardWorkPlanCollaborationOpportunityModelService.getCollaborationOpportunityModelAndView(
         modelAndView,
         form,
         projectDetail.getProject().getId()
+    );
+  }
+
+  private ModelAndView getFileUploadModelAndView(ForwardWorkPlanCollaborationOpportunityForm form,
+                                                 ProjectDetail projectDetail) {
+    return createModelAndView(
+        ForwardWorkPlanCollaborationOpportunityModelService.FORM_TEMPLATE_PATH,
+        projectDetail,
+        ForwardWorkPlanCollaborationOpportunityFileLinkService.FILE_PURPOSE,
+        form
     );
   }
 

@@ -62,6 +62,9 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
   private ValidationService validationService;
 
   @Mock
+  private ForwardWorkPlanCollaborationSetupService forwardWorkPlanCollaborationSetupService;
+
+  @Mock
   private EntityDuplicationService entityDuplicationService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
@@ -88,6 +91,7 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
         forwardWorkPlanCollaborationOpportunityRepository,
         forwardWorkPlanCollaborationOpportunityFileLinkService,
         forwardWorkPlanCollaborationOpportunityFormValidator,
+        forwardWorkPlanCollaborationSetupService,
         validationService,
         entityDuplicationService
     );

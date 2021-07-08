@@ -247,8 +247,9 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
             null
         ));
       case WORK_PLAN_COLLABORATION_OPPORTUNITIES:
-        return ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class).viewCollaborationOpportunities(
+        return ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class).getCollaborationOpportunitySetup(
             projectId,
+            null,
             null
         ));
       default:

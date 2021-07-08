@@ -134,8 +134,8 @@ public class ForwardWorkPlanUpcomingTenderSectionSummaryServiceTest {
 
     when(forwardWorkPlanTenderSetupService.getTenderSetupView(
         detail.getProject(),
-        detail.getVersion())
-    ).thenReturn(previousSetupView);
+        detail.getVersion() - 1
+    )).thenReturn(previousSetupView);
 
     workPlanUpcomingTenderSectionSummaryService.getSummary(detail);
 

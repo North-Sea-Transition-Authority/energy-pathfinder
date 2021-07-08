@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.
 
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityCommon;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationSetup;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
@@ -38,6 +40,7 @@ public class ForwardWorkPlanCollaborationOpportunityService
   private final ForwardWorkPlanCollaborationOpportunityRepository forwardWorkPlanCollaborationOpportunityRepository;
   private final ForwardWorkPlanCollaborationOpportunityFileLinkService forwardWorkPlanCollaborationOpportunityFileLinkService;
   private final ForwardWorkPlanCollaborationOpportunityFormValidator forwardWorkPlanCollaborationOpportunityFormValidator;
+  private final ForwardWorkPlanCollaborationSetupService forwardWorkPlanCollaborationSetupService;
   private final ValidationService validationService;
   private final EntityDuplicationService entityDuplicationService;
 
@@ -50,6 +53,7 @@ public class ForwardWorkPlanCollaborationOpportunityService
       ForwardWorkPlanCollaborationOpportunityRepository forwardWorkPlanCollaborationOpportunityRepository,
       ForwardWorkPlanCollaborationOpportunityFileLinkService forwardWorkPlanCollaborationOpportunityFileLinkService,
       ForwardWorkPlanCollaborationOpportunityFormValidator forwardWorkPlanCollaborationOpportunityFormValidator,
+      ForwardWorkPlanCollaborationSetupService forwardWorkPlanCollaborationSetupService,
       ValidationService validationService,
       EntityDuplicationService entityDuplicationService
   ) {
@@ -62,6 +66,7 @@ public class ForwardWorkPlanCollaborationOpportunityService
     this.forwardWorkPlanCollaborationOpportunityRepository = forwardWorkPlanCollaborationOpportunityRepository;
     this.forwardWorkPlanCollaborationOpportunityFileLinkService = forwardWorkPlanCollaborationOpportunityFileLinkService;
     this.forwardWorkPlanCollaborationOpportunityFormValidator = forwardWorkPlanCollaborationOpportunityFormValidator;
+    this.forwardWorkPlanCollaborationSetupService = forwardWorkPlanCollaborationSetupService;
     this.validationService = validationService;
     this.entityDuplicationService = entityDuplicationService;
   }
@@ -177,7 +182,31 @@ public class ForwardWorkPlanCollaborationOpportunityService
 
   @Override
   public boolean isComplete(ProjectDetail detail) {
-    return super.isComplete(detail);
+
+    final var forwardWorkPlanCollaborationSetup = forwardWorkPlanCollaborationSetupService.getCollaborationSetupFromDetail(detail)
+        .orElse(new ForwardWorkPlanCollaborationSetup());
+
+    if (forwardWorkPlanCollaborationSetup.getHasCollaborationToAdd() == null) {
+      return false;
+    } else if (BooleanUtils.isTrue(forwardWorkPlanCollaborationSetup.getHasCollaborationToAdd())) {
+      return forwardWorkPlanCollaborationSetup.getHasOtherCollaborationToAdd() != null
+          && !hasOtherCollaborationsToAdd(forwardWorkPlanCollaborationSetup)
+          && areAllAddedCollaborationsValid(detail);
+    } else {
+      // indicated that no collaboration are to be added
+      return true;
+    }
+  }
+
+  private boolean hasOtherCollaborationsToAdd(ForwardWorkPlanCollaborationSetup forwardWorkPlanCollaborationSetup) {
+    return BooleanUtils.isTrue(forwardWorkPlanCollaborationSetup.getHasOtherCollaborationToAdd());
+  }
+
+  private boolean areAllAddedCollaborationsValid(ProjectDetail projectDetail) {
+    final var collaborations = getOpportunitiesForDetail(projectDetail);
+    return !collaborations.isEmpty() && collaborations
+        .stream()
+        .allMatch(collaborationOpportunity -> isValid(collaborationOpportunity, ValidationType.FULL));
   }
 
   @Override

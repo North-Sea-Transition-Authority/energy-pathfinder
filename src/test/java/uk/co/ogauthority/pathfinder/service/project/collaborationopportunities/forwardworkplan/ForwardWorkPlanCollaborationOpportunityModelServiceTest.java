@@ -3,7 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,17 +18,22 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.servlet.ModelAndView;
-import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
 import uk.co.ogauthority.pathfinder.controller.rest.ForwardWorkPlanCollaborationOpportunityRestController;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
+import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
+import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationCompletionForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityForm;
+import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationSetupForm;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationOpportunityView;
+import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationOpportunityViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.validation.ValidationErrorOrderingService;
+import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
@@ -45,6 +50,9 @@ public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
   @Mock
   private ForwardWorkPlanCollaborationOpportunitiesSummaryService forwardWorkPlanCollaborationOpportunitiesSummaryService;
 
+  @Mock
+  private ValidationErrorOrderingService validationErrorOrderingService;
+
   private ForwardWorkPlanCollaborationOpportunityModelService forwardWorkPlanCollaborationOpportunityModelService;
 
   @Before
@@ -52,125 +60,52 @@ public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
     forwardWorkPlanCollaborationOpportunityModelService = new ForwardWorkPlanCollaborationOpportunityModelService(
         forwardWorkPlanCollaborationOpportunityService,
         breadcrumbService,
-        forwardWorkPlanCollaborationOpportunitiesSummaryService
+        forwardWorkPlanCollaborationOpportunitiesSummaryService,
+        validationErrorOrderingService
     );
   }
 
   @Test
-  public void getViewCollaborationOpportunitiesModelAndView_withNotValidatedValidationResult_assertModelProperties() {
+  public void getViewCollaborationOpportunitiesModelAndView_whenErrors_assertModelProperties() {
 
     final var projectDetail = ProjectUtil.getProjectDetails();
-    final var collaborationOpportunityViews = List.of(new ForwardWorkPlanCollaborationOpportunityView());
-    final var validationResult = ValidationResult.NOT_VALIDATED;
-
-    when(forwardWorkPlanCollaborationOpportunitiesSummaryService.getSummaryViews(projectDetail)).thenReturn(collaborationOpportunityViews);
-
-    final var modelAndView = forwardWorkPlanCollaborationOpportunityModelService.getViewCollaborationOpportunitiesModelAndView(
-        projectDetail,
-        validationResult
-    );
-
-    getViewCollaborationOpportunitiesModelAndView_assertCommonProperties(
-        projectDetail,
-        collaborationOpportunityViews,
-        modelAndView
-    );
-
-    assertThat(modelAndView.getModelMap()).contains(
-        entry("isValid", false),
-        entry("errorSummary", null)
-    );
-
-    verify(forwardWorkPlanCollaborationOpportunitiesSummaryService, never()).getErrors(collaborationOpportunityViews);
-  }
-
-  @Test
-  public void getViewCollaborationOpportunitiesModelAndView_withValidValidationResult_assertModelProperties() {
-
-    final var projectDetail = ProjectUtil.getProjectDetails();
-    final var collaborationOpportunityViews = List.of(new ForwardWorkPlanCollaborationOpportunityView());
-    final var validationResult = ValidationResult.VALID;
-
-    when(forwardWorkPlanCollaborationOpportunitiesSummaryService.getSummaryViews(projectDetail)).thenReturn(collaborationOpportunityViews);
-
-    final var modelAndView = forwardWorkPlanCollaborationOpportunityModelService.getViewCollaborationOpportunitiesModelAndView(
-        projectDetail,
-        validationResult
-    );
-
-    getViewCollaborationOpportunitiesModelAndView_assertCommonProperties(
-        projectDetail,
-        collaborationOpportunityViews,
-        modelAndView
-    );
-
-    assertThat(modelAndView.getModelMap()).contains(
-        entry("isValid", true),
-        entry("errorSummary", null)
-    );
-
-    verify(forwardWorkPlanCollaborationOpportunitiesSummaryService, never()).getErrors(collaborationOpportunityViews);
-  }
-
-  @Test
-  public void getViewCollaborationOpportunitiesModelAndView_withInvalidValidationResult_assertModelProperties() {
-
-    final var projectDetail = ProjectUtil.getProjectDetails();
-    final var collaborationOpportunityViews = List.of(new ForwardWorkPlanCollaborationOpportunityView());
-    final var validationResult = ValidationResult.INVALID;
-
-    when(forwardWorkPlanCollaborationOpportunitiesSummaryService.getSummaryViews(projectDetail)).thenReturn(collaborationOpportunityViews);
-
-    final var modelAndView = forwardWorkPlanCollaborationOpportunityModelService.getViewCollaborationOpportunitiesModelAndView(
-        projectDetail,
-        validationResult
-    );
-
-    getViewCollaborationOpportunitiesModelAndView_assertCommonProperties(
-        projectDetail,
-        collaborationOpportunityViews,
-        modelAndView
-    );
-
-    assertThat(modelAndView.getModelMap()).contains(
-        entry("isValid", false),
-        entry("errorSummary", Collections.emptyList())
-    );
-
-    verify(forwardWorkPlanCollaborationOpportunitiesSummaryService, times(1)).getErrors(collaborationOpportunityViews);
-  }
-
-  private void getViewCollaborationOpportunitiesModelAndView_assertCommonProperties(
-      ProjectDetail projectDetail,
-      List<ForwardWorkPlanCollaborationOpportunityView> collaborationOpportunityViews,
-      ModelAndView modelAndView
-  ) {
-
     final var projectId = projectDetail.getProject().getId();
 
-    assertThat(modelAndView.getModelMap()).containsOnlyKeys(
-        "pageHeading",
-        "addCollaborationOpportunityFormUrl",
-        "collaborationOpportunityViews",
-        "isValid",
-        "errorSummary",
-        "backToTaskListUrl"
+    final var collaborationOpportunityViews = List.of(new ForwardWorkPlanCollaborationOpportunityView());
+
+    final var validationResult = ValidationResult.NOT_VALIDATED;
+    final var collaborationCompletionForm = new ForwardWorkPlanCollaborationCompletionForm();
+
+    final var resultingModel = forwardWorkPlanCollaborationOpportunityModelService.getViewCollaborationOpportunitiesModelAndView(
+        projectDetail,
+        validationResult,
+        collaborationOpportunityViews,
+        collaborationCompletionForm,
+        ReverseRouter.emptyBindingResult()
     );
 
-    assertThat(modelAndView.getModelMap()).contains(
+    assertThat(resultingModel.getModelMap()).containsExactly(
         entry("pageHeading", ForwardWorkPlanCollaborationOpportunityModelService.PAGE_NAME),
-        entry(
-            "addCollaborationOpportunityFormUrl",
-            ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class).addCollaborationOpportunity(
-                projectId,
-                null
-            ))
-        ),
         entry("collaborationOpportunityViews", collaborationOpportunityViews),
-        entry("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectId))
+        entry("errorSummary", Collections.emptyList()),
+        entry("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectId)),
+        entry("form", collaborationCompletionForm),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
+            projectDetail.getProjectType().getDisplayName()
+        ),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR,
+            projectDetail.getProjectType().getLowercaseDisplayName()
+        )
     );
 
-    verify(breadcrumbService).fromTaskList(projectId, modelAndView, ForwardWorkPlanCollaborationOpportunityModelService.PAGE_NAME);
+    verify(breadcrumbService, times(1)).fromTaskList(
+        projectId,
+        resultingModel,
+        ForwardWorkPlanCollaborationOpportunityModelService.PAGE_NAME
+    );
+
   }
 
   @Test
@@ -209,53 +144,6 @@ public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
   }
 
   @Test
-  public void getSaveCollaborationOpportunitySummaryModelAndView_whenInvalidViews_assertModelProperties() {
-
-    final var projectDetail = ProjectUtil.getProjectDetails();
-    final var collaborationOpportunityViews = List.of(new ForwardWorkPlanCollaborationOpportunityView());
-
-    when(forwardWorkPlanCollaborationOpportunitiesSummaryService.getValidatedSummaryViews(projectDetail)).thenReturn(collaborationOpportunityViews);
-    when(forwardWorkPlanCollaborationOpportunitiesSummaryService.validateViews(collaborationOpportunityViews)).thenReturn(ValidationResult.INVALID);
-
-    final var modelAndView = forwardWorkPlanCollaborationOpportunityModelService.getSaveCollaborationOpportunitySummaryModelAndView(
-        projectDetail
-    );
-
-    getViewCollaborationOpportunitiesModelAndView_assertCommonProperties(
-        projectDetail,
-        collaborationOpportunityViews,
-        modelAndView
-    );
-
-    assertThat(modelAndView.getModelMap()).contains(
-        entry("isValid", false),
-        entry("errorSummary", Collections.emptyList())
-    );
-
-    verify(forwardWorkPlanCollaborationOpportunitiesSummaryService, times(1)).getErrors(collaborationOpportunityViews);
-
-  }
-
-  @Test
-  public void getSaveCollaborationOpportunitySummaryModelAndView_whenValidViews_assertTaskListModelAndView() {
-
-    final var projectDetail = ProjectUtil.getProjectDetails();
-
-    when(forwardWorkPlanCollaborationOpportunitiesSummaryService.validateViews(any())).thenReturn(ValidationResult.VALID);
-
-    final var modelAndView = forwardWorkPlanCollaborationOpportunityModelService.getSaveCollaborationOpportunitySummaryModelAndView(
-        projectDetail
-    );
-
-    final var expectedModelAndViewName = ReverseRouter.redirect(on(TaskListController.class).viewTaskList(
-        projectDetail.getProject().getId(),
-        null
-    )).getViewName();
-
-    assertThat(modelAndView.getViewName()).isEqualTo(expectedModelAndViewName);
-  }
-
-  @Test
   public void getRemoveCollaborationOpportunityConfirmationModelAndView_assertModelProperties() {
 
     final var projectId = 100;
@@ -291,6 +179,197 @@ public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
         projectId,
         modelAndView,
         ForwardWorkPlanCollaborationOpportunityModelService.REMOVE_PAGE_NAME
+    );
+  }
+
+  @Test
+  public void getCollaborationSetupModelAndView_assertModelProperties() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+    final var projectId = projectDetail.getProject().getId();
+
+    final var collaborationSetupForm = new ForwardWorkPlanCollaborationSetupForm();
+
+    final var resultingModel = forwardWorkPlanCollaborationOpportunityModelService.getCollaborationSetupModelAndView(
+        projectDetail,
+        collaborationSetupForm
+    );
+
+    assertThat(resultingModel.getModel()).containsExactly(
+        entry("pageName", ForwardWorkPlanCollaborationOpportunityModelService.PAGE_NAME),
+        entry("form", collaborationSetupForm),
+        entry("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(projectId)),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
+            projectDetail.getProjectType().getDisplayName()
+        ),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR,
+            projectDetail.getProjectType().getLowercaseDisplayName()
+        )
+    );
+
+    verify(breadcrumbService, times(1)).fromTaskList(
+        projectId,
+        resultingModel,
+        ForwardWorkPlanCollaborationOpportunityModelService.PAGE_NAME
+    );
+  }
+
+  @Test
+  public void getErrors_whenNoErrors_thenEmptyList() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+    final var collaborationOpportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(
+        projectDetail
+    );
+    final var isValid = true;
+
+    final var collaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+        collaborationOpportunity,
+        1,
+        List.of(),
+        isValid
+    );
+
+    final var errorList = forwardWorkPlanCollaborationOpportunityModelService.getErrors(List.of(collaborationOpportunityView));
+    assertThat(errorList).isEmpty();
+  }
+
+  @Test
+  public void getErrors_whenErrors_thenAssertExpectedMessages() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+    final var collaborationOpportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(
+        projectDetail
+    );
+
+    final var validCollaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+        collaborationOpportunity,
+        1,
+        List.of(),
+        true
+    );
+
+    final var invalidCollaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+        collaborationOpportunity,
+        2,
+        List.of(),
+        false
+    );
+
+    final var errorList = forwardWorkPlanCollaborationOpportunityModelService.getErrors(
+        List.of(validCollaborationOpportunityView, invalidCollaborationOpportunityView)
+    );
+
+    assertThat(errorList).hasSize(1);
+
+    final var invalidViewDisplayOrder = invalidCollaborationOpportunityView.getDisplayOrder();
+    assertThat(errorList.get(0).getDisplayOrder()).isEqualTo(invalidViewDisplayOrder);
+    assertThat(errorList.get(0).getFieldName()).isEqualTo(String.format(
+        ForwardWorkPlanCollaborationOpportunityModelService.ERROR_FIELD_NAME,
+        invalidViewDisplayOrder
+    ));
+    assertThat(errorList.get(0).getErrorMessage()).isEqualTo(String.format(
+        ForwardWorkPlanCollaborationOpportunityModelService.ERROR_MESSAGE,
+        invalidViewDisplayOrder
+    ));
+
+  }
+
+  @Test
+  public void getErrors_whenMixtureOfValidAndInvalidViews_thenRelevantErrorsDetected() {
+    var views = List.of(
+        ForwardWorkPlanCollaborationOpportunityTestUtil.getView(1, true),
+        ForwardWorkPlanCollaborationOpportunityTestUtil.getView(2, false),
+        ForwardWorkPlanCollaborationOpportunityTestUtil.getView(3, false)
+    );
+    var errors = forwardWorkPlanCollaborationOpportunityModelService.getErrors(views);
+    assertThat(errors).hasSize(2);
+
+    assertThat(errors.get(0).getDisplayOrder()).isEqualTo(2);
+    assertThat(errors.get(0).getFieldName()).isEqualTo(String.format(ForwardWorkPlanCollaborationOpportunityModelService.ERROR_FIELD_NAME, 2));
+    assertThat(errors.get(0).getErrorMessage()).isEqualTo(String.format(ForwardWorkPlanCollaborationOpportunityModelService.ERROR_MESSAGE, 2));
+
+    assertThat(errors.get(1).getDisplayOrder()).isEqualTo(3);
+    assertThat(errors.get(1).getFieldName()).isEqualTo(String.format(ForwardWorkPlanCollaborationOpportunityModelService.ERROR_FIELD_NAME, 3));
+    assertThat(errors.get(1).getErrorMessage()).isEqualTo(String.format(ForwardWorkPlanCollaborationOpportunityModelService.ERROR_MESSAGE, 3));
+  }
+
+  @Test
+  public void getErrors_whenNoCollaborations_thenEmptyListError() {
+    var errors = forwardWorkPlanCollaborationOpportunityModelService.getErrors(Collections.emptyList());
+
+    assertThat(errors).hasSize(1);
+    assertThat(errors.get(0).getDisplayOrder()).isEqualTo(1);
+    assertThat(errors.get(0).getFieldName()).isEqualTo(ForwardWorkPlanCollaborationOpportunityModelService.EMPTY_LIST_ERROR);
+    assertThat(errors.get(0).getErrorMessage()).isEqualTo(ForwardWorkPlanCollaborationOpportunityModelService.EMPTY_LIST_ERROR);
+  }
+
+  @Test
+  public void getSummaryViewErrors_whenOnlyCollaborationViewErrors() {
+
+    final var views = List.of(
+        ForwardWorkPlanCollaborationOpportunityTestUtil.getView(1, false)
+    );
+
+    final var invalidValidationResult = ValidationResult.INVALID;
+
+    final var resultingErrors = forwardWorkPlanCollaborationOpportunityModelService.getSummaryViewErrors(
+        views,
+        invalidValidationResult,
+        null,
+        null
+    );
+
+    assertThat(resultingErrors).extracting(ErrorItem::getErrorMessage).containsExactly(
+        String.format(ForwardWorkPlanCollaborationOpportunityModelService.ERROR_MESSAGE, views.get(0).getDisplayOrder())
+    );
+  }
+
+  @Test
+  public void getSummaryViewErrors_whenOnlyCompletionFormErrors() {
+
+    final var errorItem = new ErrorItem(1, "fieldName", "error message");
+    final var expectedErrorItems = List.of(errorItem);
+
+    when(validationErrorOrderingService.getErrorItemsFromBindingResult(any(), any(), anyInt())).thenReturn(expectedErrorItems);
+
+    final var resultingErrors = forwardWorkPlanCollaborationOpportunityModelService.getSummaryViewErrors(
+        Collections.emptyList(),
+        ValidationResult.NOT_VALIDATED,
+        null,
+        null
+    );
+
+    assertThat(resultingErrors).isEqualTo(expectedErrorItems);
+
+  }
+
+  @Test
+  public void getSummaryViewErrors_whenCollaborationAndCompletionFormErrors() {
+
+    final var formErrorItem = new ErrorItem(1, "fieldName", "error message");
+    final var expectedFormErrorItems = List.of(formErrorItem);
+
+    when(validationErrorOrderingService.getErrorItemsFromBindingResult(any(), any(), anyInt())).thenReturn(expectedFormErrorItems);
+
+    final var views = List.of(
+        ForwardWorkPlanCollaborationOpportunityTestUtil.getView(1, false)
+    );
+
+    final var invalidValidationResult = ValidationResult.INVALID;
+
+    final var resultingErrors = forwardWorkPlanCollaborationOpportunityModelService.getSummaryViewErrors(
+        views,
+        invalidValidationResult,
+        null,
+        null
+    );
+
+    assertThat(resultingErrors).extracting(ErrorItem::getErrorMessage).containsExactly(
+        String.format(ForwardWorkPlanCollaborationOpportunityModelService.ERROR_MESSAGE, views.get(0).getDisplayOrder()),
+        formErrorItem.getErrorMessage()
     );
   }
 

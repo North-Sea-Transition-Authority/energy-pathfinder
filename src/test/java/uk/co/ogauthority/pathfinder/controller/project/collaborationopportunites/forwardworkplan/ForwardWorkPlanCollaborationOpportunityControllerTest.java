@@ -6,8 +6,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
 import java.util.Set;
 import org.junit.Before;
@@ -20,6 +23,8 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
@@ -31,16 +36,23 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationCompletionForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityForm;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationCompletionService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityFileLinkService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityModelService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationRoutingService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationSetupService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(
@@ -64,6 +76,18 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
   @MockBean
   protected ProjectDetailFileService projectDetailFileService;
 
+  @MockBean
+  protected ForwardWorkPlanCollaborationRoutingService forwardWorkPlanCollaborationRoutingService;
+
+  @MockBean
+  protected ForwardWorkPlanCollaborationSetupService forwardWorkPlanCollaborationSetupService;
+
+  @MockBean
+  protected ForwardWorkPlanCollaborationOpportunitiesSummaryService forwardWorkPlanCollaborationOpportunitiesSummaryService;
+
+  @MockBean
+  protected ForwardWorkPlanCollaborationCompletionService forwardWorkPlanCollaborationCompletionService;
+
   private ProjectControllerTesterService projectControllerTesterService;
 
   private final int projectId = 1;
@@ -84,6 +108,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
   public void setup() {
     projectControllerTesterService = new ProjectControllerTesterService(mockMvc, projectOperatorService);
     when(projectService.getLatestDetailOrError(projectId)).thenReturn(projectDetail);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
   }
 
   @Test
@@ -443,6 +468,57 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
         ),
         status().is3xxRedirection()
     );
+  }
+
+  @Test
+  public void saveCollaborationOpportunities_whenAuthenticatedAndValidPage_thenRedirect() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    when(forwardWorkPlanCollaborationOpportunitiesSummaryService.validateViews(any())).thenReturn(ValidationResult.VALID);
+
+    final var bindingResult = new BeanPropertyBindingResult(ForwardWorkPlanCollaborationCompletionForm.class, "form");
+    when(forwardWorkPlanCollaborationCompletionService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class)
+            .saveCollaborationOpportunities(projectId, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        // this is an ok status as the ForwardWorkPlanCollaborationRoutingService determines which route to
+        // return. As this is a mock for the test it returns null and hence an ok status. The call to
+        // the routing service is verified below
+        .andExpect(status().isOk());
+
+    verify(forwardWorkPlanCollaborationCompletionService, times(1)).saveCollaborationCompletionForm(any(), any());
+    verify(forwardWorkPlanCollaborationRoutingService, times(1)).getPostSaveCollaborationsRoute(any(), any());
+  }
+
+  @Test
+  public void saveCollaborationOpportunities_whenAuthenticatedAndInvalidPage_thenStayOnSummary() throws Exception {
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    when(forwardWorkPlanCollaborationOpportunitiesSummaryService.validateViews(any())).thenReturn(ValidationResult.INVALID);
+
+    final var bindingResult = new BeanPropertyBindingResult(ForwardWorkPlanCollaborationCompletionForm.class, "form");
+    when(forwardWorkPlanCollaborationCompletionService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    mockMvc.perform(
+        post(ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class)
+            .saveCollaborationOpportunities(projectId, null, null, null)
+        ))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .params(completeParams))
+        .andExpect(status().isOk());
+
+    verify(forwardWorkPlanCollaborationCompletionService, never()).saveCollaborationCompletionForm(any(), any());
+    verify(forwardWorkPlanCollaborationRoutingService, never()).getPostSaveCollaborationsRoute(any(), any());
   }
 
   private void removeCollaborationOpportunity_setup(int collaborationOpportunityId) {

@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationOpportunityView;
+import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationSetupView;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
@@ -35,6 +36,9 @@ public class ForwardWorkPlanCollaborationOpportunitiesSectionSummaryServiceTest 
   @Mock
   private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
+  @Mock
+  private ForwardWorkPlanCollaborationSetupService forwardWorkPlanCollaborationSetupService;
+
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
 
   private ForwardWorkPlanCollaborationOpportunitiesSectionSummaryService forwardWorkPlanCollaborationOpportunitiesSectionSummaryService;
@@ -43,6 +47,7 @@ public class ForwardWorkPlanCollaborationOpportunitiesSectionSummaryServiceTest 
   public void setup() {
     forwardWorkPlanCollaborationOpportunitiesSectionSummaryService = new ForwardWorkPlanCollaborationOpportunitiesSectionSummaryService(
         forwardWorkPlanCollaborationOpportunitiesSummaryService,
+        forwardWorkPlanCollaborationSetupService,
         differenceService,
         projectSectionSummaryCommonModelService
     );
@@ -98,6 +103,30 @@ public class ForwardWorkPlanCollaborationOpportunitiesSectionSummaryServiceTest 
     assertInteractions(Collections.emptyList(), Collections.emptyList());
   }
 
+  @Test
+  public void getSummary_assertSetupDifferenceModel() {
+
+    final var currentSetupView = new ForwardWorkPlanCollaborationSetupView();
+    currentSetupView.setHasCollaborationsToAdd("Yes");
+
+    when(forwardWorkPlanCollaborationSetupService.getCollaborationSetupView(projectDetail)).thenReturn(currentSetupView);
+
+    final var previousSetupView = new ForwardWorkPlanCollaborationSetupView();
+    previousSetupView.setHasCollaborationsToAdd("No");
+
+    when(forwardWorkPlanCollaborationSetupService.getCollaborationSetupView(
+        projectDetail.getProject(),
+        projectDetail.getVersion() - 1
+    )).thenReturn(previousSetupView);
+
+    forwardWorkPlanCollaborationOpportunitiesSectionSummaryService.getSummary(projectDetail);
+
+    verify(differenceService, times(1)).differentiate(
+        currentSetupView,
+        previousSetupView
+    );
+  }
+
   private void assertModelProperties(ProjectSectionSummary sectionSummary, ProjectDetail projectDetail) {
     assertThat(sectionSummary.getDisplayOrder()).isEqualTo(
         ForwardWorkPlanCollaborationOpportunitiesSectionSummaryService.DISPLAY_ORDER);
@@ -114,7 +143,10 @@ public class ForwardWorkPlanCollaborationOpportunitiesSectionSummaryServiceTest 
         ForwardWorkPlanCollaborationOpportunitiesSectionSummaryService.SECTION_ID
     );
 
-    assertThat(model).containsOnlyKeys("collaborationOpportunityDiffModel");
+    assertThat(model).containsOnlyKeys(
+        "collaborationOpportunityDiffModel",
+        "workPlanCollaborationSetupDiffModel"
+    );
   }
 
   private void assertInteractions(List<ForwardWorkPlanCollaborationOpportunityView> currentCollaborationOpportunityViews,

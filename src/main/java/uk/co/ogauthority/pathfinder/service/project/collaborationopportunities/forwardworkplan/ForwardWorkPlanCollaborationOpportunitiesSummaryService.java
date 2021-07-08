@@ -8,7 +8,6 @@ import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationOpportunityView;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationOpportunityViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
@@ -22,10 +21,6 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryService extends
         ForwardWorkPlanCollaborationOpportunity,
         ForwardWorkPlanCollaborationOpportunityView
     > {
-
-  public static final String ERROR_FIELD_NAME = "collaboration-opportunity-%d";
-  public static final String EMPTY_LIST_ERROR = "You must add at least one collaboration opportunity";
-  public static final String ERROR_MESSAGE = "Collaboration opportunity %d is incomplete";
 
   private final ForwardWorkPlanCollaborationOpportunityService forwardWorkPlanCollaborationOpportunityService;
   private final ForwardWorkPlanCollaborationOpportunityFileLinkService forwardWorkPlanCollaborationOpportunityFileLinkService;
@@ -58,10 +53,6 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryService extends
         forwardWorkPlanCollaborationOpportunityService.getOpportunitiesForDetail(projectDetail),
         ValidationType.FULL
     );
-  }
-
-  public List<ErrorItem> getErrors(List<ForwardWorkPlanCollaborationOpportunityView> views) {
-    return SummaryUtil.getErrors(new ArrayList<>(views), EMPTY_LIST_ERROR, ERROR_FIELD_NAME, ERROR_MESSAGE);
   }
 
   public ValidationResult validateViews(List<ForwardWorkPlanCollaborationOpportunityView> views) {

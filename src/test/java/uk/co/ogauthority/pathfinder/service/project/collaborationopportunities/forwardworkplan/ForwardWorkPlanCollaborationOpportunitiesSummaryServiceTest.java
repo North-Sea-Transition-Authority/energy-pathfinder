@@ -168,67 +168,6 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
   }
 
   @Test
-  public void getErrors_whenNoErrors_thenEmptyList() {
-
-    final var projectDetail = ProjectUtil.getProjectDetails();
-    final var collaborationOpportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(
-        projectDetail
-    );
-    final var isValid = true;
-
-    final var collaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
-        collaborationOpportunity,
-        1,
-        List.of(),
-        isValid
-    );
-
-    final var errorList = forwardWorkPlanCollaborationOpportunitiesSummaryService.getErrors(List.of(collaborationOpportunityView));
-    assertThat(errorList).isEmpty();
-  }
-
-  @Test
-  public void getErrors_whenErrors_thenAssertExpectedMessages() {
-
-    final var projectDetail = ProjectUtil.getProjectDetails();
-    final var collaborationOpportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(
-        projectDetail
-    );
-
-    final var validCollaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
-        collaborationOpportunity,
-        1,
-        List.of(),
-        true
-    );
-
-    final var invalidCollaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
-        collaborationOpportunity,
-        2,
-        List.of(),
-        false
-    );
-
-    final var errorList = forwardWorkPlanCollaborationOpportunitiesSummaryService.getErrors(
-        List.of(validCollaborationOpportunityView, invalidCollaborationOpportunityView)
-    );
-
-    assertThat(errorList).hasSize(1);
-
-    final var invalidViewDisplayOrder = invalidCollaborationOpportunityView.getDisplayOrder();
-    assertThat(errorList.get(0).getDisplayOrder()).isEqualTo(invalidViewDisplayOrder);
-    assertThat(errorList.get(0).getFieldName()).isEqualTo(String.format(
-        ForwardWorkPlanCollaborationOpportunitiesSummaryService.ERROR_FIELD_NAME,
-        invalidViewDisplayOrder
-    ));
-    assertThat(errorList.get(0).getErrorMessage()).isEqualTo(String.format(
-        ForwardWorkPlanCollaborationOpportunitiesSummaryService.ERROR_MESSAGE,
-        invalidViewDisplayOrder
-    ));
-
-  }
-
-  @Test
   public void validateViews_whenNoViews_thenInvalid() {
     final var validationResult = forwardWorkPlanCollaborationOpportunitiesSummaryService.validateViews(List.of());
     assertThat(validationResult).isEqualTo(ValidationResult.INVALID);

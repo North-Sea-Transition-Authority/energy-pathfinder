@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -31,9 +32,14 @@ public class ForwardWorkPlanCollaborationOpportunitiesSectionSummaryService
 
   private final ForwardWorkPlanCollaborationOpportunitiesSummaryService forwardWorkPlanCollaborationOpportunitiesSummaryService;
 
+  private final ForwardWorkPlanCollaborationSetupService forwardWorkPlanCollaborationSetupService;
+
+  private final DifferenceService differenceService;
+
   @Autowired
   public ForwardWorkPlanCollaborationOpportunitiesSectionSummaryService(
       ForwardWorkPlanCollaborationOpportunitiesSummaryService forwardWorkPlanCollaborationOpportunitiesSummaryService,
+      ForwardWorkPlanCollaborationSetupService forwardWorkPlanCollaborationSetupService,
       DifferenceService differenceService,
       ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService
   ) {
@@ -42,6 +48,8 @@ public class ForwardWorkPlanCollaborationOpportunitiesSectionSummaryService
         differenceService
     );
     this.forwardWorkPlanCollaborationOpportunitiesSummaryService = forwardWorkPlanCollaborationOpportunitiesSummaryService;
+    this.forwardWorkPlanCollaborationSetupService = forwardWorkPlanCollaborationSetupService;
+    this.differenceService = differenceService;
   }
 
   @Override
@@ -52,6 +60,9 @@ public class ForwardWorkPlanCollaborationOpportunitiesSectionSummaryService
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
     final var summaryModel = super.getSummaryModel(detail, ForwardWorkPlanCollaborationOpportunityView.class);
+
+    summaryModel.put("workPlanCollaborationSetupDiffModel", getCollaborationSetupDifferenceModel(detail));
+
     return super.getProjectSectionSummary(summaryModel);
   }
 
@@ -101,5 +112,23 @@ public class ForwardWorkPlanCollaborationOpportunitiesSectionSummaryService
   @Override
   protected List<UploadedFileView> getUploadedFileViews(ForwardWorkPlanCollaborationOpportunityView view) {
     return view.getUploadedFileViews();
+  }
+
+  private Map<String, Object> getCollaborationSetupDifferenceModel(ProjectDetail projectDetail) {
+
+    final var currentCollaborationSetupView = forwardWorkPlanCollaborationSetupService.getCollaborationSetupView(
+        projectDetail
+    );
+
+    final var previousCollaborationSetupView = forwardWorkPlanCollaborationSetupService.getCollaborationSetupView(
+        projectDetail.getProject(),
+        projectDetail.getVersion() - 1
+    );
+
+    return differenceService.differentiate(
+        currentCollaborationSetupView,
+        previousCollaborationSetupView
+    );
+
   }
 }

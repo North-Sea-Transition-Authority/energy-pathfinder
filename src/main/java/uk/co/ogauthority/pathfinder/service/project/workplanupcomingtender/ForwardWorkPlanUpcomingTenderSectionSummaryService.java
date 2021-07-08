@@ -104,7 +104,7 @@ public class ForwardWorkPlanUpcomingTenderSectionSummaryService implements Proje
 
     final var previousWorkPlanTenderSetupView = forwardWorkPlanTenderSetupService.getTenderSetupView(
         projectDetail.getProject(),
-        projectDetail.getVersion()
+        projectDetail.getVersion() - 1
     );
 
     return differenceService.differentiate(

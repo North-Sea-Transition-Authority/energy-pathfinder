@@ -221,16 +221,17 @@ public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionS
     if (forwardWorkPlanTenderSetup.getHasTendersToAdd() == null) {
       return false;
     } else if (BooleanUtils.isTrue(forwardWorkPlanTenderSetup.getHasTendersToAdd())) {
-      return hasNoOtherTendersToAdd(forwardWorkPlanTenderSetup) && areAllAddedTendersValid(detail);
+      return forwardWorkPlanTenderSetup.getHasOtherTendersToAdd() != null
+          && !hasOtherTendersToAdd(forwardWorkPlanTenderSetup)
+          && areAllAddedTendersValid(detail);
     } else {
       // indicated that no tenders need to be added
       return true;
     }
   }
 
-  private boolean hasNoOtherTendersToAdd(ForwardWorkPlanTenderSetup forwardWorkPlanTenderSetup) {
-    final var hasOtherTendersToAdd = forwardWorkPlanTenderSetup.getHasOtherTendersToAdd();
-    return hasOtherTendersToAdd != null && !BooleanUtils.isTrue(forwardWorkPlanTenderSetup.getHasOtherTendersToAdd());
+  private boolean hasOtherTendersToAdd(ForwardWorkPlanTenderSetup forwardWorkPlanTenderSetup) {
+    return BooleanUtils.isTrue(forwardWorkPlanTenderSetup.getHasOtherTendersToAdd());
   }
 
   private boolean areAllAddedTendersValid(ProjectDetail projectDetail) {
