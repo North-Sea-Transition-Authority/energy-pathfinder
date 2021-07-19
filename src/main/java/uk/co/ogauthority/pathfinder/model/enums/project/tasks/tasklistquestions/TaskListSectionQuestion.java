@@ -73,18 +73,17 @@ public enum TaskListSectionQuestion {
       TaskListSectionAnswer.INTEGRATED_RIGS_YES,
       TaskListSectionAnswer.INTEGRATED_RIGS_NO,
       true
+  ),
+  SUBSEA_INFRASTRUCTURE(
+      ProjectTask.SUBSEA_INFRASTRUCTURE,
+      "Is subsea infrastructure being decommissioned on this project?",
+      "Subsea infrastructure to be decommissioned",
+      "",
+      "form.subseaInfrastructureIncluded",
+      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
+      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_NO,
+      true
   );
-  // Subsea infrastructure disabled: PAT-495
-  // SUBSEA_INFRASTRUCTURE(
-  //     ProjectTask.SUBSEA_INFRASTRUCTURE,
-  //     "Is subsea infrastructure being decommissioned on this project?",
-  //     "Subsea infrastructure to be decommissioned",
-  //     "",
-  //     "form.subseaInfrastructureIncluded",
-  //     TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
-  //     TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_NO,
-  //     true
-  // );
   // Pipelines disabled: PAT-457
   // PIPELINES(
   //     ProjectTask.PIPELINES,

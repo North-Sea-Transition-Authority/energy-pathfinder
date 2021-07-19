@@ -88,9 +88,7 @@ public class ProjectSetupSectionSummaryServiceTest {
 
     assertThat(summaryItems.size()).isEqualTo(TaskListSectionQuestion.getNonDecommissioningRelatedValues().size());
 
-    summaryItems.forEach(si -> {
-      assertThat(si.getAnswerValue()).isNull();
-    });
+    summaryItems.forEach(si -> assertThat(si.getAnswerValue()).isNull());
   }
 
   @Test
@@ -114,9 +112,7 @@ public class ProjectSetupSectionSummaryServiceTest {
 
     assertThat(summaryItems.size()).isEqualTo(TaskListSectionQuestion.getAllValues().size());
 
-    summaryItems.forEach(si -> {
-      assertThat(si.getAnswerValue()).isNull();
-    });
+    summaryItems.forEach(si -> assertThat(si.getAnswerValue()).isNull());
   }
 
   @Test
@@ -133,8 +129,7 @@ public class ProjectSetupSectionSummaryServiceTest {
     assertThat(summaryItems.get(3).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(3).getAnswerValue());
     assertThat(summaryItems.get(4).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(4).getAnswerValue());
     assertThat(summaryItems.get(5).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(5).getAnswerValue());
-    // Subsea infrastructure disabled: PAT-495
-    // assertThat(summaryItems.get(6).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(6).getAnswerValue());
+    assertThat(summaryItems.get(6).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(6).getAnswerValue());
     // Pipelines disabled: PAT-457
     // assertThat(summaryItems.get(7).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(7).getAnswerValue());
   }

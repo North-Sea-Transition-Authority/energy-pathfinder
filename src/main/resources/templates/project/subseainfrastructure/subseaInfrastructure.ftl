@@ -5,11 +5,16 @@
     <@fdsSearchSelector.searchSelectorRest
       path="form.structure"
       selectorMinInputLength=1
-      labelText="What host structure does this subsea infrastructure relate to?"
+      labelText="What surface infrastructure does this subsea item tie back to?"
+      hintText="For stabilisation features such as mattresses, select the surface infrastructure that this feature stabilises"
       restUrl=springUrl(facilitiesRestUrl)
       preselectedItems=preSelectedFacilityMap!{}
     />
-    <@fdsTextarea.textarea path="form.description" labelText="Provide a description of the structure"/>
+    <@fdsTextarea.textarea
+      path="form.description"
+      labelText="Provide a brief description of the subsea item"
+      hintText="For example, riser base or subsea isolation valve"
+    />
     <@fdsSelect.select path="form.status" labelText="Structure status" options=infrastructureStatuses/>
     <@fdsRadio.radioGroup
       labelText="Type of subsea infrastructure?"
