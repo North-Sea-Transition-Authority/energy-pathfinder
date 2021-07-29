@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,8 +18,8 @@ import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.NoUpdateNotificationEmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.ProjectUpdateEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.service.email.notify.CommonEmailMergeField;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
-import uk.co.ogauthority.pathfinder.testutil.EmailPropertyTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -92,13 +93,9 @@ public class RegulatorEmailServiceTest {
     assertThat(regulatorEmailService.getRegulatorSharedMailboxAddress()).isEqualTo(REGULATOR_SHARED_EMAIL);
   }
 
-  private Map<String, String> getCommonEmailProperties() {
-    var commonEmailProperties = EmailPropertyTestUtil.getDefaultEmailPersonalisation(
-        EmailProperties.DEFAULT_RECIPIENT_IDENTIFIER,
-        EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
-    );
-    commonEmailProperties.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
-    commonEmailProperties.put("SERVICE_LOGIN_URL", SERVICE_LOGIN_URL);
+  private Map<String, Object> getCommonEmailProperties() {
+    final var commonEmailProperties = new HashMap<String, Object>();
+    commonEmailProperties.put(CommonEmailMergeField.SERVICE_LOGIN_URL, SERVICE_LOGIN_URL);
     commonEmailProperties.put("PROJECT_NAME", PROJECT_NAME);
     return commonEmailProperties;
   }

@@ -24,6 +24,7 @@ import uk.co.ogauthority.pathfinder.model.enums.NewsletterSendingResult;
 import uk.co.ogauthority.pathfinder.repository.newsletters.MonthlyNewsletterRepository;
 import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
+import uk.co.ogauthority.pathfinder.service.email.notify.DefaultEmailPersonalisationService;
 import uk.co.ogauthority.pathfinder.service.subscription.SubscriberAccessor;
 import uk.co.ogauthority.pathfinder.testutil.SubscriptionTestUtil;
 
@@ -45,6 +46,9 @@ public class NewsletterServiceTest {
   @Mock
   private NewsletterProjectService newsletterProjectService;
 
+  @Mock
+  private DefaultEmailPersonalisationService defaultEmailPersonalisationService;
+
   @Captor
   private ArgumentCaptor<MonthlyNewsletter> monthlyNewsletterArgumentCaptor;
 
@@ -59,7 +63,8 @@ public class NewsletterServiceTest {
         emailLinkService,
         emailService,
         monthlyNewsletterRepository,
-        newsletterProjectService
+        newsletterProjectService,
+        defaultEmailPersonalisationService
     );
 
     when(emailLinkService.getUnsubscribeUrl(any())).thenCallRealMethod();
@@ -103,11 +108,19 @@ public class NewsletterServiceTest {
     when(subscriberAccessor.getAllSubscribers()).thenReturn(Collections.singletonList(SUBSCRIBER));
     when(newsletterProjectService.getProjectsUpdatedInTheLastMonth()).thenReturn(Collections.emptyList());
 
+    final var serviceName = "service name";
+    when(defaultEmailPersonalisationService.getServiceName()).thenReturn(serviceName);
+
+    final var customerMnemonic = "customer mnemonic";
+    when(defaultEmailPersonalisationService.getCustomerMnemonic()).thenReturn(customerMnemonic);
+
     newsletterService.sendNewsletterToSubscribers();
 
     final var expectedEmailProperties = new NoProjectsUpdatedNewsletterEmailProperties(
         SUBSCRIBER.getForename(),
-        emailLinkService.getUnsubscribeUrl(SUBSCRIBER.getUuid().toString())
+        emailLinkService.getUnsubscribeUrl(SUBSCRIBER.getUuid().toString()),
+        serviceName,
+        customerMnemonic
     );
 
     verify(emailService, times(1)).sendEmail(expectedEmailProperties, SUBSCRIBER.getEmailAddress());
@@ -121,12 +134,20 @@ public class NewsletterServiceTest {
     when(subscriberAccessor.getAllSubscribers()).thenReturn(Collections.singletonList(SUBSCRIBER));
     when(newsletterProjectService.getProjectsUpdatedInTheLastMonth()).thenReturn(projectsUpdate);
 
+    final var serviceName = "service name";
+    when(defaultEmailPersonalisationService.getServiceName()).thenReturn(serviceName);
+
+    final var customerMnemonic = "customer mnemonic";
+    when(defaultEmailPersonalisationService.getCustomerMnemonic()).thenReturn(customerMnemonic);
+
     newsletterService.sendNewsletterToSubscribers();
 
     final var expectedEmailProperties = new ProjectsUpdatedNewsletterEmailProperties(
         SUBSCRIBER.getForename(),
         emailLinkService.getUnsubscribeUrl(SUBSCRIBER.getUuid().toString()),
-        projectsUpdate
+        projectsUpdate,
+        serviceName,
+        customerMnemonic
     );
 
     verify(emailService, times(1)).sendEmail(expectedEmailProperties, SUBSCRIBER.getEmailAddress());

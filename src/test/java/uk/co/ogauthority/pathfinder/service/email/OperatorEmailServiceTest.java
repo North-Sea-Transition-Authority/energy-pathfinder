@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
@@ -18,14 +19,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.service.team.PortalTeamAccessor;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.OutgoingOperatorProjectTransferEmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.IncomingOperatorProjectTransferEmailProperties;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.OutgoingOperatorProjectTransferEmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.ProjectUpdateRequestedEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
+import uk.co.ogauthority.pathfinder.service.email.notify.CommonEmailMergeField;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
-import uk.co.ogauthority.pathfinder.testutil.EmailPropertyTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
@@ -96,14 +97,11 @@ public class OperatorEmailServiceTest {
       verify(emailService, times(1)).sendEmail(emailCaptor.capture(), eq(person.getEmailAddress()));
       ProjectUpdateRequestedEmailProperties emailProperties = (ProjectUpdateRequestedEmailProperties) emailCaptor.getValue();
 
-      var expectedEmailProperties = EmailPropertyTestUtil.getDefaultEmailPersonalisation(
-          person.getForename(),
-          EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
-      );
+      final var expectedEmailProperties = new HashMap<String, Object>();
+      expectedEmailProperties.put(CommonEmailMergeField.RECIPIENT_IDENTIFIER, person.getForename());
       expectedEmailProperties.put("PROJECT_NAME", projectName);
       expectedEmailProperties.put("UPDATE_REASON", updateReason);
       expectedEmailProperties.put("DEADLINE_TEXT", String.format("An update to this project is due by %s.", DateUtil.formatDate(deadlineDate)));
-      expectedEmailProperties.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
       expectedEmailProperties.put("PROJECT_URL", projectUrl);
       assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(expectedEmailProperties);
     });
@@ -120,14 +118,11 @@ public class OperatorEmailServiceTest {
       verify(emailService, times(1)).sendEmail(emailCaptor.capture(), eq(person.getEmailAddress()));
       ProjectUpdateRequestedEmailProperties emailProperties = (ProjectUpdateRequestedEmailProperties) emailCaptor.getValue();
 
-      var expectedEmailProperties = EmailPropertyTestUtil.getDefaultEmailPersonalisation(
-          person.getForename(),
-          EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
-      );
+      final var expectedEmailProperties = new HashMap<String, Object>();
+      expectedEmailProperties.put(CommonEmailMergeField.RECIPIENT_IDENTIFIER, person.getForename());
       expectedEmailProperties.put("PROJECT_NAME", projectName);
       expectedEmailProperties.put("UPDATE_REASON", updateReason);
       expectedEmailProperties.put("DEADLINE_TEXT", "");
-      expectedEmailProperties.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
       expectedEmailProperties.put("PROJECT_URL", projectUrl);
 
       assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(expectedEmailProperties);
@@ -171,10 +166,8 @@ public class OperatorEmailServiceTest {
       verify(emailService, times(1)).sendEmail(emailCaptor.capture(), eq(person.getEmailAddress()));
       OutgoingOperatorProjectTransferEmailProperties emailProperties = (OutgoingOperatorProjectTransferEmailProperties) emailCaptor.getValue();
 
-      var expectedEmailProperties = EmailPropertyTestUtil.getDefaultEmailPersonalisation(
-          person.getForename(),
-          EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
-      );
+      final var expectedEmailProperties = new HashMap<String, Object>();
+      expectedEmailProperties.put(CommonEmailMergeField.RECIPIENT_IDENTIFIER, person.getForename());
       expectedEmailProperties.put("PROJECT_NAME", projectName);
       expectedEmailProperties.put("TRANSFER_REASON", transferReason);
       expectedEmailProperties.put("NEW_OPERATOR_NAME", toOrganisationGroup.getName());
@@ -187,14 +180,11 @@ public class OperatorEmailServiceTest {
       verify(emailService, times(1)).sendEmail(emailCaptor.capture(), eq(person.getEmailAddress()));
       IncomingOperatorProjectTransferEmailProperties emailProperties = (IncomingOperatorProjectTransferEmailProperties) emailCaptor.getValue();
 
-      var expectedEmailProperties = EmailPropertyTestUtil.getDefaultEmailPersonalisation(
-          person.getForename(),
-          EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
-      );
+      final var expectedEmailProperties = new HashMap<String, Object>();
+      expectedEmailProperties.put(CommonEmailMergeField.RECIPIENT_IDENTIFIER, person.getForename());
       expectedEmailProperties.put("PROJECT_NAME", projectName);
       expectedEmailProperties.put("TRANSFER_REASON", transferReason);
       expectedEmailProperties.put("PREVIOUS_OPERATOR_NAME", fromOrganisationGroup.getName());
-      expectedEmailProperties.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
       expectedEmailProperties.put("PROJECT_URL", projectUrl);
 
       assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(expectedEmailProperties);

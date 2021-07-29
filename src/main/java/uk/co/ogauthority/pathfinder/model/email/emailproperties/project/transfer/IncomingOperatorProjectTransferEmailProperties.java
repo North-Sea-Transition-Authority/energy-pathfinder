@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfe
 
 import java.util.Map;
 import java.util.Objects;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplate;
 
 public class IncomingOperatorProjectTransferEmailProperties extends ProjectTransferEmailProperties {
@@ -24,7 +23,6 @@ public class IncomingOperatorProjectTransferEmailProperties extends ProjectTrans
   public Map<String, Object> getEmailPersonalisation() {
     var emailPersonalisation = super.getEmailPersonalisation();
     emailPersonalisation.put("PREVIOUS_OPERATOR_NAME", previousOperatorName);
-    emailPersonalisation.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
     emailPersonalisation.put("PROJECT_URL", projectUrl);
     return emailPersonalisation;
   }

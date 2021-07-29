@@ -97,10 +97,6 @@ public class NewsletterProjectServiceTest {
   }
 
   private String getReportableProjectStringInExpectedFormat(ReportableProject reportableProject) {
-    return String.format(
-        "%s - %s",
-        reportableProject.getOperatorName(),
-        reportableProject.getProjectTitle()
-    );
+    return String.format("%s - %s", reportableProject.getOperatorName(), reportableProject.getProjectTitle());
   }
 }

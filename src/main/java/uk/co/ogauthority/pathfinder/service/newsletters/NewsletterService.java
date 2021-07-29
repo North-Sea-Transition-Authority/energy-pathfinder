@@ -16,6 +16,7 @@ import uk.co.ogauthority.pathfinder.model.enums.NewsletterSendingResult;
 import uk.co.ogauthority.pathfinder.repository.newsletters.MonthlyNewsletterRepository;
 import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
+import uk.co.ogauthority.pathfinder.service.email.notify.DefaultEmailPersonalisationService;
 import uk.co.ogauthority.pathfinder.service.subscription.SubscriberAccessor;
 
 @Service
@@ -28,18 +29,21 @@ public class NewsletterService {
   private final EmailService emailService;
   private final MonthlyNewsletterRepository monthlyNewsletterRepository;
   private final NewsletterProjectService newsletterProjectService;
+  private final DefaultEmailPersonalisationService defaultEmailPersonalisationService;
 
   @Autowired
   public NewsletterService(SubscriberAccessor subscriberAccessor,
                            EmailLinkService emailLinkService,
                            EmailService emailService,
                            MonthlyNewsletterRepository monthlyNewsletterRepository,
-                           NewsletterProjectService newsletterProjectService) {
+                           NewsletterProjectService newsletterProjectService,
+                           DefaultEmailPersonalisationService defaultEmailPersonalisationService) {
     this.subscriberAccessor = subscriberAccessor;
     this.emailLinkService = emailLinkService;
     this.emailService = emailService;
     this.monthlyNewsletterRepository = monthlyNewsletterRepository;
     this.newsletterProjectService = newsletterProjectService;
+    this.defaultEmailPersonalisationService = defaultEmailPersonalisationService;
   }
 
   @Transactional
@@ -71,16 +75,24 @@ public class NewsletterService {
 
   private ProjectNewsletterEmailProperties getEmailProperties(Subscriber subscriber,
                                                               List<String> projectsUpdated) {
+
+    final var serviceName = defaultEmailPersonalisationService.getServiceName();
+    final var customerMnemonic = defaultEmailPersonalisationService.getCustomerMnemonic();
+
     if (projectsUpdated.isEmpty()) {
       return new NoProjectsUpdatedNewsletterEmailProperties(
           subscriber.getForename(),
-          emailLinkService.getUnsubscribeUrl(subscriber.getUuid().toString())
+          emailLinkService.getUnsubscribeUrl(subscriber.getUuid().toString()),
+          serviceName,
+          customerMnemonic
       );
     } else {
       return new ProjectsUpdatedNewsletterEmailProperties(
           subscriber.getForename(),
           emailLinkService.getUnsubscribeUrl(subscriber.getUuid().toString()),
-          projectsUpdated
+          projectsUpdated,
+          serviceName,
+          customerMnemonic
       );
     }
   }

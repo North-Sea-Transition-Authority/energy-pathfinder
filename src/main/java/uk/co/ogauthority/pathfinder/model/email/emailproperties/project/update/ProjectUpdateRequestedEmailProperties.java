@@ -32,7 +32,6 @@ public class ProjectUpdateRequestedEmailProperties extends EmailProperties {
     emailPersonalisation.put("DEADLINE_TEXT",
         deadlineDate.equals("") ? "" : String.format("An update to this project is due by %s.", deadlineDate)
     );
-    emailPersonalisation.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
     emailPersonalisation.put("PROJECT_URL", projectUrl);
     return emailPersonalisation;
   }

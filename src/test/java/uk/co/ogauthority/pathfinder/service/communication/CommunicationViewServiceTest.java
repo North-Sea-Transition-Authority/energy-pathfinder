@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.communication.Communication;
 import uk.co.ogauthority.pathfinder.model.entity.communication.OrganisationGroupCommunication;
 import uk.co.ogauthority.pathfinder.model.enums.communication.CommunicationStatus;
@@ -164,9 +163,9 @@ public class CommunicationViewServiceTest {
     assertThat(emailView.getSenderName()).isEqualTo(SERVICE_NAME);
     assertThat(emailView.getSubject()).isEqualTo(communication.getEmailSubject());
     assertThat(emailView.getBody()).isEqualTo(communication.getEmailBody());
-    assertThat(emailView.getGreetingText()).isEqualTo(EmailProperties.DEFAULT_GREETING_TEXT);
-    assertThat(emailView.getSignOffText()).isEqualTo(EmailProperties.DEFAULT_SIGN_OFF_TEXT);
-    assertThat(emailView.getSignOffIdentifier()).isEqualTo(EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER);
+    assertThat(emailView.getGreetingText()).isEqualTo(communication.getGreetingText());
+    assertThat(emailView.getSignOffText()).isEqualTo(communication.getSignOffText());
+    assertThat(emailView.getSignOffIdentifier()).isEqualTo(communication.getSignOffIdentifier());
     assertThat(communicationView.getCommunicationId()).isEqualTo(communication.getId());
     assertThat(communicationView.getRecipientType()).isEqualTo(communication.getRecipientType().getDisplayName().toUpperCase());
   }

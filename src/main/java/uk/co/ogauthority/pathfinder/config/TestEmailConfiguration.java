@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import uk.co.ogauthority.pathfinder.service.email.notify.DefaultEmailPersonalisationService;
 import uk.co.ogauthority.pathfinder.service.email.notify.NotifyTemplateService;
 import uk.co.ogauthority.pathfinder.service.email.notify.TestEmailServiceImpl;
 import uk.gov.service.notify.NotificationClient;
@@ -25,27 +26,25 @@ public class TestEmailConfiguration {
    * @param notificationClient A GOV.UK notification client
    * @param emailValidator Email Validator
    * @param testRecipientList List of test recipients to send the emails to
-   * @param serviceName the name of the service the email is being sent from
+   * @param defaultEmailPersonalisationService An instance of DefaultEmailPersonalisationService
    * @return an instantiated TestNotifyServiceImpl
    */
   @Bean
   @ConditionalOnProperty(name = "email.mode", havingValue = "test")
-  public TestEmailServiceImpl testNotifyService(NotifyTemplateService notifyTemplateService,
-                                                NotificationClient notificationClient,
-                                                EmailValidator emailValidator,
-                                                // NB: the ":" means the default value will be an empty string when not specified
-                                                @Value("#{'${email.testRecipientList:}'.split(';')}") List<String> testRecipientList,
-                                                @Value("${service.name}") String serviceName,
-                                                @Value("${service.customer.mnemonic}") String customerMnemonic,
-                                                @Value("${service.customer.supply-chain-interface-url}") String supplyChainInterfaceUrl) {
+  public TestEmailServiceImpl testNotifyService(
+      NotifyTemplateService notifyTemplateService,
+      NotificationClient notificationClient,
+      EmailValidator emailValidator,
+      // NB: the ":" means the default value will be an empty string when not specified
+      @Value("#{'${email.testRecipientList:}'.split(';')}") List<String> testRecipientList,
+      DefaultEmailPersonalisationService defaultEmailPersonalisationService
+  ) {
     return new TestEmailServiceImpl(
         notifyTemplateService,
         notificationClient,
         emailValidator,
         testRecipientList,
-        serviceName,
-        customerMnemonic,
-        supplyChainInterfaceUrl
+        defaultEmailPersonalisationService
     );
   }
 }

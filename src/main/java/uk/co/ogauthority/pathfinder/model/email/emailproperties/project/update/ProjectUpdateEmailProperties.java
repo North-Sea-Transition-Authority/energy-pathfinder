@@ -27,7 +27,6 @@ public class ProjectUpdateEmailProperties extends EmailProperties {
     var emailPersonalisation = super.getEmailPersonalisation();
     emailPersonalisation.put("PROJECT_NAME", projectName);
     emailPersonalisation.put("SERVICE_LOGIN_URL", serviceLoginUrl);
-    emailPersonalisation.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
     return emailPersonalisation;
   }
 

@@ -36,10 +36,6 @@ public class NewsletterProjectService {
   }
 
   private String convertReportableProjectToEmailRepresentation(ReportableProject reportableProject) {
-    return String.format(
-        "%s - %s",
-        reportableProject.getOperatorName(),
-        reportableProject.getProjectTitle()
-    );
+    return String.format("%s - %s", reportableProject.getOperatorName(), reportableProject.getProjectTitle());
   }
 }

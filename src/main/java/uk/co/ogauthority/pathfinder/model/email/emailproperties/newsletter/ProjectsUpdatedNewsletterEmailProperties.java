@@ -3,26 +3,27 @@ package uk.co.ogauthority.pathfinder.model.email.emailproperties.newsletter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplate;
 
 public class ProjectsUpdatedNewsletterEmailProperties extends ProjectNewsletterEmailProperties {
-
-  private static final String INTRODUCTION_TEXT = String.format(
-      "The following %s projects have been updated in the last month:",
-      EmailProperties.SERVICE_NAME
-  );
 
   private final List<String> projectsUpdated;
 
   public ProjectsUpdatedNewsletterEmailProperties(String recipientIdentifier,
                                                   String unsubscribeUrl,
-                                                  List<String> projectsUpdated) {
+                                                  List<String> projectsUpdated,
+                                                  String serviceName,
+                                                  String customerMnemonic) {
     super(
         NotifyTemplate.NEWSLETTER_WITH_PROJECTS_UPDATED,
         recipientIdentifier,
         unsubscribeUrl,
-        INTRODUCTION_TEXT
+        String.format(
+            "The following %s projects have been updated in the last month:",
+            serviceName
+        ),
+        serviceName,
+        customerMnemonic
     );
     this.projectsUpdated = projectsUpdated;
   }

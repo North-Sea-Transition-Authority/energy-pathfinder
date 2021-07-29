@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.testutil;
 
 import java.time.Instant;
 import java.util.List;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.communication.Communication;
 import uk.co.ogauthority.pathfinder.model.entity.communication.CommunicationRecipient;
 import uk.co.ogauthority.pathfinder.model.enums.communication.CommunicationStatus;
@@ -12,6 +11,7 @@ import uk.co.ogauthority.pathfinder.model.view.communication.CommunicationView;
 import uk.co.ogauthority.pathfinder.model.view.communication.EmailView;
 import uk.co.ogauthority.pathfinder.model.view.communication.SentCommunicationView;
 import uk.co.ogauthority.pathfinder.service.communication.CommunicationJourneyStatus;
+import uk.co.ogauthority.pathfinder.service.email.notify.DefaultEmailPersonalisationService;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class CommunicationTestUtil {
@@ -20,9 +20,9 @@ public class CommunicationTestUtil {
   private static final RecipientType RECIPIENT_TYPE = RecipientType.OPERATORS;
   private static final String EMAIL_SUBJECT = "Email subject";
   private static final String EMAIL_BODY = "Email body";
-  private static final String GREETING_TEXT = EmailProperties.DEFAULT_GREETING_TEXT;
-  private static final String SIGN_OFF_TEXT = EmailProperties.DEFAULT_SIGN_OFF_TEXT;
-  private static final String SIGN_OFF_IDENTIFIER = EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER;
+  private static final String GREETING_TEXT = DefaultEmailPersonalisationService.DEFAULT_GREETING_TEXT;
+  private static final String SIGN_OFF_TEXT = DefaultEmailPersonalisationService.DEFAULT_SIGN_OFF_TEXT;
+  private static final String SIGN_OFF_IDENTIFIER = "sign off identifier";
   private static final String SENDER_NAME = "Sender";
   private static final List<String> RECIPIENT_LIST = List.of("recipient@example.com");
   private static final String SUBMITTED_BY_USERNAME = "Someone";

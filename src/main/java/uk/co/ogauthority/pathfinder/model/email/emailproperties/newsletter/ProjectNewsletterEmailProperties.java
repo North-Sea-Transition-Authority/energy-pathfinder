@@ -10,23 +10,22 @@ public abstract class ProjectNewsletterEmailProperties extends EmailProperties {
   private static final String DEFAULT_UNSUBSCRIBE_TEXT =
       "You can unsubscribe from these emails at any time using the following link.";
 
-  private static final String DEFAULT_SUPPLY_CHAIN_TEXT = String.format(
-      "For details about all %s projects, visit the %s %s supply chain interface using the following link.",
-      EmailProperties.SERVICE_NAME,
-      EmailProperties.CUSTOMER_MNEMONIC,
-      EmailProperties.SERVICE_NAME
-  );
-
   private final String unsubscribeUrl;
   private final String introductionText;
+  private final String serviceName;
+  private final String customerMnemonic;
 
   public ProjectNewsletterEmailProperties(NotifyTemplate notifyTemplate,
                                           String recipientIdentifier,
                                           String unsubscribeUrl,
-                                          String introductionText) {
+                                          String introductionText,
+                                          String serviceName,
+                                          String customerMnemonic) {
     super(notifyTemplate, recipientIdentifier);
     this.unsubscribeUrl = unsubscribeUrl;
     this.introductionText = introductionText;
+    this.serviceName = serviceName;
+    this.customerMnemonic = customerMnemonic;
   }
 
   @Override
@@ -35,8 +34,17 @@ public abstract class ProjectNewsletterEmailProperties extends EmailProperties {
     emailPersonalisation.put("UNSUBSCRIBE_URL", unsubscribeUrl);
     emailPersonalisation.put("INTRODUCTION_TEXT", introductionText);
     emailPersonalisation.put("UNSUBSCRIBE_TEXT", DEFAULT_UNSUBSCRIBE_TEXT);
-    emailPersonalisation.put("SUPPLY_CHAIN_TEXT", DEFAULT_SUPPLY_CHAIN_TEXT);
+    emailPersonalisation.put("SUPPLY_CHAIN_TEXT", getDefaultSupplyChainText());
     return emailPersonalisation;
+  }
+
+  private String getDefaultSupplyChainText() {
+    return String.format(
+        "For details about all %s projects, visit the %s %s supply chain interface using the following link.",
+        serviceName,
+        customerMnemonic,
+        serviceName
+    );
   }
 
   @Override
@@ -50,11 +58,18 @@ public abstract class ProjectNewsletterEmailProperties extends EmailProperties {
 
     ProjectNewsletterEmailProperties that = (ProjectNewsletterEmailProperties) o;
     return Objects.equals(unsubscribeUrl, that.unsubscribeUrl)
-        && Objects.equals(introductionText, that.introductionText);
+        && Objects.equals(introductionText, that.introductionText)
+        && Objects.equals(serviceName, that.serviceName)
+        && Objects.equals(customerMnemonic, that.customerMnemonic);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(unsubscribeUrl, introductionText);
+    return Objects.hash(
+        unsubscribeUrl,
+        introductionText,
+        serviceName,
+        customerMnemonic
+    );
   }
 }

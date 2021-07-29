@@ -10,13 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.communication.Communication;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.communication.CommunicationStatus;
 import uk.co.ogauthority.pathfinder.model.enums.communication.RecipientType;
 import uk.co.ogauthority.pathfinder.model.form.communication.CommunicationForm;
 import uk.co.ogauthority.pathfinder.repository.communication.CommunicationRepository;
+import uk.co.ogauthority.pathfinder.service.email.notify.DefaultEmailPersonalisationService;
 import uk.co.ogauthority.pathfinder.service.scheduler.SchedulerService;
 import uk.co.ogauthority.pathfinder.service.scheduler.communication.CommunicationJob;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -28,16 +28,19 @@ public class CommunicationService {
   private final CommunicationRepository communicationRepository;
   private final OrganisationGroupCommunicationService organisationGroupCommunicationService;
   private final SchedulerService schedulerService;
+  private final DefaultEmailPersonalisationService defaultEmailPersonalisationService;
 
   @Autowired
   public CommunicationService(ValidationService validationService,
                               CommunicationRepository communicationRepository,
                               OrganisationGroupCommunicationService organisationGroupCommunicationService,
-                              SchedulerService schedulerService) {
+                              SchedulerService schedulerService,
+                              DefaultEmailPersonalisationService defaultEmailPersonalisationService) {
     this.validationService = validationService;
     this.communicationRepository = communicationRepository;
     this.organisationGroupCommunicationService = organisationGroupCommunicationService;
     this.schedulerService = schedulerService;
+    this.defaultEmailPersonalisationService = defaultEmailPersonalisationService;
   }
 
   protected List<Communication> getCommunicationsWithStatuses(List<CommunicationStatus> communicationStatuses) {
@@ -70,9 +73,9 @@ public class CommunicationService {
     communicationEntity.setEmailBody(communicationForm.getBody());
     communicationEntity.setStatus(status);
     communicationEntity.setLatestCommunicationJourneyStatus(communicationJourneyStatus);
-    communicationEntity.setGreetingText(EmailProperties.DEFAULT_GREETING_TEXT);
-    communicationEntity.setSignOffText(EmailProperties.DEFAULT_SIGN_OFF_TEXT);
-    communicationEntity.setSignOffIdentifier(EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER);
+    communicationEntity.setGreetingText(DefaultEmailPersonalisationService.DEFAULT_GREETING_TEXT);
+    communicationEntity.setSignOffText(DefaultEmailPersonalisationService.DEFAULT_SIGN_OFF_TEXT);
+    communicationEntity.setSignOffIdentifier(defaultEmailPersonalisationService.getDefaultSignOffIdentifier());
     communicationEntity = communicationRepository.save(communicationEntity);
 
     if (RecipientType.SUBSCRIBERS.equals(communicationEntity.getRecipientType())) {
