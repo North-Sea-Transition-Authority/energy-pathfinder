@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.testutil;
 import java.time.Instant;
 import uk.co.ogauthority.pathfinder.model.entity.quarterlystatistics.ReportableProject;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.quarterlystatistics.ReportableProjectView;
 
 public class ReportableProjectTestUtil {
@@ -13,6 +14,7 @@ public class ReportableProjectTestUtil {
   private static final Instant LAST_UPDATE_DATETIME = Instant.now();
   private static final String OPERATOR_NAME = "Operator name";
   private static final String PROJECT_TITLE = "Project title";
+  private static final ProjectType PROJECT_TYPE = ProjectType.INFRASTRUCTURE;
 
   public static ReportableProject createReportableProject(FieldStage fieldStage) {
     return createReportableProject(
@@ -21,7 +23,8 @@ public class ReportableProjectTestUtil {
         PROJECT_DETAIL_ID,
         LAST_UPDATE_DATETIME,
         OPERATOR_NAME,
-        PROJECT_TITLE
+        PROJECT_TITLE,
+        PROJECT_TYPE
     );
   }
 
@@ -32,7 +35,8 @@ public class ReportableProjectTestUtil {
         PROJECT_DETAIL_ID,
         LAST_UPDATE_DATETIME,
         operatorName,
-        projectTitle
+        projectTitle,
+        PROJECT_TYPE
     );
   }
 
@@ -41,14 +45,16 @@ public class ReportableProjectTestUtil {
                                                           int projectDetailId,
                                                           Instant lastUpdateDatetime,
                                                           String operatorName,
-                                                          String projectTitle) {
+                                                          String projectTitle,
+                                                          ProjectType projectType) {
     var reportableProject = new ReportableProject();
     reportableProject.setFieldStage(fieldStage);
     reportableProject.setProjectDetailId(projectDetailId);
     reportableProject.setLastUpdatedDatetime(lastUpdateDatetime);
     reportableProject.setProjectId(projectId);
     reportableProject.setOperatorName(operatorName);
-    reportableProject.setProjectTitle(projectTitle);
+    reportableProject.setProjectDisplayName(projectTitle);
+    reportableProject.setProjectType(projectType);
     return reportableProject;
   }
 
@@ -59,7 +65,8 @@ public class ReportableProjectTestUtil {
         PROJECT_DETAIL_ID,
         LAST_UPDATE_DATETIME,
         OPERATOR_NAME,
-        PROJECT_TITLE
+        PROJECT_TITLE,
+        PROJECT_TYPE
     );
   }
 
@@ -70,7 +77,33 @@ public class ReportableProjectTestUtil {
         PROJECT_DETAIL_ID,
         LAST_UPDATE_DATETIME,
         operatorName,
-        projectTitle
+        projectTitle,
+        PROJECT_TYPE
+    );
+  }
+
+  public static ReportableProjectView createReportableProjectView(ProjectType projectType) {
+    return createReportableProjectView(
+        FIELD_STAGE,
+        PROJECT_ID,
+        PROJECT_DETAIL_ID,
+        LAST_UPDATE_DATETIME,
+        OPERATOR_NAME,
+        PROJECT_TITLE,
+        projectType
+    );
+  }
+
+  public static ReportableProjectView createReportableProjectView(ProjectType projectType,
+                                                                  Instant lastUpdateDatetime) {
+    return createReportableProjectView(
+        FIELD_STAGE,
+        PROJECT_ID,
+        PROJECT_DETAIL_ID,
+        lastUpdateDatetime,
+        OPERATOR_NAME,
+        PROJECT_TITLE,
+        projectType
     );
   }
 
@@ -83,7 +116,8 @@ public class ReportableProjectTestUtil {
         PROJECT_DETAIL_ID,
         lastUpdateDatetime,
         OPERATOR_NAME,
-        PROJECT_TITLE
+        PROJECT_TITLE,
+        PROJECT_TYPE
     );
   }
 
@@ -92,14 +126,16 @@ public class ReportableProjectTestUtil {
                                                                   int projectDetailId,
                                                                   Instant lastUpdateDatetime,
                                                                   String operatorName,
-                                                                  String projectTitle) {
+                                                                  String projectTitle,
+                                                                  ProjectType projectType) {
     final var reportableProject = createReportableProject(
         fieldStage,
         projectId,
         projectDetailId,
         lastUpdateDatetime,
         operatorName,
-        projectTitle
+        projectTitle,
+        projectType
     );
     return new ReportableProjectView(reportableProject);
   }

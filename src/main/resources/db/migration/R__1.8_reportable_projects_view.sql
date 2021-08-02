@@ -19,13 +19,19 @@ CREATE OR REPLACE VIEW ${datasource.user}.reportable_projects AS (
   , pp.project_id
   , pog.name operator_name
   , pi.field_stage
-  , pi.project_title
+  , CASE
+      WHEN pd.project_type = 'INFRASTRUCTURE' THEN
+        pi.project_title
+      WHEN pd.project_type = 'FORWARD_WORK_PLAN' THEN
+        'Forward work plan'
+    END project_display_name
   , pd.submitted_datetime last_updated_datetime
+  , pd.project_type
   FROM ${datasource.user}.published_projects pp
   JOIN ${datasource.user}.project_details pd ON pd.id = pp.project_detail_id
   JOIN ${datasource.user}.project_operators po ON po.project_detail_id = pp.project_detail_id
   JOIN ${datasource.user}.portal_organisation_groups pog ON pog.org_grp_id = po.operator_org_grp_id
-  JOIN ${datasource.user}.project_information pi ON pi.project_detail_id = pd.id
+  LEFT JOIN ${datasource.user}.project_information pi ON pi.project_detail_id = pd.id
 );
 
 CREATE OR REPLACE VIEW ${datasource.user}.api_selectable_projects (

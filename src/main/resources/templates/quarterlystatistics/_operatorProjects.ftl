@@ -5,7 +5,7 @@
   <@fdsAccordion.accordion accordionId="operators">
     <#list operatorProjectMap as operatorName, reportableProjects>
       <@fdsAccordion.accordionSection sectionHeading=operatorName>
-        <@_operatorProjects operatorReportableProjects=reportableProjects/>
+        <@_operatorProjects operatorReportableProjects=reportableProjects operatorName=operatorName />
       </@fdsAccordion.accordionSection>
     </#list>
   </@fdsAccordion.accordion>
@@ -44,7 +44,7 @@
   </script>
 </#macro>
 
-<#macro _operatorProjects operatorReportableProjects>
+<#macro _operatorProjects operatorReportableProjects operatorName>
   <div class="operator-projects">
     <table class="govuk-table operator-projects__table">
       <thead>
@@ -64,9 +64,17 @@
 
           <tr class="govuk-table__row <#if hasUpdateInQuarter>operator-projects__no-update-required-row<#else>operator-projects__update-required-row</#if>">
             <td class="govuk-table__cell govuk-table__cell--no-border">
+              <#--
+                The screen reader text is constructed outside of the link component because
+                the link component always adds the screen reader text after the prompt which isn't
+                desirable in this case.
+              -->
               <#assign linkScreenReaderText>
-                <span class="govuk-visually-hidden">View project </span>
-                ${operatorReportableProject.projectTitle}
+                <span class="govuk-visually-hidden">View </span>
+                ${operatorReportableProject.projectDisplayName}
+                <span class="govuk-visually-hidden">
+                  for ${operatorName} which was last updated on ${operatorReportableProject.lastUpdatedDatetimeFormatted}
+                </span>
               </#assign>
               <@fdsAction.link
                 linkText=linkScreenReaderText

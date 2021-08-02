@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.quarterlystatistics.QuarterlyStatisticsController;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @Service
@@ -30,19 +31,28 @@ public class QuarterlyStatisticsService {
 
     return new ModelAndView("quarterlystatistics/quarterlyStatistics")
         .addObject("pageTitle", QuarterlyStatisticsController.QUARTERLY_STATISTICS_TITLE)
-        .addObject("fieldStageStatistics", getQuarterlyStatisticsByFieldStage(reportableProjectViews))
+        .addObject("projectUpdateStatistics", getProjectUpdateStatistics(reportableProjectViews))
         .addObject("operatorReportableProjects", getReportableProjectsByOperator(reportableProjectViews));
   }
 
-  protected List<FieldStageStatistic> getQuarterlyStatisticsByFieldStage(
+  protected List<ProjectUpdateStatistic> getProjectUpdateStatistics(List<ReportableProjectView> reportableProjectViews) {
+    final var projectUpdateStatistics = getQuarterlyStatisticsByFieldStage(reportableProjectViews);
+    projectUpdateStatistics.add(getForwardWorkPlanQuarterlyUpdateStatistic(reportableProjectViews));
+    return projectUpdateStatistics;
+  }
+
+  protected List<ProjectUpdateStatistic> getQuarterlyStatisticsByFieldStage(
       List<ReportableProjectView> reportableProjects
   ) {
 
+    final var projectTypeRestriction = ProjectType.INFRASTRUCTURE;
+
     final var reportableProjectViewsByFieldStage = reportableProjects
         .stream()
+        .filter(reportableProjectView -> projectTypeRestriction.equals(reportableProjectView.getProjectType()))
         .collect(Collectors.groupingBy(ReportableProjectView::getFieldStage));
 
-    List<FieldStageStatistic> fieldStageStatistics = new ArrayList<>();
+    List<ProjectUpdateStatistic> projectUpdateStatistics = new ArrayList<>();
 
     Arrays.stream(FieldStage.values()).forEach(fieldStage -> {
       var totalProjectsForFieldStage = 0;
@@ -55,16 +65,35 @@ public class QuarterlyStatisticsService {
         totalProjectUpdatedForFieldStage = getReportableProjectsForCurrentQuarter(fieldStageReportableProjects).size();
       }
 
-      var quarterlyStatistic = new FieldStageStatistic(
+      var projectUpdateStatistic = new ProjectUpdateStatistic(
           fieldStage.getDisplayName(),
           totalProjectsForFieldStage,
           totalProjectUpdatedForFieldStage
       );
 
-      fieldStageStatistics.add(quarterlyStatistic);
+      projectUpdateStatistics.add(projectUpdateStatistic);
     });
 
-    return fieldStageStatistics;
+    return projectUpdateStatistics;
+  }
+
+  protected ProjectUpdateStatistic getForwardWorkPlanQuarterlyUpdateStatistic(List<ReportableProjectView> reportableProjects) {
+
+    final var projectTypeRestriction = ProjectType.FORWARD_WORK_PLAN;
+
+    final var forwardWorkPlanReportableProjectViews = reportableProjects
+        .stream()
+        .filter(reportableProjectView -> projectTypeRestriction.equals(reportableProjectView.getProjectType()))
+        .collect(Collectors.toList());
+
+    final var publishedForwardWorkPlansCount = forwardWorkPlanReportableProjectViews.size();
+    final var forwardWorkPlansUpdated = getReportableProjectsForCurrentQuarter(forwardWorkPlanReportableProjectViews).size();
+
+    return new ProjectUpdateStatistic(
+        projectTypeRestriction.getDisplayName(),
+        publishedForwardWorkPlansCount,
+        forwardWorkPlansUpdated
+    );
   }
 
   /**
@@ -78,7 +107,7 @@ public class QuarterlyStatisticsService {
     return reportableProjectViews
         .stream()
         .sorted(Comparator.comparing(ReportableProjectView::getOperatorName)
-            .thenComparing(reportableProjectView -> reportableProjectView.getProjectTitle().toLowerCase())
+            .thenComparing(reportableProjectView -> reportableProjectView.getProjectDisplayName().toLowerCase())
         )
         .collect(Collectors.groupingBy(ReportableProjectView::getOperatorName, LinkedHashMap::new, Collectors.toList()));
   }
