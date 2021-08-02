@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+import org.apache.commons.lang3.BooleanUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,15 +33,15 @@ public class PlatformsFpsosSummaryServiceTest {
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
-  private final PlatformFpso platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndSubstructuresRemoved_manualStructure(detail);
+  private final PlatformFpso platform = PlatformFpsoTestUtil.getPlatformFpso_withPlatform_manualStructure(detail);
 
-  private final PlatformFpso platformFpsoWithoutSubstructuresRemoved = PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndNoSubstructuresRemoved(detail);
+  private final PlatformFpso fpso = PlatformFpsoTestUtil.getPlatformFpso_withFpsoAndSubstructuresRemoved(detail);
 
   @Before
   public void setUp() {
     platformsFpsosSummaryService = new PlatformsFpsosSummaryService(platformsFpsosService);
     when(platformsFpsosService.getPlatformsFpsosByProjectDetail(detail)).thenReturn(
-        List.of(platformFpso, platformFpsoWithoutSubstructuresRemoved)
+        List.of(platform, fpso)
     );
   }
 
@@ -52,15 +53,16 @@ public class PlatformsFpsosSummaryServiceTest {
     var view2 = views.get(1);
 
     var view1PlatformFpso = view1.getPlatformFpso();
-    assertThat(view1PlatformFpso.getValue()).isEqualTo(platformFpso.getManualStructureName());
+    assertThat(view1PlatformFpso.getValue()).isEqualTo(platform.getManualStructureName());
     assertThat(view1PlatformFpso.getTag()).isEqualTo(Tag.NOT_FROM_LIST);
     assertThat(view1.getDisplayOrder()).isEqualTo(1);
     var view2PlatformFpso = view2.getPlatformFpso();
-    assertThat(view2PlatformFpso.getValue()).isEqualTo(platformFpsoWithoutSubstructuresRemoved.getStructure().getFacilityName());
+    assertThat(view2PlatformFpso.getValue()).isEqualTo(fpso.getStructure().getFacilityName());
     assertThat(view2PlatformFpso.getTag()).isEqualTo(Tag.NONE);
     assertThat(view2.getDisplayOrder()).isEqualTo(2);
-    checkCommonFields(view1, platformFpso);
-    checkCommonFields(view2, platformFpsoWithoutSubstructuresRemoved);
+    checkCommonFields(view1, platform);
+    checkCommonFields(view2, fpso);
+    checkFpsoSpecificViewProperties(fpso, view2);
   }
 
   @Test
@@ -76,7 +78,7 @@ public class PlatformsFpsosSummaryServiceTest {
 
   @Test
   public void getValidatedSummaryViews_containsInvalidEntry() {
-    when(platformsFpsosService.isValid(platformFpso, ValidationType.FULL)).thenReturn(true);
+    when(platformsFpsosService.isValid(platform, ValidationType.FULL)).thenReturn(true);
     var views = platformsFpsosSummaryService.getValidatedSummaryViews(detail);
     assertThat(views.size()).isEqualTo(2);
     var view1 = views.get(0);
@@ -88,8 +90,8 @@ public class PlatformsFpsosSummaryServiceTest {
   @Test
   public void getErrors() {
     var views = List.of(
-        PlatformFpsoViewUtil.createView(platformFpso, 1, 1, true),
-        PlatformFpsoViewUtil.createView(platformFpsoWithoutSubstructuresRemoved, 2, 1, false)
+        PlatformFpsoViewUtil.createView(platform, 1, 1, true),
+        PlatformFpsoViewUtil.createView(fpso, 2, 1, false)
     );
     var errors = platformsFpsosSummaryService.getErrors(views);
     assertThat(errors.size()).isEqualTo(1);
@@ -112,23 +114,33 @@ public class PlatformsFpsosSummaryServiceTest {
     assertThat(view.getTopsideRemovalEarliestYear()).isEqualTo(PlatformFpsoViewUtil.getYearText(platformFpso.getEarliestRemovalYear(), PlatformFpsoViewUtil.EARLIEST_YEAR_TEXT));
     assertThat(view.getTopsideRemovalLatestYear()).isEqualTo(PlatformFpsoViewUtil.getYearText(platformFpso.getLatestRemovalYear(), PlatformFpsoViewUtil.LATEST_YEAR_TEXT));
     assertThat(view.getSubstructuresExpectedToBeRemoved()).isEqualTo(platformFpso.getSubstructuresExpectedToBeRemoved());
-    if (platformFpso.getSubstructuresExpectedToBeRemoved()) {
-      assertThat(view.getSubstructureRemovalPremise()).isEqualTo(platformFpso.getSubstructureRemovalPremise().getDisplayName());
-      assertThat(view.getSubstructureRemovalMass()).isEqualTo(PlatformFpsoViewUtil.getMass(platformFpso.getSubstructureRemovalMass()));
-      assertThat(view.getSubstructureRemovalEarliestYear()).isEqualTo(
-          PlatformFpsoViewUtil.getYearText(platformFpso.getSubStructureRemovalEarliestYear(), PlatformFpsoViewUtil.EARLIEST_YEAR_TEXT)
-      );
-      assertThat(view.getSubstructureRemovalLatestYear()).isEqualTo(
-          PlatformFpsoViewUtil.getYearText(platformFpso.getSubStructureRemovalLatestYear(), PlatformFpsoViewUtil.LATEST_YEAR_TEXT)
-      );
-    }
-    assertThat(view.getFpsoType()).isEqualTo(platformFpso.getFpsoType());
-    assertThat(view.getFpsoDimensions()).isEqualTo(platformFpso.getFpsoDimensions());
 
     assertThat(view.getSummaryLinks()).extracting(SummaryLink::getLinkText).containsExactly(
         SummaryLinkText.EDIT.getDisplayName(),
         SummaryLinkText.DELETE.getDisplayName()
     );
+  }
+
+  private void checkFpsoSpecificViewProperties(PlatformFpso sourceEntity, PlatformFpsoView destinationView) {
+
+    if (BooleanUtils.isTrue(sourceEntity.getSubstructuresExpectedToBeRemoved())) {
+      assertThat(destinationView.getSubstructureRemovalPremise()).isEqualTo(sourceEntity.getSubstructureRemovalPremise().getDisplayName());
+      assertThat(destinationView.getSubstructureRemovalMass()).isEqualTo(PlatformFpsoViewUtil.getMass(sourceEntity.getSubstructureRemovalMass()));
+      assertThat(destinationView.getSubstructureRemovalEarliestYear()).isEqualTo(
+          PlatformFpsoViewUtil.getYearText(sourceEntity.getSubStructureRemovalEarliestYear(), PlatformFpsoViewUtil.EARLIEST_YEAR_TEXT)
+      );
+      assertThat(destinationView.getSubstructureRemovalLatestYear()).isEqualTo(
+          PlatformFpsoViewUtil.getYearText(sourceEntity.getSubStructureRemovalLatestYear(), PlatformFpsoViewUtil.LATEST_YEAR_TEXT)
+      );
+    } else {
+      assertThat(destinationView.getSubstructureRemovalPremise()).isEmpty();
+      assertThat(destinationView.getSubstructureRemovalMass()).isEmpty();
+      assertThat(destinationView.getSubstructureRemovalEarliestYear()).isEmpty();
+      assertThat(destinationView.getSubstructureRemovalLatestYear()).isEmpty();
+    }
+
+    assertThat(destinationView.getFpsoType()).isEqualTo(sourceEntity.getFpsoType());
+    assertThat(destinationView.getFpsoDimensions()).isEqualTo(sourceEntity.getFpsoDimensions());
   }
 
 }

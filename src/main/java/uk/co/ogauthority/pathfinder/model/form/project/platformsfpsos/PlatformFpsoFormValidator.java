@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
 import org.springframework.validation.ValidationUtils;
+import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.PlatformFpsoInfrastructureType;
@@ -16,12 +17,18 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 @Component
 public class PlatformFpsoFormValidator implements SmartValidator {
 
+  private static final String FLOATING_UNIT_TEXT_LOWERCASE = PlatformsFpsosController.FLOATING_UNIT_TEXT_LOWERCASE;
+
   public static final String MISSING_PLATFORM_ERROR = "Select a platform";
-  public static final String MISSING_FPSO_ERROR = "Select an FPSO";
-  public static final String MISSING_FPSO_TYPE_ERROR = "Enter an FPSO type";
-  public static final String MISSING_FPSO_DIMENSIONS_ERROR = "Enter the FPSO dimensions";
+  public static final String MISSING_FPSO_ERROR = String.format("Select a %s", FLOATING_UNIT_TEXT_LOWERCASE);
+  public static final String MISSING_FPSO_TYPE_ERROR = String.format("Enter the %s type", FLOATING_UNIT_TEXT_LOWERCASE);
+  public static final String MISSING_FPSO_DIMENSIONS_ERROR = String.format("Enter the %s dimensions", FLOATING_UNIT_TEXT_LOWERCASE);
   public static final String MISSING_SUBSTRUCTURE_REMOVAL_MASS_ERROR = "Enter an estimated substructure removal mass";
   public static final String MISSING_SUBSTRUCTURE_REMOVAL_PREMISE_ERROR = "Enter a substructure removal premise";
+  public static final String MISSING_SUBSTRUCTURE_REMOVAL_ERROR = "Select if substructure removal expected to be within scope";
+  public static final String NEGATIVE_SUBSTRUCTURE_REMOVAL_MASS_ERROR =
+      "Estimated substructure removal mass must be a positive whole number with no decimal places";
+
   private final MinMaxDateInputValidator minMaxDateInputValidator;
 
   @Autowired
@@ -58,25 +65,42 @@ public class PlatformFpsoFormValidator implements SmartValidator {
     } else if (PlatformFpsoInfrastructureType.FPSO.equals(infrastructureType)) {
 
       if (ValidationType.FULL.equals(validationType)) {
+
         ValidationUtils.rejectIfEmptyOrWhitespace(
             errors,
             "fpsoStructure",
             "fpsoStructure.invalid",
             MISSING_FPSO_ERROR
         );
+
         ValidationUtils.rejectIfEmptyOrWhitespace(
             errors,
             "fpsoType",
             "fpsoType.invalid",
             MISSING_FPSO_TYPE_ERROR
         );
+
         ValidationUtils.rejectIfEmptyOrWhitespace(
             errors,
             "fpsoDimensions",
             "fpsoDimensions.invalid",
             MISSING_FPSO_DIMENSIONS_ERROR
         );
+
+        ValidationUtils.rejectIfEmptyOrWhitespace(
+            errors,
+            "substructureExpectedToBeRemoved",
+            "substructureExpectedToBeRemoved.invalid",
+            MISSING_SUBSTRUCTURE_REMOVAL_ERROR
+        );
       }
+
+      validateSubstructureRemovalNestedQuestions(
+          form,
+          platformFpsoValidationHint,
+          validationType,
+          errors
+      );
     }
 
     ValidationUtil.invokeNestedValidator(
@@ -86,8 +110,22 @@ public class PlatformFpsoFormValidator implements SmartValidator {
         form.getTopsideRemovalYears(),
         platformFpsoValidationHint.getTopsidesRemovalHints()
     );
+  }
 
+  @Override
+  public void validate(Object target, Errors errors) {
+    validate(target, errors, new Object[0]);
+  }
 
+  @Override
+  public boolean supports(Class<?> clazz) {
+    return clazz.equals(PlatformFpsoForm.class);
+  }
+
+  private void validateSubstructureRemovalNestedQuestions(PlatformFpsoForm form,
+                                                          PlatformFpsoValidationHint platformFpsoValidationHint,
+                                                          ValidationType validationType,
+                                                          Errors errors) {
     if (BooleanUtils.isTrue(form.getSubstructureExpectedToBeRemoved())) {
       ValidationUtil.invokeNestedValidator(
           errors,
@@ -111,16 +149,14 @@ public class PlatformFpsoFormValidator implements SmartValidator {
             MISSING_SUBSTRUCTURE_REMOVAL_PREMISE_ERROR
         );
       }
+
+      if (form.getSubstructureRemovalMass() != null && form.getSubstructureRemovalMass() <= 0) {
+        errors.rejectValue(
+            "substructureRemovalMass",
+            "substructureRemovalMass.invalid",
+            NEGATIVE_SUBSTRUCTURE_REMOVAL_MASS_ERROR
+        );
+      }
     }
-  }
-
-  @Override
-  public void validate(Object target, Errors errors) {
-    validate(target, errors, new Object[0]);
-  }
-
-  @Override
-  public boolean supports(Class<?> clazz) {
-    return clazz.equals(PlatformFpsoForm.class);
   }
 }

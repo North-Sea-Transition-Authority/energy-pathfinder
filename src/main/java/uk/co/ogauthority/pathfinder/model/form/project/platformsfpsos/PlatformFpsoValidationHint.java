@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos;
 
 import java.util.ArrayList;
 import java.util.List;
+import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.validationhint.MaxYearMustBeInFutureHint;
@@ -10,7 +11,12 @@ import uk.co.ogauthority.pathfinder.model.form.validation.minmaxdate.MinMaxDateI
 
 public class PlatformFpsoValidationHint {
 
-  public static final FormInputLabel TOPSIDES_REMOVAL_LABEL = new FormInputLabel("Topside/FPSO removal");
+  private static final String TOPSIDES_REMOVAL_LABEL_TEXT = String.format(
+      "Topsides/%s removal",
+      PlatformsFpsosController.FLOATING_UNIT_TEXT_LOWERCASE
+  );
+
+  public static final FormInputLabel TOPSIDES_REMOVAL_LABEL = new FormInputLabel(TOPSIDES_REMOVAL_LABEL_TEXT);
   public static final FormInputLabel SUBSTRUCTURE_REMOVAL_LABEL = new FormInputLabel("substructure removal");
 
   public static final MinMaxYearLabelsHint TOPSIDES_YEAR_LABELS = new MinMaxYearLabelsHint("earliest", "latest");
