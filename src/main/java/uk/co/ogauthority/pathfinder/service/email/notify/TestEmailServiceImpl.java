@@ -40,14 +40,20 @@ public class TestEmailServiceImpl implements EmailService {
 
   @Override
   public void sendEmail(EmailProperties emailProperties, String toEmailAddress) {
-    sendEmail(emailProperties, toEmailAddress, null, null);
+    sendEmail(emailProperties, toEmailAddress, null, null, null);
+  }
+
+  @Override
+  public void sendEmail(EmailProperties emailProperties, String toEmailAddress, String recipientName) {
+    sendEmail(emailProperties, toEmailAddress, null, null, recipientName);
   }
 
   @Override
   public void sendEmail(EmailProperties emailProperties,
                         String toEmailAddress,
                         String reference,
-                        String emailReplyToId) {
+                        String emailReplyToId,
+                        String recipientName) {
 
     Optional<String> templateId = notifyTemplateService.getTemplateIdFromName(emailProperties.getTemplateName());
 
@@ -58,6 +64,10 @@ public class TestEmailServiceImpl implements EmailService {
       personalisation.putAll(emailProperties.getEmailPersonalisation());
       personalisation.put(CommonEmailMergeField.TEST_EMAIL, "yes");
       personalisation.put(CommonEmailMergeField.SUBJECT_PREFIX, "**TEST EMAIL**");
+
+      if (recipientName != null) {
+        personalisation.put(CommonEmailMergeField.RECIPIENT_IDENTIFIER, recipientName);
+      }
 
       // If we have test recipients send the email to each
       testRecipientList.stream()

@@ -35,14 +35,20 @@ public class ProductionEmailServiceImpl implements EmailService {
 
   @Override
   public void sendEmail(EmailProperties emailProperties, String toEmailAddress) {
-    sendEmail(emailProperties, toEmailAddress, null, null);
+    sendEmail(emailProperties, toEmailAddress, null, null, null);
+  }
+
+  @Override
+  public void sendEmail(EmailProperties emailProperties, String toEmailAddress, String recipientName) {
+    sendEmail(emailProperties, toEmailAddress, null, null, recipientName);
   }
 
   @Override
   public void sendEmail(EmailProperties emailProperties,
                         String toEmailAddress,
                         String reference,
-                        String emailReplyToId) {
+                        String emailReplyToId,
+                        String recipientName) {
 
     try {
 
@@ -54,6 +60,10 @@ public class ProductionEmailServiceImpl implements EmailService {
         personalisation.putAll(emailProperties.getEmailPersonalisation());
         personalisation.put(CommonEmailMergeField.TEST_EMAIL, "no");
         personalisation.put(CommonEmailMergeField.SUBJECT_PREFIX, "");
+
+        if (recipientName != null) {
+          personalisation.put(CommonEmailMergeField.RECIPIENT_IDENTIFIER, recipientName);
+        }
 
         if (emailValidator.isValid(toEmailAddress)) {
           notificationClient.sendEmail(templateId.get(), toEmailAddress, personalisation, reference, emailReplyToId);

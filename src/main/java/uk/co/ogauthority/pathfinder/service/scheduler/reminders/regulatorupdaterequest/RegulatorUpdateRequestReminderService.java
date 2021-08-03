@@ -2,7 +2,7 @@ package uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdate
 
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.ProjectUpdateEmailProperties;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.submitted.ProjectUpdateEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.scheduler.ReminderType;
 import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
@@ -44,7 +44,6 @@ public class RegulatorUpdateRequestReminderService {
 
   void sendReminderEmail(int projectId) {
     var properties = new ProjectUpdateEmailProperties(
-        "This was sent by quartz as a reminder proof of concept",
         emailLinkService.getWorkAreaUrl()
     );
     emailService.sendEmail(properties, "dummy@address.com");
