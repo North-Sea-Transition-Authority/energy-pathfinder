@@ -13,4 +13,6 @@ public interface SubscriberRepository extends CrudRepository<Subscriber, Integer
   boolean existsByUuid(UUID uuid);
 
   void deleteByUuid(UUID uuid);
+
+  void deleteByEmailAddress(String emailAddress);
 }

@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.email.notify;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplate;
 import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplateType;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
@@ -50,5 +52,19 @@ public class NotifyTemplateService {
         .map(template -> template.getId().toString())
         .findFirst();
 
+  }
+
+  public Optional<NotifyTemplate> getNotifyTemplateByTemplateName(String templateName) {
+    return Arrays.stream(NotifyTemplate.values())
+        .filter(notifyTemplate -> notifyTemplate.getTemplateName().equals(templateName))
+        .findFirst();
+  }
+
+  public NotifyTemplate getNotifyTemplateByTemplateNameOrError(String templateName) {
+    return getNotifyTemplateByTemplateName(templateName)
+        .orElseThrow(() -> new IllegalArgumentException(String.format(
+            "Could not find NotifyTemplate with name %s",
+            templateName
+        )));
   }
 }
