@@ -223,7 +223,7 @@ public class CommunicationServiceTest {
     var jobData = new HashMap<String, Object>();
     jobData.put("communicationId", communication.getId());
 
-    verify(schedulerService, times(1)).scheduleJob(any(), eq(jobData), eq(CommunicationJob.class));
+    verify(schedulerService, times(1)).scheduleJobImmediately(any(), eq(jobData), eq(CommunicationJob.class));
   }
 
   @Test

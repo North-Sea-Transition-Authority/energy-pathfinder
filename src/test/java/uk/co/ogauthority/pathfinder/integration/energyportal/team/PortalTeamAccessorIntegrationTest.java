@@ -23,6 +23,7 @@ import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalRoleDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalSystemPrivilegeDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamMemberDto;
+import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamPersonMembershipDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamScopeDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.PersonId;
@@ -523,6 +524,33 @@ public class PortalTeamAccessorIntegrationTest {
         .collect(Collectors.toList());
 
     assertThat(peopleIds).isEmpty();
+  }
+
+  @Test
+  @Transactional
+  public void getPortalTeamPersonMembershipByResourceIdIn_whenNoTeamMembersFound_thenReturnEmptyList() {
+
+    var invalidResourceId = -1;
+
+    final var resourceIds = List.of(invalidResourceId);
+
+    final var portalTeamPersonMembership = portalTeamAccessor.getPortalTeamPersonMembershipByResourceIdIn(resourceIds);
+
+    assertThat(portalTeamPersonMembership).isEmpty();
+  }
+
+  @Test
+  @Transactional
+  public void getPortalTeamPersonMembershipByResourceIdIn_whenTeamMembersFound_thenReturnPopulatedObjects() {
+
+    var resourceIds = List.of(SCOPED_TEAM_RES_ID);
+
+    var portalTeamPersonMembership = portalTeamAccessor.getPortalTeamPersonMembershipByResourceIdIn(resourceIds);
+
+    assertThat(portalTeamPersonMembership).containsExactlyInAnyOrder(
+        new PortalTeamPersonMembershipDto(SCOPED_TEAM_RES_ID, scopedTeamMemberPerson_1Role),
+        new PortalTeamPersonMembershipDto(SCOPED_TEAM_RES_ID, scopedTeamMemberPerson_2Roles)
+    );
   }
 
   private void assertPortalTeamInstanceDtoMappingAsExpected(PortalTeamDto portalTeamDto,

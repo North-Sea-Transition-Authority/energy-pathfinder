@@ -17,6 +17,7 @@ CREATE OR REPLACE VIEW ${datasource.user}.reportable_projects AS (
   SELECT
     pp.project_detail_id
   , pp.project_id
+  , pog.org_grp_id operator_group_id
   , pog.name operator_name
   , pi.field_stage
   , CASE

@@ -30,7 +30,7 @@ public class ReportableProjectService {
     return reportableProjectRepository.findByLastUpdatedDatetimeBetween(earliestUpdatedDatetime, latestUpdatedDatetime);
   }
 
-  private List<ReportableProject> getReportableProjects() {
+  public List<ReportableProject> getReportableProjects() {
     return reportableProjectRepository.findAll();
   }
 

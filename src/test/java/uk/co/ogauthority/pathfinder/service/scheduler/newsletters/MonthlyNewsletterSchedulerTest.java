@@ -1,10 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.scheduler.newsletters;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,23 +24,15 @@ public class MonthlyNewsletterSchedulerTest {
   }
 
   @Test
-  public void registerJob_whenJobAlreadyRegistered_verifyInteractions() {
-
-    when(schedulerService.doesJobWithKeyExist(any())).thenReturn(true);
+  public void registerJob_verifyInteractions() {
 
     monthlyNewsletterScheduler.registerJob();
 
-    verify(schedulerService, never()).scheduleJob(any(), any());
+    verify(schedulerService, times(1)).scheduleJobIfNoJobExists(
+        MonthlyNewsletterScheduler.JOB_KEY,
+        MonthlyNewsletterScheduler.TRIGGER_KEY,
+        MonthlyNewsletterJob.class,
+        MonthlyNewsletterScheduler.FIRST_OF_EVERY_MONTH_AT_9AM
+    );
   }
-
-  @Test
-  public void registerJob_whenJobNotRegistered_verifyInteractions() {
-
-    when(schedulerService.doesJobWithKeyExist(any())).thenReturn(false);
-
-    monthlyNewsletterScheduler.registerJob();
-
-    verify(schedulerService, times(1)).scheduleJob(any(), any());
-  }
-
 }

@@ -23,6 +23,8 @@ public class ReportableProject {
 
   private Instant lastUpdatedDatetime;
 
+  private int operatorGroupId;
+
   private String operatorName;
 
   private String projectDisplayName;
@@ -86,5 +88,13 @@ public class ReportableProject {
 
   public void setProjectType(ProjectType projectType) {
     this.projectType = projectType;
+  }
+
+  public int getOperatorGroupId() {
+    return operatorGroupId;
+  }
+
+  public void setOperatorGroupId(int operatorGroupId) {
+    this.operatorGroupId = operatorGroupId;
   }
 }

@@ -140,6 +140,6 @@ public class CommunicationService {
     var jobData = new HashMap<String, Object>();
     jobData.put("communicationId", communication.getId());
 
-    schedulerService.scheduleJob(jobIdentifier, jobData, CommunicationJob.class);
+    schedulerService.scheduleJobImmediately(jobIdentifier, jobData, CommunicationJob.class);
   }
 }
