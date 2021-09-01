@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.projectupdate;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import uk.co.ogauthority.pathfinder.repository.projectupdate.RegulatorUpdateRequ
 import uk.co.ogauthority.pathfinder.service.email.OperatorEmailService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
+import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.RegulatorUpdateRequestProjectDto;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
@@ -125,5 +127,9 @@ public class RegulatorUpdateRequestService {
     );
 
     return modelAndView;
+  }
+
+  public List<RegulatorUpdateRequestProjectDto> getAllProjectsWithOutstandingRegulatorUpdateRequestsWithDeadlines() {
+    return regulatorUpdateRequestRepository.getAllProjectsWithOutstandingRegulatorUpdateRequestsWithDeadlines();
   }
 }

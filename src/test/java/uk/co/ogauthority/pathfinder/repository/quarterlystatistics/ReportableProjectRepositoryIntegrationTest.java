@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.model.entity.quarterlystatistics.ReportableProject;
@@ -16,6 +17,7 @@ import uk.co.ogauthority.pathfinder.model.entity.quarterlystatistics.ReportableP
 @RunWith(SpringRunner.class)
 @DataJpaTest
 @ActiveProfiles("integration-test")
+@DirtiesContext
 public class ReportableProjectRepositoryIntegrationTest {
 
   @Autowired

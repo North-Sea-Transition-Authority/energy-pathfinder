@@ -10,6 +10,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +24,7 @@ import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectCo
 import uk.co.ogauthority.pathfinder.controller.projectupdate.RegulatorUpdateController;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRequest;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
@@ -32,6 +35,7 @@ import uk.co.ogauthority.pathfinder.repository.projectupdate.RegulatorUpdateRequ
 import uk.co.ogauthority.pathfinder.service.email.OperatorEmailService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
+import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.RegulatorUpdateRequestProjectDto;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -219,5 +223,33 @@ public class RegulatorUpdateRequestServiceTest {
         modelAndView,
         RegulatorUpdateController.REQUEST_UPDATE_PAGE_NAME
     );
+  }
+
+  @Test
+  public void getAllProjectsWithOutstandingRegulatorUpdateRequestsWithDeadlines_whenNoProjectsWithUpdates_thenReturnEmptyList() {
+    when(regulatorUpdateRequestRepository.getAllProjectsWithOutstandingRegulatorUpdateRequestsWithDeadlines()).thenReturn(
+        Collections.emptyList()
+    );
+
+    var resultingRegulatorUpdateDtos = regulatorUpdateRequestService.getAllProjectsWithOutstandingRegulatorUpdateRequestsWithDeadlines();
+
+    assertThat(resultingRegulatorUpdateDtos).isEmpty();
+  }
+
+  @Test
+  public void getAllProjectsWithOutstandingRegulatorUpdateRequestsWithDeadlines_whenProjectsWithUpdates_thenReturnPopulatedList() {
+
+    var regulatorUpdateRequest = new RegulatorUpdateRequest();
+    var projectOperator = new ProjectOperator();
+
+    var expectedDto = new RegulatorUpdateRequestProjectDto(regulatorUpdateRequest, projectOperator);
+
+    when(regulatorUpdateRequestRepository.getAllProjectsWithOutstandingRegulatorUpdateRequestsWithDeadlines()).thenReturn(
+        List.of(expectedDto)
+    );
+
+    var resultingRegulatorUpdateDtos = regulatorUpdateRequestService.getAllProjectsWithOutstandingRegulatorUpdateRequestsWithDeadlines();
+
+    assertThat(resultingRegulatorUpdateDtos).containsExactly(expectedDto);
   }
 }

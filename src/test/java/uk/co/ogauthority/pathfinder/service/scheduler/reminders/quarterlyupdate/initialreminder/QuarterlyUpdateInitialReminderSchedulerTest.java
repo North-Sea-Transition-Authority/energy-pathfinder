@@ -15,19 +15,19 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.quartz.CronExpression;
-import uk.co.ogauthority.pathfinder.service.scheduler.SchedulerService;
+import uk.co.ogauthority.pathfinder.service.scheduler.JobRegistrationService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuarterlyUpdateInitialReminderSchedulerTest {
 
   @Mock
-  private SchedulerService schedulerService;
+  private JobRegistrationService jobRegistrationService;
 
   private QuarterlyUpdateInitialReminderScheduler quarterlyUpdateInitialReminderScheduler;
 
   @Before
   public void setup() {
-    quarterlyUpdateInitialReminderScheduler = new QuarterlyUpdateInitialReminderScheduler(schedulerService);
+    quarterlyUpdateInitialReminderScheduler = new QuarterlyUpdateInitialReminderScheduler(jobRegistrationService);
   }
 
   @Test
@@ -35,9 +35,8 @@ public class QuarterlyUpdateInitialReminderSchedulerTest {
 
     quarterlyUpdateInitialReminderScheduler.registerJob();
 
-    verify(schedulerService, times(1)).scheduleJobIfNoJobExists(
-        QuarterlyUpdateInitialReminderScheduler.JOB_KEY,
-        QuarterlyUpdateInitialReminderScheduler.TRIGGER_KEY,
+    verify(jobRegistrationService, times(1)).registerReoccurringSchedulerJob(
+        QuarterlyUpdateInitialReminderScheduler.JOB_DOMAIN_PREFIX,
         QuarterlyUpdateInitialReminderJob.class,
         QuarterlyUpdateInitialReminderScheduler.FIRST_OF_EVERY_QUARTER_AT_9AM
     );

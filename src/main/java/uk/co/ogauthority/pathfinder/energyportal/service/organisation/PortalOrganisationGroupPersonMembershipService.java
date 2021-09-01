@@ -25,9 +25,10 @@ public class PortalOrganisationGroupPersonMembershipService {
     this.portalOrganisationAccessor = portalOrganisationAccessor;
   }
 
-  public List<OrganisationGroupMembership> getOrganisationGroupMembershipForOrganisationGroupIdsIn(List<Integer> organisationGroupIds) {
+  public List<OrganisationGroupMembership> getOrganisationGroupMembershipForOrganisationGroupIn(
+      List<PortalOrganisationGroup> organisationGroups
+  ) {
 
-    var organisationGroups = portalOrganisationAccessor.getOrganisationGroupsWhereIdIn(organisationGroupIds);
     var organisationTeams = portalTeamAccessor.findPortalTeamByOrganisationGroupsIn(organisationGroups);
 
     var organisationTeamResIds = organisationTeams
@@ -71,6 +72,12 @@ public class PortalOrganisationGroupPersonMembershipService {
 
     return organisationGroupMembershipList;
   }
+
+  public List<OrganisationGroupMembership> getOrganisationGroupMembershipForOrganisationGroupIdsIn(List<Integer> organisationGroupIds) {
+    var organisationGroups = portalOrganisationAccessor.getOrganisationGroupsWhereIdIn(organisationGroupIds);
+    return getOrganisationGroupMembershipForOrganisationGroupIn(organisationGroups);
+  }
+
 
   private OrganisationGroupMembership convertToOrganisationGroupMembership(PortalOrganisationGroup portalOrganisationGroup,
                                                                            PortalTeamDto portalTeamDto) {

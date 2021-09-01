@@ -1,39 +1,23 @@
 package uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest;
 
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RegulatorUpdateRequestReminderJob extends QuartzJobBean {
+class RegulatorUpdateRequestReminderJob extends QuartzJobBean {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(RegulatorUpdateRequestReminderJob.class);
-  private final RegulatorUpdateRequestReminderService regulatorUpdateRequestReminderService;
+  private final RegulatorUpdateReminderService regulatorUpdateReminderService;
 
-  public RegulatorUpdateRequestReminderJob(RegulatorUpdateRequestReminderService regulatorUpdateRequestReminderService) {
-    this.regulatorUpdateRequestReminderService = regulatorUpdateRequestReminderService;
+  @Autowired
+  RegulatorUpdateRequestReminderJob(RegulatorUpdateReminderService regulatorUpdateReminderService) {
+    this.regulatorUpdateReminderService = regulatorUpdateReminderService;
   }
-
 
   @Override
-  protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-    var projectId = context.getJobDetail().getJobDataMap().getInt("projectId");
-    try {
-      executeJob(projectId);
-    } catch (Exception e) {
-      final var errorMessage = String.format(
-          "Regulator update request reminder Job execution failed for project with id: %d",
-          projectId
-      );
-      LOGGER.error(errorMessage, e);
-      throw new JobExecutionException(errorMessage, e);
-    }
-  }
-
-  private void executeJob(int projectId) {
-    regulatorUpdateRequestReminderService.sendReminderEmail(projectId);
+  protected void executeInternal(@NonNull JobExecutionContext context) {
+    regulatorUpdateReminderService.processDueReminders();
   }
 }
