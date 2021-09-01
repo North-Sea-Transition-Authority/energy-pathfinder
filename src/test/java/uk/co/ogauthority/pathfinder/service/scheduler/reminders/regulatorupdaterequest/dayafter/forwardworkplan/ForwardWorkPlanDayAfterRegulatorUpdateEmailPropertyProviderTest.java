@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.weekbefore.infrastructure;
+package uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.dayafter.forwardworkplan;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -10,36 +10,31 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project.regualtorupdaterequest.RegulatorUpdateRequestReminderEmailProperties;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project.regualtorupdaterequest.weekbefore.WeekBeforeDeadlineRegulatorUpdateReminderEmailProperties;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project.regualtorupdaterequest.dayafter.DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRequest;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.RegulatorUpdateReminderEmailPropertiesService;
 
 @RunWith(MockitoJUnitRunner.class)
-public class InfrastructureWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProviderTest {
+public class ForwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProviderTest {
 
-  private static final ProjectType SUPPORTED_PROJECT_TYPE = ProjectType.INFRASTRUCTURE;
+  private static final ProjectType SUPPORTED_PROJECT_TYPE = ProjectType.FORWARD_WORK_PLAN;
 
   @Mock
   private RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService;
 
-  @Mock
-  private ProjectInformationService projectInformationService;
-
-  private InfrastructureWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider infrastructureWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider;
+  private ForwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider forwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider;
 
   @Before
   public void setup() {
-    infrastructureWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider = new InfrastructureWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider(
-        regulatorUpdateReminderEmailPropertiesService,
-        projectInformationService
+    forwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider = new ForwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider(
+        regulatorUpdateReminderEmailPropertiesService
     );
   }
 
   @Test
-  public void getSupportedProjectType_verifyInfrastructure() {
-    var resultingSupportedProjectType = infrastructureWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider.getSupportedProjectType();
+  public void getSupportedProjectType_verifyForwardWorkPlan() {
+    var resultingSupportedProjectType = forwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider.getSupportedProjectType();
     assertThat(resultingSupportedProjectType).isEqualTo(SUPPORTED_PROJECT_TYPE);
   }
 
@@ -57,30 +52,25 @@ public class InfrastructureWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvid
     var projectUrl = "project-url";
     when(regulatorUpdateReminderEmailPropertiesService.getProjectManagementUrl(regulatorUpdateRequest)).thenReturn(projectUrl);
 
-    var projectTitle = "project-title";
-    when(projectInformationService.getProjectTitle(any())).thenReturn(projectTitle);
-
-    var resultingEmailProperties = infrastructureWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider.getEmailProperties(
+    var resultingEmailProperties = forwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider.getEmailProperties(
         regulatorUpdateRequest
     );
 
     var expectedSubjectText = String.format(
-        "%s for %s: %s",
+        "%s to your organisation's %s",
         RegulatorUpdateRequestReminderEmailProperties.DEFAULT_UPDATE_REMINDER_SUBJECT_TEXT,
-        SUPPORTED_PROJECT_TYPE.getLowercaseDisplayName(),
-        projectTitle
+        SUPPORTED_PROJECT_TYPE.getLowercaseDisplayName()
     );
 
     var expectedIntroductionText = String.format(
-        "%s to your %s, %s.",
-        RegulatorUpdateRequestReminderEmailProperties.DEFAULT_UPDATE_REMINDER_INTRO_TEXT,
+        "%s to your organisation's %s was due by %s.",
+        DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties.DEFAULT_INTRODUCTION_TEXT_PREFIX,
         SUPPORTED_PROJECT_TYPE.getLowercaseDisplayName(),
-        projectTitle
+        formattedDeadlineDate
     );
 
     assertThat(resultingEmailProperties).isEqualTo(
-        new WeekBeforeDeadlineRegulatorUpdateReminderEmailProperties(
-            formattedDeadlineDate,
+        new DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties(
             updateReason,
             projectUrl,
             expectedSubjectText,

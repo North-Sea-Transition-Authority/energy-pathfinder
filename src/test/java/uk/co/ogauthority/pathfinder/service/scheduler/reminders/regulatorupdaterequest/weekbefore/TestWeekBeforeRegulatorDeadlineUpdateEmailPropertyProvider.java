@@ -6,7 +6,7 @@ import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRe
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 
 @Service
-class TestWeekBeforeRegulatorDeadlineUpdateReminderService implements WeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider {
+class TestWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider implements WeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider {
 
   @Override
   public ProjectType getSupportedProjectType() {

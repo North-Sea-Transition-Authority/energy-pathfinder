@@ -1,24 +1,23 @@
-package uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.weekbefore.forwardworkplan;
+package uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.dayafter.forwardworkplan;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project.regualtorupdaterequest.RegulatorUpdateRequestReminderEmailProperties;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project.regualtorupdaterequest.weekbefore.WeekBeforeDeadlineRegulatorUpdateReminderEmailProperties;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project.regualtorupdaterequest.dayafter.DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRequest;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.RegulatorUpdateReminderEmailPropertiesService;
-import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.weekbefore.WeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider;
+import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.dayafter.DayAfterRegulatorDeadlineUpdateEmailPropertyProvider;
 
 @Service
-class ForwardWorkPlanWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider
-    implements WeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider {
+class ForwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider implements DayAfterRegulatorDeadlineUpdateEmailPropertyProvider {
 
   private static final ProjectType SUPPORTED_PROJECT_TYPE = ProjectType.FORWARD_WORK_PLAN;
 
   private final RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService;
 
   @Autowired
-  ForwardWorkPlanWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider(
+  ForwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider(
       RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService
   ) {
     this.regulatorUpdateReminderEmailPropertiesService = regulatorUpdateReminderEmailPropertiesService;
@@ -30,7 +29,7 @@ class ForwardWorkPlanWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider
   }
 
   @Override
-  public WeekBeforeDeadlineRegulatorUpdateReminderEmailProperties getEmailProperties(RegulatorUpdateRequest regulatorUpdateRequest) {
+  public DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties getEmailProperties(RegulatorUpdateRequest regulatorUpdateRequest) {
 
     var projectTypeLowercaseDisplayName = getSupportedProjectType().getLowercaseDisplayName();
 
@@ -41,13 +40,13 @@ class ForwardWorkPlanWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider
     );
 
     var introductionText = String.format(
-        "%s to your organisation's %s.",
-        RegulatorUpdateRequestReminderEmailProperties.DEFAULT_UPDATE_REMINDER_INTRO_TEXT,
-        projectTypeLowercaseDisplayName
+        "%s to your organisation's %s was due by %s.",
+        DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties.DEFAULT_INTRODUCTION_TEXT_PREFIX,
+        projectTypeLowercaseDisplayName,
+        regulatorUpdateReminderEmailPropertiesService.getFormattedDeadlineDate(regulatorUpdateRequest.getDeadlineDate())
     );
 
-    return new WeekBeforeDeadlineRegulatorUpdateReminderEmailProperties(
-        regulatorUpdateReminderEmailPropertiesService.getFormattedDeadlineDate(regulatorUpdateRequest.getDeadlineDate()),
+    return new DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties(
         regulatorUpdateRequest.getUpdateReason(),
         regulatorUpdateReminderEmailPropertiesService.getProjectManagementUrl(regulatorUpdateRequest),
         subjectText,

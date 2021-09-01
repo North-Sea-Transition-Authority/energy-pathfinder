@@ -16,18 +16,18 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.RegulatorUpdateReminderEmailPropertiesService;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ForwardWorkPlanWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProviderTest {
+public class ForwardWorkPlanWeekBeforeRegulatorDeadlineUpdateEmailPropertyProviderTest {
 
   private static final ProjectType SUPPORTED_PROJECT_TYPE = ProjectType.FORWARD_WORK_PLAN;
 
   @Mock
   private RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService;
 
-  private ForwardWorkPlanWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider forwardWorkPlanWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider;
+  private ForwardWorkPlanWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider forwardWorkPlanWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider;
 
   @Before
   public void setup() {
-    forwardWorkPlanWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider = new ForwardWorkPlanWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider(
+    forwardWorkPlanWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider = new ForwardWorkPlanWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider(
         regulatorUpdateReminderEmailPropertiesService
     );
   }

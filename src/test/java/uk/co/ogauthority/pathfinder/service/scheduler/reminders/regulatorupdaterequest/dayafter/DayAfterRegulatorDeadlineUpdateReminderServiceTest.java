@@ -1,21 +1,19 @@
-package uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.weekbefore;
+package uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.dayafter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project.regualtorupdaterequest.weekbefore.WeekBeforeDeadlineRegulatorUpdateReminderEmailProperties;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project.regualtorupdaterequest.dayafter.DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRequest;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
@@ -24,40 +22,40 @@ import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdater
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class WeekBeforeRegulatorDeadlineUpdateReminderServiceTest {
+public class DayAfterRegulatorDeadlineUpdateReminderServiceTest {
 
   @Mock
   private RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService;
 
   @Mock
-  private TestWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider testWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider;
+  private TestDayAfterRegulatorDeadlineUpdateEmailPropertyProvider testDayAfterRegulatorDeadlineUpdateEmailPropertyProvider;
 
-  private WeekBeforeRegulatorDeadlineUpdateReminderService weekBeforeRegulatorDeadlineUpdateReminderService;
+  private DayAfterRegulatorDeadlineUpdateReminderService dayAfterRegulatorDeadlineUpdateReminderService;
 
   @Before
   public void setup() {
-    weekBeforeRegulatorDeadlineUpdateReminderService = new WeekBeforeRegulatorDeadlineUpdateReminderService(
-        List.of(testWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider),
+    dayAfterRegulatorDeadlineUpdateReminderService = new DayAfterRegulatorDeadlineUpdateReminderService(
+        List.of(testDayAfterRegulatorDeadlineUpdateEmailPropertyProvider),
         regulatorUpdateReminderEmailPropertiesService
     );
   }
 
   @Test
-  public void isReminderDue_whenSevenDaysBeforeDeadline_thenTrue() {
+  public void isReminderDue_whenDayAfterDeadline_thenTrue() {
 
-    var deadlineDateOneWeekInFuture = LocalDate.now().plus(7, ChronoUnit.DAYS);
+    var deadlineDateOneDayInPast = LocalDate.now().minusDays(1);
 
-    var isReminderDue = weekBeforeRegulatorDeadlineUpdateReminderService.isReminderDue(deadlineDateOneWeekInFuture);
+    var isReminderDue = dayAfterRegulatorDeadlineUpdateReminderService.isReminderDue(deadlineDateOneDayInPast);
 
     assertThat(isReminderDue).isTrue();
   }
 
   @Test
-  public void isReminderDue_whenNotSevenDaysBeforeDeadline_thenFalse() {
+  public void isReminderDue_whenNotDayAfterDeadline_thenFalse() {
 
-    var deadlineDateTenDaysInFuture = LocalDate.now().plus(10, ChronoUnit.DAYS);
+    var deadlineDateOneDayInFuture = LocalDate.now().plusDays(1);
 
-    var isReminderDue = weekBeforeRegulatorDeadlineUpdateReminderService.isReminderDue(deadlineDateTenDaysInFuture);
+    var isReminderDue = dayAfterRegulatorDeadlineUpdateReminderService.isReminderDue(deadlineDateOneDayInFuture);
 
     assertThat(isReminderDue).isFalse();
   }
@@ -77,11 +75,11 @@ public class WeekBeforeRegulatorDeadlineUpdateReminderServiceTest {
         new ProjectOperator()
     );
 
-    when(testWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider.getSupportedProjectType()).thenReturn(supportedProjectType);
+    when(testDayAfterRegulatorDeadlineUpdateEmailPropertyProvider.getSupportedProjectType()).thenReturn(supportedProjectType);
 
-    weekBeforeRegulatorDeadlineUpdateReminderService.getEmailReminderProperties(regulatorUpdateRequestProjectDto);
+    dayAfterRegulatorDeadlineUpdateReminderService.getEmailReminderProperties(regulatorUpdateRequestProjectDto);
 
-    verify(testWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider, times(1)).getEmailProperties(
+    verify(testDayAfterRegulatorDeadlineUpdateEmailPropertyProvider, times(1)).getEmailProperties(
         regulatorUpdateRequestProjectDto.getRegulatorUpdateRequest()
     );
   }
@@ -105,23 +103,19 @@ public class WeekBeforeRegulatorDeadlineUpdateReminderServiceTest {
         new ProjectOperator()
     );
 
-    when(testWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider.getSupportedProjectType()).thenReturn(supportedProjectType);
-
-    var expectedFormattedDeadlineDate = "deadline-date";
-    when(regulatorUpdateReminderEmailPropertiesService.getFormattedDeadlineDate(any())).thenReturn(expectedFormattedDeadlineDate);
+    when(testDayAfterRegulatorDeadlineUpdateEmailPropertyProvider.getSupportedProjectType()).thenReturn(supportedProjectType);
 
     var projectUrl = "project-url";
     when(regulatorUpdateReminderEmailPropertiesService.getProjectManagementUrl(regulatorUpdateRequest)).thenReturn(projectUrl);
 
-    var resultingEmailProperties = weekBeforeRegulatorDeadlineUpdateReminderService.getEmailReminderProperties(regulatorUpdateRequestProjectDto);
+    var resultingEmailProperties = dayAfterRegulatorDeadlineUpdateReminderService.getEmailReminderProperties(regulatorUpdateRequestProjectDto);
 
-    verify(testWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider, never()).getEmailProperties(
+    verify(testDayAfterRegulatorDeadlineUpdateEmailPropertyProvider, never()).getEmailProperties(
         regulatorUpdateRequestProjectDto.getRegulatorUpdateRequest()
     );
 
     assertThat(resultingEmailProperties).isEqualTo(
-        new WeekBeforeDeadlineRegulatorUpdateReminderEmailProperties(
-            expectedFormattedDeadlineDate,
+        new DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties(
             updateReason,
             projectUrl
         )

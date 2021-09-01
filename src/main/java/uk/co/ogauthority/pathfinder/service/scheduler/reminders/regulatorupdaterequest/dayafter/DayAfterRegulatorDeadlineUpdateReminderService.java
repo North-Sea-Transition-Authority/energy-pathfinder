@@ -1,35 +1,34 @@
-package uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.weekbefore;
+package uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.dayafter;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project.regualtorupdaterequest.weekbefore.WeekBeforeDeadlineRegulatorUpdateReminderEmailProperties;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project.regualtorupdaterequest.dayafter.DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.RegulatorUpdateReminder;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.RegulatorUpdateReminderEmailPropertiesService;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.RegulatorUpdateRequestProjectDto;
 
 @Service
-class WeekBeforeRegulatorDeadlineUpdateReminderService implements RegulatorUpdateReminder {
+class DayAfterRegulatorDeadlineUpdateReminderService implements RegulatorUpdateReminder {
 
-  private final List<WeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider> weekBeforeRegulatorDeadlineUpdateEmailPropertyProviders;
+  private final List<DayAfterRegulatorDeadlineUpdateEmailPropertyProvider> dayAfterRegulatorDeadlineUpdateEmailPropertyProviders;
 
   private final RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService;
 
   @Autowired
-  WeekBeforeRegulatorDeadlineUpdateReminderService(
-      List<WeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider> weekBeforeRegulatorDeadlineUpdateEmailPropertyProviders,
+  DayAfterRegulatorDeadlineUpdateReminderService(
+      List<DayAfterRegulatorDeadlineUpdateEmailPropertyProvider> dayAfterRegulatorDeadlineUpdateEmailPropertyProviders,
       RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService
   ) {
-    this.weekBeforeRegulatorDeadlineUpdateEmailPropertyProviders = weekBeforeRegulatorDeadlineUpdateEmailPropertyProviders;
+    this.dayAfterRegulatorDeadlineUpdateEmailPropertyProviders = dayAfterRegulatorDeadlineUpdateEmailPropertyProviders;
     this.regulatorUpdateReminderEmailPropertiesService = regulatorUpdateReminderEmailPropertiesService;
   }
 
   @Override
   public boolean isReminderDue(LocalDate updateDeadlineDate) {
-    return updateDeadlineDate.minus(7, ChronoUnit.DAYS).equals(LocalDate.now());
+    return LocalDate.now().minusDays(1).equals(updateDeadlineDate);
   }
 
   @Override
@@ -37,7 +36,7 @@ class WeekBeforeRegulatorDeadlineUpdateReminderService implements RegulatorUpdat
 
     var regulatorUpdateRequest = regulatorUpdateRequestProjectDto.getRegulatorUpdateRequest();
 
-    var emailPropertyProvider = weekBeforeRegulatorDeadlineUpdateEmailPropertyProviders
+    var emailPropertyProvider = dayAfterRegulatorDeadlineUpdateEmailPropertyProviders
         .stream()
         .filter(provider -> provider.getSupportedProjectType().equals(regulatorUpdateRequest.getProjectDetail().getProjectType()))
         .findFirst();
@@ -47,8 +46,7 @@ class WeekBeforeRegulatorDeadlineUpdateReminderService implements RegulatorUpdat
       return emailPropertyProvider.get().getEmailProperties(regulatorUpdateRequest);
     } else {
       // otherwise, fall back to the default email properties
-      return new WeekBeforeDeadlineRegulatorUpdateReminderEmailProperties(
-          regulatorUpdateReminderEmailPropertiesService.getFormattedDeadlineDate(regulatorUpdateRequest.getDeadlineDate()),
+      return new DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties(
           regulatorUpdateRequest.getUpdateReason(),
           regulatorUpdateReminderEmailPropertiesService.getProjectManagementUrl(regulatorUpdateRequest)
       );

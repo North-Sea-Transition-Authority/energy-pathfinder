@@ -95,6 +95,75 @@ public class RegulatorUpdateRequestRepositoryIntegrationTest {
     );
   }
 
+  @Test
+  public void getAllProjectsWithOutstandingRegulatorUpdateRequestsWithDeadlines_whenNewDetailSubmittedAfterUpdateRequest_thenProjectNotReturned() {
+
+    var project = createProject();
+    var submittedProjectDetailStatus = ProjectStatus.QA;
+
+    var projectDetailWithUpdateRequest = createProjectDetail(submittedProjectDetailStatus, project);
+    var projectOperatorForDetailWithUpdateRequest = createProjectOperator(projectDetailWithUpdateRequest);
+
+    var regulatorUpdateRequestWithDeadline = createRegulatorUpdateRequest(projectDetailWithUpdateRequest, LocalDate.now());
+
+    var projectDetailAfterUpdateRequest = createProjectDetail(submittedProjectDetailStatus, project);
+    projectDetailAfterUpdateRequest.setVersion(projectDetailAfterUpdateRequest.getVersion() + 1);
+
+    var projectOperatorForDetailAfterUpdateRequest = createProjectOperator(projectDetailAfterUpdateRequest);
+
+    // entities related to the original project update request
+    persistEntity(project);
+    persistEntity(projectDetailWithUpdateRequest);
+    persistEntity(projectOperatorForDetailWithUpdateRequest);
+    persistEntity(regulatorUpdateRequestWithDeadline);
+
+    // entities related to the submission after the original project update request
+    persistEntity(projectDetailAfterUpdateRequest);
+    persistEntity(projectOperatorForDetailAfterUpdateRequest);
+
+    flushDatabase();
+
+    var resultingDtos = regulatorUpdateRequestRepository.getAllProjectsWithOutstandingRegulatorUpdateRequestsWithDeadlines();
+
+    assertThat(resultingDtos).isEmpty();
+  }
+
+  @Test
+  public void getAllProjectsWithOutstandingRegulatorUpdateRequestsWithDeadlines_whenNewDetailCreatedAndNotSubmittedAfterUpdateRequest_thenProjectReturned() {
+
+    var project = createProject();
+    var submittedProjectDetailStatus = ProjectStatus.QA;
+    var draftProjectDetailStatus = ProjectStatus.DRAFT;
+
+    var projectDetailWithUpdateRequest = createProjectDetail(submittedProjectDetailStatus, project);
+    var projectOperatorForDetailWithUpdateRequest = createProjectOperator(projectDetailWithUpdateRequest);
+
+    var regulatorUpdateRequestWithDeadline = createRegulatorUpdateRequest(projectDetailWithUpdateRequest, LocalDate.now());
+
+    var projectDetailAfterUpdateRequest = createProjectDetail(draftProjectDetailStatus, project);
+    projectDetailAfterUpdateRequest.setVersion(projectDetailAfterUpdateRequest.getVersion() + 1);
+
+    var projectOperatorForDetailAfterUpdateRequest = createProjectOperator(projectDetailAfterUpdateRequest);
+
+    // entities related to the original project update request
+    persistEntity(project);
+    persistEntity(projectDetailWithUpdateRequest);
+    persistEntity(projectOperatorForDetailWithUpdateRequest);
+    persistEntity(regulatorUpdateRequestWithDeadline);
+
+    // entities related to the submission after the original project update request
+    persistEntity(projectDetailAfterUpdateRequest);
+    persistEntity(projectOperatorForDetailAfterUpdateRequest);
+
+    flushDatabase();
+
+    var resultingDtos = regulatorUpdateRequestRepository.getAllProjectsWithOutstandingRegulatorUpdateRequestsWithDeadlines();
+
+    assertThat(resultingDtos).extracting(RegulatorUpdateRequestProjectDto::getRegulatorUpdateRequest).containsExactly(
+        regulatorUpdateRequestWithDeadline
+    );
+  }
+
   private void persistEntity(Object... entities) {
     for (Object entity : entities) {
       entityManager.persist(entity);
