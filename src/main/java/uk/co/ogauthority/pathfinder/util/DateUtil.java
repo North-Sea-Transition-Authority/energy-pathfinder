@@ -64,7 +64,7 @@ public class DateUtil {
   }
 
   public static boolean isInCurrentQuarter(Instant instantToCheck) {
-    final var currentQuarter = getQuarterFromLocalDate(LocalDate.now());
+    final var currentQuarter = getCurrentQuarter();
     final var quarterStartInstant = currentQuarter.getStartDateAsInstant();
     final var quarterEndInstant = currentQuarter.getEndDateAsInstant();
 
@@ -102,6 +102,10 @@ public class DateUtil {
 
   public static long daysBetween(LocalDate fromDate, LocalDate toDate) {
     return ChronoUnit.DAYS.between(fromDate, toDate);
+  }
+
+  public static Quarter getCurrentQuarter() {
+    return getQuarterFromLocalDate(LocalDate.now());
   }
 
 }

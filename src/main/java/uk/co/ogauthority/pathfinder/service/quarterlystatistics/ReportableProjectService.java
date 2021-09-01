@@ -30,6 +30,11 @@ public class ReportableProjectService {
     return reportableProjectRepository.findByLastUpdatedDatetimeBetween(earliestUpdatedDatetime, latestUpdatedDatetime);
   }
 
+  public List<ReportableProject> getReportableProjectsNotUpdatedBetween(Instant earliestUpdatedDatetime,
+                                                                        Instant latestUpdatedDatetime) {
+    return reportableProjectRepository.findByLastUpdatedDatetimeNotBetween(earliestUpdatedDatetime, latestUpdatedDatetime);
+  }
+
   public List<ReportableProject> getReportableProjects() {
     return reportableProjectRepository.findAll();
   }

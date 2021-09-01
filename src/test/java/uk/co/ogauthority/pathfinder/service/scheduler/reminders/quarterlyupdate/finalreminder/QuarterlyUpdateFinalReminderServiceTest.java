@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.scheduler.reminders.quarterlyupdate.initialreminder;
+package uk.co.ogauthority.pathfinder.service.scheduler.reminders.quarterlyupdate.finalreminder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
@@ -15,14 +15,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project.quarterly.initialreminder.InitialQuarterlyUpdateReminderEmailProperties;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project.quarterly.finalreminder.FinalQuarterlyUpdateReminderEmailProperties;
 import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
 import uk.co.ogauthority.pathfinder.service.email.notify.CommonEmailMergeField;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.quarterlyupdate.QuarterlyUpdateReminderService;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.quarterlyupdate.RemindableProject;
 
 @RunWith(MockitoJUnitRunner.class)
-public class QuarterlyUpdateInitialReminderServiceTest {
+public class QuarterlyUpdateFinalReminderServiceTest {
 
   @Mock
   private QuarterlyUpdateReminderService quarterlyUpdateReminderService;
@@ -30,42 +30,42 @@ public class QuarterlyUpdateInitialReminderServiceTest {
   @Mock
   private EmailLinkService emailLinkService;
 
-  private QuarterlyUpdateInitialReminderService quarterlyUpdateInitialReminderService;
+  private QuarterlyUpdateFinalReminderService quarterlyUpdateFinalReminderService;
 
   @Before
   public void setup() {
-    quarterlyUpdateInitialReminderService = new QuarterlyUpdateInitialReminderService(
+    quarterlyUpdateFinalReminderService = new QuarterlyUpdateFinalReminderService(
         quarterlyUpdateReminderService,
         emailLinkService
     );
   }
 
   @Test
-  public void sendInitialQuarterlyReminder_verifyInteraction() {
+  public void sendFinalQuarterlyUpdateReminder_verifyInteraction() {
 
-    quarterlyUpdateInitialReminderService.sendInitialQuarterlyReminder();
+    quarterlyUpdateFinalReminderService.sendFinalQuarterlyUpdateReminder();
 
     verify(quarterlyUpdateReminderService, times(1)).sendQuarterlyProjectUpdateReminderToOperators(
-        quarterlyUpdateInitialReminderService
+        quarterlyUpdateFinalReminderService
     );
   }
 
   @Test
-  public void sendInitialQuarterlyReminder_whenDependentServiceThrowsException_verifyConsumerHandles() {
+  public void sendFinalQuarterlyUpdateReminder_whenDependentServiceThrowsException_verifyConsumerHandles() {
 
     doThrow(new RuntimeException()).when(quarterlyUpdateReminderService).sendQuarterlyProjectUpdateReminderToOperators(
-        quarterlyUpdateInitialReminderService
+        quarterlyUpdateFinalReminderService
     );
 
-    Assertions.assertDoesNotThrow(() -> quarterlyUpdateInitialReminderService.sendInitialQuarterlyReminder());
+    Assertions.assertDoesNotThrow(() -> quarterlyUpdateFinalReminderService.sendFinalQuarterlyUpdateReminder());
   }
 
   @Test
   public void getRemindableProjects_whenNoRemindableProjectsFound_thenReturnEmptyList() {
 
-    when(quarterlyUpdateReminderService.getAllRemindableProjects()).thenReturn(Collections.emptyList());
+    when(quarterlyUpdateReminderService.getRemindableProjectsNotUpdatedInCurrentQuarter()).thenReturn(Collections.emptyList());
 
-    var resultingRemindableProjects = quarterlyUpdateInitialReminderService.getRemindableProjects();
+    var resultingRemindableProjects = quarterlyUpdateFinalReminderService.getRemindableProjects();
 
     assertThat(resultingRemindableProjects).isEmpty();
   }
@@ -77,9 +77,9 @@ public class QuarterlyUpdateInitialReminderServiceTest {
         new RemindableProject(1, 2, "project name")
     );
 
-    when(quarterlyUpdateReminderService.getAllRemindableProjects()).thenReturn(expectedRemindableProjects);
+    when(quarterlyUpdateReminderService.getRemindableProjectsNotUpdatedInCurrentQuarter()).thenReturn(expectedRemindableProjects);
 
-    var resultingRemindableProjects = quarterlyUpdateInitialReminderService.getRemindableProjects();
+    var resultingRemindableProjects = quarterlyUpdateFinalReminderService.getRemindableProjects();
 
     assertThat(resultingRemindableProjects).isEqualTo(expectedRemindableProjects);
   }
@@ -94,14 +94,14 @@ public class QuarterlyUpdateInitialReminderServiceTest {
 
     when(emailLinkService.getWorkAreaUrl()).thenReturn(serviceUrl);
 
-    var expectedEmailProperties = new InitialQuarterlyUpdateReminderEmailProperties(
+    var expectedEmailProperties = new FinalQuarterlyUpdateReminderEmailProperties(
         recipientIdentifier,
         operatorName,
         projectNameList,
         serviceUrl
     );
 
-    var resultingEmailProperties = quarterlyUpdateInitialReminderService.getReminderEmailProperties(
+    var resultingEmailProperties = quarterlyUpdateFinalReminderService.getReminderEmailProperties(
         recipientIdentifier,
         operatorName,
         projectNameList
@@ -116,4 +116,5 @@ public class QuarterlyUpdateInitialReminderServiceTest {
         CommonEmailMergeField.RECIPIENT_IDENTIFIER, recipientIdentifier
     ));
   }
+
 }

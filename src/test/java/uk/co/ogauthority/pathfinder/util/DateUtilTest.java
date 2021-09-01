@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.IsoFields;
+import java.util.Arrays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -185,5 +187,27 @@ public class DateUtilTest {
     var resultingDaysBetween = DateUtil.daysBetween(fromDate, toDate);
 
     assertThat(resultingDaysBetween).isEqualTo(expectedDaysBetween);
+  }
+
+  @Test
+  public void getCurrentQuarter_verifyExpectedReturnValue() {
+
+    var expectedCurrentQuarter = deriveCurrentQuarter();
+
+    var resultingCurrentQuarter = DateUtil.getCurrentQuarter();
+
+    assertThat(resultingCurrentQuarter).isEqualTo(expectedCurrentQuarter);
+  }
+
+  private Quarter deriveCurrentQuarter() {
+
+    var currentQuarterIndex = LocalDate.now().get(IsoFields.QUARTER_OF_YEAR);
+
+    return Arrays.stream(Quarter.values())
+        .filter(quarter -> quarter.getDisplayValue().equals(currentQuarterIndex))
+        .findFirst()
+        .orElseThrow(() -> new RuntimeException(
+            String.format("Could not determine current quarter using index %s", currentQuarterIndex))
+        );
   }
 }

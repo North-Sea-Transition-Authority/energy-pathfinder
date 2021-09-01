@@ -141,6 +141,42 @@ public class ReportableProjectServiceTest {
     assertThat(resultingReportableProjects).isEqualTo(expectedReportableProjects);
   }
 
+  @Test
+  public void getReportableProjectsNotUpdatedBetween_whenNoReportableProjectsFound_thenEmptyList() {
+
+    var earliestUpdatedDatetime = Instant.MIN;
+    var latestUpdatedDatetime = Instant.MIN;
+
+    when(reportableProjectRepository.findByLastUpdatedDatetimeNotBetween(earliestUpdatedDatetime, latestUpdatedDatetime))
+        .thenReturn(Collections.emptyList());
+
+    var resultingReportableProjects = reportableProjectService.getReportableProjectsNotUpdatedBetween(
+        earliestUpdatedDatetime,
+        latestUpdatedDatetime
+    );
+
+    assertThat(resultingReportableProjects).isEmpty();
+  }
+
+  @Test
+  public void getReportableProjectsNotUpdatedBetween_whenReportableProjectsFound_thenPopulatedList() {
+
+    var earliestUpdatedDatetime = Instant.MIN;
+    var latestUpdatedDatetime = Instant.MIN;
+
+    var expectedReportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.DECOMMISSIONING);
+
+    when(reportableProjectRepository.findByLastUpdatedDatetimeNotBetween(earliestUpdatedDatetime, latestUpdatedDatetime))
+        .thenReturn(List.of(expectedReportableProject));
+
+    var resultingReportableProjects = reportableProjectService.getReportableProjectsNotUpdatedBetween(
+        earliestUpdatedDatetime,
+        latestUpdatedDatetime
+    );
+
+    assertThat(resultingReportableProjects).containsExactly(expectedReportableProject);
+  }
+
   private void assertCommonDerivedFields(ReportableProjectView reportableProjectView, ReportableProject reportableProject) {
     assertThat(reportableProjectView.getViewProjectUrl()).isEqualTo(
         ReverseRouter.route(on(ManageProjectController.class).getProject(

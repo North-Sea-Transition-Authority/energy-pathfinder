@@ -164,6 +164,34 @@ public class QuarterlyUpdateReminderServiceTest {
     });
   }
 
+  @Test
+  public void getRemindableProjectsNotUpdatedInCurrentQuarter_whenNoRemindableProjectsFound_thenReturnEmptyList() {
+
+    when(reportableProjectService.getReportableProjectsNotUpdatedBetween(any(), any())).thenReturn(Collections.emptyList());
+
+    var resultingRemindableProjects = quarterlyUpdateReminderService.getRemindableProjectsNotUpdatedInCurrentQuarter();
+
+    assertThat(resultingRemindableProjects).isEmpty();
+  }
+
+  @Test
+  public void getRemindableProjectsNotUpdatedInCurrentQuarter_whenRemindableProjectsFound_thenReturnPopulatedList() {
+
+    var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.DEVELOPMENT);
+
+    when(reportableProjectService.getReportableProjectsNotUpdatedBetween(any(), any())).thenReturn(List.of(reportableProject));
+
+    var resultingRemindableProjects = quarterlyUpdateReminderService.getRemindableProjectsNotUpdatedInCurrentQuarter();
+
+    assertThat(resultingRemindableProjects).containsExactly(
+        new RemindableProject(
+            reportableProject.getProjectDetailId(),
+            reportableProject.getOperatorGroupId(),
+            reportableProject.getProjectDisplayName()
+        )
+    );
+  }
+
   private Person createPerson(int personId, String emailAddress) {
     return UserTestingUtil.getPerson(
         personId,

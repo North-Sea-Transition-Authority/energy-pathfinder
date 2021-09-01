@@ -9,8 +9,10 @@ import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.OrganisationGroupMembership;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationGroupPersonMembershipService;
+import uk.co.ogauthority.pathfinder.model.entity.quarterlystatistics.ReportableProject;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
 import uk.co.ogauthority.pathfinder.service.quarterlystatistics.ReportableProjectService;
+import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @Service
 public class QuarterlyUpdateReminderService {
@@ -33,11 +35,20 @@ public class QuarterlyUpdateReminderService {
   public List<RemindableProject> getAllRemindableProjects() {
     return reportableProjectService.getReportableProjects()
         .stream()
-        .map(reportableProject -> new RemindableProject(
-            reportableProject.getProjectDetailId(),
-            reportableProject.getOperatorGroupId(),
-            reportableProject.getProjectDisplayName())
+        .map(this::convertToRemindableProject)
+        .collect(Collectors.toList());
+  }
+
+  public List<RemindableProject> getRemindableProjectsNotUpdatedInCurrentQuarter() {
+
+    var currentQuarter = DateUtil.getCurrentQuarter();
+
+    return reportableProjectService.getReportableProjectsNotUpdatedBetween(
+            currentQuarter.getStartDateAsInstant(),
+            currentQuarter.getEndDateAsInstant()
         )
+        .stream()
+        .map(this::convertToRemindableProject)
         .collect(Collectors.toList());
   }
 
@@ -104,5 +115,13 @@ public class QuarterlyUpdateReminderService {
           teamMember.getForename()
       );
     });
+  }
+
+  private RemindableProject convertToRemindableProject(ReportableProject reportableProject) {
+    return new RemindableProject(
+        reportableProject.getProjectDetailId(),
+        reportableProject.getOperatorGroupId(),
+        reportableProject.getProjectDisplayName()
+    );
   }
 }
