@@ -276,6 +276,11 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
 
     forwardWorkPlanCollaborationOpportunityService.copySectionData(fromProjectDetail, toProjectDetail);
 
+    verify(forwardWorkPlanCollaborationSetupService, times(1)).copySectionData(
+        fromProjectDetail,
+        toProjectDetail
+    );
+
     verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
         collaborationOpportunities,
         toProjectDetail,
@@ -372,9 +377,9 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
 
     forwardWorkPlanCollaborationOpportunityService.removeSectionData(projectDetail);
 
+    verify(forwardWorkPlanCollaborationSetupService, times(1)).removeSectionData(projectDetail);
     verify(forwardWorkPlanCollaborationOpportunityFileLinkService, times(1)).removeCollaborationOpportunityFileLinks(opportunitiesForDetail);
     verify(forwardWorkPlanCollaborationOpportunityRepository, times(1)).deleteAll(opportunitiesForDetail);
-
   }
 
 }

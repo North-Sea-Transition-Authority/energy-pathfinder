@@ -537,7 +537,7 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
   @Test
   public void copySectionData_verifyInteractions() {
 
-    // ensure the two and from details are different so we can
+    // ensure the two and from details are different, so we can
     // verify the params are passed in correctly
     final var fromProjectDetail = ProjectUtil.getProjectDetails();
     fromProjectDetail.setVersion(1);
@@ -563,6 +563,11 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
         toProjectDetail,
         ForwardWorkPlanUpcomingTender.class
     );
+
+    verify(forwardWorkPlanTenderSetupService, times(1)).copySectionData(
+        fromProjectDetail,
+        toProjectDetail
+    );
   }
 
   @Test
@@ -584,5 +589,7 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
     workPlanUpcomingTenderService.removeSectionData(projectDetail);
 
     verify(workPlanUpcomingTenderRepository, times(1)).deleteAll(upcomingTendersForDetail);
+
+    verify(forwardWorkPlanTenderSetupService, times(1)).removeSectionData(projectDetail);
   }
 }

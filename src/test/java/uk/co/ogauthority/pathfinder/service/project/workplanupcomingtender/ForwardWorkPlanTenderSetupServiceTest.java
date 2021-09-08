@@ -1,6 +1,8 @@
 package uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,11 +14,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanTenderSetup;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanTenderSetupForm;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.ForwardWorkPlanTenderSetupRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
@@ -30,6 +34,9 @@ public class ForwardWorkPlanTenderSetupServiceTest {
   @Mock
   private ValidationService validationService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
 
   private ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
@@ -38,7 +45,8 @@ public class ForwardWorkPlanTenderSetupServiceTest {
   public void setup() {
     forwardWorkPlanTenderSetupService = new ForwardWorkPlanTenderSetupService(
         forwardWorkPlanTenderSetupRepository,
-        validationService
+        validationService,
+        entityDuplicationService
     );
   }
 
@@ -250,6 +258,68 @@ public class ForwardWorkPlanTenderSetupServiceTest {
 
     assertThat(workPlanTenderSetupView.getHasTendersToAdd()).isEmpty();
 
+  }
+
+  @Test
+  public void getForwardWorkPlanTenderSetup_whenEntityFound_thenReturn() {
+
+    var tenderSetup = new ForwardWorkPlanTenderSetup();
+
+    when(forwardWorkPlanTenderSetupRepository.findByProjectDetail(projectDetail)).thenReturn(Optional.of(tenderSetup));
+
+    var resultingEntity = forwardWorkPlanTenderSetupService.getForwardWorkPlanTenderSetup(projectDetail);
+
+    assertThat(resultingEntity).isEqualTo(tenderSetup);
+  }
+
+  @Test(expected = PathfinderEntityNotFoundException.class)
+  public void getForwardWorkPlanTenderSetup_whenNoEntityFound_thenException() {
+    when(forwardWorkPlanTenderSetupRepository.findByProjectDetail(projectDetail)).thenReturn(Optional.empty());
+    forwardWorkPlanTenderSetupService.getForwardWorkPlanTenderSetup(projectDetail);
+  }
+
+  @Test
+  public void copySectionData_verifyInteractions() {
+
+    var fromProjectDetail = ProjectUtil.getProjectDetails();
+    fromProjectDetail.setVersion(1);
+
+    var toProjectDetail = ProjectUtil.getProjectDetails();
+    toProjectDetail.setVersion(2);
+
+    var tenderSetup = new ForwardWorkPlanTenderSetup();
+
+    when(forwardWorkPlanTenderSetupRepository.findByProjectDetail(fromProjectDetail)).thenReturn(Optional.of(tenderSetup));
+
+    forwardWorkPlanTenderSetupService.copySectionData(fromProjectDetail, toProjectDetail);
+
+    verify(entityDuplicationService, times(1)).duplicateEntityAndSetNewParent(
+        tenderSetup,
+        toProjectDetail,
+        ForwardWorkPlanTenderSetup.class
+    );
+  }
+
+  @Test
+  public void removeSectionData_whenEntityExists_thenRepositoryInteraction() {
+
+    var tenderSetup = new ForwardWorkPlanTenderSetup();
+
+    when(forwardWorkPlanTenderSetupRepository.findByProjectDetail(projectDetail)).thenReturn(Optional.of(tenderSetup));
+
+    forwardWorkPlanTenderSetupService.removeSectionData(projectDetail);
+
+    verify(forwardWorkPlanTenderSetupRepository, times(1)).delete(tenderSetup);
+  }
+
+  @Test
+  public void removeSectionData_whenNoEntityExists_thenNoRepositoryInteraction() {
+
+    when(forwardWorkPlanTenderSetupRepository.findByProjectDetail(projectDetail)).thenReturn(Optional.empty());
+
+    forwardWorkPlanTenderSetupService.removeSectionData(projectDetail);
+
+    verify(forwardWorkPlanTenderSetupRepository, never()).delete(any());
   }
 
 }

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationSetup;
@@ -13,6 +14,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationSetupView;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationSetupViewUtil;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationSetupRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
@@ -20,14 +22,17 @@ public class ForwardWorkPlanCollaborationSetupService {
 
   private final ForwardWorkPlanCollaborationSetupRepository forwardWorkPlanCollaborationSetupRepository;
   private final ValidationService validationService;
+  private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
   public ForwardWorkPlanCollaborationSetupService(
       ForwardWorkPlanCollaborationSetupRepository forwardWorkPlanCollaborationSetupRepository,
-      ValidationService validationService
+      ValidationService validationService,
+      EntityDuplicationService entityDuplicationService
   ) {
     this.forwardWorkPlanCollaborationSetupRepository = forwardWorkPlanCollaborationSetupRepository;
     this.validationService = validationService;
+    this.entityDuplicationService = entityDuplicationService;
   }
 
   public ForwardWorkPlanCollaborationSetupForm getCollaborationSetupFormFromDetail(ProjectDetail projectDetail) {
@@ -80,6 +85,31 @@ public class ForwardWorkPlanCollaborationSetupService {
         .orElse(new ForwardWorkPlanCollaborationSetup());
 
     return convertToCollaborationSetupView(collaborationSetup);
+  }
+
+  @Transactional
+  public void removeSectionData(ProjectDetail projectDetail) {
+    getCollaborationSetupFromDetail(projectDetail)
+        .ifPresent(forwardWorkPlanCollaborationSetupRepository::delete);
+  }
+
+  @Transactional
+  public void copySectionData(ProjectDetail fromProjectDetail, ProjectDetail toProjectDetail) {
+    entityDuplicationService.duplicateEntityAndSetNewParent(
+        getCollaborationSetup(fromProjectDetail),
+        toProjectDetail,
+        ForwardWorkPlanCollaborationSetup.class
+    );
+  }
+
+  ForwardWorkPlanCollaborationSetup getCollaborationSetup(ProjectDetail projectDetail) {
+    return getCollaborationSetupFromDetail(projectDetail)
+        .orElseThrow(() -> new PathfinderEntityNotFoundException(
+            String.format(
+                "Could not find ForwardWorkPlanCollaborationSetup for project detail with ID %d",
+                projectDetail.getId()
+            )
+        ));
   }
 
   private ForwardWorkPlanCollaborationSetupView convertToCollaborationSetupView(ForwardWorkPlanCollaborationSetup collaborationSetup) {

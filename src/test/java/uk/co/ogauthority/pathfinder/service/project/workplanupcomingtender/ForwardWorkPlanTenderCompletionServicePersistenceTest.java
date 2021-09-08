@@ -14,6 +14,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanTenderSetup;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanTenderCompletionForm;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.ForwardWorkPlanTenderSetupRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -26,6 +27,9 @@ public class ForwardWorkPlanTenderCompletionServicePersistenceTest {
   @Mock
   private ForwardWorkPlanTenderSetupRepository forwardWorkPlanTenderSetupRepository;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
 
   private ForwardWorkPlanTenderCompletionService forwardWorkPlanTenderCompletionService;
@@ -35,7 +39,8 @@ public class ForwardWorkPlanTenderCompletionServicePersistenceTest {
 
     final var forwardWorkPlanTenderSetupService = new ForwardWorkPlanTenderSetupService(
         forwardWorkPlanTenderSetupRepository,
-        validationService
+        validationService,
+        entityDuplicationService
     );
 
     forwardWorkPlanTenderCompletionService = new ForwardWorkPlanTenderCompletionService(

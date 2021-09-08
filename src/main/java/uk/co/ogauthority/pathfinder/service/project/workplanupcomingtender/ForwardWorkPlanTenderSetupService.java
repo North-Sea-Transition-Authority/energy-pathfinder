@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanTenderSetup;
@@ -13,6 +14,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.Fo
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanTenderSetupView;
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanTenderSetupViewUtil;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.ForwardWorkPlanTenderSetupRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
@@ -20,12 +22,23 @@ public class ForwardWorkPlanTenderSetupService {
 
   private final ForwardWorkPlanTenderSetupRepository forwardWorkPlanTenderSetupRepository;
   private final ValidationService validationService;
+  private final EntityDuplicationService entityDuplicationService;
 
   @Autowired
   public ForwardWorkPlanTenderSetupService(ForwardWorkPlanTenderSetupRepository forwardWorkPlanTenderSetupRepository,
-                                           ValidationService validationService) {
+                                           ValidationService validationService,
+                                           EntityDuplicationService entityDuplicationService) {
     this.forwardWorkPlanTenderSetupRepository = forwardWorkPlanTenderSetupRepository;
     this.validationService = validationService;
+    this.entityDuplicationService = entityDuplicationService;
+  }
+
+  ForwardWorkPlanTenderSetup getForwardWorkPlanTenderSetup(ProjectDetail projectDetail) {
+    return getForwardWorkPlanTenderSetupForDetail(projectDetail)
+        .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format(
+            "Could not find ForwardWorkPlanTenderSetup entity for project detail with ID %d",
+            projectDetail.getId()
+        )));
   }
 
   protected Optional<ForwardWorkPlanTenderSetup> getForwardWorkPlanTenderSetupForDetail(ProjectDetail projectDetail) {
@@ -87,6 +100,22 @@ public class ForwardWorkPlanTenderSetupService {
     ).orElse(new ForwardWorkPlanTenderSetup());
 
     return ForwardWorkPlanTenderSetupViewUtil.from(forwardWorkPlanTenderSetup);
+  }
+
+  @Transactional
+  public void copySectionData(ProjectDetail fromProjectDetail, ProjectDetail toProjectDetail) {
+    entityDuplicationService.duplicateEntityAndSetNewParent(
+        getForwardWorkPlanTenderSetup(fromProjectDetail),
+        toProjectDetail,
+        ForwardWorkPlanTenderSetup.class
+    );
+  }
+
+  @Transactional
+  public void removeSectionData(ProjectDetail projectDetail) {
+    getForwardWorkPlanTenderSetupForDetail(projectDetail).ifPresent(
+        forwardWorkPlanTenderSetupRepository::delete
+    );
   }
 
   private void populateForwardWorkPlanTenderSetupFromForm(ForwardWorkPlanTenderSetup entity,

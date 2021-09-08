@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,12 +14,14 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationSetup;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationSetupForm;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationSetupViewUtil;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationSetupRepository;
+import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -31,6 +34,9 @@ public class ForwardWorkPlanCollaborationSetupServiceTest {
   @Mock
   private ValidationService validationService;
 
+  @Mock
+  private EntityDuplicationService entityDuplicationService;
+
   private ProjectDetail projectDetail;
 
   private ForwardWorkPlanCollaborationSetupService forwardWorkPlanCollaborationSetupService;
@@ -39,7 +45,8 @@ public class ForwardWorkPlanCollaborationSetupServiceTest {
   public void setup() {
     forwardWorkPlanCollaborationSetupService = new ForwardWorkPlanCollaborationSetupService(
         forwardWorkPlanCollaborationSetupRepository,
-        validationService
+        validationService,
+        entityDuplicationService
     );
 
     projectDetail = ProjectUtil.getProjectDetails();
@@ -223,5 +230,74 @@ public class ForwardWorkPlanCollaborationSetupServiceTest {
     );
 
     assertThat(resultingSetupView).isEqualTo(expectedSetupView);
+  }
+
+  @Test
+  public void copySectionData_verifyInteractions() {
+
+    var fromProjectDetail = projectDetail;
+    fromProjectDetail.setVersion(1);
+
+    var toProjectDetail = ProjectUtil.getProjectDetails();
+    toProjectDetail.setVersion(2);
+
+    var collaborationSetup = new ForwardWorkPlanCollaborationSetup();
+
+    when(forwardWorkPlanCollaborationSetupRepository.findByProjectDetail(fromProjectDetail))
+        .thenReturn(Optional.of(collaborationSetup));
+
+    forwardWorkPlanCollaborationSetupService.copySectionData(fromProjectDetail, toProjectDetail);
+
+    verify(entityDuplicationService, times(1)).duplicateEntityAndSetNewParent(
+        collaborationSetup,
+        toProjectDetail,
+        ForwardWorkPlanCollaborationSetup.class
+    );
+  }
+
+  @Test
+  public void getCollaborationSetup_whenEntityFound_thenReturn() {
+
+    var collaborationSetup = new ForwardWorkPlanCollaborationSetup();
+
+    when(forwardWorkPlanCollaborationSetupRepository.findByProjectDetail(projectDetail))
+        .thenReturn(Optional.of(collaborationSetup));
+
+    var resultingEntity = forwardWorkPlanCollaborationSetupService.getCollaborationSetup(projectDetail);
+
+    assertThat(resultingEntity).isEqualTo(collaborationSetup);
+  }
+
+  @Test(expected = PathfinderEntityNotFoundException.class)
+  public void getCollaborationSetup_whenNoEntityFound_thenException() {
+
+    when(forwardWorkPlanCollaborationSetupRepository.findByProjectDetail(projectDetail))
+        .thenReturn(Optional.empty());
+
+    forwardWorkPlanCollaborationSetupService.getCollaborationSetup(projectDetail);
+  }
+
+  @Test
+  public void removeSectionData_whenEntityExist_thenRepositoryCalled() {
+
+    var collaborationSetup = new ForwardWorkPlanCollaborationSetup();
+
+    when(forwardWorkPlanCollaborationSetupRepository.findByProjectDetail(projectDetail))
+        .thenReturn(Optional.of(collaborationSetup));
+
+    forwardWorkPlanCollaborationSetupService.removeSectionData(projectDetail);
+
+    verify(forwardWorkPlanCollaborationSetupRepository, times(1)).delete(collaborationSetup);
+  }
+
+  @Test
+  public void removeSectionData_whenNoEntityExists_thenRepositoryNotCalled() {
+
+    when(forwardWorkPlanCollaborationSetupRepository.findByProjectDetail(projectDetail))
+        .thenReturn(Optional.empty());
+
+    forwardWorkPlanCollaborationSetupService.removeSectionData(projectDetail);
+
+    verify(forwardWorkPlanCollaborationSetupRepository, never()).delete(any());
   }
 }

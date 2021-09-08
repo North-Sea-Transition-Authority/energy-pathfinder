@@ -217,6 +217,8 @@ public class ForwardWorkPlanCollaborationOpportunityService
   @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
 
+    forwardWorkPlanCollaborationSetupService.copySectionData(fromDetail, toDetail);
+
     final var duplicatedOpportunityEntities = entityDuplicationService.duplicateEntitiesAndSetNewParent(
         getOpportunitiesForDetail(fromDetail),
         toDetail,
@@ -236,6 +238,7 @@ public class ForwardWorkPlanCollaborationOpportunityService
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
+    forwardWorkPlanCollaborationSetupService.removeSectionData(projectDetail);
     final var collaborationOpportunities = getOpportunitiesForDetail(projectDetail);
     forwardWorkPlanCollaborationOpportunityFileLinkService.removeCollaborationOpportunityFileLinks(collaborationOpportunities);
     forwardWorkPlanCollaborationOpportunityRepository.deleteAll(collaborationOpportunities);

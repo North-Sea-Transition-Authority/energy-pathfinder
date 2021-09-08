@@ -248,12 +248,18 @@ public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionS
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
+
+    forwardWorkPlanTenderSetupService.removeSectionData(projectDetail);
+
     final var upcomingTenders = getUpcomingTendersForDetail(projectDetail);
     workPlanUpcomingTenderRepository.deleteAll(upcomingTenders);
   }
 
   @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
+
+    forwardWorkPlanTenderSetupService.copySectionData(fromDetail, toDetail);
+
     entityDuplicationService.duplicateEntitiesAndSetNewParent(
         getUpcomingTendersForDetail(fromDetail),
         toDetail,
