@@ -9,6 +9,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.RegulatorUpdateReminderEmailPropertiesService;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.weekbefore.WeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider;
+import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.weekbefore.common.WeekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider;
 
 @Service
 class InfrastructureWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider
@@ -20,13 +21,17 @@ class InfrastructureWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider
 
   private final ProjectInformationService projectInformationService;
 
+  private final WeekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider weekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider;
+
   @Autowired
   InfrastructureWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider(
       RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService,
-      ProjectInformationService projectInformationService
+      ProjectInformationService projectInformationService,
+      WeekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider weekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider
   ) {
     this.regulatorUpdateReminderEmailPropertiesService = regulatorUpdateReminderEmailPropertiesService;
     this.projectInformationService = projectInformationService;
+    this.weekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider = weekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider;
   }
 
   @Override
@@ -50,7 +55,7 @@ class InfrastructureWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider
 
     var introductionText = String.format(
         "%s to your %s, %s.",
-        RegulatorUpdateRequestReminderEmailProperties.DEFAULT_UPDATE_REMINDER_INTRO_TEXT,
+        weekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider.getDefaultIntroductionTextPrefix(),
         projectTypeLowercaseDisplayName,
         projectTitle
     );

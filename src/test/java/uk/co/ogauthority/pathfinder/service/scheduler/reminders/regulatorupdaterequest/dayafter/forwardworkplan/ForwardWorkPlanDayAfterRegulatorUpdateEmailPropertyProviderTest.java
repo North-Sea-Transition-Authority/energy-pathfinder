@@ -14,6 +14,7 @@ import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRequest;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.RegulatorUpdateReminderEmailPropertiesService;
+import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.dayafter.common.DayAfterRegulatorUpdateCommonEmailPropertyProvider;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ForwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProviderTest {
@@ -23,12 +24,16 @@ public class ForwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProviderTest {
   @Mock
   private RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService;
 
+  @Mock
+  private DayAfterRegulatorUpdateCommonEmailPropertyProvider dayAfterRegulatorUpdateCommonEmailPropertyProvider;
+
   private ForwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider forwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider;
 
   @Before
   public void setup() {
     forwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider = new ForwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider(
-        regulatorUpdateReminderEmailPropertiesService
+        regulatorUpdateReminderEmailPropertiesService,
+        dayAfterRegulatorUpdateCommonEmailPropertyProvider
     );
   }
 
@@ -52,6 +57,9 @@ public class ForwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProviderTest {
     var projectUrl = "project-url";
     when(regulatorUpdateReminderEmailPropertiesService.getProjectManagementUrl(regulatorUpdateRequest)).thenReturn(projectUrl);
 
+    var introductionTextPrefix = "introduction text prefix";
+    when(dayAfterRegulatorUpdateCommonEmailPropertyProvider.getDefaultIntroductionTextPrefix()).thenReturn(introductionTextPrefix);
+
     var resultingEmailProperties = forwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider.getEmailProperties(
         regulatorUpdateRequest
     );
@@ -64,7 +72,7 @@ public class ForwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProviderTest {
 
     var expectedIntroductionText = String.format(
         "%s to your organisation's %s was due by %s.",
-        DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties.DEFAULT_INTRODUCTION_TEXT_PREFIX,
+        introductionTextPrefix,
         SUPPORTED_PROJECT_TYPE.getLowercaseDisplayName(),
         formattedDeadlineDate
     );

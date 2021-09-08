@@ -9,6 +9,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.RegulatorUpdateReminderEmailPropertiesService;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.dayafter.DayAfterRegulatorDeadlineUpdateEmailPropertyProvider;
+import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.dayafter.common.DayAfterRegulatorUpdateCommonEmailPropertyProvider;
 
 @Service
 class InfrastructureDayAfterRegulatorUpdateEmailPropertyProvider implements DayAfterRegulatorDeadlineUpdateEmailPropertyProvider {
@@ -19,13 +20,17 @@ class InfrastructureDayAfterRegulatorUpdateEmailPropertyProvider implements DayA
 
   private final ProjectInformationService projectInformationService;
 
+  private final DayAfterRegulatorUpdateCommonEmailPropertyProvider dayAfterRegulatorUpdateCommonEmailPropertyProvider;
+
   @Autowired
   InfrastructureDayAfterRegulatorUpdateEmailPropertyProvider(
       RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService,
-      ProjectInformationService projectInformationService
+      ProjectInformationService projectInformationService,
+      DayAfterRegulatorUpdateCommonEmailPropertyProvider dayAfterRegulatorUpdateCommonEmailPropertyProvider
   ) {
     this.regulatorUpdateReminderEmailPropertiesService = regulatorUpdateReminderEmailPropertiesService;
     this.projectInformationService = projectInformationService;
+    this.dayAfterRegulatorUpdateCommonEmailPropertyProvider = dayAfterRegulatorUpdateCommonEmailPropertyProvider;
   }
 
   @Override
@@ -49,7 +54,7 @@ class InfrastructureDayAfterRegulatorUpdateEmailPropertyProvider implements DayA
 
     var introductionText = String.format(
         "%s to your %s, %s, was due by %s.",
-        DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties.DEFAULT_INTRODUCTION_TEXT_PREFIX,
+        dayAfterRegulatorUpdateCommonEmailPropertyProvider.getDefaultIntroductionTextPrefix(),
         projectTypeLowercaseDisplayName,
         projectTitle,
         regulatorUpdateReminderEmailPropertiesService.getFormattedDeadlineDate(regulatorUpdateRequest.getDeadlineDate())

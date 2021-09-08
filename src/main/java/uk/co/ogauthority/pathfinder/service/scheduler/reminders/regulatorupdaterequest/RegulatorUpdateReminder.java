@@ -1,6 +1,8 @@
 package uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest;
 
 import java.time.LocalDate;
+import java.util.Set;
+import uk.co.ogauthority.pathfinder.model.email.EmailRecipient;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 
 /**
@@ -21,4 +23,12 @@ public interface RegulatorUpdateReminder {
    * @return The email properties required for sending the email specific to this implementation
    */
   EmailProperties getEmailReminderProperties(RegulatorUpdateRequestProjectDto regulatorUpdateRequestProjectDto);
+
+  /**
+   * Specify a group of additional email recipients that should receive this reminder.
+   * @return a set of additional email recipients that should receive this reminder.
+   */
+  default Set<EmailRecipient> getAdditionalReminderRecipients() {
+    return Set.of();
+  }
 }

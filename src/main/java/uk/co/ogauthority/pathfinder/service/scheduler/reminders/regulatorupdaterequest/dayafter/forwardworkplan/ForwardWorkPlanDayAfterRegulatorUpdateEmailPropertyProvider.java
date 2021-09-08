@@ -8,6 +8,7 @@ import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRe
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.RegulatorUpdateReminderEmailPropertiesService;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.dayafter.DayAfterRegulatorDeadlineUpdateEmailPropertyProvider;
+import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.dayafter.common.DayAfterRegulatorUpdateCommonEmailPropertyProvider;
 
 @Service
 class ForwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider implements DayAfterRegulatorDeadlineUpdateEmailPropertyProvider {
@@ -16,11 +17,15 @@ class ForwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider implements Day
 
   private final RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService;
 
+  private final DayAfterRegulatorUpdateCommonEmailPropertyProvider dayAfterRegulatorUpdateCommonEmailPropertyProvider;
+
   @Autowired
   ForwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider(
-      RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService
+      RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService,
+      DayAfterRegulatorUpdateCommonEmailPropertyProvider dayAfterRegulatorUpdateCommonEmailPropertyProvider
   ) {
     this.regulatorUpdateReminderEmailPropertiesService = regulatorUpdateReminderEmailPropertiesService;
+    this.dayAfterRegulatorUpdateCommonEmailPropertyProvider = dayAfterRegulatorUpdateCommonEmailPropertyProvider;
   }
 
   @Override
@@ -41,7 +46,7 @@ class ForwardWorkPlanDayAfterRegulatorUpdateEmailPropertyProvider implements Day
 
     var introductionText = String.format(
         "%s to your organisation's %s was due by %s.",
-        DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties.DEFAULT_INTRODUCTION_TEXT_PREFIX,
+        dayAfterRegulatorUpdateCommonEmailPropertyProvider.getDefaultIntroductionTextPrefix(),
         projectTypeLowercaseDisplayName,
         regulatorUpdateReminderEmailPropertiesService.getFormattedDeadlineDate(regulatorUpdateRequest.getDeadlineDate())
     );

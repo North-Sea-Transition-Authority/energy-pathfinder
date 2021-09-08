@@ -15,6 +15,7 @@ import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRe
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.RegulatorUpdateReminderEmailPropertiesService;
+import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.weekbefore.common.WeekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InfrastructureWeekBeforeRegulatorDeadlineUpdateEmailPropertyProviderTest {
@@ -27,13 +28,17 @@ public class InfrastructureWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvide
   @Mock
   private ProjectInformationService projectInformationService;
 
+  @Mock
+  private WeekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider weekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider;
+
   private InfrastructureWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider infrastructureWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider;
 
   @Before
   public void setup() {
     infrastructureWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider = new InfrastructureWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider(
         regulatorUpdateReminderEmailPropertiesService,
-        projectInformationService
+        projectInformationService,
+        weekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider
     );
   }
 
@@ -60,6 +65,9 @@ public class InfrastructureWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvide
     var projectTitle = "project-title";
     when(projectInformationService.getProjectTitle(any())).thenReturn(projectTitle);
 
+    var introductionTextPrefix = "introduction text prefix";
+    when(weekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider.getDefaultIntroductionTextPrefix()).thenReturn(introductionTextPrefix);
+
     var resultingEmailProperties = infrastructureWeekBeforeRegulatorDeadlineUpdatedEmailPropertyProvider.getEmailProperties(
         regulatorUpdateRequest
     );
@@ -73,7 +81,7 @@ public class InfrastructureWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvide
 
     var expectedIntroductionText = String.format(
         "%s to your %s, %s.",
-        RegulatorUpdateRequestReminderEmailProperties.DEFAULT_UPDATE_REMINDER_INTRO_TEXT,
+        introductionTextPrefix,
         SUPPORTED_PROJECT_TYPE.getLowercaseDisplayName(),
         projectTitle
     );

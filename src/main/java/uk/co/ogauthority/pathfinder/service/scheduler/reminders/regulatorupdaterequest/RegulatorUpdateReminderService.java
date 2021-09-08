@@ -3,13 +3,18 @@ package uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdate
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.OrganisationGroupMembership;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationGroupPersonMembershipService;
+import uk.co.ogauthority.pathfinder.model.email.EmailAddress;
+import uk.co.ogauthority.pathfinder.model.email.EmailRecipient;
+import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRequest;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequestService;
@@ -115,25 +120,53 @@ class RegulatorUpdateReminderService {
   private void processDueReminder(RegulatorUpdateReminder regulatorUpdateReminder,
                                   RegulatorUpdateRequestProjectDto regulatorUpdateRequestProjectDto,
                                   OrganisationGroupMembership organisationGroupMembership) {
-    organisationGroupMembership.getTeamMembers().forEach(teamMember ->
-        sendReminderEmailToTeamMember(
-            teamMember,
-            regulatorUpdateRequestProjectDto,
-            regulatorUpdateReminder
-        )
-    );
-  }
-
-  private void sendReminderEmailToTeamMember(Person teamMember,
-                                             RegulatorUpdateRequestProjectDto regulatorUpdateRequestProjectDto,
-                                             RegulatorUpdateReminder regulatorUpdateReminder) {
 
     var emailProperties = regulatorUpdateReminder.getEmailReminderProperties(regulatorUpdateRequestProjectDto);
 
+    organisationGroupMembership.getTeamMembers().forEach(teamMember ->
+        sendReminderEmailToTeamMember(
+            emailProperties,
+            teamMember
+        )
+    );
+
+    sendReminderEmailToAdditionalRecipients(
+        regulatorUpdateReminder,
+        emailProperties,
+        organisationGroupMembership.getOrganisationGroup()
+    );
+  }
+
+  private void sendReminderEmailToTeamMember(EmailProperties emailProperties, Person teamMember) {
+    sendEmail(
+        emailProperties,
+        new EmailRecipient(new EmailAddress(teamMember.getEmailAddress()), teamMember.getForename())
+    );
+  }
+
+  private void sendReminderEmailToAdditionalRecipients(RegulatorUpdateReminder regulatorUpdateReminder,
+                                                       EmailProperties emailProperties,
+                                                       PortalOrganisationGroup portalOrganisationGroup) {
+    regulatorUpdateReminder.getAdditionalReminderRecipients().forEach(emailRecipient -> {
+
+      // if no recipient identifier, default to the name of the organisation group we are sending emails too.
+      // Otherwise, use the recipient identifier provided
+      var emailRecipientWithDefaultsApplied = StringUtils.isBlank(emailRecipient.getRecipientIdentifier())
+          ? new EmailRecipient(emailRecipient.getEmailAddress(), portalOrganisationGroup.getName())
+          : emailRecipient;
+
+      sendEmail(
+          emailProperties,
+          emailRecipientWithDefaultsApplied
+      );
+    });
+  }
+
+  private void sendEmail(EmailProperties emailProperties, EmailRecipient emailRecipient) {
     emailService.sendEmail(
         emailProperties,
-        teamMember.getEmailAddress(),
-        teamMember.getForename()
+        emailRecipient.getEmailAddress().getEmailAddressValue(),
+        emailRecipient.getRecipientIdentifier()
     );
   }
 

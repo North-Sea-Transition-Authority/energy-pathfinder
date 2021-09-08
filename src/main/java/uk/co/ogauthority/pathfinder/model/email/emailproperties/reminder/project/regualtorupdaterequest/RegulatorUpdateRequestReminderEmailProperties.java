@@ -11,7 +11,7 @@ public class RegulatorUpdateRequestReminderEmailProperties extends EmailProperti
   public static final String UPDATE_REMINDER_SUBJECT_MAIL_MERGE_FIELD_NAME = "UPDATE_REMINDER_SUBJECT_TEXT";
 
   public static final String DEFAULT_UPDATE_REMINDER_INTRO_TEXT = "This is a reminder that the regulator has requested an update";
-  public static final String DEFAULT_UPDATE_REMINDER_SUBJECT_TEXT = "Outstanding regulator requested update";
+  public static final String DEFAULT_UPDATE_REMINDER_SUBJECT_TEXT = "Outstanding update request";
 
   private static final String UPDATE_REASON_MAIL_MERGE_FIELD_NAME = "REGULATOR_UPDATE_REASON";
   private static final String PROJECT_URL_MAIL_MERGE_FIELD_NAME = "SERVICE_LOGIN_URL";

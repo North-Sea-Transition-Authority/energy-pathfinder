@@ -13,6 +13,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.model.email.EmailAddress;
+import uk.co.ogauthority.pathfinder.model.email.EmailRecipient;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project.regualtorupdaterequest.dayafter.DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRequest;
@@ -30,13 +32,16 @@ public class DayAfterRegulatorDeadlineUpdateReminderServiceTest {
   @Mock
   private TestDayAfterRegulatorDeadlineUpdateEmailPropertyProvider testDayAfterRegulatorDeadlineUpdateEmailPropertyProvider;
 
+  private static final String REGULATOR_SHARED_EMAIL_ADDRESS = "email@regualtor.co.uk";
+
   private DayAfterRegulatorDeadlineUpdateReminderService dayAfterRegulatorDeadlineUpdateReminderService;
 
   @Before
   public void setup() {
     dayAfterRegulatorDeadlineUpdateReminderService = new DayAfterRegulatorDeadlineUpdateReminderService(
         List.of(testDayAfterRegulatorDeadlineUpdateEmailPropertyProvider),
-        regulatorUpdateReminderEmailPropertiesService
+        regulatorUpdateReminderEmailPropertiesService,
+        REGULATOR_SHARED_EMAIL_ADDRESS
     );
   }
 
@@ -120,6 +125,16 @@ public class DayAfterRegulatorDeadlineUpdateReminderServiceTest {
             projectUrl
         )
     );
+  }
+
+  @Test
+  public void getAdditionalReminderRecipients_verifyRegulatorEmailAddressAndNoRecipientIdentifier() {
+
+    var regulatorRecipient = new EmailRecipient(new EmailAddress(REGULATOR_SHARED_EMAIL_ADDRESS));
+
+    var resultingAdditionalRecipients = dayAfterRegulatorDeadlineUpdateReminderService.getAdditionalReminderRecipients();
+
+    assertThat(resultingAdditionalRecipients).containsExactly(regulatorRecipient);
   }
 
 }

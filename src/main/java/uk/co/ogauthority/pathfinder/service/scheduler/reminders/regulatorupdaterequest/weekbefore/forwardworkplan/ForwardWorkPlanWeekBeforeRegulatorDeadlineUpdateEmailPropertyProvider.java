@@ -8,6 +8,7 @@ import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRe
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.RegulatorUpdateReminderEmailPropertiesService;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.weekbefore.WeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider;
+import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.weekbefore.common.WeekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider;
 
 @Service
 class ForwardWorkPlanWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider
@@ -17,11 +18,15 @@ class ForwardWorkPlanWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider
 
   private final RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService;
 
+  private final WeekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider weekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider;
+
   @Autowired
   ForwardWorkPlanWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider(
-      RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService
+      RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService,
+      WeekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider weekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider
   ) {
     this.regulatorUpdateReminderEmailPropertiesService = regulatorUpdateReminderEmailPropertiesService;
+    this.weekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider = weekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider;
   }
 
   @Override
@@ -42,7 +47,7 @@ class ForwardWorkPlanWeekBeforeRegulatorDeadlineUpdateEmailPropertyProvider
 
     var introductionText = String.format(
         "%s to your organisation's %s.",
-        RegulatorUpdateRequestReminderEmailProperties.DEFAULT_UPDATE_REMINDER_INTRO_TEXT,
+        weekBeforeRegulatorDeadlineUpdateCommonEmailPropertyProvider.getDefaultIntroductionTextPrefix(),
         projectTypeLowercaseDisplayName
     );
 

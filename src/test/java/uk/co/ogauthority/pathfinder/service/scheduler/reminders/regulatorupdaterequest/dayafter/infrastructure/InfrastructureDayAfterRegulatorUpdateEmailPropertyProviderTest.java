@@ -15,6 +15,7 @@ import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRe
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.RegulatorUpdateReminderEmailPropertiesService;
+import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.dayafter.common.DayAfterRegulatorUpdateCommonEmailPropertyProvider;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InfrastructureDayAfterRegulatorUpdateEmailPropertyProviderTest {
@@ -27,13 +28,17 @@ public class InfrastructureDayAfterRegulatorUpdateEmailPropertyProviderTest {
   @Mock
   private ProjectInformationService projectInformationService;
 
+  @Mock
+  private DayAfterRegulatorUpdateCommonEmailPropertyProvider dayAfterRegulatorUpdateCommonEmailPropertyProvider;
+
   private InfrastructureDayAfterRegulatorUpdateEmailPropertyProvider infrastructureDayAfterRegulatorUpdateEmailPropertyProvider;
 
   @Before
   public void setup() {
     infrastructureDayAfterRegulatorUpdateEmailPropertyProvider = new InfrastructureDayAfterRegulatorUpdateEmailPropertyProvider(
         regulatorUpdateReminderEmailPropertiesService,
-        projectInformationService
+        projectInformationService,
+        dayAfterRegulatorUpdateCommonEmailPropertyProvider
     );
   }
 
@@ -60,6 +65,9 @@ public class InfrastructureDayAfterRegulatorUpdateEmailPropertyProviderTest {
     var projectTitle = "project title";
     when(projectInformationService.getProjectTitle(any())).thenReturn(projectTitle);
 
+    var introductionTextPrefix = "introduction text prefix";
+    when(dayAfterRegulatorUpdateCommonEmailPropertyProvider.getDefaultIntroductionTextPrefix()).thenReturn(introductionTextPrefix);
+
     var resultingEmailProperties = infrastructureDayAfterRegulatorUpdateEmailPropertyProvider.getEmailProperties(
         regulatorUpdateRequest
     );
@@ -73,7 +81,7 @@ public class InfrastructureDayAfterRegulatorUpdateEmailPropertyProviderTest {
 
     var expectedIntroductionText = String.format(
         "%s to your %s, %s, was due by %s.",
-        DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties.DEFAULT_INTRODUCTION_TEXT_PREFIX,
+        introductionTextPrefix,
         SUPPORTED_PROJECT_TYPE.getLowercaseDisplayName(),
         projectTitle,
         formattedDeadlineDate

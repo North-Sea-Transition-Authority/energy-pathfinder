@@ -128,4 +128,10 @@ public class WeekBeforeRegulatorDeadlineUpdateReminderServiceTest {
     );
   }
 
+  @Test
+  public void getAdditionalReminderRecipients_verifyEmptySet() {
+    var resultingRecipients = weekBeforeRegulatorDeadlineUpdateReminderService.getAdditionalReminderRecipients();
+    assertThat(resultingRecipients).isEmpty();
+  }
+
 }
