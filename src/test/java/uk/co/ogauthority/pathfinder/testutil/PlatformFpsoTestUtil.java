@@ -29,8 +29,8 @@ public class PlatformFpsoTestUtil {
     var platformFpso = new PlatformFpso(detail);
     platformFpso.setInfrastructureType(PlatformFpsoInfrastructureType.FPSO);
     platformFpso.setStructure(FACILITY);
-    setCommonFields(platformFpso);
-    setFpsoCommonFields(platformFpso, true);
+    setCommonFields(platformFpso, true);
+    setFpsoCommonFields(platformFpso);
     return platformFpso;
   }
 
@@ -38,7 +38,7 @@ public class PlatformFpsoTestUtil {
     var platformFpso = new PlatformFpso(detail);
     platformFpso.setInfrastructureType(PlatformFpsoInfrastructureType.PLATFORM);
     platformFpso.setStructure(FACILITY);
-    setCommonFields(platformFpso);
+    setCommonFields(platformFpso, true);
     return platformFpso;
   }
 
@@ -46,7 +46,7 @@ public class PlatformFpsoTestUtil {
     var platformFpso = new PlatformFpso(detail);
     platformFpso.setInfrastructureType(PlatformFpsoInfrastructureType.PLATFORM);
     platformFpso.setManualStructureName(MANUAL_STRUCTURE_NAME);
-    setCommonFields(platformFpso);
+    setCommonFields(platformFpso, true);
     return platformFpso;
   }
 
@@ -54,8 +54,8 @@ public class PlatformFpsoTestUtil {
     var platformFpsoForm = new PlatformFpsoForm();
     platformFpsoForm.setInfrastructureType(PlatformFpsoInfrastructureType.FPSO);
     platformFpsoForm.setFpsoStructure(FACILITY.getSelectionId());
-    setCommonFields(platformFpsoForm);
-    setFpsoCommonFields(platformFpsoForm, true);
+    setCommonFields(platformFpsoForm, true);
+    setFpsoCommonFields(platformFpsoForm);
     return platformFpsoForm;
   }
 
@@ -63,7 +63,7 @@ public class PlatformFpsoTestUtil {
     var platformFpsoForm = new PlatformFpsoForm();
     platformFpsoForm.setInfrastructureType(PlatformFpsoInfrastructureType.PLATFORM);
     platformFpsoForm.setPlatformStructure(FACILITY.getSelectionId());
-    setCommonFields(platformFpsoForm);
+    setCommonFields(platformFpsoForm, true);
     return platformFpsoForm;
   }
 
@@ -71,7 +71,7 @@ public class PlatformFpsoTestUtil {
     var platformFpsoForm = new PlatformFpsoForm();
     platformFpsoForm.setInfrastructureType(PlatformFpsoInfrastructureType.PLATFORM);
     platformFpsoForm.setPlatformStructure(SearchSelectorService.getValueWithManualEntryPrefix(MANUAL_STRUCTURE_NAME));
-    setCommonFields(platformFpsoForm);
+    setCommonFields(platformFpsoForm, true);
     return platformFpsoForm;
   }
 
@@ -79,51 +79,49 @@ public class PlatformFpsoTestUtil {
     var platformFpsoForm = new PlatformFpsoForm();
     platformFpsoForm.setInfrastructureType(PlatformFpsoInfrastructureType.FPSO);
     platformFpsoForm.setFpsoStructure(SearchSelectorService.getValueWithManualEntryPrefix(MANUAL_STRUCTURE_NAME));
-    setCommonFields(platformFpsoForm);
+    setCommonFields(platformFpsoForm, true);
 
     platformFpsoForm.setFpsoType(FPSO_TYPE);
     platformFpsoForm.setFpsoDimensions(FPSO_DIMENSIONS);
-    platformFpsoForm.setSubstructureExpectedToBeRemoved(true);
-    platformFpsoForm.setSubstructureRemovalPremise(SUBSTRUCTURE_REMOVAL_PREMISE);
-    platformFpsoForm.setSubstructureRemovalYears(new MinMaxDateInput(SUBSTRUCTURE_EARLIEST_REMOVAL_YEAR, SUBSTRUCTURE_LATEST_REMOVAL_YEAR));
-    platformFpsoForm.setSubstructureRemovalMass(SUBSTRUCTURE_REMOVAL_MASS);
     return platformFpsoForm;
   }
 
-  private static void setCommonFields(PlatformFpso platformFpso) {
+  private static void setCommonFields(PlatformFpso platformFpso, boolean substructuresRemoved) {
     platformFpso.setTopsideFpsoMass(TOPSIDE_FPSO_MASS);
     platformFpso.setEarliestRemovalYear(EARLIEST_REMOVAL_YEAR);
     platformFpso.setLatestRemovalYear(LATEST_REMOVAL_YEAR);
     platformFpso.setFuturePlans(FUTURE_PLANS);
-  }
 
-  private static void setCommonFields(PlatformFpsoForm platformFpsoForm) {
-    platformFpsoForm.setTopsideFpsoMass(TOPSIDE_FPSO_MASS);
-    platformFpsoForm.setTopsideRemovalYears(new MinMaxDateInput(EARLIEST_REMOVAL_YEAR, LATEST_REMOVAL_YEAR));
-    platformFpsoForm.setFuturePlans(FUTURE_PLANS);
-  }
-
-  private static void setFpsoCommonFields(PlatformFpso platformFpso, Boolean substructuresRemoved) {
-    platformFpso.setFpsoType(FPSO_TYPE);
-    platformFpso.setFpsoDimensions(FPSO_DIMENSIONS);
-    platformFpso.setSubstructuresExpectedToBeRemoved(substructuresRemoved);
     if (substructuresRemoved) {
       platformFpso.setSubstructureRemovalPremise(SUBSTRUCTURE_REMOVAL_PREMISE);
       platformFpso.setSubstructureRemovalMass(SUBSTRUCTURE_REMOVAL_MASS);
       platformFpso.setSubStructureRemovalEarliestYear(SUBSTRUCTURE_EARLIEST_REMOVAL_YEAR);
       platformFpso.setSubStructureRemovalLatestYear(SUBSTRUCTURE_LATEST_REMOVAL_YEAR);
     }
-
   }
 
-  private static void setFpsoCommonFields(PlatformFpsoForm platformFpsoForm, Boolean substructuresRemoved) {
+  private static void setCommonFields(PlatformFpsoForm platformFpsoForm, boolean substructuresRemoved) {
+    platformFpsoForm.setTopsideFpsoMass(TOPSIDE_FPSO_MASS);
+    platformFpsoForm.setTopsideRemovalYears(new MinMaxDateInput(EARLIEST_REMOVAL_YEAR, LATEST_REMOVAL_YEAR));
+    platformFpsoForm.setFuturePlans(FUTURE_PLANS);
+    platformFpsoForm.setSubstructureExpectedToBeRemoved(substructuresRemoved);
+
+    if (substructuresRemoved) {
+      platformFpsoForm.setSubstructureRemovalMass(SUBSTRUCTURE_REMOVAL_MASS);
+      platformFpsoForm.setSubstructureRemovalPremise(SUBSTRUCTURE_REMOVAL_PREMISE);
+      platformFpsoForm.setSubstructureRemovalYears(
+          new MinMaxDateInput(SUBSTRUCTURE_EARLIEST_REMOVAL_YEAR, SUBSTRUCTURE_LATEST_REMOVAL_YEAR)
+      );
+    }
+  }
+
+  private static void setFpsoCommonFields(PlatformFpso platformFpso) {
+    platformFpso.setFpsoType(FPSO_TYPE);
+    platformFpso.setFpsoDimensions(FPSO_DIMENSIONS);
+  }
+
+  private static void setFpsoCommonFields(PlatformFpsoForm platformFpsoForm) {
     platformFpsoForm.setFpsoType(FPSO_TYPE);
     platformFpsoForm.setFpsoDimensions(FPSO_DIMENSIONS);
-    platformFpsoForm.setSubstructureExpectedToBeRemoved(substructuresRemoved);
-    if (substructuresRemoved) {
-      platformFpsoForm.setSubstructureRemovalPremise(SUBSTRUCTURE_REMOVAL_PREMISE);
-      platformFpsoForm.setSubstructureRemovalMass(SUBSTRUCTURE_REMOVAL_MASS);
-      platformFpsoForm.setSubstructureRemovalYears(new MinMaxDateInput(SUBSTRUCTURE_EARLIEST_REMOVAL_YEAR, SUBSTRUCTURE_LATEST_REMOVAL_YEAR));
-    }
   }
 }

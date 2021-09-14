@@ -138,29 +138,6 @@
       fieldValue=fpsoDimensions
       isDiffedField=useDiffedField
     />
-    <@checkAnswers.checkAnswersStandardOrDiffRow
-      prompt="Substructure removal expected to be within scope"
-      fieldValue=substructuresExpectedToBeRemoved
-      isDiffedField=useDiffedField
-    />
-    <#if areSubstructuresExpectedToBeRemoved>
-      <@checkAnswers.checkAnswersStandardOrDiffRow
-        prompt="Substructure removal premise"
-        fieldValue=substructureRemovalPremise
-        isDiffedField=useDiffedField
-      />
-      <@checkAnswers.checkAnswersStandardOrDiffRow
-        prompt="Estimated substructure removal mass"
-        fieldValue=substructureRemovalMass
-        isDiffedField=useDiffedField
-      />
-      <@decomissioningPeriodCheckAnswers.decomissioningPeriodCheckAnswers
-        useDiffedField=useDiffedField
-        prompt="Substructure removal years"
-        earliestYear=substructureRemovalEarliestYear
-        latestYear=substructureRemovalLatestYear
-      />
-    </#if>
   </#if>
   <@checkAnswers.checkAnswersStandardOrDiffRow
     prompt="Topsides/${floatingUnitLowerCase} removal mass"
@@ -173,6 +150,29 @@
     earliestYear=topsideRemovalEarliestYear
     latestYear=topsideRemovalLatestYear
   />
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Substructure removal expected to be within scope"
+    fieldValue=substructuresExpectedToBeRemoved
+    isDiffedField=useDiffedField
+  />
+  <#if areSubstructuresExpectedToBeRemoved>
+    <@checkAnswers.checkAnswersStandardOrDiffRow
+      prompt="Substructure removal premise"
+      fieldValue=substructureRemovalPremise
+      isDiffedField=useDiffedField
+    />
+    <@checkAnswers.checkAnswersStandardOrDiffRow
+      prompt="Estimated substructure removal mass"
+      fieldValue=substructureRemovalMass
+      isDiffedField=useDiffedField
+    />
+    <@decomissioningPeriodCheckAnswers.decomissioningPeriodCheckAnswers
+      useDiffedField=useDiffedField
+      prompt="Substructure removal years"
+      earliestYear=substructureRemovalEarliestYear
+      latestYear=substructureRemovalLatestYear
+    />
+  </#if>
   <@checkAnswers.checkAnswersStandardOrDiffRow
     prompt="Future plans"
     fieldValue=futurePlans

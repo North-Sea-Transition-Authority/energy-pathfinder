@@ -59,27 +59,27 @@ public class PlatformFpsoViewUtil {
 
       view.setFpsoType(platformFpso.getFpsoType());
       view.setFpsoDimensions(platformFpso.getFpsoDimensions());
+    }
 
-      final var substructuresToRemove = platformFpso.getSubstructuresExpectedToBeRemoved();
+    final var substructuresToRemove = platformFpso.getSubstructuresExpectedToBeRemoved();
 
-      view.setSubstructuresExpectedToBeRemoved(substructuresToRemove);
+    view.setSubstructuresExpectedToBeRemoved(substructuresToRemove);
 
-      if (BooleanUtils.isTrue(substructuresToRemove)) {
+    if (BooleanUtils.isTrue(substructuresToRemove)) {
 
-        view.setSubstructureRemovalPremise(platformFpso.getSubstructureRemovalPremise() != null
-            ? platformFpso.getSubstructureRemovalPremise().getDisplayName()
-            : ""
-        );
-        view.setSubstructureRemovalMass(platformFpso.getSubstructureRemovalMass() != null
-            ? getMass(platformFpso.getSubstructureRemovalMass())
-            : ""
-        );
-        view.setSubstructureRemovalEarliestYear(
-            getYearText(platformFpso.getSubStructureRemovalEarliestYear(), EARLIEST_YEAR_TEXT));
-        view.setSubstructureRemovalLatestYear(
-            getYearText(platformFpso.getSubStructureRemovalLatestYear(), LATEST_YEAR_TEXT));
+      view.setSubstructureRemovalPremise(platformFpso.getSubstructureRemovalPremise() != null
+          ? platformFpso.getSubstructureRemovalPremise().getDisplayName()
+          : ""
+      );
+      view.setSubstructureRemovalMass(platformFpso.getSubstructureRemovalMass() != null
+          ? getMass(platformFpso.getSubstructureRemovalMass())
+          : ""
+      );
+      view.setSubstructureRemovalEarliestYear(
+          getYearText(platformFpso.getSubStructureRemovalEarliestYear(), EARLIEST_YEAR_TEXT));
+      view.setSubstructureRemovalLatestYear(
+          getYearText(platformFpso.getSubStructureRemovalLatestYear(), LATEST_YEAR_TEXT));
 
-      }
     }
 
     view.setFuturePlans(

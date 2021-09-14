@@ -40,6 +40,7 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PlatformsFpsosServiceTest {
+
   @Mock
   private PlatformFpsoRepository platformFpsoRepository;
 
@@ -444,6 +445,19 @@ public class PlatformsFpsosServiceTest {
     assertThat(platformFpso.getEarliestRemovalYear()).isEqualTo(form.getTopsideRemovalYears().getMinYear());
     assertThat(platformFpso.getLatestRemovalYear()).isEqualTo(form.getTopsideRemovalYears().getMaxYear());
     assertThat(platformFpso.getFuturePlans()).isEqualTo(form.getFuturePlans());
+    assertThat(platformFpso.getSubstructuresExpectedToBeRemoved()).isEqualTo(form.getSubstructureExpectedToBeRemoved());
+
+    if (BooleanUtils.isTrue(form.getSubstructureExpectedToBeRemoved())) {
+      assertThat(platformFpso.getSubstructureRemovalPremise()).isEqualTo(form.getSubstructureRemovalPremise());
+      assertThat(platformFpso.getSubstructureRemovalMass()).isEqualTo(form.getSubstructureRemovalMass());
+      assertThat(platformFpso.getSubStructureRemovalEarliestYear()).isEqualTo(form.getSubstructureRemovalYears().getMinYear());
+      assertThat(platformFpso.getSubStructureRemovalLatestYear()).isEqualTo(form.getSubstructureRemovalYears().getMaxYear());
+    } else {
+      assertThat(platformFpso.getSubstructureRemovalPremise()).isNull();
+      assertThat(platformFpso.getSubstructureRemovalMass()).isNull();
+      assertThat(platformFpso.getSubStructureRemovalEarliestYear()).isNull();
+      assertThat(platformFpso.getSubStructureRemovalLatestYear()).isNull();
+    }
   }
 
   private void assertCommonFormFieldsMatch(PlatformFpsoForm form, PlatformFpso platformFpso) {
@@ -598,30 +612,11 @@ public class PlatformsFpsosServiceTest {
   private void assertFpsoSpecificQuestionsAreNull(PlatformFpso sourceEntity) {
     assertThat(sourceEntity.getFpsoType()).isNull();
     assertThat(sourceEntity.getFpsoDimensions()).isNull();
-    assertThat(sourceEntity.getSubstructuresExpectedToBeRemoved()).isNull();
-    assertThat(sourceEntity.getSubstructureRemovalMass()).isNull();
-    assertThat(sourceEntity.getSubStructureRemovalEarliestYear()).isNull();
-    assertThat(sourceEntity.getSubStructureRemovalLatestYear()).isNull();
-    assertThat(sourceEntity.getSubstructureRemovalPremise()).isNull();
   }
 
   private void assertFpsoSpecificProperties(PlatformFpsoForm sourceForm, PlatformFpso destinationEntity) {
-
     assertThat(destinationEntity.getFpsoType()).isEqualTo(sourceForm.getFpsoType());
     assertThat(destinationEntity.getFpsoDimensions()).isEqualTo(sourceForm.getFpsoDimensions());
-    assertThat(destinationEntity.getSubstructuresExpectedToBeRemoved()).isEqualTo(sourceForm.getSubstructureExpectedToBeRemoved());
-
-    if (BooleanUtils.isTrue(sourceForm.getSubstructureExpectedToBeRemoved())) {
-      assertThat(destinationEntity.getSubstructureRemovalPremise()).isEqualTo(sourceForm.getSubstructureRemovalPremise());
-      assertThat(destinationEntity.getSubstructureRemovalMass()).isEqualTo(sourceForm.getSubstructureRemovalMass());
-      assertThat(destinationEntity.getSubStructureRemovalEarliestYear()).isEqualTo(sourceForm.getSubstructureRemovalYears().getMinYear());
-      assertThat(destinationEntity.getSubStructureRemovalLatestYear()).isEqualTo(sourceForm.getSubstructureRemovalYears().getMaxYear());
-    } else {
-      assertThat(destinationEntity.getSubstructureRemovalPremise()).isNull();
-      assertThat(destinationEntity.getSubstructureRemovalMass()).isNull();
-      assertThat(destinationEntity.getSubStructureRemovalEarliestYear()).isNull();
-      assertThat(destinationEntity.getSubStructureRemovalLatestYear()).isNull();
-    }
   }
 
 }

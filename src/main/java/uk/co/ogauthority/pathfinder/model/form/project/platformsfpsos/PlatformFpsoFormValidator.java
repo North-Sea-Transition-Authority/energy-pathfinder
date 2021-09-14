@@ -95,13 +95,14 @@ public class PlatformFpsoFormValidator implements SmartValidator {
         );
       }
 
-      validateSubstructureRemovalNestedQuestions(
-          form,
-          platformFpsoValidationHint,
-          validationType,
-          errors
-      );
     }
+
+    validateSubstructureRemovalNestedQuestions(
+        form,
+        platformFpsoValidationHint,
+        validationType,
+        errors
+    );
 
     ValidationUtil.invokeNestedValidator(
         errors,

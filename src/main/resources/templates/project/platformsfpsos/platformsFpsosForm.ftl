@@ -57,39 +57,6 @@
           hintText="Provide the approximate maximum overall length, breadth and height, and the minimum/maximum draught in metres. This information is useful in identifying suitable decommissioning yards"
           nestingPath="form.infrastructureType"
         />
-        <@fdsRadio.radioGroup
-          path="form.substructureExpectedToBeRemoved"
-          labelText="Is substructure removal expected to be within scope?"
-          hintText="Substructure refers to anchor chains and anchor suction cans"
-          hiddenContent=true
-          nestingPath="form.infrastructureType"
-        >
-          <@fdsRadio.radioYes path="form.substructureExpectedToBeRemoved">
-            <@fdsRadio.radio
-              path="form.substructureRemovalPremise"
-              nestingPath="form.substructureExpectedToBeRemoved"
-              labelText="Substructure removal premise"
-              radioItems=substructureRemovalPremiseMap
-            />
-            <@fdsTextInput.textInput
-              path="form.substructureRemovalMass"
-              nestingPath="form.substructureExpectedToBeRemoved"
-              labelText="Estimated substructure removal mass"
-              suffix=mtUnit.plural
-              suffixScreenReaderPrompt=mtUnit.screenReaderSuffix
-              inputClass="govuk-input--width-4"
-            />
-            <@minMaxDateInput
-              minFormPath="form.substructureRemovalYears.minYear"
-              maxFormPath="form.substructureRemovalYears.maxYear"
-              labelText="Provide the period over which the substructure removal takes place"
-              altMinLabel="Earliest start year"
-              altMaxLabel="Latest completion year"
-              formId="substructure-removal"
-            />
-          </@fdsRadio.radioYes>
-          <@fdsRadio.radioNo path="form.substructureExpectedToBeRemoved"/>
-        </@fdsRadio.radioGroup>
       </@fdsRadio.radioItem>
     </@fdsRadio.radioGroup>
 
@@ -108,6 +75,39 @@
       altMaxLabel="Latest completion year"
       formId="topsides-fpso-removal"
     />
+    <@fdsRadio.radioGroup
+      path="form.substructureExpectedToBeRemoved"
+      labelText="Is substructure removal expected to be within scope?"
+      hintText="Substructure refers to any steel jacket, or gravity based structure supporting the topsides or securing the ${floatingUnitLowerCase} including footings, anchor chains, or anchor suction cans"
+      hiddenContent=true
+    >
+      <@fdsRadio.radioYes path="form.substructureExpectedToBeRemoved">
+        <@fdsRadio.radio
+          path="form.substructureRemovalPremise"
+          nestingPath="form.substructureExpectedToBeRemoved"
+          labelText="Substructure removal premise"
+          radioItems=substructureRemovalPremiseMap
+        />
+        <@fdsTextInput.textInput
+          path="form.substructureRemovalMass"
+          nestingPath="form.substructureExpectedToBeRemoved"
+          labelText="Estimated substructure removal mass"
+          suffix=mtUnit.plural
+          suffixScreenReaderPrompt=mtUnit.screenReaderSuffix
+          inputClass="govuk-input--width-4"
+        />
+        <@minMaxDateInput
+          minFormPath="form.substructureRemovalYears.minYear"
+          maxFormPath="form.substructureRemovalYears.maxYear"
+          labelText="Provide the period over which the substructure removal takes place"
+          altMinLabel="Earliest start year"
+          altMaxLabel="Latest completion year"
+          formId="substructure-removal"
+          nestedPath="form.substructureExpectedToBeRemoved"
+        />
+      </@fdsRadio.radioYes>
+      <@fdsRadio.radioNo path="form.substructureExpectedToBeRemoved"/>
+    </@fdsRadio.radioGroup>
     <@fdsRadio.radio path="form.futurePlans" labelText="Future plans" radioItems=futurePlansMap/>
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
   </@fdsForm.htmlForm>

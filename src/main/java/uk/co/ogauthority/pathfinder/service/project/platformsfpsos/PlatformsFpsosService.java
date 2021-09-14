@@ -103,6 +103,20 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
     platformFpso.setLatestRemovalYear(form.getTopsideRemovalYears().getMaxYear());
     platformFpso.setFuturePlans(form.getFuturePlans());
 
+    platformFpso.setSubstructuresExpectedToBeRemoved(form.getSubstructureExpectedToBeRemoved());
+
+    if (BooleanUtils.isTrue(form.getSubstructureExpectedToBeRemoved())) {
+      platformFpso.setSubstructureRemovalPremise(form.getSubstructureRemovalPremise());
+      platformFpso.setSubstructureRemovalMass(form.getSubstructureRemovalMass());
+      platformFpso.setSubStructureRemovalEarliestYear(form.getSubstructureRemovalYears().getMinYear());
+      platformFpso.setSubStructureRemovalLatestYear(form.getSubstructureRemovalYears().getMaxYear());
+    } else {
+      platformFpso.setSubstructureRemovalPremise(null);
+      platformFpso.setSubstructureRemovalMass(null);
+      platformFpso.setSubStructureRemovalEarliestYear(null);
+      platformFpso.setSubStructureRemovalLatestYear(null);
+    }
+
     return platformFpso;
   }
 
@@ -110,30 +124,11 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
                                                           PlatformFpso destinationEntity) {
     destinationEntity.setFpsoType(sourceForm.getFpsoType());
     destinationEntity.setFpsoDimensions(sourceForm.getFpsoDimensions());
-
-    destinationEntity.setSubstructuresExpectedToBeRemoved(sourceForm.getSubstructureExpectedToBeRemoved());
-
-    if (BooleanUtils.isTrue(sourceForm.getSubstructureExpectedToBeRemoved())) {
-      destinationEntity.setSubstructureRemovalPremise(sourceForm.getSubstructureRemovalPremise());
-      destinationEntity.setSubstructureRemovalMass(sourceForm.getSubstructureRemovalMass());
-      destinationEntity.setSubStructureRemovalEarliestYear(sourceForm.getSubstructureRemovalYears().getMinYear());
-      destinationEntity.setSubStructureRemovalLatestYear(sourceForm.getSubstructureRemovalYears().getMaxYear());
-    } else {
-      destinationEntity.setSubstructureRemovalPremise(null);
-      destinationEntity.setSubstructureRemovalMass(null);
-      destinationEntity.setSubStructureRemovalEarliestYear(null);
-      destinationEntity.setSubStructureRemovalLatestYear(null);
-    }
   }
 
   private void clearFloatingUnitNestedEntityProperties(PlatformFpso platformFpso) {
     platformFpso.setFpsoType(null);
     platformFpso.setFpsoDimensions(null);
-    platformFpso.setSubstructuresExpectedToBeRemoved(null);
-    platformFpso.setSubstructureRemovalPremise(null);
-    platformFpso.setSubstructureRemovalMass(null);
-    platformFpso.setSubStructureRemovalEarliestYear(null);
-    platformFpso.setSubStructureRemovalLatestYear(null);
   }
 
   @Transactional

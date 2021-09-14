@@ -182,7 +182,7 @@ public class PlatformFpsoFormValidatorTest {
   }
 
   @Test
-  public void validate_whenFpsoAndFullValidationAndSubstructuresExpectedToBeRemovedNull_thenError() {
+  public void validate_whenFullValidationAndSubstructuresExpectedToBeRemovedNull_thenError() {
 
     final var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpso_manualStructure();
     form.setSubstructureExpectedToBeRemoved(null);
@@ -206,7 +206,7 @@ public class PlatformFpsoFormValidatorTest {
   }
 
   @Test
-  public void validate_whenFpsoAndPartialValidationAndSubstructuresExpectedToBeRemovedNull_thenNoError() {
+  public void validate_whenPartialValidationAndSubstructuresExpectedToBeRemovedNull_thenNoError() {
 
     final var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpso_manualStructure();
     form.setSubstructureExpectedToBeRemoved(null);
@@ -221,7 +221,7 @@ public class PlatformFpsoFormValidatorTest {
   }
 
   @Test
-  public void validate_whenFpsoAndPartialValidationAndSubstructuresExpectedIsFalse_thenNoErrorsInConditionalQuestions() {
+  public void validate_whenPartialValidationAndSubstructuresExpectedIsFalse_thenNoErrorsInConditionalQuestions() {
 
     final var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpso_manualStructure();
     form.setSubstructureExpectedToBeRemoved(false);
@@ -241,7 +241,7 @@ public class PlatformFpsoFormValidatorTest {
   }
 
   @Test
-  public void validate_whenFpsoAndFullValidationAndSubstructuresExpectedIsFalse_thenNoErrorsInConditionalQuestions() {
+  public void validate_whenFullValidationAndSubstructuresExpectedIsFalse_thenNoErrorsInConditionalQuestions() {
 
     final var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpso_manualStructure();
     form.setSubstructureExpectedToBeRemoved(false);
@@ -261,7 +261,7 @@ public class PlatformFpsoFormValidatorTest {
   }
 
   @Test
-  public void validate_whenFpsoAndSubstructuresExpectedAndPartialValidationAndNoConditionalQuestionsAnswered_thenNoErrors() {
+  public void validate_whenSubstructuresExpectedAndPartialValidationAndNoConditionalQuestionsAnswered_thenNoErrors() {
 
     final var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpso_manualStructure();
     form.setSubstructureExpectedToBeRemoved(true);
@@ -281,7 +281,7 @@ public class PlatformFpsoFormValidatorTest {
   }
 
   @Test
-  public void validate_whenFpsoAndSubstructuresExpectedAndFullValidationAndNoConditionalQuestionsAnswered_thenErrors() {
+  public void validate_whenSubstructuresExpectedAndFullValidationAndNoConditionalQuestionsAnswered_thenErrors() {
 
     final var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpso_manualStructure();
     form.setSubstructureExpectedToBeRemoved(true);

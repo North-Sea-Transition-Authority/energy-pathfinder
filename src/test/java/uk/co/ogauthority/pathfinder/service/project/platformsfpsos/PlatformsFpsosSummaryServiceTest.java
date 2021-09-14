@@ -115,6 +115,22 @@ public class PlatformsFpsosSummaryServiceTest {
     assertThat(view.getTopsideRemovalLatestYear()).isEqualTo(PlatformFpsoViewUtil.getYearText(platformFpso.getLatestRemovalYear(), PlatformFpsoViewUtil.LATEST_YEAR_TEXT));
     assertThat(view.getSubstructuresExpectedToBeRemoved()).isEqualTo(platformFpso.getSubstructuresExpectedToBeRemoved());
 
+    if (BooleanUtils.isTrue(platformFpso.getSubstructuresExpectedToBeRemoved())) {
+      assertThat(view.getSubstructureRemovalPremise()).isEqualTo(platformFpso.getSubstructureRemovalPremise().getDisplayName());
+      assertThat(view.getSubstructureRemovalMass()).isEqualTo(PlatformFpsoViewUtil.getMass(platformFpso.getSubstructureRemovalMass()));
+      assertThat(view.getSubstructureRemovalEarliestYear()).isEqualTo(
+          PlatformFpsoViewUtil.getYearText(platformFpso.getSubStructureRemovalEarliestYear(), PlatformFpsoViewUtil.EARLIEST_YEAR_TEXT)
+      );
+      assertThat(view.getSubstructureRemovalLatestYear()).isEqualTo(
+          PlatformFpsoViewUtil.getYearText(platformFpso.getSubStructureRemovalLatestYear(), PlatformFpsoViewUtil.LATEST_YEAR_TEXT)
+      );
+    } else {
+      assertThat(view.getSubstructureRemovalPremise()).isEmpty();
+      assertThat(view.getSubstructureRemovalMass()).isEmpty();
+      assertThat(view.getSubstructureRemovalEarliestYear()).isEmpty();
+      assertThat(view.getSubstructureRemovalLatestYear()).isEmpty();
+    }
+
     assertThat(view.getSummaryLinks()).extracting(SummaryLink::getLinkText).containsExactly(
         SummaryLinkText.EDIT.getDisplayName(),
         SummaryLinkText.DELETE.getDisplayName()
@@ -122,23 +138,6 @@ public class PlatformsFpsosSummaryServiceTest {
   }
 
   private void checkFpsoSpecificViewProperties(PlatformFpso sourceEntity, PlatformFpsoView destinationView) {
-
-    if (BooleanUtils.isTrue(sourceEntity.getSubstructuresExpectedToBeRemoved())) {
-      assertThat(destinationView.getSubstructureRemovalPremise()).isEqualTo(sourceEntity.getSubstructureRemovalPremise().getDisplayName());
-      assertThat(destinationView.getSubstructureRemovalMass()).isEqualTo(PlatformFpsoViewUtil.getMass(sourceEntity.getSubstructureRemovalMass()));
-      assertThat(destinationView.getSubstructureRemovalEarliestYear()).isEqualTo(
-          PlatformFpsoViewUtil.getYearText(sourceEntity.getSubStructureRemovalEarliestYear(), PlatformFpsoViewUtil.EARLIEST_YEAR_TEXT)
-      );
-      assertThat(destinationView.getSubstructureRemovalLatestYear()).isEqualTo(
-          PlatformFpsoViewUtil.getYearText(sourceEntity.getSubStructureRemovalLatestYear(), PlatformFpsoViewUtil.LATEST_YEAR_TEXT)
-      );
-    } else {
-      assertThat(destinationView.getSubstructureRemovalPremise()).isEmpty();
-      assertThat(destinationView.getSubstructureRemovalMass()).isEmpty();
-      assertThat(destinationView.getSubstructureRemovalEarliestYear()).isEmpty();
-      assertThat(destinationView.getSubstructureRemovalLatestYear()).isEmpty();
-    }
-
     assertThat(destinationView.getFpsoType()).isEqualTo(sourceEntity.getFpsoType());
     assertThat(destinationView.getFpsoDimensions()).isEqualTo(sourceEntity.getFpsoDimensions());
   }
