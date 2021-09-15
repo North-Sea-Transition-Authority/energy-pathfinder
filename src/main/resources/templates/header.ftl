@@ -33,14 +33,11 @@
       <#if currentUserView?has_content && currentUserView.isAuthenticated()>
         <@fdsHeader.headerNavigationItem
           itemText=currentUserView.fullName
-          signOutButton=false
           itemActive=false
         />
-        <@fdsHeader.headerNavigationItem
-          itemText="Sign out"
-          itemUrl=foxLogoutUrl
-          signOutButton=false
-          itemActive=false
+        <@fdsHeader.headerNavigationSignOutLink
+          linkText="Sign out"
+          linkUrl=foxLogoutUrl
         />
       </#if>
     </@fdsHeader.headerNavigation>
