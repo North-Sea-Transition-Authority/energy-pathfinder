@@ -20,16 +20,12 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
-import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.model.form.validation.quarteryear.QuarterYearInputValidator;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectInformationFormValidatorTest {
-
-  @Mock
-  private DateInputValidator dateInputValidator;
 
   @Mock
   private QuarterYearInputValidator quarterYearInputValidator;
@@ -39,7 +35,6 @@ public class ProjectInformationFormValidatorTest {
   @Before
   public void setup() {
     projectInformationFormValidator = new ProjectInformationFormValidator(
-        dateInputValidator,
         quarterYearInputValidator
     );
 

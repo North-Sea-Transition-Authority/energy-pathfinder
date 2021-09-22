@@ -11,6 +11,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -278,7 +279,7 @@ public class OperatorProjectUpdateServiceTest {
     var update = new ProjectUpdate();
     when(projectUpdateService.getByToDetail(projectDetail)).thenReturn(Optional.of(update));
     when(noUpdateNotificationRepository.existsByProjectUpdate(update)).thenReturn(true);
-    operatorProjectUpdateService.confirmNoUpdateExistsForProjectDetail(projectDetail);
+    Assertions.assertDoesNotThrow(() -> operatorProjectUpdateService.confirmNoUpdateExistsForProjectDetail(projectDetail));
   }
 
   @Test(expected = AccessDeniedException.class)

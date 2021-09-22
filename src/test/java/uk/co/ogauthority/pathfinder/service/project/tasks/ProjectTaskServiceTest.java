@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.service.project.tasks;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -48,7 +47,7 @@ public class ProjectTaskServiceTest {
 
   @Test
   public void canShowTask_allConditionalTasksShown() {
-    when(projectFormSectionService.canShowInTaskList(eq(detail))).thenReturn(true);
+    when(projectFormSectionService.canShowInTaskList(detail)).thenReturn(true);
 
     ProjectTask.stream().forEach(projectTask -> {
       assertThat(projectTaskService.canShowTask(projectTask, detail)).isTrue();
@@ -57,7 +56,7 @@ public class ProjectTaskServiceTest {
 
   @Test
   public void canShowTask_noConditionalTasksShown() {
-    when(projectFormSectionService.canShowInTaskList(eq(detail))).thenReturn(false);
+    when(projectFormSectionService.canShowInTaskList(detail)).thenReturn(false);
 
     ProjectTask.stream().forEach(projectTask -> {
       assertThat(projectTaskService.canShowTask(projectTask, detail)).isFalse();
@@ -66,7 +65,7 @@ public class ProjectTaskServiceTest {
 
   @Test
   public void canShowTask_verifyInteractions() {
-    when(projectFormSectionService.canShowInTaskList(eq(detail))).thenReturn(false);
+    when(projectFormSectionService.canShowInTaskList(detail)).thenReturn(false);
 
     assertThat(projectTaskService.canShowTask(ProjectTask.PIPELINES, detail)).isFalse();
 
@@ -76,7 +75,7 @@ public class ProjectTaskServiceTest {
 
   @Test
   public void isTaskComplete_verifyInteractions() {
-    when(projectFormSectionService.isComplete(eq(detail))).thenReturn(true);
+    when(projectFormSectionService.isComplete(detail)).thenReturn(true);
 
     assertThat(projectTaskService.isTaskComplete(ProjectTask.PIPELINES, detail)).isTrue();
 

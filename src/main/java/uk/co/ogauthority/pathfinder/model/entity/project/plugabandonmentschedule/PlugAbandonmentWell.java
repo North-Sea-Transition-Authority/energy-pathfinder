@@ -59,6 +59,6 @@ public class PlugAbandonmentWell implements ChildEntity<Integer, PlugAbandonment
 
   @Override
   public PlugAbandonmentSchedule getParent() {
-    return plugAbandonmentSchedule;
+    return getPlugAbandonmentSchedule();
   }
 }

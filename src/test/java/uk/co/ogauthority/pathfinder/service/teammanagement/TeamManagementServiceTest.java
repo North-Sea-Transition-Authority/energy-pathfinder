@@ -32,15 +32,15 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.form.teammanagement.UserRolesForm;
 import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
-import uk.co.ogauthority.pathfinder.model.team.RegulatorRole;
-import uk.co.ogauthority.pathfinder.model.team.TeamType;
-import uk.co.ogauthority.pathfinder.model.teammanagement.TeamMemberView;
-import uk.co.ogauthority.pathfinder.model.teammanagement.TeamRoleView;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
+import uk.co.ogauthority.pathfinder.model.team.RegulatorRole;
 import uk.co.ogauthority.pathfinder.model.team.RegulatorTeam;
 import uk.co.ogauthority.pathfinder.model.team.Role;
 import uk.co.ogauthority.pathfinder.model.team.Team;
 import uk.co.ogauthority.pathfinder.model.team.TeamMember;
+import uk.co.ogauthority.pathfinder.model.team.TeamType;
+import uk.co.ogauthority.pathfinder.model.teammanagement.TeamMemberView;
+import uk.co.ogauthority.pathfinder.model.teammanagement.TeamRoleView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.email.TeamManagementEmailService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
@@ -152,7 +152,7 @@ public class TeamManagementServiceTest {
 
     when(teamService.getTeamByResId(regulatorTeam.getId())).thenReturn(regulatorTeam);
 
-    when(teamService.getMembershipOfPersonInTeam(eq(regulatorTeam), eq(regulatorTeamAdminPerson)))
+    when(teamService.getMembershipOfPersonInTeam(regulatorTeam, regulatorTeamAdminPerson))
         .thenReturn(Optional.of(regulatorPersonRegulatorTeamMember));
 
     when(teamService.getTeamMembers(regulatorTeam))
@@ -174,7 +174,7 @@ public class TeamManagementServiceTest {
   public void getTeamOrError_verifyServiceInteraction() {
     Team regTeam = teamManagementService.getTeamOrError(regulatorTeam.getId());
     assertThat(regTeam).isEqualTo(regulatorTeam);
-    verify(teamService, times(1)).getTeamByResId(eq(regulatorTeam.getId()));
+    verify(teamService, times(1)).getTeamByResId(regulatorTeam.getId());
   }
 
   @Test(expected = PathfinderEntityNotFoundException.class)

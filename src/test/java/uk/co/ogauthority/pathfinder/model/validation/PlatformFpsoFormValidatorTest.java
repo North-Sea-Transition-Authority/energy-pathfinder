@@ -175,7 +175,6 @@ public class PlatformFpsoFormValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors.size()).isPositive();
     assertThat(fieldErrors).containsExactly(
         entry("topsideRemovalYears.minYear", Set.of("minYear.invalid"))
     );
@@ -220,7 +219,6 @@ public class PlatformFpsoFormValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors.size()).isPositive();
     assertThat(fieldErrors).containsExactly(
         entry("substructureRemovalYears.minYear", Set.of("minYear.invalid")),
         entry("substructureRemovalMass", Set.of("substructureRemovalMass.invalid")),

@@ -55,28 +55,31 @@ public class PlatformFpsoFormValidator implements SmartValidator {
             MISSING_PLATFORM_ERROR
         );
       }
-    } else if (PlatformFpsoInfrastructureType.FPSO.equals(infrastructureType)) {
+    } else if (
+        PlatformFpsoInfrastructureType.FPSO.equals(infrastructureType)
+        && ValidationType.FULL.equals(validationType)
+    ) {
 
-      if (ValidationType.FULL.equals(validationType)) {
-        ValidationUtils.rejectIfEmptyOrWhitespace(
-            errors,
-            "fpsoStructure",
-            "fpsoStructure.invalid",
-            MISSING_FPSO_ERROR
-        );
-        ValidationUtils.rejectIfEmptyOrWhitespace(
-            errors,
-            "fpsoType",
-            "fpsoType.invalid",
-            MISSING_FPSO_TYPE_ERROR
-        );
-        ValidationUtils.rejectIfEmptyOrWhitespace(
-            errors,
-            "fpsoDimensions",
-            "fpsoDimensions.invalid",
-            MISSING_FPSO_DIMENSIONS_ERROR
-        );
-      }
+      ValidationUtils.rejectIfEmptyOrWhitespace(
+          errors,
+          "fpsoStructure",
+          "fpsoStructure.invalid",
+          MISSING_FPSO_ERROR
+      );
+
+      ValidationUtils.rejectIfEmptyOrWhitespace(
+          errors,
+          "fpsoType",
+          "fpsoType.invalid",
+          MISSING_FPSO_TYPE_ERROR
+      );
+
+      ValidationUtils.rejectIfEmptyOrWhitespace(
+          errors,
+          "fpsoDimensions",
+          "fpsoDimensions.invalid",
+          MISSING_FPSO_DIMENSIONS_ERROR
+      );
     }
 
     ValidationUtil.invokeNestedValidator(
