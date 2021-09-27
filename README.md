@@ -19,14 +19,42 @@
 
 #### Configure the following environment variables
 
+##### Development profile (`development`)
 
 | Environment Variable | Description |
 | -------------------- |-------------|
 | DB_SCHEMA_NAME | Database schema to connect as. E.g. `PATHFINDER_XX` This schema will be created for you by Flyway|
 | CONTEXT_SUFFIX | A unique per developer suffix string to apply to the application context path. E.g. your initials |
-| PATHFINDER_GOVUK_NOTIFY_API_KEY | API key for the environment. for Local dev see TPM https://tpm.fivium.local/index.php/pwd/view/1569 |
+| PATHFINDER_GOVUK_NOTIFY_API_KEY | API key for the environment. For local dev see [TPM](https://tpm.fivium.local/index.php/pwd/view/1569) |
 | PATHFINDER_TEST_EMAIL_RECIPIENT | Email address to send all emails to when email.mode = "test" |
 
+##### Production profile (`production`)
+
+| Environment Variable | Description |
+| -------------------- |-------------|
+| PATHFINDER_DB_URL | The URL to the database you want to use |
+| PATHFINDER_DB_SCHEMA | Database schema to connect as. E.g. `PATHFINDER_XX` This schema will be created for you by Flyway|
+| PATHFINDER_DB_PASSWORD | The password to the `PATHFINDER_DA_SCHEMA` schema |
+| PATHFINDER_CONTEXT | A unique per developer suffix string to apply to the application context path. E.g. your initials |
+| PATHFINDER_GOVUK_NOTIFY_API_KEY | API key for the environment. for Local dev see TPM https://tpm.fivium.local/index.php/pwd/view/1569 |
+| PATHFINDER_TEST_EMAIL_RECIPIENT | Email address to send all emails to when email.mode = "test" |
+| PATHFINDER_BASE_URL | The non Pathfinder specific URL prefix e.g. [https://itportal.dev.decc.local](https://itportal.dev.decc.local) |
+| PATHFINDER_FOX_LOGIN_URL | The login URL for the Energy Portal on the environment you want to use, e.g [https://itportal.dev.decc.local/engedudev1/fox/oga/OGA_LOGIN/login?REFERRED_BY=PATHFINDER&DEV_CONTEXT_OVERRIDE=xx](https://itportal.dev.decc.local/engedudev1/fox/oga/OGA_LOGIN/login?REFERRED_BY=PATHFINDER&DEV_CONTEXT_OVERRIDE=xx) |
+| PATHFINDER_FOX_LOGOUT_URL | The logout URL for the Energy Portal on the environment you want to use, e.g [https://itportal.dev.decc.local/engedudev1/fox/oga/OGA_LOGIN/logout](https://itportal.dev.decc.local/engedudev1/fox/oga/OGA_LOGIN/logout) |
+| PATHFINDER_FOX_REGISTRATION_URL | The registration URL for the Energy Portal on the environment you want you use, e.g [https://itportal.dev.decc.local/engedudev1/fox?foxopen=oga/LOGIN001L/register](https://itportal.dev.decc.local/engedudev1/fox?foxopen=oga/LOGIN001L/register) |
+| PATHFINDER_CLAMAV_HOST | The host URL for ClamAV antivirus |
+| PATHFINDER_CLAMAV_PORT | The port for the ClamAV antivirus |
+| PATHFINDER_CLAMAV_TIMEOUT | The timeout for the ClamAV antivirus |
+| REGULATOR_SHARED_EMAIL | An email address to send to when an email is sent to the regulator shared inbox |
+| PATHFINDER_PUBLIC_INTERFACE_DB_PASSWORD | The password to create the `PATHFINDER_INTERFACE[_XX]` schema with |
+| PATHFINDER_SUPPLY_CHAIN_INTERFACE_URL | The URL to the supply chain interface (for local dev this can be any URL) |
+| PATHFINDER_ENABLE_STATSD | Boolean paramter to enable statsd stat aggregation |
+| PATHFINDER_ENABLE_FLYWAY_OUT_OF_ORDER | Boolean paramater to allow flyway to run migrations out of order |
+
+##### Debug profile (`debug`)
+Add the debug profile to enable hibernate SQL and descriptor output. You can look in the `application-debug.properties` file to enable other debug properties if requried.
+
+No environment variables need to be added when enabling the debug profile.
 
 #### Create the Flyway user
 
@@ -87,7 +115,7 @@ To enable Spring to access the fox session, you must access your local instance 
 
 The easiest way to do this is to add a ProxyPass rule to Apache running on itportal.dev.decc.local.
  
-Edit the `nginx` configuration file at https://bitbucket.org/fiviumuk/oga-dev-app/src/master/app/volumes/nginx/nginx.conf and add a ProxyPass rule forwarding traffic under your CONTEXT_SUFFIX to your local machine e.g.
+Edit the [nginx configuration file](https://bitbucket.org/fiviumuk/oga-dev-app/src/master/app/volumes/nginx/nginx.conf) at and add a ProxyPass rule forwarding traffic under your CONTEXT_SUFFIX to your local machine e.g.
 
 ```
 location /engedudev1/da/ {
@@ -95,7 +123,7 @@ location /engedudev1/da/ {
 }
 ```
 
-Once you have added the ProxyPass rule you will need to increment the version number of the nginx configuration file in https://bitbucket.org/fiviumuk/oga-dev-app/src/master/app/compose/uni.yml. See [OGA Bloomsbury Street infrastructure](https://confluence.fivium.co.uk/pages/viewpage.action?pageId=67733766#EDU/MMO/ETLdev/stBloomsburyStreet(OGA)-HowdoIupdatetheconfigforanapp) for more infomration.
+Once you have added the ProxyPass rule you will need to increment the version number of the nginx configuration file in the [uni.yml](https://bitbucket.org/fiviumuk/oga-dev-app/src/master/app/compose/uni.yml) file. See [OGA Bloomsbury Street infrastructure](https://confluence.fivium.co.uk/pages/viewpage.action?pageId=67733766#EDU/MMO/ETLdev/stBloomsburyStreet(OGA)-HowdoIupdatetheconfigforanapp) for more infomration.
 
 For example if the following was included in the `uni.yml` file
 
@@ -111,5 +139,5 @@ Commit and push the changes to both files and once the build has passed the Prox
 
 #### Run the app
 IntelliJ should auto detect the Spring application and create a run configuration.
-Run the project and navigate to `http://edu-dev-app3.decc.local/engedudev1/CONTEXT_SUFFIX/test`
+Run the project and navigate to `http://edu-dev-app3.decc.local/engedudev1/<CONTEXT_SUFFIX>/work-area`
     
