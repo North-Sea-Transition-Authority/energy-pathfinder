@@ -1,13 +1,14 @@
 package uk.co.ogauthority.pathfinder.model.enums.project;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Map;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
 public enum EnergyTransitionCategory {
 
   CARBON_CAPTURE_UTILISATION_AND_STORAGE("Carbon capture and storage (CCS)"),
-  ELECTRIFICATION("Electrification"),
+  ELECTRIFICATION("Low carbon power"),
   HYDROGEN("Hydrogen"),
   OFFSHORE_POWER_GENERATION("Offshore power generation");
 
@@ -23,6 +24,7 @@ public enum EnergyTransitionCategory {
 
   public static Map<String, String> getAllAsMap() {
     return Arrays.stream(values())
+        .sorted(Comparator.comparing(EnergyTransitionCategory::getDisplayName))
         .collect(StreamUtil.toLinkedHashMap(Enum::name, EnergyTransitionCategory::getDisplayName));
   }
 }
