@@ -286,24 +286,43 @@ public class TeamManagementService {
   /**
    * Remove the given Person from the given Team, as long as they are not the last administrator for that team.
    */
-  public void removeTeamMember(Person person,
-                               Team team,
+  public void removeTeamMember(Person personToRemove,
+                               Team teamToRemoveFrom,
                                WebUserAccount actionPerformedBy) {
 
-    if (isPersonMemberOfTeam(person, team)) {
-      if (isPersonLastTeamAdmin(team, person)) {
+    if (isPersonMemberOfTeam(personToRemove, teamToRemoveFrom)) {
+      if (
+          isPersonLastTeamAdmin(teamToRemoveFrom, personToRemove)
+          && !canLastTeamAdministratorBeRemovedFromTeam(teamToRemoveFrom, actionPerformedBy.getLinkedPerson())
+      ) {
         throw new LastAdministratorException(String.format(
-            "PersonId %s cannot be removed from resId %s as this would result in 0 team admins", person.getId(), team.getId()
+            "Person with ID %s cannot remove person with ID %s from %s with ID %d as this would result in 0 access managers",
+            actionPerformedBy.getLinkedPerson().getId(),
+            personToRemove.getId(),
+            teamToRemoveFrom.getType().name(),
+            teamToRemoveFrom.getId()
         ));
       } else {
-        teamService.removePersonFromTeam(team, person, actionPerformedBy);
-        notifyTeamUserRemoved(team, person, actionPerformedBy);
+        teamService.removePersonFromTeam(teamToRemoveFrom, personToRemove, actionPerformedBy);
+        notifyTeamUserRemoved(teamToRemoveFrom, personToRemove, actionPerformedBy);
       }
     } else {
-      throw new RuntimeException(String.format("PersonId %s is not a member of resId %s", person.getId(), team.getId()));
+      throw new RuntimeException(String.format(
+          "PersonId %s is not a member of resId %s",
+          personToRemove.getId(),
+          teamToRemoveFrom.getId())
+      );
     }
+  }
 
+  private boolean canLastTeamAdministratorBeRemovedFromTeam(Team team,
+                                                            Person personPerformingRemoval) {
+    return team.getType().equals(TeamType.ORGANISATION)
+        && canLastTeamAdministratorBeRemovedFromOrganisationTeam(personPerformingRemoval);
+  }
 
+  private boolean canLastTeamAdministratorBeRemovedFromOrganisationTeam(Person personPerformingRemoval) {
+    return canManageAnyOrgTeam(personPerformingRemoval);
   }
 
   private boolean isPersonLastTeamAdmin(Team team, Person person) {
@@ -445,7 +464,11 @@ public class TeamManagementService {
   }
 
   public boolean canManageAnyOrgTeam(AuthenticatedUserAccount userAccount) {
-    List<UserPrivilege> userPrivileges = teamService.getAllUserPrivilegesForPerson(userAccount.getLinkedPerson());
+    return canManageAnyOrgTeam(userAccount.getLinkedPerson());
+  }
+
+  public boolean canManageAnyOrgTeam(Person person) {
+    List<UserPrivilege> userPrivileges = teamService.getAllUserPrivilegesForPerson(person);
     return canManageAnyOrgTeam(userPrivileges);
   }
 

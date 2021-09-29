@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -63,8 +64,9 @@ public class TeamManagementServiceTest {
   private WebUserAccountRepository webUserAccountRepository;
 
   private RegulatorTeam regulatorTeam;
-  private Role regTeamAdminRole;
+  private Role teamAdminRole;
   private Role regTeamSomeOtherRole;
+  private Role orgTeamSomeOtherRole;
   private List<Role> organisationRoles;
   private String organisationRolesCsv;
   private TeamMember regulatorPersonRegulatorTeamMember;
@@ -80,7 +82,7 @@ public class TeamManagementServiceTest {
   private AuthenticatedUserAccount workAreaOnlyUser;
   private AuthenticatedUserAccount teamViewerOnlyUser;
   private AuthenticatedUserAccount manageAllTeamsUser;
-  private final WebUserAccount someWebUserAccount = new WebUserAccount(99);
+  private final WebUserAccount someWebUserAccount = UserTestingUtil.getWebUserAccount();
   private UserRolesForm userRolesForm;
   private TeamManagementService teamManagementService;
 
@@ -103,8 +105,9 @@ public class TeamManagementServiceTest {
 
     regulatorTeam = TeamTestingUtil.getRegulatorTeam();
 
-    regTeamAdminRole = TeamTestingUtil.getTeamAdminRole();
+    teamAdminRole = TeamTestingUtil.getTeamAdminRole();
     regTeamSomeOtherRole = TeamTestingUtil.generateRole("SOME_ROLE", 999);
+    orgTeamSomeOtherRole = TeamTestingUtil.generateRole("SOME_NON_ADMIN_ROLE", 999);
     organisationRoles = List.of(
         TeamTestingUtil.generateRole("FIRST_ROLE", 10),
         TeamTestingUtil.generateRole("SECOND_ROLE", 20)
@@ -112,7 +115,7 @@ public class TeamManagementServiceTest {
     organisationRolesCsv = "FIRST_ROLE, SECOND_ROLE";
 
     regulatorTeamAdminPerson = new Person(1, "reg", "person", "reg@person.com", "0");
-    regulatorPersonRegulatorTeamMember = new TeamMember(regulatorTeam, regulatorTeamAdminPerson, Set.of(regTeamAdminRole));
+    regulatorPersonRegulatorTeamMember = new TeamMember(regulatorTeam, regulatorTeamAdminPerson, Set.of(teamAdminRole));
 
     otherRegulatorPerson = new Person(2, "other reg", "person", "otherreg@person.com", "0");
     otherRegulatorPersonTeamMember = new TeamMember(regulatorTeam, otherRegulatorPerson, Set.of(regTeamSomeOtherRole));
@@ -161,7 +164,7 @@ public class TeamManagementServiceTest {
     when(teamService.isPersonMemberOfTeam(regulatorTeamAdminPerson, regulatorTeam)).thenReturn(true);
 
     when(teamService.getAllRolesForTeam(regulatorTeam))
-        .thenReturn(List.of(regTeamAdminRole, regTeamSomeOtherRole));
+        .thenReturn(List.of(teamAdminRole, regTeamSomeOtherRole));
 
     when(teamService.getAllOrganisationTeams())
         // Returned list must be mutable
@@ -347,7 +350,7 @@ public class TeamManagementServiceTest {
   public void populateExistingRoles_personHasRolesInTeam() {
     when(teamService.getMembershipOfPersonInTeam(regulatorTeam, regulatorTeamAdminPerson))
         .thenReturn(Optional.of(new TeamMember(regulatorTeam,
-            regulatorTeamAdminPerson, Set.of(regTeamAdminRole, regTeamSomeOtherRole))));
+            regulatorTeamAdminPerson, Set.of(teamAdminRole, regTeamSomeOtherRole))));
 
     teamManagementService.populateExistingRoles(
         regulatorTeamAdminPerson,
@@ -356,15 +359,15 @@ public class TeamManagementServiceTest {
         manageRegTeamRegulatorUser
     );
     // Expect order to match role display sequence
-    assertThat(userRolesForm.getUserRoles()).containsExactly(regTeamAdminRole.getName(),
+    assertThat(userRolesForm.getUserRoles()).containsExactly(teamAdminRole.getName(),
         regTeamSomeOtherRole.getName());
 
   }
 
   @Test
-  public void removePersonFromTeam_personBeingRemovedIsNotLastAdministrator() {
-    // Setup a second team member who is also an admin
-    var secondTeamMember = new TeamMember(regulatorTeam, otherRegulatorPerson, Set.of(regTeamAdminRole));
+  public void removeTeamMember_whenRegulatorTeamAndPersonBeingRemovedIsNotLastAdministrator_thenRemovalExpected() {
+    // Set up a second team member who is also an admin
+    var secondTeamMember = new TeamMember(regulatorTeam, otherRegulatorPerson, Set.of(teamAdminRole));
 
     when(teamService.getTeamMembers(regulatorTeam))
         .thenReturn(List.of(regulatorPersonRegulatorTeamMember, secondTeamMember));
@@ -372,22 +375,79 @@ public class TeamManagementServiceTest {
     when(teamService.isPersonMemberOfTeam(or(eq(regulatorPersonRegulatorTeamMember.getPerson()), eq(secondTeamMember.getPerson())), eq(regulatorTeam)))
         .thenReturn(true);
 
-    teamManagementService.removeTeamMember(regulatorTeamAdminPerson, regulatorTeam, someWebUserAccount);
-    verify(teamService, times(1)).removePersonFromTeam(regulatorTeam, regulatorTeamAdminPerson, someWebUserAccount);
+    teamManagementService.removeTeamMember(secondTeamMember.getPerson(), regulatorTeam, someWebUserAccount);
+    verify(teamService, times(1)).removePersonFromTeam(regulatorTeam, secondTeamMember.getPerson(), someWebUserAccount);
   }
 
   @Test(expected = LastAdministratorException.class)
-  public void removePersonFromTeam_personBeingRemovedIsLastAdministrator() {
-    // Setup a second team member who is not an admin
-    var secondTeamMember = new TeamMember(regulatorTeam, otherRegulatorPerson, Set.of(regTeamSomeOtherRole));
+  public void removeTeamMember_whenRegulatorTeamAndPersonBeingRemovedIsLastAdministrator_thenException() {
+
+    var lastTeamAdministrator = new TeamMember(regulatorTeam, regulatorTeamAdminPerson, Set.of(teamAdminRole));
 
     when(teamService.getTeamMembers(regulatorTeam))
-        .thenReturn(List.of(regulatorPersonRegulatorTeamMember, secondTeamMember));
+        .thenReturn(List.of(lastTeamAdministrator));
 
-    when(teamService.isPersonMemberOfTeam(or(eq(regulatorPersonRegulatorTeamMember.getPerson()), eq(secondTeamMember.getPerson())), eq(regulatorTeam)))
+    when(teamService.isPersonMemberOfTeam(lastTeamAdministrator.getPerson(), regulatorTeam))
         .thenReturn(true);
 
-    teamManagementService.removeTeamMember(regulatorTeamAdminPerson, regulatorTeam, someWebUserAccount);
+    teamManagementService.removeTeamMember(lastTeamAdministrator.getPerson(), regulatorTeam, someWebUserAccount);
+  }
+
+  @Test
+  public void removeTeamMember_whenOrganisationTeamAndPersonBeingRemovedIsNotLastAdministrator_thenRemovalExpected() {
+
+    var teamAdministratorMember = new TeamMember(organisationTeam1, new Person(50, "other", "person", "other@person.com", "0"), Set.of(
+        teamAdminRole));
+    var nonTeamAdministratorMember = new TeamMember(organisationTeam1, organisationPerson, Set.of(orgTeamSomeOtherRole));
+
+    when(teamService.getTeamMembers(organisationTeam1))
+        .thenReturn(List.of(teamAdministratorMember, nonTeamAdministratorMember));
+
+    when(teamService.isPersonMemberOfTeam(or(eq(nonTeamAdministratorMember.getPerson()), eq(nonTeamAdministratorMember.getPerson())), eq(organisationTeam1)))
+        .thenReturn(true);
+
+    teamManagementService.removeTeamMember(nonTeamAdministratorMember.getPerson(), organisationTeam1, someWebUserAccount);
+    verify(teamService, times(1)).removePersonFromTeam(organisationTeam1, nonTeamAdministratorMember.getPerson(), someWebUserAccount);
+  }
+
+  @Test(expected = LastAdministratorException.class)
+  public void removeTeamMember_whenOrganisationTeamAndPersonBeingRemovedIsLastAdministratorAndNotRemovedByRegulator_thenException() {
+
+    var lastTeamAdministrator = new TeamMember(organisationTeam1, organisationPerson, Set.of(teamAdminRole));
+
+    when(teamService.getTeamMembers(organisationTeam1))
+        .thenReturn(List.of(lastTeamAdministrator));
+
+    when(teamService.isPersonMemberOfTeam(lastTeamAdministrator.getPerson(), organisationTeam1))
+        .thenReturn(true);
+
+    var notRegulatorOrganisationManagerPrivilege = UserPrivilege.PATHFINDER_WORK_AREA;
+
+    when(teamService.getAllUserPrivilegesForPerson(someWebUserAccount.getLinkedPerson()))
+        .thenReturn(List.of(notRegulatorOrganisationManagerPrivilege));
+
+    teamManagementService.removeTeamMember(lastTeamAdministrator.getPerson(), organisationTeam1, someWebUserAccount);
+  }
+
+  @Test
+  public void removeTeamMember_whenOrganisationTeamAndPersonBeingRemovedIsLastAdministratorAndRemovedByRegulator_thenRemovalAllowed() {
+
+    var lastTeamAdministrator = new TeamMember(organisationTeam1, organisationPerson, Set.of(teamAdminRole));
+
+    when(teamService.getTeamMembers(organisationTeam1))
+        .thenReturn(List.of(lastTeamAdministrator));
+
+    when(teamService.isPersonMemberOfTeam(lastTeamAdministrator.getPerson(), organisationTeam1))
+        .thenReturn(true);
+
+    var regulatorOrganisationManagerPrivilege = UserPrivilege.PATHFINDER_REG_ORG_MANAGER;
+
+    when(teamService.getAllUserPrivilegesForPerson(someWebUserAccount.getLinkedPerson()))
+        .thenReturn(List.of(regulatorOrganisationManagerPrivilege));
+
+    Assertions.assertDoesNotThrow(() ->
+        teamManagementService.removeTeamMember(lastTeamAdministrator.getPerson(), organisationTeam1, someWebUserAccount)
+    );
   }
 
   @Test(expected = RuntimeException.class)
@@ -404,7 +464,7 @@ public class TeamManagementServiceTest {
 
   @Test
   public void updateUserRoles_whenPersonWhoIsLastAdminHasRoleAdded() {
-    userRolesForm.setUserRoles(List.of(regTeamAdminRole.getName(), regTeamSomeOtherRole.getName()));
+    userRolesForm.setUserRoles(List.of(teamAdminRole.getName(), regTeamSomeOtherRole.getName()));
 
     teamManagementService.updateUserRoles(regulatorTeamAdminPerson, regulatorTeam, userRolesForm, someWebUserAccount);
 
@@ -417,7 +477,7 @@ public class TeamManagementServiceTest {
   @Test
   public void updateUserRoles_whenNewPersonAddedToTeam() {
     when(teamService.isPersonMemberOfTeam(regulatorTeamAdminPerson, regulatorTeam)).thenReturn(false);
-    userRolesForm.setUserRoles(List.of(regTeamAdminRole.getName(), regTeamSomeOtherRole.getName()));
+    userRolesForm.setUserRoles(List.of(teamAdminRole.getName(), regTeamSomeOtherRole.getName()));
 
     teamManagementService.updateUserRoles(regulatorTeamAdminPerson, regulatorTeam, userRolesForm, someWebUserAccount);
 
@@ -436,10 +496,10 @@ public class TeamManagementServiceTest {
 
   @Test
   public void getSelectedRolesForTeam_formContainsSomeSupportedRolesForTeam() {
-    userRolesForm.setUserRoles(List.of("NOT_SUPPORTED1", "NOT_SUPPORTED2", regTeamAdminRole.getName(), regTeamSomeOtherRole.getName()));
+    userRolesForm.setUserRoles(List.of("NOT_SUPPORTED1", "NOT_SUPPORTED2", teamAdminRole.getName(), regTeamSomeOtherRole.getName()));
 
     List<Role> validSelectedRoles = teamManagementService.getSelectedRolesForTeam(userRolesForm, regulatorTeam);
-    assertThat(validSelectedRoles).containsExactlyInAnyOrder(regTeamAdminRole, regTeamSomeOtherRole);
+    assertThat(validSelectedRoles).containsExactlyInAnyOrder(teamAdminRole, regTeamSomeOtherRole);
   }
 
   @Test
@@ -879,7 +939,7 @@ public class TeamManagementServiceTest {
   }
 
   @Test
-  public void canManageAnyOrgTeam_whenOrganisationAccessManager_thenTrue() {
+  public void canManageAnyOrgTeam_authenticatedUserAccountVariant_whenOrganisationAccessManager_thenTrue() {
     final var regulatorOrganisationManagerPrivilege = UserPrivilege.PATHFINDER_REG_ORG_MANAGER;
     final var user = UserTestingUtil.getAuthenticatedUserAccount(
         Set.of(regulatorOrganisationManagerPrivilege)
@@ -891,7 +951,7 @@ public class TeamManagementServiceTest {
   }
 
   @Test
-  public void canManageAnyOrgTeam_whenNotOrganisationAccessManager_thenFalse() {
+  public void canManageAnyOrgTeam_authenticatedUserAccountVariant_whenNotOrganisationAccessManager_thenFalse() {
     final var regulatorOrganisationManagerPrivilege = UserPrivilege.PATHFINDER_WORK_AREA;
     final var user = UserTestingUtil.getAuthenticatedUserAccount(
         Set.of(regulatorOrganisationManagerPrivilege)
@@ -900,6 +960,32 @@ public class TeamManagementServiceTest {
         .thenReturn(List.of(regulatorOrganisationManagerPrivilege));
 
     assertThat(teamManagementService.canManageAnyOrgTeam(user)).isFalse();
+  }
+
+  @Test
+  public void canManageAnyOrgTeam_personVariant_whenOrganisationAccessManager_thenTrue() {
+
+    final var regulatorOrganisationManagerPrivilege = UserPrivilege.PATHFINDER_REG_ORG_MANAGER;
+
+    final var person = UserTestingUtil.getPerson();
+
+    when(teamService.getAllUserPrivilegesForPerson(person))
+        .thenReturn(List.of(regulatorOrganisationManagerPrivilege));
+
+    assertThat(teamManagementService.canManageAnyOrgTeam(person)).isTrue();
+  }
+
+  @Test
+  public void canManageAnyOrgTeam_personVariant_whenNotOrganisationAccessManager_thenFalse() {
+
+    final var notRegulatorOrganisationManagerPrivilege = UserPrivilege.PATHFINDER_WORK_AREA;
+
+    final var person = UserTestingUtil.getPerson();
+
+    when(teamService.getAllUserPrivilegesForPerson(person))
+        .thenReturn(List.of(notRegulatorOrganisationManagerPrivilege));
+
+    assertThat(teamManagementService.canManageAnyOrgTeam(person)).isFalse();
   }
 
   @Test
