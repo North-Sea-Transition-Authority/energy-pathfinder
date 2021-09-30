@@ -1,1 +1,0 @@
-GRANT SELECT, INSERT ON ${datasource.user}.project_updates TO ${datasource.migration-user};
