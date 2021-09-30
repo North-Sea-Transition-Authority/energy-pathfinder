@@ -8,6 +8,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationUnit;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 
 @Entity
@@ -25,6 +26,13 @@ public class ProjectTransfer extends ProjectDetailEntity {
   @Lob
   @Column(name = "transfer_reason", columnDefinition = "CLOB")
   private String transferReason;
+
+  @Column(name = "publish_as_project_operator")
+  private Boolean isPublishedAsOperator;
+
+  @ManyToOne
+  @JoinColumn(name = "publishable_org_unit_id")
+  private PortalOrganisationUnit publishableOrganisationUnit;
 
   @Column(name = "transferred_datetime")
   private Instant transferredInstant;
@@ -71,5 +79,21 @@ public class ProjectTransfer extends ProjectDetailEntity {
 
   public void setTransferredByWuaId(Integer transferredByWuaId) {
     this.transferredByWuaId = transferredByWuaId;
+  }
+
+  public Boolean isPublishedAsOperator() {
+    return isPublishedAsOperator;
+  }
+
+  public void setIsPublishedAsOperator(Boolean isPublishedAsOperator) {
+    this.isPublishedAsOperator = isPublishedAsOperator;
+  }
+
+  public PortalOrganisationUnit getPublishableOrganisationUnit() {
+    return publishableOrganisationUnit;
+  }
+
+  public void setPublishableOrganisationUnit(PortalOrganisationUnit publishableOrganisationUnit) {
+    this.publishableOrganisationUnit = publishableOrganisationUnit;
   }
 }

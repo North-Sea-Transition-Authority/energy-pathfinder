@@ -1,7 +1,6 @@
 package uk.co.ogauthority.pathfinder.energyportal.repository.organisation;
 
 import java.util.List;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.repository.CrudRepository;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
@@ -12,9 +11,14 @@ public interface PortalOrganisationUnitRepository extends CrudRepository<PortalO
   @EntityGraph(attributePaths = "portalOrganisationGroup")
   List<PortalOrganisationUnit> findAll();
 
-  List<PortalOrganisationUnit> findByNameContainingIgnoreCase(String searchTerm);
+  List<PortalOrganisationUnit> findByNameContainingIgnoreCaseAndActiveTrue(String searchTerm);
 
-  List<PortalOrganisationUnit> findByNameContainingIgnoreCase(String searchTerm, Pageable pageable);
+  List<PortalOrganisationUnit> findByActiveTrueAndPortalOrganisationGroupIn(List<PortalOrganisationGroup> organisationGroups);
 
-  List<PortalOrganisationUnit> findByPortalOrganisationGroupIn(List<PortalOrganisationGroup> organisationGroups);
+  List<PortalOrganisationUnit> findByNameContainingIgnoreCaseAndActiveTrueAndPortalOrganisationGroupIn(
+      String organisationUnit,
+      List<PortalOrganisationGroup> organisationGroups
+  );
+
+  boolean existsByOuIdAndActiveTrueAndPortalOrganisationGroup_OrgGrpId(int organisationUnitId, int organisationGroupId);
 }

@@ -1,16 +1,25 @@
 package uk.co.ogauthority.pathfinder.model.form.projecttransfer;
 
 import java.util.Arrays;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
 import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
+import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
 
 @Component
 public class ProjectTransferFormValidator implements SmartValidator {
 
-  public static final String SAME_OPERATOR_ERROR_MESSAGE = "The new operator must be different to the current operator";
+  protected static final String SAME_OPERATOR_ERROR_MESSAGE = "The new operator must be different to the current operator";
+
+  private final ProjectOperatorFormValidator projectOperatorFormValidator;
+
+  @Autowired
+  public ProjectTransferFormValidator(ProjectOperatorFormValidator projectOperatorFormValidator) {
+    this.projectOperatorFormValidator = projectOperatorFormValidator;
+  }
 
   @Override
   public void validate(Object target, Errors errors, Object... validationHints) {
@@ -34,6 +43,13 @@ public class ProjectTransferFormValidator implements SmartValidator {
         );
       }
     }
+
+    projectOperatorFormValidator.validatePublishableOperatorQuestions(
+        errors,
+        form.getNewOrganisationGroup(),
+        form.isPublishedAsOperator(),
+        form.getPublishableOrganisation()
+    );
   }
 
   @Override

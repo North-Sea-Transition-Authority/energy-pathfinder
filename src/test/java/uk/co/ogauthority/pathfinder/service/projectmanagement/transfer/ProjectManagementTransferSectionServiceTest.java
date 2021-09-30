@@ -1,9 +1,9 @@
 package uk.co.ogauthority.pathfinder.service.projectmanagement.transfer;
 
-import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.Map;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +13,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementSection;
 import uk.co.ogauthority.pathfinder.model.view.projecttransfer.ProjectTransferViewUtil;
 import uk.co.ogauthority.pathfinder.service.projecttransfer.ProjectTransferService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectTransferTestUtil;
@@ -44,19 +45,25 @@ public class ProjectManagementTransferSectionServiceTest {
 
   @Test
   public void getSection_whenTransfer_thenReturnView() {
-    var projectTransfer = ProjectTransferTestUtil.createProjectTransfer();
+
+    final var projectTransfer = ProjectTransferTestUtil.createProjectTransfer();
+    final var expectedProjectTransferView = ProjectTransferViewUtil.from(projectTransfer, authenticatedUser);
 
     when(projectTransferService.getProjectTransfer(projectDetail)).thenReturn(Optional.of(projectTransfer));
     when(webUserAccountService.getWebUserAccountOrError(projectTransfer.getTransferredByWuaId())).thenReturn(authenticatedUser);
 
-    var section = projectManagementTransferSectionService.getSection(projectDetail, authenticatedUser);
-    assertThat(section.getTemplatePath()).isEqualTo(ProjectManagementTransferSectionService.TEMPLATE_PATH);
-    assertThat(section.getDisplayOrder()).isEqualTo(ProjectManagementTransferSectionService.DISPLAY_ORDER);
-    assertThat(section.getSectionType()).isEqualTo(ProjectManagementTransferSectionService.SECTION_TYPE);
+    final var resultingSection = projectManagementTransferSectionService.getSection(
+        projectDetail,
+        authenticatedUser
+    );
 
-    var projectTransferView = ProjectTransferViewUtil.from(projectTransfer, authenticatedUser);
-    assertThat(section.getTemplateModel()).containsExactly(
-        entry("projectTransferView", projectTransferView)
+    assertCommonSectionProperties(resultingSection);
+
+    assertThat(resultingSection.getTemplateModel()).containsExactlyInAnyOrderEntriesOf(
+        Map.of(
+            "projectTransferView", expectedProjectTransferView,
+            "isPublishedAsOperator", projectTransfer.isPublishedAsOperator()
+        )
     );
   }
 
@@ -64,11 +71,18 @@ public class ProjectManagementTransferSectionServiceTest {
   public void getSection_whenNoTransfer_thenNoView() {
     when(projectTransferService.getProjectTransfer(projectDetail)).thenReturn(Optional.empty());
 
-    var section = projectManagementTransferSectionService.getSection(projectDetail, authenticatedUser);
-    assertThat(section.getTemplatePath()).isEqualTo(ProjectManagementTransferSectionService.TEMPLATE_PATH);
-    assertThat(section.getDisplayOrder()).isEqualTo(ProjectManagementTransferSectionService.DISPLAY_ORDER);
-    assertThat(section.getSectionType()).isEqualTo(ProjectManagementTransferSectionService.SECTION_TYPE);
+    final var resultingSection = projectManagementTransferSectionService.getSection(
+        projectDetail,
+        authenticatedUser
+    );
 
-    assertThat(section.getTemplateModel()).isEmpty();
+    assertCommonSectionProperties(resultingSection);
+    assertThat(resultingSection.getTemplateModel()).isEmpty();
+  }
+
+  private void assertCommonSectionProperties(ProjectManagementSection projectManagementSection) {
+    assertThat(projectManagementSection.getTemplatePath()).isEqualTo(ProjectManagementTransferSectionService.TEMPLATE_PATH);
+    assertThat(projectManagementSection.getDisplayOrder()).isEqualTo(ProjectManagementTransferSectionService.DISPLAY_ORDER);
+    assertThat(projectManagementSection.getSectionType()).isEqualTo(ProjectManagementTransferSectionService.SECTION_TYPE);
   }
 }

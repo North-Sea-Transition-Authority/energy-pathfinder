@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.view.projectoperator.ProjectOperatorView;
 import uk.co.ogauthority.pathfinder.model.view.projectoperator.ProjectOperatorViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
@@ -66,8 +67,8 @@ public class ProjectOperatorSectionSummaryServiceTest {
     );
     final var previousProjectOperatorView = ProjectOperatorViewUtil.from(previousProjectOperator);
 
-    when(projectOperatorService.getProjectOperatorByProjectDetail(projectDetail))
-        .thenReturn(Optional.of(currentProjectOperator));
+    when(projectOperatorService.getProjectOperatorByProjectDetailOrError(projectDetail))
+        .thenReturn(currentProjectOperator);
 
     when(projectOperatorService.getProjectOperatorByProjectAndVersion(
         projectDetail.getProject(),
@@ -85,11 +86,13 @@ public class ProjectOperatorSectionSummaryServiceTest {
   public void getSummary_whenProjectOperatorNotExist_thenProjectOperatorViewNotPopulated() {
 
     final var projectDetail = ProjectUtil.getProjectDetails();
-    final var currentProjectOperatorView = new ProjectOperatorView();
+
+    final var currentProjectOperator = new ProjectOperator();
+    final var currentProjectOperatorView = ProjectOperatorViewUtil.from(currentProjectOperator);
     final var previousProjectOperatorView = new ProjectOperatorView();
 
-    when(projectOperatorService.getProjectOperatorByProjectDetail(projectDetail))
-        .thenReturn(Optional.empty());
+    when(projectOperatorService.getProjectOperatorByProjectDetailOrError(projectDetail))
+        .thenReturn(currentProjectOperator);
 
     when(projectOperatorService.getProjectOperatorByProjectAndVersion(projectDetail.getProject(), projectDetail.getVersion()-1))
         .thenReturn(Optional.empty());
@@ -98,7 +101,6 @@ public class ProjectOperatorSectionSummaryServiceTest {
 
     assertModelProperties(sectionSummary);
     assertInteractions(currentProjectOperatorView, previousProjectOperatorView);
-
   }
 
   private void assertModelProperties(ProjectSectionSummary sectionSummary) {
@@ -112,7 +114,8 @@ public class ProjectOperatorSectionSummaryServiceTest {
     assertThat(model).containsOnlyKeys(
         "sectionTitle",
         "sectionId",
-        "projectOperatorDiffModel"
+        "projectOperatorDiffModel",
+        "isPublishedAsOperator"
     );
 
     assertThat(model).contains(entry("sectionTitle", ProjectOperatorSectionSummaryService.PAGE_NAME));

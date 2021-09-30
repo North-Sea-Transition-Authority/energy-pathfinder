@@ -1,15 +1,18 @@
 package uk.co.ogauthority.pathfinder.service.project;
 
 import java.util.Optional;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
+import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 
@@ -21,27 +24,37 @@ public class ProjectOperatorService {
 
   private final TeamService teamService;
   private final ProjectOperatorRepository projectOperatorRepository;
+  private final PortalOrganisationAccessor portalOrganisationAccessor;
 
   @Autowired
   public ProjectOperatorService(TeamService teamService,
-                                ProjectOperatorRepository projectOperatorRepository) {
+                                ProjectOperatorRepository projectOperatorRepository,
+                                PortalOrganisationAccessor portalOrganisationAccessor) {
     this.teamService = teamService;
     this.projectOperatorRepository = projectOperatorRepository;
+    this.portalOrganisationAccessor = portalOrganisationAccessor;
   }
 
-  /**
-   * Create a ProjectOperator for the specified detail and org group.
-   * If one exists already for that detail update the operator
-   *
-   * @param detail            Detail to link to Org Group.
-   * @param organisationGroup Org Group to create for.
-   * @return ProjectOperator for the specified detail and org group.
-   */
   @Transactional
-  public ProjectOperator createOrUpdateProjectOperator(ProjectDetail detail,
-                                                       PortalOrganisationGroup organisationGroup) {
-    var projectOperator = getProjectOperatorByProjectDetail(detail).orElse(new ProjectOperator(detail));
-    projectOperator.setOrganisationGroup(organisationGroup);
+  public ProjectOperator createOrUpdateProjectOperator(ProjectDetail projectDetail,
+                                                       ProjectOperatorForm form) {
+    final var projectOperator = getProjectOperatorByProjectDetail(projectDetail)
+        .orElse(new ProjectOperator(projectDetail));
+
+    final var operatorOrganisationGroup = portalOrganisationAccessor.getOrganisationGroupOrError(
+        Integer.parseInt(form.getOperator())
+    );
+    projectOperator.setOrganisationGroup(operatorOrganisationGroup);
+
+    projectOperator.setIsPublishedAsOperator(form.isPublishedAsOperator());
+
+    final var publishableOrganisation =
+        (BooleanUtils.isFalse(projectOperator.isPublishedAsOperator()) && form.getPublishableOrganisation() != null)
+        ? portalOrganisationAccessor.getOrganisationUnitOrError(Integer.parseInt(form.getPublishableOrganisation()))
+        : null;
+
+    projectOperator.setPublishableOrganisationUnit(publishableOrganisation);
+
     return projectOperatorRepository.save(projectOperator);
   }
 

@@ -34,6 +34,7 @@ import uk.co.ogauthority.pathfinder.model.form.projecttransfer.ProjectTransferFo
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.service.projecttransfer.ProjectTransferModelService;
 import uk.co.ogauthority.pathfinder.service.projecttransfer.ProjectTransferService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -50,6 +51,9 @@ public class ProjectTransferControllerTest extends ProjectContextAbstractControl
 
   @MockBean
   private ProjectTransferService projectTransferService;
+
+  @MockBean
+  private ProjectTransferModelService projectTransferModelService;
 
   private final ProjectDetail publishedProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.PUBLISHED);
   private final ProjectDetail unsubmittedProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
@@ -119,7 +123,7 @@ public class ProjectTransferControllerTest extends ProjectContextAbstractControl
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
 
-    when(projectTransferService.getTransferProjectModelAndView(eq(publishedProjectDetail), eq(authenticatedUser), any())).thenReturn(new ModelAndView());
+    when(projectTransferModelService.getTransferProjectModelAndView(eq(publishedProjectDetail), eq(authenticatedUser), any())).thenReturn(new ModelAndView());
     when(projectTransferService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(

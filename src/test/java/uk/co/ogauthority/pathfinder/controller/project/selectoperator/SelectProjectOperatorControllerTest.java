@@ -27,8 +27,8 @@ import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
+import uk.co.ogauthority.pathfinder.service.project.projectoperator.ProjectOperatorModelService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
-import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -36,12 +36,14 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 @WebMvcTest(SelectProjectOperatorController.class)
 public class SelectProjectOperatorControllerTest extends AbstractControllerTest {
 
-
   @MockBean
   private StartProjectService startProjectService;
 
   @MockBean
   private SelectOperatorService selectOperatorService;
+
+  @MockBean
+  private ProjectOperatorModelService projectOperatorModelService;
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       SystemAccessService.CREATE_PROJECT_PRIVILEGES);
@@ -65,16 +67,14 @@ public class SelectProjectOperatorControllerTest extends AbstractControllerTest 
 
   @Test
   public void startProject_validForm() throws Exception {
-    when(selectOperatorService.getOrganisationGroupOrError(any(), any())).thenReturn(
-        ProjectOperatorTestUtil.ORG_GROUP
-    );
-    when(startProjectService.startProject(authenticatedUser, ProjectOperatorTestUtil.ORG_GROUP)).thenReturn(
+
+    when(startProjectService.startProject(any(), any())).thenReturn(
         ProjectUtil.getProjectDetails()
     );
 
     MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
       add(SelectProjectOperatorController.PRIMARY_BUTTON_TEXT, SelectProjectOperatorController.PRIMARY_BUTTON_TEXT);
-      add("organisationGroup", "1");
+      add("operator", "1");
     }};
 
     var bindingResult = new BeanPropertyBindingResult(ProjectOperatorForm.class, "form");
@@ -94,12 +94,13 @@ public class SelectProjectOperatorControllerTest extends AbstractControllerTest 
 
   @Test
   public void startProject_inValidForm() throws Exception {
-    when(selectOperatorService.getSelectOperatorModelAndView(
+    when(projectOperatorModelService.getProjectOperatorModelAndView(
+        any(),
         any(),
         any(),
         any(),
         any()
-    )).thenReturn(new ModelAndView("test/blankTemplate")); //Just return a model and view that needs no params.
+    )).thenReturn(new ModelAndView()); //Just return a model and view that needs no params.
 
     MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
       add(SelectProjectOperatorController.PRIMARY_BUTTON_TEXT, SelectProjectOperatorController.PRIMARY_BUTTON_TEXT);

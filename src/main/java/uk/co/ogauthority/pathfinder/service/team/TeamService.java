@@ -135,9 +135,24 @@ public class TeamService {
         searchTerm
     );
 
-    return teamDtoFactory.createOrganisationTeamList(orgTeamList).stream().map(
-        OrganisationTeam::getPortalOrganisationGroup).collect(Collectors.toList()
+    return convertToPortalOrganisationGroupList(orgTeamList);
+  }
+
+  public List<PortalOrganisationGroup> getOrganisationGroupsPersonInTeamFor(Person person) {
+
+    final var portalTeamDtoList =  portalTeamAccessor.getTeamsWherePersonMemberOfTeamType(
+        person,
+        TeamType.ORGANISATION.getPortalTeamType()
     );
+
+    return convertToPortalOrganisationGroupList(portalTeamDtoList);
+  }
+
+  private List<PortalOrganisationGroup> convertToPortalOrganisationGroupList(List<PortalTeamDto> portalTeamDtoList) {
+    return teamDtoFactory.createOrganisationTeamList(portalTeamDtoList)
+        .stream()
+        .map(OrganisationTeam::getPortalOrganisationGroup)
+        .collect(Collectors.toList());
   }
 
   private List<String> getPortalRoleNames(Collection<OrganisationRole> roles) {

@@ -39,14 +39,21 @@ public class ProjectOperatorTestUtil {
   }
 
   public static ProjectOperator getOperator(ProjectDetail detail, PortalOrganisationGroup organisationGroup) {
-    return new ProjectOperator(
+    final var projectOperator = new ProjectOperator(
         detail,
         organisationGroup
     );
+
+    projectOperator.setIsPublishedAsOperator(true);
+
+    return projectOperator;
   }
 
   public static ProjectOperatorForm getCompleteForm() {
-    return new ProjectOperatorForm(ORG_GROUP_ID.toString());
+    final var form = new ProjectOperatorForm();
+    form.setOperator(ORG_GROUP_ID.toString());
+    form.setIsPublishedAsOperator(true);
+    return form;
   }
 
 

@@ -9,6 +9,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.management.ProjectManagementSectionType;
 import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagementPageSectionType;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementSection;
+import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorDisplayNameUtil;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectManagementSectionService;
@@ -38,7 +39,10 @@ public class ProjectManagementHeadingSectionService implements ProjectManagement
     var projectOperator = projectOperatorService.getProjectOperatorByProjectDetailOrError(projectDetail);
 
     summaryModel.put("projectTitle", projectInformation.getProjectTitle());
-    summaryModel.put("projectOperator", projectOperator.getOrganisationGroup().getName());
+    summaryModel.put("projectOperatorDisplayName", ProjectOperatorDisplayNameUtil.getProjectOperatorDisplayName(
+        projectOperator.getOrganisationGroup(),
+        projectOperator.getPublishableOrganisationUnit()
+    ));
     return new ProjectManagementSection(
         TEMPLATE_PATH,
         summaryModel,

@@ -16,9 +16,9 @@ import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrga
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
+import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorFormValidator;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
-import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -31,13 +31,13 @@ public class SelectOperatorServiceValidationTest {
   private PortalOrganisationAccessor portalOrganisationAccessor;
 
   @Mock
-  private SearchSelectorService searchSelectorService;
-
-  @Mock
   private ProjectOperatorService projectOperatorService;
 
   @Mock
   private EntityDuplicationService entityDuplicationService;
+
+  @Mock
+  private ProjectOperatorFormValidator projectOperatorFormValidator;
 
   private SelectOperatorService selectOperatorService;
 
@@ -59,14 +59,14 @@ public class SelectOperatorServiceValidationTest {
     selectOperatorService = new SelectOperatorService(
         portalOrganisationAccessor,
         validationService,
-        searchSelectorService,
         projectOperatorService,
-        entityDuplicationService
+        entityDuplicationService,
+        projectOperatorFormValidator
     );
   }
 
   @Test
-  public void isCompleted_fullForm() {
+  public void isCompleted_whenValidForm_thenTrue() {
     when(projectOperatorService.getProjectOperatorByProjectDetail(detail))
         .thenReturn(Optional.of(projectOperator));
     assertThat(selectOperatorService.isComplete(detail)).isTrue();
