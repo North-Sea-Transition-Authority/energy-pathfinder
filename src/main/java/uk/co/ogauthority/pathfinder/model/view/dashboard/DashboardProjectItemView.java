@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.model.view.dashboard;
 
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
 import uk.co.ogauthority.pathfinder.model.form.useraction.DashboardLink;
+import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorDisplayNameUtil;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
@@ -39,6 +40,11 @@ public class DashboardProjectItemView {
         ? String.format(SCREEN_READER_TEXT, formattedCreatedDateTime)
         : "";
 
+    final var projectOperatorDisplayName = ProjectOperatorDisplayNameUtil.getProjectOperatorDisplayName(
+        dashboardProjectItem.getOrganisationGroup(),
+        dashboardProjectItem.getPublishableOperator()
+    );
+
     return new DashboardProjectItemView(
         getLink(dashboardProjectItem, title, screenReaderText),
         title,
@@ -48,7 +54,7 @@ public class DashboardProjectItemView {
         dashboardProjectItem.getFieldName() != null
             ? dashboardProjectItem.getFieldName()
             : StringDisplayUtil.NOT_SET_TEXT,
-        dashboardProjectItem.getOperatorName(),
+        projectOperatorDisplayName,
         status,
         dashboardProjectItem.isUpdateRequested(),
         DateUtil.formatDate(dashboardProjectItem.getUpdateDeadlineDate())

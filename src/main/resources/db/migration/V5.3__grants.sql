@@ -29,8 +29,6 @@ GRANT EXECUTE ON pedmgr.ped_utils TO ${datasource.user};
 
 GRANT SELECT ON devukmgr.facilities TO ${datasource.user};
 
-GRANT SELECT ON decmgr.path_operators TO ${datasource.migration-user};
-
 GRANT SELECT ON securemgr.web_user_accounts TO ${datasource.user};
 
 GRANT SELECT ON securemgr.web_user_sessions TO ${datasource.user};

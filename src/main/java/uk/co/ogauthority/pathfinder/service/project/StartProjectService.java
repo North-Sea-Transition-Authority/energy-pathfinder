@@ -4,11 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectRepository;
 
@@ -39,7 +39,7 @@ public class StartProjectService {
    * Create a draft project and projectOperator for the provided user.
    */
   @Transactional
-  public ProjectDetail startProject(AuthenticatedUserAccount user, PortalOrganisationGroup organisationGroup) {
+  public ProjectDetail startProject(AuthenticatedUserAccount user, ProjectOperatorForm projectOperatorForm) {
     var project = new Project();
     var projectDetails = new ProjectDetail(
         project,
@@ -51,7 +51,7 @@ public class StartProjectService {
     );
     projectRepository.save(project);
     projectDetailsRepository.save(projectDetails);
-    projectOperatorService.createOrUpdateProjectOperator(projectDetails, organisationGroup);
+    projectOperatorService.createOrUpdateProjectOperator(projectDetails, projectOperatorForm);
 
     return projectDetails;
   }

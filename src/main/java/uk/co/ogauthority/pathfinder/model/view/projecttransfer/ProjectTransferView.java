@@ -16,6 +16,10 @@ public class ProjectTransferView {
 
   private String transferredByUserEmailAddress;
 
+  private String isPublishedAsOperator;
+
+  private String publishableOrganisationName;
+
   public String getOldOperator() {
     return oldOperator;
   }
@@ -64,6 +68,22 @@ public class ProjectTransferView {
     this.transferredByUserEmailAddress = transferredByUserEmailAddress;
   }
 
+  public String getIsPublishedAsOperator() {
+    return isPublishedAsOperator;
+  }
+
+  public void setIsPublishedAsOperator(String isPublishedAsOperator) {
+    this.isPublishedAsOperator = isPublishedAsOperator;
+  }
+
+  public String getPublishableOrganisationName() {
+    return publishableOrganisationName;
+  }
+
+  public void setPublishableOrganisationName(String publishableOrganisationName) {
+    this.publishableOrganisationName = publishableOrganisationName;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -78,7 +98,9 @@ public class ProjectTransferView {
         && Objects.equals(getTransferReason(), that.getTransferReason())
         && Objects.equals(getTransferDate(), that.getTransferDate())
         && Objects.equals(getTransferredByUserName(), that.getTransferredByUserName())
-        && Objects.equals(getTransferredByUserEmailAddress(), that.getTransferredByUserEmailAddress());
+        && Objects.equals(getTransferredByUserEmailAddress(), that.getTransferredByUserEmailAddress())
+        && Objects.equals(getIsPublishedAsOperator(), that.getIsPublishedAsOperator())
+        && Objects.equals(getPublishableOrganisationName(), that.getPublishableOrganisationName());
   }
 
   @Override
@@ -89,7 +111,9 @@ public class ProjectTransferView {
         getTransferReason(),
         getTransferDate(),
         getTransferredByUserName(),
-        getTransferredByUserEmailAddress()
+        getTransferredByUserEmailAddress(),
+        getIsPublishedAsOperator(),
+        getPublishableOrganisationName()
     );
   }
 }

@@ -3,12 +3,14 @@ SELECT
   xou.organ_id ou_id
 , xou.name
 , cog.id org_grp_id
+, CASE
+    WHEN DECODE(xou.is_duplicate, 'Y', 1, 0) = 0 AND xou.end_date IS NULL
+      THEN 1
+    ELSE 0
+  END active
 FROM decmgr.xview_organisation_units xou
-JOIN decmgr.current_org_grp_organisations cogo ON cogo.organ_id = xou.organ_id
-JOIN decmgr.current_organisation_groups cog ON cog.id = cogo.org_grp_id
-WHERE xou.end_date IS NULL
-AND cog.org_grp_type = 'REG'
-AND xou.is_duplicate IS NULL;
+LEFT JOIN decmgr.current_org_grp_organisations cogo ON cogo.organ_id = xou.organ_id
+LEFT JOIN decmgr.current_organisation_groups cog ON cog.id = cogo.org_grp_id AND cog.org_grp_type = 'REG';
 
 CREATE OR REPLACE VIEW ${datasource.user}.portal_organisation_groups AS
 SELECT

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -324,5 +325,39 @@ public class TeamServiceTest {
     when(portalTeamAccessor.getNumberOfTeamsWherePersonMemberOfTeamType(organisationPerson, TeamType.ORGANISATION.getPortalTeamType())).thenReturn(1L);
 
     assertThat(teamService.isPersonMemberOfTeamType(organisationPerson, TeamType.ORGANISATION)).isTrue();
+  }
+
+  @Test
+  public void getOrganisationGroupsPersonInTeamFor_whenPersonNotPartOfAnyOrganisationTeams_thenEmptyList() {
+
+    when(portalTeamAccessor.getTeamsWherePersonMemberOfTeamType(
+        regulatorPerson,
+        TeamType.ORGANISATION.getPortalTeamType()
+    )).thenReturn(Collections.emptyList());
+
+    final var resultingOrganisationGroups = teamService.getOrganisationGroupsPersonInTeamFor(regulatorPerson);
+
+    assertThat(resultingOrganisationGroups).isEmpty();
+  }
+
+  @Test
+  public void getOrganisationGroupsPersonInTeamFor_whenPersonPartOfAnyOrganisationTeams_thenPopulatedList() {
+
+    final var expectedPortalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "name", "short name");
+
+    final var organisationTeam = new OrganisationTeam(1, "name", "description", expectedPortalOrganisationGroup);
+    final var portalTeamDto = TeamTestingUtil.portalTeamDtoFrom(organisationTeam);
+
+    when(portalTeamAccessor.getTeamsWherePersonMemberOfTeamType(
+        regulatorPerson,
+        TeamType.ORGANISATION.getPortalTeamType()
+    )).thenReturn(List.of(portalTeamDto));
+
+    when(teamDtoFactory.createOrganisationTeamList(any())).thenReturn(List.of(organisationTeam));
+
+    final var resultingOrganisationGroups = teamService.getOrganisationGroupsPersonInTeamFor(regulatorPerson);
+
+    assertThat(resultingOrganisationGroups).containsExactly(expectedPortalOrganisationGroup);
+
   }
 }

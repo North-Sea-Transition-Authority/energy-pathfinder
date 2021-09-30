@@ -90,28 +90,28 @@ public class PortalOrganisationAccessorTest {
   }
 
   @Test
-  public void findOrganisationUnitsWhereNameContains_whenMatch_thenListPopulated() {
+  public void findActiveOrganisationUnitsWhereNameContains_whenMatch_thenListPopulated() {
 
     final var searchTerm = "searchTerm";
 
-    when(organisationUnitRepository.findByNameContainingIgnoreCase(searchTerm)).thenReturn(
+    when(organisationUnitRepository.findByNameContainingIgnoreCaseAndActiveTrue(searchTerm)).thenReturn(
         List.of(organisationUnit)
     );
 
-    var result = portalOrganisationAccessor.findOrganisationUnitsWhereNameContains(searchTerm);
+    var result = portalOrganisationAccessor.findActiveOrganisationUnitsWhereNameContains(searchTerm);
 
     assertThat(result).hasSize(1);
     assertThat(result.get(0)).isEqualTo(organisationUnit);
   }
 
   @Test
-  public void findOrganisationUnitsWhereNameContains_whenNoMatch_thenEmptyList() {
+  public void findActiveOrganisationUnitsWhereNameContains_whenNoMatch_thenEmptyList() {
 
     final var searchTerm = "searchTerm";
 
-    when(organisationUnitRepository.findByNameContainingIgnoreCase(searchTerm)).thenReturn(List.of());
+    when(organisationUnitRepository.findByNameContainingIgnoreCaseAndActiveTrue(searchTerm)).thenReturn(List.of());
 
-    var result = portalOrganisationAccessor.findOrganisationUnitsWhereNameContains(searchTerm);
+    var result = portalOrganisationAccessor.findActiveOrganisationUnitsWhereNameContains(searchTerm);
     assertThat(result).isEmpty();
   }
 
@@ -308,26 +308,26 @@ public class PortalOrganisationAccessorTest {
   }
 
   @Test
-  public void getOrganisationUnitsForOrganisationGroupsIn_whenResults_thenReturnPopulatedList() {
+  public void getActiveOrganisationUnitsForOrganisationGroupsIn_whenResults_thenReturnPopulatedList() {
 
     var organisationGroups = List.of(organisationGroup);
 
-    when(organisationUnitRepository.findByPortalOrganisationGroupIn(organisationGroups)).thenReturn(List.of(organisationUnit));
+    when(organisationUnitRepository.findByActiveTrueAndPortalOrganisationGroupIn(organisationGroups)).thenReturn(List.of(organisationUnit));
 
-    var result = portalOrganisationAccessor.getOrganisationUnitsForOrganisationGroupsIn(organisationGroups);
+    var result = portalOrganisationAccessor.getActiveOrganisationUnitsForOrganisationGroupsIn(organisationGroups);
 
     assertThat(result).hasSize(1);
     assertThat(result.get(0)).isEqualTo(organisationUnit);
   }
 
   @Test
-  public void getOrganisationUnitsForOrganisationGroupsIn_whenNoResults_thenReturnEmptyList() {
+  public void getActiveOrganisationUnitsForOrganisationGroupsIn_whenNoResults_thenReturnEmptyList() {
 
     var organisationGroups = List.of(organisationGroup);
 
-    when(organisationUnitRepository.findByPortalOrganisationGroupIn(organisationGroups)).thenReturn(List.of());
+    when(organisationUnitRepository.findByActiveTrueAndPortalOrganisationGroupIn(organisationGroups)).thenReturn(List.of());
 
-    var result = portalOrganisationAccessor.getOrganisationUnitsForOrganisationGroupsIn(organisationGroups);
+    var result = portalOrganisationAccessor.getActiveOrganisationUnitsForOrganisationGroupsIn(organisationGroups);
 
     assertThat(result).isEmpty();
   }
@@ -433,5 +433,116 @@ public class PortalOrganisationAccessorTest {
     );
 
     assertThat(results).isEmpty();
+  }
+
+  @Test
+  public void getActiveOrganisationUnitsByNameAndOrganisationGroupId_whenResults_thenReturnPopulatedList() {
+
+    final var dummyOrganisationGroup = new PortalOrganisationGroup();
+    final var expectedOrganisationUnit = TeamTestingUtil.generateOrganisationUnit(10, "group name", dummyOrganisationGroup);
+
+    final var organisationUnitName = "organisation unit name";
+    final var organisationGroups = List.of(dummyOrganisationGroup);
+
+    when(organisationUnitRepository.findByNameContainingIgnoreCaseAndActiveTrueAndPortalOrganisationGroupIn(
+        organisationUnitName,
+        organisationGroups
+    )).thenReturn(List.of(expectedOrganisationUnit));
+
+    final var resultingOrganisationUnits = portalOrganisationAccessor.getActiveOrganisationUnitsByNameAndOrganisationGroupId(
+        organisationUnitName,
+        organisationGroups
+    );
+
+    assertThat(resultingOrganisationUnits).containsExactly(expectedOrganisationUnit);
+
+  }
+
+  @Test
+  public void getActiveOrganisationUnitsByNameAndOrganisationGroupId_whenNoResults_thenReturnEmptyList() {
+
+    final var organisationUnitName = "organisation unit name";
+    final var organisationGroups = List.of(new PortalOrganisationGroup());
+
+    when(organisationUnitRepository.findByNameContainingIgnoreCaseAndActiveTrueAndPortalOrganisationGroupIn(
+        organisationUnitName,
+        organisationGroups
+    )).thenReturn(Collections.emptyList());
+
+    final var resultingOrganisationUnits = portalOrganisationAccessor.getActiveOrganisationUnitsByNameAndOrganisationGroupId(
+        organisationUnitName,
+        organisationGroups
+    );
+
+    assertThat(resultingOrganisationUnits).isEmpty();
+  }
+
+  @Test
+  public void getOrganisationUnitOrError_whenFound_thenOrganisationUnitReturned() {
+
+    final var organisationUnit = TeamTestingUtil.generateOrganisationUnit(
+        100,
+        "name",
+        new PortalOrganisationGroup()
+    );
+
+    when(organisationUnitRepository.findById(organisationUnit.getOuId())).thenReturn(Optional.of(organisationUnit));
+
+    final var resultingOrganisationUnit = portalOrganisationAccessor.getOrganisationUnitOrError(organisationUnit.getOuId());
+
+    assertThat(resultingOrganisationUnit).isEqualTo(organisationUnit);
+  }
+
+  @Test(expected = PathfinderEntityNotFoundException.class)
+  public void getOrganisationUnitOrError_whenNotFound_thenException() {
+
+    final var organisationUnit = TeamTestingUtil.generateOrganisationUnit(
+        100,
+        "name",
+        new PortalOrganisationGroup()
+    );
+
+    when(organisationUnitRepository.findById(organisationUnit.getOuId())).thenReturn(Optional.empty());
+
+    portalOrganisationAccessor.getOrganisationUnitOrError(organisationUnit.getOuId());
+  }
+
+  @Test
+  public void isOrganisationUnitActiveAndPartOfOrganisationGroup_whenPartOfGroup_thenTrue() {
+
+    final var organisationUnitId = 100;
+    final var organisationGroupId = 200;
+
+    when(organisationUnitRepository.existsByOuIdAndActiveTrueAndPortalOrganisationGroup_OrgGrpId(
+        organisationUnitId,
+        organisationGroupId
+    )).thenReturn(true);
+
+    final var isPartOfOrganisationGroup = portalOrganisationAccessor.isOrganisationUnitActiveAndPartOfOrganisationGroup(
+        organisationGroupId,
+        organisationUnitId
+    );
+
+    assertThat(isPartOfOrganisationGroup).isTrue();
+  }
+
+  @Test
+  public void isOrganisationUnitActiveAndPartOfOrganisationGroup_whenNotPartOfGroup_thenFalse() {
+
+    final var organisationUnitId = 100;
+    final var organisationGroupId = 200;
+
+    when(organisationUnitRepository.existsByOuIdAndActiveTrueAndPortalOrganisationGroup_OrgGrpId(
+        organisationUnitId,
+        organisationGroupId
+    )).thenReturn(false);
+
+    final var isPartOfOrganisationGroup = portalOrganisationAccessor.isOrganisationUnitActiveAndPartOfOrganisationGroup(
+        organisationGroupId,
+        organisationUnitId
+    );
+
+    assertThat(isPartOfOrganisationGroup).isFalse();
+
   }
 }

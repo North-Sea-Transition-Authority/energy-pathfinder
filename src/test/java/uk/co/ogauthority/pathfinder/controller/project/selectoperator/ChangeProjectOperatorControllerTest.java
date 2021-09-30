@@ -27,21 +27,26 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
+import uk.co.ogauthority.pathfinder.service.project.projectoperator.ProjectOperatorModelService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
-import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = ChangeProjectOperatorController.class, includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ProjectContextService.class))
 public class ChangeProjectOperatorControllerTest extends ProjectContextAbstractControllerTest {
+
   private static final Integer PROJECT_ID = 1;
 
   @MockBean
   private SelectOperatorService selectOperatorService;
+
+  @MockBean
+  private ProjectOperatorModelService projectOperatorModelService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
@@ -52,24 +57,22 @@ public class ChangeProjectOperatorControllerTest extends ProjectContextAbstractC
   public void setUp() {
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(detail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
-    when(selectOperatorService.getSelectOperatorModelAndView(
+    when(projectOperatorModelService.getProjectOperatorModelAndView(
+        any(),
         any(),
         any(),
         any(),
         any()
-    )).thenReturn(new ModelAndView("test/blankTemplate")); //Just return a model and view that needs no params.
+    )).thenReturn(new ModelAndView()); //Just return a model and view that needs no params.
   }
 
   @Test
   public void startProject_validForm() throws Exception {
-    when(selectOperatorService.getOrganisationGroupOrError(any(), any())).thenReturn(
-        ProjectOperatorTestUtil.ORG_GROUP
-    );
 
+    when(selectOperatorService.updateProjectOperator(any(), any())).thenReturn(new ProjectOperator());
 
     MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
       add(SelectProjectOperatorController.PRIMARY_BUTTON_TEXT, SelectProjectOperatorController.PRIMARY_BUTTON_TEXT);
-      add("organisationGroup", "1");
     }};
 
     var bindingResult = new BeanPropertyBindingResult(ProjectOperatorForm.class, "form");

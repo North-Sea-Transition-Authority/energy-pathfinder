@@ -18,9 +18,11 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
+import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
@@ -37,6 +39,9 @@ public class ProjectOperatorServiceTest {
 
   @Mock
   private ProjectOperatorRepository projectOperatorRepository;
+
+  @Mock
+  private PortalOrganisationAccessor portalOrganisationAccessor;
 
   private ProjectOperatorService projectOperatorService;
 
@@ -61,7 +66,8 @@ public class ProjectOperatorServiceTest {
   public void setUp() {
     projectOperatorService = new ProjectOperatorService(
         teamService,
-        projectOperatorRepository
+        projectOperatorRepository,
+        portalOrganisationAccessor
     );
 
     when(projectOperatorRepository.save(any(ProjectOperator.class)))
@@ -69,25 +75,101 @@ public class ProjectOperatorServiceTest {
   }
 
   @Test
-  public void createOrUpdateProjectOperator_noExisting() {
-    var projectOperator = projectOperatorService.createOrUpdateProjectOperator(detail, organisationGroup);
-    assertThat(projectOperator.getOrganisationGroup()).isEqualTo(organisationGroup);
-    assertThat(projectOperator.getProjectDetail()).isEqualTo(detail);
+  public void createOrUpdateProjectOperator_whenPublishedAsOperatorIsTrue_thenAssertEntityProperties() {
+
+    final var projectOperatorForm = new ProjectOperatorForm();
+    projectOperatorForm.setOperator(String.valueOf(organisationGroup.getOrgGrpId()));
+    projectOperatorForm.setIsPublishedAsOperator(true);
+
+    when(portalOrganisationAccessor.getOrganisationGroupOrError(
+        Integer.parseInt(projectOperatorForm.getOperator())
+    )).thenReturn(organisationGroup);
+
+    final var resultingProjectOperator = projectOperatorService.createOrUpdateProjectOperator(
+        detail,
+        projectOperatorForm
+    );
+
+    assertCommonProjectOperatorEntityProperties(resultingProjectOperator, detail, projectOperatorForm);
+    assertThat(resultingProjectOperator.isPublishedAsOperator()).isEqualTo(projectOperatorForm.isPublishedAsOperator());
+    assertThat(resultingProjectOperator.getPublishableOrganisationUnit()).isNull();
   }
 
   @Test
-  public void createOrUpdateProjectOperator_withExisting() {
-    when(projectOperatorRepository.findByProjectDetail(detail)).thenReturn(
-        Optional.of(projectOperator)
+  public void createOrUpdateProjectOperator_whenPublishedAsOperatorIsFalse_thenAssertEntityProperties() {
+
+    final var projectOperatorForm = new ProjectOperatorForm();
+    projectOperatorForm.setOperator(String.valueOf(organisationGroup.getOrgGrpId()));
+    projectOperatorForm.setIsPublishedAsOperator(false);
+
+    final var publishableOrganisationUnit = TeamTestingUtil.generateOrganisationUnit(100, "name", organisationGroup);
+    projectOperatorForm.setPublishableOrganisation(String.valueOf(publishableOrganisationUnit.getOuId()));
+
+    when(portalOrganisationAccessor.getOrganisationGroupOrError(
+        Integer.parseInt(projectOperatorForm.getOperator())
+    )).thenReturn(organisationGroup);
+
+    when(portalOrganisationAccessor.getOrganisationUnitOrError(
+        Integer.parseInt(projectOperatorForm.getPublishableOrganisation())
+    )).thenReturn(publishableOrganisationUnit);
+
+    final var resultingProjectOperator = projectOperatorService.createOrUpdateProjectOperator(
+        detail,
+        projectOperatorForm
     );
-    var newOrgGroup = TeamTestingUtil.generateOrganisationGroup(
-        2,
-        "Org Grp2",
-        "Org Grp2"
+
+    assertCommonProjectOperatorEntityProperties(resultingProjectOperator, detail, projectOperatorForm);
+    assertThat(resultingProjectOperator.isPublishedAsOperator()).isEqualTo(projectOperatorForm.isPublishedAsOperator());
+    assertThat(resultingProjectOperator.getPublishableOrganisationUnit().getOuId()).isEqualTo(Integer.parseInt(projectOperatorForm.getPublishableOrganisation()));
+  }
+
+  @Test
+  public void createOrUpdateProjectOperator_whenPublishedAsOperatorIsNull_thenAssertEntityProperties() {
+
+    final var projectOperatorForm = new ProjectOperatorForm();
+    projectOperatorForm.setOperator(String.valueOf(organisationGroup.getOrgGrpId()));
+    projectOperatorForm.setIsPublishedAsOperator(null);
+
+    final var publishableOrganisationUnit = TeamTestingUtil.generateOrganisationUnit(100, "name", organisationGroup);
+    projectOperatorForm.setPublishableOrganisation(String.valueOf(publishableOrganisationUnit.getOuId()));
+
+    when(portalOrganisationAccessor.getOrganisationGroupOrError(
+        Integer.parseInt(projectOperatorForm.getOperator())
+    )).thenReturn(organisationGroup);
+
+    final var resultingProjectOperator = projectOperatorService.createOrUpdateProjectOperator(
+        detail,
+        projectOperatorForm
     );
-    var projectOperator = projectOperatorService.createOrUpdateProjectOperator(detail, newOrgGroup);
-    assertThat(projectOperator.getOrganisationGroup()).isEqualTo(newOrgGroup);
-    assertThat(projectOperator.getProjectDetail()).isEqualTo(detail);
+
+    assertCommonProjectOperatorEntityProperties(resultingProjectOperator, detail, projectOperatorForm);
+    assertThat(resultingProjectOperator.isPublishedAsOperator()).isNull();
+    assertThat(resultingProjectOperator.getPublishableOrganisationUnit()).isNull();
+  }
+
+  @Test
+  public void createOrUpdateProjectOperator_whenPublishedAsOperatorIsFalseAndPublishableOrganisationIsNull_thenAssertEntityProperties() {
+
+    final var projectOperatorForm = new ProjectOperatorForm();
+    projectOperatorForm.setOperator(String.valueOf(organisationGroup.getOrgGrpId()));
+    projectOperatorForm.setIsPublishedAsOperator(false);
+    projectOperatorForm.setPublishableOrganisation(null);
+
+    final var publishableOrganisationUnit = TeamTestingUtil.generateOrganisationUnit(100, "name", organisationGroup);
+    projectOperatorForm.setPublishableOrganisation(String.valueOf(publishableOrganisationUnit.getOuId()));
+
+    when(portalOrganisationAccessor.getOrganisationGroupOrError(
+        Integer.parseInt(projectOperatorForm.getOperator())
+    )).thenReturn(organisationGroup);
+
+    final var resultingProjectOperator = projectOperatorService.createOrUpdateProjectOperator(
+        detail,
+        projectOperatorForm
+    );
+
+    assertCommonProjectOperatorEntityProperties(resultingProjectOperator, detail, projectOperatorForm);
+    assertThat(resultingProjectOperator.isPublishedAsOperator()).isEqualTo(projectOperatorForm.isPublishedAsOperator());
+    assertThat(resultingProjectOperator.getPublishableOrganisationUnit()).isNull();
   }
 
   @Test
@@ -204,5 +286,13 @@ public class ProjectOperatorServiceTest {
   public void getProjectOperatorByProjectDetailOrError_whenNotFound_thenException() {
     when(projectOperatorRepository.findByProjectDetail(detail)).thenReturn(Optional.empty());
     projectOperatorService.getProjectOperatorByProjectDetailOrError(detail);
+  }
+
+  private void assertCommonProjectOperatorEntityProperties(ProjectOperator entityToAssert,
+                                                           ProjectDetail sourceProjectDetail,
+                                                           ProjectOperatorForm sourceForm) {
+    assertThat(entityToAssert.getProjectDetail()).isEqualTo(sourceProjectDetail);
+    assertThat(entityToAssert.getOrganisationGroup().getOrgGrpId()).isEqualTo(Integer.parseInt(sourceForm.getOperator()));
+    verify(projectOperatorRepository, times(1)).save(entityToAssert);
   }
 }

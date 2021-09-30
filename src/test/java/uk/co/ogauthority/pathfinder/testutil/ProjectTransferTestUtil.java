@@ -24,6 +24,7 @@ public class ProjectTransferTestUtil {
     projectTransfer.setTransferReason(TRANSFER_REASON);
     projectTransfer.setTransferredInstant(Instant.now());
     projectTransfer.setTransferredByWuaId(TRANSFERRED_BY_WUA_ID);
+    projectTransfer.setIsPublishedAsOperator(true);
     return projectTransfer;
   }
 
@@ -31,6 +32,7 @@ public class ProjectTransferTestUtil {
     var form = new ProjectTransferForm();
     form.setNewOrganisationGroup(TO_ORGANISATION_GROUP.getSelectionId());
     form.setTransferReason(TRANSFER_REASON);
+    form.setIsPublishedAsOperator(true);
     return form;
   }
 }

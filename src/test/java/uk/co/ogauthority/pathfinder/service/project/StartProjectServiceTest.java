@@ -11,13 +11,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectRepository;
-import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -37,12 +36,6 @@ public class StartProjectServiceTest {
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       SystemAccessService.CREATE_PROJECT_PRIVILEGES);
 
-  private static final PortalOrganisationGroup organisationGroup = TeamTestingUtil.generateOrganisationGroup(
-      1,
-      "Org Grp",
-      "Org Grp"
-  );
-
   @Before
   public void setUp() throws Exception {
     startProjectService = new StartProjectService(
@@ -54,15 +47,23 @@ public class StartProjectServiceTest {
 
   @Test
   public void startProject_correctCalls() {
-    var projectDetails = startProjectService.startProject(authenticatedUser, organisationGroup);
+
+    final var projectOperatorForm = new ProjectOperatorForm();
+
+    final var projectDetails = startProjectService.startProject(authenticatedUser, projectOperatorForm);
+
     verify(projectRepository, times(1)).save(any());
     verify(projectDetailsRepository, times(1)).save(any());
-    verify(projectOperatorService, times(1)).createOrUpdateProjectOperator(projectDetails, organisationGroup);
+    verify(projectOperatorService, times(1)).createOrUpdateProjectOperator(projectDetails, projectOperatorForm);
   }
 
   @Test
   public void startProject_correctDetails() {
-    var projectDetails = startProjectService.startProject(authenticatedUser, organisationGroup);
+
+    final var projectOperatorForm = new ProjectOperatorForm();
+
+    final var projectDetails = startProjectService.startProject(authenticatedUser, projectOperatorForm);
+
     assertThat(projectDetails.getCreatedByWua()).isEqualTo(authenticatedUser.getWuaId());
     assertThat(projectDetails.getStatus()).isEqualTo(ProjectStatus.DRAFT);
     assertThat(projectDetails.getVersion()).isEqualTo(1);

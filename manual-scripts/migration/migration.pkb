@@ -1,4 +1,4 @@
-CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
+CREATE OR REPLACE PACKAGE BODY pathfinder_migration.migration AS
 
   /**
     Utility procedure to raise a nicely formatted exception message with
@@ -26,7 +26,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     @param p_migration_type An identifier for the migration check record
    */
   PROCEDURE create_migration_check_log(
-    p_migration_type IN ${datasource.migration-user}.migration_check_log.migration_type%TYPE
+    p_migration_type IN pathfinder_migration.migration_check_log.migration_type%TYPE
   )
   IS
 
@@ -34,7 +34,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
   BEGIN
 
-    INSERT INTO ${datasource.migration-user}.migration_check_log(
+    INSERT INTO pathfinder_migration.migration_check_log(
       migration_type
     )
     VALUES(
@@ -51,7 +51,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     @param p_log_message The log message to append to the migration_check_log record
    */
   PROCEDURE log_migration_check(
-    p_migration_type IN ${datasource.migration-user}.migration_check_log.migration_type%TYPE
+    p_migration_type IN pathfinder_migration.migration_check_log.migration_type%TYPE
   , p_log_message IN VARCHAR2
   )
     IS
@@ -60,7 +60,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
   BEGIN
 
-    UPDATE ${datasource.migration-user}.migration_check_log mcl
+    UPDATE pathfinder_migration.migration_check_log mcl
     SET mcl.check_output = mcl.check_output || CHR(10) || p_log_message || CHR(10)
     WHERE mcl.migration_type = p_migration_type;
 
@@ -82,7 +82,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   PROCEDURE run_subscriber_checks
   IS
 
-    K_SUBSCRIBER_MIGRATION_TYPE CONSTANT ${datasource.migration-user}.migration_check_log.migration_type%TYPE := 'SUBSCRIBERS';
+    K_SUBSCRIBER_MIGRATION_TYPE CONSTANT pathfinder_migration.migration_check_log.migration_type%TYPE := 'SUBSCRIBERS';
 
     TYPE subscriber_inconsistency_rec IS RECORD (
       forename VARCHAR2(4000)
@@ -113,7 +113,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     SELECT DECODE(COUNT(*), 0, K_MIGRATION_CHECK_PASS, K_MIGRATION_CHECK_FAIL)
     INTO l_all_migrations_completed
-    FROM ${datasource.migration-user}.subscriber_migration_log sml
+    FROM pathfinder_migration.subscriber_migration_log sml
     WHERE sml.migration_status != K_COMPLETE_MIGRATION_STATUS;
 
     log_migration_check(
@@ -125,7 +125,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       SELECT
         sml.id
       , sml.migration_status
-      FROM ${datasource.migration-user}.subscriber_migration_log sml
+      FROM pathfinder_migration.subscriber_migration_log sml
       WHERE sml.migration_status != K_COMPLETE_MIGRATION_STATUS
     )
     LOOP
@@ -139,7 +139,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     SELECT COUNT(*)
     INTO l_total_legacy_subscribers
-    FROM ${datasource.migration-user}.legacy_subscribers ls;
+    FROM pathfinder_migration.legacy_subscribers ls;
 
     SELECT COUNT(*)
     INTO l_total_migrated_subscribers
@@ -163,7 +163,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     , ls.surname
     , ls.email_address
     BULK COLLECT INTO l_migration_issues
-    FROM ${datasource.migration-user}.legacy_subscribers ls
+    FROM pathfinder_migration.legacy_subscribers ls
     MINUS
     SELECT
       s.forename
@@ -206,7 +206,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   PROCEDURE run_team_migration_checks
   IS
 
-    K_TEAM_MIGRATION_TYPE CONSTANT ${datasource.migration-user}.migration_check_log.migration_type%TYPE := 'TEAMS';
+    K_TEAM_MIGRATION_TYPE CONSTANT pathfinder_migration.migration_check_log.migration_type%TYPE := 'TEAMS';
 
     l_all_migrations_completed VARCHAR2(4000);
 
@@ -224,7 +224,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     SELECT DECODE(COUNT(*), 0, K_MIGRATION_CHECK_PASS, K_MIGRATION_CHECK_FAIL)
     INTO l_all_migrations_completed
-    FROM ${datasource.migration-user}.team_migration_log tml
+    FROM pathfinder_migration.team_migration_log tml
     WHERE tml.migration_status !=  K_COMPLETE_MIGRATION_STATUS;
 
     log_migration_check(
@@ -236,7 +236,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       SELECT
         tml.id
       , tml.migration_status
-      FROM ${datasource.migration-user}.team_migration_log tml
+      FROM pathfinder_migration.team_migration_log tml
       WHERE tml.migration_status != K_COMPLETE_MIGRATION_STATUS
     )
     LOOP
@@ -258,8 +258,8 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
         lt.legacy_resource_id
       , tml.new_resource_id
       , COALESCE(cog.name, lt.resource_type) name
-      FROM ${datasource.migration-user}.legacy_teams lt
-      JOIN ${datasource.migration-user}.team_migration_log tml ON tml.legacy_resource_id = lt.legacy_resource_id
+      FROM pathfinder_migration.legacy_teams lt
+      JOIN pathfinder_migration.team_migration_log tml ON tml.legacy_resource_id = lt.legacy_resource_id
       LEFT JOIN decmgr.resource_usages_current ruc ON ruc.res_id = tml.legacy_resource_id
       LEFT JOIN decmgr.current_organisation_groups cog ON cog.id || '++REGORGGRP' = ruc.uref
     )
@@ -313,7 +313,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   PROCEDURE run_project_migration_checks
   IS
 
-    K_PROJECT_MIGRATION_TYPE CONSTANT ${datasource.migration-user}.migration_check_log.migration_type%TYPE := 'PROJECTS';
+    K_PROJECT_MIGRATION_TYPE CONSTANT pathfinder_migration.migration_check_log.migration_type%TYPE := 'PROJECTS';
 
     l_project_migrations_completed VARCHAR2(4000);
     l_detail_migrations_completed VARCHAR2(4000);
@@ -337,7 +337,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       INTO
         l_legacy_project_count
       , l_legacy_project_detail_count
-      FROM ${datasource.migration-user}.legacy_project_data lpd;
+      FROM pathfinder_migration.legacy_project_data lpd;
 
       SELECT COUNT(*)
       INTO l_migrated_project_count
@@ -398,7 +398,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       SELECT
         pdml.legacy_project_detail_id
       , pd.status
-      FROM ${datasource.migration-user}.project_detail_migration_log pdml
+      FROM pathfinder_migration.project_detail_migration_log pdml
       JOIN ${datasource.user}.project_details pd ON pd.id = pdml.new_project_detail_id;
 
       IF l_status_inconsistencies.COUNT = 0 THEN
@@ -450,12 +450,12 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
         lpd.legacy_project_detail_id
       , lpd.operator_org_group_id
       BULK COLLECT INTO l_operator_inconsistencies
-      FROM ${datasource.migration-user}.legacy_project_data lpd
+      FROM pathfinder_migration.legacy_project_data lpd
       MINUS
       SELECT
         pdml.legacy_project_detail_id
       , po.operator_org_grp_id
-      FROM ${datasource.migration-user}.project_detail_migration_log pdml
+      FROM pathfinder_migration.project_detail_migration_log pdml
       JOIN ${datasource.user}.project_operators po ON po.project_detail_id = pdml.new_project_detail_id;
 
       IF l_operator_inconsistencies.COUNT = 0 THEN
@@ -535,7 +535,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
         ) first_production_quarter
       , lpd.first_production_year
       BULK COLLECT INTO l_information_inconsistencies
-      FROM ${datasource.migration-user}.legacy_project_data lpd
+      FROM pathfinder_migration.legacy_project_data lpd
       MINUS
       SELECT
         pdml.legacy_project_detail_id
@@ -548,7 +548,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       , pi.phone_number
       , pi.first_production_date_quarter
       , pi.first_production_date_year
-      FROM ${datasource.migration-user}.project_detail_migration_log pdml
+      FROM pathfinder_migration.project_detail_migration_log pdml
       JOIN ${datasource.user}.project_information pi ON pi.project_detail_id = pdml.new_project_detail_id;
 
       IF l_information_inconsistencies.COUNT = 0 THEN
@@ -608,13 +608,13 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
         ) field_type
       , lpd.fdp_approved
       BULK COLLECT INTO l_location_inconsistencies
-      FROM ${datasource.migration-user}.legacy_project_data lpd
+      FROM pathfinder_migration.legacy_project_data lpd
       MINUS
       SELECT
         pdml.legacy_project_detail_id
       , pl.field_type
       , pl.approved_fdp
-      FROM ${datasource.migration-user}.project_detail_migration_log pdml
+      FROM pathfinder_migration.project_detail_migration_log pdml
       JOIN ${datasource.user}.project_locations pl ON pl.project_detail_id = pdml.new_project_detail_id;
 
       IF l_location_inconsistencies.COUNT = 0 THEN
@@ -674,7 +674,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
       SELECT COUNT(*)
       INTO l_legacy_contract_count
-      FROM ${datasource.migration-user}.legacy_project_contracts lpc;
+      FROM pathfinder_migration.legacy_project_contracts lpc;
 
       SELECT COUNT(*)
       INTO l_migrated_contract_count
@@ -715,7 +715,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       , lpc.contact_telephone_no
       , lpc.contact_email_address
       BULK COLLECT INTO l_contract_inconsistencies
-      FROM ${datasource.migration-user}.legacy_project_contracts lpc
+      FROM pathfinder_migration.legacy_project_contracts lpc
       MINUS
       SELECT
         pdml.legacy_project_detail_id
@@ -726,7 +726,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       , ac.contact_name
       , ac.phone_number
       , ac.email_address
-      FROM ${datasource.migration-user}.project_detail_migration_log pdml
+      FROM pathfinder_migration.project_detail_migration_log pdml
       JOIN ${datasource.user}.awarded_contracts ac ON ac.project_detail_id = pdml.new_project_detail_id;
 
       IF l_contract_inconsistencies.COUNT = 0 THEN
@@ -783,7 +783,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
       SELECT COUNT(*)
       INTO l_legacy_collab_ops_count
-      FROM ${datasource.migration-user}.legacy_project_challenges lpc;
+      FROM pathfinder_migration.legacy_project_challenges lpc;
 
       SELECT COUNT(*)
       INTO l_migrated_collap_ops_count
@@ -810,7 +810,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       , lpc.contact_telephone_no
       , lpc.contact_email_address
       BULK COLLECT INTO l_collab_op_inconsistencies
-      FROM ${datasource.migration-user}.legacy_project_challenges lpc
+      FROM pathfinder_migration.legacy_project_challenges lpc
       MINUS
       SELECT
         pdml.legacy_project_detail_id
@@ -818,7 +818,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       , co.contact_name
       , co.phone_number
       , co.email_address
-      FROM ${datasource.migration-user}.project_detail_migration_log pdml
+      FROM pathfinder_migration.project_detail_migration_log pdml
       JOIN ${datasource.user}.collaboration_opportunities co ON co.project_detail_id = pdml.new_project_detail_id;
 
       IF l_collab_op_inconsistencies.COUNT = 0 THEN
@@ -858,7 +858,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     SELECT DECODE(COUNT(*), 0, K_MIGRATION_CHECK_PASS, K_MIGRATION_CHECK_FAIL)
     INTO l_project_migrations_completed
-    FROM ${datasource.migration-user}.project_migration_log pml
+    FROM pathfinder_migration.project_migration_log pml
     WHERE pml.migration_status !=  K_COMPLETE_MIGRATION_STATUS;
 
     log_migration_check(
@@ -870,7 +870,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       SELECT
         pml.id
       , pml.migration_status
-      FROM ${datasource.migration-user}.project_migration_log pml
+      FROM pathfinder_migration.project_migration_log pml
       WHERE pml.migration_status != K_COMPLETE_MIGRATION_STATUS
     )
     LOOP
@@ -884,7 +884,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     SELECT DECODE(COUNT(*), 0, K_MIGRATION_CHECK_PASS, K_MIGRATION_CHECK_FAIL)
     INTO l_detail_migrations_completed
-    FROM ${datasource.migration-user}.project_detail_migration_log pdml
+    FROM pathfinder_migration.project_detail_migration_log pdml
     WHERE pdml.migration_status !=  K_COMPLETE_MIGRATION_STATUS;
 
     log_migration_check(
@@ -896,7 +896,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       SELECT
         pml.id
       , pml.migration_status
-      FROM ${datasource.migration-user}.project_detail_migration_log pml
+      FROM pathfinder_migration.project_detail_migration_log pml
       WHERE pml.migration_status != K_COMPLETE_MIGRATION_STATUS
     )
     LOOP
@@ -972,7 +972,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
   BEGIN
 
-    INSERT INTO ${datasource.migration-user}.project_migration_log(
+    INSERT INTO pathfinder_migration.project_migration_log(
       legacy_project_id
     , migration_status
     , system_message
@@ -985,7 +985,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     -- Safety check to not populate with duplicate projects
     WHERE pp.id NOT IN (
       SELECT pml.legacy_project_id
-      FROM ${datasource.migration-user}.project_migration_log pml
+      FROM pathfinder_migration.project_migration_log pml
     );
 
   END populate_project_migration_log;
@@ -1000,7 +1000,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
   BEGIN
 
-    INSERT INTO ${datasource.migration-user}.project_detail_migration_log(
+    INSERT INTO pathfinder_migration.project_detail_migration_log(
       legacy_project_id
     , legacy_project_detail_id
     , migration_status
@@ -1015,7 +1015,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     -- Safety check to not populate with duplicate projects
     WHERE ppd.id NOT IN (
       SELECT pml.legacy_project_detail_id
-      FROM ${datasource.migration-user}.project_detail_migration_log pml
+      FROM pathfinder_migration.project_detail_migration_log pml
     );
 
   END populate_detail_migration_log;
@@ -1029,7 +1029,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   IS
   BEGIN
 
-    INSERT INTO ${datasource.migration-user}.unmapped_project_migration_log(
+    INSERT INTO pathfinder_migration.unmapped_project_migration_log(
       legacy_project_id
     , migration_status
     , system_message
@@ -1042,7 +1042,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     -- Safety check to not populate with duplicate projects
     WHERE pp.id NOT IN (
       SELECT pml.legacy_project_id
-      FROM ${datasource.migration-user}.unmapped_project_migration_log pml
+      FROM pathfinder_migration.unmapped_project_migration_log pml
     );
 
   END populate_unmapped_project_log;
@@ -1057,7 +1057,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
   BEGIN
 
-    INSERT INTO ${datasource.migration-user}.unmapped_detail_migration_log(
+    INSERT INTO pathfinder_migration.unmapped_detail_migration_log(
       legacy_project_id
     , legacy_project_detail_id
     , migration_status
@@ -1072,7 +1072,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     -- Safety check to not populate with duplicate projects
     WHERE ppd.id NOT IN (
       SELECT pml.legacy_project_detail_id
-      FROM ${datasource.migration-user}.unmapped_detail_migration_log pml
+      FROM pathfinder_migration.unmapped_detail_migration_log pml
     );
 
   END populate_unmapped_detail_log;
@@ -1116,10 +1116,10 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     @param p_system_message The message to append to the log
    */
   PROCEDURE log_project_migration(
-    p_legacy_project_id IN ${datasource.migration-user}.project_migration_log.legacy_project_id%TYPE
-  , p_migration_status IN ${datasource.migration-user}.project_migration_log.migration_status%TYPE DEFAULT NULL
-  , p_new_project_id IN ${datasource.migration-user}.project_migration_log.new_project_id%TYPE DEFAULT NULL
-  , p_system_message IN ${datasource.migration-user}.project_migration_log.system_message%TYPE
+    p_legacy_project_id IN pathfinder_migration.project_migration_log.legacy_project_id%TYPE
+  , p_migration_status IN pathfinder_migration.project_migration_log.migration_status%TYPE DEFAULT NULL
+  , p_new_project_id IN pathfinder_migration.project_migration_log.new_project_id%TYPE DEFAULT NULL
+  , p_system_message IN pathfinder_migration.project_migration_log.system_message%TYPE
   )
   IS
 
@@ -1127,7 +1127,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
   BEGIN
 
-    UPDATE ${datasource.migration-user}.project_migration_log pml
+    UPDATE pathfinder_migration.project_migration_log pml
     SET
       pml.migration_status = COALESCE(p_migration_status, pml.migration_status)
     , pml.system_message = pml.system_message || CHR(10) || TO_CHAR(SYSTIMESTAMP) || ': ' || p_system_message || CHR(10)
@@ -1147,10 +1147,10 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     @param p_system_message The message to append to the log
    */
   PROCEDURE log_project_detail_migration(
-    p_legacy_project_detail_id IN ${datasource.migration-user}.project_detail_migration_log.legacy_project_detail_id%TYPE
-  , p_migration_status IN ${datasource.migration-user}.project_detail_migration_log.migration_status%TYPE DEFAULT NULL
-  , p_new_project_detail_id IN ${datasource.migration-user}.project_detail_migration_log.new_project_detail_id%TYPE DEFAULT NULL
-  , p_system_message IN ${datasource.migration-user}.project_detail_migration_log.system_message%TYPE
+    p_legacy_project_detail_id IN pathfinder_migration.project_detail_migration_log.legacy_project_detail_id%TYPE
+  , p_migration_status IN pathfinder_migration.project_detail_migration_log.migration_status%TYPE DEFAULT NULL
+  , p_new_project_detail_id IN pathfinder_migration.project_detail_migration_log.new_project_detail_id%TYPE DEFAULT NULL
+  , p_system_message IN pathfinder_migration.project_detail_migration_log.system_message%TYPE
   )
   IS
 
@@ -1158,7 +1158,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
   BEGIN
 
-    UPDATE ${datasource.migration-user}.project_detail_migration_log pdml
+    UPDATE pathfinder_migration.project_detail_migration_log pdml
     SET
       pdml.migration_status = COALESCE(p_migration_status, pdml.migration_status)
     , pdml.system_message = pdml.system_message || CHR(10) || TO_CHAR(SYSTIMESTAMP) || ': ' || p_system_message || CHR(10)
@@ -1177,8 +1177,8 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     @param p_system_message The message to write to all the project detail migration logs for this project
    */
   PROCEDURE reset_project_detail_log(
-    p_legacy_project_id IN ${datasource.migration-user}.project_detail_migration_log.legacy_project_id%TYPE
-  , p_system_message IN ${datasource.migration-user}.project_detail_migration_log.system_message%TYPE
+    p_legacy_project_id IN pathfinder_migration.project_detail_migration_log.legacy_project_id%TYPE
+  , p_system_message IN pathfinder_migration.project_detail_migration_log.system_message%TYPE
   )
   IS
 
@@ -1186,7 +1186,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
   BEGIN
 
-    UPDATE ${datasource.migration-user}.project_detail_migration_log pdml
+    UPDATE pathfinder_migration.project_detail_migration_log pdml
     SET
       pdml.migration_status = K_PENDING_MIGRATION_STATUS
     , pdml.system_message = pdml.system_message || CHR(10) || TO_CHAR(SYSTIMESTAMP) || ': ' || p_system_message || CHR(10)
@@ -1205,9 +1205,9 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     @param p_system_message The message to append to the log
    */
   PROCEDURE log_unmapped_project_migration(
-    p_legacy_project_id IN ${datasource.migration-user}.unmapped_project_migration_log.legacy_project_id%TYPE
-  , p_migration_status IN ${datasource.migration-user}.unmapped_project_migration_log.migration_status%TYPE DEFAULT NULL
-  , p_system_message IN ${datasource.migration-user}.unmapped_project_migration_log.system_message%TYPE
+    p_legacy_project_id IN pathfinder_migration.unmapped_project_migration_log.legacy_project_id%TYPE
+  , p_migration_status IN pathfinder_migration.unmapped_project_migration_log.migration_status%TYPE DEFAULT NULL
+  , p_system_message IN pathfinder_migration.unmapped_project_migration_log.system_message%TYPE
   )
   IS
 
@@ -1215,7 +1215,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
   BEGIN
 
-    UPDATE ${datasource.migration-user}.unmapped_project_migration_log upml
+    UPDATE pathfinder_migration.unmapped_project_migration_log upml
     SET
       upml.migration_status = COALESCE(p_migration_status, upml.migration_status)
     , upml.system_message = upml.system_message || CHR(10) || TO_CHAR(SYSTIMESTAMP) || ': ' || p_system_message || CHR(10)
@@ -1233,9 +1233,9 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   @param p_system_message The message to append to the log
  */
   PROCEDURE log_unmapped_detail_migration(
-    p_legacy_project_detail_id IN ${datasource.migration-user}.unmapped_detail_migration_log.legacy_project_detail_id%TYPE
-  , p_migration_status IN ${datasource.migration-user}.unmapped_detail_migration_log.migration_status%TYPE DEFAULT NULL
-  , p_system_message IN ${datasource.migration-user}.unmapped_detail_migration_log.system_message%TYPE
+    p_legacy_project_detail_id IN pathfinder_migration.unmapped_detail_migration_log.legacy_project_detail_id%TYPE
+  , p_migration_status IN pathfinder_migration.unmapped_detail_migration_log.migration_status%TYPE DEFAULT NULL
+  , p_system_message IN pathfinder_migration.unmapped_detail_migration_log.system_message%TYPE
   )
   IS
 
@@ -1243,7 +1243,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
   BEGIN
 
-    UPDATE ${datasource.migration-user}.unmapped_detail_migration_log pudl
+    UPDATE pathfinder_migration.unmapped_detail_migration_log pudl
     SET
       pudl.migration_status = COALESCE(p_migration_status, pudl.migration_status)
     , pudl.system_message = pudl.system_message || CHR(10) || TO_CHAR(SYSTIMESTAMP) || ': ' || p_system_message || CHR(10)
@@ -1261,8 +1261,8 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     @param p_system_message The message to write to all the project detail migration logs for this project
    */
   PROCEDURE reset_unmapped_detail_log(
-    p_legacy_project_id IN ${datasource.migration-user}.unmapped_detail_migration_log.legacy_project_id%TYPE
-  , p_system_message IN ${datasource.migration-user}.unmapped_detail_migration_log.system_message%TYPE
+    p_legacy_project_id IN pathfinder_migration.unmapped_detail_migration_log.legacy_project_id%TYPE
+  , p_system_message IN pathfinder_migration.unmapped_detail_migration_log.system_message%TYPE
   )
   IS
 
@@ -1270,7 +1270,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
   BEGIN
 
-    UPDATE ${datasource.migration-user}.unmapped_detail_migration_log udml
+    UPDATE pathfinder_migration.unmapped_detail_migration_log udml
     SET
       udml.migration_status = K_PENDING_MIGRATION_STATUS
     , udml.system_message = udml.system_message || CHR(10) || TO_CHAR(SYSTIMESTAMP) || ': ' || p_system_message || CHR(10)
@@ -1501,7 +1501,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     SELECT lpd.operator_org_group_id
     INTO l_operator_org_grp_id
-    FROM ${datasource.migration-user}.legacy_project_data lpd
+    FROM pathfinder_migration.legacy_project_data lpd
     WHERE lpd.legacy_project_detail_id = p_legacy_project_detail_id;
 
     INSERT INTO ${datasource.user}.project_operators(
@@ -1589,15 +1589,15 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     l_new_project_information_id ${datasource.user}.project_information.id%TYPE;
 
-    l_field_stage ${datasource.migration-user}.legacy_project_data.field_stage%TYPE;
-    l_project_title ${datasource.migration-user}.legacy_project_data.project_title%TYPE;
-    l_project_summary ${datasource.migration-user}.legacy_project_data.project_summary%TYPE;
-    l_contact_name ${datasource.migration-user}.legacy_project_data.project_contact_name%TYPE;
-    l_contact_phone_number ${datasource.migration-user}.legacy_project_data.project_contact_tel_number%TYPE;
-    l_contact_job_title ${datasource.migration-user}.legacy_project_data.project_contact_job_title%TYPE;
-    l_contact_email_address ${datasource.migration-user}.legacy_project_data.project_contact_email_address%TYPE;
-    l_first_prod_date_quarter ${datasource.migration-user}.legacy_project_data.first_production_quarter%TYPE;
-    l_first_prod_date_year ${datasource.migration-user}.legacy_project_data.first_production_year%TYPE;
+    l_field_stage pathfinder_migration.legacy_project_data.field_stage%TYPE;
+    l_project_title pathfinder_migration.legacy_project_data.project_title%TYPE;
+    l_project_summary pathfinder_migration.legacy_project_data.project_summary%TYPE;
+    l_contact_name pathfinder_migration.legacy_project_data.project_contact_name%TYPE;
+    l_contact_phone_number pathfinder_migration.legacy_project_data.project_contact_tel_number%TYPE;
+    l_contact_job_title pathfinder_migration.legacy_project_data.project_contact_job_title%TYPE;
+    l_contact_email_address pathfinder_migration.legacy_project_data.project_contact_email_address%TYPE;
+    l_first_prod_date_quarter pathfinder_migration.legacy_project_data.first_production_quarter%TYPE;
+    l_first_prod_date_year pathfinder_migration.legacy_project_data.first_production_year%TYPE;
 
   BEGIN
 
@@ -1632,7 +1632,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     , l_contact_email_address
     , l_first_prod_date_quarter
     , l_first_prod_date_year
-    FROM ${datasource.migration-user}.legacy_project_data lpd
+    FROM pathfinder_migration.legacy_project_data lpd
     WHERE lpd.legacy_project_detail_id = p_legacy_project_detail_id;
 
     INSERT INTO ${datasource.user}.project_information(
@@ -1691,7 +1691,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     @return The ID of a devuk field whose name matches exactly p_legacy_manual_entry_field
    */
   FUNCTION lookup_field_id_from_freetext(
-    p_legacy_manual_entry_field IN ${datasource.migration-user}.legacy_project_data.manual_field_name%TYPE
+    p_legacy_manual_entry_field IN pathfinder_migration.legacy_project_data.manual_field_name%TYPE
   ) RETURN ${datasource.user}.project_locations.field_id%TYPE
   IS
 
@@ -1726,8 +1726,8 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
    */
   FUNCTION sanitise_legacy_field_inputs(
     p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
-  , p_legacy_devuk_field_id IN ${datasource.migration-user}.legacy_project_data.devuk_field_id%TYPE
-  , p_legacy_manual_field_name IN ${datasource.migration-user}.legacy_project_data.manual_field_name%TYPE
+  , p_legacy_devuk_field_id IN pathfinder_migration.legacy_project_data.devuk_field_id%TYPE
+  , p_legacy_manual_field_name IN pathfinder_migration.legacy_project_data.manual_field_name%TYPE
   ) RETURN ${datasource.user}.project_locations.field_id%TYPE
   IS
 
@@ -1779,11 +1779,11 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
    */
   FUNCTION sanitise_legacy_water_depth(
     p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
-  , p_legacy_water_depth_value IN ${datasource.migration-user}.legacy_project_data.water_depth%TYPE
+  , p_legacy_water_depth_value IN pathfinder_migration.legacy_project_data.water_depth%TYPE
   ) RETURN ${datasource.user}.project_locations.maximum_water_depth%TYPE
   IS
 
-    l_sanitised_water_depth_value ${datasource.migration-user}.legacy_project_data.water_depth%TYPE;
+    l_sanitised_water_depth_value pathfinder_migration.legacy_project_data.water_depth%TYPE;
 
   BEGIN
 
@@ -1829,22 +1829,22 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
    */
   FUNCTION get_water_depth_value(
     p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
-  , p_legacy_water_depth_value IN ${datasource.migration-user}.legacy_project_data.water_depth%TYPE
+  , p_legacy_water_depth_value IN pathfinder_migration.legacy_project_data.water_depth%TYPE
   ) RETURN NUMBER
   IS
 
     PRAGMA AUTONOMOUS_TRANSACTION;
 
-    K_IS_MIGRATABLE_FALSE CONSTANT ${datasource.migration-user}.water_depth_migration_mapping.is_migratable%TYPE := 0;
-    K_IS_MIGRATABLE_TRUE CONSTANT ${datasource.migration-user}.water_depth_migration_mapping.is_migratable%TYPE := 1;
+    K_IS_MIGRATABLE_FALSE CONSTANT pathfinder_migration.water_depth_migration_mapping.is_migratable%TYPE := 0;
+    K_IS_MIGRATABLE_TRUE CONSTANT pathfinder_migration.water_depth_migration_mapping.is_migratable%TYPE := 1;
 
     l_sanitised_water_depth_value ${datasource.user}.project_locations.maximum_water_depth%TYPE;
-    l_is_water_depth_migratable ${datasource.migration-user}.water_depth_migration_mapping.is_migratable%TYPE;
+    l_is_water_depth_migratable pathfinder_migration.water_depth_migration_mapping.is_migratable%TYPE;
 
   BEGIN
 
     -- merge statement so we can do rerun of project migrations and not get duplicate rows
-    MERGE INTO ${datasource.migration-user}.water_depth_migration_mapping wdmm
+    MERGE INTO pathfinder_migration.water_depth_migration_mapping wdmm
     USING(
       SELECT p_legacy_project_detail_id legacy_project_detail_id
       FROM dual
@@ -1891,7 +1891,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     END IF;
 
-    UPDATE ${datasource.migration-user}.water_depth_migration_mapping wdmm
+    UPDATE pathfinder_migration.water_depth_migration_mapping wdmm
     SET
       wdmm.sanitised_water_depth_value = l_sanitised_water_depth_value
     , wdmm.is_migratable = l_is_water_depth_migratable
@@ -1919,14 +1919,14 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     l_new_project_location_id ${datasource.user}.project_locations.id%TYPE;
 
-    l_legacy_devuk_field_id ${datasource.migration-user}.legacy_project_data.devuk_field_id%TYPE;
-    l_legacy_manual_field_name ${datasource.migration-user}.legacy_project_data.manual_field_name%TYPE;
+    l_legacy_devuk_field_id pathfinder_migration.legacy_project_data.devuk_field_id%TYPE;
+    l_legacy_manual_field_name pathfinder_migration.legacy_project_data.manual_field_name%TYPE;
     l_sanitised_field_id ${datasource.user}.project_locations.field_id%TYPE;
 
-    l_field_type ${datasource.migration-user}.legacy_project_data.field_type%TYPE;
-    l_fdp_approved ${datasource.migration-user}.legacy_project_data.fdp_approved%TYPE;
+    l_field_type pathfinder_migration.legacy_project_data.field_type%TYPE;
+    l_fdp_approved pathfinder_migration.legacy_project_data.fdp_approved%TYPE;
 
-    l_legacy_water_depth ${datasource.migration-user}.legacy_project_data.water_depth%TYPE;
+    l_legacy_water_depth pathfinder_migration.legacy_project_data.water_depth%TYPE;
     l_sanitised_water_depth ${datasource.user}.project_locations.maximum_water_depth%TYPE;
 
   BEGIN
@@ -1954,7 +1954,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     , l_field_type
     , l_fdp_approved
     , l_legacy_water_depth
-    FROM ${datasource.migration-user}.legacy_project_data lpd
+    FROM pathfinder_migration.legacy_project_data lpd
     WHERE lpd.legacy_project_detail_id = p_legacy_project_detail_id;
 
     l_sanitised_field_id := sanitise_legacy_field_inputs(
@@ -2008,7 +2008,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
    */
   FUNCTION sanitise_legacy_location_input(
     p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
-  , p_legacy_location_input IN ${datasource.migration-user}.legacy_project_data.location%TYPE
+  , p_legacy_location_input IN pathfinder_migration.legacy_project_data.location%TYPE
   ) RETURN bpmmgr.varchar2_list_type
   IS
 
@@ -2080,22 +2080,22 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
    */
   FUNCTION get_location_block_list(
     p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
-  , p_legacy_location_input ${datasource.migration-user}.legacy_project_data.location%TYPE
+  , p_legacy_location_input pathfinder_migration.legacy_project_data.location%TYPE
   ) RETURN bpmmgr.varchar2_list_type
   IS
 
     PRAGMA AUTONOMOUS_TRANSACTION;
 
-    K_IS_MIGRATABLE_FALSE CONSTANT ${datasource.migration-user}.location_migration_mapping.is_migratable%TYPE := 0;
-    K_IS_MIGRATABLE_TRUE CONSTANT ${datasource.migration-user}.location_migration_mapping.is_migratable%TYPE := 1;
+    K_IS_MIGRATABLE_FALSE CONSTANT pathfinder_migration.location_migration_mapping.is_migratable%TYPE := 0;
+    K_IS_MIGRATABLE_TRUE CONSTANT pathfinder_migration.location_migration_mapping.is_migratable%TYPE := 1;
 
     l_sanitised_location_list bpmmgr.varchar2_list_type;
-    l_is_location_migratable ${datasource.migration-user}.location_migration_mapping.is_migratable%TYPE;
+    l_is_location_migratable pathfinder_migration.location_migration_mapping.is_migratable%TYPE;
 
   BEGIN
 
     -- merge statement so we can do rerun of project migrations and not get duplicate rows
-    MERGE INTO ${datasource.migration-user}.location_migration_mapping lmm
+    MERGE INTO pathfinder_migration.location_migration_mapping lmm
     USING(
       SELECT p_legacy_project_detail_id legacy_project_detail_id
       FROM dual
@@ -2139,7 +2139,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     END IF;
 
-    UPDATE ${datasource.migration-user}.location_migration_mapping lmm
+    UPDATE pathfinder_migration.location_migration_mapping lmm
     SET
       -- persist a csv of sanitised blocks for easy viewing in the logs
       lmm.sanitised_location_value = envmgr.st.join(l_sanitised_location_list, ',')
@@ -2165,7 +2165,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     K_DESTINATION_TABLE_NAME CONSTANT VARCHAR2(30) := 'PROJECT_LOCATION_BLOCKS';
 
-    l_legacy_location_value ${datasource.migration-user}.legacy_project_data.location%TYPE;
+    l_legacy_location_value pathfinder_migration.legacy_project_data.location%TYPE;
     l_sanitised_block_list bpmmgr.varchar2_list_type;
 
     l_new_location_block_id ${datasource.user}.project_location_blocks.id%TYPE;
@@ -2178,7 +2178,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     SELECT lpd.location
     INTO l_legacy_location_value
-    FROM ${datasource.migration-user}.legacy_project_data lpd
+    FROM pathfinder_migration.legacy_project_data lpd
     WHERE lpd.legacy_project_detail_id = p_legacy_project_detail_id;
 
     l_sanitised_block_list := get_location_block_list(
@@ -2276,7 +2276,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       , lpc.contact_email_address
       , ROWNUM idx
       , COUNT(*) OVER (PARTITION BY lpc.legacy_project_detail_id) total_contracts_for_detail
-      FROM ${datasource.migration-user}.legacy_project_contracts lpc
+      FROM pathfinder_migration.legacy_project_contracts lpc
       WHERE lpc.legacy_project_detail_id = p_legacy_project_detail_id
     )
     LOOP
@@ -2359,7 +2359,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       , lpc.contact_email_address
       , ROWNUM idx
       , COUNT(*) OVER (PARTITION BY lpc.legacy_project_detail_id) total_contracts_for_detail
-      FROM ${datasource.migration-user}.legacy_project_challenges lpc
+      FROM pathfinder_migration.legacy_project_challenges lpc
       WHERE lpc.legacy_project_detail_id = p_legacy_project_detail_id
     )
     LOOP
@@ -2703,7 +2703,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       , ppd.start_datetime submitted_datetime
       FROM decmgr.path_projects pp
       JOIN decmgr.path_project_details ppd ON ppd.path_project_id = pp.id
-      JOIN ${datasource.migration-user}.project_detail_migration_log pdml ON pdml.legacy_project_detail_id = ppd.id
+      JOIN pathfinder_migration.project_detail_migration_log pdml ON pdml.legacy_project_detail_id = ppd.id
       WHERE pp.id = p_legacy_project_id
       AND pdml.migration_status = K_PENDING_MIGRATION_STATUS
       ORDER BY ppd.start_datetime
@@ -2853,7 +2853,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     FOR project IN (
       SELECT pml.legacy_project_id id
-      FROM ${datasource.migration-user}.project_migration_log pml
+      FROM pathfinder_migration.project_migration_log pml
       WHERE pml.migration_status = K_PENDING_MIGRATION_STATUS
       ORDER BY pml.legacy_project_id
     )
@@ -2880,15 +2880,15 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   PROCEDURE create_unmapped_data_record(
     p_legacy_project_id IN decmgr.path_projects.id%TYPE
   , p_legacy_project_detail_id IN decmgr.path_project_details.id%TYPE
-  , p_legacy_question_id IN ${datasource.migration-user}.unmapped_project_data.legacy_question_id%TYPE
-  , p_legacy_answer IN ${datasource.migration-user}.unmapped_project_data.legacy_answer%TYPE
+  , p_legacy_question_id IN pathfinder_migration.unmapped_project_data.legacy_question_id%TYPE
+  , p_legacy_answer IN pathfinder_migration.unmapped_project_data.legacy_answer%TYPE
   )
   IS
 
-    l_new_project_id ${datasource.migration-user}.project_migration_log.new_project_id%TYPE;
-    l_new_project_detail_id ${datasource.migration-user}.project_detail_migration_log.new_project_detail_id%TYPE;
+    l_new_project_id pathfinder_migration.project_migration_log.new_project_id%TYPE;
+    l_new_project_detail_id pathfinder_migration.project_detail_migration_log.new_project_detail_id%TYPE;
 
-    l_unmapped_project_data_id ${datasource.migration-user}.unmapped_project_data.id%TYPE;
+    l_unmapped_project_data_id pathfinder_migration.unmapped_project_data.id%TYPE;
 
   BEGIN
 
@@ -2907,11 +2907,11 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       INTO
         l_new_project_id
       , l_new_project_detail_id
-      FROM ${datasource.migration-user}.project_detail_migration_log pdml
-      JOIN ${datasource.migration-user}.project_migration_log pml ON pml.legacy_project_id = pdml.legacy_project_id
+      FROM pathfinder_migration.project_detail_migration_log pdml
+      JOIN pathfinder_migration.project_migration_log pml ON pml.legacy_project_id = pdml.legacy_project_id
       WHERE pdml.legacy_project_detail_id = p_legacy_project_detail_id;
 
-      INSERT INTO ${datasource.migration-user}.unmapped_project_data(
+      INSERT INTO pathfinder_migration.unmapped_project_data(
         legacy_project_id
       , new_project_id
       , legacy_project_detail_id
@@ -2959,7 +2959,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   )
   IS
 
-    l_unmapped_project_comment_id ${datasource.migration-user}.unmapped_project_comments.id%TYPE;
+    l_unmapped_project_comment_id pathfinder_migration.unmapped_project_comments.id%TYPE;
 
   BEGIN
 
@@ -2974,12 +2974,12 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       , ulc.comment_datetime
       , ulc.commented_by_wua_id
       , ulc.comment_type
-      FROM ${datasource.migration-user}.unmapped_legacy_comments ulc
+      FROM pathfinder_migration.unmapped_legacy_comments ulc
       WHERE ulc.legacy_project_id = p_legacy_project_id
     )
     LOOP
 
-      INSERT INTO ${datasource.migration-user}.unmapped_project_comments(
+      INSERT INTO pathfinder_migration.unmapped_project_comments(
         legacy_project_id
       , comment_text
       , comment_datetime
@@ -3034,27 +3034,27 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
           ppd.id legacy_detail_id
         , (
           SELECT upq.id
-          FROM ${datasource.migration-user}.unmapped_project_questions upq
+          FROM pathfinder_migration.unmapped_project_questions upq
           WHERE upq.legacy_question_mnem = 'SUMMARY_OF_UPDATE'
         ) update_summary_question_id
         , (
           SELECT upq.id
-          FROM ${datasource.migration-user}.unmapped_project_questions upq
+          FROM pathfinder_migration.unmapped_project_questions upq
           WHERE upq.legacy_question_mnem = 'ORIGINAL_PRODUCTION_QUARTER'
         ) orig_prod_quarter_question_id
         , (
           SELECT upq.id
-          FROM ${datasource.migration-user}.unmapped_project_questions upq
+          FROM pathfinder_migration.unmapped_project_questions upq
           WHERE upq.legacy_question_mnem = 'ORIGINAL_PRODUCTION_YEAR'
         ) orig_prod_year_question_id
         , (
           SELECT upq.id
-          FROM ${datasource.migration-user}.unmapped_project_questions upq
+          FROM pathfinder_migration.unmapped_project_questions upq
           WHERE upq.legacy_question_mnem = 'UNDER_CONSTRUCTION_FLAG'
         ) construction_flag_question_id
         , (
           SELECT upq.id
-          FROM ${datasource.migration-user}.unmapped_project_questions upq
+          FROM pathfinder_migration.unmapped_project_questions upq
           WHERE upq.legacy_question_mnem = 'CONSTRUCTION_DATE'
         ) construction_date_question_id
         , ulpd.update_summary update_summary_answer
@@ -3064,9 +3064,9 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
         , ulpd.construction_date construction_date_answer
         FROM decmgr.path_projects pp
         JOIN decmgr.path_project_details ppd ON ppd.path_project_id = pp.id
-        JOIN ${datasource.migration-user}.project_migration_log pml ON pml.legacy_project_id = pp.id
-        JOIN ${datasource.migration-user}.unmapped_detail_migration_log udml ON udml.legacy_project_detail_id = ppd.id
-        JOIN ${datasource.migration-user}.unmapped_legacy_project_data ulpd ON ulpd.legacy_project_detail_id = udml.legacy_project_detail_id
+        JOIN pathfinder_migration.project_migration_log pml ON pml.legacy_project_id = pp.id
+        JOIN pathfinder_migration.unmapped_detail_migration_log udml ON udml.legacy_project_detail_id = ppd.id
+        JOIN pathfinder_migration.unmapped_legacy_project_data ulpd ON ulpd.legacy_project_detail_id = udml.legacy_project_detail_id
         WHERE pp.id = p_legacy_project_id
         -- where the unmapped status is pending
         AND udml.migration_status = K_PENDING_MIGRATION_STATUS
@@ -3173,8 +3173,8 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     FOR project IN (
       SELECT upml.legacy_project_id id
-      FROM ${datasource.migration-user}.unmapped_project_migration_log upml
-      JOIN ${datasource.migration-user}.project_migration_log pml ON pml.legacy_project_id = upml.legacy_project_id
+      FROM pathfinder_migration.unmapped_project_migration_log upml
+      JOIN pathfinder_migration.project_migration_log pml ON pml.legacy_project_id = upml.legacy_project_id
       -- where the unmapped status is pending
       WHERE upml.migration_status = K_PENDING_MIGRATION_STATUS
       -- but the actual project has successfully been migrated
@@ -3223,10 +3223,10 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     @param p_new_subscriber_id the id of the subscriber in the new model
    */
   PROCEDURE log_subscriber_migration(
-    p_legacy_resource_person_id IN ${datasource.migration-user}.subscriber_migration_log.legacy_resource_person_id%TYPE
-  , p_migration_status IN ${datasource.migration-user}.subscriber_migration_log.migration_status%TYPE DEFAULT NULL
-  , p_system_message IN ${datasource.migration-user}.subscriber_migration_log.system_message%TYPE
-  , p_new_subscriber_id IN ${datasource.migration-user}.subscriber_migration_log.new_subscriber_id%TYPE DEFAULT NULL
+    p_legacy_resource_person_id IN pathfinder_migration.subscriber_migration_log.legacy_resource_person_id%TYPE
+  , p_migration_status IN pathfinder_migration.subscriber_migration_log.migration_status%TYPE DEFAULT NULL
+  , p_system_message IN pathfinder_migration.subscriber_migration_log.system_message%TYPE
+  , p_new_subscriber_id IN pathfinder_migration.subscriber_migration_log.new_subscriber_id%TYPE DEFAULT NULL
   )
   IS
 
@@ -3234,7 +3234,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
   BEGIN
 
-    UPDATE ${datasource.migration-user}.subscriber_migration_log sml
+    UPDATE pathfinder_migration.subscriber_migration_log sml
     SET
       sml.migration_status = COALESCE(p_migration_status, sml.migration_status)
     , sml.system_message = sml.system_message || CHR(10) || TO_CHAR(SYSTIMESTAMP) || ': ' || p_system_message || CHR(10)
@@ -3253,10 +3253,10 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     @param p_email_address the email address of the legacy subscriber
    */
   PROCEDURE migrate_subscriber(
-    p_resource_person_id IN ${datasource.migration-user}.legacy_subscribers.resource_person_id%TYPE
-  , p_forename IN ${datasource.migration-user}.legacy_subscribers.forename%TYPE
-  , p_surname IN ${datasource.migration-user}.legacy_subscribers.surname%TYPE
-  , p_email_address IN ${datasource.migration-user}.legacy_subscribers.email_address%TYPE
+    p_resource_person_id IN pathfinder_migration.legacy_subscribers.resource_person_id%TYPE
+  , p_forename IN pathfinder_migration.legacy_subscribers.forename%TYPE
+  , p_surname IN pathfinder_migration.legacy_subscribers.surname%TYPE
+  , p_email_address IN pathfinder_migration.legacy_subscribers.email_address%TYPE
   )
   IS
 
@@ -3329,7 +3329,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   IS
   BEGIN
 
-    INSERT INTO ${datasource.migration-user}.subscriber_migration_log(
+    INSERT INTO pathfinder_migration.subscriber_migration_log(
       legacy_resource_person_id
     , migration_status
     , system_message
@@ -3338,11 +3338,11 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       ls.resource_person_id
     , K_PENDING_MIGRATION_STATUS
     , EMPTY_CLOB()
-    FROM ${datasource.migration-user}.legacy_subscribers ls
+    FROM pathfinder_migration.legacy_subscribers ls
     -- Safety check to not populate with duplicate subscribers
     WHERE ls.resource_person_id NOT IN (
       SELECT sml.legacy_resource_person_id
-      FROM ${datasource.migration-user}.subscriber_migration_log sml
+      FROM pathfinder_migration.subscriber_migration_log sml
     );
 
     COMMIT;
@@ -3365,8 +3365,8 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       , ls.forename
       , ls.surname
       , ls.email_address
-      FROM ${datasource.migration-user}.legacy_subscribers ls
-      JOIN ${datasource.migration-user}.subscriber_migration_log sml ON sml.legacy_resource_person_id = ls.resource_person_id
+      FROM pathfinder_migration.legacy_subscribers ls
+      JOIN pathfinder_migration.subscriber_migration_log sml ON sml.legacy_resource_person_id = ls.resource_person_id
       WHERE sml.migration_status = K_PENDING_MIGRATION_STATUS
     )
     LOOP
@@ -3392,10 +3392,10 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
     @param p_new_resource_id the id of the resource in the new model
    */
   PROCEDURE log_team_migration(
-    p_legacy_resource_id IN ${datasource.migration-user}.team_migration_log.legacy_resource_id%TYPE
-  , p_migration_status IN ${datasource.migration-user}.team_migration_log.migration_status%TYPE DEFAULT NULL
-  , p_system_message IN ${datasource.migration-user}.team_migration_log.system_message%TYPE
-  , p_new_resource_id IN ${datasource.migration-user}.team_migration_log.new_resource_id%TYPE DEFAULT NULL
+    p_legacy_resource_id IN pathfinder_migration.team_migration_log.legacy_resource_id%TYPE
+  , p_migration_status IN pathfinder_migration.team_migration_log.migration_status%TYPE DEFAULT NULL
+  , p_system_message IN pathfinder_migration.team_migration_log.system_message%TYPE
+  , p_new_resource_id IN pathfinder_migration.team_migration_log.new_resource_id%TYPE DEFAULT NULL
   )
     IS
 
@@ -3403,7 +3403,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
   BEGIN
 
-    UPDATE ${datasource.migration-user}.team_migration_log tml
+    UPDATE pathfinder_migration.team_migration_log tml
     SET
       tml.migration_status = COALESCE(p_migration_status, tml.migration_status)
     , tml.system_message = tml.system_message || CHR(10) || TO_CHAR(SYSTIMESTAMP) || ': ' || p_system_message || CHR(10)
@@ -3421,7 +3421,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
   IS
   BEGIN
 
-    INSERT INTO ${datasource.migration-user}.team_migration_log(
+    INSERT INTO pathfinder_migration.team_migration_log(
       legacy_resource_id
     , migration_status
     , system_message
@@ -3430,11 +3430,11 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       lt.legacy_resource_id
     , K_PENDING_MIGRATION_STATUS
     , EMPTY_CLOB()
-    FROM ${datasource.migration-user}.legacy_teams lt
+    FROM pathfinder_migration.legacy_teams lt
     -- Safety check to not populate with duplicate teams
     WHERE lt.legacy_resource_id NOT IN (
       SELECT tml.legacy_resource_id
-      FROM ${datasource.migration-user}.team_migration_log tml
+      FROM pathfinder_migration.team_migration_log tml
     );
 
     COMMIT;
@@ -3620,7 +3620,7 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
 
     SELECT lt.legacy_resource_id
     INTO l_legacy_regulator_resource_id
-    FROM ${datasource.migration-user}.legacy_teams lt
+    FROM pathfinder_migration.legacy_teams lt
     WHERE lt.resource_type = K_LEGACY_REGULATOR_TEAM;
 
     migrate_team(
@@ -3633,8 +3633,8 @@ CREATE OR REPLACE PACKAGE BODY ${datasource.migration-user}.migration AS
       SELECT
         lt.legacy_resource_id id
       , lt.scoped_uref uref
-      FROM ${datasource.migration-user}.legacy_teams lt
-      JOIN ${datasource.migration-user}.team_migration_log tml ON tml.legacy_resource_id = lt.legacy_resource_id
+      FROM pathfinder_migration.legacy_teams lt
+      JOIN pathfinder_migration.team_migration_log tml ON tml.legacy_resource_id = lt.legacy_resource_id
       WHERE tml.migration_status = K_PENDING_MIGRATION_STATUS
       AND lt.resource_type = K_LEGACY_ORGANISATION_TEAM
     )

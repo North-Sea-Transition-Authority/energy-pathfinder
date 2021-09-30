@@ -1,26 +1,72 @@
 package uk.co.ogauthority.pathfinder.model.form.project.selectoperator;
 
+import java.util.Objects;
 import javax.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
-import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
 
 public class ProjectOperatorForm {
 
-  @NotNull(message = "Select an operator", groups = {FullValidation.class, PartialValidation.class})
-  private String organisationGroup;
+  @NotNull(message = "Select the operator of the project", groups = FullValidation.class)
+  private String operator;
 
-  public ProjectOperatorForm() {
+  @NotNull(
+      message = "Select if this is the operator you want shown on the supply chain interface",
+      groups = FullValidation.class
+  )
+  private Boolean isPublishedAsOperator;
+
+  private String publishableOrganisation;
+
+  public String getOperator() {
+    return operator;
   }
 
-  public ProjectOperatorForm(String organisationGroup) {
-    this.organisationGroup = organisationGroup;
+  public void setOperator(String operator) {
+    this.operator = operator;
   }
 
-  public String getOrganisationGroup() {
-    return organisationGroup;
+  public Boolean isPublishedAsOperator() {
+    return isPublishedAsOperator;
   }
 
-  public void setOrganisationGroup(String organisationGroup) {
-    this.organisationGroup = organisationGroup;
+  public Boolean getIsPublishedAsOperator() {
+    return isPublishedAsOperator();
+  }
+
+  public void setIsPublishedAsOperator(Boolean isPublishedAsOperator) {
+    this.isPublishedAsOperator = isPublishedAsOperator;
+  }
+
+  public String getPublishableOrganisation() {
+    return publishableOrganisation;
+  }
+
+  public void setPublishableOrganisation(String publishableOrganisation) {
+    this.publishableOrganisation = publishableOrganisation;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    ProjectOperatorForm that = (ProjectOperatorForm) o;
+    return Objects.equals(operator, that.operator)
+        && Objects.equals(isPublishedAsOperator, that.isPublishedAsOperator)
+        && Objects.equals(publishableOrganisation, that.publishableOrganisation);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        operator,
+        isPublishedAsOperator,
+        publishableOrganisation
+    );
   }
 }

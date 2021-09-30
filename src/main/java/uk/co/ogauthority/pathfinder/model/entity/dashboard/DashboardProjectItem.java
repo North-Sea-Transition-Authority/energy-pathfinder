@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationUnit;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
@@ -41,6 +42,10 @@ public class DashboardProjectItem {
   @ManyToOne
   @JoinColumn(name = "operator_org_grp_id")
   private PortalOrganisationGroup organisationGroup;
+
+  @ManyToOne
+  @JoinColumn(name = "publishable_org_unit_id")
+  private PortalOrganisationUnit publishableOperator;
 
   private boolean updateRequested;
 
@@ -165,5 +170,14 @@ public class DashboardProjectItem {
 
   public void setUpdateSortKey(Instant updateSortKey) {
     this.updateSortKey = updateSortKey;
+  }
+
+  public PortalOrganisationUnit getPublishableOperator() {
+    return publishableOperator;
+  }
+
+  public void setPublishableOperator(
+      PortalOrganisationUnit publishableOperator) {
+    this.publishableOperator = publishableOperator;
   }
 }
