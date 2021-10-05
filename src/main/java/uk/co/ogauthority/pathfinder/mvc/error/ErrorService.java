@@ -10,6 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.model.enums.contact.ServiceContactDetail;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
+import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 
 @Service
 public class ErrorService {
@@ -56,6 +57,11 @@ public class ErrorService {
     modelAndView.addObject("service", serviceProperties);
   }
 
+  private void addCommonUrls(ModelAndView modelAndView) {
+    modelAndView.addObject("serviceHomeUrl", ControllerUtils.getWorkAreaUrl());
+    footerService.addFooterUrlsToModelAndView(modelAndView);
+  }
+
   public ModelAndView addErrorAttributesToModel(ModelAndView modelAndView, Throwable throwable) {
     if (throwable != null) {
       addStackTraceToModel(modelAndView, throwable);
@@ -63,7 +69,7 @@ public class ErrorService {
     }
     addTechnicalSupportContactDetails(modelAndView);
     addServiceProperties(modelAndView);
-    footerService.addFooterUrlsToModelAndView(modelAndView);
+    addCommonUrls(modelAndView);
     return modelAndView;
   }
 }

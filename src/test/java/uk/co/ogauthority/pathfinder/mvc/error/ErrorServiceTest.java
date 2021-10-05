@@ -39,7 +39,8 @@ public class ErrorServiceTest {
     assertThat(resultingModelMap).containsOnlyKeys(
         "errorRef",
         "technicalSupportContact",
-        "service"
+        "service",
+        "serviceHomeUrl"
     );
     assertThat(resultingModelMap.get("errorRef")).isNotNull();
     assertCommonModelProperties(resultingModelMap);
@@ -54,7 +55,8 @@ public class ErrorServiceTest {
 
     assertThat(resultingModelMap).containsOnlyKeys(
         "technicalSupportContact",
-        "service"
+        "service",
+        "serviceHomeUrl"
     );
     assertCommonModelProperties(resultingModelMap);
   }
