@@ -10,7 +10,8 @@ SELECT
   END active
 FROM decmgr.xview_organisation_units xou
 LEFT JOIN decmgr.current_org_grp_organisations cogo ON cogo.organ_id = xou.organ_id
-LEFT JOIN decmgr.current_organisation_groups cog ON cog.id = cogo.org_grp_id;
+LEFT JOIN decmgr.current_organisation_groups cog ON cog.id = cogo.org_grp_id
+WHERE (cog.org_grp_type = 'REG' OR cog.org_grp_type IS NULL);
 
 CREATE OR REPLACE VIEW ${datasource.user}.portal_organisation_groups AS
 SELECT
