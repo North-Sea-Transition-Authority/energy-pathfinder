@@ -41,6 +41,7 @@ public class SubscriptionController {
   @PostMapping("/subscribe")
   public ModelAndView subscribe(@Valid @ModelAttribute("form") SubscribeForm form,
                                 BindingResult bindingResult) {
+    metricsProvider.getSubscribePagePostCounter().increment();
     bindingResult = subscriptionService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
@@ -69,6 +70,7 @@ public class SubscriptionController {
 
   @PostMapping("/unsubscribe/{subscriberUuid}")
   public ModelAndView unsubscribe(@PathVariable("subscriberUuid") String subscriberUuid) {
+    metricsProvider.getUnsubscribePagePostCounter().increment();
     AuditService.audit(
         AuditEvent.UNSUBSCRIBE_POST_REQUEST,
         String.format(AuditEvent.UNSUBSCRIBE_GET_REQUEST.getMessage(), subscriberUuid)
