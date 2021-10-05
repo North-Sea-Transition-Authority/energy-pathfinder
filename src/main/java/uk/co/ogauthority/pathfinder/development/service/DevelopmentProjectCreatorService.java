@@ -16,12 +16,12 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
-import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionAnswer;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
+import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupForm;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
@@ -49,7 +49,6 @@ public class DevelopmentProjectCreatorService {
   public static final Boolean APPROVED_FDP_PLAN = true;
   public static final LocalDate APPROVED_FDP_DATE = LocalDate.now().withDayOfMonth(1);
   public static final Boolean APPROVED_DECOM_PROGRAM = false;
-  public static final UkcsArea UKCS_AREA =  UkcsArea.WOS;
   public static final List<String> LICENCE_BLOCKS = Collections.singletonList("16/29b1629b666"); //16/29b
 
   private final StartProjectService startProjectService;
@@ -93,8 +92,14 @@ public class DevelopmentProjectCreatorService {
     return detail;
   }
 
-  private ProjectDetail createProject(AuthenticatedUserAccount user, PortalOrganisationGroup organisationGroup, ProjectStatus status) {
-    var projectDetail = startProjectService.createInfrastructureProject(user, organisationGroup);
+  private ProjectDetail createProject(AuthenticatedUserAccount user,
+                                      PortalOrganisationGroup organisationGroup,
+                                      ProjectStatus status) {
+
+    final var projectOperatorForm = new ProjectOperatorForm();
+    projectOperatorForm.setOperator(String.valueOf(organisationGroup.getOrgGrpId()));
+
+    var projectDetail = startProjectService.createInfrastructureProject(user, projectOperatorForm);
     projectDetail.setStatus(status);
 
     if (!status.equals(ProjectStatus.DRAFT)) {

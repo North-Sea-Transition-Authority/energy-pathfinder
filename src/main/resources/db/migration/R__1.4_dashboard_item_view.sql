@@ -13,6 +13,7 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
     , df.field_name
     , df.ukcs_area
     , po.operator_org_grp_id
+    , po.publishable_org_unit_id
     , COALESCE(pd.submitted_datetime, pd.created_datetime, p.created_datetime) sort_key
     , pd.is_current_version
     , DECODE(

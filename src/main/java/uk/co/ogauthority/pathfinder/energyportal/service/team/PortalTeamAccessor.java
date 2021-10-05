@@ -194,6 +194,26 @@ public class PortalTeamAccessor {
         .getResultList();
   }
 
+  public List<PortalTeamDto> getTeamsWherePersonMemberOfTeamType(Person person, String portalTeamType) {
+    return entityManager.createQuery("" +
+            // Distinct required to remove duplicates caused by using the PortalTeamTypeRole entity as root
+            "SELECT DISTINCT new uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto( " +
+            "  pt.resId, pt.name, pt.description, pt.portalTeamType.type, ptu.uref " +
+            ") " +
+            "FROM PortalTeamType ptt " +
+            "JOIN PortalTeam pt ON pt.portalTeamType = ptt " +
+            "JOIN PortalTeamMember ptm ON ptm.portalTeam = pt " +
+            "LEFT JOIN PortalTeamUsage ptu ON ptu.portalTeam = pt " +
+            "WHERE ptt.type = :portalTeamType " +
+            "AND ptm.personId = :personId " +
+            "AND (ptu.purpose = :usagePurpose OR ptu IS NULL) ",
+        PortalTeamDto.class)
+        .setParameter("portalTeamType", portalTeamType)
+        .setParameter("personId", person.getId().asInt())
+        .setParameter("usagePurpose", PortalTeamUsagePurpose.PRIMARY_DATA)
+        .getResultList();
+  }
+
   public long getNumberOfTeamsWherePersonMemberOfTeamType(Person person,
                                                           String portalTeamType) {
     return (Long) entityManager.createQuery("" +

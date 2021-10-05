@@ -27,6 +27,7 @@ import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
+import uk.co.ogauthority.pathfinder.service.project.projectoperator.ProjectOperatorModelService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
 
 @Controller
@@ -36,18 +37,22 @@ import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperato
 @RequestMapping("/project/{projectId}/operator")
 public class ChangeProjectOperatorController extends ProjectFormPageController {
 
-  public static final String PAGE_NAME = "Project operator";
+  public static final String PAGE_NAME = SelectProjectOperatorController.PAGE_NAME;
   public static final String PRIMARY_BUTTON_TEXT = "Save and continue";
 
   private final SelectOperatorService selectOperatorService;
+  private final ProjectOperatorModelService projectOperatorModelService;
 
   @Autowired
   public ChangeProjectOperatorController(
       SelectOperatorService selectOperatorService,
       ControllerHelperService controllerHelperService,
-      BreadcrumbService breadcrumbService) {
+      BreadcrumbService breadcrumbService,
+      ProjectOperatorModelService projectOperatorModelService
+  ) {
     super(breadcrumbService, controllerHelperService);
     this.selectOperatorService = selectOperatorService;
+    this.projectOperatorModelService = projectOperatorModelService;
   }
 
 
@@ -75,16 +80,20 @@ public class ChangeProjectOperatorController extends ProjectFormPageController {
         getSelectOperatorModelAndView(form, projectId),
         form,
         () -> {
-          var portalOrganisationGroup = selectOperatorService.getOrganisationGroupOrError(
-              user,
-              Integer.parseInt(form.getOrganisationGroup())
+
+          final var projectDetail = projectContext.getProjectDetails();
+
+          final var projectOperator = selectOperatorService.updateProjectOperator(
+              projectDetail,
+              form
           );
-          selectOperatorService.updateProjectOperator(projectContext.getProjectDetails(), portalOrganisationGroup);
+
           AuditService.audit(
               AuditEvent.PROJECT_OPERATOR_UPDATED,
               String.format(
                   AuditEvent.PROJECT_OPERATOR_UPDATED.getMessage(),
-                  portalOrganisationGroup.getOrgGrpId(),projectContext.getProjectDetails().getId()
+                  projectOperator.getId(),
+                  projectDetail.getId()
               )
           );
           return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
@@ -92,11 +101,12 @@ public class ChangeProjectOperatorController extends ProjectFormPageController {
   }
 
   private ModelAndView getSelectOperatorModelAndView(ProjectOperatorForm form, Integer projectId) {
-    var modelAndView =  selectOperatorService.getSelectOperatorModelAndView(
+    var modelAndView =  projectOperatorModelService.getProjectOperatorModelAndView(
         form,
         ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId, null)),
         PRIMARY_BUTTON_TEXT,
-        TopNavigationType.BREADCRUMBS
+        TopNavigationType.BREADCRUMBS,
+        PAGE_NAME
     );
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);
     return modelAndView;

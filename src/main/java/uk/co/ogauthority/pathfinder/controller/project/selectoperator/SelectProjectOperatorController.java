@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOpe
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
+import uk.co.ogauthority.pathfinder.service.project.projectoperator.ProjectOperatorModelService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
 
 /**
@@ -27,21 +28,25 @@ import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperato
 @RequestMapping("/project-operator-select")
 public class SelectProjectOperatorController {
 
-  public static final String PAGE_NAME = "Project operator";
   public static final String PRIMARY_BUTTON_TEXT = "Save and continue";
+  protected static final String PAGE_NAME = "Project operator";
 
   private final StartProjectService startProjectService;
   private final SelectOperatorService selectOperatorService;
   private final ControllerHelperService controllerHelperService;
+  private final ProjectOperatorModelService projectOperatorModelService;
 
   @Autowired
   public SelectProjectOperatorController(
       StartProjectService startProjectService,
       SelectOperatorService selectOperatorService,
-      ControllerHelperService controllerHelperService) {
+      ControllerHelperService controllerHelperService,
+      ProjectOperatorModelService projectOperatorModelService
+  ) {
     this.startProjectService = startProjectService;
     this.selectOperatorService = selectOperatorService;
     this.controllerHelperService = controllerHelperService;
+    this.projectOperatorModelService = projectOperatorModelService;
   }
 
   @GetMapping
@@ -61,7 +66,7 @@ public class SelectProjectOperatorController {
         () -> {
           var projectDetail = startProjectService.createInfrastructureProject(
               user,
-              selectOperatorService.getOrganisationGroupOrError(user, Integer.valueOf(form.getOrganisationGroup()))
+              form
           );
 
           return ReverseRouter.redirect(
@@ -71,11 +76,12 @@ public class SelectProjectOperatorController {
   }
 
   private ModelAndView getSelectOperatorModelAndView(ProjectOperatorForm form) {
-    return selectOperatorService.getSelectOperatorModelAndView(
+    return projectOperatorModelService.getProjectOperatorModelAndView(
         form,
         ReverseRouter.route(on(InfrastructureProjectStartController.class).startPage(null)),
         PRIMARY_BUTTON_TEXT,
-        TopNavigationType.BACKLINK
+        TopNavigationType.BACKLINK,
+        PAGE_NAME
     );
   }
 }

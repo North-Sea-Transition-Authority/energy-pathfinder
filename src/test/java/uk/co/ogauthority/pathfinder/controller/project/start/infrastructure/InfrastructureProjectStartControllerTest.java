@@ -23,6 +23,7 @@ import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
 import uk.co.ogauthority.pathfinder.testutil.MetricsProviderTestUtil;
@@ -86,10 +87,17 @@ public class InfrastructureProjectStartControllerTest extends AbstractController
 
   @Test
   public void redirect_whenSingleTeam() throws Exception {
+
+    final var singleOrganisationGroup = ProjectOperatorTestUtil.ORG_GROUP;
+
     when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUser.getLinkedPerson())).thenReturn(
-        List.of(TeamTestingUtil.getOrganisationTeam(ProjectOperatorTestUtil.ORG_GROUP))
+        List.of(TeamTestingUtil.getOrganisationTeam(singleOrganisationGroup))
     );
-    when(startProjectService.createInfrastructureProject(authenticatedUser, ProjectOperatorTestUtil.ORG_GROUP)).thenReturn(detail);
+
+    final var projectOperatorForm = new ProjectOperatorForm();
+    projectOperatorForm.setOperator(String.valueOf(singleOrganisationGroup.getOrgGrpId()));
+
+    when(startProjectService.createInfrastructureProject(authenticatedUser, projectOperatorForm)).thenReturn(detail);
 
     mockMvc.perform(
         MockMvcRequestBuilders.post(
@@ -99,6 +107,7 @@ public class InfrastructureProjectStartControllerTest extends AbstractController
             .with(csrf())
     )
         .andExpect(status().is3xxRedirection());
-    verify(startProjectService, times(1)).createInfrastructureProject(any(), any());
+
+    verify(startProjectService, times(1)).createInfrastructureProject(authenticatedUser, projectOperatorForm);
   }
 }

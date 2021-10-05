@@ -1,5 +1,8 @@
 <#include '../../layout.ftl'>
 
+<#-- @ftlvariable name="headingText" type="String" -->
+<#-- @ftlvariable name="captionText" type="String" -->
+
 <@headingWithContent
   caption=""
   captionClass=""

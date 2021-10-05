@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.view.projectoperator.ProjectOperatorView;
 import uk.co.ogauthority.pathfinder.model.view.projectoperator.ProjectOperatorViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
@@ -76,8 +77,8 @@ public class ProjectOperatorSectionSummaryServiceTest {
     );
     final var previousProjectOperatorView = ProjectOperatorViewUtil.from(previousProjectOperator);
 
-    when(projectOperatorService.getProjectOperatorByProjectDetail(details))
-        .thenReturn(Optional.of(currentProjectOperator));
+    when(projectOperatorService.getProjectOperatorByProjectDetailOrError(details))
+        .thenReturn(currentProjectOperator);
 
     when(projectOperatorService.getProjectOperatorByProjectAndVersion(
         details.getProject(),
@@ -94,18 +95,21 @@ public class ProjectOperatorSectionSummaryServiceTest {
   @Test
   public void getSummary_whenProjectOperatorNotExist_thenProjectOperatorViewNotPopulated() {
 
-    final var currentProjectOperatorView = new ProjectOperatorView();
+    final var projectDetail = ProjectUtil.getProjectDetails();
+
+    final var currentProjectOperator = new ProjectOperator();
+    final var currentProjectOperatorView = ProjectOperatorViewUtil.from(currentProjectOperator);
     final var previousProjectOperatorView = new ProjectOperatorView();
 
-    when(projectOperatorService.getProjectOperatorByProjectDetail(details))
+    when(projectOperatorService.getProjectOperatorByProjectDetailOrError(projectDetail))
+        .thenReturn(currentProjectOperator);
+
+    when(projectOperatorService.getProjectOperatorByProjectAndVersion(projectDetail.getProject(), projectDetail.getVersion()-1))
         .thenReturn(Optional.empty());
 
-    when(projectOperatorService.getProjectOperatorByProjectAndVersion(details.getProject(), details.getVersion()-1))
-        .thenReturn(Optional.empty());
+    final var sectionSummary = projectOperatorSectionSummaryService.getSummary(projectDetail);
 
-    final var sectionSummary = projectOperatorSectionSummaryService.getSummary(details);
-
-    assertModelProperties(sectionSummary, details);
+    assertModelProperties(sectionSummary, projectDetail);
     assertInteractions(currentProjectOperatorView, previousProjectOperatorView);
 
   }
@@ -124,7 +128,7 @@ public class ProjectOperatorSectionSummaryServiceTest {
         ProjectOperatorSectionSummaryService.SECTION_ID
     );
 
-    assertThat(model).containsOnlyKeys("projectOperatorDiffModel");
+    assertThat(model).containsOnlyKeys("isPublishedAsOperator", "projectOperatorDiffModel");
   }
 
   private void assertInteractions(ProjectOperatorView currentProjectOperatorView, ProjectOperatorView previousProjectOperatorView) {

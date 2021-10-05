@@ -27,6 +27,7 @@ import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.service.projecttransfer.ProjectTransferModelService;
 import uk.co.ogauthority.pathfinder.service.projecttransfer.ProjectTransferService;
 
 @Controller
@@ -39,21 +40,26 @@ import uk.co.ogauthority.pathfinder.service.projecttransfer.ProjectTransferServi
 @RequestMapping("/project/{projectId}/change-operator")
 public class ProjectTransferController extends ProjectFormPageController {
 
+  public static final String PAGE_NAME = "Change project operator";
+
   private final ProjectTransferService projectTransferService;
+  private final ProjectTransferModelService projectTransferModelService;
 
   @Autowired
   public ProjectTransferController(BreadcrumbService breadcrumbService,
                                    ControllerHelperService controllerHelperService,
-                                   ProjectTransferService projectTransferService) {
+                                   ProjectTransferService projectTransferService,
+                                   ProjectTransferModelService projectTransferModelService) {
     super(breadcrumbService, controllerHelperService);
     this.projectTransferService = projectTransferService;
+    this.projectTransferModelService = projectTransferModelService;
   }
 
   @GetMapping
   public ModelAndView getTransferProject(@PathVariable("projectId") Integer projectId,
                                          ProjectContext projectContext,
                                          AuthenticatedUserAccount user) {
-    return projectTransferService.getTransferProjectModelAndView(
+    return projectTransferModelService.getTransferProjectModelAndView(
         projectContext.getProjectDetails(),
         user,
         new ProjectTransferForm()
@@ -69,7 +75,7 @@ public class ProjectTransferController extends ProjectFormPageController {
     bindingResult = projectTransferService.validate(form, bindingResult, projectContext.getProjectDetails());
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        projectTransferService.getTransferProjectModelAndView(projectContext.getProjectDetails(), user, form),
+        projectTransferModelService.getTransferProjectModelAndView(projectContext.getProjectDetails(), user, form),
         form,
         () -> {
           projectTransferService.transferProject(projectContext.getProjectDetails(), user, form);

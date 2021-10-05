@@ -7,7 +7,9 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorDisplayNameUtil;
 import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
@@ -158,10 +160,61 @@ public class InfrastructureProjectDashboardItemViewUtilTest {
     );
   }
 
+  @Test
+  public void from_whenPublishedAsProjectOperator_thenOperatorNameIsOrganisationGroupName() {
+
+    final var dashboardProjectItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+
+    var projectOperatorGroup = TeamTestingUtil.generateOrganisationGroup(
+        100,
+        "organisation group name",
+        "organisation group short name"
+    );
+
+    dashboardProjectItem.setOrganisationGroup(projectOperatorGroup);
+    dashboardProjectItem.setPublishableOperator(null);
+
+    var dashboardProjectItemView = InfrastructureProjectDashboardItemViewUtil.from(dashboardProjectItem);
+
+    assertCommonViewProperties(dashboardProjectItemView, dashboardProjectItem);
+    assertThat(dashboardProjectItemView.getOperatorName()).isEqualTo(dashboardProjectItem.getOperatorName());
+  }
+
+  @Test
+  public void from_whenNotPublishedAsProjectOperator_thenOperatorNameIsOrganisationGroupAndPublishableOrganisation() {
+
+    final var dashboardProjectItem = DashboardProjectItemTestUtil.getDashboardProjectItem();
+
+    var projectOperatorGroup = TeamTestingUtil.generateOrganisationGroup(
+        100,
+        "organisation group name",
+        "organisation group short name"
+    );
+
+    var publishableOperator = TeamTestingUtil.generateOrganisationUnit(
+        10,
+        "organisation name",
+        projectOperatorGroup
+    );
+
+    dashboardProjectItem.setOrganisationGroup(projectOperatorGroup);
+    dashboardProjectItem.setPublishableOperator(publishableOperator);
+
+    var dashboardProjectItemView = InfrastructureProjectDashboardItemViewUtil.from(dashboardProjectItem);
+
+    assertCommonViewProperties(dashboardProjectItemView, dashboardProjectItem);
+
+    var expectedOperatorName = ProjectOperatorDisplayNameUtil.getProjectOperatorDisplayName(
+        projectOperatorGroup,
+        publishableOperator
+    );
+
+    assertThat(dashboardProjectItemView.getOperatorName()).isEqualTo(expectedOperatorName);
+  }
+
   private void assertCommonViewProperties(InfrastructureProjectDashboardItemView dashboardProjectItemView,
                                           DashboardProjectItem dashboardProjectItem) {
     assertThat(dashboardProjectItemView.getProjectTitle()).isEqualTo(dashboardProjectItem.getProjectTitle());
-    assertThat(dashboardProjectItemView.getOperatorName()).isEqualTo(dashboardProjectItem.getOperatorName());
     assertThat(dashboardProjectItemView.getStatus()).isEqualTo(dashboardProjectItem.getStatus().getDisplayName());
     assertThat(dashboardProjectItemView.isUpdateRequested()).isEqualTo(dashboardProjectItem.isUpdateRequested());
     assertThat(dashboardProjectItemView.getUpdateDeadlineDate()).isEqualTo(DateUtil.formatDate(dashboardProjectItem.getUpdateDeadlineDate()));

@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.IterableUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationUnit;
@@ -54,24 +53,22 @@ public class PortalOrganisationAccessor {
     return organisationUnitRepository.findById(ouId);
   }
 
-  /**
-   * Return a list of  all organisation units where the search term is contained within the actual name.
-   *
-   * @param searchString find org units with name containing this string
-   * @return organisation unit Entities matching search term.
-   */
-  public List<PortalOrganisationUnit> findOrganisationUnitsWhereNameContains(String searchString) {
-    return organisationUnitRepository.findByNameContainingIgnoreCase(searchString);
+  public PortalOrganisationUnit getOrganisationUnitOrError(Integer portalOrganisationUnitId) {
+    return getOrganisationUnitById(portalOrganisationUnitId).orElseThrow(
+        () -> new PathfinderEntityNotFoundException(
+            String.format("Could not find PortalOrganisationUnit with ID %d", portalOrganisationUnitId)
+        )
+    );
   }
 
   /**
-   * Return a list of  all organisation units where the search term is contained within the actual name.
+   * Return a list of active organisation units where the search term is contained within the organisation name.
    *
-   * @param searchString find org units with name containing this string
-   * @return organisation unit Entities matching search term.
+   * @param searchTerm find org units with name containing this string
+   * @return active organisation units where the organisation name includes the search term.
    */
-  public List<PortalOrganisationUnit> findOrganisationUnitsWhereNameContains(String searchString, Pageable pageable) {
-    return organisationUnitRepository.findByNameContainingIgnoreCase(searchString, pageable);
+  public List<PortalOrganisationUnit> findActiveOrganisationUnitsWhereNameContains(String searchTerm) {
+    return organisationUnitRepository.findByNameContainingIgnoreCaseAndActiveTrue(searchTerm);
   }
 
   /**
@@ -149,11 +146,12 @@ public class PortalOrganisationAccessor {
   }
 
   /**
-   * Returns a list of organisation units which belong to organisation groups in the provided list.
+   * Returns a list of active organisation units which belong to organisation groups in the provided list.
    */
-  public List<PortalOrganisationUnit> getOrganisationUnitsForOrganisationGroupsIn(
-      List<PortalOrganisationGroup> organisationGroups) {
-    return organisationUnitRepository.findByPortalOrganisationGroupIn(organisationGroups);
+  public List<PortalOrganisationUnit> getActiveOrganisationUnitsForOrganisationGroupsIn(
+      List<PortalOrganisationGroup> organisationGroups
+  ) {
+    return organisationUnitRepository.findByActiveTrueAndPortalOrganisationGroupIn(organisationGroups);
   }
 
   public List<PortalOrganisationGroup> findOrganisationGroupsWhereNameContains(String searchTerm) {
@@ -191,6 +189,30 @@ public class PortalOrganisationAccessor {
         teamType.getPortalTeamType(),
         PortalTeamUsagePurpose.PRIMARY_DATA,
         searchTerm
+    );
+  }
+
+  /**
+   * Get active organisation units where the organisation unit name contains the
+   * organisationUnitName provided and is within one of the provided organisationGroups.
+   * @param organisationUnitName The name of the organisation unit to filter by
+   * @param organisationGroups The organisation groups the matched organisation unit must be within
+   * @return a list of organisation units matching organisationUnitName and within organisationGroups
+   */
+  public List<PortalOrganisationUnit> getActiveOrganisationUnitsByNameAndOrganisationGroupId(
+      String organisationUnitName,
+      List<PortalOrganisationGroup> organisationGroups
+  ) {
+    return organisationUnitRepository.findByNameContainingIgnoreCaseAndActiveTrueAndPortalOrganisationGroupIn(
+        organisationUnitName,
+        organisationGroups
+    );
+  }
+
+  public boolean isOrganisationUnitActiveAndPartOfOrganisationGroup(int organisationGroupId, int organisationUnitId) {
+    return organisationUnitRepository.existsByOuIdAndActiveTrueAndPortalOrganisationGroup_OrgGrpId(
+        organisationUnitId,
+        organisationGroupId
     );
   }
 

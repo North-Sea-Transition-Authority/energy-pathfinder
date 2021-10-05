@@ -9,6 +9,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectRepository;
 
@@ -40,7 +41,7 @@ public class StartProjectService {
    */
   private ProjectDetail startProject(
       AuthenticatedUserAccount user,
-      PortalOrganisationGroup organisationGroup,
+      ProjectOperatorForm projectOperatorForm,
       ProjectType projectType
   ) {
     var project = new Project();
@@ -54,7 +55,7 @@ public class StartProjectService {
     );
     projectRepository.save(project);
     projectDetailsRepository.save(projectDetails);
-    projectOperatorService.createOrUpdateProjectOperator(projectDetails, organisationGroup);
+    projectOperatorService.createOrUpdateProjectOperator(projectDetails, projectOperatorForm);
 
     return projectDetails;
   }
@@ -62,16 +63,18 @@ public class StartProjectService {
   @Transactional
   public ProjectDetail createInfrastructureProject(
       AuthenticatedUserAccount user,
-      PortalOrganisationGroup organisationGroup
+      ProjectOperatorForm projectOperatorForm
   ) {
-    return startProject(user, organisationGroup, ProjectType.INFRASTRUCTURE);
+    return startProject(user, projectOperatorForm, ProjectType.INFRASTRUCTURE);
   }
 
   @Transactional
   public ProjectDetail createForwardWorkPlanProject(
       AuthenticatedUserAccount user,
-      PortalOrganisationGroup organisationGroup
+      PortalOrganisationGroup portalOrganisationGroup
   ) {
-    return startProject(user, organisationGroup, ProjectType.FORWARD_WORK_PLAN);
+    var projectOperatorForm = new ProjectOperatorForm();
+    projectOperatorForm.setOperator(String.valueOf(portalOrganisationGroup.getOrgGrpId()));
+    return startProject(user, projectOperatorForm, ProjectType.FORWARD_WORK_PLAN);
   }
 }

@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.projectmanagement.transfer;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
@@ -25,7 +26,8 @@ public class ProjectManagementTransferSectionService implements ProjectManagemen
 
   public ProjectManagementTransferSectionService(
       ProjectTransferService projectTransferService,
-      WebUserAccountService webUserAccountService) {
+      WebUserAccountService webUserAccountService
+  ) {
     this.projectTransferService = projectTransferService;
     this.webUserAccountService = webUserAccountService;
   }
@@ -45,6 +47,8 @@ public class ProjectManagementTransferSectionService implements ProjectManagemen
           projectTransfer,
           transferredByUser
       ));
+
+      summaryModel.put("isPublishedAsOperator", BooleanUtils.isTrue(projectTransfer.isPublishedAsOperator()));
     });
 
     return new ProjectManagementSection(

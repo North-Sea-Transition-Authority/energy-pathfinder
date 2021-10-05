@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.model.view.dashboard.infrastructure;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
 import uk.co.ogauthority.pathfinder.model.form.useraction.DashboardLink;
 import uk.co.ogauthority.pathfinder.model.view.dashboard.DashboardProjectItemViewUtil;
+import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorDisplayNameUtil;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
@@ -38,6 +39,13 @@ public class InfrastructureProjectDashboardItemViewUtil {
     var screenReaderText = dashboardProjectItem.getProjectTitle() != null
         ? String.format(SCREEN_READER_TEXT, formattedCreatedDateTime)
         : "";
+
+    var projectOperatorDisplayName = ProjectOperatorDisplayNameUtil.getProjectOperatorDisplayName(
+        dashboardProjectItem.getOrganisationGroup(),
+        dashboardProjectItem.getPublishableOperator()
+    );
+
+    dashboardProjectItemView.setOperatorName(projectOperatorDisplayName);
 
     return new InfrastructureProjectDashboardItemView(
         dashboardProjectItemView,

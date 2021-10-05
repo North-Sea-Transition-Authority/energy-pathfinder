@@ -13,6 +13,7 @@ import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.selectoperator.SelectProjectOperatorController;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
@@ -56,14 +57,17 @@ public class InfrastructureProjectStartController {
   @PostMapping
   public ModelAndView startProject(AuthenticatedUserAccount user) {
     //if in multiple teams redirect to the team select
-    var organisationTeams = teamService.getOrganisationTeamsPersonIsMemberOf(user.getLinkedPerson());
+    final var organisationTeams = teamService.getOrganisationTeamsPersonIsMemberOf(user.getLinkedPerson());
 
     if (organisationTeams.size() > 1) {
       return ReverseRouter.redirect(on(SelectProjectOperatorController.class).selectOperator(null));
     }
 
     //User is in one team so start project
-    var projectDetail = startProjectService.createInfrastructureProject(user, organisationTeams.get(0).getPortalOrganisationGroup());
+    final var projectOperatorForm = new ProjectOperatorForm();
+    projectOperatorForm.setOperator(String.valueOf(organisationTeams.get(0).getPortalOrganisationGroup().getOrgGrpId()));
+
+    final var projectDetail = startProjectService.createInfrastructureProject(user, projectOperatorForm);
     metricsProvider.getProjectStartCounter().increment();
     return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectDetail.getProject().getId(), null));
   }

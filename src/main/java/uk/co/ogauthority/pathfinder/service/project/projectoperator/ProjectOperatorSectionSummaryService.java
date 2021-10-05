@@ -2,10 +2,12 @@ package uk.co.ogauthority.pathfinder.service.project.projectoperator;
 
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProjectOperatorController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.projectoperator.ProjectOperatorView;
@@ -56,7 +58,11 @@ public class ProjectOperatorSectionSummaryService implements ProjectSectionSumma
         SECTION_ID
     );
 
-    summaryModel.put("projectOperatorDiffModel", getProjectOperatorDifferenceModel(detail));
+    final var currentProjectOperator = projectOperatorService.getProjectOperatorByProjectDetailOrError(detail);
+
+    summaryModel.put("isPublishedAsOperator", BooleanUtils.isTrue(currentProjectOperator.isPublishedAsOperator()));
+
+    summaryModel.put("projectOperatorDiffModel", getProjectOperatorDifferenceModel(detail, currentProjectOperator));
 
     return new ProjectSectionSummary(
         List.of(SECTION_LINK),
@@ -66,11 +72,10 @@ public class ProjectOperatorSectionSummaryService implements ProjectSectionSumma
     );
   }
 
-  private Map<String, Object> getProjectOperatorDifferenceModel(ProjectDetail projectDetail) {
+  private Map<String, Object> getProjectOperatorDifferenceModel(ProjectDetail projectDetail,
+                                                                ProjectOperator currentProjectOperator) {
 
-    var currentProjectOperatorView = projectOperatorService.getProjectOperatorByProjectDetail(projectDetail)
-        .map(ProjectOperatorViewUtil::from)
-        .orElse(new ProjectOperatorView());
+    var currentProjectOperatorView = ProjectOperatorViewUtil.from(currentProjectOperator);
 
     var previousProjectOperatorView = projectOperatorService.getProjectOperatorByProjectAndVersion(
         projectDetail.getProject(),

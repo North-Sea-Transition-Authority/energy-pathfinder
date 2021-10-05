@@ -41,7 +41,7 @@ import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 @AutoConfigureDataJpa
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @ActiveProfiles("integration-test")
-@SuppressWarnings({"JpaQueryApiInspection", "SqlNoDataSourceInspection"}) // IJ seems to give spurious warnings when running with embedded H2
+@SuppressWarnings({"SqlNoDataSourceInspection"}) // IJ seems to give spurious warnings when running with embedded H2
 public class PortalTeamAccessorIntegrationTest {
 
 
@@ -338,6 +338,51 @@ public class PortalTeamAccessorIntegrationTest {
         UNSCOPED_TEAM_DESCRIPTION
     );
 
+  }
+
+  @Test
+  @Transactional
+  public void getTeamsWherePersonMemberOfTeamType_whenPersonIsTeamMemberAndMatchedTeamType_thenTeamReturned() {
+
+    List<PortalTeamDto> resultingTeams = portalTeamAccessor.getTeamsWherePersonMemberOfTeamType(
+        scopedTeamMemberPerson_1Role,
+        SCOPED_TEAM_PORTAL_TYPE
+    );
+
+    assertThat(resultingTeams).hasSize(1);
+    assertPortalTeamInstanceDtoMappingAsExpected(
+        resultingTeams.get(0),
+        SCOPED_TEAM_UREF,
+        SCOPED_TEAM_RES_ID,
+        SCOPED_TEAM_PORTAL_TYPE,
+        SCOPED_TEAM_NAME,
+        SCOPED_TEAM_DESCRIPTION
+    );
+
+  }
+
+  @Test
+  @Transactional
+  public void getTeamsWherePersonMemberOfTeamType_whenPersonIsTeamMemberAndNoMatchedTeamType_thenTeamNotReturned() {
+
+    List<PortalTeamDto> resultingTeams = portalTeamAccessor.getTeamsWherePersonMemberOfTeamType(
+        scopedTeamMemberPerson_1Role,
+        UNSCOPED_TEAM_PORTAL_TYPE
+    );
+
+    assertThat(resultingTeams).isEmpty();
+  }
+
+  @Test
+  @Transactional
+  public void getTeamsWherePersonMemberOfTeamType_whenPersonIsNotTeamMember_thenTeamNotReturned() {
+
+    List<PortalTeamDto> resultingTeams = portalTeamAccessor.getTeamsWherePersonMemberOfTeamType(
+        scopedTeamMemberPerson_1Role,
+        UNSCOPED_TEAM_PORTAL_TYPE
+    );
+
+    assertThat(resultingTeams).isEmpty();
   }
 
   @Test
