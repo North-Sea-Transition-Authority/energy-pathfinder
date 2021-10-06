@@ -38,7 +38,11 @@ public class AddUserToTeamFormValidator implements Validator {
       Optional<Person> person = teamManagementService.getPersonByEmailAddressOrLoginId(form.getUserIdentifier());
 
       if (person.isEmpty()) {
-        errors.rejectValue("userIdentifier", "userIdentifier.userNotFound", "User not found");
+        errors.rejectValue(
+            "userIdentifier",
+            "userIdentifier.userNotFound",
+            "No Energy Portal user exists with this email address or login ID"
+        );
       } else {
         // check if the person is already member of the team
         Team team = teamManagementService.getTeamOrError(form.getResId());

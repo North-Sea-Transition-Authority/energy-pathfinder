@@ -412,19 +412,19 @@ public class ProjectLocationServiceTest {
   }
 
   @Test
-  public void canShowInTaskList_whenInfrastructureProjectAndNotEnergyTransitionProject_thenTrue() {
+  public void canShowInTaskList_whenInfrastructureProjectAndOilAndGasProject_thenTrue() {
     var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
 
-    when(projectInformationService.isEnergyTransitionProject(projectDetail)).thenReturn(false);
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
 
     assertThat(projectLocationService.canShowInTaskList(projectDetail)).isTrue();
   }
 
   @Test
-  public void canShowInTaskList_whenInfrastructureProjectAndEnergyTransitionProject_thenFalse() {
+  public void canShowInTaskList_whenInfrastructureProjectAndNotOilAndGasProject_thenFalse() {
     var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
 
-    when(projectInformationService.isEnergyTransitionProject(projectDetail)).thenReturn(true);
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(false);
 
     assertThat(projectLocationService.canShowInTaskList(projectDetail)).isFalse();
   }

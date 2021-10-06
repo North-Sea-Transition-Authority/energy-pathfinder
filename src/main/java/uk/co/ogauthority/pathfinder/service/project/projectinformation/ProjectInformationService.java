@@ -215,7 +215,7 @@ public class ProjectInformationService implements ProjectFormSectionService {
         .orElse(false);
   }
 
-  public boolean isEnergyTransitionProject(ProjectDetail projectDetail) {
+  boolean isEnergyTransitionProject(ProjectDetail projectDetail) {
     return getProjectInformation(projectDetail)
         .map(this::isEnergyTransitionProject)
         .orElse(false);
@@ -223,6 +223,12 @@ public class ProjectInformationService implements ProjectFormSectionService {
 
   public boolean isEnergyTransitionProject(ProjectInformation projectInformation) {
     return FieldStage.ENERGY_TRANSITION.equals(projectInformation.getFieldStage());
+  }
+
+  public boolean isOilAndGasProject(ProjectDetail projectDetail) {
+    return getProjectInformation(projectDetail)
+        .map(projectInformation -> !isEnergyTransitionProject(projectInformation))
+        .orElse(false);
   }
 
   @Override

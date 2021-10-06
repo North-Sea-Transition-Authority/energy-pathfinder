@@ -286,7 +286,8 @@ public class ProjectLocationService implements ProjectFormSectionService {
 
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
-    return ProjectService.isInfrastructureProject(detail) && !projectInformationService.isEnergyTransitionProject(detail);
+    return ProjectService.isInfrastructureProject(detail)
+        && projectInformationService.isOilAndGasProject(detail);
   }
 
 }
