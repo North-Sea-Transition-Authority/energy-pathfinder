@@ -6,8 +6,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +24,6 @@ import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationFormValidator;
@@ -159,7 +159,6 @@ public class ProjectInformationServiceTest {
     form.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
 
     var notPersistedQuarterYearInput = new QuarterYearInput(Quarter.Q2, "2021");
-    var notPersistedThreeFieldDateInput = new ThreeFieldDateInput(LocalDate.now());
 
     // the following should not be persisted
     form.setDiscoveryFirstProductionDate(notPersistedQuarterYearInput);
@@ -292,7 +291,6 @@ public class ProjectInformationServiceTest {
     projectInformation.setFirstProductionDateYear(Integer.parseInt(persistedFirstProductionDate.getYear()));
 
     // The following should not be populated to the forms
-    var invalidPersistedDecomWorkStartDate = new QuarterYearInput(Quarter.Q2, "2021");
     projectInformation.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
 
     when(projectInformationRepository.findByProjectDetail(details))
@@ -551,5 +549,46 @@ public class ProjectInformationServiceTest {
     projectInformation.setFieldStage(FieldStage.DISCOVERY);
 
     assertThat(projectInformationService.isEnergyTransitionProject(projectInformation)).isFalse();
+  }
+
+  @Test
+  public void isOilAndGasProject_whenOilAndGasFieldStage_thenReturnTrue() {
+
+    var oilAndGasFieldStages = Arrays.stream(FieldStage.values())
+            .filter(fieldStage -> !FieldStage.ENERGY_TRANSITION.equals(fieldStage))
+            .collect(Collectors.toList());
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
+
+    oilAndGasFieldStages.forEach(fieldStage -> {
+
+      projectInformation.setFieldStage(fieldStage);
+
+      when(projectInformationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectInformation));
+
+      var isOilAndGasProject = projectInformationService.isOilAndGasProject(details);
+
+      assertThat(isOilAndGasProject).isTrue();
+    });
+  }
+
+  @Test
+  public void isOilAndGasProject_whenNotOilAndGasFieldStage_thenReturnFalse() {
+
+    var oilAndGasFieldStages = Arrays.stream(FieldStage.values())
+        .filter(FieldStage.ENERGY_TRANSITION::equals)
+        .collect(Collectors.toList());
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
+
+    oilAndGasFieldStages.forEach(fieldStage -> {
+      projectInformation.setFieldStage(fieldStage);
+
+      when(projectInformationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectInformation));
+
+      var isOilAndGasProject = projectInformationService.isOilAndGasProject(details);
+
+      assertThat(isOilAndGasProject).isFalse();
+    });
   }
 }

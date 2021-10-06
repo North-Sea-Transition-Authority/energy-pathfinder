@@ -401,7 +401,7 @@ public class TeamManagementService {
   public Optional<Person> getPersonByEmailAddressOrLoginId(String emailOrLoginId) {
 
     List<WebUserAccount> webUserAccounts =
-        webUserAccountRepository.findAllByEmailAddressAndAccountStatusNot(emailOrLoginId,
+        webUserAccountRepository.findAllByEmailAddressIgnoreCaseAndAccountStatusNot(emailOrLoginId,
             WebUserAccountStatus.CANCELLED);
 
     if (webUserAccounts.size() == 1) {
@@ -409,7 +409,7 @@ public class TeamManagementService {
     }
 
     webUserAccounts.addAll(
-        webUserAccountRepository.findAllByLoginIdAndAccountStatusNot(emailOrLoginId, WebUserAccountStatus.CANCELLED));
+        webUserAccountRepository.findAllByLoginIdIgnoreCaseAndAccountStatusNot(emailOrLoginId, WebUserAccountStatus.CANCELLED));
 
     if (webUserAccounts.size() == 1) {
       return Optional.of(webUserAccounts.get(0).getLinkedPerson());
