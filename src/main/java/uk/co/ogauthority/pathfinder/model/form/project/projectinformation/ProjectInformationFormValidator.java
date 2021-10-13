@@ -52,14 +52,7 @@ public class ProjectInformationFormValidator implements SmartValidator {
     var fieldStage = form.getFieldStage();
 
     if (fieldStage != null) {
-      if (BooleanUtils.isTrue(fieldStage.equals(FieldStage.DISCOVERY))) {
-        validateFirstProductionDate(
-            "discoveryFirstProductionDate",
-            form.getDiscoveryFirstProductionDate(),
-            projectInformationValidationHint,
-            errors
-        );
-      } else if (BooleanUtils.isTrue(fieldStage.equals(FieldStage.DEVELOPMENT))) {
+      if (BooleanUtils.isTrue(fieldStage.equals(FieldStage.DEVELOPMENT))) {
         validateFirstProductionDate(
             "developmentFirstProductionDate",
             form.getDevelopmentFirstProductionDate(),

@@ -1,5 +1,11 @@
 <#include '../../layout.ftl'/>
 
+<#-- @ftlvariable name="sectionId" type="String" -->
+<#-- @ftlvariable name="sectionTitle" type="String" -->
+<#-- @ftlvariable name="projectInformationDiffModel" type="java.util.Map<String, Object>" -->
+<#-- @ftlvariable name="isDevelopmentFieldStage" type="Boolean" -->
+<#-- @ftlvariable name="isEnergyTransitionFieldStage" type="Boolean" -->
+
 <@sectionSummaryWrapper.sectionSummaryWrapper sectionId=sectionId sectionTitle=sectionTitle>
   <@fdsCheckAnswers.checkAnswers >
     <@checkAnswers.diffedCheckAnswersRowNoActions
@@ -18,12 +24,6 @@
       <@checkAnswers.diffedCheckAnswersRowNoActions
         prompt="Development first production date"
         diffedField=projectInformationDiffModel.ProjectInformationView_developmentFirstProductionDate
-      />
-    </#if>
-    <#if isDiscoveryFieldStage>
-      <@checkAnswers.diffedCheckAnswersRowNoActions
-        prompt="Discovery first production date"
-        diffedField=projectInformationDiffModel.ProjectInformationView_discoveryFirstProductionDate
       />
     </#if>
     <#if isEnergyTransitionFieldStage>

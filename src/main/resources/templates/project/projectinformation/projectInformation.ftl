@@ -1,5 +1,7 @@
 <#include '../../layout.ftl'>
 
+<#-- @ftlvariable name="errorList" type="java.util.List<uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem>" -->
+
 <@defaultPage htmlTitle=pageName pageHeading=pageName breadcrumbs=true errorItems=errorList>
   <@fdsForm.htmlForm>
     <@fdsTextInput.textInput path="form.projectTitle" labelText="What is the project title?"/>
@@ -25,9 +27,7 @@
       path="form.fieldStage"
       hiddenContent=true
     >
-      <@fdsRadio.radioItem path="form.fieldStage" itemMap=discoveryFieldStage itemHintText=discoveryFieldStageDescription isFirstItem=true>
-        <@firstProductionDate path="form.discoveryFirstProductionDate" nestingPath="form.fieldStage"/>
-      </@fdsRadio.radioItem>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=discoveryFieldStage itemHintText=discoveryFieldStageDescription isFirstItem=true/>
       <@fdsRadio.radioItem path="form.fieldStage" itemMap=developmentFieldStage itemHintText=developmentFieldStageDescription>
         <@firstProductionDate path="form.developmentFirstProductionDate" nestingPath="form.fieldStage"/>
       </@fdsRadio.radioItem>

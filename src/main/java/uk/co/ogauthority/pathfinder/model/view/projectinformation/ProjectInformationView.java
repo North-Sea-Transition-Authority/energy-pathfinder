@@ -12,8 +12,6 @@ public class ProjectInformationView {
 
   private String developmentFirstProductionDate;
 
-  private String discoveryFirstProductionDate;
-
   private String energyTransitionCategory;
 
   private String contactName;
@@ -54,14 +52,6 @@ public class ProjectInformationView {
 
   public void setDevelopmentFirstProductionDate(String developmentFirstProductionDate) {
     this.developmentFirstProductionDate = developmentFirstProductionDate;
-  }
-
-  public String getDiscoveryFirstProductionDate() {
-    return discoveryFirstProductionDate;
-  }
-
-  public void setDiscoveryFirstProductionDate(String discoveryFirstProductionDate) {
-    this.discoveryFirstProductionDate = discoveryFirstProductionDate;
   }
 
   public String getEnergyTransitionCategory() {
@@ -119,7 +109,6 @@ public class ProjectInformationView {
         && Objects.equals(that.getProjectSummary(), getProjectSummary())
         && Objects.equals(that.getFieldStage(), getFieldStage())
         && Objects.equals(that.getDevelopmentFirstProductionDate(), getDevelopmentFirstProductionDate())
-        && Objects.equals(that.getDiscoveryFirstProductionDate(), getDiscoveryFirstProductionDate())
         && Objects.equals(that.getContactName(), getContactName())
         && Objects.equals(that.getContactPhoneNumber(), getContactPhoneNumber())
         && Objects.equals(that.getContactJobTitle(), getContactJobTitle())
@@ -133,7 +122,6 @@ public class ProjectInformationView {
         getProjectSummary(),
         getFieldStage(),
         getDevelopmentFirstProductionDate(),
-        getDiscoveryFirstProductionDate(),
         getContactName(),
         getContactPhoneNumber(),
         getContactJobTitle(),

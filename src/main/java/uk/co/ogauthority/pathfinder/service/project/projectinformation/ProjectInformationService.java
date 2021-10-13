@@ -28,9 +28,7 @@ import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 public class ProjectInformationService implements ProjectFormSectionService {
 
   private static final Set<FieldStage> FIELD_STAGES_WITH_HIDDEN_INPUTS = Set.of(
-      FieldStage.DECOMMISSIONING,
       FieldStage.DEVELOPMENT,
-      FieldStage.DISCOVERY,
       FieldStage.ENERGY_TRANSITION
   );
 
@@ -77,7 +75,7 @@ public class ProjectInformationService implements ProjectFormSectionService {
   }
 
   private void clearFirstProductionDate(ProjectInformationForm form) {
-    form.setDiscoveryFirstProductionDate(null);
+    form.setDevelopmentFirstProductionDate(null);
   }
 
   private void clearEnergyTransitionCategory(ProjectInformation projectInformation) {
@@ -148,21 +146,8 @@ public class ProjectInformationService implements ProjectFormSectionService {
     var fieldStage = form.getFieldStage();
 
     if (fieldStage == null || !FIELD_STAGES_WITH_HIDDEN_INPUTS.contains(fieldStage)) {
-      // These inputs are hidden if field stage is not discovery, development or decommissioning
       clearFirstProductionDate(projectInformation);
       clearEnergyTransitionCategory(projectInformation);
-    } else if (fieldStage.equals(FieldStage.DISCOVERY)) {
-
-      form.getDiscoveryFirstProductionDate()
-          .create()
-          .ifPresent(quarterYearInput -> {
-            projectInformation.setFirstProductionDateQuarter(quarterYearInput.getQuarter());
-            projectInformation.setFirstProductionDateYear(Integer.parseInt(quarterYearInput.getYear()));
-          });
-
-      // These inputs are hidden if discovery field stage
-      clearEnergyTransitionCategory(projectInformation);
-
     } else if (fieldStage.equals(FieldStage.DEVELOPMENT)) {
       form.getDevelopmentFirstProductionDate()
           .create()
@@ -172,11 +157,6 @@ public class ProjectInformationService implements ProjectFormSectionService {
           });
 
       // These inputs are hidden if development field stage
-      clearEnergyTransitionCategory(projectInformation);
-
-    } else if (fieldStage.equals(FieldStage.DECOMMISSIONING)) {
-      // These inputs are hidden if decommissioning field stage
-      clearFirstProductionDate(projectInformation);
       clearEnergyTransitionCategory(projectInformation);
 
     } else if (fieldStage.equals(FieldStage.ENERGY_TRANSITION)) {
@@ -194,18 +174,11 @@ public class ProjectInformationService implements ProjectFormSectionService {
     if (fieldStage == null || !FIELD_STAGES_WITH_HIDDEN_INPUTS.contains(fieldStage)) {
       clearFirstProductionDate(form);
       clearEnergyTransitionCategory(form);
-    } else if (fieldStage.equals(FieldStage.DISCOVERY)) {
-      form.setDiscoveryFirstProductionDate(getFirstProductionDate(projectInformation));
-      clearEnergyTransitionCategory(form);
     } else if (fieldStage.equals(FieldStage.DEVELOPMENT)) {
       form.setDevelopmentFirstProductionDate(getFirstProductionDate(projectInformation));
       clearEnergyTransitionCategory(form);
-    } else if (fieldStage.equals(FieldStage.DECOMMISSIONING)) {
-      clearFirstProductionDate(form);
-      clearEnergyTransitionCategory(form);
     } else if (fieldStage.equals(FieldStage.ENERGY_TRANSITION)) {
       form.setEnergyTransitionCategory(projectInformation.getEnergyTransitionCategory());
-
       clearFirstProductionDate(form);
     }
   }
