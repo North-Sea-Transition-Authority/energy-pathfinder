@@ -38,7 +38,7 @@ public class ValidPhoneNumberTest {
     Set<ConstraintViolation<ValidPhoneNumberTestForm>> constraintViolations = validator.validate(form);
     assertThat(constraintViolations).extracting(ConstraintViolation::getMessage)
         .containsExactly(
-            ValidPhoneNumberTestForm.PREFIX + " must be a valid telephone or mobile number. For example: 020 7947 6330"
+            ValidPhoneNumberTestForm.PREFIX + " must be a valid telephone or mobile number. For example: 020 7946 0330"
         );
   }
 
@@ -55,7 +55,7 @@ public class ValidPhoneNumberTest {
     Set<ConstraintViolation<ValidPhoneNumberTestForm>> constraintViolations = validator.validate(form);
     assertThat(constraintViolations).extracting(ConstraintViolation::getMessage)
         .containsExactly(
-            ValidPhoneNumberTestForm.PREFIX + " must be a valid telephone or mobile number. For example: 020 7947 6330"
+            ValidPhoneNumberTestForm.PREFIX + " must be a valid telephone or mobile number. For example: 020 7946 0330"
         );
   }
 

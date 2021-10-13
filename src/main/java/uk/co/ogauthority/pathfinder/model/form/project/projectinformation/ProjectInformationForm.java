@@ -23,8 +23,6 @@ public class ProjectInformationForm {
   @NotNull(message = "Select a field stage", groups = FullValidation.class)
   private FieldStage fieldStage;
 
-  private QuarterYearInput discoveryFirstProductionDate;
-
   private QuarterYearInput developmentFirstProductionDate;
 
   private EnergyTransitionCategory energyTransitionCategory;
@@ -62,14 +60,6 @@ public class ProjectInformationForm {
 
   public void setContactDetail(ContactDetailForm contactDetail) {
     this.contactDetail = contactDetail;
-  }
-
-  public QuarterYearInput getDiscoveryFirstProductionDate() {
-    return discoveryFirstProductionDate;
-  }
-
-  public void setDiscoveryFirstProductionDate(QuarterYearInput discoveryFirstProductionDate) {
-    this.discoveryFirstProductionDate = discoveryFirstProductionDate;
   }
 
   public EnergyTransitionCategory getEnergyTransitionCategory() {

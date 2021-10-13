@@ -63,8 +63,6 @@ public class NotifyCallbackService {
 
           emailService.sendEmail(failedEmailProperties, regulatorSharedEmail);
 
-          throw new NotificationClientException("");
-
         } catch (NotificationClientException e) {
           LOGGER.error("Couldn't retrieve email notification from GOV.UK: ", e);
         }

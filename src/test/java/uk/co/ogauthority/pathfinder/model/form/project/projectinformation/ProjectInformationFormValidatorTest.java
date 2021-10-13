@@ -20,16 +20,12 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
-import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.model.form.validation.quarteryear.QuarterYearInputValidator;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectInformationFormValidatorTest {
-
-  @Mock
-  private DateInputValidator dateInputValidator;
 
   @Mock
   private QuarterYearInputValidator quarterYearInputValidator;
@@ -39,7 +35,6 @@ public class ProjectInformationFormValidatorTest {
   @Before
   public void setup() {
     projectInformationFormValidator = new ProjectInformationFormValidator(
-        dateInputValidator,
         quarterYearInputValidator
     );
 
@@ -65,59 +60,6 @@ public class ProjectInformationFormValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
 
     assertThat(fieldErrors).isEmpty();
-  }
-
-  @Test
-  public void validate_whenDiscoveryFieldStageAndEmptyHiddenQuestionsWithPartialValidation_thenValid() {
-    var form = ProjectInformationUtil.getCompleteForm();
-    form.setFieldStage(FieldStage.DISCOVERY);
-    form.setDiscoveryFirstProductionDate(new QuarterYearInput(null, null));
-
-    var errors = getErrors(form, ValidationType.PARTIAL);
-
-    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
-
-    assertThat(fieldErrors).isEmpty();
-  }
-
-  @Test
-  public void validate_whenDiscoveryFieldStageAndValidHiddenQuestionsWithFullValidation_thenValid() {
-    var form = ProjectInformationUtil.getCompleteForm();
-    form.setFieldStage(FieldStage.DISCOVERY);
-    form.setDiscoveryFirstProductionDate(new QuarterYearInput(Quarter.Q1, "2020"));
-
-    var errors = getErrors(form, ValidationType.FULL);
-
-    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
-
-    assertThat(fieldErrors).isEmpty();
-  }
-
-  @Test
-  public void validate_whenDiscoveryFieldStageAndEmptyHiddenQuestionsWithFullValidation_thenInvalid() {
-    var form = ProjectInformationUtil.getCompleteForm();
-    form.setFieldStage(FieldStage.DISCOVERY);
-    form.setDiscoveryFirstProductionDate(new QuarterYearInput(null, null));
-
-    var errors = getErrors(form, ValidationType.FULL);
-
-    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
-    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
-
-    assertThat(fieldErrors).containsExactly(
-        entry("discoveryFirstProductionDate.quarter", Set.of(QuarterYearInputValidator.QUARTER_INVALID_CODE)),
-        entry("discoveryFirstProductionDate.year", Set.of(QuarterYearInputValidator.YEAR_INVALID_CODE))
-    );
-
-    assertThat(fieldErrorMessages).containsExactly(
-        entry("discoveryFirstProductionDate.quarter", Set.of(
-            String.format(
-                QuarterYearInputValidator.EMPTY_QUARTER_YEAR_ERROR,
-                "a " + ProjectInformationValidationHint.FIRST_PRODUCTION_DATE_LABEL.getLabel()
-            ))
-        ),
-        entry("discoveryFirstProductionDate.year", Set.of(""))
-    );
   }
 
   @Test
