@@ -46,7 +46,6 @@ public class ProjectInformationUtil {
     );
     form.setContactDetail(contactDetailForm);
     form.setDevelopmentFirstProductionDate(new QuarterYearInput(null, null));
-    form.setDiscoveryFirstProductionDate(new QuarterYearInput(null, null));
     form.setEnergyTransitionCategory(ENERGY_TRANSITION_CATEGORY);
 
     return form;

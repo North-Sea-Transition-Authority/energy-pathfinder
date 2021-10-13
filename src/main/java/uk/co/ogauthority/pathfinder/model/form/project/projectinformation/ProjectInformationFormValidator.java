@@ -11,7 +11,6 @@ import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
-import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.model.form.validation.quarteryear.QuarterYearInputValidator;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 
@@ -20,13 +19,10 @@ public class ProjectInformationFormValidator implements SmartValidator {
 
   public static final String MISSING_ENERGY_TRANSITION_CATEGORY_ERROR = "Select an energy transition category";
 
-  private final DateInputValidator dateInputValidator;
   private final QuarterYearInputValidator quarterYearInputValidator;
 
   @Autowired
-  public ProjectInformationFormValidator(DateInputValidator dateInputValidator,
-                                         QuarterYearInputValidator quarterYearInputValidator) {
-    this.dateInputValidator = dateInputValidator;
+  public ProjectInformationFormValidator(QuarterYearInputValidator quarterYearInputValidator) {
     this.quarterYearInputValidator = quarterYearInputValidator;
   }
 
@@ -56,14 +52,7 @@ public class ProjectInformationFormValidator implements SmartValidator {
     var fieldStage = form.getFieldStage();
 
     if (fieldStage != null) {
-      if (BooleanUtils.isTrue(fieldStage.equals(FieldStage.DISCOVERY))) {
-        validateFirstProductionDate(
-            "discoveryFirstProductionDate",
-            form.getDiscoveryFirstProductionDate(),
-            projectInformationValidationHint,
-            errors
-        );
-      } else if (BooleanUtils.isTrue(fieldStage.equals(FieldStage.DEVELOPMENT))) {
+      if (BooleanUtils.isTrue(fieldStage.equals(FieldStage.DEVELOPMENT))) {
         validateFirstProductionDate(
             "developmentFirstProductionDate",
             form.getDevelopmentFirstProductionDate(),

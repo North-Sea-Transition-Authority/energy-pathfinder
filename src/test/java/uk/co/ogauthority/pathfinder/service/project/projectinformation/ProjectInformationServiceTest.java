@@ -101,14 +101,12 @@ public class ProjectInformationServiceTest {
   }
 
   @Test
-  public void createOrUpdate_whenDiscoveryFieldStage_thenFirstProductionSaved() {
+  public void createOrUpdate_whenDiscoveryFieldStage_thenNoHiddenQuestionsSaved() {
 
     var form = ProjectInformationUtil.getCompleteForm();
     form.setFieldStage(FieldStage.DISCOVERY);
 
-    var persistedQuarterYearInput = new QuarterYearInput(Quarter.Q1, "2020");
     var notPersistedQuarterYearInput = new QuarterYearInput(Quarter.Q2, "2021");
-    form.setDiscoveryFirstProductionDate(persistedQuarterYearInput);
 
     // the following should not be persisted
     form.setDevelopmentFirstProductionDate(notPersistedQuarterYearInput);
@@ -120,8 +118,8 @@ public class ProjectInformationServiceTest {
     projectInformation = projectInformationService.createOrUpdate(details, form);
 
     assertThat(projectInformation.getFieldStage()).isEqualTo(FieldStage.DISCOVERY);
-    assertThat(projectInformation.getFirstProductionDateQuarter()).isEqualTo(persistedQuarterYearInput.getQuarter());
-    assertThat(projectInformation.getFirstProductionDateYear()).isEqualTo(Integer.parseInt(persistedQuarterYearInput.getYear()));
+    assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
+    assertThat(projectInformation.getFirstProductionDateYear()).isNull();
     assertThat(projectInformation.getEnergyTransitionCategory()).isNull();
   }
 
@@ -132,11 +130,9 @@ public class ProjectInformationServiceTest {
     form.setFieldStage(FieldStage.DEVELOPMENT);
 
     var persistedQuarterYearInput = new QuarterYearInput(Quarter.Q1, "2020");
-    var notPersistedQuarterYearInput = new QuarterYearInput(Quarter.Q2, "2021");
     form.setDevelopmentFirstProductionDate(persistedQuarterYearInput);
 
     // the following should not be persisted
-    form.setDiscoveryFirstProductionDate(notPersistedQuarterYearInput);
     form.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
 
     when(projectInformationRepository.findByProjectDetail(details))
@@ -161,7 +157,6 @@ public class ProjectInformationServiceTest {
     var notPersistedQuarterYearInput = new QuarterYearInput(Quarter.Q2, "2021");
 
     // the following should not be persisted
-    form.setDiscoveryFirstProductionDate(notPersistedQuarterYearInput);
     form.setDevelopmentFirstProductionDate(notPersistedQuarterYearInput);
 
     when(projectInformationRepository.findByProjectDetail(details))
@@ -184,7 +179,6 @@ public class ProjectInformationServiceTest {
     var notPersistedQuarterYearInput = new QuarterYearInput(Quarter.Q2, "2021");
 
     // the following should not be persisted
-    form.setDiscoveryFirstProductionDate(notPersistedQuarterYearInput);
     form.setDevelopmentFirstProductionDate(notPersistedQuarterYearInput);
     form.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
 
@@ -281,11 +275,12 @@ public class ProjectInformationServiceTest {
   }
 
   @Test
-  public void getForm_whenDiscoveryFieldStage_thenFirstProductionDatePopulated() {
+  public void getForm_whenDiscoveryFieldStage_assertExpectedProperties() {
 
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
     projectInformation.setFieldStage(FieldStage.DISCOVERY);
 
+    // The following should not be populated to the forms
     var persistedFirstProductionDate = new QuarterYearInput(Quarter.Q1, "2020");
     projectInformation.setFirstProductionDateQuarter(persistedFirstProductionDate.getQuarter());
     projectInformation.setFirstProductionDateYear(Integer.parseInt(persistedFirstProductionDate.getYear()));
@@ -299,7 +294,6 @@ public class ProjectInformationServiceTest {
     ProjectInformationForm form = projectInformationService.getForm(details);
 
     assertThat(form.getFieldStage()).isEqualTo(FieldStage.DISCOVERY);
-    assertThat(form.getDiscoveryFirstProductionDate()).isEqualTo(persistedFirstProductionDate);
 
     assertThat(form.getDevelopmentFirstProductionDate()).isNull();
     assertThat(form.getEnergyTransitionCategory()).isNull();
@@ -326,7 +320,6 @@ public class ProjectInformationServiceTest {
     assertThat(form.getFieldStage()).isEqualTo(FieldStage.DEVELOPMENT);
     assertThat(form.getDevelopmentFirstProductionDate()).isEqualTo(persistedFirstProductionDate);
 
-    assertThat(form.getDiscoveryFirstProductionDate()).isNull();
     assertThat(form.getEnergyTransitionCategory()).isNull();
   }
 
@@ -352,7 +345,6 @@ public class ProjectInformationServiceTest {
     assertThat(form.getEnergyTransitionCategory()).isEqualTo(EnergyTransitionCategory.HYDROGEN);
 
     assertThat(form.getDevelopmentFirstProductionDate()).isNull();
-    assertThat(form.getDiscoveryFirstProductionDate()).isNull();
   }
 
   @Test
@@ -375,7 +367,6 @@ public class ProjectInformationServiceTest {
 
     assertThat(form.getFieldStage()).isNull();
     assertThat(form.getDevelopmentFirstProductionDate()).isNull();
-    assertThat(form.getDiscoveryFirstProductionDate()).isNull();
     assertThat(form.getEnergyTransitionCategory()).isNull();
   }
 

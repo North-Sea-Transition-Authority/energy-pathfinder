@@ -67,7 +67,6 @@ public class ProjectInformationViewUtilTest {
         firstProductionYear
     );
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isEqualTo(expectedFirstProductionDate);
-    assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isNull();
     assertThat(projectInformationView.getEnergyTransitionCategory()).isNull();
   }
 
@@ -78,6 +77,8 @@ public class ProjectInformationViewUtilTest {
     final var firstProductionYear = 2020;
 
     projectInformation.setFieldStage(fieldStage);
+
+    // should not be populated into view
     projectInformation.setFirstProductionDateQuarter(firstProductionQuarter);
     projectInformation.setFirstProductionDateYear(firstProductionYear);
 
@@ -86,11 +87,6 @@ public class ProjectInformationViewUtilTest {
     assertCommonProperties(projectInformationView, projectInformation);
     assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
 
-    var expectedFirstProductionDate = DateUtil.getDateFromQuarterYear(
-        firstProductionQuarter,
-        firstProductionYear
-    );
-    assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isEqualTo(expectedFirstProductionDate);
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
     assertThat(projectInformationView.getEnergyTransitionCategory()).isNull();
   }
@@ -107,7 +103,6 @@ public class ProjectInformationViewUtilTest {
     assertCommonProperties(projectInformationView, projectInformation);
     assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
 
-    assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isNull();
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
     assertThat(projectInformationView.getEnergyTransitionCategory()).isNull();
   }
@@ -129,7 +124,6 @@ public class ProjectInformationViewUtilTest {
 
     assertThat(projectInformationView.getEnergyTransitionCategory()).isEqualTo(energyTransitionCategory.getDisplayName());
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
-    assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isNull();
   }
 
   @Test
@@ -144,7 +138,6 @@ public class ProjectInformationViewUtilTest {
     assertCommonProperties(projectInformationView, projectInformation);
     assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
-    assertThat(projectInformationView.getDiscoveryFirstProductionDate()).isNull();
     assertThat(projectInformationView.getEnergyTransitionCategory()).isNull();
   }
 }
