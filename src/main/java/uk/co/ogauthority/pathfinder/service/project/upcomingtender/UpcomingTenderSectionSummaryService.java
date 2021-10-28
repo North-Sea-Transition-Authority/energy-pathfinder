@@ -79,6 +79,7 @@ public class UpcomingTenderSectionSummaryService implements ProjectSectionSummar
           upcomingTenderView.getUploadedFileViews(),
           previousUpcomingTenderView.getUploadedFileViews(),
           Set.of("fileUploadedTime"),
+          Set.of("fileUrl"),
           UploadedFileView::getFileId,
           UploadedFileView::getFileId
       );

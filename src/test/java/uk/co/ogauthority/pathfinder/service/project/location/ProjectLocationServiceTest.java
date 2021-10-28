@@ -442,6 +442,11 @@ public class ProjectLocationServiceTest {
     assertThat(projectLocationService.canShowInTaskList(projectDetail)).isFalse();
   }
 
+  @Test
+  public void getSupportedProjectTypes_verifyInfrastructure() {
+    assertThat(projectLocationService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
+  }
+
   private void checkCommonFieldsMatch(ProjectLocation projectLocation) {
     assertThat(projectLocation.getFieldType()).isEqualTo(ProjectLocationTestUtil.FIELD_TYPE);
     assertThat(projectLocation.getMaximumWaterDepth()).isEqualTo(ProjectLocationTestUtil.WATER_DEPTH);

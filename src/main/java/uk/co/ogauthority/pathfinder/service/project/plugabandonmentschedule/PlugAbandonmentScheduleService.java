@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedule.PlugAbandonmentSchedule;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.plugabandonmentschedule.PlugAbandonmentScheduleForm;
@@ -189,6 +191,11 @@ public class PlugAbandonmentScheduleService implements ProjectFormSectionService
     );
 
     plugAbandonmentWellService.copyPlugAbandonmentWells(duplicatedPlugAbandonmentScheduleEntityMap);
+  }
+
+  @Override
+  public Set<ProjectType> getSupportedProjectTypes() {
+    return Set.of(ProjectType.INFRASTRUCTURE);
   }
 
   public ModelAndView getPlugAbandonmentScheduleModelAndView(Integer projectId,

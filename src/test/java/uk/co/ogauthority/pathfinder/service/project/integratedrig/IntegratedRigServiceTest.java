@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.integratedrig.IntegratedRig;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.integratedrig.IntegratedRigForm;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
@@ -356,5 +357,10 @@ public class IntegratedRigServiceTest {
         toProjectDetail,
         IntegratedRig.class
     );
+  }
+
+  @Test
+  public void getSupportedProjectTypes_verifyInfrastructure() {
+    assertThat(integratedRigService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
   }
 }

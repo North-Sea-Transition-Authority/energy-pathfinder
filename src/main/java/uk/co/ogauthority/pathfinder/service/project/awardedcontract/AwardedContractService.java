@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project.awardedcontract;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.Awarded
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
@@ -203,4 +205,8 @@ public class AwardedContractService implements ProjectFormSectionService {
     );
   }
 
+  @Override
+  public Set<ProjectType> getSupportedProjectTypes() {
+    return Set.of(ProjectType.INFRASTRUCTURE);
+  }
 }

@@ -11,6 +11,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,11 +24,10 @@ import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryRenderingService;
-import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -45,10 +45,10 @@ public class CancelDraftProjectVersionServiceTest {
   private ProjectSummaryRenderingService projectSummaryRenderingService;
 
   @Mock
-  private UpcomingTenderService upcomingTenderService;
+  private TestProjectFormSectionService infrastructureProjectFormSectionService;
 
   @Mock
-  private PlatformsFpsosService platformsFpsosService;
+  private TestProjectFormSectionService forwardWorkPlanProjectFormSectionService;
 
   private CancelDraftProjectVersionService cancelDraftProjectVersionService;
 
@@ -63,18 +63,22 @@ public class CancelDraftProjectVersionServiceTest {
         projectService,
         projectUpdateService,
         projectSummaryRenderingService,
-        List.of(upcomingTenderService, platformsFpsosService)
+        List.of(infrastructureProjectFormSectionService, forwardWorkPlanProjectFormSectionService)
     );
   }
 
   @Test
-  public void cancelDraft_whenFirstVersion() {
+  public void cancelDraft_whenFirstVersion_verifyInteractions() {
     projectDetail.setVersion(1);
+    projectDetail.setProjectType(ProjectType.INFRASTRUCTURE);
+
+    when(infrastructureProjectFormSectionService.getSupportedProjectTypes()).thenReturn(Set.of(ProjectType.INFRASTRUCTURE));
+    when(forwardWorkPlanProjectFormSectionService.getSupportedProjectTypes()).thenReturn(Set.of(ProjectType.FORWARD_WORK_PLAN));
 
     cancelDraftProjectVersionService.cancelDraft(projectDetail);
 
-    verify(upcomingTenderService, times(1)).removeSectionData(projectDetail);
-    verify(platformsFpsosService, times(1)).removeSectionData(projectDetail);
+    verify(infrastructureProjectFormSectionService, times(1)).removeSectionData(projectDetail);
+    verify(forwardWorkPlanProjectFormSectionService, never()).removeSectionData(projectDetail);
 
     verify(projectUpdateService, never()).getByToDetail(projectDetail);
 
@@ -83,8 +87,12 @@ public class CancelDraftProjectVersionServiceTest {
   }
 
   @Test
-  public void cancelDraft_whenUpdate() {
+  public void cancelDraft_whenNotFirstVersion_verifyInteractions() {
     projectDetail.setVersion(2);
+    projectDetail.setProjectType(ProjectType.INFRASTRUCTURE);
+
+    when(infrastructureProjectFormSectionService.getSupportedProjectTypes()).thenReturn(Set.of(ProjectType.INFRASTRUCTURE));
+    when(forwardWorkPlanProjectFormSectionService.getSupportedProjectTypes()).thenReturn(Set.of(ProjectType.FORWARD_WORK_PLAN));
 
     var projectUpdate = new ProjectUpdate();
     projectUpdate.setUpdateType(ProjectUpdateType.OPERATOR_INITIATED);
@@ -96,8 +104,8 @@ public class CancelDraftProjectVersionServiceTest {
 
     cancelDraftProjectVersionService.cancelDraft(projectDetail);
 
-    verify(upcomingTenderService, times(1)).removeSectionData(projectDetail);
-    verify(platformsFpsosService, times(1)).removeSectionData(projectDetail);
+    verify(infrastructureProjectFormSectionService, times(1)).removeSectionData(projectDetail);
+    verify(forwardWorkPlanProjectFormSectionService, never()).removeSectionData(projectDetail);
 
     verify(projectUpdateService, times(1)).deleteProjectUpdate(projectUpdate);
     verify(projectService, times(1)).updateProjectDetailIsCurrentVersion(fromDetail, true);

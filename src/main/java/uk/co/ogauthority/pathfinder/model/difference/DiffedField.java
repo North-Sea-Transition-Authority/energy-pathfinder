@@ -53,4 +53,8 @@ public class DiffedField {
   public void setPreviousValueTag(Tag previousValueTag) {
     this.previousValueTag = previousValueTag;
   }
+
+  public void setDifferenceType(DifferenceType differenceType) {
+    this.differenceType = differenceType;
+  }
 }

@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +12,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.decommissionedpipeline.DecommissionedPipeline;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineForm;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineFormValidator;
@@ -186,5 +188,10 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
     //     toDetail,
     //     DecommissionedPipeline.class
     // );
+  }
+
+  @Override
+  public Set<ProjectType> getSupportedProjectTypes() {
+    return Set.of(ProjectType.INFRASTRUCTURE);
   }
 }

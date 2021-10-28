@@ -79,6 +79,7 @@ public class CollaborationOpportunitiesSectionSummaryService implements ProjectS
           collaborationOpportunityView.getUploadedFileViews(),
           previousCollaborationOpportunityView.getUploadedFileViews(),
           Set.of("fileUploadedTime"),
+          Set.of("fileUrl"),
           UploadedFileView::getFileId,
           UploadedFileView::getFileId
       );

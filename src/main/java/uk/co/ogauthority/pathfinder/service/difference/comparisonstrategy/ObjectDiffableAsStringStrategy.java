@@ -42,5 +42,10 @@ public class ObjectDiffableAsStringStrategy implements ComparisonStrategy<Diffab
   public DiffedField createTypeAddedDiffedField(DiffableAsString value) {
     return new DiffedField(DifferenceType.ADDED, value.getDiffableString(), null, Tag.NONE, null);
   }
+
+  @Override
+  public DiffedField createTypeNotDiffedField(DiffableAsString value) {
+    return new DiffedField(DifferenceType.NOT_DIFFED, value.getDiffableString(), null, Tag.NONE, null);
+  }
 }
 

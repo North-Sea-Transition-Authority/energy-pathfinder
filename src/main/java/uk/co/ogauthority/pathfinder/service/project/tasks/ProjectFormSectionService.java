@@ -1,6 +1,8 @@
 package uk.co.ogauthority.pathfinder.service.project.tasks;
 
+import java.util.Set;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 
 /**
  * Define the methods common to all services which manage Project form pages which appear on the task list.
@@ -29,4 +31,6 @@ public interface ProjectFormSectionService {
   }
 
   void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail);
+
+  Set<ProjectType> getSupportedProjectTypes();
 }

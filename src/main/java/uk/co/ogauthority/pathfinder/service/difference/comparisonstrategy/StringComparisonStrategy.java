@@ -61,4 +61,9 @@ public class StringComparisonStrategy implements ComparisonStrategy<String> {
   public DiffedField createTypeAddedDiffedField(String value) {
     return new DiffedField(DifferenceType.ADDED, value, "");
   }
+
+  @Override
+  public DiffedField createTypeNotDiffedField(String value) {
+    return new DiffedField(DifferenceType.NOT_DIFFED, value, "");
+  }
 }

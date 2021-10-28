@@ -31,7 +31,7 @@ public class DifferenceService {
    * @return A map of field name to DiffedField or List of DiffedFields
    */
   public <T> Map<String, Object> differentiate(T current, T previous) {
-    return differentiate(current, previous, Collections.emptySet());
+    return differentiate(current, previous, Collections.emptySet(), Collections.emptySet());
   }
 
   /**
@@ -41,30 +41,38 @@ public class DifferenceService {
    *
    * @param current The current instance of the object.
    * @param previous A previous instance of the same type to compare against.
-   * @param ignoreFieldNames if provided, do not diff field where name is within set
+   * @param excludeFields if provided, do not diff field where name is within set, completely exclude from the resulting model
+   * @param includeFieldsWithoutDiffing include the field in the resulting model but do not diff, set as 'not diffed'
    * @param <T> The type of both objects.
    * @return A map of field name to DiffedField or List of DiffedFields
    */
-  public <T> Map<String, Object> differentiate(T current, T previous, Set<String> ignoreFieldNames) {
+  public <T> Map<String, Object> differentiate(T current, T previous, Set<String> excludeFields, Set<String> includeFieldsWithoutDiffing) {
 
     Map<String, Object> diffResult = new HashMap<>();
 
 
     doWithField(current.getClass(), field -> {
-      var processField = !ignoreFieldNames.contains(field.getName());
+      boolean includeFieldWithoutDiffing = includeFieldsWithoutDiffing.contains(field.getName());
+      var processField = !excludeFields.contains(field.getName()) && !includeFieldWithoutDiffing;
+      // To avoid clashing member variable names between objects, use the simple class name for a slightly better chance
+      // at uniqueness in the map
+      String attributeName = createAttributeName(current.getClass(), field);
+      Object currentValue = getFieldValue(field, current);
+      Object previousValue = getFieldValue(field, previous);
 
       if (processField) {
-        Object currentValue = getFieldValue(field, current);
-        Object previousValue = getFieldValue(field, previous);
-
-        // To avoid clashing member variable names between objects, use the simple class name for a slightly better chance
-        // at uniqueness in the map
-        String attributeName = createAttributeName(current.getClass(), field);
         compare(diffResult, attributeName, currentValue, previousValue, field);
+
+      } else if (includeFieldWithoutDiffing) {
+        addNotDiffedField(diffResult, attributeName, currentValue, field);
       }
     });
 
     return diffResult;
+  }
+
+  public <T> Map<String, Object> differentiate(T current, T previous, Set<String> ignoreFieldNames) {
+    return differentiate(current, previous, ignoreFieldNames, Set.of());
   }
 
   private String createAttributeName(Class parentClass, Field field) {
@@ -103,7 +111,9 @@ public class DifferenceService {
    *
    * @param currentList current list of items to compare
    * @param previousList previous list of items to compare
-   * @param ignoreFieldNames if provided, do not diff field where name is within set
+   * @param excludeFields if provided, do not diff field where name is within set, the field will be completely excluded from the output
+   * @param includeFieldsWithoutDiffingWhenExistsInPrevList if provided, do not diff field where provided name is within "previous" list"
+   *                                                       but still include the field in the output
    * @param getCurrentItemLinkToPrevious when looping the current list, how can the item object be mapped to an item in the "previous" list
    * @param getPreviousItemLinkToCurrent when looping the previous list, how can the item object be mapped to an item in the "current" list
    * @param <T> each list for comparison contains objects of the this type
@@ -111,7 +121,8 @@ public class DifferenceService {
    */
   public <T, V> List<Map<String, ?>> differentiateComplexLists(List<T> currentList,
                                                                List<T> previousList,
-                                                               Set<String> ignoreFieldNames,
+                                                               Set<String> excludeFields,
+                                                               Set<String> includeFieldsWithoutDiffingWhenExistsInPrevList,
                                                                Function<T, V> getCurrentItemLinkToPrevious,
                                                                Function<T, V> getPreviousItemLinkToCurrent) {
 
@@ -134,10 +145,11 @@ public class DifferenceService {
 
       if (previousListItemOptional.isPresent()) {
         // Compare all the item fields
-        itemDiffMap = differentiate(currentListItem, previousListItemOptional.get(), ignoreFieldNames);
+        itemDiffMap = differentiate(
+            currentListItem, previousListItemOptional.get(), excludeFields, includeFieldsWithoutDiffingWhenExistsInPrevList);
       } else {
         // This item didn't exist in the previous version so it must be newly added
-        itemDiffMap = createdAddedObject(currentListItem, ignoreFieldNames);
+        itemDiffMap = createdAddedObject(currentListItem, excludeFields);
       }
       listOfItemDiffs.add(itemDiffMap);
 
@@ -156,13 +168,31 @@ public class DifferenceService {
 
       if (currentItemOptional.isEmpty()) {
         // This item exists in the previous list but not the current list. It must have been deleted.
-        Map<String, ?> itemDiffMap = createdDeletedObject(previousItem, ignoreFieldNames);
+        Map<String, ?> itemDiffMap = createdDeletedObject(previousItem, excludeFields);
         listOfItemDiffs.add(itemDiffMap);
       }
     }
 
     return listOfItemDiffs;
   }
+
+  public <T, V> List<Map<String, ?>> differentiateComplexLists(List<T> currentList,
+                                                               List<T> previousList,
+                                                               Set<String> ignoreFieldNames,
+                                                               Function<T, V> getCurrentItemLinkToPrevious,
+                                                               Function<T, V> getPreviousItemLinkToCurrent) {
+
+    return differentiateComplexLists(
+        currentList,
+        previousList,
+        ignoreFieldNames,
+        Set.of(),
+        getCurrentItemLinkToPrevious,
+        getPreviousItemLinkToCurrent
+    );
+  }
+
+
 
   /**
    * Return a object with all fields marked as added.
@@ -323,4 +353,18 @@ public class DifferenceService {
 
     return listOfDiffedStrings;
   }
+
+  /**
+   * Add an entry into the diffed results map as a 'not diffed' DiffedField.
+   */
+  private void addNotDiffedField(Map<String, Object> diffResult,
+                                 String attributeName,
+                                 Object currentValue,
+                                 Field valueField) {
+
+    var comparisonStrategy = ComparisonType.findComparisonType(valueField.getType()).getComparisonStrategy();
+    var diffedField = comparisonStrategy.createNotDiffedField(currentValue);
+    diffResult.put(attributeName, diffedField);
+  }
+
 }

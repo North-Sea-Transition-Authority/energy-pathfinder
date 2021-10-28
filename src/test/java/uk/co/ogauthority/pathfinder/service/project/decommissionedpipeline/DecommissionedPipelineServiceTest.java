@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.decommissionedpipeline.DecommissionedPipeline;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineForm;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineFormValidator;
@@ -306,6 +307,11 @@ public class DecommissionedPipelineServiceTest {
     decommissionedPipelineService.copySectionData(fromProjectDetail, toProjectDetail);
 
     verify(entityDuplicationService, never()).duplicateEntitiesAndSetNewParent(any(), any(), any());
+  }
+
+  @Test
+  public void getSupportedProjectTypes_verifyInfrastructure() {
+    assertThat(decommissionedPipelineService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
   }
 
   // @Test

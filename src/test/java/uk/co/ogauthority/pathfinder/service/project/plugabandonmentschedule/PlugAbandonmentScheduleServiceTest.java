@@ -24,6 +24,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedule.PlugAbandonmentSchedule;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.plugabandonmentschedule.PlugAbandonmentScheduleForm;
 import uk.co.ogauthority.pathfinder.model.form.project.plugabandonmentschedule.PlugAbandonmentScheduleFormValidator;
@@ -453,5 +454,10 @@ public class PlugAbandonmentScheduleServiceTest {
         modelAndView,
         PlugAbandonmentScheduleController.REMOVE_PAGE_NAME
     );
+  }
+
+  @Test
+  public void getSupportedProjectTypes_verifyInfrastructure() {
+    assertThat(plugAbandonmentScheduleService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
   }
 }

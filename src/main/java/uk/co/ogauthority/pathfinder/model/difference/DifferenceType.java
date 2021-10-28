@@ -4,5 +4,6 @@ public enum DifferenceType {
   ADDED,
   UPDATED,
   DELETED,
-  UNCHANGED
+  UNCHANGED,
+  NOT_DIFFED
 }

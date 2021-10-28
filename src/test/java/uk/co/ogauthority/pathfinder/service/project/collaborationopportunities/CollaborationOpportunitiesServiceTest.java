@@ -22,6 +22,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunit
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormValidator;
@@ -302,4 +303,8 @@ public class CollaborationOpportunitiesServiceTest {
     assertThat(result).isEmpty();
   }
 
+  @Test
+  public void getSupportedProjectTypes_verifyInfrastructure() {
+    assertThat(collaborationOpportunitiesService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
+  }
 }

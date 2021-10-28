@@ -8,6 +8,10 @@
     </p>
   </#if>
 
+  <#if bannerMessage?has_content>
+      <@fdsFlash.flash flashTitle=bannerMessage/>
+  </#if>
+
   <#if allRoles??>
     <@fdsDetails.summaryDetails summaryTitle="What does each role allow a user to do?" >
       <@fdsCheckAnswers.checkAnswers summaryListClass="">

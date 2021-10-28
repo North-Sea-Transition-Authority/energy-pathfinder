@@ -138,7 +138,7 @@
     </@_diffChanges>
   </#if>
 
-  <#if differenceType == "UNCHANGED">
+  <#if differenceType == "UNCHANGED" || differenceType == "NOT_DIFFED">
     <@_diffLink
       diffedLinkText=diffedLinkText.currentValue
       diffedLinkUrl=diffedLinkUrl.currentValue
@@ -217,7 +217,7 @@
 
   </#if>
 
-  <#if diffedField.differenceType == "UNCHANGED">
+  <#if diffedField.differenceType == "UNCHANGED" || diffedField.differenceType == "NOT_DIFFED">
     <@_diffValue
       noAutoEscapeFlagValue=noAutoEscapeFlag
       value=diffedField.currentValue
