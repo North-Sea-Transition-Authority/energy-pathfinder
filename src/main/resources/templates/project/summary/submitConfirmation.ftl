@@ -1,12 +1,18 @@
 <#include '../../layout.ftl'>
 
+<#-- @ftlvariable name="feedbackUrl" type="String" -->
+<#-- @ftlvariable name="workAreaUrl" type="String" -->
+<#-- @ftlvariable name="service" type="uk.co.ogauthority.pathfinder.config.ServiceProperties" -->
+<#-- @ftlvariable name="projectSubmissionSummaryView" type="uk.co.ogauthority.pathfinder.model.view.summary.ProjectSubmissionSummaryView" -->
+<#-- @ftlvariable name="isUpdate" type="Boolean" -->
+
 <#if isUpdate>
   <#assign title = "Project update submitted">
 <#else>
   <#assign title = "Project submitted">
 </#if>
 
-<@defaultPage htmlTitle=title pageHeading="" breadcrumbs=false>
+<@defaultPage htmlTitle=title pageHeading="" breadcrumbs=false phaseBanner=false>
   <@fdsPanel.panel
     panelTitle=title
     panelText="${projectSubmissionSummaryView.projectTitle}"
@@ -27,5 +33,11 @@
     Once reviewed your project will be published on their website.
   </p>
 
-  <@fdsAction.link linkClass="govuk-link govuk-!-font-size-19" linkText="Back to work area" linkUrl=springUrl(workAreaUrl)/>
+  <@serviceFeedbackLink.feedbackLink feedbackUrl=feedbackUrl/>
+
+  <@fdsAction.link
+    linkClass="govuk-link govuk-!-font-size-19"
+    linkText="Back to work area"
+    linkUrl=springUrl(workAreaUrl)
+  />
 </@defaultPage>

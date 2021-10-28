@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.submission.SubmitProjectController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -99,7 +98,8 @@ public class SubmitProjectService {
     modelAndView
         .addObject("isUpdate", !projectDetail.isFirstVersion())
         .addObject("projectSubmissionSummaryView", projectSubmissionSummaryView)
-        .addObject("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)));
+        .addObject("workAreaUrl", ControllerUtils.getWorkAreaUrl())
+        .addObject("feedbackUrl", ControllerUtils.getFeedbackUrl(projectDetail.getId()));
 
     return modelAndView;
   }

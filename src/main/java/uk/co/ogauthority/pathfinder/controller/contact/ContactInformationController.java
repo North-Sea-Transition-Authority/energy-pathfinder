@@ -17,7 +17,7 @@ public class ContactInformationController {
   }
 
   @GetMapping("/contact")
-  public ModelAndView getContactInformation() {
-    return supportContactService.getContactInformationModelAndView();
+  public ModelAndView getContactInformation(boolean opensInNewTab) {
+    return supportContactService.getContactInformationModelAndView(opensInNewTab);
   }
 }
