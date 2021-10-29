@@ -1,10 +1,16 @@
 <#include '../layout.ftl'>
 
+<#-- @ftlvariable name="technicalSupportContact" type="uk.co.ogauthority.pathfinder.model.enums.contact.ServiceContactDetail" -->
+<#-- @ftlvariable name="service" type="uk.co.ogauthority.pathfinder.config.ServiceProperties" -->
+
+<#assign pageTitle = "Page not found" />
+
 <@defaultPage
-  htmlTitle="Page not found"
-  pageHeading="Page not found"
+  htmlTitle=pageTitle
+  pageHeading=pageTitle
   topNavigation=false
   twoThirdsColumn=true
+  phaseBanner=false
 >
   <p class="govuk-body">
     If you typed the web address, check it is correct.

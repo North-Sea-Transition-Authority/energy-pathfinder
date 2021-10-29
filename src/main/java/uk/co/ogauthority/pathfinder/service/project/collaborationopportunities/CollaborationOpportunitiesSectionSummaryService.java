@@ -92,6 +92,7 @@ public abstract class CollaborationOpportunitiesSectionSummaryService<V> {
           getUploadedFileViews(collaborationOpportunityView),
           getUploadedFileViews(previousCollaborationOpportunityView),
           Set.of("fileUploadedTime"),
+          Set.of("fileUrl"),
           UploadedFileView::getFileId,
           UploadedFileView::getFileId
       );

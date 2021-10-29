@@ -21,8 +21,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.exception.DifferenceProcessingException;
-import uk.co.ogauthority.pathfinder.model.difference.DifferenceType;
 import uk.co.ogauthority.pathfinder.model.difference.DiffedField;
+import uk.co.ogauthority.pathfinder.model.difference.DifferenceType;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -403,5 +403,52 @@ public class DifferenceServiceTest {
     assertThat(diffResult.get(0)).isEmpty();
 
   }
+
+  @Test
+  public void differentiateComplexLists_setFieldsAsNotDiffedWithinDoNotDiffSet() {
+
+    var includeFieldsWithoutDiffing = Arrays.stream(FieldUtils.getAllFields(SimpleDifferenceTestClass.class))
+        .map(Field::getName)
+        .collect(toSet());
+
+    List<Map<String, ?>> diffResultList = differenceService.differentiateComplexLists(
+        List.of(simpleObjectCurrent),
+        List.of(simpleObjectPrevious),
+        Set.of(),
+        includeFieldsWithoutDiffing,
+        SimpleDifferenceTestClass::getIntegerField,
+        SimpleDifferenceTestClass::getIntegerField);
+
+    for (Map<String, ?> diffResultMap : diffResultList) {
+      assertThat(diffResultMap).hasSize(includeFieldsWithoutDiffing.size());
+
+      for (Object diffResultObject : diffResultMap.values()) {
+        DiffedField diffedField = ((DiffedField) diffResultObject);
+        assertThat(diffedField.getDifferenceType()).isEqualTo(DifferenceType.NOT_DIFFED);
+        assertThat(diffedField.getCurrentValue()).isNotBlank();
+      }
+    }
+
+  }
+
+  @Test
+  public void differentiate_setFieldsAsNotDiffedWithinDoNotDiffSet() {
+
+    var includeFieldsWithoutDiffing = Arrays.stream(FieldUtils.getAllFields(SimpleDifferenceTestClass.class))
+        .map(Field::getName)
+        .collect(toSet());
+
+    Map<String, Object> diffResult = differenceService.differentiate(simpleObjectCurrent, simpleObjectPrevious, Set.of(), includeFieldsWithoutDiffing);
+
+    assertThat(diffResult).hasSize(includeFieldsWithoutDiffing.size());
+
+    for (Object diffResultObject : diffResult.values()) {
+      DiffedField diffedField = ((DiffedField) diffResultObject);
+      assertThat(diffedField.getDifferenceType()).isEqualTo(DifferenceType.NOT_DIFFED);
+      assertThat(diffedField.getCurrentValue()).isNotBlank();
+    }
+
+  }
+
 
 }

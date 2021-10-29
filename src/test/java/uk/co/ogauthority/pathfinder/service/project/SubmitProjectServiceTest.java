@@ -287,6 +287,7 @@ public class SubmitProjectServiceTest {
         entry("isUpdate", isUpdate),
         entry("projectSubmissionSummaryView", projectSubmissionSummaryView),
         entry("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null))),
+        entry("feedbackUrl", ControllerUtils.getFeedbackUrl(projectDetail.getId())),
         entry(
             ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
             ProjectService.getProjectTypeDisplayName(projectDetail)

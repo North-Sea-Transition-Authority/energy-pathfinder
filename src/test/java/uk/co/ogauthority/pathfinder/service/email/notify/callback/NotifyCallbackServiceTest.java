@@ -117,6 +117,26 @@ public class NotifyCallbackServiceTest {
     assertThat(notifyCallbackService.isTokenValid(bearerToken)).isTrue();
   }
 
+  @Test
+  public void isTokenValid_tokenStartWithCharactersInBearerAndTokenIsValid_thenReturnTrue() {
+
+    var testTokenSuffix = "-token";
+
+    for(char characterInAuthorisationSchemeString : NotifyCallbackService.AUTHORIZATION_SCHEME.toCharArray()) {
+
+      var token = characterInAuthorisationSchemeString + testTokenSuffix;
+
+      notifyCallbackService = new NotifyCallbackService(
+          notificationClientMock,
+          notifyTemplateService,
+          pathfinderEmailFailureService,
+          token
+      );
+      var bearerToken = NotifyCallbackService.AUTHORIZATION_SCHEME + token;
+      assertThat(notifyCallbackService.isTokenValid(bearerToken)).isTrue();
+    }
+  }
+
   private JSONObject getExampleTemplateJson() {
     final var templateJson = new JSONObject();
     templateJson.put("id", UUID.randomUUID().toString());

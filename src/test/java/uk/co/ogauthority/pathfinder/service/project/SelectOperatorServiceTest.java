@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
@@ -222,6 +221,11 @@ public class SelectOperatorServiceTest {
     var projectDetail = ProjectUtil.getProjectDetails();
     projectDetail.setProjectType(null);
     assertThat(selectOperatorService.canShowInTaskList(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void getSupportedProjectTypes_verifyInfrastructure() {
+    assertThat(selectOperatorService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
   }
 
   @Test

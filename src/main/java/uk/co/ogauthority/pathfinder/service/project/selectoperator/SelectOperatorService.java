@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.project.selectoperator;
 
+import java.util.Set;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -144,6 +145,11 @@ public class SelectOperatorService implements ProjectFormSectionService {
   @Override
   public boolean canShowInTaskList(ProjectDetail detail) {
     return ProjectService.isInfrastructureProject(detail);
+  }
+
+  @Override
+  public Set<ProjectType> getSupportedProjectTypes() {
+    return Set.of(ProjectType.INFRASTRUCTURE);
   }
 
   @Override

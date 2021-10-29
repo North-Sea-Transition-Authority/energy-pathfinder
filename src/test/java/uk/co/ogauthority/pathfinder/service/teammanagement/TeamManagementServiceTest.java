@@ -547,6 +547,7 @@ public class TeamManagementServiceTest {
     String expectedRemoveRoute = ReverseRouter.route(on(PortalTeamManagementController.class).renderRemoveTeamMember(
         team.getId(),
         person.getId().asInt(),
+        null,
         null
     ));
 

@@ -547,6 +547,11 @@ public class DecommissioningScheduleServiceTest {
   }
 
   @Test
+  public void getSupportedProjectTypes_verifyInfrastructure() {
+    assertThat(decommissioningScheduleService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
+  }
+
+  @Test
   public void alwaysCopySectionData_verifyFalse() {
     assertThat(decommissioningScheduleService.alwaysCopySectionData(projectDetail)).isFalse();
   }

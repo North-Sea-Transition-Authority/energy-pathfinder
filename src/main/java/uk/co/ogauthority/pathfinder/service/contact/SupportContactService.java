@@ -20,8 +20,9 @@ public class SupportContactService {
         .collect(Collectors.toList());
   }
 
-  public ModelAndView getContactInformationModelAndView() {
+  public ModelAndView getContactInformationModelAndView(boolean opensInNewTab) {
     return new ModelAndView(TEMPLATE_PATH)
-        .addObject("contacts", getSupportContactList());
+        .addObject("contacts", getSupportContactList())
+        .addObject("opensInNewTab", opensInNewTab);
   }
 }

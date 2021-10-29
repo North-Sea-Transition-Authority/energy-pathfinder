@@ -11,6 +11,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,11 +82,15 @@ public class CancelDraftProjectVersionServiceTest {
   public void cancelDraft_whenFirstVersion_andSupportedServiceAndCancellable_verifyInteractions() {
 
     projectDetail.setVersion(1);
+    projectDetail.setProjectType(ProjectType.INFRASTRUCTURE);
+
+    when(testProjectFormSectionServiceA.getSupportedProjectTypes()).thenReturn(Set.of(ProjectType.INFRASTRUCTURE));
+    when(testProjectFormSectionServiceB.getSupportedProjectTypes()).thenReturn(Set.of(ProjectType.FORWARD_WORK_PLAN));
 
     cancelDraftProjectVersionService.cancelDraft(projectDetail);
 
     verify(testProjectFormSectionServiceA, times(1)).removeSectionData(projectDetail);
-    verify(testProjectFormSectionServiceB, times(1)).removeSectionData(projectDetail);
+    verify(testProjectFormSectionServiceB, never()).removeSectionData(projectDetail);
 
     verify(projectUpdateService, never()).getByToDetail(projectDetail);
 
@@ -96,6 +101,10 @@ public class CancelDraftProjectVersionServiceTest {
   @Test
   public void cancelDraft_whenUpdate_andSupportedServiceAndCancellable_verifyInteractions() {
     projectDetail.setVersion(2);
+    projectDetail.setProjectType(ProjectType.INFRASTRUCTURE);
+
+    when(testProjectFormSectionServiceA.getSupportedProjectTypes()).thenReturn(Set.of(ProjectType.INFRASTRUCTURE));
+    when(testProjectFormSectionServiceB.getSupportedProjectTypes()).thenReturn(Set.of(ProjectType.FORWARD_WORK_PLAN));
 
     var projectUpdate = new ProjectUpdate();
     projectUpdate.setUpdateType(ProjectUpdateType.OPERATOR_INITIATED);
@@ -108,7 +117,7 @@ public class CancelDraftProjectVersionServiceTest {
     cancelDraftProjectVersionService.cancelDraft(projectDetail);
 
     verify(testProjectFormSectionServiceA, times(1)).removeSectionData(projectDetail);
-    verify(testProjectFormSectionServiceB, times(1)).removeSectionData(projectDetail);
+    verify(testProjectFormSectionServiceB, never()).removeSectionData(projectDetail);
 
     verify(projectUpdateService, times(1)).deleteProjectUpdate(projectUpdate);
     verify(projectService, times(1)).updateProjectDetailIsCurrentVersion(fromDetail, true);

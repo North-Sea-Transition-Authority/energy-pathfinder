@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender;
 
 import java.util.List;
+import java.util.Set;
 import javax.transaction.Transactional;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
@@ -265,5 +267,10 @@ public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionS
         toDetail,
         ForwardWorkPlanUpcomingTender.class
     );
+  }
+
+  @Override
+  public Set<ProjectType> getSupportedProjectTypes() {
+    return Set.of(ProjectType.FORWARD_WORK_PLAN);
   }
 }

@@ -443,6 +443,11 @@ public class ProjectLocationServiceTest {
   }
 
   @Test
+  public void getSupportedProjectTypes_verifyInfrastructure() {
+    assertThat(projectLocationService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
+  }
+
+  @Test
   public void alwaysCopySectionData_verifyFalse() {
     assertThat(projectLocationService.alwaysCopySectionData(details)).isFalse();
   }

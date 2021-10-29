@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project.campaigninformation;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignInformation;
 import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignProject;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.campaigninformation.CampaignInformationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.campaigninformation.CampaignInformationFormValidator;
@@ -131,6 +133,11 @@ public class CampaignInformationService implements ProjectFormSectionService {
         fromCampaignInformation,
         toCampaignInformation
     );
+  }
+
+  @Override
+  public Set<ProjectType> getSupportedProjectTypes() {
+    return Set.of(ProjectType.INFRASTRUCTURE);
   }
 
   @Override

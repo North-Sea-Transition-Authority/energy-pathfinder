@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunit
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormCommon;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityForm;
@@ -234,6 +236,11 @@ public class ForwardWorkPlanCollaborationOpportunityService
         toDetail,
         duplicatedOpportunityEntityMap
     );
+  }
+
+  @Override
+  public Set<ProjectType> getSupportedProjectTypes() {
+    return Set.of(ProjectType.FORWARD_WORK_PLAN);
   }
 
   @Override

@@ -25,7 +25,7 @@ public class FooterServiceTest {
     final var modelAndView = new ModelAndView();
     footerService.addFooterUrlsToModelAndView(modelAndView);
     assertThat(modelAndView.getModelMap()).containsExactly(
-        entry(FooterService.CONTACT_URL_ATTR_NAME, ControllerUtils.getContactUrl()),
+        entry(FooterService.CONTACT_URL_ATTR_NAME, ControllerUtils.getContactUrl(false)),
         entry(FooterService.ACCESSIBILITY_STATEMENT_URL_ATTR_NAME, ControllerUtils.getAccessibilityStatementUrl())
     );
   }

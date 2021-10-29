@@ -592,4 +592,9 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
     verify(forwardWorkPlanTenderSetupService, times(1)).removeSectionData(projectDetail);
   }
+
+  @Test
+  public void getSupportedProjectTypes_verifyForwardWorkPlan() {
+    assertThat(workPlanUpcomingTenderService.getSupportedProjectTypes()).containsExactly(ProjectType.FORWARD_WORK_PLAN);
+  }
 }

@@ -23,6 +23,14 @@ public interface ComparisonStrategy<T> {
     return createTypeAddedDiffedField(objectAsType(value));
   }
 
+
+  /**
+   * create a diffedField object where the diff type is NOT_DIFFED.
+   */
+  default DiffedField createNotDiffedField(Object value) {
+    return createTypeNotDiffedField(objectAsType(value));
+  }
+
   /**
    * This is the attach point the diff service code uses. The Implementation detail is left to each strategy.
    */
@@ -51,4 +59,9 @@ public interface ComparisonStrategy<T> {
    * Type specific representation of added value.
    */
   DiffedField createTypeAddedDiffedField(T value);
+
+  /**
+   * Type specific representation of a 'not diffed' value.
+   */
+  DiffedField createTypeNotDiffedField(T value);
 }

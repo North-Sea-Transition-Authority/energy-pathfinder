@@ -63,9 +63,9 @@ public class CancelDraftProjectVersionService {
 
   private void cancelProjectVersion(ProjectDetail projectDetail) {
 
-    projectFormSectionServices.forEach(
-        projectFormSectionService -> projectFormSectionService.removeSectionData(projectDetail)
-    );
+    projectFormSectionServices.stream()
+        .filter(projectFormSectionService -> projectFormSectionService.getSupportedProjectTypes().contains(projectDetail.getProjectType()))
+        .forEach(projectFormSectionService -> projectFormSectionService.removeSectionData(projectDetail));
 
     if (!projectDetail.isFirstVersion()) {
       projectUpdateService.getByToDetail(projectDetail).ifPresent(projectUpdate -> {

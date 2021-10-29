@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.rest.OrganisationGroupRestController;
 import uk.co.ogauthority.pathfinder.controller.team.annotation.TeamManagementPermissionCheck;
@@ -201,9 +202,10 @@ public class PortalTeamManagementController {
   @TeamManagementPermissionCheck(permissions = TeamManagementPermission.MANAGE)
   public ModelAndView renderRemoveTeamMember(@PathVariable Integer resId,
                                              @PathVariable Integer personId,
-                                             TeamManagementContext teamManagementContext) {
+                                             TeamManagementContext teamManagementContext,
+                                             RedirectAttributes redirectAttributes) {
     var person = teamManagementService.getPerson(personId);
-    return getRemoveTeamMemberModelAndView(teamManagementContext, person, null);
+    return getRemoveTeamMemberModelAndView(teamManagementContext, person, null, redirectAttributes);
   }
 
   @PostMapping("/teams/{resId}/member/{personId}/remove")
@@ -219,12 +221,14 @@ public class PortalTeamManagementController {
       return getRemoveTeamMemberModelAndView(
           teamManagementContext,
           person,
-          "This person cannot be removed from the team as they are currently the only person in the access manager role.");
+          "This person cannot be removed from the team as they are currently the only person in the access manager role.",
+          null);
     }
     return ReverseRouter.redirect(on(PortalTeamManagementController.class).renderTeamMembers(resId, null));
   }
 
-  private ModelAndView getRemoveTeamMemberModelAndView(TeamManagementContext teamManagementContext, Person person, String error) {
+  private ModelAndView getRemoveTeamMemberModelAndView(TeamManagementContext teamManagementContext, Person person, String error,
+                                                       RedirectAttributes redirectAttributes) {
 
     final var team = teamManagementContext.getTeam();
 
@@ -232,17 +236,22 @@ public class PortalTeamManagementController {
         team,
         person,
         teamManagementContext.getUserAccount()
-    )
-        .orElseThrow(() -> new PathfinderEntityNotFoundException(
-            String.format("personId: %s is not a member of resId: %s", person.getId(), team.getId())
-        ));
+    );
 
-    return new ModelAndView("teamManagement/removeMember")
-        .addObject("cancelUrl", ReverseRouter.route(on(PortalTeamManagementController.class).renderTeamMembers(team.getId(), null)))
-        .addObject("showTopNav", true)
-        .addObject("teamName", team.getName())
-        .addObject("teamMember", teamMemberView)
-        .addObject("error", error);
+    if (teamMemberView.isPresent()) {
+      return new ModelAndView("teamManagement/removeMember")
+          .addObject("cancelUrl", ReverseRouter.route(on(PortalTeamManagementController.class).renderTeamMembers(team.getId(), null)))
+          .addObject("showTopNav", true)
+          .addObject("teamName", team.getName())
+          .addObject("teamMember", teamMemberView.get())
+          .addObject("error", error);
+    } else {
+      redirectAttributes.addFlashAttribute(
+          "bannerMessage",
+          String.format("%s is no longer a member of %s", person.getFullName(), teamManagementContext.getTeam().getName())
+      );
+      return ReverseRouter.redirect(on(PortalTeamManagementController.class).renderTeamMembers(team.getId(), null));
+    }
   }
 
   @GetMapping("/teams/{resId}/member/{personId}/roles")

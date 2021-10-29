@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.OperatorUpdateController;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
@@ -27,6 +26,7 @@ import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.project.submission.ProjectSubmissionSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 
 @Service
 public class OperatorProjectUpdateService {
@@ -165,7 +165,7 @@ public class OperatorProjectUpdateService {
         )
         .addObject(
             "workAreaUrl",
-            ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null))
+            ControllerUtils.getWorkAreaUrl()).addObject("feedbackUrl", ControllerUtils.getFeedbackUrl(projectDetail.getId())
         );
 
     ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, projectDetail);

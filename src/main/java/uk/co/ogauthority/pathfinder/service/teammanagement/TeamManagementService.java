@@ -125,6 +125,7 @@ public class TeamManagementService {
     String removeRoute = ReverseRouter.route(on(PortalTeamManagementController.class).renderRemoveTeamMember(
         team.getId(),
         teamMemberPerson.getId().asInt(),
+        null,
         null
     ));
 

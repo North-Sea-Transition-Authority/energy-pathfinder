@@ -357,6 +357,11 @@ public class ProjectSetupServiceTest {
   }
 
   @Test
+  public void getSupportedProjectTypes_verifyInfrastructure() {
+    assertThat(projectSetupService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
+  }
+
+  @Test
   public void alwaysCopySectionData_verifyFalse() {
     assertThat(projectSetupService.alwaysCopySectionData(details)).isFalse();
   }

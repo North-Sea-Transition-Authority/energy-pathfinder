@@ -14,6 +14,11 @@
 <#-- @ftlvariable name="accessibilityStatementUrl" type="String" -->
 <#-- @ftlvariable name="contactUrl" type="String" -->
 
+<#-- @ftlvariable name="feedbackUrl" type="String" -->
+<#-- @ftlvariable name="flashTitle" type="String" -->
+<#-- @ftlvariable name="flashClass" type="String" -->
+<#-- @ftlvariable name="flashMessage" type="String" -->
+
 <#macro defaultPage
   htmlTitle
   mainClasses="govuk-main-wrapper"
@@ -33,8 +38,8 @@
   backLinkUrl=""
   backLinkText="Back"
   breadcrumbs=false
-  phaseBanner=false
-  phaseBannerLink="#"
+  phaseBanner=true
+  phaseBannerLink=feedbackUrl!""
   topNavigation=true
   wrapperWidth=false
   masthead=false
@@ -60,12 +65,21 @@
     />
 
     <#--Phase banner-->
-    <#if phaseBanner>
+    <#if phaseBanner && feedbackUrl?has_content>
       <div class="govuk-phase-banner__wrapper">
         <div class="govuk-phase-banner<#if wrapperWidth> govuk-width-container-wide<#else> govuk-width-container</#if><#if topNavigation> govuk-phase-banner--no-border</#if>">
           <p class="govuk-phase-banner__content">
-            <strong class="govuk-tag govuk-phase-banner__content__tag ">alpha</strong>
-            <span class="govuk-phase-banner__text">This is a new service – your <a class="govuk-link" href="${phaseBannerLink}">feedback</a> will help us to improve it.</span>
+            <strong class="govuk-tag govuk-phase-banner__content__tag ">beta</strong>
+            <span class="govuk-phase-banner__text">
+              <span>This is a new service – your</span>
+              <@fdsAction.link
+                linkText="feedback"
+                linkUrl=springUrl(phaseBannerLink)
+                openInNewTab=true
+                linkClass="govuk-link govuk-link--no-visited-state"
+              />
+              <span> will help us to improve it.</span>
+            </span>
           </p>
         </div>
       </div>
@@ -90,11 +104,26 @@
       <@fdsBackLink.backLink backLinkUrl=backLinkUrl backLinkText=backLinkText/>
     </#if>
 
+    <#assign flash>
+      <#if flashTitle?has_content>
+        <#if flashMessage?has_content>
+          <@fdsFlash.flash flashTitle=flashTitle flashClass=flashClass!"">
+            <p class="govuk-body govuk-!-margin-bottom-0">
+              ${flashMessage}
+            </p>
+          </@fdsFlash.flash>
+          <#else>
+            <@fdsFlash.flash flashTitle=flashTitle flashClass=flashClass!""/>
+        </#if>
+      </#if>
+    </#assign>
+
     <main class="${mainClasses}" id="main-content" role="main">
       <#--Grid-->
       <#if fullWidthColumn>
         <@grid.gridRow>
           <@grid.fullColumn>
+            ${flash}
             <@defaultHeading
               caption=caption
               captionClass=captionClass
@@ -108,6 +137,7 @@
       <#elseif oneHalfColumn>
         <@grid.gridRow>
           <@grid.oneHalfColumn>
+            ${flash}
             <@defaultHeading
               caption=caption
               captionClass=captionClass
@@ -121,6 +151,7 @@
       <#elseif oneThirdColumn>
         <@grid.gridRow>
           <@grid.oneThirdColumn>
+            ${flash}
             <@defaultHeading
               caption=caption
               captionClass=captionClass
@@ -134,6 +165,7 @@
       <#elseif twoThirdsColumn>
         <@grid.gridRow>
           <@grid.twoThirdsColumn>
+            ${flash}
             <@defaultHeading
               caption=caption
               captionClass=captionClass
@@ -147,6 +179,7 @@
       <#elseif oneQuarterColumn>
         <@grid.gridRow>
           <@grid.oneQuarterColumn>
+            ${flash}
             <@defaultHeading
               caption=caption
               captionClass=captionClass
@@ -160,6 +193,7 @@
       <#elseif twoThirdsOneThirdColumn>
         <@grid.gridRow>
           <@grid.twoThirdsColumn>
+            ${flash}
             <@defaultHeading
               caption=caption
               captionClass=captionClass
@@ -174,6 +208,7 @@
           </@grid.oneThirdColumn>
         </@grid.gridRow>
       <#else>
+        ${flash}
         <@defaultHeading
           caption=caption
           captionClass=captionClass

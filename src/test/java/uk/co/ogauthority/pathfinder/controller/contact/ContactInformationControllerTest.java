@@ -18,11 +18,13 @@ import uk.co.ogauthority.pathfinder.service.contact.SupportContactService;
 public class ContactInformationControllerTest extends AbstractControllerTest {
 
   @MockBean
-  private SupportContactService supportContactService;
+  SupportContactService supportContactService;
 
   @Test
   public void getContactInformation() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(on(ContactInformationController.class).getContactInformation())))
+    mockMvc.perform(
+        get(ReverseRouter.route(on(ContactInformationController.class).getContactInformation(true)))
+    )
         .andExpect(status().isOk());
   }
 }

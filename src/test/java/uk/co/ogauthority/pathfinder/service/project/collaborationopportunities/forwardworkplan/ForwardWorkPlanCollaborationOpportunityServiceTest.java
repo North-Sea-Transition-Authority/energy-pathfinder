@@ -382,4 +382,9 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
     verify(forwardWorkPlanCollaborationOpportunityRepository, times(1)).deleteAll(opportunitiesForDetail);
   }
 
+  @Test
+  public void getSupportedProjectTypes_verifyForwardWorkPlan() {
+    assertThat(forwardWorkPlanCollaborationOpportunityService.getSupportedProjectTypes()).containsExactly(ProjectType.FORWARD_WORK_PLAN);
+  }
+
 }

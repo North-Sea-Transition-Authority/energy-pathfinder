@@ -23,6 +23,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.Cam
 import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignProject;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.campaigninformation.CampaignInformationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.campaigninformation.CampaignInformationFormValidator;
@@ -309,6 +310,11 @@ public class CampaignInformationServiceTest {
     );
 
     assertThat(result).contains(expectedCampaignInformation);
+  }
+
+  @Test
+  public void getSupportedProjectTypes_verifyInfrastructure() {
+    assertThat(campaignInformationService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
   }
 
   private void callValidateMethodAndVerifyInteractions(ValidationType validationType) {

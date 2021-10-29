@@ -170,6 +170,7 @@ public class ForwardWorkPlanCollaborationOpportunitiesSectionSummaryServiceTest 
           eq(collaborationOpportunityView.getUploadedFileViews()),
           eq(previousCollaborationOpportunityView.getUploadedFileViews()),
           eq(Set.of("fileUploadedTime")),
+          eq(Set.of("fileUrl")),
           any(),
           any()
       );

@@ -25,7 +25,7 @@ public class FooterService {
     var footerItems = new ArrayList<FooterItem>();
     footerItems.add(new FooterItem(
         CONTACT_URL_ATTR_NAME,
-        ControllerUtils.getContactUrl())
+        ControllerUtils.getContactUrl(false))
     );
     footerItems.add(new FooterItem(
         ACCESSIBILITY_STATEMENT_URL_ATTR_NAME,
