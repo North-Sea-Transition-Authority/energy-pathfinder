@@ -356,6 +356,11 @@ public class ProjectSetupServiceTest {
     assertThat(isValidAndSelected).isTrue();
   }
 
+  @Test
+  public void getSupportedProjectTypes_verifyInfrastructure() {
+    assertThat(projectSetupService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
+  }
+
   private void checkCommonFieldsMatch(ProjectSetupForm formToCheckAgainst, ProjectSetupForm resultingForm) {
     assertThat(formToCheckAgainst.getUpcomingTendersIncluded()).isEqualTo(resultingForm.getUpcomingTendersIncluded());
     assertThat(formToCheckAgainst.getAwardedContractsIncluded()).isEqualTo(resultingForm.getAwardedContractsIncluded());

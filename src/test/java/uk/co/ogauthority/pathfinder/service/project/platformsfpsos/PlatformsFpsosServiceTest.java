@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.PlatformFpsoInfrastructureType;
 import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.SubstructureRemovalPremise;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
@@ -609,6 +610,10 @@ public class PlatformsFpsosServiceTest {
     );
   }
 
+  @Test
+  public void getSupportedProjectTypes_verifyInfrastructure() {
+    assertThat(platformsFpsosService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
+  }
   private void assertFpsoSpecificQuestionsAreNull(PlatformFpso sourceEntity) {
     assertThat(sourceEntity.getFpsoType()).isNull();
     assertThat(sourceEntity.getFpsoDimensions()).isNull();

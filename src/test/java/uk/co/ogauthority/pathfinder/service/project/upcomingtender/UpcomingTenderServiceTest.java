@@ -25,6 +25,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.Upcoming
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderFormValidator;
@@ -376,5 +377,10 @@ public class UpcomingTenderServiceTest {
 
     var result = upcomingTenderService.getUpcomingTendersForProjectVersion(project, version);
     assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void getSupportedProjectTypes_verifyInfrastructure() {
+    assertThat(upcomingTenderService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
   }
 }

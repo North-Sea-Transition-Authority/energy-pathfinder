@@ -545,4 +545,9 @@ public class DecommissioningScheduleServiceTest {
         DecommissioningSchedule.class
     );
   }
+
+  @Test
+  public void getSupportedProjectTypes_verifyInfrastructure() {
+    assertThat(decommissioningScheduleService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
+  }
 }

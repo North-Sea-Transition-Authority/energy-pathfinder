@@ -8,7 +8,7 @@ public enum ServiceContactDetail {
       "pathfinder@ogauthority.co.uk",
       "",
       "https://www.ogauthority.co.uk/supply-chain/energy-pathfinder/",
-      "For example, questions about filling in your project and the information you need to provide",
+      "For example, questions about filling in your project, the information you need to provide or to provide feedback on the service",
       true,
       10
   ),

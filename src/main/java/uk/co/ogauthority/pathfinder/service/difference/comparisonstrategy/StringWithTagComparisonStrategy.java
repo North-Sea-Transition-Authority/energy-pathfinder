@@ -48,5 +48,10 @@ public class StringWithTagComparisonStrategy implements ComparisonStrategy<Strin
   public DiffedField createTypeAddedDiffedField(StringWithTag value) {
     return new DiffedField(DifferenceType.ADDED, value.getValue(), null, value.getTag(), null);
   }
+
+  @Override
+  public DiffedField createTypeNotDiffedField(StringWithTag value) {
+    return new DiffedField(DifferenceType.NOT_DIFFED, value.getValue(), null, value.getTag(), null);
+  }
 }
 

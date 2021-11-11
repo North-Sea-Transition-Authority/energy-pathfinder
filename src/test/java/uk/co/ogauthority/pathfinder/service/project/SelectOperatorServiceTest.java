@@ -228,6 +228,11 @@ public class SelectOperatorServiceTest {
     assertThat(selectOperatorService.canShowInTaskList(projectDetail)).isFalse();
   }
 
+  @Test
+  public void getSupportedProjectTypes_verifyInfrastructure() {
+    assertThat(selectOperatorService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
+  }
+
   private void assertCommonOperatorFormProperties(ProjectOperatorForm formToAssert, ProjectOperator sourceEntity) {
     assertThat(formToAssert.getOperator()).isEqualTo(String.valueOf(sourceEntity.getOrganisationGroup().getOrgGrpId()));
     assertThat(formToAssert.isPublishedAsOperator()).isEqualTo(sourceEntity.isPublishedAsOperator());

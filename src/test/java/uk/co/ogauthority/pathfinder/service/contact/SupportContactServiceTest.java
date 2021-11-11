@@ -28,12 +28,23 @@ public class SupportContactServiceTest {
   }
 
   @Test
-  public void getContactInformationModelAndView() {
-    var modelAndView = supportContactService.getContactInformationModelAndView();
+  public void getContactInformationModelAndView_whenOpensInNewTab_thenOpensInNewTabIsTrue() {
+    assertExpectedModelProperties(true);
+  }
+
+  @Test
+  public void getContactInformationModelAndView_whenDoesntOpensInNewTab_thenOpensInNewTabIsFalse() {
+    assertExpectedModelProperties(false);
+  }
+
+  private void assertExpectedModelProperties(boolean showBackLink) {
+
+    var modelAndView = supportContactService.getContactInformationModelAndView(showBackLink);
 
     assertThat(modelAndView.getViewName()).isEqualTo(SupportContactService.TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
-        entry("contacts", supportContactService.getSupportContactList())
+        entry("contacts", supportContactService.getSupportContactList()),
+        entry("opensInNewTab", showBackLink)
     );
   }
 }

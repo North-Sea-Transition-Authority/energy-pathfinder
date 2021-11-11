@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlTemplate;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -28,6 +29,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -41,9 +43,11 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.teammanagement.AddOrganisationTeamForm;
 import uk.co.ogauthority.pathfinder.model.form.teammanagement.UserRolesForm;
+import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
+import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
+import uk.co.ogauthority.pathfinder.model.team.Team;
 import uk.co.ogauthority.pathfinder.model.teammanagement.TeamMemberView;
 import uk.co.ogauthority.pathfinder.model.teammanagement.TeamRoleView;
-import uk.co.ogauthority.pathfinder.model.team.Team;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.team.TeamCreationService;
@@ -51,8 +55,6 @@ import uk.co.ogauthority.pathfinder.service.team.teammanagementcontext.TeamManag
 import uk.co.ogauthority.pathfinder.service.teammanagement.AddUserToTeamFormValidator;
 import uk.co.ogauthority.pathfinder.service.teammanagement.LastAdministratorException;
 import uk.co.ogauthority.pathfinder.service.teammanagement.TeamManagementService;
-import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
-import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.testutil.ControllerTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -354,7 +356,10 @@ public class PortalTeamManagementControllerTest extends TeamManagementContextAbs
             regulatorTeam.getId(),
             regulatorTeamAdminPerson.getId().asInt())
             .with(authenticatedUserAndSession(regulatorTeamAdmin)))
-        .andExpect(status().isNotFound());
+        .andExpect(MockMvcResultMatchers.flash().attribute("bannerMessage",
+            String.format("%s is no longer a member of %s", regulatorTeamAdminPerson.getFullName(), regulatorTeam.getName())))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl(ReverseRouter.route(on(PortalTeamManagementController.class).renderTeamMembers(regulatorTeam.getId(), null))));
   }
 
   @Test

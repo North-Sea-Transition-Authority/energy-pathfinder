@@ -1,11 +1,18 @@
 <#include '../layout.ftl'>
 <#include 'errorReference.ftl'>
 
+<#-- @ftlvariable name="errorRef" type="String" -->
+<#-- @ftlvariable name="technicalSupportContact" type="uk.co.ogauthority.pathfinder.model.enums.contact.ServiceContactDetail" -->
+<#-- @ftlvariable name="service" type="uk.co.ogauthority.pathfinder.config.ServiceProperties" -->
+
+<#assign pageTitle = "Sorry, there is a problem with the service" />
+
 <@defaultPage
-  htmlTitle="Sorry, there is a problem with the service"
-  pageHeading="Sorry, there is a problem with the service"
+  htmlTitle=pageTitle
+  pageHeading=pageTitle
   topNavigation=false
   twoThirdsColumn=true
+  phaseBanner=false
 >
   <p class="govuk-body">Try again later.</p>
   <p class="govuk-body">

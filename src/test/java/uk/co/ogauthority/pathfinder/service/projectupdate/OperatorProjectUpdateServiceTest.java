@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.OperatorUpdateController;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
@@ -35,6 +34,7 @@ import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSumma
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
+import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OperatorProjectUpdateServiceTest {
@@ -246,7 +246,8 @@ public class OperatorProjectUpdateServiceTest {
     assertThat(modelAndView.getViewName()).isEqualTo(OperatorProjectUpdateService.PROVIDE_NO_UPDATE_CONFIRMATION_TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
         entry("projectNoUpdateSummaryView", projectNoUpdateSummaryView),
-        entry("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
+        entry("workAreaUrl", ControllerUtils.getWorkAreaUrl()),
+        entry("feedbackUrl", ControllerUtils.getFeedbackUrl(projectDetail.getId()))
     );
   }
 

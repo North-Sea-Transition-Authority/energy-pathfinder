@@ -582,4 +582,9 @@ public class ProjectInformationServiceTest {
       assertThat(isOilAndGasProject).isFalse();
     });
   }
+
+  @Test
+  public void getSupportedProjectTypes_verifyInfrastructure() {
+    assertThat(projectInformationService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
+  }
 }

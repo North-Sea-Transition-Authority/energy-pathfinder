@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.accessibility.AccessibilityStatementController;
 import uk.co.ogauthority.pathfinder.controller.contact.ContactInformationController;
+import uk.co.ogauthority.pathfinder.controller.feedback.FeedbackController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.setup.ProjectSetupController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
@@ -48,10 +49,18 @@ public class ControllerUtils {
   }
 
   public static String getContactUrl() {
-    return ReverseRouter.route(on(ContactInformationController.class).getContactInformation());
+    return getContactUrl(false);
+  }
+
+  public static String getContactUrl(boolean opensInNewTab) {
+    return ReverseRouter.route(on(ContactInformationController.class).getContactInformation(opensInNewTab));
   }
 
   public static String getAccessibilityStatementUrl() {
     return ReverseRouter.route(on(AccessibilityStatementController.class).getAccessibilityStatement());
+  }
+
+  public static String getFeedbackUrl(Integer projectDetailId) {
+    return ReverseRouter.route(on(FeedbackController.class).getFeedback(projectDetailId, null));
   }
 }

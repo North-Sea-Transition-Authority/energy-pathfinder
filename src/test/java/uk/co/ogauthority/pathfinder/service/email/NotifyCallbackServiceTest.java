@@ -119,9 +119,12 @@ public class NotifyCallbackServiceTest {
   }
 
   @Test
-  public void isCallbackTokenMatching_matchingToken() {
-    String bearerToken = NotifyCallbackService.AUTHORIZATION_SCHEME + CALLBACK_TOKEN;
-
-    assertThat(notifyCallbackService.isTokenValid(bearerToken)).isTrue();
+  public void isTokenValid_tokenStartWithCharactersInBearerAndTokenIsValid_thenReturnTrue() {
+    String testToken = "-token";
+    for(char c : NotifyCallbackService.AUTHORIZATION_SCHEME.toCharArray()){
+      notifyCallbackService = new NotifyCallbackService(emailServiceMock, notificationClientMock, BOUNCE_BACK_EMAIL_BOX, c + testToken);
+      String bearerToken = NotifyCallbackService.AUTHORIZATION_SCHEME + c + testToken;
+      assertThat(notifyCallbackService.isTokenValid(bearerToken)).isTrue();
+    }
   }
 }

@@ -243,7 +243,8 @@ public class SubmitProjectServiceTest {
     assertProjectSubmitConfirmationModelAndView(
         modelAndView,
         false,
-        projectSubmissionSummaryView
+        projectSubmissionSummaryView,
+        projectDetail
     );
   }
 
@@ -261,18 +262,21 @@ public class SubmitProjectServiceTest {
     assertProjectSubmitConfirmationModelAndView(
         modelAndView,
         true,
-        projectSubmissionSummaryView
+        projectSubmissionSummaryView,
+        projectDetail
     );
   }
 
   private void assertProjectSubmitConfirmationModelAndView(ModelAndView modelAndView,
                                                            boolean isUpdate,
-                                                           ProjectSubmissionSummaryView projectSubmissionSummaryView) {
+                                                           ProjectSubmissionSummaryView projectSubmissionSummaryView,
+                                                           ProjectDetail projectDetail) {
     assertThat(modelAndView.getViewName()).isEqualTo(SubmitProjectService.PROJECT_SUBMIT_CONFIRMATION_TEMPLATE_PATH);
     assertThat(modelAndView.getModelMap()).containsExactly(
         entry("isUpdate", isUpdate),
         entry("projectSubmissionSummaryView", projectSubmissionSummaryView),
-        entry("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
+        entry("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null))),
+        entry("feedbackUrl", ControllerUtils.getFeedbackUrl(projectDetail.getId()))
     );
   }
 }

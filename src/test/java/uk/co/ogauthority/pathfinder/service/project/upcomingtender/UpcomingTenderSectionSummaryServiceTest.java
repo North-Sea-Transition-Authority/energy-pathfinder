@@ -130,6 +130,7 @@ public class UpcomingTenderSectionSummaryServiceTest {
           eq(upcomingTenderView.getUploadedFileViews()),
           eq(previousUpcomingTenderView.getUploadedFileViews()),
           eq(Set.of("fileUploadedTime")),
+          eq(Set.of("fileUrl")),
           any(),
           any()
       );
