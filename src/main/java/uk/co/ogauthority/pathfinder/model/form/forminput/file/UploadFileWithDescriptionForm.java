@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.MandatoryUploadValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
+import uk.co.ogauthority.pathfinder.model.form.validation.lengthrestrictedstring.LengthRestrictedString;
 
 /**
  * Form which allows a single file with a mandatory description to be uploaded.
@@ -17,6 +18,11 @@ public class UploadFileWithDescriptionForm {
   private String uploadedFileId;
 
   @NotEmpty(message = "Enter a file description", groups = {
+      FullValidation.class,
+      PartialValidation.class,
+      MandatoryUploadValidation.class
+  })
+  @LengthRestrictedString(messagePrefix = "The file description", max = 2000, groups = {
       FullValidation.class,
       PartialValidation.class,
       MandatoryUploadValidation.class
