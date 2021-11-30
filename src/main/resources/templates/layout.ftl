@@ -19,6 +19,11 @@
 <#-- @ftlvariable name="flashClass" type="String" -->
 <#-- @ftlvariable name="flashMessage" type="String" -->
 
+<#-- @ftlvariable name="feedbackUrl" type="String" -->
+<#-- @ftlvariable name="flashTitle" type="String" -->
+<#-- @ftlvariable name="flashClass" type="String" -->
+<#-- @ftlvariable name="flashMessage" type="String" -->
+
 <#macro defaultPage
   htmlTitle
   mainClasses="govuk-main-wrapper"

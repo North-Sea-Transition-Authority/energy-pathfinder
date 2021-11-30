@@ -40,6 +40,17 @@ public class ReportableProjectTestUtil {
     );
   }
 
+  public static ReportableProject createReportableProject(String operatorName, String projectTitle) {
+    return createReportableProject(
+        FIELD_STAGE,
+        PROJECT_ID,
+        PROJECT_DETAIL_ID,
+        LAST_UPDATE_DATETIME,
+        operatorName,
+        projectTitle
+    );
+  }
+
   public static ReportableProject createReportableProject(FieldStage fieldStage,
                                                           int projectId,
                                                           int projectDetailId,
