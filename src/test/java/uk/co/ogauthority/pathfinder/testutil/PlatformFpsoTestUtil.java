@@ -91,6 +91,7 @@ public class PlatformFpsoTestUtil {
     platformFpso.setEarliestRemovalYear(EARLIEST_REMOVAL_YEAR);
     platformFpso.setLatestRemovalYear(LATEST_REMOVAL_YEAR);
     platformFpso.setFuturePlans(FUTURE_PLANS);
+    platformFpso.setSubstructuresExpectedToBeRemoved(substructuresRemoved);
 
     if (substructuresRemoved) {
       platformFpso.setSubstructureRemovalPremise(SUBSTRUCTURE_REMOVAL_PREMISE);
