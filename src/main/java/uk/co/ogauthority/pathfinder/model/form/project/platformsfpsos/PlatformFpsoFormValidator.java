@@ -25,7 +25,6 @@ public class PlatformFpsoFormValidator implements SmartValidator {
   public static final String MISSING_FPSO_DIMENSIONS_ERROR = String.format("Enter the %s dimensions", FLOATING_UNIT_TEXT_LOWERCASE);
   public static final String MISSING_SUBSTRUCTURE_REMOVAL_MASS_ERROR = "Enter an estimated substructure removal mass";
   public static final String MISSING_SUBSTRUCTURE_REMOVAL_PREMISE_ERROR = "Enter a substructure removal premise";
-  public static final String MISSING_SUBSTRUCTURE_REMOVAL_ERROR = "Select if substructure removal expected to be within scope";
   public static final String NEGATIVE_SUBSTRUCTURE_REMOVAL_MASS_ERROR =
       "Estimated substructure removal mass must be a positive whole number with no decimal places";
 
@@ -89,13 +88,6 @@ public class PlatformFpsoFormValidator implements SmartValidator {
       }
 
     }
-
-    ValidationUtils.rejectIfEmptyOrWhitespace(
-        errors,
-        "substructureExpectedToBeRemoved",
-        "substructureExpectedToBeRemoved.invalid",
-        MISSING_SUBSTRUCTURE_REMOVAL_ERROR
-    );
 
     validateSubstructureRemovalNestedQuestions(
         form,

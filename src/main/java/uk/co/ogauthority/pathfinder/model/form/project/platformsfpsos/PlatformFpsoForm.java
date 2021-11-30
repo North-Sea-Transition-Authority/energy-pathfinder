@@ -28,6 +28,7 @@ public class PlatformFpsoForm {
 
   private MinMaxDateInput topsideRemovalYears;
 
+  @NotNull(message = "Select if substructure removal is expected to be within scope", groups = FullValidation.class)
   private Boolean substructureExpectedToBeRemoved;
 
   private SubstructureRemovalPremise substructureRemovalPremise;

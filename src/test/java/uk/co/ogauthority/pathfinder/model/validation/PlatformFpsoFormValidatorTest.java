@@ -181,45 +181,6 @@ public class PlatformFpsoFormValidatorTest {
   }
 
   @Test
-  public void validate_whenFullValidationAndSubstructuresExpectedToBeRemovedNull_thenError() {
-
-    final var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpso_manualStructure();
-    form.setSubstructureExpectedToBeRemoved(null);
-
-    final var errors = new BeanPropertyBindingResult(form, "form");
-    final var validationHint = new PlatformFpsoValidationHint(ValidationType.FULL);
-
-    ValidationUtils.invokeValidator(validator, form, errors, validationHint);
-    final var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
-
-    assertThat(fieldErrors).containsExactly(
-        entry("substructureExpectedToBeRemoved", Set.of("substructureExpectedToBeRemoved.invalid"))
-    );
-
-    final var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
-
-    assertThat(fieldErrorMessages).containsExactly(
-        entry("substructureExpectedToBeRemoved", Set.of(PlatformFpsoFormValidator.MISSING_SUBSTRUCTURE_REMOVAL_ERROR))
-    );
-
-  }
-
-  @Test
-  public void validate_whenPartialValidationAndSubstructuresExpectedToBeRemovedNull_thenNoError() {
-
-    final var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpso_manualStructure();
-    form.setSubstructureExpectedToBeRemoved(null);
-
-    final var errors = new BeanPropertyBindingResult(form, "form");
-    final var validationHint = new PlatformFpsoValidationHint(ValidationType.PARTIAL);
-
-    ValidationUtils.invokeValidator(validator, form, errors, validationHint);
-    final var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
-
-    assertThat(fieldErrors).isEmpty();
-  }
-
-  @Test
   public void validate_whenPartialValidationAndSubstructuresExpectedIsFalse_thenNoErrorsInConditionalQuestions() {
 
     final var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpso_manualStructure();
