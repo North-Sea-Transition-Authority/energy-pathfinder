@@ -20,8 +20,8 @@ public class TaskListSectionQuestionTest {
       ProjectTask.CAMPAIGN_INFORMATION,
       ProjectTask.WELLS,
       ProjectTask.PLATFORM_FPSO,
-      ProjectTask.INTEGRATED_RIGS
-      // ProjectTask.SUBSEA_INFRASTRUCTURE // Subsea infrastructure disabled: PAT-495
+      ProjectTask.INTEGRATED_RIGS,
+      ProjectTask.SUBSEA_INFRASTRUCTURE
       // ProjectTask.PIPELINES // Pipelines disabled: PAT-457
   );
 

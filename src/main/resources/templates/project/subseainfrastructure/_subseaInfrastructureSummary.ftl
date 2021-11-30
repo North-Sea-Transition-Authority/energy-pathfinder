@@ -102,7 +102,7 @@
   latestDecommissioningCompletionYear=""
 >
   <@checkAnswers.checkAnswersStandardNestedOrDiffRow
-    prompt="Host structure"
+    prompt="Surface infrastructure"
     fieldValue=structure
     isDiffedField=useDiffedField
   >

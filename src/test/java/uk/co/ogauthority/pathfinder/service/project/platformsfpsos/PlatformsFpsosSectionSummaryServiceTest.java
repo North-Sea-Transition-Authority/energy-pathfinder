@@ -65,15 +65,15 @@ public class PlatformsFpsosSectionSummaryServiceTest {
 
   @Test
   public void getSummary() {
-    var platformFpso1 = PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndSubstructuresRemoved(detail);
-    var platformFpso2 = PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndSubstructuresRemoved(detail);
+    var platformFpso1 = PlatformFpsoTestUtil.getPlatformFpso_withPlatform(detail);
+    var platformFpso2 = PlatformFpsoTestUtil.getPlatformFpso_withPlatform(detail);
     var previousPlatformFpsos = List.of(platformFpso1, platformFpso2);
     var previousPlatformFpsoViews = List.of(
         PlatformFpsoViewUtil.createView(platformFpso1, 1, detail.getProject().getId()),
         PlatformFpsoViewUtil.createView(platformFpso2, 2, detail.getProject().getId())
     );
 
-    var platformFpso3 = PlatformFpsoTestUtil.getPlatformFpso_withPlatformAndSubstructuresRemoved(detail);
+    var platformFpso3 = PlatformFpsoTestUtil.getPlatformFpso_withPlatform(detail);
     var currentPlatformFpsos = List.of(platformFpso3);
     var currentPlatformFpsoViews = List.of(
         PlatformFpsoViewUtil.createView(platformFpso3, 1, detail.getProject().getId())

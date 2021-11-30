@@ -1,14 +1,18 @@
 <#include '../../layout.ftl'/>
+<#import './_terminology.ftl' as terminology>
+
+<#assign platformInitCapped = terminology.terminology['platformInitCapped'] />
+<#assign floatingUnitLowerCase = terminology.terminology['floatingUnitLowerCase'] />
+<#assign floatingUnitInitCapped = terminology.terminology['floatingUnitInitCapped'] />
 
 <#assign idPrefix = "platform-fpso" />
-<#assign headingPrefix = "Platform or FPSO" />
-<#assign defaultPlatformFpsoName = "Platform or FPSO" />
+<#assign headingPrefix = "${platformInitCapped} or ${floatingUnitLowerCase}" />
+<#assign defaultPlatformFpsoName = headingPrefix />
 <#assign defaultHeadingSize = "h2" />
 <#assign defaultHeadingClass = "govuk-heading-l" />
 
 <#macro platformFpsoSummary
   view
-  platformFpsoName=defaultPlatformFpsoName
   showHeader=false
   showActions=false
   headingSize=defaultHeadingSize
@@ -110,7 +114,7 @@
   futurePlans=""
 >
   <@checkAnswers.checkAnswersStandardOrDiffRow
-    prompt="Platform or FPSO"
+    prompt="${platformInitCapped} or ${floatingUnitLowerCase}"
     fieldValue=infrastructureType
     isDiffedField=useDiffedField
   />
@@ -125,24 +129,24 @@
   </#if>
   <#if fpso>
     <@checkAnswers.checkAnswersStandardOrDiffRow
-      prompt="FPSO type"
+      prompt="${floatingUnitInitCapped} type"
       fieldValue=fpsoType
       isDiffedField=useDiffedField
       />
     <@checkAnswers.checkAnswersStandardOrDiffRow
-      prompt="FPSO dimensions"
+      prompt="${floatingUnitInitCapped} dimensions"
       fieldValue=fpsoDimensions
       isDiffedField=useDiffedField
     />
   </#if>
   <@checkAnswers.checkAnswersStandardOrDiffRow
-    prompt="Topside/FPSO removal mass"
+    prompt="Topsides/${floatingUnitLowerCase} removal mass"
     fieldValue=topsideFpsoMass
     isDiffedField=useDiffedField
   />
   <@decomissioningPeriodCheckAnswers.decomissioningPeriodCheckAnswers
     useDiffedField=useDiffedField
-    prompt="Expected topside removal period"
+    prompt="Expected topsides/${floatingUnitLowerCase} removal period"
     earliestYear=topsideRemovalEarliestYear
     latestYear=topsideRemovalLatestYear
   />

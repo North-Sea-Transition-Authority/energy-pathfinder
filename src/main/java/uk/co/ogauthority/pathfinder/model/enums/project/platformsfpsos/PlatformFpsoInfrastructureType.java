@@ -2,11 +2,12 @@ package uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos;
 
 import java.util.Collections;
 import java.util.Map;
+import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 
 public enum PlatformFpsoInfrastructureType {
 
   PLATFORM("Platform"),
-  FPSO("FPSO");
+  FPSO(PlatformsFpsosController.FLOATING_UNIT_TEXT_INIT_CAP);
 
   private final String displayName;
 

@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.model.view.platformfpso;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.ArrayList;
+import org.apache.commons.lang3.BooleanUtils;
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
@@ -34,7 +35,9 @@ public class PlatformFpsoViewUtil {
         projectId
     );
 
-    view.setFpso(PlatformFpsoInfrastructureType.FPSO.equals(platformFpso.getInfrastructureType()));
+    final var isFpso = PlatformFpsoInfrastructureType.FPSO.equals(platformFpso.getInfrastructureType());
+
+    view.setFpso(isFpso);
     view.setInfrastructureType(platformFpso.getInfrastructureType() != null
         ? platformFpso.getInfrastructureType().getDisplayName()
         : ""
@@ -51,20 +54,36 @@ public class PlatformFpsoViewUtil {
     );
     view.setTopsideRemovalEarliestYear(getYearText(platformFpso.getEarliestRemovalYear(), EARLIEST_YEAR_TEXT));
     view.setTopsideRemovalLatestYear(getYearText(platformFpso.getLatestRemovalYear(), LATEST_YEAR_TEXT));
-    view.setSubstructuresExpectedToBeRemoved(platformFpso.getSubstructuresExpectedToBeRemoved());
-    view.setSubstructureRemovalPremise(platformFpso.getSubstructureRemovalPremise() != null
-        ? platformFpso.getSubstructureRemovalPremise().getDisplayName()
-        : ""
-    );
-    view.setSubstructureRemovalMass(platformFpso.getSubstructureRemovalMass() != null
-        ? getMass(platformFpso.getSubstructureRemovalMass())
-        : ""
-    );
-    view.setSubstructureRemovalEarliestYear(getYearText(platformFpso.getSubStructureRemovalEarliestYear(), EARLIEST_YEAR_TEXT));
-    view.setSubstructureRemovalLatestYear(getYearText(platformFpso.getSubStructureRemovalLatestYear(), LATEST_YEAR_TEXT));
-    view.setFpsoType(platformFpso.getFpsoType());
-    view.setFpsoDimensions(platformFpso.getFpsoDimensions());
-    view.setFuturePlans(platformFpso.getFuturePlans() != null ? platformFpso.getFuturePlans().getDisplayName() : "");
+
+    if (isFpso) {
+
+      view.setFpsoType(platformFpso.getFpsoType());
+      view.setFpsoDimensions(platformFpso.getFpsoDimensions());
+    }
+
+    final var substructuresToRemove = platformFpso.getSubstructuresExpectedToBeRemoved();
+
+    view.setSubstructuresExpectedToBeRemoved(substructuresToRemove);
+
+    if (BooleanUtils.isTrue(substructuresToRemove)) {
+
+      view.setSubstructureRemovalPremise(platformFpso.getSubstructureRemovalPremise() != null
+          ? platformFpso.getSubstructureRemovalPremise().getDisplayName()
+          : ""
+      );
+      view.setSubstructureRemovalMass(platformFpso.getSubstructureRemovalMass() != null
+          ? getMass(platformFpso.getSubstructureRemovalMass())
+          : ""
+      );
+      view.setSubstructureRemovalEarliestYear(
+          getYearText(platformFpso.getSubStructureRemovalEarliestYear(), EARLIEST_YEAR_TEXT));
+      view.setSubstructureRemovalLatestYear(
+          getYearText(platformFpso.getSubStructureRemovalLatestYear(), LATEST_YEAR_TEXT));
+
+    }
+
+    view.setFuturePlans(
+        platformFpso.getFuturePlans() != null ? platformFpso.getFuturePlans().getDisplayName() : "");
 
     var summaryLinks = new ArrayList<SummaryLink>();
     summaryLinks.add(

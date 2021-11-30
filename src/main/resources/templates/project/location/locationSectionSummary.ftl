@@ -1,5 +1,11 @@
 <#include '../../layout.ftl'/>
 
+<#-- @ftlvariable name="sectionId" type="String" -->
+<#-- @ftlvariable name="sectionTitle" type="String" -->
+<#-- @ftlvariable name="projectLocationDiffModel" type="java.util.Map<String, Object>" -->
+<#-- @ftlvariable name="hasApprovedFieldDevelopmentPlan" type="Boolean" -->
+<#-- @ftlvariable name="hasApprovedDecomProgram" type="Boolean" -->
+
 <@sectionSummaryWrapper.sectionSummaryWrapper sectionId=sectionId sectionTitle=sectionTitle>
   <@fdsCheckAnswers.checkAnswers>
     <@checkAnswers.diffedCheckAnswersRowNoActions
@@ -29,7 +35,7 @@
       />
     </#if>
     <@checkAnswers.diffedCheckAnswersRowNoActions
-      prompt="Approved Decommissioning Program"
+      prompt="Approved Decommissioning Programme"
       diffedField=projectLocationDiffModel.ProjectLocationView_approvedDecomProgram
     />
     <#if hasApprovedDecomProgram>

@@ -16,13 +16,13 @@ import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
 public class SubseaInfrastructureForm {
 
-  @NotEmpty(message = "Select a structure", groups = FullValidation.class)
+  @NotEmpty(message = "Select which surface infrastructure this subsea item ties back to", groups = FullValidation.class)
   private String structure;
 
-  @NotEmpty(message = "Enter a description for the structure", groups = FullValidation.class)
+  @NotEmpty(message = "Enter a description for the subsea item", groups = FullValidation.class)
   private String description;
 
-  @NotNull(message = "Select the status of the structure", groups = FullValidation.class)
+  @NotNull(message = "Select the status of the subsea item", groups = FullValidation.class)
   private InfrastructureStatus status;
 
   @NotNull(message = "Select the type of subsea infrastructure", groups = FullValidation.class)
