@@ -30,7 +30,6 @@ public class AddedToTeamEmailProperties extends EmailProperties {
     emailPersonalisation.put("ADDED_BY_USER_NAME", addedByUserName);
     emailPersonalisation.put("ROLES_CSV", rolesCsv);
     emailPersonalisation.put("SERVICE_LOGIN_URL", serviceLoginUrl);
-    emailPersonalisation.put("SERVICE_LOGIN_TEXT", EmailProperties.DEFAULT_SERVICE_LOGIN_TEXT);
     return emailPersonalisation;
   }
 }

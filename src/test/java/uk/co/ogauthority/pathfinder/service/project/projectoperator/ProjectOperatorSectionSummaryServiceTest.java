@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.project.projectoperator;
 
-import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -13,12 +12,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.view.projectoperator.ProjectOperatorView;
 import uk.co.ogauthority.pathfinder.model.view.projectoperator.ProjectOperatorViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
@@ -32,23 +34,31 @@ public class ProjectOperatorSectionSummaryServiceTest {
   @Mock
   private DifferenceService differenceService;
 
+  @Mock
+  private SelectOperatorService selectOperatorService;
+
+  @Mock
+  private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   private ProjectOperatorSectionSummaryService projectOperatorSectionSummaryService;
+
+  private final ProjectDetail details = ProjectUtil.getProjectDetails();
 
   @Before
   public void setup() {
     projectOperatorSectionSummaryService = new ProjectOperatorSectionSummaryService(
         projectOperatorService,
-        differenceService
+        differenceService,
+        selectOperatorService,
+        projectSectionSummaryCommonModelService
     );
   }
 
   @Test
   public void getSummary_whenProjectOperatorExists_thenProjectOperatorViewPopulated() {
 
-    final var projectDetail = ProjectUtil.getProjectDetails();
-
     final var currentProjectOperator = ProjectOperatorTestUtil.getOperator(
-        projectDetail,
+        details,
         TeamTestingUtil.generateOrganisationGroup(
             10,
             "TEST",
@@ -58,7 +68,7 @@ public class ProjectOperatorSectionSummaryServiceTest {
     final var currentProjectOperatorView = ProjectOperatorViewUtil.from(currentProjectOperator);
 
     final var previousProjectOperator = ProjectOperatorTestUtil.getOperator(
-        projectDetail,
+        details,
         TeamTestingUtil.generateOrganisationGroup(
           20,
           "TEST2",
@@ -67,18 +77,18 @@ public class ProjectOperatorSectionSummaryServiceTest {
     );
     final var previousProjectOperatorView = ProjectOperatorViewUtil.from(previousProjectOperator);
 
-    when(projectOperatorService.getProjectOperatorByProjectDetailOrError(projectDetail))
+    when(projectOperatorService.getProjectOperatorByProjectDetailOrError(details))
         .thenReturn(currentProjectOperator);
 
     when(projectOperatorService.getProjectOperatorByProjectAndVersion(
-        projectDetail.getProject(),
-        projectDetail.getVersion() - 1
+        details.getProject(),
+        details.getVersion() - 1
     ))
         .thenReturn(Optional.of(previousProjectOperator));
 
-    final var sectionSummary = projectOperatorSectionSummaryService.getSummary(projectDetail);
+    final var sectionSummary = projectOperatorSectionSummaryService.getSummary(details);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, details);
     assertInteractions(currentProjectOperatorView, previousProjectOperatorView);
   }
 
@@ -99,11 +109,12 @@ public class ProjectOperatorSectionSummaryServiceTest {
 
     final var sectionSummary = projectOperatorSectionSummaryService.getSummary(projectDetail);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, projectDetail);
     assertInteractions(currentProjectOperatorView, previousProjectOperatorView);
+
   }
 
-  private void assertModelProperties(ProjectSectionSummary sectionSummary) {
+  private void assertModelProperties(ProjectSectionSummary sectionSummary, ProjectDetail projectDetail) {
 
     assertThat(sectionSummary.getDisplayOrder()).isEqualTo(ProjectOperatorSectionSummaryService.DISPLAY_ORDER);
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectOperatorSectionSummaryService.SECTION_LINK));
@@ -111,19 +122,31 @@ public class ProjectOperatorSectionSummaryServiceTest {
 
     var model = sectionSummary.getTemplateModel();
 
-    assertThat(model).containsOnlyKeys(
-        "sectionTitle",
-        "sectionId",
-        "projectOperatorDiffModel",
-        "isPublishedAsOperator"
+    verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
+        projectDetail,
+        ProjectOperatorSectionSummaryService.PAGE_NAME,
+        ProjectOperatorSectionSummaryService.SECTION_ID
     );
 
-    assertThat(model).contains(entry("sectionTitle", ProjectOperatorSectionSummaryService.PAGE_NAME));
-    assertThat(model).contains(entry("sectionId", ProjectOperatorSectionSummaryService.SECTION_ID));
+    assertThat(model).containsOnlyKeys("isPublishedAsOperator", "projectOperatorDiffModel");
   }
 
   private void assertInteractions(ProjectOperatorView currentProjectOperatorView, ProjectOperatorView previousProjectOperatorView) {
     verify(differenceService, times(1)).differentiate(currentProjectOperatorView, previousProjectOperatorView);
+  }
+
+  @Test
+  public void canShowSection_whenCanShowInTaskList_thenTrue() {
+    when(selectOperatorService.canShowInTaskList(details)).thenReturn(true);
+
+    assertThat(projectOperatorSectionSummaryService.canShowSection(details)).isTrue();
+  }
+
+  @Test
+  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
+    when(selectOperatorService.canShowInTaskList(details)).thenReturn(false);
+
+    assertThat(projectOperatorSectionSummaryService.canShowSection(details)).isFalse();
   }
 
 }

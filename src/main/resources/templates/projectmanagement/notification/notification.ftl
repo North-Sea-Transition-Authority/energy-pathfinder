@@ -1,9 +1,11 @@
 <#include '../../layout.ftl'>
 
 <#if showRegulatorUpdateRequestNotification>
-  <@_regulatorUpdateRequestNotification
+  <@_regulatorUpdateRequestNotificationBanner
     regulatorMnemonic=service.customerMnemonic
     regulatorUpdateRequestView=regulatorUpdateRequestView
+    projectTypeDisplayNameLowercase=projectTypeDisplayNameLowercase
+    titleString=titleString
   />
   <#elseif showUpdateInProgressNotification>
     <@_operatorUpdateInProgressNotification
@@ -23,28 +25,29 @@
   </@fdsContactPanel.contactPanel>
 </#macro>
 
-<#macro _regulatorUpdateRequestNotification regulatorMnemonic regulatorUpdateRequestView>
-  <@panel.panel
-    headingText="The ${regulatorMnemonic} have requested an update to this project"
+<#macro _regulatorUpdateRequestNotificationBanner
+  regulatorMnemonic
+  regulatorUpdateRequestView
+  projectTypeDisplayNameLowercase
+  titleString
+>
+  <@fdsNotificationBanner.notificationBannerInfo
+    bannerTitleText="${regulatorMnemonic} have requested an update"
+    bannerClass="govuk-notification-banner--full-width-content"
   >
-    <@panel.panelSection headingText="Update reason">
+    <#if titleString?has_content>
+      <h3 class="govuk-notification-banner__heading">
+        ${titleString}
+      </h3>
+    </#if>
+    <p class="govuk-body">
+      Provide an update in order to make the changes the ${regulatorMnemonic} have requested.
+      Confirm no changes if you do not need to change any information on your ${projectTypeDisplayNameLowercase}.
+    </p>
+    <@fdsDetails.summaryDetails summaryTitle="What have ${regulatorMnemonic} asked me to update?">
       <@multiLineText.multiLineText blockClass="govuk-body">
         ${regulatorUpdateRequestView.updateReason}
       </@multiLineText.multiLineText>
-    </@panel.panelSection>
-    <#if regulatorUpdateRequestView.deadlineDate?has_content>
-      <@panel.panelSection headingText="Deadline date">
-        ${regulatorUpdateRequestView.deadlineDate}
-      </@panel.panelSection>
-    </#if>
-    <@panel.panelSection headingText="Update requested by">
-      <div>
-        ${regulatorUpdateRequestView.requestedByUserName}
-        <#if regulatorUpdateRequestView.requestedByUserEmailAddress?has_content>
-          (${regulatorUpdateRequestView.requestedByUserEmailAddress})
-        </#if>
-      </div>
-      <div>${regulatorUpdateRequestView.requestedDate}</div>
-    </@panel.panelSection>
-  </@panel.panel>
+    </@fdsDetails.summaryDetails>
+  </@fdsNotificationBanner.notificationBannerInfo>
 </#macro>

@@ -27,7 +27,8 @@ import uk.co.ogauthority.pathfinder.model.form.projectarchive.ArchiveProjectForm
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectarchive.ProjectArchiveDetailRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
-import uk.co.ogauthority.pathfinder.service.project.CancelDraftProjectVersionService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
+import uk.co.ogauthority.pathfinder.service.project.cancellation.CancelDraftProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -137,14 +138,28 @@ public class ArchiveProjectServiceTest {
         form
     );
 
+    final var pageHeading = String.format(
+        "%s %s",
+        ArchiveProjectController.ARCHIVE_PROJECT_PAGE_NAME_PREFIX,
+        projectDetail.getProjectType().getLowercaseDisplayName()
+    );
+
     assertThat(modelAndView.getViewName()).isEqualTo(ArchiveProjectService.ARCHIVE_PROJECT_TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
         entry("projectHeaderHtml", projectHeaderHtml),
         entry("form", form),
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class)
-            .getProject(projectId, null, null, null)))
+            .getProject(projectId, null, null, null))
+        ),
+        entry("pageHeading", pageHeading),
+        entry(ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR, projectDetail.getProjectType().getDisplayName()),
+        entry(ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR, projectDetail.getProjectType().getLowercaseDisplayName())
     );
 
-    verify(breadcrumbService, times(1)).fromManageProject(projectId, modelAndView, ArchiveProjectController.ARCHIVE_PROJECT_PAGE_NAME);
+    verify(breadcrumbService, times(1)).fromManageProject(
+        projectDetail,
+        modelAndView,
+        pageHeading
+    );
   }
 }

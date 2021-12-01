@@ -7,22 +7,17 @@ import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplate;
 
 class ProjectTransferEmailProperties extends EmailProperties {
 
-  private final String projectName;
   private final String transferReason;
 
   public ProjectTransferEmailProperties(NotifyTemplate template,
-                                        String recipientName,
-                                        String projectName,
                                         String transferReason) {
-    super(template, recipientName);
-    this.projectName = projectName;
+    super(template);
     this.transferReason = transferReason;
   }
 
   @Override
   public Map<String, Object> getEmailPersonalisation() {
     var emailPersonalisation = super.getEmailPersonalisation();
-    emailPersonalisation.put("PROJECT_NAME", projectName);
     emailPersonalisation.put("TRANSFER_REASON", transferReason);
     return emailPersonalisation;
   }
@@ -39,12 +34,11 @@ class ProjectTransferEmailProperties extends EmailProperties {
       return false;
     }
     ProjectTransferEmailProperties that = (ProjectTransferEmailProperties) o;
-    return Objects.equals(projectName, that.projectName)
-        && Objects.equals(transferReason, that.transferReason);
+    return Objects.equals(transferReason, that.transferReason);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), projectName, transferReason);
+    return Objects.hash(super.hashCode(), transferReason);
   }
 }

@@ -94,6 +94,11 @@ public class SubscriptionService {
     subscriberRepository.deleteByUuid(subscriberUuid);
   }
 
+  @Transactional
+  public void unsubscribe(String emailAddress) {
+    subscriberRepository.deleteByEmailAddress(emailAddress);
+  }
+
   public BindingResult validate(SubscribeForm form, BindingResult bindingResult) {
     subscribeFormValidator.validate(form, bindingResult);
     return validationService.validate(form, bindingResult, ValidationType.FULL);

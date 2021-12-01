@@ -12,7 +12,8 @@
     />
     <h2 class="govuk-heading-m">Wells</h2>
     <@fdsAddToList.addToList
-      path="form.wells"
+      pathForList="form.wells"
+      pathForSelector="form.wellsSelect"
       alreadyAdded=alreadyAddedWells
       title=""
       itemName="Well"

@@ -7,6 +7,7 @@ import java.util.Objects;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.model.entity.quarterlystatistics.ReportableProject;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
@@ -24,9 +25,11 @@ public final class ReportableProjectView {
 
   private final String operatorName;
 
-  private final String projectTitle;
+  private final String projectDisplayName;
 
   private final boolean hasUpdateInQuarter;
+
+  private final ProjectType projectType;
 
   public ReportableProjectView(ReportableProject reportableProject) {
     this(
@@ -34,7 +37,8 @@ public final class ReportableProjectView {
         reportableProject.getFieldStage(),
         reportableProject.getLastUpdatedDatetime(),
         reportableProject.getOperatorName(),
-        reportableProject.getProjectTitle()
+        reportableProject.getProjectDisplayName(),
+        reportableProject.getProjectType()
     );
   }
 
@@ -42,7 +46,8 @@ public final class ReportableProjectView {
                                 FieldStage fieldStage,
                                 Instant lastUpdatedDatetime,
                                 String operatorName,
-                                String projectTitle) {
+                                String projectDisplayName,
+                                ProjectType projectType) {
     this.projectId = projectId;
     this.viewProjectUrl = ReverseRouter.route(on(ManageProjectController.class).getProject(
         projectId,
@@ -54,8 +59,9 @@ public final class ReportableProjectView {
     this.lastUpdatedDatetime = lastUpdatedDatetime;
     this.lastUpdatedDatetimeFormatted = DateUtil.formatInstant(lastUpdatedDatetime);
     this.operatorName = operatorName;
-    this.projectTitle = projectTitle;
+    this.projectDisplayName = projectDisplayName;
     this.hasUpdateInQuarter = DateUtil.isInCurrentQuarter(lastUpdatedDatetime);
+    this.projectType = projectType;
   }
 
   public Integer getProjectId() {
@@ -82,12 +88,16 @@ public final class ReportableProjectView {
     return operatorName;
   }
 
-  public String getProjectTitle() {
-    return projectTitle;
+  public String getProjectDisplayName() {
+    return projectDisplayName;
   }
 
   public boolean hasUpdateInQuarter() {
     return hasUpdateInQuarter;
+  }
+
+  public ProjectType getProjectType() {
+    return projectType;
   }
 
   @Override
@@ -104,11 +114,19 @@ public final class ReportableProjectView {
         && Objects.equals(fieldStage, that.fieldStage)
         && Objects.equals(lastUpdatedDatetime, that.lastUpdatedDatetime)
         && Objects.equals(operatorName, that.operatorName)
-        && Objects.equals(projectTitle, that.projectTitle);
+        && Objects.equals(projectDisplayName, that.projectDisplayName)
+        && Objects.equals(projectType, that.projectType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(projectId, fieldStage, lastUpdatedDatetime, operatorName, projectTitle);
+    return Objects.hash(
+        projectId,
+        fieldStage,
+        lastUpdatedDatetime,
+        operatorName,
+        projectDisplayName,
+        projectType
+    );
   }
 }

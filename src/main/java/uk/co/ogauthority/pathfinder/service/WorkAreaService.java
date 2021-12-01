@@ -11,7 +11,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
-import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
+import uk.co.ogauthority.pathfinder.controller.project.start.infrastructure.InfrastructureProjectStartController;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -40,7 +40,7 @@ public class WorkAreaService {
   public ModelAndView getWorkAreaModelAndViewForUser(AuthenticatedUserAccount user, DashboardFilter filter, DashboardFilterForm form) {
     var dashboardStopwatch = Stopwatch.createStarted();
     var filterType = dashboardService.getDashboardFilterType(user);
-    var dashboardProjectItemViews =  dashboardService.getDashboardProjectItemViewsForUser(user, filterType, filter);
+    var dashboardProjectHtmlItems =  dashboardService.getDashboardProjectHtmlItemsForUser(user, filterType, filter);
 
     var elapsedMs = dashboardStopwatch.elapsed(TimeUnit.MILLISECONDS);
     metricsProvider.getDashboardTimer().record(elapsedMs, TimeUnit.MILLISECONDS);
@@ -53,14 +53,14 @@ public class WorkAreaService {
         .addObject("statuses", ProjectStatus.getAllAsMap())
         .addObject("fieldStages", FieldStage.getAllAsMap())
         .addObject("ukcsAreas", UkcsArea.getAllAsMap())
-        .addObject("dashboardProjectItemViews", dashboardProjectItemViews)
-        .addObject("resultSize", dashboardProjectItemViews.size());
+        .addObject("dashboardProjectHtmlItems", dashboardProjectHtmlItems)
+        .addObject("resultSize", dashboardProjectHtmlItems.size());
   }
 
   public LinkButton getStartProjectLinkButton(AuthenticatedUserAccount user) {
     return new LinkButton(
         LINK_BUTTON_TEXT,
-        ReverseRouter.route(on(StartProjectController.class).startProject(null)),
+        ReverseRouter.route(on(InfrastructureProjectStartController.class).startProject(null)),
         user.getUserPrivileges().contains(UserPrivilege.PATHFINDER_PROJECT_CREATE),
         ButtonType.PRIMARY
     );

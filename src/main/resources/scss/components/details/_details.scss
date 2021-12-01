@@ -1,0 +1,5 @@
+.govuk-details-wrapper {
+  &--no-margin-bottom > .govuk-details {
+    margin-bottom: govuk-spacing(0);
+  }
+}

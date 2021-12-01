@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.view.projectinformation.ProjectInforma
 import uk.co.ogauthority.pathfinder.model.view.projectinformation.ProjectInformationViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -33,13 +34,19 @@ public class ProjectInformationSectionSummaryServiceTest {
   @Mock
   private DifferenceService differenceService;
 
+  @Mock
+  private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   private ProjectInformationSectionSummaryService projectInformationSectionSummaryService;
+
+  private final ProjectDetail details = ProjectUtil.getProjectDetails();
 
   @Before
   public void setUp() throws Exception {
     projectInformationSectionSummaryService = new ProjectInformationSectionSummaryService(
         projectInformationService,
-        differenceService
+        differenceService,
+        projectSectionSummaryCommonModelService
     );
     when(projectInformationService.getProjectInformation(detail)).thenReturn(Optional.of(projectInformation));
   }
@@ -62,7 +69,7 @@ public class ProjectInformationSectionSummaryServiceTest {
     var currentProjectInformationView = ProjectInformationViewUtil.from(projectInformation);
     var previousProjectInformationView = ProjectInformationViewUtil.from(previousProjectInformation);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, detail);
     assertInteractions(currentProjectInformationView, previousProjectInformationView);
   }
 
@@ -76,11 +83,11 @@ public class ProjectInformationSectionSummaryServiceTest {
     )).thenReturn(Optional.empty());
 
     var sectionSummary = projectInformationSectionSummaryService.getSummary(detail);
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, detail);
     assertInteractions(new ProjectInformationView(), new ProjectInformationView());
   }
 
-  private void assertModelProperties(ProjectSectionSummary projectSectionSummary) {
+  private void assertModelProperties(ProjectSectionSummary projectSectionSummary, ProjectDetail projectDetail) {
 
     assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(ProjectInformationSectionSummaryService.DISPLAY_ORDER);
     assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectInformationSectionSummaryService.SECTION_LINK));
@@ -88,17 +95,18 @@ public class ProjectInformationSectionSummaryServiceTest {
 
     var model = projectSectionSummary.getTemplateModel();
 
+    verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
+        projectDetail,
+        ProjectInformationSectionSummaryService.PAGE_NAME,
+        ProjectInformationSectionSummaryService.SECTION_ID
+    );
+
     assertThat(model).containsOnlyKeys(
-        "sectionTitle",
-        "sectionId",
         "projectInformationDiffModel",
         "isDevelopmentFieldStage",
         "isDiscoveryFieldStage",
         "isEnergyTransitionFieldStage"
     );
-
-    assertThat(model).containsEntry("sectionTitle", ProjectInformationSectionSummaryService.PAGE_NAME);
-    assertThat(model).containsEntry("sectionId", ProjectInformationSectionSummaryService.SECTION_ID);
   }
 
   private void assertInteractions(ProjectInformationView currentProjectInformationView,
@@ -109,4 +117,17 @@ public class ProjectInformationSectionSummaryServiceTest {
     );
   }
 
+  @Test
+  public void canShowSection_whenCanShowInTaskList_thenTrue() {
+    when(projectInformationService.canShowInTaskList(details)).thenReturn(true);
+
+    assertThat(projectInformationSectionSummaryService.canShowSection(details)).isTrue();
+  }
+
+  @Test
+  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
+    when(projectInformationService.canShowInTaskList(details)).thenReturn(false);
+
+    assertThat(projectInformationSectionSummaryService.canShowSection(details)).isFalse();
+  }
 }

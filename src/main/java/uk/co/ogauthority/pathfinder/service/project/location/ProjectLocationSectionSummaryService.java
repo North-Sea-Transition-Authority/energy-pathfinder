@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.project.location;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,7 @@ import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationView;
 import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
@@ -30,14 +30,19 @@ public class ProjectLocationSectionSummaryService implements ProjectSectionSumma
   private final ProjectLocationService projectLocationService;
   private final ProjectLocationBlocksService projectLocationBlocksService;
   private final DifferenceService differenceService;
+  private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
   @Autowired
-  public ProjectLocationSectionSummaryService(ProjectLocationService projectLocationService,
-                                              ProjectLocationBlocksService projectLocationBlocksService,
-                                              DifferenceService differenceService) {
+  public ProjectLocationSectionSummaryService(
+      ProjectLocationService projectLocationService,
+      ProjectLocationBlocksService projectLocationBlocksService,
+      DifferenceService differenceService,
+      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService
+  ) {
     this.projectLocationService = projectLocationService;
     this.projectLocationBlocksService = projectLocationBlocksService;
     this.differenceService = differenceService;
+    this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
   }
 
   @Override
@@ -47,9 +52,12 @@ public class ProjectLocationSectionSummaryService implements ProjectSectionSumma
 
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
-    Map<String, Object> summaryModel = new HashMap<>();
-    summaryModel.put("sectionTitle", PAGE_NAME);
-    summaryModel.put("sectionId", SECTION_ID);
+
+    final var summaryModel = projectSectionSummaryCommonModelService.getCommonSummaryModelMap(
+        detail,
+        PAGE_NAME,
+        SECTION_ID
+    );
 
     var projectLocationView = projectLocationService.getProjectLocationByProjectDetail(detail)
         .map(projectLocation -> {

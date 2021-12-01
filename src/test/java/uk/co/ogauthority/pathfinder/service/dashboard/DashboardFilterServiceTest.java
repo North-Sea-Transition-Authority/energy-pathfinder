@@ -36,7 +36,7 @@ public class DashboardFilterServiceTest {
   private static final DashboardProjectItem UKCS_ITEM = DashboardProjectItemTestUtil.getDashboardProjectItem(UKCS_AREA);
 
   private DashboardFilter filter;
-  private List<DashboardProjectItem> dashboardProjectItems = List.of(
+  private final List<DashboardProjectItem> dashboardProjectItems = List.of(
       OPERATOR_ITEM,
       TITLE_ITEM,
       FIELD_STAGE_ITEM,
@@ -303,5 +303,77 @@ public class DashboardFilterServiceTest {
         earliestUpdateRequestDashboardItem
     ), filter);
     assertThat(results).containsExactly(earliestUpdateRequestDashboardItem, latestUpdateRequestDashboardItem, noUpdateRequestDashboardItem);
+  }
+
+  @Test
+  public void filter_orderedCorrectly_projectTypeSortKey() {
+
+    final var highestProjectTypePriority = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    setNonProjectTypeSortKeys(highestProjectTypePriority);
+    highestProjectTypePriority.setProjectTypeSortKey(1);
+
+    final var middleProjectTypePriority = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    setNonProjectTypeSortKeys(middleProjectTypePriority);
+    middleProjectTypePriority.setProjectTypeSortKey(2);
+
+    final var lowestProjectTypePriority = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    setNonProjectTypeSortKeys(lowestProjectTypePriority);
+    lowestProjectTypePriority.setProjectTypeSortKey(3);
+
+    final var results = dashboardFilterService.filter(List.of(
+        middleProjectTypePriority,
+        lowestProjectTypePriority,
+        highestProjectTypePriority
+    ),
+        filter
+    );
+
+    assertThat(results).containsExactly(
+        highestProjectTypePriority,
+        middleProjectTypePriority,
+        lowestProjectTypePriority
+    );
+  }
+
+  @Test
+  public void filter_orderedCorrectly_projectTypeSortKey_whenUpdateExist_ensureUpdatePrioritised() {
+
+    final var highestProjectTypePriorityNoUpdate = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    setNonProjectTypeSortKeys(highestProjectTypePriorityNoUpdate);
+    highestProjectTypePriorityNoUpdate.setProjectTypeSortKey(1);
+
+    final var middleProjectTypePriorityWithUpdate = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    setNonProjectTypeSortKeys(middleProjectTypePriorityWithUpdate);
+    middleProjectTypePriorityWithUpdate.setProjectTypeSortKey(2);
+
+    final var updateDate = middleProjectTypePriorityWithUpdate.getUpdateSortKey().minus(10, ChronoUnit.DAYS);
+    middleProjectTypePriorityWithUpdate.setUpdateSortKey(updateDate);
+
+    final var lowestProjectTypePriorityNoUpdate = DashboardProjectItemTestUtil.getDashboardProjectItem();
+    setNonProjectTypeSortKeys(lowestProjectTypePriorityNoUpdate);
+    lowestProjectTypePriorityNoUpdate.setProjectTypeSortKey(3);
+
+    final var results = dashboardFilterService.filter(List.of(
+        middleProjectTypePriorityWithUpdate,
+        lowestProjectTypePriorityNoUpdate,
+        highestProjectTypePriorityNoUpdate
+        ),
+        filter
+    );
+
+    assertThat(results).containsExactly(
+        middleProjectTypePriorityWithUpdate,
+        highestProjectTypePriorityNoUpdate,
+        lowestProjectTypePriorityNoUpdate
+    );
+  }
+
+  private void setNonProjectTypeSortKeys(DashboardProjectItem dashboardProjectItem) {
+
+    final var submissionDate = Instant.now();
+    dashboardProjectItem.setSortKey(submissionDate);
+
+    final var updateDate = Instant.now();
+    dashboardProjectItem.setUpdateSortKey(updateDate);
   }
 }

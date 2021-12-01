@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
@@ -30,6 +31,7 @@ import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagem
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementSection;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.project.ProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.rendering.TemplateRenderingService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -75,18 +77,7 @@ public class ProjectManagementViewServiceTest {
 
     assertThat(modelAndView.getViewName()).isEqualTo(ProjectManagementViewService.TEMPLATE_PATH);
 
-    var model = modelAndView.getModel();
-    assertThat(model)
-        .containsOnlyKeys(
-            "projectManagementView",
-            "backLinkUrl",
-            "viewableVersions",
-            "form",
-            "viewVersionUrl"
-        )
-        .containsEntry("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
-        .containsEntry("viewVersionUrl", ReverseRouter.route(on(ManageProjectController.class)
-            .updateProjectVersion(project.getId(), null, null, null)));
+    assertModelProperties(modelAndView, projectDetail);
   }
 
   @Test
@@ -97,18 +88,7 @@ public class ProjectManagementViewServiceTest {
 
     assertThat(modelAndView.getViewName()).isEqualTo(ProjectManagementViewService.TEMPLATE_PATH);
 
-    var model = modelAndView.getModel();
-    assertThat(model)
-        .containsOnlyKeys(
-            "projectManagementView",
-            "backLinkUrl",
-            "viewableVersions",
-            "form",
-            "viewVersionUrl"
-        )
-        .containsEntry("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
-        .containsEntry("viewVersionUrl", ReverseRouter.route(on(ManageProjectController.class)
-            .updateProjectVersion(project.getId(), null, null, null)));
+    assertModelProperties(modelAndView, projectDetail);
   }
 
   @Test
@@ -123,18 +103,7 @@ public class ProjectManagementViewServiceTest {
 
     assertThat(modelAndView.getViewName()).isEqualTo(ProjectManagementViewService.TEMPLATE_PATH);
 
-    var model = modelAndView.getModel();
-    assertThat(model)
-        .containsOnlyKeys(
-            "projectManagementView",
-            "backLinkUrl",
-            "viewableVersions",
-            "form",
-            "viewVersionUrl"
-        )
-        .containsEntry("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
-        .containsEntry("viewVersionUrl", ReverseRouter.route(on(ManageProjectController.class)
-            .updateProjectVersion(project.getId(), null, null, null)));
+    assertModelProperties(modelAndView, projectDetail);
   }
 
   @Test
@@ -188,5 +157,28 @@ public class ProjectManagementViewServiceTest {
     var dto = new ProjectVersionDto(2, now, false);
     var desc = projectManagementViewService.getViewableVersionDescription(dto);
     assertThat(desc).isEqualTo(String.format("(%s) Submitted: %s %s", dto.getVersion(), DateUtil.formatInstant(dto.getSubmittedInstant()), ""));
+  }
+
+  private void assertModelProperties(ModelAndView modelAndView, ProjectDetail projectDetail) {
+
+    final var projectTypeDisplayNameAttr = ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR;
+    final var projectTypeLowercaseDisplayNameAttr = ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR;
+
+    assertThat(modelAndView.getModel())
+        .containsOnlyKeys(
+            "projectManagementView",
+            "backLinkUrl",
+            "viewableVersions",
+            "form",
+            "viewVersionUrl",
+            projectTypeDisplayNameAttr,
+            projectTypeLowercaseDisplayNameAttr
+        )
+        .containsEntry("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
+        .containsEntry("viewVersionUrl", ReverseRouter.route(on(ManageProjectController.class)
+            .updateProjectVersion(projectDetail.getProject().getId(), null, null, null))
+        )
+        .containsEntry(projectTypeDisplayNameAttr, projectDetail.getProjectType().getDisplayName())
+        .containsEntry(projectTypeLowercaseDisplayNameAttr, projectDetail.getProjectType().getLowercaseDisplayName());
   }
 }

@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.service.file;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -252,15 +251,15 @@ public class ProjectDetailFileServiceTest {
     );
 
     verifyNoInteractions(fileUploadService);
-    verify(projectDetailFileRepository, times(1)).saveAll(eq(Set.of()));
-    verify(projectDetailFileRepository, times(1)).deleteAll(eq(Set.of()));
+    verify(projectDetailFileRepository, times(1)).saveAll(Set.of());
+    verify(projectDetailFileRepository, times(1)).deleteAll(Set.of());
 
   }
 
   @Test
   public void deleteFileLinksAndUploadedFiles_uploadedFileRemoveSuccessful() {
     projectDetailFileService.deleteProjectDetailFileLinksAndUploadedFiles(List.of(file), wua);
-    verify(projectDetailFileRepository).deleteAll(eq(List.of(file)));
+    verify(projectDetailFileRepository).deleteAll(List.of(file));
   }
 
   @Test(expected = RuntimeException.class)
@@ -331,7 +330,7 @@ public class ProjectDetailFileServiceTest {
         List.of(1, 2, 3)
     );
 
-    verify(projectDetailFileRepository, times(1)).deleteAll(eq(List.of(file4, file5)));
+    verify(projectDetailFileRepository, times(1)).deleteAll(List.of(file4, file5));
 
   }
 
@@ -358,7 +357,7 @@ public class ProjectDetailFileServiceTest {
 
     projectDetailFileService.cleanupFiles(projectDetail, ProjectDetailFilePurpose.PLACEHOLDER, List.of());
 
-    verify(projectDetailFileRepository, times(1)).deleteAll(eq(List.of(file1, file2, file3)));
+    verify(projectDetailFileRepository, times(1)).deleteAll(List.of(file1, file2, file3));
 
   }
 

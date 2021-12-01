@@ -1,11 +1,11 @@
 package uk.co.ogauthority.pathfinder.config;
 
 import org.apache.commons.validator.routines.EmailValidator;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import uk.co.ogauthority.pathfinder.service.email.notify.DefaultEmailPersonalisationService;
 import uk.co.ogauthority.pathfinder.service.email.notify.NotifyTemplateService;
 import uk.co.ogauthority.pathfinder.service.email.notify.ProductionEmailServiceImpl;
 import uk.gov.service.notify.NotificationClient;
@@ -23,7 +23,7 @@ public class ProductionConfiguration {
    * @param notifyTemplateService An instance of the template service
    * @param notificationClient A GOV.UK notification client
    * @param emailValidator Email Validator
-   * @param serviceName the name of the service the email is being sent from
+   * @param defaultEmailPersonalisationService An instance of DefaultEmailPersonalisationService
    * @return an instantiated ProductionNotifyServiceImpl
    */
   @Bean
@@ -32,17 +32,13 @@ public class ProductionConfiguration {
       NotifyTemplateService notifyTemplateService,
       NotificationClient notificationClient,
       EmailValidator emailValidator,
-      @Value("${service.name}") String serviceName,
-      @Value("${service.customer.mnemonic}") String customerMnemonic,
-      @Value("${service.customer.supply-chain-interface-url}") String supplyChainInterfaceUrl
+      DefaultEmailPersonalisationService defaultEmailPersonalisationService
   ) {
     return new ProductionEmailServiceImpl(
         notifyTemplateService,
         notificationClient,
         emailValidator,
-        serviceName,
-        customerMnemonic,
-        supplyChainInterfaceUrl
+        defaultEmailPersonalisationService
     );
   }
 }

@@ -2,14 +2,15 @@
 
 <#-- @ftlvariable name="feedbackUrl" type="String" -->
 <#-- @ftlvariable name="workAreaUrl" type="String" -->
-<#-- @ftlvariable name="projectNoUpdateSummaryView" type="uk.co.ogauthority.pathfinder.model.view.projectupdate.ProjectNoUpdateSummaryView" -->
+<#-- @ftlvariable name="projectNoUpdateSummaryView" type="uk.co.ogauthority.pathfinder.model.view.submission.ProjectNoUpdateSubmissionSummaryView" -->
+<#-- @ftlvariable name="projectTypeDisplayNameLowercase" type="String" -->
 
 <#assign title = "Confirmed no changes" />
 
 <@defaultPage htmlTitle=title pageHeading="" breadcrumbs=false phaseBanner=false>
   <@fdsPanel.panel
     panelTitle=title
-    panelText="${projectNoUpdateSummaryView.projectTitle}"
+    panelText="${projectNoUpdateSummaryView.projectDisplayName}"
   />
 
   <@fdsCheckAnswers.checkAnswers>
@@ -20,7 +21,7 @@
   <h2 class="govuk-heading-m">What happens next</h2>
 
   <p class="govuk-body">
-    You will not receive further reminders this quarter to submit an update for this project.
+    You will not receive further reminders this quarter to submit an update for this ${projectTypeDisplayNameLowercase}.
   </p>
 
   <@serviceFeedbackLink.feedbackLink feedbackUrl=feedbackUrl/>

@@ -13,6 +13,9 @@
       />
     </#list>
   <#else>
-    <@emptySectionSummaryInset.emptySectionSummaryInset itemText="pipelines"/>
+    <@emptySectionSummaryInset.emptySectionSummaryInset
+      itemText="pipelines"
+      projectTypeDisplayName=projectTypeDisplayNameLowercase
+    />
   </#if>
 </@sectionSummaryWrapper.sectionSummaryWrapper>

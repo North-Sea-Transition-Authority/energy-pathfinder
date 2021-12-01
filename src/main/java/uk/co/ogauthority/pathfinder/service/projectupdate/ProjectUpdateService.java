@@ -76,7 +76,12 @@ public class ProjectUpdateService {
                                                AuthenticatedUserAccount userAccount) {
     final var newDetail = projectService.createNewProjectDetailVersion(fromDetail, status, userAccount);
     projectFormSectionServices.stream()
-        .filter(projectFormSectionService -> projectFormSectionService.canShowInTaskList(fromDetail))
+        .filter(projectFormSectionService ->
+            // only copy sections which are always copied or are shown in the task list
+            projectFormSectionService.alwaysCopySectionData(fromDetail)
+            ||
+            projectFormSectionService.canShowInTaskList(fromDetail)
+        )
         .forEach(projectFormSectionService -> projectFormSectionService.copySectionData(fromDetail, newDetail));
     return newDetail;
   }

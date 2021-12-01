@@ -460,4 +460,15 @@ public class PlugAbandonmentScheduleServiceTest {
   public void getSupportedProjectTypes_verifyInfrastructure() {
     assertThat(plugAbandonmentScheduleService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
   }
+
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(plugAbandonmentScheduleService.alwaysCopySectionData(detail)).isFalse();
+  }
+
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = plugAbandonmentScheduleService.allowSectionDataCleanUp(detail);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
 }

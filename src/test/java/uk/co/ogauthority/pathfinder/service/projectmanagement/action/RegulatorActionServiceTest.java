@@ -113,7 +113,7 @@ public class RegulatorActionServiceTest {
     var actions = regulatorActionService.getActions(projectDetail, authenticatedUser);
 
     assertThat(actions).containsExactly(
-        regulatorActionService.getTransferProjectAction(project.getId())
+        regulatorActionService.getTransferProjectAction(projectDetail)
     );
   }
 
@@ -133,7 +133,7 @@ public class RegulatorActionServiceTest {
     var actions = regulatorActionService.getActions(projectDetail, authenticatedUser);
 
     assertThat(actions).containsExactly(
-        projectActionService.getArchiveAction(project.getId(), RegulatorActionService.ARCHIVE_ACTION_DISPLAY_ORDER)
+        projectActionService.getArchiveAction(projectDetail, RegulatorActionService.ARCHIVE_ACTION_DISPLAY_ORDER)
     );
   }
 
@@ -173,10 +173,13 @@ public class RegulatorActionServiceTest {
 
   @Test
   public void getTransferProjectAction() {
-    var action = regulatorActionService.getTransferProjectAction(project.getId());
+    var action = regulatorActionService.getTransferProjectAction(projectDetail);
 
     var linkButton = (LinkButton) action.getUserAction();
-    assertThat(linkButton.getPrompt()).isEqualTo(RegulatorActionService.TRANSFER_PROJECT_ACTION_PROMPT);
+
+    final var expectedButtonPrompt = String.format("Change %s operator", projectDetail.getProjectType().getLowercaseDisplayName());
+    assertThat(linkButton.getPrompt()).isEqualTo(expectedButtonPrompt);
+
     assertThat(linkButton.getUrl()).isEqualTo(
         ReverseRouter.route(on(ProjectTransferController.class).getTransferProject(project.getId(), null, null))
     );

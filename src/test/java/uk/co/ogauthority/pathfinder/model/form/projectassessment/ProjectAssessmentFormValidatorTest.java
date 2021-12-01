@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.ValidationUtils;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
 import uk.co.ogauthority.pathfinder.testutil.ProjectAssessmentTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
@@ -29,8 +30,13 @@ public class ProjectAssessmentFormValidatorTest {
     var form = ProjectAssessmentTestUtil.createProjectAssessmentForm();
     form.setReadyToBePublished(false);
 
+    final var canRequestUpdate = true;
+
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectAssessmentValidationHint = new ProjectAssessmentValidationHint(true);
+    var projectAssessmentValidationHint = new ProjectAssessmentValidationHint(
+        canRequestUpdate,
+        ProjectType.INFRASTRUCTURE
+    );
 
     ValidationUtils.invokeValidator(projectAssessmentFormValidator, form, errors, projectAssessmentValidationHint);
 
@@ -44,8 +50,13 @@ public class ProjectAssessmentFormValidatorTest {
     form.setReadyToBePublished(true);
     form.setUpdateRequired(null);
 
+    final var canRequestUpdate = true;
+
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectAssessmentValidationHint = new ProjectAssessmentValidationHint(true);
+    var projectAssessmentValidationHint = new ProjectAssessmentValidationHint(
+        canRequestUpdate,
+        ProjectType.INFRASTRUCTURE
+    );
 
     ValidationUtils.invokeValidator(projectAssessmentFormValidator, form, errors, projectAssessmentValidationHint);
 
@@ -61,8 +72,13 @@ public class ProjectAssessmentFormValidatorTest {
     form.setReadyToBePublished(true);
     form.setUpdateRequired(false);
 
+    final var canRequestUpdate = true;
+
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectAssessmentValidationHint = new ProjectAssessmentValidationHint(true);
+    var projectAssessmentValidationHint = new ProjectAssessmentValidationHint(
+        canRequestUpdate,
+        ProjectType.INFRASTRUCTURE
+    );
 
     ValidationUtils.invokeValidator(projectAssessmentFormValidator, form, errors, projectAssessmentValidationHint);
 
@@ -76,8 +92,13 @@ public class ProjectAssessmentFormValidatorTest {
     form.setReadyToBePublished(true);
     form.setUpdateRequired(true);
 
+    final var canRequestUpdate = false;
+
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectAssessmentValidationHint = new ProjectAssessmentValidationHint(false);
+    var projectAssessmentValidationHint = new ProjectAssessmentValidationHint(
+        canRequestUpdate,
+        ProjectType.INFRASTRUCTURE
+    );
 
     ValidationUtils.invokeValidator(projectAssessmentFormValidator, form, errors, projectAssessmentValidationHint);
 
@@ -93,8 +114,13 @@ public class ProjectAssessmentFormValidatorTest {
     form.setReadyToBePublished(true);
     form.setUpdateRequired(null);
 
+    final var canRequestUpdate = false;
+
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectAssessmentValidationHint = new ProjectAssessmentValidationHint(false);
+    var projectAssessmentValidationHint = new ProjectAssessmentValidationHint(
+        canRequestUpdate,
+        ProjectType.INFRASTRUCTURE
+    );
 
     ValidationUtils.invokeValidator(projectAssessmentFormValidator, form, errors, projectAssessmentValidationHint);
 

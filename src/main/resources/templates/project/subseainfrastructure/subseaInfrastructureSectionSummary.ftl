@@ -16,6 +16,9 @@
       />
     </#list>
   <#else>
-    <@emptySectionSummaryInset.emptySectionSummaryInset itemText="subsea infrastructures"/>
+    <@emptySectionSummaryInset.emptySectionSummaryInset
+      itemText="subsea infrastructures"
+      projectTypeDisplayName=projectTypeDisplayNameLowercase
+    />
   </#if>
 </@sectionSummaryWrapper.sectionSummaryWrapper>

@@ -17,17 +17,19 @@ public class TaskListSectionQuestionTest {
       ProjectTask.UPCOMING_TENDERS,
       ProjectTask.AWARDED_CONTRACTS,
       ProjectTask.COLLABORATION_OPPORTUNITIES,
+      ProjectTask.CAMPAIGN_INFORMATION,
       ProjectTask.WELLS,
       ProjectTask.PLATFORM_FPSO,
-      ProjectTask.INTEGRATED_RIGS
-      // ProjectTask.SUBSEA_INFRASTRUCTURE // Subsea infrastructure disabled: PAT-495
+      ProjectTask.INTEGRATED_RIGS,
+      ProjectTask.SUBSEA_INFRASTRUCTURE
       // ProjectTask.PIPELINES // Pipelines disabled: PAT-457
   );
 
   private static final List<ProjectTask> NON_DECOM_TASKS = List.of(
       ProjectTask.UPCOMING_TENDERS,
       ProjectTask.AWARDED_CONTRACTS,
-      ProjectTask.COLLABORATION_OPPORTUNITIES
+      ProjectTask.COLLABORATION_OPPORTUNITIES,
+      ProjectTask.CAMPAIGN_INFORMATION
   );
 
   @Test

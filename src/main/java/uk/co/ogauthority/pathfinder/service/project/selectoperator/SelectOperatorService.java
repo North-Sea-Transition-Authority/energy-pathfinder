@@ -129,17 +129,17 @@ public class SelectOperatorService implements ProjectFormSectionService {
   }
 
   @Override
-  public void removeSectionData(ProjectDetail projectDetail) {
-    projectOperatorService.deleteProjectOperatorByProjectDetail(projectDetail);
-  }
-
-  @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
     entityDuplicationService.duplicateEntityAndSetNewParent(
         getProjectOperatorOrError(fromDetail),
         toDetail,
         ProjectOperator.class
     );
+  }
+
+  @Override
+  public boolean alwaysCopySectionData(ProjectDetail projectDetail) {
+    return ProjectType.FORWARD_WORK_PLAN.equals(projectDetail.getProjectType());
   }
 
   @Override
@@ -150,5 +150,15 @@ public class SelectOperatorService implements ProjectFormSectionService {
   @Override
   public Set<ProjectType> getSupportedProjectTypes() {
     return Set.of(ProjectType.INFRASTRUCTURE);
+  }
+
+  @Override
+  public void removeSectionData(ProjectDetail projectDetail) {
+    projectOperatorService.deleteProjectOperatorByProjectDetail(projectDetail);
+  }
+
+  @Override
+  public boolean allowSectionDataCleanUp(ProjectDetail projectDetail) {
+    return false;
   }
 }

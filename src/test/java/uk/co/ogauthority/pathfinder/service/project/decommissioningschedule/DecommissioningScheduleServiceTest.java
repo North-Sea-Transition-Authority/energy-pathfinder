@@ -550,4 +550,15 @@ public class DecommissioningScheduleServiceTest {
   public void getSupportedProjectTypes_verifyInfrastructure() {
     assertThat(decommissioningScheduleService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
   }
+
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(decommissioningScheduleService.alwaysCopySectionData(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = decommissioningScheduleService.allowSectionDataCleanUp(projectDetail);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
 }

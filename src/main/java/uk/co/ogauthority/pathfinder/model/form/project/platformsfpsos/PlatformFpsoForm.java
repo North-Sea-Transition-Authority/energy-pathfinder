@@ -22,18 +22,17 @@ public class PlatformFpsoForm {
 
   private String fpsoDimensions;
 
-  @NotNull(message = "Enter a topside/FPSO mass", groups = FullValidation.class)
-  @PositiveWholeNumber(messagePrefix = "Topside/FPSO mass", groups = {FullValidation.class, PartialValidation.class})
+  @NotNull(message = "Enter the topsides/floating unit mass", groups = FullValidation.class)
+  @PositiveWholeNumber(messagePrefix = "Topsides/floating unit mass", groups = {FullValidation.class, PartialValidation.class})
   private Integer topsideFpsoMass;
 
   private MinMaxDateInput topsideRemovalYears;
 
-  @NotNull(message = "Select if substructure removal expected to be within scope", groups = FullValidation.class)
+  @NotNull(message = "Select if substructure removal is expected to be within scope", groups = FullValidation.class)
   private Boolean substructureExpectedToBeRemoved;
 
   private SubstructureRemovalPremise substructureRemovalPremise;
 
-  @PositiveWholeNumber(messagePrefix = "Estimated substructure removal mass", groups = {FullValidation.class, PartialValidation.class})
   private Integer substructureRemovalMass;
 
   private MinMaxDateInput substructureRemovalYears;

@@ -43,13 +43,16 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
 @ProjectTypeCheck(types = ProjectType.INFRASTRUCTURE)
-@RequestMapping("/project/{projectId}/platforms-fpsos")
+@RequestMapping("/project/{projectId}/platforms-floating-units")
 public class PlatformsFpsosController extends ProjectFormPageController {
 
-  public static final String TASK_LIST_NAME = "Platforms and FPSOs";
-  public static final String SUMMARY_PAGE_NAME = "Platforms and FPSOs to be decommissioned";
-  public static final String FORM_PAGE_NAME = "Platform or FPSO";
-  public static final String REMOVE_PAGE_NAME = "Remove platform or FPSO";
+  public static final String FLOATING_UNIT_TEXT_INIT_CAP = "Floating unit";
+  public static final String FLOATING_UNIT_TEXT_LOWERCASE = FLOATING_UNIT_TEXT_INIT_CAP.toLowerCase();
+
+  public static final String TASK_LIST_NAME = String.format("Platforms and %ss", FLOATING_UNIT_TEXT_LOWERCASE);
+  public static final String SUMMARY_PAGE_NAME = String.format("Platforms and %ss to be decommissioned", FLOATING_UNIT_TEXT_LOWERCASE);
+  public static final String FORM_PAGE_NAME = String.format("Platform or %s", FLOATING_UNIT_TEXT_LOWERCASE);
+  public static final String REMOVE_PAGE_NAME = String.format("Remove platform or %s", FLOATING_UNIT_TEXT_LOWERCASE);
 
   private final PlatformsFpsosService platformsFpsosService;
   private final PlatformsFpsosSummaryService platformsFpsosSummaryService;
@@ -90,13 +93,13 @@ public class PlatformsFpsosController extends ProjectFormPageController {
     return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
   }
 
-  @GetMapping("/platform-fpso")
+  @GetMapping("/platform-floating-unit")
   public ModelAndView addPlatformFpso(@PathVariable("projectId") Integer projectId,
                                       ProjectContext projectContext) {
     return getPlatformFpsoFormModelAndView(projectId, new PlatformFpsoForm());
   }
 
-  @PostMapping("/platform-fpso")
+  @PostMapping("/platform-floating-unit")
   public ModelAndView saveNewPlatformFpso(@PathVariable("projectId") Integer projectId,
                                           @Valid @ModelAttribute("form") PlatformFpsoForm form,
                                           BindingResult bindingResult,
@@ -123,7 +126,7 @@ public class PlatformsFpsosController extends ProjectFormPageController {
     );
   }
 
-  @GetMapping("/platform-fpso/{platformFpsoId}/edit")
+  @GetMapping("/platform-floating-unit/{platformFpsoId}/edit")
   public ModelAndView editPlatformFpso(@PathVariable("projectId") Integer projectId,
                                        @PathVariable("platformFpsoId") Integer platformFpsoId,
                                        ProjectContext projectContext) {
@@ -134,7 +137,7 @@ public class PlatformsFpsosController extends ProjectFormPageController {
     );
   }
 
-  @PostMapping("/platform-fpso/{platformFpsoId}/edit")
+  @PostMapping("/platform-floating-unit/{platformFpsoId}/edit")
   public ModelAndView updatePlatformFpso(@PathVariable("projectId") Integer projectId,
                                          @PathVariable("platformFpsoId") Integer platformFpsoId,
                                          @Valid @ModelAttribute("form") PlatformFpsoForm form,
@@ -162,7 +165,7 @@ public class PlatformsFpsosController extends ProjectFormPageController {
     );
   }
 
-  @GetMapping("/platform-fpso/{platformFpsoId}/remove/{displayOrder}")
+  @GetMapping("/platform-floating-unit/{platformFpsoId}/remove/{displayOrder}")
   public ModelAndView removePlatformFpsoConfirm(@PathVariable("projectId") Integer projectId,
                                                 @PathVariable("platformFpsoId") Integer platformFpsoId,
                                                 @PathVariable("displayOrder") Integer displayOrder,
@@ -175,7 +178,7 @@ public class PlatformsFpsosController extends ProjectFormPageController {
     return modelAndView;
   }
 
-  @PostMapping("/platform-fpso/{platformFpsoId}/remove/{displayOrder}")
+  @PostMapping("/platform-floating-unit/{platformFpsoId}/remove/{displayOrder}")
   public ModelAndView removePlatformFpso(@PathVariable("projectId") Integer projectId,
                                          @PathVariable("platformFpsoId") Integer platformFpsoId,
                                          @PathVariable("displayOrder") Integer displayOrder,

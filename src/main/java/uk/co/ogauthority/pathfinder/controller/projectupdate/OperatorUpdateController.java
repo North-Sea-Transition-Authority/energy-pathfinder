@@ -48,7 +48,7 @@ public class OperatorUpdateController {
   @GetMapping("/start-update")
   public ModelAndView startPage(@PathVariable("projectId") Integer projectId,
                                 OperatorProjectUpdateContext operatorProjectUpdateContext) {
-    return operatorProjectUpdateService.getProjectUpdateModelAndView(projectId);
+    return operatorProjectUpdateService.getProjectUpdateModelAndView(operatorProjectUpdateContext.getProjectDetails());
   }
 
   @PostMapping("/start-update")

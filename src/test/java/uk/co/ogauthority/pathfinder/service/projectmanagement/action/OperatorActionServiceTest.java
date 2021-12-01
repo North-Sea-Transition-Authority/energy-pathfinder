@@ -1,7 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.projectmanagement.action;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -109,7 +108,7 @@ public class OperatorActionServiceTest {
     var actions = operatorActionService.getActions(projectDetail, authenticatedUser);
 
     assertThat(actions).containsExactly(
-        projectActionService.getArchiveAction(project.getId(), OperatorActionService.ARCHIVE_ACTION_DISPLAY_ORDER)
+        projectActionService.getArchiveAction(projectDetail, OperatorActionService.ARCHIVE_ACTION_DISPLAY_ORDER)
     );
   }
 

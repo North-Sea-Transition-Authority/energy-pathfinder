@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.entity.communication.Communication;
 import uk.co.ogauthority.pathfinder.model.entity.communication.CommunicationRecipient;
 import uk.co.ogauthority.pathfinder.model.enums.communication.RecipientType;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
+import uk.co.ogauthority.pathfinder.service.email.notify.CommonEmailMergeField;
 import uk.co.ogauthority.pathfinder.testutil.CommunicationTestUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -82,11 +83,7 @@ public class CommunicationEmailServiceTest {
           Map.of(
               "SUBJECT", communication.getEmailSubject(),
               "BODY", communication.getEmailBody(),
-              "GREETING_TEXT", EmailProperties.DEFAULT_GREETING_TEXT,
-              "SIGN_OFF_TEXT", EmailProperties.DEFAULT_SIGN_OFF_TEXT,
-              "TEST_EMAIL", "no",
-              "SIGN_OFF_IDENTIFIER", EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER,
-              "RECIPIENT_IDENTIFIER", recipient.getForename()
+              CommonEmailMergeField.RECIPIENT_IDENTIFIER, recipient.getForename()
           )
       );
     });

@@ -59,15 +59,16 @@ public class ProjectInformationFormValidator implements SmartValidator {
             projectInformationValidationHint,
             errors
         );
-      } else if (BooleanUtils.isTrue(fieldStage.equals(FieldStage.ENERGY_TRANSITION))) {
-        if (ValidationType.FULL.equals(projectInformationValidationHint.getValidationType())) {
-          ValidationUtils.rejectIfEmptyOrWhitespace(
-              errors,
-              "energyTransitionCategory",
-              "energyTransitionCategory.invalid",
-              MISSING_ENERGY_TRANSITION_CATEGORY_ERROR
-          );
-        }
+      } else if (
+          BooleanUtils.isTrue(fieldStage.equals(FieldStage.ENERGY_TRANSITION))
+          && ValidationType.FULL.equals(projectInformationValidationHint.getValidationType())
+      ) {
+        ValidationUtils.rejectIfEmptyOrWhitespace(
+            errors,
+            "energyTransitionCategory",
+            "energyTransitionCategory.invalid",
+            MISSING_ENERGY_TRANSITION_CATEGORY_ERROR
+        );
       }
     }
   }

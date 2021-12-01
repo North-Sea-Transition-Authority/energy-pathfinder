@@ -1,7 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.project.setup;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,10 +17,12 @@ import uk.co.ogauthority.pathfinder.model.view.setup.ProjectSetupSummaryItem;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
 public class ProjectSetupSectionSummaryService implements ProjectSectionSummaryService {
+
   public static final String TEMPLATE_PATH = "project/setup/projectSetupSectionSummary.ftl";
   public static final String PAGE_NAME = ProjectSetupController.PAGE_NAME;
   public static final String SECTION_ID = "projectSetup";
@@ -31,25 +32,33 @@ public class ProjectSetupSectionSummaryService implements ProjectSectionSummaryS
       SECTION_ID
   );
 
-
   private final ProjectService projectService;
   private final ProjectSetupService projectSetupService;
   private final DifferenceService differenceService;
+  private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
   @Autowired
-  public ProjectSetupSectionSummaryService(ProjectService projectService,
-                                           ProjectSetupService projectSetupService,
-                                           DifferenceService differenceService) {
+  public ProjectSetupSectionSummaryService(
+      ProjectService projectService,
+      ProjectSetupService projectSetupService,
+      DifferenceService differenceService,
+      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService
+  ) {
     this.projectService = projectService;
     this.projectSetupService = projectSetupService;
     this.differenceService = differenceService;
+    this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
   }
 
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
-    Map<String, Object> summaryModel = new HashMap<>();
-    summaryModel.put("sectionTitle", PAGE_NAME);
-    summaryModel.put("sectionId", SECTION_ID);
+
+    final var summaryModel = projectSectionSummaryCommonModelService.getCommonSummaryModelMap(
+        detail,
+        PAGE_NAME,
+        SECTION_ID
+    );
+
     var summaryItems = getSummaryItems(detail);
     summaryModel.put("projectSetupDiffModel", getProjectSetupDifferenceModel(
         detail,
@@ -110,5 +119,10 @@ public class ProjectSetupSectionSummaryService implements ProjectSectionSummaryS
         .filter(si -> si.getQuestion().getYesAnswer().equals(answer) || si.getQuestion().getNoAnswer().equals(answer))
         .findFirst() //Will only have answered each question once
         .ifPresent(a -> a.setAnswerValue(answer.getAnswerValue()));
+  }
+
+  @Override
+  public boolean canShowSection(ProjectDetail detail) {
+    return projectSetupService.canShowInTaskList(detail);
   }
 }

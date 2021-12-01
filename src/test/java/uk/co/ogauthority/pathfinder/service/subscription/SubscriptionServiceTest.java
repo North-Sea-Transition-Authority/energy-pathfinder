@@ -156,12 +156,22 @@ public class SubscriptionServiceTest {
   }
 
   @Test
-  public void unsubscribe() {
+  public void unsubscribe_uuidVariant_verifyInteractions() {
     var subscriberUuid = UUID.randomUUID();
 
     subscriptionService.unsubscribe(subscriberUuid);
 
     verify(subscriberRepository, times(1)).deleteByUuid(subscriberUuid);
+  }
+
+  @Test
+  public void unsubscribe_emailAddressVariant_verifyInteractions() {
+
+    final var subscriberEmailAddress = "someone@example.com";
+
+    subscriptionService.unsubscribe(subscriberEmailAddress);
+
+    verify(subscriberRepository, times(1)).deleteByEmailAddress(subscriberEmailAddress);
   }
 
   @Test

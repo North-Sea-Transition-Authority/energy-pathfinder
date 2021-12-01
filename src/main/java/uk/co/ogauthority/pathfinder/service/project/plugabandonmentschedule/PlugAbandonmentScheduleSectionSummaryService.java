@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +12,7 @@ import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.plugabandonmentschedule.PlugAbandonmentScheduleView;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
@@ -29,12 +29,17 @@ public class PlugAbandonmentScheduleSectionSummaryService implements ProjectSect
 
   private final PlugAbandonmentScheduleSummaryService plugAbandonmentScheduleSummaryService;
   private final DifferenceService differenceService;
+  private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
   @Autowired
-  public PlugAbandonmentScheduleSectionSummaryService(PlugAbandonmentScheduleSummaryService plugAbandonmentScheduleSummaryService,
-                                                      DifferenceService differenceService) {
+  public PlugAbandonmentScheduleSectionSummaryService(
+      PlugAbandonmentScheduleSummaryService plugAbandonmentScheduleSummaryService,
+      DifferenceService differenceService,
+      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService
+  ) {
     this.plugAbandonmentScheduleSummaryService = plugAbandonmentScheduleSummaryService;
     this.differenceService = differenceService;
+    this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
   }
 
   @Override
@@ -44,9 +49,12 @@ public class PlugAbandonmentScheduleSectionSummaryService implements ProjectSect
 
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
-    Map<String, Object> summaryModel = new HashMap<>();
-    summaryModel.put("sectionTitle", PAGE_NAME);
-    summaryModel.put("sectionId", SECTION_ID);
+
+    final var summaryModel = projectSectionSummaryCommonModelService.getCommonSummaryModelMap(
+        detail,
+        PAGE_NAME,
+        SECTION_ID
+    );
 
     var plugAbandonmentScheduleViews = plugAbandonmentScheduleSummaryService.getPlugAbandonmentScheduleSummaryViews(detail);
     summaryModel.put("plugAbandonmentScheduleDiffModel", getPlugAbandonmentScheduleDifferenceModel(

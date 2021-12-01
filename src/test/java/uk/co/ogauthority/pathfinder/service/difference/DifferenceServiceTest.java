@@ -21,8 +21,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.exception.DifferenceProcessingException;
-import uk.co.ogauthority.pathfinder.model.difference.DifferenceType;
 import uk.co.ogauthority.pathfinder.model.difference.DiffedField;
+import uk.co.ogauthority.pathfinder.model.difference.DifferenceType;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 
 @RunWith(MockitoJUnitRunner.class)

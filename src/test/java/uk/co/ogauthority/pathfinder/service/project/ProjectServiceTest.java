@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -219,5 +220,41 @@ public class ProjectServiceTest {
   public void isInfrastructureProject_whenNullType_thenFalse() {
     projectDetail.setProjectType(null);
     assertThat(ProjectService.isInfrastructureProject(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void isForwardWorkPlanProject_whenWorkPlan_thenTrue() {
+    projectDetail.setProjectType(ProjectType.FORWARD_WORK_PLAN);
+    assertThat(ProjectService.isForwardWorkPlanProject(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void isForwardWorkPlanProject_whenNotWorkPlan_thenFalse() {
+    projectDetail.setProjectType(ProjectType.INFRASTRUCTURE);
+    assertThat(ProjectService.isForwardWorkPlanProject(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void isForwardWorkPlanProject_whenNullType_thenFalse() {
+    projectDetail.setProjectType(null);
+    assertThat(ProjectService.isForwardWorkPlanProject(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void getProjectTypeDisplayNameLowercase_smokeTest() {
+    Arrays.asList(ProjectType.values()).forEach(projectType -> {
+      projectDetail.setProjectType(projectType);
+      final var expectedReturnValue = projectType.getLowercaseDisplayName();
+      assertThat(ProjectService.getProjectTypeDisplayNameLowercase(projectDetail)).isEqualTo(expectedReturnValue);
+    });
+  }
+
+  @Test
+  public void getProjectTypeDisplayName_smokeTest() {
+    Arrays.asList(ProjectType.values()).forEach(projectType -> {
+      projectDetail.setProjectType(projectType);
+      final var expectedReturnValue = projectType.getDisplayName();
+      assertThat(ProjectService.getProjectTypeDisplayName(projectDetail)).isEqualTo(expectedReturnValue);
+    });
   }
 }

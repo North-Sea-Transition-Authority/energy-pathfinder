@@ -100,7 +100,7 @@ public class NewsletterProjectServiceTest {
     return String.format(
         "%s - %s",
         reportableProject.getOperatorName(),
-        reportableProject.getProjectTitle()
+        reportableProject.getProjectDisplayName()
     );
   }
 }

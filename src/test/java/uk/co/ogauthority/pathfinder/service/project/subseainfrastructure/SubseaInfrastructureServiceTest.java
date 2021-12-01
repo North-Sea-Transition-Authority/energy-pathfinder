@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.service.project.subseainfrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -669,25 +668,17 @@ public class SubseaInfrastructureServiceTest {
     subseaInfrastructureService.getSubseaInfrastructure(SUBSEA_INFRASTRUCTURE_ID, projectDetail);
   }
 
-  // Subsea infrastructure disabled: PAT-495
   @Test
-  public void canShowInTaskList() {
-    assertThat(subseaInfrastructureService.canShowInTaskList(projectDetail)).isFalse();
-
-    verify(projectSetupService, never()).taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.SUBSEA_INFRASTRUCTURE);
+  public void canShowInTaskList_true() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.SUBSEA_INFRASTRUCTURE)).thenReturn(true);
+    assertThat(subseaInfrastructureService.canShowInTaskList(projectDetail)).isTrue();
   }
 
-  // @Test
-  // public void canShowInTaskList_true() {
-  //   when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.SUBSEA_INFRASTRUCTURE)).thenReturn(true);
-  //   assertThat(subseaInfrastructureService.canShowInTaskList(projectDetail)).isTrue();
-  // }
-  //
-  // @Test
-  // public void canShowInTaskList_false() {
-  //   when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.SUBSEA_INFRASTRUCTURE)).thenReturn(false);
-  //   assertThat(subseaInfrastructureService.canShowInTaskList(projectDetail)).isFalse();
-  // }
+  @Test
+  public void canShowInTaskList_false() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.SUBSEA_INFRASTRUCTURE)).thenReturn(false);
+    assertThat(subseaInfrastructureService.canShowInTaskList(projectDetail)).isFalse();
+  }
 
   @Test
   public void removeSectionData_verifyInteractions() {
@@ -702,35 +693,33 @@ public class SubseaInfrastructureServiceTest {
     final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
     final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
 
+    final var subseaInfrastructures = List.of(
+        SubseaInfrastructureTestUtil.createSubseaInfrastructure_withConcreteMattresses()
+    );
+    when(subseaInfrastructureRepository.findByProjectDetailOrderByIdAsc(fromProjectDetail)).thenReturn(subseaInfrastructures);
+
     subseaInfrastructureService.copySectionData(fromProjectDetail, toProjectDetail);
 
-    verify(entityDuplicationService, never()).duplicateEntitiesAndSetNewParent(any(), any(), any());
-  }
+    verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
+        subseaInfrastructures,
+        toProjectDetail,
+        SubseaInfrastructure.class
+    );
+   }
 
   @Test
   public void getSupportedProjectTypes_verifyInfrastructure() {
     assertThat(subseaInfrastructureService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
   }
 
-  // @Test
-  // public void copySectionData_verifyDuplicationServiceInteraction() {
-  //
-  //   final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
-  //   final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
-  //
-  //   final var subseaInfrastructures = List.of(
-  //       SubseaInfrastructureTestUtil.createSubseaInfrastructure_withConcreteMattresses()
-  //   );
-  //   when(subseaInfrastructureRepository.findByProjectDetailOrderByIdAsc(fromProjectDetail)).thenReturn(subseaInfrastructures);
-  //
-  //   subseaInfrastructureService.copySectionData(fromProjectDetail, toProjectDetail);
-  //
-  //   verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
-  //       subseaInfrastructures,
-  //       toProjectDetail,
-  //       SubseaInfrastructure.class
-  //   );
-  //
-  // }
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(subseaInfrastructureService.alwaysCopySectionData(projectDetail)).isFalse();
+  }
 
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = subseaInfrastructureService.allowSectionDataCleanUp(projectDetail);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
 }

@@ -11,7 +11,6 @@ import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
 @Component
 public class ProjectAssessmentFormValidator implements SmartValidator {
 
-  public static final String MISSING_UPDATE_REQUIRED_ERROR = "Select yes if the project requires an update";
   public static final String CANNOT_PROVIDE_UPDATE_REQUIRED_ERROR
       = "Cannot request an update when an update is already in progress";
 
@@ -33,7 +32,10 @@ public class ProjectAssessmentFormValidator implements SmartValidator {
             errors,
             "updateRequired",
             "updateRequired.invalid",
-            MISSING_UPDATE_REQUIRED_ERROR
+            String.format(
+                "Select yes if the %s requires an update",
+                projectAssessmentValidationHint.getProjectType().getLowercaseDisplayName()
+            )
         );
       } else {
         if (form.getUpdateRequired() != null) {

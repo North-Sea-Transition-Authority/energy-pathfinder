@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.view.platformfpso.PlatformFpsoView;
 import uk.co.ogauthority.pathfinder.model.view.platformfpso.PlatformFpsoViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
@@ -25,7 +26,7 @@ public class PlatformsFpsosSectionSummaryService implements ProjectSectionSummar
 
   public static final String TEMPLATE_PATH = "project/platformsfpsos/platformsFpsoSectionSummary.ftl";
   public static final String PAGE_NAME = PlatformsFpsosController.TASK_LIST_NAME;
-  public static final String SECTION_ID = "platformFpso";
+  public static final String SECTION_ID = "platform-floating-units";
   public static final SidebarSectionLink SECTION_LINK = SidebarSectionLink.createAnchorLink(
       PAGE_NAME,
       SECTION_ID
@@ -34,12 +35,17 @@ public class PlatformsFpsosSectionSummaryService implements ProjectSectionSummar
 
   private final PlatformsFpsosService platformsFpsosService;
   private final DifferenceService differenceService;
+  private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
   @Autowired
-  public PlatformsFpsosSectionSummaryService(PlatformsFpsosService platformsFpsosService,
-                                             DifferenceService differenceService) {
+  public PlatformsFpsosSectionSummaryService(
+      PlatformsFpsosService platformsFpsosService,
+      DifferenceService differenceService,
+      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService
+  ) {
     this.platformsFpsosService = platformsFpsosService;
     this.differenceService = differenceService;
+    this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
   }
 
   @Override
@@ -49,9 +55,13 @@ public class PlatformsFpsosSectionSummaryService implements ProjectSectionSummar
 
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
-    Map<String, Object> summaryModel = new HashMap<>();
-    summaryModel.put("sectionTitle", PAGE_NAME);
-    summaryModel.put("sectionId", SECTION_ID);
+
+    final var summaryModel = projectSectionSummaryCommonModelService.getCommonSummaryModelMap(
+        detail,
+        PAGE_NAME,
+        SECTION_ID
+    );
+
     var platformFpsos = platformsFpsosService.getPlatformsFpsosByProjectDetail(detail);
     var platformFpsoViews = getPlatformFpsoViews(detail, platformFpsos);
     summaryModel.put("platformFpsoDiffModel", getPlatformFpsoDifferenceModel(

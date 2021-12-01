@@ -33,4 +33,23 @@ public interface ProjectFormSectionService {
   void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail);
 
   Set<ProjectType> getSupportedProjectTypes();
+
+  /**
+   * Method to determine if the section data should always be copied.
+   * @param projectDetail the project detail being processed
+   * @return true if we should always copy this sections data, false otherwise
+   */
+  default boolean alwaysCopySectionData(ProjectDetail projectDetail) {
+    return false;
+  }
+
+  /**
+   * Method to indicate if the section allows its data to be removed if the section
+   * is no longer relevant to project at submission time.
+   * @param projectDetail the project detail being processed
+   * @return true if the section is allowed to have its data cleaned up, false otherwise
+   */
+  default boolean allowSectionDataCleanUp(ProjectDetail projectDetail) {
+    return true;
+  }
 }

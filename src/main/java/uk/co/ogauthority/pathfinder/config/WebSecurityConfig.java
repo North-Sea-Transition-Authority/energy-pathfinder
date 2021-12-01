@@ -48,7 +48,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .mvcMatchers("/manage-teams", "/team-management", "/team-management/**")
           .hasAnyAuthority(systemAccessService.getViewTeamGrantedAuthorities())
 
-        .mvcMatchers("/start-project", "/project-operator-select")
+        .mvcMatchers("/infrastructure/start-project", "/project-operator-select")
           .hasAnyAuthority(systemAccessService.getCreateProjectGrantedAuthorities())
 
         .mvcMatchers("/api/**")

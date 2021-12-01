@@ -15,6 +15,7 @@ import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
@@ -33,11 +34,15 @@ public class UpcomingTenderSectionSummaryService implements ProjectSectionSummar
 
   private final DifferenceService differenceService;
 
+  private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   @Autowired
   public UpcomingTenderSectionSummaryService(UpcomingTenderSummaryService upcomingTenderSummaryService,
-                                             DifferenceService differenceService) {
+                                             DifferenceService differenceService,
+                                             ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService) {
     this.upcomingTenderSummaryService = upcomingTenderSummaryService;
     this.differenceService = differenceService;
+    this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
   }
 
   @Override
@@ -47,9 +52,12 @@ public class UpcomingTenderSectionSummaryService implements ProjectSectionSummar
 
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
-    Map<String, Object> summaryModel = new HashMap<>();
-    summaryModel.put("sectionTitle", PAGE_NAME);
-    summaryModel.put("sectionId", SECTION_ID);
+
+    final var summaryModel = projectSectionSummaryCommonModelService.getCommonSummaryModelMap(
+        detail,
+        PAGE_NAME,
+        SECTION_ID
+    );
 
     var currentUpcomingTenderViews = upcomingTenderSummaryService.getSummaryViews(detail);
     var previousUpcomingTenderViews = upcomingTenderSummaryService.getSummaryViews(

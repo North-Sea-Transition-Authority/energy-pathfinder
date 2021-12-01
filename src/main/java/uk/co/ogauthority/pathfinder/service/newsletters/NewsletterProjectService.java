@@ -39,7 +39,7 @@ public class NewsletterProjectService {
     return String.format(
         "%s - %s",
         reportableProject.getOperatorName(),
-        reportableProject.getProjectTitle()
+        reportableProject.getProjectDisplayName()
     );
   }
 }

@@ -1,0 +1,6 @@
+package uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan;
+
+import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormCommon;
+
+public class ForwardWorkPlanCollaborationOpportunityForm extends CollaborationOpportunityFormCommon {
+}

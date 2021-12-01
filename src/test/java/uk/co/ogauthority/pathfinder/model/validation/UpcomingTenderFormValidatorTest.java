@@ -129,7 +129,6 @@ public class UpcomingTenderFormValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors.size()).isPositive();
     assertThat(fieldErrors).contains(
         entry("estimatedTenderDate.day", Set.of(DateInputValidator.DAY_AFTER_DATE_CODE)),
         entry("estimatedTenderDate.month", Set.of(DateInputValidator.MONTH_AFTER_DATE_CODE)),

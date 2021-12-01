@@ -1,7 +1,6 @@
 package uk.co.ogauthority.pathfinder.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -13,13 +12,16 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.repository.WebUserAccountRepository;
-import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.UserSession;
 import uk.co.ogauthority.pathfinder.repository.UserSessionRepository;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 
+@RunWith(MockitoJUnitRunner.class)
 public class UserSessionServiceTest {
 
   private UserSessionService userSessionService;
@@ -46,13 +48,13 @@ public class UserSessionServiceTest {
     loggedOutSession = createUserSession("LOGGED OUT", oneMinuteAgo);
     loggedOutSession.setLogoutTimestamp(oneMinuteAgo);
 
-    when(userSessionRepository.findById(eq(validSession.getId()))).thenReturn(Optional.of(validSession));
-    when(userSessionRepository.findById(eq(expiredSession.getId()))).thenReturn(Optional.of(expiredSession));
-    when(userSessionRepository.findById(eq(loggedOutSession.getId()))).thenReturn(Optional.of(loggedOutSession));
+    when(userSessionRepository.findById(validSession.getId())).thenReturn(Optional.of(validSession));
+    when(userSessionRepository.findById(expiredSession.getId())).thenReturn(Optional.of(expiredSession));
+    when(userSessionRepository.findById(loggedOutSession.getId())).thenReturn(Optional.of(loggedOutSession));
 
-    when(webUserAccountRepository.findById(eq(validSession.getWuaId()))).thenReturn(Optional.of(validSession.getAuthenticatedUserAccount()));
-    when(webUserAccountRepository.findById(eq(expiredSession.getWuaId()))).thenReturn(Optional.of(expiredSession.getAuthenticatedUserAccount()));
-    when(webUserAccountRepository.findById(eq(loggedOutSession.getWuaId()))).thenReturn(Optional.of(loggedOutSession.getAuthenticatedUserAccount()));
+    when(webUserAccountRepository.findById(validSession.getWuaId())).thenReturn(Optional.of(validSession.getAuthenticatedUserAccount()));
+    when(webUserAccountRepository.findById(expiredSession.getWuaId())).thenReturn(Optional.of(expiredSession.getAuthenticatedUserAccount()));
+    when(webUserAccountRepository.findById(loggedOutSession.getWuaId())).thenReturn(Optional.of(loggedOutSession.getAuthenticatedUserAccount()));
   }
 
   @Test

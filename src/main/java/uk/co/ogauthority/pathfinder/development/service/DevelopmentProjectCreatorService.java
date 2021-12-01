@@ -99,7 +99,7 @@ public class DevelopmentProjectCreatorService {
     final var projectOperatorForm = new ProjectOperatorForm();
     projectOperatorForm.setOperator(String.valueOf(organisationGroup.getOrgGrpId()));
 
-    var projectDetail = startProjectService.startProject(user, projectOperatorForm);
+    var projectDetail = startProjectService.createInfrastructureProject(user, projectOperatorForm);
     projectDetail.setStatus(status);
 
     if (!status.equals(ProjectStatus.DRAFT)) {

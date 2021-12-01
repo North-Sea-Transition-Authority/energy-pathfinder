@@ -30,7 +30,8 @@ public enum ProjectTaskGroup {
       List.of(
           ProjectTask.UPCOMING_TENDERS,
           ProjectTask.AWARDED_CONTRACTS,
-          ProjectTask.COLLABORATION_OPPORTUNITIES
+          ProjectTask.COLLABORATION_OPPORTUNITIES,
+          ProjectTask.CAMPAIGN_INFORMATION
       ),
       Set.of(ProjectType.INFRASTRUCTURE),
       3
@@ -47,6 +48,15 @@ public enum ProjectTaskGroup {
       ),
       Set.of(ProjectType.INFRASTRUCTURE),
       4
+  ),
+  WORK_PLAN_COMMERCIAL_INFORMATION(
+      "Commercial information",
+      List.of(
+          ProjectTask.WORK_PLAN_UPCOMING_TENDERS,
+          ProjectTask.WORK_PLAN_COLLABORATION_OPPORTUNITIES
+      ),
+      Set.of(ProjectType.FORWARD_WORK_PLAN),
+      1
   );
 
 

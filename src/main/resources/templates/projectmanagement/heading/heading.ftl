@@ -1,13 +1,15 @@
 <#include '../../layout.ftl'>
 
-<#-- @ftlvariable name="projectTitle" type="String" -->
-<#-- @ftlvariable name="projectOperatorDisplayName" type="String" -->
+<#-- @ftlvariable name="headingText" type="String" -->
+<#-- @ftlvariable name="captionText" type="String" -->
 
 <@headingWithContent
   caption=""
   captionClass=""
-  pageHeading="Project: ${projectTitle}"
+  pageHeading=headingText
   pageHeadingClass="govuk-heading-xl"
 >
-  <span class="govuk-caption-l">${projectOperatorDisplayName}</span>
+  <#if captionText?has_content>
+    <span class="govuk-caption-l">${captionText}</span>
+  </#if>
 </@headingWithContent>

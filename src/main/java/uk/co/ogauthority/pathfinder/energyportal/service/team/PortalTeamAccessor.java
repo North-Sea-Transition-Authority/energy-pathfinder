@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalRoleDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalSystemPrivilegeDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamMemberDto;
+import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamPersonMembershipDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.PersonId;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
@@ -477,5 +478,20 @@ public class PortalTeamAccessor {
       throw new RuntimeException(message, e);
     }
 
+  }
+
+  public List<PortalTeamPersonMembershipDto> getPortalTeamPersonMembershipByResourceIdIn(List<Integer> resourceIds) {
+    return entityManager.createQuery("" +
+                "SELECT new uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamPersonMembershipDto(" +
+                "  ptm.portalTeam.resId, " +
+                "  p " +
+                ")" +
+                "FROM PortalTeamMember ptm " +
+                "JOIN PortalTeam pt ON pt = ptm.portalTeam " +
+                "JOIN Person p ON p.id = ptm.personId " +
+                "WHERE ptm.portalTeam.resId IN :portalTeamIds ",
+            PortalTeamPersonMembershipDto.class)
+        .setParameter("portalTeamIds", resourceIds)
+        .getResultList();
   }
 }

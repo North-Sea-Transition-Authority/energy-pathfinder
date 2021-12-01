@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -348,5 +347,16 @@ public class AwardedContractServiceTest {
   @Test
   public void getSupportedProjectTypes_verifyInfrastructure() {
     assertThat(awardedContractService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
+  }
+
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(awardedContractService.alwaysCopySectionData(detail)).isFalse();
+  }
+
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = awardedContractService.allowSectionDataCleanUp(detail);
+    assertThat(allowSectionDateCleanUp).isTrue();
   }
 }

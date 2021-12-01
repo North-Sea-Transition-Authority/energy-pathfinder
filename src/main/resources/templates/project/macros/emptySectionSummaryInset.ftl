@@ -1,7 +1,7 @@
 <#include '../../layout.ftl'>
 
-<#macro emptySectionSummaryInset itemText>
+<#macro emptySectionSummaryInset itemText projectTypeDisplayName>
   <@fdsInsetText.insetText>
-    <p>No ${itemText} have been added to this project</p>
+    <p>No ${itemText} have been added to this ${projectTypeDisplayName}</p>
   </@fdsInsetText.insetText>
 </#macro>

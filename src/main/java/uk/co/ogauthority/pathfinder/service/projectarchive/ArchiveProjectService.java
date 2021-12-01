@@ -19,7 +19,8 @@ import uk.co.ogauthority.pathfinder.model.form.projectarchive.ArchiveProjectForm
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectarchive.ProjectArchiveDetailRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
-import uk.co.ogauthority.pathfinder.service.project.CancelDraftProjectVersionService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
+import uk.co.ogauthority.pathfinder.service.project.cancellation.CancelDraftProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -77,13 +78,30 @@ public class ArchiveProjectService {
   }
 
   public ModelAndView getArchiveProjectModelAndView(ProjectDetail projectDetail, AuthenticatedUserAccount user, ArchiveProjectForm form) {
+
     var projectId = projectDetail.getProject().getId();
+
+    final var pageHeading = String.format(
+        "%s %s",
+        ArchiveProjectController.ARCHIVE_PROJECT_PAGE_NAME_PREFIX,
+        projectDetail.getProjectType().getLowercaseDisplayName()
+    );
+
     var modelAndView = new ModelAndView(ARCHIVE_PROJECT_TEMPLATE_PATH)
         .addObject("projectHeaderHtml", projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, user))
         .addObject("form", form)
         .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class)
-            .getProject(projectId, null, null, null)));
-    breadcrumbService.fromManageProject(projectId, modelAndView, ArchiveProjectController.ARCHIVE_PROJECT_PAGE_NAME);
+            .getProject(projectId, null, null, null))
+        )
+        .addObject("pageHeading", pageHeading);
+
+    ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, projectDetail);
+
+    breadcrumbService.fromManageProject(
+        projectDetail,
+        modelAndView,
+        pageHeading
+    );
     return modelAndView;
   }
 }

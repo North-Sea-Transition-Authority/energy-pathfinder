@@ -22,7 +22,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.model.email.NotifyCallback;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.email.notify.NotifyCallbackService;
+import uk.co.ogauthority.pathfinder.service.email.notify.callback.NotifyCallbackService;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = NotifyCallbackController.class)

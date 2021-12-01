@@ -13,7 +13,7 @@ import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
 @Immutable
 public class PortalOrganisationGroup implements SearchSelectable {
 
-  public static final String UREF_TYPE = "++REGOGRGRP";
+  public static final String UREF_TYPE = "++REGORGGRP";
 
   @Id
   private Integer orgGrpId;

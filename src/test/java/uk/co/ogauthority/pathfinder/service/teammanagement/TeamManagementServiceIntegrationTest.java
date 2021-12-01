@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.teammanagement;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.persistence.EntityManager;
@@ -128,27 +127,27 @@ public class TeamManagementServiceIntegrationTest {
     createPerson(personId);
 
     entityManager.createNativeQuery(
-        "INSERT INTO user_accounts (" +
-            "  wua_id" +
-            ", title " +
-            ", forename " +
-            ", surname " +
-            ", email_address " +
-            ", login_id " +
-            ", id " +
-            ", person_id " +
-            ", account_status " +
-            ") VALUES (" +
-            "  :wua_id" +
-            ", :title" +
-            ", :forename" +
-            ", :surname" +
-            ", :email_address" +
-            ", :login_id" +
-            ", :person_id" +
-            ", :person_id" +
-            ", :account_status" +
-            ")"
+            "INSERT INTO user_accounts (" +
+                "  wua_id" +
+                ", title " +
+                ", forename " +
+                ", surname " +
+                ", email_address " +
+                ", login_id " +
+                ", id " +
+                ", person_id " +
+                ", account_status " +
+                ") VALUES (" +
+                "  :wua_id" +
+                ", :title" +
+                ", :forename" +
+                ", :surname" +
+                ", :email_address" +
+                ", :login_id" +
+                ", :person_id" +
+                ", :person_id" +
+                ", :account_status" +
+                ")"
         )
         .setParameter("wua_id", 1)
         .setParameter("title", "title")
@@ -163,20 +162,20 @@ public class TeamManagementServiceIntegrationTest {
 
   private void createPerson(int personId) {
     entityManager.createNativeQuery(
-        "INSERT INTO people (" +
-            "  id" +
-            ", forename" +
-            ", surname" +
-            ", email_address" +
-            ", telephone_no" +
-            ") " +
-            "VALUES (" +
-            "  :person_id" +
-            ", :forename" +
-            ", :surname" +
-            ", :email_address" +
-            ", :telephone_no" +
-            ")"
+            "INSERT INTO people (" +
+                "  id" +
+                ", forename" +
+                ", surname" +
+                ", email_address" +
+                ", telephone_no" +
+                ") " +
+                "VALUES (" +
+                "  :person_id" +
+                ", :forename" +
+                ", :surname" +
+                ", :email_address" +
+                ", :telephone_no" +
+                ")"
         )
         .setParameter("person_id", personId)
         .setParameter("forename", "forename")

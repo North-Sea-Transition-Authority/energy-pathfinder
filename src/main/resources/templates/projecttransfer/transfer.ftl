@@ -9,8 +9,10 @@
 <#-- @ftlvariable name="organisationUnitRestUrl" type="String" -->
 <#-- @ftlvariable name="preselectedPublishableOrganisation" type="java.util.Map<String, String>" -->
 <#-- @ftlvariable name="cancelUrl" type="String" -->
+<#-- @ftlvariable name="pageTitle" type="String" -->
+<#-- @ftlvariable name="projectTypeDisplayNameLowercase" type="String" -->
 
-<#assign title = "Change project operator">
+<#assign title = pageTitle>
 
 <@defaultPage htmlTitle=title breadcrumbs=true fullWidthColumn=true errorItems=errorList>
 
@@ -20,17 +22,17 @@
       <h2 class="govuk-heading-l">${title}</h2>
 
       <@fdsInsetText.insetText insetTextClass="govuk-inset-text--yellow">
-        By changing this project's operator, any in progress updates will no longer be able to be submitted.
+        By changing this ${projectTypeDisplayNameLowercase}'s operator, any in progress updates will no longer be able to be submitted.
       </@fdsInsetText.insetText>
 
       <@fdsDataItems.dataItem>
-        <@fdsDataItems.dataValues key="Current project operator" value=currentOperator />
+        <@fdsDataItems.dataValues key="Current ${projectTypeDisplayNameLowercase} operator" value=currentOperator />
       </@fdsDataItems.dataItem>
 
       <@fdsForm.htmlForm>
         <@fdsSearchSelector.searchSelectorRest
           path="form.newOrganisationGroup"
-          labelText="Who is the new operator for the project?"
+          labelText="Who is the new operator for the ${projectTypeDisplayNameLowercase}?"
           selectorMinInputLength=3
           restUrl=springUrl(operatorsRestUrl)
           preselectedItems=preselectedOperator!{}
@@ -38,7 +40,7 @@
 
         <@fdsTextarea.textarea
           path="form.transferReason"
-          labelText="What is the reason you are changing this project's operator?"
+          labelText="What is the reason you are changing this ${projectTypeDisplayNameLowercase}'s operator?"
         />
 
         <#assign customerMnemonic = service.customerMnemonic />

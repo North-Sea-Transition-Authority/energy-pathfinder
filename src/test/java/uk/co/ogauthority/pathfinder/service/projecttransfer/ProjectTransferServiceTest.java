@@ -27,8 +27,8 @@ import uk.co.ogauthority.pathfinder.model.form.projecttransfer.ProjectTransferFo
 import uk.co.ogauthority.pathfinder.model.form.projecttransfer.ProjectTransferValidationHint;
 import uk.co.ogauthority.pathfinder.repository.projecttransfer.ProjectTransferRepository;
 import uk.co.ogauthority.pathfinder.service.email.OperatorEmailService;
-import uk.co.ogauthority.pathfinder.service.project.CancelDraftProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.cancellation.CancelDraftProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.ProjectUpdateService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;

@@ -13,6 +13,9 @@
       />
     </#list>
   <#else>
-    <@emptySectionSummaryInset.emptySectionSummaryInset itemText="awarded contracts"/>
+    <@emptySectionSummaryInset.emptySectionSummaryInset
+      itemText="awarded contracts"
+      projectTypeDisplayName=projectTypeDisplayNameLowercase
+    />
   </#if>
 </@sectionSummaryWrapper.sectionSummaryWrapper>

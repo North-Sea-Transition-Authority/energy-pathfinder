@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.subscription.SubscribedToNewsletterEmailProperties;
-import uk.co.ogauthority.pathfinder.testutil.EmailPropertyTestUtil;
+import uk.co.ogauthority.pathfinder.service.email.notify.CommonEmailMergeField;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubscriberEmailServiceTest {
@@ -48,10 +49,8 @@ public class SubscriberEmailServiceTest {
     verify(emailService, times(1)).sendEmail(emailCaptor.capture(), eq(emailAddress));
     SubscribedToNewsletterEmailProperties emailProperties = (SubscribedToNewsletterEmailProperties) emailCaptor.getValue();
 
-    var expectedEmailProperties = EmailPropertyTestUtil.getDefaultEmailPersonalisation(
-        forename,
-        EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER
-    );
+    final var expectedEmailProperties = new HashMap<String, Object>();
+    expectedEmailProperties.put(CommonEmailMergeField.RECIPIENT_IDENTIFIER, forename);
     expectedEmailProperties.put("UNSUBSCRIBE_URL", unsubscribeUrl);
     assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(expectedEmailProperties);
   }

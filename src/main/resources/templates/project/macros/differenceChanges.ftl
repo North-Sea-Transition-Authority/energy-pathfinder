@@ -228,8 +228,8 @@
 
 </#macro>
 
-<#macro toggler showDiffOnLoad=false togglerLabel="Show differences from previous version">
-  <div class="govuk-form-group">
+<#macro toggler showDiffOnLoad=false togglerLabel="Show differences from previous version" formGroupClass="">
+  <div class="govuk-form-group ${formGroupClass}">
     <div class="govuk-checkboxes">
       <div class="govuk-checkboxes__item">
         <input class="govuk-checkboxes__input" id="toggle-diff" type="checkbox" ${showDiffOnLoad?then('checked','')}>

@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.form.projecttransfer.ProjectTransferFo
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 
@@ -92,6 +93,8 @@ public class ProjectTransferModelService {
     final var organisationGroup = projectOperatorService.getProjectOperatorByProjectDetailOrError(projectDetail)
         .getOrganisationGroup();
 
+    var pageTitle = ProjectTransferController.PAGE_NAME;
+
     final var modelAndView = new ModelAndView(TRANSFER_PROJECT_TEMPLATE_PATH)
         .addObject("projectHeaderHtml", projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, user))
         .addObject("currentOperator", organisationGroup.getName())
@@ -106,9 +109,12 @@ public class ProjectTransferModelService {
         .addObject("organisationUnitRestUrl", SearchSelectorService.route(on(OrganisationUnitRestController.class)
             .searchOrganisationUnits(null))
         )
-        .addObject("preselectedPublishableOrganisation", getPreSelectedPublishableOrganisation(form));
+        .addObject("preselectedPublishableOrganisation", getPreSelectedPublishableOrganisation(form))
+        .addObject("pageTitle", pageTitle);
 
-    breadcrumbService.fromManageProject(projectId, modelAndView, ProjectTransferController.PAGE_NAME);
+    breadcrumbService.fromManageProject(projectDetail, modelAndView, pageTitle);
+
+    ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, projectDetail);
 
     return modelAndView;
   }

@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 
@@ -31,6 +32,9 @@ public class UpcomingTenderSectionSummaryServiceTest {
   @Mock
   private DifferenceService differenceService;
 
+  @Mock
+  private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   private UpcomingTenderSectionSummaryService upcomingTenderSectionSummaryService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
@@ -39,7 +43,8 @@ public class UpcomingTenderSectionSummaryServiceTest {
   public void setup() {
     upcomingTenderSectionSummaryService = new UpcomingTenderSectionSummaryService(
         upcomingTenderSummaryService,
-        differenceService
+        differenceService,
+        projectSectionSummaryCommonModelService
     );
   }
 
@@ -73,7 +78,7 @@ public class UpcomingTenderSectionSummaryServiceTest {
     )).thenReturn(previousUpcomingTenderViews);
 
     final var sectionSummary = upcomingTenderSectionSummaryService.getSummary(projectDetail);
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, projectDetail);
     assertInteractions(currentUpcomingTenderViews, previousUpcomingTenderViews);
   }
 
@@ -88,25 +93,24 @@ public class UpcomingTenderSectionSummaryServiceTest {
 
     final var sectionSummary = upcomingTenderSectionSummaryService.getSummary(projectDetail);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, projectDetail);
     assertInteractions(Collections.emptyList(), Collections.emptyList());
   }
 
-  private void assertModelProperties(ProjectSectionSummary sectionSummary) {
+  private void assertModelProperties(ProjectSectionSummary sectionSummary, ProjectDetail projectDetail) {
     assertThat(sectionSummary.getDisplayOrder()).isEqualTo(UpcomingTenderSectionSummaryService.DISPLAY_ORDER);
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(UpcomingTenderSectionSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(UpcomingTenderSectionSummaryService.TEMPLATE_PATH);
 
     var model = sectionSummary.getTemplateModel();
 
-    assertThat(model).containsOnlyKeys(
-        "sectionTitle",
-        "sectionId",
-        "upcomingTenderDiffModel"
+    verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
+        projectDetail,
+        UpcomingTenderSectionSummaryService.PAGE_NAME,
+        UpcomingTenderSectionSummaryService.SECTION_ID
     );
 
-    assertThat(model).containsEntry("sectionTitle", UpcomingTenderSectionSummaryService.PAGE_NAME);
-    assertThat(model).containsEntry("sectionId", UpcomingTenderSectionSummaryService.SECTION_ID);
+    assertThat(model).containsOnlyKeys("upcomingTenderDiffModel");
   }
 
   private void assertInteractions(List<UpcomingTenderView> currentTenderViews,

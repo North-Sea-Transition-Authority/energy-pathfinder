@@ -5,7 +5,7 @@
   headingPrefix
   displayOrder
   isValid
-  summaryLinkList
+  summaryLinkList=[]
   showHeader=true
   showActions=true
   headingSize="h2"

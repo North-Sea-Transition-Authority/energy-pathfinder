@@ -1,102 +1,68 @@
 package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.co.ogauthority.pathfinder.model.entity.project.Project;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
-import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityView;
-import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityViewUtil;
-import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
-import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Service
-public class CollaborationOpportunitiesSummaryService {
-  public static final String ERROR_FIELD_NAME = "collaboration-opportunity-%d";
-  public static final String EMPTY_LIST_ERROR = "You must add at least one collaboration opportunity";
-  public static final String ERROR_MESSAGE = "Collaboration opportunity %d is incomplete";
+public abstract class CollaborationOpportunitiesSummaryService<E, V> {
 
-  private final CollaborationOpportunitiesService collaborationOpportunitiesService;
-  private final CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService;
+  /**
+   * Method to return a view class which represents entity of type E.
+   * @param opportunity the opportunity to create the view from
+   * @param displayOrder the display order the view should have
+   * @return return a view class which represents entity of type E
+   */
+  public abstract V getView(
+      E opportunity,
+      Integer displayOrder
+  );
 
-  @Autowired
-  public CollaborationOpportunitiesSummaryService(CollaborationOpportunitiesService collaborationOpportunitiesService,
-                                                  CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService) {
-    this.collaborationOpportunitiesService = collaborationOpportunitiesService;
-    this.collaborationOpportunityFileLinkService = collaborationOpportunityFileLinkService;
-  }
+  /**
+   * Method to return a view class which represents entity of type E.
+   * @param opportunity the opportunity to create the view from
+   * @param displayOrder the display order the view should have
+   * @param isValid indicates if the underlying entity is valid
+   * @return return a view class which represents entity of type E
+   */
+  public abstract V getView(
+      E opportunity,
+      Integer displayOrder,
+      boolean isValid
+  );
 
-  public List<CollaborationOpportunityView> getSummaryViews(ProjectDetail detail) {
-    return createCollaborationOpportunityViews(
-        collaborationOpportunitiesService.getOpportunitiesForDetail(detail),
-        ValidationType.NO_VALIDATION
-    );
-  }
+  /**
+   * Method to determine if a entity of type E is valid based on the validation type.
+   * @param opportunity the opportunity to validate
+   * @param validationType the validation type to validate with
+   * @return true if the entity is valid, false otherwise
+   */
+  protected abstract boolean isValid(
+      E opportunity,
+      ValidationType validationType
+  );
 
-  public List<CollaborationOpportunityView> getSummaryViews(Project project, Integer version) {
-    return createCollaborationOpportunityViews(
-        collaborationOpportunitiesService.getOpportunitiesForProjectVersion(project, version),
-        ValidationType.NO_VALIDATION
-    );
-  }
-
-  public List<CollaborationOpportunityView> getValidatedSummaryViews(ProjectDetail detail) {
-    return createCollaborationOpportunityViews(
-        collaborationOpportunitiesService.getOpportunitiesForDetail(detail),
-        ValidationType.FULL
-    );
-  }
-
-  public CollaborationOpportunityView getView(CollaborationOpportunity opportunity, Integer displayOrder) {
-    var uploadedFileViews =
-        collaborationOpportunityFileLinkService.getFileUploadViewsLinkedToOpportunity(opportunity);
-    return CollaborationOpportunityViewUtil.createView(opportunity, displayOrder, uploadedFileViews);
-  }
-
-  private CollaborationOpportunityView getView(CollaborationOpportunity opportunity,
-                                              Integer displayOrder,
-                                              boolean isValid) {
-    var uploadedFileViews =
-        collaborationOpportunityFileLinkService.getFileUploadViewsLinkedToOpportunity(opportunity);
-    return CollaborationOpportunityViewUtil.createView(opportunity, displayOrder, uploadedFileViews, isValid);
-  }
-
-  public List<ErrorItem> getErrors(List<CollaborationOpportunityView> views) {
-    return SummaryUtil.getErrors(new ArrayList<>(views), EMPTY_LIST_ERROR, ERROR_FIELD_NAME, ERROR_MESSAGE);
-  }
-
-  public ValidationResult validateViews(List<CollaborationOpportunityView> views) {
-    return SummaryUtil.validateViews(new ArrayList<>(views));
-  }
-
-  public List<CollaborationOpportunityView> createCollaborationOpportunityViews(
-      List<CollaborationOpportunity> collaborationOpportunities,
+  protected List<V> constructCollaborationOpportunityViews(
+      List<E> collaborationOpportunities,
       ValidationType validationType
   ) {
     return IntStream.range(0, collaborationOpportunities.size())
         .mapToObj(index -> {
 
-          var opportunity = collaborationOpportunities.get(index);
+          var collaborationOpportunity = collaborationOpportunities.get(index);
           var displayIndex = index + 1;
 
           return validationType.equals(ValidationType.NO_VALIDATION)
-              ? getView(opportunity, displayIndex)
+              ? getView(collaborationOpportunity, displayIndex)
               : getView(
-                  opportunity,
+                  collaborationOpportunity,
                   displayIndex,
-                  collaborationOpportunitiesService.isValid(opportunity, validationType)
-                );
+                  isValid(collaborationOpportunity, validationType)
+              );
         })
         .collect(Collectors.toList());
   }
 
-  public boolean canShowInTaskList(ProjectDetail detail) {
-    return collaborationOpportunitiesService.canShowInTaskList(detail);
-  }
 }

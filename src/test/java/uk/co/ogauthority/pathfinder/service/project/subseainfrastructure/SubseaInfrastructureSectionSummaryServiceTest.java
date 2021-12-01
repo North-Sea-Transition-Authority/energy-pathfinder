@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.view.subseainfrastructure.SubseaInfras
 import uk.co.ogauthority.pathfinder.model.view.subseainfrastructure.SubseaInfrastructureViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.SubseaInfrastructureTestUtil;
 
@@ -32,6 +33,9 @@ public class SubseaInfrastructureSectionSummaryServiceTest {
   @Mock
   private DifferenceService differenceService;
 
+  @Mock
+  private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   private SubseaInfrastructureSectionSummaryService subseaInfrastructureSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -40,7 +44,8 @@ public class SubseaInfrastructureSectionSummaryServiceTest {
   public void setup() {
     subseaInfrastructureSectionSummaryService = new SubseaInfrastructureSectionSummaryService(
         subseaInfrastructureService,
-        differenceService
+        differenceService,
+        projectSectionSummaryCommonModelService
     );
   }
 
@@ -81,7 +86,7 @@ public class SubseaInfrastructureSectionSummaryServiceTest {
     )).thenReturn(previousSubseaInfrastructures);
     var sectionSummary = subseaInfrastructureSectionSummaryService.getSummary(detail);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, detail);
     assertInteractions(currentSubseaInfrastructureViews, previousSubseaInfastructureViews);
   }
 
@@ -91,26 +96,25 @@ public class SubseaInfrastructureSectionSummaryServiceTest {
 
     var sectionSummary = subseaInfrastructureSectionSummaryService.getSummary(detail);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, detail);
 
     verify(differenceService, never()).differentiate(any(), any(), any());
   }
 
-  private void assertModelProperties(ProjectSectionSummary projectSectionSummary) {
+  private void assertModelProperties(ProjectSectionSummary projectSectionSummary, ProjectDetail projectDetail) {
     assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(SubseaInfrastructureSectionSummaryService.DISPLAY_ORDER);
     assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(SubseaInfrastructureSectionSummaryService.SECTION_LINK));
     assertThat(projectSectionSummary.getTemplatePath()).isEqualTo(SubseaInfrastructureSectionSummaryService.TEMPLATE_PATH);
 
     var model = projectSectionSummary.getTemplateModel();
 
-    assertThat(model).containsOnlyKeys(
-        "sectionTitle",
-        "sectionId",
-        "subseaInfrastructureDiffModel"
+    verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
+        projectDetail,
+        SubseaInfrastructureSectionSummaryService.PAGE_NAME,
+        SubseaInfrastructureSectionSummaryService.SECTION_ID
     );
 
-    assertThat(model).containsEntry("sectionTitle", SubseaInfrastructureSectionSummaryService.PAGE_NAME);
-    assertThat(model).containsEntry("sectionId", SubseaInfrastructureSectionSummaryService.SECTION_ID);
+    assertThat(model).containsOnlyKeys("subseaInfrastructureDiffModel");
   }
 
   private void assertInteractions(List<SubseaInfrastructureView> currentSubseaInfrastructureViews,

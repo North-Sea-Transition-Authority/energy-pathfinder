@@ -1,7 +1,7 @@
 <#include '../../layout.ftl'>
 
 <#if projectArchiveDetailView?has_content>
-  <h2 class="govuk-heading-l">Project archive details</h2>
+  <h2 class="govuk-heading-l">Archive details</h2>
 
   <@fdsCheckAnswers.checkAnswers>
     <@checkAnswers.checkAnswersRowNoActions prompt="Archive reason" value=projectArchiveDetailView.archiveReason />

@@ -7,6 +7,7 @@ import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.IsoFields;
 import java.time.temporal.Temporal;
 import java.util.Arrays;
@@ -63,7 +64,7 @@ public class DateUtil {
   }
 
   public static boolean isInCurrentQuarter(Instant instantToCheck) {
-    final var currentQuarter = getQuarterFromLocalDate(LocalDate.now());
+    final var currentQuarter = getCurrentQuarter();
     final var quarterStartInstant = currentQuarter.getStartDateAsInstant();
     final var quarterEndInstant = currentQuarter.getEndDateAsInstant();
 
@@ -97,6 +98,14 @@ public class DateUtil {
 
   private static Instant getEndOfMonth(LocalDate dateToGetEndOfMonthFor, ZoneOffset zoneOffset) {
     return YearMonth.from(dateToGetEndOfMonthFor).atEndOfMonth().atTime(LocalTime.MAX).atZone(zoneOffset).toInstant();
+  }
+
+  public static long daysBetween(LocalDate fromDate, LocalDate toDate) {
+    return ChronoUnit.DAYS.between(fromDate, toDate);
+  }
+
+  public static Quarter getCurrentQuarter() {
+    return getQuarterFromLocalDate(LocalDate.now());
   }
 
 }

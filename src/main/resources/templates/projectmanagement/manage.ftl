@@ -1,7 +1,7 @@
 <#include '../layout.ftl'>
 
 <@defaultPage
-  htmlTitle="Manage project"
+  htmlTitle="Manage ${projectTypeDisplayNameLowercase}"
   fullWidthColumn=true
   twoThirdsColumn=false
   backLink=true

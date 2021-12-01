@@ -4,73 +4,73 @@ import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.view.projectmanagement.details.ProjectManagementDetailViewUtil;
-import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
-import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
-import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
-import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
+import uk.co.ogauthority.pathfinder.exception.ProjectTypeDetailServiceImplementationException;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectManagementDetailSectionServiceTest {
 
-  private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
-  private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
-
   @Mock
-  private ProjectInformationService projectInformationService;
+  private TestProjectManagementDetailSummariserService testProjectManagementDetailSummariserService;
 
-  @Mock
-  private ProjectLocationService projectLocationService;
-
-  @Mock
-  private WebUserAccountService webUserAccountService;
+  private static final AuthenticatedUserAccount AUTHENTICATED_USER_ACCOUNT = UserTestingUtil.getAuthenticatedUserAccount();
 
   private ProjectManagementDetailSectionService projectManagementDetailSectionService;
 
   @Before
   public void setup() {
     projectManagementDetailSectionService = new ProjectManagementDetailSectionService(
-        projectInformationService,
-        projectLocationService,
-        webUserAccountService
+        List.of(testProjectManagementDetailSummariserService)
     );
   }
 
   @Test
-  public void getSection() {
-    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
-    var projectLocation = ProjectLocationTestUtil.getProjectLocation(projectDetail);
-    var submitterAccount = UserTestingUtil.getAuthenticatedUserAccount();
+  public void getSection_whenImplementationForProjectType_assertSectionProperties() {
 
-    when(projectInformationService.getProjectInformationOrError(projectDetail)).thenReturn(projectInformation);
-    when(projectInformationService.isEnergyTransitionProject(projectInformation)).thenReturn(false);
-    when(projectLocationService.getOrError(projectDetail)).thenReturn(projectLocation);
-    when(webUserAccountService.getWebUserAccountOrError(projectDetail.getSubmittedByWua())).thenReturn(submitterAccount);
+    final var projectType = ProjectType.INFRASTRUCTURE;
 
-    var section = projectManagementDetailSectionService.getSection(projectDetail, authenticatedUser);
-    assertThat(section.getTemplatePath()).isEqualTo(ProjectManagementDetailSectionService.TEMPLATE_PATH);
+    final var projectDetail = ProjectUtil.getProjectDetails();
+    projectDetail.setProjectType(projectType);
+
+    when(testProjectManagementDetailSummariserService.getSupportedProjectType()).thenReturn(projectType);
+
+    final var templatePath = "template path";
+    when(testProjectManagementDetailSummariserService.getTemplatePath()).thenReturn(templatePath);
+
+    final var projectManagementDetailView = new TestProjectManagementDetailView();
+    when(testProjectManagementDetailSummariserService.getManagementDetailView(projectDetail)).thenReturn(projectManagementDetailView);
+
+    var section = projectManagementDetailSectionService.getSection(
+        projectDetail,
+        AUTHENTICATED_USER_ACCOUNT
+    );
+
+    assertThat(section.getTemplatePath()).isEqualTo(templatePath);
     assertThat(section.getDisplayOrder()).isEqualTo(ProjectManagementDetailSectionService.DISPLAY_ORDER);
     assertThat(section.getSectionType()).isEqualTo(ProjectManagementDetailSectionService.SECTION_TYPE);
-
-    var projectManagementDetailView = ProjectManagementDetailViewUtil.from(
-        projectDetail,
-        projectInformation,
-        projectLocation,
-        false,
-        submitterAccount
-    );
     assertThat(section.getTemplateModel()).containsExactly(
         entry("projectManagementDetailView", projectManagementDetailView)
     );
+  }
+
+  @Test(expected = ProjectTypeDetailServiceImplementationException.class)
+  public void getSection_whenNoImplementationForProjectType_thenException() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+    projectDetail.setProjectType(null);
+
+    final var projectType = ProjectType.INFRASTRUCTURE;
+    when(testProjectManagementDetailSummariserService.getSupportedProjectType()).thenReturn(projectType);
+
+    projectManagementDetailSectionService.getSection(projectDetail, AUTHENTICATED_USER_ACCOUNT);
   }
 }

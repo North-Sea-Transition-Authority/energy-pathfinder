@@ -18,7 +18,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
-import uk.co.ogauthority.pathfinder.controller.project.StartProjectController;
+import uk.co.ogauthority.pathfinder.controller.project.start.infrastructure.InfrastructureProjectStartController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
 import uk.co.ogauthority.pathfinder.model.enums.DashboardFilterType;
@@ -28,11 +28,10 @@ import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 import uk.co.ogauthority.pathfinder.model.form.dashboard.DashboardFilterForm;
 import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
-import uk.co.ogauthority.pathfinder.model.view.dashboard.DashboardProjectItemView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.dashboard.DashboardProjectHtmlItem;
 import uk.co.ogauthority.pathfinder.service.dashboard.DashboardService;
 import uk.co.ogauthority.pathfinder.testutil.DashboardFilterTestUtil;
-import uk.co.ogauthority.pathfinder.testutil.DashboardProjectItemTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.MetricsProviderTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -55,14 +54,18 @@ public class WorkAreaServiceTest {
       Set.of(UserPrivilege.PATHFINDER_WORK_AREA, UserPrivilege.PATHFINDER_PROJECT_CREATE)
   );
 
-  private final List<DashboardProjectItemView> dashboardProjectItemViews = List.of(DashboardProjectItemTestUtil.getDashboardProjectItemView());
+  private final List<DashboardProjectHtmlItem> dashboardProjectHtmlItems = List.of(
+      new DashboardProjectHtmlItem("html content 1"),
+      new DashboardProjectHtmlItem("html content 2")
+  );
   private final DashboardFilter filter = DashboardFilterTestUtil.getEmptyFilter();
   private final DashboardFilterForm form = DashboardFilterTestUtil.getEmptyForm();
 
   @Before
   public void setUp() throws Exception {
     workAreaService = new WorkAreaService(dashboardService, metricsProvider);
-    when(dashboardService.getDashboardProjectItemViewsForUser(any(), any(), any())).thenReturn(dashboardProjectItemViews);
+    when(dashboardService.getDashboardProjectHtmlItemsForUser(any(), any(), any())).thenReturn(
+        dashboardProjectHtmlItems);
     when(metricsProvider.getDashboardTimer()).thenReturn(MetricsProviderTestUtil.getNoOpTimer());
   }
 
@@ -83,7 +86,7 @@ public class WorkAreaServiceTest {
   @Test
   public void getWorkAreaModelAndViewForUser_resultSizeMatches() {
     var modelAndView = workAreaService.getWorkAreaModelAndViewForUser(createProjectUser, filter, form);
-    assertThat(modelAndView.getModel()).containsEntry("resultSize", dashboardProjectItemViews.size());
+    assertThat(modelAndView.getModel()).containsEntry("resultSize", dashboardProjectHtmlItems.size());
   }
 
   @Test
@@ -141,16 +144,16 @@ public class WorkAreaServiceTest {
   private void assertLinkFieldsCorrect(LinkButton link) {
     assertThat(link.getButtonType()).isEqualTo(ButtonType.PRIMARY);
     assertThat(link.getPrompt()).isEqualTo(WorkAreaService.LINK_BUTTON_TEXT);
-    assertThat(link.getUrl()).isEqualTo(ReverseRouter.route(on(StartProjectController.class).startProject(null)));
+    assertThat(link.getUrl()).isEqualTo(ReverseRouter.route(on(InfrastructureProjectStartController.class).startProject(null)));
   }
 
   private void assertModelAndViewFieldsSet(ModelAndView modelAndView, LinkButton link, DashboardFilterType filterType) {
     assertThat(modelAndView.getModel()).containsOnly(
-        entry("dashboardProjectItemViews", dashboardProjectItemViews),
+        entry("dashboardProjectHtmlItems", dashboardProjectHtmlItems),
         entry("startProjectButton", link),
         entry("filterType", filterType),
         entry("clearFilterUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkAreaClearFilter(null, null))),
-        entry("resultSize", dashboardProjectItemViews.size()),
+        entry("resultSize", dashboardProjectHtmlItems.size()),
         entry("form", form),
         entry("statuses", ProjectStatus.getAllAsMap()),
         entry("fieldStages", FieldStage.getAllAsMap()),

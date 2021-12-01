@@ -4,7 +4,7 @@
 <#-- @ftlvariable name="isPublishedAsOperator" type="Boolean" -->
 
 <#if projectTransferView?has_content>
-  <h2 class="govuk-heading-l">Project operator change details</h2>
+  <h2 class="govuk-heading-l">Operator change details</h2>
   <@fdsCheckAnswers.checkAnswers>
     <@checkAnswers.checkAnswersRowNoActions prompt="Previous operator" value=projectTransferView.oldOperator />
     <@checkAnswers.checkAnswersRowNoActions prompt="New operator" value=projectTransferView.newOperator />

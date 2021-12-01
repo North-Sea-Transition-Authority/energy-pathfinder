@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationView;
 import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -34,6 +35,9 @@ public class ProjectLocationSectionSummaryServiceTest {
   @Mock
   private DifferenceService differenceService;
 
+  @Mock
+  private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   private ProjectLocationSectionSummaryService projectLocationSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -44,7 +48,8 @@ public class ProjectLocationSectionSummaryServiceTest {
     projectLocationSectionSummaryService = new ProjectLocationSectionSummaryService(
         projectLocationService,
         projectLocationBlocksService,
-        differenceService
+        differenceService,
+        projectSectionSummaryCommonModelService
     );
   }
 
@@ -75,7 +80,6 @@ public class ProjectLocationSectionSummaryServiceTest {
 
     var sectionSummary = projectLocationSectionSummaryService.getSummary(detail);
 
-    var model = sectionSummary.getTemplateModel();
     assertThat(sectionSummary.getDisplayOrder()).isEqualTo(ProjectLocationSectionSummaryService.DISPLAY_ORDER);
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectLocationSectionSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectLocationSectionSummaryService.TEMPLATE_PATH);
@@ -83,7 +87,7 @@ public class ProjectLocationSectionSummaryServiceTest {
     var currentProjectLocationView = ProjectLocationViewUtil.from(projectLocation, Collections.emptyList());
     var previousProjectLocationView = ProjectLocationViewUtil.from(previousProjectLocation, Collections.emptyList());
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, detail);
     assertInteractions(currentProjectLocationView, previousProjectLocationView);
   }
 
@@ -97,27 +101,28 @@ public class ProjectLocationSectionSummaryServiceTest {
     )).thenReturn(Optional.empty());
 
     var sectionSummary = projectLocationSectionSummaryService.getSummary(detail);
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, detail);
     assertInteractions(new ProjectLocationView(), new ProjectLocationView());
   }
 
-  private void assertModelProperties(ProjectSectionSummary projectSectionSummary) {
+  private void assertModelProperties(ProjectSectionSummary projectSectionSummary, ProjectDetail projectDetail) {
     assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(ProjectLocationSectionSummaryService.DISPLAY_ORDER);
     assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectLocationSectionSummaryService.SECTION_LINK));
     assertThat(projectSectionSummary.getTemplatePath()).isEqualTo(ProjectLocationSectionSummaryService.TEMPLATE_PATH);
 
     var model = projectSectionSummary.getTemplateModel();
 
+    verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
+        projectDetail,
+        ProjectLocationSectionSummaryService.PAGE_NAME,
+        ProjectLocationSectionSummaryService.SECTION_ID
+    );
+
     assertThat(model).containsOnlyKeys(
-        "sectionTitle",
-        "sectionId",
         "projectLocationDiffModel",
         "hasApprovedFieldDevelopmentPlan",
         "hasApprovedDecomProgram"
     );
-
-    assertThat(model).containsEntry("sectionTitle", ProjectLocationSectionSummaryService.PAGE_NAME);
-    assertThat(model).containsEntry("sectionId", ProjectLocationSectionSummaryService.SECTION_ID);
   }
 
   private void assertInteractions(ProjectLocationView currentProjectLocationView,

@@ -18,53 +18,56 @@ import uk.gov.service.notify.NotificationClientException;
  */
 public class TestEmailServiceImpl implements EmailService {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(TestEmailServiceImpl.class);
+
   private final NotificationClient notificationClient;
   private final NotifyTemplateService notifyTemplateService;
   private final List<String> testRecipientList;
   private final EmailValidator emailValidator;
-  private static final Logger LOGGER = LoggerFactory.getLogger(TestEmailServiceImpl.class);
-  private final String serviceName;
-  private final String customerMnemonic;
-  private final String supplyChainInterfaceUrl;
+  private final DefaultEmailPersonalisationService defaultEmailPersonalisationService;
 
   public TestEmailServiceImpl(NotifyTemplateService notifyTemplateService,
                               NotificationClient notificationClient,
                               EmailValidator emailValidator,
                               List<String> testRecipientList,
-                              String serviceName,
-                              String customerMnemonic,
-                              String supplyChainInterfaceUrl) {
+                              DefaultEmailPersonalisationService defaultEmailPersonalisationService) {
     this.notificationClient = notificationClient;
     this.notifyTemplateService = notifyTemplateService;
     this.emailValidator = emailValidator;
     this.testRecipientList = testRecipientList;
-    this.serviceName = serviceName;
-    this.customerMnemonic = customerMnemonic;
-    this.supplyChainInterfaceUrl = supplyChainInterfaceUrl;
+    this.defaultEmailPersonalisationService = defaultEmailPersonalisationService;
   }
 
   @Override
   public void sendEmail(EmailProperties emailProperties, String toEmailAddress) {
-    sendEmail(emailProperties, toEmailAddress, null, null);
+    sendEmail(emailProperties, toEmailAddress, null, null, null);
+  }
+
+  @Override
+  public void sendEmail(EmailProperties emailProperties, String toEmailAddress, String recipientName) {
+    sendEmail(emailProperties, toEmailAddress, null, null, recipientName);
   }
 
   @Override
   public void sendEmail(EmailProperties emailProperties,
                         String toEmailAddress,
                         String reference,
-                        String emailReplyToId) {
+                        String emailReplyToId,
+                        String recipientName) {
 
     Optional<String> templateId = notifyTemplateService.getTemplateIdFromName(emailProperties.getTemplateName());
 
     if (templateId.isPresent()) {
 
       // Set the TEST_EMAIL personalisation when in the development service
-      var personalisation = emailProperties.getEmailPersonalisation();
-      personalisation.put("TEST_EMAIL", "yes");
-      personalisation.put("SUBJECT_PREFIX", "**TEST EMAIL**");
-      personalisation.put("SERVICE_NAME", serviceName);
-      personalisation.put("CUSTOMER_MNEMONIC", customerMnemonic);
-      personalisation.put("SUPPLY_CHAIN_INTERFACE_URL", supplyChainInterfaceUrl);
+      var personalisation = defaultEmailPersonalisationService.getDefaultEmailPersonalisation();
+      personalisation.putAll(emailProperties.getEmailPersonalisation());
+      personalisation.put(CommonEmailMergeField.TEST_EMAIL, "yes");
+      personalisation.put(CommonEmailMergeField.SUBJECT_PREFIX, "**TEST EMAIL**");
+
+      if (recipientName != null) {
+        personalisation.put(CommonEmailMergeField.RECIPIENT_IDENTIFIER, recipientName);
+      }
 
       // If we have test recipients send the email to each
       testRecipientList.stream()

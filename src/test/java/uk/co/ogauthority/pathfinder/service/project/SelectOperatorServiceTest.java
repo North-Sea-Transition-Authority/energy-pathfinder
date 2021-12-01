@@ -6,7 +6,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -183,13 +185,6 @@ public class SelectOperatorServiceTest {
   }
 
   @Test
-  public void removeSectionData() {
-    selectOperatorService.removeSectionData(detail);
-
-    verify(projectOperatorService, times(1)).deleteProjectOperatorByProjectDetail(detail);
-  }
-
-  @Test
   public void copySectionData_verifyDuplicationServiceInteraction() {
 
     final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
@@ -231,6 +226,40 @@ public class SelectOperatorServiceTest {
   @Test
   public void getSupportedProjectTypes_verifyInfrastructure() {
     assertThat(selectOperatorService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
+  }
+
+  @Test
+  public void alwaysCopySectionData_smokeTestProjectTypes_assertOnlyForwardWorkPlanType() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+
+    final var projectTypesToAlwaysCopy = Set.of(ProjectType.FORWARD_WORK_PLAN);
+
+    Arrays.asList(ProjectType.values()).forEach(projectType -> {
+
+      projectDetail.setProjectType(projectType);
+
+      final var alwaysCopySectionData = selectOperatorService.alwaysCopySectionData(projectDetail);
+
+      if (projectTypesToAlwaysCopy.contains(projectType)) {
+        assertThat(alwaysCopySectionData).isTrue();
+      } else {
+        assertThat(alwaysCopySectionData).isFalse();
+      }
+
+    });
+  }
+
+  @Test
+  public void removeSectionData_verifyInteractions() {
+    selectOperatorService.removeSectionData(detail);
+    verify(projectOperatorService, times(1)).deleteProjectOperatorByProjectDetail(detail);
+  }
+
+  @Test
+  public void allowSectionDataCleanUp_verifyIsFalse() {
+    final var allowSectionDateCleanUp = selectOperatorService.allowSectionDataCleanUp(detail);
+    assertThat(allowSectionDateCleanUp).isFalse();
   }
 
   private void assertCommonOperatorFormProperties(ProjectOperatorForm formToAssert, ProjectOperator sourceEntity) {

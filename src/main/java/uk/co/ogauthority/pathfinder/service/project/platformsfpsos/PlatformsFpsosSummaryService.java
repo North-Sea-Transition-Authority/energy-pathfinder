@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -17,9 +18,12 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Service
 public class PlatformsFpsosSummaryService {
+
+  private static final String FLOATING_POINT_TEXT_LOWERCASE = PlatformsFpsosController.FLOATING_UNIT_TEXT_LOWERCASE;
+
   public static final String ERROR_FIELD_NAME = "platform-fpso-%d";
-  public static final String EMPTY_LIST_ERROR = "You must add at least one platform or FPSO";
-  public static final String ERROR_MESSAGE = "Platform or FPSO %d is incomplete";
+  public static final String EMPTY_LIST_ERROR = String.format("You must add at least one platform or %s", FLOATING_POINT_TEXT_LOWERCASE);
+  public static final String ERROR_MESSAGE = "Platform or " + FLOATING_POINT_TEXT_LOWERCASE + " %d is incomplete";
 
   private final PlatformsFpsosService platformsFpsosService;
 

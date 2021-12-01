@@ -8,7 +8,7 @@ public class ProjectTransferForm {
   @NotNull(message = "Select a new operator", groups = FullValidation.class)
   private String newOrganisationGroup;
 
-  @NotNull(message = "Enter the reason you are changing the project's operator", groups = FullValidation.class)
+  @NotNull(message = "Enter the reason you are changing the operator", groups = FullValidation.class)
   private String transferReason;
 
   @NotNull(

@@ -1,7 +1,7 @@
 <#include '../layoutPane.ftl'>
 
-<#macro defaultPageWithSidebar pageHeading themeHeading sidebarSectionLinks isSidebarSticky=false>
-  <@defaultPagePane htmlTitle=pageHeading phaseBanner=false>
+<#macro defaultPageWithSidebar pageHeading themeHeading sidebarSectionLinks htmlTitle=pageHeading isSidebarSticky=false>
+  <@defaultPagePane htmlTitle=htmlTitle phaseBanner=false>
     <@defaultPagePaneSubNav>
       <@fdsSubNavigation.subNavigation sticky=isSidebarSticky>
         <@fdsSubNavigation.subNavigationSection themeHeading=themeHeading>
@@ -12,7 +12,7 @@
       </@fdsSubNavigation.subNavigation>
     </@defaultPagePaneSubNav>
 
-    <@defaultPagePaneContent pageHeading=pageHeading>
+    <@defaultPagePaneContent pageHeading=pageHeading!"">
       <#nested>
     </@defaultPagePaneContent>
   </@defaultPagePane>

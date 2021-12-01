@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +33,7 @@ public class TaskListGroupsServiceTest {
   private static final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
   @Before
-  public void setup() throws Exception {
+  public void setup() {
     taskListGroupsService = new TaskListGroupsService(
         projectTaskService,
         taskListEntryCreatorService
@@ -42,16 +44,30 @@ public class TaskListGroupsServiceTest {
 
   @Test
   public void getTaskListGroups_whenInfrastructure_correctNumberOfGroups() {
-    detail.setProjectType(ProjectType.INFRASTRUCTURE);
-    var groups = taskListGroupsService.getTaskListGroups(detail);
-    assertThat(groups.size()).isEqualTo(ProjectTaskGroup.asList().size() + 1); //+1 for review and submit
+    final var projectType = ProjectType.INFRASTRUCTURE;
+    detail.setProjectType(projectType);
+    assertThatCorrectProjectTaskGroupsAreReturned(projectType, detail);
   }
 
   @Test
   public void getTaskListGroups_whenForwardWorkPlan_correctNumberOfGroups() {
-    detail.setProjectType(ProjectType.FORWARD_WORK_PLAN);
-    var groups = taskListGroupsService.getTaskListGroups(detail);
-    assertThat(groups.size()).isEqualTo(1); // 1 for review and submit
+    final var projectType = ProjectType.FORWARD_WORK_PLAN;
+    detail.setProjectType(projectType);
+    assertThatCorrectProjectTaskGroupsAreReturned(projectType, detail);
+  }
+
+  private List<ProjectTaskGroup> getProjectTaskGroupsByProjectType(ProjectType projectType) {
+    return ProjectTaskGroup.asList()
+        .stream()
+        .filter(projectTaskGroup -> projectTaskGroup.getRelatedProjectTypes().contains(projectType))
+        .collect(Collectors.toList());
+  }
+
+  private void assertThatCorrectProjectTaskGroupsAreReturned(ProjectType projectType,
+                                                             ProjectDetail projectDetail) {
+    var taskListGroupsForProjectDetail = taskListGroupsService.getTaskListGroups(projectDetail);
+    var expectedProjectTaskGroups = getProjectTaskGroupsByProjectType(projectType);
+    assertThat(taskListGroupsForProjectDetail.size()).isEqualTo(expectedProjectTaskGroups.size() + 1); // +1 for review and submit
   }
 
   @Test

@@ -12,10 +12,11 @@ import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.Porta
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationUnit;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 
 @MappedSuperclass
-public class DashboardProjectItem {
+public abstract class DashboardProjectItem {
 
   @Id
   private Integer projectId;
@@ -54,6 +55,11 @@ public class DashboardProjectItem {
   private Instant sortKey;
 
   private Instant updateSortKey;
+
+  @Enumerated(EnumType.STRING)
+  private ProjectType projectType;
+
+  private int projectTypeSortKey;
 
   public Integer getProjectId() {
     return projectId;
@@ -170,6 +176,22 @@ public class DashboardProjectItem {
 
   public void setUpdateSortKey(Instant updateSortKey) {
     this.updateSortKey = updateSortKey;
+  }
+
+  public ProjectType getProjectType() {
+    return projectType;
+  }
+
+  public void setProjectType(ProjectType projectType) {
+    this.projectType = projectType;
+  }
+
+  public int getProjectTypeSortKey() {
+    return projectTypeSortKey;
+  }
+
+  public void setProjectTypeSortKey(int projectTypeSortKey) {
+    this.projectTypeSortKey = projectTypeSortKey;
   }
 
   public PortalOrganisationUnit getPublishableOperator() {

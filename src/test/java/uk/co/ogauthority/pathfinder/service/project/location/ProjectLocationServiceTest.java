@@ -447,6 +447,17 @@ public class ProjectLocationServiceTest {
     assertThat(projectLocationService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
   }
 
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(projectLocationService.alwaysCopySectionData(details)).isFalse();
+  }
+
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = projectLocationService.allowSectionDataCleanUp(details);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
+
   private void checkCommonFieldsMatch(ProjectLocation projectLocation) {
     assertThat(projectLocation.getFieldType()).isEqualTo(ProjectLocationTestUtil.FIELD_TYPE);
     assertThat(projectLocation.getMaximumWaterDepth()).isEqualTo(ProjectLocationTestUtil.WATER_DEPTH);

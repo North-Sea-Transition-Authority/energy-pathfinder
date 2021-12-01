@@ -22,6 +22,8 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.NoUpdateNotificationRepository;
 import uk.co.ogauthority.pathfinder.service.email.RegulatorEmailService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
+import uk.co.ogauthority.pathfinder.service.project.submission.ProjectSubmissionSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
@@ -36,7 +38,7 @@ public class OperatorProjectUpdateService {
   private final ProjectUpdateService projectUpdateService;
   private final RegulatorUpdateRequestService regulatorUpdateRequestService;
   private final NoUpdateNotificationRepository noUpdateNotificationRepository;
-  private final ProjectNoUpdateSummaryViewService projectNoUpdateSummaryViewService;
+  private final ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService;
   private final ProjectHeaderSummaryService projectHeaderSummaryService;
   private final RegulatorEmailService regulatorEmailService;
   private final ValidationService validationService;
@@ -47,7 +49,7 @@ public class OperatorProjectUpdateService {
       ProjectUpdateService projectUpdateService,
       RegulatorUpdateRequestService regulatorUpdateRequestService,
       NoUpdateNotificationRepository noUpdateNotificationRepository,
-      ProjectNoUpdateSummaryViewService projectNoUpdateSummaryViewService,
+      ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService,
       ProjectHeaderSummaryService projectHeaderSummaryService,
       RegulatorEmailService regulatorEmailService,
       ValidationService validationService,
@@ -55,7 +57,7 @@ public class OperatorProjectUpdateService {
     this.projectUpdateService = projectUpdateService;
     this.regulatorUpdateRequestService = regulatorUpdateRequestService;
     this.noUpdateNotificationRepository = noUpdateNotificationRepository;
-    this.projectNoUpdateSummaryViewService = projectNoUpdateSummaryViewService;
+    this.projectSubmissionSummaryViewService = projectSubmissionSummaryViewService;
     this.projectHeaderSummaryService = projectHeaderSummaryService;
     this.regulatorEmailService = regulatorEmailService;
     this.validationService = validationService;
@@ -102,20 +104,34 @@ public class OperatorProjectUpdateService {
     return noUpdateNotificationRepository.findByProjectUpdate_ToDetail(projectDetail);
   }
 
-  public ModelAndView getProjectUpdateModelAndView(Integer projectId) {
-    return new ModelAndView(START_PAGE_TEMPLATE_PATH)
-        .addObject("startActionUrl", ReverseRouter.route(on(OperatorUpdateController.class).startUpdate(projectId, null, null)));
+  public ModelAndView getProjectUpdateModelAndView(ProjectDetail projectDetail) {
+    final var modelAndView = new ModelAndView(START_PAGE_TEMPLATE_PATH)
+        .addObject("startActionUrl", ReverseRouter.route(on(OperatorUpdateController.class).startUpdate(
+            projectDetail.getProject().getId(),
+            null,
+            null
+        )));
+
+    ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, projectDetail);
+
+    return modelAndView;
   }
 
   public ModelAndView getProjectProvideNoUpdateModelAndView(ProjectDetail projectDetail,
                                                             AuthenticatedUserAccount user,
                                                             ProvideNoUpdateForm form) {
     var projectId = projectDetail.getProject().getId();
+
     var modelAndView = new ModelAndView(PROVIDE_NO_UPDATE_TEMPLATE_PATH)
         .addObject("projectHeaderHtml", projectHeaderSummaryService.getProjectHeaderHtml(projectDetail, user))
         .addObject("form", form)
         .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)));
-    breadcrumbService.fromManageProject(projectId, modelAndView, OperatorUpdateController.NO_UPDATE_REQUIRED_PAGE_NAME);
+
+    breadcrumbService.fromManageProject(
+        projectDetail,
+        modelAndView,
+        OperatorUpdateController.NO_UPDATE_REQUIRED_PAGE_NAME
+    );
     return modelAndView;
   }
 
@@ -142,9 +158,18 @@ public class OperatorProjectUpdateService {
   }
 
   public ModelAndView getProjectProvideNoUpdateConfirmationModelAndView(ProjectDetail projectDetail) {
-    return new ModelAndView(PROVIDE_NO_UPDATE_CONFIRMATION_TEMPLATE_PATH)
-        .addObject("projectNoUpdateSummaryView", projectNoUpdateSummaryViewService.getProjectNoUpdateSummaryView(projectDetail))
-        .addObject("workAreaUrl", ControllerUtils.getWorkAreaUrl())
-        .addObject("feedbackUrl", ControllerUtils.getFeedbackUrl(projectDetail.getId()));
+    final var modelAndView = new ModelAndView(PROVIDE_NO_UPDATE_CONFIRMATION_TEMPLATE_PATH)
+        .addObject(
+            "projectNoUpdateSummaryView",
+            projectSubmissionSummaryViewService.getProjectNoUpdateSubmissionSummaryView(projectDetail)
+        )
+        .addObject(
+            "workAreaUrl",
+            ControllerUtils.getWorkAreaUrl()).addObject("feedbackUrl", ControllerUtils.getFeedbackUrl(projectDetail.getId())
+        );
+
+    ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, projectDetail);
+
+    return modelAndView;
   }
 }

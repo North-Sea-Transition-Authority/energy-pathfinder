@@ -29,7 +29,6 @@ public class RegulatorActionService {
   public static final String REQUEST_UPDATE_ACTION_PROMPT = "Request update";
   public static final int REQUEST_UPDATE_ACTION_DISPLAY_ORDER = 20;
 
-  public static final String TRANSFER_PROJECT_ACTION_PROMPT = "Change project operator";
   public static final int TRANSFER_PROJECT_ACTION_DISPLAY_ORDER = 30;
 
   public static final int ARCHIVE_ACTION_DISPLAY_ORDER = 40;
@@ -80,7 +79,7 @@ public class RegulatorActionService {
         ProjectTransferController.class
     );
     if (canTransfer) {
-      actions.add(getTransferProjectAction(projectId));
+      actions.add(getTransferProjectAction(projectDetail));
     }
 
     var canArchive = projectContextService.canBuildContext(
@@ -89,7 +88,7 @@ public class RegulatorActionService {
         ArchiveProjectController.class
     );
     if (canArchive) {
-      actions.add(projectActionService.getArchiveAction(projectId, ARCHIVE_ACTION_DISPLAY_ORDER));
+      actions.add(projectActionService.getArchiveAction(projectDetail, ARCHIVE_ACTION_DISPLAY_ORDER));
     }
 
     return actions;
@@ -115,11 +114,15 @@ public class RegulatorActionService {
         ), REQUEST_UPDATE_ACTION_DISPLAY_ORDER);
   }
 
-  protected UserActionWithDisplayOrder getTransferProjectAction(Integer projectId) {
+  protected UserActionWithDisplayOrder getTransferProjectAction(ProjectDetail projectDetail) {
     return new UserActionWithDisplayOrder(
         new LinkButton(
-            TRANSFER_PROJECT_ACTION_PROMPT,
-            ReverseRouter.route(on(ProjectTransferController.class).getTransferProject(projectId, null, null)),
+            String.format("Change %s operator", projectDetail.getProjectType().getLowercaseDisplayName()),
+            ReverseRouter.route(on(ProjectTransferController.class).getTransferProject(
+                projectDetail.getProject().getId(),
+                null,
+                null
+            )),
             true,
             ButtonType.SECONDARY
         ), TRANSFER_PROJECT_ACTION_DISPLAY_ORDER);

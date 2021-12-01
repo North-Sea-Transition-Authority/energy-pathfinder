@@ -1,6 +1,7 @@
 <#include '../layout.ftl'>
 
 <#-- @ftlvariable name="technicalSupportContact" type="uk.co.ogauthority.pathfinder.model.enums.contact.ServiceContactDetail" -->
+<#-- @ftlvariable name="service" type="uk.co.ogauthority.pathfinder.config.ServiceProperties" -->
 
 <#assign pageTitle = "Page not found" />
 

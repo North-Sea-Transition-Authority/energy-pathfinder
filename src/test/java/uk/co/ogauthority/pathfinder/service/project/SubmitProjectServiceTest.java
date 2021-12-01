@@ -19,15 +19,17 @@ import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.submission.SubmitProjectController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
-import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSubmissionSummaryView;
+import uk.co.ogauthority.pathfinder.model.view.submission.ProjectSubmissionSummaryView;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSummaryView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.service.email.RegulatorEmailService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.cleanup.ProjectCleanUpService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
-import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSubmissionSummaryViewService;
+import uk.co.ogauthority.pathfinder.service.project.submission.ProjectSubmissionSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSummaryViewService;
+import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequestService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectSubmissionSummaryTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -57,6 +59,9 @@ public class SubmitProjectServiceTest {
   @Mock
   private RegulatorEmailService regulatorEmailService;
 
+  @Mock
+  private RegulatorUpdateRequestService regulatorUpdateRequestService;
+
   private SubmitProjectService submitProjectService;
 
   private final static ProjectDetail PROJECT_DETAIL = ProjectUtil.getProjectDetails();
@@ -69,8 +74,8 @@ public class SubmitProjectServiceTest {
         projectSummaryViewService,
         projectSubmissionSummaryViewService,
         List.of(projectInformationService, awardedContractService),
-        regulatorEmailService
-    );
+        regulatorEmailService,
+        regulatorUpdateRequestService);
     when(projectDetailsRepository.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
@@ -157,14 +162,12 @@ public class SubmitProjectServiceTest {
     final var projectDetail = PROJECT_DETAIL;
     projectDetail.setVersion(1);
 
-    final var projectId = projectDetail.getProject().getId();
-
     final var projectSummaryView = new ProjectSummaryView("test", List.of());
     when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
 
     final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail, true);
 
-    assertProjectSubmitSummaryModelAndView(projectId, modelAndView, false, true, projectSummaryView);
+    assertProjectSubmitSummaryModelAndView(projectDetail, modelAndView, false, true, projectSummaryView);
   }
 
   @Test
@@ -173,14 +176,12 @@ public class SubmitProjectServiceTest {
     final var projectDetail = PROJECT_DETAIL;
     projectDetail.setVersion(1);
 
-    final var projectId = projectDetail.getProject().getId();
-
     final var projectSummaryView = new ProjectSummaryView("test", List.of());
     when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
 
     final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail, false);
 
-    assertProjectSubmitSummaryModelAndView(projectId, modelAndView, false, false, projectSummaryView);
+    assertProjectSubmitSummaryModelAndView(projectDetail, modelAndView, false, false, projectSummaryView);
   }
 
   @Test
@@ -189,13 +190,11 @@ public class SubmitProjectServiceTest {
     final var projectDetail = PROJECT_DETAIL;
     projectDetail.setVersion(2);
 
-    final var projectId = projectDetail.getProject().getId();
-
     final var projectSummaryView = new ProjectSummaryView("test", List.of());
     when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
 
     final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail, true);
-    assertProjectSubmitSummaryModelAndView(projectId, modelAndView, true, true, projectSummaryView);
+    assertProjectSubmitSummaryModelAndView(projectDetail, modelAndView, true, true, projectSummaryView);
   }
 
   @Test
@@ -204,20 +203,21 @@ public class SubmitProjectServiceTest {
     final var projectDetail = PROJECT_DETAIL;
     projectDetail.setVersion(2);
 
-    final var projectId = projectDetail.getProject().getId();
-
     final var projectSummaryView = new ProjectSummaryView("test", List.of());
     when(projectSummaryViewService.getProjectSummaryView(projectDetail)).thenReturn(projectSummaryView);
 
     final var modelAndView = submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail, false);
-    assertProjectSubmitSummaryModelAndView(projectId, modelAndView, true, false, projectSummaryView);
+    assertProjectSubmitSummaryModelAndView(projectDetail, modelAndView, true, false, projectSummaryView);
   }
 
-  private void assertProjectSubmitSummaryModelAndView(Integer projectId,
+  private void assertProjectSubmitSummaryModelAndView(ProjectDetail projectDetail,
                                                       ModelAndView modelAndView,
                                                       boolean isUpdate,
                                                       boolean isProjectValid,
                                                       ProjectSummaryView projectSummaryView) {
+
+    final var projectId = projectDetail.getProject().getId();
+
     assertThat(modelAndView.getModelMap()).containsExactly(
         entry("isUpdate", isUpdate),
         entry("isProjectValid", isProjectValid),
@@ -225,7 +225,18 @@ public class SubmitProjectServiceTest {
         entry("submitProjectUrl",
             ReverseRouter.route(on(SubmitProjectController.class).submitProject(projectId, null))
         ),
-        entry("taskListUrl", ControllerUtils.getBackToTaskListUrl(projectId))
+        entry("updateRequestReason", regulatorUpdateRequestService.getUpdateRequestReason(
+            projectDetail.getProject(),
+            projectDetail.getVersion())),
+        entry("taskListUrl", ControllerUtils.getBackToTaskListUrl(projectId)),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
+            ProjectService.getProjectTypeDisplayName(projectDetail)
+        ),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR,
+            ProjectService.getProjectTypeDisplayNameLowercase(projectDetail)
+        )
     );
   }
 
@@ -276,7 +287,15 @@ public class SubmitProjectServiceTest {
         entry("isUpdate", isUpdate),
         entry("projectSubmissionSummaryView", projectSubmissionSummaryView),
         entry("workAreaUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null))),
-        entry("feedbackUrl", ControllerUtils.getFeedbackUrl(projectDetail.getId()))
+        entry("feedbackUrl", ControllerUtils.getFeedbackUrl(projectDetail.getId())),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
+            ProjectService.getProjectTypeDisplayName(projectDetail)
+        ),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR,
+            ProjectService.getProjectTypeDisplayNameLowercase(projectDetail)
+        )
     );
   }
 }

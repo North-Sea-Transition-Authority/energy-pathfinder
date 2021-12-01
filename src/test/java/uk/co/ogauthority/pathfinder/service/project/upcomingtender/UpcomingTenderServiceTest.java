@@ -383,4 +383,15 @@ public class UpcomingTenderServiceTest {
   public void getSupportedProjectTypes_verifyInfrastructure() {
     assertThat(upcomingTenderService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
   }
+
+  @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(upcomingTenderService.alwaysCopySectionData(detail)).isFalse();
+  }
+
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = upcomingTenderService.allowSectionDataCleanUp(detail);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
 }

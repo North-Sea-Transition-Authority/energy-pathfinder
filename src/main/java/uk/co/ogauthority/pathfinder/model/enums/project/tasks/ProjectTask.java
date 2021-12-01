@@ -5,7 +5,9 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.Set;
 import java.util.stream.Stream;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
-import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.CollaborationOpportunitiesController;
+import uk.co.ogauthority.pathfinder.controller.project.campaigninformation.CampaignInformationController;
+import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
+import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedpipeline.DecommissionedPipelineController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissioningschedule.DecommissioningScheduleController;
 import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedRigController;
@@ -17,11 +19,15 @@ import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProj
 import uk.co.ogauthority.pathfinder.controller.project.setup.ProjectSetupController;
 import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.SubseaInfrastructureController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
+import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
-import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
+import uk.co.ogauthority.pathfinder.service.project.campaigninformation.CampaignInformationService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityModelService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityService;
+import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesService;
 import uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline.DecommissionedPipelineService;
 import uk.co.ogauthority.pathfinder.service.project.decommissioningschedule.DecommissioningScheduleService;
 import uk.co.ogauthority.pathfinder.service.project.integratedrig.IntegratedRigService;
@@ -34,6 +40,7 @@ import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.subseainfrastructure.SubseaInfrastructureService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
+import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderService;
 
 /**
  * An enum to encapsulate a task list section, to be used when generating the task list for a given project.
@@ -83,11 +90,18 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       60
   ),
   COLLABORATION_OPPORTUNITIES(
-      CollaborationOpportunitiesController.PAGE_NAME,
-      CollaborationOpportunitiesController.class,
-      CollaborationOpportunitiesService.class,
+      InfrastructureCollaborationOpportunitiesController.PAGE_NAME,
+      InfrastructureCollaborationOpportunitiesController.class,
+      InfrastructureCollaborationOpportunitiesService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
       70
+  ),
+  CAMPAIGN_INFORMATION(
+      CampaignInformationController.PAGE_NAME,
+      CampaignInformationController.class,
+      CampaignInformationService.class,
+      Set.of(ProjectType.INFRASTRUCTURE),
+      75
   ),
   DECOMMISSIONING_SCHEDULE(
       DecommissioningScheduleController.PAGE_NAME,
@@ -130,6 +144,20 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       DecommissionedPipelineService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
       130
+  ),
+  WORK_PLAN_UPCOMING_TENDERS(
+      ForwardWorkPlanUpcomingTenderController.PAGE_NAME,
+      ForwardWorkPlanUpcomingTenderController.class,
+      ForwardWorkPlanUpcomingTenderService.class,
+      Set.of(ProjectType.FORWARD_WORK_PLAN),
+      10
+  ),
+  WORK_PLAN_COLLABORATION_OPPORTUNITIES(
+      ForwardWorkPlanCollaborationOpportunityModelService.PAGE_NAME,
+      ForwardWorkPlanCollaborationOpportunityController.class,
+      ForwardWorkPlanCollaborationOpportunityService.class,
+      Set.of(ProjectType.FORWARD_WORK_PLAN),
+      20
   );
 
   private final String displayName;
@@ -196,7 +224,10 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       case AWARDED_CONTRACTS:
         return ReverseRouter.route(on(AwardedContractController.class).viewAwardedContracts(projectId, null));
       case COLLABORATION_OPPORTUNITIES:
-        return ReverseRouter.route(on(CollaborationOpportunitiesController.class).viewCollaborationOpportunities(projectId, null));
+        return ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
+            .viewCollaborationOpportunities(projectId, null));
+      case CAMPAIGN_INFORMATION:
+        return ReverseRouter.route(on(CampaignInformationController.class).getCampaignInformation(projectId, null));
       case DECOMMISSIONING_SCHEDULE:
         return ReverseRouter.route(on(DecommissioningScheduleController.class).getDecommissioningSchedule(projectId, null));
       case WELLS:
@@ -209,6 +240,18 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
         return ReverseRouter.route(on(SubseaInfrastructureController.class).viewSubseaStructures(projectId, null));
       case PIPELINES:
         return ReverseRouter.route(on(DecommissionedPipelineController.class).viewPipelines(projectId, null));
+      case WORK_PLAN_UPCOMING_TENDERS:
+        return ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).getUpcomingTenderSetup(
+            projectId,
+            null,
+            null
+        ));
+      case WORK_PLAN_COLLABORATION_OPPORTUNITIES:
+        return ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class).getCollaborationOpportunitySetup(
+            projectId,
+            null,
+            null
+        ));
       default:
         return "";
     }

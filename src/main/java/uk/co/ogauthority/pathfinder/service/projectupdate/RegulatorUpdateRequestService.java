@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.projectupdate;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.controller.projectupdate.RegulatorUpdateController;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRequest;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -23,6 +25,7 @@ import uk.co.ogauthority.pathfinder.repository.projectupdate.RegulatorUpdateRequ
 import uk.co.ogauthority.pathfinder.service.email.OperatorEmailService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
+import uk.co.ogauthority.pathfinder.service.scheduler.reminders.regulatorupdaterequest.RegulatorUpdateRequestProjectDto;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
@@ -96,6 +99,18 @@ public class RegulatorUpdateRequestService {
         && !hasUpdateBeenRequested(projectDetail);
   }
 
+  /** Returns the update request reason if one exists for the provided project version
+   * and an empty string if it does not.
+   * @param project we are finding the request reason from.
+   * @param version of the project.
+   * @return update request reason or an empty string.
+   */
+  public String getUpdateRequestReason(Project project, Integer version) {
+    return regulatorUpdateRequestRepository.findByProjectDetail_projectAndProjectDetail_Version(project, version)
+        .map(RegulatorUpdateRequest::getUpdateReason)
+        .orElse("");
+  }
+
   public ModelAndView getRequestUpdateModelAndView(ProjectDetail projectDetail,AuthenticatedUserAccount user, RequestUpdateForm form) {
     var projectId = projectDetail.getProject().getId();
     var modelAndView = new ModelAndView(REQUEST_UPDATE_TEMPLATE_PATH)
@@ -104,7 +119,17 @@ public class RegulatorUpdateRequestService {
         .addObject("startActionUrl", ReverseRouter.route(on(RegulatorUpdateController.class)
             .requestUpdate(projectId, null, null, null, null)))
         .addObject("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(projectId, null, null, null)));
-    breadcrumbService.fromManageProject(projectId, modelAndView, RegulatorUpdateController.REQUEST_UPDATE_PAGE_NAME);
+
+    breadcrumbService.fromManageProject(
+        projectDetail,
+        modelAndView,
+        RegulatorUpdateController.REQUEST_UPDATE_PAGE_NAME
+    );
+
     return modelAndView;
+  }
+
+  public List<RegulatorUpdateRequestProjectDto> getAllProjectsWithOutstandingRegulatorUpdateRequestsWithDeadlines() {
+    return regulatorUpdateRequestRepository.getAllProjectsWithOutstandingRegulatorUpdateRequestsWithDeadlines();
   }
 }

@@ -543,11 +543,22 @@ public class ProjectInformationServiceTest {
   }
 
   @Test
+  public void alwaysCopySectionData_verifyFalse() {
+    assertThat(projectInformationService.alwaysCopySectionData(details)).isFalse();
+  }
+
+  @Test
+  public void allowSectionDataCleanUp_verifyIsTrue() {
+    final var allowSectionDateCleanUp = projectInformationService.allowSectionDataCleanUp(details);
+    assertThat(allowSectionDateCleanUp).isTrue();
+  }
+
+  @Test
   public void isOilAndGasProject_whenOilAndGasFieldStage_thenReturnTrue() {
 
     var oilAndGasFieldStages = Arrays.stream(FieldStage.values())
-            .filter(fieldStage -> !FieldStage.ENERGY_TRANSITION.equals(fieldStage))
-            .collect(Collectors.toList());
+        .filter(fieldStage -> !FieldStage.ENERGY_TRANSITION.equals(fieldStage))
+        .collect(Collectors.toList());
 
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
 

@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.view.decommissioningschedule.Decommiss
 import uk.co.ogauthority.pathfinder.model.view.decommissioningschedule.DecommissioningScheduleViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.DecommissioningScheduleTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -30,6 +31,9 @@ public class DecommissioningScheduleSectionSummaryServiceTest {
   @Mock
   private DifferenceService differenceService;
 
+  @Mock
+  private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   private DecommissioningScheduleSectionSummaryService decommissioningScheduleSectionSummaryService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
@@ -39,7 +43,8 @@ public class DecommissioningScheduleSectionSummaryServiceTest {
   public void setUp() {
     decommissioningScheduleSectionSummaryService = new DecommissioningScheduleSectionSummaryService(
         decommissioningScheduleService,
-        differenceService
+        differenceService,
+        projectSectionSummaryCommonModelService
     );
   }
 
@@ -73,7 +78,7 @@ public class DecommissioningScheduleSectionSummaryServiceTest {
     var currentProjectInformationView = DecommissioningScheduleViewUtil.from(decommissioningSchedule);
     var previousProjectInformationView = DecommissioningScheduleViewUtil.from(previousDecommissioningSchedule);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, projectDetail);
     assertInteractions(currentProjectInformationView, previousProjectInformationView);
   }
 
@@ -87,11 +92,11 @@ public class DecommissioningScheduleSectionSummaryServiceTest {
     )).thenReturn(Optional.empty());
 
     var sectionSummary = decommissioningScheduleSectionSummaryService.getSummary(projectDetail);
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, projectDetail);
     assertInteractions(new DecommissioningScheduleView(), new DecommissioningScheduleView());
   }
 
-  private void assertModelProperties(ProjectSectionSummary projectSectionSummary) {
+  private void assertModelProperties(ProjectSectionSummary projectSectionSummary, ProjectDetail projectDetail) {
 
     assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(DecommissioningScheduleSectionSummaryService.DISPLAY_ORDER);
     assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(DecommissioningScheduleSectionSummaryService.SECTION_LINK));
@@ -99,14 +104,13 @@ public class DecommissioningScheduleSectionSummaryServiceTest {
 
     var model = projectSectionSummary.getTemplateModel();
 
-    assertThat(model).containsOnlyKeys(
-        "sectionTitle",
-        "sectionId",
-        "decommissioningScheduleDiffModel"
+    verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
+        projectDetail,
+        DecommissioningScheduleSectionSummaryService.PAGE_NAME,
+        DecommissioningScheduleSectionSummaryService.SECTION_ID
     );
 
-    assertThat(model).containsEntry("sectionTitle", DecommissioningScheduleSectionSummaryService.PAGE_NAME);
-    assertThat(model).containsEntry("sectionId", DecommissioningScheduleSectionSummaryService.SECTION_ID);
+    assertThat(model).containsOnlyKeys("decommissioningScheduleDiffModel");
   }
 
   private void assertInteractions(DecommissioningScheduleView currentDecommissioningScheduleView,

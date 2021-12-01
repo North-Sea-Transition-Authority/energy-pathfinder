@@ -82,7 +82,7 @@ public class OperatorActionService {
     );
     if (canArchive) {
       actions.add(projectActionService.getArchiveAction(
-          projectId,
+          projectDetail,
           ARCHIVE_ACTION_DISPLAY_ORDER
       ));
     }

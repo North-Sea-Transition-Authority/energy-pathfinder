@@ -7,6 +7,7 @@ import org.springframework.validation.SmartValidator;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.validationhint.EmptyQuarterYearAcceptableHint;
+import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.validationhint.OnOrAfterQuarterYearHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
 import uk.co.ogauthority.pathfinder.model.form.validation.ValidationHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
@@ -16,12 +17,14 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 @Component
 public class QuarterYearInputValidator implements SmartValidator {
 
-  private static final String QUARTER = "quarter";
-  private static final String YEAR = "year";
+  protected static final String QUARTER = "quarter";
+  protected static final String YEAR = "year";
   public static final String QUARTER_INVALID_CODE = QUARTER + FieldValidationErrorCodes.INVALID.getCode();
   public static final String YEAR_INVALID_CODE = YEAR + FieldValidationErrorCodes.INVALID.getCode();
   public static final String EMPTY_QUARTER_YEAR_ERROR = "Enter %s ";
   public static final String VALID_QUARTER_YEAR_ERROR = "%s must have a valid quarter and year";
+  public static final String QUARTER_ON_OR_AFTER_DATE_CODE = QUARTER + OnOrAfterQuarterYearHint.ON_OR_AFTER_QUARTER_YEAR_CODE;
+  public static final String YEAR_ON_OR_AFTER_DATE_CODE = YEAR + OnOrAfterQuarterYearHint.ON_OR_AFTER_QUARTER_YEAR_CODE;
 
   @Override
   public boolean supports(Class<?> clazz) {

@@ -18,13 +18,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
-import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.communication.Communication;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.communication.CommunicationStatus;
 import uk.co.ogauthority.pathfinder.model.enums.communication.RecipientType;
 import uk.co.ogauthority.pathfinder.model.form.communication.CommunicationForm;
 import uk.co.ogauthority.pathfinder.repository.communication.CommunicationRepository;
+import uk.co.ogauthority.pathfinder.service.email.notify.DefaultEmailPersonalisationService;
 import uk.co.ogauthority.pathfinder.service.scheduler.SchedulerService;
 import uk.co.ogauthority.pathfinder.service.scheduler.communication.CommunicationJob;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -46,7 +46,13 @@ public class CommunicationServiceTest {
   @Mock
   private SchedulerService schedulerService;
 
+  @Mock
+  private DefaultEmailPersonalisationService defaultEmailPersonalisationService;
+
+  private static final String SIGN_OFF_IDENTIFIER = "sign off identifier";
+
   private CommunicationService communicationService;
+
 
   @Before
   public void setup() {
@@ -54,10 +60,13 @@ public class CommunicationServiceTest {
         validationService,
         communicationRepository,
         organisationGroupCommunicationService,
-        schedulerService
+        schedulerService,
+        defaultEmailPersonalisationService
     );
 
     when(communicationRepository.save(any(Communication.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
+
+    when(defaultEmailPersonalisationService.getDefaultSignOffIdentifier()).thenReturn(SIGN_OFF_IDENTIFIER);
   }
 
   @Test
@@ -148,9 +157,9 @@ public class CommunicationServiceTest {
     assertThat(communication.getEmailBody()).isEqualTo(communicationForm.getBody());
     assertThat(communication.getStatus()).isEqualTo(communicationStatus);
     assertThat(communication.getLatestCommunicationJourneyStatus()).isEqualTo(communicationCommunicationJourneyStatus);
-    assertThat(communication.getGreetingText()).isEqualTo(EmailProperties.DEFAULT_GREETING_TEXT);
-    assertThat(communication.getSignOffText()).isEqualTo(EmailProperties.DEFAULT_SIGN_OFF_TEXT);
-    assertThat(communication.getSignOffIdentifier()).isEqualTo(EmailProperties.DEFAULT_SIGN_OFF_IDENTIFIER);
+    assertThat(communication.getGreetingText()).isEqualTo(DefaultEmailPersonalisationService.DEFAULT_GREETING_TEXT);
+    assertThat(communication.getSignOffText()).isEqualTo(DefaultEmailPersonalisationService.DEFAULT_SIGN_OFF_TEXT);
+    assertThat(communication.getSignOffIdentifier()).isEqualTo(SIGN_OFF_IDENTIFIER);
   }
 
   @Test
@@ -214,7 +223,7 @@ public class CommunicationServiceTest {
     var jobData = new HashMap<String, Object>();
     jobData.put("communicationId", communication.getId());
 
-    verify(schedulerService, times(1)).scheduleJob(any(), eq(jobData), eq(CommunicationJob.class));
+    verify(schedulerService, times(1)).scheduleJobImmediately(any(), eq(jobData), eq(CommunicationJob.class));
   }
 
   @Test

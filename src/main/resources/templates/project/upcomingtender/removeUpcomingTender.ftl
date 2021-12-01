@@ -1,7 +1,7 @@
 <#include '../../layout.ftl'>
 <#import './_upcomingTenderSummary.ftl' as tenderSummary>
 
-<#assign title = "Are you sure you want to remove upcoming tender " + displayOrder/>
+<#assign title = "Are you sure you want to remove upcoming tender ${displayOrder}?"/>
 
 <@defaultPage htmlTitle=title pageHeading=title breadcrumbs=true>
 

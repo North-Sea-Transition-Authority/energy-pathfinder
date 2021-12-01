@@ -25,7 +25,12 @@ public enum AuditEvent {
   PIPELINE_UPDATED(AuditLevel.INFO, "Pipeline with id: %d updated for projectDetail with id: %d"),
   PIPELINE_REMOVED(AuditLevel.INFO, "Pipeline with id: %d removed for projectDetail with id: %d"),
   SUBSEA_INFRASTRUCTURE_UPDATED(AuditLevel.INFO, "Subsea infrastructure with id: %d updated for projectDetail with id: %d"),
-  SUBSEA_INFRASTRUCTURE_REMOVED(AuditLevel.INFO, "Subsea infrastructure with id: %d removed for projectDetail with id: %d");
+  SUBSEA_INFRASTRUCTURE_REMOVED(AuditLevel.INFO, "Subsea infrastructure with id: %d removed for projectDetail with id: %d"),
+  WORK_PLAN_UPCOMING_TENDER_UPDATED(AuditLevel.INFO, "Work plan upcoming tender with id: %d updated for projectDetail with id: %d"),
+  WORK_PLAN_UPCOMING_TENDER_REMOVED(AuditLevel.INFO, "Work plan upcoming tender with id: %d removed for projectDetail with id: %d"),
+  WORK_PLAN_COLLABORATION_UPDATED(AuditLevel.INFO, "Work plan collaboration opportunity with id: %d updated for projectDetail with id: %d"),
+  WORK_PLAN_COLLABORATION_REMOVED(AuditLevel.INFO, "Work plan collaboration opportunity with id: %d removed for projectDetail with id: %d"),
+  CAMPAIGN_INFORMATION_UPDATED(AuditLevel.INFO, "Campaign information with id: %d updated for projectDetail with id: %d");
 
   private final AuditLevel auditLevel;
   private final String message;

@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.IsoFields;
+import java.util.Arrays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -151,5 +153,61 @@ public class DateUtilTest {
 
     final var result = DateUtil.getEndOfMonth(localDateToTest);
     assertThat(result).isEqualTo(expectedReturnValue);
+  }
+
+  @Test
+  public void daysBetween_whenToDateInFuture_thenPositiveReturnValue() {
+    var fromDate = LocalDate.now();
+    var expectedDaysBetween = 5;
+    var toDate = fromDate.plusDays(expectedDaysBetween);
+    var resultingDaysBetween = DateUtil.daysBetween(fromDate, toDate);
+
+    assertThat(resultingDaysBetween).isEqualTo(expectedDaysBetween);
+  }
+
+  @Test
+  public void daysBetween_whenToDateInPast_thenNegativeReturnValue() {
+    var fromDate = LocalDate.now();
+    var expectedDaysBetween = -5;
+    var toDate = fromDate.plusDays(expectedDaysBetween);
+    var resultingDaysBetween = DateUtil.daysBetween(fromDate, toDate);
+
+    assertThat(resultingDaysBetween).isEqualTo(expectedDaysBetween);
+  }
+
+  // This test is to ensure that when the deadline date is more than 1 month in the future
+  // that the days between today and the deadline are correctly returned. A bug was spotted in
+  // a previous implementation whereby the Period.class was being used and that resulted in a value in months being
+  // returned instead of a value in days. This test is to ensure this erroneous behaviour is never reintroduced
+  @Test
+  public void daysBetween_whenToDateMoreThanAMonthInFuture_thenPositiveReturnValue() {
+    var fromDate = LocalDate.now();
+    var expectedDaysBetween = 50;
+    var toDate = fromDate.plusDays(expectedDaysBetween);
+    var resultingDaysBetween = DateUtil.daysBetween(fromDate, toDate);
+
+    assertThat(resultingDaysBetween).isEqualTo(expectedDaysBetween);
+  }
+
+  @Test
+  public void getCurrentQuarter_verifyExpectedReturnValue() {
+
+    var expectedCurrentQuarter = deriveCurrentQuarter();
+
+    var resultingCurrentQuarter = DateUtil.getCurrentQuarter();
+
+    assertThat(resultingCurrentQuarter).isEqualTo(expectedCurrentQuarter);
+  }
+
+  private Quarter deriveCurrentQuarter() {
+
+    var currentQuarterIndex = LocalDate.now().get(IsoFields.QUARTER_OF_YEAR);
+
+    return Arrays.stream(Quarter.values())
+        .filter(quarter -> quarter.getDisplayValue().equals(currentQuarterIndex))
+        .findFirst()
+        .orElseThrow(() -> new RuntimeException(
+            String.format("Could not determine current quarter using index %s", currentQuarterIndex))
+        );
   }
 }

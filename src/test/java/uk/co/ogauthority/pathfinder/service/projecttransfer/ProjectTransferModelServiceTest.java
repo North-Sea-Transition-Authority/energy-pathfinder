@@ -23,6 +23,7 @@ import uk.co.ogauthority.pathfinder.model.form.projecttransfer.ProjectTransferFo
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
@@ -90,10 +91,13 @@ public class ProjectTransferModelServiceTest {
         entry("organisationUnitRestUrl", SearchSelectorService.route(on(OrganisationUnitRestController.class)
             .searchOrganisationUnits(null))
         ),
-        entry("preselectedPublishableOrganisation", projectTransferModelService.getPreSelectedPublishableOrganisation(form))
+        entry("preselectedPublishableOrganisation", projectTransferModelService.getPreSelectedPublishableOrganisation(form)),
+        entry("pageTitle", ProjectTransferController.PAGE_NAME),
+        entry(ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR, projectDetail.getProjectType().getDisplayName()),
+        entry(ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR, projectDetail.getProjectType().getLowercaseDisplayName())
     );
 
-    verify(breadcrumbService, times(1)).fromManageProject(projectId, modelAndView, ProjectTransferController.PAGE_NAME);
+    verify(breadcrumbService, times(1)).fromManageProject(projectDetail, modelAndView, ProjectTransferController.PAGE_NAME);
   }
 
   @Test

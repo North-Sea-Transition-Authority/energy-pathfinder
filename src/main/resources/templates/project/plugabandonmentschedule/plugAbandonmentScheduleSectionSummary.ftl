@@ -13,6 +13,9 @@
       />
     </#list>
   <#else>
-    <@emptySectionSummaryInset.emptySectionSummaryInset itemText="well decommissioning schedules"/>
+    <@emptySectionSummaryInset.emptySectionSummaryInset
+      itemText="well decommissioning schedules"
+      projectTypeDisplayName=projectTypeDisplayNameLowercase
+    />
   </#if>
 </@sectionSummaryWrapper.sectionSummaryWrapper>

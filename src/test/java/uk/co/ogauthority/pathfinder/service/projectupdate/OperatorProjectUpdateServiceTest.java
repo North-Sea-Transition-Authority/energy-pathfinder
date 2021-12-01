@@ -11,6 +11,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -25,11 +26,13 @@ import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.projectupdate.ProjectUpdateType;
 import uk.co.ogauthority.pathfinder.model.form.projectupdate.ProvideNoUpdateForm;
-import uk.co.ogauthority.pathfinder.model.view.projectupdate.ProjectNoUpdateSummaryView;
+import uk.co.ogauthority.pathfinder.model.view.submission.ProjectNoUpdateSubmissionSummaryView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.projectupdate.NoUpdateNotificationRepository;
 import uk.co.ogauthority.pathfinder.service.email.RegulatorEmailService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
+import uk.co.ogauthority.pathfinder.service.project.submission.ProjectSubmissionSummaryViewService;
 import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectHeaderSummaryService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -51,7 +54,7 @@ public class OperatorProjectUpdateServiceTest {
   private NoUpdateNotificationRepository noUpdateNotificationRepository;
 
   @Mock
-  private ProjectNoUpdateSummaryViewService projectNoUpdateSummaryService;
+  private ProjectSubmissionSummaryViewService projectSubmissionSummaryViewService;
 
   @Mock
   private ProjectHeaderSummaryService projectHeaderSummaryService;
@@ -77,7 +80,7 @@ public class OperatorProjectUpdateServiceTest {
         projectUpdateService,
         regulatorUpdateRequestService,
         noUpdateNotificationRepository,
-        projectNoUpdateSummaryService,
+        projectSubmissionSummaryViewService,
         projectHeaderSummaryService,
         regulatorEmailService,
         validationService,
@@ -203,12 +206,21 @@ public class OperatorProjectUpdateServiceTest {
 
   @Test
   public void getProjectUpdateModelAndView() {
-    var modelAndView = operatorProjectUpdateService.getProjectUpdateModelAndView(PROJECT_ID);
+    var modelAndView = operatorProjectUpdateService.getProjectUpdateModelAndView(projectDetail);
 
     assertThat(modelAndView.getViewName()).isEqualTo(OperatorProjectUpdateService.START_PAGE_TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
         entry("startActionUrl", ReverseRouter.route(on(OperatorUpdateController.class)
-            .startUpdate(PROJECT_ID, null, null)))
+            .startUpdate(projectDetail.getProject().getId(), null, null))
+        ),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
+            projectDetail.getProjectType().getDisplayName()
+        ),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR,
+            projectDetail.getProjectType().getLowercaseDisplayName()
+        )
     );
   }
 
@@ -232,14 +244,18 @@ public class OperatorProjectUpdateServiceTest {
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(PROJECT_ID, null, null, null)))
     );
 
-    verify(breadcrumbService, times(1)).fromManageProject(PROJECT_ID, modelAndView, OperatorUpdateController.NO_UPDATE_REQUIRED_PAGE_NAME);
+    verify(breadcrumbService, times(1)).fromManageProject(
+        projectDetail,
+        modelAndView,
+        OperatorUpdateController.NO_UPDATE_REQUIRED_PAGE_NAME
+    );
   }
 
   @Test
   public void getProjectProvideNoUpdateConfirmationModelAndView() {
-    var projectNoUpdateSummaryView = new ProjectNoUpdateSummaryView();
+    var projectNoUpdateSummaryView = new ProjectNoUpdateSubmissionSummaryView("test", "time", "user");
 
-    when(projectNoUpdateSummaryService.getProjectNoUpdateSummaryView(projectDetail)).thenReturn(projectNoUpdateSummaryView);
+    when(projectSubmissionSummaryViewService.getProjectNoUpdateSubmissionSummaryView(projectDetail)).thenReturn(projectNoUpdateSummaryView);
 
     var modelAndView = operatorProjectUpdateService.getProjectProvideNoUpdateConfirmationModelAndView(projectDetail);
 
@@ -247,7 +263,15 @@ public class OperatorProjectUpdateServiceTest {
     assertThat(modelAndView.getModel()).containsExactly(
         entry("projectNoUpdateSummaryView", projectNoUpdateSummaryView),
         entry("workAreaUrl", ControllerUtils.getWorkAreaUrl()),
-        entry("feedbackUrl", ControllerUtils.getFeedbackUrl(projectDetail.getId()))
+        entry("feedbackUrl", ControllerUtils.getFeedbackUrl(projectDetail.getId())),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
+            projectDetail.getProjectType().getDisplayName()
+        ),
+        entry(
+            ProjectTypeModelUtil.PROJECT_TYPE_LOWERCASE_DISPLAY_NAME_MODEL_ATTR,
+            projectDetail.getProjectType().getLowercaseDisplayName()
+        )
     );
   }
 
@@ -256,7 +280,7 @@ public class OperatorProjectUpdateServiceTest {
     var update = new ProjectUpdate();
     when(projectUpdateService.getByToDetail(projectDetail)).thenReturn(Optional.of(update));
     when(noUpdateNotificationRepository.existsByProjectUpdate(update)).thenReturn(true);
-    operatorProjectUpdateService.confirmNoUpdateExistsForProjectDetail(projectDetail);
+    Assertions.assertDoesNotThrow(() -> operatorProjectUpdateService.confirmNoUpdateExistsForProjectDetail(projectDetail));
   }
 
   @Test(expected = AccessDeniedException.class)

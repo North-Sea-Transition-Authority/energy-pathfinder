@@ -12,27 +12,27 @@ public class PlatformFpsoView extends ProjectSummaryItem {
 
   private StringWithTag platformFpso;
 
-  private String topsideFpsoMass;
+  private String topsideFpsoMass = "";
 
-  private String topsideRemovalEarliestYear;
+  private String topsideRemovalEarliestYear = "";
 
-  private String topsideRemovalLatestYear;
+  private String topsideRemovalLatestYear = "";
 
   private Boolean substructuresExpectedToBeRemoved;
 
-  private String substructureRemovalPremise;
+  private String substructureRemovalPremise = "";
 
-  private String substructureRemovalMass;
+  private String substructureRemovalMass = "";
 
-  private String substructureRemovalEarliestYear;
+  private String substructureRemovalEarliestYear = "";
 
-  private String substructureRemovalLatestYear;
+  private String substructureRemovalLatestYear = "";
 
-  private String fpsoType;
+  private String fpsoType = "";
 
-  private String fpsoDimensions;
+  private String fpsoDimensions = "";
 
-  private String futurePlans;
+  private String futurePlans = "";
 
   public PlatformFpsoView() {
   }

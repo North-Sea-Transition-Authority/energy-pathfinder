@@ -68,7 +68,7 @@ public class SelectProjectOperatorControllerTest extends AbstractControllerTest 
   @Test
   public void startProject_validForm() throws Exception {
 
-    when(startProjectService.startProject(any(), any())).thenReturn(
+    when(startProjectService.createInfrastructureProject(any(), any())).thenReturn(
         ProjectUtil.getProjectDetails()
     );
 
@@ -89,7 +89,7 @@ public class SelectProjectOperatorControllerTest extends AbstractControllerTest 
             .params(completeParams))
         .andExpect(status().is3xxRedirection());
 
-    verify(startProjectService, times(1)).startProject(any(), any());
+    verify(startProjectService, times(1)).createInfrastructureProject(any(), any());
   }
 
   @Test
@@ -119,6 +119,6 @@ public class SelectProjectOperatorControllerTest extends AbstractControllerTest 
             .params(completeParams))
         .andExpect(status().is2xxSuccessful());
 
-    verify(startProjectService, times(0)).startProject(any(), any());
+    verify(startProjectService, times(0)).createInfrastructureProject(any(), any());
   }
 }

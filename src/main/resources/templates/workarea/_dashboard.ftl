@@ -1,16 +1,16 @@
 <#include '../layout.ftl'>
 
-<#macro dashboard dashboardProjectItemViews resultSize="" showOperator=true>
-  <#if !dashboardProjectItemViews?has_content>
+<#macro dashboard dashboardProjectHtmlItems resultSize="" showOperator=true>
+  <#if !dashboardProjectHtmlItems?has_content>
     <@fdsInsetText.insetText>
       No projects match your filters or no projects have been created that you have access to.
     </@fdsInsetText.insetText>
   <#else>
     <@_resultCounter resultSize=resultSize/>
     <ol class="govuk-list dashboard-list">
-      <#list dashboardProjectItemViews as dashboardItem>
+      <#list dashboardProjectHtmlItems as dashboardProjectHtmlItem>
         <li class="govuk-list__item dashboard-list__item">
-          <@_dashboardItem dashboardItem=dashboardItem showOperator=showOperator/>
+          <@noEscapeHtml.noEscapeHtml html=dashboardProjectHtmlItem.htmlContent />
         </li>
       </#list>
     </ol>
@@ -23,7 +23,7 @@
   </h2>
 </#macro>
 
-<#macro _dashboardItem dashboardItem showOperator=true>
+<#macro dashboardItemHeaderWrapper dashboardItem showOperator=true>
   <div class="dashboard-item">
     <h3 class="dashboard-item__heading">
       <@userAction.userAction userAction=dashboardItem.dashboardLink/>
@@ -40,10 +40,6 @@
         <span class="govuk-caption-m">${dashboardItem.operatorName}</span>
       </#if>
     </h3>
-    <@fdsDataItems.dataItem dataItemListClasses="dashboard-item__data-list" >
-      <@fdsDataItems.dataValues key="Field stage" value=dashboardItem.fieldStage!""/>
-      <@fdsDataItems.dataValues key="Field" value=dashboardItem.fieldName!""/>
-      <@fdsDataItems.dataValues key="Status" value=dashboardItem.status!""/>
-    </@fdsDataItems.dataItem>
+    <#nested/>
   </div>
 </#macro>

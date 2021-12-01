@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.project.projectinformation;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import uk.co.ogauthority.pathfinder.model.view.projectinformation.ProjectInforma
 import uk.co.ogauthority.pathfinder.model.view.projectinformation.ProjectInformationViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
@@ -31,18 +31,27 @@ public class ProjectInformationSectionSummaryService implements ProjectSectionSu
 
   private final DifferenceService differenceService;
 
+  private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   @Autowired
-  public ProjectInformationSectionSummaryService(ProjectInformationService projectInformationService,
-                                                 DifferenceService differenceService) {
+  public ProjectInformationSectionSummaryService(
+      ProjectInformationService projectInformationService,
+      DifferenceService differenceService,
+      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService
+  ) {
     this.projectInformationService = projectInformationService;
     this.differenceService = differenceService;
+    this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
   }
 
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
-    Map<String, Object> summaryModel = new HashMap<>();
-    summaryModel.put("sectionTitle", PAGE_NAME);
-    summaryModel.put("sectionId", SECTION_ID);
+
+    final var summaryModel = projectSectionSummaryCommonModelService.getCommonSummaryModelMap(
+        detail,
+        PAGE_NAME,
+        SECTION_ID
+    );
 
     var projectInformationView = projectInformationService.getProjectInformation(detail)
         .map(ProjectInformationViewUtil::from)
@@ -79,5 +88,10 @@ public class ProjectInformationSectionSummaryService implements ProjectSectionSu
         .orElse(new ProjectInformationView());
 
     return differenceService.differentiate(currentProjectInformationView, previousProjectInformationView);
+  }
+
+  @Override
+  public boolean canShowSection(ProjectDetail detail) {
+    return projectInformationService.canShowInTaskList(detail);
   }
 }

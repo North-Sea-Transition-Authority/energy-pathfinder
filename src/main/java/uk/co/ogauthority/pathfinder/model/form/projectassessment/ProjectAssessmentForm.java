@@ -5,7 +5,7 @@ import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
 public class ProjectAssessmentForm {
 
-  @NotNull(message = "Select yes if the project is ready to be published", groups = FullValidation.class)
+  @NotNull(message = "Select yes to publish", groups = FullValidation.class)
   private Boolean readyToBePublished;
 
   private Boolean updateRequired;

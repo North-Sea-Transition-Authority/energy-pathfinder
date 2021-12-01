@@ -16,38 +16,39 @@ import uk.gov.service.notify.NotificationClientException;
  */
 public class ProductionEmailServiceImpl implements EmailService {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProductionEmailServiceImpl.class);
+
   private final NotificationClient notificationClient;
   private final NotifyTemplateService notifyTemplateService;
   private final EmailValidator emailValidator;
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProductionEmailServiceImpl.class);
-  private final String serviceName;
-  private final String customerMnemonic;
-  private final String supplyChainInterfaceUrl;
+  private final DefaultEmailPersonalisationService defaultEmailPersonalisationService;
 
   public ProductionEmailServiceImpl(NotifyTemplateService notifyTemplateService,
                                     NotificationClient notificationClient,
                                     EmailValidator emailValidator,
-                                    String serviceName,
-                                    String customerMnemonic,
-                                    String supplyChainInterfaceUrl) {
+                                    DefaultEmailPersonalisationService defaultEmailPersonalisationService) {
     this.notificationClient = notificationClient;
     this.notifyTemplateService = notifyTemplateService;
     this.emailValidator = emailValidator;
-    this.serviceName = serviceName;
-    this.customerMnemonic = customerMnemonic;
-    this.supplyChainInterfaceUrl = supplyChainInterfaceUrl;
+    this.defaultEmailPersonalisationService = defaultEmailPersonalisationService;
   }
 
   @Override
   public void sendEmail(EmailProperties emailProperties, String toEmailAddress) {
-    sendEmail(emailProperties, toEmailAddress, null, null);
+    sendEmail(emailProperties, toEmailAddress, null, null, null);
+  }
+
+  @Override
+  public void sendEmail(EmailProperties emailProperties, String toEmailAddress, String recipientName) {
+    sendEmail(emailProperties, toEmailAddress, null, null, recipientName);
   }
 
   @Override
   public void sendEmail(EmailProperties emailProperties,
                         String toEmailAddress,
                         String reference,
-                        String emailReplyToId) {
+                        String emailReplyToId,
+                        String recipientName) {
 
     try {
 
@@ -55,11 +56,14 @@ public class ProductionEmailServiceImpl implements EmailService {
 
       if (templateId.isPresent()) {
 
-        var personalisation = emailProperties.getEmailPersonalisation();
-        personalisation.put("SERVICE_NAME", serviceName);
-        personalisation.put("CUSTOMER_MNEMONIC", customerMnemonic);
-        personalisation.put("SUPPLY_CHAIN_INTERFACE_URL", supplyChainInterfaceUrl);
-        personalisation.put("SUBJECT_PREFIX", "");
+        var personalisation = defaultEmailPersonalisationService.getDefaultEmailPersonalisation();
+        personalisation.putAll(emailProperties.getEmailPersonalisation());
+        personalisation.put(CommonEmailMergeField.TEST_EMAIL, "no");
+        personalisation.put(CommonEmailMergeField.SUBJECT_PREFIX, "");
+
+        if (recipientName != null) {
+          personalisation.put(CommonEmailMergeField.RECIPIENT_IDENTIFIER, recipientName);
+        }
 
         if (emailValidator.isValid(toEmailAddress)) {
           notificationClient.sendEmail(templateId.get(), toEmailAddress, personalisation, reference, emailReplyToId);

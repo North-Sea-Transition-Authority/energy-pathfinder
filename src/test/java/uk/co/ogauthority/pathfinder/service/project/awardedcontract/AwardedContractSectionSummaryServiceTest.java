@@ -3,7 +3,6 @@ package uk.co.ogauthority.pathfinder.service.project.awardedcontract;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,6 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -31,6 +31,9 @@ public class AwardedContractSectionSummaryServiceTest {
   @Mock
   private DifferenceService differenceService;
 
+  @Mock
+  private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   private AwardedContractSectionSummaryService awardedContractSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -39,7 +42,8 @@ public class AwardedContractSectionSummaryServiceTest {
   public void setup() {
     awardedContractSectionSummaryService = new AwardedContractSectionSummaryService(
         awardedContractService,
-        differenceService
+        differenceService,
+        projectSectionSummaryCommonModelService
     );
   }
 
@@ -74,7 +78,7 @@ public class AwardedContractSectionSummaryServiceTest {
 
     var sectionSummary = awardedContractSectionSummaryService.getSummary(detail);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, detail);
 
     verify(differenceService, times(1)).differentiateComplexLists(
         any(),
@@ -91,23 +95,22 @@ public class AwardedContractSectionSummaryServiceTest {
 
     var sectionSummary = awardedContractSectionSummaryService.getSummary(detail);
 
-    assertModelProperties(sectionSummary);
+    assertModelProperties(sectionSummary, detail);
   }
 
-  private void assertModelProperties(ProjectSectionSummary projectSectionSummary) {
+  private void assertModelProperties(ProjectSectionSummary projectSectionSummary, ProjectDetail projectDetail) {
     assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(AwardedContractSectionSummaryService.DISPLAY_ORDER);
     assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(AwardedContractSectionSummaryService.SECTION_LINK));
     assertThat(projectSectionSummary.getTemplatePath()).isEqualTo(AwardedContractSectionSummaryService.TEMPLATE_PATH);
 
     var model = projectSectionSummary.getTemplateModel();
 
-    assertThat(model).containsOnlyKeys(
-        "sectionTitle",
-        "sectionId",
-        "awardedContractDiffModel"
+    verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
+        projectDetail,
+        AwardedContractSectionSummaryService.PAGE_NAME,
+        AwardedContractSectionSummaryService.SECTION_ID
     );
 
-    assertThat(model).containsEntry("sectionTitle", AwardedContractSectionSummaryService.PAGE_NAME);
-    assertThat(model).containsEntry("sectionId", AwardedContractSectionSummaryService.SECTION_ID);
+    assertThat(model).containsOnlyKeys("awardedContractDiffModel");
   }
 }

@@ -57,7 +57,7 @@ public enum TaskListSectionQuestion {
   PLATFORM_FPSO(
       ProjectTask.PLATFORM_FPSO,
       "Are platforms or floating units such as FPSOs being decommissioned on this project?",
-      "Platforms or floating production storage and offloading units to be decommissioned",
+      "Platforms or floating units to be decommissioned",
       "",
       "form.platformsFpsosIncluded",
       TaskListSectionAnswer.PLATFORM_FPSO_YES,
@@ -73,18 +73,27 @@ public enum TaskListSectionQuestion {
       TaskListSectionAnswer.INTEGRATED_RIGS_YES,
       TaskListSectionAnswer.INTEGRATED_RIGS_NO,
       true
+  ),
+  CAMPAIGN_INFORMATION(
+      ProjectTask.CAMPAIGN_INFORMATION,
+      "Are you willing to combine your work with other operators or the Supply Chain to form a campaign?",
+      "Campaign information",
+      "",
+      "form.campaignInformationIncluded",
+      TaskListSectionAnswer.CAMPAIGN_INFORMATION_YES,
+      TaskListSectionAnswer.CAMPAIGN_INFORMATION_NO,
+      false
+  ),
+  SUBSEA_INFRASTRUCTURE(
+      ProjectTask.SUBSEA_INFRASTRUCTURE,
+      "Is subsea infrastructure being decommissioned on this project?",
+      "Subsea infrastructure to be decommissioned",
+      "",
+      "form.subseaInfrastructureIncluded",
+      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
+      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_NO,
+      true
   );
-  // Subsea infrastructure disabled: PAT-495
-  // SUBSEA_INFRASTRUCTURE(
-  //     ProjectTask.SUBSEA_INFRASTRUCTURE,
-  //     "Is subsea infrastructure being decommissioned on this project?",
-  //     "Subsea infrastructure to be decommissioned",
-  //     "",
-  //     "form.subseaInfrastructureIncluded",
-  //     TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
-  //     TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_NO,
-  //     true
-  // );
   // Pipelines disabled: PAT-457
   // PIPELINES(
   //     ProjectTask.PIPELINES,

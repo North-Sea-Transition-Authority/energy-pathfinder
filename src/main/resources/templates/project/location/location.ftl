@@ -1,5 +1,8 @@
 <#include '../../layout.ftl'>
 
+<#-- @ftlvariable name="errorList" type="java.util.List<uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem>" -->
+<#-- @ftlvariable name="service" type="uk.co.ogauthority.pathfinder.config.ServiceProperties" -->
+
 <@defaultPage htmlTitle="Location" pageHeading="Location" breadcrumbs=true errorItems=errorList>
   <@fdsForm.htmlForm>
     <@fdsSearchSelector.searchSelectorRest path="form.field" selectorMinInputLength=3  labelText="Which field is the project related to?" restUrl=springUrl(fieldsRestUrl)  preselectedItems=preselectedField!{} />
@@ -26,7 +29,7 @@
       <@fdsRadio.radioNo path="form.approvedFieldDevelopmentPlan"/>
     </@fdsRadio.radioGroup>
 
-    <@fdsRadio.radioGroup path="form.approvedDecomProgram" labelText="Do you have an approved Decommissioning Program (DP)?" hiddenContent=true>
+    <@fdsRadio.radioGroup path="form.approvedDecomProgram" labelText="Do you have an approved Decommissioning Programme (DP)?" hiddenContent=true>
       <@fdsRadio.radioYes path="form.approvedDecomProgram">
         <@fdsDateInput.dateInput
           dayPath="form.approvedDecomProgramDate.day"
@@ -41,7 +44,8 @@
     </@fdsRadio.radioGroup>
     <h2 class="govuk-heading-m">Licence blocks</h2>
     <@fdsAddToList.addToList
-      path="form.licenceBlocks"
+      pathForList="form.licenceBlocks"
+      pathForSelector="form.licenceBlocksSelect"
       alreadyAdded=alreadyAddedBlocks
       itemName="Licence block"
       noItemText="No licence blocks added"

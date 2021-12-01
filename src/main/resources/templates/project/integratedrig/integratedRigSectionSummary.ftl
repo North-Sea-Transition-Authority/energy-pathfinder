@@ -13,6 +13,9 @@
       />
     </#list>
   <#else>
-    <@emptySectionSummaryInset.emptySectionSummaryInset itemText="integrated rigs"/>
+    <@emptySectionSummaryInset.emptySectionSummaryInset
+      itemText="integrated rigs"
+      projectTypeDisplayName=projectTypeDisplayNameLowercase
+    />
   </#if>
 </@sectionSummaryWrapper.sectionSummaryWrapper>

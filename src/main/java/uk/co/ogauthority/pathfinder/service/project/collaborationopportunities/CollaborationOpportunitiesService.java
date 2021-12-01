@@ -2,221 +2,203 @@ package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
-import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.config.file.FileDeleteResult;
-import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
-import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
-import uk.co.ogauthority.pathfinder.model.entity.project.Project;
+import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityCommon;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityFileLinkCommon;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
-import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDescriptionForm;
-import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
-import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormValidator;
-import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityValidationHint;
-import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.CollaborationOpportunitiesRepository;
-import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormCommon;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
-import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
-import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
 @Service
-public class CollaborationOpportunitiesService implements ProjectFormSectionService {
-
+public abstract class CollaborationOpportunitiesService {
 
   private final SearchSelectorService searchSelectorService;
   private final FunctionService functionService;
-  private final ValidationService validationService;
-  private final CollaborationOpportunityFormValidator collaborationOpportunityFormValidator;
-  private final CollaborationOpportunitiesRepository collaborationOpportunitiesRepository;
-  private final CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService;
-  private final ProjectDetailFileService projectDetailFileService;
   private final ProjectSetupService projectSetupService;
-  private final EntityDuplicationService entityDuplicationService;
+  private final ProjectDetailFileService projectDetailFileService;
 
   @Autowired
   public CollaborationOpportunitiesService(SearchSelectorService searchSelectorService,
                                            FunctionService functionService,
-                                           ValidationService validationService,
-                                           CollaborationOpportunityFormValidator collaborationOpportunityFormValidator,
-                                           CollaborationOpportunitiesRepository collaborationOpportunitiesRepository,
-                                           CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService,
-                                           ProjectDetailFileService projectDetailFileService,
                                            ProjectSetupService projectSetupService,
-                                           EntityDuplicationService entityDuplicationService) {
+                                           ProjectDetailFileService projectDetailFileService) {
     this.searchSelectorService = searchSelectorService;
     this.functionService = functionService;
-    this.validationService = validationService;
-    this.collaborationOpportunityFormValidator = collaborationOpportunityFormValidator;
-    this.collaborationOpportunitiesRepository = collaborationOpportunitiesRepository;
-    this.collaborationOpportunityFileLinkService = collaborationOpportunityFileLinkService;
-    this.projectDetailFileService = projectDetailFileService;
     this.projectSetupService = projectSetupService;
-    this.entityDuplicationService = entityDuplicationService;
+    this.projectDetailFileService = projectDetailFileService;
   }
 
+  /**
+   * Method to return the collaboration opportunity entities associated with the provided project detail.
+   * @param projectDetail The project detail to retrieve the collaboration opportunities for
+   * @return the collaboration opportunity entities associated with the provided project detail
+   */
+  public abstract List<? extends CollaborationOpportunityCommon> getOpportunitiesForDetail(ProjectDetail projectDetail);
 
-  public BindingResult validate(CollaborationOpportunityForm form,
-                                BindingResult bindingResult,
-                                ValidationType validationType) {
-    var collaborationOpportunityValidationHint = new CollaborationOpportunityValidationHint();
-    collaborationOpportunityFormValidator.validate(form, bindingResult, collaborationOpportunityValidationHint);
-    return validationService.validate(form, bindingResult, validationType);
-  }
+  /**
+   * Get a populated form based on the provided collaboration opportunity entity.
+   * @param entity The entity to populate the form from
+   * @param <E> The specific implementation of CollaborationOpportunityCommon
+   * @return a populated form based on the provided collaboration opportunity entity
+   */
+  public abstract <E extends CollaborationOpportunityCommon> CollaborationOpportunityFormCommon getForm(E entity);
 
-  public boolean isValid(CollaborationOpportunity opportunity, ValidationType validationType) {
-    var form = getForm(opportunity);
+  public abstract <F extends CollaborationOpportunityFormCommon> BindingResult validate(F form,
+                                                                                        BindingResult bindingResult,
+                                                                                        ValidationType validationType);
+
+  /**
+   * Determines if a collaboration opportunity entity is valid.
+   * @param entity The entity to check if valid
+   * @param validationType The validation type to use in the valid check
+   * @return true is the provided entity is valid, false otherwise
+   */
+  protected boolean isValid(CollaborationOpportunityCommon entity, ValidationType validationType) {
+    final var form = getForm(entity);
     BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult = validate(form, bindingResult, validationType);
     return !bindingResult.hasErrors();
   }
 
-  @Transactional
-  public CollaborationOpportunity createCollaborationOpportunity(ProjectDetail detail,
-                                                                 CollaborationOpportunityForm form,
-                                                                 AuthenticatedUserAccount authenticatedUserAccount) {
-    var opportunity = new CollaborationOpportunity(detail);
-    setCommonFields(opportunity, form);
-    opportunity = collaborationOpportunitiesRepository.save(opportunity);
-
-    collaborationOpportunityFileLinkService.updateCollaborationOpportunityFileLinks(
-        opportunity,
-        form,
-        authenticatedUserAccount
-    );
-
-    return opportunity;
-  }
-
-  @Transactional
-  public CollaborationOpportunity updateCollaborationOpportunity(CollaborationOpportunity opportunity,
-                                                                 CollaborationOpportunityForm form,
-                                                                 AuthenticatedUserAccount authenticatedUserAccount) {
-    collaborationOpportunityFileLinkService.updateCollaborationOpportunityFileLinks(
-        opportunity,
-        form,
-        authenticatedUserAccount
-    );
-    setCommonFields(opportunity, form);
-    return collaborationOpportunitiesRepository.save(opportunity);
-  }
-
-  private void setCommonFields(CollaborationOpportunity opportunity, CollaborationOpportunityForm form) {
-    searchSelectorService.mapSearchSelectorFormEntryToEntity(
-        form.getFunction(),
-        Function.values(),
-        opportunity::setManualFunction,
-        opportunity::setFunction
-    );
-
-    opportunity.setDescriptionOfWork(form.getDescriptionOfWork());
-    opportunity.setUrgentResponseNeeded(form.getUrgentResponseNeeded());
-
-    var contactDetailForm = form.getContactDetail();
-    opportunity.setContactName(contactDetailForm.getName());
-    opportunity.setPhoneNumber(contactDetailForm.getPhoneNumber());
-    opportunity.setJobTitle(contactDetailForm.getJobTitle());
-    opportunity.setEmailAddress(contactDetailForm.getEmailAddress());
-  }
-
-  @Transactional
-  public void delete(CollaborationOpportunity opportunity) {
-    collaborationOpportunityFileLinkService.removeCollaborationOpportunityFileLinks(opportunity);
-    collaborationOpportunitiesRepository.delete(opportunity);
-  }
-
-  public List<RestSearchItem> findFunctionsLikeWithManualEntry(String searchTerm) {
-    return functionService.findFunctionsLikeWithManualEntry(searchTerm, FunctionType.COLLABORATION_OPPORTUNITY);
-  }
-
-  public List<CollaborationOpportunity> getOpportunitiesForDetail(ProjectDetail detail) {
-    return collaborationOpportunitiesRepository.findAllByProjectDetailOrderByIdAsc(detail);
-  }
-
-  public List<CollaborationOpportunity> getOpportunitiesForProjectVersion(Project project, Integer version) {
-    return collaborationOpportunitiesRepository.findAllByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version);
-  }
-
-  public Map<String, String> getPreSelectedCollaborationFunction(CollaborationOpportunityForm form) {
-    return searchSelectorService.getPreSelectedSearchSelectorValue(form.getFunction(), Function.values());
-  }
-
-  public CollaborationOpportunity getOrError(Integer opportunityId) {
-    return collaborationOpportunitiesRepository.findById(opportunityId)
-        .orElseThrow(
-            () -> new PathfinderEntityNotFoundException(
-                String.format("Unable to find collaborationOpportunity with ID %d", opportunityId)
-          )
-        );
-  }
-
-  public CollaborationOpportunityForm getForm(CollaborationOpportunity opportunity) {
-    var form = new CollaborationOpportunityForm();
-
-    if (opportunity.getFunction() != null) {
-      form.setFunction(opportunity.getFunction().name());
-    } else if (opportunity.getManualFunction() != null) {
-      form.setFunction(SearchSelectorService.getValueWithManualEntryPrefix(opportunity.getManualFunction()));
-    }
-
-    form.setUrgentResponseNeeded(opportunity.getUrgentResponseNeeded());
-    form.setDescriptionOfWork(opportunity.getDescriptionOfWork());
-    form.setContactDetail(new ContactDetailForm(opportunity));
-    form.setUploadedFileWithDescriptionForms(getUploadedFilesFormsByCollaborationOpportunity(opportunity));
-
-    return form;
+  /**
+   * Method to populate a collaboration opportunity entity based on the provided form.
+   * @param sourceForm the form to populate the entity from
+   * @param entityToPopulate the entity to populate
+   * @return a populated entity based on the provided form
+   */
+  protected CollaborationOpportunityCommon populateCollaborationOpportunity(
+      CollaborationOpportunityFormCommon sourceForm,
+      CollaborationOpportunityCommon entityToPopulate
+  ) {
+    setCommonEntityFields(sourceForm, entityToPopulate);
+    return entityToPopulate;
   }
 
   /**
-   * Remove an uploaded collaboration opportunity file.
-   * @param fileId The file id to remove
-   * @param projectDetail the project detail the file is linked to
-   * @param webUserAccount the logged in user
-   * @return a FileDeleteResult to indicate a success or failure of the removal
+   * Finds a list of functions with a type of functionType which match the provided searchTerm.
+   * @param searchTerm the term to search for
+   * @param functionType the function type to restrict by
+   * @return a list of matching functions based on the searchTerm and functionType
    */
-  public FileDeleteResult deleteCollaborationOpportunityFile(String fileId,
-                                                             ProjectDetail projectDetail,
-                                                             WebUserAccount webUserAccount) {
-    var file = projectDetailFileService.getProjectDetailFileByProjectDetailAndFileId(
-        projectDetail,
-        fileId
-    );
+  protected List<RestSearchItem> findFunctionsLikeWithManualEntry(String searchTerm, FunctionType functionType) {
+    return functionService.findFunctionsLikeWithManualEntry(searchTerm, functionType);
+  }
 
-    if (file.getFileLinkStatus().equals(FileLinkStatus.FULL)) {
-      // if fully linked we need to remove the collaboration opportunity file link
-      collaborationOpportunityFileLinkService.removeCollaborationOpportunityFileLink(file);
+  /**
+   * Method to return the function selected in the form for pre-population of this value by the front end.
+   * @param form the form being viewed
+   * @param functionValues the list of possible functions to select from
+   * @return a map containing the selected function for display on the front end
+   */
+  protected Map<String, String> getPreSelectedCollaborationFunction(CollaborationOpportunityFormCommon form,
+                                                                    Function[] functionValues) {
+    return searchSelectorService.getPreSelectedSearchSelectorValue(form.getFunction(), functionValues);
+  }
+
+  /**
+   * Method to populate a form from the given entity.
+   * @param sourceEntity The entity to populate the form data from
+   * @param formToPopulate The form to populate
+   * @param collaborationOpportunityFileLinks The files associated with the entity
+   * @param projectDetailFilePurpose The file upload purpose for the attached files
+   * @return a populated form based on the entity and files provided
+   */
+  protected CollaborationOpportunityFormCommon populateCollaborationOpportunityForm(
+      CollaborationOpportunityCommon sourceEntity,
+      CollaborationOpportunityFormCommon formToPopulate,
+      List<? extends CollaborationOpportunityFileLinkCommon> collaborationOpportunityFileLinks,
+      ProjectDetailFilePurpose projectDetailFilePurpose
+  ) {
+    if (sourceEntity.getFunction() != null) {
+      formToPopulate.setFunction(sourceEntity.getFunction().name());
+    } else if (sourceEntity.getManualFunction() != null) {
+      formToPopulate.setFunction(SearchSelectorService.getValueWithManualEntryPrefix(sourceEntity.getManualFunction()));
     }
 
-    return projectDetailFileService.processFileDeletion(file, webUserAccount);
+    formToPopulate.setUrgentResponseNeeded(sourceEntity.getUrgentResponseNeeded());
+    formToPopulate.setDescriptionOfWork(sourceEntity.getDescriptionOfWork());
+    formToPopulate.setContactDetail(new ContactDetailForm(sourceEntity));
+    formToPopulate.setUploadedFileWithDescriptionForms(getUploadedFilesFormsByCollaborationOpportunity(
+        collaborationOpportunityFileLinks,
+        projectDetailFilePurpose
+    ));
+
+    return formToPopulate;
+  }
+
+  /**
+   * Determines if the section is complete (e.g. doesn't contain any validation errors).
+   * @param projectDetail the project detail we are processing
+   * @return true if the section is complete, false otherwise
+   */
+  protected boolean isComplete(ProjectDetail projectDetail) {
+
+    final var collaborationOpportunities = getOpportunitiesForDetail(projectDetail);
+
+    return !collaborationOpportunities.isEmpty() && collaborationOpportunities
+        .stream()
+        .allMatch(opportunity -> isValid(opportunity, ValidationType.FULL));
+  }
+
+  /**
+   * Determines if the task should be shown in the task list.
+   * @param projectDetail the project detail we are processing
+   * @param projectTask the project task to check
+   * @return true if task can be shown in task list, false otherwise
+   */
+  protected boolean canShowInTaskList(ProjectDetail projectDetail, ProjectTask projectTask) {
+    return projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, projectTask);
+  }
+
+  private void setCommonEntityFields(CollaborationOpportunityFormCommon sourceForm,
+                                     CollaborationOpportunityCommon destinationEntity) {
+    searchSelectorService.mapSearchSelectorFormEntryToEntity(
+        sourceForm.getFunction(),
+        Function.values(),
+        destinationEntity::setManualFunction,
+        destinationEntity::setFunction
+    );
+
+    destinationEntity.setDescriptionOfWork(sourceForm.getDescriptionOfWork());
+    destinationEntity.setUrgentResponseNeeded(sourceForm.getUrgentResponseNeeded());
+
+    final var contactDetailForm = sourceForm.getContactDetail();
+    destinationEntity.setContactName(contactDetailForm.getName());
+    destinationEntity.setPhoneNumber(contactDetailForm.getPhoneNumber());
+    destinationEntity.setJobTitle(contactDetailForm.getJobTitle());
+    destinationEntity.setEmailAddress(contactDetailForm.getEmailAddress());
   }
 
   private List<UploadFileWithDescriptionForm> getUploadedFilesFormsByCollaborationOpportunity(
-      CollaborationOpportunity collaborationOpportunity
+      List<? extends CollaborationOpportunityFileLinkCommon> collaborationOpportunityFileLinks,
+      ProjectDetailFilePurpose projectDetailFilePurpose
   ) {
-    return collaborationOpportunityFileLinkService.getAllByCollaborationOpportunity(collaborationOpportunity)
+    return collaborationOpportunityFileLinks
         .stream()
         .map(collaborationOpportunityFileLink -> {
-          var uploadedFileView = projectDetailFileService.getUploadedFileView(
-              collaborationOpportunity.getProjectDetail(),
-              collaborationOpportunityFileLink.getProjectDetailFile().getFileId(),
-              CollaborationOpportunityFileLinkService.FILE_PURPOSE,
+
+          final var projectDetailFile = collaborationOpportunityFileLink.getProjectDetailFile();
+
+          final var uploadedFileView = projectDetailFileService.getUploadedFileView(
+              projectDetailFile.getProjectDetail(),
+              projectDetailFile.getFileId(),
+              projectDetailFilePurpose,
               FileLinkStatus.FULL
           );
           return new UploadFileWithDescriptionForm(
@@ -226,49 +208,5 @@ public class CollaborationOpportunitiesService implements ProjectFormSectionServ
           );
         })
         .collect(Collectors.toList());
-  }
-
-  @Override
-  public boolean isComplete(ProjectDetail detail) {
-    var opportunities =  getOpportunitiesForDetail(detail);
-    return !opportunities.isEmpty() && opportunities.stream()
-        .allMatch(ut -> isValid(ut, ValidationType.FULL));
-  }
-
-  @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
-    return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES);
-  }
-
-  @Override
-  public void removeSectionData(ProjectDetail projectDetail) {
-    final var collaborationOpportunities = getOpportunitiesForDetail(projectDetail);
-    collaborationOpportunityFileLinkService.removeCollaborationOpportunityFileLinks(collaborationOpportunities);
-    collaborationOpportunitiesRepository.deleteAll(collaborationOpportunities);
-  }
-
-  @Override
-  public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
-
-    final var duplicatedOpportunityEntities = entityDuplicationService.duplicateEntitiesAndSetNewParent(
-        getOpportunitiesForDetail(fromDetail),
-        toDetail,
-        CollaborationOpportunity.class
-    );
-
-    final var duplicatedOpportunityEntityMap = entityDuplicationService.createDuplicatedEntityPairingMap(
-        duplicatedOpportunityEntities
-    );
-
-    collaborationOpportunityFileLinkService.copyCollaborationOpportunityFileLinkData(
-        fromDetail,
-        toDetail,
-        duplicatedOpportunityEntityMap
-    );
-  }
-
-  @Override
-  public Set<ProjectType> getSupportedProjectTypes() {
-    return Set.of(ProjectType.INFRASTRUCTURE);
   }
 }

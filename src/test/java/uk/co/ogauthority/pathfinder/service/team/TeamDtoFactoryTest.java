@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.service.team;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -119,7 +118,7 @@ public class TeamDtoFactoryTest {
   public void createOrganisationTeam_mapsDtoAsExpected() {
     List<String> expectedUrefList = List.of(portalOrganisationGroup1.getUrefValue());
     organisationTeam1 = teamDtoFactory.createOrganisationTeam(organisationTeamDto1);
-    verify(portalOrganisationAccessor, times(1)).getAllOrganisationGroupsWithUrefIn(eq(expectedUrefList));
+    verify(portalOrganisationAccessor, times(1)).getAllOrganisationGroupsWithUrefIn(expectedUrefList);
     verifyNoMoreInteractions(portalOrganisationAccessor);
 
     assertThat(organisationTeam1.getId()).isEqualTo(organisationTeamDto1.getResId());
@@ -149,7 +148,7 @@ public class TeamDtoFactoryTest {
         .thenReturn(List.of(portalOrganisationGroup1, portalOrganisationGroup2));
 
     teamDtoFactory.createOrganisationTeamList(List.of(organisationTeamDto1, organisationTeamDto2));
-    verify(portalOrganisationAccessor, times(1)).getAllOrganisationGroupsWithUrefIn(eq(expectedUrefList));
+    verify(portalOrganisationAccessor, times(1)).getAllOrganisationGroupsWithUrefIn(expectedUrefList);
     verifyNoMoreInteractions(portalOrganisationAccessor);
   }
 
@@ -163,7 +162,7 @@ public class TeamDtoFactoryTest {
 
     assertThat(TeamMembers).hasSize(2);
     verify(personRepository, times(1))
-        .findAllByIdIn(eq(Set.of(orgMember1.getId().asInt(), orgMember2.getId().asInt())));
+        .findAllByIdIn(Set.of(orgMember1.getId().asInt(), orgMember2.getId().asInt()));
   }
 
   @Test

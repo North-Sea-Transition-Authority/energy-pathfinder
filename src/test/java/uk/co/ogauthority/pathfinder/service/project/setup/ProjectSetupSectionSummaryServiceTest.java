@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.tasks.ProjectTaskListSe
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionQuestion;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectTaskListSetupTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -35,6 +36,9 @@ public class ProjectSetupSectionSummaryServiceTest {
   @Mock
   private DifferenceService differenceService;
 
+  @Mock
+  private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
   private ProjectSetupSectionSummaryService projectSetupSectionSummaryService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -48,7 +52,8 @@ public class ProjectSetupSectionSummaryServiceTest {
     projectSetupSectionSummaryService = new ProjectSetupSectionSummaryService(
         projectService,
         projectSetupService,
-        differenceService
+        differenceService,
+        projectSectionSummaryCommonModelService
     );
   }
 
@@ -63,13 +68,13 @@ public class ProjectSetupSectionSummaryServiceTest {
     assertThat(summary.getDisplayOrder()).isEqualTo(ProjectSetupSectionSummaryService.DISPLAY_ORDER);
     assertThat(summary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectSetupSectionSummaryService.SECTION_LINK));
 
-    assertThat(modelMap).containsOnlyKeys(
-        "sectionTitle",
-        "sectionId",
-        "projectSetupDiffModel"
-    )
-        .containsEntry("sectionTitle", ProjectSetupSectionSummaryService.PAGE_NAME)
-        .containsEntry("sectionId", ProjectSetupSectionSummaryService.SECTION_ID);
+    verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
+        details,
+        ProjectSetupSectionSummaryService.PAGE_NAME,
+        ProjectSetupSectionSummaryService.SECTION_ID
+    );
+
+    assertThat(modelMap).containsOnlyKeys("projectSetupDiffModel");
 
     verify(differenceService, times(1)).differentiateComplexLists(
         any(),
@@ -88,9 +93,7 @@ public class ProjectSetupSectionSummaryServiceTest {
 
     assertThat(summaryItems.size()).isEqualTo(TaskListSectionQuestion.getNonDecommissioningRelatedValues().size());
 
-    summaryItems.forEach(si -> {
-      assertThat(si.getAnswerValue()).isNull();
-    });
+    summaryItems.forEach(si -> assertThat(si.getAnswerValue()).isNull());
   }
 
   @Test
@@ -114,9 +117,7 @@ public class ProjectSetupSectionSummaryServiceTest {
 
     assertThat(summaryItems.size()).isEqualTo(TaskListSectionQuestion.getAllValues().size());
 
-    summaryItems.forEach(si -> {
-      assertThat(si.getAnswerValue()).isNull();
-    });
+    summaryItems.forEach(si -> assertThat(si.getAnswerValue()).isNull());
   }
 
   @Test
@@ -133,9 +134,22 @@ public class ProjectSetupSectionSummaryServiceTest {
     assertThat(summaryItems.get(3).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(3).getAnswerValue());
     assertThat(summaryItems.get(4).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(4).getAnswerValue());
     assertThat(summaryItems.get(5).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(5).getAnswerValue());
-    // Subsea infrastructure disabled: PAT-495
-    // assertThat(summaryItems.get(6).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(6).getAnswerValue());
+    assertThat(summaryItems.get(6).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(6).getAnswerValue());
     // Pipelines disabled: PAT-457
     // assertThat(summaryItems.get(7).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(7).getAnswerValue());
+  }
+
+  @Test
+  public void canShowSection_whenCanShowInTaskList_thenTrue() {
+    when(projectSetupService.canShowInTaskList(details)).thenReturn(true);
+
+    assertThat(projectSetupSectionSummaryService.canShowSection(details)).isTrue();
+  }
+
+  @Test
+  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
+    when(projectSetupService.canShowInTaskList(details)).thenReturn(false);
+
+    assertThat(projectSetupSectionSummaryService.canShowSection(details)).isFalse();
   }
 }

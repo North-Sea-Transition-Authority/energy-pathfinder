@@ -1,0 +1,164 @@
+package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
+import java.util.List;
+import org.junit.Test;
+import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
+import uk.co.ogauthority.pathfinder.model.enums.project.Function;
+import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
+import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
+import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
+import uk.co.ogauthority.pathfinder.model.view.Tag;
+import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
+import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
+
+public class InfrastructureCollaborationOpportunityViewUtilTest {
+
+  private final int displayOrder = 1;
+  private final List<UploadedFileView> fileList = List.of(UploadedFileUtil.createUploadedFileView());
+
+  @Test
+  public void createView_withoutValidParam_whenFunctionFromList_thenNoTag() {
+
+    final var entity = getPopulatedInfrastructureCollaborationOpportunity();
+    entity.setFunction(Function.HR);
+    entity.setManualFunction(null);
+
+    final var view = InfrastructureCollaborationOpportunityViewUtil.createView(
+        entity,
+        displayOrder,
+        fileList
+    );
+
+    createViewAndAssertCommonViewProperties(view, entity);
+
+    assertThat(view.getFunction()).isEqualTo(new StringWithTag(entity.getFunction().getDisplayName(), Tag.NONE));
+    assertThat(view.isValid()).isNull();
+  }
+
+  @Test
+  public void createView_withoutValidParam_whenManualFunction_thenNotFromListTag() {
+
+    final var entity = getPopulatedInfrastructureCollaborationOpportunity();
+    entity.setFunction(null);
+
+    final var manualFunction = "manual function";
+    entity.setManualFunction(manualFunction);
+
+    final var view = InfrastructureCollaborationOpportunityViewUtil.createView(
+        entity,
+        displayOrder,
+        fileList
+    );
+
+    createViewAndAssertCommonViewProperties(view, entity);
+
+    assertThat(view.getFunction()).isEqualTo(new StringWithTag(entity.getManualFunction(), Tag.NOT_FROM_LIST));
+    assertThat(view.isValid()).isNull();
+  }
+
+  @Test
+  public void createView_withValidParam_whenFunctionFromList_thenNoTag() {
+
+    final var entity = getPopulatedInfrastructureCollaborationOpportunity();
+    entity.setFunction(Function.HR);
+    entity.setManualFunction(null);
+
+    final var isValid = false;
+
+    final var view = InfrastructureCollaborationOpportunityViewUtil.createView(
+        entity,
+        displayOrder,
+        fileList,
+        isValid
+    );
+
+    createViewAndAssertCommonViewProperties(view, entity);
+
+    assertThat(view.getFunction()).isEqualTo(new StringWithTag(entity.getFunction().getDisplayName(), Tag.NONE));
+    assertThat(view.isValid()).isEqualTo(isValid);
+  }
+
+  @Test
+  public void createView_withValidParam_whenManualFunction_thenNotFromListTag() {
+
+    final var entity = getPopulatedInfrastructureCollaborationOpportunity();
+    entity.setFunction(null);
+
+    final var manualFunction = "manual function";
+    entity.setManualFunction(manualFunction);
+
+    final var isValid = true;
+
+    final var view = InfrastructureCollaborationOpportunityViewUtil.createView(
+        entity,
+        displayOrder,
+        fileList,
+        isValid
+    );
+
+    createViewAndAssertCommonViewProperties(view, entity);
+
+    assertThat(view.getFunction()).isEqualTo(new StringWithTag(entity.getManualFunction(), Tag.NOT_FROM_LIST));
+    assertThat(view.isValid()).isEqualTo(isValid);
+  }
+
+  private void createViewAndAssertCommonViewProperties(InfrastructureCollaborationOpportunityView view,
+                                                       InfrastructureCollaborationOpportunity entity) {
+
+    final var projectId = entity.getProjectDetail().getProject().getId();
+
+    assertThat(view.getDisplayOrder()).isEqualTo(displayOrder);
+    assertThat(view.getId()).isEqualTo(entity.getId());
+    assertThat(view.getProjectId()).isEqualTo(projectId);
+    assertThat(view.getDescriptionOfWork()).isEqualTo(entity.getDescriptionOfWork());
+    assertThat(view.getUrgentResponseNeeded()).isEqualTo(StringDisplayUtil.yesNoFromBoolean(entity.getUrgentResponseNeeded()));
+    assertThat(view.getContactName()).isEqualTo(entity.getContactName());
+    assertThat(view.getContactPhoneNumber()).isEqualTo(entity.getPhoneNumber());
+    assertThat(view.getContactJobTitle()).isEqualTo(entity.getJobTitle());
+    assertThat(view.getContactEmailAddress()).isEqualTo(entity.getEmailAddress());
+    assertThat(view.getUploadedFileViews()).isEqualTo(fileList);
+
+    final var editUrl = ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
+        .editCollaborationOpportunity(
+            projectId,
+            entity.getId(),
+            null
+        )
+    );
+
+    final var deleteUrl = ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
+        .removeCollaborationOpportunityConfirm(
+            projectId,
+            entity.getId(),
+            displayOrder,
+            null
+        )
+    );
+
+    final SummaryLink editLink = new SummaryLink(
+        SummaryLinkText.EDIT.getDisplayName(),
+        editUrl
+    );
+
+    final SummaryLink removeLink = new SummaryLink(
+        SummaryLinkText.DELETE.getDisplayName(),
+        deleteUrl
+    );
+
+
+    assertThat(view.getSummaryLinks()).isEqualTo(List.of(editLink, removeLink));
+  }
+
+  private InfrastructureCollaborationOpportunity getPopulatedInfrastructureCollaborationOpportunity() {
+    return InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(ProjectUtil.getProjectDetails());
+  }
+
+}

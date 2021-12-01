@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.project.decommissioningschedule;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,7 @@ import uk.co.ogauthority.pathfinder.model.view.decommissioningschedule.Decommiss
 import uk.co.ogauthority.pathfinder.model.view.decommissioningschedule.DecommissioningScheduleViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
@@ -29,13 +29,17 @@ public class DecommissioningScheduleSectionSummaryService implements ProjectSect
 
   private final DecommissioningScheduleService decommissioningScheduleService;
   private final DifferenceService differenceService;
+  private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
   @Autowired
   public DecommissioningScheduleSectionSummaryService(
       DecommissioningScheduleService decommissioningScheduleService,
-      DifferenceService differenceService) {
+      DifferenceService differenceService,
+      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService
+  ) {
     this.decommissioningScheduleService = decommissioningScheduleService;
     this.differenceService = differenceService;
+    this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
   }
 
   @Override
@@ -45,9 +49,12 @@ public class DecommissioningScheduleSectionSummaryService implements ProjectSect
 
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
-    Map<String, Object> summaryModel = new HashMap<>();
-    summaryModel.put("sectionTitle", PAGE_NAME);
-    summaryModel.put("sectionId", SECTION_ID);
+
+    final var summaryModel = projectSectionSummaryCommonModelService.getCommonSummaryModelMap(
+        detail,
+        PAGE_NAME,
+        SECTION_ID
+    );
 
     var decommissioningScheduleView = decommissioningScheduleService.getDecommissioningSchedule(detail)
         .map(DecommissioningScheduleViewUtil::from)

@@ -32,7 +32,7 @@ public class PlatformFpsoFormValidatorTest {
 
   @Test
   public void validate_completeForm_isValid() {
-    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatformAndSubstructuresToBeRemoved();
+    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatform();
     var errors = new BeanPropertyBindingResult(form, "form");
     var validationHint = new PlatformFpsoValidationHint(ValidationType.FULL);
 
@@ -47,7 +47,7 @@ public class PlatformFpsoFormValidatorTest {
   // when the user clicks "Save and complete later" and partial validation runs
   @Test
   public void validate_missingInfrastructureType_isValid() {
-    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatformAndSubstructuresToBeRemoved();
+    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatform();
     form.setInfrastructureType(null);
     var errors = new BeanPropertyBindingResult(form, "form");
     var validationHint = new PlatformFpsoValidationHint(ValidationType.PARTIAL);
@@ -60,7 +60,7 @@ public class PlatformFpsoFormValidatorTest {
 
   @Test
   public void validate_platformMissingPlatformStructure_isInvalid() {
-    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatformAndSubstructuresToBeRemoved();
+    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatform();
     form.setInfrastructureType(PlatformFpsoInfrastructureType.PLATFORM);
     form.setPlatformStructure(null);
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -152,21 +152,8 @@ public class PlatformFpsoFormValidatorTest {
   }
 
   @Test
-  public void validate_emptyDateAcceptable_withEmptyDate_isValid() {
-    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatformAndSubstructuresToBeRemoved();
-    form.setSubstructureRemovalYears(new MinMaxDateInput(null, null));
-    var errors = new BeanPropertyBindingResult(form, "form");
-    var validationHint = new PlatformFpsoValidationHint(ValidationType.PARTIAL);
-
-    ValidationUtils.invokeValidator(validator, form, errors, validationHint);
-    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
-
-    assertThat(fieldErrors).isEmpty();
-  }
-
-  @Test
   public void validate_emptyDateNotAcceptable_withEmptyDate_isInValid() {
-    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatformAndSubstructuresToBeRemoved();
+    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatform();
     form.setTopsideRemovalYears(new MinMaxDateInput(null, null));
     var errors = new BeanPropertyBindingResult(form, "form");
     var validationHint = new PlatformFpsoValidationHint(ValidationType.FULL);
@@ -175,7 +162,6 @@ public class PlatformFpsoFormValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors.size()).isPositive();
     assertThat(fieldErrors).containsExactly(
         entry("topsideRemovalYears.minYear", Set.of("minYear.invalid"))
     );
@@ -195,37 +181,87 @@ public class PlatformFpsoFormValidatorTest {
   }
 
   @Test
-  public void validate_noSubstructuresRemoved_isValid() {
-    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatformAndNoSubstructuresToBeRemoved();
+  public void validate_whenPartialValidationAndSubstructuresExpectedIsFalse_thenNoErrorsInConditionalQuestions() {
 
-    var errors = new BeanPropertyBindingResult(form, "form");
-    var validationHint = new PlatformFpsoValidationHint(ValidationType.FULL);
+    final var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpso_manualStructure();
+    form.setSubstructureExpectedToBeRemoved(false);
+
+    // explicitly set condition fields to null, so we can be sure we don't get errors in this scenario
+    form.setSubstructureRemovalMass(null);
+    form.setSubstructureRemovalPremise(null);
+    form.setSubstructureRemovalYears(new MinMaxDateInput(null, null));
+
+    final var errors = new BeanPropertyBindingResult(form, "form");
+    final var validationHint = new PlatformFpsoValidationHint(ValidationType.PARTIAL);
 
     ValidationUtils.invokeValidator(validator, form, errors, validationHint);
-    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    final var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
 
     assertThat(fieldErrors).isEmpty();
   }
 
   @Test
-  public void validate_noSubstructuresRemoved_missingSubstructureQuestions_isInValid() {
-    var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatformAndSubstructuresToBeRemoved();
-    form.setSubstructureRemovalYears(new MinMaxDateInput(null, null));
+  public void validate_whenFullValidationAndSubstructuresExpectedIsFalse_thenNoErrorsInConditionalQuestions() {
+
+    final var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpso_manualStructure();
+    form.setSubstructureExpectedToBeRemoved(false);
+
+    // explicitly set condition fields to null, so we can be sure we don't get errors in this scenario
     form.setSubstructureRemovalMass(null);
     form.setSubstructureRemovalPremise(null);
-    var errors = new BeanPropertyBindingResult(form, "form");
-    var validationHint = new PlatformFpsoValidationHint(ValidationType.FULL);
+    form.setSubstructureRemovalYears(new MinMaxDateInput(null, null));
+
+    final var errors = new BeanPropertyBindingResult(form, "form");
+    final var validationHint = new PlatformFpsoValidationHint(ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, validationHint);
-    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
-    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+    final var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
 
-    assertThat(fieldErrors.size()).isPositive();
+    assertThat(fieldErrors).isEmpty();
+  }
+
+  @Test
+  public void validate_whenSubstructuresExpectedAndPartialValidationAndNoConditionalQuestionsAnswered_thenNoErrors() {
+
+    final var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpso_manualStructure();
+    form.setSubstructureExpectedToBeRemoved(true);
+
+    // explicitly set condition fields to null, so we can be sure we don't get errors in this scenario
+    form.setSubstructureRemovalMass(null);
+    form.setSubstructureRemovalPremise(null);
+    form.setSubstructureRemovalYears(new MinMaxDateInput(null, null));
+
+    final var errors = new BeanPropertyBindingResult(form, "form");
+    final var validationHint = new PlatformFpsoValidationHint(ValidationType.PARTIAL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, validationHint);
+    final var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+
+    assertThat(fieldErrors).isEmpty();
+  }
+
+  @Test
+  public void validate_whenSubstructuresExpectedAndFullValidationAndNoConditionalQuestionsAnswered_thenErrors() {
+
+    final var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpso_manualStructure();
+    form.setSubstructureExpectedToBeRemoved(true);
+    form.setSubstructureRemovalMass(null);
+    form.setSubstructureRemovalPremise(null);
+    form.setSubstructureRemovalYears(new MinMaxDateInput(null, null));
+
+    final var errors = new BeanPropertyBindingResult(form, "form");
+    final var validationHint = new PlatformFpsoValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, validationHint);
+    final var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+
     assertThat(fieldErrors).containsExactly(
         entry("substructureRemovalYears.minYear", Set.of("minYear.invalid")),
         entry("substructureRemovalMass", Set.of("substructureRemovalMass.invalid")),
         entry("substructureRemovalPremise", Set.of("substructureRemovalPremise.invalid"))
     );
+
+    final var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
     assertThat(fieldErrorMessages).containsExactly(
         entry(
@@ -240,7 +276,100 @@ public class PlatformFpsoFormValidatorTest {
         ),
         entry("substructureRemovalMass", Set.of(PlatformFpsoFormValidator.MISSING_SUBSTRUCTURE_REMOVAL_MASS_ERROR)),
         entry("substructureRemovalPremise", Set.of(PlatformFpsoFormValidator.MISSING_SUBSTRUCTURE_REMOVAL_PREMISE_ERROR))
-      );
+    );
+  }
+
+  @Test
+  public void validate_whenSubstructureRemovalMassIsNegativeAndPartialValidation_thenError() {
+    validateAndAssertSubstructureRemovalMassErrorsWhenNotPositiveInteger(-1, ValidationType.PARTIAL);
+  }
+
+  @Test
+  public void validate_whenSubstructureRemovalMassIsNegativeAndFullValidation_thenError() {
+    validateAndAssertSubstructureRemovalMassErrorsWhenNotPositiveInteger(-1, ValidationType.FULL);
+  }
+
+  @Test
+  public void validate_whenSubstructureRemovalMassIsZeroAndPartialValidation_thenError() {
+    validateAndAssertSubstructureRemovalMassErrorsWhenNotPositiveInteger(0, ValidationType.FULL);
+  }
+
+  @Test
+  public void validate_whenSubstructureRemovalMassIsZeroAndFullValidation_thenError() {
+    validateAndAssertSubstructureRemovalMassErrorsWhenNotPositiveInteger(0, ValidationType.FULL);
+  }
+
+  @Test
+  public void validate_whenSubstructureRemovalExpectedAndFullValidationAndRemovalYearsNull_thenError() {
+
+    final var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpso_manualStructure();
+    form.setSubstructureExpectedToBeRemoved(true);
+    form.setSubstructureRemovalYears(new MinMaxDateInput(null, null));
+
+    final var errors = new BeanPropertyBindingResult(form, "form");
+    final var validationHint = new PlatformFpsoValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, validationHint);
+    final var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+
+    assertThat(fieldErrors).containsExactly(
+        entry("substructureRemovalYears.minYear", Set.of("minYear.invalid"))
+    );
+
+    final var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry(
+            "substructureRemovalYears.minYear",
+            Set.of(String.format(
+                MinMaxDateInputValidator.ENTER_BOTH_YEARS_ERROR,
+                PlatformFpsoValidationHint.SUBSTRUCTURE_REMOVAL_LABEL.getInitCappedLabel(),
+                StringDisplayUtil.getPrefixForVowelOrConsonant(PlatformFpsoValidationHint.SUBSTRUCTURE_YEAR_LABELS.getMinYearLabel()),
+                PlatformFpsoValidationHint.SUBSTRUCTURE_YEAR_LABELS.getMinYearLabel(),
+                PlatformFpsoValidationHint.SUBSTRUCTURE_YEAR_LABELS.getMaxYearLabel()
+            ))
+        )
+    );
+  }
+
+  @Test
+  public void validate_whenSubstructureRemovalExpectedAndPartialValidationAndRemovalYearsNull_thenNoError() {
+
+    final var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpso_manualStructure();
+    form.setSubstructureExpectedToBeRemoved(true);
+    form.setSubstructureRemovalYears(new MinMaxDateInput(null, null));
+
+    final var errors = new BeanPropertyBindingResult(form, "form");
+    final var validationHint = new PlatformFpsoValidationHint(ValidationType.PARTIAL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, validationHint);
+    final var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+
+    assertThat(fieldErrors).isEmpty();
+  }
+
+  private void validateAndAssertSubstructureRemovalMassErrorsWhenNotPositiveInteger(int substructureMassTestValue,
+                                                                                    ValidationType validationType) {
+
+    final var form = PlatformFpsoTestUtil.getPlatformFpsoForm_withFpso_manualStructure();
+    form.setSubstructureExpectedToBeRemoved(true);
+    form.setSubstructureRemovalMass(substructureMassTestValue);
+
+    final var errors = new BeanPropertyBindingResult(form, "form");
+    final var validationHint = new PlatformFpsoValidationHint(validationType);
+
+    ValidationUtils.invokeValidator(validator, form, errors, validationHint);
+    final var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+
+    assertThat(fieldErrors).containsExactly(
+        entry("substructureRemovalMass", Set.of("substructureRemovalMass.invalid"))
+    );
+
+    final var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("substructureRemovalMass", Set.of(PlatformFpsoFormValidator.NEGATIVE_SUBSTRUCTURE_REMOVAL_MASS_ERROR))
+    );
   }
 
 }

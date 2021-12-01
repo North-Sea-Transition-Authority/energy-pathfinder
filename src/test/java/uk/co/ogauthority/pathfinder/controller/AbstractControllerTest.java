@@ -37,6 +37,7 @@ import uk.co.ogauthority.pathfinder.service.projectupdate.OperatorProjectUpdateC
 import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdateContextService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.team.teammanagementcontext.TeamManagementContextService;
+import uk.co.ogauthority.pathfinder.service.validation.ValidationErrorOrderingService;
 
 @Import(AbstractControllerTest.TestConfig.class)
 public abstract class AbstractControllerTest {
@@ -128,7 +129,10 @@ public abstract class AbstractControllerTest {
     }
 
     @Bean
-    public ControllerHelperService controllerHelperService() { return new ControllerHelperService(messageSource()); }
+    public ControllerHelperService controllerHelperService() { return new ControllerHelperService(validationErrorOrderingService()); }
+
+    @Bean
+    public ValidationErrorOrderingService validationErrorOrderingService() { return new ValidationErrorOrderingService(messageSource()); }
 
     @Bean
     public FileUploadProperties fileUploadProperties() {

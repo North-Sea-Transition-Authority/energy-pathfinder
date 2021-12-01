@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.form.projectmanagement.ProjectManageme
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.project.ProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.rendering.TemplateRenderingService;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -56,13 +57,18 @@ public class ProjectManagementViewService {
     var form = new ProjectManagementForm();
     form.setVersion(selectedVersionProjectDetail.getVersion());
 
-    return new ModelAndView(TEMPLATE_PATH)
+    final var modelAndView = new ModelAndView(TEMPLATE_PATH)
         .addObject("projectManagementView", getProjectManagementView(latestSubmittedProjectDetail, selectedVersionProjectDetail, user))
         .addObject("viewableVersions", getViewableVersionsMap(project))
         .addObject("form", form)
         .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
         .addObject("viewVersionUrl", ReverseRouter.route(on(ManageProjectController.class)
-            .updateProjectVersion(project.getId(), null, null, null)));
+            .updateProjectVersion(project.getId(), null, null, null))
+        );
+
+    ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, latestSubmittedProjectDetail);
+
+    return modelAndView;
   }
 
   ProjectManagementView getProjectManagementView(ProjectDetail latestSubmittedProjectDetail,

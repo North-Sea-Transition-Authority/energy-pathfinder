@@ -1,310 +1,303 @@
 package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
+import java.time.Instant;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.validation.BeanPropertyBindingResult;
-import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
-import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunity;
-import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityCommon;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
-import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
-import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
-import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityForm;
-import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormValidator;
+import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
+import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDescriptionForm;
+import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormCommon;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
-import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.CollaborationOpportunitiesRepository;
-import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.TestCollaborationOpportunityCommon;
+import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
-import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
-import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtilCommon;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
-import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CollaborationOpportunitiesServiceTest {
 
   @Mock
-  private ValidationService validationService;
-
-  @Mock
-  private CollaborationOpportunitiesRepository collaborationOpportunitiesRepository;
-
-  @Mock
-  private CollaborationOpportunityFormValidator collaborationOpportunityFormValidator;
-
-  @Mock
-  private CollaborationOpportunityFileLinkService collaborationOpportunityFileLinkService;
+  private ProjectSetupService projectSetupService;
 
   @Mock
   private ProjectDetailFileService projectDetailFileService;
 
-  @Mock
-  private ProjectSetupService projectSetupService;
-
-  @Mock
-  private EntityDuplicationService entityDuplicationService;
-
-  private CollaborationOpportunitiesService collaborationOpportunitiesService;
-
-  private final ProjectDetail detail = ProjectUtil.getProjectDetails();
-
-  private final CollaborationOpportunity opportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity(
-      detail
-  );
-
-  private final AuthenticatedUserAccount userAccount = UserTestingUtil.getAuthenticatedUserAccount();
+  private TestCollaborationOpportunitiesService collaborationOpportunitiesService;
 
   @Before
-  public void setUp() {
+  public void setup() {
 
-    SearchSelectorService searchSelectorService = new SearchSelectorService();
-    FunctionService functionService = new FunctionService(searchSelectorService);
+    final var searchSelectorService = new SearchSelectorService();
+    final var functionService = new FunctionService(searchSelectorService);
 
-    collaborationOpportunitiesService = new CollaborationOpportunitiesService(
+    collaborationOpportunitiesService = new TestCollaborationOpportunitiesService(
         searchSelectorService,
         functionService,
-        validationService,
-        collaborationOpportunityFormValidator,
-        collaborationOpportunitiesRepository,
-        collaborationOpportunityFileLinkService,
-        projectDetailFileService,
         projectSetupService,
-        entityDuplicationService
+        projectDetailFileService
     );
-
-    when(collaborationOpportunitiesRepository.save(any(CollaborationOpportunity.class)))
-        .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
   @Test
-  public void createCollaborationOpportunity() {
-    var form = CollaborationOpportunityTestUtil.getCompleteForm();
-    var newCollaborationOpportunity = collaborationOpportunitiesService.createCollaborationOpportunity(
-        detail,
+  public void populateCollaborationOpportunity_withFromListFunction_assertProperties() {
+
+    final var selectedFunction = CollaborationOpportunityTestUtilCommon.FUNCTION;
+
+    final var form = CollaborationOpportunityTestUtilCommon.populateCompleteForm(new TestCollaborationOpportunityForm());
+    form.setFunction(selectedFunction.getSelectionId());
+
+    final var entityToPopulate = new TestCollaborationOpportunityCommon();
+
+    final var newCollaborationOpportunity = collaborationOpportunitiesService.populateCollaborationOpportunity(
         form,
-        userAccount
+        entityToPopulate
     );
-    assertThat(newCollaborationOpportunity.getProjectDetail()).isEqualTo(detail);
-    assertThat(newCollaborationOpportunity.getFunction()).isEqualTo(CollaborationOpportunityTestUtil.FUNCTION);
-    checkCommonFields(form, newCollaborationOpportunity);
+
+    assertThat(newCollaborationOpportunity.getFunction()).isEqualTo(selectedFunction);
+    checkCommonEntityFields(form, newCollaborationOpportunity);
   }
 
   @Test
-  public void createCollaborationOpportunity_manualFunction() {
-    var form = CollaborationOpportunityTestUtil.getCompletedForm_manualEntry();
-    var opportunity = collaborationOpportunitiesService.createCollaborationOpportunity(
-        detail,
+  public void populateCollaborationOpportunity_withNotFromListFunction_assertProperties() {
+
+    final var rawFunctionString = "Manual function";
+    final var selectedFunction = String.format("%s%s", SearchSelectablePrefix.FREE_TEXT_PREFIX, rawFunctionString);
+
+    final var form = CollaborationOpportunityTestUtilCommon.populateCompleteForm(new TestCollaborationOpportunityForm());
+    form.setFunction(selectedFunction);
+
+    final var entityToPopulate = new TestCollaborationOpportunityCommon();
+
+    final var newCollaborationOpportunity = collaborationOpportunitiesService.populateCollaborationOpportunity(
         form,
-        userAccount
-    );
-    assertThat(opportunity.getProjectDetail()).isEqualTo(detail);
-    checkCommonFields(form, opportunity);
-  }
-
-  @Test
-  public void updateCollaborationOpportunity() {
-    var form = CollaborationOpportunityTestUtil.getCompleteForm();
-    form.setFunction(Function.DRILLING.name());
-    var existingOpportunity = opportunity;
-    collaborationOpportunitiesService.updateCollaborationOpportunity(existingOpportunity, form, userAccount);
-    assertThat(existingOpportunity.getProjectDetail()).isEqualTo(detail);
-    assertThat(existingOpportunity.getFunction()).isEqualTo(Function.DRILLING);
-    checkCommonFields(form, existingOpportunity);
-  }
-
-  @Test
-  public void updateCollaborationOpportunity_manualFunction() {
-    var form = CollaborationOpportunityTestUtil.getCompleteForm();
-    form.setFunction(CollaborationOpportunityTestUtil.MANUAL_FUNCTION);
-    var existingOpportunity = opportunity;
-    collaborationOpportunitiesService.updateCollaborationOpportunity(existingOpportunity, form, userAccount);
-    assertThat(existingOpportunity.getProjectDetail()).isEqualTo(detail);
-    assertThat(existingOpportunity.getManualFunction()).isEqualTo(SearchSelectorService.removePrefix(CollaborationOpportunityTestUtil.MANUAL_FUNCTION));
-    checkCommonFields(form, existingOpportunity);
-  }
-
-  @Test
-  public void getForm() {
-    var form = collaborationOpportunitiesService.getForm(opportunity);
-    assertThat(form.getFunction()).isEqualTo(opportunity.getFunction().name());
-    checkCommonFormFields(form, opportunity);
-  }
-
-  @Test
-  public void getFormManualEntry() {
-    var manualEntryOpportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity_manualEntry(detail);
-    var form = collaborationOpportunitiesService.getForm(manualEntryOpportunity);
-    assertThat(form.getFunction()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(manualEntryOpportunity.getManualFunction()));
-    checkCommonFormFields(form, manualEntryOpportunity);
-  }
-
-  @Test
-  public void validate_partial() {
-    var form = new CollaborationOpportunityForm();
-    var bindingResult = new BeanPropertyBindingResult(form, "form");
-
-    collaborationOpportunitiesService.validate(
-        form,
-        bindingResult,
-        ValidationType.PARTIAL
-    );
-    verify(validationService, times(1)).validate(form, bindingResult, ValidationType.PARTIAL);
-  }
-
-  @Test
-  public void validate_full() {
-    var form = CollaborationOpportunityTestUtil.getCompleteForm();
-    var bindingResult = new BeanPropertyBindingResult(form, "form");
-
-    collaborationOpportunitiesService.validate(
-        form,
-        bindingResult,
-        ValidationType.FULL
+        entityToPopulate
     );
 
-    verify(validationService, times(1)).validate(form, bindingResult, ValidationType.FULL);
+    assertThat(newCollaborationOpportunity.getManualFunction()).isEqualTo(rawFunctionString);
+    checkCommonEntityFields(form, newCollaborationOpportunity);
   }
 
-  private void checkCommonFields(CollaborationOpportunityForm form, CollaborationOpportunity collaborationOpportunity) {
-    assertThat(collaborationOpportunity.getDescriptionOfWork()).isEqualTo(CollaborationOpportunityTestUtil.DESCRIPTION_OF_WORK);
-    assertThat(collaborationOpportunity.getUrgentResponseNeeded()).isEqualTo(form.getUrgentResponseNeeded());
-    assertThat(collaborationOpportunity.getContactName()).isEqualTo(form.getContactDetail().getName());
-    assertThat(collaborationOpportunity.getPhoneNumber()).isEqualTo(form.getContactDetail().getPhoneNumber());
-    assertThat(collaborationOpportunity.getJobTitle()).isEqualTo(form.getContactDetail().getJobTitle());
-    assertThat(collaborationOpportunity.getEmailAddress()).isEqualTo(form.getContactDetail().getEmailAddress());
-  }
-
-  private void checkCommonFormFields(CollaborationOpportunityForm form, CollaborationOpportunity collaborationOpportunity) {
-    assertThat(form.getDescriptionOfWork()).isEqualTo(collaborationOpportunity.getDescriptionOfWork());
-    assertThat(form.getUrgentResponseNeeded()).isEqualTo(collaborationOpportunity.getUrgentResponseNeeded());
-    assertThat(form.getContactDetail().getName()).isEqualTo(collaborationOpportunity.getContactName());
-    assertThat(form.getContactDetail().getPhoneNumber()).isEqualTo(collaborationOpportunity.getPhoneNumber());
-    assertThat(form.getContactDetail().getJobTitle()).isEqualTo(collaborationOpportunity.getJobTitle());
-    assertThat(form.getContactDetail().getEmailAddress()).isEqualTo(collaborationOpportunity.getEmailAddress());
+  private void checkCommonEntityFields(
+      CollaborationOpportunityFormCommon form,
+      CollaborationOpportunityCommon entity
+  ) {
+    assertThat(entity.getDescriptionOfWork()).isEqualTo(form.getDescriptionOfWork());
+    assertThat(entity.getUrgentResponseNeeded()).isEqualTo(form.getUrgentResponseNeeded());
+    assertThat(entity.getContactName()).isEqualTo(form.getContactDetail().getName());
+    assertThat(entity.getPhoneNumber()).isEqualTo(form.getContactDetail().getPhoneNumber());
+    assertThat(entity.getJobTitle()).isEqualTo(form.getContactDetail().getJobTitle());
+    assertThat(entity.getEmailAddress()).isEqualTo(form.getContactDetail().getEmailAddress());
   }
 
   @Test
-  public void findTenderFunctionsLikeWithManualEntry() {
-    var results = collaborationOpportunitiesService.findFunctionsLikeWithManualEntry(Function.FACILITIES_OFFSHORE.getDisplayName());
-    assertThat(results.size()).isEqualTo(1);
-    assertThat(results.get(0).getId()).isEqualTo(Function.FACILITIES_OFFSHORE.name());
+  public void canShowInTaskList_whenTrue_thenTrue() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(true);
+
+    final var canShowInTaskList = collaborationOpportunitiesService.canShowInTaskList(
+        projectDetail,
+        ProjectTask.COLLABORATION_OPPORTUNITIES
+    );
+
+    assertThat(canShowInTaskList).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_whenFalse_thenFalse() {
+
+    final var projectDetail = ProjectUtil.getProjectDetails();
+
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(false);
+
+    final var canShowInTaskList = collaborationOpportunitiesService.canShowInTaskList(
+        projectDetail,
+        ProjectTask.COLLABORATION_OPPORTUNITIES
+    );
+
+    assertThat(canShowInTaskList).isFalse();
+  }
+
+  @Test
+  public void findTenderFunctionsLikeWithManualEntry_whenFromList() {
+    final var results = collaborationOpportunitiesService.findFunctionsLikeWithManualEntry(
+        Function.FACILITIES_OFFSHORE.getDisplayName(),
+        FunctionType.COLLABORATION_OPPORTUNITY
+    );
+    assertThat(results).extracting(RestSearchItem::getId).containsExactly(Function.FACILITIES_OFFSHORE.name());
   }
 
   @Test
   public void findTenderFunctionsLikeWithManualEntry_withManualEntry() {
-    var manualEntry = "manual entry";
-    var results = collaborationOpportunitiesService.findFunctionsLikeWithManualEntry(manualEntry);
+
+    final var manualEntry = "manual entry";
+
+    final var results = collaborationOpportunitiesService.findFunctionsLikeWithManualEntry(
+        manualEntry,
+        FunctionType.COLLABORATION_OPPORTUNITY
+    );
+
     assertThat(results.size()).isEqualTo(1);
-    assertThat(results.get(0).getId()).isEqualTo(SearchSelectablePrefix.FREE_TEXT_PREFIX+manualEntry);
-  }
-
-  @Test
-  public void canShowInTaskList_true() {
-    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(true);
-    assertThat(collaborationOpportunitiesService.canShowInTaskList(detail)).isTrue();
-  }
-
-  @Test
-  public void canShowInTaskList_false() {
-    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(false);
-    assertThat(collaborationOpportunitiesService.canShowInTaskList(detail)).isFalse();
-  }
-
-  @Test
-  public void removeSectionData_verifyInteractions() {
-    final var collaborationOpportunity1 = CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
-    final var collaborationOpportunity2 = CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
-    final var collaborationOpportunities = List.of(collaborationOpportunity1, collaborationOpportunity2);
-
-    when(collaborationOpportunitiesRepository.findAllByProjectDetailOrderByIdAsc(detail)).thenReturn(collaborationOpportunities);
-
-    collaborationOpportunitiesService.removeSectionData(detail);
-
-    verify(collaborationOpportunityFileLinkService, times(1)).removeCollaborationOpportunityFileLinks(
-        collaborationOpportunities
+    assertThat(results).extracting(RestSearchItem::getId).containsExactly(
+        String.format("%s%s", SearchSelectablePrefix.FREE_TEXT_PREFIX, manualEntry)
     );
-    verify(collaborationOpportunitiesRepository, times(1)).deleteAll(collaborationOpportunities);
   }
 
   @Test
-  public void copySectionData_verifyDuplicationServiceInteraction() {
+  public void getPreSelectedCollaborationFunction_whenFunctionIsNull_themEmptyMap() {
+    final var form = CollaborationOpportunityTestUtilCommon.populateCompleteForm(new TestCollaborationOpportunityForm());
+    form.setFunction(null);
 
-    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
-    final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
-    final var collaborationOpportunities = List.of(
-        CollaborationOpportunityTestUtil.getCollaborationOpportunity(fromProjectDetail)
+    final var preSelectedValues = collaborationOpportunitiesService.getPreSelectedCollaborationFunction(form, Function.values());
+    assertThat(preSelectedValues).isEmpty();
+  }
+
+  @Test
+  public void getPreSelectedCollaborationFunction_whenFunctionFromList_themReturnMapWithEntryFromList() {
+
+    final var selectedFunction = CollaborationOpportunityTestUtilCommon.FUNCTION;
+
+    final var form = CollaborationOpportunityTestUtilCommon.populateCompleteForm(new TestCollaborationOpportunityForm());
+    form.setFunction(selectedFunction.getSelectionId());
+
+    final var preSelectedValues = collaborationOpportunitiesService.getPreSelectedCollaborationFunction(form, Function.values());
+    assertThat(preSelectedValues).containsExactly(
+        entry(selectedFunction.getSelectionId(), selectedFunction.getSelectionText())
+    );
+  }
+
+  @Test
+  public void getPreSelectedCollaborationFunction_whenFunctionNotFromList_themReturnMapWithManualEntry() {
+
+    final var selectedFunction = CollaborationOpportunityTestUtilCommon.MANUAL_FUNCTION;
+
+    final var form = CollaborationOpportunityTestUtilCommon.populateCompleteForm(new TestCollaborationOpportunityForm());
+    form.setFunction(selectedFunction);
+
+    final var preSelectedValues = collaborationOpportunitiesService.getPreSelectedCollaborationFunction(form, Function.values());
+    assertThat(preSelectedValues).containsExactly(
+        entry(selectedFunction, SearchSelectorService.removePrefix(selectedFunction))
+    );
+  }
+
+  @Test
+  public void populateCollaborationOpportunityForm_whenFunctionFromList() {
+
+    final var selectedFunction = Function.DRILLING;
+
+    final var entity = CollaborationOpportunityTestUtilCommon.populateCollaborationOpportunity(new TestCollaborationOpportunityCommon());
+    entity.setFunction(selectedFunction);
+    entity.setManualFunction(null);
+
+    final var form = new TestCollaborationOpportunityForm();
+
+    collaborationOpportunitiesService.populateCollaborationOpportunityForm(
+        entity,
+        form,
+        List.of(),
+        ProjectDetailFilePurpose.COLLABORATION_OPPORTUNITY
     );
 
-    when(collaborationOpportunitiesRepository.findAllByProjectDetailOrderByIdAsc(fromProjectDetail))
-        .thenReturn(collaborationOpportunities);
+    assertThat(form.getFunction()).isEqualTo(selectedFunction.getSelectionId());
+    checkCommonFormFields(entity, form);
+  }
 
-    collaborationOpportunitiesService.copySectionData(fromProjectDetail, toProjectDetail);
+  @Test
+  public void populateCollaborationOpportunityForm_whenFunctionNotFromList() {
 
-    verify(entityDuplicationService, times(1)).duplicateEntitiesAndSetNewParent(
-        collaborationOpportunities,
-        toProjectDetail,
-        CollaborationOpportunity.class
+    final var rawFunction = "manual";
+    final var selectedFunction = String.format("%s%s", SearchSelectablePrefix.FREE_TEXT_PREFIX, rawFunction);
+
+    final var entity = CollaborationOpportunityTestUtilCommon.populateCollaborationOpportunity(new TestCollaborationOpportunityCommon());
+    entity.setFunction(null);
+    entity.setManualFunction(rawFunction);
+
+    final var form = new TestCollaborationOpportunityForm();
+
+    collaborationOpportunitiesService.populateCollaborationOpportunityForm(
+        entity,
+        form,
+        List.of(),
+        ProjectDetailFilePurpose.COLLABORATION_OPPORTUNITY
     );
 
-    verify(entityDuplicationService, times(1)).createDuplicatedEntityPairingMap(any());
+    assertThat(form.getFunction()).isEqualTo(selectedFunction);
+    checkCommonFormFields(entity, form);
+  }
 
-    verify(collaborationOpportunityFileLinkService, times(1)).copyCollaborationOpportunityFileLinkData(
-        eq(fromProjectDetail),
-        eq(toProjectDetail),
-        anyMap()
+  @Test
+  public void populateCollaborationOpportunityForm_whenUploadedFiles() {
+
+    final var entity = CollaborationOpportunityTestUtilCommon.populateCollaborationOpportunity(new TestCollaborationOpportunityCommon());
+
+    final var form = new TestCollaborationOpportunityForm();
+
+    final var uploadedFile = CollaborationOpportunityTestUtilCommon.populateCollaborationOpportunityFileLink(
+        new TestCollaborationOpportunityFileLinkCommon()
     );
 
+    final var uploadedFileView = new UploadedFileView(
+        uploadedFile.getProjectDetailFile().getFileId(),
+        "fileName",
+        1L,
+        uploadedFile.getProjectDetailFile().getDescription(),
+        Instant.now(),
+        "url"
+    );
+
+    when(projectDetailFileService.getUploadedFileView(
+        any(),
+        any(),
+        any(),
+        any()
+    )).thenReturn(uploadedFileView);
+
+    collaborationOpportunitiesService.populateCollaborationOpportunityForm(
+        entity,
+        form,
+        List.of(uploadedFile),
+        ProjectDetailFilePurpose.COLLABORATION_OPPORTUNITY
+    );
+
+    assertThat(form.getUploadedFileWithDescriptionForms()).containsExactly(
+        new UploadFileWithDescriptionForm(
+            uploadedFileView.getFileId(),
+            uploadedFileView.getFileDescription(),
+            uploadedFileView.getFileUploadedTime()
+        )
+    );
+
+    checkCommonFormFields(entity, form);
   }
 
-  @Test
-  public void getOpportunitiesForProjectVersion_whenFound_thenReturnPopulatedList() {
-
-    final var collaborationOpportunity = CollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
-    final var collaborationOpportunityList = List.of(collaborationOpportunity);
-
-    final var project = detail.getProject();
-    final var version = detail.getVersion();
-
-    when(collaborationOpportunitiesRepository.findAllByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
-        .thenReturn(collaborationOpportunityList);
-
-    var result = collaborationOpportunitiesService.getOpportunitiesForProjectVersion(project, version);
-    assertThat(result).containsExactly(collaborationOpportunityList.get(0));
+  private void checkCommonFormFields(
+      CollaborationOpportunityCommon entity,
+      CollaborationOpportunityFormCommon form
+  ) {
+    assertThat(form.getDescriptionOfWork()).isEqualTo(entity.getDescriptionOfWork());
+    assertThat(form.getUrgentResponseNeeded()).isEqualTo(entity.getUrgentResponseNeeded());
+    assertThat(form.getContactDetail().getName()).isEqualTo(entity.getContactName());
+    assertThat(form.getContactDetail().getPhoneNumber()).isEqualTo(entity.getPhoneNumber());
+    assertThat(form.getContactDetail().getJobTitle()).isEqualTo(entity.getJobTitle());
+    assertThat(form.getContactDetail().getEmailAddress()).isEqualTo(entity.getEmailAddress());
   }
 
-  @Test
-  public void getOpportunitiesForProjectVersion_whenNotFound_thenReturnEmptyList() {
-
-    final var project = detail.getProject();
-    final var version = detail.getVersion();
-
-    when(collaborationOpportunitiesRepository.findAllByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version))
-        .thenReturn(Collections.emptyList());
-
-    var result = collaborationOpportunitiesService.getOpportunitiesForProjectVersion(project, version);
-    assertThat(result).isEmpty();
-  }
-
-  @Test
-  public void getSupportedProjectTypes_verifyInfrastructure() {
-    assertThat(collaborationOpportunitiesService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
-  }
 }

@@ -63,7 +63,7 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
   @Transactional
   public PlatformFpso createPlatformFpso(ProjectDetail detail, PlatformFpsoForm form) {
     var platformFpso = new PlatformFpso(detail);
-    return platformFpsoRepository.save(setCommonFields(platformFpso, form));
+    return updatePlatformFpso(detail, platformFpso, form);
   }
 
   @Transactional
@@ -95,17 +95,18 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
     }
 
     if (PlatformFpsoInfrastructureType.FPSO.equals(infrastructureType)) {
-      platformFpso.setFpsoType(form.getFpsoType());
-      platformFpso.setFpsoDimensions(form.getFpsoDimensions());
+      populateFloatingUnitNestedEntityProperties(form, platformFpso);
     } else {
-      platformFpso.setFpsoType(null);
-      platformFpso.setFpsoDimensions(null);
+      clearFloatingUnitNestedEntityProperties(platformFpso);
     }
 
     platformFpso.setTopsideFpsoMass(form.getTopsideFpsoMass());
     platformFpso.setEarliestRemovalYear(form.getTopsideRemovalYears().getMinYear());
     platformFpso.setLatestRemovalYear(form.getTopsideRemovalYears().getMaxYear());
+    platformFpso.setFuturePlans(form.getFuturePlans());
+
     platformFpso.setSubstructuresExpectedToBeRemoved(form.getSubstructureExpectedToBeRemoved());
+
     if (BooleanUtils.isTrue(form.getSubstructureExpectedToBeRemoved())) {
       platformFpso.setSubstructureRemovalPremise(form.getSubstructureRemovalPremise());
       platformFpso.setSubstructureRemovalMass(form.getSubstructureRemovalMass());
@@ -117,9 +118,19 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
       platformFpso.setSubStructureRemovalEarliestYear(null);
       platformFpso.setSubStructureRemovalLatestYear(null);
     }
-    platformFpso.setFuturePlans(form.getFuturePlans());
 
     return platformFpso;
+  }
+
+  private void populateFloatingUnitNestedEntityProperties(PlatformFpsoForm sourceForm,
+                                                          PlatformFpso destinationEntity) {
+    destinationEntity.setFpsoType(sourceForm.getFpsoType());
+    destinationEntity.setFpsoDimensions(sourceForm.getFpsoDimensions());
+  }
+
+  private void clearFloatingUnitNestedEntityProperties(PlatformFpso platformFpso) {
+    platformFpso.setFpsoType(null);
+    platformFpso.setFpsoDimensions(null);
   }
 
   @Transactional

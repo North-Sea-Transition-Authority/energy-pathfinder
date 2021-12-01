@@ -143,7 +143,7 @@ public class TeamServiceTest {
     teamService.getTeamMembers(regulatorTeam);
 
     verify(portalTeamAccessor, times(1)).getPortalTeamMembers(regulatorTeam.getId());
-    verify(teamDtoFactory, times(1)).createTeamMemberList(eq(regulatorTeamMembers), eq(regulatorTeam));
+    verify(teamDtoFactory, times(1)).createTeamMemberList(regulatorTeamMembers, regulatorTeam);
   }
 
   @Test
@@ -153,9 +153,9 @@ public class TeamServiceTest {
 
   @Test
   public void getMembershipOfPersonInTeam_populatedOptionalWhenTeamMember() {
-    when(portalTeamAccessor.getPersonTeamMembership(eq(regulatorPerson), eq(regulatorTeam.getId())))
+    when(portalTeamAccessor.getPersonTeamMembership(regulatorPerson, regulatorTeam.getId()))
         .thenReturn(Optional.of(regulatorTeamMemberDto));
-    when(teamDtoFactory.createTeamMember(eq(regulatorTeamMemberDto), eq(regulatorPerson), eq(regulatorTeam)))
+    when(teamDtoFactory.createTeamMember(regulatorTeamMemberDto, regulatorPerson, regulatorTeam))
         .thenReturn(mock(TeamMember.class));
 
     assertThat(teamService.getMembershipOfPersonInTeam(regulatorTeam, regulatorPerson)).isNotEmpty();
@@ -169,9 +169,9 @@ public class TeamServiceTest {
   @Test
   public void getRegulatorTeamIfPersonInRole_whenNotInProvidedRoles() {
     when(portalTeamAccessor.getTeamsWherePersonMemberOfTeamTypeAndHasRoleMatching(
-        eq(regulatorPerson),
-        eq(TeamType.REGULATOR.getPortalTeamType()),
-        eq(List.of(RegulatorRole.ORGANISATION_MANAGER.getPortalTeamRoleName()))))
+        regulatorPerson,
+        TeamType.REGULATOR.getPortalTeamType(),
+        List.of(RegulatorRole.ORGANISATION_MANAGER.getPortalTeamRoleName())))
         .thenReturn(List.of());
 
     assertThat(teamService.getRegulatorTeamIfPersonInRole(regulatorPerson, List.of(RegulatorRole.ORGANISATION_MANAGER)))
@@ -290,7 +290,7 @@ public class TeamServiceTest {
   public void getAllRolesForTeam_whenMultipleRolesReturned() {
     var mockRole = mock(Role.class);
     when(teamDtoFactory.createRole(any())).thenReturn(mockRole);
-    when(portalTeamAccessor.getAllPortalRolesForTeam(eq(regulatorTeam.getId())))
+    when(portalTeamAccessor.getAllPortalRolesForTeam(regulatorTeam.getId()))
         .thenReturn(List.of(TeamTestingUtil.getTeamAdminRoleDto(regulatorTeam), TeamTestingUtil.getTeamAdminRoleDto(regulatorTeam)));
 
     assertThat(teamService.getAllRolesForTeam(regulatorTeam)).containsExactly(mockRole, mockRole);
