@@ -16,11 +16,11 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
+import uk.co.ogauthority.pathfinder.feedback.FeedbackModelService;
+import uk.co.ogauthority.pathfinder.feedback.FeedbackService;
 import uk.co.ogauthority.pathfinder.model.form.feedback.FeedbackForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
-import uk.co.ogauthority.pathfinder.service.feedback.FeedbackModelService;
-import uk.co.ogauthority.pathfinder.service.feedback.FeedbackService;
 import uk.co.ogauthority.pathfinder.util.flash.FlashUtils;
 
 @Controller
@@ -41,9 +41,9 @@ public class FeedbackController {
   }
 
   @GetMapping
-  public ModelAndView getFeedback(@RequestParam(required = false) Integer projectDetailId,
+  public ModelAndView getFeedback(@RequestParam(required = false) Optional<Integer> projectDetailId,
                                   AuthenticatedUserAccount user) {
-    var form = Optional.ofNullable(projectDetailId)
+    var form = projectDetailId
         .map(FeedbackForm::new)
         .orElse(new FeedbackForm());
     return feedbackModelService.getFeedbackModelAndView(form);

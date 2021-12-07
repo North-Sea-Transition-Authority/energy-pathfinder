@@ -105,14 +105,6 @@ public class SystemAccessServiceTest {
     );
   }
 
-  @Test
-  public void getFeedbackGrantedAuthorities_verifyAuthorities() {
-    assertGrantedAuthorities(
-        SystemAccessService.FEEDBACK_PRIVILEGES,
-        systemAccessService::getFeedbackGrantedAuthorities
-    );
-  }
-
   private void assertGrantedAuthorities(Set<UserPrivilege> expectedUserPrivileges, Callable<String[]> testFunction) {
 
     final var privileges = expectedUserPrivileges

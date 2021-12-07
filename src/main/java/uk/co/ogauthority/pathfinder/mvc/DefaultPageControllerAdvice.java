@@ -59,7 +59,7 @@ public class DefaultPageControllerAdvice {
 
   private void addCommonUrls(Model model) {
     model.addAttribute("foxLogoutUrl", foxUrlService.getFoxLogoutUrl());
-    model.addAttribute("feedbackUrl", ControllerUtils.getContactUrl(true));
+    model.addAttribute("feedbackUrl", ControllerUtils.getFeedbackUrl());
     model.addAttribute("serviceHomeUrl", ControllerUtils.getWorkAreaUrl());
     footerService.addFooterUrlsToModel(model);
   }

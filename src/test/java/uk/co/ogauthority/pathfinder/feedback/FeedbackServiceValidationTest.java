@@ -1,8 +1,9 @@
-package uk.co.ogauthority.pathfinder.service.feedback;
+package uk.co.ogauthority.pathfinder.feedback;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
+import java.time.Clock;
 import java.util.Set;
 import javax.validation.Validation;
 import org.junit.Before;
@@ -12,7 +13,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
-import uk.co.ogauthority.pathfinder.repository.feedback.FeedbackRepository;
+import uk.co.fivium.feedbackmanagementservice.client.FeedbackClientService;
+import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
+import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 
@@ -20,7 +23,19 @@ import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 public class FeedbackServiceValidationTest {
 
   @Mock
-  private FeedbackRepository feedbackRepository;
+  private ProjectDetailsRepository projectDetailsRepository;
+
+  @Mock
+  private ProjectInformationService projectInformationService;
+
+  @Mock
+  private FeedbackClientService feedbackClientService;
+
+  @Mock
+  private FeedbackEmailService feedbackEmailService;
+
+  @Mock
+  Clock clock;
 
   private FeedbackService feedbackService;
 
@@ -29,16 +44,14 @@ public class FeedbackServiceValidationTest {
     var validator = new SpringValidatorAdapter(Validation.buildDefaultValidatorFactory().getValidator());
     var validationService = new ValidationService(validator);
 
-    feedbackService = new FeedbackService(
-        validationService,
-        feedbackRepository
-    );
+    feedbackService = new FeedbackService(validationService, feedbackClientService, projectDetailsRepository,
+        projectInformationService, feedbackEmailService, clock, "PATHFINDER");
   }
 
   @Test
   public void validateFeedbackForm_whenNoServiceRating_thenValidationErrorExpected() {
 
-    var form = FeedbackTestUtil.getValidFeedbackForm();
+    var form = FeedbackTestUtil.getValidFeedbackFormWithProjectDetailId();
     form.setServiceRating(null);
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
@@ -61,7 +74,7 @@ public class FeedbackServiceValidationTest {
   @Test
   public void validateFeedbackForm_whenNoFeedback_thenNoValidationErrorExpected() {
 
-    var form = FeedbackTestUtil.getValidFeedbackForm();
+    var form = FeedbackTestUtil.getValidFeedbackFormWithProjectDetailId();
     form.setFeedback(null);
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
@@ -78,7 +91,7 @@ public class FeedbackServiceValidationTest {
         FeedbackModelService.FEEDBACK_CHARACTER_LIMIT + 1
     );
 
-    var form = FeedbackTestUtil.getValidFeedbackForm();
+    var form = FeedbackTestUtil.getValidFeedbackFormWithProjectDetailId();
     form.setFeedback(feedbackOverLimit);
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
@@ -94,7 +107,7 @@ public class FeedbackServiceValidationTest {
 
   @Test
   public void validateFeedbackForm_whenValidFeedbackForm_thenNoValidationErrorExpected() {
-    var form = FeedbackTestUtil.getValidFeedbackForm();
+    var form = FeedbackTestUtil.getValidFeedbackFormWithProjectDetailId();
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 

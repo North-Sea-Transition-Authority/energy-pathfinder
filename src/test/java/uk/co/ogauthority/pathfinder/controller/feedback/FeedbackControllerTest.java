@@ -8,15 +8,18 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
+import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
@@ -26,8 +29,8 @@ import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.form.feedback.FeedbackForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.feedback.FeedbackModelService;
-import uk.co.ogauthority.pathfinder.service.feedback.FeedbackService;
+import uk.co.ogauthority.pathfinder.feedback.FeedbackModelService;
+import uk.co.ogauthority.pathfinder.feedback.FeedbackService;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 
@@ -41,18 +44,15 @@ public class FeedbackControllerTest extends AbstractControllerTest {
   @MockBean
   FeedbackService feedbackService;
 
-  private static final AuthenticatedUserAccount AUTHENTICATED_USER = UserTestingUtil.getAuthenticatedUserAccount(
-      SystemAccessService.FEEDBACK_PRIVILEGES
-  );
-
-  private static final AuthenticatedUserAccount UNAUTHENTICATED_USER = UserTestingUtil.getAuthenticatedUserAccount();
+  private static final AuthenticatedUserAccount AUTHENTICATED_USER = UserTestingUtil.getAuthenticatedUserAccount();
 
   private static final String DUMMY_MODEL_NAME = "model-name";
+  private static final String EXPECTED_LOGIN_URL = "login-url";
 
   @Test
   public void getFeedback_whenAuthenticatedAndProjectDetailId_thenOk() throws Exception {
     mockMvc.perform(
-        get(ReverseRouter.route(on(FeedbackController.class).getFeedback(10, null)))
+        get(ReverseRouter.route(on(FeedbackController.class).getFeedback(Optional.of(10), null)))
         .with(authenticatedUserAndSession(AUTHENTICATED_USER))
     )
         .andExpect(status().isOk());
@@ -61,37 +61,21 @@ public class FeedbackControllerTest extends AbstractControllerTest {
   @Test
   public void getFeedback_whenAuthenticatedAndNoProjectDetailId_thenOk() throws Exception {
     mockMvc.perform(
-            get(ReverseRouter.route(on(FeedbackController.class).getFeedback(null, null)))
+            get(ReverseRouter.route(on(FeedbackController.class).getFeedback(Optional.empty(), null)))
                 .with(authenticatedUserAndSession(AUTHENTICATED_USER))
         )
         .andExpect(status().isOk());
   }
 
   @Test
-  public void getFeedback_whenUnauthenticatedAndProjectDetailId_thenForbidden() throws Exception {
-    mockMvc.perform(
-            get(ReverseRouter.route(on(FeedbackController.class).getFeedback(10, null)))
-                .with(authenticatedUserAndSession(UNAUTHENTICATED_USER))
-        )
-        .andExpect(status().isForbidden());
-  }
+  public void getFeedback_whenUnauthenticated_thenRedirectionToLoginPage() throws Exception {
+    when(foxUrlService.getFoxLoginUrl()).thenReturn(EXPECTED_LOGIN_URL);
 
-  @Test
-  public void getFeedback_whenUnauthenticatedAndNoProjectDetailId_thenForbidden() throws Exception {
     mockMvc.perform(
-        get(ReverseRouter.route(on(FeedbackController.class).getFeedback(null, null)))
-        .with(authenticatedUserAndSession(UNAUTHENTICATED_USER))
-    )
-        .andExpect(status().isForbidden());
-  }
-
-  @Test
-  public void getFeedback_whenUnauthenticated_thenForbidden() throws Exception {
-    mockMvc.perform(
-            get(ReverseRouter.route(on(FeedbackController.class).getFeedback(null, null)))
-                .with(authenticatedUserAndSession(UNAUTHENTICATED_USER))
+            get(ReverseRouter.route(on(FeedbackController.class).getFeedback(Optional.empty(), null)))
         )
-        .andExpect(status().isForbidden());
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl(EXPECTED_LOGIN_URL));
   }
 
   @Test
@@ -105,7 +89,7 @@ public class FeedbackControllerTest extends AbstractControllerTest {
     when(feedbackModelService.getFeedbackModelAndView(any())).thenReturn(new ModelAndView(DUMMY_MODEL_NAME));
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(FeedbackController.class).getFeedback(null, null)))
+        post(ReverseRouter.route(on(FeedbackController.class).getFeedback(Optional.empty(), null)))
             .with(authenticatedUserAndSession(AUTHENTICATED_USER))
             .with(csrf())
         )
@@ -127,7 +111,7 @@ public class FeedbackControllerTest extends AbstractControllerTest {
     when(feedbackModelService.getFeedbackModelAndView(any())).thenReturn(new ModelAndView(DUMMY_MODEL_NAME));
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(FeedbackController.class).getFeedback(null, null)))
+        post(ReverseRouter.route(on(FeedbackController.class).getFeedback(Optional.empty(), null)))
             .with(authenticatedUserAndSession(AUTHENTICATED_USER))
             .with(csrf())
         )
@@ -147,12 +131,14 @@ public class FeedbackControllerTest extends AbstractControllerTest {
 
     when(feedbackModelService.getFeedbackModelAndView(any())).thenReturn(new ModelAndView(DUMMY_MODEL_NAME));
 
+    when(foxUrlService.getFoxLoginUrl()).thenReturn(EXPECTED_LOGIN_URL);
+
     mockMvc.perform(
-            post(ReverseRouter.route(on(FeedbackController.class).getFeedback(null, null)))
-                .with(authenticatedUserAndSession(UNAUTHENTICATED_USER))
+            post(ReverseRouter.route(on(FeedbackController.class).getFeedback(Optional.empty(), null)))
                 .with(csrf())
         )
-        .andExpect(status().isForbidden());
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl(EXPECTED_LOGIN_URL));
 
     verify(feedbackService, never()).saveFeedback(any(), any());
   }
