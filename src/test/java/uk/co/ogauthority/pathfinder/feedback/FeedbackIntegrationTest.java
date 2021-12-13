@@ -39,6 +39,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.fivium.feedbackmanagementservice.client.FeedbackClientService;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
@@ -51,29 +52,36 @@ import uk.co.ogauthority.pathfinder.model.enums.feedback.ServiceFeedbackRating;
 import uk.co.ogauthority.pathfinder.mvc.error.DefaultExceptionResolver;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.service.contact.SupportContactService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
+@TestPropertySource(properties = {
+    "pathfinder.url.base = http://test/",
+    "context-path = pathfinder"
+})
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = FeedbackController.class,
     includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
         classes = {FeedbackService.class, FeedbackModelService.class, ValidationService.class,
-            FeedbackEmailService.class, DefaultExceptionResolver.class, SupportContactService.class}))
+            FeedbackEmailService.class, LinkService.class, DefaultExceptionResolver.class,
+            SupportContactService.class}))
             //DefaultExceptionResolver and SupportContactService have to be included so
             //Spring knows how to handle CannotSendFeedbackException in some tests
 @Import({FeedbackIntegrationTest.FeedbackTestConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class FeedbackIntegrationTest extends AbstractControllerTest {
 
-  private final static String TEST_RATING = ServiceFeedbackRating.NEITHER.name();
+  private final static String RATING = ServiceFeedbackRating.NEITHER.name();
   private final static String COMMENT = "testImprovement";
-  private final static Instant TEST_DATETIME = Instant.parse("2020-04-29T10:15:30Z");
-  private final static Integer TEST_PROJECT_ID = 1;
-  private final static String TEST_TITLE = "TestTitle";
-  private final static Integer TEST_PROJECT_DETAIL_ID = 2;
+  private final static Instant DATETIME = Instant.parse("2020-04-29T10:15:30Z");
+  private final static Integer PROJECT_ID = 1;
+  private final static String TITLE = "TestTitle";
+  private final static String PROJECT_LINK = String.format("http://test/pathfinder/project/%s/manage/", PROJECT_ID);
+  private final static Integer PROJECT_DETAIL_ID = 2;
   private final static String SUPPORT_EMAIl = ServiceContactDetail.TECHNICAL_SUPPORT.getEmailAddress();
 
   @Autowired
@@ -99,9 +107,9 @@ public class FeedbackIntegrationTest extends AbstractControllerTest {
     person = user.getLinkedPerson();
 
     var projectDetail = ProjectUtil.getProjectDetails();
-    when(projectDetailsRepository.findById(TEST_PROJECT_DETAIL_ID)).thenReturn(Optional.of(projectDetail));
+    when(projectDetailsRepository.findById(PROJECT_DETAIL_ID)).thenReturn(Optional.of(projectDetail));
 
-    when(projectInformationService.getProjectTitle(projectDetail)).thenReturn(TEST_TITLE);
+    when(projectInformationService.getProjectTitle(projectDetail)).thenReturn(TITLE);
 
     responseWhenAuthorized = new MockResponse()
         .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
@@ -126,7 +134,7 @@ public class FeedbackIntegrationTest extends AbstractControllerTest {
     mockMvc.perform(post("/feedback")
             .with(authenticatedUserAndSession(user))
             .with(csrf())
-            .param("serviceRating", TEST_RATING)
+            .param("serviceRating", RATING)
             .param("feedback", COMMENT))
         .andExpect(redirectedUrlTemplate("/work-area"));
 
@@ -146,7 +154,7 @@ public class FeedbackIntegrationTest extends AbstractControllerTest {
     mockMvc.perform(post("/feedback")
             .with(authenticatedUserAndSession(user))
             .with(csrf())
-            .param("serviceRating", TEST_RATING)
+            .param("serviceRating", RATING)
             .param("feedback", COMMENT))
         .andExpect(redirectedUrlTemplate("/work-area"));
 
@@ -160,9 +168,9 @@ public class FeedbackIntegrationTest extends AbstractControllerTest {
     mockMvc.perform(post("/feedback")
             .with(authenticatedUserAndSession(user))
             .with(csrf())
-            .param("serviceRating", TEST_RATING)
+            .param("serviceRating", RATING)
             .param("feedback", COMMENT)
-            .param("projectDetailId", TEST_PROJECT_DETAIL_ID.toString()))
+            .param("projectDetailId", PROJECT_DETAIL_ID.toString()))
         .andExpect(redirectedUrlTemplate("/work-area"));
 
     var observedRequest = mockWebServer.takeRequest();
@@ -174,12 +182,13 @@ public class FeedbackIntegrationTest extends AbstractControllerTest {
     var postedJson = objectMapper.readTree(observedRequest.getBody().readUtf8());
     assertThat(postedJson.get("submitterName").asText()).isEqualTo(person.getFullName());
     assertThat(postedJson.get("submitterEmail").asText()).isEqualTo(person.getEmailAddress());
-    assertThat(postedJson.get("serviceRating").asText()).isEqualTo(TEST_RATING);
+    assertThat(postedJson.get("serviceRating").asText()).isEqualTo(RATING);
     assertThat(postedJson.get("comment").asText()).isEqualTo(COMMENT);
-    assertThat(Instant.parse(postedJson.get("givenDatetime").asText())).isEqualTo(TEST_DATETIME);
+    assertThat(Instant.parse(postedJson.get("givenDatetime").asText())).isEqualTo(DATETIME);
     assertThat(postedJson.get("serviceName").asText()).isEqualTo("PATHFINDER");
-    assertThat(postedJson.get("transactionId").asText()).isEqualTo(TEST_PROJECT_ID.toString());
-    assertThat(postedJson.get("transactionReference").asText()).isEqualTo(TEST_TITLE);
+    assertThat(postedJson.get("transactionId").asText()).isEqualTo(PROJECT_ID.toString());
+    assertThat(postedJson.get("transactionReference").asText()).isEqualTo(TITLE);
+    assertThat(postedJson.get("transactionLink").asText()).isEqualTo(PROJECT_LINK);
   }
 
   @Test
@@ -189,7 +198,7 @@ public class FeedbackIntegrationTest extends AbstractControllerTest {
     mockMvc.perform(post("/feedback")
             .with(authenticatedUserAndSession(user))
             .with(csrf())
-            .param("serviceRating", TEST_RATING)
+            .param("serviceRating", RATING)
             .param("feedback", COMMENT))
         .andExpect(redirectedUrlTemplate("/work-area"));
 
@@ -202,12 +211,13 @@ public class FeedbackIntegrationTest extends AbstractControllerTest {
     var postedJson = objectMapper.readTree(observedRequest.getBody().readUtf8());
     assertThat(postedJson.get("submitterName").asText()).isEqualTo(person.getFullName());
     assertThat(postedJson.get("submitterEmail").asText()).isEqualTo(person.getEmailAddress());
-    assertThat(postedJson.get("serviceRating").asText()).isEqualTo(TEST_RATING);
+    assertThat(postedJson.get("serviceRating").asText()).isEqualTo(RATING);
     assertThat(postedJson.get("comment").asText()).isEqualTo(COMMENT);
-    assertThat(Instant.parse(postedJson.get("givenDatetime").asText())).isEqualTo(TEST_DATETIME);
+    assertThat(Instant.parse(postedJson.get("givenDatetime").asText())).isEqualTo(DATETIME);
     assertThat(postedJson.get("serviceName").asText()).isEqualTo("PATHFINDER");
     assertThat(postedJson.get("transactionId").isNull()).isTrue();
     assertThat(postedJson.get("transactionReference").isNull()).isTrue();
+    assertThat(postedJson.get("transactionLink").isNull()).isTrue();
   }
 
   @Test
@@ -231,7 +241,7 @@ public class FeedbackIntegrationTest extends AbstractControllerTest {
     mockMvc.perform(post("/feedback")
             .with(authenticatedUserAndSession(user))
             .with(csrf())
-            .param("serviceRating", TEST_RATING)
+            .param("serviceRating", RATING)
             .param("feedback", COMMENT))
         .andExpect(redirectedUrlTemplate("/work-area"));
 
@@ -248,7 +258,7 @@ public class FeedbackIntegrationTest extends AbstractControllerTest {
     mockMvc.perform(post("/feedback")
             .with(authenticatedUserAndSession(user))
             .with(csrf())
-            .param("serviceRating", TEST_RATING)
+            .param("serviceRating", RATING)
             .param("feedback", COMMENT))
         .andExpect(redirectedUrlTemplate("/work-area"));
 
@@ -273,7 +283,7 @@ public class FeedbackIntegrationTest extends AbstractControllerTest {
 
     @Bean
     public Clock utcClock() {
-      return Clock.fixed(TEST_DATETIME, ZoneId.of("UTC"));
+      return Clock.fixed(DATETIME, ZoneId.of("UTC"));
     }
   }
 }

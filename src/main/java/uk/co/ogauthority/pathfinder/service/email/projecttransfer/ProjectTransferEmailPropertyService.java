@@ -5,21 +5,21 @@ import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.IncomingOperatorProjectTransferEmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.OutgoingOperatorProjectTransferEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 
 @Service
 public class ProjectTransferEmailPropertyService {
 
   private final List<ProjectTransferEmailPropertyProvider> projectTransferEmailPropertyProviders;
 
-  private final EmailLinkService emailLinkService;
+  private final LinkService linkService;
 
   public ProjectTransferEmailPropertyService(
       List<ProjectTransferEmailPropertyProvider> projectTransferEmailPropertyProviders,
-      EmailLinkService emailLinkService
+      LinkService linkService
   ) {
     this.projectTransferEmailPropertyProviders = projectTransferEmailPropertyProviders;
-    this.emailLinkService = emailLinkService;
+    this.linkService = linkService;
   }
 
   public IncomingOperatorProjectTransferEmailProperties getIncomingOperatorProjectTransferEmailProperties(
@@ -43,7 +43,7 @@ public class ProjectTransferEmailPropertyService {
       );
     } else {
 
-      final var projectUrl = emailLinkService.generateProjectManagementUrl(projectDetail.getProject());
+      final var projectUrl = linkService.generateProjectManagementUrl(projectDetail.getProject());
 
       return new IncomingOperatorProjectTransferEmailProperties(
           transferReason,

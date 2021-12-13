@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project.quarterly.QuarterlyUpdateReminderEmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project.quarterly.initialreminder.InitialQuarterlyUpdateReminderEmailProperties;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.quarterlyupdate.QuarterlyUpdateReminder;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.quarterlyupdate.QuarterlyUpdateReminderService;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.quarterlyupdate.RemindableProject;
@@ -19,13 +19,13 @@ class QuarterlyUpdateInitialReminderService implements QuarterlyUpdateReminder {
 
   private final QuarterlyUpdateReminderService quarterlyUpdateReminderService;
 
-  private final EmailLinkService emailLinkService;
+  private final LinkService linkService;
 
   @Autowired
   QuarterlyUpdateInitialReminderService(QuarterlyUpdateReminderService quarterlyUpdateReminderService,
-                                        EmailLinkService emailLinkService) {
+                                        LinkService linkService) {
     this.quarterlyUpdateReminderService = quarterlyUpdateReminderService;
-    this.emailLinkService = emailLinkService;
+    this.linkService = linkService;
   }
 
   void sendInitialQuarterlyReminder() {
@@ -49,7 +49,7 @@ class QuarterlyUpdateInitialReminderService implements QuarterlyUpdateReminder {
         recipientIdentifier,
         operatorName,
         remindableProjects,
-        emailLinkService.getWorkAreaUrl()
+        linkService.getWorkAreaUrl()
     );
   }
 }

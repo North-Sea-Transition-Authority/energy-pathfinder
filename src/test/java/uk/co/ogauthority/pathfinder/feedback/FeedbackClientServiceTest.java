@@ -31,6 +31,7 @@ public class FeedbackClientServiceTest {
   private final static String COMMENT = "testImprovement";
   private final static Integer NOTIFICATION_ID = 2;
   private final static String CASE_REFERENCE = "IRS/1234";
+  private final static String CASE_LINK = "testLink.com";
 
   private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
@@ -46,7 +47,7 @@ public class FeedbackClientServiceTest {
 
     feedbackClientService = new FeedbackClientService(objectMapper, baseUrl, 20L, "/api/v1/save-feedback", "IRS", "dev");
     feedback = new TestFeedback(1,SUBMITTER_NAME, SUBMITTER_EMAIL, SERVICE_RATING,
-        COMMENT, Instant.now(), NOTIFICATION_ID, CASE_REFERENCE);
+        COMMENT, Instant.now(), NOTIFICATION_ID, CASE_REFERENCE, CASE_LINK);
   }
 
   @After
@@ -79,6 +80,7 @@ public class FeedbackClientServiceTest {
     assertThat(Instant.ofEpochSecond(postedJson.get("givenDatetime").asLong())).isCloseTo(feedback.getGivenDatetime(), within(1, ChronoUnit.SECONDS));
     assertThat(postedJson.get("transactionId").asText()).isEqualTo(feedback.getTransactionId().toString());
     assertThat(postedJson.get("transactionReference").asText()).isEqualTo(feedback.getTransactionReference());
+    assertThat(postedJson.get("transactionLink").asText()).isEqualTo(feedback.getTransactionLink());
   }
 
   @Test(expected = CannotSendFeedbackException.class)

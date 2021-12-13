@@ -15,6 +15,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import uk.co.fivium.feedbackmanagementservice.client.FeedbackClientService;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
@@ -35,6 +36,9 @@ public class FeedbackServiceValidationTest {
   private FeedbackEmailService feedbackEmailService;
 
   @Mock
+  private LinkService linkService;
+
+  @Mock
   Clock clock;
 
   private FeedbackService feedbackService;
@@ -45,7 +49,7 @@ public class FeedbackServiceValidationTest {
     var validationService = new ValidationService(validator);
 
     feedbackService = new FeedbackService(validationService, feedbackClientService, projectDetailsRepository,
-        projectInformationService, feedbackEmailService, clock, "PATHFINDER");
+        projectInformationService, feedbackEmailService, linkService, clock, "PATHFINDER");
   }
 
   @Test

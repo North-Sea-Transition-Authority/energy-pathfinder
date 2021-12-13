@@ -9,7 +9,7 @@ import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.infrastructure.InfrastructureOutgoingOperatorTransferEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.email.projecttransfer.ProjectTransferEmailPropertyProvider;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 
@@ -20,15 +20,15 @@ class InfrastructureProjectTransferEmailPropertyService implements ProjectTransf
 
   private final ProjectInformationService projectInformationService;
 
-  private final EmailLinkService emailLinkService;
+  private final LinkService linkService;
 
   @Autowired
   InfrastructureProjectTransferEmailPropertyService(ServiceProperties serviceProperties,
                                                     ProjectInformationService projectInformationService,
-                                                    EmailLinkService emailLinkService) {
+                                                    LinkService linkService) {
     this.serviceProperties = serviceProperties;
     this.projectInformationService = projectInformationService;
-    this.emailLinkService = emailLinkService;
+    this.linkService = linkService;
   }
 
   @Override
@@ -43,7 +43,7 @@ class InfrastructureProjectTransferEmailPropertyService implements ProjectTransf
       String previousOperatorName
   ) {
 
-    final var projectUrl = emailLinkService.generateProjectManagementUrl(projectDetail.getProject());
+    final var projectUrl = linkService.generateProjectManagementUrl(projectDetail.getProject());
 
     return new InfrastructureIncomingOperatorTransferEmailProperties(
         transferReason,

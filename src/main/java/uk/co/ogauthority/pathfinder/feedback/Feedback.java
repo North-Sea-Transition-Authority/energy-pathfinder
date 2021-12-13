@@ -12,6 +12,7 @@ class Feedback implements FeedbackManagementServiceFeedback {
   private Instant givenDatetime;
   private Integer transactionId;
   private String transactionReference;
+  private String transactionLink;
 
   public String getSubmitterName() {
     return submitterName;
@@ -67,5 +68,13 @@ class Feedback implements FeedbackManagementServiceFeedback {
 
   public void setTransactionReference(String transactionReference) {
     this.transactionReference = transactionReference;
+  }
+
+  public String getTransactionLink() {
+    return transactionLink;
+  }
+
+  public void setTransactionLink(String transactionLink) {
+    this.transactionLink = transactionLink;
   }
 }

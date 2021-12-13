@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.email;
+package uk.co.ogauthority.pathfinder.service;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -10,7 +10,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 
 @Service
-public class EmailLinkService {
+public class LinkService {
 
   @Value("${pathfinder.url.base}")
   private String pathfinderUrlBase;

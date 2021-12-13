@@ -22,10 +22,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.fivium.feedbackmanagementservice.client.CannotSendFeedbackException;
 import uk.co.fivium.feedbackmanagementservice.client.FeedbackClientService;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.contact.ServiceContactDetail;
 import uk.co.ogauthority.pathfinder.model.form.feedback.FeedbackForm;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -39,6 +41,7 @@ public class FeedbackServiceTest {
   private static final Integer PROJECT_DETAIL_ID = 2;
   private static final Integer PROJECT_ID = 1;
   private static final String TITLE = "testTitle";
+  private static final String PROJECT_LINK = "testLink.com";
   private static final String SUPPORT_EMAIL = ServiceContactDetail.TECHNICAL_SUPPORT.getEmailAddress();
   private static final String RECIPIENT_NAME = ServiceContactDetail.TECHNICAL_SUPPORT.getServiceName();
 
@@ -57,6 +60,9 @@ public class FeedbackServiceTest {
   @Mock
   private FeedbackEmailService feedbackEmailService;
 
+  @Mock
+  private LinkService linkService;
+
   private Person person;
   private FeedbackService feedbackService;
 
@@ -71,6 +77,7 @@ public class FeedbackServiceTest {
         projectDetailsRepository,
         projectInformationService,
         feedbackEmailService,
+        linkService,
         fixedClock,
         SERVICE_NAME);
 
@@ -79,11 +86,12 @@ public class FeedbackServiceTest {
     ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
     when(projectDetailsRepository.findById(PROJECT_DETAIL_ID)).thenReturn(Optional.of(projectDetail));
     when(projectInformationService.getProjectTitle(projectDetail)).thenReturn(TITLE);
+    when(linkService.generateProjectManagementUrl(any(Project.class))).thenReturn("testLink.com");
 
   }
 
   @Test
-  public void saveFeedback_whenNoProjectDetailId_thenTransactionIdAndTransactionReferenceNull() throws CannotSendFeedbackException {
+  public void saveFeedback_whenNoProjectDetailId_thenTransactionDetailsNull() throws CannotSendFeedbackException {
     var form = FeedbackTestUtil.getValidFeedbackFormWithProjectDetailId();
     form.setProjectDetailId(null);
 
@@ -98,10 +106,11 @@ public class FeedbackServiceTest {
     assertExpectedEntityProperties(form, savedFeedback, person);
     assertThat(savedFeedback.getTransactionId()).isNull();
     assertThat(savedFeedback.getTransactionReference()).isNull();
+    assertThat(savedFeedback.getTransactionLink()).isNull();
   }
 
   @Test
-  public void saveFeedback_whenProjectDetailId_thenTransactionIdAndTransactionReferenceNotNull() throws CannotSendFeedbackException {
+  public void saveFeedback_whenProjectDetailId_thenTransactionDetailsNotNull() throws CannotSendFeedbackException {
     var form = FeedbackTestUtil.getValidFeedbackFormWithProjectDetailId();
     form.setProjectDetailId(PROJECT_DETAIL_ID);
 
@@ -117,6 +126,7 @@ public class FeedbackServiceTest {
     //TransactionId is the project id we get from ProjectUtil not the projectDetailId
     assertThat(savedFeedback.getTransactionId()).isEqualTo(1);
     assertThat(savedFeedback.getTransactionReference()).isEqualTo(TITLE);
+    assertThat(savedFeedback.getTransactionLink()).isEqualTo(PROJECT_LINK);
   }
 
   @Test(expected = EntityNotFoundException.class)
@@ -150,7 +160,8 @@ public class FeedbackServiceTest {
             "\nDate and time: " + formatter.format(DATETIME)+
             "\nService name: " + SERVICE_NAME +
             "\nTransaction ID: " + PROJECT_ID +
-            "\nTransaction reference: " + TITLE
+            "\nTransaction reference: " + TITLE +
+            "\nTransaction link: " + PROJECT_LINK
     );
   }
 

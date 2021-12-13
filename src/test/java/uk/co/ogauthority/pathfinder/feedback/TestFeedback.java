@@ -13,10 +13,11 @@ public class TestFeedback implements FeedbackManagementServiceFeedback {
   private final Instant givenDatetime;
   private final Integer transactionId;
   private final String transactionReference;
+  private final String transactionLink;
 
   public TestFeedback(Integer id, String submitterName, String submitterEmail, String serviceRating,
                       String serviceImprovement, Instant givenDatetime, Integer transactionId,
-                      String transactionReference) {
+                      String transactionReference, String transactionLink) {
     this.id = id;
     this.submitterName = submitterName;
     this.submitterEmail = submitterEmail;
@@ -25,6 +26,7 @@ public class TestFeedback implements FeedbackManagementServiceFeedback {
     this.givenDatetime = givenDatetime;
     this.transactionId = transactionId;
     this.transactionReference = transactionReference;
+    this.transactionLink = transactionLink;
   }
 
   public Integer getId() {
@@ -64,5 +66,10 @@ public class TestFeedback implements FeedbackManagementServiceFeedback {
   @Override
   public String getTransactionReference() {
     return transactionReference;
+  }
+
+  @Override
+  public String getTransactionLink() {
+    return transactionLink;
   }
 }

@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.contact.ServiceContactDetail;
 import uk.co.ogauthority.pathfinder.model.form.feedback.FeedbackForm;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
@@ -32,6 +33,7 @@ public class FeedbackService {
   private final ProjectDetailsRepository projectDetailsRepository;
   private final ProjectInformationService projectInformationService;
   private final FeedbackEmailService feedbackEmailService;
+  private final LinkService linkService;
   private final String serviceName;
   private final Clock utcClock;
 
@@ -43,6 +45,7 @@ public class FeedbackService {
                          ProjectDetailsRepository projectDetailsRepository,
                          ProjectInformationService projectInformationService,
                          FeedbackEmailService feedbackEmailService,
+                         LinkService linkService,
                          @Qualifier("utcClock") Clock utcClock,
                          @Value("${fms.service.name}") String serviceName) {
     this.validationService = validationService;
@@ -50,6 +53,7 @@ public class FeedbackService {
     this.projectDetailsRepository = projectDetailsRepository;
     this.projectInformationService = projectInformationService;
     this.feedbackEmailService = feedbackEmailService;
+    this.linkService = linkService;
     this.serviceName = serviceName;
     this.utcClock = utcClock;
   }
@@ -73,8 +77,11 @@ public class FeedbackService {
       var projectDetail = projectDetailsRepository.findById(projectDetailId)
           .orElseThrow(() -> new EntityNotFoundException("Unable to find project detail with id:" + projectDetailId));
 
-      feedback.setTransactionId(projectDetail.getProject().getId());
+      var project = projectDetail.getProject();
+
+      feedback.setTransactionId(project.getId());
       feedback.setTransactionReference(projectInformationService.getProjectTitle(projectDetail));
+      feedback.setTransactionLink(linkService.generateProjectManagementUrl(project));
     }
 
     try {
@@ -101,7 +108,8 @@ public class FeedbackService {
 
     if (feedback.getTransactionId() != null) {
       feedbackContent += "\nTransaction ID: " + feedback.getTransactionId() +
-          "\nTransaction reference: " + feedback.getTransactionReference();
+          "\nTransaction reference: " + feedback.getTransactionReference() +
+          "\nTransaction link: " + feedback.getTransactionLink();
     }
     return feedbackContent;
   }

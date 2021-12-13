@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.subscription.SubscribedToNewsletterEmailProperties;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.email.notify.CommonEmailMergeField;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -25,13 +26,13 @@ public class SubscriberEmailServiceTest {
   private EmailService emailService;
 
   @Mock
-  private EmailLinkService emailLinkService;
+  private LinkService linkService;
 
   private SubscriberEmailService subscriberEmailService;
 
   @Before
   public void setup() {
-    subscriberEmailService = new SubscriberEmailService(emailService, emailLinkService);
+    subscriberEmailService = new SubscriberEmailService(emailService, linkService);
   }
 
   @Test
@@ -41,7 +42,7 @@ public class SubscriberEmailServiceTest {
     var subscriberUuid = UUID.randomUUID();
     var unsubscribeUrl = "testUrl";
 
-    when(emailLinkService.getUnsubscribeUrl(subscriberUuid.toString())).thenReturn(unsubscribeUrl);
+    when(linkService.getUnsubscribeUrl(subscriberUuid.toString())).thenReturn(unsubscribeUrl);
 
     subscriberEmailService.sendSubscribedEmail(forename, emailAddress, subscriberUuid);
 

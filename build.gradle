@@ -53,7 +53,7 @@ dependencies {
   compile 'com.oracle:ojdbc7:12.1.0.2'
   compile 'org.springframework.session:spring-session-jdbc'
   compile('uk.gov.service.notify:notifications-java-client:3.17.0-RELEASE')
-  compile('uk.co.fivium.feedbackmanagementservice:client:2.0.2-SNAPSHOT')
+  compile('uk.co.fivium.feedbackmanagementservice:client:2.1.0-SNAPSHOT')
 
   compile 'com.google.guava:guava:28.1-jre'
   compile 'org.apache.commons:commons-lang3:3.9'

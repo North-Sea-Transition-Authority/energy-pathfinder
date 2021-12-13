@@ -13,7 +13,7 @@ import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.IncomingOperatorProjectTransferEmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.infrastructure.InfrastructureOutgoingOperatorTransferEmailProperties;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -27,7 +27,7 @@ public class InfrastructureProjectTransferEmailPropertyServiceTest {
   private ProjectInformationService projectInformationService;
 
   @Mock
-  private EmailLinkService emailLinkService;
+  private LinkService linkService;
 
   private InfrastructureProjectTransferEmailPropertyService infrastructureProjectTransferEmailPropertyService;
 
@@ -36,7 +36,7 @@ public class InfrastructureProjectTransferEmailPropertyServiceTest {
     infrastructureProjectTransferEmailPropertyService = new InfrastructureProjectTransferEmailPropertyService(
         serviceProperties,
         projectInformationService,
-        emailLinkService
+        linkService
     );
   }
 
@@ -56,7 +56,7 @@ public class InfrastructureProjectTransferEmailPropertyServiceTest {
     final var projectTitle = "project title";
     final var customerMnemonic = "customer mnemonic";
 
-    when(emailLinkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(projectUrl);
+    when(linkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(projectUrl);
     when(projectInformationService.getProjectTitle(projectDetail)).thenReturn(projectTitle);
     when(serviceProperties.getCustomerMnemonic()).thenReturn(customerMnemonic);
 

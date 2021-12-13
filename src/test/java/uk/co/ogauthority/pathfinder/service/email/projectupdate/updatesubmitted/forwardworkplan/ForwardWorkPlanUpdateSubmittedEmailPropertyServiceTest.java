@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.submitted.ProjectUpdateEmailProperties;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.email.notify.CommonEmailMergeField;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
@@ -28,7 +28,7 @@ public class ForwardWorkPlanUpdateSubmittedEmailPropertyServiceTest {
   private ProjectOperatorService projectOperatorService;
 
   @Mock
-  private EmailLinkService emailLinkService;
+  private LinkService linkService;
 
   private ForwardWorkPlanUpdateSubmittedEmailPropertyService forwardWorkPlanUpdateSubmittedEmailPropertyService;
 
@@ -36,10 +36,10 @@ public class ForwardWorkPlanUpdateSubmittedEmailPropertyServiceTest {
   public void setup() {
     forwardWorkPlanUpdateSubmittedEmailPropertyService = new ForwardWorkPlanUpdateSubmittedEmailPropertyService(
         projectOperatorService,
-        emailLinkService
+        linkService
     );
 
-    when(emailLinkService.generateProjectManagementUrl(any())).thenReturn(SERVICE_LOGIN_URL);
+    when(linkService.generateProjectManagementUrl(any())).thenReturn(SERVICE_LOGIN_URL);
   }
 
   @Test

@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.project.quarterly.finalreminder.FinalQuarterlyUpdateReminderEmailProperties;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.email.notify.CommonEmailMergeField;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.quarterlyupdate.QuarterlyUpdateReminderService;
 import uk.co.ogauthority.pathfinder.service.scheduler.reminders.quarterlyupdate.RemindableProject;
@@ -28,7 +28,7 @@ public class QuarterlyUpdateFinalReminderServiceTest {
   private QuarterlyUpdateReminderService quarterlyUpdateReminderService;
 
   @Mock
-  private EmailLinkService emailLinkService;
+  private LinkService linkService;
 
   private QuarterlyUpdateFinalReminderService quarterlyUpdateFinalReminderService;
 
@@ -36,7 +36,7 @@ public class QuarterlyUpdateFinalReminderServiceTest {
   public void setup() {
     quarterlyUpdateFinalReminderService = new QuarterlyUpdateFinalReminderService(
         quarterlyUpdateReminderService,
-        emailLinkService
+        linkService
     );
   }
 
@@ -92,7 +92,7 @@ public class QuarterlyUpdateFinalReminderServiceTest {
     var serviceUrl = "/service-url";
     var projectNameList = List.of("project A", "project B");
 
-    when(emailLinkService.getWorkAreaUrl()).thenReturn(serviceUrl);
+    when(linkService.getWorkAreaUrl()).thenReturn(serviceUrl);
 
     var expectedEmailProperties = new FinalQuarterlyUpdateReminderEmailProperties(
         recipientIdentifier,

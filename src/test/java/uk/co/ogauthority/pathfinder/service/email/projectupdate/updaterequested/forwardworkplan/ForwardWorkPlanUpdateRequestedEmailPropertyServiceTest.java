@@ -13,14 +13,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.requested.forwardworkplan.ForwardWorkPlanUpdateRequestedEmailProperties;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ForwardWorkPlanUpdateRequestedEmailPropertyServiceTest {
 
   @Mock
-  private EmailLinkService emailLinkService;
+  private LinkService linkService;
 
   @Mock
   private ServiceProperties serviceProperties;
@@ -30,7 +30,7 @@ public class ForwardWorkPlanUpdateRequestedEmailPropertyServiceTest {
   @Before
   public void setup() {
     forwardWorkPlanUpdateRequestedEmailPropertyService = new ForwardWorkPlanUpdateRequestedEmailPropertyService(
-        emailLinkService,
+        linkService,
         serviceProperties
     );
   }
@@ -52,7 +52,7 @@ public class ForwardWorkPlanUpdateRequestedEmailPropertyServiceTest {
     final var projectDetail = ProjectUtil.getProjectDetails();
 
     final var projectUrl = "whenDeadlineDateIsEmptyString project url";
-    when(emailLinkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(projectUrl);
+    when(linkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(projectUrl);
 
     final var updateReason = "whenDeadlineDateIsEmptyString update reason";
 
@@ -84,7 +84,7 @@ public class ForwardWorkPlanUpdateRequestedEmailPropertyServiceTest {
     final var projectDetail = ProjectUtil.getProjectDetails();
 
     final var projectUrl = "whenDeadlineDateNotEmpty project url";
-    when(emailLinkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(projectUrl);
+    when(linkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(projectUrl);
 
     final var updateReason = "whenDeadlineDateNotEmpty update reason";
 
