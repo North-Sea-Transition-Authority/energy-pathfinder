@@ -40,9 +40,14 @@ public class PortalOrganisationGroupPersonMembershipService {
         .stream()
         .collect(Collectors.groupingBy(PortalTeamPersonMembershipDto::getResourceId));
 
+    var organisationTeamsWithMembers = organisationTeams
+        .stream()
+        .filter(organisationTeam -> peopleInOrganisationTeams.get(organisationTeam.getResId()) != null)
+        .collect(Collectors.toList());
+
     var organisationGroupMembershipList = new ArrayList<OrganisationGroupMembership>();
 
-    organisationTeams.forEach(organisationTeam -> {
+    organisationTeamsWithMembers.forEach(organisationTeam -> {
 
       var organisationGroupIdFromTeamScope = extractOrganisationGroupIdFromScope(organisationTeam.getScope().getPrimaryScope());
 

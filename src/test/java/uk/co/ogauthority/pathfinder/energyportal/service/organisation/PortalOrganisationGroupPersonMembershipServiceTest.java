@@ -148,4 +148,62 @@ public class PortalOrganisationGroupPersonMembershipServiceTest {
         new OrganisationGroupMembership(organisationBTeamDto.getResId(), organisationGroupB, List.of(personInOrganisationTeamB))
     );
   }
+
+  @Test
+  public void getOrganisationGroupMembershipForOrganisationGroupIn_whenNoPeopleInOrganisationGroupTeam_thenOnlyOrganisationWithTeamMembersReturned() {
+
+    // GIVEN an organisation group with a team member
+    var organisationGroupWithMember = TeamTestingUtil.generateOrganisationGroup(
+        1,
+        "operator group with member name",
+        "operator group with member name"
+    );
+
+    var organisationTeamWithMemberDto = TeamTestingUtil.portalTeamDtoFrom(TeamTestingUtil.getOrganisationTeam(10, organisationGroupWithMember));
+
+    var personInOrganisationTeam = UserTestingUtil.getPerson(1, "person forename", "person surname", "someone@example.com", "123");
+
+    var portalTeamPersonMemberships = List.of(
+        new PortalTeamPersonMembershipDto(organisationTeamWithMemberDto.getResId(), personInOrganisationTeam)
+    );
+
+    // AND an organisation group with no team members
+    var noMemberOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(
+        2,
+        "operator group with no member name",
+        "operator group with no member name"
+    );
+
+    var noMemberOrganisationTeamDto = TeamTestingUtil.portalTeamDtoFrom(TeamTestingUtil.getOrganisationTeam(20, noMemberOrganisationGroup));
+
+    var organisationGroupList = List.of(
+        organisationGroupWithMember,
+        noMemberOrganisationGroup
+    );
+
+    var organisationGroupTeamResourceIds = List.of(
+        organisationTeamWithMemberDto.getResId(),
+        noMemberOrganisationTeamDto.getResId()
+    );
+
+    when(portalTeamAccessor.findPortalTeamByOrganisationGroupsIn(organisationGroupList)).thenReturn(
+        List.of(organisationTeamWithMemberDto, noMemberOrganisationTeamDto)
+    );
+
+    when(portalTeamAccessor.getPortalTeamPersonMembershipByResourceIdIn(organisationGroupTeamResourceIds)).thenReturn(portalTeamPersonMemberships);
+
+    // WHEN we get the organisation group membership
+    var resultingOrganisationGroupMembership = portalOrganisationGroupPersonMembershipService.getOrganisationGroupMembershipForOrganisationGroupIn(
+        organisationGroupList
+    );
+
+    // THEN only the organisation with a team member is returned
+    assertThat(resultingOrganisationGroupMembership).containsExactlyInAnyOrder(
+        new OrganisationGroupMembership(
+            organisationTeamWithMemberDto.getResId(),
+            organisationGroupWithMember,
+            List.of(personInOrganisationTeam)
+        )
+    );
+  }
 }
