@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
+import java.time.LocalDate;
 import uk.co.ogauthority.pathfinder.model.entity.project.decommissionedpipeline.DecommissionedPipeline;
 import uk.co.ogauthority.pathfinder.model.enums.project.InfrastructureStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedpipeline.PipelineRemovalPremise;
@@ -13,7 +14,7 @@ public class DecommissionedPipelineTestUtil {
   private static final String MATERIAL_TYPE = "materialType";
   private static final InfrastructureStatus INFRASTRUCTURE_STATUS = InfrastructureStatus.READY_TO_DECOMMISSION;
   private static final Integer EARLIEST_DECOM_START = 2020;
-  private static final Integer LATEST_DECOM_COMPLETION = 2021;
+  private static final Integer LATEST_DECOM_COMPLETION = LocalDate.now().getYear();
   private static final PipelineRemovalPremise REMOVAL_PREMISE = PipelineRemovalPremise.PARTIAL_REMOVAL_AND_BURY;
 
   private DecommissionedPipelineTestUtil() {

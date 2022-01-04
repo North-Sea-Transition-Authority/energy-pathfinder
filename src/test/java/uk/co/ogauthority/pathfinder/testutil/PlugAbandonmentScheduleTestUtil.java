@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedule.PlugAbandonmentSchedule;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
@@ -10,7 +11,7 @@ import uk.co.ogauthority.pathfinder.model.view.plugabandonmentschedule.PlugAband
 public class PlugAbandonmentScheduleTestUtil {
 
   private static final Integer EARLIEST_PLUG_ABANDONMENT_START_YEAR = 2020;
-  private static final Integer LATEST_PLUG_ABANDONMENT_COMPLETION_YEAR = 2021;
+  private static final Integer LATEST_PLUG_ABANDONMENT_COMPLETION_YEAR = LocalDate.now().getYear();
 
   private PlugAbandonmentScheduleTestUtil() {
     throw new IllegalStateException("PlugAbandonmentScheduleTestUtil is a utility class and should not be instantiated");

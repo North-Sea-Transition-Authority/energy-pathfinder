@@ -122,7 +122,7 @@ public class DateUtilTest {
 
   @Test
   public void isInCurrentQuarter_lastDayOfQuarter_atEndOfDay() {
-    final var timeInCurrentQuarter = LocalDateTime.of(2021, 6, 30, 23, 59, 59, 999999999).atZone(ZoneId.systemDefault()).toInstant();
+    final var timeInCurrentQuarter = LocalDateTime.of(LocalDate.now().getYear(), 6, 30, 23, 59, 59, 999999999).atZone(ZoneId.systemDefault()).toInstant();
     assertThat(Quarter.Q2.getEndDateAsInstant()).isEqualTo(timeInCurrentQuarter);
   }
 
