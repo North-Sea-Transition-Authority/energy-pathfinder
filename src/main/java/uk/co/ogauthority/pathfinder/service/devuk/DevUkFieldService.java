@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.devuk;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
@@ -27,8 +28,8 @@ public class DevUkFieldService {
    * @param fieldName a whole or partial field name
    * @return list of matching DevUkField entities
    */
-  private List<DevUkField> findByFieldName(String fieldName) {
-    return devUkFieldRepository.findAllByFieldNameContainingIgnoreCase(fieldName);
+  private List<DevUkField> findSelectableFieldsByName(String fieldName) {
+    return devUkFieldRepository.findAllByFieldNameContainingIgnoreCaseAndIsLandwardFalseAndIsActiveTrue(fieldName);
   }
 
   /**
@@ -40,13 +41,17 @@ public class DevUkFieldService {
   public List<RestSearchItem> searchFieldsWithNameContaining(String searchTerm) {
     return searchSelectorService.search(
         searchTerm,
-        findByFieldName(searchTerm)
+        findSelectableFieldsByName(searchTerm)
     );
   }
 
-  public DevUkField findById(int id) {
-    return devUkFieldRepository.findById(id)
+  public DevUkField findByIdOrError(int id) {
+    return findById(id)
         .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format("Couldn't find DEVUK field with ID: %d", id)));
+  }
+
+  public Optional<DevUkField> findById(int id) {
+    return devUkFieldRepository.findById(id);
   }
 
 }

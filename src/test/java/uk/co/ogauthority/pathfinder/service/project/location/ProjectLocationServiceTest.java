@@ -88,7 +88,7 @@ public class ProjectLocationServiceTest {
   @Test
   public void createOrUpdate_newLocation() {
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
-    when(fieldService.findById(ProjectLocationTestUtil.FIELD_ID)).thenReturn(ProjectLocationTestUtil.FIELD);
+    when(fieldService.findByIdOrError(ProjectLocationTestUtil.FIELD_ID)).thenReturn(ProjectLocationTestUtil.FIELD);
     projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationTestUtil.getCompletedForm());
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
     assertThat(projectLocation.getField()).isEqualTo(ProjectLocationTestUtil.FIELD);
@@ -187,7 +187,7 @@ public class ProjectLocationServiceTest {
   @Test
   public void getPreSelectedLocation_withField() {
     when(searchSelectorService.buildPrePopulatedSelections(any(), any())).thenCallRealMethod();
-    when(fieldService.findById(ProjectLocationTestUtil.FIELD_ID)).thenReturn(ProjectLocationTestUtil.FIELD);
+    when(fieldService.findByIdOrError(ProjectLocationTestUtil.FIELD_ID)).thenReturn(ProjectLocationTestUtil.FIELD);
     var form = ProjectLocationTestUtil.getCompletedForm();
     var preSelectedLocation = projectLocationService.getPreSelectedField(form);
     assertThat(preSelectedLocation).containsOnly(

@@ -25,6 +25,10 @@ public class DevUkField implements SearchSelectable {
   @Enumerated(EnumType.STRING)
   private UkcsArea ukcsArea;
 
+  private Boolean isLandward;
+
+  private Boolean isActive;
+
   public DevUkField() {
   }
 
@@ -75,6 +79,22 @@ public class DevUkField implements SearchSelectable {
 
   public void setUkcsArea(UkcsArea ukcsArea) {
     this.ukcsArea = ukcsArea;
+  }
+
+  public Boolean isLandward() {
+    return isLandward;
+  }
+
+  public void setLandward(Boolean landward) {
+    isLandward = landward;
+  }
+
+  public Boolean isActive() {
+    return isActive;
+  }
+
+  public void setActive(Boolean active) {
+    isActive = active;
   }
 
   @Override
