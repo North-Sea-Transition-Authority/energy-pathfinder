@@ -36,7 +36,7 @@ public class DevUkFieldServiceTest {
   public void searchFieldsWithNameContaining() {
     var searchTerm = "field";
     var field = DevUkTestUtil.getDevUkField();
-    when(devUkFieldRepository.findAllByFieldNameContainingIgnoreCase(searchTerm)).thenReturn(
+    when(devUkFieldRepository.findAllByFieldNameContainingIgnoreCaseAndIsLandwardFalseAndIsActiveTrue(searchTerm)).thenReturn(
         Collections.singletonList(field)
     );
     var results = devUkFieldService.searchFieldsWithNameContaining(searchTerm);
@@ -47,7 +47,7 @@ public class DevUkFieldServiceTest {
   @Test
   public void searchFieldsWithNameContaining_whenNoResults() {
     var searchTerm = "fac";
-    when(devUkFieldRepository.findAllByFieldNameContainingIgnoreCase(searchTerm)).thenReturn(Collections.emptyList());
+    when(devUkFieldRepository.findAllByFieldNameContainingIgnoreCaseAndIsLandwardFalseAndIsActiveTrue(searchTerm)).thenReturn(Collections.emptyList());
     var results = devUkFieldService.searchFieldsWithNameContaining(searchTerm);
     assertThat(results).isEmpty();
   }
@@ -58,7 +58,7 @@ public class DevUkFieldServiceTest {
     final var fieldId = fieldToFind.getFieldId();
     when(devUkFieldRepository.findById(fieldId)).thenReturn(Optional.of(fieldToFind));
 
-    final var resultingField = devUkFieldService.findById(fieldId);
+    final var resultingField = devUkFieldService.findByIdOrError(fieldId);
     assertThat(resultingField).isEqualTo(fieldToFind);
   }
 
@@ -66,6 +66,6 @@ public class DevUkFieldServiceTest {
   public void findById_whenNotFound_thenException() {
     final var fieldId = 1;
     when(devUkFieldRepository.findById(fieldId)).thenReturn(Optional.empty());
-    devUkFieldService.findById(fieldId);
+    devUkFieldService.findByIdOrError(fieldId);
   }
 }

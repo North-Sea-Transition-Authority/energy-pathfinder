@@ -70,7 +70,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
     var projectLocation = getProjectLocationByProjectDetail(detail).orElse(new ProjectLocation(detail));
 
     if (form.getField() != null) {
-      projectLocation.setField(fieldService.findById(Integer.parseInt(form.getField())));
+      projectLocation.setField(fieldService.findByIdOrError(Integer.parseInt(form.getField())));
     } else { //The form has no data so clear the existing values
       projectLocation.setField(null);
     }
@@ -170,6 +170,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
    */
   public Map<String, String> getPreSelectedField(ProjectLocationForm form) {
     if (form.getField() != null) {
+      var field = fieldService.findByIdOrError(Integer.parseInt(form.getField()));
       return SearchSelectorService.isManualEntry(form.getField())
         ? searchSelectorService.buildPrePopulatedSelections(
             Collections.singletonList(form.getField()),
@@ -177,7 +178,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
           )
         : searchSelectorService.buildPrePopulatedSelections(
             Collections.singletonList(form.getField()),
-            Map.of(form.getField(), fieldService.findById(Integer.parseInt(form.getField())).getFieldName())
+            Map.of(form.getField(), field.getFieldName())
           );
 
     }

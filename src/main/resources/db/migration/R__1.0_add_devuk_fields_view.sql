@@ -5,5 +5,14 @@ SELECT
 , andf.operator_ou_id
 , andf.status
 , andf.ukcs_area
-FROM devukmgr.api_non_deleted_fields andf
-WHERE (andf.ukcs_area != 'LAND' OR andf.ukcs_area IS NULL);
+, CASE
+    WHEN andf.ukcs_area = 'LAND'
+      THEN 1
+    ELSE 0
+  END is_landward
+, CASE
+    WHEN andf.status = 9999
+      THEN 0
+    ELSE 1
+  END is_active
+FROM devukmgr.api_all_fields andf;

@@ -10,7 +10,8 @@ public enum UkcsArea {
   NNS("Northern North Sea (NNS)"),
   CNS("Central North Sea (CNS)"),
   SNS("Southern North Sea (SNS)"),
-  IS("East Irish Sea (EIS)");
+  IS("East Irish Sea (EIS)"),
+  LAND("Landward");
 
   private final String displayName;
 

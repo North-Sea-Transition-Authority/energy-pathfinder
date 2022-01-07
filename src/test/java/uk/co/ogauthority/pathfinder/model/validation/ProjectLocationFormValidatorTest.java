@@ -3,10 +3,12 @@ package uk.co.ogauthority.pathfinder.model.validation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,11 +17,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.ValidationUtils;
+import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkField;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationValidationHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
+import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.project.location.LicenceBlockValidatorService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
@@ -35,13 +39,20 @@ public class ProjectLocationFormValidatorTest {
   @Mock
   private LicenceBlockValidatorService licenceBlockValidatorService;
 
+  @Mock
+  private DevUkFieldService devUkFieldService;
+
   private ProjectLocationFormValidator validator;
 
   @Before
   public void setUp() {
-    validator = new ProjectLocationFormValidator(dateInputValidator, licenceBlockValidatorService);
+    validator = new ProjectLocationFormValidator(dateInputValidator, licenceBlockValidatorService, devUkFieldService);
     doCallRealMethod().when(dateInputValidator).validate(any(), any(), any());
     when(dateInputValidator.supports(any())).thenReturn(true);
+    var testField = new DevUkField();
+    testField.setLandward(false);
+    testField.setActive(true);
+    when(devUkFieldService.findById(anyInt())).thenReturn(Optional.of(testField));
   }
 
   @Test
@@ -311,5 +322,91 @@ public class ProjectLocationFormValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
 
     assertThat(fieldErrors).isEmpty();
+  }
+
+  @Test
+  public void validate_fieldSelectedIsNotFound_thenFail() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+
+    when(devUkFieldService.findById(Integer.parseInt(form.getField()))).thenReturn(Optional.empty());
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).contains(
+        entry("field", Set.of(ProjectLocationFormValidator.INVALID_FIELD_ERROR_CODE))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("field", Set.of(
+            ProjectLocationFormValidator.INVALID_FIELD_ERROR_MSG
+        ))
+    );
+  }
+
+  @Test
+  public void validate_fieldSelectedIsNotActive_thenFail() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+
+    var testField = new DevUkField();
+    testField.setActive(false);
+    testField.setLandward(false);
+
+    when(devUkFieldService.findById(Integer.parseInt(form.getField()))).thenReturn(Optional.of(testField));
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).contains(
+        entry("field", Set.of(ProjectLocationFormValidator.INVALID_FIELD_ERROR_CODE))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("field", Set.of(
+            ProjectLocationFormValidator.INVALID_FIELD_ERROR_MSG
+        ))
+    );
+  }
+
+  @Test
+  public void validate_fieldSelectedIsLandward_thenFail() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+
+    var testField = new DevUkField();
+    testField.setActive(true);
+    testField.setLandward(true);
+
+    when(devUkFieldService.findById(Integer.parseInt(form.getField()))).thenReturn(Optional.of(testField));
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).contains(
+        entry("field", Set.of(ProjectLocationFormValidator.INVALID_FIELD_ERROR_CODE))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("field", Set.of(
+            ProjectLocationFormValidator.INVALID_FIELD_ERROR_MSG
+        ))
+    );
   }
 }
