@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.accessibility.AccessibilityStatementController;
@@ -61,6 +62,10 @@ public class ControllerUtils {
   }
 
   public static String getFeedbackUrl(Integer projectDetailId) {
-    return ReverseRouter.route(on(FeedbackController.class).getFeedback(projectDetailId, null));
+    return ReverseRouter.route(on(FeedbackController.class).getFeedback(Optional.of(projectDetailId), null));
+  }
+
+  public static String getFeedbackUrl() {
+    return ReverseRouter.route(on(FeedbackController.class).getFeedback(Optional.empty(), null));
   }
 }

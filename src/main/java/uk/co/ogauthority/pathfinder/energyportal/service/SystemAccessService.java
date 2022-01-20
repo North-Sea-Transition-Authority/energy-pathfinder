@@ -1,11 +1,9 @@
 package uk.co.ogauthority.pathfinder.energyportal.service;
 
-import com.google.common.collect.Sets;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
-import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 
 @Service
 public class SystemAccessService {
@@ -28,10 +26,6 @@ public class SystemAccessService {
 
   public static final Set<UserPrivilege> COMMUNICATION_PRIVILEGES = Set.of(
       UserPrivilege.PATHFINDER_COMMUNICATIONS
-  );
-
-  public static final Set<UserPrivilege> FEEDBACK_PRIVILEGES = Sets.newHashSet(
-      ProjectPermission.SUBMIT.getUserPrivileges()
   );
 
   /**
@@ -78,10 +72,6 @@ public class SystemAccessService {
 
   public String[] getCommunicationsGrantedAuthorities() {
     return getGrantedAuthorities(COMMUNICATION_PRIVILEGES);
-  }
-
-  public String[] getFeedbackGrantedAuthorities() {
-    return getGrantedAuthorities(FEEDBACK_PRIVILEGES);
   }
 
   private String[] getGrantedAuthorities(Set<UserPrivilege> userPrivileges) {

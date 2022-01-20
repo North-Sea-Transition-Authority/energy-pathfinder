@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.noupdatenotification.NoUpdateNotificationEmailProperties;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.email.notify.CommonEmailMergeField;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
@@ -29,7 +29,7 @@ public class InfrastructureNoUpdateNotificationEmailPropertyServiceTest {
   private ProjectOperatorService projectOperatorService;
 
   @Mock
-  private EmailLinkService emailLinkService;
+  private LinkService linkService;
 
   @Mock
   private ProjectInformationService projectInformationService;
@@ -40,11 +40,11 @@ public class InfrastructureNoUpdateNotificationEmailPropertyServiceTest {
   public void setup() {
     infrastructureNoUpdateNotificationEmailPropertyService = new InfrastructureNoUpdateNotificationEmailPropertyService(
         projectOperatorService,
-        emailLinkService,
+        linkService,
         projectInformationService
     );
 
-    when(emailLinkService.generateProjectManagementUrl(any())).thenReturn(SERVICE_LOGIN_URL);
+    when(linkService.generateProjectManagementUrl(any())).thenReturn(SERVICE_LOGIN_URL);
   }
 
   @Test

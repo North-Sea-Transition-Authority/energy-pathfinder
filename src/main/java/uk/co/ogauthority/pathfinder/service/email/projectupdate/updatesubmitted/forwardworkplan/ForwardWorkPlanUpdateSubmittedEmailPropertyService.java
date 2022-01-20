@@ -6,7 +6,7 @@ import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.s
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.submitted.forwardworkplan.ForwardWorkPlanUpdateEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.email.projectupdate.updatesubmitted.UpdateSubmittedEmailPropertyProvider;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 
@@ -15,13 +15,13 @@ class ForwardWorkPlanUpdateSubmittedEmailPropertyService implements UpdateSubmit
 
   private final ProjectOperatorService projectOperatorService;
 
-  private final EmailLinkService emailLinkService;
+  private final LinkService linkService;
 
   @Autowired
   ForwardWorkPlanUpdateSubmittedEmailPropertyService(ProjectOperatorService projectOperatorService,
-                                                     EmailLinkService emailLinkService) {
+                                                     LinkService linkService) {
     this.projectOperatorService = projectOperatorService;
-    this.emailLinkService = emailLinkService;
+    this.linkService = linkService;
   }
 
   @Override
@@ -36,7 +36,7 @@ class ForwardWorkPlanUpdateSubmittedEmailPropertyService implements UpdateSubmit
         .getOrganisationGroup()
         .getName();
 
-    final var loginUrl = emailLinkService.generateProjectManagementUrl(projectDetail.getProject());
+    final var loginUrl = linkService.generateProjectManagementUrl(projectDetail.getProject());
 
     return new ForwardWorkPlanUpdateEmailProperties(
         loginUrl,

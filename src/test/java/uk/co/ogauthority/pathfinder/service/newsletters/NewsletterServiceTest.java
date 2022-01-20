@@ -22,7 +22,7 @@ import uk.co.ogauthority.pathfinder.model.entity.newsletters.MonthlyNewsletter;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
 import uk.co.ogauthority.pathfinder.model.enums.NewsletterSendingResult;
 import uk.co.ogauthority.pathfinder.repository.newsletters.MonthlyNewsletterRepository;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
 import uk.co.ogauthority.pathfinder.service.email.notify.DefaultEmailPersonalisationService;
 import uk.co.ogauthority.pathfinder.service.subscription.SubscriberAccessor;
@@ -35,7 +35,7 @@ public class NewsletterServiceTest {
   private SubscriberAccessor subscriberAccessor;
 
   @Mock
-  private EmailLinkService emailLinkService;
+  private LinkService linkService;
 
   @Mock
   private EmailService emailService;
@@ -60,14 +60,14 @@ public class NewsletterServiceTest {
   public void setUp() throws Exception {
     newsletterService = new NewsletterService(
         subscriberAccessor,
-        emailLinkService,
+        linkService,
         emailService,
         monthlyNewsletterRepository,
         newsletterProjectService,
         defaultEmailPersonalisationService
     );
 
-    when(emailLinkService.getUnsubscribeUrl(any())).thenCallRealMethod();
+    when(linkService.getUnsubscribeUrl(any())).thenCallRealMethod();
   }
 
   @Test
@@ -75,7 +75,7 @@ public class NewsletterServiceTest {
     when(subscriberAccessor.getAllSubscribers()).thenReturn(Collections.singletonList(SUBSCRIBER));
     newsletterService.sendNewsletterToSubscribers();
 
-    verify(emailLinkService, times(1)).getUnsubscribeUrl(SUBSCRIBER.getUuid().toString());
+    verify(linkService, times(1)).getUnsubscribeUrl(SUBSCRIBER.getUuid().toString());
     verify(emailService, times(1)).sendEmail(any(), eq(SUBSCRIBER.getEmailAddress()));
     verify(monthlyNewsletterRepository, times(1)).save(monthlyNewsletterArgumentCaptor.capture());
     verify(newsletterProjectService, times(1)).getProjectsUpdatedInTheLastMonth();
@@ -91,7 +91,7 @@ public class NewsletterServiceTest {
     when(subscriberAccessor.getAllSubscribers()).thenThrow(new RuntimeException());
     newsletterService.sendNewsletterToSubscribers();
 
-    verify(emailLinkService, times(0)).getUnsubscribeUrl(SUBSCRIBER.getUuid().toString());
+    verify(linkService, times(0)).getUnsubscribeUrl(SUBSCRIBER.getUuid().toString());
     verify(emailService, times(0)).sendEmail(any(), any());
     verify(monthlyNewsletterRepository, times(1)).save(monthlyNewsletterArgumentCaptor.capture());
     verify(newsletterProjectService, times(1)).getProjectsUpdatedInTheLastMonth();
@@ -118,7 +118,7 @@ public class NewsletterServiceTest {
 
     final var expectedEmailProperties = new NoProjectsUpdatedNewsletterEmailProperties(
         SUBSCRIBER.getForename(),
-        emailLinkService.getUnsubscribeUrl(SUBSCRIBER.getUuid().toString()),
+        linkService.getUnsubscribeUrl(SUBSCRIBER.getUuid().toString()),
         serviceName,
         customerMnemonic
     );
@@ -144,7 +144,7 @@ public class NewsletterServiceTest {
 
     final var expectedEmailProperties = new ProjectsUpdatedNewsletterEmailProperties(
         SUBSCRIBER.getForename(),
-        emailLinkService.getUnsubscribeUrl(SUBSCRIBER.getUuid().toString()),
+        linkService.getUnsubscribeUrl(SUBSCRIBER.getUuid().toString()),
         projectsUpdate,
         serviceName,
         customerMnemonic

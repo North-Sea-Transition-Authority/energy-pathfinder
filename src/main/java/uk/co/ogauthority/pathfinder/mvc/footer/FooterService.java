@@ -10,8 +10,9 @@ import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 @Service
 public class FooterService {
 
-  protected static final String CONTACT_URL_ATTR_NAME = "contactUrl";
-  protected static final String ACCESSIBILITY_STATEMENT_URL_ATTR_NAME = "accessibilityStatementUrl";
+  static final String CONTACT_URL_ATTR_NAME = "contactUrl";
+  static final String ACCESSIBILITY_STATEMENT_URL_ATTR_NAME = "accessibilityStatementUrl";
+  static final String FEEDBACK_URL_ATTR_NAME = "feedbackUrl";
 
   public void addFooterUrlsToModelAndView(ModelAndView modelAndView) {
     getFooterItems().forEach(footerItem -> modelAndView.addObject(footerItem.getAttributeName(), footerItem.getUrl()));
@@ -30,6 +31,10 @@ public class FooterService {
     footerItems.add(new FooterItem(
         ACCESSIBILITY_STATEMENT_URL_ATTR_NAME,
         ControllerUtils.getAccessibilityStatementUrl())
+    );
+    footerItems.add(new FooterItem(
+        FEEDBACK_URL_ATTR_NAME,
+        ControllerUtils.getFeedbackUrl())
     );
     return footerItems;
   }

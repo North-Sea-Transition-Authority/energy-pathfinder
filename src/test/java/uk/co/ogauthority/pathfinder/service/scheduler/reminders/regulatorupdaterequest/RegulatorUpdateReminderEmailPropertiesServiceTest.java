@@ -10,21 +10,21 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRequest;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RegulatorUpdateReminderEmailPropertiesServiceTest {
 
   @Mock
-  private EmailLinkService emailLinkService;
+  private LinkService linkService;
 
   private RegulatorUpdateReminderEmailPropertiesService regulatorUpdateReminderEmailPropertiesService;
 
   @Before
   public void setup() {
     regulatorUpdateReminderEmailPropertiesService = new RegulatorUpdateReminderEmailPropertiesService(
-        emailLinkService
+        linkService
     );
   }
 
@@ -48,7 +48,7 @@ public class RegulatorUpdateReminderEmailPropertiesServiceTest {
 
     var expectedProjectUrl = "project/url";
 
-    when(emailLinkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(expectedProjectUrl);
+    when(linkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(expectedProjectUrl);
 
     var resultingProjectUrl = regulatorUpdateReminderEmailPropertiesService.getProjectManagementUrl(regulatorUpdateRequest);
 

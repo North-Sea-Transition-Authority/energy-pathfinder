@@ -48,7 +48,7 @@ public abstract class AbstractControllerTest {
   protected WebApplicationContext context;
 
   @MockBean
-  private FoxUrlService foxUrlService;
+  protected FoxUrlService foxUrlService;
 
   @MockBean
   protected TeamService teamService;
