@@ -13,7 +13,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.requested.infrastructure.InfrastructureUpdateRequestedEmailProperties;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -21,7 +21,7 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 public class InfrastructureUpdateRequestedEmailPropertyServiceTest {
 
   @Mock
-  private EmailLinkService emailLinkService;
+  private LinkService linkService;
 
   @Mock
   private ServiceProperties serviceProperties;
@@ -34,7 +34,7 @@ public class InfrastructureUpdateRequestedEmailPropertyServiceTest {
   @Before
   public void setup() {
     infrastructureUpdateRequestedEmailPropertyService = new InfrastructureUpdateRequestedEmailPropertyService(
-        emailLinkService,
+        linkService,
         serviceProperties,
         projectInformationService
     );
@@ -57,7 +57,7 @@ public class InfrastructureUpdateRequestedEmailPropertyServiceTest {
     final var projectDetail = ProjectUtil.getProjectDetails();
 
     final var projectUrl = "whenDeadlineDateIsEmptyString project url";
-    when(emailLinkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(projectUrl);
+    when(linkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(projectUrl);
 
     final var projectTitle = "whenDeadlineDateIsEmptyString project title";
     when(projectInformationService.getProjectTitle(projectDetail)).thenReturn(projectTitle);
@@ -93,7 +93,7 @@ public class InfrastructureUpdateRequestedEmailPropertyServiceTest {
     final var projectDetail = ProjectUtil.getProjectDetails();
 
     final var projectUrl = "whenDeadlineDateNotEmpty project url";
-    when(emailLinkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(projectUrl);
+    when(linkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(projectUrl);
 
     final var projectTitle = "whenDeadlineDateNotEmpty project title";
     when(projectInformationService.getProjectTitle(projectDetail)).thenReturn(projectTitle);

@@ -14,7 +14,7 @@ import uk.co.ogauthority.pathfinder.model.entity.newsletters.MonthlyNewsletter;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
 import uk.co.ogauthority.pathfinder.model.enums.NewsletterSendingResult;
 import uk.co.ogauthority.pathfinder.repository.newsletters.MonthlyNewsletterRepository;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
 import uk.co.ogauthority.pathfinder.service.email.notify.DefaultEmailPersonalisationService;
 import uk.co.ogauthority.pathfinder.service.subscription.SubscriberAccessor;
@@ -25,7 +25,7 @@ public class NewsletterService {
   private static final Logger LOGGER = LoggerFactory.getLogger(NewsletterService.class);
 
   private final SubscriberAccessor subscriberAccessor;
-  private final EmailLinkService emailLinkService;
+  private final LinkService linkService;
   private final EmailService emailService;
   private final MonthlyNewsletterRepository monthlyNewsletterRepository;
   private final NewsletterProjectService newsletterProjectService;
@@ -33,13 +33,13 @@ public class NewsletterService {
 
   @Autowired
   public NewsletterService(SubscriberAccessor subscriberAccessor,
-                           EmailLinkService emailLinkService,
+                           LinkService linkService,
                            EmailService emailService,
                            MonthlyNewsletterRepository monthlyNewsletterRepository,
                            NewsletterProjectService newsletterProjectService,
                            DefaultEmailPersonalisationService defaultEmailPersonalisationService) {
     this.subscriberAccessor = subscriberAccessor;
-    this.emailLinkService = emailLinkService;
+    this.linkService = linkService;
     this.emailService = emailService;
     this.monthlyNewsletterRepository = monthlyNewsletterRepository;
     this.newsletterProjectService = newsletterProjectService;
@@ -82,14 +82,14 @@ public class NewsletterService {
     if (projectsUpdated.isEmpty()) {
       return new NoProjectsUpdatedNewsletterEmailProperties(
           subscriber.getForename(),
-          emailLinkService.getUnsubscribeUrl(subscriber.getUuid().toString()),
+          linkService.getUnsubscribeUrl(subscriber.getUuid().toString()),
           serviceName,
           customerMnemonic
       );
     } else {
       return new ProjectsUpdatedNewsletterEmailProperties(
           subscriber.getForename(),
-          emailLinkService.getUnsubscribeUrl(subscriber.getUuid().toString()),
+          linkService.getUnsubscribeUrl(subscriber.getUuid().toString()),
           projectsUpdated,
           serviceName,
           customerMnemonic

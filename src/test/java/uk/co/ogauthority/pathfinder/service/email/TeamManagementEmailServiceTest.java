@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.email.emailproperties.teammanagement.A
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.teammanagement.RemovedFromTeamEmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.teammanagement.TeamRolesUpdatedEmailProperties;
 import uk.co.ogauthority.pathfinder.model.team.Team;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.email.notify.CommonEmailMergeField;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
@@ -40,15 +41,15 @@ public class TeamManagementEmailServiceTest {
   private EmailService emailService;
 
   @Mock
-  private EmailLinkService emailLinkService;
+  private LinkService linkService;
 
   private TeamManagementEmailService teamManagementEmailService;
 
   @Before
   public void setup() {
-    teamManagementEmailService = new TeamManagementEmailService(emailService, emailLinkService, SERVICE_NAME);
+    teamManagementEmailService = new TeamManagementEmailService(emailService, linkService, SERVICE_NAME);
 
-    when(emailLinkService.getWorkAreaUrl()).thenReturn(SERVICE_LOGIN_URL);
+    when(linkService.getWorkAreaUrl()).thenReturn(SERVICE_LOGIN_URL);
   }
 
   @Test
@@ -78,7 +79,7 @@ public class TeamManagementEmailServiceTest {
     expectedEmailProperties.put("TEAM_NAME", teamName);
     expectedEmailProperties.put("ADDED_BY_USER_NAME", ACTION_PERFORMED_BY_USER.getFullName());
     expectedEmailProperties.put("ROLES_CSV", ROLES_CSV);
-    expectedEmailProperties.put("SERVICE_LOGIN_URL", emailLinkService.getWorkAreaUrl());
+    expectedEmailProperties.put("SERVICE_LOGIN_URL", linkService.getWorkAreaUrl());
 
     assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(expectedEmailProperties);
   }
@@ -110,7 +111,7 @@ public class TeamManagementEmailServiceTest {
     expectedEmailProperties.put("TEAM_NAME", teamName);
     expectedEmailProperties.put("UPDATED_BY_USER_NAME", ACTION_PERFORMED_BY_USER.getFullName());
     expectedEmailProperties.put("ROLES_CSV", ROLES_CSV);
-    expectedEmailProperties.put("SERVICE_LOGIN_URL", emailLinkService.getWorkAreaUrl());
+    expectedEmailProperties.put("SERVICE_LOGIN_URL", linkService.getWorkAreaUrl());
 
     assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(expectedEmailProperties);
   }

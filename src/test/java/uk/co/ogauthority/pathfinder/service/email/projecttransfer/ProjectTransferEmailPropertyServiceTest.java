@@ -14,7 +14,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.IncomingOperatorProjectTransferEmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.transfer.OutgoingOperatorProjectTransferEmailProperties;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -24,7 +24,7 @@ public class ProjectTransferEmailPropertyServiceTest {
   private TestProjectTransferEmailPropertyProvider testProjectTransferEmailPropertyProvider;
 
   @Mock
-  private EmailLinkService emailLinkService;
+  private LinkService linkService;
 
   private ProjectTransferEmailPropertyService projectTransferEmailPropertyService;
 
@@ -32,7 +32,7 @@ public class ProjectTransferEmailPropertyServiceTest {
   public void setup() {
     projectTransferEmailPropertyService = new ProjectTransferEmailPropertyService(
         List.of(testProjectTransferEmailPropertyProvider),
-        emailLinkService
+        linkService
     );
   }
 
@@ -103,7 +103,7 @@ public class ProjectTransferEmailPropertyServiceTest {
     final var projectUrl = "project url";
 
     when(testProjectTransferEmailPropertyProvider.getSupportedProjectType()).thenReturn(supportedProjectType);
-    when(emailLinkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(projectUrl);
+    when(linkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(projectUrl);
 
     final var expectedEmailPersonalisation = new HashMap<String, Object>();
     expectedEmailPersonalisation.put("PREVIOUS_OPERATOR_NAME", previousOperatorName);

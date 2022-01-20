@@ -5,22 +5,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.requested.ProjectUpdateRequestedEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 
 @Service
 public class UpdateRequestedEmailPropertyService {
 
   private final List<UpdateRequestedEmailPropertyProvider> updateRequestedEmailPropertyProviders;
 
-  private final EmailLinkService emailLinkService;
+  private final LinkService linkService;
 
   @Autowired
   public UpdateRequestedEmailPropertyService(
       List<UpdateRequestedEmailPropertyProvider> updateRequestedEmailPropertyProviders,
-      EmailLinkService emailLinkService
+      LinkService linkService
   ) {
     this.updateRequestedEmailPropertyProviders = updateRequestedEmailPropertyProviders;
-    this.emailLinkService = emailLinkService;
+    this.linkService = linkService;
   }
 
   public ProjectUpdateRequestedEmailProperties getUpdateRequestedEmailProperties(ProjectDetail projectDetail,
@@ -44,7 +44,7 @@ public class UpdateRequestedEmailPropertyService {
       );
     } else {
 
-      final var projectManagementUrl = emailLinkService.generateProjectManagementUrl(projectDetail.getProject());
+      final var projectManagementUrl = linkService.generateProjectManagementUrl(projectDetail.getProject());
 
       return new ProjectUpdateRequestedEmailProperties(
           updateReason,

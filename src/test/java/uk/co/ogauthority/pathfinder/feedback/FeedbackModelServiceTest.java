@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.feedback;
+package uk.co.ogauthority.pathfinder.feedback;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
@@ -31,9 +31,28 @@ public class FeedbackModelServiceTest {
     assertThat(resultingModel.getViewName()).isEqualTo(FeedbackModelService.TEMPLATE_PATH);
     assertThat(resultingModel.getModelMap()).containsExactly(
         entry("form", form),
-        entry("cancelUrl", ControllerUtils.getWorkAreaUrl()),
         entry("serviceRatings", ServiceFeedbackRating.getAllAsMap()),
-        entry("feedbackCharacterLimit", String.valueOf(FeedbackModelService.FEEDBACK_CHARACTER_LIMIT))
+        entry("feedbackCharacterLimit", String.valueOf(FeedbackModelService.FEEDBACK_CHARACTER_LIMIT)),
+        entry("cancelUrl", ControllerUtils.getWorkAreaUrl()),
+        entry("showBackLink", true)
+    );
+  }
+
+  @Test
+  public void getFeedbackModelAndView_assertModelProperties_projectDetailIdNotNull() {
+
+    var form = new FeedbackForm();
+    form.setProjectDetailId(1);
+
+    var resultingModel = feedbackModelService.getFeedbackModelAndView(form);
+
+    assertThat(resultingModel.getViewName()).isEqualTo(FeedbackModelService.TEMPLATE_PATH);
+    assertThat(resultingModel.getModelMap()).containsExactly(
+        entry("form", form),
+        entry("serviceRatings", ServiceFeedbackRating.getAllAsMap()),
+        entry("feedbackCharacterLimit", String.valueOf(FeedbackModelService.FEEDBACK_CHARACTER_LIMIT)),
+        entry("cancelUrl", ControllerUtils.getWorkAreaUrl()),
+        entry("showBackLink", false)
     );
   }
 

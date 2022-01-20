@@ -4,17 +4,17 @@ import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.entity.projectupdate.RegulatorUpdateRequest;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @Service
 public class RegulatorUpdateReminderEmailPropertiesService {
 
-  private final EmailLinkService emailLinkService;
+  private final LinkService linkService;
 
   @Autowired
-  public RegulatorUpdateReminderEmailPropertiesService(EmailLinkService emailLinkService) {
-    this.emailLinkService = emailLinkService;
+  public RegulatorUpdateReminderEmailPropertiesService(LinkService linkService) {
+    this.linkService = linkService;
   }
 
   public String getFormattedDeadlineDate(LocalDate deadlineDate) {
@@ -22,7 +22,7 @@ public class RegulatorUpdateReminderEmailPropertiesService {
   }
 
   public String getProjectManagementUrl(RegulatorUpdateRequest regulatorUpdateRequest) {
-    return emailLinkService.generateProjectManagementUrl(
+    return linkService.generateProjectManagementUrl(
         regulatorUpdateRequest.getProjectDetail().getProject()
     );
   }

@@ -7,20 +7,20 @@ import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.r
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.requested.forwardworkplan.ForwardWorkPlanUpdateRequestedEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.email.projectupdate.updaterequested.UpdateRequestedEmailPropertyProvider;
 
 @Service
 class ForwardWorkPlanUpdateRequestedEmailPropertyService implements UpdateRequestedEmailPropertyProvider {
 
-  private final EmailLinkService emailLinkService;
+  private final LinkService linkService;
 
   private final ServiceProperties serviceProperties;
 
   @Autowired
-  ForwardWorkPlanUpdateRequestedEmailPropertyService(EmailLinkService emailLinkService,
+  ForwardWorkPlanUpdateRequestedEmailPropertyService(LinkService linkService,
                                                      ServiceProperties serviceProperties) {
-    this.emailLinkService = emailLinkService;
+    this.linkService = linkService;
     this.serviceProperties = serviceProperties;
   }
 
@@ -36,7 +36,7 @@ class ForwardWorkPlanUpdateRequestedEmailPropertyService implements UpdateReques
     return new ForwardWorkPlanUpdateRequestedEmailProperties(
         updateReason,
         deadlineDate,
-        emailLinkService.generateProjectManagementUrl(projectDetail.getProject()),
+        linkService.generateProjectManagementUrl(projectDetail.getProject()),
         serviceProperties.getCustomerMnemonic()
     );
   }

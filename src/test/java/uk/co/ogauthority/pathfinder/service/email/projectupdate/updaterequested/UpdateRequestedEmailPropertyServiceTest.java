@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.requested.ProjectUpdateRequestedEmailProperties;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -23,7 +23,7 @@ public class UpdateRequestedEmailPropertyServiceTest {
   private TestUpdateRequestedEmailPropertyService testUpdateRequestedEmailPropertyService;
 
   @Mock
-  private EmailLinkService emailLinkService;
+  private LinkService linkService;
 
   private UpdateRequestedEmailPropertyService updateRequestedEmailPropertyService;
 
@@ -31,7 +31,7 @@ public class UpdateRequestedEmailPropertyServiceTest {
   public void setup() {
     updateRequestedEmailPropertyService = new UpdateRequestedEmailPropertyService(
         List.of(testUpdateRequestedEmailPropertyService),
-        emailLinkService
+        linkService
     );
   }
 
@@ -95,7 +95,7 @@ public class UpdateRequestedEmailPropertyServiceTest {
     final var formattedDeadlineDate = "deadline date";
     final var projectUrl = "project url";
 
-    when(emailLinkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(projectUrl);
+    when(linkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(projectUrl);
 
     final var expectedEmailProperties = new HashMap<String, Object>();
     expectedEmailProperties.put("UPDATE_REASON", updateReason);

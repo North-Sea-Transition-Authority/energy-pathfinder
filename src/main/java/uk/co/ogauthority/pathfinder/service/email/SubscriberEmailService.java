@@ -4,22 +4,23 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.subscription.SubscribedToNewsletterEmailProperties;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 
 @Service
 public class SubscriberEmailService {
 
   private final EmailService emailService;
-  private final EmailLinkService emailLinkService;
+  private final LinkService linkService;
 
   @Autowired
   public SubscriberEmailService(EmailService emailService,
-                                EmailLinkService emailLinkService) {
+                                LinkService linkService) {
     this.emailService = emailService;
-    this.emailLinkService = emailLinkService;
+    this.linkService = linkService;
   }
 
   public void sendSubscribedEmail(String forename, String emailAddress, UUID subscriberUuid) {
-    var unsubscribeUrl = emailLinkService.getUnsubscribeUrl(subscriberUuid.toString());
+    var unsubscribeUrl = linkService.getUnsubscribeUrl(subscriberUuid.toString());
 
     var emailProperties = new SubscribedToNewsletterEmailProperties(
         forename,

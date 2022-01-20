@@ -10,20 +10,21 @@ import uk.co.ogauthority.pathfinder.model.email.emailproperties.teammanagement.R
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.teammanagement.TeamRolesUpdatedEmailProperties;
 import uk.co.ogauthority.pathfinder.model.team.Team;
 import uk.co.ogauthority.pathfinder.model.team.TeamType;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 
 @Service
 public class TeamManagementEmailService {
 
   private final EmailService emailService;
-  private final EmailLinkService emailLinkService;
+  private final LinkService linkService;
   private final String serviceName;
 
   @Autowired
   public TeamManagementEmailService(EmailService emailService,
-                                    EmailLinkService emailLinkService,
+                                    LinkService linkService,
                                     @Value("${service.name}") String serviceName) {
     this.emailService = emailService;
-    this.emailLinkService = emailLinkService;
+    this.linkService = linkService;
     this.serviceName = serviceName;
   }
 
@@ -33,7 +34,7 @@ public class TeamManagementEmailService {
         formatTeamName(team),
         addedByUser.getFullName(),
         rolesCsv,
-        emailLinkService.getWorkAreaUrl()
+        linkService.getWorkAreaUrl()
     );
     emailService.sendEmail(emailProperties, person.getEmailAddress());
   }
@@ -44,7 +45,7 @@ public class TeamManagementEmailService {
         formatTeamName(team),
         updatedByUser.getFullName(),
         rolesCsv,
-        emailLinkService.getWorkAreaUrl()
+        linkService.getWorkAreaUrl()
     );
     emailService.sendEmail(emailProperties, person.getEmailAddress());
   }

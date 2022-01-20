@@ -6,7 +6,7 @@ import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.n
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.noupdatenotification.forwardworkplan.ForwardWorkPlanNoUpdateNotificationEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.email.projectupdate.noupdatenotification.NoUpdateNotificationEmailPropertyProvider;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 
@@ -15,13 +15,13 @@ class ForwardWorkPlanNoUpdateNotificationEmailPropertyService implements NoUpdat
 
   private final ProjectOperatorService projectOperatorService;
 
-  private final EmailLinkService emailLinkService;
+  private final LinkService linkService;
 
   @Autowired
   ForwardWorkPlanNoUpdateNotificationEmailPropertyService(ProjectOperatorService projectOperatorService,
-                                                          EmailLinkService emailLinkService) {
+                                                          LinkService linkService) {
     this.projectOperatorService = projectOperatorService;
-    this.emailLinkService = emailLinkService;
+    this.linkService = linkService;
   }
 
   @Override
@@ -37,7 +37,7 @@ class ForwardWorkPlanNoUpdateNotificationEmailPropertyService implements NoUpdat
         .getOrganisationGroup()
         .getName();
 
-    final var projectManagementUrl = emailLinkService.generateProjectManagementUrl(projectDetail.getProject());
+    final var projectManagementUrl = linkService.generateProjectManagementUrl(projectDetail.getProject());
 
     return new ForwardWorkPlanNoUpdateNotificationEmailProperties(
         projectManagementUrl,

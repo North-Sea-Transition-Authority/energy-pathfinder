@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.project.update.submitted.ProjectUpdateEmailProperties;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.service.email.EmailLinkService;
+import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.email.notify.CommonEmailMergeField;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -24,7 +24,7 @@ public class UpdateSubmittedEmailPropertyServiceTest {
   private TestUpdateSubmittedEmailPropertyService testUpdateSubmittedEmailPropertyService;
 
   @Mock
-  private EmailLinkService emailLinkService;
+  private LinkService linkService;
 
   private UpdateSubmittedEmailPropertyService updateSubmittedEmailPropertyService;
 
@@ -32,7 +32,7 @@ public class UpdateSubmittedEmailPropertyServiceTest {
   public void setup() {
     updateSubmittedEmailPropertyService = new UpdateSubmittedEmailPropertyService(
         List.of(testUpdateSubmittedEmailPropertyService),
-        emailLinkService
+        linkService
     );
   }
 
@@ -75,7 +75,7 @@ public class UpdateSubmittedEmailPropertyServiceTest {
     when(testUpdateSubmittedEmailPropertyService.getSupportedProjectType()).thenReturn(supportedProjectType);
 
     final var serviceUrl = "service-url";
-    when(emailLinkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(serviceUrl);
+    when(linkService.generateProjectManagementUrl(projectDetail.getProject())).thenReturn(serviceUrl);
 
     final var expectedEmailProperties = new HashMap<String, Object>();
     expectedEmailProperties.put(CommonEmailMergeField.SERVICE_LOGIN_URL, serviceUrl);
