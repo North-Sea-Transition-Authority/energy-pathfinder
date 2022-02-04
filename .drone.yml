@@ -63,6 +63,7 @@ steps:
         - release/**
         - hotfix/**
         - publish-to-docker
+        - rebrand-to-nsta
       status:
         - success
 
