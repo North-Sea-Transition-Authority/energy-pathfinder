@@ -149,7 +149,7 @@ public class SelectOperatorService implements ProjectFormSectionService {
 
   @Override
   public Set<ProjectType> getSupportedProjectTypes() {
-    return Set.of(ProjectType.INFRASTRUCTURE);
+    return Set.of(ProjectType.INFRASTRUCTURE, ProjectType.FORWARD_WORK_PLAN);
   }
 
   @Override
