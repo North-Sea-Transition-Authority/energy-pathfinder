@@ -224,8 +224,11 @@ public class SelectOperatorServiceTest {
   }
 
   @Test
-  public void getSupportedProjectTypes_verifyInfrastructure() {
-    assertThat(selectOperatorService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
+  public void getSupportedProjectTypes_verifyInfrastructureAndForwardWorkPlan() {
+    assertThat(selectOperatorService.getSupportedProjectTypes()).containsExactlyInAnyOrder(
+        ProjectType.INFRASTRUCTURE,
+        ProjectType.FORWARD_WORK_PLAN
+    );
   }
 
   @Test
