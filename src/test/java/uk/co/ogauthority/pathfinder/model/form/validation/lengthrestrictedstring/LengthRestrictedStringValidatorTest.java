@@ -63,7 +63,7 @@ public class LengthRestrictedStringValidatorTest extends AbstractControllerTest 
     Set<ConstraintViolation<LengthRestrictedStringTestForm>> constraintViolations = validator.validate(form);
     assertThat(constraintViolations).extracting(ConstraintViolation::getMessage)
         .containsExactly(
-            "The string value can not be more than 4000 characters (currently " + invalidValue.length() + " characters)"
+            "The string value must be 4000 characters or fewer"
         );
   }
 
@@ -75,7 +75,7 @@ public class LengthRestrictedStringValidatorTest extends AbstractControllerTest 
     Set<ConstraintViolation<LengthRestrictedStringTestForm>> constraintViolations = validator.validate(form);
     assertThat(constraintViolations).extracting(ConstraintViolation::getMessage)
         .containsExactly(
-            "The string value can not be more than 10 characters (currently " + invalidValue.length() + " characters)"
+            "The string value must be 10 characters or fewer"
         );
   }
 
@@ -96,7 +96,7 @@ public class LengthRestrictedStringValidatorTest extends AbstractControllerTest 
     Set<ConstraintViolation<LengthRestrictedStringTestForm>> constraintViolations = validator.validate(form);
     assertThat(constraintViolations).extracting(ConstraintViolation::getMessage)
         .containsExactly(
-            "The string value can not be more than 1 character (currently " + invalidValue.length() + " characters)"
+            "The string value must be 1 character or fewer"
         );
   }
 
