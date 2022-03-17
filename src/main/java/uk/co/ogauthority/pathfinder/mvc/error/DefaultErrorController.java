@@ -62,9 +62,4 @@ public class DefaultErrorController implements ErrorController {
         return ErrorView.DEFAULT_ERROR.getViewName();
     }
   }
-
-  @Override
-  public String getErrorPath() {
-    return "/error";
-  }
 }

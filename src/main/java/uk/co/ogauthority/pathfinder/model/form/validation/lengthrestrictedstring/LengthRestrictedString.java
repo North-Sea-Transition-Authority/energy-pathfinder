@@ -14,8 +14,7 @@ import javax.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LengthRestrictedString {
 
-  String message() default "{messagePrefix} can not be more than {max} character${max > 1 ? 's' : ''} " +
-      "(currently ${validatedValue.length()} character${validatedValue.length() > 1 ? 's' : ''})";
+  String message() default "{messagePrefix} must be {max} character${max > 1 ? 's' : ''} or fewer";
 
   Class<?>[] groups() default {};
 

@@ -1,5 +1,5 @@
 plugins {
-  id 'org.springframework.boot' version '2.3.1.RELEASE'
+  id 'org.springframework.boot' version '2.6.3'
   id 'java'
   id 'jacoco'
   id 'checkstyle'
@@ -24,7 +24,8 @@ tasks {
 repositories {
   mavenCentral()
   maven {
-    url("http://nexus.fivium.local:8081/repository/maven-releases/")
+    url = "http://nexus.fivium.local:8081/repository/maven-releases/"
+    allowInsecureProtocol = true
   }
 }
 
@@ -44,27 +45,28 @@ dependencies {
     exclude group: 'com.zaxxer', module: 'HikariCP-java7'
     // workaround for https://github.com/spring-projects/spring-boot/issues/16489
   }
-  implementation 'io.micrometer:micrometer-registry-statsd:1.5.1'
+  implementation 'io.micrometer:micrometer-registry-statsd:1.7.8'
 
-  compile 'org.flywaydb:flyway-core:5.2.1-FIVIUM'
-  compile 'com.oracle:ojdbc7:12.1.0.2'
-  compile 'org.springframework.session:spring-session-jdbc'
-  compile('uk.gov.service.notify:notifications-java-client:3.17.0-RELEASE')
+  implementation 'org.flywaydb:flyway-core:5.2.1-FIVIUM'
+  implementation 'com.oracle:ojdbc7:12.1.0.2'
+  implementation 'org.springframework.session:spring-session-jdbc'
+  implementation 'uk.gov.service.notify:notifications-java-client:3.17.0-RELEASE'
   implementation('uk.co.fivium.feedbackmanagementservice:client:2.1.1')
 
-  compile 'com.google.guava:guava:28.1-jre'
-  compile 'org.apache.commons:commons-lang3:3.9'
-  compile 'org.apache.commons:commons-collections4:4.4'
-  compile group: 'commons-validator', name: 'commons-validator', version: '1.7'
-  compile group: 'com.googlecode.libphonenumber', name: 'libphonenumber', version: '8.12.8'
-  compile group: 'fi.solita.clamav', name: 'clamav-client', version: '1.0.1'
+  implementation 'com.google.guava:guava:31.0.1-jre'
+  implementation 'org.apache.commons:commons-lang3:3.12.0'
+  implementation 'org.apache.commons:commons-collections4:4.4'
+  implementation group: 'commons-validator', name: 'commons-validator', version: '1.7'
+  implementation group: 'com.googlecode.libphonenumber', name: 'libphonenumber', version: '8.12.8'
+  implementation group: 'fi.solita.clamav', name: 'clamav-client', version: '1.0.1'
 
-  testCompile 'com.h2database:h2:1.4.197'
   testImplementation(
+      'com.h2database:h2:1.4.197',
       'org.springframework.boot:spring-boot-starter-test',
       'org.springframework.security:spring-security-test',
       'com.squareup.okhttp3:mockwebserver:4.9.1',
-      'com.squareup.okhttp3:okhttp:4.9.1' // Required otherwise MockWebServer gives ClassNotFoundException
+      'com.squareup.okhttp3:okhttp:4.9.1', // Required otherwise MockWebServer gives ClassNotFoundException
+      'junit:junit:4.13.1'
   )
 }
 
