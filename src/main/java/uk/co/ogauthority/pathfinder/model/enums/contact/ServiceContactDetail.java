@@ -4,10 +4,10 @@ public enum ServiceContactDetail {
 
   BUSINESS_SUPPORT(
       "Business support",
-      "OGA",
-      "pathfinder@ogauthority.co.uk",
+      "NSTA",
+      "pathfinder@nstauthority.co.uk",
       "",
-      "https://www.ogauthority.co.uk/supply-chain/energy-pathfinder/",
+      "https://www.nstauthority.co.uk/supply-chain/energy-pathfinder/",
       "For example, questions about filling in your project, the information you need to provide or to provide feedback on the service",
       true,
       10
@@ -15,7 +15,7 @@ public enum ServiceContactDetail {
   TECHNICAL_SUPPORT(
       "Technical support",
       "UKOP service desk",
-      "ukop@ogauthority.co.uk",
+      "ukop@nstauthority.co.uk",
       "0300 067 1682",
       "",
       "For example, unexpected problems using the service or system errors being received",
