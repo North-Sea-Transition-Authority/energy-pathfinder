@@ -8,6 +8,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfiguration;
 import uk.co.ogauthority.pathfinder.auth.CurrentUserView;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
@@ -24,18 +25,21 @@ public class DefaultPageControllerAdvice {
   private final TopNavigationService topNavigationService;
   private final HttpServletRequest request;
   private final FooterService footerService;
+  private final AnalyticsConfiguration analyticsConfiguration;
 
   @Autowired
   public DefaultPageControllerAdvice(FoxUrlService foxUrlService,
                                      ServiceProperties serviceProperties,
                                      TopNavigationService topNavigationService,
                                      HttpServletRequest request,
-                                     FooterService footerService) {
+                                     FooterService footerService,
+                                     AnalyticsConfiguration analyticsConfiguration) {
     this.foxUrlService = foxUrlService;
     this.serviceProperties = serviceProperties;
     this.topNavigationService = topNavigationService;
     this.request = request;
     this.footerService = footerService;
+    this.analyticsConfiguration = analyticsConfiguration;
   }
 
   @InitBinder
@@ -50,6 +54,12 @@ public class DefaultPageControllerAdvice {
     addCommonUrls(model);
     addServiceSpecificAttributes(model);
     addTopNavigationItems(model, request);
+    addAnalyticsItems(model);
+  }
+
+  private void addAnalyticsItems(Model model) {
+    model.addAttribute("analytics", analyticsConfiguration.getProperties());
+    model.addAttribute("cookiePrefsUrl", ControllerUtils.getCookiesUrl());
   }
 
   private void addCurrentUserView(Model model) {
