@@ -11,6 +11,8 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
@@ -28,10 +30,14 @@ public class DevelopmentProjectCreatorControllerTest extends AbstractControllerT
   @MockBean
   DevelopmentProjectCreatorSchedulerService notificationCreatorService;
 
+  @DynamicPropertySource
+  static void registerProperties(DynamicPropertyRegistry registry) {
+    registry.add("analytics.config.enabled", () -> false);
+    registry.add("analytics.config.connection-timeout-seconds", () -> 1);
+  }
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       SystemAccessService.CREATE_PROJECT_PRIVILEGES);
-
 
   @Test
   public void testGetDevelopmentProjectCreator_notInProductionProfile() throws Exception {
@@ -40,4 +46,5 @@ public class DevelopmentProjectCreatorControllerTest extends AbstractControllerT
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isNotFound());
   }
+
 }
