@@ -12,13 +12,13 @@
   </@fdsInsetText.insetText>
   <@fdsTabs.tabs tabsHeading="Quarterly statistics">
     <@fdsTabs.tabList>
-      <@fdsTabs.tab tabLabel="Overview" tabAnchor="overview" tabSelected=true/>
-      <@fdsTabs.tab tabLabel="Operators" tabAnchor="operators" tabSelected=false/>
+      <@fdsTabs.tab tabLabel="Overview" tabAnchor="overview"/>
+      <@fdsTabs.tab tabLabel="Operators" tabAnchor="operators"/>
     </@fdsTabs.tabList>
-    <@fdsTabs.tabContent tabAnchor="overview" tabSelected=true>
+    <@fdsTabs.tabContent tabAnchor="overview">
       <@projectUpdateStatistic._projectUpdateStatisticGroup projectUpdateStatistics=projectUpdateStatistics />
     </@fdsTabs.tabContent>
-    <@fdsTabs.tabContent tabAnchor="operators" tabSelected=false>
+    <@fdsTabs.tabContent tabAnchor="operators">
       <@operatorProjects._operators operatorProjectMap=operatorReportableProjects />
     </@fdsTabs.tabContent>
   </@fdsTabs.tabs>
