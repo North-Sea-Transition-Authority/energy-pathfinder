@@ -1,10 +1,12 @@
 package uk.co.ogauthority.pathfinder.controller.projectupdate;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -13,6 +15,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
+import java.util.Map;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +28,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.RegulatorProjectUpdateContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
@@ -100,7 +105,7 @@ public class RegulatorUpdateControllerTest extends RegulatorProjectUpdateContext
 
     mockMvc.perform(
         post(ReverseRouter.route(on(RegulatorUpdateController.class)
-            .requestUpdate(QA_PROJECT_ID, null, null, null, null)
+            .requestUpdate(QA_PROJECT_ID, null, null, null, null, Optional.empty())
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf()))
@@ -108,6 +113,8 @@ public class RegulatorUpdateControllerTest extends RegulatorProjectUpdateContext
 
     verify(regulatorUpdateRequestService, times(1)).validate(any(), any());
     verify(regulatorUpdateRequestService, times(1)).requestUpdate(any(), any(), any());
+    verify(analyticsService, times(1))
+        .sendGoogleAnalyticsEvent(any(), eq(AnalyticsEventCategory.UPDATE_REQUESTED), eq(Map.of("project_type", qaProjectDetail.getProjectType().name())));
   }
 
   @Test
@@ -120,7 +127,7 @@ public class RegulatorUpdateControllerTest extends RegulatorProjectUpdateContext
 
     mockMvc.perform(
         post(ReverseRouter.route(on(RegulatorUpdateController.class)
-            .requestUpdate(QA_PROJECT_ID, null, null, null, null)
+            .requestUpdate(QA_PROJECT_ID, null, null, null, null, Optional.empty())
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf()))
@@ -128,13 +135,14 @@ public class RegulatorUpdateControllerTest extends RegulatorProjectUpdateContext
 
     verify(regulatorUpdateRequestService, times(1)).validate(any(), any());
     verify(regulatorUpdateRequestService, times(0)).requestUpdate(any(), any(), any());
+    verifyNoInteractions(analyticsService);
   }
 
   @Test
   public void requestUpdate_whenUnauthenticatedAndQA_thenNoAccess() throws Exception {
     mockMvc.perform(
         post(ReverseRouter.route(on(RegulatorUpdateController.class)
-            .requestUpdate(QA_PROJECT_ID, null, null, null, null)
+            .requestUpdate(QA_PROJECT_ID, null, null, null, null, Optional.empty())
         ))
             .with(authenticatedUserAndSession(unauthenticatedUser))
             .with(csrf()))
@@ -147,7 +155,7 @@ public class RegulatorUpdateControllerTest extends RegulatorProjectUpdateContext
   public void requestUpdate_whenAuthenticatedAndUnsubmitted_thenNoAccess() throws Exception {
     mockMvc.perform(
         post(ReverseRouter.route(on(RegulatorUpdateController.class)
-            .requestUpdate(UNSUBMITTED_PROJECT_ID, null, null, null, null)
+            .requestUpdate(UNSUBMITTED_PROJECT_ID, null, null, null, null, Optional.empty())
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf()))

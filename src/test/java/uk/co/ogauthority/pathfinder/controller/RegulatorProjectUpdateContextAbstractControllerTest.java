@@ -23,6 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfig;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfiguration;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsProperties;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.model.entity.UserSession;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
@@ -97,6 +98,9 @@ public abstract class RegulatorProjectUpdateContextAbstractControllerTest {
 
   @MockBean
   protected FooterService footerService;
+
+  @MockBean
+  protected AnalyticsService analyticsService;
 
   @Before
   public void projectContextAbstractControllerTestSetUp() {

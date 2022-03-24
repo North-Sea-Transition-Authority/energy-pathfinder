@@ -12,6 +12,8 @@ public enum AnalyticsEventCategory {
 
   NO_CHANGE_UPDATE_SUBMITTED("No change update submitted"),
 
+  UPDATE_REQUESTED("Update requested"),
+
   SHOW_DIFFS_PROJECT("Show differences between versions of a project");
 
   private final String displayName;

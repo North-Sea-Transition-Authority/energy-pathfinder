@@ -2,16 +2,21 @@ package uk.co.ogauthority.pathfinder.controller.projectupdate;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Map;
+import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
@@ -41,12 +46,15 @@ public class RegulatorUpdateController {
 
   private final RegulatorUpdateRequestService regulatorUpdateRequestService;
   private final ControllerHelperService controllerHelperService;
+  private final AnalyticsService analyticsService;
 
   @Autowired
   public RegulatorUpdateController(RegulatorUpdateRequestService regulatorUpdateRequestService,
-                                   ControllerHelperService controllerHelperService) {
+                                   ControllerHelperService controllerHelperService,
+                                   AnalyticsService analyticsService) {
     this.regulatorUpdateRequestService = regulatorUpdateRequestService;
     this.controllerHelperService = controllerHelperService;
+    this.analyticsService = analyticsService;
   }
 
   @GetMapping("/request-update")
@@ -65,7 +73,8 @@ public class RegulatorUpdateController {
                                     @Valid @ModelAttribute("form") RequestUpdateForm form,
                                     BindingResult bindingResult,
                                     RegulatorProjectUpdateContext regulatorProjectUpdateContext,
-                                    AuthenticatedUserAccount user) {
+                                    AuthenticatedUserAccount user,
+                                    @CookieValue(name = "pathfinder-ga-client-id", required = false) Optional<String> analyticsClientId) {
     bindingResult = regulatorUpdateRequestService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
@@ -73,6 +82,8 @@ public class RegulatorUpdateController {
         form,
         () -> {
           regulatorUpdateRequestService.requestUpdate(regulatorProjectUpdateContext.getProjectDetails(), form, user);
+          analyticsService.sendGoogleAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.UPDATE_REQUESTED,
+              Map.of("project_type", regulatorProjectUpdateContext.getProjectDetails().getProjectType().name()));
           return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(null, null));
         }
     );
