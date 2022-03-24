@@ -2,13 +2,18 @@ package uk.co.ogauthority.pathfinder.controller.project;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Map;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
@@ -30,10 +35,13 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 public class CancelDraftProjectVersionController {
 
   private final CancelDraftProjectVersionService cancelDraftProjectVersionService;
+  private final AnalyticsService analyticsService;
 
   @Autowired
-  public CancelDraftProjectVersionController(CancelDraftProjectVersionService cancelDraftProjectVersionService) {
+  public CancelDraftProjectVersionController(CancelDraftProjectVersionService cancelDraftProjectVersionService,
+                                             AnalyticsService analyticsService) {
     this.cancelDraftProjectVersionService = cancelDraftProjectVersionService;
+    this.analyticsService = analyticsService;
   }
 
   @GetMapping
@@ -48,10 +56,13 @@ public class CancelDraftProjectVersionController {
   @PostMapping
   public ModelAndView cancelDraft(@PathVariable("projectId") Integer projectId,
                                   ProjectContext projectContext,
-                                  AuthenticatedUserAccount user) {
+                                  AuthenticatedUserAccount user,
+                                  @CookieValue(name = "pathfinder-ga-client-id", required = false) Optional<String> analyticsClientId) {
     final var projectDetail = projectContext.getProjectDetails();
     checkCancellingPermitted(projectDetail);
     cancelDraftProjectVersionService.cancelDraft(projectContext.getProjectDetails());
+    analyticsService.sendGoogleAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.PROJECT_DRAFT_CANCELLED,
+        Map.of("project_type", projectDetail.getProjectType().name()));
     return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(null, null));
   }
 

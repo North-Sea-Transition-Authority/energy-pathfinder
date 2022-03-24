@@ -14,6 +14,8 @@ public enum AnalyticsEventCategory {
 
   UPDATE_REQUESTED("Update requested"),
 
+  PROJECT_DRAFT_CANCELLED("Project draft cancelled"),
+
   SHOW_DIFFS_PROJECT("Show differences between versions of a project");
 
   private final String displayName;
