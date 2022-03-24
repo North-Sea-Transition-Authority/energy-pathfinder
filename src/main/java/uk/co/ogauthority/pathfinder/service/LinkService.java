@@ -28,6 +28,7 @@ public class LinkService {
   }
 
   public String getUnsubscribeUrl(String subscriberUuid) {
-    return pathfinderUrlBase + contextPath + ReverseRouter.route(on(SubscriptionController.class).unsubscribe(subscriberUuid, Optional.empty()));
+    return pathfinderUrlBase + contextPath + ReverseRouter.route(on(SubscriptionController.class)
+        .unsubscribe(subscriberUuid, Optional.empty()));
   }
 }
