@@ -23,6 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfig;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfiguration;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsProperties;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
 import uk.co.ogauthority.pathfinder.model.entity.UserSession;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
@@ -89,6 +90,9 @@ public abstract class TeamManagementContextAbstractControllerTest {
 
   @Autowired
   protected TeamManagementContextService teamManagementContextService;
+
+  @MockBean
+  protected AnalyticsService analyticsService;
 
   @Before
   public void  projectContextAbstractControllerTestSetUp() {
