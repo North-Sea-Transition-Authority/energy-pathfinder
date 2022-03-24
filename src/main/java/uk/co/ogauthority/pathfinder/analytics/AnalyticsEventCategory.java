@@ -10,6 +10,8 @@ public enum AnalyticsEventCategory {
   NEW_SUBSCRIBER("New subscriber"),
   SUBSCRIBER_UNSUBSCRIBED("Subscriber unsubscribed"),
 
+  NO_CHANGE_UPDATE_SUBMITTED("No change update submitted"),
+
   SHOW_DIFFS_PROJECT("Show differences between versions of a project");
 
   private final String displayName;
