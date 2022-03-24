@@ -61,9 +61,9 @@
       <@multiLineText.multiLineText blockClass="govuk-body">
         <div>${updateRequestReason}</div>
       </@multiLineText.multiLineText>
-      <@differenceChanges.toggler formGroupClass="govuk-!-margin-bottom-0"/>
+      <@differenceChanges.toggler analyticsEventCategory="SHOW_DIFFS_PROJECT" formGroupClass="govuk-!-margin-bottom-0"/>
     </@fdsInsetText.insetText>
   <#else>
-    <@differenceChanges.toggler/>
+    <@differenceChanges.toggler analyticsEventCategory="SHOW_DIFFS_PROJECT"/>
   </#if>
 </#macro>

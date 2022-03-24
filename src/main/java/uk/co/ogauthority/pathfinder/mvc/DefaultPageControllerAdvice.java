@@ -1,5 +1,8 @@
 package uk.co.ogauthority.pathfinder.mvc;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
+import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfiguration;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsController;
 import uk.co.ogauthority.pathfinder.auth.CurrentUserView;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
@@ -26,6 +30,7 @@ public class DefaultPageControllerAdvice {
   private final HttpServletRequest request;
   private final FooterService footerService;
   private final AnalyticsConfiguration analyticsConfiguration;
+  private final String analyticsMeasurementUrl;
 
   @Autowired
   public DefaultPageControllerAdvice(FoxUrlService foxUrlService,
@@ -40,6 +45,8 @@ public class DefaultPageControllerAdvice {
     this.request = request;
     this.footerService = footerService;
     this.analyticsConfiguration = analyticsConfiguration;
+    this.analyticsMeasurementUrl = ReverseRouter.route(on(AnalyticsController.class)
+        .collectAnalyticsEvent(null, Optional.empty()));
   }
 
   @InitBinder
@@ -60,6 +67,7 @@ public class DefaultPageControllerAdvice {
   private void addAnalyticsItems(Model model) {
     model.addAttribute("analytics", analyticsConfiguration.getProperties());
     model.addAttribute("cookiePrefsUrl", ControllerUtils.getCookiesUrl());
+    model.addAttribute("analyticsMeasurementUrl", analyticsMeasurementUrl);
   }
 
   private void addCurrentUserView(Model model) {

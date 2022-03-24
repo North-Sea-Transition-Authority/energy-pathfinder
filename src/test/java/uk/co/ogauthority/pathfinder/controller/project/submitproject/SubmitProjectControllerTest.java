@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.controller.project.submitproject;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,6 +13,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
 import java.util.Collections;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.project.submission.SubmitProjectController;
@@ -39,7 +42,6 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 public class SubmitProjectControllerTest extends ProjectContextAbstractControllerTest {
 
   private static final Integer PROJECT_ID = 1;
-
 
   @MockBean
   private ProjectSummaryViewService projectSummaryViewService;
@@ -87,11 +89,12 @@ public class SubmitProjectControllerTest extends ProjectContextAbstractControlle
     when(submitProjectService.isProjectValid(any())).thenReturn(true);
 
     mockMvc.perform(post(ReverseRouter.route(
-        on(SubmitProjectController.class).submitProject(PROJECT_ID, null)))
+        on(SubmitProjectController.class).submitProject(PROJECT_ID, null, Optional.empty())))
         .with(authenticatedUserAndSession(authenticatedUser))
         .with(csrf()))
         .andExpect(status().is3xxRedirection());
 
+    verify(analyticsService, times(1)).sendGoogleAnalyticsEvent(any(), eq(AnalyticsEventCategory.PROJECT_SUBMISSION));
     verify(submitProjectService, times(1)).submitProject(any(), any());
   }
 
@@ -101,7 +104,7 @@ public class SubmitProjectControllerTest extends ProjectContextAbstractControlle
     when(submitProjectService.isProjectValid(any())).thenReturn(false);
 
     mockMvc.perform(post(ReverseRouter.route(
-        on(SubmitProjectController.class).submitProject(PROJECT_ID, null)))
+        on(SubmitProjectController.class).submitProject(PROJECT_ID, null, Optional.empty())))
         .with(authenticatedUserAndSession(authenticatedUser))
         .with(csrf()))
         .andExpect(status().isOk());
@@ -112,7 +115,7 @@ public class SubmitProjectControllerTest extends ProjectContextAbstractControlle
   @Test
   public void submitProject_whenUnauthenticated_thenNoAccess() throws Exception {
     mockMvc.perform(post(ReverseRouter.route(
-        on(SubmitProjectController.class).submitProject(PROJECT_ID, null)))
+        on(SubmitProjectController.class).submitProject(PROJECT_ID, null, Optional.empty())))
         .with(authenticatedUserAndSession(unAuthenticatedUser))
         .with(csrf()))
         .andExpect(status().isForbidden());

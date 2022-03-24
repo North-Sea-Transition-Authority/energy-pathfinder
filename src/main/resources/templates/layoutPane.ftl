@@ -55,11 +55,14 @@
       <#--Footer -->
       <#local footerMetaContent>
         <@fdsFooter.footerMeta footerMetaHiddenHeading="Support links">
-          <@fdsFooter.footerMetaLink linkText="Contact" linkUrl=springUrl(contactUrl)/>
-          <@fdsFooter.footerMetaLink linkText="Feedback" linkUrl=springUrl(feedbackUrl)/>
+          <@pathfinderFooter.footerLinks/>
         </@fdsFooter.footerMeta>
       </#local>
       <@fdsFooter.footer wrapperWidth=wrapperWidth metaLinks=true footerMetaContent=footerMetaContent/>
+
+      <#--Custom scripts-->
+      <@pathfinderCustomScripts/>
+
     </div>
   </@genericLayout>
 </#macro>

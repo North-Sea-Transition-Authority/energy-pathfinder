@@ -240,17 +240,13 @@
     <#--Footer-->
     <#local footerMetaContent>
       <@fdsFooter.footerMeta footerMetaHiddenHeading="Support links">
-        <@fdsFooter.footerMetaLink linkText="Accessibility statement" linkUrl=springUrl(accessibilityStatementUrl)/>
-        <@fdsFooter.footerMetaLink linkText="Contact" linkUrl=springUrl(contactUrl)/>
-        <@fdsFooter.footerMetaLink linkText="Cookies" linkUrl=springUrl(cookiePrefsUrl)/>
-        <@fdsFooter.footerMetaLink linkText="Feedback" linkUrl=springUrl(feedbackUrl)/>
+        <@pathfinderFooter.footerLinks/>
       </@fdsFooter.footerMeta>
     </#local>
     <@fdsFooter.footer wrapperWidth=wrapperWidth metaLinks=true footerMetaContent=footerMetaContent/>
 
     <#--Custom scripts-->
-    <#local checkboxTogglerUrl = springUrl('/assets/static/js/pathfinder/checkboxToggler.js') />
-    <script src="${checkboxTogglerUrl}"></script>
+    <@pathfinderCustomScripts/>
 
   </@genericLayout>
 </#macro>

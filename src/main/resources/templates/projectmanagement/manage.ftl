@@ -16,7 +16,7 @@
       </@inlineInputAction.inlineInputAction>
     </@fdsForm.htmlForm>
     <#if form.version != 1>
-      <@differenceChanges.toggler/>
+      <@differenceChanges.toggler analyticsEventCategory="SHOW_DIFFS_PROJECT"/>
     </#if>
   </#if>
   <@noEscapeHtml.noEscapeHtml html=projectManagementView.versionContentHtml />
