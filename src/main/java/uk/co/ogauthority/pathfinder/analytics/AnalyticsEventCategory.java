@@ -16,7 +16,9 @@ public enum AnalyticsEventCategory {
 
   PROJECT_DRAFT_CANCELLED("Project draft cancelled"),
 
-  SHOW_DIFFS_PROJECT("Show differences between versions of a project");
+  SHOW_DIFFS_PROJECT("Show differences between versions of a project"),
+
+  WORK_AREA_FILTERED("Work area filtered");
 
   private final String displayName;
 
