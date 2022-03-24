@@ -1,14 +1,18 @@
 package uk.co.ogauthority.pathfinder.controller.subscription;
 
+import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
 import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
@@ -22,14 +26,18 @@ public class SubscriptionController {
   private final SubscriptionService subscriptionService;
   private final ControllerHelperService controllerHelperService;
   private final MetricsProvider metricsProvider;
+  private final AnalyticsService analyticsService;
 
   @Autowired
   public SubscriptionController(
       SubscriptionService subscriptionService,
-      ControllerHelperService controllerHelperService, MetricsProvider metricsProvider) {
+      ControllerHelperService controllerHelperService,
+      MetricsProvider metricsProvider,
+      AnalyticsService analyticsService) {
     this.subscriptionService = subscriptionService;
     this.controllerHelperService = controllerHelperService;
     this.metricsProvider = metricsProvider;
+    this.analyticsService = analyticsService;
   }
 
   @GetMapping("/subscribe")
@@ -40,7 +48,8 @@ public class SubscriptionController {
 
   @PostMapping("/subscribe")
   public ModelAndView subscribe(@Valid @ModelAttribute("form") SubscribeForm form,
-                                BindingResult bindingResult) {
+                                BindingResult bindingResult,
+                                @CookieValue(name = "pathfinder-ga-client-id", required = false) Optional<String> analyticsClientId) {
     metricsProvider.getSubscribePagePostCounter().increment();
     bindingResult = subscriptionService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
@@ -49,8 +58,9 @@ public class SubscriptionController {
         form,
         () -> {
           subscriptionService.subscribe(form);
+          analyticsService.sendGoogleAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.NEW_SUBSCRIBER);
           // We don't redirect to a separate endpoint here as we don't want the confirmation
-          // page to be publicly accessible. We considered adding errors to the the email
+          // page to be publicly accessible. We considered adding errors to the email
           // address form field if already subscribed, however this would give anyone the
           // ability to tell if an email address is currently subscribed by submitting the form.
           return subscriptionService.getSubscribeConfirmationModelAndView();
@@ -69,7 +79,8 @@ public class SubscriptionController {
   }
 
   @PostMapping("/unsubscribe/{subscriberUuid}")
-  public ModelAndView unsubscribe(@PathVariable("subscriberUuid") String subscriberUuid) {
+  public ModelAndView unsubscribe(@PathVariable("subscriberUuid") String subscriberUuid,
+                                  @CookieValue(name = "pathfinder-ga-client-id", required = false) Optional<String> analyticsClientId) {
     metricsProvider.getUnsubscribePagePostCounter().increment();
     AuditService.audit(
         AuditEvent.UNSUBSCRIBE_POST_REQUEST,
@@ -77,6 +88,7 @@ public class SubscriptionController {
     );
     var uuid = subscriptionService.verifyIsSubscribed(subscriberUuid);
     subscriptionService.unsubscribe(uuid);
+    analyticsService.sendGoogleAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.SUBSCRIBER_UNSUBSCRIBED);
     return subscriptionService.getUnsubscribeConfirmationModelAndView();
   }
 }

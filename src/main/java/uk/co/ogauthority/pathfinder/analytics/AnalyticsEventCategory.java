@@ -7,6 +7,9 @@ public enum AnalyticsEventCategory {
 
   PROJECT_SUBMISSION("Project submitted"),
 
+  NEW_SUBSCRIBER("New subscriber"),
+  SUBSCRIBER_UNSUBSCRIBED("Subscriber unsubscribed"),
+
   SHOW_DIFFS_PROJECT("Show differences between versions of a project");
 
   private final String displayName;
