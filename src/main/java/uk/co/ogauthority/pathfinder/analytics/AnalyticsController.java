@@ -22,16 +22,16 @@ public class AnalyticsController {
   @PostMapping(value = "/analytics/collect", consumes = MediaType.APPLICATION_JSON_VALUE)
   public ModelAndView collectAnalyticsEvent(
       @RequestBody AnalyticsEventForm analyticsEventForm,
-      @CookieValue(name = "pathfinder-ga-client-id", required = false) Optional<String> googleAnalyticsClientId
+      @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false) Optional<String> googleAnalyticsClientId
   ) {
 
-    analyticsService.sendGoogleAnalyticsEvent(
+    analyticsService.sendAnalyticsEvent(
         googleAnalyticsClientId,
         analyticsEventForm.getEventCategory(),
         analyticsEventForm.getParamMap()
     );
 
-    return new ModelAndView("blank");
+    return new ModelAndView("analytics/response");
 
   }
 

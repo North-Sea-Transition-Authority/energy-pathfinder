@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsUtils;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 
 @Component
@@ -50,15 +51,16 @@ public class ProjectRouteInterceptor implements HandlerInterceptor {
         }
 
         var analyticsClientIdOpt = Arrays.stream(request.getCookies())
-            .filter(cookie -> Objects.equals(cookie.getName(), "pathfinder-ga-client-id"))
+            .filter(cookie -> Objects.equals(cookie.getName(), AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME))
             .map(Cookie::getValue)
             .findFirst();
 
-        // transform "project/247/forward-work-plan/collaboration-opportunities/collaboration-opportunity/" into "collaboration-opportunity"
-        var endpointIdString = StringUtils.substringBefore(StringUtils.reverseDelimited(request.getRequestURI(), '/'), "/");
+        // transform "/engedudev1/cw/project/361/infrastructure/collaboration-opportunities/collaboration-opportunity/21/edit"
+        // into "/infrastructure/collaboration-opportunities/collaboration-opportunity//edit"
+        var endpointIdString = StringUtils.substringAfter(request.getRequestURI().replaceAll("[0-9*]", ""), "project/");
 
         resolvedValidationTypes.forEach(validationType -> analyticsService
-            .sendGoogleAnalyticsEvent(
+            .sendAnalyticsEvent(
                 analyticsClientIdOpt,
                 // we will never attempt this for a validation type that doesn't have a category due to the filter above
                 validationType.getAnalyticsEventCategory().orElseThrow(),

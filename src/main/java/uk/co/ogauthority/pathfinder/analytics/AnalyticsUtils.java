@@ -8,8 +8,10 @@ import uk.co.ogauthority.pathfinder.util.FormObjectMapper;
 
 public class AnalyticsUtils {
 
+  public static final String GA_CLIENT_ID_COOKIE_NAME = "pathfinder-ga-client-id";
+
   private AnalyticsUtils() {
-    throw new AssertionError("No util for you");
+    throw new IllegalStateException("AnalyticsUtils is a utility class and should not be instantiated");
   }
 
   public static Map<String, String> getFiltersUsedParamMap(Object searchParamsObject) {

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsUtils;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
@@ -84,7 +85,8 @@ public class OperatorUpdateController {
                                    BindingResult bindingResult,
                                    OperatorProjectUpdateContext operatorProjectUpdateContext,
                                    AuthenticatedUserAccount user,
-                                   @CookieValue(name = "pathfinder-ga-client-id", required = false) Optional<String> analyticsClientId) {
+                                   @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false)
+                                         Optional<String> analyticsClientId) {
     bindingResult = operatorProjectUpdateService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
@@ -98,7 +100,7 @@ public class OperatorUpdateController {
               form
           );
 
-          analyticsService.sendGoogleAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.NO_CHANGE_UPDATE_SUBMITTED,
+          analyticsService.sendAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.NO_CHANGE_UPDATE_SUBMITTED,
               Map.of("project_type", operatorProjectUpdateContext.getProjectDetails().getProjectType().name()));
 
           return ReverseRouter.redirect(on(OperatorUpdateController.class).provideNoUpdateConfirmation(projectId, null));

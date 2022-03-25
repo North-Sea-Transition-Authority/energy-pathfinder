@@ -46,7 +46,8 @@
   <script>
     var PATHFINDER_CONFIG = {
       analyticsMeasurementUrl: "<@spring.url analyticsMeasurementUrl/>",
-      globalTag: "${analytics.globalTag}"
+      globalTag: "${analytics.globalTag}",
+      analyticsClientIdCookieName: "${analyticsClientIdCookieName}"
     };
   </script>
 </#macro>

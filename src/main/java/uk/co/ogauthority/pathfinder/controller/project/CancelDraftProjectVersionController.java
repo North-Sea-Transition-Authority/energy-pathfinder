@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsUtils;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
@@ -57,11 +58,12 @@ public class CancelDraftProjectVersionController {
   public ModelAndView cancelDraft(@PathVariable("projectId") Integer projectId,
                                   ProjectContext projectContext,
                                   AuthenticatedUserAccount user,
-                                  @CookieValue(name = "pathfinder-ga-client-id", required = false) Optional<String> analyticsClientId) {
+                                  @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false)
+                                        Optional<String> analyticsClientId) {
     final var projectDetail = projectContext.getProjectDetails();
     checkCancellingPermitted(projectDetail);
     cancelDraftProjectVersionService.cancelDraft(projectContext.getProjectDetails());
-    analyticsService.sendGoogleAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.PROJECT_DRAFT_CANCELLED,
+    analyticsService.sendAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.PROJECT_DRAFT_CANCELLED,
         Map.of("project_type", projectDetail.getProjectType().name()));
     return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(null, null));
   }

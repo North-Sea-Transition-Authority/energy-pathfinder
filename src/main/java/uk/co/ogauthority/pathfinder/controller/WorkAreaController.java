@@ -47,11 +47,11 @@ public class WorkAreaController {
       AuthenticatedUserAccount user,
       @ModelAttribute("form") DashboardFilterForm form,
       @ModelAttribute("dashboardFilter") DashboardFilter filter,
-      @CookieValue(name = "pathfinder-ga-client-id", required = false) Optional<String> analyticsClientId
+      @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false) Optional<String> analyticsClientId
   ) {
     filter.setFromForm(form);
     var analyticsParamMap = AnalyticsUtils.getFiltersUsedParamMap(filter);
-    analyticsService.sendGoogleAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.WORK_AREA_FILTERED, analyticsParamMap);
+    analyticsService.sendAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.WORK_AREA_FILTERED, analyticsParamMap);
     return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(null, null));
   }
 

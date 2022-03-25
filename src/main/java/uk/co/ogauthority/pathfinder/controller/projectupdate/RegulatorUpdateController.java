@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsUtils;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
@@ -74,7 +75,8 @@ public class RegulatorUpdateController {
                                     BindingResult bindingResult,
                                     RegulatorProjectUpdateContext regulatorProjectUpdateContext,
                                     AuthenticatedUserAccount user,
-                                    @CookieValue(name = "pathfinder-ga-client-id", required = false) Optional<String> analyticsClientId) {
+                                    @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false)
+                                          Optional<String> analyticsClientId) {
     bindingResult = regulatorUpdateRequestService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
@@ -82,7 +84,7 @@ public class RegulatorUpdateController {
         form,
         () -> {
           regulatorUpdateRequestService.requestUpdate(regulatorProjectUpdateContext.getProjectDetails(), form, user);
-          analyticsService.sendGoogleAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.UPDATE_REQUESTED,
+          analyticsService.sendAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.UPDATE_REQUESTED,
               Map.of("project_type", regulatorProjectUpdateContext.getProjectDetails().getProjectType().name()));
           return ReverseRouter.redirect(on(WorkAreaController.class).getWorkArea(null, null));
         }

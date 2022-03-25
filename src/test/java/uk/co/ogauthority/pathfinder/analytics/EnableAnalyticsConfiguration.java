@@ -11,6 +11,6 @@ import org.springframework.test.context.ActiveProfiles;
     AnalyticsProperties.class,
     AnalyticsConfig.class
 })
-@Import(AnalyticsConfiguration.class)
+@Import(AnalyticsConfigurationProperties.class)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EnableAnalyticsConfiguration { }
