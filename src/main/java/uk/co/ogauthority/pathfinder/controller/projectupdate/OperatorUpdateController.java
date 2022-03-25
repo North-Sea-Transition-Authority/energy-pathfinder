@@ -85,7 +85,8 @@ public class OperatorUpdateController {
                                    BindingResult bindingResult,
                                    OperatorProjectUpdateContext operatorProjectUpdateContext,
                                    AuthenticatedUserAccount user,
-                                   @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false) Optional<String> analyticsClientId) {
+                                   @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false)
+                                         Optional<String> analyticsClientId) {
     bindingResult = operatorProjectUpdateService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,

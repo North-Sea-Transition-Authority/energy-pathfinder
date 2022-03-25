@@ -75,7 +75,8 @@ public class RegulatorUpdateController {
                                     BindingResult bindingResult,
                                     RegulatorProjectUpdateContext regulatorProjectUpdateContext,
                                     AuthenticatedUserAccount user,
-                                    @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false) Optional<String> analyticsClientId) {
+                                    @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false)
+                                          Optional<String> analyticsClientId) {
     bindingResult = regulatorUpdateRequestService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,

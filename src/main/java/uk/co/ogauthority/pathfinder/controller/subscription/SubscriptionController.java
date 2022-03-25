@@ -50,7 +50,8 @@ public class SubscriptionController {
   @PostMapping("/subscribe")
   public ModelAndView subscribe(@Valid @ModelAttribute("form") SubscribeForm form,
                                 BindingResult bindingResult,
-                                @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false) Optional<String> analyticsClientId) {
+                                @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false)
+                                      Optional<String> analyticsClientId) {
     metricsProvider.getSubscribePagePostCounter().increment();
     bindingResult = subscriptionService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
@@ -81,7 +82,8 @@ public class SubscriptionController {
 
   @PostMapping("/unsubscribe/{subscriberUuid}")
   public ModelAndView unsubscribe(@PathVariable("subscriberUuid") String subscriberUuid,
-                                  @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false) Optional<String> analyticsClientId) {
+                                  @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false)
+                                      Optional<String> analyticsClientId) {
     metricsProvider.getUnsubscribePagePostCounter().increment();
     AuditService.audit(
         AuditEvent.UNSUBSCRIBE_POST_REQUEST,

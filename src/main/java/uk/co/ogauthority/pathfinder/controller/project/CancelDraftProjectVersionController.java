@@ -58,7 +58,8 @@ public class CancelDraftProjectVersionController {
   public ModelAndView cancelDraft(@PathVariable("projectId") Integer projectId,
                                   ProjectContext projectContext,
                                   AuthenticatedUserAccount user,
-                                  @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false) Optional<String> analyticsClientId) {
+                                  @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false)
+                                        Optional<String> analyticsClientId) {
     final var projectDetail = projectContext.getProjectDetails();
     checkCancellingPermitted(projectDetail);
     cancelDraftProjectVersionService.cancelDraft(projectContext.getProjectDetails());
