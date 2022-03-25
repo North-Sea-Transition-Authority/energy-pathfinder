@@ -8,7 +8,7 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "analytics.config")
 @ConstructorBinding
 @Validated
-public class AnalyticsConfig {
+class AnalyticsConfig {
 
   @NotNull
   private final boolean enabled;
@@ -21,7 +21,7 @@ public class AnalyticsConfig {
 
   private final Integer connectionTimeoutSeconds;
 
-  public AnalyticsConfig(boolean enabled,
+  AnalyticsConfig(boolean enabled,
                          String apiSecret,
                          String endpointUrl,
                          String userAgent,
@@ -33,23 +33,23 @@ public class AnalyticsConfig {
     this.connectionTimeoutSeconds = connectionTimeoutSeconds;
   }
 
-  public boolean isEnabled() {
+  boolean isEnabled() {
     return enabled;
   }
 
-  public String getApiSecret() {
+  String getApiSecret() {
     return apiSecret;
   }
 
-  public String getEndpointUrl() {
+  String getEndpointUrl() {
     return endpointUrl;
   }
 
-  public String getUserAgent() {
+  String getUserAgent() {
     return userAgent;
   }
 
-  public Integer getConnectionTimeoutSeconds() {
+  Integer getConnectionTimeoutSeconds() {
     return connectionTimeoutSeconds;
   }
 
