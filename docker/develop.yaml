@@ -48,9 +48,9 @@ services:
       PATHFINDER_DB_URL: "edu-dev-db5.decc.local:1521:edudev1"
       PATHFINDER_DB_SCHEMA: "PATHFINDER"
       PATHFINDER_DB_PASSWORD: "dev1"
-      PATHFINDER_FOX_LOGIN_URL: "http://edu-app3.decc.local/engedudev1/fox/oga/OGA_LOGIN/login?REFERRED_BY=PATHFINDER"
-      PATHFINDER_FOX_LOGOUT_URL: "http://edu-app3.decc.local/engedudev1/fox/oga/OGA_LOGIN/logout"
-      PATHFINDER_FOX_REGISTRATION_URL: "http://edu-app3.decc.local/engedudev1/fox?foxopen=oga/LOGIN001L/register"
+      PATHFINDER_FOX_LOGIN_URL: "http://edu-app3.decc.local/engedudev1/fox/nsta/NSTA_LOGIN/login?REFERRED_BY=PATHFINDER"
+      PATHFINDER_FOX_LOGOUT_URL: "http://edu-app3.decc.local/engedudev1/fox/nsta/NSTA_LOGIN/logout"
+      PATHFINDER_FOX_REGISTRATION_URL: "http://edu-app3.decc.local/engedudev1/fox?foxopen=nsta/LOGIN001L/register"
       PATHFINDER_ENABLE_STATSD: "false"
       PATHFINDER_CLAMAV_HOST: "clamav"
       PATHFINDER_CLAMAV_PORT: 3310
