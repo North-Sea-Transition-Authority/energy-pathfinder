@@ -20,9 +20,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfig;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfiguration;
-import uk.co.ogauthority.pathfinder.analytics.AnalyticsProperties;
+import uk.co.ogauthority.pathfinder.analytics.EnableAnalyticsConfiguration;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.model.entity.UserSession;
@@ -41,12 +40,8 @@ import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdate
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.team.teammanagementcontext.TeamManagementContextService;
 
-@ActiveProfiles("test")
-@EnableConfigurationProperties(value = {
-    AnalyticsProperties.class,
-    AnalyticsConfig.class
-})
-@Import({AbstractControllerTest.TestConfig.class, RegulatorProjectUpdateContextAbstractControllerTest.TestConfig.class, AnalyticsConfiguration.class})
+@EnableAnalyticsConfiguration
+@Import({AbstractControllerTest.TestConfig.class, RegulatorProjectUpdateContextAbstractControllerTest.TestConfig.class})
 public abstract class RegulatorProjectUpdateContextAbstractControllerTest {
 
   protected MockMvc mockMvc;

@@ -59,8 +59,9 @@ public class SubmitProjectController {
     final var isProjectValid = submitProjectService.isProjectValid(projectDetail);
 
     if (isProjectValid) {
+      var modelAndView = submitProjectAndRedirectToConfirmation(projectDetail, projectContext.getUserAccount());
       analyticsService.sendGoogleAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.PROJECT_SUBMISSION);
-      return submitProjectAndRedirectToConfirmation(projectDetail, projectContext.getUserAccount());
+      return modelAndView;
     }
 
     return submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail, false);
