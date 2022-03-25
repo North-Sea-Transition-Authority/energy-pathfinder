@@ -12,7 +12,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 public enum ViewableTeamType {
 
   REGULATOR_TEAM(
-      "OGA team",
+      "NSTA team",
       "Team for regulator users",
       ReverseRouter.route(on(PortalTeamManagementController.class).renderManageableTeams(null, TeamType.REGULATOR)),
       10
