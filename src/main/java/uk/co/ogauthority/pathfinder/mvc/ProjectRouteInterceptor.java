@@ -55,8 +55,9 @@ public class ProjectRouteInterceptor implements HandlerInterceptor {
             .map(Cookie::getValue)
             .findFirst();
 
-        // transform "project/247/forward-work-plan/collaboration-opportunities/collaboration-opportunity/" into "collaboration-opportunity"
-        var endpointIdString = StringUtils.substringBefore(StringUtils.reverseDelimited(request.getRequestURI(), '/'), "/");
+        // transform "/engedudev1/cw/project/361/infrastructure/collaboration-opportunities/collaboration-opportunity/21/edit"
+        // into "/infrastructure/collaboration-opportunities/collaboration-opportunity//edit"
+        var endpointIdString = StringUtils.substringAfter(request.getRequestURI().replaceAll("[0-9*]", ""), "project/");
 
         resolvedValidationTypes.forEach(validationType -> analyticsService
             .sendAnalyticsEvent(
