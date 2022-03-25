@@ -25,15 +25,15 @@ public class AnalyticsService {
   private static final Logger LOGGER = LoggerFactory.getLogger(AnalyticsService.class);
 
   private final ClientHttpRequestFactory requestFactory;
-  private final AnalyticsConfiguration configuration;
+  private final AnalyticsConfigurationProperties configurationProperties;
   private final ObjectMapper objectMapper;
 
   @Autowired
   public AnalyticsService(ClientHttpRequestFactory requestFactory,
-                          AnalyticsConfiguration configuration,
+                          AnalyticsConfigurationProperties configurationProperties,
                           ObjectMapper objectMapper) {
     this.requestFactory = requestFactory;
-    this.configuration = configuration;
+    this.configurationProperties = configurationProperties;
     this.objectMapper = objectMapper;
   }
 
@@ -61,7 +61,7 @@ public class AnalyticsService {
       Map<String, String> paramMap
   ) {
 
-    if (!configuration.getConfig().isEnabled()) {
+    if (!configurationProperties.getConfig().isEnabled()) {
       return;
     }
 
@@ -72,14 +72,14 @@ public class AnalyticsService {
           .orElse("anonymous_user");
 
       var restTemplate = new RestTemplateBuilder()
-          .setConnectTimeout(Duration.ofSeconds(configuration.getConfig().getConnectionTimeoutSeconds()))
-          .setReadTimeout(Duration.ofSeconds(configuration.getConfig().getConnectionTimeoutSeconds()))
-          .defaultHeader("User-Agent", configuration.getConfig().getUserAgent())
+          .setConnectTimeout(Duration.ofSeconds(configurationProperties.getConfig().getConnectionTimeoutSeconds()))
+          .setReadTimeout(Duration.ofSeconds(configurationProperties.getConfig().getConnectionTimeoutSeconds()))
+          .defaultHeader("User-Agent", configurationProperties.getConfig().getUserAgent())
           .requestFactory(() -> requestFactory)
           .build();
 
-      sendEventForTag(restTemplate, configuration.getProperties().getAppTag(), clientId, eventCategory, paramMap);
-      sendEventForTag(restTemplate, configuration.getProperties().getGlobalTag(), clientId, eventCategory, paramMap);
+      sendEventForTag(restTemplate, configurationProperties.getProperties().getAppTag(), clientId, eventCategory, paramMap);
+      sendEventForTag(restTemplate, configurationProperties.getProperties().getGlobalTag(), clientId, eventCategory, paramMap);
 
     } catch (Exception e) {
       LOGGER.error("Error sending Google Analytics event. Response was still served to user", e);
@@ -99,9 +99,9 @@ public class AnalyticsService {
 
     var request = new HttpEntity<>(payloadString, headers);
 
-    var uriTemplate = UriComponentsBuilder.fromHttpUrl(configuration.getConfig().getEndpointUrl())
+    var uriTemplate = UriComponentsBuilder.fromHttpUrl(configurationProperties.getConfig().getEndpointUrl())
         .queryParam("measurement_id", trackingId)
-        .queryParam("api_secret", configuration.getConfig().getApiSecret())
+        .queryParam("api_secret", configurationProperties.getConfig().getApiSecret())
         .build()
         .toUriString();
 
