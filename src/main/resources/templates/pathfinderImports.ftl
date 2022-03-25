@@ -30,6 +30,7 @@
 <#import 'macros/tag.ftl' as tag>
 <#import 'macros/textUtil.ftl' as textUtil>
 <#import 'macros/panel.ftl' as panel>
+<#import 'macros/footerLinks.ftl' as pathfinderFooter>
 
 <#function springUrl url>
   <#local springUrl>
@@ -37,3 +38,16 @@
   </#local>
   <#return springUrl>
 </#function>
+
+<#macro pathfinderCustomScripts>
+  <#local checkboxTogglerUrl = springUrl('/assets/static/js/pathfinder/checkboxToggler.js') />
+  <script src="${checkboxTogglerUrl}"></script>
+  <script src="<@spring.url'/assets/static/js/pathfinder/googleAnalyticsEventTracking.js'/>"></script>
+  <script>
+    var PATHFINDER_CONFIG = {
+      analyticsMeasurementUrl: "<@spring.url analyticsMeasurementUrl/>",
+      globalTag: "${analytics.globalTag}",
+      analyticsClientIdCookieName: "${analyticsClientIdCookieName}"
+    };
+  </script>
+</#macro>

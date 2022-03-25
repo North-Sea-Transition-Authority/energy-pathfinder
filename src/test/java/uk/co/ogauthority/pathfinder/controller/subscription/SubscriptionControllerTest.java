@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.controller.subscription;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -10,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +22,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
@@ -59,13 +62,14 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         post(ReverseRouter.route(on(SubscriptionController.class)
-            .subscribe(null, null)
+            .subscribe(null, null, Optional.empty())
         )))
         .andExpect(status().isOk());
 
     verify(subscriptionService, times(1)).validate(any(), any());
     verify(subscriptionService, times(1)).subscribe(any());
     verify(metricsProvider.getSubscribePagePostCounter(), times(1)).increment();
+    verify(analyticsService, times(1)).sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.NEW_SUBSCRIBER));
   }
 
   @Test
@@ -80,7 +84,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         post(ReverseRouter.route(on(SubscriptionController.class)
-            .subscribe(null, null)
+            .subscribe(null, null, Optional.empty())
         )))
         .andExpect(status().isOk());
 
@@ -105,12 +109,13 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
 
     mockMvc.perform(
         post(ReverseRouter.route(on(SubscriptionController.class)
-            .unsubscribe(SUBSCRIBER_UUID.toString())
+            .unsubscribe(SUBSCRIBER_UUID.toString(), Optional.empty())
         )))
         .andExpect(status().isOk());
 
     verify(subscriptionService, times(1)).verifyIsSubscribed(SUBSCRIBER_UUID.toString());
     verify(subscriptionService, times(1)).unsubscribe(SUBSCRIBER_UUID);
+    verify(analyticsService, times(1)).sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.SUBSCRIBER_UNSUBSCRIBED));
     verify(metricsProvider.getUnsubscribePagePostCounter(), times(1)).increment();
   }
 }

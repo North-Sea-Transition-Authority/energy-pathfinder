@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.co.ogauthority.pathfinder.analytics.EnableAnalyticsConfiguration;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.config.file.FileUploadProperties;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
@@ -84,6 +85,9 @@ public abstract class AbstractControllerTest {
 
   @MockBean
   protected FooterService footerService;
+
+  @MockBean
+  protected AnalyticsService analyticsService;
 
   @Before
   public void abstractControllerTestSetup() {

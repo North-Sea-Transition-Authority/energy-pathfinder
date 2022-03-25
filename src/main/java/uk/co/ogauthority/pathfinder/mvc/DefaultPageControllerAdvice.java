@@ -1,5 +1,8 @@
 package uk.co.ogauthority.pathfinder.mvc;
 
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+
+import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
@@ -8,7 +11,10 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfiguration;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfigurationProperties;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsController;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsUtils;
 import uk.co.ogauthority.pathfinder.auth.CurrentUserView;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
@@ -25,7 +31,8 @@ public class DefaultPageControllerAdvice {
   private final TopNavigationService topNavigationService;
   private final HttpServletRequest request;
   private final FooterService footerService;
-  private final AnalyticsConfiguration analyticsConfiguration;
+  private final AnalyticsConfigurationProperties analyticsConfigurationProperties;
+  private final String analyticsMeasurementUrl;
 
   @Autowired
   public DefaultPageControllerAdvice(FoxUrlService foxUrlService,
@@ -33,13 +40,15 @@ public class DefaultPageControllerAdvice {
                                      TopNavigationService topNavigationService,
                                      HttpServletRequest request,
                                      FooterService footerService,
-                                     AnalyticsConfiguration analyticsConfiguration) {
+                                     AnalyticsConfigurationProperties analyticsConfigurationProperties) {
     this.foxUrlService = foxUrlService;
     this.serviceProperties = serviceProperties;
     this.topNavigationService = topNavigationService;
     this.request = request;
     this.footerService = footerService;
-    this.analyticsConfiguration = analyticsConfiguration;
+    this.analyticsConfigurationProperties = analyticsConfigurationProperties;
+    this.analyticsMeasurementUrl = ReverseRouter.route(on(AnalyticsController.class)
+        .collectAnalyticsEvent(null, Optional.empty()));
   }
 
   @InitBinder
@@ -58,8 +67,11 @@ public class DefaultPageControllerAdvice {
   }
 
   private void addAnalyticsItems(Model model) {
-    model.addAttribute("analytics", analyticsConfiguration.getProperties());
+    model.addAttribute("analytics", analyticsConfigurationProperties.getProperties());
     model.addAttribute("cookiePrefsUrl", ControllerUtils.getCookiesUrl());
+    model.addAttribute("analyticsMeasurementUrl", analyticsMeasurementUrl);
+    model.addAttribute("analyticsClientIdCookieName", AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME);
+    model.addAttribute("showDiffsProjectEventCategory", AnalyticsEventCategory.SHOW_DIFFS_PROJECT.name());
   }
 
   private void addCurrentUserView(Model model) {

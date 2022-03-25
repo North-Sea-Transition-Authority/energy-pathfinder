@@ -1,6 +1,10 @@
 package uk.co.ogauthority.pathfinder.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -10,6 +14,8 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +25,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
@@ -88,7 +95,7 @@ public class WorkAreaControllerTest extends AbstractControllerTest {
 
   @Test
   public void authenticatedUser_hasAccessToFilteredWorkArea() throws Exception {
-    mockMvc.perform(post(ReverseRouter.route(on(WorkAreaController.class).getWorkAreaFiltered(authenticatedUser, null, DEFAULT_FILTER)))
+    mockMvc.perform(post(ReverseRouter.route(on(WorkAreaController.class).getWorkAreaFiltered(authenticatedUser, null, DEFAULT_FILTER, Optional.empty())))
         .with(authenticatedUserAndSession(authenticatedUser))
         .with(csrf()))
         .andExpect(status().is3xxRedirection());
@@ -96,7 +103,7 @@ public class WorkAreaControllerTest extends AbstractControllerTest {
 
   @Test
   public void unAuthenticatedUser_cannotAccessFilteredWorkArea() throws Exception {
-    mockMvc.perform(post(ReverseRouter.route(on(WorkAreaController.class).getWorkAreaFiltered(unAuthenticatedUser, null, DEFAULT_FILTER)))
+    mockMvc.perform(post(ReverseRouter.route(on(WorkAreaController.class).getWorkAreaFiltered(unAuthenticatedUser, null, DEFAULT_FILTER, Optional.empty())))
         .with(authenticatedUserAndSession(unAuthenticatedUser))
         .with(csrf()))
         .andExpect(status().isForbidden());
@@ -148,13 +155,20 @@ public class WorkAreaControllerTest extends AbstractControllerTest {
     form.setProjectStatusList(STATUSES);
     filter.setFromForm(form);
 
-    mockMvc.perform(post(ReverseRouter.route(on(WorkAreaController.class).getWorkAreaFiltered(authenticatedUser, form, DEFAULT_FILTER)))
+    mockMvc.perform(post(ReverseRouter.route(on(WorkAreaController.class).getWorkAreaFiltered(authenticatedUser, form, DEFAULT_FILTER, Optional.empty())))
         .with(authenticatedUserAndSession(authenticatedUser))
         .sessionAttr("dashboardFilter", DEFAULT_FILTER)
         .flashAttr("form", form)
         .with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andReturn();
+
+    verify(analyticsService, times(1)).sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.WORK_AREA_FILTERED),
+        eq(Map.of("projectTitle", "true",
+            "field", "true",
+            "fieldStages", "true",
+            "ukcsAreas", "true",
+            "projectStatusList", "true")));
 
     var result = mockMvc.perform(get(ReverseRouter.route(on(WorkAreaController.class).getWorkArea(authenticatedUser, null)))
         .with(authenticatedUserAndSession(authenticatedUser))
