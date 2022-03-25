@@ -9,20 +9,16 @@ import java.util.Optional;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.CustomScopeConfigurer;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.SimpleThreadScope;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfig;
-import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfiguration;
-import uk.co.ogauthority.pathfinder.analytics.AnalyticsProperties;
+import uk.co.ogauthority.pathfinder.analytics.EnableAnalyticsConfiguration;
 import uk.co.ogauthority.pathfinder.model.entity.UserSession;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
@@ -38,12 +34,8 @@ import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdate
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.team.teammanagementcontext.TeamManagementContextService;
 
-@ActiveProfiles("test")
-@EnableConfigurationProperties(value = {
-    AnalyticsProperties.class,
-    AnalyticsConfig.class
-})
-@Import({AbstractControllerTest.TestConfig.class, TeamManagementContextAbstractControllerTest.TestConfig.class, AnalyticsConfiguration.class})
+@EnableAnalyticsConfiguration
+@Import({AbstractControllerTest.TestConfig.class, TeamManagementContextAbstractControllerTest.TestConfig.class})
 public abstract class TeamManagementContextAbstractControllerTest {
 
   protected MockMvc mockMvc;

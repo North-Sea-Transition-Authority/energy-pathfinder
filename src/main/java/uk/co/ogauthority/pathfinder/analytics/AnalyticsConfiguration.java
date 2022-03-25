@@ -21,7 +21,7 @@ public class AnalyticsConfiguration {
     return properties;
   }
 
-  public AnalyticsConfig getConfig() {
+  AnalyticsConfig getConfig() {
     return config;
   }
 
