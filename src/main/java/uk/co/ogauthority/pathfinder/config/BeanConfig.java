@@ -26,12 +26,7 @@ public class BeanConfig {
   public NotificationClient notificationClient(@Value("${notify.apiKey}") String apiKey,
                                                @Value("${pathfinder.proxy.host:#{null}}") String proxyHost,
                                                @Value("${pathfinder.proxy.port:#{null}}") String proxyPort) {
-    Proxy proxy;
-    if (proxyHost == null) {
-      proxy = Proxy.NO_PROXY;
-    } else {
-      proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, Integer.valueOf(proxyPort)));
-    }
+    var proxy = createProxy(proxyHost, proxyPort);
     return new NotificationClient(apiKey, proxy);
   }
 
@@ -94,7 +89,7 @@ public class BeanConfig {
   }
 
   @Bean
-  @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE) // We need a new instance for each invocation - based on etl config
+  @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
   public ClientHttpRequestFactory requestFactory(@Value("${pathfinder.proxy.host:#{null}}") String proxyHost,
                                                  @Value("${pathfinder.proxy.port:#{null}}") String proxyPort) {
     var httpRequestFactory = new SimpleClientHttpRequestFactory();
