@@ -114,7 +114,7 @@ public class RegulatorUpdateControllerTest extends RegulatorProjectUpdateContext
     verify(regulatorUpdateRequestService, times(1)).validate(any(), any());
     verify(regulatorUpdateRequestService, times(1)).requestUpdate(any(), any(), any());
     verify(analyticsService, times(1))
-        .sendGoogleAnalyticsEvent(any(), eq(AnalyticsEventCategory.UPDATE_REQUESTED), eq(Map.of("project_type", qaProjectDetail.getProjectType().name())));
+        .sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.UPDATE_REQUESTED), eq(Map.of("project_type", qaProjectDetail.getProjectType().name())));
   }
 
   @Test

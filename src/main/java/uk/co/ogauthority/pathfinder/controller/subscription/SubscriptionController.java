@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsUtils;
 import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
@@ -49,7 +50,7 @@ public class SubscriptionController {
   @PostMapping("/subscribe")
   public ModelAndView subscribe(@Valid @ModelAttribute("form") SubscribeForm form,
                                 BindingResult bindingResult,
-                                @CookieValue(name = "pathfinder-ga-client-id", required = false) Optional<String> analyticsClientId) {
+                                @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false) Optional<String> analyticsClientId) {
     metricsProvider.getSubscribePagePostCounter().increment();
     bindingResult = subscriptionService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
@@ -58,7 +59,7 @@ public class SubscriptionController {
         form,
         () -> {
           subscriptionService.subscribe(form);
-          analyticsService.sendGoogleAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.NEW_SUBSCRIBER);
+          analyticsService.sendAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.NEW_SUBSCRIBER);
           // We don't redirect to a separate endpoint here as we don't want the confirmation
           // page to be publicly accessible. We considered adding errors to the email
           // address form field if already subscribed, however this would give anyone the
@@ -80,7 +81,7 @@ public class SubscriptionController {
 
   @PostMapping("/unsubscribe/{subscriberUuid}")
   public ModelAndView unsubscribe(@PathVariable("subscriberUuid") String subscriberUuid,
-                                  @CookieValue(name = "pathfinder-ga-client-id", required = false) Optional<String> analyticsClientId) {
+                                  @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false) Optional<String> analyticsClientId) {
     metricsProvider.getUnsubscribePagePostCounter().increment();
     AuditService.audit(
         AuditEvent.UNSUBSCRIBE_POST_REQUEST,
@@ -88,7 +89,7 @@ public class SubscriptionController {
     );
     var uuid = subscriptionService.verifyIsSubscribed(subscriberUuid);
     subscriptionService.unsubscribe(uuid);
-    analyticsService.sendGoogleAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.SUBSCRIBER_UNSUBSCRIBED);
+    analyticsService.sendAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.SUBSCRIBER_UNSUBSCRIBED);
     return subscriptionService.getUnsubscribeConfirmationModelAndView();
   }
 }

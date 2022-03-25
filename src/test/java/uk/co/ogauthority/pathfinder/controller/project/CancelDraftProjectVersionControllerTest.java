@@ -168,7 +168,7 @@ public class CancelDraftProjectVersionControllerTest extends ProjectContextAbstr
 
     verify(cancelDraftProjectVersionService, times(1)).cancelDraft(projectDetail);
     verify(analyticsService, times(1))
-        .sendGoogleAnalyticsEvent(any(), eq(AnalyticsEventCategory.PROJECT_DRAFT_CANCELLED), eq(
+        .sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.PROJECT_DRAFT_CANCELLED), eq(
             Map.of("project_type", projectDetail.getProjectType().name())));
 
   }

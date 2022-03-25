@@ -176,7 +176,7 @@ public class OperatorUpdateControllerTest extends OperatorProjectUpdateContextAb
     verify(operatorProjectUpdateService, times(1)).validate(any(), any());
     verify(operatorProjectUpdateService, times(1)).createNoUpdateNotification(any(), any(), any());
     verify(analyticsService, times(1))
-        .sendGoogleAnalyticsEvent(any(), eq(AnalyticsEventCategory.NO_CHANGE_UPDATE_SUBMITTED), eq(Map.of("project_type", qaProjectDetail.getProjectType().name())));
+        .sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.NO_CHANGE_UPDATE_SUBMITTED), eq(Map.of("project_type", qaProjectDetail.getProjectType().name())));
   }
 
   @Test

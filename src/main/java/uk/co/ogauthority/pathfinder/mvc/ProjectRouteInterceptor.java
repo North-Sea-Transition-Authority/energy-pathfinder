@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsUtils;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 
 @Component
@@ -50,7 +51,7 @@ public class ProjectRouteInterceptor implements HandlerInterceptor {
         }
 
         var analyticsClientIdOpt = Arrays.stream(request.getCookies())
-            .filter(cookie -> Objects.equals(cookie.getName(), "pathfinder-ga-client-id"))
+            .filter(cookie -> Objects.equals(cookie.getName(), AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME))
             .map(Cookie::getValue)
             .findFirst();
 
@@ -58,7 +59,7 @@ public class ProjectRouteInterceptor implements HandlerInterceptor {
         var endpointIdString = StringUtils.substringBefore(StringUtils.reverseDelimited(request.getRequestURI(), '/'), "/");
 
         resolvedValidationTypes.forEach(validationType -> analyticsService
-            .sendGoogleAnalyticsEvent(
+            .sendAnalyticsEvent(
                 analyticsClientIdOpt,
                 // we will never attempt this for a validation type that doesn't have a category due to the filter above
                 validationType.getAnalyticsEventCategory().orElseThrow(),

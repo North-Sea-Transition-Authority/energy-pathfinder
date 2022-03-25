@@ -11,7 +11,7 @@ $(document).ready(() => {
 
   if (window.FDS.googleAnalytics !== undefined) {
     window.FDS.googleAnalytics._gtag('get', PATHFINDER_CONFIG.globalTag, 'client_id', clientId => {
-      setCookie('pathfinder-ga-client-id', clientId);
+      setCookie(PATHFINDER_CONFIG.analyticsClientIdCookieName, clientId);
     })
   }
 });

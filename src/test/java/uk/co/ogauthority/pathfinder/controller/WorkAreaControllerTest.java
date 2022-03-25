@@ -163,7 +163,7 @@ public class WorkAreaControllerTest extends AbstractControllerTest {
         .andExpect(status().is3xxRedirection())
         .andReturn();
 
-    verify(analyticsService, times(1)).sendGoogleAnalyticsEvent(any(), eq(AnalyticsEventCategory.WORK_AREA_FILTERED),
+    verify(analyticsService, times(1)).sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.WORK_AREA_FILTERED),
         eq(Map.of("projectTitle", "true",
             "field", "true",
             "fieldStages", "true",

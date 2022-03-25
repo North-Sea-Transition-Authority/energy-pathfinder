@@ -2,32 +2,22 @@ package uk.co.ogauthority.pathfinder.analytics;
 
 public enum AnalyticsEventCategory {
 
-  SAVE_PROJECT_FORM("Save project form"),
-  SAVE_PROJECT_FORM_COMPLETE_LATER("Save project form and complete later"),
+  SAVE_PROJECT_FORM,
+  SAVE_PROJECT_FORM_COMPLETE_LATER,
 
-  PROJECT_SUBMISSION("Project submitted"),
+  PROJECT_SUBMISSION,
 
-  NEW_SUBSCRIBER("New subscriber"),
-  SUBSCRIBER_UNSUBSCRIBED("Subscriber unsubscribed"),
+  NEW_SUBSCRIBER,
+  SUBSCRIBER_UNSUBSCRIBED,
 
-  NO_CHANGE_UPDATE_SUBMITTED("No change update submitted"),
+  NO_CHANGE_UPDATE_SUBMITTED,
 
-  UPDATE_REQUESTED("Update requested"),
+  UPDATE_REQUESTED,
 
-  PROJECT_DRAFT_CANCELLED("Project draft cancelled"),
+  PROJECT_DRAFT_CANCELLED,
 
-  SHOW_DIFFS_PROJECT("Show differences between versions of a project"),
+  SHOW_DIFFS_PROJECT,
 
-  WORK_AREA_FILTERED("Work area filtered");
-
-  private final String displayName;
-
-  AnalyticsEventCategory(String displayName) {
-    this.displayName = displayName;
-  }
-
-  public String getDisplayName() {
-    return displayName;
-  }
+  WORK_AREA_FILTERED
 
 }

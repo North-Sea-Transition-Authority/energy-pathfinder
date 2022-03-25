@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfiguration;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsController;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsUtils;
 import uk.co.ogauthority.pathfinder.auth.CurrentUserView;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
@@ -68,6 +70,8 @@ public class DefaultPageControllerAdvice {
     model.addAttribute("analytics", analyticsConfiguration.getProperties());
     model.addAttribute("cookiePrefsUrl", ControllerUtils.getCookiesUrl());
     model.addAttribute("analyticsMeasurementUrl", analyticsMeasurementUrl);
+    model.addAttribute("analyticsClientIdCookieName", AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME);
+    model.addAttribute("showDiffsProjectEventCategory", AnalyticsEventCategory.SHOW_DIFFS_PROJECT.name());
   }
 
   private void addCurrentUserView(Model model) {

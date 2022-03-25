@@ -38,7 +38,7 @@ public class AnalyticsService {
   }
 
   @Async
-  public void sendGoogleAnalyticsEvent(
+  public void sendAnalyticsEvent(
       Optional<String> cookieClientId,
       AnalyticsEventCategory eventCategory
   ) {
@@ -47,7 +47,7 @@ public class AnalyticsService {
 
 
   @Async
-  public void sendGoogleAnalyticsEvent(
+  public void sendAnalyticsEvent(
       Optional<String> cookieClientId,
       AnalyticsEventCategory eventCategory,
       Map<String, String> paramMap

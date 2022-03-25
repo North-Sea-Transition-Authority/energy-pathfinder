@@ -94,7 +94,7 @@ public class SubmitProjectControllerTest extends ProjectContextAbstractControlle
         .with(csrf()))
         .andExpect(status().is3xxRedirection());
 
-    verify(analyticsService, times(1)).sendGoogleAnalyticsEvent(any(), eq(AnalyticsEventCategory.PROJECT_SUBMISSION));
+    verify(analyticsService, times(1)).sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.PROJECT_SUBMISSION));
     verify(submitProjectService, times(1)).submitProject(any(), any());
   }
 

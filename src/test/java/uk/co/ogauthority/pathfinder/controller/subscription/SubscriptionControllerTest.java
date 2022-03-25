@@ -69,7 +69,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     verify(subscriptionService, times(1)).validate(any(), any());
     verify(subscriptionService, times(1)).subscribe(any());
     verify(metricsProvider.getSubscribePagePostCounter(), times(1)).increment();
-    verify(analyticsService, times(1)).sendGoogleAnalyticsEvent(any(), eq(AnalyticsEventCategory.NEW_SUBSCRIBER));
+    verify(analyticsService, times(1)).sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.NEW_SUBSCRIBER));
   }
 
   @Test
@@ -115,7 +115,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
 
     verify(subscriptionService, times(1)).verifyIsSubscribed(SUBSCRIBER_UUID.toString());
     verify(subscriptionService, times(1)).unsubscribe(SUBSCRIBER_UUID);
-    verify(analyticsService, times(1)).sendGoogleAnalyticsEvent(any(), eq(AnalyticsEventCategory.SUBSCRIBER_UNSUBSCRIBED));
+    verify(analyticsService, times(1)).sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.SUBSCRIBER_UNSUBSCRIBED));
     verify(metricsProvider.getUnsubscribePagePostCounter(), times(1)).increment();
   }
 }
