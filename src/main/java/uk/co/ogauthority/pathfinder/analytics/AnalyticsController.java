@@ -31,7 +31,7 @@ public class AnalyticsController {
         analyticsEventForm.getParamMap()
     );
 
-    return new ModelAndView("blank");
+    return new ModelAndView("analytics/response");
 
   }
 
