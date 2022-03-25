@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsUtils;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
@@ -52,7 +53,7 @@ public class SubmitProjectController {
   @PostMapping
   public ModelAndView submitProject(@PathVariable("projectId") Integer projectId,
                                     ProjectContext projectContext,
-                                    @CookieValue(name = "pathfinder-ga-client-id", required = false)
+                                    @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false)
                                           Optional<String> analyticsClientId) {
 
     final var projectDetail = projectContext.getProjectDetails();
@@ -60,7 +61,7 @@ public class SubmitProjectController {
 
     if (isProjectValid) {
       var modelAndView = submitProjectAndRedirectToConfirmation(projectDetail, projectContext.getUserAccount());
-      analyticsService.sendGoogleAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.PROJECT_SUBMISSION);
+      analyticsService.sendAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.PROJECT_SUBMISSION);
       return modelAndView;
     }
 

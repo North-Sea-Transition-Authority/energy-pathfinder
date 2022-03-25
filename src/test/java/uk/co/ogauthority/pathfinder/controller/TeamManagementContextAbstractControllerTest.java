@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.co.ogauthority.pathfinder.analytics.EnableAnalyticsConfiguration;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
 import uk.co.ogauthority.pathfinder.model.entity.UserSession;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
@@ -81,6 +82,9 @@ public abstract class TeamManagementContextAbstractControllerTest {
 
   @Autowired
   protected TeamManagementContextService teamManagementContextService;
+
+  @MockBean
+  protected AnalyticsService analyticsService;
 
   @Before
   public void  projectContextAbstractControllerTestSetUp() {

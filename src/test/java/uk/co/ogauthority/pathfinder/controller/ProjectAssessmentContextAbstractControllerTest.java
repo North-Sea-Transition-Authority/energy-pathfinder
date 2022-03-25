@@ -9,19 +9,17 @@ import java.util.Optional;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.CustomScopeConfigurer;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.SimpleThreadScope;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfiguration;
 import uk.co.ogauthority.pathfinder.analytics.EnableAnalyticsConfiguration;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.model.entity.UserSession;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
@@ -88,6 +86,9 @@ public abstract class ProjectAssessmentContextAbstractControllerTest {
 
   @MockBean
   protected FooterService footerService;
+
+  @MockBean
+  protected AnalyticsService analyticsService;
 
   @Before
   public void projectContextAbstractControllerTestSetUp() {

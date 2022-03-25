@@ -2,18 +2,22 @@ package uk.co.ogauthority.pathfinder.analytics;
 
 public enum AnalyticsEventCategory {
 
-  PROJECT_SUBMISSION("Project submitted"),
+  SAVE_PROJECT_FORM,
+  SAVE_PROJECT_FORM_COMPLETE_LATER,
 
-  SHOW_DIFFS_PROJECT("Show differences between versions of a project");
+  PROJECT_SUBMISSION,
 
-  private final String displayName;
+  NEW_SUBSCRIBER,
+  SUBSCRIBER_UNSUBSCRIBED,
 
-  AnalyticsEventCategory(String displayName) {
-    this.displayName = displayName;
-  }
+  NO_CHANGE_UPDATE_SUBMITTED,
 
-  public String getDisplayName() {
-    return displayName;
-  }
+  UPDATE_REQUESTED,
+
+  PROJECT_DRAFT_CANCELLED,
+
+  SHOW_DIFFS_PROJECT,
+
+  WORK_AREA_FILTERED
 
 }
