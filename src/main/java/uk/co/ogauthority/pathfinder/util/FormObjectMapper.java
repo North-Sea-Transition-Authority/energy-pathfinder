@@ -39,8 +39,9 @@ public class FormObjectMapper {
     Map<String, String> beanMap = new TreeMap<>();
 
     Map<String, Object> properties = getProperties(object);
-    for (String property : properties.keySet()) {
-      Object value = properties.get(property);
+    for (Map.Entry<String, Object> entry : properties.entrySet()) {
+      String property = entry.getKey();
+      Object value = entry.getValue();
       // ignore nulls
       if (value != null) {
         if (Collection.class.isAssignableFrom(value.getClass())) {
@@ -96,7 +97,7 @@ public class FormObjectMapper {
   private static Map<String, Object> getFieldProperties(Object object, Class<?> classType) {
     Map<String, Object> result = new HashMap<>();
 
-    Class superClass = classType.getSuperclass();
+    Class<?> superClass = classType.getSuperclass();
     if (superClass != null) {
       result.putAll(getFieldProperties(object, superClass));
     }
@@ -127,8 +128,9 @@ public class FormObjectMapper {
 
   private static Map<String, String> convertMap(Map<?, ?> values, String key, Set<Object> cache) {
     Map<String, String> valuesMap = new HashMap<>();
-    for (Object thisKey : values.keySet()) {
-      Object value = values.get(thisKey);
+    for (Map.Entry<?, ?> entry : values.entrySet()) {
+      Object thisKey = entry.getKey();
+      Object value = entry.getValue();
       if (value != null) {
         valuesMap.putAll(convertObject(value, key + "[" + thisKey + "]", cache));
       }
