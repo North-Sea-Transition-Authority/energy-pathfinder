@@ -10,6 +10,8 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
@@ -24,6 +26,12 @@ public class DevelopmentTestNotifyCallbackControllerTest extends AbstractControl
 
   @MockBean
   NotifyCallbackService notifyCallbackService;
+
+  @DynamicPropertySource
+  static void registerProperties(DynamicPropertyRegistry registry) {
+    registry.add("analytics.config.enabled", () -> false);
+    registry.add("analytics.config.connection-timeout-seconds", () -> 1);
+  }
 
   @Test
   public void triggerNotifyCallback_ensureNotValidInProductionProfile() throws Exception {

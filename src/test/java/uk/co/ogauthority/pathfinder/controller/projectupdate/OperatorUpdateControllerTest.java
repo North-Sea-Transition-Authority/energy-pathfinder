@@ -1,9 +1,11 @@
 package uk.co.ogauthority.pathfinder.controller.projectupdate;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -12,6 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
+import java.util.Map;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +27,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.OperatorProjectUpdateContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
@@ -162,7 +167,7 @@ public class OperatorUpdateControllerTest extends OperatorProjectUpdateContextAb
 
     mockMvc.perform(
         post(ReverseRouter.route(on(OperatorUpdateController.class)
-            .saveNoUpdate(QA_PROJECT_ID, null, null, null, null)
+            .saveNoUpdate(QA_PROJECT_ID, null, null, null, null, Optional.empty())
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf()))
@@ -170,6 +175,8 @@ public class OperatorUpdateControllerTest extends OperatorProjectUpdateContextAb
 
     verify(operatorProjectUpdateService, times(1)).validate(any(), any());
     verify(operatorProjectUpdateService, times(1)).createNoUpdateNotification(any(), any(), any());
+    verify(analyticsService, times(1))
+        .sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.NO_CHANGE_UPDATE_SUBMITTED), eq(Map.of("project_type", qaProjectDetail.getProjectType().name())));
   }
 
   @Test
@@ -182,7 +189,7 @@ public class OperatorUpdateControllerTest extends OperatorProjectUpdateContextAb
 
     mockMvc.perform(
         post(ReverseRouter.route(on(OperatorUpdateController.class)
-            .saveNoUpdate(QA_PROJECT_ID, null, null, null, null)
+            .saveNoUpdate(QA_PROJECT_ID, null, null, null, null, Optional.empty())
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf()))
@@ -190,13 +197,14 @@ public class OperatorUpdateControllerTest extends OperatorProjectUpdateContextAb
 
     verify(operatorProjectUpdateService, times(1)).validate(any(), any());
     verify(operatorProjectUpdateService, times(0)).createNoUpdateNotification(any(), any(), any());
+    verifyNoInteractions(analyticsService);
   }
 
   @Test
   public void saveNoUpdate_whenUnauthenticatedAndQA_thenNoAccess() throws Exception {
     mockMvc.perform(
         post(ReverseRouter.route(on(OperatorUpdateController.class)
-            .saveNoUpdate(QA_PROJECT_ID, null, null, null, null)
+            .saveNoUpdate(QA_PROJECT_ID, null, null, null, null, Optional.empty())
         ))
             .with(authenticatedUserAndSession(unauthenticatedUser))
             .with(csrf()))
@@ -209,7 +217,7 @@ public class OperatorUpdateControllerTest extends OperatorProjectUpdateContextAb
   public void saveNoUpdate_whenAuthenticatedAndDraft_thenNoAccess() throws Exception {
     mockMvc.perform(
         post(ReverseRouter.route(on(OperatorUpdateController.class)
-            .saveNoUpdate(DRAFT_PROJECT_ID, null, null, null, null)
+            .saveNoUpdate(DRAFT_PROJECT_ID, null, null, null, null, Optional.empty())
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf()))

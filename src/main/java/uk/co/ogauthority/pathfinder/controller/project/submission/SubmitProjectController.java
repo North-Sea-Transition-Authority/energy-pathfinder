@@ -2,13 +2,18 @@ package uk.co.ogauthority.pathfinder.controller.project.submission;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsUtils;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
@@ -30,10 +35,13 @@ public class SubmitProjectController {
   public static final String PAGE_NAME = "Review and submit";
 
   private final SubmitProjectService submitProjectService;
+  private final AnalyticsService analyticsService;
 
   @Autowired
-  public SubmitProjectController(SubmitProjectService submitProjectService) {
+  public SubmitProjectController(SubmitProjectService submitProjectService,
+                                 AnalyticsService analyticsService) {
     this.submitProjectService = submitProjectService;
+    this.analyticsService = analyticsService;
   }
 
   @GetMapping
@@ -44,14 +52,21 @@ public class SubmitProjectController {
 
   @PostMapping
   public ModelAndView submitProject(@PathVariable("projectId") Integer projectId,
-                                    ProjectContext projectContext) {
+                                    ProjectContext projectContext,
+                                    @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false)
+                                          Optional<String> analyticsClientId) {
 
     final var projectDetail = projectContext.getProjectDetails();
     final var isProjectValid = submitProjectService.isProjectValid(projectDetail);
 
-    return isProjectValid
-        ? submitProjectAndRedirectToConfirmation(projectDetail, projectContext.getUserAccount())
-        : submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail, false);
+    if (isProjectValid) {
+      var modelAndView = submitProjectAndRedirectToConfirmation(projectDetail, projectContext.getUserAccount());
+      analyticsService.sendAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.PROJECT_SUBMISSION);
+      return modelAndView;
+    }
+
+    return submitProjectService.getProjectSubmitSummaryModelAndView(projectDetail, false);
+
   }
 
   @GetMapping("/confirmation")

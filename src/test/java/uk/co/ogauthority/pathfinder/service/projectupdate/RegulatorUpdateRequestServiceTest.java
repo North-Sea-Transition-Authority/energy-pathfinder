@@ -214,7 +214,7 @@ public class RegulatorUpdateRequestServiceTest {
         entry("projectHeaderHtml", projectHeaderHtml),
         entry("form", form),
         entry("startActionUrl", ReverseRouter.route(on(RegulatorUpdateController.class)
-            .requestUpdate(project.getId(), null, null, null, null))),
+            .requestUpdate(project.getId(), null, null, null, null, Optional.empty()))),
         entry("cancelUrl", ReverseRouter.route(on(ManageProjectController.class).getProject(project.getId(), null, null, null)))
     );
 

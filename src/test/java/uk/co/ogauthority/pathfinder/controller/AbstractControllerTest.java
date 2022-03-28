@@ -18,6 +18,8 @@ import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfig
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.co.ogauthority.pathfinder.analytics.EnableAnalyticsConfiguration;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.config.file.FileUploadProperties;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
@@ -39,6 +41,7 @@ import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.team.teammanagementcontext.TeamManagementContextService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationErrorOrderingService;
 
+@EnableAnalyticsConfiguration
 @Import(AbstractControllerTest.TestConfig.class)
 public abstract class AbstractControllerTest {
 
@@ -55,9 +58,6 @@ public abstract class AbstractControllerTest {
 
   @MockBean
   protected UserSessionService userSessionService;
-
-  @MockBean
-  protected ServiceProperties serviceProperties;
 
   @MockBean
   protected TopNavigationService topNavigationService;
@@ -86,6 +86,9 @@ public abstract class AbstractControllerTest {
   @MockBean
   protected FooterService footerService;
 
+  @MockBean
+  protected AnalyticsService analyticsService;
+
   @Before
   public void abstractControllerTestSetup() {
     mockMvc = MockMvcBuilders
@@ -98,11 +101,6 @@ public abstract class AbstractControllerTest {
     when(foxUrlService.getFoxRegistrationUrl()).thenReturn("test-registration-url");
 
     when(userSessionService.getAndValidateSession(any(), anyBoolean())).thenReturn(Optional.of(new UserSession()));
-
-    when(serviceProperties.getServiceName()).thenReturn("service-name");
-    when(serviceProperties.getCustomerMnemonic()).thenReturn("customer-mnemonic");
-    when(serviceProperties.getCustomerName()).thenReturn("customer-name");
-    when(serviceProperties.getStackTraceEnabled()).thenReturn(false);
 
     doCallRealMethod().when(footerService).addFooterUrlsToModelAndView(any());
     doCallRealMethod().when(footerService).addFooterUrlsToModel(any());
@@ -141,6 +139,17 @@ public abstract class AbstractControllerTest {
       fileUploadProperties.setAllowedExtensions(FileUploadServiceTest.ALLOWED_TEST_EXTENSIONS);
       return fileUploadProperties;
     }
+
+    @Bean
+    public ServiceProperties serviceProperties() {
+      return new ServiceProperties(
+          "service-name",
+          "customer-mnemonic",
+          "customer-name",
+          false,
+          "supply-chain-interface-url");
+    }
+
   }
 
 }

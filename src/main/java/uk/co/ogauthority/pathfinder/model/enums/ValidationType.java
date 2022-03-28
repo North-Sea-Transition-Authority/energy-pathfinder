@@ -1,5 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.enums;
 
+import java.util.Optional;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.MandatoryUploadValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
@@ -12,18 +14,21 @@ import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
  */
 public enum ValidationType {
 
-  FULL("Save and complete", FullValidation.class),
-  PARTIAL("Save and complete later", PartialValidation.class),
-  NO_VALIDATION("", null),
-  MANDATORY_UPLOAD("", MandatoryUploadValidation.class);
+  FULL("Save and complete", FullValidation.class, AnalyticsEventCategory.SAVE_PROJECT_FORM),
+  PARTIAL("Save and complete later", PartialValidation.class, AnalyticsEventCategory.SAVE_PROJECT_FORM_COMPLETE_LATER),
+  NO_VALIDATION("", null, null),
+  MANDATORY_UPLOAD("", MandatoryUploadValidation.class, null);
 
   private final String buttonText;
 
   private final Class<?> validationClass;
 
-  ValidationType(String buttonText, Class<?> validationClass) {
+  private final AnalyticsEventCategory analyticsEventCategory;
+
+  ValidationType(String buttonText, Class<?> validationClass, AnalyticsEventCategory analyticsEventCategory) {
     this.buttonText = buttonText;
     this.validationClass = validationClass;
+    this.analyticsEventCategory = analyticsEventCategory;
   }
 
   public String getButtonText() {
@@ -33,4 +38,9 @@ public enum ValidationType {
   public Class<?> getValidationClass() {
     return validationClass;
   }
+
+  public Optional<AnalyticsEventCategory> getAnalyticsEventCategory() {
+    return Optional.ofNullable(analyticsEventCategory);
+  }
+
 }

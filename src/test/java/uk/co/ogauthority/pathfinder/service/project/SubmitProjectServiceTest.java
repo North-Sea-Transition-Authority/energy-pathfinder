@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -223,7 +224,7 @@ public class SubmitProjectServiceTest {
         entry("isProjectValid", isProjectValid),
         entry("projectSummaryView", projectSummaryView),
         entry("submitProjectUrl",
-            ReverseRouter.route(on(SubmitProjectController.class).submitProject(projectId, null))
+            ReverseRouter.route(on(SubmitProjectController.class).submitProject(projectId, null, Optional.empty()))
         ),
         entry("updateRequestReason", regulatorUpdateRequestService.getUpdateRequestReason(
             projectDetail.getProject(),

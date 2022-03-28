@@ -2,16 +2,22 @@ package uk.co.ogauthority.pathfinder.controller.projectupdate;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Map;
+import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsUtils;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
@@ -37,12 +43,15 @@ public class OperatorUpdateController {
 
   private final OperatorProjectUpdateService operatorProjectUpdateService;
   private final ControllerHelperService controllerHelperService;
+  private final AnalyticsService analyticsService;
 
   @Autowired
   public OperatorUpdateController(OperatorProjectUpdateService operatorProjectUpdateService,
-                                  ControllerHelperService controllerHelperService) {
+                                  ControllerHelperService controllerHelperService,
+                                  AnalyticsService analyticsService) {
     this.operatorProjectUpdateService = operatorProjectUpdateService;
     this.controllerHelperService = controllerHelperService;
+    this.analyticsService = analyticsService;
   }
 
   @GetMapping("/start-update")
@@ -75,19 +84,27 @@ public class OperatorUpdateController {
                                    @Valid @ModelAttribute("form") ProvideNoUpdateForm form,
                                    BindingResult bindingResult,
                                    OperatorProjectUpdateContext operatorProjectUpdateContext,
-                                   AuthenticatedUserAccount user) {
+                                   AuthenticatedUserAccount user,
+                                   @CookieValue(name = AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME, required = false)
+                                         Optional<String> analyticsClientId) {
     bindingResult = operatorProjectUpdateService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
         operatorProjectUpdateService.getProjectProvideNoUpdateModelAndView(operatorProjectUpdateContext.getProjectDetails(), user, form),
         form,
         () -> {
+
           operatorProjectUpdateService.createNoUpdateNotification(
               operatorProjectUpdateContext.getProjectDetails(),
               user,
               form
           );
+
+          analyticsService.sendAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.NO_CHANGE_UPDATE_SUBMITTED,
+              Map.of("project_type", operatorProjectUpdateContext.getProjectDetails().getProjectType().name()));
+
           return ReverseRouter.redirect(on(OperatorUpdateController.class).provideNoUpdateConfirmation(projectId, null));
+
         }
     );
   }

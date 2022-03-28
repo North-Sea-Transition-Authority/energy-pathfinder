@@ -20,9 +20,14 @@
 <#-- @ftlvariable name="flashMessage" type="String" -->
 
 <#-- @ftlvariable name="feedbackUrl" type="String" -->
+<#-- @ftlvariable name="cookiePrefsUrl" type="String" -->
 <#-- @ftlvariable name="flashTitle" type="String" -->
 <#-- @ftlvariable name="flashClass" type="String" -->
 <#-- @ftlvariable name="flashMessage" type="String" -->
+
+<#macro cookieBannerContent>
+  <@fdsCookieBanner.analyticsCookieBanner serviceName=service.serviceName cookieSettingsUrl=springUrl(cookiePrefsUrl)/>
+</#macro>
 
 <#macro defaultPage
   htmlTitle
@@ -53,7 +58,7 @@
   noIndex=false
   errorItems=[]
 >
-  <@genericLayout htmlTitle=htmlTitle htmlAppTitle=service.serviceName errorCheck=errorCheck noIndex=noIndex>
+  <@genericLayout htmlTitle=htmlTitle htmlAppTitle=service.serviceName errorCheck=errorCheck noIndex=noIndex cookieBannerMacro=cookieBannerContent>
 
     <#local serviceHomeUrl = springUrl(serviceHomeUrl) />
 
@@ -94,6 +99,9 @@
     <#if topNavigation>
       <@fdsNavigation.navigation navigationItems=navigationItems currentEndPoint=currentEndPoint wrapperWidth=wrapperWidth />
     </#if>
+
+    <@fdsGoogleAnalytics.googleAnalytics measurementId=analytics.appTag />
+    <@fdsGoogleAnalytics.googleAnalytics measurementId=analytics.globalTag />
 
     <#if !masthead>
       <div class="<#if wrapperWidth>govuk-width-container-wide<#else> govuk-width-container </#if>${wrapperClasses}">
@@ -232,16 +240,13 @@
     <#--Footer-->
     <#local footerMetaContent>
       <@fdsFooter.footerMeta footerMetaHiddenHeading="Support links">
-        <@fdsFooter.footerMetaLink linkText="Accessibility statement" linkUrl=springUrl(accessibilityStatementUrl)/>
-        <@fdsFooter.footerMetaLink linkText="Contact" linkUrl=springUrl(contactUrl)/>
-        <@fdsFooter.footerMetaLink linkText="Feedback" linkUrl=springUrl(feedbackUrl)/>
+        <@pathfinderFooter.footerLinks/>
       </@fdsFooter.footerMeta>
     </#local>
     <@fdsFooter.footer wrapperWidth=wrapperWidth metaLinks=true footerMetaContent=footerMetaContent/>
 
     <#--Custom scripts-->
-    <#local checkboxTogglerUrl = springUrl('/assets/static/js/pathfinder/checkboxToggler.js') />
-    <script src="${checkboxTogglerUrl}"></script>
+    <@pathfinderCustomScripts/>
 
   </@genericLayout>
 </#macro>
