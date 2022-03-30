@@ -11,7 +11,11 @@ $(document).ready(() => {
 
   if (window.FDS.googleAnalytics !== undefined) {
     window.FDS.googleAnalytics._gtag('get', PATHFINDER_CONFIG.globalTag, 'client_id', clientId => {
-      setCookie(PATHFINDER_CONFIG.analyticsClientIdCookieName, clientId);
+      if (clientId !== 'anonymous_user') {
+        setCookie(PATHFINDER_CONFIG.analyticsClientIdCookieName, clientId);
+      } else {
+        window.FDS.cookies.deleteCookie(PATHFINDER_CONFIG.analyticsClientIdCookieName);
+      }
     })
   }
 });
