@@ -21,13 +21,14 @@
 
 ##### Development profile (`development`)
 
-| Environment Variable            | Description                                                                                            |
-|---------------------------------|--------------------------------------------------------------------------------------------------------|
-| DB_SCHEMA_NAME                  | Database schema to connect as. E.g. `PATHFINDER_XX` This schema will be created for you by Flyway      |
-| CONTEXT_SUFFIX                  | A unique per developer suffix string to apply to the application context path. E.g. your initials      |
-| PATHFINDER_GOVUK_NOTIFY_API_KEY | API key for the environment. For local dev see [TPM](https://tpm.fivium.local/index.php/pwd/view/1569) |
-| PATHFINDER_TEST_EMAIL_RECIPIENT | Email address to send all emails to when email.mode = "test"                                           |
-| PATHFINDER_ANALYTICS_API_SECRET | API key to allow posting data to analytics endpoint                                                    |
+| Environment Variable                   | Description                                                                                            |
+|----------------------------------------|--------------------------------------------------------------------------------------------------------|
+| DB_SCHEMA_NAME                         | Database schema to connect as. E.g. `PATHFINDER_XX` This schema will be created for you by Flyway      |
+| CONTEXT_SUFFIX                         | A unique per developer suffix string to apply to the application context path. E.g. your initials      |
+| PATHFINDER_GOVUK_NOTIFY_API_KEY        | API key for the environment. For local dev see [TPM](https://tpm.fivium.local/index.php/pwd/view/1569) |
+| PATHFINDER_TEST_EMAIL_RECIPIENT        | Email address to send all emails to when email.mode = "test"                                           |
+| PATHFINDER_ANALYTICS_APP_API_SECRET    | API key to allow posting data to analytics endpoint for app metrics                                    |
+| PATHFINDER_ANALYTICS_GLOBAL_API_SECRET | API key to allow posting data to analytics endpoint for global metrics                                 |
 
 ##### Production profile (`production`)
 
@@ -57,7 +58,8 @@
 | PATHFINDER_ANALYTICS_CONN_TIMEOUT_SECS  | Timeout to be used when trying to connect to analytics endpoints                                                                                                                                                                                                                                                       |
 | PATHFINDER_ANALYTICS_APP_TAG            | App-specific measurement id to separate analytics collection                                                                                                                                                                                                                                                           |
 | PATHFINDER_ANALYTICS_GLOBAL_TAG         | Portal-wide measurement id to separate analytics collection                                                                                                                                                                                                                                                            |
-| PATHFINDER_ANALYTICS_API_SECRET         | API key to allow posting data to analytics endpoint                                                                                                                                                                                                                                                                    |
+| PATHFINDER_ANALYTICS_APP_API_SECRET     | API key to allow posting data to analytics endpoint for app metrics                                                                                                                                                                                                                                                    |
+| PATHFINDER_ANALYTICS_GLOBAL_API_SECRET  | API key to allow posting data to analytics endpoint for global metrics                                                                                                                                                                                                                                                 |
 
 ##### Debug profile (`debug`)
 Add the debug profile to enable hibernate SQL and descriptor output. You can look in the `application-debug.properties` file to enable other debug properties if requried.
