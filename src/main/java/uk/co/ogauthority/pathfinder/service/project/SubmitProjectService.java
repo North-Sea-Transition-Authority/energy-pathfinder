@@ -4,6 +4,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,7 +88,7 @@ public class SubmitProjectService {
         .addObject("isProjectValid", projectValid)
         .addObject("projectSummaryView", projectSummaryView)
         .addObject("submitProjectUrl",
-            ReverseRouter.route(on(SubmitProjectController.class).submitProject(projectId, null))
+            ReverseRouter.route(on(SubmitProjectController.class).submitProject(projectId, null, Optional.empty()))
         )
         .addObject("updateRequestReason", regulatorUpdateRequestService.getUpdateRequestReason(
             projectDetail.getProject(),

@@ -10,6 +10,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.VersionResourceResolver;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
+import uk.co.ogauthority.pathfinder.mvc.ProjectRouteInterceptor;
 import uk.co.ogauthority.pathfinder.mvc.ResponseBufferSizeHandlerInterceptor;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.AuthenticatedUserAccountArgumentResolver;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.CommunicationContextArgumentResolver;
@@ -29,6 +31,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
   private final RegulatorProjectUpdateContextArgumentResolver regulatorProjectUpdateContextArgumentResolver;
   private final TeamManagementContextArgumentResolver teamManagementContextArgumentResolver;
   private final CommunicationContextArgumentResolver communicationContextArgumentResolver;
+  private final AnalyticsService analyticsService;
 
   @Autowired
   public WebMvcConfig(ProjectContextArgumentResolver projectContextArgumentResolver,
@@ -36,13 +39,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
                       OperatorProjectUpdateContextArgumentResolver operatorProjectUpdateContextArgumentResolver,
                       RegulatorProjectUpdateContextArgumentResolver regulatorProjectUpdateContextArgumentResolver,
                       TeamManagementContextArgumentResolver teamManagementContextArgumentResolver,
-                      CommunicationContextArgumentResolver communicationContextArgumentResolver) {
+                      CommunicationContextArgumentResolver communicationContextArgumentResolver,
+                      AnalyticsService analyticsService) {
     this.projectContextArgumentResolver = projectContextArgumentResolver;
     this.projectAssessmentContextArgumentResolver = projectAssessmentContextArgumentResolver;
     this.operatorProjectUpdateContextArgumentResolver = operatorProjectUpdateContextArgumentResolver;
     this.regulatorProjectUpdateContextArgumentResolver = regulatorProjectUpdateContextArgumentResolver;
     this.teamManagementContextArgumentResolver = teamManagementContextArgumentResolver;
     this.communicationContextArgumentResolver = communicationContextArgumentResolver;
+    this.analyticsService = analyticsService;
   }
 
   @Override
@@ -68,8 +73,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
+
     registry.addInterceptor(new ResponseBufferSizeHandlerInterceptor())
         .excludePathPatterns("/assets/**");
+
+    registry.addInterceptor(new ProjectRouteInterceptor(analyticsService))
+        .addPathPatterns("/project/**");
+
   }
 
 }

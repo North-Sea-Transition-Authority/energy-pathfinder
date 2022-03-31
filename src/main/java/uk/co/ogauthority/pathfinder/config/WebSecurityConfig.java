@@ -75,7 +75,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .anyRequest()
           .authenticated();
 
-    http.csrf().ignoringAntMatchers("/notify/callback", "/subscribe", "/unsubscribe/**");
+    http.csrf().ignoringAntMatchers("/notify/callback", "/subscribe", "/unsubscribe/**", "/analytics/collect");
 
     try {
       // Redirect to FOX for login if the request is unauthenticated.

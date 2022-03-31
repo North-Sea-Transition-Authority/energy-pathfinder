@@ -18,7 +18,8 @@ import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfig
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.co.ogauthority.pathfinder.config.ServiceProperties;
+import uk.co.ogauthority.pathfinder.analytics.EnableAnalyticsConfiguration;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
 import uk.co.ogauthority.pathfinder.model.entity.UserSession;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
@@ -34,6 +35,7 @@ import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorProjectUpdate
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.team.teammanagementcontext.TeamManagementContextService;
 
+@EnableAnalyticsConfiguration
 @Import({AbstractControllerTest.TestConfig.class, TeamManagementContextAbstractControllerTest.TestConfig.class})
 public abstract class TeamManagementContextAbstractControllerTest {
 
@@ -50,9 +52,6 @@ public abstract class TeamManagementContextAbstractControllerTest {
 
   @MockBean
   protected UserSessionService userSessionService;
-
-  @MockBean
-  protected ServiceProperties serviceProperties;
 
   @MockBean
   protected TopNavigationService topNavigationService;
@@ -83,6 +82,9 @@ public abstract class TeamManagementContextAbstractControllerTest {
 
   @Autowired
   protected TeamManagementContextService teamManagementContextService;
+
+  @MockBean
+  protected AnalyticsService analyticsService;
 
   @Before
   public void  projectContextAbstractControllerTestSetUp() {

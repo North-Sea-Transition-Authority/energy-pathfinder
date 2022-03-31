@@ -1,0 +1,1 @@
+<#-- Used to provide a blank response to app frontend analytics request -->

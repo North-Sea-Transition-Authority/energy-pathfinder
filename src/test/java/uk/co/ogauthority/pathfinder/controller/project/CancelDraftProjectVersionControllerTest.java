@@ -1,9 +1,19 @@
 package uk.co.ogauthority.pathfinder.controller.project;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +24,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
@@ -21,6 +32,7 @@ import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.cancellation.CancelDraftProjectVersionService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
@@ -114,7 +126,7 @@ public class CancelDraftProjectVersionControllerTest extends ProjectContextAbstr
         .withRequiredProjectPermissions(requiredPermissions);
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
-        on(CancelDraftProjectVersionController.class).cancelDraft(PROJECT_ID, null, null),
+        on(CancelDraftProjectVersionController.class).cancelDraft(PROJECT_ID, null, null, Optional.empty()),
         status().is3xxRedirection(),
         status().isForbidden()
     );
@@ -134,9 +146,50 @@ public class CancelDraftProjectVersionControllerTest extends ProjectContextAbstr
         .withRequiredProjectPermissions(requiredPermissions);
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
-        on(CancelDraftProjectVersionController.class).cancelDraft(PROJECT_ID, null, null),
+        on(CancelDraftProjectVersionController.class).cancelDraft(PROJECT_ID, null, null, Optional.empty()),
         status().isForbidden(),
         status().isForbidden()
     );
   }
+
+  @Test
+  public void cancelDraft_whenAuthenticatedAndCancellable_thenCancel() throws Exception {
+
+    when(cancelDraftProjectVersionService.isCancellable(any())).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
+
+    mockMvc.perform(
+            post(ReverseRouter.route(on(CancelDraftProjectVersionController.class)
+                .cancelDraft(PROJECT_ID, null, null, Optional.empty())
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser))
+                .with(csrf()))
+        .andExpect(status().is3xxRedirection());
+
+    verify(cancelDraftProjectVersionService, times(1)).cancelDraft(projectDetail);
+    verify(analyticsService, times(1))
+        .sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.PROJECT_DRAFT_CANCELLED), eq(
+            Map.of("project_type", projectDetail.getProjectType().name())));
+
+  }
+
+  @Test
+  public void cancelDraft_whenAuthenticatedAndNotCancellable_noCancel() throws Exception {
+
+    when(cancelDraftProjectVersionService.isCancellable(any())).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
+
+    mockMvc.perform(
+            post(ReverseRouter.route(on(CancelDraftProjectVersionController.class)
+                .cancelDraft(PROJECT_ID, null, null, Optional.empty())
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser))
+                .with(csrf()))
+        .andExpect(status().isForbidden());
+
+    verify(cancelDraftProjectVersionService, times(0)).cancelDraft(projectDetail);
+    verifyNoInteractions(analyticsService);
+
+  }
+
 }
