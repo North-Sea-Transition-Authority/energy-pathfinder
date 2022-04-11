@@ -29,6 +29,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
+import uk.co.ogauthority.pathfinder.controller.file.FileDownloadService;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
@@ -66,6 +67,9 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
 
   @MockBean
   protected ProjectDetailFileService projectDetailFileService;
+
+  @MockBean
+  protected FileDownloadService fileDownloadService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 

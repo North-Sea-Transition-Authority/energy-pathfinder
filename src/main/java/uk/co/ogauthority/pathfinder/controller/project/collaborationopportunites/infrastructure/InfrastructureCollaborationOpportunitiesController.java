@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.config.file.FileDeleteResult;
 import uk.co.ogauthority.pathfinder.config.file.FileUploadResult;
+import uk.co.ogauthority.pathfinder.controller.file.FileDownloadService;
 import uk.co.ogauthority.pathfinder.controller.file.PathfinderFileUploadController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
@@ -69,9 +70,10 @@ public class InfrastructureCollaborationOpportunitiesController extends Pathfind
       ControllerHelperService controllerHelperService,
       InfrastructureCollaborationOpportunitiesService infrastructureCollaborationOpportunitiesService,
       InfrastructureCollaborationOpportunitiesSummaryService infrastructureCollaborationOpportunitiesSummaryService,
-      ProjectDetailFileService projectDetailFileService
+      ProjectDetailFileService projectDetailFileService,
+      FileDownloadService fileDownloadService
   ) {
-    super(projectDetailFileService);
+    super(projectDetailFileService, fileDownloadService);
     this.breadcrumbService = breadcrumbService;
     this.controllerHelperService = controllerHelperService;
     this.infrastructureCollaborationOpportunitiesService = infrastructureCollaborationOpportunitiesService;

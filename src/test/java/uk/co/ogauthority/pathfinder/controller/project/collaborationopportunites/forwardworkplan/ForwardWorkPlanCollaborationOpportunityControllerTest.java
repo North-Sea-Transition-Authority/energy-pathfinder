@@ -31,6 +31,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
+import uk.co.ogauthority.pathfinder.controller.file.FileDownloadService;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
@@ -87,6 +88,9 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
 
   @MockBean
   protected ForwardWorkPlanCollaborationCompletionService forwardWorkPlanCollaborationCompletionService;
+
+  @MockBean
+  protected FileDownloadService fileDownloadService;
 
   private ProjectControllerTesterService projectControllerTesterService;
 
