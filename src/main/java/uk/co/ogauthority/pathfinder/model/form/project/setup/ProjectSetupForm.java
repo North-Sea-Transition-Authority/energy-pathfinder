@@ -6,6 +6,9 @@ import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
 public class ProjectSetupForm {
 
+  @NotNull(message = "Select yes if you plan to add other organisations to contribute to this project", groups = FullValidation.class)
+  private TaskListSectionAnswer projectContributorsIncluded;
+
   @NotNull(message = "Select yes if you plan to add any upcoming tenders to your project", groups = FullValidation.class)
   private TaskListSectionAnswer upcomingTendersIncluded;
 
@@ -106,5 +109,14 @@ public class ProjectSetupForm {
   public void setPipelinesIncluded(
       TaskListSectionAnswer pipelinesIncluded) {
     this.pipelinesIncluded = pipelinesIncluded;
+  }
+
+  public TaskListSectionAnswer getProjectContributorsIncluded() {
+    return projectContributorsIncluded;
+  }
+
+  public void setProjectContributorsIncluded(
+      TaskListSectionAnswer projectContributorsIncluded) {
+    this.projectContributorsIncluded = projectContributorsIncluded;
   }
 }

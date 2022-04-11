@@ -14,6 +14,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.
 public class TaskListSectionQuestionTest {
 
   private static final List<ProjectTask> ALL_QUESTION_TASKS = List.of(
+      ProjectTask.PROJECT_CONTRIBUTORS,
       ProjectTask.UPCOMING_TENDERS,
       ProjectTask.AWARDED_CONTRACTS,
       ProjectTask.COLLABORATION_OPPORTUNITIES,
@@ -26,6 +27,7 @@ public class TaskListSectionQuestionTest {
   );
 
   private static final List<ProjectTask> NON_DECOM_TASKS = List.of(
+      ProjectTask.PROJECT_CONTRIBUTORS,
       ProjectTask.UPCOMING_TENDERS,
       ProjectTask.AWARDED_CONTRACTS,
       ProjectTask.COLLABORATION_OPPORTUNITIES,

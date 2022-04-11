@@ -14,12 +14,14 @@ import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupForm;
 public class ProjectTaskListSetupTestUtil {
 
   public static final List<TaskListSectionQuestion> NON_DECOM_SECTIONS = List.of(
+      TaskListSectionQuestion.PROJECT_CONTRIBUTORS,
       TaskListSectionQuestion.AWARDED_CONTRACTS,
       TaskListSectionQuestion.UPCOMING_TENDERS,
       TaskListSectionQuestion.CAMPAIGN_INFORMATION
   );
 
   public static final List<TaskListSectionAnswer> NON_DECOM_ANSWERS = List.of(
+      TaskListSectionAnswer.PROJECT_CONTRIBUTORS_YES,
       TaskListSectionAnswer.AWARDED_CONTRACTS_YES,
       TaskListSectionAnswer.UPCOMING_TENDERS_YES,
       TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_NO,
@@ -27,6 +29,7 @@ public class ProjectTaskListSetupTestUtil {
   );
 
   public static final List<TaskListSectionQuestion> DECOM_SECTIONS = List.of(
+      TaskListSectionQuestion.PROJECT_CONTRIBUTORS,
       TaskListSectionQuestion.UPCOMING_TENDERS,
       TaskListSectionQuestion.AWARDED_CONTRACTS,
       TaskListSectionQuestion.WELLS,
@@ -35,6 +38,7 @@ public class ProjectTaskListSetupTestUtil {
   );
 
   public static final List<TaskListSectionAnswer> DECOM_ANSWERS = List.of(
+      TaskListSectionAnswer.PROJECT_CONTRIBUTORS_YES,
       TaskListSectionAnswer.UPCOMING_TENDERS_YES,
       TaskListSectionAnswer.AWARDED_CONTRACTS_YES,
       TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_NO,
@@ -95,5 +99,6 @@ public class ProjectTaskListSetupTestUtil {
     form.setAwardedContractsIncluded(TaskListSectionAnswer.AWARDED_CONTRACTS_YES);
     form.setCollaborationOpportunitiesIncluded(TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_NO);
     form.setCampaignInformationIncluded(TaskListSectionAnswer.CAMPAIGN_INFORMATION_YES);
+    form.setProjectContributorsIncluded(TaskListSectionAnswer.PROJECT_CONTRIBUTORS_YES);
   }
 }

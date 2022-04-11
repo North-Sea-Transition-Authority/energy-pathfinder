@@ -14,6 +14,7 @@ import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedR
 import uk.co.ogauthority.pathfinder.controller.project.location.ProjectLocationController;
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
 import uk.co.ogauthority.pathfinder.controller.project.plugabandonmentschedule.PlugAbandonmentScheduleController;
+import uk.co.ogauthority.pathfinder.controller.project.projectcontributor.ProjectContributorsController;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
 import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProjectOperatorController;
 import uk.co.ogauthority.pathfinder.controller.project.setup.ProjectSetupController;
@@ -34,6 +35,7 @@ import uk.co.ogauthority.pathfinder.service.project.integratedrig.IntegratedRigS
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
 import uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule.PlugAbandonmentScheduleService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontribution.ProjectContributorsFormSectionService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
@@ -74,6 +76,13 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       ProjectSetupService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
       40
+  ),
+  PROJECT_CONTRIBUTORS(
+      ProjectContributorsController.PAGE_NAME,
+      ProjectContributorsController.class,
+      ProjectContributorsFormSectionService.class,
+      Set.of(ProjectType.INFRASTRUCTURE),
+      45
   ),
   UPCOMING_TENDERS(
       UpcomingTendersController.PAGE_NAME,
@@ -252,6 +261,8 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
             null,
             null
         ));
+      case PROJECT_CONTRIBUTORS:
+        return ReverseRouter.route(on(ProjectContributorsController.class).renderProjectContributorsForm(projectId, null));
       default:
         return "";
     }

@@ -13,7 +13,7 @@ public enum ProjectTaskGroup {
       ProjectTask.PROJECT_OPERATOR.getDisplayName(),
       List.of(ProjectTask.PROJECT_OPERATOR),
       Set.of(ProjectType.INFRASTRUCTURE),
-      1
+      10
   ),
   PREPARE_PROJECT(
       "Prepare project",
@@ -23,7 +23,15 @@ public enum ProjectTaskGroup {
           ProjectTask.PROJECT_SETUP
       ),
       Set.of(ProjectType.INFRASTRUCTURE),
-      2
+      20
+  ),
+  PROJECT_CONTRIBUTORS(
+      "Project contributors",
+      List.of(
+          ProjectTask.PROJECT_CONTRIBUTORS
+      ),
+      Set.of(ProjectType.INFRASTRUCTURE),
+      25
   ),
   COMMERCIAL_INFORMATION(
     "Commercial information",
@@ -34,7 +42,7 @@ public enum ProjectTaskGroup {
           ProjectTask.CAMPAIGN_INFORMATION
       ),
       Set.of(ProjectType.INFRASTRUCTURE),
-      3
+      30
   ),
   DECOMMISSIONING_SCHEDULES(
       "Scope & schedule information",
@@ -47,7 +55,7 @@ public enum ProjectTaskGroup {
           ProjectTask.PIPELINES
       ),
       Set.of(ProjectType.INFRASTRUCTURE),
-      4
+      40
   ),
   WORK_PLAN_COMMERCIAL_INFORMATION(
       "Commercial information",
@@ -56,7 +64,7 @@ public enum ProjectTaskGroup {
           ProjectTask.WORK_PLAN_COLLABORATION_OPPORTUNITIES
       ),
       Set.of(ProjectType.FORWARD_WORK_PLAN),
-      1
+      10
   );
 
 

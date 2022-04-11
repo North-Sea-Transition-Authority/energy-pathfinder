@@ -93,6 +93,17 @@ public enum TaskListSectionQuestion {
       TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
       TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_NO,
       true
+  ),
+  PROJECT_CONTRIBUTORS(
+      ProjectTask.PROJECT_CONTRIBUTORS,
+      "Do you want to allow other organisation to contribute to this project?",
+      "Allow other organisations to contribute to this project",
+      "Nominated organisation will be able to add items such as upcoming tenders, collaboration opportunities" +
+          " and awarded contracts to this project",
+      "form.projectContributorsIncluded",
+      TaskListSectionAnswer.PROJECT_CONTRIBUTORS_YES,
+      TaskListSectionAnswer.PROJECT_CONTRIBUTORS_NO,
+      false
   );
   // Pipelines disabled: PAT-457
   // PIPELINES(
