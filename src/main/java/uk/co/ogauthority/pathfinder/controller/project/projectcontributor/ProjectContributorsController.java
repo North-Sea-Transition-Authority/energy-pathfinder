@@ -3,7 +3,6 @@ package uk.co.ogauthority.pathfinder.controller.project.projectcontributor;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
-import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -61,7 +60,7 @@ public class ProjectContributorsController {
 
   @PostMapping
   public ModelAndView saveProjectContributors(@PathVariable("projectId") Integer projectId,
-                                              @Valid @ModelAttribute("form") ProjectContributorsForm form,
+                                              @ModelAttribute("form") ProjectContributorsForm form,
                                               BindingResult bindingResult,
                                               ValidationType validationType,
                                               ProjectContext projectContext) {
