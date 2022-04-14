@@ -18,7 +18,9 @@ import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrga
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectcontribution.ProjectContributor;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.form.project.projectcontributor.ProjectContributorValidationHint;
 import uk.co.ogauthority.pathfinder.model.form.project.projectcontributor.ProjectContributorsForm;
+import uk.co.ogauthority.pathfinder.model.form.project.projectcontributor.ProjectContributorsFormValidator;
 import uk.co.ogauthority.pathfinder.model.view.organisationgroup.OrganisationGroupView;
 import uk.co.ogauthority.pathfinder.repository.project.projectcontributor.ProjectContributorRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
@@ -36,6 +38,7 @@ public class ProjectContributorsManagementService {
   private final ProjectOperatorService projectOperatorService;
   private final ValidationService validationService;
   private final String regulatorSharedEmail;
+  private final ProjectContributorsFormValidator projectContributorsFormValidator;
 
   @Autowired
   public ProjectContributorsManagementService(
@@ -44,13 +47,15 @@ public class ProjectContributorsManagementService {
       ProjectContributorRepository projectContributorRepository,
       ProjectOperatorService projectOperatorService,
       ValidationService validationService,
-      @Value("${regulator.shared.email}") String regulatorSharedEmail) {
+      @Value("${regulator.shared.email}") String regulatorSharedEmail,
+      ProjectContributorsFormValidator projectContributorsFormValidator) {
     this.breadcrumbService = breadcrumbService;
     this.portalOrganisationAccessor = portalOrganisationAccessor;
     this.projectContributorRepository = projectContributorRepository;
     this.projectOperatorService = projectOperatorService;
     this.validationService = validationService;
     this.regulatorSharedEmail = regulatorSharedEmail;
+    this.projectContributorsFormValidator = projectContributorsFormValidator;
   }
 
   public ModelAndView getProjectContributorsFormModelAndView(ProjectContributorsForm form,
@@ -59,7 +64,7 @@ public class ProjectContributorsManagementService {
     var modelAndView = new ModelAndView("project/projectcontributors/projectContributors")
         .addObject("form", form)
         .addObject("pageName", ProjectContributorsController.FORM_PAGE_NAME)
-        .addObject("alreadyAddedContributors", getOrganisationGroupViews(projectDetail))
+        .addObject("alreadyAddedContributors", getOrganisationGroupViews(form))
         .addObject("contributorsRestUrl",
             SearchSelectorService.route(on(OrganisationGroupRestController.class)
                 .searchPathfinderOrganisations(null)))
@@ -108,6 +113,8 @@ public class ProjectContributorsManagementService {
   public BindingResult validate(ProjectContributorsForm form,
                                 BindingResult bindingResult,
                                 ValidationType validationType) {
+    final var projectContributorValidationHint = new ProjectContributorValidationHint(validationType);
+    projectContributorsFormValidator.validate(form, bindingResult, projectContributorValidationHint);
     return validationService.validate(form, bindingResult, validationType);
   }
 
@@ -129,12 +136,12 @@ public class ProjectContributorsManagementService {
     projectContributorRepository.deleteAllByProjectDetail(detail);
   }
 
-  private List<OrganisationGroupView> getOrganisationGroupViews(ProjectDetail projectDetail) {
-    return projectContributorRepository.findAllByProjectDetail(projectDetail)
+  private List<OrganisationGroupView> getOrganisationGroupViews(ProjectContributorsForm form) {
+    return portalOrganisationAccessor.getOrganisationGroupsWhereIdIn(form.getContributors())
         .stream()
-        .map(projectContributor -> new OrganisationGroupView(
-            projectContributor.getContributionOrganisationGroup().getOrgGrpId(),
-            projectContributor.getContributionOrganisationGroup().getName(),
+        .map(portalOrganisationGroup -> new OrganisationGroupView(
+            portalOrganisationGroup.getOrgGrpId(),
+            portalOrganisationGroup.getName(),
             true)
         )
         .collect(Collectors.toList());

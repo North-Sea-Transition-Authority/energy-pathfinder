@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project.projectcontribution;
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,6 +28,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectcontribution.ProjectContributor;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.projectcontributor.ProjectContributorsForm;
+import uk.co.ogauthority.pathfinder.model.form.project.projectcontributor.ProjectContributorsFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.projectcontributor.ProjectContributorRepository;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
@@ -66,6 +68,9 @@ public class ProjectContributorsManagementServiceTest {
   @Mock
   private ValidationService validationService;
 
+  @Mock
+  private ProjectContributorsFormValidator projectContributorsFormValidator;
+
   private ProjectContributorsManagementService projectContributorsManagementService;
 
   @Before
@@ -75,7 +80,8 @@ public class ProjectContributorsManagementServiceTest {
         projectContributorRepository,
         projectOperatorService,
         validationService,
-        regulatorSharedEmail);
+        regulatorSharedEmail,
+        projectContributorsFormValidator);
   }
 
   @Test
@@ -141,6 +147,8 @@ public class ProjectContributorsManagementServiceTest {
         bindingResult,
         ValidationType.FULL
     );
+    verify(projectContributorsFormValidator, times(1))
+        .validate(eq(form), eq(bindingResult), any());
     verify(validationService, times(1)).validate(form, bindingResult, ValidationType.FULL);
   }
 
