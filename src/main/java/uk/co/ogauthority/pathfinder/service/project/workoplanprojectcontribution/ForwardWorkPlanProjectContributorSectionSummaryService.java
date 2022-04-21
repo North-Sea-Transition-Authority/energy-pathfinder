@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project.workoplanprojectcontributio
 
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.project.workplanprojectcontributor.ForwardWorkPlanProjectContributorsController;
@@ -75,7 +76,7 @@ public class ForwardWorkPlanProjectContributorSectionSummaryService implements P
   }
 
   private Boolean canShowContributorsList(ForwardWorkPlanProjectContributorsView forwardWorkPlanProjectContributorsView) {
-    return forwardWorkPlanProjectContributorsView.getHasProjectContributors();
+    return BooleanUtils.isTrue(forwardWorkPlanProjectContributorsView.getHasProjectContributors());
   }
 
   private Map<String, ?> getForwardProjectContributorDifferenceModel(
