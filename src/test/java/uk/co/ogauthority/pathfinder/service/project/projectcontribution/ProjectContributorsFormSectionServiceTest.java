@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project.projectcontribution;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -33,13 +34,16 @@ public class ProjectContributorsFormSectionServiceTest {
   @Mock
   private EntityDuplicationService entityDuplicationService;
 
+  @Mock
+  private ProjectContributorsCommonService projectContributorsCommonService;
+
   private ProjectContributorsFormSectionService projectContributorsFormSectionService;
   private ProjectDetail detail = ProjectUtil.getProjectDetails();
 
   @Before
   public void setup() {
     projectContributorsFormSectionService = new ProjectContributorsFormSectionService(projectSetupService,
-        projectContributorsManagementService, entityDuplicationService);
+        projectContributorsManagementService, entityDuplicationService, projectContributorsCommonService);
   }
 
   @Test
@@ -79,10 +83,18 @@ public class ProjectContributorsFormSectionServiceTest {
   }
 
   @Test
-  public void removeSectionData_verifyMethodCall() {
+  public void removeSectionData_isInfrastructure_verifyMethodCall() {
     projectContributorsFormSectionService.removeSectionData(detail);
 
     verify(projectContributorsManagementService, times(1)).removeProjectContributorsForDetail(detail);
+  }
+
+  @Test
+  public void removeSectionData_isNotInfrastructure_verifyMethodCall() {
+    var notInfrastructureDetails = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
+    projectContributorsFormSectionService.removeSectionData(notInfrastructureDetails);
+
+    verify(projectContributorsManagementService, never()).removeProjectContributorsForDetail(detail);
   }
 
   @Test
@@ -92,7 +104,7 @@ public class ProjectContributorsFormSectionServiceTest {
         ProjectContributorTestUtil.contributorWithGroupOrgId(detail, 2)
     );
     var newDetail =  ProjectUtil.getProjectDetails();
-    when(projectContributorsManagementService.getProjectContributorsForDetail(detail))
+    when( projectContributorsCommonService.getProjectContributorsForDetail(detail))
         .thenReturn(projectContributors);
 
     projectContributorsFormSectionService.copySectionData(detail, newDetail);

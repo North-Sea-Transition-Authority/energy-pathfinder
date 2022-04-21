@@ -18,15 +18,18 @@ public class ProjectContributorsFormSectionService implements ProjectFormSection
   private final ProjectSetupService projectSetupService;
   private final ProjectContributorsManagementService projectContributorsManagementService;
   private final EntityDuplicationService entityDuplicationService;
+  private final ProjectContributorsCommonService projectContributorsCommonService;
 
   @Autowired
   public ProjectContributorsFormSectionService(
       ProjectSetupService projectSetupService,
       ProjectContributorsManagementService projectContributorsManagementService,
-      EntityDuplicationService entityDuplicationService) {
+      EntityDuplicationService entityDuplicationService,
+      ProjectContributorsCommonService projectContributorsCommonService) {
     this.projectSetupService = projectSetupService;
     this.projectContributorsManagementService = projectContributorsManagementService;
     this.entityDuplicationService = entityDuplicationService;
+    this.projectContributorsCommonService = projectContributorsCommonService;
   }
 
   @Override
@@ -37,7 +40,7 @@ public class ProjectContributorsFormSectionService implements ProjectFormSection
   @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
     entityDuplicationService.duplicateEntitiesAndSetNewParent(
-        projectContributorsManagementService.getProjectContributorsForDetail(fromDetail),
+        projectContributorsCommonService.getProjectContributorsForDetail(fromDetail),
         toDetail,
         ProjectContributor.class
     );
@@ -55,6 +58,8 @@ public class ProjectContributorsFormSectionService implements ProjectFormSection
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
-    projectContributorsManagementService.removeProjectContributorsForDetail(projectDetail);
+    if (projectDetail.getProjectType().equals(ProjectType.INFRASTRUCTURE)) {
+      projectContributorsManagementService.removeProjectContributorsForDetail(projectDetail);
+    }
   }
 }

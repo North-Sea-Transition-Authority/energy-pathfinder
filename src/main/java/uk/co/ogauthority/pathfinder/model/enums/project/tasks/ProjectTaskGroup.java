@@ -57,6 +57,14 @@ public enum ProjectTaskGroup {
       Set.of(ProjectType.INFRASTRUCTURE),
       40
   ),
+  WORK_PLAN_PROJECT_CONTRIBUTORS(
+      "Contributors",
+      List.of(
+          ProjectTask.WORK_PLAN_PROJECT_CONTRIBUTORS
+      ),
+      Set.of(ProjectType.FORWARD_WORK_PLAN),
+      10
+  ),
   WORK_PLAN_COMMERCIAL_INFORMATION(
       "Commercial information",
       List.of(
@@ -64,7 +72,7 @@ public enum ProjectTaskGroup {
           ProjectTask.WORK_PLAN_COLLABORATION_OPPORTUNITIES
       ),
       Set.of(ProjectType.FORWARD_WORK_PLAN),
-      10
+      20
   );
 
 

@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.controller.project.selectoperator.ChangeProj
 import uk.co.ogauthority.pathfinder.controller.project.setup.ProjectSetupController;
 import uk.co.ogauthority.pathfinder.controller.project.subseainfrastructure.SubseaInfrastructureController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
+import uk.co.ogauthority.pathfinder.controller.project.workplanprojectcontributor.ForwardWorkPlanProjectContributorsController;
 import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
@@ -42,6 +43,7 @@ import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.subseainfrastructure.SubseaInfrastructureService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
+import uk.co.ogauthority.pathfinder.service.project.workoplanprojectcontribution.ForwardWorkPlanProjectContributorFormSectionService;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderService;
 
 /**
@@ -167,7 +169,15 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       ForwardWorkPlanCollaborationOpportunityService.class,
       Set.of(ProjectType.FORWARD_WORK_PLAN),
       20
-  );
+  ),
+  WORK_PLAN_PROJECT_CONTRIBUTORS(
+      ForwardWorkPlanProjectContributorsController.PAGE_NAME,
+      ForwardWorkPlanProjectContributorsController.class,
+      ForwardWorkPlanProjectContributorFormSectionService.class,
+      Set.of(ProjectType.FORWARD_WORK_PLAN),
+      30
+  )
+  ;
 
   private final String displayName;
   private final Class controllerClass;
@@ -263,6 +273,8 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
         ));
       case PROJECT_CONTRIBUTORS:
         return ReverseRouter.route(on(ProjectContributorsController.class).renderProjectContributorsForm(projectId, null));
+      case WORK_PLAN_PROJECT_CONTRIBUTORS:
+        return ReverseRouter.route(on(ForwardWorkPlanProjectContributorsController.class).renderProjectContributors(projectId, null));
       default:
         return "";
     }

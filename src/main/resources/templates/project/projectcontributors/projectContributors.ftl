@@ -21,13 +21,13 @@
       noItemText=noItemTextContent
       invalidItemText="This contributor is invalid"
       addToListId="contributor-table"
-      selectorLabelText="Add an organisation that can contribute to this project"
+      selectorLabelText="Add an organisation that can contribute to this ${projectTypeDisplayNameLowercase}"
       selectorHintText=""
       restUrl=springUrl(contributorsRestUrl)
     />
-    <@fdsDetails.summaryDetails summaryTitle="The organisation I want to contribute to this project is not listed">
+    <@fdsDetails.summaryDetails summaryTitle="The organisation I want to contribute to this ${projectTypeDisplayNameLowercase} is not listed">
       <p class="govuk-body">
-        If the organisation you want to contribute to this project is not shown in the list then ask the organisation
+        If the organisation you want to contribute to this ${projectTypeDisplayNameLowercase} is not shown in the list then ask the organisation
         in question to contact the <@mailTo.mailToLink linkText=service.customerMnemonic mailToEmailAddress=regulatorEmailAddress />
       </p>
     </@fdsDetails.summaryDetails>
