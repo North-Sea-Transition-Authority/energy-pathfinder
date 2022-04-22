@@ -99,8 +99,9 @@ public class ForwardWorkPlanProjectContributorManagementService {
 
   public BindingResult validate(ProjectContributorsForm form,
                                 BindingResult bindingResult,
-                                ValidationType validationType) {
-    var projectContributorValidationHint = new ProjectContributorValidationHint(validationType);
+                                ValidationType validationType,
+                                ProjectDetail detail) {
+    var projectContributorValidationHint = new ProjectContributorValidationHint(validationType, detail);
     forwardWorkPlanProjectContributorsFormValidator.validate(form, bindingResult, projectContributorValidationHint);
     return validationService.validate(form, bindingResult, validationType);
   }
@@ -108,7 +109,7 @@ public class ForwardWorkPlanProjectContributorManagementService {
   boolean isValid(ProjectDetail projectDetail, ValidationType validationType) {
     var form = getForm(projectDetail);
     BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
-    bindingResult = validate(form, bindingResult, validationType);
+    bindingResult = validate(form, bindingResult, validationType, projectDetail);
     return !bindingResult.hasErrors();
   }
 

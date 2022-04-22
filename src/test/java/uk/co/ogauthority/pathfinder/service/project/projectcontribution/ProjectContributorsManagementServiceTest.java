@@ -23,7 +23,6 @@ import uk.co.ogauthority.pathfinder.model.form.project.projectcontributor.Projec
 import uk.co.ogauthority.pathfinder.model.form.project.projectcontributor.ProjectContributorsFormValidator;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
-import uk.co.ogauthority.pathfinder.testutil.ProjectContributorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -93,7 +92,8 @@ public class ProjectContributorsManagementServiceTest {
     projectContributorsManagementService.validate(
         form,
         bindingResult,
-        ValidationType.FULL
+        ValidationType.FULL,
+        detail
     );
     verify(projectContributorsFormValidator, times(1))
         .validate(eq(form), eq(bindingResult), any());
@@ -108,7 +108,8 @@ public class ProjectContributorsManagementServiceTest {
     projectContributorsManagementService.validate(
         form,
         bindingResult,
-        ValidationType.PARTIAL
+        ValidationType.PARTIAL,
+        detail
     );
     verify(validationService, times(1)).validate(form, bindingResult, ValidationType.PARTIAL);
   }

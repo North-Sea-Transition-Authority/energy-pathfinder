@@ -62,7 +62,12 @@ public class ForwardWorkPlanProjectContributorsController {
                                               BindingResult bindingResult,
                                               ValidationType validationType,
                                               ProjectContext projectContext) {
-    bindingResult = forwardWorkPlanProjectContributorManagementService.validate(form, bindingResult, validationType);
+    bindingResult = forwardWorkPlanProjectContributorManagementService.validate(
+        form,
+        bindingResult,
+        validationType,
+        projectContext.getProjectDetails()
+    );
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
         forwardWorkPlanProjectContributorManagementService.getProjectContributorsFormModelAndView(

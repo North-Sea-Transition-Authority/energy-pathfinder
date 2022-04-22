@@ -64,7 +64,12 @@ public class ProjectContributorsController {
                                               BindingResult bindingResult,
                                               ValidationType validationType,
                                               ProjectContext projectContext) {
-    bindingResult = projectContributorsManagementService.validate(form, bindingResult, validationType);
+    bindingResult = projectContributorsManagementService.validate(
+        form,
+        bindingResult,
+        validationType,
+        projectContext.getProjectDetails()
+    );
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
         projectContributorsManagementService.getProjectContributorsFormModelAndView(

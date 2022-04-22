@@ -66,14 +66,15 @@ public class ProjectContributorsManagementService {
   public boolean isValid(ProjectDetail projectDetail, ValidationType validationType) {
     var form = getForm(projectDetail);
     BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
-    bindingResult = validate(form, bindingResult, validationType);
+    bindingResult = validate(form, bindingResult, validationType, projectDetail);
     return !bindingResult.hasErrors();
   }
 
   public BindingResult validate(ProjectContributorsForm form,
                                 BindingResult bindingResult,
-                                ValidationType validationType) {
-    final var projectContributorValidationHint = new ProjectContributorValidationHint(validationType);
+                                ValidationType validationType,
+                                ProjectDetail detail) {
+    final var projectContributorValidationHint = new ProjectContributorValidationHint(validationType, detail);
     projectContributorsFormValidator.validate(form, bindingResult, projectContributorValidationHint);
     return validationService.validate(form, bindingResult, validationType);
   }

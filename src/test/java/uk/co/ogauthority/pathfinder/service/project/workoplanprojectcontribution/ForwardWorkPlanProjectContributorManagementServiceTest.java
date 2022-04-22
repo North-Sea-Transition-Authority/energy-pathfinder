@@ -155,7 +155,8 @@ public class ForwardWorkPlanProjectContributorManagementServiceTest {
     forwardWorkPlanProjectContributorManagementService.validate(
         form,
         bindingResult,
-        ValidationType.FULL
+        ValidationType.FULL,
+        detail
     );
     verify(forwardWorkPlanProjectContributorsFormValidator, times(1))
         .validate(eq(form), eq(bindingResult), any());
@@ -170,7 +171,8 @@ public class ForwardWorkPlanProjectContributorManagementServiceTest {
     forwardWorkPlanProjectContributorManagementService.validate(
         form,
         bindingResult,
-        ValidationType.PARTIAL
+        ValidationType.PARTIAL,
+        detail
     );
     verify(validationService, times(1)).validate(form, bindingResult, ValidationType.PARTIAL);
   }

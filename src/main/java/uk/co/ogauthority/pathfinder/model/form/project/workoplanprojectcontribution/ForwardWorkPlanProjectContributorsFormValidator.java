@@ -44,18 +44,17 @@ public class ForwardWorkPlanProjectContributorsFormValidator implements SmartVal
             )
         );
 
-    if (projectContributorValidationHint.getValidationType().equals(ValidationType.FULL)) {
-      if (form.getHasProjectContributors() == null) {
-        errors.rejectValue(
-            "hasProjectContributors",
-            "hasProjectContributors.notNull",
-            "Select yes if you want to add any project contributors"
-        );
-      } else {
-        if (form.getHasProjectContributors()) {
-          projectContributorsFormValidator.validate(form, errors, validationHints);
-        }
-      }
+    if (projectContributorValidationHint.getValidationType().equals(ValidationType.FULL)
+        && form.getHasProjectContributors() == null) {
+      errors.rejectValue(
+          "hasProjectContributors",
+          "hasProjectContributors.notNull",
+          "Select yes if you want to add any project contributors"
+      );
+    }
+
+    if (Boolean.TRUE.equals(form.getHasProjectContributors())) {
+      projectContributorsFormValidator.validate(form, errors, validationHints);
     }
   }
 }

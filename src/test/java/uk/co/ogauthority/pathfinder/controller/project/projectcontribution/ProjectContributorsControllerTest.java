@@ -101,7 +101,7 @@ public class ProjectContributorsControllerTest extends ProjectContextAbstractCon
   @Test
   public void saveProjectContributors_projectContextSmokeTest() {
     var bindingResult = new BeanPropertyBindingResult(CampaignInformationForm.class, "form");
-    when(projectContributorsManagementService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(projectContributorsManagementService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
 
     projectControllerTesterService
         .withHttpRequestMethod(HttpMethod.POST)
@@ -127,7 +127,7 @@ public class ProjectContributorsControllerTest extends ProjectContextAbstractCon
     var form = new ProjectContributorsForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
-    when(projectContributorsManagementService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(projectContributorsManagementService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
             post(ReverseRouter.route(on(ProjectContributorsController.class)
@@ -136,7 +136,8 @@ public class ProjectContributorsControllerTest extends ProjectContextAbstractCon
                 .with(csrf())
                 .params(params))
         .andExpect(status().is3xxRedirection());
-    verify(projectContributorsManagementService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(projectContributorsManagementService, times(1))
+        .validate(any(), any(), eq(ValidationType.FULL), any());
     verify(projectContributorsManagementService, times(1)).saveProjectContributors(any(), any());
   }
 
@@ -149,7 +150,7 @@ public class ProjectContributorsControllerTest extends ProjectContextAbstractCon
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
 
-    when(projectContributorsManagementService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(projectContributorsManagementService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
     when(projectContributorsManagementService.getProjectContributorsFormModelAndView(any(), any(), any())).thenReturn(new ModelAndView());
 
     mockMvc.perform(
@@ -159,7 +160,8 @@ public class ProjectContributorsControllerTest extends ProjectContextAbstractCon
             .with(csrf())
             .params(params))
         .andExpect(status().isOk());
-    verify(projectContributorsManagementService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(projectContributorsManagementService, times(1))
+        .validate(any(), any(), eq(ValidationType.FULL), any());
     verify(projectContributorsManagementService, never()).saveProjectContributors(any(), any());
   }
 
@@ -171,7 +173,7 @@ public class ProjectContributorsControllerTest extends ProjectContextAbstractCon
     var form = new ProjectContributorsForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
-    when(projectContributorsManagementService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(projectContributorsManagementService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
             post(ReverseRouter.route(on(ProjectContributorsController.class)
@@ -180,7 +182,8 @@ public class ProjectContributorsControllerTest extends ProjectContextAbstractCon
                 .with(csrf())
                 .params(params))
         .andExpect(status().is3xxRedirection());
-    verify(projectContributorsManagementService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(projectContributorsManagementService, times(1))
+        .validate(any(), any(), eq(ValidationType.PARTIAL), any());
     verify(projectContributorsManagementService, times(1)).saveProjectContributors(any(), any());
   }
 
@@ -193,7 +196,7 @@ public class ProjectContributorsControllerTest extends ProjectContextAbstractCon
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
 
-    when(projectContributorsManagementService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(projectContributorsManagementService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
     when(projectContributorsManagementService.getProjectContributorsFormModelAndView(any(), any(), any())).thenReturn(new ModelAndView());
 
     mockMvc.perform(
@@ -203,7 +206,8 @@ public class ProjectContributorsControllerTest extends ProjectContextAbstractCon
                 .with(csrf())
                 .params(params))
         .andExpect(status().isOk());
-    verify(projectContributorsManagementService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(projectContributorsManagementService, times(1))
+        .validate(any(), any(), eq(ValidationType.PARTIAL), any());
     verify(projectContributorsManagementService, never()).saveProjectContributors(any(), any());
   }
 }

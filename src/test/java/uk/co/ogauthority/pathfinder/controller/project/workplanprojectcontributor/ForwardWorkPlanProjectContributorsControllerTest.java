@@ -100,7 +100,7 @@ public class ForwardWorkPlanProjectContributorsControllerTest extends ProjectCon
   @Test
   public void saveProjectContributors_projectContextSmokeTest() {
     var bindingResult = new BeanPropertyBindingResult(CampaignInformationForm.class, "form");
-    when(forwardWorkPlanProjectContributorManagementService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(forwardWorkPlanProjectContributorManagementService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
 
     projectControllerTesterService
         .withHttpRequestMethod(HttpMethod.POST)
@@ -134,7 +134,7 @@ public class ForwardWorkPlanProjectContributorsControllerTest extends ProjectCon
     form.setHasProjectContributors(true);
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
-    when(forwardWorkPlanProjectContributorManagementService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(forwardWorkPlanProjectContributorManagementService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
             post(ReverseRouter.route(on(ForwardWorkPlanProjectContributorsController.class)
@@ -143,8 +143,8 @@ public class ForwardWorkPlanProjectContributorsControllerTest extends ProjectCon
                 .with(csrf())
                 .params(params))
         .andExpect(status().is3xxRedirection());
-    verify(forwardWorkPlanProjectContributorManagementService, times(1)).validate(any(), any(),
-        eq(ValidationType.FULL));
+    verify(forwardWorkPlanProjectContributorManagementService, times(1))
+        .validate(any(), any(), eq(ValidationType.FULL), any());
     verify(forwardWorkPlanProjectContributorManagementService, times(1)).saveForwardWorkPlanProjectContributors(
         any(),
         any()
@@ -160,7 +160,7 @@ public class ForwardWorkPlanProjectContributorsControllerTest extends ProjectCon
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
 
-    when(forwardWorkPlanProjectContributorManagementService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(forwardWorkPlanProjectContributorManagementService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
     when(forwardWorkPlanProjectContributorManagementService.getProjectContributorsFormModelAndView(
         any(),
         any(),
@@ -174,8 +174,8 @@ public class ForwardWorkPlanProjectContributorsControllerTest extends ProjectCon
                 .with(csrf())
                 .params(params))
         .andExpect(status().isOk());
-    verify(forwardWorkPlanProjectContributorManagementService, times(1)).validate(any(), any(),
-        eq(ValidationType.FULL));
+    verify(forwardWorkPlanProjectContributorManagementService, times(1))
+        .validate(any(), any(), eq(ValidationType.FULL), any());
     verify(forwardWorkPlanProjectContributorManagementService, never()).saveForwardWorkPlanProjectContributors(
         any(),
         any()
@@ -191,7 +191,7 @@ public class ForwardWorkPlanProjectContributorsControllerTest extends ProjectCon
     var form = new ForwardWorkPlanProjectContributorsForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
-    when(forwardWorkPlanProjectContributorManagementService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(forwardWorkPlanProjectContributorManagementService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
             post(ReverseRouter.route(on(ForwardWorkPlanProjectContributorsController.class)
@@ -200,8 +200,8 @@ public class ForwardWorkPlanProjectContributorsControllerTest extends ProjectCon
                 .with(csrf())
                 .params(params))
         .andExpect(status().is3xxRedirection());
-    verify(forwardWorkPlanProjectContributorManagementService, times(1)).validate(any(), any(),
-        eq(ValidationType.PARTIAL));
+    verify(forwardWorkPlanProjectContributorManagementService, times(1))
+        .validate(any(), any(), eq(ValidationType.PARTIAL), any());
     verify(forwardWorkPlanProjectContributorManagementService, times(1)).saveForwardWorkPlanProjectContributors(
         any(),
         any()
@@ -218,7 +218,7 @@ public class ForwardWorkPlanProjectContributorsControllerTest extends ProjectCon
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
 
-    when(forwardWorkPlanProjectContributorManagementService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(forwardWorkPlanProjectContributorManagementService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
     when(forwardWorkPlanProjectContributorManagementService.getProjectContributorsFormModelAndView(
         any(),
         any(),
@@ -235,7 +235,8 @@ public class ForwardWorkPlanProjectContributorsControllerTest extends ProjectCon
     verify(forwardWorkPlanProjectContributorManagementService, times(1)).validate(
         any(),
         any(),
-        eq(ValidationType.PARTIAL)
+        eq(ValidationType.PARTIAL),
+        any()
     );
     verify(forwardWorkPlanProjectContributorManagementService, never()).saveForwardWorkPlanProjectContributors(any(),
         any());
