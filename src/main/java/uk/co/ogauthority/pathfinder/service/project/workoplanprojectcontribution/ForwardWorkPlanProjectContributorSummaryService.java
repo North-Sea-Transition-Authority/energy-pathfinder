@@ -24,11 +24,11 @@ public class ForwardWorkPlanProjectContributorSummaryService {
     this.projectContributorRepository = projectContributorRepository;
   }
 
-  public ForwardWorkPlanProjectContributorsView getProjectContributorsView(ProjectDetail detail) {
-    return getProjectContributorsView(detail.getProject(), detail.getVersion());
+  public ForwardWorkPlanProjectContributorsView getForwardWorkPlanProjectContributorsView(ProjectDetail detail) {
+    return getForwardWorkPlanProjectContributorsView(detail.getProject(), detail.getVersion());
   }
 
-  public ForwardWorkPlanProjectContributorsView getProjectContributorsView(Project project, int version) {
+  public ForwardWorkPlanProjectContributorsView getForwardWorkPlanProjectContributorsView(Project project, int version) {
     var forwardWorkPlanProjectContributor =
         forwardWorkPlanContributorDetailsRepository.findByProjectDetail_ProjectAndProjectDetail_Version(
             project,
@@ -50,6 +50,7 @@ public class ForwardWorkPlanProjectContributorSummaryService {
         )
         .stream()
         .map(projectContributor -> projectContributor.getContributionOrganisationGroup().getName())
+        .sorted()
         .collect(Collectors.toList());
   }
 }

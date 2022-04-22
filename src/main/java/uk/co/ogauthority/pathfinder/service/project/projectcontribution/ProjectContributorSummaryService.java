@@ -28,6 +28,7 @@ public class ProjectContributorSummaryService {
             project, version)
         .stream()
         .map(projectContributor -> projectContributor.getContributionOrganisationGroup().getName())
+        .sorted()
         .collect(Collectors.toList());
 
     return new ProjectContributorsView(organisationGroupNames);

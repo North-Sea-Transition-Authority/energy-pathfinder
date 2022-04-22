@@ -58,7 +58,7 @@ public class ForwardWorkPlanProjectContributorSectionSummaryService implements P
     );
 
     var currentForwardProjectContributorsView =
-        forwardWorkPlanProjectContributorSummaryService.getProjectContributorsView(detail);
+        forwardWorkPlanProjectContributorSummaryService.getForwardWorkPlanProjectContributorsView(detail);
 
     summaryModel.put("projectContributorDiffModel", getForwardProjectContributorDifferenceModel(
         detail,
@@ -84,7 +84,7 @@ public class ForwardWorkPlanProjectContributorSectionSummaryService implements P
       ForwardWorkPlanProjectContributorsView currentForwardOrganisationGroupViews
   ) {
     var previousForwardProjectContributorViews =
-        forwardWorkPlanProjectContributorSummaryService.getProjectContributorsView(
+        forwardWorkPlanProjectContributorSummaryService.getForwardWorkPlanProjectContributorsView(
             detail.getProject(),
             detail.getVersion() - 1
         );

@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Comparator;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +23,7 @@ import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrga
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectcontribution.ProjectContributor;
 import uk.co.ogauthority.pathfinder.model.form.project.projectcontributor.ProjectContributorsForm;
+import uk.co.ogauthority.pathfinder.model.view.organisationgroup.OrganisationGroupView;
 import uk.co.ogauthority.pathfinder.repository.project.projectcontributor.ProjectContributorRepository;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -162,6 +164,32 @@ public class ProjectContributorsCommonServiceTest {
         entry("projectTypeDisplayName", detail.getProjectType().getDisplayName()),
         entry("projectTypeDisplayNameLowercase", detail.getProjectType().getLowercaseDisplayName())
     );
+  }
+
+  @Test
+  public void setModelAndViewCommonObjects_assertContributorsNamesSorted() {
+    var modelAndView = new ModelAndView("");
+    var pageName = "My page";
+    var portalOrgA = TeamTestingUtil.generateOrganisationGroup(2, "alpha", "org1");
+    var portalOrgB = TeamTestingUtil.generateOrganisationGroup(3, "beta", "org2");
+    var portalOrgC = TeamTestingUtil.generateOrganisationGroup(1, "charlie", "org1");
+    var form = new ProjectContributorsForm();
+    form.setContributors(List.of(portalOrgB.getOrgGrpId(), portalOrgC.getOrgGrpId(), portalOrgA.getOrgGrpId()));
+
+    when(portalOrganisationAccessor.getOrganisationGroupsWhereIdIn(form.getContributors()))
+        .thenReturn(List.of(portalOrgB, portalOrgC, portalOrgA));
+
+    projectContributorsCommonService.setModelAndViewCommonObjects(
+        modelAndView,
+        detail,
+        form,
+        pageName,
+        List.of()
+    );
+
+    assertThat(modelAndView.getModel().get("alreadyAddedContributors"))
+        .asList()
+        .isSortedAccordingTo(Comparator.comparing(o -> ((OrganisationGroupView)o).getName()));
   }
 
   @Test

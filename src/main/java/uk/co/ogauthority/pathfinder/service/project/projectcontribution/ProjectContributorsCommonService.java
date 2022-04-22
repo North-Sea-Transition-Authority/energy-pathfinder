@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project.projectcontribution;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,6 +117,7 @@ public class ProjectContributorsCommonService {
             portalOrganisationGroup.getName(),
             true)
         )
+        .sorted(Comparator.comparing(OrganisationGroupView::getName))
         .collect(Collectors.toList());
   }
 }

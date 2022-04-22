@@ -99,4 +99,18 @@ public class ProjectContributorSummaryServiceTest {
         .asList()
         .isEmpty();
   }
+
+  @Test
+  public void getProjectContributorsView_assertContributorsNamesSorted() {
+    var projectContributorA = ProjectContributorTestUtil.contributorWithGroupOrgIdAndName(detail, 3, "alpha");
+    var projectContributorB = ProjectContributorTestUtil.contributorWithGroupOrgIdAndName(detail, 1, "beta");
+    var projectContributorC = ProjectContributorTestUtil.contributorWithGroupOrgIdAndName(detail, 2, "charlie");
+
+    when(projectContributorRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(
+        detail.getProject(), detail.getVersion()))
+        .thenReturn(List.of(projectContributorB, projectContributorC, projectContributorA));
+
+    assertThat(projectContributorSummaryService.getProjectContributorsView(detail).getOrganisationGroupNames())
+        .isSorted();
+  }
 }

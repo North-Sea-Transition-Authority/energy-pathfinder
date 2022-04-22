@@ -42,7 +42,7 @@ public class ForwardWorkPlanProjectContributorSummaryServiceTest {
   }
 
   @Test
-  public void getProjectContributorsViewByDetail_projectContributorsExist_assertGroupNames() {
+  public void getForwardWorkPlanProjectContributorsViewByDetail_projectContributorsExist_assertGroupNames() {
     var projectContributor1 = ProjectContributorTestUtil.contributorWithGroupOrgId(detail, 1);
     var projectContributor2 = ProjectContributorTestUtil.contributorWithGroupOrgId(detail, 2);
     var forwardWorkPlanProjectContributor = new ForwardWorkPlanContributorDetails(detail, true);
@@ -55,7 +55,7 @@ public class ForwardWorkPlanProjectContributorSummaryServiceTest {
         detail.getVersion()
     )).thenReturn(Optional.of(forwardWorkPlanProjectContributor));
 
-    var forwardWorkPlanProjectContributorsView = forwardWorkPlanProjectContributorSummaryService.getProjectContributorsView(
+    var forwardWorkPlanProjectContributorsView = forwardWorkPlanProjectContributorSummaryService.getForwardWorkPlanProjectContributorsView(
         detail
     );
 
@@ -71,13 +71,13 @@ public class ForwardWorkPlanProjectContributorSummaryServiceTest {
   }
 
   @Test
-  public void getProjectContributorsViewByDetail_projectContributorsDoesNotExist_assertNoGroupNames() {
+  public void getForwardWorkPlanProjectContributorsViewByDetail_projectContributorsDoesNotExist_assertNoGroupNames() {
     when(forwardWorkPlanContributorDetailsRepository.findByProjectDetail_ProjectAndProjectDetail_Version(
         detail.getProject(),
         detail.getVersion()
     )).thenReturn(Optional.empty());
 
-    var forwardWorkPlanProjectContributorsView = forwardWorkPlanProjectContributorSummaryService.getProjectContributorsView(
+    var forwardWorkPlanProjectContributorsView = forwardWorkPlanProjectContributorSummaryService.getForwardWorkPlanProjectContributorsView(
         detail
     );
 
@@ -90,7 +90,7 @@ public class ForwardWorkPlanProjectContributorSummaryServiceTest {
   }
 
   @Test
-  public void getProjectContributorsViewByProjectAndVersion_projectContributorsExist_assertGroupNames() {
+  public void getForwardWorkPlanProjectContributorsViewByProjectAndVersion_projectContributorsExist_assertGroupNames() {
     var projectContributor1 = ProjectContributorTestUtil.contributorWithGroupOrgId(detail, 1);
     var projectContributor2 = ProjectContributorTestUtil.contributorWithGroupOrgId(detail, 2);
     var forwardWorkPlanProjectContributor = new ForwardWorkPlanContributorDetails(detail, true);
@@ -103,7 +103,7 @@ public class ForwardWorkPlanProjectContributorSummaryServiceTest {
         detail.getVersion()
     )).thenReturn(Optional.of(forwardWorkPlanProjectContributor));
 
-    var forwardWorkPlanProjectContributorsView = forwardWorkPlanProjectContributorSummaryService.getProjectContributorsView(
+    var forwardWorkPlanProjectContributorsView = forwardWorkPlanProjectContributorSummaryService.getForwardWorkPlanProjectContributorsView(
         detail.getProject(),
         detail.getVersion()
     );
@@ -120,13 +120,13 @@ public class ForwardWorkPlanProjectContributorSummaryServiceTest {
   }
 
   @Test
-  public void getProjectContributorsViewByProjectAndVersion_projectContributorsDoesNotExist_assertNoGroupNames() {
+  public void getForwardWorkPlanProjectContributorsViewByProjectAndVersion_projectContributorsDoesNotExist_assertNoGroupNames() {
     when(forwardWorkPlanContributorDetailsRepository.findByProjectDetail_ProjectAndProjectDetail_Version(
         detail.getProject(),
         detail.getVersion()
     )).thenReturn(Optional.empty());
 
-    var forwardWorkPlanProjectContributorsView = forwardWorkPlanProjectContributorSummaryService.getProjectContributorsView(
+    var forwardWorkPlanProjectContributorsView = forwardWorkPlanProjectContributorSummaryService.getForwardWorkPlanProjectContributorsView(
         detail.getProject(),
         detail.getVersion()
     );
@@ -137,5 +137,25 @@ public class ForwardWorkPlanProjectContributorSummaryServiceTest {
         .isEmpty();
 
     assertThat(forwardWorkPlanProjectContributorsView.getHasProjectContributors()).isNull();
+  }
+
+  @Test
+  public void getForwardWorkPlanProjectContributorsView_assertContributorsNamesSorted() {
+    var projectContributorA = ProjectContributorTestUtil.contributorWithGroupOrgIdAndName(detail, 3, "alpha");
+    var projectContributorB = ProjectContributorTestUtil.contributorWithGroupOrgIdAndName(detail, 1, "beta");
+    var projectContributorC = ProjectContributorTestUtil.contributorWithGroupOrgIdAndName(detail, 2, "charlie");
+    var forwardWorkPlanProjectContributor = new ForwardWorkPlanContributorDetails(detail, true);
+
+    when(projectContributorRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(
+        detail.getProject(), detail.getVersion()))
+        .thenReturn(List.of(projectContributorB, projectContributorC, projectContributorA));
+    when(forwardWorkPlanContributorDetailsRepository.findByProjectDetail_ProjectAndProjectDetail_Version(
+        detail.getProject(),
+        detail.getVersion()
+    )).thenReturn(Optional.of(forwardWorkPlanProjectContributor));
+
+    assertThat(forwardWorkPlanProjectContributorSummaryService.getForwardWorkPlanProjectContributorsView(detail)
+        .getOrganisationGroupNames())
+        .isSorted();
   }
 }

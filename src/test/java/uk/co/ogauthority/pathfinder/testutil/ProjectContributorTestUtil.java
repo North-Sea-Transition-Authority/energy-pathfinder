@@ -10,6 +10,10 @@ public class ProjectContributorTestUtil {
   }
 
   public static ProjectContributor contributorWithGroupOrgId(ProjectDetail detail, int organisationId) {
-    return new ProjectContributor(detail, TeamTestingUtil.generateOrganisationGroup(1, "group", "grp"));
+    return contributorWithGroupOrgIdAndName(detail, organisationId, "name");
+  }
+
+  public static ProjectContributor contributorWithGroupOrgIdAndName(ProjectDetail detail, int organisationId, String name) {
+    return new ProjectContributor(detail, TeamTestingUtil.generateOrganisationGroup(organisationId, name, name));
   }
 }

@@ -66,9 +66,9 @@ public class ForwardWorkPlanProjectContributorSectionSummaryServiceTest {
     var currentProjectContributorView = new ForwardWorkPlanProjectContributorsView(listOfOrgNames, true);
     var previousProjectContributorView = new ForwardWorkPlanProjectContributorsView(listOfOrgNames, true);
 
-    when(forwardWorkPlanProjectContributorSummaryService.getProjectContributorsView(detail)).thenReturn(
+    when(forwardWorkPlanProjectContributorSummaryService.getForwardWorkPlanProjectContributorsView(detail)).thenReturn(
         currentProjectContributorView);
-    when(forwardWorkPlanProjectContributorSummaryService.getProjectContributorsView(detail.getProject(),
+    when(forwardWorkPlanProjectContributorSummaryService.getForwardWorkPlanProjectContributorsView(detail.getProject(),
         detail.getVersion() - 1))
         .thenReturn(previousProjectContributorView);
 
@@ -84,9 +84,9 @@ public class ForwardWorkPlanProjectContributorSectionSummaryServiceTest {
     var currentProjectContributorView = new ForwardWorkPlanProjectContributorsView(listOfOrgNames, true);
     var previousProjectContributorView = new ForwardWorkPlanProjectContributorsView(List.of(), true);
 
-    when(forwardWorkPlanProjectContributorSummaryService.getProjectContributorsView(detail)).thenReturn(
+    when(forwardWorkPlanProjectContributorSummaryService.getForwardWorkPlanProjectContributorsView(detail)).thenReturn(
         currentProjectContributorView);
-    when(forwardWorkPlanProjectContributorSummaryService.getProjectContributorsView(detail.getProject(),
+    when(forwardWorkPlanProjectContributorSummaryService.getForwardWorkPlanProjectContributorsView(detail.getProject(),
         detail.getVersion() - 1))
         .thenReturn(previousProjectContributorView);
 
