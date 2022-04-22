@@ -96,7 +96,7 @@ public class ForwardWorkPlanProjectContributorFormSectionServiceTest {
     var newDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
     when(projectContributorsCommonService.getProjectContributorsForDetail(detail))
         .thenReturn(projectContributors);
-    when(forwardWorkPlanProjectContributorManagementService.getForwardProjectContributorForDetailOrError(detail))
+    when(forwardWorkPlanProjectContributorManagementService.getForwardProjectContributorForDetail(detail))
         .thenReturn(forwardWorkPlanContributor);
 
     forwardWorkPlanProjectContributorFormSectionService.copySectionData(detail, newDetail);

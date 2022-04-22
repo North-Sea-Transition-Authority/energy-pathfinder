@@ -19,7 +19,6 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.ogauthority.pathfinder.controller.project.workplanprojectcontributor.ForwardWorkPlanProjectContributorsController;
-import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanprojectcontribution.ForwardWorkPlanContributorDetails;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -196,21 +195,26 @@ public class ForwardWorkPlanProjectContributorManagementServiceTest {
   }
 
   @Test
-  public void getForwardProjectContributorForDetailOrError_exist_verifyMethodCall() {
+  public void getForwardProjectContributorForDetail_exist_verifyMethodCall() {
     var forwardProjectContributor = new ForwardWorkPlanContributorDetails();
     when(forwardWorkPlanContributorDetailsRepository.findByProjectDetail(detail))
         .thenReturn(Optional.of(forwardProjectContributor));
 
-    assertThat(forwardWorkPlanProjectContributorManagementService.getForwardProjectContributorForDetailOrError(detail))
+    assertThat(forwardWorkPlanProjectContributorManagementService.getForwardProjectContributorForDetail(detail))
         .isEqualTo(forwardProjectContributor);
   }
 
-  @Test(expected = PathfinderEntityNotFoundException.class)
-  public void getForwardProjectContributorForDetailOrError_doesNotExist_expectException() {
+  @Test
+  public void getForwardProjectContributorForDetail_doesNotExist_expectNewEntity() {
     when(forwardWorkPlanContributorDetailsRepository.findByProjectDetail(detail))
         .thenReturn(Optional.empty());
 
-    forwardWorkPlanProjectContributorManagementService.getForwardProjectContributorForDetailOrError(detail);
+    assertThat(forwardWorkPlanProjectContributorManagementService.getForwardProjectContributorForDetail(detail))
+        .extracting(
+            ForwardWorkPlanContributorDetails::getProjectDetail,
+            ForwardWorkPlanContributorDetails::getHasProjectContributors
+        )
+        .containsExactly(detail, null);
   }
 
   @Test

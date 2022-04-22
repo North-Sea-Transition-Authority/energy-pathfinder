@@ -56,7 +56,7 @@ public class ForwardWorkPlanProjectContributorFormSectionService implements Proj
     );
 
     entityDuplicationService.duplicateEntityAndSetNewParent(
-        forwardWorkPlanProjectContributorManagementService.getForwardProjectContributorForDetailOrError(fromDetail),
+        forwardWorkPlanProjectContributorManagementService.getForwardProjectContributorForDetail(fromDetail),
         toDetail,
         ForwardWorkPlanContributorDetails.class
     );

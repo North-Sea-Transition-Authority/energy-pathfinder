@@ -9,7 +9,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.workplanprojectcontributor.ForwardWorkPlanProjectContributorsController;
-import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanprojectcontribution.ForwardWorkPlanContributorDetails;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -113,15 +112,9 @@ public class ForwardWorkPlanProjectContributorManagementService {
     return !bindingResult.hasErrors();
   }
 
-  ForwardWorkPlanContributorDetails getForwardProjectContributorForDetailOrError(ProjectDetail detail) {
+  ForwardWorkPlanContributorDetails getForwardProjectContributorForDetail(ProjectDetail detail) {
     return forwardWorkPlanContributorDetailsRepository.findByProjectDetail(detail)
-        .orElseThrow(() ->
-            new PathfinderEntityNotFoundException(
-                String.format("Cannot find ForwardWorkPlanProjectContributor for project detail with ID: %s",
-                    detail.getId()
-                )
-            )
-        );
+        .orElse(new ForwardWorkPlanContributorDetails(detail, null));
   }
 
   void removeForwardProjectContributorsForDetail(ProjectDetail detail) {
