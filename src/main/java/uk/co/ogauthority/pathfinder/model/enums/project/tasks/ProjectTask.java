@@ -156,24 +156,24 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       Set.of(ProjectType.INFRASTRUCTURE),
       130
   ),
+  WORK_PLAN_PROJECT_CONTRIBUTORS(
+      ForwardWorkPlanProjectContributorsController.PAGE_NAME,
+      ForwardWorkPlanProjectContributorsController.class,
+      ForwardWorkPlanProjectContributorFormSectionService.class,
+      Set.of(ProjectType.FORWARD_WORK_PLAN),
+      10
+  ),
   WORK_PLAN_UPCOMING_TENDERS(
       ForwardWorkPlanUpcomingTenderController.PAGE_NAME,
       ForwardWorkPlanUpcomingTenderController.class,
       ForwardWorkPlanUpcomingTenderService.class,
       Set.of(ProjectType.FORWARD_WORK_PLAN),
-      10
+      20
   ),
   WORK_PLAN_COLLABORATION_OPPORTUNITIES(
       ForwardWorkPlanCollaborationOpportunityModelService.PAGE_NAME,
       ForwardWorkPlanCollaborationOpportunityController.class,
       ForwardWorkPlanCollaborationOpportunityService.class,
-      Set.of(ProjectType.FORWARD_WORK_PLAN),
-      20
-  ),
-  WORK_PLAN_PROJECT_CONTRIBUTORS(
-      ForwardWorkPlanProjectContributorsController.PAGE_NAME,
-      ForwardWorkPlanProjectContributorsController.class,
-      ForwardWorkPlanProjectContributorFormSectionService.class,
       Set.of(ProjectType.FORWARD_WORK_PLAN),
       30
   )
