@@ -16,6 +16,11 @@ CREATE OR REPLACE VIEW ${datasource.user}.dashboard_project_items AS (
     , po.publishable_org_unit_id
     , COALESCE(pd.submitted_datetime, pd.created_datetime, p.created_datetime) sort_key
     , pd.is_current_version
+    , (
+        SELECT st.join(stagg(pc.cont_org_group_id))
+        FROM ${datasource.user}.project_contributor pc
+        WHERE pc.project_detail_id = pd.id
+      ) contributor_org_ids
     , DECODE(
       (
         SELECT MAX(details.version)
