@@ -14,6 +14,8 @@ import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUs
 
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +23,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -28,6 +31,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
+import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
 import uk.co.ogauthority.pathfinder.controller.file.FileDownloadService;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
@@ -36,18 +40,21 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderSummaryService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectFileTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = UpcomingTendersController.class, includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ProjectContextService.class))
@@ -70,10 +77,17 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
   @MockBean
   FileDownloadService fileDownloadService;
 
+  private ProjectControllerTesterService projectControllerTesterService;
+
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
   private final ProjectDetailFile PROJECT_DETAIL_FILE = ProjectFileTestUtil.getProjectDetailFile(detail);
 
+  private final Set<ProjectStatus> permittedProjectStatuses = Set.of(ProjectStatus.DRAFT);
+
+  private final Set<ProjectType> permittedProjectTypes = Set.of(ProjectType.INFRASTRUCTURE);
+
+  private final Set<ProjectPermission> requiredPermissions = ProjectControllerTesterService.PROJECT_CREATE_PERMISSION_SET;
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       SystemAccessService.CREATE_PROJECT_PRIVILEGES);
@@ -101,8 +115,216 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
     when(upcomingTenderService.updateUpcomingTender(any(), any(), any())).thenReturn(UpcomingTenderUtil.getUpcomingTender(detail));
     when(projectDetailFileService.getProjectDetailFileByProjectDetailVersionAndFileId(any(), any(), any())).thenReturn(PROJECT_DETAIL_FILE);
     when(projectDetailFileService.getUploadedFileById(ProjectFileTestUtil.FILE_ID)).thenReturn(file);
+
+    projectControllerTesterService = new ProjectControllerTesterService(
+        mockMvc,
+        projectOperatorService,
+        projectContributorsCommonService,
+        teamService
+    );
   }
 
+  @Test
+  public void viewUpcomingTender_projectContextSmokeTest() {
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.GET)
+        .withProjectDetail(detail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(UpcomingTendersController.class).viewUpcomingTenders(detail.getProject().getId(), null),
+        status().isOk(),
+        status().isForbidden()
+    );
+  }
+
+  @Test
+  public void saveUpcomingTenders_projectContextSmokeTest() {
+    when(upcomingTenderSummaryService.validateViews(any())).thenReturn(ValidationResult.VALID);
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.POST)
+        .withProjectDetail(detail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(UpcomingTendersController.class).saveUpcomingTenders(
+            detail.getProject().getId(),
+            null
+        ),
+        status().is3xxRedirection(),
+        status().isForbidden()
+    );
+  }
+
+  @Test
+  public void addUpcomingTender_projectContextSmokeTest() {
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.GET)
+        .withProjectDetail(detail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(UpcomingTendersController.class).addUpcomingTender(
+            detail.getProject().getId(),
+            null),
+        status().isOk(),
+        status().isForbidden()
+    );
+  }
+
+  @Test
+  public void saveUpcomingTender_projectContextSmokeTest() {
+    var form = new UpcomingTenderForm();
+    var bindingResult = new BeanPropertyBindingResult(UpcomingTenderForm.class, "form");
+    when(upcomingTenderService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.POST)
+        .withProjectDetail(detail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withRequestParam(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(UpcomingTendersController.class).saveUpcomingTender(
+            detail.getProject().getId(),
+            form,
+            bindingResult,
+            null,
+            null
+        ),
+        status().is3xxRedirection(),
+        status().isForbidden()
+    );
+  }
+
+  @Test
+  public void editUpcomingTender_projectContextSmokeTest() {
+    when(upcomingTenderService.getForm(upcomingTender)).thenReturn(UpcomingTenderUtil.getCompleteForm());
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.GET)
+        .withProjectDetail(detail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(UpcomingTendersController.class).editUpcomingTender(
+            detail.getProject().getId(),
+            UPCOMING_TENDER_ID,
+            null
+        ),
+        status().isOk(),
+        status().isForbidden()
+    );
+  }
+
+  @Test
+  public void updateUpcomingTender_projectContextSmokeTest() {
+    var form = new UpcomingTenderForm();
+    var bindingResult = new BeanPropertyBindingResult(UpcomingTenderForm.class, "form");
+    when(upcomingTenderService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(upcomingTenderService.updateUpcomingTender(eq(upcomingTender), eq(form), any())).thenReturn(upcomingTender);
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.POST)
+        .withProjectDetail(detail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withRequestParam(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(UpcomingTendersController.class).updateUpcomingTender(
+            detail.getProject().getId(),
+            UPCOMING_TENDER_ID,
+            form,
+            bindingResult,
+            null,
+            null
+        ),
+        status().is3xxRedirection(),
+        status().isForbidden()
+    );
+  }
+
+  @Test
+  public void removeUpcomingTenderConfirm_projectContextSmokeTest() {
+    when(upcomingTenderService.getForm(upcomingTender)).thenReturn(UpcomingTenderUtil.getCompleteForm());
+    when(upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, DISPLAY_ORDER))
+        .thenReturn(UpcomingTenderViewUtil.createUpComingTenderView(
+            upcomingTender,
+            DISPLAY_ORDER,
+            List.of()
+        ));
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.GET)
+        .withProjectDetail(detail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(UpcomingTendersController.class).removeUpcomingTenderConfirm(
+            detail.getProject().getId(),
+            UPCOMING_TENDER_ID,
+            DISPLAY_ORDER,
+            null
+        ),
+        status().isOk(),
+        status().isForbidden()
+    );
+  }
+
+  @Test
+  public void removeUpcomingTender_projectContextSmokeTest() {
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.POST)
+        .withProjectDetail(detail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(UpcomingTendersController.class).removeUpcomingTender(
+            detail.getProject().getId(),
+            UPCOMING_TENDER_ID,
+            DISPLAY_ORDER,
+            null
+        ),
+        status().is3xxRedirection(),
+        status().isForbidden()
+    );
+  }
 
   @Test
   public void authenticatedUser_hasAccessToUpcomingTender() throws Exception {

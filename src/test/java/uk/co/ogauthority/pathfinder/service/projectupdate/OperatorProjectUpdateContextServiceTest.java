@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.projectupdate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.when;
 
 import java.util.Set;
@@ -36,15 +37,15 @@ public class OperatorProjectUpdateContextServiceTest {
   private final Set<ProjectStatus> projectStatuses = Set.of(ProjectStatus.QA);
   private final Set<ProjectPermission> projectPermissions = Set.of(ProjectPermission.PROVIDE_UPDATE);
   private final Set<ProjectType> allowedProjectTypes = Set.of(projectDetail.getProjectType());
+  private final boolean allowProjectContributors = false;
 
   @Before
   public void setup() {
     operatorProjectUpdateContextService = new OperatorProjectUpdateContextService(
         projectContextService,
-        projectUpdateService
-    );
+        projectUpdateService);
 
-    when(projectContextService.buildProjectContext(any(), any(), any(), any(), any()))
+    when(projectContextService.buildProjectContext(any(), any(), any(), any(), any(), anyBoolean()))
         .thenAnswer(invocation -> new ProjectContext(invocation.getArgument(0), invocation.getArgument(3), invocation.getArgument(1)));
   }
 
@@ -55,7 +56,8 @@ public class OperatorProjectUpdateContextServiceTest {
         authenticatedUser,
         projectStatuses,
         projectPermissions,
-        allowedProjectTypes
+        allowedProjectTypes,
+        allowProjectContributors
     );
 
     assertThat(operatorProjectUpdateContext.getProjectDetails()).isEqualTo(projectDetail);

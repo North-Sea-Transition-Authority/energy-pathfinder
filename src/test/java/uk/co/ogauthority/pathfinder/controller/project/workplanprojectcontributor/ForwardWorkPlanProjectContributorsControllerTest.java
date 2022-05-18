@@ -74,7 +74,12 @@ public class ForwardWorkPlanProjectContributorsControllerTest extends ProjectCon
 
   @Before
   public void setup() {
-    projectControllerTesterService = new ProjectControllerTesterService(mockMvc, projectOperatorService);
+    projectControllerTesterService = new ProjectControllerTesterService(
+        mockMvc,
+        projectOperatorService,
+        projectContributorsCommonService,
+        teamService
+    );
     when(projectService.getLatestDetailOrError(projectId)).thenReturn(projectDetail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
   }

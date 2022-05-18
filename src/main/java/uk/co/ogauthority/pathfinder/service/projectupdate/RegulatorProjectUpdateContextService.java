@@ -34,7 +34,8 @@ public class RegulatorProjectUpdateContextService extends ProjectUpdateContextSe
                                                                  AuthenticatedUserAccount user,
                                                                  Set<ProjectStatus> statusCheck,
                                                                  Set<ProjectPermission> permissionCheck,
-                                                                 Set<ProjectType> allowedProjectTypes) {
+                                                                 Set<ProjectType> allowedProjectTypes,
+                                                                 boolean allowProjectContributors) {
     // This check to get the latest submitted detail is a safety check, in case
     // detail is not the latest submitted detail.
     var latestSubmittedDetail = projectService.getLatestSubmittedDetailOrError(detail.getProject().getId());
@@ -53,7 +54,8 @@ public class RegulatorProjectUpdateContextService extends ProjectUpdateContextSe
         user,
         statusCheck,
         permissionCheck,
-        allowedProjectTypes
+        allowedProjectTypes,
+        allowProjectContributors
     );
 
     return new RegulatorProjectUpdateContext(projectUpdateContext);

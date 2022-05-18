@@ -12,6 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
+import java.util.List;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +21,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -26,10 +29,13 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
+import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContract;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractForm;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -37,6 +43,7 @@ import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentR
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -52,6 +59,12 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
   private static final Integer PROJECT_ID = 1;
   private static final Integer AWARDED_CONTRACT_ID = 10;
 
+  private final Set<ProjectStatus> permittedProjectStatuses = Set.of(ProjectStatus.DRAFT);
+
+  private final Set<ProjectType> permittedProjectTypes = Set.of(ProjectType.INFRASTRUCTURE);
+
+  private final Set<ProjectPermission> requiredPermissions = ProjectControllerTesterService.PROJECT_CREATE_PERMISSION_SET;
+
   @MockBean
   private AwardedContractService awardedContractService;
 
@@ -64,11 +77,19 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
 
   private AuthenticatedUserAccount unauthenticatedUser;
 
+  private ProjectControllerTesterService projectControllerTesterService;
+
   @Before
   public void setup() {
     projectDetail = ProjectUtil.getProjectDetails();
     authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(SystemAccessService.CREATE_PROJECT_PRIVILEGES);
     unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
+    projectControllerTesterService = new ProjectControllerTesterService(
+        mockMvc,
+        projectOperatorService,
+        projectContributorsCommonService,
+        teamService
+    );
 
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
@@ -544,5 +565,178 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
             .with(csrf())
             .params(params))
         .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void viewAwardedContracts_projectContextSmokeTest() {
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.GET)
+        .withProjectDetail(projectDetail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(AwardedContractController.class).viewAwardedContracts(projectDetail.getProject().getId(), null),
+        status().isOk(),
+        status().isForbidden()
+    );
+  }
+
+  @Test
+  public void addAwardedContract_projectContextSmokeTest() {
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.GET)
+        .withProjectDetail(projectDetail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(AwardedContractController.class).addAwardedContract(projectDetail.getProject().getId(), null),
+        status().isOk(),
+        status().isForbidden()
+    );
+  }
+
+  @Test
+  public void getAwardedContract_projectContextSmokeTest() {
+    when(awardedContractService.getForm(eq(AWARDED_CONTRACT_ID), any()))
+        .thenReturn(AwardedContractTestUtil.createAwardedContractForm());
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.GET)
+        .withProjectDetail(projectDetail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(AwardedContractController.class).getAwardedContract(
+            projectDetail.getProject().getId(),
+            AWARDED_CONTRACT_ID,
+            null
+        ),
+        status().isOk(),
+        status().isForbidden()
+    );
+  }
+
+  @Test
+  public void removeAwardedContractConfirmation_projectContextSmokeTest() {
+    var awardedContractView = AwardedContractViewUtil.from(
+        AwardedContractTestUtil.createAwardedContract(),
+        1
+    );
+
+    when(awardedContractSummaryService.getAwardedContractView(AWARDED_CONTRACT_ID, projectDetail, 1))
+        .thenReturn(awardedContractView);
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.GET)
+        .withProjectDetail(projectDetail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(AwardedContractController.class).removeAwardedContractConfirmation(
+            projectDetail.getProject().getId(),
+            AWARDED_CONTRACT_ID,
+            1,
+            null
+        ),
+        status().isOk(),
+        status().isForbidden()
+    );
+  }
+
+  @Test
+  public void saveAwardedContract_projectContextSmokeTest() {
+    var form = new AwardedContractForm();
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+    when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.POST)
+        .withProjectDetail(projectDetail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withRequestParam(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(AwardedContractController.class).saveAwardedContract(
+            projectDetail.getProject().getId(),
+            form,
+            bindingResult,
+            ValidationType.PARTIAL,
+            null
+        ),
+        status().is3xxRedirection(),
+        status().isForbidden()
+    );
+  }
+
+  @Test
+  public void removeAwardedContract_projectContextSmokeTest() {
+    when(awardedContractService.getAwardedContract(eq(AWARDED_CONTRACT_ID), any()))
+        .thenReturn(AwardedContractTestUtil.createAwardedContract());
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.POST)
+        .withProjectDetail(projectDetail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(AwardedContractController.class).removeAwardedContract(
+            projectDetail.getProject().getId(),
+            AWARDED_CONTRACT_ID,
+            1,
+            null
+        ),
+        status().is3xxRedirection(),
+        status().isForbidden()
+    );
+  }
+
+  @Test
+  public void saveAwardedContractSummary_projectContextSmokeTest() {
+    var awardedContractViews = List.of(AwardedContractTestUtil.createAwardedContractView(1));
+    when(awardedContractSummaryService.getValidatedAwardedContractViews(projectDetail))
+        .thenReturn(awardedContractViews);
+    when(awardedContractSummaryService.validateViews(awardedContractViews)).thenReturn(ValidationResult.VALID);
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.POST)
+        .withProjectDetail(projectDetail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(AwardedContractController.class).saveAwardedContractSummary(
+            projectDetail.getProject().getId(),
+            null
+        ),
+        status().is3xxRedirection(),
+        status().isForbidden()
+    );
   }
 }

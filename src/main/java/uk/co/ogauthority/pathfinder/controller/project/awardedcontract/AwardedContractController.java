@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.AllowProjectContributorAccess;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
@@ -40,6 +41,7 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
+@AllowProjectContributorAccess
 @ProjectTypeCheck(types = ProjectType.INFRASTRUCTURE)
 @RequestMapping("/project/{projectId}/awarded-contracts")
 public class AwardedContractController extends ProjectFormPageController {

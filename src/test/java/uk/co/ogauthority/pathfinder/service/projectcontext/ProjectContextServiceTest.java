@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +27,11 @@ import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.service.project.projectcontribution.ProjectContributorsCommonService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
+import uk.co.ogauthority.pathfinder.testutil.ProjectContributorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -37,6 +42,12 @@ public class ProjectContextServiceTest {
 
   @Mock
   private ProjectOperatorService projectOperatorService;
+
+  @Mock
+  private ProjectContributorsCommonService projectContributorsCommonService;
+
+  @Mock
+  private TeamService teamService;
 
   private ProjectContextService projectContextService;
 
@@ -54,8 +65,9 @@ public class ProjectContextServiceTest {
   public void setUp() throws Exception {
     projectContextService = new ProjectContextService(
         projectService,
-        projectOperatorService
-    );
+        projectOperatorService,
+        projectContributorsCommonService,
+        teamService);
     detail.setStatus(ProjectStatus.DRAFT);
   }
 
@@ -115,7 +127,8 @@ public class ProjectContextServiceTest {
         authenticatedUser,
         Set.of(ProjectStatus.DRAFT),
         projectPermissions,
-        allowedProjectTypes
+        allowedProjectTypes,
+        false
     );
     assertThat(context.getProjectDetails()).isEqualTo(detail);
     assertThat(context.getUserAccount()).isEqualTo(authenticatedUser);
@@ -135,7 +148,8 @@ public class ProjectContextServiceTest {
         authenticatedUser,
         Set.of(ProjectStatus.DRAFT),
         projectPermissions,
-        allowedProjectTypes
+        allowedProjectTypes,
+        false
     );
   }
 
@@ -147,7 +161,8 @@ public class ProjectContextServiceTest {
         authenticatedUser,
         Set.of(ProjectStatus.QA),
         projectPermissions,
-        allowedProjectTypes
+        allowedProjectTypes,
+        false
     );
   }
 
@@ -163,7 +178,8 @@ public class ProjectContextServiceTest {
         authenticatedUser,
         Set.of(ProjectStatus.QA),
         projectPermissions,
-        allowedProjectTypes
+        allowedProjectTypes,
+        false
     );
   }
 
@@ -175,7 +191,99 @@ public class ProjectContextServiceTest {
         unAuthenticatedUser,
         Set.of(ProjectStatus.DRAFT),
         projectPermissions,
-        allowedProjectTypes
+        allowedProjectTypes,
+        false
+    );
+  }
+
+  @Test
+  public void buildProjectContext_whenContributorAccessAllowed_andUserIsContributor_thenAccessGranted() {
+    var myOrganisationTeam = TeamTestingUtil.getOrganisationTeam(1, "My org");
+    var projectContributor = ProjectContributorTestUtil.contributorWithGroupOrgId(
+        detail,
+        myOrganisationTeam.getPortalOrganisationGroup().getOrgGrpId()
+    );
+
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(false);
+    when(projectContributorsCommonService.getProjectContributorsForDetail(detail))
+        .thenReturn(List.of(projectContributor));
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUser.getLinkedPerson()))
+        .thenReturn(List.of(myOrganisationTeam));
+
+    var context = projectContextService.buildProjectContext(
+        detail,
+        authenticatedUser,
+        Set.of(ProjectStatus.DRAFT),
+        projectPermissions,
+        allowedProjectTypes,
+        true
+    );
+
+    assertThat(context.getProjectDetails()).isEqualTo(detail);
+    assertThat(context.getUserAccount()).isEqualTo(authenticatedUser);
+    assertThat(context.getProjectPermissions()).containsExactlyInAnyOrder(
+        ProjectPermission.EDIT,
+        ProjectPermission.SUBMIT,
+        ProjectPermission.PROVIDE_UPDATE,
+        ProjectPermission.ARCHIVE
+    );
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  public void buildProjectContext_whenNoPermissionsAndIsNotContributor() {
+    var myOrganisationTeam = TeamTestingUtil.getOrganisationTeam(1, "My org");
+    var projectContributor = ProjectContributorTestUtil.contributorWithGroupOrgId(
+        detail,
+        142 //different organisationId than myOrganisationTeam
+    );
+
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(false);
+    when(projectContributorsCommonService.getProjectContributorsForDetail(detail))
+        .thenReturn(List.of(projectContributor));
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUser.getLinkedPerson()))
+        .thenReturn(List.of(myOrganisationTeam));
+
+    projectContextService.buildProjectContext(
+        detail,
+        authenticatedUser,
+        Set.of(ProjectStatus.DRAFT),
+        projectPermissions,
+        allowedProjectTypes,
+        true
+    );
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  public void buildProjectContext_whenContributorAccessNotAllowed_andUserIsContributor_thenForbidden() {
+    var myOrganisationTeam = TeamTestingUtil.getOrganisationTeam(1, "My org");
+    var projectContributor = ProjectContributorTestUtil.contributorWithGroupOrgId(
+        detail,
+        myOrganisationTeam.getPortalOrganisationGroup().getOrgGrpId()
+    );
+
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(false);
+
+    projectContextService.buildProjectContext(
+        detail,
+        authenticatedUser,
+        Set.of(ProjectStatus.DRAFT),
+        projectPermissions,
+        allowedProjectTypes,
+        false
+    );
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  public void buildProjectContext_whenContributorAccessNotAllowed_andUserIsNotContributor_thenForbidden() {
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(false);
+
+    projectContextService.buildProjectContext(
+        detail,
+        authenticatedUser,
+        Set.of(ProjectStatus.DRAFT),
+        projectPermissions,
+        allowedProjectTypes,
+        false
     );
   }
 
@@ -192,7 +300,8 @@ public class ProjectContextServiceTest {
         authenticatedUser,
         Set.of(ProjectStatus.DRAFT),
         projectPermissions,
-        Set.of(projectType)
+        Set.of(projectType),
+        false
     );
 
     assertThat(context.getProjectDetails()).isEqualTo(detail);
@@ -212,7 +321,8 @@ public class ProjectContextServiceTest {
         authenticatedUser,
         Set.of(ProjectStatus.DRAFT),
         projectPermissions,
-        Set.of(expectedProjectType)
+        Set.of(expectedProjectType),
+        false
     );
   }
 
@@ -230,7 +340,8 @@ public class ProjectContextServiceTest {
         authenticatedUser,
         Set.of(ProjectStatus.DRAFT),
         projectPermissions,
-        expectedProjectTypes
+        expectedProjectTypes,
+        false
     );
   }
 
@@ -247,7 +358,8 @@ public class ProjectContextServiceTest {
         authenticatedUser,
         Set.of(ProjectStatus.DRAFT),
         projectPermissions,
-        expectedProjectTypes
+        expectedProjectTypes,
+        false
     );
   }
 

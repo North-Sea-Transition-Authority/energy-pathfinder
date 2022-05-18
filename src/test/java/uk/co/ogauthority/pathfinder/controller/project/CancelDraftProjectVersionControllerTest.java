@@ -67,7 +67,12 @@ public class CancelDraftProjectVersionControllerTest extends ProjectContextAbstr
   @Before
   public void setup() {
 
-    projectControllerTesterService = new ProjectControllerTesterService(mockMvc, projectOperatorService);
+    projectControllerTesterService = new ProjectControllerTesterService(
+        mockMvc,
+        projectOperatorService,
+        projectContributorsCommonService,
+        teamService
+    );
 
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
   }

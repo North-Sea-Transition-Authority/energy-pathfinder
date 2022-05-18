@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.projectupdate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.when;
 
 import java.util.Set;
@@ -44,6 +45,7 @@ public class RegulatorProjectUpdateContextServiceTest {
   private final Set<ProjectStatus> projectStatuses = Set.of(ProjectStatus.QA);
   private final Set<ProjectPermission> projectPermissions = Set.of(ProjectPermission.REQUEST_UPDATE);
   private final Set<ProjectType> allowedProjectTypes = Set.of(projectDetail.getProjectType());
+  private final boolean allowProjectContributors = false;
 
   @Before
   public void setup() {
@@ -51,12 +53,11 @@ public class RegulatorProjectUpdateContextServiceTest {
         projectContextService,
         projectUpdateService,
         projectService,
-        regulatorUpdateRequestService
-    );
+        regulatorUpdateRequestService);
 
     when(projectService.getLatestSubmittedDetailOrError(projectDetail.getProject().getId())).thenReturn(projectDetail);
 
-    when(projectContextService.buildProjectContext(any(), any(), any(), any(), any()))
+    when(projectContextService.buildProjectContext(any(), any(), any(), any(), any(), anyBoolean()))
         .thenAnswer(invocation -> new ProjectContext(invocation.getArgument(0), invocation.getArgument(3), invocation.getArgument(1)));
   }
 
@@ -69,7 +70,8 @@ public class RegulatorProjectUpdateContextServiceTest {
         authenticatedUser,
         projectStatuses,
         projectPermissions,
-        allowedProjectTypes
+        allowedProjectTypes,
+        allowProjectContributors
     );
 
     assertThat(regulatorProjectUpdateContext.getProjectDetails()).isEqualTo(projectDetail);
@@ -86,7 +88,8 @@ public class RegulatorProjectUpdateContextServiceTest {
         authenticatedUser,
         projectStatuses,
         projectPermissions,
-        allowedProjectTypes
+        allowedProjectTypes,
+        allowProjectContributors
     );
   }
 }

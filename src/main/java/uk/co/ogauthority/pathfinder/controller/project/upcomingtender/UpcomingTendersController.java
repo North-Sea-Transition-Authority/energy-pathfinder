@@ -23,6 +23,7 @@ import uk.co.ogauthority.pathfinder.config.file.FileUploadResult;
 import uk.co.ogauthority.pathfinder.controller.file.FileDownloadService;
 import uk.co.ogauthority.pathfinder.controller.file.PathfinderFileUploadController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.AllowProjectContributorAccess;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
@@ -51,6 +52,7 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
+@AllowProjectContributorAccess
 @ProjectTypeCheck(types = ProjectType.INFRASTRUCTURE)
 @RequestMapping("/project/{projectId}/upcoming-tenders")
 public class UpcomingTendersController extends PathfinderFileUploadController {

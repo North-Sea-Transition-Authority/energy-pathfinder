@@ -52,7 +52,12 @@ public class ForwardWorkPlanProjectStartControllerTest extends ProjectContextAbs
 
   @Before
   public void setup() {
-    projectControllerTesterService = new ProjectControllerTesterService(mockMvc, projectOperatorService);
+    projectControllerTesterService = new ProjectControllerTesterService(
+        mockMvc,
+        projectOperatorService,
+        projectContributorsCommonService,
+        teamService
+    );
     when(projectService.getLatestDetailOrError(projectDetail.getProject().getId())).thenReturn(projectDetail);
   }
 

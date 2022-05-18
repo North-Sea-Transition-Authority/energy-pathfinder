@@ -10,6 +10,7 @@ import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUs
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.http.HttpMethod;
@@ -25,6 +26,10 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.service.project.projectcontribution.ProjectContributorsCommonService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
+import uk.co.ogauthority.pathfinder.testutil.ProjectContributorTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 public class ProjectControllerTesterService {
@@ -40,6 +45,10 @@ public class ProjectControllerTesterService {
 
   private final ProjectOperatorService projectOperatorService;
 
+  private final ProjectContributorsCommonService projectContributorsCommonService;
+
+  private final TeamService teamService;
+
   private final Map<String, String> requestParams = new HashMap<>();
 
   private HttpMethod requestMethod;
@@ -54,10 +63,16 @@ public class ProjectControllerTesterService {
 
   private Set<ProjectPermission> requiredPermissions;
 
+  private boolean allowContributorAccess = false;
+
   public ProjectControllerTesterService(MockMvc mockMvc,
-                                        ProjectOperatorService projectOperatorService) {
+                                        ProjectOperatorService projectOperatorService,
+                                        ProjectContributorsCommonService projectContributorsCommonService,
+                                        TeamService teamService) {
     this.projectOperatorService = projectOperatorService;
     this.mockMvc = mockMvc;
+    this.projectContributorsCommonService = projectContributorsCommonService;
+    this.teamService = teamService;
   }
 
   public ProjectControllerTesterService withHttpRequestMethod(HttpMethod requestMethod) {
@@ -103,6 +118,11 @@ public class ProjectControllerTesterService {
     return this;
   }
 
+  public ProjectControllerTesterService withProjectContributorAccess() {
+    allowContributorAccess = true;
+    return this;
+  }
+
   public void smokeTestProjectContextAnnotationsForControllerEndpoint(
       Object controllerMethodToCheck,
       ResultMatcher successMatcher,
@@ -133,6 +153,15 @@ public class ProjectControllerTesterService {
     smokeTestProjectPermissions(
         controllerMethodToCheck,
         requiredPermissions,
+        successMatcher,
+        failedMatcher
+    );
+
+    resetProjectDetail(originalProjectType, originalProjectStatus);
+
+    smokeTestProjectContributorAccess(
+
+        controllerMethodToCheck,
         successMatcher,
         failedMatcher
     );
@@ -246,6 +275,51 @@ public class ProjectControllerTesterService {
     });
 
     makeRequestWithUnauthenticatedUser(controllerMethodToCheck);
+  }
+
+  public void smokeTestProjectContributorAccess(
+      Object controllerMethodToCheck,
+      ResultMatcher matcherWhenRequiredPermission,
+      ResultMatcher matcherWhenNotRequiredPermission
+  ) {
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUserAccount))
+        .thenReturn(false);
+
+    if (allowContributorAccess) {
+      var organisationGroup = TeamTestingUtil.generateOrganisationGroup(100, "my Org", "org");
+      when(projectContributorsCommonService.getProjectContributorsForDetail(projectDetail)).thenReturn(List.of(
+          ProjectContributorTestUtil.contributorWithGroupOrgId(projectDetail, organisationGroup.getOrgGrpId())
+      ));
+
+      when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUserAccount.getLinkedPerson())).thenReturn(
+          List.of(TeamTestingUtil.getOrganisationTeam(organisationGroup)));
+
+      try {
+        final var response = makeRequestWithUser(
+            controllerMethodToCheck,
+            authenticatedUserAccount
+        );
+        response.andExpect(matcherWhenRequiredPermission);
+      } catch (AssertionError | Exception ex) {
+        throw new AssertionError(
+            String.format("Failed to access endpoint as a contributor %s", ex.getMessage()),
+            ex
+        );
+      }
+    } else {
+      try {
+        final var response = makeRequestWithUser(
+            controllerMethodToCheck,
+            authenticatedUserAccount
+        );
+        response.andExpect(matcherWhenNotRequiredPermission);
+      } catch (AssertionError | Exception ex) {
+        throw new AssertionError(
+            String.format("Failed, access was granted without being a contributor %s", ex.getMessage()),
+            ex
+        );
+      }
+    }
   }
 
   public void makeRequestAndAssertMatcher(

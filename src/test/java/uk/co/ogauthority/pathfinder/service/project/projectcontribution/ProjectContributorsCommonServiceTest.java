@@ -213,4 +213,19 @@ public class ProjectContributorsCommonServiceTest {
         projectContributor2
     );
   }
+
+  @Test
+  public void hasProjectContributors_whenThereAreContributors_assertTrue() {
+    when(projectContributorRepository.findAllByProjectDetail(detail))
+        .thenReturn(List.of(ProjectContributorTestUtil.contributorWithGroupOrgId(detail, 1)));
+
+    assertThat(projectContributorsCommonService.hasProjectContributors(detail)).isTrue();
+  }
+
+  @Test
+  public void hasProjectContributors_whenThereAreNoContributors_assertFalse() {
+    when(projectContributorRepository.findAllByProjectDetail(detail)).thenReturn(List.of());
+
+    assertThat(projectContributorsCommonService.hasProjectContributors(detail)).isFalse();
+  }
 }

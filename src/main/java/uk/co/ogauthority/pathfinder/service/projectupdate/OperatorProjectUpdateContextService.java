@@ -24,13 +24,16 @@ public class OperatorProjectUpdateContextService extends ProjectUpdateContextSer
                                                                 AuthenticatedUserAccount user,
                                                                 Set<ProjectStatus> statusCheck,
                                                                 Set<ProjectPermission> permissionCheck,
-                                                                Set<ProjectType> allowedProjectTypes) {
+                                                                Set<ProjectType> allowedProjectTypes,
+                                                                boolean allowProjectContributors
+                                                                ) {
     var projectUpdateContext = super.buildProjectUpdateContext(
         detail,
         user,
         statusCheck,
         permissionCheck,
-        allowedProjectTypes
+        allowedProjectTypes,
+        allowProjectContributors
     );
 
     return new OperatorProjectUpdateContext(projectUpdateContext);

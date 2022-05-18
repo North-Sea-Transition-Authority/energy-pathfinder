@@ -117,7 +117,12 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
     when(workPlanUpcomingTenderService.updateUpcomingTender(any(), any())).thenReturn(ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail));
     when(workPlanUpcomingTenderModelService.getUpcomingTenderFormModelAndView(eq(projectDetail), any())).thenReturn(new ModelAndView(""));
 
-    projectControllerTesterService = new ProjectControllerTesterService(mockMvc, projectOperatorService);
+    projectControllerTesterService = new ProjectControllerTesterService(
+        mockMvc,
+        projectOperatorService,
+        projectContributorsCommonService,
+        teamService
+    );
   }
 
   @Test

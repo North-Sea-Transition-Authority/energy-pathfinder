@@ -106,6 +106,10 @@ public class ProjectContributorsCommonService {
     return projectContributorRepository.findAllByProjectDetail(detail);
   }
 
+  public boolean hasProjectContributors(ProjectDetail detail) {
+    return !getProjectContributorsForDetail(detail).isEmpty();
+  }
+
   private List<OrganisationGroupView> getOrganisationGroupViews(ProjectContributorsForm form) {
     if (form.getContributors() == null) {
       return List.of();
