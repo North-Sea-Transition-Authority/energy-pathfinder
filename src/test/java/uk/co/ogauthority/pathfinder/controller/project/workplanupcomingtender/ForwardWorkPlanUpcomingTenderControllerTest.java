@@ -457,7 +457,8 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
         .withUser(authenticatedUser)
         .withPermittedProjectStatuses(permittedProjectStatuses)
         .withPermittedProjectTypes(permittedProjectTypes)
-        .withRequiredProjectPermissions(requiredPermissions);
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
         on(ForwardWorkPlanUpcomingTenderController.class).getUpcomingTenderSetup(
@@ -483,7 +484,8 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
         .withUser(authenticatedUser)
         .withPermittedProjectStatuses(permittedProjectStatuses)
         .withPermittedProjectTypes(permittedProjectTypes)
-        .withRequiredProjectPermissions(requiredPermissions);
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
         on(ForwardWorkPlanUpcomingTenderController.class).saveUpcomingTenderSetup(

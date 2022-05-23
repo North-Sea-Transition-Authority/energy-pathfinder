@@ -129,7 +129,8 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
         .withUser(authenticatedUser)
         .withPermittedProjectStatuses(permittedProjectStatuses)
         .withPermittedProjectTypes(permittedProjectTypes)
-        .withRequiredProjectPermissions(requiredPermissions);
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
         on(ForwardWorkPlanCollaborationOpportunityController.class).viewCollaborationOpportunities(projectId, null),
@@ -147,7 +148,8 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
         .withUser(authenticatedUser)
         .withPermittedProjectStatuses(permittedProjectStatuses)
         .withPermittedProjectTypes(permittedProjectTypes)
-        .withRequiredProjectPermissions(requiredPermissions);
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
         on(ForwardWorkPlanCollaborationOpportunityController.class).addCollaborationOpportunity(projectId, null),
@@ -168,7 +170,8 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
         .withUser(authenticatedUser)
         .withPermittedProjectStatuses(permittedProjectStatuses)
         .withPermittedProjectTypes(permittedProjectTypes)
-        .withRequiredProjectPermissions(requiredPermissions);
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
         on(ForwardWorkPlanCollaborationOpportunityController.class).editCollaborationOpportunity(
@@ -195,7 +198,8 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
         .withPermittedProjectStatuses(permittedProjectStatuses)
         .withPermittedProjectTypes(permittedProjectTypes)
         .withRequiredProjectPermissions(requiredPermissions)
-        .withRequestParam(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+        .withRequestParam(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE)
+        .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
         on(ForwardWorkPlanCollaborationOpportunityController.class).saveCollaborationOpportunity(
@@ -315,7 +319,8 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
         .withPermittedProjectStatuses(permittedProjectStatuses)
         .withPermittedProjectTypes(permittedProjectTypes)
         .withRequiredProjectPermissions(requiredPermissions)
-        .withRequestParam(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+        .withRequestParam(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE)
+        .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
         on(ForwardWorkPlanCollaborationOpportunityController.class).updateCollaborationOpportunity(
@@ -432,7 +437,8 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
         .withUser(authenticatedUser)
         .withPermittedProjectStatuses(permittedProjectStatuses)
         .withPermittedProjectTypes(permittedProjectTypes)
-        .withRequiredProjectPermissions(requiredPermissions);
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
         on(ForwardWorkPlanCollaborationOpportunityController.class)
@@ -545,6 +551,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
         .withPermittedProjectStatuses(permittedProjectStatuses)
         .withPermittedProjectTypes(permittedProjectTypes)
         .withRequiredProjectPermissions(requiredPermissions)
-        .withRequestParam(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+        .withRequestParam(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE)
+        .withProjectContributorAccess();
   }
 }

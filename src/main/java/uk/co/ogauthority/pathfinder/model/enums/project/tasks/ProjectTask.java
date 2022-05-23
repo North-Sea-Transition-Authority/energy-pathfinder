@@ -170,14 +170,14 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       ForwardWorkPlanUpcomingTenderService.class,
       Set.of(ProjectType.FORWARD_WORK_PLAN),
       20,
-      Set.of(UserToProjectRelationship.OPERATOR)),
+      Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)),
   WORK_PLAN_COLLABORATION_OPPORTUNITIES(
       ForwardWorkPlanCollaborationOpportunityModelService.PAGE_NAME,
       ForwardWorkPlanCollaborationOpportunityController.class,
       ForwardWorkPlanCollaborationOpportunityService.class,
       Set.of(ProjectType.FORWARD_WORK_PLAN),
       30,
-      Set.of(UserToProjectRelationship.OPERATOR))
+      Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR))
   ;
 
   private final String displayName;

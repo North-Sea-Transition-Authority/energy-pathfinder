@@ -537,7 +537,7 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
     ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
         workPlanUpcomingTenderService,
         projectDetail,
-        Set.of(UserToProjectRelationship.OPERATOR)
+        Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)
     );
   }
 

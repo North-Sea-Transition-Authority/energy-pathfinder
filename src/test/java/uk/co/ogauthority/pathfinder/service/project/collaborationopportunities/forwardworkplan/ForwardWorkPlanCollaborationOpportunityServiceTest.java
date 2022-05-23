@@ -124,12 +124,21 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
   }
 
   @Test
+  public void canShowInTaskList_whenTaskIsValidAndValidRelation_true() {
+    projectDetail.setProjectType(ProjectType.FORWARD_WORK_PLAN);
+    assertThat(forwardWorkPlanCollaborationOpportunityService.canShowInTaskList(
+        projectDetail,
+        Set.of(UserToProjectRelationship.OPERATOR))
+    ).isTrue();
+  }
+
+  @Test
   public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
     var detail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
     ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
         forwardWorkPlanCollaborationOpportunityService,
         detail,
-        Set.of(UserToProjectRelationship.OPERATOR)
+        Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)
     );
   }
 

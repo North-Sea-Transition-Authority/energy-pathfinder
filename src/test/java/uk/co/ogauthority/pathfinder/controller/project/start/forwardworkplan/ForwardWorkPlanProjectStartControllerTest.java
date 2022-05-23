@@ -74,7 +74,8 @@ public class ForwardWorkPlanProjectStartControllerTest extends ProjectContextAbs
         .withUser(authenticatedUser)
         .withPermittedProjectStatuses(permittedProjectStatuses)
         .withPermittedProjectTypes(permittedProjectTypes)
-        .withRequiredProjectPermissions(requiredPermissions);
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
         on(ForwardWorkPlanProjectStartController.class).startPage(

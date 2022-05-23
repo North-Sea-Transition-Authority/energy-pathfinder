@@ -22,6 +22,7 @@ import uk.co.ogauthority.pathfinder.config.file.FileDeleteResult;
 import uk.co.ogauthority.pathfinder.config.file.FileUploadResult;
 import uk.co.ogauthority.pathfinder.controller.file.FileDownloadService;
 import uk.co.ogauthority.pathfinder.controller.file.PathfinderFileUploadController;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.AllowProjectContributorAccess;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
@@ -50,6 +51,7 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
+@AllowProjectContributorAccess
 @ProjectTypeCheck(types = ProjectType.FORWARD_WORK_PLAN)
 @RequestMapping("/project/{projectId}/forward-work-plan/collaboration-opportunities")
 public class ForwardWorkPlanCollaborationOpportunityController extends PathfinderFileUploadController {
