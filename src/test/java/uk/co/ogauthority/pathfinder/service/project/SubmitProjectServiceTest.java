@@ -121,8 +121,8 @@ public class SubmitProjectServiceTest {
 
     final var projectDetail = PROJECT_DETAIL;
 
-    when(projectInformationService.canShowInTaskList(projectDetail)).thenReturn(true);
-    when(awardedContractService.canShowInTaskList(projectDetail)).thenReturn(true);
+    when(projectInformationService.isTaskValidForProjectDetail(projectDetail)).thenReturn(true);
+    when(awardedContractService.isTaskValidForProjectDetail(projectDetail)).thenReturn(true);
 
     when(projectInformationService.isComplete(projectDetail)).thenReturn(true);
     when(awardedContractService.isComplete(projectDetail)).thenReturn(true);
@@ -135,8 +135,8 @@ public class SubmitProjectServiceTest {
 
     final var projectDetail = PROJECT_DETAIL;
 
-    when(projectInformationService.canShowInTaskList(projectDetail)).thenReturn(true);
-    when(awardedContractService.canShowInTaskList(projectDetail)).thenReturn(true);
+    when(projectInformationService.isTaskValidForProjectDetail(projectDetail)).thenReturn(true);
+    when(awardedContractService.isTaskValidForProjectDetail(projectDetail)).thenReturn(true);
 
     when(projectInformationService.isComplete(projectDetail)).thenReturn(true);
     when(awardedContractService.isComplete(projectDetail)).thenReturn(false);
@@ -149,8 +149,8 @@ public class SubmitProjectServiceTest {
 
     final var projectDetail = PROJECT_DETAIL;
 
-    when(projectInformationService.canShowInTaskList(projectDetail)).thenReturn(true);
-    when(awardedContractService.canShowInTaskList(projectDetail)).thenReturn(false);
+    when(projectInformationService.isTaskValidForProjectDetail(projectDetail)).thenReturn(true);
+    when(awardedContractService.isTaskValidForProjectDetail(projectDetail)).thenReturn(false);
 
     when(projectInformationService.isComplete(projectDetail)).thenReturn(true);
 

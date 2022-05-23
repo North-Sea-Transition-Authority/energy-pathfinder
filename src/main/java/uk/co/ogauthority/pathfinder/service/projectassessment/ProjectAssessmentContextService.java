@@ -74,7 +74,8 @@ public class ProjectAssessmentContextService {
     return new ProjectAssessmentContext(
         projectContext.getProjectDetails(),
         projectContext.getProjectPermissions(),
-        projectContext.getUserAccount()
+        projectContext.getUserAccount(),
+        projectContext.getUserToProjectRelationships()
     );
   }
 

@@ -234,7 +234,7 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
 
       projectDetail.setProjectType(projectType);
 
-      when(forwardWorkPlanCollaborationOpportunityService.canShowInTaskList(projectDetail)).thenCallRealMethod();
+      when(forwardWorkPlanCollaborationOpportunityService.isTaskValidForProjectDetail(projectDetail)).thenCallRealMethod();
 
       final var canShowInTaskList = forwardWorkPlanCollaborationOpportunitiesSummaryService.canShowInTaskList(projectDetail);
 

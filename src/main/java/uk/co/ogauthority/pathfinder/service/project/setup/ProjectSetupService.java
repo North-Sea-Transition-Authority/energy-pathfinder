@@ -27,9 +27,11 @@ import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupFormVal
 import uk.co.ogauthority.pathfinder.repository.project.tasks.ProjectTaskListSetupRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 /**
  * The service used in the 'Set up your project' page to decide what optional features of a project should be included.
@@ -248,6 +250,11 @@ public class ProjectSetupService implements ProjectFormSectionService {
   }
 
   @Override
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
+    return ProjectService.isInfrastructureProject(detail);
+  }
+
+  @Override
   public void removeSectionData(ProjectDetail projectDetail) {
     projectTaskListSetupRepository.deleteByProjectDetail(projectDetail);
   }
@@ -262,8 +269,9 @@ public class ProjectSetupService implements ProjectFormSectionService {
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
-    return ProjectService.isInfrastructureProject(detail);
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.PROJECT_SETUP, userToProjectRelationships);
   }
 
   @Override

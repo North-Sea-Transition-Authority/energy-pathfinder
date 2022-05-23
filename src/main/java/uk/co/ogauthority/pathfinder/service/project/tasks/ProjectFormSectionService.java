@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project.tasks;
 import java.util.Set;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 
 /**
  * Define the methods common to all services which manage Project form pages which appear on the task list.
@@ -13,9 +14,20 @@ public interface ProjectFormSectionService {
 
   /**
    * Used to show/hide the task list entry.
+   * @param detail The detail of the project used to evaluate if the task should be shown
+   * @param userToProjectRelationships The relation(s) between the user to the project
    * @return True if entry should be shown.
    */
-  default boolean canShowInTaskList(ProjectDetail detail) {
+  default boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return false;
+  }
+
+  /**
+   * Used to determine if a task is valid for a projectDetail.
+   *
+   * @return true if section is valid
+   */
+  default boolean isTaskValidForProjectDetail(ProjectDetail detail) {
     return false;
   }
 

@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project.projectcontext;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,9 +75,22 @@ public class ProjectContextService {
                                             Set<ProjectPermission> permissionCheck,
                                             Set<ProjectType> allowedProjectTypes,
                                             boolean allowProjectContributors) {
-    var isOperatorOrRegulator = projectOperatorService.isUserInProjectTeamOrRegulator(detail, user);
+    var isRegulator = teamService.isPersonMemberOfRegulatorTeam(user.getLinkedPerson());
+    var isOperator = projectOperatorService.isUserInProjectTeam(detail, user);
     var canAccessAsContributor = allowProjectContributors && userBelongsAsContributor(user, detail);
-    if (!isOperatorOrRegulator && !canAccessAsContributor) {
+    Set<UserToProjectRelationship> relationships = new HashSet<>();
+
+    if (isRegulator) {
+      relationships.add(UserToProjectRelationship.REGULATOR);
+    }
+    if (isOperator) {
+      relationships.add(UserToProjectRelationship.OPERATOR);
+    }
+    if (canAccessAsContributor) {
+      relationships.add(UserToProjectRelationship.CONTRIBUTOR);
+    }
+
+    if (!isRegulator && !isOperator && !canAccessAsContributor) {
       throw new AccessDeniedException(
           String.format(
               "User with wua: %d does not have access to view projectDetail with id: %d",
@@ -114,17 +128,18 @@ public class ProjectContextService {
       );
     }
 
-    return getProjectContext(detail, user, userPermissions);
+    return getProjectContext(detail, user, userPermissions, relationships);
   }
 
   public ProjectContext getProjectContext(ProjectDetail detail,
                                           AuthenticatedUserAccount user,
-                                          Set<ProjectPermission> projectPermissions) {
+                                          Set<ProjectPermission> projectPermissions,
+                                          Set<UserToProjectRelationship> relationships) {
     return new ProjectContext(
         detail,
         projectPermissions,
-        user
-    );
+        user,
+        relationships);
   }
 
   public ProjectDetail getProjectDetailsOrError(Integer projectId, ProjectDetailVersionType projectDetailVersionType) {

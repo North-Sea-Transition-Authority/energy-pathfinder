@@ -33,11 +33,13 @@ import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.vali
 import uk.co.ogauthority.pathfinder.repository.project.subseainfrastructure.SubseaInfrastructureRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class SubseaInfrastructureService implements ProjectFormSectionService {
@@ -345,8 +347,15 @@ public class SubseaInfrastructureService implements ProjectFormSectionService {
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
     return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.SUBSEA_INFRASTRUCTURE);
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.SUBSEA_INFRASTRUCTURE,
+        userToProjectRelationships);
   }
 
   @Override

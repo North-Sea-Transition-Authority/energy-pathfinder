@@ -9,8 +9,10 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class ProjectContributorsFormSectionService implements ProjectFormSectionService {
@@ -38,6 +40,11 @@ public class ProjectContributorsFormSectionService implements ProjectFormSection
   }
 
   @Override
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
+    return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.PROJECT_CONTRIBUTORS);
+  }
+
+  @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
     entityDuplicationService.duplicateEntitiesAndSetNewParent(
         projectContributorsCommonService.getProjectContributorsForDetail(fromDetail),
@@ -52,8 +59,10 @@ public class ProjectContributorsFormSectionService implements ProjectFormSection
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
-    return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.PROJECT_CONTRIBUTORS);
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.PROJECT_CONTRIBUTORS,
+        userToProjectRelationships);
   }
 
   @Override

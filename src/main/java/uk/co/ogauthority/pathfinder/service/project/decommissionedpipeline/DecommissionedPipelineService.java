@@ -13,6 +13,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.decommissionedpipeline.DecommissionedPipeline;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineForm;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.DecommissionedPipelineFormValidator;
@@ -20,9 +21,11 @@ import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.De
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedpipeline.DecommissionedPipelineRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.pipeline.PipelineService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class DecommissionedPipelineService implements ProjectFormSectionService {
@@ -170,9 +173,15 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
     // return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.PIPELINES);
     return false; // Pipelines disabled: PAT-457
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.PIPELINES, userToProjectRelationships);
   }
 
   @Override

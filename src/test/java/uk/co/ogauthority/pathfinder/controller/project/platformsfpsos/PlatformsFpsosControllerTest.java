@@ -76,8 +76,8 @@ public class PlatformsFpsosControllerTest extends ProjectContextAbstractControll
         PROJECT_ID
     );
     when(platformsFpsosSummaryService.getView(any(), any(), any())).thenReturn(platformFpsoView);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, unAuthenticatedUser)).thenReturn(false);
     when(platformsFpsosService.createPlatformFpso(any(), any())).thenReturn(PlatformFpsoTestUtil.getPlatformFpso_withFpsoAndSubstructuresRemoved(detail));
   }
 

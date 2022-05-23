@@ -58,17 +58,8 @@ public class ProjectOperatorService {
     return projectOperatorRepository.save(projectOperator);
   }
 
-  /**
-   * If a user is not a regulator work out if they are in the team linked to the project.
-   *
-   * @return true if the user provided is in the Organisation Group the project is linked to. True always if regulator.
-   */
-  public boolean isUserInProjectTeamOrRegulator(ProjectDetail detail, AuthenticatedUserAccount user) {
+  public boolean isUserInProjectTeam(ProjectDetail detail, AuthenticatedUserAccount user) {
     var person = user.getLinkedPerson();
-
-    if (teamService.isPersonMemberOfRegulatorTeam(person)) {
-      return true;
-    }
 
     var userTeams = teamService.getOrganisationTeamsPersonIsMemberOf(person);
 

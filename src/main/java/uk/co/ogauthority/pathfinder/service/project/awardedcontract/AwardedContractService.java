@@ -26,10 +26,12 @@ import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedCo
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.AwardedContractRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class AwardedContractService implements ProjectFormSectionService {
@@ -187,7 +189,13 @@ public class AwardedContractService implements ProjectFormSectionService {
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.AWARDED_CONTRACTS, userToProjectRelationships);
+  }
+
+  @Override
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
     return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS);
   }
 

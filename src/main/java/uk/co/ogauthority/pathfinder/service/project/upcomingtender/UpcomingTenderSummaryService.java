@@ -100,7 +100,7 @@ public class UpcomingTenderSummaryService {
     return views;
   }
 
-  public boolean canShowInTaskList(ProjectDetail detail) {
-    return upcomingTenderService.canShowInTaskList(detail);
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
+    return upcomingTenderService.isTaskValidForProjectDetail(detail);
   }
 }

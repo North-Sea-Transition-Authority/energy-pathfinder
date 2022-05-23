@@ -37,7 +37,10 @@ public class TaskListController {
   @GetMapping
   public ModelAndView viewTaskList(@PathVariable("projectId") Integer projectId,
                                    ProjectContext projectContext) {
-    var modelAndView = taskListService.getTaskListModelAndView(projectContext.getProjectDetails());
+    var modelAndView = taskListService.getTaskListModelAndView(
+        projectContext.getProjectDetails(),
+        projectContext.getUserToProjectRelationships()
+    );
     breadcrumbService.fromWorkArea(modelAndView, "Task list");
 
     return modelAndView;

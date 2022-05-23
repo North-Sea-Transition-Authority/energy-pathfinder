@@ -31,10 +31,12 @@ import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationS
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class InfrastructureCollaborationOpportunitiesService
@@ -212,8 +214,15 @@ public class InfrastructureCollaborationOpportunitiesService
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
     return super.canShowInTaskList(detail, ProjectTask.COLLABORATION_OPPORTUNITIES);
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.COLLABORATION_OPPORTUNITIES,
+        userToProjectRelationships);
   }
 
   @Override

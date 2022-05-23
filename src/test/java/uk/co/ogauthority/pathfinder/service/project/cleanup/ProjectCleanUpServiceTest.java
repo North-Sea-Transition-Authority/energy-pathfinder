@@ -38,8 +38,8 @@ public class ProjectCleanUpServiceTest {
   @Test
   public void removeProjectSectionDataIfNotRelevant_whenAllSectionsInTaskListAndAllowDataCleanUp_noRemoveMethodInvoked() {
 
-    when(testProjectFormSectionServiceA.canShowInTaskList(projectDetail)).thenReturn(true);
-    when(testProjectFormSectionServiceB.canShowInTaskList(projectDetail)).thenReturn(true);
+    when(testProjectFormSectionServiceA.isTaskValidForProjectDetail(projectDetail)).thenReturn(true);
+    when(testProjectFormSectionServiceB.isTaskValidForProjectDetail(projectDetail)).thenReturn(true);
 
     when(testProjectFormSectionServiceA.allowSectionDataCleanUp(projectDetail)).thenReturn(true);
     when(testProjectFormSectionServiceB.allowSectionDataCleanUp(projectDetail)).thenReturn(true);
@@ -53,8 +53,8 @@ public class ProjectCleanUpServiceTest {
   @Test
   public void removeProjectSectionDataIfNotRelevant_whenAllSectionsNotInTaskListAndAllowDataCleanUp_removeMethodInvoked() {
 
-    when(testProjectFormSectionServiceA.canShowInTaskList(projectDetail)).thenReturn(false);
-    when(testProjectFormSectionServiceB.canShowInTaskList(projectDetail)).thenReturn(false);
+    when(testProjectFormSectionServiceA.isTaskValidForProjectDetail(projectDetail)).thenReturn(false);
+    when(testProjectFormSectionServiceB.isTaskValidForProjectDetail(projectDetail)).thenReturn(false);
 
     when(testProjectFormSectionServiceA.allowSectionDataCleanUp(projectDetail)).thenReturn(true);
     when(testProjectFormSectionServiceB.allowSectionDataCleanUp(projectDetail)).thenReturn(true);
@@ -68,8 +68,8 @@ public class ProjectCleanUpServiceTest {
   @Test
   public void removeProjectSectionDataIfNotRelevant_whenSomeSectionsNotInTaskListAndAllAllowDataCleanUp_removeMethodInvokedOnSelectedSections() {
 
-    when(testProjectFormSectionServiceA.canShowInTaskList(projectDetail)).thenReturn(true);
-    when(testProjectFormSectionServiceB.canShowInTaskList(projectDetail)).thenReturn(false);
+    when(testProjectFormSectionServiceA.isTaskValidForProjectDetail(projectDetail)).thenReturn(true);
+    when(testProjectFormSectionServiceB.isTaskValidForProjectDetail(projectDetail)).thenReturn(false);
 
     when(testProjectFormSectionServiceA.allowSectionDataCleanUp(projectDetail)).thenReturn(true);
     when(testProjectFormSectionServiceB.allowSectionDataCleanUp(projectDetail)).thenReturn(true);
@@ -98,7 +98,7 @@ public class ProjectCleanUpServiceTest {
     when(testProjectFormSectionServiceA.allowSectionDataCleanUp(projectDetail)).thenReturn(false);
     when(testProjectFormSectionServiceB.allowSectionDataCleanUp(projectDetail)).thenReturn(true);
 
-    when(testProjectFormSectionServiceB.canShowInTaskList(projectDetail)).thenReturn(false);
+    when(testProjectFormSectionServiceB.isTaskValidForProjectDetail(projectDetail)).thenReturn(false);
 
     projectCleanUpService.removeProjectSectionDataIfNotRelevant(projectDetail);
 

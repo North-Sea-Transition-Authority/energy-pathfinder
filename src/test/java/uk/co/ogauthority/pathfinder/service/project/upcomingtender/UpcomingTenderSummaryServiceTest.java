@@ -18,7 +18,6 @@ import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
-import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderViewUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
@@ -171,17 +170,17 @@ public class UpcomingTenderSummaryServiceTest {
   }
 
   @Test
-  public void canShowInTaskList_whenCanShowInTaskList_thenTrue() {
-    when(upcomingTenderService.canShowInTaskList(details)).thenReturn(true);
+  public void canShowInTaskList_whenTaskValidForProjectDetail_thenTrue() {
+    when(upcomingTenderService.isTaskValidForProjectDetail(details)).thenReturn(true);
 
-    assertThat(upcomingTenderSummaryService.canShowInTaskList(details)).isTrue();
+    assertThat(upcomingTenderSummaryService.isTaskValidForProjectDetail(details)).isTrue();
   }
 
   @Test
-  public void canShowInTaskList_whenCannotShowInTaskList_thenFalse() {
-    when(upcomingTenderService.canShowInTaskList(details)).thenReturn(false);
+  public void canShowInTaskList_whenTaskNotValidForProjectDetail_thenFalse() {
+    when(upcomingTenderService.isTaskValidForProjectDetail(details)).thenReturn(false);
 
-    assertThat(upcomingTenderSummaryService.canShowInTaskList(details)).isFalse();
+    assertThat(upcomingTenderSummaryService.isTaskValidForProjectDetail(details)).isFalse();
   }
 
   @Test

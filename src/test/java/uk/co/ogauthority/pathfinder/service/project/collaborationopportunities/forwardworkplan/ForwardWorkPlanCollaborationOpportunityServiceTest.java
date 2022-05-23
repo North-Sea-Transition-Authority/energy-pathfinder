@@ -25,6 +25,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityFormValidator;
@@ -33,10 +34,12 @@ import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanCollaborationOpportunityTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -101,7 +104,7 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
   }
 
   @Test
-  public void canShowInTaskList_smokeTestProjectTypes_assertOnlyForwardWorkPlanAllowed() {
+  public void isTaskValidForProjectDetail_smokeTestProjectTypes_assertOnlyForwardWorkPlanAllowed() {
 
     final var projectDetail = ProjectUtil.getProjectDetails();
     final var projectTypesToShowInTaskList = Set.of(ProjectType.FORWARD_WORK_PLAN);
@@ -110,7 +113,7 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
 
       projectDetail.setProjectType(projectType);
 
-      final var canShowInTaskList = forwardWorkPlanCollaborationOpportunityService.canShowInTaskList(projectDetail);
+      final var canShowInTaskList = forwardWorkPlanCollaborationOpportunityService.isTaskValidForProjectDetail(projectDetail);
 
       if (projectTypesToShowInTaskList.contains(projectType)) {
         assertThat(canShowInTaskList).isTrue();
@@ -118,6 +121,16 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
         assertThat(canShowInTaskList).isFalse();
       }
     });
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    var detail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        forwardWorkPlanCollaborationOpportunityService,
+        detail,
+        Set.of(UserToProjectRelationship.OPERATOR)
+    );
   }
 
   @Test

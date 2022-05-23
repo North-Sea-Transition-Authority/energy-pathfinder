@@ -7,8 +7,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,10 +33,13 @@ import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.AwardedContractRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
+import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -309,13 +315,35 @@ public class AwardedContractServiceTest {
   @Test
   public void canShowInTaskList_true() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS)).thenReturn(true);
-    assertThat(awardedContractService.canShowInTaskList(detail)).isTrue();
+    assertThat(awardedContractService.canShowInTaskList(detail, Set.of(UserToProjectRelationship.OPERATOR))).isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS)).thenReturn(false);
-    assertThat(awardedContractService.canShowInTaskList(detail)).isFalse();
+    assertThat(awardedContractService.canShowInTaskList(detail, Set.of(UserToProjectRelationship.OPERATOR))).isFalse();
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS)).thenReturn(true);
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        awardedContractService,
+        detail,
+        Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)
+    );
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_true() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS)).thenReturn(true);
+    assertThat(awardedContractService.isTaskValidForProjectDetail(detail)).isTrue();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_false() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS)).thenReturn(false);
+    assertThat(awardedContractService.isTaskValidForProjectDetail(detail)).isFalse();
   }
 
   @Test

@@ -48,7 +48,7 @@ public class AwardedContractSectionSummaryService implements ProjectSectionSumma
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return awardedContractService.canShowInTaskList(detail);
+    return awardedContractService.isTaskValidForProjectDetail(detail);
   }
 
   @Override

@@ -81,7 +81,7 @@ public class ForwardWorkPlanProjectContributorsControllerTest extends ProjectCon
         teamService
     );
     when(projectService.getLatestDetailOrError(projectId)).thenReturn(projectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
   }
 
   @Test

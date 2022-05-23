@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormCommon;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityForm;
@@ -30,10 +31,12 @@ import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class ForwardWorkPlanCollaborationOpportunityService
@@ -200,6 +203,11 @@ public class ForwardWorkPlanCollaborationOpportunityService
     }
   }
 
+  @Override
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
+    return ProjectService.isForwardWorkPlanProject(detail);
+  }
+
   private boolean hasOtherCollaborationsToAdd(ForwardWorkPlanCollaborationSetup forwardWorkPlanCollaborationSetup) {
     return BooleanUtils.isTrue(forwardWorkPlanCollaborationSetup.getHasOtherCollaborationToAdd());
   }
@@ -212,8 +220,10 @@ public class ForwardWorkPlanCollaborationOpportunityService
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
-    return ProjectService.isForwardWorkPlanProject(detail);
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.WORK_PLAN_COLLABORATION_OPPORTUNITIES,
+        userToProjectRelationships);
   }
 
   @Override

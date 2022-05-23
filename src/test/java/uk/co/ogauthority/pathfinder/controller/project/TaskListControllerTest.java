@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.controller.project;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,19 +44,20 @@ public class TaskListControllerTest extends ProjectContextAbstractControllerTest
 
   @Before
   public void setUp() throws Exception {
-    when(taskListService.getTaskListModelAndView(details)).thenReturn(new ModelAndView("test/blankTemplate.ftl"));
+    when(taskListService.getTaskListModelAndView(eq(details), any()))
+        .thenReturn(new ModelAndView("test/blankTemplate.ftl"));
   }
 
   @Test
   public void authenticatedUser_hasAccessToTaskList() throws Exception {
     when(projectService.getLatestDetailOrError(any())).thenReturn(details);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(details, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(details, authenticatedUser)).thenReturn(true);
 
     mockMvc.perform(get(ReverseRouter.route(on(TaskListController.class).viewTaskList(1, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
 
-    verify(taskListService, times(1)).getTaskListModelAndView(details);
+    verify(taskListService, times(1)).getTaskListModelAndView(eq(details), any());
   }
 
   @Test
@@ -65,6 +67,6 @@ public class TaskListControllerTest extends ProjectContextAbstractControllerTest
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
 
-    verify(taskListService, times(0)).getTaskListModelAndView(details);
+    verify(taskListService, times(0)).getTaskListModelAndView(eq(details), any());
   }
 }

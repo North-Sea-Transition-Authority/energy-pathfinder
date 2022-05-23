@@ -15,12 +15,16 @@ public class ProjectContext {
 
   private final AuthenticatedUserAccount userAccount;
 
+  private final Set<UserToProjectRelationship> userToProjectRelationships;
+
   public ProjectContext(ProjectDetail projectDetails,
                         Set<ProjectPermission> projectPermissions,
-                        AuthenticatedUserAccount userAccount) {
+                        AuthenticatedUserAccount userAccount,
+                        Set<UserToProjectRelationship> userToProjectRelationships) {
     this.projectDetails = projectDetails;
     this.projectPermissions = projectPermissions;
     this.userAccount = userAccount;
+    this.userToProjectRelationships = userToProjectRelationships;
   }
 
   public ProjectDetail getProjectDetails() {
@@ -33,5 +37,9 @@ public class ProjectContext {
 
   public AuthenticatedUserAccount getUserAccount() {
     return userAccount;
+  }
+
+  public Set<UserToProjectRelationship> getUserToProjectRelationships() {
+    return userToProjectRelationships;
   }
 }

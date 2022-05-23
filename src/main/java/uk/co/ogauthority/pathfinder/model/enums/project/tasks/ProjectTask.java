@@ -36,6 +36,7 @@ import uk.co.ogauthority.pathfinder.service.project.integratedrig.IntegratedRigS
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
 import uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule.PlugAbandonmentScheduleService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.projectcontribution.ProjectContributorsFormSectionService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperatorService;
@@ -56,127 +57,127 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       ChangeProjectOperatorController.class,
       SelectOperatorService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      1
-  ),
+      1,
+      Set.of(UserToProjectRelationship.OPERATOR)),
   PROJECT_INFORMATION(
       ProjectInformationController.PAGE_NAME,
       ProjectInformationController.class,
       ProjectInformationService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      20
-  ),
+      20,
+      Set.of(UserToProjectRelationship.OPERATOR)),
   PROJECT_LOCATION(
       ProjectLocationController.PAGE_NAME,
       ProjectLocationController.class,
       ProjectLocationService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      30
-  ),
+      30,
+      Set.of(UserToProjectRelationship.OPERATOR)),
   PROJECT_SETUP(
       ProjectSetupController.PAGE_NAME,
       ProjectSetupController.class,
       ProjectSetupService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      40
-  ),
+      40,
+      Set.of(UserToProjectRelationship.OPERATOR)),
   PROJECT_CONTRIBUTORS(
       ProjectContributorsController.PAGE_NAME,
       ProjectContributorsController.class,
       ProjectContributorsFormSectionService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      45
-  ),
+      45,
+      Set.of(UserToProjectRelationship.OPERATOR)),
   UPCOMING_TENDERS(
       UpcomingTendersController.PAGE_NAME,
       UpcomingTendersController.class,
       UpcomingTenderService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      50
-  ),
+      50,
+      Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)),
   AWARDED_CONTRACTS(
       AwardedContractController.PAGE_NAME,
       AwardedContractController.class,
       AwardedContractService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      60
-  ),
+      60,
+      Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)),
   COLLABORATION_OPPORTUNITIES(
       InfrastructureCollaborationOpportunitiesController.PAGE_NAME,
       InfrastructureCollaborationOpportunitiesController.class,
       InfrastructureCollaborationOpportunitiesService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      70
-  ),
+      70,
+      Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)),
   CAMPAIGN_INFORMATION(
       CampaignInformationController.PAGE_NAME,
       CampaignInformationController.class,
       CampaignInformationService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      75
-  ),
+      75,
+      Set.of(UserToProjectRelationship.OPERATOR)),
   DECOMMISSIONING_SCHEDULE(
       DecommissioningScheduleController.PAGE_NAME,
       DecommissioningScheduleController.class,
       DecommissioningScheduleService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      80
-  ),
+      80,
+      Set.of(UserToProjectRelationship.OPERATOR)),
   WELLS(
       PlugAbandonmentScheduleController.TASK_LIST_NAME,
       PlugAbandonmentScheduleController.class,
       PlugAbandonmentScheduleService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      90
-  ),
+      90,
+      Set.of(UserToProjectRelationship.OPERATOR)),
   PLATFORM_FPSO(
       PlatformsFpsosController.TASK_LIST_NAME,
       PlatformsFpsosController.class,
       PlatformsFpsosService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      100
-  ),
+      100,
+      Set.of(UserToProjectRelationship.OPERATOR)),
   INTEGRATED_RIGS(
       IntegratedRigController.TASK_LIST_NAME,
       IntegratedRigController.class,
       IntegratedRigService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      110
-  ),
+      110,
+      Set.of(UserToProjectRelationship.OPERATOR)),
   SUBSEA_INFRASTRUCTURE(
       SubseaInfrastructureController.TASK_LIST_NAME,
       SubseaInfrastructureController.class,
       SubseaInfrastructureService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      120
-  ),
+      120,
+      Set.of(UserToProjectRelationship.OPERATOR)),
   PIPELINES(
       DecommissionedPipelineController.TASK_LIST_NAME,
       DecommissionedPipelineController.class,
       DecommissionedPipelineService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      130
-  ),
+      130,
+      Set.of(UserToProjectRelationship.OPERATOR)),
   WORK_PLAN_PROJECT_CONTRIBUTORS(
       ForwardWorkPlanProjectContributorsController.PAGE_NAME,
       ForwardWorkPlanProjectContributorsController.class,
       ForwardWorkPlanProjectContributorFormSectionService.class,
       Set.of(ProjectType.FORWARD_WORK_PLAN),
-      10
-  ),
+      10,
+      Set.of(UserToProjectRelationship.OPERATOR)),
   WORK_PLAN_UPCOMING_TENDERS(
       ForwardWorkPlanUpcomingTenderController.PAGE_NAME,
       ForwardWorkPlanUpcomingTenderController.class,
       ForwardWorkPlanUpcomingTenderService.class,
       Set.of(ProjectType.FORWARD_WORK_PLAN),
-      20
-  ),
+      20,
+      Set.of(UserToProjectRelationship.OPERATOR)),
   WORK_PLAN_COLLABORATION_OPPORTUNITIES(
       ForwardWorkPlanCollaborationOpportunityModelService.PAGE_NAME,
       ForwardWorkPlanCollaborationOpportunityController.class,
       ForwardWorkPlanCollaborationOpportunityService.class,
       Set.of(ProjectType.FORWARD_WORK_PLAN),
-      30
-  )
+      30,
+      Set.of(UserToProjectRelationship.OPERATOR))
   ;
 
   private final String displayName;
@@ -184,17 +185,20 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
   private final Class<? extends ProjectFormSectionService> serviceClass;
   private final Set<ProjectType> relatedProjectTypes;
   private final int displayOrder;
+  private final Set<UserToProjectRelationship> permittedUserRelationships;
 
   ProjectTask(String displayName,
               Class controllerClass,
               Class<? extends ProjectFormSectionService> serviceClass,
               Set<ProjectType> relatedProjectTypes,
-              int displayOrder) {
+              int displayOrder,
+              Set<UserToProjectRelationship> permittedUserRelationships) {
     this.displayName = displayName;
     this.controllerClass = controllerClass;
     this.serviceClass = serviceClass;
     this.relatedProjectTypes = relatedProjectTypes;
     this.displayOrder = displayOrder;
+    this.permittedUserRelationships = permittedUserRelationships;
   }
 
   public static Stream<ProjectTask> stream() {
@@ -278,5 +282,9 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       default:
         return "";
     }
+  }
+
+  public Set<UserToProjectRelationship> getPermittedUserRelationships() {
+    return permittedUserRelationships;
   }
 }

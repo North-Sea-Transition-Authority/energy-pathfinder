@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,8 +19,10 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectContributorTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -71,7 +74,8 @@ public class ProjectContributorsFormSectionServiceTest {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.PROJECT_CONTRIBUTORS))
         .thenReturn(true);
 
-    assertThat(projectContributorsFormSectionService.canShowInTaskList(detail)).isTrue();
+    assertThat(projectContributorsFormSectionService.canShowInTaskList(detail, Set.of(UserToProjectRelationship.OPERATOR)))
+        .isTrue();
   }
 
   @Test
@@ -79,7 +83,34 @@ public class ProjectContributorsFormSectionServiceTest {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.PROJECT_CONTRIBUTORS))
         .thenReturn(false);
 
-    assertThat(projectContributorsFormSectionService.canShowInTaskList(detail)).isFalse();
+    assertThat(projectContributorsFormSectionService.canShowInTaskList(detail, Set.of(UserToProjectRelationship.OPERATOR)))
+    .isFalse();
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.PROJECT_CONTRIBUTORS)).thenReturn(true);
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        projectContributorsFormSectionService,
+        detail,
+        Set.of(UserToProjectRelationship.OPERATOR)
+    );
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_taskValidAndSelected_thenTrue() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.PROJECT_CONTRIBUTORS))
+        .thenReturn(true);
+
+    assertThat(projectContributorsFormSectionService.isTaskValidForProjectDetail(detail)).isTrue();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_taskInValidAndNotSelected_thenFalse() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.PROJECT_CONTRIBUTORS))
+        .thenReturn(false);
+
+    assertThat(projectContributorsFormSectionService.isTaskValidForProjectDetail(detail)).isFalse();
   }
 
   @Test

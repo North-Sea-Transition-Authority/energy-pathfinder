@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +30,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissioningschedule.CessationOfProductionDateType;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissioningschedule.DecommissioningStartDateType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.project.decommissioningschedule.DecommissioningScheduleForm;
@@ -36,9 +38,11 @@ import uk.co.ogauthority.pathfinder.model.form.project.decommissioningschedule.D
 import uk.co.ogauthority.pathfinder.repository.project.decommissioningschedule.DecommissioningScheduleRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.DecommissioningScheduleTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -502,7 +506,8 @@ public class DecommissioningScheduleServiceTest {
   public void canShowInTaskList_whenNotInfrastructureProject_thenFalse() {
     var projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
 
-    assertThat(decommissioningScheduleService.canShowInTaskList(projectDetail)).isFalse();
+    assertThat(decommissioningScheduleService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR)))
+        .isFalse();
 
     verify(projectInformationService, never()).isDecomRelated(projectDetail);
   }
@@ -511,14 +516,40 @@ public class DecommissioningScheduleServiceTest {
   public void canShowInTaskList_whenInfrastructureProjectAndDecomRelated_thenTrue() {
     when(projectInformationService.isDecomRelated(projectDetail)).thenReturn(true);
 
-    assertThat(decommissioningScheduleService.canShowInTaskList(projectDetail)).isTrue();
+    assertThat(decommissioningScheduleService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR)))
+        .isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    when(projectInformationService.isDecomRelated(projectDetail)).thenReturn(true);
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        decommissioningScheduleService,
+        projectDetail,
+        Set.of(UserToProjectRelationship.OPERATOR)
+    );
   }
 
   @Test
   public void canShowInTaskList_whenInfrastructureProjectAndNotDecomRelated_thenFalse() {
     when(projectInformationService.isDecomRelated(projectDetail)).thenReturn(false);
 
-    assertThat(decommissioningScheduleService.canShowInTaskList(projectDetail)).isFalse();
+    assertThat(decommissioningScheduleService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR)))
+        .isFalse();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_true() {
+    when(projectInformationService.isDecomRelated(projectDetail)).thenReturn(true);
+
+    assertThat(decommissioningScheduleService.isTaskValidForProjectDetail(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_false() {
+    when(projectInformationService.isDecomRelated(projectDetail)).thenReturn(false);
+
+    assertThat(decommissioningScheduleService.isTaskValidForProjectDetail(projectDetail)).isFalse();
   }
 
   @Test

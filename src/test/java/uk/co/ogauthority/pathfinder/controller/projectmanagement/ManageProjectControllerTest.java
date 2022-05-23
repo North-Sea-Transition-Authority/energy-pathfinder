@@ -49,12 +49,12 @@ public class ManageProjectControllerTest extends ProjectContextAbstractControlle
   @Before
   public void setup() {
     when(projectService.getLatestSubmittedDetailOrError(PUBLISHED_PROJECT_ID)).thenReturn(publishedProjectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(publishedProjectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(publishedProjectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(publishedProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(publishedProjectDetail, unauthenticatedUser)).thenReturn(false);
 
     doThrow(new PathfinderEntityNotFoundException("test")).when(projectService).getLatestSubmittedDetailOrError(UNSUBMITTED_PROJECT_ID);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(unsubmittedProjectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(unsubmittedProjectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(unsubmittedProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(unsubmittedProjectDetail, unauthenticatedUser)).thenReturn(false);
   }
 
   @Test

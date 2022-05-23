@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,9 +30,11 @@ import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 
@@ -519,12 +522,35 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
   public void canShowInTaskList_whenNotForwardWorkPlan_thenFalse() {
     var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
 
-    assertThat(workPlanUpcomingTenderService.canShowInTaskList(projectDetail)).isFalse();
+    assertThat(workPlanUpcomingTenderService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR)))
+        .isFalse();
   }
 
   @Test
   public void canShowInTaskList_whenForwardWorkPlan_thenTrue() {
-    assertThat(workPlanUpcomingTenderService.canShowInTaskList(projectDetail)).isTrue();
+    assertThat(workPlanUpcomingTenderService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR)))
+        .isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        workPlanUpcomingTenderService,
+        projectDetail,
+        Set.of(UserToProjectRelationship.OPERATOR)
+    );
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_whenNotForwardWorkPlan_thenFalse() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
+
+    assertThat(workPlanUpcomingTenderService.isTaskValidForProjectDetail(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_whenForwardWorkPlan_thenTrue() {
+    assertThat(workPlanUpcomingTenderService.isTaskValidForProjectDetail(projectDetail)).isTrue();
   }
 
   @Test

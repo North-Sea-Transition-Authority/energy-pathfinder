@@ -45,7 +45,7 @@ public class ProjectContributorsSectionSummaryService implements ProjectSectionS
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return projectContributorsFormSectionService.canShowInTaskList(detail);
+    return projectContributorsFormSectionService.isTaskValidForProjectDetail(detail);
   }
 
   @Override

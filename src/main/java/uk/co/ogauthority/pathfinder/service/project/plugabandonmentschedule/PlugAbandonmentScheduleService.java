@@ -28,11 +28,13 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.plugabandonmentschedule.PlugAbandonmentScheduleRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.service.wellbore.WellboreService;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class PlugAbandonmentScheduleService implements ProjectFormSectionService {
@@ -167,8 +169,14 @@ public class PlugAbandonmentScheduleService implements ProjectFormSectionService
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
     return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.WELLS);
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.WELLS, userToProjectRelationships);
   }
 
   @Override

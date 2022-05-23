@@ -25,10 +25,12 @@ import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFp
 import uk.co.ogauthority.pathfinder.repository.project.platformsfpsos.PlatformFpsoRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class PlatformsFpsosService implements ProjectFormSectionService {
@@ -244,8 +246,14 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
     return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.PLATFORM_FPSO);
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.PLATFORM_FPSO, userToProjectRelationships);
   }
 
   @Override

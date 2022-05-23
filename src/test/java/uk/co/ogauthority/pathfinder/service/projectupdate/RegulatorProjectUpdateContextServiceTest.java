@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -58,7 +59,8 @@ public class RegulatorProjectUpdateContextServiceTest {
     when(projectService.getLatestSubmittedDetailOrError(projectDetail.getProject().getId())).thenReturn(projectDetail);
 
     when(projectContextService.buildProjectContext(any(), any(), any(), any(), any(), anyBoolean()))
-        .thenAnswer(invocation -> new ProjectContext(invocation.getArgument(0), invocation.getArgument(3), invocation.getArgument(1)));
+        .thenAnswer(invocation -> new ProjectContext(invocation.getArgument(0), invocation.getArgument(3), invocation.getArgument(1),
+            Set.of(UserToProjectRelationship.OPERATOR)));
   }
 
   @Test

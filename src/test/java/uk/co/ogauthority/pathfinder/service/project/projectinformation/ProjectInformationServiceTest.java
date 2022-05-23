@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,12 +25,15 @@ import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -456,20 +460,45 @@ public class ProjectInformationServiceTest {
   @Test
   public void canShowInTaskList_whenInfrastructureProject_thenTrue() {
     var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
-    assertThat(projectInformationService.canShowInTaskList(projectDetail)).isTrue();
+    assertThat(projectInformationService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR)))
+        .isTrue();
   }
 
   @Test
   public void canShowInTaskList_whenNotInfrastructureProject_thenFalse() {
     var projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
-    assertThat(projectInformationService.canShowInTaskList(projectDetail)).isFalse();
+    assertThat(projectInformationService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR)))
+        .isFalse();
   }
 
   @Test
   public void canShowInTaskList_whenNullProjectType_thenFalse() {
     var projectDetail = ProjectUtil.getProjectDetails();
     projectDetail.setProjectType(null);
-    assertThat(projectInformationService.canShowInTaskList(projectDetail)).isFalse();
+    assertThat(projectInformationService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR)))
+        .isFalse();
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        projectInformationService,
+        projectDetail,
+        Set.of(UserToProjectRelationship.OPERATOR)
+    );
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_whenInfrastructureProject_thenTrue() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
+    assertThat(projectInformationService.isTaskValidForProjectDetail(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_whenNotInfrastructureProject_thenFalse() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
+    assertThat(projectInformationService.isTaskValidForProjectDetail(projectDetail)).isFalse();
   }
 
   @Test

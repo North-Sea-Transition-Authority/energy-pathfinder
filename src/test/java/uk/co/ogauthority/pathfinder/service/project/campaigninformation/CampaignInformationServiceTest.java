@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,9 +32,11 @@ import uk.co.ogauthority.pathfinder.model.form.project.campaigninformation.Campa
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.campaigninformation.CampaignInformationRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.CampaignInformationTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -176,13 +179,35 @@ public class CampaignInformationServiceTest {
   @Test
   public void canShowInTaskList_true() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.CAMPAIGN_INFORMATION)).thenReturn(true);
-    assertThat(campaignInformationService.canShowInTaskList(projectDetail)).isTrue();
+    assertThat(campaignInformationService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR))).isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.CAMPAIGN_INFORMATION)).thenReturn(false);
-    assertThat(campaignInformationService.canShowInTaskList(projectDetail)).isFalse();
+    assertThat(campaignInformationService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR))).isFalse();
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.CAMPAIGN_INFORMATION)).thenReturn(true);
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        campaignInformationService,
+        projectDetail,
+        Set.of(UserToProjectRelationship.OPERATOR)
+    );
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_true() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.CAMPAIGN_INFORMATION)).thenReturn(true);
+    assertThat(campaignInformationService.isTaskValidForProjectDetail(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_false() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.CAMPAIGN_INFORMATION)).thenReturn(false);
+    assertThat(campaignInformationService.isTaskValidForProjectDetail(projectDetail)).isFalse();
   }
 
   @Test

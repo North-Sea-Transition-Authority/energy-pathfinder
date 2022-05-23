@@ -111,8 +111,8 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
     );
     when(workPlanUpcomingTenderSummaryService.getUpcomingTenderView(workPlanUpcomingTender, DISPLAY_ORDER)).thenReturn(upcomingTenderView);
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, unauthenticatedUser)).thenReturn(false);
     when(workPlanUpcomingTenderService.createUpcomingTender(any(), any())).thenReturn(ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail));
     when(workPlanUpcomingTenderService.updateUpcomingTender(any(), any())).thenReturn(ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail));
     when(workPlanUpcomingTenderModelService.getUpcomingTenderFormModelAndView(eq(projectDetail), any())).thenReturn(new ModelAndView(""));

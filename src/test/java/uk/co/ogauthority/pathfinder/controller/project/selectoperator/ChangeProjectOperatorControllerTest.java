@@ -56,7 +56,7 @@ public class ChangeProjectOperatorControllerTest extends ProjectContextAbstractC
   @Before
   public void setUp() {
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(detail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
     when(projectOperatorModelService.getProjectOperatorModelAndView(
         any(),
         any(),

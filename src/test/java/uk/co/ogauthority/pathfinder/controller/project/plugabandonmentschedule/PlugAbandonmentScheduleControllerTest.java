@@ -73,8 +73,8 @@ public class PlugAbandonmentScheduleControllerTest extends ProjectContextAbstrac
     unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, unauthenticatedUser)).thenReturn(false);
 
     when(plugAbandonmentScheduleService.getWellboreRestUrl()).thenReturn("testurl");
     when(plugAbandonmentScheduleService.createPlugAbandonmentSchedule(any(), any())).thenReturn(PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule());

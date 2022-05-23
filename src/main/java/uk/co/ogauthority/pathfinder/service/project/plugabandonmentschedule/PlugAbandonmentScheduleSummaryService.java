@@ -121,7 +121,7 @@ public class PlugAbandonmentScheduleSummaryService {
   }
 
   public boolean canShowInTaskList(ProjectDetail detail) {
-    return plugAbandonmentScheduleService.canShowInTaskList(detail);
+    return plugAbandonmentScheduleService.isTaskValidForProjectDetail(detail);
   }
 
   public ModelAndView getPlugAbandonmentScheduleSummaryModelAndView(Integer projectId,

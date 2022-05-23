@@ -109,8 +109,8 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
     );
     when(upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, DISPLAY_ORDER)).thenReturn(upcomingTenderView);
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, unAuthenticatedUser)).thenReturn(false);
     when(upcomingTenderService.createUpcomingTender(any(), any(), any())).thenReturn(UpcomingTenderUtil.getUpcomingTender(detail));
     when(upcomingTenderService.updateUpcomingTender(any(), any(), any())).thenReturn(UpcomingTenderUtil.getUpcomingTender(detail));
     when(projectDetailFileService.getProjectDetailFileByProjectDetailVersionAndFileId(any(), any(), any())).thenReturn(PROJECT_DETAIL_FILE);

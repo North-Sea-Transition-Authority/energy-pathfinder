@@ -50,7 +50,7 @@ public class PlatformsFpsosSectionSummaryService implements ProjectSectionSummar
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return platformsFpsosService.canShowInTaskList(detail);
+    return platformsFpsosService.isTaskValidForProjectDetail(detail);
   }
 
   @Override

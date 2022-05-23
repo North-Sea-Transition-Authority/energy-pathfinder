@@ -118,14 +118,14 @@ public class InfrastructureCollaborationOpportunitiesSummaryServiceTest {
 
   @Test
   public void canShowInTaskList_whenCanShowInTaskList_thenTrue() {
-    when(infrastructureCollaborationOpportunitiesService.canShowInTaskList(detail)).thenReturn(true);
+    when(infrastructureCollaborationOpportunitiesService.isTaskValidForProjectDetail(detail)).thenReturn(true);
 
     assertThat(infrastructureCollaborationOpportunitiesSummaryService.canShowInTaskList(detail)).isTrue();
   }
 
   @Test
   public void canShowInTaskList_whenCannotShowInTaskList_thenFalse() {
-    when(infrastructureCollaborationOpportunitiesService.canShowInTaskList(detail)).thenReturn(false);
+    when(infrastructureCollaborationOpportunitiesService.isTaskValidForProjectDetail(detail)).thenReturn(false);
 
     assertThat(infrastructureCollaborationOpportunitiesSummaryService.canShowInTaskList(detail)).isFalse();
   }

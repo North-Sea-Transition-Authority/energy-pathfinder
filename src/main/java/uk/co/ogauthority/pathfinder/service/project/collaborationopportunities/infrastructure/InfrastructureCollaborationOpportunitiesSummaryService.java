@@ -79,7 +79,7 @@ public class InfrastructureCollaborationOpportunitiesSummaryService extends
   }
 
   public boolean canShowInTaskList(ProjectDetail detail) {
-    return infrastructureCollaborationOpportunitiesService.canShowInTaskList(detail);
+    return infrastructureCollaborationOpportunitiesService.isTaskValidForProjectDetail(detail);
   }
 
   private List<UploadedFileView> getUploadedFileViews(InfrastructureCollaborationOpportunity collaborationOpportunity) {

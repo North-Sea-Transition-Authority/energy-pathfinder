@@ -68,12 +68,12 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
   @Before
   public void setup() {
     when(projectService.getLatestSubmittedDetailOrError(QA_PROJECT_ID)).thenReturn(qaProjectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(qaProjectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(qaProjectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(qaProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(qaProjectDetail, unauthenticatedUser)).thenReturn(false);
 
     doThrow(new PathfinderEntityNotFoundException("test")).when(projectService).getLatestSubmittedDetailOrError(UNSUBMITTED_PROJECT_ID);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(unsubmittedProjectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(unsubmittedProjectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(unsubmittedProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(unsubmittedProjectDetail, unauthenticatedUser)).thenReturn(false);
   }
 
   @Test

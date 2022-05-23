@@ -117,7 +117,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
         teamService
     );
     when(projectService.getLatestDetailOrError(projectId)).thenReturn(projectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
   }
 
   @Test
@@ -271,7 +271,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
 
   private void makeSaveCollaborationOpportunityRequest(String validationTypeArgument, ResultMatcher expectedMatcher) {
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
     when(forwardWorkPlanCollaborationOpportunityService.createCollaborationOpportunity(any(), any(), any())).thenReturn(new ForwardWorkPlanCollaborationOpportunity());
     when(forwardWorkPlanCollaborationOpportunityModelService.getCollaborationOpportunityModelAndView(any(), any(), anyInt())).thenReturn(new ModelAndView());
 
@@ -392,7 +392,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
 
   private void makeUpdateCollaborationOpportunityRequest(String validationTypeArgument, ResultMatcher expectedMatcher) {
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
 
     final var collaborationOpportunityId = 100;
     final var collaborationOpportunity = new ForwardWorkPlanCollaborationOpportunity();
@@ -532,7 +532,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
 
   private void removeCollaborationOpportunity_setup(int collaborationOpportunityId) {
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
 
     final var collaborationOpportunity = new ForwardWorkPlanCollaborationOpportunity();
 

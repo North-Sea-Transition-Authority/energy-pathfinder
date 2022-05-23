@@ -77,7 +77,8 @@ public class ProjectUpdateContextService {
     return new ProjectUpdateContext(
         projectContext.getProjectDetails(),
         projectContext.getProjectPermissions(),
-        projectContext.getUserAccount()
+        projectContext.getUserAccount(),
+        projectContext.getUserToProjectRelationships()
     );
   }
 

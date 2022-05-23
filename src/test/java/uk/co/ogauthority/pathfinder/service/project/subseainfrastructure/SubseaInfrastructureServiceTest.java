@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,10 +39,12 @@ import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.subseainfrastructure.SubseaInfrastructureRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFacilitiesService;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.DevUkTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.SubseaInfrastructureTestUtil;
 
@@ -671,13 +674,37 @@ public class SubseaInfrastructureServiceTest {
   @Test
   public void canShowInTaskList_true() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.SUBSEA_INFRASTRUCTURE)).thenReturn(true);
-    assertThat(subseaInfrastructureService.canShowInTaskList(projectDetail)).isTrue();
+    assertThat(subseaInfrastructureService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR)))
+        .isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.SUBSEA_INFRASTRUCTURE)).thenReturn(false);
-    assertThat(subseaInfrastructureService.canShowInTaskList(projectDetail)).isFalse();
+    assertThat(subseaInfrastructureService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR)))
+        .isFalse();
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.SUBSEA_INFRASTRUCTURE)).thenReturn(true);
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        subseaInfrastructureService,
+        projectDetail,
+        Set.of(UserToProjectRelationship.OPERATOR)
+    );
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_true() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.SUBSEA_INFRASTRUCTURE)).thenReturn(true);
+    assertThat(subseaInfrastructureService.isTaskValidForProjectDetail(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_false() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.SUBSEA_INFRASTRUCTURE)).thenReturn(false);
+    assertThat(subseaInfrastructureService.isTaskValidForProjectDetail(projectDetail)).isFalse();
   }
 
   @Test

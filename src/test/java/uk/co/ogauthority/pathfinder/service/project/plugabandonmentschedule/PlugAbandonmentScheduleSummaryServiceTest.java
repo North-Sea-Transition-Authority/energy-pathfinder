@@ -229,14 +229,14 @@ public class PlugAbandonmentScheduleSummaryServiceTest {
 
   @Test
   public void canShowInTaskList_whenCanShowInTaskList_thenTrue() {
-    when(plugAbandonmentScheduleService.canShowInTaskList(projectDetail)).thenReturn(true);
+    when(plugAbandonmentScheduleService.isTaskValidForProjectDetail(projectDetail)).thenReturn(true);
 
     assertThat(plugAbandonmentScheduleSummaryService.canShowInTaskList(projectDetail)).isTrue();
   }
 
   @Test
   public void canShowInTaskList_whenCannotShowInTaskList_thenFalse() {
-    when(plugAbandonmentScheduleService.canShowInTaskList(projectDetail)).thenReturn(false);
+    when(plugAbandonmentScheduleService.isTaskValidForProjectDetail(projectDetail)).thenReturn(false);
 
     assertThat(plugAbandonmentScheduleSummaryService.canShowInTaskList(projectDetail)).isFalse();
   }

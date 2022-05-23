@@ -55,6 +55,28 @@ public class WebUserAccountServiceTest {
   }
 
   @Test
+  public void getWebUserAccount_whenExists_thenReturn() {
+    when(webUserAccountRepository.findById(WUA_ID)).thenReturn(
+        Optional.of(webUserAccount)
+    );
+
+    var result = webUserAccountService.getWebUserAccount(WUA_ID);
+
+    assertThat(result.get()).isEqualTo(webUserAccount);
+  }
+
+  @Test
+  public void getWebUserAccount_whenNotExists_thenReturnEmpty() {
+    when(webUserAccountRepository.findById(WUA_ID)).thenReturn(
+        Optional.empty()
+    );
+
+    var result = webUserAccountService.getWebUserAccount(WUA_ID);
+
+    assertThat(result).isEmpty();
+  }
+
+  @Test
   public void getWebUserAccounts_whenFound_thenReturnPopulatedList() {
     final var webUserAccountIds = List.of(webUserAccount.getWuaId());
     when(webUserAccountRepository.findAllByWuaIdIn(webUserAccountIds)).thenReturn(List.of(webUserAccount));

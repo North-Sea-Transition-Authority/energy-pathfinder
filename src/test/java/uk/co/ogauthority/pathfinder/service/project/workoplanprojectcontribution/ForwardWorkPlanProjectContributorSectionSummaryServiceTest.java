@@ -50,13 +50,13 @@ public class ForwardWorkPlanProjectContributorSectionSummaryServiceTest {
 
   @Test
   public void canShowInSection_whenCanShow_assertTrue() {
-    when(forwardWorkPlanProjectContributorFormSectionService.canShowInTaskList(detail)).thenReturn(true);
+    when(forwardWorkPlanProjectContributorFormSectionService.isTaskValidForProjectDetail(detail)).thenReturn(true);
     assertThat(forwardWorkPlanProjectContributorSectionSummaryService.canShowSection(detail)).isTrue();
   }
 
   @Test
   public void canShowInSection_whenCannotShow_assertFalse() {
-    when(forwardWorkPlanProjectContributorFormSectionService.canShowInTaskList(detail)).thenReturn(false);
+    when(forwardWorkPlanProjectContributorFormSectionService.isTaskValidForProjectDetail(detail)).thenReturn(false);
     assertThat(forwardWorkPlanProjectContributorSectionSummaryService.canShowSection(detail)).isFalse();
   }
 

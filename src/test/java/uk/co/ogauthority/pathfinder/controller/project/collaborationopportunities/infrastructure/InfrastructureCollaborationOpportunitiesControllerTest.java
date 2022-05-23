@@ -100,8 +100,8 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
   @Before
   public void setUp() throws SQLException {
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(detail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, unAuthenticatedUser)).thenReturn(false);
     when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID)).thenReturn(opportunity);
     UploadedFile file = ProjectFileTestUtil.getUploadedFile();
 

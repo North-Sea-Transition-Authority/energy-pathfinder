@@ -119,14 +119,14 @@ public class ProjectInformationSectionSummaryServiceTest {
 
   @Test
   public void canShowSection_whenCanShowInTaskList_thenTrue() {
-    when(projectInformationService.canShowInTaskList(details)).thenReturn(true);
+    when(projectInformationService.isTaskValidForProjectDetail(details)).thenReturn(true);
 
     assertThat(projectInformationSectionSummaryService.canShowSection(details)).isTrue();
   }
 
   @Test
   public void canShowSection_whenCannotShowInTaskList_thenFalse() {
-    when(projectInformationService.canShowInTaskList(details)).thenReturn(false);
+    when(projectInformationService.isTaskValidForProjectDetail(details)).thenReturn(false);
 
     assertThat(projectInformationSectionSummaryService.canShowSection(details)).isFalse();
   }

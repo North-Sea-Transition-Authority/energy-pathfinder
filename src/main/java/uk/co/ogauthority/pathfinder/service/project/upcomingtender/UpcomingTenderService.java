@@ -33,10 +33,12 @@ import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTe
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class UpcomingTenderService implements ProjectFormSectionService {
@@ -238,8 +240,14 @@ public class UpcomingTenderService implements ProjectFormSectionService {
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
     return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS);
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.UPCOMING_TENDERS, userToProjectRelationships);
   }
 
   @Override

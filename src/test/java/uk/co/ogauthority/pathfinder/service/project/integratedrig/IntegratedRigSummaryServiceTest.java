@@ -211,14 +211,14 @@ public class IntegratedRigSummaryServiceTest {
 
   @Test
   public void canShowInTaskList_whenCanShowInTaskList_thenTrue() {
-    when(integratedRigService.canShowInTaskList(projectDetail)).thenReturn(true);
+    when(integratedRigService.isTaskValidForProjectDetail(projectDetail)).thenReturn(true);
 
     assertThat(integratedRigSummaryService.canShowInTaskList(projectDetail)).isTrue();
   }
 
   @Test
   public void canShowInTaskList_whenCannotShowInTaskList_thenFalse() {
-    when(integratedRigService.canShowInTaskList(projectDetail)).thenReturn(false);
+    when(integratedRigService.isTaskValidForProjectDetail(projectDetail)).thenReturn(false);
 
     assertThat(integratedRigSummaryService.canShowInTaskList(projectDetail)).isFalse();
   }

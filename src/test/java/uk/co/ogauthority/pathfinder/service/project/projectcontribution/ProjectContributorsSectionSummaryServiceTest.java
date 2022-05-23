@@ -48,13 +48,13 @@ public class ProjectContributorsSectionSummaryServiceTest {
 
   @Test
   public void canShowInSection_whenCanShow_assertTrue() {
-    when(projectContributorsFormSectionService.canShowInTaskList(detail)).thenReturn(true);
+    when(projectContributorsFormSectionService.isTaskValidForProjectDetail(detail)).thenReturn(true);
     assertThat(projectContributorsSectionSummaryService.canShowSection(detail)).isTrue();
   }
 
   @Test
   public void canShowInSection_whenCannotShow_assertFalse() {
-    when(projectContributorsFormSectionService.canShowInTaskList(detail)).thenReturn(false);
+    when(projectContributorsFormSectionService.isTaskValidForProjectDetail(detail)).thenReturn(false);
     assertThat(projectContributorsSectionSummaryService.canShowSection(detail)).isFalse();
   }
 

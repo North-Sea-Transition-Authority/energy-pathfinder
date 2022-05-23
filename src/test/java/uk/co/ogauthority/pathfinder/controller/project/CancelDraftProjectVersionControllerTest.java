@@ -161,7 +161,7 @@ public class CancelDraftProjectVersionControllerTest extends ProjectContextAbstr
   public void cancelDraft_whenAuthenticatedAndCancellable_thenCancel() throws Exception {
 
     when(cancelDraftProjectVersionService.isCancellable(any())).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
 
     mockMvc.perform(
             post(ReverseRouter.route(on(CancelDraftProjectVersionController.class)
@@ -182,7 +182,7 @@ public class CancelDraftProjectVersionControllerTest extends ProjectContextAbstr
   public void cancelDraft_whenAuthenticatedAndNotCancellable_noCancel() throws Exception {
 
     when(cancelDraftProjectVersionService.isCancellable(any())).thenReturn(false);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
 
     mockMvc.perform(
             post(ReverseRouter.route(on(CancelDraftProjectVersionController.class)

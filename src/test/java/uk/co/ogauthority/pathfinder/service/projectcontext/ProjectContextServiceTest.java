@@ -27,6 +27,7 @@ import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.projectcontribution.ProjectContributorsCommonService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectContributorTestUtil;
@@ -61,6 +62,8 @@ public class ProjectContextServiceTest {
 
   private final Set<ProjectType> allowedProjectTypes = Set.of(ProjectType.INFRASTRUCTURE);
 
+  private final Set<UserToProjectRelationship> relationships = Set.of(UserToProjectRelationship.OPERATOR);
+
   @Before
   public void setUp() throws Exception {
     projectContextService = new ProjectContextService(
@@ -74,13 +77,19 @@ public class ProjectContextServiceTest {
   @Test
   public void getProjectContext() {
 
-    var context = projectContextService.getProjectContext(detail, authenticatedUser, projectPermissions);
+    var context = projectContextService.getProjectContext(
+        detail,
+        authenticatedUser,
+        projectPermissions,
+        relationships
+    );
     assertThat(context.getProjectDetails()).isEqualTo(detail);
     assertThat(context.getUserAccount()).isEqualTo(authenticatedUser);
     assertThat(context.getProjectPermissions()).containsExactlyInAnyOrder(
         ProjectPermission.EDIT,
         ProjectPermission.SUBMIT
     );
+    assertThat(context.getUserToProjectRelationships()).isEqualTo(relationships);
   }
 
   @Test
@@ -109,7 +118,7 @@ public class ProjectContextServiceTest {
 
   @Test
   public void canBuildContext_whenNoException() {
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
 
     assertThat(projectContextService.canBuildContext(detail, authenticatedUser, TestController.class)).isTrue();
   }
@@ -121,7 +130,7 @@ public class ProjectContextServiceTest {
 
   @Test
   public void buildProjectContext_whenHasAccess() {
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
     var context = projectContextService.buildProjectContext(
         detail,
         authenticatedUser,
@@ -142,7 +151,7 @@ public class ProjectContextServiceTest {
 
   @Test(expected = AccessDeniedException.class)
   public void buildProjectContext_whenNoAccess() {
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(false);
     projectContextService.buildProjectContext(
         detail,
         authenticatedUser,
@@ -155,7 +164,7 @@ public class ProjectContextServiceTest {
 
   @Test(expected = AccessDeniedException.class)
   public void buildProjectContext_whenWrongStatus() {
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
     projectContextService.buildProjectContext(
         detail,
         authenticatedUser,
@@ -171,7 +180,7 @@ public class ProjectContextServiceTest {
 
     detail.setStatus(null);
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
 
     projectContextService.buildProjectContext(
         detail,
@@ -185,7 +194,7 @@ public class ProjectContextServiceTest {
 
   @Test(expected = AccessDeniedException.class)
   public void buildProjectContext_whenNoPermissions() {
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, unAuthenticatedUser)).thenReturn(true);
     projectContextService.buildProjectContext(
         detail,
         unAuthenticatedUser,
@@ -204,7 +213,7 @@ public class ProjectContextServiceTest {
         myOrganisationTeam.getPortalOrganisationGroup().getOrgGrpId()
     );
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(false);
     when(projectContributorsCommonService.getProjectContributorsForDetail(detail))
         .thenReturn(List.of(projectContributor));
     when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUser.getLinkedPerson()))
@@ -237,7 +246,7 @@ public class ProjectContextServiceTest {
         142 //different organisationId than myOrganisationTeam
     );
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(false);
     when(projectContributorsCommonService.getProjectContributorsForDetail(detail))
         .thenReturn(List.of(projectContributor));
     when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUser.getLinkedPerson()))
@@ -261,7 +270,7 @@ public class ProjectContextServiceTest {
         myOrganisationTeam.getPortalOrganisationGroup().getOrgGrpId()
     );
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(false);
 
     projectContextService.buildProjectContext(
         detail,
@@ -275,7 +284,7 @@ public class ProjectContextServiceTest {
 
   @Test(expected = AccessDeniedException.class)
   public void buildProjectContext_whenContributorAccessNotAllowed_andUserIsNotContributor_thenForbidden() {
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(false);
 
     projectContextService.buildProjectContext(
         detail,
@@ -293,7 +302,7 @@ public class ProjectContextServiceTest {
     final var projectType = ProjectType.INFRASTRUCTURE;
     detail.setProjectType(projectType);
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
 
     final var context = projectContextService.buildProjectContext(
         detail,
@@ -314,7 +323,7 @@ public class ProjectContextServiceTest {
     final var detailProjectType = ProjectType.FORWARD_WORK_PLAN;
     detail.setProjectType(detailProjectType);
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
 
     projectContextService.buildProjectContext(
         detail,
@@ -333,7 +342,7 @@ public class ProjectContextServiceTest {
     final var detailProjectType = ProjectType.FORWARD_WORK_PLAN;
     detail.setProjectType(detailProjectType);
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
 
     projectContextService.buildProjectContext(
         detail,
@@ -351,7 +360,7 @@ public class ProjectContextServiceTest {
     Set<ProjectType> expectedProjectTypes = Set.of(ProjectType.INFRASTRUCTURE);
     detail.setProjectType(null);
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
 
     projectContextService.buildProjectContext(
         detail,

@@ -90,6 +90,6 @@ public class IntegratedRigSummaryService {
   }
 
   public boolean canShowInTaskList(ProjectDetail detail) {
-    return integratedRigService.canShowInTaskList(detail);
+    return integratedRigService.isTaskValidForProjectDetail(detail);
   }
 }

@@ -49,15 +49,15 @@ public class UpcomingTenderSectionSummaryServiceTest {
   }
 
   @Test
-  public void canShowSection_whenCanShowInTaskList_thenTrue() {
-    when(upcomingTenderSummaryService.canShowInTaskList(projectDetail)).thenReturn(true);
+  public void canShowSection_whenTaskValidForProjectDetail_thenTrue() {
+    when(upcomingTenderSummaryService.isTaskValidForProjectDetail(projectDetail)).thenReturn(true);
 
     assertThat(upcomingTenderSectionSummaryService.canShowSection(projectDetail)).isTrue();
   }
 
   @Test
-  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
-    when(upcomingTenderSummaryService.canShowInTaskList(projectDetail)).thenReturn(false);
+  public void canShowSection_whenTaskNotValidForProjectDetail_thenFalse() {
+    when(upcomingTenderSummaryService.isTaskValidForProjectDetail(projectDetail)).thenReturn(false);
 
     assertThat(upcomingTenderSectionSummaryService.canShowSection(projectDetail)).isFalse();
   }

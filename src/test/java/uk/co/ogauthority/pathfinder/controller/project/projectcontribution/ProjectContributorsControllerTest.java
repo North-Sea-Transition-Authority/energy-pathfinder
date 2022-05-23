@@ -82,7 +82,7 @@ public class ProjectContributorsControllerTest extends ProjectContextAbstractCon
         teamService
     );
     when(projectService.getLatestDetailOrError(projectId)).thenReturn(projectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
   }
 
   @Test

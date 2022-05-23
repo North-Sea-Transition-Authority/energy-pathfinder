@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocatio
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
@@ -29,10 +30,12 @@ import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationR
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class ProjectLocationService implements ProjectFormSectionService {
@@ -257,6 +260,12 @@ public class ProjectLocationService implements ProjectFormSectionService {
   }
 
   @Override
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
+    return ProjectService.isInfrastructureProject(detail)
+        && projectInformationService.isOilAndGasProject(detail);
+  }
+
+  @Override
   public void removeSectionData(ProjectDetail projectDetail) {
     getProjectLocationByProjectDetail(projectDetail).ifPresent(projectLocation -> {
       projectLocationBlocksService.deleteBlocks(projectLocation);
@@ -288,9 +297,9 @@ public class ProjectLocationService implements ProjectFormSectionService {
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
-    return ProjectService.isInfrastructureProject(detail)
-        && projectInformationService.isOilAndGasProject(detail);
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.PROJECT_LOCATION, userToProjectRelationships);
   }
 
   @Override

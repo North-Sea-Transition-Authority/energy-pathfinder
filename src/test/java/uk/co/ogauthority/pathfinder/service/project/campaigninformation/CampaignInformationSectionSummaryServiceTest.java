@@ -57,7 +57,7 @@ public class CampaignInformationSectionSummaryServiceTest {
   @Test
   public void canShowSection_whenCanShowInTaskList_thenTrue() {
 
-    when(campaignInformationService.canShowInTaskList(projectDetail)).thenReturn(true);
+    when(campaignInformationService.isTaskValidForProjectDetail(projectDetail)).thenReturn(true);
 
     final var canShowSection = campaignInformationSectionSummaryService.canShowSection(projectDetail);
 
@@ -67,7 +67,7 @@ public class CampaignInformationSectionSummaryServiceTest {
   @Test
   public void canShowSection_whenCannotShowInTaskList_thenFalse() {
 
-    when(campaignInformationService.canShowInTaskList(projectDetail)).thenReturn(false);
+    when(campaignInformationService.isTaskValidForProjectDetail(projectDetail)).thenReturn(false);
 
     final var canShowSection = campaignInformationSectionSummaryService.canShowSection(projectDetail);
 

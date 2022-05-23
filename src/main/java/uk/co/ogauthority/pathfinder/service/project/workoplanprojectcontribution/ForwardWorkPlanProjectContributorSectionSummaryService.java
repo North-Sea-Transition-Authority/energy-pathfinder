@@ -46,7 +46,7 @@ public class ForwardWorkPlanProjectContributorSectionSummaryService implements P
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return forwardWorkPlanProjectContributorFormSectionService.canShowInTaskList(detail);
+    return forwardWorkPlanProjectContributorFormSectionService.isTaskValidForProjectDetail(detail);
   }
 
   @Override

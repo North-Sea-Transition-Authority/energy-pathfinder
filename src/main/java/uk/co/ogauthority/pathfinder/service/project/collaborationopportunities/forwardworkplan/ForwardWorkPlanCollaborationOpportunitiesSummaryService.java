@@ -70,7 +70,7 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryService extends
   }
 
   public boolean canShowInTaskList(ProjectDetail projectDetail) {
-    return forwardWorkPlanCollaborationOpportunityService.canShowInTaskList(projectDetail);
+    return forwardWorkPlanCollaborationOpportunityService.isTaskValidForProjectDetail(projectDetail);
   }
 
   private List<UploadedFileView> getUploadedFileViews(ForwardWorkPlanCollaborationOpportunity opportunity) {

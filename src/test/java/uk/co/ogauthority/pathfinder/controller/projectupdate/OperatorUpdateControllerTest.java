@@ -65,12 +65,12 @@ public class OperatorUpdateControllerTest extends OperatorProjectUpdateContextAb
   @Before
   public void setup() {
     when(projectService.getLatestDetailOrError(QA_PROJECT_ID)).thenReturn(qaProjectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(qaProjectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(qaProjectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(qaProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(qaProjectDetail, unauthenticatedUser)).thenReturn(false);
 
     when(projectService.getLatestDetailOrError(DRAFT_PROJECT_ID)).thenReturn(draftProjectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(draftProjectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(draftProjectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(draftProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(draftProjectDetail, unauthenticatedUser)).thenReturn(false);
   }
 
   @Test

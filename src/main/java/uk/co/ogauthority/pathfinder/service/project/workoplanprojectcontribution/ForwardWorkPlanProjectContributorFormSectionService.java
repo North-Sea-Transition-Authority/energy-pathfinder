@@ -8,10 +8,13 @@ import uk.co.ogauthority.pathfinder.model.entity.project.projectcontribution.Pro
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanprojectcontribution.ForwardWorkPlanContributorDetails;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.projectcontribution.ProjectContributorsCommonService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class ForwardWorkPlanProjectContributorFormSectionService implements ProjectFormSectionService {
@@ -36,8 +39,15 @@ public class ForwardWorkPlanProjectContributorFormSectionService implements Proj
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
     return ProjectService.isForwardWorkPlanProject(detail);
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.WORK_PLAN_PROJECT_CONTRIBUTORS,
+        userToProjectRelationships);
   }
 
   @Override

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,10 +32,12 @@ import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -228,13 +231,41 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
   @Test
   public void canShowInTaskList_true() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(true);
-    assertThat(infrastructureCollaborationOpportunitiesService.canShowInTaskList(detail)).isTrue();
+    assertThat(infrastructureCollaborationOpportunitiesService.canShowInTaskList(
+        detail,
+        Set.of(UserToProjectRelationship.OPERATOR))
+    ).isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(false);
-    assertThat(infrastructureCollaborationOpportunitiesService.canShowInTaskList(detail)).isFalse();
+    assertThat(infrastructureCollaborationOpportunitiesService.canShowInTaskList(
+        detail,
+        Set.of(UserToProjectRelationship.OPERATOR))
+    ).isFalse();
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(true);
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        infrastructureCollaborationOpportunitiesService,
+        detail,
+        Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)
+    );
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_true() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(true);
+    assertThat(infrastructureCollaborationOpportunitiesService.isTaskValidForProjectDetail(detail)).isTrue();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_false() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(false);
+    assertThat(infrastructureCollaborationOpportunitiesService.isTaskValidForProjectDetail(detail)).isFalse();
   }
 
   @Test

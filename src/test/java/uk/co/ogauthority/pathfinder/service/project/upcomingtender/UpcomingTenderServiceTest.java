@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,9 +35,11 @@ import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTe
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
@@ -298,13 +301,35 @@ public class UpcomingTenderServiceTest {
   @Test
   public void canShowInTaskList_true() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(true);
-    assertThat(upcomingTenderService.canShowInTaskList(detail)).isTrue();
+    assertThat(upcomingTenderService.canShowInTaskList(detail, Set.of(UserToProjectRelationship.OPERATOR))).isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(false);
-    assertThat(upcomingTenderService.canShowInTaskList(detail)).isFalse();
+    assertThat(upcomingTenderService.canShowInTaskList(detail, Set.of(UserToProjectRelationship.OPERATOR))).isFalse();
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(true);
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        upcomingTenderService,
+        detail,
+        Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)
+    );
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_true() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(true);
+    assertThat(upcomingTenderService.isTaskValidForProjectDetail(detail)).isTrue();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_false() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(false);
+    assertThat(upcomingTenderService.isTaskValidForProjectDetail(detail)).isFalse();
   }
 
   @Test

@@ -59,14 +59,14 @@ public class ForwardWorkPlanUpcomingTenderSectionSummaryServiceTest {
 
   @Test
   public void canShowSection_whenCanShowInTaskList_thenTrue() {
-    when(workPlanUpcomingTenderService.canShowInTaskList(detail)).thenReturn(true);
+    when(workPlanUpcomingTenderService.isTaskValidForProjectDetail(detail)).thenReturn(true);
 
     assertThat(workPlanUpcomingTenderSectionSummaryService.canShowSection(detail)).isTrue();
   }
 
   @Test
   public void canShowSection_whenCannotShowInTaskList_thenFalse() {
-    when(workPlanUpcomingTenderService.canShowInTaskList(detail)).thenReturn(false);
+    when(workPlanUpcomingTenderService.isTaskValidForProjectDetail(detail)).thenReturn(false);
 
     assertThat(workPlanUpcomingTenderSectionSummaryService.canShowSection(detail)).isFalse();
   }

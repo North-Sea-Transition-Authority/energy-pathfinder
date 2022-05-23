@@ -181,7 +181,7 @@ public class ProjectControllerTesterService {
       ResultMatcher matcherWhenNonPermittedStatus
   ) {
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUserAccount)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUserAccount)).thenReturn(true);
 
     Arrays.asList(ProjectStatus.values()).forEach(projectStatus -> {
 
@@ -214,7 +214,7 @@ public class ProjectControllerTesterService {
       ResultMatcher matcherWhenNonPermittedType
   ) {
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUserAccount)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUserAccount)).thenReturn(true);
 
     Arrays.asList(ProjectType.values()).forEach(projectType -> {
 
@@ -253,7 +253,7 @@ public class ProjectControllerTesterService {
           projectPermission.getUserPrivileges()
       );
 
-      when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUserWithPrivilege)).thenReturn(true);
+      when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUserWithPrivilege)).thenReturn(true);
 
       try {
         final var response = makeRequestWithUser(
@@ -282,7 +282,7 @@ public class ProjectControllerTesterService {
       ResultMatcher matcherWhenRequiredPermission,
       ResultMatcher matcherWhenNotRequiredPermission
   ) {
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUserAccount))
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUserAccount))
         .thenReturn(false);
 
     if (allowContributorAccess) {
