@@ -19,7 +19,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.AllowProjectContributorAccess;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
@@ -160,7 +162,6 @@ public class ProjectControllerTesterService {
     resetProjectDetail(originalProjectType, originalProjectStatus);
 
     smokeTestProjectContributorAccess(
-
         controllerMethodToCheck,
         successMatcher,
         failedMatcher
@@ -285,6 +286,16 @@ public class ProjectControllerTesterService {
     when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUserAccount))
         .thenReturn(false);
 
+    var hasAllowContributorAccess = hasProjectContributorAnnotation(
+        (MvcUriComponentsBuilder.MethodInvocationInfo) controllerMethodToCheck
+    );
+
+    //If the controller has @AllowProjectContributorAccess the projectControllerTesterService must have allowContributorAccess = true
+    if (hasAllowContributorAccess && !allowContributorAccess) {
+      throw new IllegalStateException("Controller contains @AllowProjectContributorAccess but smoke test was not properly" +
+          " setup to test it. Fix: Use withProjectContributorAccess() when setting your projectControllerTesterService");
+    }
+
     if (allowContributorAccess) {
       var organisationGroup = TeamTestingUtil.generateOrganisationGroup(100, "my Org", "org");
       when(projectContributorsCommonService.getProjectContributorsForDetail(projectDetail)).thenReturn(List.of(
@@ -385,5 +396,10 @@ public class ProjectControllerTesterService {
     } catch (AssertionError | Exception ex) {
       throw new AssertionError(String.format("Unauthenticated check expected 3xx redirect\n %s", ex.getMessage()), ex);
     }
+  }
+
+  private boolean hasProjectContributorAnnotation(MvcUriComponentsBuilder.MethodInvocationInfo controllerMethodToCheck) {
+    return controllerMethodToCheck.getControllerType().isAnnotationPresent(AllowProjectContributorAccess.class)
+        || controllerMethodToCheck.getControllerMethod().isAnnotationPresent(AllowProjectContributorAccess.class);
   }
 }

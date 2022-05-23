@@ -3,6 +3,8 @@ package uk.co.ogauthority.pathfinder.service.projectcontext;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -129,7 +131,7 @@ public class ProjectContextServiceTest {
   }
 
   @Test
-  public void buildProjectContext_whenHasAccess() {
+  public void buildProjectContext_whenHasAccessAsOperator() {
     when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
     var context = projectContextService.buildProjectContext(
         detail,
@@ -147,6 +149,8 @@ public class ProjectContextServiceTest {
         ProjectPermission.PROVIDE_UPDATE,
         ProjectPermission.ARCHIVE
     );
+
+    verify(projectContributorsCommonService, never()).getProjectContributorsForDetail(detail);
   }
 
   @Test(expected = AccessDeniedException.class)
@@ -218,6 +222,7 @@ public class ProjectContextServiceTest {
         .thenReturn(List.of(projectContributor));
     when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUser.getLinkedPerson()))
         .thenReturn(List.of(myOrganisationTeam));
+    when(projectService.getLatestDetailOrError(detail.getProject().getId())).thenReturn(detail);
 
     var context = projectContextService.buildProjectContext(
         detail,
@@ -247,8 +252,6 @@ public class ProjectContextServiceTest {
     );
 
     when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(false);
-    when(projectContributorsCommonService.getProjectContributorsForDetail(detail))
-        .thenReturn(List.of(projectContributor));
     when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUser.getLinkedPerson()))
         .thenReturn(List.of(myOrganisationTeam));
 
@@ -264,12 +267,6 @@ public class ProjectContextServiceTest {
 
   @Test(expected = AccessDeniedException.class)
   public void buildProjectContext_whenContributorAccessNotAllowed_andUserIsContributor_thenForbidden() {
-    var myOrganisationTeam = TeamTestingUtil.getOrganisationTeam(1, "My org");
-    var projectContributor = ProjectContributorTestUtil.contributorWithGroupOrgId(
-        detail,
-        myOrganisationTeam.getPortalOrganisationGroup().getOrgGrpId()
-    );
-
     when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(false);
 
     projectContextService.buildProjectContext(

@@ -77,7 +77,13 @@ public class ProjectContextService {
                                             boolean allowProjectContributors) {
     var isRegulator = teamService.isPersonMemberOfRegulatorTeam(user.getLinkedPerson());
     var isOperator = projectOperatorService.isUserInProjectTeam(detail, user);
-    var canAccessAsContributor = allowProjectContributors && userBelongsAsContributor(user, detail);
+    var canAccessAsContributor = false;
+    if (!isOperator) {
+      canAccessAsContributor = allowProjectContributors && userBelongsAsContributor(
+          user,
+          detail.getProject().getId()
+      );
+    }
     Set<UserToProjectRelationship> relationships = new HashSet<>();
 
     if (isRegulator) {
@@ -199,7 +205,8 @@ public class ProjectContextService {
         .anyMatch(annotation -> annotation.annotationType().equals(AllowProjectContributorAccess.class));
   }
 
-  private boolean userBelongsAsContributor(AuthenticatedUserAccount user, ProjectDetail detail) {
+  private boolean userBelongsAsContributor(AuthenticatedUserAccount user, int projectId) {
+    var detail = getProjectDetailsOrError(projectId, ProjectDetailVersionType.CURRENT_VERSION);
     var projectContributorsIdList = projectContributorsCommonService.getProjectContributorsForDetail(detail)
         .stream()
         .map(projectContributor -> projectContributor.getContributionOrganisationGroup().getOrgGrpId())

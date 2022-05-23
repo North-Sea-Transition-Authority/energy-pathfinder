@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.AllowProjectContributorAccess;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
@@ -30,6 +31,7 @@ import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectManagementV
 )
 @ProjectFormPagePermissionCheck(permissions = ProjectPermission.VIEW)
 @ProjectTypeCheck(types = { ProjectType.INFRASTRUCTURE, ProjectType.FORWARD_WORK_PLAN })
+@AllowProjectContributorAccess
 @RequestMapping("/project/{projectId}/manage")
 public class ManageProjectController {
 
