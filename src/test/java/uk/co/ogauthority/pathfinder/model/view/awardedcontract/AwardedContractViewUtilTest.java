@@ -18,13 +18,12 @@ public class AwardedContractViewUtilTest {
   private static final Integer DISPLAY_ORDER = 1;
 
   @Test
-  public void from_withFromListFunction() {
+  public void awardedContractViewBuilder_withFromListFunction() {
     var awardedContract= AwardedContractTestUtil.createAwardedContract();
     awardedContract.setContractFunction(Function.DRILLING);
     awardedContract.setManualContractFunction(null);
 
-    var awardedContractView = AwardedContractViewUtil.from(awardedContract, DISPLAY_ORDER);
-
+    AwardedContractView awardedContractView = new AwardedContractViewUtil.AwardedContractViewBuilder(awardedContract, DISPLAY_ORDER).build();
     checkCommonFields(awardedContract, awardedContractView, DISPLAY_ORDER);
     var contractFunction = awardedContractView.getContractFunction();
     assertThat(contractFunction.getValue()).isEqualTo(awardedContract.getContractFunction().getDisplayName());
@@ -33,12 +32,12 @@ public class AwardedContractViewUtilTest {
   }
 
   @Test
-  public void from_withManualEntryFunction() {
+  public void awardedContractViewBuilder_withManualEntryFunction() {
     var awardedContract= AwardedContractTestUtil.createAwardedContract();
     awardedContract.setContractFunction(null);
     awardedContract.setManualContractFunction("my manual entry function");
 
-    var awardedContractView = AwardedContractViewUtil.from(awardedContract, DISPLAY_ORDER);
+    AwardedContractView awardedContractView = new AwardedContractViewUtil.AwardedContractViewBuilder(awardedContract, DISPLAY_ORDER).build();
 
     checkCommonFields(awardedContract, awardedContractView, DISPLAY_ORDER);
     var contractFunction = awardedContractView.getContractFunction();
@@ -47,34 +46,36 @@ public class AwardedContractViewUtilTest {
   }
 
   @Test
-  public void from_withNullContractBand() {
+  public void awardedContractViewBuilder_withNullContractBand() {
     var awardedContract= AwardedContractTestUtil.createAwardedContract();
     awardedContract.setContractBand(null);
 
-    var awardedContractView = AwardedContractViewUtil.from(awardedContract, DISPLAY_ORDER);
+    AwardedContractView awardedContractView = new AwardedContractViewUtil.AwardedContractViewBuilder(awardedContract, DISPLAY_ORDER).build();
 
     checkCommonFields(awardedContract, awardedContractView, DISPLAY_ORDER);
     assertThat(awardedContractView.getContractBand()).isNull();
   }
 
   @Test
-  public void from_withNotNullContractBand() {
+  public void awardedContractViewBuilder_withNotNullContractBand() {
     var awardedContract= AwardedContractTestUtil.createAwardedContract();
     awardedContract.setContractBand(ContractBand.GREATER_THAN_OR_EQUAL_TO_25M);
 
-    var awardedContractView = AwardedContractViewUtil.from(awardedContract, DISPLAY_ORDER);
+    AwardedContractView awardedContractView = new AwardedContractViewUtil.AwardedContractViewBuilder(awardedContract, DISPLAY_ORDER).build();
 
     checkCommonFields(awardedContract, awardedContractView, DISPLAY_ORDER);
     assertThat(awardedContractView.getContractBand()).isEqualTo(awardedContract.getContractBand().getDisplayName());
   }
 
   @Test
-  public void from_containsCorrectSummaryLinks() {
+  public void awardedContractViewBuilder_containsCorrectSummaryLinks() {
     var awardedContract= AwardedContractTestUtil.createAwardedContract();
     var projectId = awardedContract.getProjectDetail().getProject().getId();
     var awardedContractId = awardedContract.getId();
 
-    var awardedContractView = AwardedContractViewUtil.from(awardedContract, DISPLAY_ORDER);
+    AwardedContractView awardedContractView = new AwardedContractViewUtil.AwardedContractViewBuilder(awardedContract, DISPLAY_ORDER)
+        .includeSummaryLinks(true)
+        .build();
 
     var summaryLinks = awardedContractView.getSummaryLinks();
 
@@ -86,18 +87,36 @@ public class AwardedContractViewUtilTest {
   }
 
   @Test
-  public void from_whenIsValidTruePassedIn_validPropertyIsSetTrue() {
+  public void awardedContractViewBuilder_containsNoSummaryLinks() {
     var awardedContract= AwardedContractTestUtil.createAwardedContract();
-    var awardedContractView = AwardedContractViewUtil.from(awardedContract, DISPLAY_ORDER, true);
+
+    AwardedContractView awardedContractView = new AwardedContractViewUtil.AwardedContractViewBuilder(awardedContract, DISPLAY_ORDER)
+        .includeSummaryLinks(false)
+        .build();
+
+    var summaryLinks = awardedContractView.getSummaryLinks();
+
+    checkCommonFields(awardedContract, awardedContractView, DISPLAY_ORDER);
+    assertThat(summaryLinks).isEmpty();
+  }
+
+  @Test
+  public void awardedContractViewBuilder_whenIsValidTruePassedIn_validPropertyIsSetTrue() {
+    var awardedContract= AwardedContractTestUtil.createAwardedContract();
+    AwardedContractView awardedContractView = new AwardedContractViewUtil.AwardedContractViewBuilder(awardedContract, DISPLAY_ORDER)
+        .isValid(true)
+        .build();
 
     checkCommonFields(awardedContract, awardedContractView, DISPLAY_ORDER);
     assertThat(awardedContractView.isValid()).isTrue();
   }
 
   @Test
-  public void from_whenIsValidFalsePassedIn_validPropertyIsSetFalse() {
+  public void awardedContractViewBuilder_whenIsValidFalsePassedIn_validPropertyIsSetFalse() {
     var awardedContract= AwardedContractTestUtil.createAwardedContract();
-    var awardedContractView = AwardedContractViewUtil.from(awardedContract, DISPLAY_ORDER, false);
+    AwardedContractView awardedContractView = new AwardedContractViewUtil.AwardedContractViewBuilder(awardedContract, DISPLAY_ORDER)
+        .isValid(false)
+        .build();
 
     checkCommonFields(awardedContract, awardedContractView, DISPLAY_ORDER);
     assertThat(awardedContractView.isValid()).isFalse();

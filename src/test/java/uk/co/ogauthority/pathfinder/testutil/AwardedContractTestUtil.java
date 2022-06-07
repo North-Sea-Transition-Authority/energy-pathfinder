@@ -22,6 +22,7 @@ public class AwardedContractTestUtil {
   public static final String PHONE_NUMBER = ContactDetailsTestUtil.PHONE_NUMBER;
   public static final String JOB_TITLE = ContactDetailsTestUtil.JOB_TITLE;
   public static final String EMAIL_ADDRESS = ContactDetailsTestUtil.EMAIL;
+  public static final int ADDED_BY_ORGANISATION_GROUP = 1;
 
   private AwardedContractTestUtil() {
     throw new IllegalStateException("AwardedContractTestUtil is a utility class and should not be instantiated");
@@ -38,7 +39,8 @@ public class AwardedContractTestUtil {
       String contactName,
       String phoneNumber,
       String emailAddress,
-      String jobTitle
+      String jobTitle,
+      int addedByOrganisationGroup
   ) {
     var awardedContract = new AwardedContract();
     awardedContract.setProjectDetail(projectDetail);
@@ -52,6 +54,7 @@ public class AwardedContractTestUtil {
     awardedContract.setPhoneNumber(phoneNumber);
     awardedContract.setEmailAddress(emailAddress);
     awardedContract.setJobTitle(jobTitle);
+    awardedContract.setAddedByOrganisationGroup(addedByOrganisationGroup);
     return awardedContract;
   }
 
@@ -67,7 +70,8 @@ public class AwardedContractTestUtil {
         CONTACT_NAME,
         PHONE_NUMBER,
         EMAIL_ADDRESS,
-        JOB_TITLE
+        JOB_TITLE,
+        ADDED_BY_ORGANISATION_GROUP
     );
   }
 
@@ -83,7 +87,8 @@ public class AwardedContractTestUtil {
         CONTACT_NAME,
         PHONE_NUMBER,
         EMAIL_ADDRESS,
-        JOB_TITLE
+        JOB_TITLE,
+        ADDED_BY_ORGANISATION_GROUP
     );
   }
 
@@ -130,6 +135,9 @@ public class AwardedContractTestUtil {
   }
 
   public static AwardedContractView createAwardedContractView(Integer displayOrder) {
-    return AwardedContractViewUtil.from(createAwardedContract(), displayOrder);
+    return new AwardedContractViewUtil.AwardedContractViewBuilder(
+        AwardedContractTestUtil.createAwardedContract(),
+        displayOrder
+    ).build() ;
   }
 }

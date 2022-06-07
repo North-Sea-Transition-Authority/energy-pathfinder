@@ -20,6 +20,8 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.ContractFunctionRestController;
+import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
+import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContract;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
@@ -31,6 +33,8 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
@@ -52,15 +56,18 @@ public class AwardedContractController extends ProjectFormPageController {
 
   private final AwardedContractService awardedContractService;
   private final AwardedContractSummaryService awardedContractSummaryService;
+  private final AccessService accessService;
 
   @Autowired
   public AwardedContractController(BreadcrumbService breadcrumbService,
                                    AwardedContractService awardedContractService,
                                    ControllerHelperService controllerHelperService,
-                                   AwardedContractSummaryService awardedContractSummaryService) {
+                                   AwardedContractSummaryService awardedContractSummaryService,
+                                   AccessService accessService) {
     super(breadcrumbService, controllerHelperService);
     this.awardedContractService = awardedContractService;
     this.awardedContractSummaryService = awardedContractSummaryService;
+    this.accessService = accessService;
   }
 
   @GetMapping
@@ -82,6 +89,10 @@ public class AwardedContractController extends ProjectFormPageController {
   public ModelAndView getAwardedContract(@PathVariable("projectId") Integer projectId,
                                          @PathVariable("awardedContractId") Integer awardedProjectId,
                                          ProjectContext projectContext) {
+    var awardedContract = awardedContractService.getAwardedContract(
+        awardedProjectId,
+        projectContext.getProjectDetails());
+    checkIfUserHasAccessAwardedContract(awardedContract);
     var form = awardedContractService.getForm(awardedProjectId, projectContext.getProjectDetails());
     return getAwardedContractModelAndView(projectId, form);
   }
@@ -91,6 +102,11 @@ public class AwardedContractController extends ProjectFormPageController {
                                                         @PathVariable("awardedContractId") Integer awardedProjectId,
                                                         @PathVariable("displayOrder") Integer displayOrder,
                                                         ProjectContext projectContext) {
+    var awardedContract = awardedContractService.getAwardedContract(
+        awardedProjectId,
+        projectContext.getProjectDetails()
+    );
+    checkIfUserHasAccessAwardedContract(awardedContract);
     var awardedContractView = awardedContractSummaryService.getAwardedContractView(
         awardedProjectId,
         projectContext.getProjectDetails(),
@@ -111,7 +127,11 @@ public class AwardedContractController extends ProjectFormPageController {
         getAwardedContractModelAndView(projectId, form),
         form,
         () -> {
-          var contract = awardedContractService.createAwardedContract(projectContext.getProjectDetails(), form);
+          var contract = awardedContractService.createAwardedContract(
+              projectContext.getProjectDetails(),
+              form,
+              projectContext.getUserAccount()
+          );
           AuditService.audit(
               AuditEvent.AWARDED_CONTRACT_UPDATED,
               String.format(
@@ -132,13 +152,19 @@ public class AwardedContractController extends ProjectFormPageController {
                                           BindingResult bindingResult,
                                           ValidationType validationType,
                                           ProjectContext projectContext) {
+    var awardedContract = awardedContractService.getAwardedContract(
+        awardedContractId,
+        projectContext.getProjectDetails()
+    );
+    checkIfUserHasAccessAwardedContract(awardedContract);
     bindingResult = awardedContractService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
         getAwardedContractModelAndView(projectId, form),
         form,
         () -> {
-          var contract = awardedContractService.updateAwardedContract(awardedContractId, projectContext.getProjectDetails(), form);
+          var contract = awardedContractService.updateAwardedContract(awardedContractId,
+              projectContext.getProjectDetails(), form);
           AuditService.audit(
               AuditEvent.AWARDED_CONTRACT_UPDATED,
               String.format(
@@ -162,6 +188,7 @@ public class AwardedContractController extends ProjectFormPageController {
         awardedContractId,
         projectContext.getProjectDetails()
     );
+    checkIfUserHasAccessAwardedContract(awardedContract);
     awardedContractService.deleteAwardedContract(awardedContract);
     AuditService.audit(
         AuditEvent.AWARDED_CONTRACT_REMOVED,
@@ -248,5 +275,18 @@ public class AwardedContractController extends ProjectFormPageController {
 
   private String getAwardedContractSummaryUrl(Integer projectId) {
     return ReverseRouter.route(on(AwardedContractController.class).viewAwardedContracts(projectId, null));
+  }
+
+  private void checkIfUserHasAccessAwardedContract(AwardedContract awardedContract) {
+    if (!accessService.canCurrentUserAccessProjectSectionInfo(
+        awardedContract.getProjectDetail(),
+        new OrganisationGroupIdWrapper(awardedContract.getAddedByOrganisationGroup())
+    )) {
+      throw new AccessDeniedException(
+          String.format(
+              "User does not have access to the awarded contract with id: %d",
+              awardedContract.getId())
+      );
+    }
   }
 }

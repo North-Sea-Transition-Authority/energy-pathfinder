@@ -18,48 +18,6 @@ public class AwardedContractViewUtil {
     throw new IllegalStateException("AwardedContractViewUtil is a util class and should not be instantiated");
   }
 
-  public static AwardedContractView from(AwardedContract awardedContract, Integer displayOrder) {
-    return from(awardedContract, displayOrder, true);
-  }
-
-  public static AwardedContractView from(AwardedContract awardedContract, Integer displayOrder, boolean isValid) {
-    var awardedContractView = new AwardedContractView();
-    awardedContractView.setDisplayOrder(displayOrder);
-    awardedContractView.setId(awardedContract.getId());
-
-    var projectId = awardedContract.getProjectDetail().getProject().getId();
-    awardedContractView.setProjectId(projectId);
-    awardedContractView.setContractorName(awardedContract.getContractorName());
-
-    var contractFunction = (awardedContract.getContractFunction() != null)
-        ? new StringWithTag(awardedContract.getContractFunction().getDisplayName(), Tag.NONE)
-        : new StringWithTag(awardedContract.getManualContractFunction(), Tag.NOT_FROM_LIST);
-    awardedContractView.setContractFunction(contractFunction);
-
-    awardedContractView.setDescriptionOfWork(awardedContract.getDescriptionOfWork());
-    awardedContractView.setDateAwarded(DateUtil.formatDate(awardedContract.getDateAwarded()));
-
-    var contractBand = (awardedContract.getContractBand() != null)
-        ? awardedContract.getContractBand().getDisplayName()
-        : null;
-    awardedContractView.setContractBand(contractBand);
-
-    awardedContractView.setContactName(awardedContract.getContactName());
-    awardedContractView.setContactPhoneNumber(awardedContract.getPhoneNumber());
-    awardedContractView.setContactJobTitle(awardedContract.getJobTitle());
-    awardedContractView.setContactEmailAddress(awardedContract.getEmailAddress());
-
-    var summaryLinks = new ArrayList<SummaryLink>();
-    summaryLinks.add(getEditLink(projectId, awardedContract.getId()));
-    summaryLinks.add(getDeleteLink(projectId, awardedContract.getId(), displayOrder));
-
-    awardedContractView.setSummaryLinks(summaryLinks);
-
-    awardedContractView.setIsValid(isValid);
-
-    return awardedContractView;
-  }
-
   public static SummaryLink getEditLink(Integer projectId, Integer awardedContractId) {
     return new SummaryLink(
         SummaryLinkText.EDIT.getDisplayName(),
@@ -81,5 +39,81 @@ public class AwardedContractViewUtil {
             null
         ))
     );
+  }
+
+  public static class AwardedContractViewBuilder {
+
+    private final AwardedContract awardedContract;
+    private final int displayOrder;
+    private boolean isValid = true;
+    private boolean includeSummaryLinks = false;
+
+    public AwardedContractViewBuilder(AwardedContract awardedContract,
+                                      Integer displayOrder) {
+      this.awardedContract = awardedContract;
+      this.displayOrder = displayOrder;
+    }
+
+    public AwardedContractViewBuilder isValid(boolean isValid) {
+      this.isValid = isValid;
+      return this;
+    }
+
+    public AwardedContractViewBuilder includeSummaryLinks(boolean includeSummaryLinks) {
+      this.includeSummaryLinks = includeSummaryLinks;
+      return this;
+    }
+
+    public AwardedContractView build() {
+      return createAwardedContractView(
+          this.awardedContract,
+          this.displayOrder,
+          this.isValid,
+          this.includeSummaryLinks
+      );
+    }
+
+    private static AwardedContractView createAwardedContractView(AwardedContract awardedContract,
+                                                                 int displayOrder,
+                                                                 boolean isValid,
+                                                                 boolean includeSummaryLinks) {
+      var awardedContractView = new AwardedContractView();
+      awardedContractView.setDisplayOrder(displayOrder);
+      awardedContractView.setId(awardedContract.getId());
+
+      var projectId = awardedContract.getProjectDetail().getProject().getId();
+      awardedContractView.setProjectId(projectId);
+      awardedContractView.setContractorName(awardedContract.getContractorName());
+
+      var contractFunction = (awardedContract.getContractFunction() != null)
+          ? new StringWithTag(awardedContract.getContractFunction().getDisplayName(), Tag.NONE)
+          : new StringWithTag(awardedContract.getManualContractFunction(), Tag.NOT_FROM_LIST);
+      awardedContractView.setContractFunction(contractFunction);
+
+      awardedContractView.setDescriptionOfWork(awardedContract.getDescriptionOfWork());
+      awardedContractView.setDateAwarded(DateUtil.formatDate(awardedContract.getDateAwarded()));
+
+      var contractBand = (awardedContract.getContractBand() != null)
+          ? awardedContract.getContractBand().getDisplayName()
+          : null;
+      awardedContractView.setContractBand(contractBand);
+
+      awardedContractView.setContactName(awardedContract.getContactName());
+      awardedContractView.setContactPhoneNumber(awardedContract.getPhoneNumber());
+      awardedContractView.setContactJobTitle(awardedContract.getJobTitle());
+      awardedContractView.setContactEmailAddress(awardedContract.getEmailAddress());
+
+      var summaryLinks = new ArrayList<SummaryLink>();
+      if (includeSummaryLinks) {
+        summaryLinks.add(getEditLink(projectId, awardedContract.getId()));
+        summaryLinks.add(getDeleteLink(projectId, awardedContract.getId(), displayOrder));
+      }
+
+      awardedContractView.setSummaryLinks(summaryLinks);
+
+      awardedContractView.setIsValid(isValid);
+
+      return awardedContractView;
+    }
   }
 }

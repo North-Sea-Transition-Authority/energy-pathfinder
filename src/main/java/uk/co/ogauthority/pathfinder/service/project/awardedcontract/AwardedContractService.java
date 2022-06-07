@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -23,6 +24,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDat
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractForm;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractValidationHint;
+import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.AwardedContractRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
@@ -30,6 +32,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProject
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
@@ -43,6 +46,7 @@ public class AwardedContractService implements ProjectFormSectionService {
   private final SearchSelectorService searchSelectorService;
   private final ProjectSetupService projectSetupService;
   private final EntityDuplicationService entityDuplicationService;
+  private final TeamService teamService;
 
   @Autowired
   public AwardedContractService(FunctionService functionService,
@@ -51,7 +55,8 @@ public class AwardedContractService implements ProjectFormSectionService {
                                 AwardedContractFormValidator awardedContractFormValidator,
                                 SearchSelectorService searchSelectorService,
                                 ProjectSetupService projectSetupService,
-                                EntityDuplicationService entityDuplicationService) {
+                                EntityDuplicationService entityDuplicationService,
+                                TeamService teamService) {
     this.functionService = functionService;
     this.validationService = validationService;
     this.awardedContractRepository = awardedContractRepository;
@@ -59,6 +64,7 @@ public class AwardedContractService implements ProjectFormSectionService {
     this.searchSelectorService = searchSelectorService;
     this.projectSetupService = projectSetupService;
     this.entityDuplicationService = entityDuplicationService;
+    this.teamService = teamService;
   }
 
   public AwardedContractForm getForm(Integer awardedContractId, ProjectDetail projectDetail) {
@@ -107,8 +113,21 @@ public class AwardedContractService implements ProjectFormSectionService {
   }
 
   @Transactional
-  public AwardedContract createAwardedContract(ProjectDetail projectDetail, AwardedContractForm form) {
+  public AwardedContract createAwardedContract(ProjectDetail projectDetail,
+                                               AwardedContractForm form,
+                                               AuthenticatedUserAccount userAccount) {
     var awardedContract = new AwardedContract(projectDetail);
+
+    //TODO PAT-685 make sure only one org is saved when user belongs to mutliple ones
+    var portalOrganisationGroup = teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson())
+        .stream()
+        .map(OrganisationTeam::getPortalOrganisationGroup)
+        .findFirst()
+        .orElseThrow(() -> {
+          throw new PathfinderEntityNotFoundException("Could not get user's portal organisation team");
+        });
+
+    awardedContract.setAddedByOrganisationGroup(portalOrganisationGroup.getOrgGrpId());
     return createOrUpdateAwardedContract(awardedContract, form);
   }
 
