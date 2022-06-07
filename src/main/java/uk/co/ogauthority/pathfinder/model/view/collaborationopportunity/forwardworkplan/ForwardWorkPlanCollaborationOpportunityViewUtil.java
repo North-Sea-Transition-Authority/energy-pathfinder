@@ -23,7 +23,8 @@ public class ForwardWorkPlanCollaborationOpportunityViewUtil {
     private boolean includeSummaryViews = false;
 
     public ForwardWorkPlanCollaborationOpportunityViewBuilder(
-        ForwardWorkPlanCollaborationOpportunity opportunity, Integer displayOrder,
+        ForwardWorkPlanCollaborationOpportunity opportunity,
+        Integer displayOrder,
         List<UploadedFileView> uploadedFileViews) {
       this.opportunity = opportunity;
       this.displayOrder = displayOrder;

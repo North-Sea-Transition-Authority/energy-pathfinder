@@ -28,6 +28,7 @@ public class ForwardWorkPlanUpcomingTenderUtil {
   public static final String EMAIL = ContactDetailsTestUtil.EMAIL;
   public static final DurationPeriod CONTRACT_TERM_DURATION_PERIOD = DurationPeriod.YEARS;
   public static final Integer CONTRACT_TERM_DURATION = 1;
+  public static final Integer ADDED_BY_ORGANISATION_GROUP = 1;
 
   public static final Integer ID = 1;
   public static final Integer PROJECT_ID = 1;
@@ -78,6 +79,7 @@ public class ForwardWorkPlanUpcomingTenderUtil {
     tender.setPhoneNumber(PHONE_NUMBER);
     tender.setJobTitle(JOB_TITLE);
     tender.setEmailAddress(EMAIL);
+    tender.setAddedByOrganisationGroup(ADDED_BY_ORGANISATION_GROUP);
   }
 
   private static void setUpcomingTenderFields(ForwardWorkPlanUpcomingTenderForm form) {

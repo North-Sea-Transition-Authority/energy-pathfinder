@@ -48,6 +48,8 @@ public class ForwardWorkPlanUpcomingTender extends ProjectDetailEntity implement
   @Enumerated(EnumType.STRING)
   private DurationPeriod contractTermDurationPeriod;
 
+  private Integer addedByOrganisationGroup;
+
   public ForwardWorkPlanUpcomingTender() {
   }
 
@@ -157,5 +159,13 @@ public class ForwardWorkPlanUpcomingTender extends ProjectDetailEntity implement
 
   public void setContractTermDurationPeriod(DurationPeriod contractTermDurationPeriod) {
     this.contractTermDurationPeriod = contractTermDurationPeriod;
+  }
+
+  public Integer getAddedByOrganisationGroup() {
+    return addedByOrganisationGroup;
+  }
+
+  public void setAddedByOrganisationGroup(Integer addedByOrganisationGroup) {
+    this.addedByOrganisationGroup = addedByOrganisationGroup;
   }
 }

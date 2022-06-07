@@ -40,11 +40,13 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
     upcomingTender.setManualDepartmentType(null);
 
     final var displayOrder = 1;
-
-    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    var includeSummaryLinks = true;
+    ForwardWorkPlanUpcomingTenderView upcomingTenderView = new ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder
-    );
+    )
+        .includeSummaryLinks(includeSummaryLinks)
+        .build();
 
     assertThat(upcomingTenderView.getTenderDepartment()).isEqualTo(new StringWithTag());
 
@@ -62,10 +64,13 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
 
     final var displayOrder = 2;
 
-    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    var includeSummaryLinks = true;
+    ForwardWorkPlanUpcomingTenderView upcomingTenderView = new ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder
-    );
+    )
+        .includeSummaryLinks(includeSummaryLinks)
+        .build();
 
     assertThat(upcomingTenderView.getTenderDepartment()).isEqualTo(
         new StringWithTag(tenderDepartment.getDisplayName(), Tag.NONE)
@@ -85,10 +90,13 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
 
     final var displayOrder = 2;
 
-    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    var includeSummaryLinks = true;
+    ForwardWorkPlanUpcomingTenderView upcomingTenderView = new ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder
-    );
+    )
+        .includeSummaryLinks(includeSummaryLinks)
+        .build();
 
     assertThat(upcomingTenderView.getTenderDepartment()).isEqualTo(
         new StringWithTag(tenderDepartment, Tag.NOT_FROM_LIST)
@@ -107,10 +115,13 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
 
     final var displayOrder = 2;
 
-    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    var includeSummaryLinks = true;
+    ForwardWorkPlanUpcomingTenderView upcomingTenderView = new ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder
-    );
+    )
+        .includeSummaryLinks(includeSummaryLinks)
+        .build();
 
     assertThat(upcomingTenderView.getContractBand()).isEqualTo(contractBand.getDisplayName());
 
@@ -125,10 +136,13 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
 
     final var displayOrder = 2;
 
-    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    var includeSummaryLinks = true;
+    ForwardWorkPlanUpcomingTenderView upcomingTenderView = new ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder
-    );
+    )
+        .includeSummaryLinks(includeSummaryLinks)
+        .build();
 
     assertThat(upcomingTenderView.getContractBand()).isEmpty();
 
@@ -143,11 +157,14 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
     final var displayOrder = 3;
     final var isValid = true;
 
-    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    var includeSummaryLinks = true;
+    ForwardWorkPlanUpcomingTenderView upcomingTenderView = new ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder(
         upcomingTender,
-        displayOrder,
-        isValid
-    );
+        displayOrder
+    )
+        .includeSummaryLinks(includeSummaryLinks)
+        .isValid(isValid)
+        .build();
 
     assertThat(upcomingTenderView.isValid()).isTrue();
 
@@ -161,12 +178,14 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
 
     final var displayOrder = 3;
     final var isValid = false;
-
-    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    var includeSummaryLinks = true;
+    ForwardWorkPlanUpcomingTenderView upcomingTenderView = new ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder(
         upcomingTender,
-        displayOrder,
-        isValid
-    );
+        displayOrder
+    )
+        .includeSummaryLinks(includeSummaryLinks)
+        .isValid(isValid)
+        .build();
 
     assertThat(upcomingTenderView.isValid()).isFalse();
 
@@ -182,10 +201,13 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
 
     final var displayOrder = 1;
 
-    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    var includeSummaryLinks = true;
+    ForwardWorkPlanUpcomingTenderView upcomingTenderView = new ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder
-    );
+    )
+        .includeSummaryLinks(includeSummaryLinks)
+        .build();
 
     assertThat(upcomingTenderView.getContractLength()).isEmpty();
     assertCommonProperties(upcomingTenderView, upcomingTender, displayOrder);
@@ -200,10 +222,13 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
 
     final var displayOrder = 1;
 
-    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    var includeSummaryLinks = true;
+    ForwardWorkPlanUpcomingTenderView upcomingTenderView = new ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder
-    );
+    )
+        .includeSummaryLinks(includeSummaryLinks)
+        .build();
 
     assertThat(upcomingTenderView.getContractLength()).isEmpty();
     assertCommonProperties(upcomingTenderView, upcomingTender, displayOrder);
@@ -218,13 +243,34 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
 
     final var displayOrder = 1;
 
-    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    var includeSummaryLinks = true;
+    ForwardWorkPlanUpcomingTenderView upcomingTenderView = new ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder
-    );
+    )
+        .includeSummaryLinks(includeSummaryLinks)
+        .build();
 
     assertThat(upcomingTenderView.getContractLength()).isEmpty();
     assertCommonProperties(upcomingTenderView, upcomingTender, displayOrder);
+  }
+
+  @Test
+  public void createUpcomingTenderView_whenNotIncludeSummaryLinks_thenNoLinks() {
+
+    var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+
+    final var displayOrder = 1;
+    var includeSummaryLinks = false;
+
+    ForwardWorkPlanUpcomingTenderView upcomingTenderView = new ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder(
+        upcomingTender,
+        displayOrder
+    )
+        .includeSummaryLinks(includeSummaryLinks)
+        .build();
+
+    assertThat(upcomingTenderView.getSummaryLinks()).isEmpty();
   }
 
   @Test
@@ -265,10 +311,13 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
 
     final var displayOrder = 1;
 
-    final var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    var includeSummaryLinks = true;
+    ForwardWorkPlanUpcomingTenderView upcomingTenderView = new ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder
-    );
+    )
+        .includeSummaryLinks(includeSummaryLinks)
+        .build();
 
     assertThat(upcomingTenderView.getContractLength()).isEqualTo(expectedContractTermString);
     assertCommonProperties(upcomingTenderView, upcomingTender, displayOrder);

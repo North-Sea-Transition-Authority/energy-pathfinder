@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormCommon;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
+import uk.co.ogauthority.pathfinder.model.team.Team;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.TestCollaborationOpportunityCommon;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;

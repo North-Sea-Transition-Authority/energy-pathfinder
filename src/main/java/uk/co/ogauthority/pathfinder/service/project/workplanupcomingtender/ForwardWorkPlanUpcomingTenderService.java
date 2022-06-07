@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -25,6 +26,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarte
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderValidationHint;
+import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
@@ -32,6 +34,7 @@ import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
@@ -45,6 +48,7 @@ public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionS
   private final SearchSelectorService searchSelectorService;
   private final EntityDuplicationService entityDuplicationService;
   private final ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
+  private final TeamService teamService;
 
   @Autowired
   public ForwardWorkPlanUpcomingTenderService(FunctionService functionService,
@@ -53,7 +57,8 @@ public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionS
                                               ForwardWorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository,
                                               SearchSelectorService searchSelectorService,
                                               EntityDuplicationService entityDuplicationService,
-                                              ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService) {
+                                              ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService,
+                                              TeamService teamService) {
     this.functionService = functionService;
     this.validationService = validationService;
     this.workPlanUpcomingTenderFormValidator = workPlanUpcomingTenderFormValidator;
@@ -61,6 +66,7 @@ public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionS
     this.searchSelectorService = searchSelectorService;
     this.entityDuplicationService = entityDuplicationService;
     this.forwardWorkPlanTenderSetupService = forwardWorkPlanTenderSetupService;
+    this.teamService = teamService;
   }
 
   public List<RestSearchItem> findDepartmentTenderLikeWithManualEntry(String searchTerm) {
@@ -116,8 +122,20 @@ public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionS
 
   @Transactional
   public ForwardWorkPlanUpcomingTender createUpcomingTender(ProjectDetail detail,
-                                                            ForwardWorkPlanUpcomingTenderForm form) {
+                                                            ForwardWorkPlanUpcomingTenderForm form,
+                                                            AuthenticatedUserAccount userAccount) {
     var upcomingTender = new ForwardWorkPlanUpcomingTender(detail);
+
+    //TODO PAT-685 make sure only one org is saved when user belongs to mutliple ones
+    var portalOrganisationGroup = teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson())
+        .stream()
+        .map(OrganisationTeam::getPortalOrganisationGroup)
+        .findFirst()
+        .orElseThrow(() -> {
+          throw new PathfinderEntityNotFoundException("Could not get user's portal organisation team");
+        });
+
+    upcomingTender.setAddedByOrganisationGroup(portalOrganisationGroup.getOrgGrpId());
     return updateUpcomingTender(upcomingTender, form);
   }
 

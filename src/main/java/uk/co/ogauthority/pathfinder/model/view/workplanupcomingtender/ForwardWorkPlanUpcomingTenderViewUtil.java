@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.ArrayList;
 import java.util.List;
 import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
@@ -21,92 +22,128 @@ public class ForwardWorkPlanUpcomingTenderViewUtil {
     );
   }
 
-  public static ForwardWorkPlanUpcomingTenderView createUpcomingTenderView(ForwardWorkPlanUpcomingTender workPlanUpcomingTender,
-                                                                           Integer displayOrder) {
-    var projectId = workPlanUpcomingTender.getProjectDetail().getProject().getId();
-    var tenderView = new ForwardWorkPlanUpcomingTenderView(
-        displayOrder,
-        workPlanUpcomingTender.getId(),
-        projectId
-    );
+  public static class ForwardWorkPlanUpcomingTenderViewBuilder {
 
-    var tenderFunction = new StringWithTag();
+    private final ForwardWorkPlanUpcomingTender forwardWorkPlanUpcomingTender;
+    private final int displayOrder;
+    private boolean isValid = true;
+    private boolean includeSummaryLinks = false;
 
-    if (workPlanUpcomingTender.getDepartmentType() != null) {
-      tenderFunction = new StringWithTag(workPlanUpcomingTender.getDepartmentType().getDisplayName(), Tag.NONE);
-    } else if (workPlanUpcomingTender.getManualDepartmentType() != null) {
-      tenderFunction = new StringWithTag(workPlanUpcomingTender.getManualDepartmentType(), Tag.NOT_FROM_LIST);
+    public ForwardWorkPlanUpcomingTenderViewBuilder(ForwardWorkPlanUpcomingTender forwardWorkPlanUpcomingTender,
+                                                    int displayOrder) {
+      this.forwardWorkPlanUpcomingTender = forwardWorkPlanUpcomingTender;
+      this.displayOrder = displayOrder;
     }
 
-    tenderView.setTenderDepartment(tenderFunction);
-    tenderView.setDescriptionOfWork(workPlanUpcomingTender.getDescriptionOfWork());
-    tenderView.setEstimatedTenderStartDate(DateUtil.getDateFromQuarterYear(
-        workPlanUpcomingTender.getEstimatedTenderDateQuarter(), workPlanUpcomingTender.getEstimatedTenderDateYear()));
-    tenderView.setContractBand(
-        workPlanUpcomingTender.getContractBand() != null
-            ? workPlanUpcomingTender.getContractBand().getDisplayName()
-            : ""
-    );
+    public ForwardWorkPlanUpcomingTenderViewBuilder isValid(boolean isValid) {
+      this.isValid = isValid;
+      return this;
+    }
 
-    tenderView.setContactName(workPlanUpcomingTender.getContactName());
-    tenderView.setContactPhoneNumber(workPlanUpcomingTender.getPhoneNumber());
-    tenderView.setContactEmailAddress(workPlanUpcomingTender.getEmailAddress());
-    tenderView.setContactJobTitle(workPlanUpcomingTender.getJobTitle());
+    public ForwardWorkPlanUpcomingTenderViewBuilder includeSummaryLinks(boolean includeSummaryLinks) {
+      this.includeSummaryLinks = includeSummaryLinks;
+      return this;
+    }
 
-    var contractLength = getContractLength(
-        workPlanUpcomingTender.getContractTermDurationPeriod(),
-        workPlanUpcomingTender.getContractTermDuration()
-    );
-
-    tenderView.setContractLength(contractLength);
-
-    var editLink = new SummaryLink(
-        SummaryLinkText.EDIT.getDisplayName(),
-        ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).editUpcomingTender(
-            projectId,
-            workPlanUpcomingTender.getId(),
-            null
-        ))
-    );
-
-    var removeLink = new SummaryLink(
-        SummaryLinkText.DELETE.getDisplayName(),
-        ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).removeUpcomingTenderConfirm(
-            projectId,
-            workPlanUpcomingTender.getId(),
-            displayOrder,
-            null
-        ))
-    );
-
-    tenderView.setSummaryLinks(List.of(editLink, removeLink));
-
-    return tenderView;
-  }
-
-  public static ForwardWorkPlanUpcomingTenderView createUpcomingTenderView(ForwardWorkPlanUpcomingTender workPlanUpcomingTender,
-                                                                           Integer displayOrder,
-                                                                           Boolean isValid) {
-    var view = createUpcomingTenderView(workPlanUpcomingTender, displayOrder);
-    view.setIsValid(isValid);
-    return view;
-  }
-
-  private static String getContractLength(DurationPeriod contractTermDurationPeriod,
-                                          Integer contractTermDuration) {
-
-    var contractLength = "";
-
-    if (contractTermDuration != null && contractTermDurationPeriod != null) {
-      contractLength = String.format(
-          "%s %s",
-          contractTermDuration,
-          (contractTermDuration == 1)
-              ? contractTermDurationPeriod.getDisplayNameSingular().toLowerCase()
-              : contractTermDurationPeriod.getDisplayNamePlural().toLowerCase()
+    public ForwardWorkPlanUpcomingTenderView build() {
+      return createUpcomingTenderView(
+          this.forwardWorkPlanUpcomingTender,
+          this.displayOrder,
+          this.isValid,
+          this.includeSummaryLinks
       );
     }
 
-    return contractLength;
+    private static ForwardWorkPlanUpcomingTenderView createUpcomingTenderView(
+        ForwardWorkPlanUpcomingTender forwardWorkPlanUpcomingTender,
+        Integer displayOrder,
+        boolean isValid,
+        boolean includeSummaryLinks) {
+      var projectId = forwardWorkPlanUpcomingTender.getProjectDetail().getProject().getId();
+      var workPlanUpcomingTenderView = new ForwardWorkPlanUpcomingTenderView(
+          displayOrder,
+          forwardWorkPlanUpcomingTender.getId(),
+          projectId
+      );
+
+      var tenderFunction = new StringWithTag();
+
+      if (forwardWorkPlanUpcomingTender.getDepartmentType() != null) {
+        tenderFunction = new StringWithTag(forwardWorkPlanUpcomingTender.getDepartmentType().getDisplayName(),
+            Tag.NONE);
+      } else if (forwardWorkPlanUpcomingTender.getManualDepartmentType() != null) {
+        tenderFunction = new StringWithTag(forwardWorkPlanUpcomingTender.getManualDepartmentType(), Tag.NOT_FROM_LIST);
+      }
+
+      workPlanUpcomingTenderView.setTenderDepartment(tenderFunction);
+      workPlanUpcomingTenderView.setDescriptionOfWork(forwardWorkPlanUpcomingTender.getDescriptionOfWork());
+      workPlanUpcomingTenderView.setEstimatedTenderStartDate(DateUtil.getDateFromQuarterYear(
+          forwardWorkPlanUpcomingTender.getEstimatedTenderDateQuarter(),
+          forwardWorkPlanUpcomingTender.getEstimatedTenderDateYear()));
+      workPlanUpcomingTenderView.setContractBand(
+          forwardWorkPlanUpcomingTender.getContractBand() != null
+              ? forwardWorkPlanUpcomingTender.getContractBand().getDisplayName()
+              : ""
+      );
+
+      workPlanUpcomingTenderView.setContactName(forwardWorkPlanUpcomingTender.getContactName());
+      workPlanUpcomingTenderView.setContactPhoneNumber(forwardWorkPlanUpcomingTender.getPhoneNumber());
+      workPlanUpcomingTenderView.setContactEmailAddress(forwardWorkPlanUpcomingTender.getEmailAddress());
+      workPlanUpcomingTenderView.setContactJobTitle(forwardWorkPlanUpcomingTender.getJobTitle());
+
+      var contractLength = getContractLength(
+          forwardWorkPlanUpcomingTender.getContractTermDurationPeriod(),
+          forwardWorkPlanUpcomingTender.getContractTermDuration()
+      );
+
+      workPlanUpcomingTenderView.setContractLength(contractLength);
+
+      List<SummaryLink> summaryLinks = new ArrayList<>();
+      if (includeSummaryLinks) {
+        var editLink = new SummaryLink(
+            SummaryLinkText.EDIT.getDisplayName(),
+            ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).editUpcomingTender(
+                projectId,
+                forwardWorkPlanUpcomingTender.getId(),
+                null
+            ))
+        );
+        summaryLinks.add(editLink);
+
+        var removeLink = new SummaryLink(
+            SummaryLinkText.DELETE.getDisplayName(),
+            ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).removeUpcomingTenderConfirm(
+                projectId,
+                forwardWorkPlanUpcomingTender.getId(),
+                displayOrder,
+                null
+            ))
+        );
+        summaryLinks.add(removeLink);
+      }
+
+      workPlanUpcomingTenderView.setSummaryLinks(summaryLinks);
+      workPlanUpcomingTenderView.setIsValid(isValid);
+
+      return workPlanUpcomingTenderView;
+    }
+
+    private static String getContractLength(DurationPeriod contractTermDurationPeriod,
+                                            Integer contractTermDuration) {
+
+      var contractLength = "";
+
+      if (contractTermDuration != null && contractTermDurationPeriod != null) {
+        contractLength = String.format(
+            "%s %s",
+            contractTermDuration,
+            (contractTermDuration == 1)
+                ? contractTermDurationPeriod.getDisplayNameSingular().toLowerCase()
+                : contractTermDurationPeriod.getDisplayNamePlural().toLowerCase()
+        );
+      }
+
+      return contractLength;
+    }
   }
 }

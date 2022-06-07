@@ -43,6 +43,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.Fo
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanUpcomingTenderViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
+import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanTenderCompletionService;
@@ -85,6 +86,9 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
   @MockBean
   protected ForwardWorkPlanTenderCompletionService forwardWorkPlanTenderCompletionService;
 
+  @MockBean
+  protected AccessService accessService;
+
   private final AuthenticatedUserAccount unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
@@ -105,17 +109,18 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
   @Before
   public void setup() {
     when(workPlanUpcomingTenderService.getOrError(UPCOMING_TENDER_ID)).thenReturn(workPlanUpcomingTender);
-    var upcomingTenderView = ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(
+    var upcomingTenderView =  new ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder(
         workPlanUpcomingTender,
         DISPLAY_ORDER
-    );
+    ).build();
     when(workPlanUpcomingTenderSummaryService.getUpcomingTenderView(workPlanUpcomingTender, DISPLAY_ORDER)).thenReturn(upcomingTenderView);
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
     when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeam(projectDetail, unauthenticatedUser)).thenReturn(false);
-    when(workPlanUpcomingTenderService.createUpcomingTender(any(), any())).thenReturn(ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail));
+    when(workPlanUpcomingTenderService.createUpcomingTender(any(), any(), any())).thenReturn(ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail));
     when(workPlanUpcomingTenderService.updateUpcomingTender(any(), any())).thenReturn(ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail));
     when(workPlanUpcomingTenderModelService.getUpcomingTenderFormModelAndView(eq(projectDetail), any())).thenReturn(new ModelAndView(""));
+    when(accessService.canCurrentUserAccessProjectSectionInfo(any(), any())).thenReturn(true);
 
     projectControllerTesterService = new ProjectControllerTesterService(
         mockMvc,
@@ -201,7 +206,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class)
-            .saveUpcomingTender(PROJECT_ID, null, null, null, null)
+            .saveUpcomingTender(PROJECT_ID, null, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())
@@ -209,7 +214,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
         .andExpect(status().is3xxRedirection());
 
     verify(workPlanUpcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(workPlanUpcomingTenderService, times(1)).createUpcomingTender(any(), any());
+    verify(workPlanUpcomingTenderService, times(1)).createUpcomingTender(any(), any(), eq(authenticatedUser));
   }
 
    @Test
@@ -224,7 +229,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
 
      mockMvc.perform(
          post(ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class)
-             .saveUpcomingTender(PROJECT_ID, null, null, null, null)
+             .saveUpcomingTender(PROJECT_ID, null, null, null, null, null)
          ))
              .with(authenticatedUserAndSession(authenticatedUser))
              .with(csrf())
@@ -232,7 +237,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
          .andExpect(status().is2xxSuccessful());
 
      verify(workPlanUpcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-     verify(workPlanUpcomingTenderService, times(0)).createUpcomingTender(any(), any());
+     verify(workPlanUpcomingTenderService, times(0)).createUpcomingTender(any(), any(), eq(authenticatedUser));
    }
 
   @Test
@@ -246,7 +251,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class)
-            .saveUpcomingTender(PROJECT_ID, null, null, null, null)
+            .saveUpcomingTender(PROJECT_ID, null, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())
@@ -254,7 +259,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
         .andExpect(status().is3xxRedirection());
 
     verify(workPlanUpcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(workPlanUpcomingTenderService, times(1)).createUpcomingTender(any(), any());
+    verify(workPlanUpcomingTenderService, times(1)).createUpcomingTender(any(), any(), eq(authenticatedUser));
   }
 
   @Test
@@ -269,7 +274,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class)
-            .saveUpcomingTender(PROJECT_ID, null, null, null, null)
+            .saveUpcomingTender(PROJECT_ID, null, null, null, null, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
             .with(csrf())
@@ -277,7 +282,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
         .andExpect(status().is2xxSuccessful());
 
     verify(workPlanUpcomingTenderService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(workPlanUpcomingTenderService, times(0)).createUpcomingTender(any(), any());
+    verify(workPlanUpcomingTenderService, times(0)).createUpcomingTender(any(), any(), any());
   }
 
   @Test
@@ -558,5 +563,84 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
         eq(projectDetail),
         any()
     );
+  }
+
+  @Test
+  public void editUpcomingTender_userCantAccessTender_thenAccessForbidden() throws Exception {
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        eq(workPlanUpcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(false);
+
+    mockMvc.perform(
+            get(ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class)
+                .editUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, null)
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void updateUpcomingTender_userCantAccessTender_thenAccessForbidden() throws Exception {
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        eq(workPlanUpcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(false);
+
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    mockMvc.perform(
+            post(ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class)
+                .updateUpcomingTender(
+                    PROJECT_ID,
+                    UPCOMING_TENDER_ID,
+                    null,
+                    new ForwardWorkPlanUpcomingTenderForm(),
+                    null,
+                    null
+                )
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser))
+                .with(csrf())
+                .params(completeParams))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void removeUpcomingTenderConfirm_userCantAccessTender_thenAccessForbidden() throws Exception {
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        eq(workPlanUpcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(false);
+
+    mockMvc.perform(
+            get(ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class)
+                .removeUpcomingTenderConfirm(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void removeUpcomingTender_userCantAccessTender_thenAccessForbidden() throws Exception {
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        eq(workPlanUpcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(false);
+
+    mockMvc.perform(
+            post(ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class)
+                .removeUpcomingTender(
+                    PROJECT_ID,
+                    UPCOMING_TENDER_ID,
+                    DISPLAY_ORDER,
+                    null
+                )
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser))
+                .with(csrf()))
+        .andExpect(status().isForbidden());
   }
 }
