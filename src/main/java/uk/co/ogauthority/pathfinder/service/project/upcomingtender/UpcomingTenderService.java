@@ -29,13 +29,12 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDesc
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderValidationHint;
-import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
@@ -57,7 +56,7 @@ public class UpcomingTenderService implements ProjectFormSectionService {
   private final ProjectSetupService projectSetupService;
   private final EntityDuplicationService entityDuplicationService;
   private final TeamService teamService;
-  private final AccessService accessService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   @Autowired
   public UpcomingTenderService(UpcomingTenderRepository upcomingTenderRepository,
@@ -70,7 +69,7 @@ public class UpcomingTenderService implements ProjectFormSectionService {
                                ProjectSetupService projectSetupService,
                                EntityDuplicationService entityDuplicationService,
                                TeamService teamService,
-                               AccessService accessService) {
+                               ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     this.upcomingTenderRepository = upcomingTenderRepository;
     this.validationService = validationService;
     this.upcomingTenderFormValidator = upcomingTenderFormValidator;
@@ -81,7 +80,7 @@ public class UpcomingTenderService implements ProjectFormSectionService {
     this.projectSetupService = projectSetupService;
     this.entityDuplicationService = entityDuplicationService;
     this.teamService = teamService;
-    this.accessService = accessService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
   }
 
   @Transactional
@@ -90,16 +89,7 @@ public class UpcomingTenderService implements ProjectFormSectionService {
                                              AuthenticatedUserAccount userAccount) {
     var upcomingTender = new UpcomingTender(detail);
     setCommonFields(upcomingTender, form);
-
-    //TODO PAT-685 make sure only one org is saved when user belongs to mutliple ones
-    var portalOrganisationGroup = teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson())
-        .stream()
-        .map(OrganisationTeam::getPortalOrganisationGroup)
-        .findFirst()
-        .orElseThrow(() -> {
-          throw new PathfinderEntityNotFoundException("Could not get user's portal organisation team");
-        });
-
+    var portalOrganisationGroup = teamService.getContributorPortalOrganisationGroup(userAccount);
     upcomingTender.setAddedByOrganisationGroup(portalOrganisationGroup.getOrgGrpId());
     upcomingTender = upcomingTenderRepository.save(upcomingTender);
 
@@ -152,7 +142,7 @@ public class UpcomingTenderService implements ProjectFormSectionService {
   }
 
   public boolean canCurrentUserAccessTender(UpcomingTender upcomingTender) {
-    return accessService.canCurrentUserAccessProjectSectionInfo(
+    return projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         upcomingTender.getProjectDetail(),
         new OrganisationGroupIdWrapper(upcomingTender.getAddedByOrganisationGroup())
     );

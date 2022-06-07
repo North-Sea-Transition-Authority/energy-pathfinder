@@ -13,8 +13,8 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure.InfrastructureCollaborationOpportunityView;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
@@ -32,16 +32,16 @@ public class InfrastructureCollaborationOpportunitiesSummaryService extends
 
   private final InfrastructureCollaborationOpportunitiesService infrastructureCollaborationOpportunitiesService;
   private final InfrastructureCollaborationOpportunityFileLinkService infrastructureCollaborationOpportunityFileLinkService;
-  private final AccessService accessService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   @Autowired
   public InfrastructureCollaborationOpportunitiesSummaryService(
       InfrastructureCollaborationOpportunitiesService infrastructureCollaborationOpportunitiesService,
       InfrastructureCollaborationOpportunityFileLinkService infrastructureCollaborationOpportunityFileLinkService,
-      AccessService accessService) {
+      ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     this.infrastructureCollaborationOpportunitiesService = infrastructureCollaborationOpportunitiesService;
     this.infrastructureCollaborationOpportunityFileLinkService = infrastructureCollaborationOpportunityFileLinkService;
-    this.accessService = accessService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
   }
 
   public List<InfrastructureCollaborationOpportunityView> getSummaryViews(ProjectDetail detail) {
@@ -118,7 +118,7 @@ public class InfrastructureCollaborationOpportunitiesSummaryService extends
       InfrastructureCollaborationOpportunity opportunity,
       Integer displayOrder) {
     var uploadedFileViews = getUploadedFileViews(opportunity);
-    var includeLinks = accessService.canCurrentUserAccessProjectSectionInfo(
+    var includeLinks = projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         opportunity.getProjectDetail(),
         new OrganisationGroupIdWrapper(opportunity.getAddedByOrganisationGroup())
     );

@@ -88,8 +88,6 @@ public class AwardedContractServiceTest {
         teamService);
 
     when(awardedContractRepository.save(any(AwardedContract.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
-    when(teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson()))
-        .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup)));
 
   }
 
@@ -197,6 +195,7 @@ public class AwardedContractServiceTest {
 
   @Test
   public void createAwardedContract() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     var form = AwardedContractTestUtil.createAwardedContractForm();
     var projectDetail = ProjectUtil.getProjectDetails();
 
@@ -211,6 +210,7 @@ public class AwardedContractServiceTest {
 
   @Test
   public void createAwardedContract_withManualContractFunction() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     var form = AwardedContractTestUtil.createAwardedContractForm();
 
     var manualEntryFunction = SearchSelectablePrefix.FREE_TEXT_PREFIX + "my new function";

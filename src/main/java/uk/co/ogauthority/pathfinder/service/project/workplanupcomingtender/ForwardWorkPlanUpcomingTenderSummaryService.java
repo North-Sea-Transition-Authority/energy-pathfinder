@@ -12,8 +12,8 @@ import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanUpcomingTenderView;
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanUpcomingTenderViewUtil;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
@@ -21,14 +21,14 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 public class ForwardWorkPlanUpcomingTenderSummaryService {
 
   private final ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
-  private final AccessService accessService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   @Autowired
   public ForwardWorkPlanUpcomingTenderSummaryService(
       ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService,
-      AccessService accessService) {
+      ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     this.workPlanUpcomingTenderService = workPlanUpcomingTenderService;
-    this.accessService = accessService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
   }
 
   public List<ForwardWorkPlanUpcomingTenderView> getSummaryViews(ProjectDetail projectDetail) {
@@ -90,7 +90,7 @@ public class ForwardWorkPlanUpcomingTenderSummaryService {
   private ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder getForwardWorkPlanUpcomingTenderViewBuilder(
       ForwardWorkPlanUpcomingTender forwardWorkPlanUpcomingTender,
       Integer displayOrder) {
-    var includeLinks = accessService.canCurrentUserAccessProjectSectionInfo(
+    var includeLinks = projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         forwardWorkPlanUpcomingTender.getProjectDetail(),
         new OrganisationGroupIdWrapper(forwardWorkPlanUpcomingTender.getAddedByOrganisationGroup())
     );

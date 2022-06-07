@@ -29,8 +29,8 @@ import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.Fo
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanTenderCompletionService;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanTenderRoutingService;
@@ -59,7 +59,7 @@ public class ForwardWorkPlanUpcomingTenderController {
   private final ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
   private final ForwardWorkPlanTenderRoutingService forwardWorkPlanTenderRoutingService;
   private final ForwardWorkPlanTenderCompletionService forwardWorkPlanTenderCompletionService;
-  private final AccessService accessService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   @Autowired
   public ForwardWorkPlanUpcomingTenderController(
@@ -70,7 +70,7 @@ public class ForwardWorkPlanUpcomingTenderController {
       ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService,
       ForwardWorkPlanTenderRoutingService forwardWorkPlanTenderRoutingService,
       ForwardWorkPlanTenderCompletionService forwardWorkPlanTenderCompletionService,
-      AccessService accessService) {
+      ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     this.workPlanUpcomingTenderService = workPlanUpcomingTenderService;
     this.workPlanUpcomingTenderSummaryService = workPlanUpcomingTenderSummaryService;
     this.controllerHelperService = controllerHelperService;
@@ -78,7 +78,7 @@ public class ForwardWorkPlanUpcomingTenderController {
     this.forwardWorkPlanTenderSetupService = forwardWorkPlanTenderSetupService;
     this.forwardWorkPlanTenderRoutingService = forwardWorkPlanTenderRoutingService;
     this.forwardWorkPlanTenderCompletionService = forwardWorkPlanTenderCompletionService;
-    this.accessService = accessService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
   }
 
   @GetMapping("/setup")
@@ -275,7 +275,7 @@ public class ForwardWorkPlanUpcomingTenderController {
   }
 
   private void checkIfUserHasAccessToTender(ForwardWorkPlanUpcomingTender upcomingTender) {
-    if (!accessService.canCurrentUserAccessProjectSectionInfo(
+    if (!projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         upcomingTender.getProjectDetail(),
         new OrganisationGroupIdWrapper(upcomingTender.getAddedByOrganisationGroup())
     )) {

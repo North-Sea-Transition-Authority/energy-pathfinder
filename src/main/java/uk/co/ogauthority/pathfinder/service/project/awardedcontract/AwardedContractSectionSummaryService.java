@@ -16,8 +16,8 @@ import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractVi
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
@@ -36,18 +36,18 @@ public class AwardedContractSectionSummaryService implements ProjectSectionSumma
   private final AwardedContractService awardedContractService;
   private final DifferenceService differenceService;
   private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
-  private final AccessService accessService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   @Autowired
   public AwardedContractSectionSummaryService(
       AwardedContractService awardedContractService,
       DifferenceService differenceService,
       ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService,
-      AccessService accessService) {
+      ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     this.awardedContractService = awardedContractService;
     this.differenceService = differenceService;
     this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
-    this.accessService = accessService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
   }
 
   @Override
@@ -114,7 +114,7 @@ public class AwardedContractSectionSummaryService implements ProjectSectionSumma
 
   private AwardedContractViewUtil.AwardedContractViewBuilder getAwardedContractViewBuilder(AwardedContract awardedContract,
                                                                                            int displayNumber) {
-    var includeSummaryLinks = accessService.canCurrentUserAccessProjectSectionInfo(
+    var includeSummaryLinks = projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         awardedContract.getProjectDetail(),
         new OrganisationGroupIdWrapper(awardedContract.getAddedByOrganisationGroup())
     );

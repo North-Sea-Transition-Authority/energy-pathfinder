@@ -11,14 +11,14 @@ import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.util.SecurityUtil;
 
 @Service
-public class AccessService {
+public class ProjectSectionItemOwnershipService {
 
   private final ProjectOperatorService projectOperatorService;
   private final TeamService teamService;
 
   @Autowired
-  public AccessService(ProjectOperatorService projectOperatorService,
-                       TeamService teamService) {
+  public ProjectSectionItemOwnershipService(ProjectOperatorService projectOperatorService,
+                                            TeamService teamService) {
     this.projectOperatorService = projectOperatorService;
     this.teamService = teamService;
   }

@@ -49,7 +49,7 @@ import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastr
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
@@ -81,7 +81,7 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
   protected FileDownloadService fileDownloadService;
 
   @MockBean
-  protected AccessService accessService;
+  protected ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private ProjectControllerTesterService projectControllerTesterService;
 
@@ -124,7 +124,7 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail));
     when(projectDetailFileService.getProjectDetailFileByProjectDetailVersionAndFileId(any(), any(), any())).thenReturn(PROJECT_DETAIL_FILE);
     when(projectDetailFileService.getUploadedFileById(FILE_ID)).thenReturn(file);
-    when(accessService.canCurrentUserAccessProjectSectionInfo(any(), any())).thenReturn(true);
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(any(), any())).thenReturn(true);
 
     projectControllerTesterService = new ProjectControllerTesterService(
         mockMvc,
@@ -596,7 +596,7 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
     when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID))
         .thenReturn(collaborationOpportunity);
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         any(),
         any())
     ).thenReturn(false);
@@ -615,7 +615,7 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
     when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID))
         .thenReturn(collaborationOpportunity);
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         any(),
         any())
     ).thenReturn(false);
@@ -647,7 +647,7 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
     when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID))
         .thenReturn(collaborationOpportunity);
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         any(),
         any())
     ).thenReturn(false);
@@ -666,7 +666,7 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
     when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID))
         .thenReturn(collaborationOpportunity);
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         any(),
         any())
     ).thenReturn(false);

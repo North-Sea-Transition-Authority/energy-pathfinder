@@ -12,8 +12,8 @@ import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunit
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationOpportunityView;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
@@ -27,16 +27,16 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryService extends
 
   private final ForwardWorkPlanCollaborationOpportunityService forwardWorkPlanCollaborationOpportunityService;
   private final ForwardWorkPlanCollaborationOpportunityFileLinkService forwardWorkPlanCollaborationOpportunityFileLinkService;
-  private final AccessService accessService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   @Autowired
   public ForwardWorkPlanCollaborationOpportunitiesSummaryService(
       ForwardWorkPlanCollaborationOpportunityService forwardWorkPlanCollaborationOpportunityService,
       ForwardWorkPlanCollaborationOpportunityFileLinkService forwardWorkPlanCollaborationOpportunityFileLinkService,
-      AccessService accessService) {
+      ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     this.forwardWorkPlanCollaborationOpportunityService = forwardWorkPlanCollaborationOpportunityService;
     this.forwardWorkPlanCollaborationOpportunityFileLinkService = forwardWorkPlanCollaborationOpportunityFileLinkService;
-    this.accessService = accessService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
   }
 
   public List<ForwardWorkPlanCollaborationOpportunityView> getSummaryViews(ProjectDetail projectDetail) {
@@ -117,7 +117,7 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryService extends
       ForwardWorkPlanCollaborationOpportunity opportunity,
       Integer displayOrder) {
     var uploadedFileViews = getUploadedFileViews(opportunity);
-    var includeSummaryLinks = accessService.canCurrentUserAccessProjectSectionInfo(
+    var includeSummaryLinks = projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         opportunity.getProjectDetail(),
         new OrganisationGroupIdWrapper(opportunity.getAddedByOrganisationGroup())
     );

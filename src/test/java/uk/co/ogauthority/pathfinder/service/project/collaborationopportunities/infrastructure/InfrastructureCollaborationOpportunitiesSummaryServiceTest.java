@@ -19,7 +19,7 @@ import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure.InfrastructureCollaborationOpportunityView;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
@@ -34,7 +34,7 @@ public class InfrastructureCollaborationOpportunitiesSummaryServiceTest {
   private InfrastructureCollaborationOpportunityFileLinkService infrastructureCollaborationOpportunityFileLinkService;
 
   @Mock
-  private AccessService accessService;
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private InfrastructureCollaborationOpportunitiesSummaryService infrastructureCollaborationOpportunitiesSummaryService;
 
@@ -49,7 +49,7 @@ public class InfrastructureCollaborationOpportunitiesSummaryServiceTest {
     infrastructureCollaborationOpportunitiesSummaryService = new InfrastructureCollaborationOpportunitiesSummaryService(
         infrastructureCollaborationOpportunitiesService,
         infrastructureCollaborationOpportunityFileLinkService,
-        accessService);
+        projectSectionItemOwnershipService);
     when(infrastructureCollaborationOpportunitiesService.getOpportunitiesForDetail(detail)).thenReturn(
         List.of(opportunity, manualEntryOpportunity)
     );
@@ -143,7 +143,7 @@ public class InfrastructureCollaborationOpportunitiesSummaryServiceTest {
     final var project = detail.getProject();
     final var version = detail.getVersion();
 
-    when(accessService.canCurrentUserAccessProjectSectionInfo(eq(detail), any())).thenReturn(true);
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(detail), any())).thenReturn(true);
     when(infrastructureCollaborationOpportunitiesService.getOpportunitiesForProjectVersion(project, version))
         .thenReturn(List.of(collaborationOpportunity));
 

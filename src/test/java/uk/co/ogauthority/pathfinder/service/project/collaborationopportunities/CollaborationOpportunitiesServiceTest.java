@@ -21,7 +21,6 @@ import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormCommon;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
-import uk.co.ogauthority.pathfinder.model.team.Team;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.TestCollaborationOpportunityCommon;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
@@ -312,9 +311,8 @@ public class CollaborationOpportunitiesServiceTest {
   public void setAddedByOrganisationGroup_thenCollaborationOpportunityEntityHasOrganisationGroupId() {
     var user = UserTestingUtil.getAuthenticatedUserAccount();
     var portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
-    var organisationTeam = TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup);
     var collaborationOpportunity = new TestCollaborationOpportunityCommon();
-    when(teamService.getOrganisationTeamsPersonIsMemberOf(user.getLinkedPerson())).thenReturn(List.of(organisationTeam));
+    when(teamService.getContributorPortalOrganisationGroup(user)).thenReturn(portalOrganisationGroup);
 
     collaborationOpportunitiesService.setAddedByOrganisationGroup(collaborationOpportunity, user);
 

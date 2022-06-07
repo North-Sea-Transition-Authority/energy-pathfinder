@@ -24,7 +24,6 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDat
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractForm;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractValidationHint;
-import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.AwardedContractRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
@@ -117,15 +116,7 @@ public class AwardedContractService implements ProjectFormSectionService {
                                                AwardedContractForm form,
                                                AuthenticatedUserAccount userAccount) {
     var awardedContract = new AwardedContract(projectDetail);
-
-    //TODO PAT-685 make sure only one org is saved when user belongs to mutliple ones
-    var portalOrganisationGroup = teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson())
-        .stream()
-        .map(OrganisationTeam::getPortalOrganisationGroup)
-        .findFirst()
-        .orElseThrow(() -> {
-          throw new PathfinderEntityNotFoundException("Could not get user's portal organisation team");
-        });
+    var portalOrganisationGroup = teamService.getContributorPortalOrganisationGroup(userAccount);
 
     awardedContract.setAddedByOrganisationGroup(portalOrganisationGroup.getOrgGrpId());
     return createOrUpdateAwardedContract(awardedContract, form);

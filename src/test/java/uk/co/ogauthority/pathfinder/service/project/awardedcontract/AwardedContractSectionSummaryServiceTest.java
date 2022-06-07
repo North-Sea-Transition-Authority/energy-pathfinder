@@ -18,7 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -33,7 +33,7 @@ public class AwardedContractSectionSummaryServiceTest {
   private DifferenceService differenceService;
 
   @Mock
-  private AccessService accessService;
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   @Mock
   private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
@@ -48,7 +48,7 @@ public class AwardedContractSectionSummaryServiceTest {
         awardedContractService,
         differenceService,
         projectSectionSummaryCommonModelService,
-        accessService);
+        projectSectionItemOwnershipService);
   }
 
   @Test

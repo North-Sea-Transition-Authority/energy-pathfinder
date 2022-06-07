@@ -17,7 +17,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanUpcomingTenderView;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -29,7 +29,7 @@ public class ForwardWorkPlanUpcomingTenderSummaryServiceTest {
   private ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
   @Mock
-  private AccessService accessService;
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private ForwardWorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
 
@@ -43,7 +43,7 @@ public class ForwardWorkPlanUpcomingTenderSummaryServiceTest {
   public void setup() {
     workPlanUpcomingTenderSummaryService = new ForwardWorkPlanUpcomingTenderSummaryService(
         workPlanUpcomingTenderService,
-        accessService
+        projectSectionItemOwnershipService
     );
     when(workPlanUpcomingTenderService.getUpcomingTendersForDetail(projectDetail)).thenReturn(
         List.of(workPlanUpcomingTender, manualEntryWorkPlanUpcomingTender)

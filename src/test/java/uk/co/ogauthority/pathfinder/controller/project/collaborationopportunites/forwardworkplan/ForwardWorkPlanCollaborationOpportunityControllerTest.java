@@ -43,7 +43,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationCompletionService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityFileLinkService;
@@ -96,7 +96,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
   protected FileDownloadService fileDownloadService;
 
   @MockBean
-  protected AccessService accessService;
+  protected ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private ProjectControllerTesterService projectControllerTesterService;
 
@@ -124,7 +124,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
     );
     when(projectService.getLatestDetailOrError(projectId)).thenReturn(projectDetail);
     when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
-    when(accessService.canCurrentUserAccessProjectSectionInfo(any(), any())).thenReturn(true);
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(any(), any())).thenReturn(true);
   }
 
   @Test
@@ -572,7 +572,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
     final var collaborationOpportunity =
         ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
     when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         any(),
         any())
     ).thenReturn(false);
@@ -590,7 +590,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
     final var collaborationOpportunity =
         ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
     when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         any(),
         any())
     ).thenReturn(false);
@@ -621,7 +621,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
     final var collaborationOpportunity =
         ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
     when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         any(),
         any())
     ).thenReturn(false);
@@ -639,7 +639,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
     final var collaborationOpportunity =
         ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
     when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         any(),
         any())
     ).thenReturn(false);

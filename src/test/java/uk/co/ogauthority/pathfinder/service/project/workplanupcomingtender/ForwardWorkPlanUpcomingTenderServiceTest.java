@@ -93,12 +93,11 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
     when(workPlanUpcomingTenderRepository.save(any(ForwardWorkPlanUpcomingTender.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
-    when(teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson()))
-        .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup)));
   }
 
   @Test
   public void createUpcomingTender() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     var newUpcomingTenders = workPlanUpcomingTenderService.createUpcomingTender(
         projectDetail,
@@ -113,6 +112,7 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_manualDepartment() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm_manualEntry();
     var newUpcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
         projectDetail,
@@ -128,6 +128,7 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_whenNoContractTermPeriod_thenNoContractTermColumnsPopulatedInEntity() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setContractTermDurationPeriod(null);
 
@@ -145,6 +146,7 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_whenNoContractTermPeriodIsDays_thenNoContractTermColumnsPopulatedInEntity() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
 
     final var expectedContractTermDuration = 10;
     final var expectedContractTermDurationPeriod = DurationPeriod.DAYS;
@@ -172,6 +174,7 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_whenNoContractTermPeriodIsWeeks_thenNoContractTermColumnsPopulatedInEntity() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
 
     final var expectedContractTermDuration = 11;
     final var expectedContractTermDurationPeriod = DurationPeriod.WEEKS;
@@ -199,6 +202,7 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_whenNoContractTermPeriodIsMonths_thenNoContractTermColumnsPopulatedInEntity() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
 
     final var expectedContractTermDuration = 12;
     final var expectedContractTermDurationPeriod = DurationPeriod.MONTHS;
@@ -226,6 +230,7 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_whenNoContractTermPeriodIsYears_thenNoContractTermColumnsPopulatedInEntity() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
 
     final var expectedContractTermDuration = 13;
     final var expectedContractTermDurationPeriod = DurationPeriod.YEARS;
@@ -253,6 +258,7 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_whenEmptyForm() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     var form = ForwardWorkPlanUpcomingTenderUtil.getEmptyForm();
 
     var upcomingTender = workPlanUpcomingTenderService.createUpcomingTender(

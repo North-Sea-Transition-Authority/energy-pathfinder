@@ -26,7 +26,6 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.Quarte
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderValidationHint;
-import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
@@ -125,15 +124,7 @@ public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionS
                                                             ForwardWorkPlanUpcomingTenderForm form,
                                                             AuthenticatedUserAccount userAccount) {
     var upcomingTender = new ForwardWorkPlanUpcomingTender(detail);
-
-    //TODO PAT-685 make sure only one org is saved when user belongs to mutliple ones
-    var portalOrganisationGroup = teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson())
-        .stream()
-        .map(OrganisationTeam::getPortalOrganisationGroup)
-        .findFirst()
-        .orElseThrow(() -> {
-          throw new PathfinderEntityNotFoundException("Could not get user's portal organisation team");
-        });
+    var portalOrganisationGroup = teamService.getContributorPortalOrganisationGroup(userAccount);
 
     upcomingTender.setAddedByOrganisationGroup(portalOrganisationGroup.getOrgGrpId());
     return updateUpcomingTender(upcomingTender, form);

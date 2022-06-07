@@ -151,8 +151,7 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
 
   @Test
   public void createCollaborationOpportunity_whenFromListFunction() {
-    when(teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson()))
-        .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup)));
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
 
     final var selectedFunction = ForwardWorkPlanCollaborationOpportunityTestUtil.FUNCTION;
 
@@ -172,8 +171,7 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
   @Test
   public void createCollaborationOpportunity_manualFunction() {
     var form = ForwardWorkPlanCollaborationOpportunityTestUtil.getCompletedForm_manualEntry();
-    when(teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson()))
-        .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup)));
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     var opportunity = forwardWorkPlanCollaborationOpportunityService.createCollaborationOpportunity(
         projectDetail,
         form,

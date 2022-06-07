@@ -35,6 +35,7 @@ import uk.co.ogauthority.pathfinder.model.team.Role;
 import uk.co.ogauthority.pathfinder.model.team.TeamMember;
 import uk.co.ogauthority.pathfinder.model.team.TeamType;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
+import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TeamServiceTest {
@@ -359,5 +360,31 @@ public class TeamServiceTest {
 
     assertThat(resultingOrganisationGroups).containsExactly(expectedPortalOrganisationGroup);
 
+  }
+
+  @Test
+  public void getContributorPortalOrganisationGroup_whenUserBelongsToOneOrgGroup_thenAssertOrganisationGroup() {
+    var user = UserTestingUtil.getAuthenticatedUserAccount();
+    var portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
+    var organisationTeam = TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup);
+    List<PortalTeamDto> foundOrganisationTeams = List.of(TeamTestingUtil.portalTeamDtoFrom(organisationTeam));
+
+    when(portalTeamAccessor.getTeamsWherePersonMemberOfTeamTypeAndHasRoleMatching(
+        eq(user.getLinkedPerson()),
+        any(),
+        any())
+    ).thenReturn(foundOrganisationTeams);
+    when(teamDtoFactory.createOrganisationTeamList(foundOrganisationTeams)).thenReturn(List.of(organisationTeam));
+
+    assertThat(teamService.getContributorPortalOrganisationGroup(user)).isEqualTo(portalOrganisationGroup);
+  }
+
+  @Test(expected = PathfinderEntityNotFoundException.class)
+  public void getContributorPortalOrganisationGroup_whenCantFindUsersPortalOrg_thenThrowException() {
+    var user = UserTestingUtil.getAuthenticatedUserAccount();
+
+    when(teamDtoFactory.createOrganisationTeamList(any())).thenReturn(Collections.emptyList());
+
+    teamService.getContributorPortalOrganisationGroup(user);
   }
 }

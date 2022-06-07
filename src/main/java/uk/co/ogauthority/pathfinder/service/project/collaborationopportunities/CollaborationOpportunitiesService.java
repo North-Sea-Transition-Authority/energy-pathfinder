@@ -9,7 +9,6 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
-import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -23,7 +22,6 @@ import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.CollaborationOpportunityFormCommon;
-import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
@@ -220,18 +218,7 @@ public abstract class CollaborationOpportunitiesService {
 
   protected void setAddedByOrganisationGroup(CollaborationOpportunityCommon opportunity,
                                              AuthenticatedUserAccount userAccount) {
-
-    //TODO PAT-685 make sure only one org is saved when user belongs to multiple ones
-    PortalOrganisationGroup portalOrganisationGroup =
-        teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson())
-            .stream()
-            .map(OrganisationTeam::getPortalOrganisationGroup)
-            .findFirst()
-            .orElseThrow(() -> {
-              throw new PathfinderEntityNotFoundException(
-                  String.format("Could not get user with WuaId: %s portal organisation team", userAccount.getWuaId())
-              );
-            });
+    PortalOrganisationGroup portalOrganisationGroup = teamService.getContributorPortalOrganisationGroup(userAccount);
     opportunity.setAddedByOrganisationGroup(portalOrganisationGroup.getOrgGrpId());
   }
 }

@@ -40,7 +40,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedCo
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
@@ -73,7 +73,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
   private AwardedContractSummaryService awardedContractSummaryService;
 
   @MockBean
-  private AccessService accessService;
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private ProjectDetail projectDetail;
 
@@ -100,7 +100,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(projectOperatorService.isUserInProjectTeam(projectDetail, unauthenticatedUser)).thenReturn(false);
     when(awardedContractService.createAwardedContract(any(), any(), any())).thenReturn(AwardedContractTestUtil.createAwardedContract());
     when(awardedContractService.updateAwardedContract(any(), any(), any())).thenReturn(AwardedContractTestUtil.createAwardedContract());
-    when(accessService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(true);
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(true);
   }
 
   @Test
@@ -775,7 +775,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
     when(awardedContractService.getAwardedContract(any(), any())).thenReturn(awardedContract);
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(awardedContract.getProjectDetail()),
         any())
     ).thenReturn(false);
@@ -793,7 +793,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
     when(awardedContractService.getAwardedContract(any(), any())).thenReturn(awardedContract);
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(awardedContract.getProjectDetail()),
         any())
     ).thenReturn(false);
@@ -811,7 +811,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
     when(awardedContractService.getAwardedContract(any(), any())).thenReturn(awardedContract);
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(awardedContract.getProjectDetail()),
         any())
     ).thenReturn(false);
@@ -842,7 +842,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
     when(awardedContractService.getAwardedContract(any(), any())).thenReturn(awardedContract);
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(awardedContract.getProjectDetail()),
         any())
     ).thenReturn(false);

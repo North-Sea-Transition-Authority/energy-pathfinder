@@ -12,8 +12,8 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractView;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractViewUtil;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
@@ -25,13 +25,13 @@ public class AwardedContractSummaryService {
   public static final String EMPTY_LIST_ERROR = "You must add at least one awarded contract";
 
   private final AwardedContractService awardedContractService;
-  private final AccessService accessService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   @Autowired
   public AwardedContractSummaryService(AwardedContractService awardedContractService,
-                                       AccessService accessService) {
+                                       ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     this.awardedContractService = awardedContractService;
-    this.accessService = accessService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
   }
 
   public List<AwardedContractView> getAwardedContractViews(ProjectDetail projectDetail) {
@@ -71,7 +71,7 @@ public class AwardedContractSummaryService {
 
   private AwardedContractViewUtil.AwardedContractViewBuilder getAwardedContractViewBuilder(AwardedContract awardedContract,
                                                                                             int displayNumber) {
-    var includeSummaryLinks = accessService.canCurrentUserAccessProjectSectionInfo(
+    var includeSummaryLinks = projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         awardedContract.getProjectDetail(),
         new OrganisationGroupIdWrapper(awardedContract.getAddedByOrganisationGroup())
     );

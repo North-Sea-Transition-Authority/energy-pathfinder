@@ -18,7 +18,7 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationOpportunityView;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationOpportunityViewUtil;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
@@ -33,7 +33,7 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
   private ForwardWorkPlanCollaborationOpportunityFileLinkService forwardWorkPlanCollaborationOpportunityFileLinkService;
 
   @Mock
-  private AccessService accessService;
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private ForwardWorkPlanCollaborationOpportunitiesSummaryService forwardWorkPlanCollaborationOpportunitiesSummaryService;
 
@@ -42,7 +42,7 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
     forwardWorkPlanCollaborationOpportunitiesSummaryService = new ForwardWorkPlanCollaborationOpportunitiesSummaryService(
         forwardWorkPlanCollaborationOpportunityService,
         forwardWorkPlanCollaborationOpportunityFileLinkService,
-        accessService);
+        projectSectionItemOwnershipService);
   }
 
   @Test
@@ -68,7 +68,7 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
     final var collaborationOpportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(
         projectDetail
     );
-    when(accessService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(true);
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(true);
 
     ForwardWorkPlanCollaborationOpportunityView expectedCollaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
@@ -130,7 +130,7 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
     when(forwardWorkPlanCollaborationOpportunityService.getOpportunitiesForProjectVersion(project, version)).thenReturn(
         List.of(collaborationOpportunity)
     );
-    when(accessService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(true);
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(true);
 
     final var summaryViews = forwardWorkPlanCollaborationOpportunitiesSummaryService.getSummaryViews(
         project,
@@ -157,7 +157,7 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
         projectDetail
     );
 
-    when(accessService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(true);
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(true);
 
     ForwardWorkPlanCollaborationOpportunityView expectedCollaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
@@ -317,7 +317,7 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
         .includeSummaryLinks(accessValid)
         .build();
 
-    when(accessService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(accessValid);
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(accessValid);
 
     final var resultingView = forwardWorkPlanCollaborationOpportunitiesSummaryService.getView(
         collaborationOpportunity,
@@ -347,7 +347,7 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
         .isValid(isValid)
         .build();
 
-    when(accessService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(accessValid);
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(accessValid);
 
     final var resultingView = forwardWorkPlanCollaborationOpportunitiesSummaryService.getView(
         collaborationOpportunity,

@@ -22,9 +22,8 @@ import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTe
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
-import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
@@ -65,7 +64,7 @@ public class UpcomingTenderServiceValidationTest {
   private TeamService teamService;
 
   @Mock
-  private AccessService accessService;
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private UpcomingTenderService upcomingTenderService;
 
@@ -86,7 +85,7 @@ public class UpcomingTenderServiceValidationTest {
         projectSetupService,
         entityDuplicationService,
         teamService,
-        accessService);
+        projectSectionItemOwnershipService);
   }
 
   @Test

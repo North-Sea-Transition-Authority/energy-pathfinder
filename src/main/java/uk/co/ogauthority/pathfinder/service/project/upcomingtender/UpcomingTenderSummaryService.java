@@ -11,8 +11,8 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderViewUtil;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
@@ -24,15 +24,15 @@ public class UpcomingTenderSummaryService {
 
   private final UpcomingTenderService upcomingTenderService;
   private final UpcomingTenderFileLinkService upcomingTenderFileLinkService;
-  private final AccessService accessService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   @Autowired
   public UpcomingTenderSummaryService(UpcomingTenderService upcomingTenderService,
                                       UpcomingTenderFileLinkService upcomingTenderFileLinkService,
-                                      AccessService accessService) {
+                                      ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     this.upcomingTenderService = upcomingTenderService;
     this.upcomingTenderFileLinkService = upcomingTenderFileLinkService;
-    this.accessService = accessService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
   }
 
   public List<UpcomingTenderView> getSummaryViews(ProjectDetail detail) {
@@ -111,7 +111,7 @@ public class UpcomingTenderSummaryService {
   private UpcomingTenderViewUtil.UpcomingTenderViewBuilder getUpcomingTenderViewBuilder(UpcomingTender upcomingTender,
                                                                                         Integer displayOrder) {
     var uploadedFileViews = upcomingTenderFileLinkService.getFileUploadViewsLinkedToUpcomingTender(upcomingTender);
-    var includeLinks = accessService.canCurrentUserAccessProjectSectionInfo(
+    var includeLinks = projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         upcomingTender.getProjectDetail(),
         new OrganisationGroupIdWrapper(upcomingTender.getAddedByOrganisationGroup())
     );

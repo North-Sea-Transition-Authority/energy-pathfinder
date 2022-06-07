@@ -43,8 +43,8 @@ import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderFileLinkService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
@@ -69,7 +69,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
   private final ControllerHelperService controllerHelperService;
   private final UpcomingTenderService upcomingTenderService;
   private final UpcomingTenderSummaryService upcomingTenderSummaryService;
-  private final AccessService accessService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
 
   @Autowired
@@ -79,13 +79,13 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
                                    UpcomingTenderSummaryService upcomingTenderSummaryService,
                                    ProjectDetailFileService projectDetailFileService,
                                    FileDownloadService fileDownloadService,
-                                   AccessService accessService) {
+                                   ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     super(projectDetailFileService, fileDownloadService);
     this.breadcrumbService = breadcrumbService;
     this.controllerHelperService = controllerHelperService;
     this.upcomingTenderService = upcomingTenderService;
     this.upcomingTenderSummaryService = upcomingTenderSummaryService;
-    this.accessService = accessService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
   }
 
   @GetMapping
@@ -314,7 +314,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
   }
 
   private void checkIfUserHasAccessToTender(UpcomingTender upcomingTender) {
-    if (!accessService.canCurrentUserAccessProjectSectionInfo(
+    if (!projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         upcomingTender.getProjectDetail(),
         new OrganisationGroupIdWrapper(upcomingTender.getAddedByOrganisationGroup())
     )) {

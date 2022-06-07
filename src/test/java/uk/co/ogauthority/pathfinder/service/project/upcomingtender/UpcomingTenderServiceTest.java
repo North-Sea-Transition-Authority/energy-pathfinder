@@ -35,8 +35,8 @@ import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -44,7 +44,6 @@ import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
-import uk.co.ogauthority.pathfinder.testutil.SecurityHelperUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
@@ -78,7 +77,7 @@ public class UpcomingTenderServiceTest {
   private EntityDuplicationService entityDuplicationService;
 
   @Mock
-  private AccessService accessService;
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private UpcomingTenderService upcomingTenderService;
 
@@ -107,22 +106,17 @@ public class UpcomingTenderServiceTest {
         projectSetupService,
         entityDuplicationService,
         teamService,
-        accessService
+        projectSectionItemOwnershipService
         );
 
     when(upcomingTenderRepository.save(any(UpcomingTender.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
-
-    when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUserAccount.getLinkedPerson()))
-        .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup)));
-
-    SecurityHelperUtil.setAuthentication(authenticatedUserAccount);
   }
 
 
   @Test
   public void createUpcomingTender() {
-
+    when(teamService.getContributorPortalOrganisationGroup(authenticatedUserAccount)).thenReturn(portalOrganisationGroup);
     var form = UpcomingTenderUtil.getCompleteForm();
     var newUpcomingTender = upcomingTenderService.createUpcomingTender(
         detail,
@@ -136,6 +130,7 @@ public class UpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_manualFunction() {
+    when(teamService.getContributorPortalOrganisationGroup(authenticatedUserAccount)).thenReturn(portalOrganisationGroup);
     var form = UpcomingTenderUtil.getCompletedForm_manualEntry();
     var newUpcomingTender = upcomingTenderService.createUpcomingTender(
         detail,
@@ -444,14 +439,14 @@ public class UpcomingTenderServiceTest {
 
   @Test
   public void canCurrentUserAccessTender_whenCurrentUserHasAccessToProjectSectionInfo_thenTrue() {
-    when(accessService.canCurrentUserAccessProjectSectionInfo(eq(detail), any())).thenReturn(true);
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(detail), any())).thenReturn(true);
 
     assertThat(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).isTrue();
   }
 
   @Test
   public void canCurrentUserAccessTender_whenCurrentUserHasNoAccessToProjectSectionInfo_thenTrue() {
-    when(accessService.canCurrentUserAccessProjectSectionInfo(eq(detail), any())).thenReturn(false);
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(detail), any())).thenReturn(false);
 
     assertThat(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).isFalse();
   }

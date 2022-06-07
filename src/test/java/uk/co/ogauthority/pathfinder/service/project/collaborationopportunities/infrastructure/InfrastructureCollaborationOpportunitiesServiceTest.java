@@ -107,8 +107,7 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
 
   @Test
   public void createCollaborationOpportunity() {
-    when(teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson()))
-        .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup)));
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     final var selectedFunction = InfrastructureCollaborationOpportunityTestUtil.FUNCTION;
 
     var form = InfrastructureCollaborationOpportunityTestUtil.getCompleteForm();
@@ -126,8 +125,7 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
 
   @Test
   public void createCollaborationOpportunity_manualFunction() {
-    when(teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson()))
-        .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup)));
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     var form = InfrastructureCollaborationOpportunityTestUtil.getCompletedForm_manualEntry();
     var opportunity = infrastructureCollaborationOpportunitiesService.createCollaborationOpportunity(
         detail,

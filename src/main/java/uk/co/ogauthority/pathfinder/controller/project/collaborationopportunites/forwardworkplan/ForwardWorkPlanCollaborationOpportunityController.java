@@ -40,8 +40,8 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationCompletionService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityFileLinkService;
@@ -68,7 +68,7 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
   private final ForwardWorkPlanCollaborationOpportunitiesSummaryService forwardWorkPlanCollaborationOpportunitiesSummaryService;
   private final ForwardWorkPlanCollaborationCompletionService forwardWorkPlanCollaborationCompletionService;
   private final ControllerHelperService controllerHelperService;
-  private final AccessService accessService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   @Autowired
   public ForwardWorkPlanCollaborationOpportunityController(
@@ -82,7 +82,7 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
       ProjectDetailFileService projectDetailFileService,
       ControllerHelperService controllerHelperService,
       FileDownloadService fileDownloadService,
-      AccessService accessService) {
+      ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     super(projectDetailFileService, fileDownloadService);
     this.forwardWorkPlanCollaborationOpportunityModelService = forwardWorkPlanCollaborationOpportunityModelService;
     this.forwardWorkPlanCollaborationOpportunityFileLinkService = forwardWorkPlanCollaborationOpportunityFileLinkService;
@@ -92,7 +92,7 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
     this.forwardWorkPlanCollaborationOpportunitiesSummaryService = forwardWorkPlanCollaborationOpportunitiesSummaryService;
     this.forwardWorkPlanCollaborationCompletionService = forwardWorkPlanCollaborationCompletionService;
     this.controllerHelperService = controllerHelperService;
-    this.accessService = accessService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
   }
 
   @GetMapping("/setup")
@@ -369,7 +369,7 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
   }
 
   private void checkIfUserHasAccessToCollaborationOpportunity(ForwardWorkPlanCollaborationOpportunity opportunity) {
-    if (!accessService.canCurrentUserAccessProjectSectionInfo(
+    if (!projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         opportunity.getProjectDetail(),
         new OrganisationGroupIdWrapper(opportunity.getAddedByOrganisationGroup())
     )) {

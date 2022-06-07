@@ -43,7 +43,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.Fo
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanUpcomingTenderViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanTenderCompletionService;
@@ -87,7 +87,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
   protected ForwardWorkPlanTenderCompletionService forwardWorkPlanTenderCompletionService;
 
   @MockBean
-  protected AccessService accessService;
+  protected ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private final AuthenticatedUserAccount unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
@@ -120,7 +120,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
     when(workPlanUpcomingTenderService.createUpcomingTender(any(), any(), any())).thenReturn(ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail));
     when(workPlanUpcomingTenderService.updateUpcomingTender(any(), any())).thenReturn(ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail));
     when(workPlanUpcomingTenderModelService.getUpcomingTenderFormModelAndView(eq(projectDetail), any())).thenReturn(new ModelAndView(""));
-    when(accessService.canCurrentUserAccessProjectSectionInfo(any(), any())).thenReturn(true);
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(any(), any())).thenReturn(true);
 
     projectControllerTesterService = new ProjectControllerTesterService(
         mockMvc,
@@ -567,7 +567,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
 
   @Test
   public void editUpcomingTender_userCantAccessTender_thenAccessForbidden() throws Exception {
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(workPlanUpcomingTender.getProjectDetail()),
         any())
     ).thenReturn(false);
@@ -582,7 +582,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
 
   @Test
   public void updateUpcomingTender_userCantAccessTender_thenAccessForbidden() throws Exception {
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(workPlanUpcomingTender.getProjectDetail()),
         any())
     ).thenReturn(false);
@@ -610,7 +610,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
 
   @Test
   public void removeUpcomingTenderConfirm_userCantAccessTender_thenAccessForbidden() throws Exception {
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(workPlanUpcomingTender.getProjectDetail()),
         any())
     ).thenReturn(false);
@@ -625,7 +625,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
 
   @Test
   public void removeUpcomingTender_userCantAccessTender_thenAccessForbidden() throws Exception {
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(workPlanUpcomingTender.getProjectDetail()),
         any())
     ).thenReturn(false);

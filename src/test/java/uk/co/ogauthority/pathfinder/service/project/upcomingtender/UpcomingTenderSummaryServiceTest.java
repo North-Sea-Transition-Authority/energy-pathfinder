@@ -22,7 +22,7 @@ import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
@@ -38,7 +38,7 @@ public class UpcomingTenderSummaryServiceTest {
   private UpcomingTenderFileLinkService upcomingTenderFileLinkService;
 
   @Mock
-  private AccessService accessService;
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private UpcomingTenderSummaryService upcomingTenderSummaryService;
 
@@ -53,17 +53,17 @@ public class UpcomingTenderSummaryServiceTest {
     upcomingTenderSummaryService = new UpcomingTenderSummaryService(
         upcomingTenderService,
         upcomingTenderFileLinkService,
-        accessService);
+        projectSectionItemOwnershipService);
     when(upcomingTenderService.getUpcomingTendersForDetail(details)).thenReturn(
         List.of(upcomingTender, manualEntryUpcomingTender)
     );
 
-    when(accessService.canCurrentUserAccessProjectSectionInfo(any(), any())).thenReturn(false);
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(any(), any())).thenReturn(false);
   }
 
   @Test
   public void getSummaryViews() {
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(upcomingTender.getProjectDetail()),
         any())
     ).thenReturn(true);
@@ -137,7 +137,7 @@ public class UpcomingTenderSummaryServiceTest {
     var uploadedFileView = UploadedFileUtil.createUploadedFileView();
     when(upcomingTenderFileLinkService.getFileUploadViewsLinkedToUpcomingTender(any())).thenReturn(List.of(uploadedFileView));
 
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(upcomingTender.getProjectDetail()),
         any())
     ).thenReturn(true);
@@ -164,7 +164,7 @@ public class UpcomingTenderSummaryServiceTest {
 
     when(upcomingTenderFileLinkService.getFileUploadViewsLinkedToUpcomingTender(any())).thenReturn(List.of());
 
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(upcomingTender.getProjectDetail()),
         any())
     ).thenReturn(true);
@@ -216,7 +216,7 @@ public class UpcomingTenderSummaryServiceTest {
     final var project = details.getProject();
     final var version = details.getVersion();
 
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(upcomingTender.getProjectDetail()),
         any())
     ).thenReturn(true);
@@ -250,7 +250,7 @@ public class UpcomingTenderSummaryServiceTest {
 
   @Test
   public void getUpcomingTenderView_whenUserCanAccessService_thenThereAreLinks() {
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(upcomingTender.getProjectDetail()),
         any())
     ).thenReturn(true);

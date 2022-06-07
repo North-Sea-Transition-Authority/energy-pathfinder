@@ -33,8 +33,8 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
@@ -56,18 +56,18 @@ public class AwardedContractController extends ProjectFormPageController {
 
   private final AwardedContractService awardedContractService;
   private final AwardedContractSummaryService awardedContractSummaryService;
-  private final AccessService accessService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   @Autowired
   public AwardedContractController(BreadcrumbService breadcrumbService,
                                    AwardedContractService awardedContractService,
                                    ControllerHelperService controllerHelperService,
                                    AwardedContractSummaryService awardedContractSummaryService,
-                                   AccessService accessService) {
+                                   ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     super(breadcrumbService, controllerHelperService);
     this.awardedContractService = awardedContractService;
     this.awardedContractSummaryService = awardedContractSummaryService;
-    this.accessService = accessService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
   }
 
   @GetMapping
@@ -278,7 +278,7 @@ public class AwardedContractController extends ProjectFormPageController {
   }
 
   private void checkIfUserHasAccessAwardedContract(AwardedContract awardedContract) {
-    if (!accessService.canCurrentUserAccessProjectSectionInfo(
+    if (!projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         awardedContract.getProjectDetail(),
         new OrganisationGroupIdWrapper(awardedContract.getAddedByOrganisationGroup())
     )) {

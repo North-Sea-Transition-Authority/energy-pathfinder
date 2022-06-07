@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
@@ -23,13 +23,14 @@ public class AwardedContractSummaryServiceTest {
   private AwardedContractService awardedContractService;
 
   @Mock
-  private AccessService accessService;
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private AwardedContractSummaryService awardedContractSummaryService;
 
   @Before
   public void setup() {
-    awardedContractSummaryService = new AwardedContractSummaryService(awardedContractService, accessService);
+    awardedContractSummaryService = new AwardedContractSummaryService(awardedContractService,
+        projectSectionItemOwnershipService);
   }
 
   @Test

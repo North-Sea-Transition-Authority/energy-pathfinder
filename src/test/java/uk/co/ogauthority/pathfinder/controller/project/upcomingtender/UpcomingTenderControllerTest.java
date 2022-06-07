@@ -47,7 +47,7 @@ import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
-import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
@@ -80,7 +80,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
   FileDownloadService fileDownloadService;
 
   @MockBean
-  AccessService accessService;
+  ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private ProjectControllerTesterService projectControllerTesterService;
 
@@ -113,7 +113,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
         Collections.emptyList()
     ).build();
     when(upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, DISPLAY_ORDER)).thenReturn(upcomingTenderView);
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(upcomingTender.getProjectDetail()),
         any())
     ).thenReturn(true);
@@ -533,7 +533,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
   @Test
   public void editUpcomingTender_userCantAccessTender_thenAccessForbidden() throws Exception {
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(upcomingTender.getProjectDetail()),
         any())
     ).thenReturn(false);
@@ -548,7 +548,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
   @Test
   public void updateUpcomingTender_userCantAccessTender_thenAccessForbidden() throws Exception {
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(upcomingTender.getProjectDetail()),
         any())
     ).thenReturn(false);
@@ -599,7 +599,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
   @Test
   public void removeUpcomingTenderConfirm_userCantAccessTender_thenAccessForbidden() throws Exception {
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(upcomingTender.getProjectDetail()),
         any())
     ).thenReturn(false);
@@ -614,7 +614,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
   @Test
   public void removeUpcomingTender_userCantAccessTender_thenAccessForbidden() throws Exception {
-    when(accessService.canCurrentUserAccessProjectSectionInfo(
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(upcomingTender.getProjectDetail()),
         any())
     ).thenReturn(false);

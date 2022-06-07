@@ -18,7 +18,7 @@ import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AccessServiceTest {
+public class ProjectSectionItemOwnershipServiceTest {
 
   private final AuthenticatedUserAccount authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount();
 
@@ -30,13 +30,13 @@ public class AccessServiceTest {
   @Mock
   private TeamService teamService;
 
-  private AccessService accessService;
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   @Before
   public void setup() {
     SecurityHelperUtil.setAuthentication(authenticatedUserAccount);
 
-    accessService = new AccessService(
+    projectSectionItemOwnershipService = new ProjectSectionItemOwnershipService(
         projectOperatorService,
         teamService
     );
@@ -46,7 +46,7 @@ public class AccessServiceTest {
   public void canCurrentUserAccessProjectSectionInfo_whenUserIsOperator_thenTrue() {
     when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUserAccount)).thenReturn(true);
 
-    assertThat(accessService.canCurrentUserAccessProjectSectionInfo(detail, new OrganisationGroupIdWrapper(1))).isTrue();
+    assertThat(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(detail, new OrganisationGroupIdWrapper(1))).isTrue();
   }
 
   @Test
@@ -58,7 +58,8 @@ public class AccessServiceTest {
     when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUserAccount.getLinkedPerson()))
         .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup)));
 
-    assertThat(accessService.canCurrentUserAccessProjectSectionInfo(detail, organisationGroupIdWrapper)).isTrue();
+    assertThat(
+        projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(detail, organisationGroupIdWrapper)).isTrue();
   }
 
   @Test
@@ -71,6 +72,7 @@ public class AccessServiceTest {
     when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUserAccount.getLinkedPerson()))
         .thenReturn(List.of(differentOrganisationTeam));
 
-    assertThat(accessService.canCurrentUserAccessProjectSectionInfo(detail, organisationGroupIdWrapper)).isFalse();
+    assertThat(
+        projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(detail, organisationGroupIdWrapper)).isFalse();
   }
 }
