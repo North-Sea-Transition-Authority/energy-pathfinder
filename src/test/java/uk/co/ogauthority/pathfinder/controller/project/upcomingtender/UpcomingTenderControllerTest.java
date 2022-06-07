@@ -42,10 +42,12 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
+import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
+import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
@@ -77,6 +79,9 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
   @MockBean
   FileDownloadService fileDownloadService;
 
+  @MockBean
+  AccessService accessService;
+
   private ProjectControllerTesterService projectControllerTesterService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -102,14 +107,16 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
     when(upcomingTenderService.getOrError(UPCOMING_TENDER_ID)).thenReturn(upcomingTender);
     UploadedFile file = ProjectFileTestUtil.getUploadedFile();
 
-    var upcomingTenderView = UpcomingTenderViewUtil.createUpComingTenderView(
+    UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
-        true,
         DISPLAY_ORDER,
         Collections.emptyList()
-    );
+    ).build();
     when(upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, DISPLAY_ORDER)).thenReturn(upcomingTenderView);
-    when(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).thenReturn(true);
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        eq(upcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeam(detail, unAuthenticatedUser)).thenReturn(false);
     when(upcomingTenderService.createUpcomingTender(any(), any(), any())).thenReturn(UpcomingTenderUtil.getUpcomingTender(detail));
@@ -276,12 +283,9 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
   public void removeUpcomingTenderConfirm_projectContextSmokeTest() {
     when(upcomingTenderService.getForm(upcomingTender)).thenReturn(UpcomingTenderUtil.getCompleteForm());
     when(upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, DISPLAY_ORDER))
-        .thenReturn(UpcomingTenderViewUtil.createUpComingTenderView(
-            upcomingTender,
-            true,
-            DISPLAY_ORDER,
-            List.of()
-        ));
+        .thenReturn(
+            new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(upcomingTender, DISPLAY_ORDER, List.of()).build()
+        );
 
     projectControllerTesterService
         .withHttpRequestMethod(HttpMethod.GET)
@@ -529,7 +533,10 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
   @Test
   public void editUpcomingTender_userCantAccessTender_thenAccessForbidden() throws Exception {
-    when(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).thenReturn(false);
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        eq(upcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(false);
 
     mockMvc.perform(
             get(ReverseRouter.route(on(UpcomingTendersController.class)
@@ -541,7 +548,10 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
   @Test
   public void updateUpcomingTender_userCantAccessTender_thenAccessForbidden() throws Exception {
-    when(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).thenReturn(false);
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        eq(upcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(false);
 
     MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
@@ -589,7 +599,10 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
   @Test
   public void removeUpcomingTenderConfirm_userCantAccessTender_thenAccessForbidden() throws Exception {
-    when(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).thenReturn(false);
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        eq(upcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(false);
 
     mockMvc.perform(
             get(ReverseRouter.route(on(UpcomingTendersController.class)
@@ -601,7 +614,10 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
   @Test
   public void removeUpcomingTender_userCantAccessTender_thenAccessForbidden() throws Exception {
-    when(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).thenReturn(false);
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        eq(upcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(false);
 
     MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);

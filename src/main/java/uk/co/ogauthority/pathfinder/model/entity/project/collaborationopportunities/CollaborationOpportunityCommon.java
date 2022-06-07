@@ -35,6 +35,8 @@ public abstract class CollaborationOpportunityCommon
 
   private String emailAddress;
 
+  private Integer addedByOrganisationGroup;
+
   public CollaborationOpportunityCommon() {
   }
 
@@ -112,5 +114,14 @@ public abstract class CollaborationOpportunityCommon
   @Override
   public String getEmailAddress() {
     return emailAddress;
+  }
+
+  public Integer getAddedByOrganisationGroup() {
+    return addedByOrganisationGroup;
+  }
+
+  public void setAddedByOrganisationGroup(
+      Integer portalOrganisationGroup) {
+    this.addedByOrganisationGroup = portalOrganisationGroup;
   }
 }

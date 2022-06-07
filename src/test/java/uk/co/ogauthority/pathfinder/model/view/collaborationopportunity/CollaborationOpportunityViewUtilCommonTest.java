@@ -48,6 +48,7 @@ public class CollaborationOpportunityViewUtilCommonTest {
     CollaborationOpportunityViewUtilCommon.populateView(
         view,
         entity,
+        true,
         displayOrder,
         fileList,
         editUrl,
@@ -74,6 +75,7 @@ public class CollaborationOpportunityViewUtilCommonTest {
     CollaborationOpportunityViewUtilCommon.populateView(
         view,
         entity,
+        true,
         displayOrder,
         fileList,
         editUrl,
@@ -100,6 +102,7 @@ public class CollaborationOpportunityViewUtilCommonTest {
     CollaborationOpportunityViewUtilCommon.populateView(
         view,
         entity,
+        true,
         displayOrder,
         fileList,
         editUrl,
@@ -129,6 +132,7 @@ public class CollaborationOpportunityViewUtilCommonTest {
     CollaborationOpportunityViewUtilCommon.populateView(
         view,
         entity,
+        true,
         displayOrder,
         fileList,
         editUrl,

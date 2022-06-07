@@ -31,11 +31,13 @@ public class InfrastructureCollaborationOpportunityViewUtilTest {
     entity.setFunction(Function.HR);
     entity.setManualFunction(null);
 
-    final var view = InfrastructureCollaborationOpportunityViewUtil.createView(
+    InfrastructureCollaborationOpportunityView view = new InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder(
         entity,
         displayOrder,
         fileList
-    );
+    )
+        .includeSummaryLinks(true)
+        .build();
 
     createViewAndAssertCommonViewProperties(view, entity);
 
@@ -52,11 +54,13 @@ public class InfrastructureCollaborationOpportunityViewUtilTest {
     final var manualFunction = "manual function";
     entity.setManualFunction(manualFunction);
 
-    final var view = InfrastructureCollaborationOpportunityViewUtil.createView(
+    InfrastructureCollaborationOpportunityView view = new InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder(
         entity,
         displayOrder,
         fileList
-    );
+    )
+        .includeSummaryLinks(true)
+        .build();
 
     createViewAndAssertCommonViewProperties(view, entity);
 
@@ -73,12 +77,14 @@ public class InfrastructureCollaborationOpportunityViewUtilTest {
 
     final var isValid = false;
 
-    final var view = InfrastructureCollaborationOpportunityViewUtil.createView(
+    InfrastructureCollaborationOpportunityView view = new InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder(
         entity,
         displayOrder,
-        fileList,
-        isValid
-    );
+        fileList
+    )
+        .includeSummaryLinks(true)
+        .isValid(isValid)
+        .build();
 
     createViewAndAssertCommonViewProperties(view, entity);
 
@@ -97,12 +103,14 @@ public class InfrastructureCollaborationOpportunityViewUtilTest {
 
     final var isValid = true;
 
-    final var view = InfrastructureCollaborationOpportunityViewUtil.createView(
+    InfrastructureCollaborationOpportunityView view = new InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder(
         entity,
         displayOrder,
-        fileList,
-        isValid
-    );
+        fileList
+    )
+        .includeSummaryLinks(true)
+        .isValid(isValid)
+        .build();
 
     createViewAndAssertCommonViewProperties(view, entity);
 

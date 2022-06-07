@@ -11,6 +11,8 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderViewUtil;
+import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
@@ -22,12 +24,15 @@ public class UpcomingTenderSummaryService {
 
   private final UpcomingTenderService upcomingTenderService;
   private final UpcomingTenderFileLinkService upcomingTenderFileLinkService;
+  private final AccessService accessService;
 
   @Autowired
   public UpcomingTenderSummaryService(UpcomingTenderService upcomingTenderService,
-                                      UpcomingTenderFileLinkService upcomingTenderFileLinkService) {
+                                      UpcomingTenderFileLinkService upcomingTenderFileLinkService,
+                                      AccessService accessService) {
     this.upcomingTenderService = upcomingTenderService;
     this.upcomingTenderFileLinkService = upcomingTenderFileLinkService;
+    this.accessService = accessService;
   }
 
   public List<UpcomingTenderView> getSummaryViews(ProjectDetail detail) {
@@ -51,36 +56,6 @@ public class UpcomingTenderSummaryService {
     );
   }
 
-  public UpcomingTenderView getUpcomingTenderView(UpcomingTender upcomingTender, Integer displayOrder) {
-    var uploadedFileViews = upcomingTenderFileLinkService.getFileUploadViewsLinkedToUpcomingTender(
-        upcomingTender
-    );
-    var canAccessTender = upcomingTenderService.canCurrentUserAccessTender(upcomingTender);
-
-    return UpcomingTenderViewUtil.createUpComingTenderView(
-        upcomingTender,
-        canAccessTender,
-        displayOrder,
-        uploadedFileViews
-    );
-  }
-
-  private UpcomingTenderView getUpcomingTenderView(UpcomingTender upcomingTender,
-                                                   Integer displayOrder,
-                                                   boolean isValid) {
-    var uploadedFileViews = upcomingTenderFileLinkService.getFileUploadViewsLinkedToUpcomingTender(
-        upcomingTender
-    );
-    var canAccessTender = upcomingTenderService.canCurrentUserAccessTender(upcomingTender);
-    return UpcomingTenderViewUtil.createUpComingTenderView(
-        upcomingTender,
-        canAccessTender,
-        displayOrder,
-        uploadedFileViews,
-        isValid
-    );
-  }
-
   public List<ErrorItem> getErrors(List<UpcomingTenderView> views) {
     return SummaryUtil.getErrors(new ArrayList<>(views), EMPTY_LIST_ERROR, ERROR_FIELD_NAME, ERROR_MESSAGE);
   }
@@ -95,7 +70,8 @@ public class UpcomingTenderSummaryService {
    * @param validationType ValidationType (generally expected FULL or NO_VALIDATION)
    * @return A list of views validated if necessary.
    */
-  public List<UpcomingTenderView> createUpcomingTenderViews(List<UpcomingTender> upcomingTenders, ValidationType validationType) {
+  public List<UpcomingTenderView> createUpcomingTenderViews(List<UpcomingTender> upcomingTenders,
+                                                            ValidationType validationType) {
     List<UpcomingTenderView> views = new ArrayList<>();
     for (int i = 0; i < upcomingTenders.size(); i++) {
       var displayOrder = i + 1;
@@ -116,5 +92,35 @@ public class UpcomingTenderSummaryService {
 
   public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
     return upcomingTenderService.isTaskValidForProjectDetail(detail);
+  }
+
+  public UpcomingTenderView getUpcomingTenderView(UpcomingTender upcomingTender,
+                                                  Integer displayOrder) {
+    return getUpcomingTenderViewBuilder(upcomingTender, displayOrder)
+        .build();
+  }
+
+  private UpcomingTenderView getUpcomingTenderView(UpcomingTender upcomingTender,
+                                                   Integer displayOrder,
+                                                   boolean isValid) {
+    return getUpcomingTenderViewBuilder(upcomingTender, displayOrder)
+        .isValid(isValid)
+        .build();
+  }
+
+  private UpcomingTenderViewUtil.UpcomingTenderViewBuilder getUpcomingTenderViewBuilder(UpcomingTender upcomingTender,
+                                                                                        Integer displayOrder) {
+    var uploadedFileViews = upcomingTenderFileLinkService.getFileUploadViewsLinkedToUpcomingTender(upcomingTender);
+    var includeLinks = accessService.canCurrentUserAccessProjectSectionInfo(
+        upcomingTender.getProjectDetail(),
+        new OrganisationGroupIdWrapper(upcomingTender.getAddedByOrganisationGroup())
+    );
+
+    return new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
+        upcomingTender,
+        displayOrder,
+        uploadedFileViews
+    )
+        .includeSummaryLinks(includeLinks);
   }
 }

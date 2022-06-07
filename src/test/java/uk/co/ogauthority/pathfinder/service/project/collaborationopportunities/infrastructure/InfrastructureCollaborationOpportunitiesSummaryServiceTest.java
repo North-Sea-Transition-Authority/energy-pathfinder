@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -18,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure.InfrastructureCollaborationOpportunityView;
+import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
@@ -31,6 +33,9 @@ public class InfrastructureCollaborationOpportunitiesSummaryServiceTest {
   @Mock
   private InfrastructureCollaborationOpportunityFileLinkService infrastructureCollaborationOpportunityFileLinkService;
 
+  @Mock
+  private AccessService accessService;
+
   private InfrastructureCollaborationOpportunitiesSummaryService infrastructureCollaborationOpportunitiesSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -43,8 +48,8 @@ public class InfrastructureCollaborationOpportunitiesSummaryServiceTest {
   public void setUp() {
     infrastructureCollaborationOpportunitiesSummaryService = new InfrastructureCollaborationOpportunitiesSummaryService(
         infrastructureCollaborationOpportunitiesService,
-        infrastructureCollaborationOpportunityFileLinkService
-    );
+        infrastructureCollaborationOpportunityFileLinkService,
+        accessService);
     when(infrastructureCollaborationOpportunitiesService.getOpportunitiesForDetail(detail)).thenReturn(
         List.of(opportunity, manualEntryOpportunity)
     );
@@ -138,6 +143,7 @@ public class InfrastructureCollaborationOpportunitiesSummaryServiceTest {
     final var project = detail.getProject();
     final var version = detail.getVersion();
 
+    when(accessService.canCurrentUserAccessProjectSectionInfo(eq(detail), any())).thenReturn(true);
     when(infrastructureCollaborationOpportunitiesService.getOpportunitiesForProjectVersion(project, version))
         .thenReturn(List.of(collaborationOpportunity));
 

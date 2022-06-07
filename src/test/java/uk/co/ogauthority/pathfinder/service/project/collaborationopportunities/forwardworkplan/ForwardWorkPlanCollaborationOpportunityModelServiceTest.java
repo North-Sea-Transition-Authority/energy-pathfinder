@@ -152,7 +152,6 @@ public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
     final var opportunity = new ForwardWorkPlanCollaborationOpportunity();
     final var opportunityView = new ForwardWorkPlanCollaborationOpportunityView();
 
-    when(forwardWorkPlanCollaborationOpportunityService.getOrError(opportunityId)).thenReturn(opportunity);
     when(forwardWorkPlanCollaborationOpportunitiesSummaryService.getView(
         opportunity,
         displayOrder
@@ -160,7 +159,7 @@ public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
 
     final var modelAndView = forwardWorkPlanCollaborationOpportunityModelService.getRemoveCollaborationOpportunityConfirmationModelAndView(
         projectId,
-        opportunityId,
+        opportunity,
         displayOrder
     );
 
@@ -225,12 +224,14 @@ public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
     );
     final var isValid = true;
 
-    final var collaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView collaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         1,
-        List.of(),
-        isValid
-    );
+        Collections.emptyList()
+    )
+        .includeSummaryLinks(true)
+        .isValid(isValid)
+        .build();
 
     final var errorList = forwardWorkPlanCollaborationOpportunityModelService.getErrors(List.of(collaborationOpportunityView));
     assertThat(errorList).isEmpty();
@@ -244,19 +245,23 @@ public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
         projectDetail
     );
 
-    final var validCollaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView validCollaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         1,
-        List.of(),
-        true
-    );
+        Collections.emptyList()
+    )
+        .includeSummaryLinks(true)
+        .isValid(true)
+        .build();
 
-    final var invalidCollaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView invalidCollaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         2,
-        List.of(),
-        false
-    );
+        Collections.emptyList()
+    )
+        .includeSummaryLinks(true)
+        .isValid(false)
+        .build();
 
     final var errorList = forwardWorkPlanCollaborationOpportunityModelService.getErrors(
         List.of(validCollaborationOpportunityView, invalidCollaborationOpportunityView)

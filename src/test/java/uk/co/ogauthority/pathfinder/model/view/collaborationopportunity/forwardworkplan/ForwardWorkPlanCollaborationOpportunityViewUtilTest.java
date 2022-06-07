@@ -34,11 +34,13 @@ public class ForwardWorkPlanCollaborationOpportunityViewUtilTest {
     entity.setFunction(Function.HR);
     entity.setManualFunction(null);
 
-    final var view = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView view = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         entity,
         displayOrder,
         fileList
-    );
+    )
+        .includeSummaryLinks(true)
+        .build();
 
     createViewAndAssertCommonViewProperties(view, entity);
 
@@ -55,11 +57,13 @@ public class ForwardWorkPlanCollaborationOpportunityViewUtilTest {
     final var manualFunction = "manual function";
     entity.setManualFunction(manualFunction);
 
-    final var view = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView view = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         entity,
         displayOrder,
         fileList
-    );
+    )
+        .includeSummaryLinks(true)
+        .build();
 
     createViewAndAssertCommonViewProperties(view, entity);
 
@@ -76,12 +80,14 @@ public class ForwardWorkPlanCollaborationOpportunityViewUtilTest {
 
     final var isValid = false;
 
-    final var view = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView view = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         entity,
         displayOrder,
-        fileList,
-        isValid
-    );
+        fileList
+    )
+        .includeSummaryLinks(true)
+        .isValid(isValid)
+        .build();
 
     createViewAndAssertCommonViewProperties(view, entity);
 
@@ -100,12 +106,14 @@ public class ForwardWorkPlanCollaborationOpportunityViewUtilTest {
 
     final var isValid = true;
 
-    final var view = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView view = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         entity,
         displayOrder,
-        fileList,
-        isValid
-    );
+        fileList
+    )
+        .includeSummaryLinks(true)
+        .isValid(isValid)
+        .build();
 
     createViewAndAssertCommonViewProperties(view, entity);
 

@@ -19,13 +19,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityFormValidator;
@@ -37,10 +37,12 @@ import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -70,6 +72,9 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
   @Mock
   private EntityDuplicationService entityDuplicationService;
 
+  @Mock
+  private TeamService teamService;
+
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
 
   private final ForwardWorkPlanCollaborationOpportunity opportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(
@@ -79,6 +84,8 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
   private final AuthenticatedUserAccount userAccount = UserTestingUtil.getAuthenticatedUserAccount();
 
   private ForwardWorkPlanCollaborationOpportunityService forwardWorkPlanCollaborationOpportunityService;
+
+  private final PortalOrganisationGroup portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   @Before
   public void setup() {
@@ -96,8 +103,8 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
         forwardWorkPlanCollaborationOpportunityFormValidator,
         forwardWorkPlanCollaborationSetupService,
         validationService,
-        entityDuplicationService
-    );
+        entityDuplicationService,
+        teamService);
 
     when(forwardWorkPlanCollaborationOpportunityRepository.save(any(ForwardWorkPlanCollaborationOpportunity.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
@@ -144,6 +151,8 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
 
   @Test
   public void createCollaborationOpportunity_whenFromListFunction() {
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson()))
+        .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup)));
 
     final var selectedFunction = ForwardWorkPlanCollaborationOpportunityTestUtil.FUNCTION;
 
@@ -163,6 +172,8 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
   @Test
   public void createCollaborationOpportunity_manualFunction() {
     var form = ForwardWorkPlanCollaborationOpportunityTestUtil.getCompletedForm_manualEntry();
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson()))
+        .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup)));
     var opportunity = forwardWorkPlanCollaborationOpportunityService.createCollaborationOpportunity(
         projectDetail,
         form,
@@ -255,6 +266,7 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
     assertThat(collaborationOpportunity.getPhoneNumber()).isEqualTo(form.getContactDetail().getPhoneNumber());
     assertThat(collaborationOpportunity.getJobTitle()).isEqualTo(form.getContactDetail().getJobTitle());
     assertThat(collaborationOpportunity.getEmailAddress()).isEqualTo(form.getContactDetail().getEmailAddress());
+    assertThat(collaborationOpportunity.getAddedByOrganisationGroup()).isEqualTo(portalOrganisationGroup.getOrgGrpId());
   }
 
   private void checkCommonFormFields(ForwardWorkPlanCollaborationOpportunityForm form,

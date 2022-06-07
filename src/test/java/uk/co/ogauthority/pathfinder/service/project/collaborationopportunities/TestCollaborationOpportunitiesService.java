@@ -12,6 +12,7 @@ import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 
 @Service
 public class TestCollaborationOpportunitiesService extends CollaborationOpportunitiesService {
@@ -20,13 +21,14 @@ public class TestCollaborationOpportunitiesService extends CollaborationOpportun
       SearchSelectorService searchSelectorService,
       FunctionService functionService,
       ProjectSetupService projectSetupService,
-      ProjectDetailFileService projectDetailFileService) {
+      ProjectDetailFileService projectDetailFileService,
+      TeamService teamService) {
     super(
         searchSelectorService,
         functionService,
         projectSetupService,
-        projectDetailFileService
-    );
+        projectDetailFileService,
+        teamService);
   }
 
   @Override

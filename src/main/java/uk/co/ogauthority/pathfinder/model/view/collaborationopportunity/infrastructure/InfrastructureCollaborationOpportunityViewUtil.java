@@ -15,53 +15,81 @@ public class InfrastructureCollaborationOpportunityViewUtil {
     throw new IllegalStateException("InfrastructureCollaborationOpportunityViewUtil is a utility class and should not be instantiated");
   }
 
-  public static InfrastructureCollaborationOpportunityView createView(
-      InfrastructureCollaborationOpportunity opportunity,
-      Integer displayOrder,
-      List<UploadedFileView> uploadedFileViews
-  ) {
+  public static class InfrastructureCollaborationOpportunityViewBuilder {
+    private final InfrastructureCollaborationOpportunity opportunity;
+    private final Integer displayOrder;
+    private final List<UploadedFileView> uploadedFileViews;
+    private Boolean isValid;
+    private boolean includeSummaryLinks = false;
 
-    var projectId = opportunity.getProjectDetail().getProject().getId();
+    public InfrastructureCollaborationOpportunityViewBuilder(
+        InfrastructureCollaborationOpportunity opportunity,
+        Integer displayOrder,
+        List<UploadedFileView> uploadedFileViews) {
+      this.opportunity = opportunity;
+      this.displayOrder = displayOrder;
+      this.uploadedFileViews = uploadedFileViews;
+    }
 
-    final var editUrl = ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
-        .editCollaborationOpportunity(
-            projectId,
-            opportunity.getId(),
-            null
-        )
-    );
+    public InfrastructureCollaborationOpportunityViewBuilder isValid(Boolean isValid) {
+      this.isValid = isValid;
+      return this;
+    }
 
-    final var deleteUrl = ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
-        .removeCollaborationOpportunityConfirm(
-            projectId,
-            opportunity.getId(),
-            displayOrder,
-            null
-        )
-    );
+    public InfrastructureCollaborationOpportunityViewBuilder includeSummaryLinks(boolean includeSummaryLinks) {
+      this.includeSummaryLinks = includeSummaryLinks;
+      return this;
+    }
 
-    return (InfrastructureCollaborationOpportunityView) CollaborationOpportunityViewUtilCommon.populateView(
-        new InfrastructureCollaborationOpportunityView(),
-        opportunity,
-        displayOrder,
-        uploadedFileViews,
-        editUrl,
-        deleteUrl
-    );
-  }
+    public InfrastructureCollaborationOpportunityView build() {
+      return createView(
+          this.opportunity,
+          this.includeSummaryLinks,
+          this.displayOrder,
+          this.uploadedFileViews,
+          this.isValid
+      );
+    }
 
-  public static InfrastructureCollaborationOpportunityView createView(
-      InfrastructureCollaborationOpportunity opportunity,
-      Integer displayOrder,
-      List<UploadedFileView> uploadedFileViews,
-      Boolean isValid
-  ) {
-    var view = createView(
-        opportunity,
-        displayOrder,
-        uploadedFileViews
-    );
-    view.setIsValid(isValid);
-    return view;
+    private static InfrastructureCollaborationOpportunityView createView(
+        InfrastructureCollaborationOpportunity opportunity,
+        boolean includeSummaryLinks,
+        Integer displayOrder,
+        List<UploadedFileView> uploadedFileViews,
+        Boolean isValid
+    ) {
+
+      var projectId = opportunity.getProjectDetail().getProject().getId();
+
+      final var editUrl = ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
+          .editCollaborationOpportunity(
+              projectId,
+              opportunity.getId(),
+              null
+          )
+      );
+
+      final var deleteUrl = ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
+          .removeCollaborationOpportunityConfirm(
+              projectId,
+              opportunity.getId(),
+              displayOrder,
+              null
+          )
+      );
+
+      InfrastructureCollaborationOpportunityView view =
+          (InfrastructureCollaborationOpportunityView) CollaborationOpportunityViewUtilCommon.populateView(
+              new InfrastructureCollaborationOpportunityView(),
+              opportunity,
+              includeSummaryLinks,
+              displayOrder,
+              uploadedFileViews,
+              editUrl,
+              deleteUrl
+          );
+      view.setIsValid(isValid);
+      return view;
+    }
   }
 }

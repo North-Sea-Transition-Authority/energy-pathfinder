@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity;
 
+import java.util.ArrayList;
 import java.util.List;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityCommon;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
@@ -18,6 +19,7 @@ public class CollaborationOpportunityViewUtilCommon {
   public static CollaborationOpportunityViewCommon populateView(
       CollaborationOpportunityViewCommon view,
       CollaborationOpportunityCommon opportunity,
+      boolean includeSummaryLinks,
       Integer displayOrder,
       List<UploadedFileView> uploadedFileViews,
       String editUrl,
@@ -45,17 +47,22 @@ public class CollaborationOpportunityViewUtilCommon {
 
     view.setUploadedFileViews(uploadedFileViews);
 
-    final var editLink = new SummaryLink(
-        SummaryLinkText.EDIT.getDisplayName(),
-        editUrl
-    );
+    ArrayList<SummaryLink> summaryLinks = new ArrayList<>();
+    if (includeSummaryLinks) {
+      final var editLink = new SummaryLink(
+          SummaryLinkText.EDIT.getDisplayName(),
+          editUrl
+      );
+      summaryLinks.add(editLink);
 
-    final var removeLink = new SummaryLink(
-        SummaryLinkText.DELETE.getDisplayName(),
-        deleteUrl
-    );
+      final var removeLink = new SummaryLink(
+          SummaryLinkText.DELETE.getDisplayName(),
+          deleteUrl
+      );
+      summaryLinks.add(removeLink);
+    }
 
-    view.setSummaryLinks(List.of(editLink, removeLink));
+    view.setSummaryLinks(summaryLinks);
 
     return view;
   }
@@ -63,6 +70,7 @@ public class CollaborationOpportunityViewUtilCommon {
   public static CollaborationOpportunityViewCommon populateView(
       CollaborationOpportunityViewCommon opportunityView,
       CollaborationOpportunityCommon opportunity,
+      boolean includeSummaryLinks,
       Integer displayOrder,
       List<UploadedFileView> uploadedFileViews,
       String editUrl,
@@ -72,6 +80,7 @@ public class CollaborationOpportunityViewUtilCommon {
     final var populatedOpportunityView = populateView(
         opportunityView,
         opportunity,
+        includeSummaryLinks,
         displayOrder,
         uploadedFileViews,
         editUrl,

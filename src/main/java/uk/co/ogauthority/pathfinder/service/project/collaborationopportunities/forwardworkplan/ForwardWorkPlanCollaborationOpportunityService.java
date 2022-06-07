@@ -35,6 +35,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProject
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
@@ -60,14 +61,14 @@ public class ForwardWorkPlanCollaborationOpportunityService
       ForwardWorkPlanCollaborationOpportunityFormValidator forwardWorkPlanCollaborationOpportunityFormValidator,
       ForwardWorkPlanCollaborationSetupService forwardWorkPlanCollaborationSetupService,
       ValidationService validationService,
-      EntityDuplicationService entityDuplicationService
-  ) {
+      EntityDuplicationService entityDuplicationService,
+      TeamService teamService) {
     super(
         searchSelectorService,
         functionService,
         projectSetupService,
-        projectDetailFileService
-    );
+        projectDetailFileService,
+        teamService);
     this.forwardWorkPlanCollaborationOpportunityRepository = forwardWorkPlanCollaborationOpportunityRepository;
     this.forwardWorkPlanCollaborationOpportunityFileLinkService = forwardWorkPlanCollaborationOpportunityFileLinkService;
     this.forwardWorkPlanCollaborationOpportunityFormValidator = forwardWorkPlanCollaborationOpportunityFormValidator;
@@ -107,6 +108,7 @@ public class ForwardWorkPlanCollaborationOpportunityService
         form,
         opportunity
     );
+    setAddedByOrganisationGroup(opportunity, authenticatedUserAccount);
 
     opportunity = forwardWorkPlanCollaborationOpportunityRepository.save(opportunity);
 

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -42,6 +43,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
+import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationCompletionService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityFileLinkService;
@@ -51,6 +53,7 @@ import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.f
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationSetupService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
@@ -92,6 +95,9 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
   @MockBean
   protected FileDownloadService fileDownloadService;
 
+  @MockBean
+  protected AccessService accessService;
+
   private ProjectControllerTesterService projectControllerTesterService;
 
   private final int projectId = 1;
@@ -118,6 +124,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
     );
     when(projectService.getLatestDetailOrError(projectId)).thenReturn(projectDetail);
     when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
+    when(accessService.canCurrentUserAccessProjectSectionInfo(any(), any())).thenReturn(true);
   }
 
   @Test
@@ -162,7 +169,8 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
   public void editCollaborationOpportunity_projectContextSmokeTest() {
 
     final var opportunityId = 10;
-    when(forwardWorkPlanCollaborationOpportunityService.getOrError(10)).thenReturn(new ForwardWorkPlanCollaborationOpportunity());
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(10))
+        .thenReturn(ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail));
 
     projectControllerTesterService
         .withHttpRequestMethod(HttpMethod.GET)
@@ -304,7 +312,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
   public void updateCollaborationOpportunity_projectContextSmokeTest() {
 
     final var collaborationOpportunityId = 100;
-    final var collaborationOpportunity = new ForwardWorkPlanCollaborationOpportunity();
+    final var collaborationOpportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
 
     when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
     when(forwardWorkPlanCollaborationOpportunityService.updateCollaborationOpportunity(any(), any(), any())).thenReturn(collaborationOpportunity);
@@ -400,7 +408,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
     when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
 
     final var collaborationOpportunityId = 100;
-    final var collaborationOpportunity = new ForwardWorkPlanCollaborationOpportunity();
+    final var collaborationOpportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
 
     when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
     when(forwardWorkPlanCollaborationOpportunityService.updateCollaborationOpportunity(any(), any(), any())).thenReturn(collaborationOpportunity);
@@ -430,6 +438,10 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
 
   @Test
   public void removeCollaborationOpportunityConfirm_projectContextSmokeTest() {
+
+    var collaborationOpportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
+
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
 
     projectControllerTesterService
         .withHttpRequestMethod(HttpMethod.GET)
@@ -540,7 +552,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
 
     when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
 
-    final var collaborationOpportunity = new ForwardWorkPlanCollaborationOpportunity();
+    final var collaborationOpportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
 
     when(forwardWorkPlanCollaborationOpportunityService.getOrError(collaborationOpportunityId)).thenReturn(collaborationOpportunity);
 
@@ -553,5 +565,96 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
         .withRequiredProjectPermissions(requiredPermissions)
         .withRequestParam(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE)
         .withProjectContributorAccess();
+  }
+
+  @Test
+  public void editCollaborationOpportunity_userCantAccessTender_thenAccessForbidden() throws Exception {
+    final var collaborationOpportunity =
+        ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        any(),
+        any())
+    ).thenReturn(false);
+
+    mockMvc.perform(
+            get(ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class)
+                .editCollaborationOpportunity(projectId, 1, null)
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void updateCollaborationOpportunity_userCantAccessTender_thenAccessForbidden() throws Exception {
+    final var collaborationOpportunity =
+        ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        any(),
+        any())
+    ).thenReturn(false);
+
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    mockMvc.perform(
+            post(ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class)
+                .updateCollaborationOpportunity(
+                    projectId,
+                    1,
+                    new ForwardWorkPlanCollaborationOpportunityForm(),
+                    null,
+                    null,
+                    null
+                )
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser))
+                .with(csrf())
+                .params(completeParams))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void removeCollaborationOpportunityConfirm_userCantAccessTender_thenAccessForbidden() throws Exception {
+    final var collaborationOpportunity =
+        ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        any(),
+        any())
+    ).thenReturn(false);
+
+    mockMvc.perform(
+            get(ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class)
+                .removeCollaborationOpportunityConfirm(projectId, 1, 1, null)
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void removeCollaborationOpportunity_userCantAccessTender_thenAccessForbidden() throws Exception {
+    final var collaborationOpportunity =
+        ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        any(),
+        any())
+    ).thenReturn(false);
+
+    mockMvc.perform(
+            post(ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class)
+                .removeCollaborationOpportunity(
+                    projectId,
+                    1,
+                    1,
+                    null
+                )
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser))
+                .with(csrf()))
+        .andExpect(status().isForbidden());
   }
 }

@@ -44,10 +44,12 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunityForm;
+import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure.InfrastructureCollaborationOpportunityView;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure.InfrastructureCollaborationOpportunityViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
+import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
@@ -78,6 +80,9 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
   @MockBean
   protected FileDownloadService fileDownloadService;
 
+  @MockBean
+  protected AccessService accessService;
+
   private ProjectControllerTesterService projectControllerTesterService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -105,11 +110,13 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
     when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID)).thenReturn(opportunity);
     UploadedFile file = ProjectFileTestUtil.getUploadedFile();
 
-    var collaborationOpportunityView = InfrastructureCollaborationOpportunityViewUtil.createView(
+    InfrastructureCollaborationOpportunityView collaborationOpportunityView = new InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder(
         opportunity,
         DISPLAY_ORDER,
         Collections.emptyList()
-    );
+    )
+        .includeSummaryLinks(true)
+        .build();
     when(infrastructureCollaborationOpportunitiesSummaryService.getView(opportunity, DISPLAY_ORDER)).thenReturn(collaborationOpportunityView);
     when(infrastructureCollaborationOpportunitiesService.createCollaborationOpportunity(any(), any(), any())).thenReturn(
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail));
@@ -117,6 +124,7 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail));
     when(projectDetailFileService.getProjectDetailFileByProjectDetailVersionAndFileId(any(), any(), any())).thenReturn(PROJECT_DETAIL_FILE);
     when(projectDetailFileService.getUploadedFileById(FILE_ID)).thenReturn(file);
+    when(accessService.canCurrentUserAccessProjectSectionInfo(any(), any())).thenReturn(true);
 
     projectControllerTesterService = new ProjectControllerTesterService(
         mockMvc,
@@ -148,11 +156,13 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
   public void saveCollaborationOpportunities_projectContextSmokeTest() {
     var infrastructureCollaborationOpportunity =
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
-    var collaborationOpportunityView = InfrastructureCollaborationOpportunityViewUtil.createView(
+    InfrastructureCollaborationOpportunityView collaborationOpportunityView = new InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder(
         infrastructureCollaborationOpportunity,
-        1,
-        List.of()
-    );
+        DISPLAY_ORDER,
+        Collections.emptyList()
+    )
+        .includeSummaryLinks(true)
+        .build();
     var infrastructureCollaborationOpportunityViews = List.of(collaborationOpportunityView);
     when(infrastructureCollaborationOpportunitiesSummaryService.getValidatedSummaryViews(detail))
         .thenReturn(infrastructureCollaborationOpportunityViews);
@@ -290,11 +300,13 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
   @Test
   public void removeCollaborationOpportunityConfirm_projectContextSmokeTest() {
     var opportunity = InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
-    var collaborationOpportunityView = InfrastructureCollaborationOpportunityViewUtil.createView(
+    InfrastructureCollaborationOpportunityView collaborationOpportunityView = new InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder(
         opportunity,
         DISPLAY_ORDER,
         Collections.emptyList()
-    );
+    )
+        .includeSummaryLinks(true)
+        .build();
     when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID))
         .thenReturn(opportunity);
     when(infrastructureCollaborationOpportunitiesSummaryService.getView(opportunity, DISPLAY_ORDER))
@@ -578,4 +590,98 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
         .andExpect(status().isOk());
   }
 
+  @Test
+  public void editCollaborationOpportunity_userCantAccessCollabOpportunity_thenAccessForbidden() throws Exception {
+    final var collaborationOpportunity =
+        InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
+    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID))
+        .thenReturn(collaborationOpportunity);
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        any(),
+        any())
+    ).thenReturn(false);
+
+    mockMvc.perform(
+            get(ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
+                .editCollaborationOpportunity(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, null)
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void updateCollaborationOpportunity_userCantAccessCollabOpportunity_thenAccessForbidden() throws Exception {
+    final var collaborationOpportunity =
+        InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
+    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID))
+        .thenReturn(collaborationOpportunity);
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        any(),
+        any())
+    ).thenReturn(false);
+
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    mockMvc.perform(
+            post(ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
+                .updateCollaborationOpportunity(
+                    PROJECT_ID,
+                    COLLABORATION_OPPORTUNITY_ID,
+                    new InfrastructureCollaborationOpportunityForm(),
+                    null,
+                    null,
+                    null
+                )
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser))
+                .with(csrf())
+                .params(completeParams))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void removeCollaborationOpportunityConfirm_userCantAccessCollabOpportunity_thenAccessForbidden() throws Exception {
+    final var collaborationOpportunity =
+        InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
+    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID))
+        .thenReturn(collaborationOpportunity);
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        any(),
+        any())
+    ).thenReturn(false);
+
+    mockMvc.perform(
+            get(ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
+                .removeCollaborationOpportunityConfirm(PROJECT_ID, COLLABORATION_OPPORTUNITY_ID, DISPLAY_ORDER, null)
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void removeCollaborationOpportunity_userCantAccessCollabOpportunity_thenAccessForbidden() throws Exception {
+    final var collaborationOpportunity =
+        InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
+    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID))
+        .thenReturn(collaborationOpportunity);
+    when(accessService.canCurrentUserAccessProjectSectionInfo(
+        any(),
+        any())
+    ).thenReturn(false);
+
+    mockMvc.perform(
+            post(ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
+                .removeCollaborationOpportunity(
+                    PROJECT_ID,
+                    COLLABORATION_OPPORTUNITY_ID,
+                    DISPLAY_ORDER,
+                    null
+                )
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser))
+                .with(csrf()))
+        .andExpect(status().isForbidden());
+  }
 }

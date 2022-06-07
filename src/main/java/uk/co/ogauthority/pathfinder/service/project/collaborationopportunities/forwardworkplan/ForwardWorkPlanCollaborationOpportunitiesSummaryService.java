@@ -1,5 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan;
 
+import static uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +11,9 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationOpportunityView;
-import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationOpportunityViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
+import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
@@ -24,14 +27,16 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryService extends
 
   private final ForwardWorkPlanCollaborationOpportunityService forwardWorkPlanCollaborationOpportunityService;
   private final ForwardWorkPlanCollaborationOpportunityFileLinkService forwardWorkPlanCollaborationOpportunityFileLinkService;
+  private final AccessService accessService;
 
   @Autowired
   public ForwardWorkPlanCollaborationOpportunitiesSummaryService(
       ForwardWorkPlanCollaborationOpportunityService forwardWorkPlanCollaborationOpportunityService,
-      ForwardWorkPlanCollaborationOpportunityFileLinkService forwardWorkPlanCollaborationOpportunityFileLinkService
-  ) {
+      ForwardWorkPlanCollaborationOpportunityFileLinkService forwardWorkPlanCollaborationOpportunityFileLinkService,
+      AccessService accessService) {
     this.forwardWorkPlanCollaborationOpportunityService = forwardWorkPlanCollaborationOpportunityService;
     this.forwardWorkPlanCollaborationOpportunityFileLinkService = forwardWorkPlanCollaborationOpportunityFileLinkService;
+    this.accessService = accessService;
   }
 
   public List<ForwardWorkPlanCollaborationOpportunityView> getSummaryViews(ProjectDetail projectDetail) {
@@ -59,6 +64,41 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryService extends
     return SummaryUtil.validateViews(new ArrayList<>(views));
   }
 
+  public boolean canShowInTaskList(ProjectDetail projectDetail) {
+    return forwardWorkPlanCollaborationOpportunityService.isTaskValidForProjectDetail(projectDetail);
+  }
+
+  @Override
+  public ForwardWorkPlanCollaborationOpportunityView getView(ForwardWorkPlanCollaborationOpportunity opportunity,
+                                                             Integer displayOrder) {
+
+    return getForwardWorkPlanCollaborationOpportunityViewBuilder(
+        opportunity,
+        displayOrder
+    )
+        .build();
+  }
+
+  @Override
+  public ForwardWorkPlanCollaborationOpportunityView getView(ForwardWorkPlanCollaborationOpportunity opportunity,
+                                                             Integer displayOrder,
+                                                             boolean isValid) {
+    return getForwardWorkPlanCollaborationOpportunityViewBuilder(
+        opportunity,
+        displayOrder
+    )
+        .isValid(isValid)
+        .build();
+  }
+
+  @Override
+  protected boolean isValid(ForwardWorkPlanCollaborationOpportunity opportunity, ValidationType validationType) {
+    return forwardWorkPlanCollaborationOpportunityService.isValid(
+        opportunity,
+        validationType
+    );
+  }
+
   private List<ForwardWorkPlanCollaborationOpportunityView> createCollaborationOpportunityViews(
       List<ForwardWorkPlanCollaborationOpportunity> collaborationOpportunities,
       ValidationType validationType
@@ -69,43 +109,23 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryService extends
     );
   }
 
-  public boolean canShowInTaskList(ProjectDetail projectDetail) {
-    return forwardWorkPlanCollaborationOpportunityService.isTaskValidForProjectDetail(projectDetail);
-  }
-
   private List<UploadedFileView> getUploadedFileViews(ForwardWorkPlanCollaborationOpportunity opportunity) {
     return forwardWorkPlanCollaborationOpportunityFileLinkService.getFileUploadViewsLinkedToOpportunity(opportunity);
   }
 
-  @Override
-  public ForwardWorkPlanCollaborationOpportunityView getView(ForwardWorkPlanCollaborationOpportunity opportunity,
-                                                             Integer displayOrder) {
-    final var uploadedFileViews = getUploadedFileViews(opportunity);
-    return ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+  private ForwardWorkPlanCollaborationOpportunityViewBuilder getForwardWorkPlanCollaborationOpportunityViewBuilder(
+      ForwardWorkPlanCollaborationOpportunity opportunity,
+      Integer displayOrder) {
+    var uploadedFileViews = getUploadedFileViews(opportunity);
+    var includeSummaryLinks = accessService.canCurrentUserAccessProjectSectionInfo(
+        opportunity.getProjectDetail(),
+        new OrganisationGroupIdWrapper(opportunity.getAddedByOrganisationGroup())
+    );
+    return new ForwardWorkPlanCollaborationOpportunityViewBuilder(
         opportunity,
         displayOrder,
         uploadedFileViews
-    );
-  }
-
-  @Override
-  public ForwardWorkPlanCollaborationOpportunityView getView(ForwardWorkPlanCollaborationOpportunity opportunity,
-                                                             Integer displayOrder,
-                                                             boolean isValid) {
-    final var uploadedFileViews = getUploadedFileViews(opportunity);
-    return ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
-        opportunity,
-        displayOrder,
-        uploadedFileViews,
-        isValid
-    );
-  }
-
-  @Override
-  protected boolean isValid(ForwardWorkPlanCollaborationOpportunity opportunity, ValidationType validationType) {
-    return forwardWorkPlanCollaborationOpportunityService.isValid(
-        opportunity,
-        validationType
-    );
+    )
+        .includeSummaryLinks(includeSummaryLinks);
   }
 }

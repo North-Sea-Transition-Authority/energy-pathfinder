@@ -46,12 +46,14 @@ public class UpcomingTenderViewUtilTest {
 
     final var displayOrder = 1;
 
-    final var upcomingTenderView = UpcomingTenderViewUtil.createUpComingTenderView(
+    UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
-        true,
         displayOrder,
         uploadedFileViews
-    );
+    )
+        .isValid(true)
+        .includeSummaryLinks(true)
+        .build();
 
     assertThat(upcomingTenderView.getTenderFunction()).isEqualTo(new StringWithTag());
 
@@ -70,12 +72,14 @@ public class UpcomingTenderViewUtilTest {
 
     final var displayOrder = 2;
 
-    final var upcomingTenderView = UpcomingTenderViewUtil.createUpComingTenderView(
+    UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
-        true,
         displayOrder,
         uploadedFileViews
-    );
+    )
+        .isValid(true)
+        .includeSummaryLinks(true)
+        .build();
 
     assertThat(upcomingTenderView.getTenderFunction()).isEqualTo(
         new StringWithTag(tenderFunction.getDisplayName(), Tag.NONE)
@@ -96,12 +100,14 @@ public class UpcomingTenderViewUtilTest {
 
     final var displayOrder = 2;
 
-    final var upcomingTenderView = UpcomingTenderViewUtil.createUpComingTenderView(
+    UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
-        true,
         displayOrder,
         uploadedFileViews
-    );
+    )
+        .isValid(true)
+        .includeSummaryLinks(true)
+        .build();
 
     assertThat(upcomingTenderView.getTenderFunction()).isEqualTo(
         new StringWithTag(tenderFunction, Tag.NOT_FROM_LIST)
@@ -121,12 +127,14 @@ public class UpcomingTenderViewUtilTest {
 
     final var displayOrder = 2;
 
-    final var upcomingTenderView = UpcomingTenderViewUtil.createUpComingTenderView(
+    UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
-        true,
         displayOrder,
         uploadedFileViews
-    );
+    )
+        .isValid(true)
+        .includeSummaryLinks(true)
+        .build();
 
     assertThat(upcomingTenderView.getContractBand()).isEqualTo(contractBand.getDisplayName());
 
@@ -142,12 +150,14 @@ public class UpcomingTenderViewUtilTest {
 
     final var displayOrder = 2;
 
-    final var upcomingTenderView = UpcomingTenderViewUtil.createUpComingTenderView(
+    UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
-        true,
         displayOrder,
         uploadedFileViews
-    );
+    )
+        .isValid(true)
+        .includeSummaryLinks(true)
+        .build();
 
     assertThat(upcomingTenderView.getContractBand()).isEmpty();
 
@@ -163,13 +173,14 @@ public class UpcomingTenderViewUtilTest {
     final var displayOrder = 3;
     final var isValid = true;
 
-    final var upcomingTenderView = UpcomingTenderViewUtil.createUpComingTenderView(
+    UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
-        true,
         displayOrder,
-        uploadedFileViews,
-        isValid
-    );
+        uploadedFileViews
+    )
+        .isValid(isValid)
+        .includeSummaryLinks(true)
+        .build();
 
     assertThat(upcomingTenderView.isValid()).isTrue();
 
@@ -185,13 +196,14 @@ public class UpcomingTenderViewUtilTest {
     final var displayOrder = 3;
     final var isValid = false;
 
-    final var upcomingTenderView = UpcomingTenderViewUtil.createUpComingTenderView(
+    UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
-        true,
         displayOrder,
-        uploadedFileViews,
-        isValid
-    );
+        uploadedFileViews
+    )
+        .isValid(isValid)
+        .includeSummaryLinks(true)
+        .build();
 
     assertThat(upcomingTenderView.isValid()).isFalse();
 
@@ -200,21 +212,23 @@ public class UpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_whenCannotAccessTender_thenEmptyLinkList() {
+  public void createUpComingTenderView_doNotIncludeSummaryLinks_thenEmptyLinkList() {
 
     var upcomingTender = UpcomingTenderUtil.getUpcomingTender(projectDetail);
-    var canAccessTender = false;
+    var includeSummaryLinks = false;
 
     final var displayOrder = 2;
 
-    final var upcomingTenderView = UpcomingTenderViewUtil.createUpComingTenderView(
+    UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
-        canAccessTender,
         displayOrder,
         uploadedFileViews
-    );
+    )
+        .isValid(true)
+        .includeSummaryLinks(includeSummaryLinks)
+        .build();
 
-    assertCommonProperties(upcomingTenderView, upcomingTender, displayOrder, uploadedFileViews, canAccessTender);
+    assertCommonProperties(upcomingTenderView, upcomingTender, displayOrder, uploadedFileViews, includeSummaryLinks);
 
   }
 

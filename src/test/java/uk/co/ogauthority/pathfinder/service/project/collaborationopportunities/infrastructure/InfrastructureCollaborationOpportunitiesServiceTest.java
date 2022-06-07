@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -35,10 +36,12 @@ import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -65,6 +68,9 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
   @Mock
   private EntityDuplicationService entityDuplicationService;
 
+  @Mock
+  private TeamService teamService;
+
   private InfrastructureCollaborationOpportunitiesService infrastructureCollaborationOpportunitiesService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -74,6 +80,8 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
   );
 
   private final AuthenticatedUserAccount userAccount = UserTestingUtil.getAuthenticatedUserAccount();
+
+  private final PortalOrganisationGroup portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   @Before
   public void setUp() {
@@ -90,8 +98,8 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
         infrastructureCollaborationOpportunityFileLinkService,
         projectDetailFileService,
         projectSetupService,
-        entityDuplicationService
-    );
+        entityDuplicationService,
+        teamService);
 
     when(infrastructureCollaborationOpportunitiesRepository.save(any(InfrastructureCollaborationOpportunity.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
@@ -99,7 +107,8 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
 
   @Test
   public void createCollaborationOpportunity() {
-
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson()))
+        .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup)));
     final var selectedFunction = InfrastructureCollaborationOpportunityTestUtil.FUNCTION;
 
     var form = InfrastructureCollaborationOpportunityTestUtil.getCompleteForm();
@@ -117,6 +126,8 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
 
   @Test
   public void createCollaborationOpportunity_manualFunction() {
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson()))
+        .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup)));
     var form = InfrastructureCollaborationOpportunityTestUtil.getCompletedForm_manualEntry();
     var opportunity = infrastructureCollaborationOpportunitiesService.createCollaborationOpportunity(
         detail,
@@ -202,6 +213,7 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
     assertThat(infrastructureCollaborationOpportunity.getPhoneNumber()).isEqualTo(form.getContactDetail().getPhoneNumber());
     assertThat(infrastructureCollaborationOpportunity.getJobTitle()).isEqualTo(form.getContactDetail().getJobTitle());
     assertThat(infrastructureCollaborationOpportunity.getEmailAddress()).isEqualTo(form.getContactDetail().getEmailAddress());
+    assertThat(infrastructureCollaborationOpportunity.getAddedByOrganisationGroup()).isEqualTo(portalOrganisationGroup.getOrgGrpId());
   }
 
   private void checkCommonFormFields(InfrastructureCollaborationOpportunityForm form, InfrastructureCollaborationOpportunity infrastructureCollaborationOpportunity) {

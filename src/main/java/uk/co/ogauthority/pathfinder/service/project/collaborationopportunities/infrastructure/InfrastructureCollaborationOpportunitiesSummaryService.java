@@ -1,5 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure;
 
+import static uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure.InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +12,9 @@ import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunit
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure.InfrastructureCollaborationOpportunityView;
-import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure.InfrastructureCollaborationOpportunityViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
+import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
@@ -29,14 +32,16 @@ public class InfrastructureCollaborationOpportunitiesSummaryService extends
 
   private final InfrastructureCollaborationOpportunitiesService infrastructureCollaborationOpportunitiesService;
   private final InfrastructureCollaborationOpportunityFileLinkService infrastructureCollaborationOpportunityFileLinkService;
+  private final AccessService accessService;
 
   @Autowired
   public InfrastructureCollaborationOpportunitiesSummaryService(
       InfrastructureCollaborationOpportunitiesService infrastructureCollaborationOpportunitiesService,
-      InfrastructureCollaborationOpportunityFileLinkService infrastructureCollaborationOpportunityFileLinkService
-  ) {
+      InfrastructureCollaborationOpportunityFileLinkService infrastructureCollaborationOpportunityFileLinkService,
+      AccessService accessService) {
     this.infrastructureCollaborationOpportunitiesService = infrastructureCollaborationOpportunitiesService;
     this.infrastructureCollaborationOpportunityFileLinkService = infrastructureCollaborationOpportunityFileLinkService;
+    this.accessService = accessService;
   }
 
   public List<InfrastructureCollaborationOpportunityView> getSummaryViews(ProjectDetail detail) {
@@ -82,34 +87,46 @@ public class InfrastructureCollaborationOpportunitiesSummaryService extends
     return infrastructureCollaborationOpportunitiesService.isTaskValidForProjectDetail(detail);
   }
 
-  private List<UploadedFileView> getUploadedFileViews(InfrastructureCollaborationOpportunity collaborationOpportunity) {
-    return infrastructureCollaborationOpportunityFileLinkService.getFileUploadViewsLinkedToOpportunity(
-        collaborationOpportunity
-    );
-  }
-
   @Override
   public InfrastructureCollaborationOpportunityView getView(InfrastructureCollaborationOpportunity opportunity,
                                                             Integer displayOrder) {
-    final var uploadedFileViews = getUploadedFileViews(opportunity);
-    return InfrastructureCollaborationOpportunityViewUtil.createView(opportunity, displayOrder, uploadedFileViews);
+    return getView(opportunity, displayOrder, true);
   }
 
   @Override
   public InfrastructureCollaborationOpportunityView getView(InfrastructureCollaborationOpportunity opportunity,
                                                             Integer displayOrder,
                                                             boolean isValid) {
-    final var uploadedFileViews = getUploadedFileViews(opportunity);
-    return InfrastructureCollaborationOpportunityViewUtil.createView(
-        opportunity,
-        displayOrder,
-        uploadedFileViews,
-        isValid
-    );
+
+    return getInfrastructureCollaborationOpportunityViewBuilder(opportunity, displayOrder)
+        .isValid(isValid)
+        .build();
   }
 
   @Override
   protected boolean isValid(InfrastructureCollaborationOpportunity opportunity, ValidationType validationType) {
     return infrastructureCollaborationOpportunitiesService.isValid(opportunity, validationType);
+  }
+
+  private List<UploadedFileView> getUploadedFileViews(InfrastructureCollaborationOpportunity collaborationOpportunity) {
+    return infrastructureCollaborationOpportunityFileLinkService.getFileUploadViewsLinkedToOpportunity(
+        collaborationOpportunity
+    );
+  }
+
+  private InfrastructureCollaborationOpportunityViewBuilder getInfrastructureCollaborationOpportunityViewBuilder(
+      InfrastructureCollaborationOpportunity opportunity,
+      Integer displayOrder) {
+    var uploadedFileViews = getUploadedFileViews(opportunity);
+    var includeLinks = accessService.canCurrentUserAccessProjectSectionInfo(
+        opportunity.getProjectDetail(),
+        new OrganisationGroupIdWrapper(opportunity.getAddedByOrganisationGroup())
+    );
+    return new InfrastructureCollaborationOpportunityViewBuilder(
+        opportunity,
+        displayOrder,
+        uploadedFileViews
+    )
+        .includeSummaryLinks(includeLinks);
   }
 }

@@ -15,53 +15,79 @@ public class ForwardWorkPlanCollaborationOpportunityViewUtil {
     throw new IllegalStateException("ForwardWorkPlanCollaborationOpportunityViewUtil is a utility class and should not be instantiated");
   }
 
-  public static ForwardWorkPlanCollaborationOpportunityView createView(
-      ForwardWorkPlanCollaborationOpportunity opportunity,
-      Integer displayOrder,
-      List<UploadedFileView> uploadedFileViews
-  ) {
+  public static class ForwardWorkPlanCollaborationOpportunityViewBuilder {
+    private final ForwardWorkPlanCollaborationOpportunity opportunity;
+    private final Integer displayOrder;
+    private final List<UploadedFileView> uploadedFileViews;
+    private Boolean isValid;
+    private boolean includeSummaryViews = false;
 
-    var projectId = opportunity.getProjectDetail().getProject().getId();
+    public ForwardWorkPlanCollaborationOpportunityViewBuilder(
+        ForwardWorkPlanCollaborationOpportunity opportunity, Integer displayOrder,
+        List<UploadedFileView> uploadedFileViews) {
+      this.opportunity = opportunity;
+      this.displayOrder = displayOrder;
+      this.uploadedFileViews = uploadedFileViews;
+    }
 
-    final var editUrl = ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class)
-        .editCollaborationOpportunity(
-            projectId,
-            opportunity.getId(),
-            null
-        )
-    );
+    public ForwardWorkPlanCollaborationOpportunityViewBuilder isValid(Boolean isValid) {
+      this.isValid = isValid;
+      return this;
+    }
 
-    final var deleteUrl = ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class)
-        .removeCollaborationOpportunityConfirm(
-            projectId,
-            opportunity.getId(),
-            displayOrder,
-            null
-        )
-    );
+    public ForwardWorkPlanCollaborationOpportunityViewBuilder includeSummaryLinks(boolean includeSummaryViews) {
+      this.includeSummaryViews = includeSummaryViews;
+      return this;
+    }
 
-    return (ForwardWorkPlanCollaborationOpportunityView) CollaborationOpportunityViewUtilCommon.populateView(
-        new ForwardWorkPlanCollaborationOpportunityView(),
-        opportunity,
-        displayOrder,
-        uploadedFileViews,
-        editUrl,
-        deleteUrl
-    );
-  }
+    public ForwardWorkPlanCollaborationOpportunityView build() {
+      return createView(
+          opportunity,
+          includeSummaryViews,
+          displayOrder,
+          uploadedFileViews
+      );
+    }
 
-  public static ForwardWorkPlanCollaborationOpportunityView createView(
-      ForwardWorkPlanCollaborationOpportunity opportunity,
-      Integer displayOrder,
-      List<UploadedFileView> uploadedFileViews,
-      Boolean isValid
-  ) {
-    var view = createView(
-        opportunity,
-        displayOrder,
-        uploadedFileViews
-    );
-    view.setIsValid(isValid);
-    return view;
+    private ForwardWorkPlanCollaborationOpportunityView createView(
+        ForwardWorkPlanCollaborationOpportunity opportunity,
+        boolean includeSummaryLinks,
+        Integer displayOrder,
+        List<UploadedFileView> uploadedFileViews
+    ) {
+
+      var projectId = opportunity.getProjectDetail().getProject().getId();
+
+      final var editUrl = ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class)
+          .editCollaborationOpportunity(
+              projectId,
+              opportunity.getId(),
+              null
+          )
+      );
+
+      final var deleteUrl = ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class)
+          .removeCollaborationOpportunityConfirm(
+              projectId,
+              opportunity.getId(),
+              displayOrder,
+              null
+          )
+      );
+
+      var view = (ForwardWorkPlanCollaborationOpportunityView) CollaborationOpportunityViewUtilCommon.populateView(
+          new ForwardWorkPlanCollaborationOpportunityView(),
+          opportunity,
+          includeSummaryLinks,
+          displayOrder,
+          uploadedFileViews,
+          editUrl,
+          deleteUrl
+      );
+
+      view.setIsValid(this.isValid);
+
+      return view;
+    }
   }
 }

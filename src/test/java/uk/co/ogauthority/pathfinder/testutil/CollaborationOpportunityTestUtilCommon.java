@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityCommon;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityFileLinkCommon;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
@@ -22,6 +23,7 @@ public class CollaborationOpportunityTestUtilCommon {
   public static final String PHONE_NUMBER = ContactDetailsTestUtil.PHONE_NUMBER;
   public static final String JOB_TITLE = ContactDetailsTestUtil.JOB_TITLE;
   public static final String EMAIL = ContactDetailsTestUtil.EMAIL;
+  public static final PortalOrganisationGroup portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   public static CollaborationOpportunityFormCommon populateCompleteForm(CollaborationOpportunityFormCommon form) {
     form.setFunction(FUNCTION.name());
@@ -99,5 +101,6 @@ public class CollaborationOpportunityTestUtilCommon {
     opportunity.setPhoneNumber(PHONE_NUMBER);
     opportunity.setJobTitle(JOB_TITLE);
     opportunity.setEmailAddress(EMAIL);
+    opportunity.setAddedByOrganisationGroup(portalOrganisationGroup.getOrgGrpId());
   }
 }

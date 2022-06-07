@@ -35,6 +35,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProject
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
@@ -59,14 +60,14 @@ public class InfrastructureCollaborationOpportunitiesService
       InfrastructureCollaborationOpportunityFileLinkService infrastructureCollaborationOpportunityFileLinkService,
       ProjectDetailFileService projectDetailFileService,
       ProjectSetupService projectSetupService,
-      EntityDuplicationService entityDuplicationService
-  ) {
+      EntityDuplicationService entityDuplicationService,
+      TeamService teamService) {
     super(
         searchSelectorService,
         functionService,
         projectSetupService,
-        projectDetailFileService
-    );
+        projectDetailFileService,
+        teamService);
     this.validationService = validationService;
     this.infrastructureCollaborationOpportunityFormValidator = infrastructureCollaborationOpportunityFormValidator;
     this.infrastructureCollaborationOpportunitiesRepository = infrastructureCollaborationOpportunitiesRepository;
@@ -104,6 +105,8 @@ public class InfrastructureCollaborationOpportunitiesService
         form,
         opportunity
     );
+
+    setAddedByOrganisationGroup(opportunity, authenticatedUserAccount);
 
     opportunity = infrastructureCollaborationOpportunitiesRepository.save(opportunity);
 

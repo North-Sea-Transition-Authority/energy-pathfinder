@@ -26,7 +26,9 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.AllowProjectCo
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
+import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -38,6 +40,8 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
+import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationCompletionService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityFileLinkService;
@@ -64,6 +68,7 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
   private final ForwardWorkPlanCollaborationOpportunitiesSummaryService forwardWorkPlanCollaborationOpportunitiesSummaryService;
   private final ForwardWorkPlanCollaborationCompletionService forwardWorkPlanCollaborationCompletionService;
   private final ControllerHelperService controllerHelperService;
+  private final AccessService accessService;
 
   @Autowired
   public ForwardWorkPlanCollaborationOpportunityController(
@@ -76,8 +81,8 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
       ForwardWorkPlanCollaborationCompletionService forwardWorkPlanCollaborationCompletionService,
       ProjectDetailFileService projectDetailFileService,
       ControllerHelperService controllerHelperService,
-      FileDownloadService fileDownloadService
-  ) {
+      FileDownloadService fileDownloadService,
+      AccessService accessService) {
     super(projectDetailFileService, fileDownloadService);
     this.forwardWorkPlanCollaborationOpportunityModelService = forwardWorkPlanCollaborationOpportunityModelService;
     this.forwardWorkPlanCollaborationOpportunityFileLinkService = forwardWorkPlanCollaborationOpportunityFileLinkService;
@@ -87,6 +92,7 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
     this.forwardWorkPlanCollaborationOpportunitiesSummaryService = forwardWorkPlanCollaborationOpportunitiesSummaryService;
     this.forwardWorkPlanCollaborationCompletionService = forwardWorkPlanCollaborationCompletionService;
     this.controllerHelperService = controllerHelperService;
+    this.accessService = accessService;
   }
 
   @GetMapping("/setup")
@@ -221,6 +227,7 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
                                                    @PathVariable("opportunityId") Integer opportunityId,
                                                    ProjectContext projectContext) {
     var opportunity = forwardWorkPlanCollaborationOpportunityService.getOrError(opportunityId);
+    checkIfUserHasAccessToCollaborationOpportunity(opportunity);
     return getCollaborationOpportunityModelAndView(
         (ForwardWorkPlanCollaborationOpportunityForm) forwardWorkPlanCollaborationOpportunityService.getForm(opportunity),
         projectContext.getProjectDetails()
@@ -235,6 +242,7 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
                                                      ValidationType validationType,
                                                      ProjectContext projectContext) {
     var opportunity = forwardWorkPlanCollaborationOpportunityService.getOrError(opportunityId);
+    checkIfUserHasAccessToCollaborationOpportunity(opportunity);
     bindingResult = forwardWorkPlanCollaborationOpportunityService.validate(form, bindingResult, validationType);
 
     return controllerHelperService.checkErrorsAndRedirect(
@@ -267,9 +275,11 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
                                                             @PathVariable("opportunityId") Integer opportunityId,
                                                             @PathVariable("displayOrder") Integer displayOrder,
                                                             ProjectContext projectContext) {
+    var opportunity = forwardWorkPlanCollaborationOpportunityService.getOrError(opportunityId);
+    checkIfUserHasAccessToCollaborationOpportunity(opportunity);
     return forwardWorkPlanCollaborationOpportunityModelService.getRemoveCollaborationOpportunityConfirmationModelAndView(
         projectId,
-        opportunityId,
+        opportunity,
         displayOrder
     );
   }
@@ -280,6 +290,7 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
                                                      @PathVariable("displayOrder") Integer displayOrder,
                                                      ProjectContext projectContext) {
     final var opportunity = forwardWorkPlanCollaborationOpportunityService.getOrError(opportunityId);
+    checkIfUserHasAccessToCollaborationOpportunity(opportunity);
     forwardWorkPlanCollaborationOpportunityService.delete(opportunity);
 
     AuditService.audit(
@@ -357,4 +368,16 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
     );
   }
 
+  private void checkIfUserHasAccessToCollaborationOpportunity(ForwardWorkPlanCollaborationOpportunity opportunity) {
+    if (!accessService.canCurrentUserAccessProjectSectionInfo(
+        opportunity.getProjectDetail(),
+        new OrganisationGroupIdWrapper(opportunity.getAddedByOrganisationGroup())
+    )) {
+      throw new AccessDeniedException(
+          String.format(
+              "User does not have access to the ForwardWorkPlanCollaborationOpportunity with id: %d",
+              opportunity.getId())
+      );
+    }
+  }
 }

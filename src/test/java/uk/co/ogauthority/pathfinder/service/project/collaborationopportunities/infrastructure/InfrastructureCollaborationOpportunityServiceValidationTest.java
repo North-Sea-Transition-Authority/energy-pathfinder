@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -52,6 +53,9 @@ public class InfrastructureCollaborationOpportunityServiceValidationTest {
   @Mock
   private EntityDuplicationService entityDuplicationService;
 
+  @Mock
+  private TeamService teamService;
+
   private InfrastructureCollaborationOpportunitiesService infrastructureCollaborationOpportunitiesService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -70,8 +74,8 @@ public class InfrastructureCollaborationOpportunityServiceValidationTest {
         infrastructureCollaborationOpportunityFileLinkService,
         projectDetailFileService,
         projectSetupService,
-        entityDuplicationService
-    );
+        entityDuplicationService,
+        teamService);
   }
 
   @Test

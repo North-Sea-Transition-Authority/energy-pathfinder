@@ -43,6 +43,8 @@ import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.AccessService;
+import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderFileLinkService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
@@ -67,6 +69,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
   private final ControllerHelperService controllerHelperService;
   private final UpcomingTenderService upcomingTenderService;
   private final UpcomingTenderSummaryService upcomingTenderSummaryService;
+  private final AccessService accessService;
 
 
   @Autowired
@@ -75,12 +78,14 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
                                    UpcomingTenderService upcomingTenderService,
                                    UpcomingTenderSummaryService upcomingTenderSummaryService,
                                    ProjectDetailFileService projectDetailFileService,
-                                   FileDownloadService fileDownloadService) {
+                                   FileDownloadService fileDownloadService,
+                                   AccessService accessService) {
     super(projectDetailFileService, fileDownloadService);
     this.breadcrumbService = breadcrumbService;
     this.controllerHelperService = controllerHelperService;
     this.upcomingTenderService = upcomingTenderService;
     this.upcomingTenderSummaryService = upcomingTenderSummaryService;
+    this.accessService = accessService;
   }
 
   @GetMapping
@@ -309,10 +314,13 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
   }
 
   private void checkIfUserHasAccessToTender(UpcomingTender upcomingTender) {
-    if (!upcomingTenderService.canCurrentUserAccessTender(upcomingTender)) {
+    if (!accessService.canCurrentUserAccessProjectSectionInfo(
+        upcomingTender.getProjectDetail(),
+        new OrganisationGroupIdWrapper(upcomingTender.getAddedByOrganisationGroup())
+    )) {
       throw new AccessDeniedException(
           String.format(
-              "User does not have access to update UpcomingTender with id: %d",
+              "User does not have access to the UpcomingTender with id: %d",
               upcomingTender.getId())
       );
     }

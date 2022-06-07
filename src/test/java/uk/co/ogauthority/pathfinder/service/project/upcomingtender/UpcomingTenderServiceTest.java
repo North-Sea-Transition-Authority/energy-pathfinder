@@ -35,8 +35,8 @@ import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
+import uk.co.ogauthority.pathfinder.service.project.AccessService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
-import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -78,7 +78,7 @@ public class UpcomingTenderServiceTest {
   private EntityDuplicationService entityDuplicationService;
 
   @Mock
-  private ProjectOperatorService projectOperatorService;
+  private AccessService accessService;
 
   private UpcomingTenderService upcomingTenderService;
 
@@ -96,8 +96,6 @@ public class UpcomingTenderServiceTest {
     SearchSelectorService searchSelectorService = new SearchSelectorService();
     FunctionService functionService = new FunctionService(searchSelectorService);
 
-    SecurityHelperUtil.setAuthentication(authenticatedUserAccount);
-
     upcomingTenderService = new UpcomingTenderService(
         upcomingTenderRepository,
         validationService,
@@ -109,12 +107,11 @@ public class UpcomingTenderServiceTest {
         projectSetupService,
         entityDuplicationService,
         teamService,
-        projectOperatorService);
+        accessService
+        );
 
     when(upcomingTenderRepository.save(any(UpcomingTender.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
-
-    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUserAccount)).thenReturn(true);
 
     when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUserAccount.getLinkedPerson()))
         .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup)));
@@ -446,30 +443,15 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void canCurrentUserAccessTender_whenUserIsOperator_thenTrue() {
-    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUserAccount)).thenReturn(true);
+  public void canCurrentUserAccessTender_whenCurrentUserHasAccessToProjectSectionInfo_thenTrue() {
+    when(accessService.canCurrentUserAccessProjectSectionInfo(eq(detail), any())).thenReturn(true);
 
     assertThat(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).isTrue();
   }
 
   @Test
-  public void canCurrentUserAccessTender_whenUserNotOperatorAndCreatedUpcomingTender_thenTrue() {
-    var portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
-    upcomingTender.setAddedByOrganisationGroup(portalOrganisationGroup.getOrgGrpId());
-    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUserAccount)).thenReturn(false);
-    when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUserAccount.getLinkedPerson()))
-        .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup)));
-
-    assertThat(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).isTrue();
-  }
-
-  @Test
-  public void canCurrentUserAccessTender_whenUserNotOperatorAndNotCreatedUpcomingTender_thenFalse() {
-    var portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(42, "org", "org");
-    upcomingTender.setAddedByOrganisationGroup(portalOrganisationGroup.getOrgGrpId());
-    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUserAccount)).thenReturn(false);
-    when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUserAccount.getLinkedPerson()))
-        .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(1, "other org")));
+  public void canCurrentUserAccessTender_whenCurrentUserHasNoAccessToProjectSectionInfo_thenTrue() {
+    when(accessService.canCurrentUserAccessProjectSectionInfo(eq(detail), any())).thenReturn(false);
 
     assertThat(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).isFalse();
   }
