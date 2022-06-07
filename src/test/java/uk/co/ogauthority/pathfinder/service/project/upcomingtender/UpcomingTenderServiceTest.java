@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -35,12 +36,16 @@ import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTe
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.SecurityHelperUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -67,7 +72,13 @@ public class UpcomingTenderServiceTest {
   private ProjectSetupService projectSetupService;
 
   @Mock
+  private TeamService teamService;
+
+  @Mock
   private EntityDuplicationService entityDuplicationService;
+
+  @Mock
+  private ProjectOperatorService projectOperatorService;
 
   private UpcomingTenderService upcomingTenderService;
 
@@ -77,11 +88,15 @@ public class UpcomingTenderServiceTest {
 
   private final AuthenticatedUserAccount authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount();
 
+  private final PortalOrganisationGroup portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
+
   @Before
   public void setUp() {
 
     SearchSelectorService searchSelectorService = new SearchSelectorService();
     FunctionService functionService = new FunctionService(searchSelectorService);
+
+    SecurityHelperUtil.setAuthentication(authenticatedUserAccount);
 
     upcomingTenderService = new UpcomingTenderService(
         upcomingTenderRepository,
@@ -92,16 +107,25 @@ public class UpcomingTenderServiceTest {
         projectDetailFileService,
         upcomingTenderFileLinkService,
         projectSetupService,
-        entityDuplicationService
-    );
+        entityDuplicationService,
+        teamService,
+        projectOperatorService);
 
     when(upcomingTenderRepository.save(any(UpcomingTender.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
+
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUserAccount)).thenReturn(true);
+
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUserAccount.getLinkedPerson()))
+        .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup)));
+
+    SecurityHelperUtil.setAuthentication(authenticatedUserAccount);
   }
 
 
   @Test
   public void createUpcomingTender() {
+
     var form = UpcomingTenderUtil.getCompleteForm();
     var newUpcomingTender = upcomingTenderService.createUpcomingTender(
         detail,
@@ -233,6 +257,7 @@ public class UpcomingTenderServiceTest {
     assertThat(newUpcomingTender.getPhoneNumber()).isEqualTo(UpcomingTenderUtil.PHONE_NUMBER);
     assertThat(newUpcomingTender.getJobTitle()).isEqualTo(UpcomingTenderUtil.JOB_TITLE);
     assertThat(newUpcomingTender.getEmailAddress()).isEqualTo(UpcomingTenderUtil.EMAIL);
+    assertThat(newUpcomingTender.getAddedByOrganisationGroup()).isEqualTo(portalOrganisationGroup.getOrgGrpId());
   }
 
   private void checkCommonFormFields(UpcomingTenderForm form, UpcomingTender upcomingTender) {
@@ -418,5 +443,34 @@ public class UpcomingTenderServiceTest {
   public void allowSectionDataCleanUp_verifyIsTrue() {
     final var allowSectionDateCleanUp = upcomingTenderService.allowSectionDataCleanUp(detail);
     assertThat(allowSectionDateCleanUp).isTrue();
+  }
+
+  @Test
+  public void canCurrentUserAccessTender_whenUserIsOperator_thenTrue() {
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUserAccount)).thenReturn(true);
+
+    assertThat(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).isTrue();
+  }
+
+  @Test
+  public void canCurrentUserAccessTender_whenUserNotOperatorAndCreatedUpcomingTender_thenTrue() {
+    var portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
+    upcomingTender.setAddedByOrganisationGroup(portalOrganisationGroup.getOrgGrpId());
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUserAccount)).thenReturn(false);
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUserAccount.getLinkedPerson()))
+        .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(portalOrganisationGroup)));
+
+    assertThat(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).isTrue();
+  }
+
+  @Test
+  public void canCurrentUserAccessTender_whenUserNotOperatorAndNotCreatedUpcomingTender_thenFalse() {
+    var portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(42, "org", "org");
+    upcomingTender.setAddedByOrganisationGroup(portalOrganisationGroup.getOrgGrpId());
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUserAccount)).thenReturn(false);
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUserAccount.getLinkedPerson()))
+        .thenReturn(List.of(TeamTestingUtil.getOrganisationTeam(1, "other org")));
+
+    assertThat(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).isFalse();
   }
 }

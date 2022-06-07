@@ -104,11 +104,12 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
     var upcomingTenderView = UpcomingTenderViewUtil.createUpComingTenderView(
         upcomingTender,
+        true,
         DISPLAY_ORDER,
         Collections.emptyList()
     );
     when(upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, DISPLAY_ORDER)).thenReturn(upcomingTenderView);
-
+    when(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeam(detail, unAuthenticatedUser)).thenReturn(false);
     when(upcomingTenderService.createUpcomingTender(any(), any(), any())).thenReturn(UpcomingTenderUtil.getUpcomingTender(detail));
@@ -277,6 +278,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
     when(upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, DISPLAY_ORDER))
         .thenReturn(UpcomingTenderViewUtil.createUpComingTenderView(
             upcomingTender,
+            true,
             DISPLAY_ORDER,
             List.of()
         ));
@@ -526,6 +528,36 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
   }
 
   @Test
+  public void editUpcomingTender_userCantAccessTender_thenAccessForbidden() throws Exception {
+    when(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).thenReturn(false);
+
+    mockMvc.perform(
+            get(ReverseRouter.route(on(UpcomingTendersController.class)
+                .editUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, null)
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void updateUpcomingTender_userCantAccessTender_thenAccessForbidden() throws Exception {
+    when(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).thenReturn(false);
+
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    mockMvc.perform(
+            post(ReverseRouter.route(on(UpcomingTendersController.class)
+                .updateUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, null, null, null, null)
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser))
+                .with(csrf())
+                .params(completeParams))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
   public void handleDownload_draftProject() throws Exception {
     makeDownloadRequest(ProjectStatus.DRAFT);
   }
@@ -553,5 +585,35 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
         on(UpcomingTendersController.class).handleDownload(PROJECT_ID, PROJECT_VERSION, ProjectFileTestUtil.FILE_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
+  }
+
+  @Test
+  public void removeUpcomingTenderConfirm_userCantAccessTender_thenAccessForbidden() throws Exception {
+    when(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).thenReturn(false);
+
+    mockMvc.perform(
+            get(ReverseRouter.route(on(UpcomingTendersController.class)
+                .removeUpcomingTenderConfirm(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void removeUpcomingTender_userCantAccessTender_thenAccessForbidden() throws Exception {
+    when(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).thenReturn(false);
+
+    MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
+      add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+    }};
+
+    mockMvc.perform(
+            post(ReverseRouter.route(on(UpcomingTendersController.class)
+                .removeUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser))
+                .with(csrf())
+                .params(completeParams))
+        .andExpect(status().isForbidden());
   }
 }

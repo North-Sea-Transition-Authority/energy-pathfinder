@@ -55,16 +55,30 @@ public class UpcomingTenderSummaryService {
     var uploadedFileViews = upcomingTenderFileLinkService.getFileUploadViewsLinkedToUpcomingTender(
         upcomingTender
     );
-    return UpcomingTenderViewUtil.createUpComingTenderView(upcomingTender, displayOrder, uploadedFileViews);
+    var canAccessTender = upcomingTenderService.canCurrentUserAccessTender(upcomingTender);
+
+    return UpcomingTenderViewUtil.createUpComingTenderView(
+        upcomingTender,
+        canAccessTender,
+        displayOrder,
+        uploadedFileViews
+    );
   }
 
   private UpcomingTenderView getUpcomingTenderView(UpcomingTender upcomingTender,
-                                                  Integer displayOrder,
-                                                  boolean isValid) {
+                                                   Integer displayOrder,
+                                                   boolean isValid) {
     var uploadedFileViews = upcomingTenderFileLinkService.getFileUploadViewsLinkedToUpcomingTender(
         upcomingTender
     );
-    return UpcomingTenderViewUtil.createUpComingTenderView(upcomingTender, displayOrder, uploadedFileViews, isValid);
+    var canAccessTender = upcomingTenderService.canCurrentUserAccessTender(upcomingTender);
+    return UpcomingTenderViewUtil.createUpComingTenderView(
+        upcomingTender,
+        canAccessTender,
+        displayOrder,
+        uploadedFileViews,
+        isValid
+    );
   }
 
   public List<ErrorItem> getErrors(List<UpcomingTenderView> views) {

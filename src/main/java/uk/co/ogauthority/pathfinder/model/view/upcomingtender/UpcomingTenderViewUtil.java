@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.model.view.upcomingtender;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.ArrayList;
 import java.util.List;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
@@ -20,6 +21,7 @@ public class UpcomingTenderViewUtil {
   }
 
   public static UpcomingTenderView createUpComingTenderView(UpcomingTender upcomingTender,
+                                                            boolean includeSummaryLinks,
                                                             Integer displayOrder,
                                                             List<UploadedFileView> uploadedFileViews) {
     var projectId = upcomingTender.getProjectDetail().getProject().getId();
@@ -51,26 +53,31 @@ public class UpcomingTenderViewUtil {
     tender.setContactEmailAddress(upcomingTender.getEmailAddress());
     tender.setContactJobTitle(upcomingTender.getJobTitle());
 
-    var editLink = new SummaryLink(
-        SummaryLinkText.EDIT.getDisplayName(),
-        ReverseRouter.route(on(UpcomingTendersController.class).editUpcomingTender(
-            projectId,
-            upcomingTender.getId(),
-            null
-        ))
-    );
+    var links = new ArrayList<SummaryLink>();
+    if (includeSummaryLinks) {
+      var editLink = new SummaryLink(
+          SummaryLinkText.EDIT.getDisplayName(),
+          ReverseRouter.route(on(UpcomingTendersController.class).editUpcomingTender(
+              projectId,
+              upcomingTender.getId(),
+              null
+          ))
+      );
+      links.add(editLink);
 
-    var removeLink = new SummaryLink(
-        SummaryLinkText.DELETE.getDisplayName(),
-        ReverseRouter.route(on(UpcomingTendersController.class).removeUpcomingTenderConfirm(
-            projectId,
-            upcomingTender.getId(),
-            displayOrder,
-            null
-        ))
-    );
+      var removeLink = new SummaryLink(
+          SummaryLinkText.DELETE.getDisplayName(),
+          ReverseRouter.route(on(UpcomingTendersController.class).removeUpcomingTenderConfirm(
+              projectId,
+              upcomingTender.getId(),
+              displayOrder,
+              null
+          ))
+      );
+      links.add(removeLink);
+    }
 
-    tender.setSummaryLinks(List.of(editLink, removeLink));
+    tender.setSummaryLinks(links);
 
     tender.setUploadedFileViews(uploadedFileViews);
 
@@ -79,10 +86,11 @@ public class UpcomingTenderViewUtil {
 
   public static UpcomingTenderView createUpComingTenderView(
       UpcomingTender upcomingTender,
+      boolean includeSummaryLinks,
       Integer displayOrder,
       List<UploadedFileView> uploadedFileViews,
       Boolean isValid) {
-    var view = createUpComingTenderView(upcomingTender, displayOrder, uploadedFileViews);
+    var view = createUpComingTenderView(upcomingTender, includeSummaryLinks, displayOrder, uploadedFileViews);
     view.setIsValid(isValid);
     return view;
   }

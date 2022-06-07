@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.config.file.FileDeleteResult;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
@@ -29,15 +30,19 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDesc
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderForm;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderValidationHint;
+import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.util.SecurityUtil;
 import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
@@ -52,6 +57,8 @@ public class UpcomingTenderService implements ProjectFormSectionService {
   private final UpcomingTenderFileLinkService upcomingTenderFileLinkService;
   private final ProjectSetupService projectSetupService;
   private final EntityDuplicationService entityDuplicationService;
+  private final TeamService teamService;
+  private final ProjectOperatorService projectOperatorService;
 
   @Autowired
   public UpcomingTenderService(UpcomingTenderRepository upcomingTenderRepository,
@@ -62,7 +69,9 @@ public class UpcomingTenderService implements ProjectFormSectionService {
                                ProjectDetailFileService projectDetailFileService,
                                UpcomingTenderFileLinkService upcomingTenderFileLinkService,
                                ProjectSetupService projectSetupService,
-                               EntityDuplicationService entityDuplicationService) {
+                               EntityDuplicationService entityDuplicationService,
+                               TeamService teamService,
+                               ProjectOperatorService projectOperatorService) {
     this.upcomingTenderRepository = upcomingTenderRepository;
     this.validationService = validationService;
     this.upcomingTenderFormValidator = upcomingTenderFormValidator;
@@ -72,6 +81,8 @@ public class UpcomingTenderService implements ProjectFormSectionService {
     this.upcomingTenderFileLinkService = upcomingTenderFileLinkService;
     this.projectSetupService = projectSetupService;
     this.entityDuplicationService = entityDuplicationService;
+    this.teamService = teamService;
+    this.projectOperatorService = projectOperatorService;
   }
 
   @Transactional
@@ -80,6 +91,17 @@ public class UpcomingTenderService implements ProjectFormSectionService {
                                              AuthenticatedUserAccount userAccount) {
     var upcomingTender = new UpcomingTender(detail);
     setCommonFields(upcomingTender, form);
+
+    //TODO PAT-685 make sure only one org is saved when user belongs to mutliple ones
+    var portalOrganisationGroup = teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson())
+        .stream()
+        .map(OrganisationTeam::getPortalOrganisationGroup)
+        .findFirst()
+        .orElseThrow(() -> {
+          throw new PathfinderEntityNotFoundException("Could not get user's portal organisation team");
+        });
+
+    upcomingTender.setAddedByOrganisationGroup(portalOrganisationGroup.getOrgGrpId());
     upcomingTender = upcomingTenderRepository.save(upcomingTender);
 
     upcomingTenderFileLinkService.updateUpcomingTenderFileLinks(upcomingTender, form, userAccount);
@@ -98,7 +120,6 @@ public class UpcomingTenderService implements ProjectFormSectionService {
   }
 
   private void setCommonFields(UpcomingTender upcomingTender, UpcomingTenderForm form) {
-
     searchSelectorService.mapSearchSelectorFormEntryToEntity(
         form.getTenderFunction(),
         Function.values(),
@@ -129,6 +150,26 @@ public class UpcomingTenderService implements ProjectFormSectionService {
             String.format("Unable to find tender with id: %s", upcomingTenderId)
         )
     );
+  }
+
+  public boolean canCurrentUserAccessTender(UpcomingTender upcomingTender) {
+    var userAccount = SecurityUtil.getAuthenticatedUserFromSecurityContext()
+        .orElseThrow(() -> {
+          throw new PathfinderEntityNotFoundException("Could not get and authenticated user from security context");
+        });
+    var isProjectOperator = projectOperatorService.isUserInProjectTeam(upcomingTender.getProjectDetail(), userAccount);
+
+    if (isProjectOperator) {
+      return true;
+    }
+
+    var userPortalOrganisationGroupIds = teamService.getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson())
+        .stream()
+        .map(OrganisationTeam::getPortalOrganisationGroup)
+        .map(PortalOrganisationGroup::getOrgGrpId)
+        .collect(Collectors.toList());
+
+    return userPortalOrganisationGroupIds.contains(upcomingTender.getAddedByOrganisationGroup());
   }
 
   public BindingResult validate(UpcomingTenderForm form,

@@ -23,8 +23,10 @@ import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTe
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
@@ -58,6 +60,12 @@ public class UpcomingTenderServiceValidationTest {
   @Mock
   private EntityDuplicationService entityDuplicationService;
 
+  @Mock
+  private TeamService teamService;
+
+  @Mock
+  private ProjectOperatorService projectOperatorService;
+
   private UpcomingTenderService upcomingTenderService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -75,8 +83,9 @@ public class UpcomingTenderServiceValidationTest {
         projectDetailFileService,
         upcomingTenderFileLinkService,
         projectSetupService,
-        entityDuplicationService
-    );
+        entityDuplicationService,
+        teamService,
+        projectOperatorService);
   }
 
   @Test

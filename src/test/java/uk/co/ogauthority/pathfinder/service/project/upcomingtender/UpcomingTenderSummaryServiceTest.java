@@ -42,10 +42,14 @@ public class UpcomingTenderSummaryServiceTest {
 
   @Before
   public void setUp() {
-    upcomingTenderSummaryService = new UpcomingTenderSummaryService(upcomingTenderService, upcomingTenderFileLinkService);
+    upcomingTenderSummaryService = new UpcomingTenderSummaryService(
+        upcomingTenderService,
+        upcomingTenderFileLinkService);
     when(upcomingTenderService.getUpcomingTendersForDetail(details)).thenReturn(
         List.of(upcomingTender, manualEntryUpcomingTender)
     );
+
+    when(upcomingTenderService.canCurrentUserAccessTender(any())).thenReturn(true);
   }
 
   @Test

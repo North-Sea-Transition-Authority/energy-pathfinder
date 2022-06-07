@@ -42,6 +42,8 @@ public class UpcomingTender
 
   private String emailAddress;
 
+  private Integer addedByOrganisationGroup;
+
   public UpcomingTender() {
   }
 
@@ -127,5 +129,14 @@ public class UpcomingTender
   @Override
   public String getName() {
     return getContactName();
+  }
+
+  public Integer getAddedByOrganisationGroup() {
+    return addedByOrganisationGroup;
+  }
+
+  public void setAddedByOrganisationGroup(
+      Integer portalOrganisationGroupId) {
+    this.addedByOrganisationGroup = portalOrganisationGroupId;
   }
 }
