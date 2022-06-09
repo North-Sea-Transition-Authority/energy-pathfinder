@@ -44,7 +44,7 @@ public class TaskListControllerTest extends ProjectContextAbstractControllerTest
 
   @Before
   public void setUp() throws Exception {
-    when(taskListService.getTaskListModelAndView(eq(details), any()))
+    when(taskListService.getTaskListModelAndView(eq(details), any(), eq(authenticatedUser)))
         .thenReturn(new ModelAndView("test/blankTemplate.ftl"));
   }
 
@@ -57,7 +57,8 @@ public class TaskListControllerTest extends ProjectContextAbstractControllerTest
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
 
-    verify(taskListService, times(1)).getTaskListModelAndView(eq(details), any());
+    verify(taskListService, times(1))
+        .getTaskListModelAndView(eq(details), any(), eq(authenticatedUser));
   }
 
   @Test
@@ -67,6 +68,7 @@ public class TaskListControllerTest extends ProjectContextAbstractControllerTest
         .with(authenticatedUserAndSession(unAuthenticatedUser)))
         .andExpect(status().isForbidden());
 
-    verify(taskListService, times(0)).getTaskListModelAndView(eq(details), any());
+    verify(taskListService, times(0))
+        .getTaskListModelAndView(eq(details), any(), eq(authenticatedUser));
   }
 }

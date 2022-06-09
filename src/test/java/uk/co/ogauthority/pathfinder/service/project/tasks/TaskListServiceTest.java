@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.controller.project.CancelDraftProjectVersionController;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
@@ -22,6 +23,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.view.tasks.TaskListGroup;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.project.cancellation.CancelDraftProjectVersionService;
@@ -45,14 +47,20 @@ public class TaskListServiceTest {
   @Mock
   private WebUserAccountService webUserAccountService;
 
+  @Mock
+  private ProjectOperatorService projectOperatorService;
+
   private static final String SERVICE_NAME = "Service name";
 
   private final Set<UserToProjectRelationship> relationships = Set.of(UserToProjectRelationship.OPERATOR);
-  private final WebUserAccount webUserAccount = UserTestingUtil.getWebUserAccount();
+  private final WebUserAccount ownerWebUserAccount = UserTestingUtil.getWebUserAccount();
+  private final Boolean isOperator = true;
 
   private TaskListService taskListService;
 
   private ProjectDetail projectDetail;
+
+  private AuthenticatedUserAccount authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount();
 
   @Before
   public void setup() throws Exception {
@@ -60,14 +68,19 @@ public class TaskListServiceTest {
         taskListGroupsService,
         serviceProperties,
         cancelDraftProjectVersionService,
-        webUserAccountService);
+        webUserAccountService,
+        projectOperatorService
+    );
     projectDetail = ProjectUtil.getProjectDetails();
 
     when(serviceProperties.getServiceName()).thenReturn(SERVICE_NAME);
 
     when(cancelDraftProjectVersionService.isCancellable(projectDetail)).thenReturn(false);
 
-    when(webUserAccountService.getWebUserAccount(projectDetail.getCreatedByWua())).thenReturn(Optional.of(webUserAccount));
+    when(webUserAccountService.getWebUserAccount(projectDetail.getCreatedByWua()))
+        .thenReturn(Optional.of(ownerWebUserAccount));
+
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUserAccount)).thenReturn(isOperator);
   }
 
   @Test
@@ -81,7 +94,11 @@ public class TaskListServiceTest {
 
     when(taskListGroupsService.getTaskListGroups(projectDetail, relationships)).thenReturn(groups);
 
-    var modelAndView = taskListService.getTaskListModelAndView(projectDetail, relationships);
+    var modelAndView = taskListService.getTaskListModelAndView(
+        projectDetail,
+        relationships,
+        authenticatedUserAccount
+    );
     assertTaskListModelAndView(modelAndView, false, groups, projectDetail);
   }
 
@@ -96,7 +113,11 @@ public class TaskListServiceTest {
 
     when(taskListGroupsService.getTaskListGroups(projectDetail, relationships)).thenReturn(groups);
 
-    var modelAndView = taskListService.getTaskListModelAndView(projectDetail, relationships);
+    var modelAndView = taskListService.getTaskListModelAndView(
+        projectDetail,
+        relationships,
+        authenticatedUserAccount
+    );
     assertTaskListModelAndView(modelAndView, true, groups, projectDetail);
   }
 
@@ -104,7 +125,11 @@ public class TaskListServiceTest {
   public void getTaskListModelAndView_whenInfrastructureProject() {
     projectDetail.setProjectType(ProjectType.INFRASTRUCTURE);
 
-    var modelAndView = taskListService.getTaskListModelAndView(projectDetail, relationships);
+    var modelAndView = taskListService.getTaskListModelAndView(
+        projectDetail,
+        relationships,
+        authenticatedUserAccount
+    );
     assertTaskListModelAndView(modelAndView, false, List.of(), projectDetail);
   }
 
@@ -113,7 +138,11 @@ public class TaskListServiceTest {
 
     projectDetail.setProjectType(ProjectType.FORWARD_WORK_PLAN);
 
-    var modelAndView = taskListService.getTaskListModelAndView(projectDetail, relationships);
+    var modelAndView = taskListService.getTaskListModelAndView(
+        projectDetail,
+        relationships,
+        authenticatedUserAccount
+    );
     assertTaskListModelAndView(modelAndView, false, List.of(), projectDetail);
   }
 
@@ -121,7 +150,7 @@ public class TaskListServiceTest {
                                           boolean isUpdate,
                                           List<TaskListGroup> groups,
                                           ProjectDetail projectDetail) {
-    var ownerEmail = webUserAccount.getEmailAddress();
+    var ownerEmail = ownerWebUserAccount.getEmailAddress();
     assertThat(modelAndView.getViewName()).isEqualTo(TaskListService.TASK_LIST_TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
         entry("isUpdate", isUpdate),
@@ -133,6 +162,7 @@ public class TaskListServiceTest {
         entry("isCancellable", false),
         entry("canDisplayEmail",  !ownerEmail.isBlank()),
         entry("ownerEmail", ownerEmail),
+        entry("isOperator", isOperator),
         entry(
             ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR,
             ProjectService.getProjectTypeDisplayName(projectDetail)
@@ -148,5 +178,17 @@ public class TaskListServiceTest {
     return ProjectService.isInfrastructureProject(projectDetail)
         ? String.format("%s %s", SERVICE_NAME, ProjectService.getProjectTypeDisplayNameLowercase(projectDetail))
         : ProjectService.getProjectTypeDisplayName(projectDetail);
+  }
+
+  @Test
+  public void getTaskListModelAndView_whenUserIsNotOperator_assertFlagFalse() {
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUserAccount)).thenReturn(false);
+
+    var modelAndView = taskListService.getTaskListModelAndView(
+        projectDetail,
+        relationships,
+        authenticatedUserAccount
+    );
+    assertThat(modelAndView.getModel()).containsEntry("isOperator", false);
   }
 }

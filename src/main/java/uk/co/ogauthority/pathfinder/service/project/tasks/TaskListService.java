@@ -6,12 +6,14 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.controller.project.CancelDraftProjectVersionController;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.project.cancellation.CancelDraftProjectVersionService;
@@ -30,22 +32,29 @@ public class TaskListService {
 
   private final WebUserAccountService webUserAccountService;
 
+  private final ProjectOperatorService projectOperatorService;
+
   @Autowired
   public TaskListService(TaskListGroupsService taskListGroupsService,
                          ServiceProperties serviceProperties,
                          CancelDraftProjectVersionService cancelDraftProjectVersionService,
-                         WebUserAccountService webUserAccountService) {
+                         WebUserAccountService webUserAccountService,
+                         ProjectOperatorService projectOperatorService) {
     this.taskListGroupsService = taskListGroupsService;
     this.serviceProperties = serviceProperties;
     this.cancelDraftProjectVersionService = cancelDraftProjectVersionService;
     this.webUserAccountService = webUserAccountService;
+    this.projectOperatorService = projectOperatorService;
   }
 
-  public ModelAndView getTaskListModelAndView(ProjectDetail detail, Set<UserToProjectRelationship> relationships) {
+  public ModelAndView getTaskListModelAndView(ProjectDetail detail,
+                                              Set<UserToProjectRelationship> relationships,
+                                              AuthenticatedUserAccount userAccount) {
     var ownerEmail = webUserAccountService.getWebUserAccount(detail.getCreatedByWua())
         .map(WebUserAccount::getEmailAddress)
         .orElse("");
     var taskListGroups = taskListGroupsService.getTaskListGroups(detail, relationships);
+    var isCurrentUserOperator = projectOperatorService.isUserInProjectTeam(detail, userAccount);
     var modelAndView = new ModelAndView(TASK_LIST_TEMPLATE_PATH)
         .addObject("isUpdate", !detail.isFirstVersion())
         .addObject("hasTaskListGroups", !taskListGroups.isEmpty())
@@ -56,7 +65,8 @@ public class TaskListService {
         .addObject("taskListPageHeading", getTaskListPageHeading(detail))
         .addObject("isCancellable", cancelDraftProjectVersionService.isCancellable(detail))
         .addObject("canDisplayEmail", !ownerEmail.isBlank())
-        .addObject("ownerEmail", ownerEmail);
+        .addObject("ownerEmail", ownerEmail)
+        .addObject("isOperator", isCurrentUserOperator);
 
     ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, detail);
 
