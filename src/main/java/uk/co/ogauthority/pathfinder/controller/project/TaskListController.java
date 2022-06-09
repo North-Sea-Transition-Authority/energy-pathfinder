@@ -39,7 +39,8 @@ public class TaskListController {
                                    ProjectContext projectContext) {
     var modelAndView = taskListService.getTaskListModelAndView(
         projectContext.getProjectDetails(),
-        projectContext.getUserToProjectRelationships()
+        projectContext.getUserToProjectRelationships(),
+        projectContext.getUserAccount()
     );
     breadcrumbService.fromWorkArea(modelAndView, "Task list");
 

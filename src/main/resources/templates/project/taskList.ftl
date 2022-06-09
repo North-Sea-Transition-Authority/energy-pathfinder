@@ -9,6 +9,7 @@
 <#-- @ftlvariable name="canDisplayEmail" type="Boolean" -->
 <#-- @ftlvariable name="hasTaskListGroups" type="Boolean" -->
 <#-- @ftlvariable name="ownerEmail" type="String" -->
+<#-- @ftlvariable name="isOperator" type="Boolean" -->
 
 <#if isUpdate>
   <#assign cancelDraftLinkText = "Cancel draft update">
@@ -28,7 +29,7 @@
 
 <@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true>
 
-  <#if isCancellable>
+  <#if isCancellable && isOperator>
     <@fdsAction.link
       linkText=cancelDraftLinkText
       linkUrl=springUrl(cancelDraftUrl)
