@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project.projectcontribution;
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,6 +21,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.rest.OrganisationGroupRestController;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
+import uk.co.ogauthority.pathfinder.event.contributor.ContributorsAddedEventPublisher;
+import uk.co.ogauthority.pathfinder.event.contributor.ContributorsDeletedEventPublisher;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectcontribution.ProjectContributor;
 import uk.co.ogauthority.pathfinder.model.form.project.projectcontributor.ProjectContributorsForm;
@@ -48,6 +51,12 @@ public class ProjectContributorsCommonServiceTest {
   @Mock
   private PortalOrganisationAccessor portalOrganisationAccessor;
 
+  @Mock
+  private ContributorsDeletedEventPublisher contributorsDeletedEventPublisher;
+
+  @Mock
+  private ContributorsAddedEventPublisher contributorsAddedEventPublisher;
+
   private ProjectContributorsCommonService projectContributorsCommonService;
 
   @Before
@@ -56,7 +65,9 @@ public class ProjectContributorsCommonServiceTest {
         projectContributorRepository,
         projectOperatorService,
         portalOrganisationAccessor,
-        regulatorSharedEmail);
+        regulatorSharedEmail,
+        contributorsDeletedEventPublisher,
+        contributorsAddedEventPublisher);
   }
 
 
@@ -86,18 +97,75 @@ public class ProjectContributorsCommonServiceTest {
     assertThat(savedProjectContributors.get(1))
         .extracting(ProjectContributor::getContributionOrganisationGroup, ProjectContributor::getProjectDetail)
         .containsExactly(portalOrg2, detail);
+
+    verify(contributorsDeletedEventPublisher, times(1))
+        .publishContributorsDeletedEvent(argumentCaptor.capture(), eq(detail));
+    var deletedContributors = (List<ProjectContributor>) argumentCaptor.getValue();
+    assertThat(deletedContributors).isEmpty();
+
+    verify(contributorsAddedEventPublisher, times(1))
+        .publishContributorsAddedEvent(savedProjectContributors, detail);
   }
 
   @Test
   public void saveProjectContributors_nullList_verifyNoMethodCalls() {
     var form = new ProjectContributorsForm();
-    var myPortalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(3, "org3", "org3");
-    var projectOperator = ProjectOperatorTestUtil.getOperator(detail, myPortalOrganisationGroup);
 
     projectContributorsCommonService.saveProjectContributors(form, detail);
 
     verify(projectContributorRepository, never()).deleteAllByProjectDetail(detail);
     verify(projectContributorRepository, never()).saveAll(any());
+    verify(contributorsDeletedEventPublisher, never()).publishContributorsDeletedEvent(any(), any());
+    verify(contributorsAddedEventPublisher, never()).publishContributorsAddedEvent(any(), any());
+  }
+
+  @Test
+  public void saveProjectContributors_removedAContributor_thenRemovedContributorSentToEventPublisher() {
+    var form = new ProjectContributorsForm();
+    form.setContributors(List.of(1, 2));
+    var portalOrg1 = TeamTestingUtil.generateOrganisationGroup(1, "org1", "org1");
+    var portalOrg2 = TeamTestingUtil.generateOrganisationGroup(2, "org2", "org2");
+    var myPortalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(3, "org3", "org3");
+    var projectOperator = ProjectOperatorTestUtil.getOperator(detail, myPortalOrganisationGroup);
+    var removedProjectContributor = ProjectContributorTestUtil.contributorWithGroupOrgId(detail, 4);
+    ArgumentCaptor<List> argumentCaptor = ArgumentCaptor.forClass(List.class);
+    when(projectOperatorService.getProjectOperatorByProjectDetailOrError(detail)).thenReturn(projectOperator);
+    when(portalOrganisationAccessor.getOrganisationGroupsWhereIdIn(List.of(1, 2))).thenReturn(
+        List.of(portalOrg1, portalOrg2)
+    );
+    when(projectContributorRepository.findAllByProjectDetail(detail)).thenReturn(List.of(removedProjectContributor));
+
+    projectContributorsCommonService.saveProjectContributors(form, detail);
+
+    verify(contributorsDeletedEventPublisher, times(1))
+        .publishContributorsDeletedEvent(argumentCaptor.capture(), eq(detail));
+    var deletedContributors = (List<ProjectContributor>) argumentCaptor.getValue();
+    assertThat(deletedContributors).containsExactlyInAnyOrder(removedProjectContributor);
+  }
+
+  @Test
+  public void saveProjectContributors_addedAContributor_thenAddedContributorSentToEventPublisher() {
+    var form = new ProjectContributorsForm();
+    form.setContributors(List.of(1, 2));
+    var portalOrg1 = TeamTestingUtil.generateOrganisationGroup(1, "org1", "org1");
+    var portalOrg2 = TeamTestingUtil.generateOrganisationGroup(2, "org2", "org2");
+    var oldProjectContributor = ProjectContributorTestUtil.contributorWithGroupOrg(detail, portalOrg1);
+    var expectedNewProjectContributor = ProjectContributorTestUtil.contributorWithGroupOrg(detail, portalOrg2);
+    var myPortalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(3, "org3", "org3");
+    var projectOperator = ProjectOperatorTestUtil.getOperator(detail, myPortalOrganisationGroup);
+    ArgumentCaptor<List> argumentCaptor = ArgumentCaptor.forClass(List.class);
+    when(projectOperatorService.getProjectOperatorByProjectDetailOrError(detail)).thenReturn(projectOperator);
+    when(portalOrganisationAccessor.getOrganisationGroupsWhereIdIn(List.of(1, 2))).thenReturn(
+        List.of(portalOrg1, portalOrg2)
+    );
+    when(projectContributorRepository.findAllByProjectDetail(detail)).thenReturn(List.of(oldProjectContributor));
+
+    projectContributorsCommonService.saveProjectContributors(form, detail);
+
+    verify(contributorsAddedEventPublisher, times(1))
+        .publishContributorsAddedEvent(argumentCaptor.capture(), eq(detail));
+    var newProjectContributor = (List<ProjectContributor>) argumentCaptor.getValue();
+    assertThat(newProjectContributor).containsExactlyInAnyOrder(expectedNewProjectContributor);
   }
 
   @Test
@@ -194,9 +262,19 @@ public class ProjectContributorsCommonServiceTest {
 
   @Test
   public void deleteProjectContributors_verifyMethodCall() {
+    var projectContributor1 = ProjectContributorTestUtil.contributorWithGroupOrgId(detail, 1);
+    var projectContributor2 = ProjectContributorTestUtil.contributorWithGroupOrgId(detail, 2);
+    var listOfContributors = List.of(projectContributor1, projectContributor2);
+
+    when(projectContributorRepository.findAllByProjectDetail(detail))
+        .thenReturn(listOfContributors);
+
     projectContributorsCommonService.deleteProjectContributors(detail);
 
-    verify(projectContributorRepository, times(1)).deleteAllByProjectDetail(detail);
+    verify(projectContributorRepository, times(1))
+        .deleteAll(listOfContributors);
+    verify(contributorsDeletedEventPublisher, times(1))
+        .publishContributorsDeletedEvent(listOfContributors, detail);
   }
 
   @Test

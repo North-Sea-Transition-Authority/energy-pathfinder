@@ -2,6 +2,8 @@ package uk.co.ogauthority.pathfinder.service.entityduplication;
 
 public class TestChildEntity implements ChildEntity<Integer, TestParentEntity> {
 
+  private final static int finalField = 123456;
+
   private Integer id;
 
   private String stringValue;

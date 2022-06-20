@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation;
 
+import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -11,9 +12,11 @@ import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
 @Entity
 @Table(name = "portal_organisation_groups")
 @Immutable
-public class PortalOrganisationGroup implements SearchSelectable {
+public class PortalOrganisationGroup implements SearchSelectable, Serializable {
+
 
   public static final String UREF_TYPE = "++REGORGGRP";
+  private static final long serialVersionUID = -5005828457178189055L;
 
   @Id
   private Integer orgGrpId;

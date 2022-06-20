@@ -13,6 +13,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.rest.OrganisationGroupRestController;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
+import uk.co.ogauthority.pathfinder.event.contributor.ContributorsAddedEventPublisher;
+import uk.co.ogauthority.pathfinder.event.contributor.ContributorsDeletedEventPublisher;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectcontribution.ProjectContributor;
 import uk.co.ogauthority.pathfinder.model.form.project.projectcontributor.ProjectContributorsForm;
@@ -30,17 +32,23 @@ public class ProjectContributorsCommonService {
   private final ProjectOperatorService projectOperatorService;
   private final PortalOrganisationAccessor portalOrganisationAccessor;
   private final String regulatorSharedEmail;
+  private final ContributorsDeletedEventPublisher contributorsDeletedEventPublisher;
+  private final ContributorsAddedEventPublisher contributorsAddedEventPublisher;
 
   @Autowired
   public ProjectContributorsCommonService(
       ProjectContributorRepository projectContributorRepository,
       ProjectOperatorService projectOperatorService,
       PortalOrganisationAccessor portalOrganisationAccessor,
-      @Value("${regulator.shared.email}") String regulatorSharedEmail) {
+      @Value("${regulator.shared.email}") String regulatorSharedEmail,
+      ContributorsDeletedEventPublisher contributorsDeletedEventPublisher,
+      ContributorsAddedEventPublisher contributorsAddedEventPublisher) {
     this.projectContributorRepository = projectContributorRepository;
     this.projectOperatorService = projectOperatorService;
     this.portalOrganisationAccessor = portalOrganisationAccessor;
     this.regulatorSharedEmail = regulatorSharedEmail;
+    this.contributorsDeletedEventPublisher = contributorsDeletedEventPublisher;
+    this.contributorsAddedEventPublisher = contributorsAddedEventPublisher;
   }
 
   public void setContributorsInForm(ProjectContributorsForm form,
@@ -61,20 +69,36 @@ public class ProjectContributorsCommonService {
           .distinct()
           .filter(integer -> !projectOperator.getOrganisationGroup().getOrgGrpId().equals(integer))
           .collect(Collectors.toList());
-      List<ProjectContributor> projectContributors =
+      List<ProjectContributor> projectContributorsInForm =
           portalOrganisationAccessor.getOrganisationGroupsWhereIdIn(uniqueGroupOrganisationIds)
               .stream()
               .map(portalOrganisationGroup -> new ProjectContributor(projectDetail, portalOrganisationGroup))
               .collect(Collectors.toList());
 
+      var projectContributorsInDB = projectContributorRepository.findAllByProjectDetail(projectDetail);
+
+      var deletedContributors = projectContributorsInDB
+          .stream()
+          .filter(projectContributor -> !projectContributorsInForm.contains(projectContributor))
+          .collect(Collectors.toList());
+
+      var completelyNewContributors = projectContributorsInForm
+          .stream()
+          .filter(projectContributor -> !projectContributorsInDB.contains(projectContributor))
+          .collect(Collectors.toList());
+
+      contributorsDeletedEventPublisher.publishContributorsDeletedEvent(deletedContributors, projectDetail);
+      contributorsAddedEventPublisher.publishContributorsAddedEvent(completelyNewContributors, projectDetail);
       projectContributorRepository.deleteAllByProjectDetail(projectDetail);
-      projectContributorRepository.saveAll(projectContributors);
+      projectContributorRepository.saveAll(projectContributorsInForm);
     }
   }
 
   @Transactional
   public void deleteProjectContributors(ProjectDetail projectDetail) {
-    projectContributorRepository.deleteAllByProjectDetail(projectDetail);
+    var projectContributorsToDelete = projectContributorRepository.findAllByProjectDetail(projectDetail);
+    projectContributorRepository.deleteAll(projectContributorsToDelete);
+    contributorsDeletedEventPublisher.publishContributorsDeletedEvent(projectContributorsToDelete, projectDetail);
   }
 
   public void setModelAndViewCommonObjects(ModelAndView modelAndView,
