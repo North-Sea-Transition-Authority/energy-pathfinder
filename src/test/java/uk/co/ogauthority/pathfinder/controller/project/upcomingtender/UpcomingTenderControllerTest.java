@@ -33,6 +33,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
 import uk.co.ogauthority.pathfinder.controller.file.FileDownloadService;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.file.UploadedFile;
@@ -54,6 +55,7 @@ import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTende
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderSummaryService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectFileTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
@@ -100,6 +102,8 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
   private static final AuthenticatedUserAccount unAuthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
   private final UpcomingTender upcomingTender = UpcomingTenderUtil.getUpcomingTender(detail);
+  private final PortalOrganisationGroup addedByPortalOrganisationGroup =
+      TeamTestingUtil.generateOrganisationGroup(upcomingTender.getAddedByOrganisationGroup(), "org", "org");
 
   @Before
   public void setUp() throws SQLException {
@@ -110,7 +114,8 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
     UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
         DISPLAY_ORDER,
-        Collections.emptyList()
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
     ).build();
     when(upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, DISPLAY_ORDER)).thenReturn(upcomingTenderView);
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
@@ -284,7 +289,12 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
     when(upcomingTenderService.getForm(upcomingTender)).thenReturn(UpcomingTenderUtil.getCompleteForm());
     when(upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, DISPLAY_ORDER))
         .thenReturn(
-            new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(upcomingTender, DISPLAY_ORDER, List.of()).build()
+            new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
+                upcomingTender,
+                DISPLAY_ORDER,
+                List.of(),
+                addedByPortalOrganisationGroup
+            ).build()
         );
 
     projectControllerTesterService

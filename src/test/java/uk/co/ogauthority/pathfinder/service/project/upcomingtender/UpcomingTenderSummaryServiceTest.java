@@ -8,12 +8,15 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -24,6 +27,7 @@ import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -40,6 +44,9 @@ public class UpcomingTenderSummaryServiceTest {
   @Mock
   private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
+  @Mock
+  private PortalOrganisationAccessor portalOrganisationAccessor;
+
   private UpcomingTenderSummaryService upcomingTenderSummaryService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -48,17 +55,26 @@ public class UpcomingTenderSummaryServiceTest {
 
   private final UpcomingTender manualEntryUpcomingTender = UpcomingTenderUtil.getUpcomingTender_manualEntry(details);
 
+  private final PortalOrganisationGroup addedByPortalOrganisationGroup =
+      TeamTestingUtil.generateOrganisationGroup(upcomingTender.getAddedByOrganisationGroup(), "org", "org");
+
   @Before
   public void setUp() {
     upcomingTenderSummaryService = new UpcomingTenderSummaryService(
         upcomingTenderService,
         upcomingTenderFileLinkService,
-        projectSectionItemOwnershipService);
+        projectSectionItemOwnershipService,
+        portalOrganisationAccessor
+    );
     when(upcomingTenderService.getUpcomingTendersForDetail(details)).thenReturn(
         List.of(upcomingTender, manualEntryUpcomingTender)
     );
 
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(any(), any())).thenReturn(false);
+    when(portalOrganisationAccessor.getOrganisationGroupById(upcomingTender.getAddedByOrganisationGroup()))
+        .thenReturn(Optional.of(addedByPortalOrganisationGroup));
+    when(portalOrganisationAccessor.getOrganisationGroupById(manualEntryUpcomingTender.getAddedByOrganisationGroup()))
+        .thenReturn(Optional.of(addedByPortalOrganisationGroup));
   }
 
   @Test
@@ -187,6 +203,7 @@ public class UpcomingTenderSummaryServiceTest {
     assertThat(view.getContactPhoneNumber()).isEqualTo(tender.getPhoneNumber());
     assertThat(view.getContactJobTitle()).isEqualTo(tender.getJobTitle());
     assertThat(view.getContactEmailAddress()).isEqualTo(tender.getEmailAddress());
+    assertThat(view.getAddedByOrganisationGroup()).isEqualTo(addedByPortalOrganisationGroup.getName());
 
     assertThat(view.getSummaryLinks()).extracting(SummaryLink::getLinkText).containsExactly(
         SummaryLinkText.EDIT.getDisplayName(),

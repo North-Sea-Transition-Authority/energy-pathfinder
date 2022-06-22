@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
@@ -25,14 +27,17 @@ public class UpcomingTenderSummaryService {
   private final UpcomingTenderService upcomingTenderService;
   private final UpcomingTenderFileLinkService upcomingTenderFileLinkService;
   private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
+  private final PortalOrganisationAccessor portalOrganisationAccessor;
 
   @Autowired
   public UpcomingTenderSummaryService(UpcomingTenderService upcomingTenderService,
                                       UpcomingTenderFileLinkService upcomingTenderFileLinkService,
-                                      ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
+                                      ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
+                                      PortalOrganisationAccessor portalOrganisationAccessor) {
     this.upcomingTenderService = upcomingTenderService;
     this.upcomingTenderFileLinkService = upcomingTenderFileLinkService;
     this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
+    this.portalOrganisationAccessor = portalOrganisationAccessor;
   }
 
   public List<UpcomingTenderView> getSummaryViews(ProjectDetail detail) {
@@ -115,11 +120,15 @@ public class UpcomingTenderSummaryService {
         upcomingTender.getProjectDetail(),
         new OrganisationGroupIdWrapper(upcomingTender.getAddedByOrganisationGroup())
     );
+    var addedByPortalOrganisationGroup =
+        portalOrganisationAccessor.getOrganisationGroupById(upcomingTender.getAddedByOrganisationGroup())
+            .orElse(new PortalOrganisationGroup());
 
     return new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder,
-        uploadedFileViews
+        uploadedFileViews,
+        addedByPortalOrganisationGroup
     )
         .includeSummaryLinks(includeLinks);
   }

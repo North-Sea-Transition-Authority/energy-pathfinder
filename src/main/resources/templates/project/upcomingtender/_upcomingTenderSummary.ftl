@@ -37,6 +37,7 @@
       uploadedFileUrl=(view.uploadedFileViews[0].fileUrl)!""
       uploadedFileName=(view.uploadedFileViews[0].fileName)!""
       uploadedFileDescription=(view.uploadedFileViews[0].fileDescription)!""
+      addedByOrganisationGroup=view.addedByOrganisationGroup
     />
   </@summaryViewWrapper.summaryViewItemWrapper>
 </#macro>
@@ -74,6 +75,7 @@
       uploadedFileUrl=(files[0].UploadedFileView_fileUrl)!""
       uploadedFileName=(files[0].UploadedFileView_fileName)!""
       uploadedFileDescription=(files[0].UploadedFileView_fileDescription)!""
+      addedByOrganisationGroup=diffModel.UpcomingTenderView_addedByOrganisationGroup
     />
   </@summaryViewWrapper.summaryViewItemWrapper>
 </#macro>
@@ -91,6 +93,7 @@
   uploadedFileUrl=""
   uploadedFileName=""
   uploadedFileDescription=""
+  addedByOrganisationGroup=""
 >
   <@checkAnswers.checkAnswersStandardNestedOrDiffRow
     prompt="Tender function"
@@ -138,6 +141,11 @@
     fileUrlFieldValue=uploadedFileUrl
     fileNameFieldValue=uploadedFileName
     fileDescriptionFieldValue=uploadedFileDescription
+    isDiffedField=useDiffedField
+  />
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Added by"
+    fieldValue=addedByOrganisationGroup
     isDiffedField=useDiffedField
   />
 </#macro>

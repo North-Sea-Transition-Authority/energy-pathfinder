@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
@@ -20,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -27,6 +29,7 @@ import uk.co.ogauthority.pathfinder.util.DateUtil;
 @RunWith(MockitoJUnitRunner.class)
 public class UpcomingTenderViewUtilTest {
 
+  private PortalOrganisationGroup addedByPortalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
   private ProjectDetail projectDetail;
   private List<UploadedFileView> uploadedFileViews;
 
@@ -49,7 +52,8 @@ public class UpcomingTenderViewUtilTest {
     UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder,
-        uploadedFileViews
+        uploadedFileViews,
+        addedByPortalOrganisationGroup
     )
         .isValid(true)
         .includeSummaryLinks(true)
@@ -75,7 +79,8 @@ public class UpcomingTenderViewUtilTest {
     UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder,
-        uploadedFileViews
+        uploadedFileViews,
+        addedByPortalOrganisationGroup
     )
         .isValid(true)
         .includeSummaryLinks(true)
@@ -103,7 +108,8 @@ public class UpcomingTenderViewUtilTest {
     UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder,
-        uploadedFileViews
+        uploadedFileViews,
+        addedByPortalOrganisationGroup
     )
         .isValid(true)
         .includeSummaryLinks(true)
@@ -130,7 +136,8 @@ public class UpcomingTenderViewUtilTest {
     UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder,
-        uploadedFileViews
+        uploadedFileViews,
+        addedByPortalOrganisationGroup
     )
         .isValid(true)
         .includeSummaryLinks(true)
@@ -153,7 +160,8 @@ public class UpcomingTenderViewUtilTest {
     UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder,
-        uploadedFileViews
+        uploadedFileViews,
+        addedByPortalOrganisationGroup
     )
         .isValid(true)
         .includeSummaryLinks(true)
@@ -176,7 +184,8 @@ public class UpcomingTenderViewUtilTest {
     UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder,
-        uploadedFileViews
+        uploadedFileViews,
+        addedByPortalOrganisationGroup
     )
         .isValid(isValid)
         .includeSummaryLinks(true)
@@ -199,7 +208,8 @@ public class UpcomingTenderViewUtilTest {
     UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder,
-        uploadedFileViews
+        uploadedFileViews,
+        addedByPortalOrganisationGroup
     )
         .isValid(isValid)
         .includeSummaryLinks(true)
@@ -222,7 +232,8 @@ public class UpcomingTenderViewUtilTest {
     UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
         upcomingTender,
         displayOrder,
-        uploadedFileViews
+        uploadedFileViews,
+        addedByPortalOrganisationGroup
     )
         .isValid(true)
         .includeSummaryLinks(includeSummaryLinks)
@@ -230,6 +241,26 @@ public class UpcomingTenderViewUtilTest {
 
     assertCommonProperties(upcomingTenderView, upcomingTender, displayOrder, uploadedFileViews, includeSummaryLinks);
 
+  }
+
+  @Test
+  public void createUpComingTenderView_cannotFindPortalOrgGroup_thenDefaultAddedByPortalOrgGroupString() {
+    var upcomingTender = UpcomingTenderUtil.getUpcomingTender(projectDetail);
+    var includeSummaryLinks = false;
+    var emptyPortalOrganisationGroup = new PortalOrganisationGroup();
+    var displayOrder = 2;
+
+    UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
+        upcomingTender,
+        displayOrder,
+        uploadedFileViews,
+        emptyPortalOrganisationGroup
+    )
+        .isValid(true)
+        .includeSummaryLinks(includeSummaryLinks)
+        .build();
+
+    assertThat(upcomingTenderView.getAddedByOrganisationGroup()).isEqualTo("Unknown organisation");
   }
 
   private void assertCommonProperties(
@@ -248,6 +279,7 @@ public class UpcomingTenderViewUtilTest {
     assertThat(upcomingTenderView.getProjectId()).isEqualTo(upcomingTender.getProjectDetail().getProject().getId());
     assertThat(upcomingTenderView.getDisplayOrder()).isEqualTo(displayOrder);
     assertThat(upcomingTenderView.getUploadedFileViews()).containsExactlyElementsOf(files);
+    assertThat(upcomingTenderView.getAddedByOrganisationGroup()).isEqualTo(addedByPortalOrganisationGroup.getName());
 
     final var editSummaryLink = new SummaryLink(
         SummaryLinkText.EDIT.getDisplayName(),

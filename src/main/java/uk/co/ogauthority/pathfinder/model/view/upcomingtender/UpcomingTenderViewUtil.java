@@ -4,7 +4,9 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
@@ -25,15 +27,18 @@ public class UpcomingTenderViewUtil {
     private final UpcomingTender upcomingTender;
     private final int displayOrder;
     private final List<UploadedFileView> uploadedFileViews;
+    private final PortalOrganisationGroup addedByPortalOrganisationGroup;
     private boolean isValid = true;
     private boolean includeSummaryLinks = false;
 
     public UpcomingTenderViewBuilder(UpcomingTender upcomingTender,
                                      int displayOrder,
-                                     List<UploadedFileView> uploadedFileViews) {
+                                     List<UploadedFileView> uploadedFileViews,
+                                     PortalOrganisationGroup addedByPortalOrganisationGroup) {
       this.upcomingTender = upcomingTender;
       this.displayOrder = displayOrder;
       this.uploadedFileViews = uploadedFileViews;
+      this.addedByPortalOrganisationGroup = addedByPortalOrganisationGroup;
     }
 
     public UpcomingTenderViewBuilder isValid(boolean isValid) {
@@ -52,7 +57,8 @@ public class UpcomingTenderViewUtil {
           this.displayOrder,
           this.uploadedFileViews,
           this.isValid,
-          this.includeSummaryLinks
+          this.includeSummaryLinks,
+          this.addedByPortalOrganisationGroup
       );
     }
 
@@ -61,7 +67,8 @@ public class UpcomingTenderViewUtil {
         Integer displayOrder,
         List<UploadedFileView> uploadedFileViews,
         boolean isValid,
-        boolean includeSummaryLinks
+        boolean includeSummaryLinks,
+        PortalOrganisationGroup addedByPortalOrganisationGroup
     ) {
       var projectId = upcomingTender.getProjectDetail().getProject().getId();
       var upcomingTenderView = new UpcomingTenderView(
@@ -119,8 +126,16 @@ public class UpcomingTenderViewUtil {
       upcomingTenderView.setSummaryLinks(links);
       upcomingTenderView.setUploadedFileViews(uploadedFileViews);
       upcomingTenderView.setIsValid(isValid);
+      upcomingTenderView.setAddedByOrganisationGroup(resolvePortalOrganisationGroupName(addedByPortalOrganisationGroup));
 
       return upcomingTenderView;
+    }
+
+    private static String resolvePortalOrganisationGroupName(PortalOrganisationGroup portalOrganisationGroup) {
+      if (StringUtils.isBlank(portalOrganisationGroup.getName())) {
+        return "Unknown organisation";
+      }
+      return portalOrganisationGroup.getName();
     }
   }
 }
