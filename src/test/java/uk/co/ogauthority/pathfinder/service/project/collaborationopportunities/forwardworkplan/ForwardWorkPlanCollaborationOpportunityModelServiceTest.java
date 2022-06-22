@@ -20,6 +20,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
 import uk.co.ogauthority.pathfinder.controller.rest.ForwardWorkPlanCollaborationOpportunityRestController;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
@@ -35,11 +36,15 @@ import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService
 import uk.co.ogauthority.pathfinder.service.validation.ValidationErrorOrderingService;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
+
+  private final PortalOrganisationGroup addedByPortalOrganisationGroup =
+      TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   @Mock
   private ForwardWorkPlanCollaborationOpportunityService forwardWorkPlanCollaborationOpportunityService;
@@ -227,7 +232,8 @@ public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
     ForwardWorkPlanCollaborationOpportunityView collaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         1,
-        Collections.emptyList()
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
     )
         .includeSummaryLinks(true)
         .isValid(isValid)
@@ -248,7 +254,8 @@ public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
     ForwardWorkPlanCollaborationOpportunityView validCollaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         1,
-        Collections.emptyList()
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
     )
         .includeSummaryLinks(true)
         .isValid(true)
@@ -257,7 +264,8 @@ public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
     ForwardWorkPlanCollaborationOpportunityView invalidCollaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         2,
-        Collections.emptyList()
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
     )
         .includeSummaryLinks(true)
         .isValid(false)

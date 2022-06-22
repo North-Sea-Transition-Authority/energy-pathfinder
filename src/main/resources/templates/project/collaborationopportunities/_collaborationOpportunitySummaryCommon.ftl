@@ -12,6 +12,7 @@
   uploadedFileUrl=""
   uploadedFileName=""
   uploadedFileDescription=""
+  addedByPortalOrganisationGroup=""
 >
   <@checkAnswers.checkAnswersStandardNestedOrDiffRow
     prompt="Opportunity function"
@@ -54,6 +55,11 @@
     fileUrlFieldValue=uploadedFileUrl
     fileNameFieldValue=uploadedFileName
     fileDescriptionFieldValue=uploadedFileDescription
+    isDiffedField=useDiffedField
+  />
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Added by"
+    fieldValue=addedByPortalOrganisationGroup
     isDiffedField=useDiffedField
   />
 </#macro>

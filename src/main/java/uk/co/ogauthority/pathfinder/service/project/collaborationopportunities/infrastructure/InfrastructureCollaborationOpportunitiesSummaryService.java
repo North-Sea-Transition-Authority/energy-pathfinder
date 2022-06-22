@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
@@ -33,15 +35,18 @@ public class InfrastructureCollaborationOpportunitiesSummaryService extends
   private final InfrastructureCollaborationOpportunitiesService infrastructureCollaborationOpportunitiesService;
   private final InfrastructureCollaborationOpportunityFileLinkService infrastructureCollaborationOpportunityFileLinkService;
   private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
+  private final PortalOrganisationAccessor portalOrganisationAccessor;
 
   @Autowired
   public InfrastructureCollaborationOpportunitiesSummaryService(
       InfrastructureCollaborationOpportunitiesService infrastructureCollaborationOpportunitiesService,
       InfrastructureCollaborationOpportunityFileLinkService infrastructureCollaborationOpportunityFileLinkService,
-      ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
+      ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
+      PortalOrganisationAccessor portalOrganisationAccessor) {
     this.infrastructureCollaborationOpportunitiesService = infrastructureCollaborationOpportunitiesService;
     this.infrastructureCollaborationOpportunityFileLinkService = infrastructureCollaborationOpportunityFileLinkService;
     this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
+    this.portalOrganisationAccessor = portalOrganisationAccessor;
   }
 
   public List<InfrastructureCollaborationOpportunityView> getSummaryViews(ProjectDetail detail) {
@@ -122,10 +127,14 @@ public class InfrastructureCollaborationOpportunitiesSummaryService extends
         opportunity.getProjectDetail(),
         new OrganisationGroupIdWrapper(opportunity.getAddedByOrganisationGroup())
     );
+    var addedByPortalOrganisationGroup =
+        portalOrganisationAccessor.getOrganisationGroupById(opportunity.getAddedByOrganisationGroup())
+            .orElse(new PortalOrganisationGroup());
     return new InfrastructureCollaborationOpportunityViewBuilder(
         opportunity,
         displayOrder,
-        uploadedFileViews
+        uploadedFileViews,
+        addedByPortalOrganisationGroup
     )
         .includeSummaryLinks(includeLinks);
   }

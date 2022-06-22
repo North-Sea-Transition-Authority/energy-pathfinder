@@ -2,6 +2,8 @@ package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityCommon;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
@@ -23,7 +25,8 @@ public class CollaborationOpportunityViewUtilCommon {
       Integer displayOrder,
       List<UploadedFileView> uploadedFileViews,
       String editUrl,
-      String deleteUrl
+      String deleteUrl,
+      PortalOrganisationGroup addedByPortalOrganisationGroup
   ) {
 
     var projectId = opportunity.getProjectDetail().getProject().getId();
@@ -63,6 +66,7 @@ public class CollaborationOpportunityViewUtilCommon {
     }
 
     view.setSummaryLinks(summaryLinks);
+    view.setAddedByPortalOrganisationGroup(resolvePortalOrganisationGroupName(addedByPortalOrganisationGroup));
 
     return view;
   }
@@ -75,7 +79,8 @@ public class CollaborationOpportunityViewUtilCommon {
       List<UploadedFileView> uploadedFileViews,
       String editUrl,
       String deleteUrl,
-      Boolean isValid
+      Boolean isValid,
+      PortalOrganisationGroup addedByPortalOrganisationGroup
   ) {
     final var populatedOpportunityView = populateView(
         opportunityView,
@@ -84,9 +89,17 @@ public class CollaborationOpportunityViewUtilCommon {
         displayOrder,
         uploadedFileViews,
         editUrl,
-        deleteUrl
+        deleteUrl,
+        addedByPortalOrganisationGroup
     );
     populatedOpportunityView.setIsValid(isValid);
     return populatedOpportunityView;
+  }
+
+  private static String resolvePortalOrganisationGroupName(PortalOrganisationGroup portalOrganisationGroup) {
+    if (StringUtils.isBlank(portalOrganisationGroup.getName())) {
+      return "Unknown organisation";
+    }
+    return portalOrganisationGroup.getName();
   }
 }

@@ -4,6 +4,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.List;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityViewUtilCommon;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
@@ -19,16 +20,19 @@ public class InfrastructureCollaborationOpportunityViewUtil {
     private final InfrastructureCollaborationOpportunity opportunity;
     private final Integer displayOrder;
     private final List<UploadedFileView> uploadedFileViews;
+    private final PortalOrganisationGroup addedByPortalOrganisationGroup;
     private Boolean isValid;
     private boolean includeSummaryLinks = false;
 
     public InfrastructureCollaborationOpportunityViewBuilder(
         InfrastructureCollaborationOpportunity opportunity,
         Integer displayOrder,
-        List<UploadedFileView> uploadedFileViews) {
+        List<UploadedFileView> uploadedFileViews,
+        PortalOrganisationGroup addedByPortalOrganisationGroup) {
       this.opportunity = opportunity;
       this.displayOrder = displayOrder;
       this.uploadedFileViews = uploadedFileViews;
+      this.addedByPortalOrganisationGroup = addedByPortalOrganisationGroup;
     }
 
     public InfrastructureCollaborationOpportunityViewBuilder isValid(Boolean isValid) {
@@ -47,7 +51,8 @@ public class InfrastructureCollaborationOpportunityViewUtil {
           this.includeSummaryLinks,
           this.displayOrder,
           this.uploadedFileViews,
-          this.isValid
+          this.isValid,
+          this.addedByPortalOrganisationGroup
       );
     }
 
@@ -56,7 +61,8 @@ public class InfrastructureCollaborationOpportunityViewUtil {
         boolean includeSummaryLinks,
         Integer displayOrder,
         List<UploadedFileView> uploadedFileViews,
-        Boolean isValid
+        Boolean isValid,
+        PortalOrganisationGroup addedByPortalOrganisationGroup
     ) {
 
       var projectId = opportunity.getProjectDetail().getProject().getId();
@@ -86,7 +92,8 @@ public class InfrastructureCollaborationOpportunityViewUtil {
               displayOrder,
               uploadedFileViews,
               editUrl,
-              deleteUrl
+              deleteUrl,
+              addedByPortalOrganisationGroup
           );
       view.setIsValid(isValid);
       return view;

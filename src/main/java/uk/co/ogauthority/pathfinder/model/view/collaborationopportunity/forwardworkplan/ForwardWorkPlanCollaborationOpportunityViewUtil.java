@@ -4,6 +4,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.List;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityViewUtilCommon;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
@@ -19,16 +20,19 @@ public class ForwardWorkPlanCollaborationOpportunityViewUtil {
     private final ForwardWorkPlanCollaborationOpportunity opportunity;
     private final Integer displayOrder;
     private final List<UploadedFileView> uploadedFileViews;
+    private final PortalOrganisationGroup addedByPortalOrganisationGroup;
     private Boolean isValid;
     private boolean includeSummaryViews = false;
 
     public ForwardWorkPlanCollaborationOpportunityViewBuilder(
         ForwardWorkPlanCollaborationOpportunity opportunity,
         Integer displayOrder,
-        List<UploadedFileView> uploadedFileViews) {
+        List<UploadedFileView> uploadedFileViews,
+        PortalOrganisationGroup addedByPortalOrganisationGroup) {
       this.opportunity = opportunity;
       this.displayOrder = displayOrder;
       this.uploadedFileViews = uploadedFileViews;
+      this.addedByPortalOrganisationGroup = addedByPortalOrganisationGroup;
     }
 
     public ForwardWorkPlanCollaborationOpportunityViewBuilder isValid(Boolean isValid) {
@@ -46,7 +50,8 @@ public class ForwardWorkPlanCollaborationOpportunityViewUtil {
           opportunity,
           includeSummaryViews,
           displayOrder,
-          uploadedFileViews
+          uploadedFileViews,
+          addedByPortalOrganisationGroup
       );
     }
 
@@ -54,7 +59,8 @@ public class ForwardWorkPlanCollaborationOpportunityViewUtil {
         ForwardWorkPlanCollaborationOpportunity opportunity,
         boolean includeSummaryLinks,
         Integer displayOrder,
-        List<UploadedFileView> uploadedFileViews
+        List<UploadedFileView> uploadedFileViews,
+        PortalOrganisationGroup addedByPortalOrganisationGroup
     ) {
 
       var projectId = opportunity.getProjectDetail().getProject().getId();
@@ -83,7 +89,8 @@ public class ForwardWorkPlanCollaborationOpportunityViewUtil {
           displayOrder,
           uploadedFileViews,
           editUrl,
-          deleteUrl
+          deleteUrl,
+          addedByPortalOrganisationGroup
       );
 
       view.setIsValid(this.isValid);

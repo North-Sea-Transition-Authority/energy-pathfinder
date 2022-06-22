@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
@@ -28,15 +30,18 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryService extends
   private final ForwardWorkPlanCollaborationOpportunityService forwardWorkPlanCollaborationOpportunityService;
   private final ForwardWorkPlanCollaborationOpportunityFileLinkService forwardWorkPlanCollaborationOpportunityFileLinkService;
   private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
+  private final PortalOrganisationAccessor portalOrganisationAccessor;
 
   @Autowired
   public ForwardWorkPlanCollaborationOpportunitiesSummaryService(
       ForwardWorkPlanCollaborationOpportunityService forwardWorkPlanCollaborationOpportunityService,
       ForwardWorkPlanCollaborationOpportunityFileLinkService forwardWorkPlanCollaborationOpportunityFileLinkService,
-      ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
+      ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
+      PortalOrganisationAccessor portalOrganisationAccessor) {
     this.forwardWorkPlanCollaborationOpportunityService = forwardWorkPlanCollaborationOpportunityService;
     this.forwardWorkPlanCollaborationOpportunityFileLinkService = forwardWorkPlanCollaborationOpportunityFileLinkService;
     this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
+    this.portalOrganisationAccessor = portalOrganisationAccessor;
   }
 
   public List<ForwardWorkPlanCollaborationOpportunityView> getSummaryViews(ProjectDetail projectDetail) {
@@ -121,10 +126,14 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryService extends
         opportunity.getProjectDetail(),
         new OrganisationGroupIdWrapper(opportunity.getAddedByOrganisationGroup())
     );
+    var addedByPortalOrganisationGroup =
+        portalOrganisationAccessor.getOrganisationGroupById(opportunity.getAddedByOrganisationGroup())
+            .orElse(new PortalOrganisationGroup());
     return new ForwardWorkPlanCollaborationOpportunityViewBuilder(
         opportunity,
         displayOrder,
-        uploadedFileViews
+        uploadedFileViews,
+        addedByPortalOrganisationGroup
     )
         .includeSummaryLinks(includeSummaryLinks);
   }

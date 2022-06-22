@@ -6,6 +6,7 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
@@ -13,6 +14,7 @@ import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
@@ -21,6 +23,8 @@ public class CollaborationOpportunityViewUtilCommonTest {
 
   private final int displayOrder = 1;
   private final List<UploadedFileView> fileList = List.of(UploadedFileUtil.createUploadedFileView());
+  private final PortalOrganisationGroup addedByPortalOrganisationGroup =
+      TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   private final String editUrl = "editUrl";
 
@@ -52,7 +56,8 @@ public class CollaborationOpportunityViewUtilCommonTest {
         displayOrder,
         fileList,
         editUrl,
-        deleteUrl
+        deleteUrl,
+        addedByPortalOrganisationGroup
     );
 
     populateViewAndAssertCommonViewProperties(view, entity);
@@ -79,7 +84,8 @@ public class CollaborationOpportunityViewUtilCommonTest {
         displayOrder,
         fileList,
         editUrl,
-        deleteUrl
+        deleteUrl,
+        addedByPortalOrganisationGroup
     );
 
     populateViewAndAssertCommonViewProperties(view, entity);
@@ -107,7 +113,8 @@ public class CollaborationOpportunityViewUtilCommonTest {
         fileList,
         editUrl,
         deleteUrl,
-        isValid
+        isValid,
+        addedByPortalOrganisationGroup
     );
 
     populateViewAndAssertCommonViewProperties(view, entity);
@@ -137,13 +144,34 @@ public class CollaborationOpportunityViewUtilCommonTest {
         fileList,
         editUrl,
         deleteUrl,
-        isValid
+        isValid,
+        addedByPortalOrganisationGroup
     );
 
     populateViewAndAssertCommonViewProperties(view, entity);
 
     assertThat(view.getFunction()).isEqualTo(new StringWithTag(entity.getManualFunction(), Tag.NOT_FROM_LIST));
     assertThat(view.isValid()).isEqualTo(isValid);
+  }
+
+  @Test
+  public void populateView_emptyAddedByPortalOrganisationGroup_thenDefaultAddedByString() {
+    var entity = getPopulatedTestCollaborationOpportunityCommon();
+    var view = new TestCollaborationOpportunityViewCommon();
+    var emptyPortalOrganisationGroup = new PortalOrganisationGroup();
+
+    CollaborationOpportunityViewUtilCommon.populateView(
+        view,
+        entity,
+        true,
+        displayOrder,
+        fileList,
+        editUrl,
+        deleteUrl,
+        emptyPortalOrganisationGroup
+    );
+
+    assertThat(view.getAddedByPortalOrganisationGroup()).isEqualTo("Unknown organisation");
   }
 
   private void populateViewAndAssertCommonViewProperties(TestCollaborationOpportunityViewCommon view,
@@ -160,6 +188,7 @@ public class CollaborationOpportunityViewUtilCommonTest {
     assertThat(view.getContactEmailAddress()).isEqualTo(entity.getEmailAddress());
     assertThat(view.getUploadedFileViews()).isEqualTo(fileList);
     assertThat(view.getSummaryLinks()).isEqualTo(List.of(editLink, removeLink));
+    assertThat(view.getAddedByPortalOrganisationGroup()).isEqualTo(addedByPortalOrganisationGroup.getName());
   }
 
   private TestCollaborationOpportunityCommon getPopulatedTestCollaborationOpportunityCommon() {

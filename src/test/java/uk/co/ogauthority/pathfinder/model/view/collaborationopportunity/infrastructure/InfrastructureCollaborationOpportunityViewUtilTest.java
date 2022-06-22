@@ -6,6 +6,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.List;
 import org.junit.Test;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
@@ -16,6 +17,7 @@ import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
@@ -23,6 +25,8 @@ public class InfrastructureCollaborationOpportunityViewUtilTest {
 
   private final int displayOrder = 1;
   private final List<UploadedFileView> fileList = List.of(UploadedFileUtil.createUploadedFileView());
+  private final PortalOrganisationGroup addedByPortalOrganisationGroup =
+      TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   @Test
   public void createView_withoutValidParam_whenFunctionFromList_thenNoTag() {
@@ -34,7 +38,8 @@ public class InfrastructureCollaborationOpportunityViewUtilTest {
     InfrastructureCollaborationOpportunityView view = new InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder(
         entity,
         displayOrder,
-        fileList
+        fileList,
+        addedByPortalOrganisationGroup
     )
         .includeSummaryLinks(true)
         .build();
@@ -57,7 +62,8 @@ public class InfrastructureCollaborationOpportunityViewUtilTest {
     InfrastructureCollaborationOpportunityView view = new InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder(
         entity,
         displayOrder,
-        fileList
+        fileList,
+        addedByPortalOrganisationGroup
     )
         .includeSummaryLinks(true)
         .build();
@@ -80,7 +86,8 @@ public class InfrastructureCollaborationOpportunityViewUtilTest {
     InfrastructureCollaborationOpportunityView view = new InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder(
         entity,
         displayOrder,
-        fileList
+        fileList,
+        addedByPortalOrganisationGroup
     )
         .includeSummaryLinks(true)
         .isValid(isValid)
@@ -106,7 +113,8 @@ public class InfrastructureCollaborationOpportunityViewUtilTest {
     InfrastructureCollaborationOpportunityView view = new InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder(
         entity,
         displayOrder,
-        fileList
+        fileList,
+        addedByPortalOrganisationGroup
     )
         .includeSummaryLinks(true)
         .isValid(isValid)
@@ -133,6 +141,7 @@ public class InfrastructureCollaborationOpportunityViewUtilTest {
     assertThat(view.getContactJobTitle()).isEqualTo(entity.getJobTitle());
     assertThat(view.getContactEmailAddress()).isEqualTo(entity.getEmailAddress());
     assertThat(view.getUploadedFileViews()).isEqualTo(fileList);
+    assertThat(view.getAddedByPortalOrganisationGroup()).isEqualTo(addedByPortalOrganisationGroup.getName());
 
     final var editUrl = ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
         .editCollaborationOpportunity(

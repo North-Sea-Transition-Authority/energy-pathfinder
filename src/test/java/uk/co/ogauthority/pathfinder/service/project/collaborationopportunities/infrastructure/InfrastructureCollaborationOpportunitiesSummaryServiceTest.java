@@ -7,11 +7,14 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -22,6 +25,7 @@ import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastr
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
@@ -36,6 +40,9 @@ public class InfrastructureCollaborationOpportunitiesSummaryServiceTest {
   @Mock
   private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
+  @Mock
+  private PortalOrganisationAccessor portalOrganisationAccessor;
+
   private InfrastructureCollaborationOpportunitiesSummaryService infrastructureCollaborationOpportunitiesSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -44,15 +51,24 @@ public class InfrastructureCollaborationOpportunitiesSummaryServiceTest {
 
   private final InfrastructureCollaborationOpportunity manualEntryOpportunity = InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity_manualEntry(detail);
 
+  private final PortalOrganisationGroup addedByPortalOrganisationGroup =
+      TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
+
   @Before
   public void setUp() {
     infrastructureCollaborationOpportunitiesSummaryService = new InfrastructureCollaborationOpportunitiesSummaryService(
         infrastructureCollaborationOpportunitiesService,
         infrastructureCollaborationOpportunityFileLinkService,
-        projectSectionItemOwnershipService);
+        projectSectionItemOwnershipService,
+        portalOrganisationAccessor
+    );
     when(infrastructureCollaborationOpportunitiesService.getOpportunitiesForDetail(detail)).thenReturn(
         List.of(opportunity, manualEntryOpportunity)
     );
+    when(portalOrganisationAccessor.getOrganisationGroupById(opportunity.getAddedByOrganisationGroup()))
+        .thenReturn(Optional.of(addedByPortalOrganisationGroup));
+    when(portalOrganisationAccessor.getOrganisationGroupById(manualEntryOpportunity.getAddedByOrganisationGroup()))
+        .thenReturn(Optional.of(addedByPortalOrganisationGroup));
   }
 
 

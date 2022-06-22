@@ -35,6 +35,7 @@ import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerT
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
 import uk.co.ogauthority.pathfinder.controller.file.FileDownloadService;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.file.UploadedFile;
@@ -57,6 +58,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermis
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectFileTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
@@ -67,6 +69,8 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
   private static final Integer COLLABORATION_OPPORTUNITY_ID = 1;
   private static final Integer DISPLAY_ORDER = 1;
   private static final Integer PROJECT_VERSION = 1;
+  private final PortalOrganisationGroup addedByPortalOrganisationGroup =
+      TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   @MockBean
   private InfrastructureCollaborationOpportunitiesService infrastructureCollaborationOpportunitiesService;
@@ -113,7 +117,8 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
     InfrastructureCollaborationOpportunityView collaborationOpportunityView = new InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder(
         opportunity,
         DISPLAY_ORDER,
-        Collections.emptyList()
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
     )
         .includeSummaryLinks(true)
         .build();
@@ -159,7 +164,8 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
     InfrastructureCollaborationOpportunityView collaborationOpportunityView = new InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder(
         infrastructureCollaborationOpportunity,
         DISPLAY_ORDER,
-        Collections.emptyList()
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
     )
         .includeSummaryLinks(true)
         .build();
@@ -303,7 +309,8 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
     InfrastructureCollaborationOpportunityView collaborationOpportunityView = new InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder(
         opportunity,
         DISPLAY_ORDER,
-        Collections.emptyList()
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
     )
         .includeSummaryLinks(true)
         .build();
