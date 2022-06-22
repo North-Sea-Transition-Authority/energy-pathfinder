@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
@@ -25,12 +26,17 @@ public class AwardedContractSummaryServiceTest {
   @Mock
   private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
+  @Mock
+  private PortalOrganisationAccessor portalOrganisationAccessor;
+
   private AwardedContractSummaryService awardedContractSummaryService;
 
   @Before
   public void setup() {
     awardedContractSummaryService = new AwardedContractSummaryService(awardedContractService,
-        projectSectionItemOwnershipService);
+        projectSectionItemOwnershipService,
+        portalOrganisationAccessor
+    );
   }
 
   @Test

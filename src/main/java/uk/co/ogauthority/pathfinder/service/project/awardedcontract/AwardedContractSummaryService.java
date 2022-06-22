@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContract;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -26,12 +28,15 @@ public class AwardedContractSummaryService {
 
   private final AwardedContractService awardedContractService;
   private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
+  private final PortalOrganisationAccessor portalOrganisationAccessor;
 
   @Autowired
   public AwardedContractSummaryService(AwardedContractService awardedContractService,
-                                       ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
+                                       ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
+                                       PortalOrganisationAccessor portalOrganisationAccessor) {
     this.awardedContractService = awardedContractService;
     this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
+    this.portalOrganisationAccessor = portalOrganisationAccessor;
   }
 
   public List<AwardedContractView> getAwardedContractViews(ProjectDetail projectDetail) {
@@ -75,7 +80,14 @@ public class AwardedContractSummaryService {
         awardedContract.getProjectDetail(),
         new OrganisationGroupIdWrapper(awardedContract.getAddedByOrganisationGroup())
     );
-    return new AwardedContractViewUtil.AwardedContractViewBuilder(awardedContract, displayNumber)
+    var addedByPortalOrganisationGroup =
+        portalOrganisationAccessor.getOrganisationGroupById(awardedContract.getAddedByOrganisationGroup())
+            .orElse(new PortalOrganisationGroup());
+    return new AwardedContractViewUtil.AwardedContractViewBuilder(
+        awardedContract,
+        displayNumber,
+        addedByPortalOrganisationGroup
+    )
         .includeSummaryLinks(includeSummaryLinks);
   }
 

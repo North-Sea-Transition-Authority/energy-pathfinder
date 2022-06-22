@@ -16,6 +16,8 @@ public class AwardedContractView extends ContactDetailProjectSummaryItem {
 
   private String contractBand;
 
+  private String addedByPortalOrganisationGroup;
+
   public String getContractorName() {
     return contractorName;
   }
@@ -54,6 +56,14 @@ public class AwardedContractView extends ContactDetailProjectSummaryItem {
 
   public void setContractBand(String contractBand) {
     this.contractBand = contractBand;
+  }
+
+  public String getAddedByPortalOrganisationGroup() {
+    return addedByPortalOrganisationGroup;
+  }
+
+  public void setAddedByPortalOrganisationGroup(String addedByPortalOrganisationGroup) {
+    this.addedByPortalOrganisationGroup = addedByPortalOrganisationGroup;
   }
 
   @Override

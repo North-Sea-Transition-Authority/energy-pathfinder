@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
@@ -38,6 +39,9 @@ public class AwardedContractSectionSummaryServiceTest {
   @Mock
   private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
+  @Mock
+  private PortalOrganisationAccessor portalOrganisationAccessor;
+
   private AwardedContractSectionSummaryService awardedContractSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -48,7 +52,9 @@ public class AwardedContractSectionSummaryServiceTest {
         awardedContractService,
         differenceService,
         projectSectionSummaryCommonModelService,
-        projectSectionItemOwnershipService);
+        projectSectionItemOwnershipService,
+        portalOrganisationAccessor
+    );
   }
 
   @Test

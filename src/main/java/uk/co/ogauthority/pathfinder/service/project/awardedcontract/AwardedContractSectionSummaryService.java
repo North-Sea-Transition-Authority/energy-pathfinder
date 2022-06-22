@@ -8,6 +8,8 @@ import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContract;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
@@ -37,17 +39,20 @@ public class AwardedContractSectionSummaryService implements ProjectSectionSumma
   private final DifferenceService differenceService;
   private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
   private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
+  private final PortalOrganisationAccessor portalOrganisationAccessor;
 
   @Autowired
   public AwardedContractSectionSummaryService(
       AwardedContractService awardedContractService,
       DifferenceService differenceService,
       ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService,
-      ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
+      ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
+      PortalOrganisationAccessor portalOrganisationAccessor) {
     this.awardedContractService = awardedContractService;
     this.differenceService = differenceService;
     this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
     this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
+    this.portalOrganisationAccessor = portalOrganisationAccessor;
   }
 
   @Override
@@ -118,7 +123,14 @@ public class AwardedContractSectionSummaryService implements ProjectSectionSumma
         awardedContract.getProjectDetail(),
         new OrganisationGroupIdWrapper(awardedContract.getAddedByOrganisationGroup())
     );
-    return new AwardedContractViewUtil.AwardedContractViewBuilder(awardedContract, displayNumber)
+    var addedByPortalOrganisationGroup =
+        portalOrganisationAccessor.getOrganisationGroupById(awardedContract.getAddedByOrganisationGroup())
+            .orElse(new PortalOrganisationGroup());
+    return new AwardedContractViewUtil.AwardedContractViewBuilder(
+        awardedContract,
+        displayNumber,
+        addedByPortalOrganisationGroup
+    )
         .includeSummaryLinks(includeSummaryLinks);
   }
 }

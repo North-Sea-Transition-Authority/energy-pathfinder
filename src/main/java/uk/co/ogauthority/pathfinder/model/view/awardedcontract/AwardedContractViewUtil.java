@@ -3,7 +3,9 @@ package uk.co.ogauthority.pathfinder.model.view.awardedcontract;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.ArrayList;
+import org.apache.commons.lang3.StringUtils;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContract;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
@@ -45,13 +47,16 @@ public class AwardedContractViewUtil {
 
     private final AwardedContract awardedContract;
     private final int displayOrder;
+    private final PortalOrganisationGroup addedByPortalOrganisationGroup;
     private boolean isValid = true;
     private boolean includeSummaryLinks = false;
 
     public AwardedContractViewBuilder(AwardedContract awardedContract,
-                                      Integer displayOrder) {
+                                      Integer displayOrder,
+                                      PortalOrganisationGroup addedByPortalOrganisationGroup) {
       this.awardedContract = awardedContract;
       this.displayOrder = displayOrder;
+      this.addedByPortalOrganisationGroup = addedByPortalOrganisationGroup;
     }
 
     public AwardedContractViewBuilder isValid(boolean isValid) {
@@ -69,14 +74,16 @@ public class AwardedContractViewUtil {
           this.awardedContract,
           this.displayOrder,
           this.isValid,
-          this.includeSummaryLinks
+          this.includeSummaryLinks,
+          this.addedByPortalOrganisationGroup
       );
     }
 
     private static AwardedContractView createAwardedContractView(AwardedContract awardedContract,
                                                                  int displayOrder,
                                                                  boolean isValid,
-                                                                 boolean includeSummaryLinks) {
+                                                                 boolean includeSummaryLinks,
+                                                                 PortalOrganisationGroup addedByPortalOrganisationGroup) {
       var awardedContractView = new AwardedContractView();
       awardedContractView.setDisplayOrder(displayOrder);
       awardedContractView.setId(awardedContract.getId());
@@ -110,10 +117,17 @@ public class AwardedContractViewUtil {
       }
 
       awardedContractView.setSummaryLinks(summaryLinks);
-
+      awardedContractView.setAddedByPortalOrganisationGroup(resolvePortalOrganisationName(addedByPortalOrganisationGroup));
       awardedContractView.setIsValid(isValid);
 
       return awardedContractView;
+    }
+
+    private static String resolvePortalOrganisationName(PortalOrganisationGroup portalOrganisationGroup) {
+      if (StringUtils.isBlank(portalOrganisationGroup.getName())) {
+        return "Unknown organisation";
+      }
+      return portalOrganisationGroup.getName();
     }
   }
 }
