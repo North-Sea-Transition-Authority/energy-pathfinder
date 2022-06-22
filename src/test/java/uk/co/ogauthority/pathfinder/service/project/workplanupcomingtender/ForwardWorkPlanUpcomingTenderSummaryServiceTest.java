@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -31,6 +32,9 @@ public class ForwardWorkPlanUpcomingTenderSummaryServiceTest {
   @Mock
   private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
+  @Mock
+  private PortalOrganisationAccessor portalOrganisationAccessor;
+
   private ForwardWorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
@@ -43,7 +47,8 @@ public class ForwardWorkPlanUpcomingTenderSummaryServiceTest {
   public void setup() {
     workPlanUpcomingTenderSummaryService = new ForwardWorkPlanUpcomingTenderSummaryService(
         workPlanUpcomingTenderService,
-        projectSectionItemOwnershipService
+        projectSectionItemOwnershipService,
+        portalOrganisationAccessor
     );
     when(workPlanUpcomingTenderService.getUpcomingTendersForDetail(projectDetail)).thenReturn(
         List.of(workPlanUpcomingTender, manualEntryWorkPlanUpcomingTender)

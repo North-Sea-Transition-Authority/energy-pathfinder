@@ -35,6 +35,7 @@
       contactPhoneNumber=view.contactPhoneNumber
       contactJobTitle=view.contactJobTitle
       contactEmailAddress=view.contactEmailAddress
+      addedByPortalOrganisationGroup=view.addedByPortalOrganisationGroup
     />
   </@summaryViewWrapper.summaryViewItemWrapper>
 </#macro>
@@ -50,6 +51,7 @@
   contactPhoneNumber=""
   contactJobTitle=""
   contactEmailAddress=""
+  addedByPortalOrganisationGroup=""
 >
   <@checkAnswers.checkAnswersStandardNestedOrDiffRow
     prompt="Department"
@@ -98,6 +100,11 @@
     fieldValue=contactEmailAddress
     isDiffedField=useDiffedField
   />
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Added by"
+    fieldValue=addedByPortalOrganisationGroup
+    isDiffedField=useDiffedField
+  />
 </#macro>
 
 <#macro upcomingTenderDiffSummary
@@ -130,6 +137,7 @@
       contactPhoneNumber=upcomingTenderDiff.ForwardWorkPlanUpcomingTenderView_contactPhoneNumber
       contactJobTitle=upcomingTenderDiff.ForwardWorkPlanUpcomingTenderView_contactJobTitle
       contactEmailAddress=upcomingTenderDiff.ForwardWorkPlanUpcomingTenderView_contactEmailAddress
+      addedByPortalOrganisationGroup=upcomingTenderDiff.ForwardWorkPlanUpcomingTenderView_addedByPortalOrganisationGroup
     />
   </@summaryViewWrapper.summaryViewItemWrapper>
 </#macro>

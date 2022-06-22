@@ -4,7 +4,9 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderController;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
@@ -26,13 +28,17 @@ public class ForwardWorkPlanUpcomingTenderViewUtil {
 
     private final ForwardWorkPlanUpcomingTender forwardWorkPlanUpcomingTender;
     private final int displayOrder;
+    private final PortalOrganisationGroup addedByPortalOrganisationGroup;
+
     private boolean isValid = true;
     private boolean includeSummaryLinks = false;
 
     public ForwardWorkPlanUpcomingTenderViewBuilder(ForwardWorkPlanUpcomingTender forwardWorkPlanUpcomingTender,
-                                                    int displayOrder) {
+                                                    int displayOrder,
+                                                    PortalOrganisationGroup addedByPortalOrganisationGroup) {
       this.forwardWorkPlanUpcomingTender = forwardWorkPlanUpcomingTender;
       this.displayOrder = displayOrder;
+      this.addedByPortalOrganisationGroup = addedByPortalOrganisationGroup;
     }
 
     public ForwardWorkPlanUpcomingTenderViewBuilder isValid(boolean isValid) {
@@ -50,7 +56,8 @@ public class ForwardWorkPlanUpcomingTenderViewUtil {
           this.forwardWorkPlanUpcomingTender,
           this.displayOrder,
           this.isValid,
-          this.includeSummaryLinks
+          this.includeSummaryLinks,
+          this.addedByPortalOrganisationGroup
       );
     }
 
@@ -58,7 +65,9 @@ public class ForwardWorkPlanUpcomingTenderViewUtil {
         ForwardWorkPlanUpcomingTender forwardWorkPlanUpcomingTender,
         Integer displayOrder,
         boolean isValid,
-        boolean includeSummaryLinks) {
+        boolean includeSummaryLinks,
+        PortalOrganisationGroup addedByPortalOrganisationGroup
+    ) {
       var projectId = forwardWorkPlanUpcomingTender.getProjectDetail().getProject().getId();
       var workPlanUpcomingTenderView = new ForwardWorkPlanUpcomingTenderView(
           displayOrder,
@@ -124,8 +133,18 @@ public class ForwardWorkPlanUpcomingTenderViewUtil {
 
       workPlanUpcomingTenderView.setSummaryLinks(summaryLinks);
       workPlanUpcomingTenderView.setIsValid(isValid);
+      workPlanUpcomingTenderView.setAddedByPortalOrganisationGroup(
+          resolvePortalOrganisationGroupName(addedByPortalOrganisationGroup)
+      );
 
       return workPlanUpcomingTenderView;
+    }
+
+    private static String resolvePortalOrganisationGroupName(PortalOrganisationGroup portalOrganisationGroup) {
+      if (StringUtils.isBlank(portalOrganisationGroup.getName())) {
+        return "Unknown organisation";
+      }
+      return portalOrganisationGroup.getName();
     }
 
     private static String getContractLength(DurationPeriod contractTermDurationPeriod,

@@ -31,6 +31,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
@@ -54,6 +55,7 @@ import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.Forwa
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderSummaryService;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
@@ -104,6 +106,9 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
 
   private final Set<ProjectPermission> requiredPermissions = ProjectControllerTesterService.PROJECT_CREATE_PERMISSION_SET;
 
+  private final PortalOrganisationGroup addedByPortalOrganisationGroup =
+      TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
+
   private ProjectControllerTesterService projectControllerTesterService;
 
   @Before
@@ -111,7 +116,8 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
     when(workPlanUpcomingTenderService.getOrError(UPCOMING_TENDER_ID)).thenReturn(workPlanUpcomingTender);
     var upcomingTenderView =  new ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder(
         workPlanUpcomingTender,
-        DISPLAY_ORDER
+        DISPLAY_ORDER,
+        addedByPortalOrganisationGroup
     ).build();
     when(workPlanUpcomingTenderSummaryService.getUpcomingTenderView(workPlanUpcomingTender, DISPLAY_ORDER)).thenReturn(upcomingTenderView);
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
