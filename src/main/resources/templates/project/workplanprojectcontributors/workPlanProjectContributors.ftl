@@ -24,7 +24,7 @@
           invalidItemText="This contributor is invalid"
           addToListId="contributor-table"
           selectorLabelText="Add an organisation that can contribute to this ${projectTypeDisplayNameLowercase}"
-          selectorHintText=""
+          selectorHintText="Any organisations that you add or remove will be notified by email when you save this page"
           restUrl=springUrl(contributorsRestUrl)
           selectorNestingPath="form.hasProjectContributors"
           />
