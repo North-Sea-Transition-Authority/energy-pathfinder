@@ -22,7 +22,7 @@
       invalidItemText="This contributor is invalid"
       addToListId="contributor-table"
       selectorLabelText="Add an organisation that can contribute to this ${projectTypeDisplayNameLowercase}"
-      selectorHintText=""
+      selectorHintText="Any organisations that you add or remove will be notified by email when you save this page"
       restUrl=springUrl(contributorsRestUrl)
     />
     <@fdsDetails.summaryDetails summaryTitle="The organisation I want to contribute to this ${projectTypeDisplayNameLowercase} is not listed">
