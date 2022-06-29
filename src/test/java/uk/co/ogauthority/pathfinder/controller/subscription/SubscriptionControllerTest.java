@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.controller.subscription;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -25,6 +26,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
+import uk.co.ogauthority.pathfinder.exception.SubscriberNotFoundException;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.subscription.SubscriptionService;
@@ -94,28 +96,75 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
   }
 
   @Test
-  public void getUnsubscribe() throws Exception {
-    mockMvc.perform(get(ReverseRouter.route(
+  public void getUnsubscribe_userIsSubscribed() throws Exception {
+    when(subscriptionService.getUnsubscribeModelAndView()).thenReturn(new ModelAndView(TEST_VIEW_NAME));
+
+    var modelAndView = mockMvc.perform(get(ReverseRouter.route(
         on(SubscriptionController.class).getUnsubscribe(SUBSCRIBER_UUID.toString()))))
-        .andExpect(status().isOk());
+        .andExpect(status().isOk())
+      .andReturn()
+      .getModelAndView();
+
+    assertThat(modelAndView.getViewName()).isEqualTo(TEST_VIEW_NAME);
 
     verify(metricsProvider.getUnSubscribePageHitCounter(), times(1)).increment();
   }
 
   @Test
-  public void unsubscribe() throws Exception {
+  public void getUnsubscribe_userIsNotSubscribed() throws Exception {
+    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString()))
+      .thenThrow(new SubscriberNotFoundException("User is not subscribed"));
+    when(subscriptionService.getAlreadyUnsubscribedModelAndView()).thenReturn(new ModelAndView(TEST_VIEW_NAME));
+
+    var modelAndView = mockMvc.perform(get(ReverseRouter.route(
+      on(SubscriptionController.class).getUnsubscribe(SUBSCRIBER_UUID.toString()))))
+      .andExpect(status().isOk())
+      .andReturn()
+      .getModelAndView();
+
+    assertThat(modelAndView.getViewName()).isEqualTo(TEST_VIEW_NAME);
+
+    verify(metricsProvider.getUnSubscribePageHitCounter(), times(1)).increment();
+  }
+
+  @Test
+  public void unsubscribe_userIsSubscribed() throws Exception {
     when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(SUBSCRIBER_UUID);
     when(subscriptionService.getUnsubscribeConfirmationModelAndView()).thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
-    mockMvc.perform(
+    var modelAndView = mockMvc.perform(
         post(ReverseRouter.route(on(SubscriptionController.class)
             .unsubscribe(SUBSCRIBER_UUID.toString(), Optional.empty())
         )))
-        .andExpect(status().isOk());
+        .andExpect(status().isOk())
+      .andReturn()
+      .getModelAndView();
 
+    assertThat(modelAndView.getViewName()).isEqualTo(TEST_VIEW_NAME);
+    
     verify(subscriptionService, times(1)).verifyIsSubscribed(SUBSCRIBER_UUID.toString());
     verify(subscriptionService, times(1)).unsubscribe(SUBSCRIBER_UUID);
     verify(analyticsService, times(1)).sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.SUBSCRIBER_UNSUBSCRIBED));
+    verify(metricsProvider.getUnsubscribePagePostCounter(), times(1)).increment();
+  }
+
+  @Test
+  public void unsubscribe_userIsNotSubscribed() throws Exception {
+    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString()))
+      .thenThrow(new SubscriberNotFoundException("User is not subscribed"));
+    when(subscriptionService.getAlreadyUnsubscribedModelAndView()).thenReturn(new ModelAndView(TEST_VIEW_NAME));
+
+    var modelAndView = mockMvc.perform(
+      post(ReverseRouter.route(on(SubscriptionController.class)
+        .unsubscribe(SUBSCRIBER_UUID.toString(), Optional.empty())
+      )))
+      .andExpect(status().isOk())
+      .andReturn().getModelAndView();
+
+    assertThat(modelAndView.getViewName()).isEqualTo(TEST_VIEW_NAME);
+
+    verify(subscriptionService, times(1)).verifyIsSubscribed(SUBSCRIBER_UUID.toString());
+    verify(subscriptionService, never()).unsubscribe(SUBSCRIBER_UUID);
     verify(metricsProvider.getUnsubscribePagePostCounter(), times(1)).increment();
   }
 }

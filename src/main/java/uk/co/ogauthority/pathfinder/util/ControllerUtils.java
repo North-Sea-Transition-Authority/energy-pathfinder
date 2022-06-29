@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsController;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.accessibility.AccessibilityStatementController;
 import uk.co.ogauthority.pathfinder.controller.analytics.CookiesController;
@@ -72,6 +73,11 @@ public class ControllerUtils {
 
   public static String getCookiesUrl() {
     return ReverseRouter.route(on(CookiesController.class).getCookiePreferences());
+  }
+
+  public static String getAnalyticsMeasurementUrl() {
+    return ReverseRouter.route(on(AnalyticsController.class)
+        .collectAnalyticsEvent(null, Optional.empty()));
   }
 
 }

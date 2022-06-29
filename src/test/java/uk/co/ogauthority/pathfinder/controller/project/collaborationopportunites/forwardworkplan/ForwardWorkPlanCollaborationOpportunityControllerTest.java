@@ -7,12 +7,18 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import static uk.co.ogauthority.pathfinder.testutil.ProjectFileTestUtil.FILE_ID;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
+import org.hibernate.AssertionFailure;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,9 +35,12 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
+import uk.co.ogauthority.pathfinder.model.entity.file.UploadedFile;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -50,6 +59,7 @@ import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.f
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationSetupService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFileTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
@@ -94,6 +104,8 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
 
+  private final ProjectDetailFile PROJECT_DETAIL_FILE = ProjectFileTestUtil.getProjectDetailFile(projectDetail);
+
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       SystemAccessService.CREATE_PROJECT_PRIVILEGES
   );
@@ -105,10 +117,13 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
   private final Set<ProjectPermission> requiredPermissions = ProjectControllerTesterService.PROJECT_CREATE_PERMISSION_SET;
 
   @Before
-  public void setup() {
+  public void setup() throws SQLException {
+    UploadedFile file = ProjectFileTestUtil.getUploadedFile();
     projectControllerTesterService = new ProjectControllerTesterService(mockMvc, projectOperatorService);
     when(projectService.getLatestDetailOrError(projectId)).thenReturn(projectDetail);
     when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectDetailFileService.getProjectDetailFileByProjectDetailVersionAndFileId(any(), any(), any())).thenReturn(PROJECT_DETAIL_FILE);
+    when(projectDetailFileService.getUploadedFileById(FILE_ID)).thenReturn(file);
   }
 
   @Test
@@ -537,5 +552,77 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
         .withPermittedProjectTypes(permittedProjectTypes)
         .withRequiredProjectPermissions(requiredPermissions)
         .withRequestParam(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
+  }
+
+  @Test
+  public void handDownload_whenUserCanAccessProjectFiles_projectStatusSmokeTest() {
+
+    var userWithViewPriv = UserTestingUtil.getAuthenticatedUserAccount(List.of(UserPrivilege.PATHFINDER_PROJECT_VIEWER));
+
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, userWithViewPriv)).thenReturn(true);
+
+    when(projectDetailFileService.canAccessFiles(projectDetail, userWithViewPriv.getLinkedPerson()))
+        .thenReturn(true);
+
+    var allowedProjectStatuses = Set.of(
+        ProjectStatus.DRAFT,
+        ProjectStatus.QA,
+        ProjectStatus.PUBLISHED,
+        ProjectStatus.ARCHIVED
+    );
+
+    Arrays.asList(ProjectStatus.values()).forEach(projectStatus -> {
+
+      projectDetail.setStatus(projectStatus);
+
+      try {
+        if (allowedProjectStatuses.contains(projectStatus)) {
+          makeDownloadRequest(userWithViewPriv, status().isOk());
+        } else {
+          makeDownloadRequest(userWithViewPriv, status().isForbidden());
+        }
+      } catch (Exception exception) {
+        throw new AssertionFailure(
+            String.format(
+                "Encountered exception when testing access to downloading a file from a project with status %s",
+                projectStatus
+            ),
+            exception
+        );
+      }
+    });
+  }
+
+  @Test
+  public void handDownload_whenUserCannotAccessProjectFiles_projectStatusSmokeTest() {
+
+    var userWithViewPriv = UserTestingUtil.getAuthenticatedUserAccount(List.of(UserPrivilege.PATHFINDER_PROJECT_VIEWER));
+
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, userWithViewPriv)).thenReturn(true);
+
+    when(projectDetailFileService.canAccessFiles(projectDetail, userWithViewPriv.getLinkedPerson()))
+        .thenReturn(false);
+
+    Arrays.asList(ProjectStatus.values()).forEach(projectStatus -> {
+
+      projectDetail.setStatus(projectStatus);
+
+      try {
+        makeDownloadRequest(userWithViewPriv, status().isForbidden());
+      } catch (Exception exception) {
+        throw new AssertionFailure(String.format(
+            "Expected a 403 response when downloading a file from a project with status %s but encountered exception %s",
+            projectStatus,
+            exception
+        ));
+      }
+    });
+  }
+
+  private void makeDownloadRequest(AuthenticatedUserAccount userAccessingEndpoint, ResultMatcher expectedResponseStatus) throws Exception {
+    mockMvc.perform(get(ReverseRouter.route(
+            on(ForwardWorkPlanCollaborationOpportunityController.class).handleDownload(1, 2, ProjectFileTestUtil.FILE_ID, null)))
+            .with(authenticatedUserAndSession(userAccessingEndpoint)))
+        .andExpect(expectedResponseStatus);
   }
 }

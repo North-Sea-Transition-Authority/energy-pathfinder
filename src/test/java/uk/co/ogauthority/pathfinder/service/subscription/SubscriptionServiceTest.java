@@ -235,4 +235,14 @@ public class SubscriptionServiceTest {
         entry("resubscribeUrl", ReverseRouter.route(on(SubscriptionController.class).getSubscribe()))
     );
   }
+
+  @Test
+  public void getAlreadyUnsubscribedModelAndView() {
+    var modelAndView = subscriptionService.getAlreadyUnsubscribedModelAndView();
+
+    assertThat(modelAndView.getViewName()).isEqualTo(SubscriptionService.ALREADY_UNSUBSCRIBED_TEMPLATE_PATH);
+    assertThat(modelAndView.getModel()).containsExactly(
+      entry("resubscribeUrl", ReverseRouter.route(on(SubscriptionController.class).getSubscribe()))
+    );
+  }
 }

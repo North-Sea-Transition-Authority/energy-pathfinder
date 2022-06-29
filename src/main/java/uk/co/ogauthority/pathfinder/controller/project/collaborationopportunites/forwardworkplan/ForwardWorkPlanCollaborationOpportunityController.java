@@ -24,6 +24,7 @@ import uk.co.ogauthority.pathfinder.controller.file.PathfinderFileUploadControll
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
+import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
@@ -44,6 +45,7 @@ import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.f
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationRoutingService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationSetupService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Controller
@@ -72,8 +74,7 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
       ForwardWorkPlanCollaborationOpportunitiesSummaryService forwardWorkPlanCollaborationOpportunitiesSummaryService,
       ForwardWorkPlanCollaborationCompletionService forwardWorkPlanCollaborationCompletionService,
       ProjectDetailFileService projectDetailFileService,
-      ControllerHelperService controllerHelperService
-  ) {
+      ControllerHelperService controllerHelperService) {
     super(projectDetailFileService);
     this.forwardWorkPlanCollaborationOpportunityModelService = forwardWorkPlanCollaborationOpportunityModelService;
     this.forwardWorkPlanCollaborationOpportunityFileLinkService = forwardWorkPlanCollaborationOpportunityFileLinkService;
@@ -307,11 +308,23 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
 
   @GetMapping("{projectVersion}/collaboration-opportunity/files/download/{fileId}")
   @ProjectStatusCheck(status = {ProjectStatus.DRAFT, ProjectStatus.QA, ProjectStatus.PUBLISHED, ProjectStatus.ARCHIVED})
+  @ProjectFormPagePermissionCheck(permissions = ProjectPermission.VIEW)
   @ResponseBody
   public ResponseEntity<Resource> handleDownload(@PathVariable("projectId") Integer projectId,
                                                  @PathVariable("projectVersion") Integer projectVersion,
                                                  @PathVariable("fileId") String fileId,
                                                  ProjectContext projectContext) {
+    if (!projectDetailFileService.canAccessFiles(
+        projectContext.getProjectDetails(),
+        projectContext.getUserAccount().getLinkedPerson()
+    )) {
+      throw new AccessDeniedException(String.format(
+          "User with id %s cannot access work plan collaboration file with id %s on project detail with id %s",
+          projectContext.getUserAccount().getWuaId(),
+          fileId,
+          projectContext.getProjectDetails().getId()
+      ));
+    }
     var file = projectDetailFileService.getProjectDetailFileByProjectDetailVersionAndFileId(
         projectContext.getProjectDetails().getProject(),
         projectVersion,

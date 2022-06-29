@@ -14,7 +14,11 @@ import static uk.co.ogauthority.pathfinder.testutil.ProjectFileTestUtil.FILE_ID;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import org.hibernate.AssertionFailure;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,11 +27,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
@@ -302,33 +308,75 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
   }
 
   @Test
-  public void handleDownload_draftProject() throws Exception {
-    makeDownloadRequest(ProjectStatus.DRAFT);
+  public void handDownload_whenUserCanAccessProjectFiles_projectStatusSmokeTest() {
+
+    var userWithViewPriv = UserTestingUtil.getAuthenticatedUserAccount(List.of(UserPrivilege.PATHFINDER_PROJECT_VIEWER));
+
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, userWithViewPriv)).thenReturn(true);
+
+    when(projectDetailFileService.canAccessFiles(detail, userWithViewPriv.getLinkedPerson()))
+        .thenReturn(true);
+
+    var allowedProjectStatuses = Set.of(
+        ProjectStatus.DRAFT,
+        ProjectStatus.QA,
+        ProjectStatus.PUBLISHED,
+        ProjectStatus.ARCHIVED
+    );
+
+    Arrays.asList(ProjectStatus.values()).forEach(projectStatus -> {
+
+      detail.setStatus(projectStatus);
+
+      try {
+        if (allowedProjectStatuses.contains(projectStatus)) {
+          makeDownloadRequest(userWithViewPriv, status().isOk());
+        } else {
+          makeDownloadRequest(userWithViewPriv, status().isForbidden());
+        }
+      } catch (Exception exception) {
+        throw new AssertionFailure(
+            String.format(
+                "Encountered exception when testing access to downloading a file from a project with status %s",
+                projectStatus
+            ),
+            exception
+        );
+      }
+    });
   }
 
   @Test
-  public void handleDownload_qaProject() throws Exception {
-    makeDownloadRequest(ProjectStatus.QA);
+  public void handDownload_whenUserCannotAccessProjectFiles_projectStatusSmokeTest() {
+
+    var userWithViewPriv = UserTestingUtil.getAuthenticatedUserAccount(List.of(UserPrivilege.PATHFINDER_PROJECT_VIEWER));
+
+    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, userWithViewPriv)).thenReturn(true);
+
+    when(projectDetailFileService.canAccessFiles(detail, userWithViewPriv.getLinkedPerson()))
+        .thenReturn(false);
+
+    Arrays.asList(ProjectStatus.values()).forEach(projectStatus -> {
+
+      detail.setStatus(projectStatus);
+
+      try {
+        makeDownloadRequest(userWithViewPriv, status().isForbidden());
+      } catch (Exception exception) {
+        throw new AssertionFailure(String.format(
+            "Expected a 403 response when downloading a file from a project with status %s but encountered exception %s",
+            projectStatus,
+            exception
+        ));
+      }
+    });
   }
 
-  @Test
-  public void handleDownload_publishedProject() throws Exception {
-    makeDownloadRequest(ProjectStatus.PUBLISHED);
-  }
-
-  @Test
-  public void handleDownload_archivedProject() throws Exception {
-    makeDownloadRequest(ProjectStatus.ARCHIVED);
-  }
-
-  private void makeDownloadRequest(ProjectStatus status) throws Exception {
-    var customStatusProject = detail;
-    customStatusProject.setStatus(status);
-    when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(customStatusProject);
+  private void makeDownloadRequest(AuthenticatedUserAccount userAccessingEndpoint, ResultMatcher expectedResponseStatus) throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(InfrastructureCollaborationOpportunitiesController.class).handleDownload(PROJECT_ID, PROJECT_VERSION, ProjectFileTestUtil.FILE_ID, null)))
-        .with(authenticatedUserAndSession(authenticatedUser)))
-        .andExpect(status().isOk());
+            on(InfrastructureCollaborationOpportunitiesController.class).handleDownload(PROJECT_ID, PROJECT_VERSION, ProjectFileTestUtil.FILE_ID, null)))
+            .with(authenticatedUserAndSession(userAccessingEndpoint)))
+        .andExpect(expectedResponseStatus);
   }
 
 }

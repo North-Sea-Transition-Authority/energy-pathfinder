@@ -2,6 +2,8 @@ package uk.co.ogauthority.pathfinder.controller.subscription;
 
 import java.util.Optional;
 import javax.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -15,6 +17,7 @@ import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsUtils;
 import uk.co.ogauthority.pathfinder.config.MetricsProvider;
+import uk.co.ogauthority.pathfinder.exception.SubscriberNotFoundException;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
 import uk.co.ogauthority.pathfinder.service.audit.AuditService;
@@ -23,6 +26,8 @@ import uk.co.ogauthority.pathfinder.service.subscription.SubscriptionService;
 
 @Controller
 public class SubscriptionController {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(SubscriptionController.class);
 
   private final SubscriptionService subscriptionService;
   private final ControllerHelperService controllerHelperService;
@@ -76,8 +81,18 @@ public class SubscriptionController {
         AuditEvent.UNSUBSCRIBE_GET_REQUEST,
         String.format(AuditEvent.UNSUBSCRIBE_GET_REQUEST.getMessage(), subscriberUuid)
     );
-    subscriptionService.verifyIsSubscribed(subscriberUuid);
-    return subscriptionService.getUnsubscribeModelAndView();
+    try {
+      subscriptionService.verifyIsSubscribed(subscriberUuid);
+      return subscriptionService.getUnsubscribeModelAndView();
+    } catch (SubscriberNotFoundException e) {
+      LOGGER.info(
+          String.format(
+              "No subscriber found when attempting to unsubscribe subscriber with UUID %s using GET endpoint",
+              subscriberUuid
+          )
+      );
+      return subscriptionService.getAlreadyUnsubscribedModelAndView();
+    }
   }
 
   @PostMapping("/unsubscribe/{subscriberUuid}")
@@ -89,9 +104,19 @@ public class SubscriptionController {
         AuditEvent.UNSUBSCRIBE_POST_REQUEST,
         String.format(AuditEvent.UNSUBSCRIBE_GET_REQUEST.getMessage(), subscriberUuid)
     );
-    var uuid = subscriptionService.verifyIsSubscribed(subscriberUuid);
-    subscriptionService.unsubscribe(uuid);
-    analyticsService.sendAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.SUBSCRIBER_UNSUBSCRIBED);
-    return subscriptionService.getUnsubscribeConfirmationModelAndView();
+    try {
+      var uuid = subscriptionService.verifyIsSubscribed(subscriberUuid);
+      subscriptionService.unsubscribe(uuid);
+      analyticsService.sendAnalyticsEvent(analyticsClientId, AnalyticsEventCategory.SUBSCRIBER_UNSUBSCRIBED);
+      return subscriptionService.getUnsubscribeConfirmationModelAndView();
+    } catch (SubscriberNotFoundException e) {
+      LOGGER.info(
+          String.format(
+              "No subscriber found when attempting to unsubscribe subscriber with UUID %s using POST endpoint",
+              subscriberUuid
+          )
+      );
+      return subscriptionService.getAlreadyUnsubscribedModelAndView();
+    }
   }
 }
