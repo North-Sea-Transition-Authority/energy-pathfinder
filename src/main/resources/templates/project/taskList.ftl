@@ -28,7 +28,20 @@
 <#assign pageTitle = taskListPageHeading />
 
 <@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true>
-
+  <#if !isOperator>
+    <@fdsNotificationBanner.notificationBannerInfo
+      bannerTitleText="You are a contributor on this ${projectTypeDisplayNameLowercase}"
+      bannerClass="govuk-notification-banner--full-width-content"
+    >
+      <h3 class="govuk-notification-banner__heading">
+        You have been given access to this ${projectTypeDisplayNameLowercase} by the operator
+      </h3>
+      <p class="govuk-body">
+        Only the operator can submit or start an update on this ${projectTypeDisplayNameLowercase}.
+        The operator can also view, edit and remove your contributions if required.
+      </p>
+    </@fdsNotificationBanner.notificationBannerInfo>
+  </#if>
   <#if isCancellable && isOperator>
     <@fdsAction.link
       linkText=cancelDraftLinkText
