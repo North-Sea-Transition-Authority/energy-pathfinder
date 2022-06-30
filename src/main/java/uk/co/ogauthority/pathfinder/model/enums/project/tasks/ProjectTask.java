@@ -4,6 +4,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.Set;
 import java.util.stream.Stream;
+import uk.co.ogauthority.pathfinder.controller.project.OverviewController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.campaigninformation.CampaignInformationController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
@@ -34,6 +35,7 @@ import uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline.Decom
 import uk.co.ogauthority.pathfinder.service.project.decommissioningschedule.DecommissioningScheduleService;
 import uk.co.ogauthority.pathfinder.service.project.integratedrig.IntegratedRigService;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
+import uk.co.ogauthority.pathfinder.service.project.overview.OverviewFormSectionService;
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
 import uk.co.ogauthority.pathfinder.service.project.plugabandonmentschedule.PlugAbandonmentScheduleService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
@@ -52,12 +54,21 @@ import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.Forwa
  */
 public enum ProjectTask implements GeneralPurposeProjectTask {
 
+  OVERVIEW(
+      OverviewController.PAGE_NAME,
+      OverviewController.class,
+      OverviewFormSectionService.class,
+      Set.of(ProjectType.INFRASTRUCTURE, ProjectType.FORWARD_WORK_PLAN),
+      5,
+      Set.of(UserToProjectRelationship.CONTRIBUTOR),
+      false
+  ),
   PROJECT_OPERATOR(
       ChangeProjectOperatorController.PAGE_NAME,
       ChangeProjectOperatorController.class,
       SelectOperatorService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      1,
+      10,
       Set.of(UserToProjectRelationship.OPERATOR)),
   PROJECT_INFORMATION(
       ProjectInformationController.PAGE_NAME,
@@ -186,6 +197,7 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
   private final Set<ProjectType> relatedProjectTypes;
   private final int displayOrder;
   private final Set<UserToProjectRelationship> permittedUserRelationships;
+  private final boolean showTag;
 
   ProjectTask(String displayName,
               Class controllerClass,
@@ -193,12 +205,31 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
               Set<ProjectType> relatedProjectTypes,
               int displayOrder,
               Set<UserToProjectRelationship> permittedUserRelationships) {
+    this(
+        displayName,
+        controllerClass,
+        serviceClass,
+        relatedProjectTypes,
+        displayOrder,
+        permittedUserRelationships,
+        true
+    );
+  }
+
+  ProjectTask(String displayName,
+              Class controllerClass,
+              Class<? extends ProjectFormSectionService> serviceClass,
+              Set<ProjectType> relatedProjectTypes,
+              int displayOrder,
+              Set<UserToProjectRelationship> permittedUserRelationships,
+              boolean showTag) {
     this.displayName = displayName;
     this.controllerClass = controllerClass;
     this.serviceClass = serviceClass;
     this.relatedProjectTypes = relatedProjectTypes;
     this.displayOrder = displayOrder;
     this.permittedUserRelationships = permittedUserRelationships;
+    this.showTag = showTag;
   }
 
   public static Stream<ProjectTask> stream() {
@@ -228,6 +259,11 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
   @Override
   public Set<ProjectType> getRelatedProjectTypes() {
     return relatedProjectTypes;
+  }
+
+  @Override
+  public boolean getShowTag() {
+    return showTag;
   }
 
   @Override
@@ -279,6 +315,8 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
         return ReverseRouter.route(on(ProjectContributorsController.class).renderProjectContributorsForm(projectId, null));
       case WORK_PLAN_PROJECT_CONTRIBUTORS:
         return ReverseRouter.route(on(ForwardWorkPlanProjectContributorsController.class).renderProjectContributors(projectId, null));
+      case OVERVIEW:
+        return ReverseRouter.route(on(OverviewController.class).getOverview(projectId, null));
       default:
         return "";
     }

@@ -13,12 +13,14 @@ public class TaskListTestUtil {
   public static final ProjectTask DEFAULT_PROJECT_TASK = ProjectTask.AWARDED_CONTRACTS;
   public static final boolean IS_COMPLETE = true;
   public static final ProjectDetail PROJECT_DETAIL = ProjectUtil.getProjectDetails();
+  public static final boolean SHOW_COMPLETION_TAG = true;
 
   public static TaskListEntry getTaskListEntry() {
     return new TaskListEntry(
         DEFAULT_PROJECT_TASK.getDisplayName(),
         DEFAULT_PROJECT_TASK.getTaskLandingPageRoute(PROJECT_DETAIL.getProject()),
         IS_COMPLETE,
+        SHOW_COMPLETION_TAG,
         DEFAULT_PROJECT_TASK.getDisplayOrder()
     );
   }
@@ -28,6 +30,7 @@ public class TaskListTestUtil {
         DEFAULT_PROJECT_TASK.getDisplayName(),
         DEFAULT_PROJECT_TASK.getTaskLandingPageRoute(detail.getProject()),
         IS_COMPLETE,
+        SHOW_COMPLETION_TAG,
         DEFAULT_PROJECT_TASK.getDisplayOrder()
     );
   }

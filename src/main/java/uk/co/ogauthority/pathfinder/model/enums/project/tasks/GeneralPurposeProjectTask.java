@@ -26,4 +26,5 @@ public interface GeneralPurposeProjectTask {
 
   Set<ProjectType> getRelatedProjectTypes();
 
+  boolean getShowTag();
 }

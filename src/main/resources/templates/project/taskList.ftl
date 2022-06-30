@@ -56,7 +56,13 @@
         <@fdsTaskList.taskListSection sectionNumber=group.displayOrder?c sectionHeadingText=group.groupName >
         <#-- List over entries -->
           <#list group.taskListEntries as task>
-            <@fdsTaskList.taskListItem itemUrl=springUrl(task.route) itemText=task.taskName completed=task.completed useNotCompletedLabels=task.usingCompletedLabels />
+            <@fdsTaskList.taskListItem
+            itemUrl=springUrl(task.route)
+            itemText=task.taskName
+            showTag=task.showTag
+            completed=task.completed
+            useNotCompletedLabels=true
+          />
           </#list>
         </@fdsTaskList.taskListSection>
       </#list>

@@ -9,6 +9,12 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 
 public enum ProjectTaskGroup {
 
+  OVERVIEW(
+      ProjectTask.OVERVIEW.getDisplayName(),
+      List.of(ProjectTask.OVERVIEW),
+      Set.of(ProjectType.INFRASTRUCTURE, ProjectType.FORWARD_WORK_PLAN),
+      5
+  ),
   PROJECT_OPERATOR(
       ProjectTask.PROJECT_OPERATOR.getDisplayName(),
       List.of(ProjectTask.PROJECT_OPERATOR),

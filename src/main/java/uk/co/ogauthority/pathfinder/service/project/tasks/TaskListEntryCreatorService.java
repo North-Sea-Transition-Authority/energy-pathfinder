@@ -31,6 +31,7 @@ public class TaskListEntryCreatorService {
         projectTask.getDisplayName(),
         projectTask.getTaskLandingPageRoute(detail.getProject()),
         projectTaskService.isTaskComplete(projectTask, detail),
+        projectTask.getShowTag(),
         projectTask.getDisplayOrder()
     );
   }
