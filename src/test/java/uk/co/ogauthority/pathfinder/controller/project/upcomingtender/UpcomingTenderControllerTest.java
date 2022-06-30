@@ -586,7 +586,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
     var userWithViewPriv = UserTestingUtil.getAuthenticatedUserAccount(List.of(UserPrivilege.PATHFINDER_PROJECT_VIEWER));
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, userWithViewPriv)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, userWithViewPriv)).thenReturn(true);
 
     when(projectDetailFileService.canAccessFiles(detail, userWithViewPriv.getLinkedPerson()))
         .thenReturn(true);
@@ -625,7 +625,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
 
     var userWithViewPriv = UserTestingUtil.getAuthenticatedUserAccount(List.of(UserPrivilege.PATHFINDER_PROJECT_VIEWER));
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, userWithViewPriv)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, userWithViewPriv)).thenReturn(true);
 
     when(projectDetailFileService.canAccessFiles(detail, userWithViewPriv.getLinkedPerson()))
         .thenReturn(false);

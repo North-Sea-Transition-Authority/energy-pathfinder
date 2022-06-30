@@ -126,7 +126,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
   private final Set<ProjectPermission> requiredPermissions = ProjectControllerTesterService.PROJECT_CREATE_PERMISSION_SET;
 
   @Before
-  public void setup() {
+  public void setup() throws SQLException {
     UploadedFile file = ProjectFileTestUtil.getUploadedFile();
     projectControllerTesterService = new ProjectControllerTesterService(
         mockMvc,
@@ -677,7 +677,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
 
     var userWithViewPriv = UserTestingUtil.getAuthenticatedUserAccount(List.of(UserPrivilege.PATHFINDER_PROJECT_VIEWER));
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, userWithViewPriv)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, userWithViewPriv)).thenReturn(true);
 
     when(projectDetailFileService.canAccessFiles(projectDetail, userWithViewPriv.getLinkedPerson()))
         .thenReturn(true);
@@ -716,7 +716,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
 
     var userWithViewPriv = UserTestingUtil.getAuthenticatedUserAccount(List.of(UserPrivilege.PATHFINDER_PROJECT_VIEWER));
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, userWithViewPriv)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, userWithViewPriv)).thenReturn(true);
 
     when(projectDetailFileService.canAccessFiles(projectDetail, userWithViewPriv.getLinkedPerson()))
         .thenReturn(false);
