@@ -1,8 +1,5 @@
 package uk.co.ogauthority.pathfinder.mvc;
 
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
-
-import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
@@ -12,7 +9,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfigurationProperties;
-import uk.co.ogauthority.pathfinder.analytics.AnalyticsController;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsUtils;
 import uk.co.ogauthority.pathfinder.auth.CurrentUserView;
@@ -47,8 +43,7 @@ public class DefaultPageControllerAdvice {
     this.request = request;
     this.footerService = footerService;
     this.analyticsConfigurationProperties = analyticsConfigurationProperties;
-    this.analyticsMeasurementUrl = ReverseRouter.route(on(AnalyticsController.class)
-        .collectAnalyticsEvent(null, Optional.empty()));
+    this.analyticsMeasurementUrl = ControllerUtils.getAnalyticsMeasurementUrl();
   }
 
   @InitBinder

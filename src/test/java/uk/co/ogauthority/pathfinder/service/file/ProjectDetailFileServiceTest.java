@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.co.ogauthority.pathfinder.config.file.FileDeleteResult;
 import uk.co.ogauthority.pathfinder.config.file.FileUploadResult;
 import uk.co.ogauthority.pathfinder.config.file.UploadErrorType;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
@@ -36,6 +37,7 @@ import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.repository.file.ProjectDetailFileRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -55,6 +57,9 @@ public class ProjectDetailFileServiceTest {
 
   @Mock
   private ProjectService projectService;
+
+  @Mock
+  private TeamService teamService;
 
   @Captor
   private ArgumentCaptor<ProjectDetailFile> projectDetailFileArgumentCaptor;
@@ -85,8 +90,8 @@ public class ProjectDetailFileServiceTest {
         fileUploadService,
         projectDetailFileRepository,
         entityDuplicationService,
-        projectService
-    );
+        projectService,
+        teamService);
 
     projectDetail = ProjectUtil.getProjectDetails();
     file = new ProjectDetailFile();
@@ -448,5 +453,49 @@ public class ProjectDetailFileServiceTest {
         PROJECT_VERSION,
         file.getFileId()
     );
+  }
+
+  @Test
+  public void canAccessFile_whenRegulatorAndQAProject_thenTrue() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+    projectDetail.setStatus(ProjectStatus.QA);
+    var person = new Person(1, "name", "surname", "email@mail.com", "123");
+
+    when(teamService.isPersonMemberOfRegulatorTeam(person)).thenReturn(true);
+
+    assertThat(projectDetailFileService.canAccessFiles(projectDetail, person)).isTrue();
+  }
+
+  @Test
+  public void canAccessFile_whenRegulatorAndDraftProject_thenFalse() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+    projectDetail.setStatus(ProjectStatus.DRAFT);
+    var person = new Person(1, "name", "surname", "email@mail.com", "123");
+
+    when(teamService.isPersonMemberOfRegulatorTeam(person)).thenReturn(true);
+
+    assertThat(projectDetailFileService.canAccessFiles(projectDetail, person)).isFalse();
+  }
+
+  @Test
+  public void canAccessFile_whenNotRegulatorAndQAProject_thenTrue() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+    projectDetail.setStatus(ProjectStatus.QA);
+    var person = new Person(1, "name", "surname", "email@mail.com", "123");
+
+    when(teamService.isPersonMemberOfRegulatorTeam(person)).thenReturn(false);
+
+    assertThat(projectDetailFileService.canAccessFiles(projectDetail, person)).isTrue();
+  }
+
+  @Test
+  public void canAccessFile_whenNotRegulatorAndDraftProject_thenTrue() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+    projectDetail.setStatus(ProjectStatus.DRAFT);
+    var person = new Person(1, "name", "surname", "email@mail.com", "123");
+
+    when(teamService.isPersonMemberOfRegulatorTeam(person)).thenReturn(false);
+
+    assertThat(projectDetailFileService.canAccessFiles(projectDetail, person)).isTrue();
   }
 }

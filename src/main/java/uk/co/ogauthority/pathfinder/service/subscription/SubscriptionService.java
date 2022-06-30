@@ -26,10 +26,11 @@ import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 @Service
 public class SubscriptionService {
 
-  public static final String SUBSCRIBE_TEMPLATE_PATH = "subscription/subscribe";
-  public static final String SUBSCRIBE_CONFIRMATION_TEMPLATE_PATH = "subscription/subscribeConfirmation";
-  public static final String UNSUBSCRIBE_TEMPLATE_PATH = "subscription/unsubscribe";
-  public static final String UNSUBSCRIBE_CONFIRMATION_TEMPLATE_PATH = "subscription/unsubscribeConfirmation";
+  static final String SUBSCRIBE_TEMPLATE_PATH = "subscription/subscribe";
+  static final String SUBSCRIBE_CONFIRMATION_TEMPLATE_PATH = "subscription/subscribeConfirmation";
+  static final String UNSUBSCRIBE_TEMPLATE_PATH = "subscription/unsubscribe";
+  static final String UNSUBSCRIBE_CONFIRMATION_TEMPLATE_PATH = "subscription/unsubscribeConfirmation";
+  static final String ALREADY_UNSUBSCRIBED_TEMPLATE_PATH = "subscription/alreadyUnsubscribed";
 
   private final SubscriberRepository subscriberRepository;
   private final ValidationService validationService;
@@ -124,5 +125,10 @@ public class SubscriptionService {
   public ModelAndView getUnsubscribeConfirmationModelAndView() {
     return new ModelAndView(UNSUBSCRIBE_CONFIRMATION_TEMPLATE_PATH)
         .addObject("resubscribeUrl", ReverseRouter.route(on(SubscriptionController.class).getSubscribe()));
+  }
+
+  public ModelAndView getAlreadyUnsubscribedModelAndView() {
+    return new ModelAndView(ALREADY_UNSUBSCRIBED_TEMPLATE_PATH)
+      .addObject("resubscribeUrl", ReverseRouter.route(on(SubscriptionController.class).getSubscribe()));
   }
 }

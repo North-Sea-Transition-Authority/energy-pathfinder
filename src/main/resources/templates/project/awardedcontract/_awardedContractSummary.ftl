@@ -56,7 +56,7 @@
     showActions=showActions
     headingSize=headingSize
     headingClass=headingClass
-    >
+  >
     <@_awardedContractSummaryFields
       useDiffedField=true
       contractorName=awardedContractDiff.AwardedContractView_contractorName

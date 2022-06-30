@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import uk.co.ogauthority.pathfinder.config.file.FileDeleteResult;
 import uk.co.ogauthority.pathfinder.config.file.FileUploadResult;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
@@ -22,6 +23,7 @@ import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
 import uk.co.ogauthority.pathfinder.model.entity.file.UploadedFile;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadMultipleFilesWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
@@ -29,6 +31,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.file.ProjectDetailFileRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 
 @Service
 public class ProjectDetailFileService {
@@ -37,16 +40,19 @@ public class ProjectDetailFileService {
   private final ProjectDetailFileRepository projectDetailFileRepository;
   private final EntityDuplicationService entityDuplicationService;
   private final ProjectService projectService;
+  private final TeamService teamService;
 
   @Autowired
   public ProjectDetailFileService(FileUploadService fileUploadService,
                                   ProjectDetailFileRepository projectDetailFileRepository,
                                   EntityDuplicationService entityDuplicationService,
-                                  ProjectService projectService) {
+                                  ProjectService projectService,
+                                  TeamService teamService) {
     this.fileUploadService = fileUploadService;
     this.projectDetailFileRepository = projectDetailFileRepository;
     this.entityDuplicationService = entityDuplicationService;
     this.projectService = projectService;
+    this.teamService = teamService;
   }
 
   /**
@@ -356,4 +362,10 @@ public class ProjectDetailFileService {
 
     return entityDuplicationService.createDuplicatedEntityPairingMap(duplicateProjectDetailFiles);
   }
+
+  public boolean canAccessFiles(ProjectDetail projectDetail, Person person) {
+    var isRegulator = teamService.isPersonMemberOfRegulatorTeam(person);
+    return !(projectDetail.getStatus().equals(ProjectStatus.DRAFT) && isRegulator);
+  }
+
 }

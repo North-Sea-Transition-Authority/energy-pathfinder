@@ -7,6 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfigurationProperties;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
+import uk.co.ogauthority.pathfinder.analytics.AnalyticsUtils;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.model.enums.contact.ServiceContactDetail;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
@@ -19,12 +22,16 @@ public class ErrorService {
 
   private final ServiceProperties serviceProperties;
   private final FooterService footerService;
+  private final AnalyticsConfigurationProperties analyticsConfigurationProperties;
+  private final String analyticsMeasurementUrl;
 
   @Autowired
   public ErrorService(ServiceProperties serviceProperties,
-                      FooterService footerService) {
+                      FooterService footerService, AnalyticsConfigurationProperties analyticsConfigurationProperties) {
     this.serviceProperties = serviceProperties;
     this.footerService = footerService;
+    this.analyticsConfigurationProperties = analyticsConfigurationProperties;
+    this.analyticsMeasurementUrl = ControllerUtils.getAnalyticsMeasurementUrl();
   }
 
   private String getErrorReference() {
@@ -62,6 +69,14 @@ public class ErrorService {
     footerService.addFooterUrlsToModelAndView(modelAndView);
   }
 
+  private void addAnalyticsItems(ModelAndView modelAndView) {
+    modelAndView.addObject("analytics", analyticsConfigurationProperties.getProperties());
+    modelAndView.addObject("cookiePrefsUrl", ControllerUtils.getCookiesUrl());
+    modelAndView.addObject("analyticsMeasurementUrl", analyticsMeasurementUrl);
+    modelAndView.addObject("analyticsClientIdCookieName", AnalyticsUtils.GA_CLIENT_ID_COOKIE_NAME);
+    modelAndView.addObject("showDiffsProjectEventCategory", AnalyticsEventCategory.SHOW_DIFFS_PROJECT.name());
+  }
+
   public ModelAndView addErrorAttributesToModel(ModelAndView modelAndView, Throwable throwable) {
     if (throwable != null) {
       addStackTraceToModel(modelAndView, throwable);
@@ -70,6 +85,7 @@ public class ErrorService {
     addTechnicalSupportContactDetails(modelAndView);
     addServiceProperties(modelAndView);
     addCommonUrls(modelAndView);
+    addAnalyticsItems(modelAndView);
     return modelAndView;
   }
 }
