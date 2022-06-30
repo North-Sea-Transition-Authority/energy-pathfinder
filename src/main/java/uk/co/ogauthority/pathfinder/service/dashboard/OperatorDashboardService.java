@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
-import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.dashboard.DashboardFilter;
 import uk.co.ogauthority.pathfinder.model.entity.dashboard.DashboardProjectItem;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
@@ -34,23 +33,7 @@ public class OperatorDashboardService {
         .map(OrganisationTeam::getPortalOrganisationGroup)
         .collect(Collectors.toList());
 
-    var dashboardItems = operatorDashboardProjectItemRepository.findAllByOrganisationGroupIn(orgGroups);
-
-    var orgGroupIds = orgGroups
-        .stream()
-        .map(PortalOrganisationGroup::getOrgGrpId)
-        .collect(Collectors.toList());
-
-    operatorDashboardProjectItemRepository.findAll()
-        .forEach(operatorDashboardProjectItem -> {
-          for (Integer organisationId : orgGroupIds) {
-            if (operatorDashboardProjectItem.getContributorOrgIds() != null
-                && operatorDashboardProjectItem.getContributorOrgIds().contains(organisationId)) {
-              dashboardItems.add(operatorDashboardProjectItem);
-            }
-          }
-        });
-
+    var dashboardItems = operatorDashboardProjectItemRepository.findAllByOrganisationGroupOrContributorIn(orgGroups);
 
     return filterService.filter(dashboardItems, filter);
   }
