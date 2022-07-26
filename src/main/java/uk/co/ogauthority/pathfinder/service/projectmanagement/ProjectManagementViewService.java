@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.projectmanagement;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
+import uk.co.ogauthority.pathfinder.exception.ProjectManagementHeadingServiceImplementationException;
 import uk.co.ogauthority.pathfinder.model.dto.project.ProjectVersionDto;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -21,6 +23,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.project.ProjectVersionService;
+import uk.co.ogauthority.pathfinder.service.projectmanagement.heading.ProjectManagementHeadingService;
 import uk.co.ogauthority.pathfinder.service.rendering.TemplateRenderingService;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
@@ -34,15 +37,19 @@ public class ProjectManagementViewService {
   private final ProjectVersionService projectVersionService;
   private final TemplateRenderingService templateRenderingService;
 
+  private final List<ProjectManagementHeadingService> projectManagementHeadingServiceList;
+
   @Autowired
   public ProjectManagementViewService(ProjectService projectService,
                                       ProjectManagementService projectManagementService,
                                       ProjectVersionService projectVersionService,
-                                      TemplateRenderingService templateRenderingService) {
+                                      TemplateRenderingService templateRenderingService,
+                                      List<ProjectManagementHeadingService> projectManagementHeadingServiceList) {
     this.projectService = projectService;
     this.projectManagementService = projectManagementService;
     this.projectVersionService = projectVersionService;
     this.templateRenderingService = templateRenderingService;
+    this.projectManagementHeadingServiceList = projectManagementHeadingServiceList;
   }
 
   public ModelAndView getProjectManagementModelAndView(ProjectDetail latestSubmittedProjectDetail,
@@ -64,7 +71,8 @@ public class ProjectManagementViewService {
         .addObject("backLinkUrl", ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)))
         .addObject("viewVersionUrl", ReverseRouter.route(on(ManageProjectController.class)
             .updateProjectVersion(project.getId(), null, null, null))
-        );
+        )
+        .addObject("pageTitle", getPageTitle(latestSubmittedProjectDetail));
 
     ProjectTypeModelUtil.addProjectTypeDisplayNameAttributesToModel(modelAndView, latestSubmittedProjectDetail);
 
@@ -107,5 +115,18 @@ public class ProjectManagementViewService {
         DateUtil.formatInstant(projectVersionDto.getSubmittedInstant()),
         (projectVersionDto.isNoUpdate() ? " (No change)" : "")
     );
+  }
+
+  private String getPageTitle(ProjectDetail projectDetail) {
+    var projectManagementHeadingService = projectManagementHeadingServiceList
+        .stream()
+        .filter(headingService -> headingService.getSupportedProjectType().equals(projectDetail.getProjectType()))
+        .findFirst()
+        .orElseThrow(() -> new ProjectManagementHeadingServiceImplementationException(String.format(
+            "Could not find implementation of ProjectManagementHeadingService that supports ProjectDetail with ID %d and type %s ",
+            projectDetail.getId(),
+            projectDetail.getProjectType()
+        )));
+    return projectManagementHeadingService.getHeadingText(projectDetail);
   }
 }

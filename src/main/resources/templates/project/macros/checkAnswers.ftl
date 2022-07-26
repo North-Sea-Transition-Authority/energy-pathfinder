@@ -8,6 +8,12 @@
   </@checkAnswersRowNoActionsWithNested>
 </#macro>
 
+<#macro checkAnswersEmailAddressRow prompt value>
+  <@fdsCheckAnswers.checkAnswersRowNoAction keyText=prompt>
+      <@mailTo.mailToLink mailToEmailAddress=value/>
+  </@fdsCheckAnswers.checkAnswersRowNoAction>
+</#macro>
+
 <#macro checkAnswersRowNoActionsWithNested prompt>
   <#local nested><#nested/></#local>
   <@fdsCheckAnswers.checkAnswersRowNoAction keyText=prompt>
@@ -65,12 +71,27 @@
 
 </#macro>
 
-<#macro diffedCheckAnswersRowNoActions prompt diffedField multiLineTextBlockClass="govuk-body">
+<#macro checkAnswersRowEmailOrDiff prompt isDiffedField fieldValue multiLineTextBlockClass="govuk-body">
+  <#if isDiffedField>
+    <#assign mailToContent><@mailTo.mailToLink mailToEmailAddress=fieldValue.currentValue/></#assign>
+    <@diffedCheckAnswersRowNoActions
+      prompt=prompt
+      diffedField=fieldValue
+      multiLineTextBlockClass=multiLineTextBlockClass
+      rawValueOverride=mailToContent
+    />
+  <#else>
+    <@checkAnswersEmailAddressRow prompt=prompt value=fieldValue />
+  </#if>
+</#macro>
+
+<#macro diffedCheckAnswersRowNoActions prompt diffedField multiLineTextBlockClass="govuk-body" rawValueOverride="">
   <@checkAnswersRowNoActionsWithNested prompt=prompt>
     <#if diffedField?has_content>
       <@differenceChanges.renderDifference
         diffedField=diffedField
         multiLineTextBlockClass=multiLineTextBlockClass
+        rawValueOverride=rawValueOverride
       />
     </#if>
   </@checkAnswersRowNoActionsWithNested>

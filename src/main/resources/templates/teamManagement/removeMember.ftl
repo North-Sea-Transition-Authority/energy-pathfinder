@@ -8,7 +8,7 @@
     <@fdsCheckAnswers.checkAnswersWrapper summaryListId="remove-member">
       <@fdsCheckAnswers.checkAnswers>
         <@checkAnswers.checkAnswersRowNoActions prompt="Full name" value=teamMember.fullName!""/>
-        <@checkAnswers.checkAnswersRowNoActions prompt="Email address" value=teamMember.emailAddress!""/>
+        <@checkAnswers.checkAnswersEmailAddressRow prompt="Email address" value=teamMember.emailAddress!""/>
         <@checkAnswers.checkAnswersRowNoActions prompt="Telephone number" value=teamMember.telephoneNo!""/>
 
         <#assign roles>
