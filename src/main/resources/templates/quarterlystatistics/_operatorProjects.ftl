@@ -2,7 +2,7 @@
 
 <#macro _operators operatorProjectMap>
   <@_updateRequiredToggle/>
-  <@fdsAccordion.accordion accordionId="operators">
+  <@fdsAccordion.accordion accordionId="operators-list">
     <#list operatorProjectMap as operatorName, reportableProjects>
       <@fdsAccordion.accordionSection sectionHeading=operatorName>
         <@_operatorProjects operatorReportableProjects=reportableProjects operatorName=operatorName />

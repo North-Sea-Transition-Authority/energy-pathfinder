@@ -24,7 +24,7 @@
     <@checkAnswers.checkAnswersRowNoActions prompt="Operator change date" value=projectTransferView.transferDate />
     <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Operator changed by">
       <div>${projectTransferView.transferredByUserName}</div>
-      <div>${projectTransferView.transferredByUserEmailAddress}</div>
+      <div><@mailTo.mailToLink mailToEmailAddress=projectTransferView.transferredByUserEmailAddress/></div>
     </@checkAnswers.checkAnswersRowNoActionsWithNested>
   </@fdsCheckAnswers.checkAnswers>
 </#if>

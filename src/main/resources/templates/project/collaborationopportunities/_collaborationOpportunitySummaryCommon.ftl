@@ -46,7 +46,7 @@
     fieldValue=contactJobTitle
     isDiffedField=useDiffedField
   />
-  <@checkAnswers.checkAnswersStandardOrDiffRow
+  <@checkAnswers.checkAnswersRowEmailOrDiff
     prompt="Email address"
     fieldValue=contactEmailAddress
     isDiffedField=useDiffedField

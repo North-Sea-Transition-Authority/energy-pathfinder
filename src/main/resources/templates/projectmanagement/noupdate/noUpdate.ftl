@@ -10,7 +10,7 @@
     <@checkAnswers.checkAnswersRowNoActions prompt="No change submission date" value=noUpdateNotificationView.submittedDate />
     <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="No change submitted by">
       <div>${noUpdateNotificationView.submittedByUserName}</div>
-      <div>${noUpdateNotificationView.submittedByUserEmailAddress}</div>
+      <div><@mailTo.mailToLink mailToEmailAddress=noUpdateNotificationView.submittedByUserEmailAddress/></div>
     </@checkAnswers.checkAnswersRowNoActionsWithNested>
   </@fdsCheckAnswers.checkAnswers>
 </#if>

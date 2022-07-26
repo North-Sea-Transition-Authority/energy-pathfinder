@@ -1,7 +1,14 @@
 <#include '../layout.ftl'>
 
+<#-- @ftlvariable name="backLinkUrl" type="String" -->
+<#-- @ftlvariable name="projectManagementView" type="uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementView" -->
+<#-- @ftlvariable name="viewVersionUrl" type="String" -->
+<#-- @ftlvariable name="viewableVersions" type="java.util.Map<String, String>" -->
+<#-- @ftlvariable name="form" type="uk.co.ogauthority.pathfinder.model.form.projectmanagement.ProjectManagementForm" -->
+<#-- @ftlvariable name="pageTitle" type="String" -->
+
 <@defaultPage
-  htmlTitle="Manage ${projectTypeDisplayNameLowercase}"
+  htmlTitle=pageTitle
   fullWidthColumn=true
   twoThirdsColumn=false
   backLink=true
