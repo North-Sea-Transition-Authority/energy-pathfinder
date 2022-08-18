@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE module PUBLIC
-    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
-    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+  "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+  "https://checkstyle.org/dtds/configuration_1_3.dtd">
 
 <!--
     Based on Google coding conventions from Google Java Style: https://google.github.io/styleguide/javaguide.html
@@ -19,8 +19,8 @@
         <property name="eachLine" value="true"/>
     </module>
     <module name="LineLength">
-        <!-- Change from Google max of 100 (devs should set their IDE to 120, but leave 20 for leeway) -->
-        <property name="max" value="140"/>
+        <!-- Change from Google max of 100 (devs should set their IDE to 120, but leave 10 for leeway) -->
+        <property name="max" value="130"/>
         <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
     </module>
 
@@ -58,7 +58,7 @@
             <property name="id" value="RightCurlyAlone"/>
             <property name="option" value="alone"/>
             <property name="tokens"
-                      value="CLASS_DEF, METHOD_DEF, LITERAL_FOR, LITERAL_WHILE, STATIC_INIT,
+                      value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, STATIC_INIT,
                     INSTANCE_INIT"/>
         </module>
         <module name="WhitespaceAround">
@@ -70,6 +70,9 @@
                      value="WhitespaceAround: ''{0}'' is not followed by whitespace. Empty blocks may only be represented as '{}' when not part of a multi-block statement (4.1.3)"/>
             <message key="ws.notPreceded"
                      value="WhitespaceAround: ''{0}'' is not preceded with whitespace."/>
+        </module>
+        <module name="WhitespaceAfter">
+            <property name="tokens" value="COMMA, SEMI"/>
         </module>
         <module name="OneStatementPerLine"/>
         <module name="MultipleVariableDeclarations"/>
@@ -181,7 +184,6 @@
             <property name="ignoreFinal" value="false"/>
             <property name="allowedAbbreviationLength" value="1"/>
         </module>
-        <module name="OverloadMethodsDeclarationOrder"/>
         <module name="VariableDeclarationUsageDistance">
             <property name="allowedDistance" value="8"/>
         </module>
@@ -234,7 +236,7 @@
                       value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF, VARIABLE_DEF"/>
         </module>
         <module name="JavadocMethod">
-            <property name="scope" value="public"/>
+            <property name="accessModifiers" value="public"/>
             <property name="allowMissingParamTags" value="true"/>
             <property name="allowMissingReturnTag" value="true"/>
             <property name="allowedAnnotations" value="Override, Test"/>
