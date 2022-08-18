@@ -8,7 +8,7 @@
     <@checkAnswers.checkAnswersRowNoActions prompt="Archived date" value=projectArchiveDetailView.archivedDate />
     <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Archived by">
       <div>${projectArchiveDetailView.archivedByUserName}</div>
-      <div>${projectArchiveDetailView.archivedByUserEmailAddress}</div>
+      <div><@mailTo.mailToLink mailToEmailAddress=projectArchiveDetailView.archivedByUserEmailAddress/></div>
     </@checkAnswers.checkAnswersRowNoActionsWithNested>
   </@fdsCheckAnswers.checkAnswers>
 </#if>

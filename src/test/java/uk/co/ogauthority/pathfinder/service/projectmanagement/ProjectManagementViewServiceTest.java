@@ -24,15 +24,18 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
+import uk.co.ogauthority.pathfinder.exception.ProjectManagementHeadingServiceImplementationException;
 import uk.co.ogauthority.pathfinder.model.dto.project.ProjectVersionDto;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.projectmanagement.ProjectManagementPageSectionType;
 import uk.co.ogauthority.pathfinder.model.view.projectmanagement.ProjectManagementSection;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.project.ProjectVersionService;
+import uk.co.ogauthority.pathfinder.service.projectmanagement.heading.TestProjectManagementHeadingSectionService;
 import uk.co.ogauthority.pathfinder.service.rendering.TemplateRenderingService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -40,6 +43,8 @@ import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectManagementViewServiceTest {
+
+  private static final String HEADING_TEXT = "heading text";
 
   @Mock
   private ProjectService projectService;
@@ -53,6 +58,9 @@ public class ProjectManagementViewServiceTest {
   @Mock
   private TemplateRenderingService templateRenderingService;
 
+  @Mock
+  private TestProjectManagementHeadingSectionService testProjectManagementHeadingSectionService;
+
   private ProjectManagementViewService projectManagementViewService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
@@ -65,8 +73,12 @@ public class ProjectManagementViewServiceTest {
         projectService,
         projectManagementService,
         projectVersionService,
-        templateRenderingService
+        templateRenderingService,
+        List.of(testProjectManagementHeadingSectionService)
     );
+
+    when(testProjectManagementHeadingSectionService.getSupportedProjectType()).thenReturn(projectDetail.getProjectType());
+    when(testProjectManagementHeadingSectionService.getHeadingText(projectDetail)).thenReturn(HEADING_TEXT);
   }
 
   @Test
@@ -159,6 +171,15 @@ public class ProjectManagementViewServiceTest {
     assertThat(desc).isEqualTo(String.format("(%s) Submitted: %s %s", dto.getVersion(), DateUtil.formatInstant(dto.getSubmittedInstant()), ""));
   }
 
+  @Test(expected = ProjectManagementHeadingServiceImplementationException.class)
+  public void getProjectManagementModelAndView_whenNoProjectManagementHeadingServiceImplementationForProjectTypeFound_thenException() {
+    projectDetail.setProjectType(ProjectType.INFRASTRUCTURE);
+
+    when(testProjectManagementHeadingSectionService.getSupportedProjectType()).thenReturn(ProjectType.FORWARD_WORK_PLAN);
+
+    projectManagementViewService.getProjectManagementModelAndView(projectDetail, projectDetail.getVersion(), authenticatedUser);
+  }
+
   private void assertModelProperties(ModelAndView modelAndView, ProjectDetail projectDetail) {
 
     final var projectTypeDisplayNameAttr = ProjectTypeModelUtil.PROJECT_TYPE_DISPLAY_NAME_MODEL_ATTR;
@@ -171,6 +192,7 @@ public class ProjectManagementViewServiceTest {
             "viewableVersions",
             "form",
             "viewVersionUrl",
+            "pageTitle",
             projectTypeDisplayNameAttr,
             projectTypeLowercaseDisplayNameAttr
         )
@@ -179,6 +201,7 @@ public class ProjectManagementViewServiceTest {
             .updateProjectVersion(projectDetail.getProject().getId(), null, null, null))
         )
         .containsEntry(projectTypeDisplayNameAttr, projectDetail.getProjectType().getDisplayName())
-        .containsEntry(projectTypeLowercaseDisplayNameAttr, projectDetail.getProjectType().getLowercaseDisplayName());
+        .containsEntry(projectTypeLowercaseDisplayNameAttr, projectDetail.getProjectType().getLowercaseDisplayName())
+        .containsEntry("pageTitle", HEADING_TEXT);
   }
 }

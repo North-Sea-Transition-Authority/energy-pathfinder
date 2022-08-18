@@ -1,6 +1,6 @@
 <#include '../layout.ftl'>
 
-<@defaultPage htmlTitle=pageHeading pageHeading=pageHeading topNavigation=false backLink=true>
+<@defaultPage htmlTitle=pageHeading pageHeading=pageHeading topNavigation=false backLink=true phaseBanner=false>
 
   <#assign customerName = service.customerName />
 

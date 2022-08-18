@@ -44,9 +44,10 @@
       prompt="Job title"
       diffedField=projectInformationDiffModel.ProjectInformationView_contactJobTitle
     />
-    <@checkAnswers.diffedCheckAnswersRowNoActions
+    <@checkAnswers.checkAnswersRowEmailOrDiff
       prompt="Email address"
-      diffedField=projectInformationDiffModel.ProjectInformationView_contactEmailAddress
+      fieldValue=projectInformationDiffModel.ProjectInformationView_contactEmailAddress
+      isDiffedField=true
     />
   </@fdsCheckAnswers.checkAnswers>
 </@sectionSummaryWrapper.sectionSummaryWrapper>

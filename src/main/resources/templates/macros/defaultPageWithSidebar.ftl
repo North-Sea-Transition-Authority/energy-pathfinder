@@ -1,7 +1,7 @@
 <#include '../layoutPane.ftl'>
 
 <#macro defaultPageWithSidebar pageHeading themeHeading sidebarSectionLinks htmlTitle=pageHeading isSidebarSticky=false>
-  <@defaultPagePane htmlTitle=htmlTitle phaseBanner=false>
+  <@defaultPagePane htmlTitle=htmlTitle>
     <@defaultPagePaneSubNav>
       <@fdsSubNavigation.subNavigation sticky=isSidebarSticky>
         <@fdsSubNavigation.subNavigationSection themeHeading=themeHeading>

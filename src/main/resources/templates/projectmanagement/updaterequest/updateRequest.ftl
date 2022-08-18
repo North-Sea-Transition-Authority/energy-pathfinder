@@ -8,7 +8,7 @@
     <@checkAnswers.checkAnswersRowNoActions prompt="Update requested date" value=regulatorUpdateRequestView.requestedDate />
     <@checkAnswers.checkAnswersRowNoActionsWithNested prompt="Update requested by">
       <div>${regulatorUpdateRequestView.requestedByUserName}</div>
-      <div>${regulatorUpdateRequestView.requestedByUserEmailAddress}</div>
+      <div><@mailTo.mailToLink mailToEmailAddress=regulatorUpdateRequestView.requestedByUserEmailAddress/></div>
     </@checkAnswers.checkAnswersRowNoActionsWithNested>
   </@fdsCheckAnswers.checkAnswers>
 </#if>

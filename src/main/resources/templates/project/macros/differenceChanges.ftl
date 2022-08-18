@@ -147,7 +147,8 @@
 
 </#macro>
 
-<#macro renderDifference diffedField noAutoEscapeFlag="false" multiLineTextBlockClass="">
+<#macro renderDifference diffedField noAutoEscapeFlag="false" multiLineTextBlockClass="" rawValueOverride="">
+<#assign nonDiffValue="${rawValueOverride?has_content?then(rawValueOverride, diffedField.currentValue!'')}"/>
 
   <#if diffedField.differenceType == "ADDED">
 
@@ -164,7 +165,7 @@
 
     <@_diffValueWithRawValueWrapper
       noAutoEscapeFlagValue=noAutoEscapeFlag
-      value=diffedField.currentValue
+      value=nonDiffValue
       tag=diffedField.currentValueTag
       multiLineTextBlockClass=multiLineTextBlockClass
     />
@@ -195,7 +196,7 @@
 
     <@_diffValueWithRawValueWrapper
       noAutoEscapeFlagValue=noAutoEscapeFlag
-      value=diffedField.currentValue
+      value=nonDiffValue
       tag=diffedField.currentValueTag
       multiLineTextBlockClass=multiLineTextBlockClass
     />
@@ -220,7 +221,7 @@
   <#if diffedField.differenceType == "UNCHANGED" || diffedField.differenceType == "NOT_DIFFED">
     <@_diffValue
       noAutoEscapeFlagValue=noAutoEscapeFlag
-      value=diffedField.currentValue
+      value=nonDiffValue
       tag=diffedField.currentValueTag
       multiLineTextBlockClass=multiLineTextBlockClass
     />

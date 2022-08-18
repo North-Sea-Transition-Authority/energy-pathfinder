@@ -2,6 +2,8 @@
 <#include 'fds/objects/layouts/generic.ftl'>
 <#import 'fds/objects/grid/grid.ftl' as grid>
 
+<#-- @ftlvariable name="feedbackUrl" type="String" -->
+
 <#include 'pathfinderImports.ftl'>
 
 <#macro defaultPagePane
@@ -10,7 +12,7 @@
   wrapperWidth=false
   topNavigation=true
   phaseBanner=true
-  phaseBannerLink="#"
+  phaseBannerLink=springUrl(feedbackUrl)!""
   headerLogo="GOVUK_CREST"
   errorCheck=false
   noIndex=false
@@ -34,7 +36,7 @@
         <div class="govuk-phase-banner__wrapper">
           <div class="govuk-phase-banner govuk-phase-banner--no-border<#if wrapperWidth> govuk-width-container-wide<#else> govuk-width-container</#if>">
             <p class="govuk-phase-banner__content">
-              <strong class="govuk-tag govuk-phase-banner__content__tag ">alpha</strong>
+              <strong class="govuk-tag govuk-phase-banner__content__tag ">beta</strong>
               <span class="govuk-phase-banner__text">This is a new service – your <a class="govuk-link" href="${phaseBannerLink}">feedback</a> will help us to improve it.</span>
             </p>
           </div>
