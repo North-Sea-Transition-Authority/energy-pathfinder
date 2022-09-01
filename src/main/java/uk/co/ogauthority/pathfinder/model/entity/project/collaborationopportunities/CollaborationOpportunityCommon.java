@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities;
 
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -112,5 +113,42 @@ public abstract class CollaborationOpportunityCommon
   @Override
   public String getEmailAddress() {
     return emailAddress;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof CollaborationOpportunityCommon)) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    CollaborationOpportunityCommon that = (CollaborationOpportunityCommon) o;
+    return function == that.function
+        && Objects.equals(manualFunction, that.manualFunction)
+        && Objects.equals(descriptionOfWork, that.descriptionOfWork)
+        && Objects.equals(urgentResponseNeeded, that.urgentResponseNeeded)
+        && Objects.equals(contactName, that.contactName)
+        && Objects.equals(phoneNumber, that.phoneNumber)
+        && Objects.equals(jobTitle, that.jobTitle)
+        && Objects.equals(emailAddress, that.emailAddress);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        super.hashCode(),
+        function,
+        manualFunction,
+        descriptionOfWork,
+        urgentResponseNeeded,
+        contactName,
+        phoneNumber,
+        jobTitle,
+        emailAddress
+    );
   }
 }

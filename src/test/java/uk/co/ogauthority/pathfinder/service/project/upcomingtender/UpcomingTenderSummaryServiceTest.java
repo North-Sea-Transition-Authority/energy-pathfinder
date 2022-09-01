@@ -18,7 +18,6 @@ import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
-import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderViewUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;

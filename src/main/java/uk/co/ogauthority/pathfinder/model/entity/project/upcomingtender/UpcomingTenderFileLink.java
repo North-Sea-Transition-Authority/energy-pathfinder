@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender;
 
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -9,6 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
+import uk.co.ogauthority.pathfinder.repository.file.UploadedFileRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.ChildEntity;
 import uk.co.ogauthority.pathfinder.service.file.FileLinkEntity;
 
@@ -63,5 +65,28 @@ public class UpcomingTenderFileLink implements FileLinkEntity, ChildEntity<Integ
   @Override
   public UpcomingTender getParent() {
     return getUpcomingTender();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof UploadedFileRepository)) {
+      return false;
+    }
+    UpcomingTenderFileLink that = (UpcomingTenderFileLink) o;
+    return Objects.equals(id, that.id)
+        && Objects.equals(upcomingTender, that.upcomingTender)
+        && Objects.equals(projectDetailFile, that.projectDetailFile);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        id,
+        upcomingTender,
+        projectDetailFile
+    );
   }
 }

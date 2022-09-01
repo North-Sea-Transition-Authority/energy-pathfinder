@@ -28,6 +28,8 @@ public class ProjectSetupForm {
 
   private TaskListSectionAnswer pipelinesIncluded;
 
+  private TaskListSectionAnswer commissionedWellsIncluded;
+
   public TaskListSectionAnswer getUpcomingTendersIncluded() {
     return upcomingTendersIncluded;
   }
@@ -106,5 +108,13 @@ public class ProjectSetupForm {
   public void setPipelinesIncluded(
       TaskListSectionAnswer pipelinesIncluded) {
     this.pipelinesIncluded = pipelinesIncluded;
+  }
+
+  public TaskListSectionAnswer getCommissionedWellsIncluded() {
+    return commissionedWellsIncluded;
+  }
+
+  public void setCommissionedWellsIncluded(TaskListSectionAnswer commissionedWellsIncluded) {
+    this.commissionedWellsIncluded = commissionedWellsIncluded;
   }
 }

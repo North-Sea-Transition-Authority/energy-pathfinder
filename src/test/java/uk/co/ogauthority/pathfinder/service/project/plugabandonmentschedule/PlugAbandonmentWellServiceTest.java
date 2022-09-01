@@ -84,9 +84,13 @@ public class PlugAbandonmentWellServiceTest {
 
   @Test
   public void deletePlugAbandonmentScheduleWells_plugAbandonmentScheduleList() {
+
+    var plugAbandonmentSchedule1 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(2021, 2024);
+    var plugAbandonmentSchedule2 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(2020, 2022);
+
     var plugAbandonmentSchedules = List.of(
-        new PlugAbandonmentSchedule(),
-        new PlugAbandonmentSchedule()
+        plugAbandonmentSchedule1,
+        plugAbandonmentSchedule2
     );
 
     plugAbandonmentWellService.deletePlugAbandonmentScheduleWells(plugAbandonmentSchedules);
@@ -166,17 +170,15 @@ public class PlugAbandonmentWellServiceTest {
 
   @Test
   public void copyPlugAbandonmentWells() {
-    var originalPlugAbandonmentSchedule1 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
-    var originalPlugAbandonmentSchedule2 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
+    var originalPlugAbandonmentSchedule1 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(2021, 2025);
+    var originalPlugAbandonmentSchedule2 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(2020, 2023);
 
-    var duplicatedPlugAbandonmentSchedule1 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
-    var duplicatedPlugAbandonmentSchedule2 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule();
+    var duplicatedPlugAbandonmentSchedule1 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(2021, 2025);
+    var duplicatedPlugAbandonmentSchedule2 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(2020, 2023);
 
     var duplicatedPlugAbandonmentScheduleLookup = Map.of(
-        originalPlugAbandonmentSchedule1,
-        duplicatedPlugAbandonmentSchedule1,
-        originalPlugAbandonmentSchedule2,
-        duplicatedPlugAbandonmentSchedule2
+        originalPlugAbandonmentSchedule1, duplicatedPlugAbandonmentSchedule1,
+        originalPlugAbandonmentSchedule2, duplicatedPlugAbandonmentSchedule2
     );
 
     var originalPlugAbandonmentSchedule1Wells = List.of(

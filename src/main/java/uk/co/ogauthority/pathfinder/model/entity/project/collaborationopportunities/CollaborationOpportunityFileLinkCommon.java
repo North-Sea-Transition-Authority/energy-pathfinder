@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities;
 
+import java.util.Objects;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -37,4 +38,24 @@ public abstract class CollaborationOpportunityFileLinkCommon implements FileLink
     return projectDetailFile;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof CollaborationOpportunityFileLinkCommon)) {
+      return false;
+    }
+    CollaborationOpportunityFileLinkCommon that = (CollaborationOpportunityFileLinkCommon) o;
+    return Objects.equals(id, that.id)
+        && Objects.equals(projectDetailFile, that.projectDetailFile);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        id,
+        projectDetailFile
+    );
+  }
 }

@@ -8,6 +8,7 @@ import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedCo
 import uk.co.ogauthority.pathfinder.controller.project.campaigninformation.CampaignInformationController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
+import uk.co.ogauthority.pathfinder.controller.project.commissionedwell.CommissionedWellController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedpipeline.DecommissionedPipelineController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissioningschedule.DecommissioningScheduleController;
 import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedRigController;
@@ -28,6 +29,7 @@ import uk.co.ogauthority.pathfinder.service.project.campaigninformation.Campaign
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityModelService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesService;
+import uk.co.ogauthority.pathfinder.service.project.commissionedwell.CommissionedWellScheduleService;
 import uk.co.ogauthority.pathfinder.service.project.decommissionedpipeline.DecommissionedPipelineService;
 import uk.co.ogauthority.pathfinder.service.project.decommissioningschedule.DecommissioningScheduleService;
 import uk.co.ogauthority.pathfinder.service.project.integratedrig.IntegratedRigService;
@@ -145,6 +147,13 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       Set.of(ProjectType.INFRASTRUCTURE),
       130
   ),
+  COMMISSIONED_WELLS(
+      CommissionedWellController.TASK_LIST_NAME,
+      CommissionedWellController.class,
+      CommissionedWellScheduleService.class,
+      Set.of(ProjectType.INFRASTRUCTURE),
+      140
+  ),
   WORK_PLAN_UPCOMING_TENDERS(
       ForwardWorkPlanUpcomingTenderController.PAGE_NAME,
       ForwardWorkPlanUpcomingTenderController.class,
@@ -252,6 +261,8 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
             null,
             null
         ));
+      case COMMISSIONED_WELLS:
+        return ReverseRouter.route(on(CommissionedWellController.class).viewWellsToCommission(projectId, null));
       default:
         return "";
     }

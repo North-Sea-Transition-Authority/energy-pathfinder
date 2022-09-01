@@ -25,7 +25,9 @@ public enum TaskListSectionAnswer {
   PIPELINES_YES(StringDisplayUtil.YES),
   PIPELINES_NO(StringDisplayUtil.NO),
   CAMPAIGN_INFORMATION_YES(StringDisplayUtil.YES),
-  CAMPAIGN_INFORMATION_NO(StringDisplayUtil.NO);
+  CAMPAIGN_INFORMATION_NO(StringDisplayUtil.NO),
+  COMMISSION_WELLS_YES(StringDisplayUtil.YES),
+  COMMISSION_WELLS_NO(StringDisplayUtil.NO);
 
   private final String answerValue;
 

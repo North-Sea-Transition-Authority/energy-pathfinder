@@ -74,8 +74,16 @@ public class ProjectInformationController extends ProjectFormPageController {
         getProjectInformationModelAndView(projectId, form),
         form,
         () -> {
-          projectInformationService.createOrUpdate(projectContext.getProjectDetails(), form);
-          projectSetupService.removeDecomSelectionsIfPresent(projectContext.getProjectDetails());
+          var projectInformation = projectInformationService.createOrUpdate(
+              projectContext.getProjectDetails(),
+              form
+          );
+
+          projectSetupService.removeTaskListSetupSectionsNotApplicableToFieldStage(
+              projectContext.getProjectDetails(),
+              projectInformation.getFieldStage()
+          );
+
           AuditService.audit(
               AuditEvent.PROJECT_INFORMATION_UPDATED,
               String.format(

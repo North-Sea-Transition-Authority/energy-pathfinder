@@ -12,6 +12,7 @@ import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
+import uk.co.ogauthority.pathfinder.controller.project.commissionedwell.CommissionedWellController;
 import uk.co.ogauthority.pathfinder.controller.project.decommissionedpipeline.DecommissionedPipelineController;
 import uk.co.ogauthority.pathfinder.controller.project.integratedrig.IntegratedRigController;
 import uk.co.ogauthority.pathfinder.controller.project.platformsfpsos.PlatformsFpsosController;
@@ -210,6 +211,20 @@ public class BreadcrumbService {
     String route = ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class)
         .viewCollaborationOpportunities(projectId, null));
     map.put(route, ForwardWorkPlanCollaborationOpportunityModelService.PAGE_NAME);
+    return map;
+  }
+
+  public void fromCommissionedWells(Integer projectId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, commissionedWells(projectId), thisPage);
+  }
+
+  private Map<String, String> commissionedWells(Integer projectId) {
+    var map = taskList(projectId);
+    String route = ReverseRouter.route(on(CommissionedWellController.class).viewWellsToCommission(
+        projectId,
+        null
+    ));
+    map.put(route, CommissionedWellController.TASK_LIST_NAME);
     return map;
   }
 }

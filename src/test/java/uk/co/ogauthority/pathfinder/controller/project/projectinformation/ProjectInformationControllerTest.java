@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.controller.project.projectinformation;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,6 +36,7 @@ import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentR
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
+import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -92,6 +94,9 @@ public class ProjectInformationControllerTest extends ProjectContextAbstractCont
     var bindingResult = new BeanPropertyBindingResult(ProjectInformationForm.class, "form");
     when(projectInformationService.validate(any(), any(), any())).thenReturn(bindingResult);
 
+    var projectInformationEntity = ProjectInformationUtil.getProjectInformation_withCompleteDetails(detail);
+    when(projectInformationService.createOrUpdate(any(), any())).thenReturn(projectInformationEntity);
+
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectInformationController.class)
             .saveProjectInformation(PROJECT_ID, null, null, null, null)
@@ -103,7 +108,10 @@ public class ProjectInformationControllerTest extends ProjectContextAbstractCont
 
     verify(projectInformationService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
     verify(projectInformationService, times(1)).createOrUpdate(any(), any());
-    verify(projectSetupService, times(1)).removeDecomSelectionsIfPresent(detail);
+    verify(projectSetupService, times(1)).removeTaskListSetupSectionsNotApplicableToFieldStage(
+        detail,
+        projectInformationEntity.getFieldStage()
+    );
   }
 
 
@@ -129,7 +137,10 @@ public class ProjectInformationControllerTest extends ProjectContextAbstractCont
 
     verify(projectInformationService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
     verify(projectInformationService, times(0)).createOrUpdate(any(), any());
-    verify(projectSetupService, times(0)).removeDecomSelectionsIfPresent(detail);
+    verify(projectSetupService, never()).removeTaskListSetupSectionsNotApplicableToFieldStage(
+        eq(detail),
+        any()
+    );
   }
 
   @Test
@@ -144,6 +155,9 @@ public class ProjectInformationControllerTest extends ProjectContextAbstractCont
     var bindingResult = new BeanPropertyBindingResult(ProjectInformationForm.class, "form");
     when(projectInformationService.validate(any(), any(), any())).thenReturn(bindingResult);
 
+    var projectInformationEntity = ProjectInformationUtil.getProjectInformation_withCompleteDetails(detail);
+    when(projectInformationService.createOrUpdate(any(), any())).thenReturn(projectInformationEntity);
+
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectInformationController.class)
             .saveProjectInformation(PROJECT_ID, null, null, null, null)
@@ -155,6 +169,10 @@ public class ProjectInformationControllerTest extends ProjectContextAbstractCont
 
     verify(projectInformationService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
     verify(projectInformationService, times(1)).createOrUpdate(any(), any());
-    verify(projectSetupService, times(1)).removeDecomSelectionsIfPresent(detail);
+
+    verify(projectSetupService, times(1)).removeTaskListSetupSectionsNotApplicableToFieldStage(
+        detail,
+        projectInformationEntity.getFieldStage()
+    );
   }
 }

@@ -595,6 +595,43 @@ public class ProjectInformationServiceTest {
   }
 
   @Test
+  public void getFieldStage_whenNoProjectInformationEntityFound_thenReturnEmptyOptional() {
+    when(projectInformationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
+
+    var resultingFieldStage = projectInformationService.getFieldStage(details);
+
+    assertThat(resultingFieldStage).isEmpty();
+  }
+
+  @Test
+  public void getFieldStage_whenProjectInformationEntityFoundAndNoFieldStageProvided_thenReturnEmptyOptional() {
+
+    var expectedProjectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
+    expectedProjectInformation.setFieldStage(null);
+
+    when(projectInformationRepository.findByProjectDetail(details)).thenReturn(Optional.of(expectedProjectInformation));
+
+    var resultingFieldStage = projectInformationService.getFieldStage(details);
+
+    assertThat(resultingFieldStage).isEmpty();
+  }
+
+  @Test
+  public void getFieldStage_whenFieldStageProvided_thenReturnPopulatedOptional() {
+
+    var expectedFieldStage = FieldStage.DISCOVERY;
+
+    var expectedProjectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
+    expectedProjectInformation.setFieldStage(expectedFieldStage);
+
+    when(projectInformationRepository.findByProjectDetail(details)).thenReturn(Optional.of(expectedProjectInformation));
+
+    var resultingFieldStage = projectInformationService.getFieldStage(details);
+
+    assertThat(resultingFieldStage).contains(expectedFieldStage);
+  }
+
+  @Test
   public void getSupportedProjectTypes_verifyInfrastructure() {
     assertThat(projectInformationService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
   }

@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure;
 
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -40,4 +41,27 @@ public class InfrastructureCollaborationOpportunityFileLink
     return getCollaborationOpportunity();
   }
 
+  @Override
+  public boolean equals(Object o) {
+
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof InfrastructureCollaborationOpportunityFileLink)) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    InfrastructureCollaborationOpportunityFileLink that = (InfrastructureCollaborationOpportunityFileLink) o;
+    return Objects.equals(collaborationOpportunity, that.collaborationOpportunity);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        super.hashCode(),
+        collaborationOpportunity
+    );
+  }
 }

@@ -9,6 +9,7 @@
 <#import 'project/macros/quarterYearInput.ftl' as quarterYear>
 <#import 'project/macros/checkAnswers.ftl' as checkAnswers>
 <#import 'project/macros/fileUpload.ftl' as fileUpload>
+<#import 'project/macros/minMaxCheckAnswers.ftl' as minMaxCheckAnswers>
 <#import 'project/macros/setupProjectGuidance.ftl' as setupProjectGuidance>
 <#import 'project/macros/twoNumberInput.ftl' as twoNumberInput>
 <#import 'project/macros/minMaxDateInput.ftl' as minMaxDate>

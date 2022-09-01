@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -133,5 +134,46 @@ public class AwardedContract extends ProjectDetailEntity implements ContactDetai
   @Override
   public String getEmailAddress() {
     return emailAddress;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    AwardedContract that = (AwardedContract) o;
+    return Objects.equals(contractorName, that.contractorName)
+        && contractFunction == that.contractFunction
+        && Objects.equals(manualContractFunction, that.manualContractFunction)
+        && Objects.equals(descriptionOfWork, that.descriptionOfWork)
+        && Objects.equals(dateAwarded, that.dateAwarded)
+        && contractBand == that.contractBand
+        && Objects.equals(contactName, that.contactName)
+        && Objects.equals(phoneNumber, that.phoneNumber)
+        && Objects.equals(jobTitle, that.jobTitle)
+        && Objects.equals(emailAddress, that.emailAddress);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        super.hashCode(),
+        contractorName,
+        contractFunction,
+        manualContractFunction,
+        descriptionOfWork,
+        dateAwarded,
+        contractBand,
+        contactName,
+        phoneNumber,
+        jobTitle,
+        emailAddress
+    );
   }
 }
