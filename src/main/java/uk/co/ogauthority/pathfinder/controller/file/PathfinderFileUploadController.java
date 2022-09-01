@@ -5,7 +5,6 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,23 +14,25 @@ import uk.co.ogauthority.pathfinder.config.file.FileDeleteResult;
 import uk.co.ogauthority.pathfinder.config.file.FileUploadResult;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
-import uk.co.ogauthority.pathfinder.model.entity.file.UploadedFile;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadMultipleFilesWithDescriptionForm;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
-import uk.co.ogauthority.pathfinder.util.file.FileDownloadUtil;
 
 @FileUploadController
 public abstract class PathfinderFileUploadController {
 
   protected final ProjectDetailFileService projectDetailFileService;
 
+  protected final FileDownloadService fileDownloadService;
+
   @Autowired
-  public PathfinderFileUploadController(ProjectDetailFileService projectDetailFileService) {
+  public PathfinderFileUploadController(ProjectDetailFileService projectDetailFileService,
+                                        FileDownloadService fileDownloadService) {
     this.projectDetailFileService = projectDetailFileService;
+    this.fileDownloadService = fileDownloadService;
   }
 
   /**
@@ -75,21 +76,8 @@ public abstract class PathfinderFileUploadController {
     );
   }
 
-  /**
-   * Serves file for download.
-   *
-   * @param uploadedFile file we want to trigger download for
-   * @return the ResponseEntity object containing the downloaded file
-   */
-  protected ResponseEntity<Resource> serveFile(UploadedFile uploadedFile) {
-    Resource resource = FileDownloadUtil.fetchFileAsStream(uploadedFile.getFileName(), uploadedFile.getFileData());
-    MediaType mediaType = MediaType.parseMediaType(uploadedFile.getContentType());
-    return FileDownloadUtil.getResourceAsResponse(resource, mediaType, uploadedFile.getFileName(),
-        uploadedFile.getFileSize());
-  }
-
   protected ResponseEntity<Resource> serveFile(ProjectDetailFile projectDetailFile) {
-    return serveFile(projectDetailFileService.getUploadedFileById(projectDetailFile.getFileId()));
+    return fileDownloadService.serveFile(projectDetailFileService.getUploadedFileById(projectDetailFile.getFileId()));
   }
 
   public abstract FileUploadResult handleUpload(@PathVariable("projectId") Integer projectId,

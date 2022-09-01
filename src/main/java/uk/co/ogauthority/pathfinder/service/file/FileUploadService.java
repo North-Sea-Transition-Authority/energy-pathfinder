@@ -4,6 +4,7 @@ import java.sql.Blob;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import javax.sql.rowset.serial.SerialBlob;
 import org.slf4j.Logger;
@@ -184,5 +185,9 @@ public class FileUploadService {
     file.setStatus(FileUploadStatus.DELETED);
     file.setLastUpdatedByWuaId(lastUpdatedByWua.getWuaId());
     uploadedFileRepository.save(file);
+  }
+
+  public Optional<UploadedFile> getUploadedFromReportableProjectByFileId(String fileId) {
+    return uploadedFileRepository.findFileOnReportableProject(fileId);
   }
 }

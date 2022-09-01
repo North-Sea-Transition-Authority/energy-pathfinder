@@ -68,7 +68,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/unsubscribe/**",
             "/accessibility-statement",
             "/assets/**",
-            "/error"
+            "/error",
+            "/public/file"
         )
           .permitAll()
 

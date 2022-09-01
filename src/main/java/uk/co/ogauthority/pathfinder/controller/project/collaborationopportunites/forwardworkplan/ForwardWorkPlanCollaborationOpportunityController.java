@@ -20,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.config.file.FileDeleteResult;
 import uk.co.ogauthority.pathfinder.config.file.FileUploadResult;
+import uk.co.ogauthority.pathfinder.controller.file.FileDownloadService;
 import uk.co.ogauthority.pathfinder.controller.file.PathfinderFileUploadController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
@@ -74,8 +75,10 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
       ForwardWorkPlanCollaborationOpportunitiesSummaryService forwardWorkPlanCollaborationOpportunitiesSummaryService,
       ForwardWorkPlanCollaborationCompletionService forwardWorkPlanCollaborationCompletionService,
       ProjectDetailFileService projectDetailFileService,
-      ControllerHelperService controllerHelperService) {
-    super(projectDetailFileService);
+      ControllerHelperService controllerHelperService,
+      FileDownloadService fileDownloadService
+  ) {
+    super(projectDetailFileService, fileDownloadService);
     this.forwardWorkPlanCollaborationOpportunityModelService = forwardWorkPlanCollaborationOpportunityModelService;
     this.forwardWorkPlanCollaborationOpportunityFileLinkService = forwardWorkPlanCollaborationOpportunityFileLinkService;
     this.forwardWorkPlanCollaborationOpportunityService = forwardWorkPlanCollaborationOpportunityService;
