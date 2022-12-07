@@ -100,7 +100,7 @@ public enum TaskListSectionQuestion {
       "form.projectContributorsIncluded",
       TaskListSectionAnswer.PROJECT_CONTRIBUTORS_YES,
       TaskListSectionAnswer.PROJECT_CONTRIBUTORS_NO
-  );
+  ),
   // Pipelines disabled: PAT-457
   // PIPELINES(
   //     ProjectTask.PIPELINES,

@@ -27,8 +27,6 @@ public abstract class PathfinderFileUploadController {
   protected final ProjectDetailFileService projectDetailFileService;
   protected final FileDownloadService fileDownloadService;
 
-  protected final FileDownloadService fileDownloadService;
-
   @Autowired
   public PathfinderFileUploadController(ProjectDetailFileService projectDetailFileService,
                                         FileDownloadService fileDownloadService) {

@@ -27,7 +27,7 @@ public enum TaskListSectionAnswer {
   CAMPAIGN_INFORMATION_YES(StringDisplayUtil.YES),
   CAMPAIGN_INFORMATION_NO(StringDisplayUtil.NO),
   COMMISSION_WELLS_YES(StringDisplayUtil.YES),
-  COMMISSION_WELLS_NO(StringDisplayUtil.NO)
+  COMMISSION_WELLS_NO(StringDisplayUtil.NO),
   PROJECT_CONTRIBUTORS_YES(StringDisplayUtil.YES),
   PROJECT_CONTRIBUTORS_NO(StringDisplayUtil.NO);
 

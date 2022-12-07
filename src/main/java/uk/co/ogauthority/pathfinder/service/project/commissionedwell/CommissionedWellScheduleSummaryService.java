@@ -91,7 +91,7 @@ public class CommissionedWellScheduleSummaryService {
   }
 
   boolean canShowInTaskList(ProjectDetail projectDetail) {
-    return commissionedWellScheduleService.canShowInTaskList(projectDetail);
+    return commissionedWellScheduleService.isTaskValidForProjectDetail(projectDetail);
   }
 
   List<CommissionedWellScheduleView> getCommissionedWellScheduleViewViewsByProjectAndVersion(Project project,

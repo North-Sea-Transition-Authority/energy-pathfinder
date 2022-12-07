@@ -182,7 +182,8 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       CommissionedWellController.class,
       CommissionedWellScheduleService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
-      140
+      140,
+      Set.of(UserToProjectRelationship.OPERATOR)
   ),
   WORK_PLAN_UPCOMING_TENDERS(
       ForwardWorkPlanUpcomingTenderController.PAGE_NAME,

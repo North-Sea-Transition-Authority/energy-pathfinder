@@ -23,7 +23,6 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionQuestion;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupForm;
 import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupFormValidator;
@@ -90,7 +89,7 @@ public class ProjectSetupServiceTest {
 
     var resultingSectionQuestions = projectSetupService.getSectionQuestionsForProjectDetail(details);
 
-    assertThat(resultingSectionQuestions).isEqualTo(expectedSectionQuestions);
+    assertThat(resultingSectionQuestions).containsExactlyInAnyOrderElementsOf(expectedSectionQuestions);
   }
 
   @Test
@@ -104,7 +103,7 @@ public class ProjectSetupServiceTest {
 
     var resultingSectionQuestions = projectSetupService.getSectionQuestionsForProjectDetail(details);
 
-    assertThat(resultingSectionQuestions).isEqualTo(expectedSectionQuestions);
+    assertThat(resultingSectionQuestions).containsExactlyInAnyOrderElementsOf(expectedSectionQuestions);
   }
 
   @Test

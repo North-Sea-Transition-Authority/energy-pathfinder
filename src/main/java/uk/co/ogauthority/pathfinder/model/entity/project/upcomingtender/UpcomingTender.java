@@ -162,7 +162,7 @@ public class UpcomingTender
         && Objects.equals(phoneNumber, that.phoneNumber)
         && Objects.equals(jobTitle, that.jobTitle)
         && Objects.equals(emailAddress, that.emailAddress)
-        && Objects.equals(addedByOrganisationGroup, that.addedByOrganisationGroup)
+        && Objects.equals(addedByOrganisationGroup, that.addedByOrganisationGroup);
   }
 
   @Override

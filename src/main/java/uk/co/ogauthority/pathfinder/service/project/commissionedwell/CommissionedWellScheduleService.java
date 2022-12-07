@@ -19,9 +19,11 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxD
 import uk.co.ogauthority.pathfinder.model.form.project.commissionedwell.CommissionedWellForm;
 import uk.co.ogauthority.pathfinder.repository.project.commissionedwell.CommissionedWellScheduleRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class CommissionedWellScheduleService implements ProjectFormSectionService {
@@ -151,7 +153,16 @@ public class CommissionedWellScheduleService implements ProjectFormSectionServic
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(
+            ProjectTask.COMMISSIONED_WELLS,
+            userToProjectRelationships
+    );
+  }
+
+  @Override
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
     return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COMMISSIONED_WELLS);
   }
 
