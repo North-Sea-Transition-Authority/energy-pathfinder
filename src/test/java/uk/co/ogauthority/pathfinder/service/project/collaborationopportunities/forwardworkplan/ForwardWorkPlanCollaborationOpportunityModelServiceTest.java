@@ -20,6 +20,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
 import uk.co.ogauthority.pathfinder.controller.rest.ForwardWorkPlanCollaborationOpportunityRestController;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
@@ -35,11 +36,15 @@ import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService
 import uk.co.ogauthority.pathfinder.service.validation.ValidationErrorOrderingService;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
+
+  private final PortalOrganisationGroup addedByPortalOrganisationGroup =
+      TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   @Mock
   private ForwardWorkPlanCollaborationOpportunityService forwardWorkPlanCollaborationOpportunityService;
@@ -152,7 +157,6 @@ public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
     final var opportunity = new ForwardWorkPlanCollaborationOpportunity();
     final var opportunityView = new ForwardWorkPlanCollaborationOpportunityView();
 
-    when(forwardWorkPlanCollaborationOpportunityService.getOrError(opportunityId)).thenReturn(opportunity);
     when(forwardWorkPlanCollaborationOpportunitiesSummaryService.getView(
         opportunity,
         displayOrder
@@ -160,7 +164,7 @@ public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
 
     final var modelAndView = forwardWorkPlanCollaborationOpportunityModelService.getRemoveCollaborationOpportunityConfirmationModelAndView(
         projectId,
-        opportunityId,
+        opportunity,
         displayOrder
     );
 
@@ -225,12 +229,15 @@ public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
     );
     final var isValid = true;
 
-    final var collaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView collaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         1,
-        List.of(),
-        isValid
-    );
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(true)
+        .isValid(isValid)
+        .build();
 
     final var errorList = forwardWorkPlanCollaborationOpportunityModelService.getErrors(List.of(collaborationOpportunityView));
     assertThat(errorList).isEmpty();
@@ -244,19 +251,25 @@ public class ForwardWorkPlanCollaborationOpportunityModelServiceTest {
         projectDetail
     );
 
-    final var validCollaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView validCollaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         1,
-        List.of(),
-        true
-    );
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(true)
+        .isValid(true)
+        .build();
 
-    final var invalidCollaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView invalidCollaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         2,
-        List.of(),
-        false
-    );
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(true)
+        .isValid(false)
+        .build();
 
     final var errorList = forwardWorkPlanCollaborationOpportunityModelService.getErrors(
         List.of(validCollaborationOpportunityView, invalidCollaborationOpportunityView)

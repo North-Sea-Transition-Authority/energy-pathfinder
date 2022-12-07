@@ -2,15 +2,21 @@ package uk.co.ogauthority.pathfinder.service.project.upcomingtender;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -18,7 +24,10 @@ import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -32,6 +41,12 @@ public class UpcomingTenderSummaryServiceTest {
   @Mock
   private UpcomingTenderFileLinkService upcomingTenderFileLinkService;
 
+  @Mock
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
+
+  @Mock
+  private PortalOrganisationAccessor portalOrganisationAccessor;
+
   private UpcomingTenderSummaryService upcomingTenderSummaryService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -40,16 +55,34 @@ public class UpcomingTenderSummaryServiceTest {
 
   private final UpcomingTender manualEntryUpcomingTender = UpcomingTenderUtil.getUpcomingTender_manualEntry(details);
 
+  private final PortalOrganisationGroup addedByPortalOrganisationGroup =
+      TeamTestingUtil.generateOrganisationGroup(upcomingTender.getAddedByOrganisationGroup(), "org", "org");
+
   @Before
   public void setUp() {
-    upcomingTenderSummaryService = new UpcomingTenderSummaryService(upcomingTenderService, upcomingTenderFileLinkService);
+    upcomingTenderSummaryService = new UpcomingTenderSummaryService(
+        upcomingTenderService,
+        upcomingTenderFileLinkService,
+        projectSectionItemOwnershipService,
+        portalOrganisationAccessor
+    );
     when(upcomingTenderService.getUpcomingTendersForDetail(details)).thenReturn(
         List.of(upcomingTender, manualEntryUpcomingTender)
     );
+
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(any(), any())).thenReturn(false);
+    when(portalOrganisationAccessor.getOrganisationGroupById(upcomingTender.getAddedByOrganisationGroup()))
+        .thenReturn(Optional.of(addedByPortalOrganisationGroup));
+    when(portalOrganisationAccessor.getOrganisationGroupById(manualEntryUpcomingTender.getAddedByOrganisationGroup()))
+        .thenReturn(Optional.of(addedByPortalOrganisationGroup));
   }
 
   @Test
   public void getSummaryViews() {
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+        eq(upcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(true);
     var views = upcomingTenderSummaryService.getSummaryViews(details);
     assertThat(views.size()).isEqualTo(2);
     var view1 = views.get(0);
@@ -120,6 +153,10 @@ public class UpcomingTenderSummaryServiceTest {
     var uploadedFileView = UploadedFileUtil.createUploadedFileView();
     when(upcomingTenderFileLinkService.getFileUploadViewsLinkedToUpcomingTender(any())).thenReturn(List.of(uploadedFileView));
 
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+        eq(upcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(true);
     when(upcomingTenderService.getUpcomingTendersForDetail(details)).thenReturn(List.of(upcomingTender));
 
     var views = upcomingTenderSummaryService.getSummaryViews(details);
@@ -143,6 +180,10 @@ public class UpcomingTenderSummaryServiceTest {
 
     when(upcomingTenderFileLinkService.getFileUploadViewsLinkedToUpcomingTender(any())).thenReturn(List.of());
 
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+        eq(upcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(true);
     when(upcomingTenderService.getUpcomingTendersForDetail(details)).thenReturn(List.of(upcomingTender));
 
     var views = upcomingTenderSummaryService.getSummaryViews(details);
@@ -162,6 +203,7 @@ public class UpcomingTenderSummaryServiceTest {
     assertThat(view.getContactPhoneNumber()).isEqualTo(tender.getPhoneNumber());
     assertThat(view.getContactJobTitle()).isEqualTo(tender.getJobTitle());
     assertThat(view.getContactEmailAddress()).isEqualTo(tender.getEmailAddress());
+    assertThat(view.getAddedByOrganisationGroup()).isEqualTo(addedByPortalOrganisationGroup.getName());
 
     assertThat(view.getSummaryLinks()).extracting(SummaryLink::getLinkText).containsExactly(
         SummaryLinkText.EDIT.getDisplayName(),
@@ -170,17 +212,17 @@ public class UpcomingTenderSummaryServiceTest {
   }
 
   @Test
-  public void canShowInTaskList_whenCanShowInTaskList_thenTrue() {
-    when(upcomingTenderService.canShowInTaskList(details)).thenReturn(true);
+  public void canShowInTaskList_whenTaskValidForProjectDetail_thenTrue() {
+    when(upcomingTenderService.isTaskValidForProjectDetail(details)).thenReturn(true);
 
-    assertThat(upcomingTenderSummaryService.canShowInTaskList(details)).isTrue();
+    assertThat(upcomingTenderSummaryService.isTaskValidForProjectDetail(details)).isTrue();
   }
 
   @Test
-  public void canShowInTaskList_whenCannotShowInTaskList_thenFalse() {
-    when(upcomingTenderService.canShowInTaskList(details)).thenReturn(false);
+  public void canShowInTaskList_whenTaskNotValidForProjectDetail_thenFalse() {
+    when(upcomingTenderService.isTaskValidForProjectDetail(details)).thenReturn(false);
 
-    assertThat(upcomingTenderSummaryService.canShowInTaskList(details)).isFalse();
+    assertThat(upcomingTenderSummaryService.isTaskValidForProjectDetail(details)).isFalse();
   }
 
   @Test
@@ -191,6 +233,10 @@ public class UpcomingTenderSummaryServiceTest {
     final var project = details.getProject();
     final var version = details.getVersion();
 
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+        eq(upcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(true);
     when(upcomingTenderService.getUpcomingTendersForProjectVersion(project, version))
         .thenReturn(List.of(upcomingTender));
 
@@ -217,5 +263,41 @@ public class UpcomingTenderSummaryServiceTest {
 
     final var result = upcomingTenderSummaryService.getSummaryViews(project, version);
     assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void getUpcomingTenderView_whenUserCanAccessService_thenThereAreLinks() {
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+        eq(upcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(true);
+    var editLink = new SummaryLink(
+        SummaryLinkText.EDIT.getDisplayName(),
+        ReverseRouter.route(on(UpcomingTendersController.class).editUpcomingTender(
+            upcomingTender.getProjectDetail().getProject().getId(),
+            upcomingTender.getId(),
+            null
+        ))
+    );
+    var removeLink = new SummaryLink(
+        SummaryLinkText.DELETE.getDisplayName(),
+        ReverseRouter.route(on(UpcomingTendersController.class).removeUpcomingTenderConfirm(
+            upcomingTender.getProjectDetail().getProject().getId(),
+            upcomingTender.getId(),
+            1,
+            null
+        ))
+    );
+
+    var upcomingTenderView = upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, 1);
+
+    assertThat(upcomingTenderView.getSummaryLinks()).containsExactly(editLink, removeLink);
+  }
+
+  @Test
+  public void getUpcomingTenderView_whenUserCannotAccessService_thenThereAreNoLinks() {
+    var upcomingTenderView = upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, 1);
+
+    assertThat(upcomingTenderView.getSummaryLinks()).isEmpty();
   }
 }

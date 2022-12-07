@@ -24,6 +24,7 @@ import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -58,6 +59,9 @@ public class ForwardWorkPlanCollaborationOpportunityServiceValidationTest {
   @Mock
   private FunctionService functionService;
 
+  @Mock
+  TeamService teamService;
+
   private ProjectDetail projectDetail;
 
   private ForwardWorkPlanCollaborationOpportunityService forwardWorkPlanCollaborationOpportunityService;
@@ -78,8 +82,8 @@ public class ForwardWorkPlanCollaborationOpportunityServiceValidationTest {
         forwardWorkPlanCollaborationOpportunityFormValidator,
         forwardWorkPlanCollaborationSetupService,
         validationService,
-        entityDuplicationService
-    );
+        entityDuplicationService,
+        teamService);
 
     projectDetail = ProjectUtil.getProjectDetails();
   }

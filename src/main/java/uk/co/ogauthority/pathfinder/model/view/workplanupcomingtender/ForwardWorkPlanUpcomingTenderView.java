@@ -16,6 +16,8 @@ public class ForwardWorkPlanUpcomingTenderView extends ContactDetailProjectSumma
 
   private String contractLength;
 
+  private String addedByPortalOrganisationGroup;
+
   public ForwardWorkPlanUpcomingTenderView(Integer displayOrder,
                                            Integer id,
                                            Integer projectId) {
@@ -63,6 +65,14 @@ public class ForwardWorkPlanUpcomingTenderView extends ContactDetailProjectSumma
 
   public void setContractLength(String contractLength) {
     this.contractLength = contractLength;
+  }
+
+  public String getAddedByPortalOrganisationGroup() {
+    return addedByPortalOrganisationGroup;
+  }
+
+  public void setAddedByPortalOrganisationGroup(String addedByPortalOrganisationGroup) {
+    this.addedByPortalOrganisationGroup = addedByPortalOrganisationGroup;
   }
 
   @Override

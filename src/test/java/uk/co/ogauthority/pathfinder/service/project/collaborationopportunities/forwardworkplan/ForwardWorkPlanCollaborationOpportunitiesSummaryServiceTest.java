@@ -1,22 +1,30 @@
 package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationOpportunityView;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationOpportunityViewUtil;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -28,13 +36,24 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
   @Mock
   private ForwardWorkPlanCollaborationOpportunityFileLinkService forwardWorkPlanCollaborationOpportunityFileLinkService;
 
+  @Mock
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
+
+  @Mock
+  private PortalOrganisationAccessor portalOrganisationAccessor;
+
   private ForwardWorkPlanCollaborationOpportunitiesSummaryService forwardWorkPlanCollaborationOpportunitiesSummaryService;
+
+  private final PortalOrganisationGroup addedByPortalOrganisationGroup =
+      TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   @Before
   public void setup() {
     forwardWorkPlanCollaborationOpportunitiesSummaryService = new ForwardWorkPlanCollaborationOpportunitiesSummaryService(
         forwardWorkPlanCollaborationOpportunityService,
-        forwardWorkPlanCollaborationOpportunityFileLinkService
+        forwardWorkPlanCollaborationOpportunityFileLinkService,
+        projectSectionItemOwnershipService,
+        portalOrganisationAccessor
     );
   }
 
@@ -62,11 +81,18 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
         projectDetail
     );
 
-    final var expectedCollaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    when(portalOrganisationAccessor.getOrganisationGroupById(collaborationOpportunity.getAddedByOrganisationGroup()))
+        .thenReturn(Optional.of(addedByPortalOrganisationGroup));
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(true);
+
+    ForwardWorkPlanCollaborationOpportunityView expectedCollaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         1,
-        List.of()
-    );
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(true)
+        .build();
 
     when(forwardWorkPlanCollaborationOpportunityService.getOpportunitiesForDetail(projectDetail)).thenReturn(
         List.of(collaborationOpportunity)
@@ -109,15 +135,21 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
         projectDetail
     );
 
-    final var expectedCollaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView expectedCollaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         1,
-        List.of()
-    );
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(true)
+        .build();
 
+    when(portalOrganisationAccessor.getOrganisationGroupById(collaborationOpportunity.getAddedByOrganisationGroup()))
+        .thenReturn(Optional.of(addedByPortalOrganisationGroup));
     when(forwardWorkPlanCollaborationOpportunityService.getOpportunitiesForProjectVersion(project, version)).thenReturn(
         List.of(collaborationOpportunity)
     );
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(true);
 
     final var summaryViews = forwardWorkPlanCollaborationOpportunitiesSummaryService.getSummaryViews(
         project,
@@ -144,12 +176,19 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
         projectDetail
     );
 
-    final var expectedCollaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    when(portalOrganisationAccessor.getOrganisationGroupById(collaborationOpportunity.getAddedByOrganisationGroup()))
+        .thenReturn(Optional.of(addedByPortalOrganisationGroup));
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(true);
+
+    ForwardWorkPlanCollaborationOpportunityView expectedCollaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         1,
-        List.of(),
-        isValid
-    );
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(true)
+        .isValid(isValid)
+        .build();
 
     when(forwardWorkPlanCollaborationOpportunityService.getOpportunitiesForDetail(projectDetail)).thenReturn(
         List.of(collaborationOpportunity)
@@ -181,12 +220,15 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
         projectDetail
     );
 
-    final var validCollaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView validCollaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         1,
-        List.of(),
-        true
-    );
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(true)
+        .isValid(true)
+        .build();
 
     final var validationResult = forwardWorkPlanCollaborationOpportunitiesSummaryService.validateViews(
         List.of(validCollaborationOpportunityView)
@@ -203,19 +245,25 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
         projectDetail
     );
 
-    final var validCollaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView validCollaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         1,
-        List.of(),
-        true
-    );
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(true)
+        .isValid(true)
+        .build();
 
-    final var invalidCollaborationOpportunityView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView invalidCollaborationOpportunityView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         1,
-        List.of(),
-        false
-    );
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(true)
+        .isValid(false)
+        .build();
 
     final var validationResult = forwardWorkPlanCollaborationOpportunitiesSummaryService.validateViews(
         List.of(validCollaborationOpportunityView, invalidCollaborationOpportunityView)
@@ -234,7 +282,7 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
 
       projectDetail.setProjectType(projectType);
 
-      when(forwardWorkPlanCollaborationOpportunityService.canShowInTaskList(projectDetail)).thenCallRealMethod();
+      when(forwardWorkPlanCollaborationOpportunityService.isTaskValidForProjectDetail(projectDetail)).thenCallRealMethod();
 
       final var canShowInTaskList = forwardWorkPlanCollaborationOpportunitiesSummaryService.canShowInTaskList(projectDetail);
 
@@ -284,12 +332,20 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
         projectDetail
     );
     final var displayOrder = 10;
+    var accessValid = true;
 
-    final var expectedView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView expectedView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         displayOrder,
-        List.of()
-    );
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(accessValid)
+        .build();
+
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(accessValid);
+    when(portalOrganisationAccessor.getOrganisationGroupById(collaborationOpportunity.getAddedByOrganisationGroup()))
+        .thenReturn(Optional.of(addedByPortalOrganisationGroup));
 
     final var resultingView = forwardWorkPlanCollaborationOpportunitiesSummaryService.getView(
         collaborationOpportunity,
@@ -308,13 +364,21 @@ public class ForwardWorkPlanCollaborationOpportunitiesSummaryServiceTest {
     );
     final var displayOrder = 10;
     final var isValid = true;
+    var accessValid = true;
 
-    final var expectedView = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView expectedView = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         collaborationOpportunity,
         displayOrder,
-        List.of(),
-        isValid
-    );
+        Collections.emptyList(),
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(accessValid)
+        .isValid(isValid)
+        .build();
+
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(accessValid);
+    when(portalOrganisationAccessor.getOrganisationGroupById(collaborationOpportunity.getAddedByOrganisationGroup()))
+        .thenReturn(Optional.of(addedByPortalOrganisationGroup));
 
     final var resultingView = forwardWorkPlanCollaborationOpportunitiesSummaryService.getView(
         collaborationOpportunity,

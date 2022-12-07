@@ -8,6 +8,8 @@ import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContract;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
@@ -16,6 +18,8 @@ import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractVi
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
@@ -34,21 +38,26 @@ public class AwardedContractSectionSummaryService implements ProjectSectionSumma
   private final AwardedContractService awardedContractService;
   private final DifferenceService differenceService;
   private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
+  private final PortalOrganisationAccessor portalOrganisationAccessor;
 
   @Autowired
   public AwardedContractSectionSummaryService(
       AwardedContractService awardedContractService,
       DifferenceService differenceService,
-      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService
-  ) {
+      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService,
+      ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
+      PortalOrganisationAccessor portalOrganisationAccessor) {
     this.awardedContractService = awardedContractService;
     this.differenceService = differenceService;
     this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
+    this.portalOrganisationAccessor = portalOrganisationAccessor;
   }
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return awardedContractService.canShowInTaskList(detail);
+    return awardedContractService.isTaskValidForProjectDetail(detail);
   }
 
   @Override
@@ -99,8 +108,29 @@ public class AwardedContractSectionSummaryService implements ProjectSectionSumma
           var awardedContract = awardedContracts.get(index);
           var displayIndex = index + 1;
 
-          return AwardedContractViewUtil.from(awardedContract, displayIndex);
+          return getAwardedContractView(awardedContract, displayIndex);
         })
         .collect(Collectors.toList());
+  }
+
+  private AwardedContractView getAwardedContractView(AwardedContract awardedContract, int displayOrder) {
+    return getAwardedContractViewBuilder(awardedContract, displayOrder).build();
+  }
+
+  private AwardedContractViewUtil.AwardedContractViewBuilder getAwardedContractViewBuilder(AwardedContract awardedContract,
+                                                                                           int displayNumber) {
+    var includeSummaryLinks = projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+        awardedContract.getProjectDetail(),
+        new OrganisationGroupIdWrapper(awardedContract.getAddedByOrganisationGroup())
+    );
+    var addedByPortalOrganisationGroup =
+        portalOrganisationAccessor.getOrganisationGroupById(awardedContract.getAddedByOrganisationGroup())
+            .orElse(new PortalOrganisationGroup());
+    return new AwardedContractViewUtil.AwardedContractViewBuilder(
+        awardedContract,
+        displayNumber,
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(includeSummaryLinks);
   }
 }

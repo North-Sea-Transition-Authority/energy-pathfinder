@@ -10,7 +10,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
@@ -21,11 +23,20 @@ public class AwardedContractSummaryServiceTest {
   @Mock
   private AwardedContractService awardedContractService;
 
+  @Mock
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
+
+  @Mock
+  private PortalOrganisationAccessor portalOrganisationAccessor;
+
   private AwardedContractSummaryService awardedContractSummaryService;
 
   @Before
   public void setup() {
-    awardedContractSummaryService = new AwardedContractSummaryService(awardedContractService);
+    awardedContractSummaryService = new AwardedContractSummaryService(awardedContractService,
+        projectSectionItemOwnershipService,
+        portalOrganisationAccessor
+    );
   }
 
   @Test
@@ -105,7 +116,7 @@ public class AwardedContractSummaryServiceTest {
 
     assertThat(awardedContractView.getDisplayOrder()).isEqualTo(displayOrder);
   }
-  
+
   @Test
   public void getAwardedContractViewErrors_whenErrors() {
     var awardedContractView1 = AwardedContractTestUtil.createAwardedContractView(1);
@@ -114,13 +125,13 @@ public class AwardedContractSummaryServiceTest {
     final var displayOrderOfInvalidView = 2;
     var awardedContractView2 = AwardedContractTestUtil.createAwardedContractView(displayOrderOfInvalidView);
     awardedContractView2.setIsValid(false);
-    
+
     var errorItems = awardedContractSummaryService.getAwardedContractViewErrors(
         List.of(awardedContractView1, awardedContractView2)
     );
-    
+
     assertThat(errorItems.size()).isEqualTo(1);
-    
+
     var errorItem = errorItems.get(0);
     assertThat(errorItem.getFieldName()).isEqualTo(
         String.format(AwardedContractSummaryService.ERROR_FIELD_NAME, displayOrderOfInvalidView)

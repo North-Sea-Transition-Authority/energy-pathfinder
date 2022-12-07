@@ -19,6 +19,8 @@ public class UpcomingTenderView extends ContactDetailProjectSummaryItem {
 
   private List<UploadedFileView> uploadedFileViews;
 
+  private String addedByOrganisationGroup;
+
   public UpcomingTenderView() {
     this.uploadedFileViews = new ArrayList<>();
   }
@@ -72,6 +74,14 @@ public class UpcomingTenderView extends ContactDetailProjectSummaryItem {
   public void setUploadedFileViews(
       List<UploadedFileView> uploadedFileViews) {
     this.uploadedFileViews = uploadedFileViews;
+  }
+
+  public String getAddedByOrganisationGroup() {
+    return addedByOrganisationGroup;
+  }
+
+  public void setAddedByOrganisationGroup(String addedByOrganisationGroup) {
+    this.addedByOrganisationGroup = addedByOrganisationGroup;
   }
 
   @Override

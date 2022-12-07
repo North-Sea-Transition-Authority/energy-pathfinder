@@ -49,14 +49,14 @@ public class DecommissionedPipelineSectionSummaryServiceTest {
 
   @Test
   public void canShowSection_whenCanShowInTaskList_thenTrue() {
-    when(decommissionedPipelineService.canShowInTaskList(detail)).thenReturn(true);
+    when(decommissionedPipelineService.isTaskValidForProjectDetail(detail)).thenReturn(true);
 
     assertThat(decommissionedPipelineSectionSummaryService.canShowSection(detail)).isTrue();
   }
 
   @Test
   public void canShowSection_whenCannotShowInTaskList_thenFalse() {
-    when(decommissionedPipelineService.canShowInTaskList(detail)).thenReturn(false);
+    when(decommissionedPipelineService.isTaskValidForProjectDetail(detail)).thenReturn(false);
 
     assertThat(decommissionedPipelineSectionSummaryService.canShowSection(detail)).isFalse();
   }

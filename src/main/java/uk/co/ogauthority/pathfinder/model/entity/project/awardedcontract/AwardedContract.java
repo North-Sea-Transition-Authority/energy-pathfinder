@@ -42,6 +42,8 @@ public class AwardedContract extends ProjectDetailEntity implements ContactDetai
 
   private String emailAddress;
 
+  private Integer addedByOrganisationGroup;
+
   public AwardedContract() {}
 
   public AwardedContract(ProjectDetail projectDetail) {
@@ -134,6 +136,14 @@ public class AwardedContract extends ProjectDetailEntity implements ContactDetai
   @Override
   public String getEmailAddress() {
     return emailAddress;
+  }
+
+  public Integer getAddedByOrganisationGroup() {
+    return addedByOrganisationGroup;
+  }
+
+  public void setAddedByOrganisationGroup(Integer addedByOrganisationGroup) {
+    this.addedByOrganisationGroup = addedByOrganisationGroup;
   }
 
   @Override

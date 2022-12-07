@@ -23,12 +23,14 @@ import uk.co.ogauthority.pathfinder.config.file.FileUploadResult;
 import uk.co.ogauthority.pathfinder.controller.file.FileDownloadService;
 import uk.co.ogauthority.pathfinder.controller.file.PathfinderFileUploadController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.AllowProjectContributorAccess;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.TenderFunctionRestController;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
@@ -41,6 +43,8 @@ import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderFileLinkService;
@@ -53,6 +57,7 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
+@AllowProjectContributorAccess
 @ProjectTypeCheck(types = ProjectType.INFRASTRUCTURE)
 @RequestMapping("/project/{projectId}/upcoming-tenders")
 public class UpcomingTendersController extends PathfinderFileUploadController {
@@ -65,6 +70,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
   private final ControllerHelperService controllerHelperService;
   private final UpcomingTenderService upcomingTenderService;
   private final UpcomingTenderSummaryService upcomingTenderSummaryService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
 
   @Autowired
@@ -73,12 +79,14 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
                                    UpcomingTenderService upcomingTenderService,
                                    UpcomingTenderSummaryService upcomingTenderSummaryService,
                                    ProjectDetailFileService projectDetailFileService,
-                                   FileDownloadService fileDownloadService) {
+                                   FileDownloadService fileDownloadService,
+                                   ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     super(projectDetailFileService, fileDownloadService);
     this.breadcrumbService = breadcrumbService;
     this.controllerHelperService = controllerHelperService;
     this.upcomingTenderService = upcomingTenderService;
     this.upcomingTenderSummaryService = upcomingTenderSummaryService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
   }
 
   @GetMapping
@@ -157,6 +165,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
                                          @PathVariable("upcomingTenderId") Integer upcomingTenderId,
                                          ProjectContext projectContext) {
     var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
+    checkIfUserHasAccessToTender(upcomingTender);
     return getUpcomingTenderModelAndView(
         projectContext.getProjectDetails(),
         upcomingTenderService.getForm(upcomingTender)
@@ -171,6 +180,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
                                            ValidationType validationType,
                                            ProjectContext projectContext) {
     var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
+    checkIfUserHasAccessToTender(upcomingTender);
     bindingResult = upcomingTenderService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
@@ -197,7 +207,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
                                                   @PathVariable("displayOrder") Integer displayOrder,
                                                   ProjectContext projectContext) {
     var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
-
+    checkIfUserHasAccessToTender(upcomingTender);
     var modelAndView = new ModelAndView("project/upcomingtender/removeUpcomingTender")
           .addObject("view", upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, displayOrder))
           .addObject("cancelUrl", ReverseRouter.route(on(UpcomingTendersController.class).viewUpcomingTenders(projectId, null)));
@@ -211,6 +221,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
                                            @PathVariable("displayOrder") Integer displayOrder,
                                            ProjectContext projectContext) {
     var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
+    checkIfUserHasAccessToTender(upcomingTender);
     upcomingTenderService.delete(upcomingTender);
     AuditService.audit(
         AuditEvent.UPCOMING_TENDER_REMOVED,
@@ -314,5 +325,18 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
         .addObject("contractBands", ContractBand.getAllAsMap());
     breadcrumbService.fromUpcomingTenders(projectDetail.getProject().getId(), modelAndView, PAGE_NAME_SINGULAR);
     return modelAndView;
+  }
+
+  private void checkIfUserHasAccessToTender(UpcomingTender upcomingTender) {
+    if (!projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+        upcomingTender.getProjectDetail(),
+        new OrganisationGroupIdWrapper(upcomingTender.getAddedByOrganisationGroup())
+    )) {
+      throw new AccessDeniedException(
+          String.format(
+              "User does not have access to the UpcomingTender with id: %d",
+              upcomingTender.getId())
+      );
+    }
   }
 }

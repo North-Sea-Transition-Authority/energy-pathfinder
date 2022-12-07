@@ -27,7 +27,7 @@ public class WebUserAccountService {
     return webUserAccountRepository.findAllByWuaIdIn(webUserAccountIds);
   }
 
-  private Optional<WebUserAccount> getWebUserAccount(Integer wuaId) {
+  public Optional<WebUserAccount> getWebUserAccount(Integer wuaId) {
     return webUserAccountRepository.findById(wuaId);
   }
 }

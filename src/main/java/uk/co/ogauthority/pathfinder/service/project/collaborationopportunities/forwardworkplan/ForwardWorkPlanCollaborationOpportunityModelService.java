@@ -11,6 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
 import uk.co.ogauthority.pathfinder.controller.rest.ForwardWorkPlanCollaborationOpportunityRestController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationCompletionForm;
 import uk.co.ogauthority.pathfinder.model.form.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityForm;
@@ -119,11 +120,11 @@ public class ForwardWorkPlanCollaborationOpportunityModelService {
     return modelAndView;
   }
 
-  public ModelAndView getRemoveCollaborationOpportunityConfirmationModelAndView(int projectId,
-                                                                                int opportunityId,
-                                                                                int displayOrder) {
+  public ModelAndView getRemoveCollaborationOpportunityConfirmationModelAndView(
+      int projectId,
+      ForwardWorkPlanCollaborationOpportunity collaborationOpportunity,
+      int displayOrder) {
 
-    final var collaborationOpportunity = forwardWorkPlanCollaborationOpportunityService.getOrError(opportunityId);
     final var collaborationOpportunityView = forwardWorkPlanCollaborationOpportunitiesSummaryService.getView(
         collaborationOpportunity,
         displayOrder

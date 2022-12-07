@@ -56,8 +56,8 @@ public class DecommissioningScheduleControllerTest extends ProjectContextAbstrac
   @Before
   public void setUp() throws Exception {
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, unauthenticatedUser)).thenReturn(false);
   }
 
   @Test

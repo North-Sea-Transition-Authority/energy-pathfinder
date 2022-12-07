@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.entity.project;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 import javax.persistence.Column;
@@ -18,8 +19,9 @@ import uk.co.ogauthority.pathfinder.service.entityduplication.ParentEntity;
 
 @Entity
 @Table(name = "project_details")
-public class ProjectDetail implements ParentEntity {
+public class ProjectDetail implements ParentEntity, Serializable {
 
+  private static final long serialVersionUID = -2707724149810437190L;
   private static final Integer FIRST_VERSION = 1;
 
   @Id

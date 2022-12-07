@@ -2,6 +2,8 @@ package uk.co.ogauthority.pathfinder.model.entity.dashboard;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
+import javax.persistence.Convert;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
@@ -10,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationUnit;
+import uk.co.ogauthority.pathfinder.model.entity.project.projectcontribution.ProjectContributorConverter;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
@@ -60,6 +63,17 @@ public abstract class DashboardProjectItem {
   private ProjectType projectType;
 
   private int projectTypeSortKey;
+
+  @Convert(converter = ProjectContributorConverter.class)
+  private List<Integer> contributorOrgIds;
+
+  public List<Integer> getContributorOrgIds() {
+    return contributorOrgIds;
+  }
+
+  public void setContributorOrgIds(List<Integer> contributorOrgIds) {
+    this.contributorOrgIds = contributorOrgIds;
+  }
 
   public Integer getProjectId() {
     return projectId;

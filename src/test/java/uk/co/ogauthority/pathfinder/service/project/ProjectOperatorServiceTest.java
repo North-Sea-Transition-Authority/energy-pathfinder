@@ -173,24 +173,16 @@ public class ProjectOperatorServiceTest {
   }
 
   @Test
-  public void isUserInProjectTeamOrRegulator_inProjectTeam() {
-    when(teamService.isPersonMemberOfRegulatorTeam(person)).thenReturn(false);
+  public void isUserInProjectTeam_inProjectTeam() {
     when(teamService.getOrganisationTeamsPersonIsMemberOf(person)).thenReturn(
         Collections.singletonList(organisationTeam));
     when(projectOperatorRepository.findByProjectDetail(detail)).thenReturn(Optional.of(projectOperator));
-    assertThat(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).isTrue();
+    assertThat(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).isTrue();
 
   }
 
   @Test
-  public void isUserInProjectTeamOrRegulator_whenRegulator() {
-    when(teamService.isPersonMemberOfRegulatorTeam(any())).thenReturn(true);
-    assertThat(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).isTrue();
-  }
-
-  @Test
-  public void isUserInProjectTeamOrRegulator_whenNotInTeam() {
-    when(teamService.isPersonMemberOfRegulatorTeam(person)).thenReturn(false);
+  public void isUserInProjectTeam_whenNotInTeam() {
     when(teamService.getOrganisationTeamsPersonIsMemberOf(person)).thenReturn(Collections.singletonList(
         TeamTestingUtil.getOrganisationTeam(
             TeamTestingUtil.generateOrganisationGroup(
@@ -201,7 +193,30 @@ public class ProjectOperatorServiceTest {
         )
     ));
     when(projectOperatorRepository.findByProjectDetail(detail)).thenReturn(Optional.of(projectOperator));
-    assertThat(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).isFalse();
+    assertThat(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).isFalse();
+  }
+
+  @Test
+  public void isUserInProjectTeam_inProjectTeam_thenTrue() {
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(person)).thenReturn(
+        Collections.singletonList(organisationTeam));
+    when(projectOperatorRepository.findByProjectDetail(detail)).thenReturn(Optional.of(projectOperator));
+    assertThat(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).isTrue();
+  }
+
+  @Test
+  public void isUserInProjectTeam_notInProjectTeam_thenFalse() {
+    when(teamService.getOrganisationTeamsPersonIsMemberOf(person)).thenReturn(Collections.singletonList(
+        TeamTestingUtil.getOrganisationTeam(
+            TeamTestingUtil.generateOrganisationGroup(
+                2,
+                "DifferentGrp",
+                "DiffGrp"
+            )
+        )
+    ));
+    when(projectOperatorRepository.findByProjectDetail(detail)).thenReturn(Optional.of(projectOperator));
+    assertThat(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).isFalse();
   }
 
   @Test

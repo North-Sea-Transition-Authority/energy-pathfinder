@@ -1,17 +1,22 @@
 package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure;
 
+import static uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure.InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure.InfrastructureCollaborationOpportunityView;
-import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure.InfrastructureCollaborationOpportunityViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
+import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.CollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
@@ -29,14 +34,19 @@ public class InfrastructureCollaborationOpportunitiesSummaryService extends
 
   private final InfrastructureCollaborationOpportunitiesService infrastructureCollaborationOpportunitiesService;
   private final InfrastructureCollaborationOpportunityFileLinkService infrastructureCollaborationOpportunityFileLinkService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
+  private final PortalOrganisationAccessor portalOrganisationAccessor;
 
   @Autowired
   public InfrastructureCollaborationOpportunitiesSummaryService(
       InfrastructureCollaborationOpportunitiesService infrastructureCollaborationOpportunitiesService,
-      InfrastructureCollaborationOpportunityFileLinkService infrastructureCollaborationOpportunityFileLinkService
-  ) {
+      InfrastructureCollaborationOpportunityFileLinkService infrastructureCollaborationOpportunityFileLinkService,
+      ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
+      PortalOrganisationAccessor portalOrganisationAccessor) {
     this.infrastructureCollaborationOpportunitiesService = infrastructureCollaborationOpportunitiesService;
     this.infrastructureCollaborationOpportunityFileLinkService = infrastructureCollaborationOpportunityFileLinkService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
+    this.portalOrganisationAccessor = portalOrganisationAccessor;
   }
 
   public List<InfrastructureCollaborationOpportunityView> getSummaryViews(ProjectDetail detail) {
@@ -79,7 +89,28 @@ public class InfrastructureCollaborationOpportunitiesSummaryService extends
   }
 
   public boolean canShowInTaskList(ProjectDetail detail) {
-    return infrastructureCollaborationOpportunitiesService.canShowInTaskList(detail);
+    return infrastructureCollaborationOpportunitiesService.isTaskValidForProjectDetail(detail);
+  }
+
+  @Override
+  public InfrastructureCollaborationOpportunityView getView(InfrastructureCollaborationOpportunity opportunity,
+                                                            Integer displayOrder) {
+    return getView(opportunity, displayOrder, true);
+  }
+
+  @Override
+  public InfrastructureCollaborationOpportunityView getView(InfrastructureCollaborationOpportunity opportunity,
+                                                            Integer displayOrder,
+                                                            boolean isValid) {
+
+    return getInfrastructureCollaborationOpportunityViewBuilder(opportunity, displayOrder)
+        .isValid(isValid)
+        .build();
+  }
+
+  @Override
+  protected boolean isValid(InfrastructureCollaborationOpportunity opportunity, ValidationType validationType) {
+    return infrastructureCollaborationOpportunitiesService.isValid(opportunity, validationType);
   }
 
   private List<UploadedFileView> getUploadedFileViews(InfrastructureCollaborationOpportunity collaborationOpportunity) {
@@ -88,28 +119,23 @@ public class InfrastructureCollaborationOpportunitiesSummaryService extends
     );
   }
 
-  @Override
-  public InfrastructureCollaborationOpportunityView getView(InfrastructureCollaborationOpportunity opportunity,
-                                                            Integer displayOrder) {
-    final var uploadedFileViews = getUploadedFileViews(opportunity);
-    return InfrastructureCollaborationOpportunityViewUtil.createView(opportunity, displayOrder, uploadedFileViews);
-  }
-
-  @Override
-  public InfrastructureCollaborationOpportunityView getView(InfrastructureCollaborationOpportunity opportunity,
-                                                            Integer displayOrder,
-                                                            boolean isValid) {
-    final var uploadedFileViews = getUploadedFileViews(opportunity);
-    return InfrastructureCollaborationOpportunityViewUtil.createView(
+  private InfrastructureCollaborationOpportunityViewBuilder getInfrastructureCollaborationOpportunityViewBuilder(
+      InfrastructureCollaborationOpportunity opportunity,
+      Integer displayOrder) {
+    var uploadedFileViews = getUploadedFileViews(opportunity);
+    var includeLinks = projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+        opportunity.getProjectDetail(),
+        new OrganisationGroupIdWrapper(opportunity.getAddedByOrganisationGroup())
+    );
+    var addedByPortalOrganisationGroup =
+        portalOrganisationAccessor.getOrganisationGroupById(opportunity.getAddedByOrganisationGroup())
+            .orElse(new PortalOrganisationGroup());
+    return new InfrastructureCollaborationOpportunityViewBuilder(
         opportunity,
         displayOrder,
         uploadedFileViews,
-        isValid
-    );
-  }
-
-  @Override
-  protected boolean isValid(InfrastructureCollaborationOpportunity opportunity, ValidationType validationType) {
-    return infrastructureCollaborationOpportunitiesService.isValid(opportunity, validationType);
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(includeLinks);
   }
 }

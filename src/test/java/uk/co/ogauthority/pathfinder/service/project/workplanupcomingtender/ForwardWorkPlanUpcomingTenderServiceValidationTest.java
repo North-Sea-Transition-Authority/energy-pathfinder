@@ -22,6 +22,7 @@ import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.Fo
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -47,6 +48,9 @@ public class ForwardWorkPlanUpcomingTenderServiceValidationTest {
   @Mock
   private ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
 
+  @Mock
+  private TeamService teamService;
+
   private ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
@@ -65,8 +69,8 @@ public class ForwardWorkPlanUpcomingTenderServiceValidationTest {
         workPlanUpcomingTenderRepository,
         searchSelectorService,
         entityDuplicationService,
-        forwardWorkPlanTenderSetupService
-    );
+        forwardWorkPlanTenderSetupService,
+        teamService);
   }
 
   @Test

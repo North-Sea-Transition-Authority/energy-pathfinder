@@ -40,15 +40,16 @@ public class ProjectAssessmentContextArgumentResolver implements HandlerMethodAr
     );
     var statusCheck = ArgumentResolverUtil.getProjectStatusCheck(parameter);
     var permissionCheck = ArgumentResolverUtil.getProjectFormPagePermissionCheck(parameter);
-
     final var allowedProjectTypes = ArgumentResolverUtil.getProjectTypesCheck(parameter);
+    var allowProjectContributors = ArgumentResolverUtil.allowProjectContributors(parameter);
 
     return projectAssessmentContextService.buildProjectAssessmentContext(
         detail,
         user,
         statusCheck,
         permissionCheck,
-        allowedProjectTypes
+        allowedProjectTypes,
+        allowProjectContributors
     );
   }
 }

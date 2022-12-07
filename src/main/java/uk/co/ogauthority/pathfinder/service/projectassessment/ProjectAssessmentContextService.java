@@ -31,9 +31,17 @@ public class ProjectAssessmentContextService {
     var statusCheck = projectContextService.getProjectStatusesForClass(controllerClass);
     var permissionCheck = projectContextService.getProjectPermissionsForClass(controllerClass);
     final var allowedProjectTypes = projectContextService.getProjectTypesForClass(controllerClass);
+    var allowProjectContributors = projectContextService.getContributorsAllowedForClass(controllerClass);
 
     try {
-      buildProjectAssessmentContext(detail, user, statusCheck, permissionCheck, allowedProjectTypes);
+      buildProjectAssessmentContext(
+          detail,
+          user,
+          statusCheck,
+          permissionCheck,
+          allowedProjectTypes,
+          allowProjectContributors
+      );
       return true;
     } catch (AccessDeniedException exception) {
       return false;
@@ -44,7 +52,8 @@ public class ProjectAssessmentContextService {
                                                                 AuthenticatedUserAccount user,
                                                                 Set<ProjectStatus> statusCheck,
                                                                 Set<ProjectPermission> permissionCheck,
-                                                                Set<ProjectType> allowedProjectTypes) {
+                                                                Set<ProjectType> allowedProjectTypes,
+                                                                boolean allowProjectContributors) {
     if (projectAssessmentService.hasProjectBeenAssessed(detail)) {
       throw new AccessDeniedException(
           String.format(
@@ -58,13 +67,15 @@ public class ProjectAssessmentContextService {
         user,
         statusCheck,
         permissionCheck,
-        allowedProjectTypes
+        allowedProjectTypes,
+        allowProjectContributors
     );
 
     return new ProjectAssessmentContext(
         projectContext.getProjectDetails(),
         projectContext.getProjectPermissions(),
-        projectContext.getUserAccount()
+        projectContext.getUserAccount(),
+        projectContext.getUserToProjectRelationships()
     );
   }
 

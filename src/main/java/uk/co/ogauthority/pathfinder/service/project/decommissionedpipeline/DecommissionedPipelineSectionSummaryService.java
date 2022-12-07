@@ -48,7 +48,7 @@ public class DecommissionedPipelineSectionSummaryService implements ProjectSecti
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return decommissionedPipelineService.canShowInTaskList(detail);
+    return decommissionedPipelineService.isTaskValidForProjectDetail(detail);
   }
 
   @Override

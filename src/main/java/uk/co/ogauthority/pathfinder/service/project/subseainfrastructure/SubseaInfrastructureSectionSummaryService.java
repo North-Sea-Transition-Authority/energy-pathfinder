@@ -50,7 +50,7 @@ public class SubseaInfrastructureSectionSummaryService implements ProjectSection
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return subseaInfrastructureService.canShowInTaskList(detail);
+    return subseaInfrastructureService.isTaskValidForProjectDetail(detail);
   }
 
   @Override

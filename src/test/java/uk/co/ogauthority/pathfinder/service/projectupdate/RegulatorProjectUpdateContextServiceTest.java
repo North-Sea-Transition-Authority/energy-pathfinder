@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.projectupdate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.when;
 
 import java.util.Set;
@@ -19,6 +20,7 @@ import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -44,6 +46,7 @@ public class RegulatorProjectUpdateContextServiceTest {
   private final Set<ProjectStatus> projectStatuses = Set.of(ProjectStatus.QA);
   private final Set<ProjectPermission> projectPermissions = Set.of(ProjectPermission.REQUEST_UPDATE);
   private final Set<ProjectType> allowedProjectTypes = Set.of(projectDetail.getProjectType());
+  private final boolean allowProjectContributors = false;
 
   @Before
   public void setup() {
@@ -51,13 +54,13 @@ public class RegulatorProjectUpdateContextServiceTest {
         projectContextService,
         projectUpdateService,
         projectService,
-        regulatorUpdateRequestService
-    );
+        regulatorUpdateRequestService);
 
     when(projectService.getLatestSubmittedDetailOrError(projectDetail.getProject().getId())).thenReturn(projectDetail);
 
-    when(projectContextService.buildProjectContext(any(), any(), any(), any(), any()))
-        .thenAnswer(invocation -> new ProjectContext(invocation.getArgument(0), invocation.getArgument(3), invocation.getArgument(1)));
+    when(projectContextService.buildProjectContext(any(), any(), any(), any(), any(), anyBoolean()))
+        .thenAnswer(invocation -> new ProjectContext(invocation.getArgument(0), invocation.getArgument(3), invocation.getArgument(1),
+            Set.of(UserToProjectRelationship.OPERATOR)));
   }
 
   @Test
@@ -69,7 +72,8 @@ public class RegulatorProjectUpdateContextServiceTest {
         authenticatedUser,
         projectStatuses,
         projectPermissions,
-        allowedProjectTypes
+        allowedProjectTypes,
+        allowProjectContributors
     );
 
     assertThat(regulatorProjectUpdateContext.getProjectDetails()).isEqualTo(projectDetail);
@@ -86,7 +90,8 @@ public class RegulatorProjectUpdateContextServiceTest {
         authenticatedUser,
         projectStatuses,
         projectPermissions,
-        allowedProjectTypes
+        allowedProjectTypes,
+        allowProjectContributors
     );
   }
 }

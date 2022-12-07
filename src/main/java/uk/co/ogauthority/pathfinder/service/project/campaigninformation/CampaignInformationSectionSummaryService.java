@@ -51,7 +51,7 @@ public class CampaignInformationSectionSummaryService implements ProjectSectionS
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return campaignInformationService.canShowInTaskList(detail);
+    return campaignInformationService.isTaskValidForProjectDetail(detail);
   }
 
   @Override

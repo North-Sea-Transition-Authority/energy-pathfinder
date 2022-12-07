@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,16 +24,19 @@ import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocatio
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
@@ -417,7 +421,7 @@ public class ProjectLocationServiceTest {
 
     when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
 
-    assertThat(projectLocationService.canShowInTaskList(projectDetail)).isTrue();
+    assertThat(projectLocationService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR))).isTrue();
   }
 
   @Test
@@ -426,20 +430,57 @@ public class ProjectLocationServiceTest {
 
     when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(false);
 
-    assertThat(projectLocationService.canShowInTaskList(projectDetail)).isFalse();
+    assertThat(projectLocationService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR))).isFalse();
   }
 
   @Test
   public void canShowInTaskList_whenNotInfrastructureProject_thenFalse() {
     var projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
-    assertThat(projectLocationService.canShowInTaskList(projectDetail)).isFalse();
+    assertThat(projectLocationService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR))).isFalse();
   }
 
   @Test
   public void canShowInTaskList_whenNullProjectType_thenFalse() {
     var projectDetail = ProjectUtil.getProjectDetails();
     projectDetail.setProjectType(null);
-    assertThat(projectLocationService.canShowInTaskList(projectDetail)).isFalse();
+    assertThat(projectLocationService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR))).isFalse();
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        projectLocationService,
+        projectDetail,
+        Set.of(UserToProjectRelationship.OPERATOR)
+    );
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_whenInfrastructureProjectAndOilAndGasProject_thenTrue() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    assertThat(projectLocationService.isTaskValidForProjectDetail(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_whenInfrastructureProjectAndNotOilAndGasProject_thenFalse() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(false);
+
+    assertThat(projectLocationService.isTaskValidForProjectDetail(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_whenNotInfrastructureProject_thenFalse() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
+    assertThat(projectLocationService.isTaskValidForProjectDetail(projectDetail)).isFalse();
   }
 
   @Test

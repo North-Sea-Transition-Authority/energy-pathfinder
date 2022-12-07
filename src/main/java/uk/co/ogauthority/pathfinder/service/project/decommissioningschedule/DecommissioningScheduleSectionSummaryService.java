@@ -44,7 +44,7 @@ public class DecommissioningScheduleSectionSummaryService implements ProjectSect
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return decommissioningScheduleService.canShowInTaskList(detail);
+    return decommissioningScheduleService.isTaskValidForProjectDetail(detail);
   }
 
   @Override

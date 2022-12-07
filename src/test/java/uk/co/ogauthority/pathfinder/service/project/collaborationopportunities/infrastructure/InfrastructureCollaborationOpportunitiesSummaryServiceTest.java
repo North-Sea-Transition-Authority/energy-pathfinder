@@ -2,15 +2,19 @@ package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -18,8 +22,10 @@ import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.infrastructure.InfrastructureCollaborationOpportunityView;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
@@ -31,6 +37,12 @@ public class InfrastructureCollaborationOpportunitiesSummaryServiceTest {
   @Mock
   private InfrastructureCollaborationOpportunityFileLinkService infrastructureCollaborationOpportunityFileLinkService;
 
+  @Mock
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
+
+  @Mock
+  private PortalOrganisationAccessor portalOrganisationAccessor;
+
   private InfrastructureCollaborationOpportunitiesSummaryService infrastructureCollaborationOpportunitiesSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -39,15 +51,24 @@ public class InfrastructureCollaborationOpportunitiesSummaryServiceTest {
 
   private final InfrastructureCollaborationOpportunity manualEntryOpportunity = InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity_manualEntry(detail);
 
+  private final PortalOrganisationGroup addedByPortalOrganisationGroup =
+      TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
+
   @Before
   public void setUp() {
     infrastructureCollaborationOpportunitiesSummaryService = new InfrastructureCollaborationOpportunitiesSummaryService(
         infrastructureCollaborationOpportunitiesService,
-        infrastructureCollaborationOpportunityFileLinkService
+        infrastructureCollaborationOpportunityFileLinkService,
+        projectSectionItemOwnershipService,
+        portalOrganisationAccessor
     );
     when(infrastructureCollaborationOpportunitiesService.getOpportunitiesForDetail(detail)).thenReturn(
         List.of(opportunity, manualEntryOpportunity)
     );
+    when(portalOrganisationAccessor.getOrganisationGroupById(opportunity.getAddedByOrganisationGroup()))
+        .thenReturn(Optional.of(addedByPortalOrganisationGroup));
+    when(portalOrganisationAccessor.getOrganisationGroupById(manualEntryOpportunity.getAddedByOrganisationGroup()))
+        .thenReturn(Optional.of(addedByPortalOrganisationGroup));
   }
 
 
@@ -118,14 +139,14 @@ public class InfrastructureCollaborationOpportunitiesSummaryServiceTest {
 
   @Test
   public void canShowInTaskList_whenCanShowInTaskList_thenTrue() {
-    when(infrastructureCollaborationOpportunitiesService.canShowInTaskList(detail)).thenReturn(true);
+    when(infrastructureCollaborationOpportunitiesService.isTaskValidForProjectDetail(detail)).thenReturn(true);
 
     assertThat(infrastructureCollaborationOpportunitiesSummaryService.canShowInTaskList(detail)).isTrue();
   }
 
   @Test
   public void canShowInTaskList_whenCannotShowInTaskList_thenFalse() {
-    when(infrastructureCollaborationOpportunitiesService.canShowInTaskList(detail)).thenReturn(false);
+    when(infrastructureCollaborationOpportunitiesService.isTaskValidForProjectDetail(detail)).thenReturn(false);
 
     assertThat(infrastructureCollaborationOpportunitiesSummaryService.canShowInTaskList(detail)).isFalse();
   }
@@ -138,6 +159,7 @@ public class InfrastructureCollaborationOpportunitiesSummaryServiceTest {
     final var project = detail.getProject();
     final var version = detail.getVersion();
 
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(detail), any())).thenReturn(true);
     when(infrastructureCollaborationOpportunitiesService.getOpportunitiesForProjectVersion(project, version))
         .thenReturn(List.of(collaborationOpportunity));
 

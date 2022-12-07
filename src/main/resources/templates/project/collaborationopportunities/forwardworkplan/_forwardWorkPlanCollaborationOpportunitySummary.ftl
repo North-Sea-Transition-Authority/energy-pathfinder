@@ -37,6 +37,7 @@
       uploadedFileUrl=(view.uploadedFileViews[0].fileUrl)!""
       uploadedFileName=(view.uploadedFileViews[0].fileName)!""
       uploadedFileDescription=(view.uploadedFileViews[0].fileDescription)!""
+      addedByPortalOrganisationGroup=view.addedByPortalOrganisationGroup
     />
   </@summaryViewWrapper.summaryViewItemWrapper>
 </#macro>
@@ -73,6 +74,7 @@
       uploadedFileUrl=(files[0].UploadedFileView_fileUrl)!""
       uploadedFileName=(files[0].UploadedFileView_fileName)!""
       uploadedFileDescription=(files[0].UploadedFileView_fileDescription)!""
+      addedByPortalOrganisationGroup=diffModel.ForwardWorkPlanCollaborationOpportunityView_addedByPortalOrganisationGroup
     />
   </@summaryViewWrapper.summaryViewItemWrapper>
 </#macro>

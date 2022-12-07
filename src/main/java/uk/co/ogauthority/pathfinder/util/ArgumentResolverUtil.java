@@ -12,6 +12,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.HandlerMapping;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.communication.CommunicationJourney;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.AllowProjectContributorAccess;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
@@ -180,5 +181,11 @@ public class ArgumentResolverUtil {
     )
         .map(p -> Arrays.stream(p.types()).collect(Collectors.toSet()))
         .orElse(Set.of());
+  }
+
+  public static boolean allowProjectContributors(MethodParameter methodParameter) {
+    return Optional.ofNullable(methodParameter.getContainingClass().getAnnotation(AllowProjectContributorAccess.class))
+        .isPresent()
+        || Optional.ofNullable(methodParameter.getMethodAnnotation(AllowProjectContributorAccess.class)).isPresent();
   }
 }

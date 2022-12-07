@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.entityduplication;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +120,7 @@ public class EntityDuplicationService {
       var newInstance = duplicationEntityClass.getConstructor().newInstance();
 
       for (Field field : FieldUtils.getAllFields(duplicationEntityClass)) {
-        if (!field.isSynthetic()) {
+        if (!field.isSynthetic() && !Modifier.isFinal(field.getModifiers())) {
           var value = FieldUtils.readField(field, entityToDuplicate, true);
           FieldUtils.writeField(field, newInstance, value, true);
         }

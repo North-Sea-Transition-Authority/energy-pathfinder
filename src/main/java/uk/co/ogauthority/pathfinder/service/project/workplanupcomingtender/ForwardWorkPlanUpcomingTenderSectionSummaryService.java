@@ -50,7 +50,7 @@ public class ForwardWorkPlanUpcomingTenderSectionSummaryService implements Proje
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return workPlanUpcomingTenderService.canShowInTaskList(detail);
+    return workPlanUpcomingTenderService.isTaskValidForProjectDetail(detail);
   }
 
   @Override

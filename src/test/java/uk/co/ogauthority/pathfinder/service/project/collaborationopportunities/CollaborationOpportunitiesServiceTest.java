@@ -27,8 +27,11 @@ import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.testutil.CollaborationOpportunityTestUtilCommon;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
+import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CollaborationOpportunitiesServiceTest {
@@ -38,6 +41,9 @@ public class CollaborationOpportunitiesServiceTest {
 
   @Mock
   private ProjectDetailFileService projectDetailFileService;
+
+  @Mock
+  private TeamService teamService;
 
   private TestCollaborationOpportunitiesService collaborationOpportunitiesService;
 
@@ -51,7 +57,8 @@ public class CollaborationOpportunitiesServiceTest {
         searchSelectorService,
         functionService,
         projectSetupService,
-        projectDetailFileService
+        projectDetailFileService,
+        teamService
     );
   }
 
@@ -298,6 +305,18 @@ public class CollaborationOpportunitiesServiceTest {
     assertThat(form.getContactDetail().getPhoneNumber()).isEqualTo(entity.getPhoneNumber());
     assertThat(form.getContactDetail().getJobTitle()).isEqualTo(entity.getJobTitle());
     assertThat(form.getContactDetail().getEmailAddress()).isEqualTo(entity.getEmailAddress());
+  }
+
+  @Test
+  public void setAddedByOrganisationGroup_thenCollaborationOpportunityEntityHasOrganisationGroupId() {
+    var user = UserTestingUtil.getAuthenticatedUserAccount();
+    var portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
+    var collaborationOpportunity = new TestCollaborationOpportunityCommon();
+    when(teamService.getContributorPortalOrganisationGroup(user)).thenReturn(portalOrganisationGroup);
+
+    collaborationOpportunitiesService.setAddedByOrganisationGroup(collaborationOpportunity, user);
+
+    assertThat(collaborationOpportunity.getAddedByOrganisationGroup()).isEqualTo(portalOrganisationGroup.getOrgGrpId());
   }
 
 }

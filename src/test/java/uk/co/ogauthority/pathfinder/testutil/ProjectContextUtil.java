@@ -5,6 +5,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 
 public class ProjectContextUtil {
 
@@ -13,7 +14,11 @@ public class ProjectContextUtil {
     return new ProjectContext(
         detail,
         Set.of(ProjectPermission.values()),
-        user
-    );
+        user,
+        Set.of(
+            UserToProjectRelationship.REGULATOR,
+            UserToProjectRelationship.OPERATOR,
+            UserToProjectRelationship.CONTRIBUTOR
+        ));
   }
 }

@@ -47,7 +47,7 @@ public class UpcomingTenderSectionSummaryService implements ProjectSectionSummar
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return upcomingTenderSummaryService.canShowInTaskList(detail);
+    return upcomingTenderSummaryService.isTaskValidForProjectDetail(detail);
   }
 
   @Override

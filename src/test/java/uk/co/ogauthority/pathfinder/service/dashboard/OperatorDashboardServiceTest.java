@@ -51,10 +51,11 @@ public class OperatorDashboardServiceTest {
   }
 
   @Test
-  public void getDashboardProjectItems_correctNumberOfItemsReturned() {
-    when(operatorDashboardProjectItemRepository.findAllByOrganisationGroupIn(any())).thenReturn(
+  public void getDashboardProjectItems_correctItemsReturned() {
+    when(operatorDashboardProjectItemRepository.findAllByOrganisationGroupOrContributorIn(any())).thenReturn(
         List.of(item1, item2)
     );
-    assertThat(operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson(), filter).size()).isEqualTo(2);
+    assertThat(operatorDashboardService.getDashboardProjectItems(authenticatedUser.getLinkedPerson(), filter))
+        .containsExactlyInAnyOrder(item1, item2);
   }
 }

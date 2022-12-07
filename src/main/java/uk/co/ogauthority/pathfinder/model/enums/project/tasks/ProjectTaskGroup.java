@@ -9,6 +9,12 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 
 public enum ProjectTaskGroup {
 
+  OVERVIEW(
+      ProjectTask.OVERVIEW.getDisplayName(),
+      List.of(ProjectTask.OVERVIEW),
+      Set.of(ProjectType.INFRASTRUCTURE, ProjectType.FORWARD_WORK_PLAN),
+      5
+  ),
   PROJECT_OPERATOR(
       ProjectTask.PROJECT_OPERATOR.getDisplayName(),
       List.of(ProjectTask.PROJECT_OPERATOR),
@@ -24,6 +30,14 @@ public enum ProjectTaskGroup {
       ),
       Set.of(ProjectType.INFRASTRUCTURE),
       20
+  ),
+  PROJECT_CONTRIBUTORS(
+      "Project contributors",
+      List.of(
+          ProjectTask.PROJECT_CONTRIBUTORS
+      ),
+      Set.of(ProjectType.INFRASTRUCTURE),
+      25
   ),
   COMMERCIAL_INFORMATION(
     "Commercial information",
@@ -55,6 +69,14 @@ public enum ProjectTaskGroup {
       Set.of(ProjectType.INFRASTRUCTURE),
       40
   ),
+  WORK_PLAN_PROJECT_CONTRIBUTORS(
+      "Contributors",
+      List.of(
+          ProjectTask.WORK_PLAN_PROJECT_CONTRIBUTORS
+      ),
+      Set.of(ProjectType.FORWARD_WORK_PLAN),
+      10
+  ),
   WORK_PLAN_COMMERCIAL_INFORMATION(
       "Commercial information",
       List.of(
@@ -62,7 +84,7 @@ public enum ProjectTaskGroup {
           ProjectTask.WORK_PLAN_COLLABORATION_OPPORTUNITIES
       ),
       Set.of(ProjectType.FORWARD_WORK_PLAN),
-      10
+      20
   );
 
   private final String displayName;

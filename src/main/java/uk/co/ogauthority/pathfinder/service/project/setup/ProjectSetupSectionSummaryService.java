@@ -116,6 +116,6 @@ public class ProjectSetupSectionSummaryService implements ProjectSectionSummaryS
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return projectSetupService.canShowInTaskList(detail);
+    return projectSetupService.isTaskValidForProjectDetail(detail);
   }
 }

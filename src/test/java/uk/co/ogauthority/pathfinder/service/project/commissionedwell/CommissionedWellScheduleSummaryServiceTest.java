@@ -230,7 +230,7 @@ class CommissionedWellScheduleSummaryServiceTest {
 
   @Test
   void canShowInTaskList_whenCanShowInTaskList_thenTrue() {
-    when(commissionedWellScheduleService.canShowInTaskList(projectDetail)).thenReturn(true);
+    when(commissionedWellScheduleService.isTaskValidForProjectDetail(projectDetail)).thenReturn(true);
 
     var canShowInTaskList = commissionedWellScheduleSummaryService.canShowInTaskList(projectDetail);
 
@@ -239,7 +239,7 @@ class CommissionedWellScheduleSummaryServiceTest {
 
   @Test
   void canShowInTaskList_whenCannotShowInTaskList_thenFalse() {
-    when(commissionedWellScheduleService.canShowInTaskList(projectDetail)).thenReturn(false);
+    when(commissionedWellScheduleService.isTaskValidForProjectDetail(projectDetail)).thenReturn(false);
 
     var canShowInTaskList = commissionedWellScheduleSummaryService.canShowInTaskList(projectDetail);
 

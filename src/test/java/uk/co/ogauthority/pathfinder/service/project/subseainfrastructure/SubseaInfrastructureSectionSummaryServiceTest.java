@@ -51,14 +51,14 @@ public class SubseaInfrastructureSectionSummaryServiceTest {
 
   @Test
   public void canShowSection_whenCanShowInTaskList_thenTrue() {
-    when(subseaInfrastructureService.canShowInTaskList(detail)).thenReturn(true);
+    when(subseaInfrastructureService.isTaskValidForProjectDetail(detail)).thenReturn(true);
 
     assertThat(subseaInfrastructureSectionSummaryService.canShowSection(detail)).isTrue();
   }
 
   @Test
   public void canShowSection_whenCannotShowInTaskList_thenFalse() {
-    when(subseaInfrastructureService.canShowInTaskList(detail)).thenReturn(false);
+    when(subseaInfrastructureService.isTaskValidForProjectDetail(detail)).thenReturn(false);
 
     assertThat(subseaInfrastructureSectionSummaryService.canShowSection(detail)).isFalse();
   }

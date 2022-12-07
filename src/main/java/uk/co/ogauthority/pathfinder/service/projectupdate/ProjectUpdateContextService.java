@@ -31,9 +31,17 @@ public class ProjectUpdateContextService {
     var statusCheck = projectContextService.getProjectStatusesForClass(controllerClass);
     var permissionCheck = projectContextService.getProjectPermissionsForClass(controllerClass);
     final var allowedProjectTypes = projectContextService.getProjectTypesForClass(controllerClass);
+    var allowProjectContributors = projectContextService.getContributorsAllowedForClass(controllerClass);
 
     try {
-      buildProjectUpdateContext(detail, user, statusCheck, permissionCheck, allowedProjectTypes);
+      buildProjectUpdateContext(
+          detail,
+          user,
+          statusCheck,
+          permissionCheck,
+          allowedProjectTypes,
+          allowProjectContributors
+      );
       return true;
     } catch (AccessDeniedException exception) {
       return false;
@@ -44,7 +52,8 @@ public class ProjectUpdateContextService {
                                                         AuthenticatedUserAccount user,
                                                         Set<ProjectStatus> statusCheck,
                                                         Set<ProjectPermission> permissionCheck,
-                                                        Set<ProjectType> allowedProjectTypes) {
+                                                        Set<ProjectType> allowedProjectTypes,
+                                                        boolean allowProjectContributors) {
     var project = detail.getProject();
 
     if (projectUpdateService.isUpdateInProgress(project)) {
@@ -61,13 +70,15 @@ public class ProjectUpdateContextService {
         user,
         statusCheck,
         permissionCheck,
-        allowedProjectTypes
+        allowedProjectTypes,
+        allowProjectContributors
     );
 
     return new ProjectUpdateContext(
         projectContext.getProjectDetails(),
         projectContext.getProjectPermissions(),
-        projectContext.getUserAccount()
+        projectContext.getUserAccount(),
+        projectContext.getUserToProjectRelationships()
     );
   }
 

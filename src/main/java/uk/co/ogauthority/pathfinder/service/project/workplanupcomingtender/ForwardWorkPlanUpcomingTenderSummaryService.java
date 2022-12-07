@@ -6,12 +6,16 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanUpcomingTenderView;
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanUpcomingTenderViewUtil;
+import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
@@ -19,11 +23,17 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 public class ForwardWorkPlanUpcomingTenderSummaryService {
 
   private final ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
+  private final PortalOrganisationAccessor portalOrganisationAccessor;
 
   @Autowired
   public ForwardWorkPlanUpcomingTenderSummaryService(
-      ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService) {
+      ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService,
+      ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
+      PortalOrganisationAccessor portalOrganisationAccessor) {
     this.workPlanUpcomingTenderService = workPlanUpcomingTenderService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
+    this.portalOrganisationAccessor = portalOrganisationAccessor;
   }
 
   public List<ForwardWorkPlanUpcomingTenderView> getSummaryViews(ProjectDetail projectDetail) {
@@ -49,13 +59,16 @@ public class ForwardWorkPlanUpcomingTenderSummaryService {
 
   public ForwardWorkPlanUpcomingTenderView getUpcomingTenderView(ForwardWorkPlanUpcomingTender workPlanUpcomingTender,
                                                                  Integer displayOrder) {
-    return ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(workPlanUpcomingTender, displayOrder);
+    return getForwardWorkPlanUpcomingTenderViewBuilder(workPlanUpcomingTender, displayOrder)
+        .build();
   }
 
   private ForwardWorkPlanUpcomingTenderView getUpcomingTenderView(ForwardWorkPlanUpcomingTender workPlanUpcomingTender,
                                                                   Integer displayOrder,
                                                                   boolean isValid) {
-    return ForwardWorkPlanUpcomingTenderViewUtil.createUpcomingTenderView(workPlanUpcomingTender, displayOrder, isValid);
+    return getForwardWorkPlanUpcomingTenderViewBuilder(workPlanUpcomingTender, displayOrder)
+        .isValid(isValid)
+        .build();
   }
 
   public ValidationResult validateViews(List<ForwardWorkPlanUpcomingTenderView> views) {
@@ -77,5 +90,24 @@ public class ForwardWorkPlanUpcomingTenderSummaryService {
             );
       })
         .collect(Collectors.toList());
+  }
+
+  private ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder getForwardWorkPlanUpcomingTenderViewBuilder(
+      ForwardWorkPlanUpcomingTender forwardWorkPlanUpcomingTender,
+      Integer displayOrder) {
+    var includeLinks = projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+        forwardWorkPlanUpcomingTender.getProjectDetail(),
+        new OrganisationGroupIdWrapper(forwardWorkPlanUpcomingTender.getAddedByOrganisationGroup())
+    );
+    var addedByPortalOrganisationGroup =
+        portalOrganisationAccessor.getOrganisationGroupById(forwardWorkPlanUpcomingTender.getAddedByOrganisationGroup())
+            .orElse(new PortalOrganisationGroup());
+
+    return new ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder(
+        forwardWorkPlanUpcomingTender,
+        displayOrder,
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(includeLinks);
   }
 }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -18,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
@@ -28,9 +30,12 @@ import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.Fo
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionService {
@@ -42,6 +47,7 @@ public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionS
   private final SearchSelectorService searchSelectorService;
   private final EntityDuplicationService entityDuplicationService;
   private final ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
+  private final TeamService teamService;
 
   @Autowired
   public ForwardWorkPlanUpcomingTenderService(FunctionService functionService,
@@ -50,7 +56,8 @@ public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionS
                                               ForwardWorkPlanUpcomingTenderRepository workPlanUpcomingTenderRepository,
                                               SearchSelectorService searchSelectorService,
                                               EntityDuplicationService entityDuplicationService,
-                                              ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService) {
+                                              ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService,
+                                              TeamService teamService) {
     this.functionService = functionService;
     this.validationService = validationService;
     this.workPlanUpcomingTenderFormValidator = workPlanUpcomingTenderFormValidator;
@@ -58,6 +65,7 @@ public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionS
     this.searchSelectorService = searchSelectorService;
     this.entityDuplicationService = entityDuplicationService;
     this.forwardWorkPlanTenderSetupService = forwardWorkPlanTenderSetupService;
+    this.teamService = teamService;
   }
 
   public List<RestSearchItem> findDepartmentTenderLikeWithManualEntry(String searchTerm) {
@@ -113,8 +121,12 @@ public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionS
 
   @Transactional
   public ForwardWorkPlanUpcomingTender createUpcomingTender(ProjectDetail detail,
-                                                            ForwardWorkPlanUpcomingTenderForm form) {
+                                                            ForwardWorkPlanUpcomingTenderForm form,
+                                                            AuthenticatedUserAccount userAccount) {
     var upcomingTender = new ForwardWorkPlanUpcomingTender(detail);
+    var portalOrganisationGroup = teamService.getContributorPortalOrganisationGroup(userAccount);
+
+    upcomingTender.setAddedByOrganisationGroup(portalOrganisationGroup.getOrgGrpId());
     return updateUpcomingTender(upcomingTender, form);
   }
 
@@ -232,6 +244,11 @@ public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionS
     }
   }
 
+  @Override
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
+    return ProjectService.isForwardWorkPlanProject(detail);
+  }
+
   private boolean hasOtherTendersToAdd(ForwardWorkPlanTenderSetup forwardWorkPlanTenderSetup) {
     return BooleanUtils.isTrue(forwardWorkPlanTenderSetup.getHasOtherTendersToAdd());
   }
@@ -244,8 +261,10 @@ public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionS
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
-    return ProjectService.isForwardWorkPlanProject(detail);
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.WORK_PLAN_UPCOMING_TENDERS,
+        userToProjectRelationships);
   }
 
   @Override

@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
@@ -18,6 +19,7 @@ import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
@@ -26,6 +28,8 @@ public class ForwardWorkPlanCollaborationOpportunityViewUtilTest {
 
   private final int displayOrder = 1;
   private final List<UploadedFileView> fileList = List.of(UploadedFileUtil.createUploadedFileView());
+  private final PortalOrganisationGroup addedByPortalOrganisationGroup =
+      TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   @Test
   public void createView_withoutValidParam_whenFunctionFromList_thenNoTag() {
@@ -34,11 +38,14 @@ public class ForwardWorkPlanCollaborationOpportunityViewUtilTest {
     entity.setFunction(Function.HR);
     entity.setManualFunction(null);
 
-    final var view = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView view = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         entity,
         displayOrder,
-        fileList
-    );
+        fileList,
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(true)
+        .build();
 
     createViewAndAssertCommonViewProperties(view, entity);
 
@@ -55,11 +62,14 @@ public class ForwardWorkPlanCollaborationOpportunityViewUtilTest {
     final var manualFunction = "manual function";
     entity.setManualFunction(manualFunction);
 
-    final var view = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView view = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         entity,
         displayOrder,
-        fileList
-    );
+        fileList,
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(true)
+        .build();
 
     createViewAndAssertCommonViewProperties(view, entity);
 
@@ -76,12 +86,15 @@ public class ForwardWorkPlanCollaborationOpportunityViewUtilTest {
 
     final var isValid = false;
 
-    final var view = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView view = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         entity,
         displayOrder,
         fileList,
-        isValid
-    );
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(true)
+        .isValid(isValid)
+        .build();
 
     createViewAndAssertCommonViewProperties(view, entity);
 
@@ -100,12 +113,15 @@ public class ForwardWorkPlanCollaborationOpportunityViewUtilTest {
 
     final var isValid = true;
 
-    final var view = ForwardWorkPlanCollaborationOpportunityViewUtil.createView(
+    ForwardWorkPlanCollaborationOpportunityView view = new ForwardWorkPlanCollaborationOpportunityViewUtil.ForwardWorkPlanCollaborationOpportunityViewBuilder(
         entity,
         displayOrder,
         fileList,
-        isValid
-    );
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(true)
+        .isValid(isValid)
+        .build();
 
     createViewAndAssertCommonViewProperties(view, entity);
 
@@ -128,6 +144,7 @@ public class ForwardWorkPlanCollaborationOpportunityViewUtilTest {
     assertThat(view.getContactJobTitle()).isEqualTo(entity.getJobTitle());
     assertThat(view.getContactEmailAddress()).isEqualTo(entity.getEmailAddress());
     assertThat(view.getUploadedFileViews()).isEqualTo(fileList);
+    assertThat(view.getAddedByPortalOrganisationGroup()).isEqualTo(addedByPortalOrganisationGroup.getName());
 
     final var editUrl = ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class)
         .editCollaborationOpportunity(

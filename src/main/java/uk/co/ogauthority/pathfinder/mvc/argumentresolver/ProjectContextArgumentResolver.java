@@ -39,6 +39,7 @@ public class ProjectContextArgumentResolver implements HandlerMethodArgumentReso
     );
     var statusCheck = ArgumentResolverUtil.getProjectStatusCheck(parameter);
     var permissionCheck = ArgumentResolverUtil.getProjectFormPagePermissionCheck(parameter);
+    var allowContributors = ArgumentResolverUtil.allowProjectContributors(parameter);
 
     final var allowedProjectTypes = ArgumentResolverUtil.getProjectTypesCheck(parameter);
 
@@ -47,7 +48,8 @@ public class ProjectContextArgumentResolver implements HandlerMethodArgumentReso
         user,
         statusCheck,
         permissionCheck,
-        allowedProjectTypes
+        allowedProjectTypes,
+        allowContributors
     );
 
   }

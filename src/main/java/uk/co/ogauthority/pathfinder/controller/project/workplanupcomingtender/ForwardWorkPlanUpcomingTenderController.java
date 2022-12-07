@@ -13,9 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.AllowProjectContributorAccess;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
+import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
+import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -26,6 +29,8 @@ import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.Fo
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
+import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanTenderCompletionService;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanTenderRoutingService;
@@ -38,6 +43,7 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
+@AllowProjectContributorAccess
 @ProjectTypeCheck(types = ProjectType.FORWARD_WORK_PLAN)
 @RequestMapping("/project/{projectId}/work-plan-upcoming-tenders")
 public class ForwardWorkPlanUpcomingTenderController {
@@ -53,6 +59,7 @@ public class ForwardWorkPlanUpcomingTenderController {
   private final ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
   private final ForwardWorkPlanTenderRoutingService forwardWorkPlanTenderRoutingService;
   private final ForwardWorkPlanTenderCompletionService forwardWorkPlanTenderCompletionService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   @Autowired
   public ForwardWorkPlanUpcomingTenderController(
@@ -62,8 +69,8 @@ public class ForwardWorkPlanUpcomingTenderController {
       ForwardWorkPlanUpcomingTenderModelService workPlanUpcomingTenderModelService,
       ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService,
       ForwardWorkPlanTenderRoutingService forwardWorkPlanTenderRoutingService,
-      ForwardWorkPlanTenderCompletionService forwardWorkPlanTenderCompletionService
-  ) {
+      ForwardWorkPlanTenderCompletionService forwardWorkPlanTenderCompletionService,
+      ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     this.workPlanUpcomingTenderService = workPlanUpcomingTenderService;
     this.workPlanUpcomingTenderSummaryService = workPlanUpcomingTenderSummaryService;
     this.controllerHelperService = controllerHelperService;
@@ -71,6 +78,7 @@ public class ForwardWorkPlanUpcomingTenderController {
     this.forwardWorkPlanTenderSetupService = forwardWorkPlanTenderSetupService;
     this.forwardWorkPlanTenderRoutingService = forwardWorkPlanTenderRoutingService;
     this.forwardWorkPlanTenderCompletionService = forwardWorkPlanTenderCompletionService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
   }
 
   @GetMapping("/setup")
@@ -161,7 +169,8 @@ public class ForwardWorkPlanUpcomingTenderController {
                                          ProjectContext projectContext,
                                          @Valid @ModelAttribute("form") ForwardWorkPlanUpcomingTenderForm form,
                                          BindingResult bindingResult,
-                                         ValidationType validationType) {
+                                         ValidationType validationType,
+                                         AuthenticatedUserAccount userAccount) {
     bindingResult = workPlanUpcomingTenderService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
@@ -170,7 +179,8 @@ public class ForwardWorkPlanUpcomingTenderController {
         () -> {
           var tender = workPlanUpcomingTenderService.createUpcomingTender(
               projectContext.getProjectDetails(),
-              form
+              form,
+              userAccount
           );
 
           AuditService.audit(
@@ -192,6 +202,7 @@ public class ForwardWorkPlanUpcomingTenderController {
                                          @PathVariable("upcomingTenderId") Integer upcomingTenderId,
                                          ProjectContext projectContext) {
     var upcomingTender = workPlanUpcomingTenderService.getOrError(upcomingTenderId);
+    checkIfUserHasAccessToTender(upcomingTender);
     return workPlanUpcomingTenderModelService.getUpcomingTenderFormModelAndView(
         projectContext.getProjectDetails(),
         workPlanUpcomingTenderService.getForm(upcomingTender)
@@ -206,6 +217,7 @@ public class ForwardWorkPlanUpcomingTenderController {
                                            BindingResult bindingResult,
                                            ValidationType validationType) {
     var upcomingTender = workPlanUpcomingTenderService.getOrError(upcomingTenderId);
+    checkIfUserHasAccessToTender(upcomingTender);
     bindingResult = workPlanUpcomingTenderService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
@@ -237,6 +249,7 @@ public class ForwardWorkPlanUpcomingTenderController {
                                                   @PathVariable("displayOrder") Integer displayOrder,
                                                   ProjectContext projectContext) {
     var upcomingTender = workPlanUpcomingTenderService.getOrError(upcomingTenderId);
+    checkIfUserHasAccessToTender(upcomingTender);
     var tenderView = workPlanUpcomingTenderSummaryService.getUpcomingTenderView(upcomingTender,displayOrder);
     return workPlanUpcomingTenderModelService.getRemoveUpcomingTenderConfirmModelAndView(projectId, tenderView);
   }
@@ -247,6 +260,7 @@ public class ForwardWorkPlanUpcomingTenderController {
                                            @PathVariable("displayOrder") Integer displayOrder,
                                            ProjectContext projectContext) {
     var upcomingTender = workPlanUpcomingTenderService.getOrError(upcomingTenderId);
+    checkIfUserHasAccessToTender(upcomingTender);
     workPlanUpcomingTenderService.delete(upcomingTender);
 
     AuditService.audit(
@@ -258,5 +272,18 @@ public class ForwardWorkPlanUpcomingTenderController {
         )
     );
     return ReverseRouter.redirect(on(ForwardWorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null));
+  }
+
+  private void checkIfUserHasAccessToTender(ForwardWorkPlanUpcomingTender upcomingTender) {
+    if (!projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+        upcomingTender.getProjectDetail(),
+        new OrganisationGroupIdWrapper(upcomingTender.getAddedByOrganisationGroup())
+    )) {
+      throw new AccessDeniedException(
+          String.format(
+              "User does not have access to the ForwardWorkPlanUpcomingTender with id: %d",
+              upcomingTender.getId())
+      );
+    }
   }
 }

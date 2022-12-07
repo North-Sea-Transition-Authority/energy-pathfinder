@@ -9,12 +9,15 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContract;
@@ -30,11 +33,16 @@ import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.AwardedContractRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
+import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AwardedContractServiceTest {
@@ -54,9 +62,14 @@ public class AwardedContractServiceTest {
   @Mock
   private EntityDuplicationService entityDuplicationService;
 
+  @Mock
+  private TeamService teamService;
+
   private AwardedContractService awardedContractService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
+  private final AuthenticatedUserAccount userAccount = UserTestingUtil.getAuthenticatedUserAccount();
+  private final PortalOrganisationGroup portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   @Before
   public void setup() {
@@ -71,8 +84,8 @@ public class AwardedContractServiceTest {
         awardedContractFormValidator,
         searchSelectorService,
         projectSetupService,
-        entityDuplicationService
-    );
+        entityDuplicationService,
+        teamService);
 
     when(awardedContractRepository.save(any(AwardedContract.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
 
@@ -182,19 +195,22 @@ public class AwardedContractServiceTest {
 
   @Test
   public void createAwardedContract() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     var form = AwardedContractTestUtil.createAwardedContractForm();
     var projectDetail = ProjectUtil.getProjectDetails();
 
-    var awardedContract = awardedContractService.createAwardedContract(projectDetail, form);
+    var awardedContract = awardedContractService.createAwardedContract(projectDetail, form, userAccount);
 
     checkCommonFields(form, awardedContract);
     assertThat(awardedContract.getProjectDetail()).isEqualTo(projectDetail);
     assertThat(awardedContract.getContractFunction()).isEqualTo(Function.valueOf(form.getContractFunction()));
     assertThat(awardedContract.getManualContractFunction()).isNull();
+    assertThat(awardedContract.getAddedByOrganisationGroup()).isEqualTo(portalOrganisationGroup.getOrgGrpId());
   }
 
   @Test
   public void createAwardedContract_withManualContractFunction() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     var form = AwardedContractTestUtil.createAwardedContractForm();
 
     var manualEntryFunction = SearchSelectablePrefix.FREE_TEXT_PREFIX + "my new function";
@@ -202,11 +218,12 @@ public class AwardedContractServiceTest {
 
     var projectDetail = ProjectUtil.getProjectDetails();
 
-    var awardedContract = awardedContractService.createAwardedContract(projectDetail, form);
+    var awardedContract = awardedContractService.createAwardedContract(projectDetail, form, userAccount);
 
     checkCommonFields(form, awardedContract);
     assertThat(awardedContract.getManualContractFunction()).isEqualTo(SearchSelectorService.removePrefix(manualEntryFunction));
     assertThat(awardedContract.getContractFunction()).isNull();
+    assertThat(awardedContract.getAddedByOrganisationGroup()).isEqualTo(portalOrganisationGroup.getOrgGrpId());
   }
 
   @Test(expected = PathfinderEntityNotFoundException.class)
@@ -309,13 +326,35 @@ public class AwardedContractServiceTest {
   @Test
   public void canShowInTaskList_true() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS)).thenReturn(true);
-    assertThat(awardedContractService.canShowInTaskList(detail)).isTrue();
+    assertThat(awardedContractService.canShowInTaskList(detail, Set.of(UserToProjectRelationship.OPERATOR))).isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS)).thenReturn(false);
-    assertThat(awardedContractService.canShowInTaskList(detail)).isFalse();
+    assertThat(awardedContractService.canShowInTaskList(detail, Set.of(UserToProjectRelationship.OPERATOR))).isFalse();
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS)).thenReturn(true);
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        awardedContractService,
+        detail,
+        Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)
+    );
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_true() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS)).thenReturn(true);
+    assertThat(awardedContractService.isTaskValidForProjectDetail(detail)).isTrue();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_false() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS)).thenReturn(false);
+    assertThat(awardedContractService.isTaskValidForProjectDetail(detail)).isFalse();
   }
 
   @Test

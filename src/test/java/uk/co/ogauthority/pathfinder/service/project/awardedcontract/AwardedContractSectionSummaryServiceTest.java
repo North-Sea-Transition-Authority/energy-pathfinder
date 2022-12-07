@@ -15,9 +15,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -32,7 +34,13 @@ public class AwardedContractSectionSummaryServiceTest {
   private DifferenceService differenceService;
 
   @Mock
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
+
+  @Mock
   private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+
+  @Mock
+  private PortalOrganisationAccessor portalOrganisationAccessor;
 
   private AwardedContractSectionSummaryService awardedContractSectionSummaryService;
 
@@ -43,20 +51,22 @@ public class AwardedContractSectionSummaryServiceTest {
     awardedContractSectionSummaryService = new AwardedContractSectionSummaryService(
         awardedContractService,
         differenceService,
-        projectSectionSummaryCommonModelService
+        projectSectionSummaryCommonModelService,
+        projectSectionItemOwnershipService,
+        portalOrganisationAccessor
     );
   }
 
   @Test
   public void canShowSection_whenCanShowInTaskList_thenTrue() {
-    when(awardedContractService.canShowInTaskList(detail)).thenReturn(true);
+    when(awardedContractService.isTaskValidForProjectDetail(detail)).thenReturn(true);
 
     assertThat(awardedContractSectionSummaryService.canShowSection(detail)).isTrue();
   }
 
   @Test
   public void canShowSection_whenCannotShowInTaskList_thenFalse() {
-    when(awardedContractService.canShowInTaskList(detail)).thenReturn(false);
+    when(awardedContractService.isTaskValidForProjectDetail(detail)).thenReturn(false);
 
     assertThat(awardedContractSectionSummaryService.canShowSection(detail)).isFalse();
   }

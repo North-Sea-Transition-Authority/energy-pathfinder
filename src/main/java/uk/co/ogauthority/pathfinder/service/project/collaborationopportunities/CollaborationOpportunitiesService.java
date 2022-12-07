@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -24,6 +26,7 @@ import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 
 @Service
 public abstract class CollaborationOpportunitiesService {
@@ -32,16 +35,19 @@ public abstract class CollaborationOpportunitiesService {
   private final FunctionService functionService;
   private final ProjectSetupService projectSetupService;
   private final ProjectDetailFileService projectDetailFileService;
+  private final TeamService teamService;
 
   @Autowired
   public CollaborationOpportunitiesService(SearchSelectorService searchSelectorService,
                                            FunctionService functionService,
                                            ProjectSetupService projectSetupService,
-                                           ProjectDetailFileService projectDetailFileService) {
+                                           ProjectDetailFileService projectDetailFileService,
+                                           TeamService teamService) {
     this.searchSelectorService = searchSelectorService;
     this.functionService = functionService;
     this.projectSetupService = projectSetupService;
     this.projectDetailFileService = projectDetailFileService;
+    this.teamService = teamService;
   }
 
   /**
@@ -208,5 +214,11 @@ public abstract class CollaborationOpportunitiesService {
           );
         })
         .collect(Collectors.toList());
+  }
+
+  protected void setAddedByOrganisationGroup(CollaborationOpportunityCommon opportunity,
+                                             AuthenticatedUserAccount userAccount) {
+    PortalOrganisationGroup portalOrganisationGroup = teamService.getContributorPortalOrganisationGroup(userAccount);
+    opportunity.setAddedByOrganisationGroup(portalOrganisationGroup.getOrgGrpId());
   }
 }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
@@ -11,6 +13,8 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderViewUtil;
+import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
@@ -22,12 +26,18 @@ public class UpcomingTenderSummaryService {
 
   private final UpcomingTenderService upcomingTenderService;
   private final UpcomingTenderFileLinkService upcomingTenderFileLinkService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
+  private final PortalOrganisationAccessor portalOrganisationAccessor;
 
   @Autowired
   public UpcomingTenderSummaryService(UpcomingTenderService upcomingTenderService,
-                                      UpcomingTenderFileLinkService upcomingTenderFileLinkService) {
+                                      UpcomingTenderFileLinkService upcomingTenderFileLinkService,
+                                      ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
+                                      PortalOrganisationAccessor portalOrganisationAccessor) {
     this.upcomingTenderService = upcomingTenderService;
     this.upcomingTenderFileLinkService = upcomingTenderFileLinkService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
+    this.portalOrganisationAccessor = portalOrganisationAccessor;
   }
 
   public List<UpcomingTenderView> getSummaryViews(ProjectDetail detail) {
@@ -51,22 +61,6 @@ public class UpcomingTenderSummaryService {
     );
   }
 
-  public UpcomingTenderView getUpcomingTenderView(UpcomingTender upcomingTender, Integer displayOrder) {
-    var uploadedFileViews = upcomingTenderFileLinkService.getFileUploadViewsLinkedToUpcomingTender(
-        upcomingTender
-    );
-    return UpcomingTenderViewUtil.createUpComingTenderView(upcomingTender, displayOrder, uploadedFileViews);
-  }
-
-  private UpcomingTenderView getUpcomingTenderView(UpcomingTender upcomingTender,
-                                                  Integer displayOrder,
-                                                  boolean isValid) {
-    var uploadedFileViews = upcomingTenderFileLinkService.getFileUploadViewsLinkedToUpcomingTender(
-        upcomingTender
-    );
-    return UpcomingTenderViewUtil.createUpComingTenderView(upcomingTender, displayOrder, uploadedFileViews, isValid);
-  }
-
   public List<ErrorItem> getErrors(List<UpcomingTenderView> views) {
     return SummaryUtil.getErrors(new ArrayList<>(views), EMPTY_LIST_ERROR, ERROR_FIELD_NAME, ERROR_MESSAGE);
   }
@@ -81,7 +75,8 @@ public class UpcomingTenderSummaryService {
    * @param validationType ValidationType (generally expected FULL or NO_VALIDATION)
    * @return A list of views validated if necessary.
    */
-  public List<UpcomingTenderView> createUpcomingTenderViews(List<UpcomingTender> upcomingTenders, ValidationType validationType) {
+  public List<UpcomingTenderView> createUpcomingTenderViews(List<UpcomingTender> upcomingTenders,
+                                                            ValidationType validationType) {
     List<UpcomingTenderView> views = new ArrayList<>();
     for (int i = 0; i < upcomingTenders.size(); i++) {
       var displayOrder = i + 1;
@@ -100,7 +95,41 @@ public class UpcomingTenderSummaryService {
     return views;
   }
 
-  public boolean canShowInTaskList(ProjectDetail detail) {
-    return upcomingTenderService.canShowInTaskList(detail);
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
+    return upcomingTenderService.isTaskValidForProjectDetail(detail);
+  }
+
+  public UpcomingTenderView getUpcomingTenderView(UpcomingTender upcomingTender,
+                                                  Integer displayOrder) {
+    return getUpcomingTenderViewBuilder(upcomingTender, displayOrder)
+        .build();
+  }
+
+  private UpcomingTenderView getUpcomingTenderView(UpcomingTender upcomingTender,
+                                                   Integer displayOrder,
+                                                   boolean isValid) {
+    return getUpcomingTenderViewBuilder(upcomingTender, displayOrder)
+        .isValid(isValid)
+        .build();
+  }
+
+  private UpcomingTenderViewUtil.UpcomingTenderViewBuilder getUpcomingTenderViewBuilder(UpcomingTender upcomingTender,
+                                                                                        Integer displayOrder) {
+    var uploadedFileViews = upcomingTenderFileLinkService.getFileUploadViewsLinkedToUpcomingTender(upcomingTender);
+    var includeLinks = projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+        upcomingTender.getProjectDetail(),
+        new OrganisationGroupIdWrapper(upcomingTender.getAddedByOrganisationGroup())
+    );
+    var addedByPortalOrganisationGroup =
+        portalOrganisationAccessor.getOrganisationGroupById(upcomingTender.getAddedByOrganisationGroup())
+            .orElse(new PortalOrganisationGroup());
+
+    return new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
+        upcomingTender,
+        displayOrder,
+        uploadedFileViews,
+        addedByPortalOrganisationGroup
+    )
+        .includeSummaryLinks(includeLinks);
   }
 }

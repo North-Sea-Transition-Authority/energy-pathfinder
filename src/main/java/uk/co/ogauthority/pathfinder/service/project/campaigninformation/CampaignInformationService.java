@@ -21,9 +21,11 @@ import uk.co.ogauthority.pathfinder.model.form.project.campaigninformation.Campa
 import uk.co.ogauthority.pathfinder.model.form.project.campaigninformation.CampaignInformationValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.campaigninformation.CampaignInformationRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class CampaignInformationService implements ProjectFormSectionService {
@@ -114,8 +116,15 @@ public class CampaignInformationService implements ProjectFormSectionService {
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
     return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.CAMPAIGN_INFORMATION);
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.CAMPAIGN_INFORMATION,
+        userToProjectRelationships);
   }
 
   @Override

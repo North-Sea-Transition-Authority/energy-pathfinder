@@ -51,14 +51,14 @@ public class PlatformsFpsosSectionSummaryServiceTest {
 
   @Test
   public void canShowSection_whenCanShowInTaskList_thenTrue() {
-    when(platformsFpsosService.canShowInTaskList(detail)).thenReturn(true);
+    when(platformsFpsosService.isTaskValidForProjectDetail(detail)).thenReturn(true);
 
     assertThat(platformsFpsosSectionSummaryService.canShowSection(detail)).isTrue();
   }
 
   @Test
   public void canShowSection_whenCannotShowInTaskList_thenFalse() {
-    when(platformsFpsosService.canShowInTaskList(detail)).thenReturn(false);
+    when(platformsFpsosService.isTaskValidForProjectDetail(detail)).thenReturn(false);
 
     assertThat(platformsFpsosSectionSummaryService.canShowSection(detail)).isFalse();
   }

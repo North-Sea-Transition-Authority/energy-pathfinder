@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -26,10 +27,13 @@ import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedCo
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.AwardedContractRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class AwardedContractService implements ProjectFormSectionService {
@@ -41,6 +45,7 @@ public class AwardedContractService implements ProjectFormSectionService {
   private final SearchSelectorService searchSelectorService;
   private final ProjectSetupService projectSetupService;
   private final EntityDuplicationService entityDuplicationService;
+  private final TeamService teamService;
 
   @Autowired
   public AwardedContractService(FunctionService functionService,
@@ -49,7 +54,8 @@ public class AwardedContractService implements ProjectFormSectionService {
                                 AwardedContractFormValidator awardedContractFormValidator,
                                 SearchSelectorService searchSelectorService,
                                 ProjectSetupService projectSetupService,
-                                EntityDuplicationService entityDuplicationService) {
+                                EntityDuplicationService entityDuplicationService,
+                                TeamService teamService) {
     this.functionService = functionService;
     this.validationService = validationService;
     this.awardedContractRepository = awardedContractRepository;
@@ -57,6 +63,7 @@ public class AwardedContractService implements ProjectFormSectionService {
     this.searchSelectorService = searchSelectorService;
     this.projectSetupService = projectSetupService;
     this.entityDuplicationService = entityDuplicationService;
+    this.teamService = teamService;
   }
 
   public AwardedContractForm getForm(Integer awardedContractId, ProjectDetail projectDetail) {
@@ -105,8 +112,13 @@ public class AwardedContractService implements ProjectFormSectionService {
   }
 
   @Transactional
-  public AwardedContract createAwardedContract(ProjectDetail projectDetail, AwardedContractForm form) {
+  public AwardedContract createAwardedContract(ProjectDetail projectDetail,
+                                               AwardedContractForm form,
+                                               AuthenticatedUserAccount userAccount) {
     var awardedContract = new AwardedContract(projectDetail);
+    var portalOrganisationGroup = teamService.getContributorPortalOrganisationGroup(userAccount);
+
+    awardedContract.setAddedByOrganisationGroup(portalOrganisationGroup.getOrgGrpId());
     return createOrUpdateAwardedContract(awardedContract, form);
   }
 
@@ -187,7 +199,13 @@ public class AwardedContractService implements ProjectFormSectionService {
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.AWARDED_CONTRACTS, userToProjectRelationships);
+  }
+
+  @Override
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
     return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS);
   }
 

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +16,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -47,29 +49,29 @@ public class ProjectTaskServiceTest {
 
   @Test
   public void canShowTask_allConditionalTasksShown() {
-    when(projectFormSectionService.canShowInTaskList(detail)).thenReturn(true);
+    var relations = Set.of(UserToProjectRelationship.OPERATOR);
+    when(projectFormSectionService.canShowInTaskList(detail, relations)).thenReturn(true);
 
     ProjectTask.stream().forEach(projectTask -> {
-      assertThat(projectTaskService.canShowTask(projectTask, detail)).isTrue();
+      assertThat(projectTaskService.canShowTask(projectTask, detail, relations)).isTrue();
     });
   }
 
   @Test
   public void canShowTask_noConditionalTasksShown() {
-    when(projectFormSectionService.canShowInTaskList(detail)).thenReturn(false);
-
     ProjectTask.stream().forEach(projectTask -> {
-      assertThat(projectTaskService.canShowTask(projectTask, detail)).isFalse();
+      assertThat(projectTaskService.canShowTask(projectTask, detail, Set.of())).isFalse();
     });
   }
 
   @Test
   public void canShowTask_verifyInteractions() {
-    when(projectFormSectionService.canShowInTaskList(detail)).thenReturn(false);
+    var relations = Set.of(UserToProjectRelationship.OPERATOR);
 
-    assertThat(projectTaskService.canShowTask(ProjectTask.PIPELINES, detail)).isFalse();
+    assertThat(projectTaskService.canShowTask(ProjectTask.PIPELINES, detail, relations))
+        .isFalse();
 
-    verify(projectFormSectionService, times(1)).canShowInTaskList(detail);
+    verify(projectFormSectionService, times(1)).canShowInTaskList(detail, relations);
 
   }
 

@@ -36,6 +36,8 @@ public abstract class CollaborationOpportunityCommon
 
   private String emailAddress;
 
+  private Integer addedByOrganisationGroup;
+
   public CollaborationOpportunityCommon() {
   }
 
@@ -115,6 +117,15 @@ public abstract class CollaborationOpportunityCommon
     return emailAddress;
   }
 
+  public Integer getAddedByOrganisationGroup() {
+    return addedByOrganisationGroup;
+  }
+
+  public void setAddedByOrganisationGroup(
+      Integer portalOrganisationGroup) {
+    this.addedByOrganisationGroup = portalOrganisationGroup;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -134,7 +145,8 @@ public abstract class CollaborationOpportunityCommon
         && Objects.equals(contactName, that.contactName)
         && Objects.equals(phoneNumber, that.phoneNumber)
         && Objects.equals(jobTitle, that.jobTitle)
-        && Objects.equals(emailAddress, that.emailAddress);
+        && Objects.equals(emailAddress, that.emailAddress)
+        && Objects.equals(addedByOrganisationGroup, that.addedByOrganisationGroup);
   }
 
   @Override
@@ -148,7 +160,8 @@ public abstract class CollaborationOpportunityCommon
         contactName,
         phoneNumber,
         jobTitle,
-        emailAddress
+        emailAddress,
+        addedByOrganisationGroup
     );
   }
 }

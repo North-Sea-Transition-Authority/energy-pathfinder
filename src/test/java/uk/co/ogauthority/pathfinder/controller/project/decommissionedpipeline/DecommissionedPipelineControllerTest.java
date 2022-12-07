@@ -63,8 +63,8 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
     unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, unauthenticatedUser)).thenReturn(false);
 
     when(decommissionedPipelineService.getPipelineRestUrl()).thenReturn("testUrl");
     // Pipelines disabled: PAT-457

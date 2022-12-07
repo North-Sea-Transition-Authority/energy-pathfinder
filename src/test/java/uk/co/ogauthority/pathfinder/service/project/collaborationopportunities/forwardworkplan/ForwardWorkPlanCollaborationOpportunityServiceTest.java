@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -33,11 +34,15 @@ import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanCollaborationOpportunityTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -67,6 +72,9 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
   @Mock
   private EntityDuplicationService entityDuplicationService;
 
+  @Mock
+  private TeamService teamService;
+
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
 
   private final ForwardWorkPlanCollaborationOpportunity opportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(
@@ -76,6 +84,8 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
   private final AuthenticatedUserAccount userAccount = UserTestingUtil.getAuthenticatedUserAccount();
 
   private ForwardWorkPlanCollaborationOpportunityService forwardWorkPlanCollaborationOpportunityService;
+
+  private final PortalOrganisationGroup portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   @Before
   public void setup() {
@@ -93,15 +103,15 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
         forwardWorkPlanCollaborationOpportunityFormValidator,
         forwardWorkPlanCollaborationSetupService,
         validationService,
-        entityDuplicationService
-    );
+        entityDuplicationService,
+        teamService);
 
     when(forwardWorkPlanCollaborationOpportunityRepository.save(any(ForwardWorkPlanCollaborationOpportunity.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
   @Test
-  public void canShowInTaskList_smokeTestProjectTypes_assertOnlyForwardWorkPlanAllowed() {
+  public void isTaskValidForProjectDetail_smokeTestProjectTypes_assertOnlyForwardWorkPlanAllowed() {
 
     final var projectDetail = ProjectUtil.getProjectDetails();
     final var projectTypesToShowInTaskList = Set.of(ProjectType.FORWARD_WORK_PLAN);
@@ -110,7 +120,7 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
 
       projectDetail.setProjectType(projectType);
 
-      final var canShowInTaskList = forwardWorkPlanCollaborationOpportunityService.canShowInTaskList(projectDetail);
+      final var canShowInTaskList = forwardWorkPlanCollaborationOpportunityService.isTaskValidForProjectDetail(projectDetail);
 
       if (projectTypesToShowInTaskList.contains(projectType)) {
         assertThat(canShowInTaskList).isTrue();
@@ -121,7 +131,27 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
   }
 
   @Test
+  public void canShowInTaskList_whenTaskIsValidAndValidRelation_true() {
+    projectDetail.setProjectType(ProjectType.FORWARD_WORK_PLAN);
+    assertThat(forwardWorkPlanCollaborationOpportunityService.canShowInTaskList(
+        projectDetail,
+        Set.of(UserToProjectRelationship.OPERATOR))
+    ).isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    var detail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        forwardWorkPlanCollaborationOpportunityService,
+        detail,
+        Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)
+    );
+  }
+
+  @Test
   public void createCollaborationOpportunity_whenFromListFunction() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
 
     final var selectedFunction = ForwardWorkPlanCollaborationOpportunityTestUtil.FUNCTION;
 
@@ -141,6 +171,7 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
   @Test
   public void createCollaborationOpportunity_manualFunction() {
     var form = ForwardWorkPlanCollaborationOpportunityTestUtil.getCompletedForm_manualEntry();
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     var opportunity = forwardWorkPlanCollaborationOpportunityService.createCollaborationOpportunity(
         projectDetail,
         form,
@@ -233,6 +264,7 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
     assertThat(collaborationOpportunity.getPhoneNumber()).isEqualTo(form.getContactDetail().getPhoneNumber());
     assertThat(collaborationOpportunity.getJobTitle()).isEqualTo(form.getContactDetail().getJobTitle());
     assertThat(collaborationOpportunity.getEmailAddress()).isEqualTo(form.getContactDetail().getEmailAddress());
+    assertThat(collaborationOpportunity.getAddedByOrganisationGroup()).isEqualTo(portalOrganisationGroup.getOrgGrpId());
   }
 
   private void checkCommonFormFields(ForwardWorkPlanCollaborationOpportunityForm form,

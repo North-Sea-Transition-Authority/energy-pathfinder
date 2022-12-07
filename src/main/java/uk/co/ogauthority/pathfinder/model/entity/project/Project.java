@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.entity.project;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 import javax.persistence.Column;
@@ -11,8 +12,9 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "projects")
-public class Project {
+public class Project implements Serializable {
 
+  private static final long serialVersionUID = -3615381727699431309L;
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;

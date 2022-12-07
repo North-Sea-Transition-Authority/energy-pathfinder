@@ -2,8 +2,11 @@ package uk.co.ogauthority.pathfinder.model.view.upcomingtender;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
@@ -19,71 +22,120 @@ public class UpcomingTenderViewUtil {
     throw new IllegalStateException("UpcomingTenderViewFactory is a utility class and should not be instantiated");
   }
 
-  public static UpcomingTenderView createUpComingTenderView(UpcomingTender upcomingTender,
-                                                            Integer displayOrder,
-                                                            List<UploadedFileView> uploadedFileViews) {
-    var projectId = upcomingTender.getProjectDetail().getProject().getId();
-    var tender = new UpcomingTenderView(
-        displayOrder,
-        upcomingTender.getId(),
-        projectId
-    );
+  public static class UpcomingTenderViewBuilder {
 
-    var tenderFunction = new StringWithTag();
+    private final UpcomingTender upcomingTender;
+    private final int displayOrder;
+    private final List<UploadedFileView> uploadedFileViews;
+    private final PortalOrganisationGroup addedByPortalOrganisationGroup;
+    private boolean isValid = true;
+    private boolean includeSummaryLinks = false;
 
-    if (upcomingTender.getTenderFunction() != null) {
-      tenderFunction = new StringWithTag(upcomingTender.getTenderFunction().getDisplayName(), Tag.NONE);
-    } else if (upcomingTender.getManualTenderFunction() != null) {
-      tenderFunction = new StringWithTag(upcomingTender.getManualTenderFunction(), Tag.NOT_FROM_LIST);
+    public UpcomingTenderViewBuilder(UpcomingTender upcomingTender,
+                                     int displayOrder,
+                                     List<UploadedFileView> uploadedFileViews,
+                                     PortalOrganisationGroup addedByPortalOrganisationGroup) {
+      this.upcomingTender = upcomingTender;
+      this.displayOrder = displayOrder;
+      this.uploadedFileViews = uploadedFileViews;
+      this.addedByPortalOrganisationGroup = addedByPortalOrganisationGroup;
     }
 
-    tender.setTenderFunction(tenderFunction);
-    tender.setDescriptionOfWork(upcomingTender.getDescriptionOfWork());
-    tender.setEstimatedTenderDate(DateUtil.formatDate(upcomingTender.getEstimatedTenderDate()));
-    tender.setContractBand(
-        upcomingTender.getContractBand() != null
-            ? upcomingTender.getContractBand().getDisplayName()
-            : ""
-    );
+    public UpcomingTenderViewBuilder isValid(boolean isValid) {
+      this.isValid = isValid;
+      return this;
+    }
 
-    tender.setContactName(upcomingTender.getName());
-    tender.setContactPhoneNumber(upcomingTender.getPhoneNumber());
-    tender.setContactEmailAddress(upcomingTender.getEmailAddress());
-    tender.setContactJobTitle(upcomingTender.getJobTitle());
+    public UpcomingTenderViewBuilder includeSummaryLinks(boolean includeSummaryLinks) {
+      this.includeSummaryLinks = includeSummaryLinks;
+      return this;
+    }
 
-    var editLink = new SummaryLink(
-        SummaryLinkText.EDIT.getDisplayName(),
-        ReverseRouter.route(on(UpcomingTendersController.class).editUpcomingTender(
-            projectId,
-            upcomingTender.getId(),
-            null
-        ))
-    );
+    public UpcomingTenderView build() {
+      return createUpComingTenderView(
+          this.upcomingTender,
+          this.displayOrder,
+          this.uploadedFileViews,
+          this.isValid,
+          this.includeSummaryLinks,
+          this.addedByPortalOrganisationGroup
+      );
+    }
 
-    var removeLink = new SummaryLink(
-        SummaryLinkText.DELETE.getDisplayName(),
-        ReverseRouter.route(on(UpcomingTendersController.class).removeUpcomingTenderConfirm(
-            projectId,
-            upcomingTender.getId(),
-            displayOrder,
-            null
-        ))
-    );
+    private static UpcomingTenderView createUpComingTenderView(
+        UpcomingTender upcomingTender,
+        Integer displayOrder,
+        List<UploadedFileView> uploadedFileViews,
+        boolean isValid,
+        boolean includeSummaryLinks,
+        PortalOrganisationGroup addedByPortalOrganisationGroup
+    ) {
+      var projectId = upcomingTender.getProjectDetail().getProject().getId();
+      var upcomingTenderView = new UpcomingTenderView(
+          displayOrder,
+          upcomingTender.getId(),
+          projectId
+      );
 
-    tender.setSummaryLinks(List.of(editLink, removeLink));
+      var tenderFunction = new StringWithTag();
 
-    tender.setUploadedFileViews(uploadedFileViews);
+      if (upcomingTender.getTenderFunction() != null) {
+        tenderFunction = new StringWithTag(upcomingTender.getTenderFunction().getDisplayName(), Tag.NONE);
+      } else if (upcomingTender.getManualTenderFunction() != null) {
+        tenderFunction = new StringWithTag(upcomingTender.getManualTenderFunction(), Tag.NOT_FROM_LIST);
+      }
 
-    return tender;
-  }
+      upcomingTenderView.setTenderFunction(tenderFunction);
+      upcomingTenderView.setDescriptionOfWork(upcomingTender.getDescriptionOfWork());
+      upcomingTenderView.setEstimatedTenderDate(DateUtil.formatDate(upcomingTender.getEstimatedTenderDate()));
+      upcomingTenderView.setContractBand(
+          upcomingTender.getContractBand() != null
+              ? upcomingTender.getContractBand().getDisplayName()
+              : ""
+      );
 
-  public static UpcomingTenderView createUpComingTenderView(
-      UpcomingTender upcomingTender,
-      Integer displayOrder,
-      List<UploadedFileView> uploadedFileViews,
-      Boolean isValid) {
-    var view = createUpComingTenderView(upcomingTender, displayOrder, uploadedFileViews);
-    view.setIsValid(isValid);
-    return view;
+      upcomingTenderView.setContactName(upcomingTender.getName());
+      upcomingTenderView.setContactPhoneNumber(upcomingTender.getPhoneNumber());
+      upcomingTenderView.setContactEmailAddress(upcomingTender.getEmailAddress());
+      upcomingTenderView.setContactJobTitle(upcomingTender.getJobTitle());
+
+      var links = new ArrayList<SummaryLink>();
+      if (includeSummaryLinks) {
+        var editLink = new SummaryLink(
+            SummaryLinkText.EDIT.getDisplayName(),
+            ReverseRouter.route(on(UpcomingTendersController.class).editUpcomingTender(
+                projectId,
+                upcomingTender.getId(),
+                null
+            ))
+        );
+        links.add(editLink);
+
+        var removeLink = new SummaryLink(
+            SummaryLinkText.DELETE.getDisplayName(),
+            ReverseRouter.route(on(UpcomingTendersController.class).removeUpcomingTenderConfirm(
+                projectId,
+                upcomingTender.getId(),
+                displayOrder,
+                null
+            ))
+        );
+        links.add(removeLink);
+      }
+
+      upcomingTenderView.setSummaryLinks(links);
+      upcomingTenderView.setUploadedFileViews(uploadedFileViews);
+      upcomingTenderView.setIsValid(isValid);
+      upcomingTenderView.setAddedByOrganisationGroup(resolvePortalOrganisationGroupName(addedByPortalOrganisationGroup));
+
+      return upcomingTenderView;
+    }
+
+    private static String resolvePortalOrganisationGroupName(PortalOrganisationGroup portalOrganisationGroup) {
+      if (StringUtils.isBlank(portalOrganisationGroup.getName())) {
+        return "Unknown organisation";
+      }
+      return portalOrganisationGroup.getName();
+    }
   }
 }

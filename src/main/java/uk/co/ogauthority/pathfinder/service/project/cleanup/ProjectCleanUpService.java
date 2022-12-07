@@ -29,7 +29,7 @@ public class ProjectCleanUpService {
             // and are not shown in the task list
             projectFormSectionService.allowSectionDataCleanUp(projectDetail)
             &&
-            !projectFormSectionService.canShowInTaskList(projectDetail)
+            !projectFormSectionService.isTaskValidForProjectDetail(projectDetail)
         )
         .forEach(projectFormSectionService -> projectFormSectionService.removeSectionData(projectDetail));
   }

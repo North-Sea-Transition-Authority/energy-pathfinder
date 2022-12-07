@@ -89,6 +89,6 @@ public class ProjectOperatorSectionSummaryService implements ProjectSectionSumma
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return selectOperatorService.canShowInTaskList(detail);
+    return selectOperatorService.isTaskValidForProjectDetail(detail);
   }
 }

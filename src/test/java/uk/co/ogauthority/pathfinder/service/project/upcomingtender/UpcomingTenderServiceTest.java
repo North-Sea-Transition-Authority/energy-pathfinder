@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -34,10 +36,15 @@ import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTe
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -64,7 +71,13 @@ public class UpcomingTenderServiceTest {
   private ProjectSetupService projectSetupService;
 
   @Mock
+  private TeamService teamService;
+
+  @Mock
   private EntityDuplicationService entityDuplicationService;
+
+  @Mock
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private UpcomingTenderService upcomingTenderService;
 
@@ -73,6 +86,8 @@ public class UpcomingTenderServiceTest {
   private final UpcomingTender upcomingTender = UpcomingTenderUtil.getUpcomingTender(detail);
 
   private final AuthenticatedUserAccount authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount();
+
+  private final PortalOrganisationGroup portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   @Before
   public void setUp() {
@@ -89,8 +104,10 @@ public class UpcomingTenderServiceTest {
         projectDetailFileService,
         upcomingTenderFileLinkService,
         projectSetupService,
-        entityDuplicationService
-    );
+        entityDuplicationService,
+        teamService,
+        projectSectionItemOwnershipService
+        );
 
     when(upcomingTenderRepository.save(any(UpcomingTender.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
@@ -99,6 +116,7 @@ public class UpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender() {
+    when(teamService.getContributorPortalOrganisationGroup(authenticatedUserAccount)).thenReturn(portalOrganisationGroup);
     var form = UpcomingTenderUtil.getCompleteForm();
     var newUpcomingTender = upcomingTenderService.createUpcomingTender(
         detail,
@@ -112,6 +130,7 @@ public class UpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_manualFunction() {
+    when(teamService.getContributorPortalOrganisationGroup(authenticatedUserAccount)).thenReturn(portalOrganisationGroup);
     var form = UpcomingTenderUtil.getCompletedForm_manualEntry();
     var newUpcomingTender = upcomingTenderService.createUpcomingTender(
         detail,
@@ -230,6 +249,7 @@ public class UpcomingTenderServiceTest {
     assertThat(newUpcomingTender.getPhoneNumber()).isEqualTo(UpcomingTenderUtil.PHONE_NUMBER);
     assertThat(newUpcomingTender.getJobTitle()).isEqualTo(UpcomingTenderUtil.JOB_TITLE);
     assertThat(newUpcomingTender.getEmailAddress()).isEqualTo(UpcomingTenderUtil.EMAIL);
+    assertThat(newUpcomingTender.getAddedByOrganisationGroup()).isEqualTo(portalOrganisationGroup.getOrgGrpId());
   }
 
   private void checkCommonFormFields(UpcomingTenderForm form, UpcomingTender upcomingTender) {
@@ -298,13 +318,35 @@ public class UpcomingTenderServiceTest {
   @Test
   public void canShowInTaskList_true() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(true);
-    assertThat(upcomingTenderService.canShowInTaskList(detail)).isTrue();
+    assertThat(upcomingTenderService.canShowInTaskList(detail, Set.of(UserToProjectRelationship.OPERATOR))).isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(false);
-    assertThat(upcomingTenderService.canShowInTaskList(detail)).isFalse();
+    assertThat(upcomingTenderService.canShowInTaskList(detail, Set.of(UserToProjectRelationship.OPERATOR))).isFalse();
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(true);
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        upcomingTenderService,
+        detail,
+        Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)
+    );
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_true() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(true);
+    assertThat(upcomingTenderService.isTaskValidForProjectDetail(detail)).isTrue();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_false() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(false);
+    assertThat(upcomingTenderService.isTaskValidForProjectDetail(detail)).isFalse();
   }
 
   @Test
@@ -393,5 +435,19 @@ public class UpcomingTenderServiceTest {
   public void allowSectionDataCleanUp_verifyIsTrue() {
     final var allowSectionDateCleanUp = upcomingTenderService.allowSectionDataCleanUp(detail);
     assertThat(allowSectionDateCleanUp).isTrue();
+  }
+
+  @Test
+  public void canCurrentUserAccessTender_whenCurrentUserHasAccessToProjectSectionInfo_thenTrue() {
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(detail), any())).thenReturn(true);
+
+    assertThat(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).isTrue();
+  }
+
+  @Test
+  public void canCurrentUserAccessTender_whenCurrentUserHasNoAccessToProjectSectionInfo_thenTrue() {
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(detail), any())).thenReturn(false);
+
+    assertThat(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).isFalse();
   }
 }

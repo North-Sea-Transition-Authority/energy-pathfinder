@@ -13,6 +13,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTaskGroup;
 import uk.co.ogauthority.pathfinder.model.view.tasks.TaskListEntry;
 import uk.co.ogauthority.pathfinder.model.view.tasks.TaskListGroup;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 
 @Service
 public class TaskListGroupsService {
@@ -29,10 +30,11 @@ public class TaskListGroupsService {
   /**
    * Get a list of TaskListGroup view objects for the given project.
    * @param detail the project detail to get the task list groups for.
+   * @param userToProjectRelationships The relation(s) between the user and the project
    * @return a list of TaskListGroup objects for each group present on the project with the appropriate tasks.
    */
-  public List<TaskListGroup> getTaskListGroups(ProjectDetail detail) {
-    Set<ProjectTask> tasks = new HashSet<>(getProjectTasksForDetail(detail));
+  public List<TaskListGroup> getTaskListGroups(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    Set<ProjectTask> tasks = new HashSet<>(getProjectTasksForDetail(detail, userToProjectRelationships));
 
     var groups = ProjectTaskGroup.asList().stream()
         .filter(taskGroup ->
@@ -58,7 +60,9 @@ public class TaskListGroupsService {
         .sorted(Comparator.comparing(TaskListGroup::getDisplayOrder))
         .collect(Collectors.toList());
 
-    groups.add(TaskListEntryCreatorService.createReviewAndSubmitGroup(detail));
+    if (userToProjectRelationships.contains(UserToProjectRelationship.OPERATOR)) {
+      groups.add(TaskListEntryCreatorService.createReviewAndSubmitGroup(detail));
+    }
 
     setDisplayOrderForGroups(groups);
 
@@ -77,11 +81,11 @@ public class TaskListGroupsService {
         });
   }
 
-  private List<ProjectTask> getProjectTasksForDetail(ProjectDetail detail) {
+  private List<ProjectTask> getProjectTasksForDetail(ProjectDetail detail, Set<UserToProjectRelationship> relationships) {
     return ProjectTask.stream()
         .filter(task ->
             task.getRelatedProjectTypes().contains(detail.getProjectType())
-            && projectTaskService.canShowTask(task, detail)
+            && projectTaskService.canShowTask(task, detail, relationships)
         )
         .collect(Collectors.toList());
   }

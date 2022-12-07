@@ -11,12 +11,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanUpcomingTenderView;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -26,6 +28,12 @@ public class ForwardWorkPlanUpcomingTenderSummaryServiceTest {
 
   @Mock
   private ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
+
+  @Mock
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
+
+  @Mock
+  private PortalOrganisationAccessor portalOrganisationAccessor;
 
   private ForwardWorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
 
@@ -37,7 +45,11 @@ public class ForwardWorkPlanUpcomingTenderSummaryServiceTest {
 
   @Before
   public void setup() {
-    workPlanUpcomingTenderSummaryService = new ForwardWorkPlanUpcomingTenderSummaryService(workPlanUpcomingTenderService);
+    workPlanUpcomingTenderSummaryService = new ForwardWorkPlanUpcomingTenderSummaryService(
+        workPlanUpcomingTenderService,
+        projectSectionItemOwnershipService,
+        portalOrganisationAccessor
+    );
     when(workPlanUpcomingTenderService.getUpcomingTendersForDetail(projectDetail)).thenReturn(
         List.of(workPlanUpcomingTender, manualEntryWorkPlanUpcomingTender)
     );

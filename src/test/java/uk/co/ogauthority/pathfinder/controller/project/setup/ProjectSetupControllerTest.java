@@ -61,8 +61,8 @@ public class ProjectSetupControllerTest extends ProjectContextAbstractController
   @Before
   public void setUp() {
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(detail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, unAuthenticatedUser)).thenReturn(false);
     when(projectSetupService.getProjectSetupModelAndView(any(), any())).thenCallRealMethod();
   }
 

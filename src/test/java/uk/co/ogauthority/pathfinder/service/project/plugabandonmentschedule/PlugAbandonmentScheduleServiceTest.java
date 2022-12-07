@@ -12,6 +12,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,11 +33,13 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.plugabandonmentschedule.PlugAbandonmentScheduleRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.service.wellbore.WellboreService;
 import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentScheduleTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentWellTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.WellboreTestUtil;
 
@@ -285,13 +288,37 @@ public class PlugAbandonmentScheduleServiceTest {
   @Test
   public void canShowInTaskList_true() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.WELLS)).thenReturn(true);
-    assertThat(plugAbandonmentScheduleService.canShowInTaskList(detail)).isTrue();
+    assertThat(plugAbandonmentScheduleService.canShowInTaskList(detail, Set.of(UserToProjectRelationship.OPERATOR)))
+        .isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.WELLS)).thenReturn(false);
-    assertThat(plugAbandonmentScheduleService.canShowInTaskList(detail)).isFalse();
+    assertThat(plugAbandonmentScheduleService.canShowInTaskList(detail, Set.of(UserToProjectRelationship.OPERATOR)))
+        .isFalse();
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.WELLS)).thenReturn(true);
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        plugAbandonmentScheduleService,
+        detail,
+        Set.of(UserToProjectRelationship.OPERATOR)
+    );
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_true() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.WELLS)).thenReturn(true);
+    assertThat(plugAbandonmentScheduleService.isTaskValidForProjectDetail(detail)).isTrue();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_false() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.WELLS)).thenReturn(false);
+    assertThat(plugAbandonmentScheduleService.isTaskValidForProjectDetail(detail)).isFalse();
   }
 
   @Test

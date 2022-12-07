@@ -19,6 +19,7 @@ import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationS
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -41,6 +42,9 @@ public class AwardedContractServiceValidationTest {
   @Mock
   private EntityDuplicationService entityDuplicationService;
 
+  @Mock
+  private TeamService teamService;
+
   private AwardedContractService awardedContractService;
 
   @Before
@@ -58,8 +62,8 @@ public class AwardedContractServiceValidationTest {
         awardedContractFormValidator,
         searchSelectorService,
         projectSetupService,
-        entityDuplicationService
-    );
+        entityDuplicationService,
+        teamService);
   }
 
   @Test
@@ -121,7 +125,7 @@ public class AwardedContractServiceValidationTest {
 
     var awardedContract1 = AwardedContractTestUtil.createAwardedContract();
     awardedContract1.setContractorName(null);
-    
+
     var isValid = awardedContractService.isValid(awardedContract1, ValidationType.FULL);
 
     assertThat(isValid).isFalse();

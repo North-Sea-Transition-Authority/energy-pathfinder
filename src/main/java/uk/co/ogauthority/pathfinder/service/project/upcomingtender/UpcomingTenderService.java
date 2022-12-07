@@ -33,10 +33,15 @@ import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTe
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class UpcomingTenderService implements ProjectFormSectionService {
@@ -50,6 +55,8 @@ public class UpcomingTenderService implements ProjectFormSectionService {
   private final UpcomingTenderFileLinkService upcomingTenderFileLinkService;
   private final ProjectSetupService projectSetupService;
   private final EntityDuplicationService entityDuplicationService;
+  private final TeamService teamService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   @Autowired
   public UpcomingTenderService(UpcomingTenderRepository upcomingTenderRepository,
@@ -60,7 +67,9 @@ public class UpcomingTenderService implements ProjectFormSectionService {
                                ProjectDetailFileService projectDetailFileService,
                                UpcomingTenderFileLinkService upcomingTenderFileLinkService,
                                ProjectSetupService projectSetupService,
-                               EntityDuplicationService entityDuplicationService) {
+                               EntityDuplicationService entityDuplicationService,
+                               TeamService teamService,
+                               ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     this.upcomingTenderRepository = upcomingTenderRepository;
     this.validationService = validationService;
     this.upcomingTenderFormValidator = upcomingTenderFormValidator;
@@ -70,6 +79,8 @@ public class UpcomingTenderService implements ProjectFormSectionService {
     this.upcomingTenderFileLinkService = upcomingTenderFileLinkService;
     this.projectSetupService = projectSetupService;
     this.entityDuplicationService = entityDuplicationService;
+    this.teamService = teamService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
   }
 
   @Transactional
@@ -78,6 +89,8 @@ public class UpcomingTenderService implements ProjectFormSectionService {
                                              AuthenticatedUserAccount userAccount) {
     var upcomingTender = new UpcomingTender(detail);
     setCommonFields(upcomingTender, form);
+    var portalOrganisationGroup = teamService.getContributorPortalOrganisationGroup(userAccount);
+    upcomingTender.setAddedByOrganisationGroup(portalOrganisationGroup.getOrgGrpId());
     upcomingTender = upcomingTenderRepository.save(upcomingTender);
 
     upcomingTenderFileLinkService.updateUpcomingTenderFileLinks(upcomingTender, form, userAccount);
@@ -96,7 +109,6 @@ public class UpcomingTenderService implements ProjectFormSectionService {
   }
 
   private void setCommonFields(UpcomingTender upcomingTender, UpcomingTenderForm form) {
-
     searchSelectorService.mapSearchSelectorFormEntryToEntity(
         form.getTenderFunction(),
         Function.values(),
@@ -126,6 +138,13 @@ public class UpcomingTenderService implements ProjectFormSectionService {
         new PathfinderEntityNotFoundException(
             String.format("Unable to find tender with id: %s", upcomingTenderId)
         )
+    );
+  }
+
+  public boolean canCurrentUserAccessTender(UpcomingTender upcomingTender) {
+    return projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+        upcomingTender.getProjectDetail(),
+        new OrganisationGroupIdWrapper(upcomingTender.getAddedByOrganisationGroup())
     );
   }
 
@@ -238,8 +257,14 @@ public class UpcomingTenderService implements ProjectFormSectionService {
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
     return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS);
+  }
+
+  @Override
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.UPCOMING_TENDERS, userToProjectRelationships);
   }
 
   @Override

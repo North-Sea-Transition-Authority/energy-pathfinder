@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
 import java.time.LocalDate;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContract;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
@@ -22,6 +23,9 @@ public class AwardedContractTestUtil {
   public static final String PHONE_NUMBER = ContactDetailsTestUtil.PHONE_NUMBER;
   public static final String JOB_TITLE = ContactDetailsTestUtil.JOB_TITLE;
   public static final String EMAIL_ADDRESS = ContactDetailsTestUtil.EMAIL;
+  public static final int ADDED_BY_ORGANISATION_GROUP = 1;
+  private static final PortalOrganisationGroup ADDED_BY_PORTAL_ORGANISATION_GROUP =
+      TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   private AwardedContractTestUtil() {
     throw new IllegalStateException("AwardedContractTestUtil is a utility class and should not be instantiated");
@@ -38,7 +42,8 @@ public class AwardedContractTestUtil {
       String contactName,
       String phoneNumber,
       String emailAddress,
-      String jobTitle
+      String jobTitle,
+      int addedByOrganisationGroup
   ) {
     var awardedContract = new AwardedContract();
     awardedContract.setProjectDetail(projectDetail);
@@ -52,6 +57,7 @@ public class AwardedContractTestUtil {
     awardedContract.setPhoneNumber(phoneNumber);
     awardedContract.setEmailAddress(emailAddress);
     awardedContract.setJobTitle(jobTitle);
+    awardedContract.setAddedByOrganisationGroup(addedByOrganisationGroup);
     return awardedContract;
   }
 
@@ -67,7 +73,8 @@ public class AwardedContractTestUtil {
         CONTACT_NAME,
         PHONE_NUMBER,
         EMAIL_ADDRESS,
-        JOB_TITLE
+        JOB_TITLE,
+        ADDED_BY_ORGANISATION_GROUP
     );
   }
 
@@ -83,7 +90,8 @@ public class AwardedContractTestUtil {
         CONTACT_NAME,
         PHONE_NUMBER,
         EMAIL_ADDRESS,
-        JOB_TITLE
+        JOB_TITLE,
+        ADDED_BY_ORGANISATION_GROUP
     );
   }
 
@@ -130,6 +138,11 @@ public class AwardedContractTestUtil {
   }
 
   public static AwardedContractView createAwardedContractView(Integer displayOrder) {
-    return AwardedContractViewUtil.from(createAwardedContract(), displayOrder);
+    return new AwardedContractViewUtil.AwardedContractViewBuilder(
+        AwardedContractTestUtil.createAwardedContract(),
+        displayOrder,
+        ADDED_BY_PORTAL_ORGANISATION_GROUP
+    )
+        .build() ;
   }
 }

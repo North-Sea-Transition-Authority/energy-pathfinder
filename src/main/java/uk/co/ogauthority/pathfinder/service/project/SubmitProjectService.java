@@ -68,7 +68,7 @@ public class SubmitProjectService {
   public boolean isProjectValid(ProjectDetail projectDetail) {
     return projectFormSectionServices
         .stream()
-        .filter(projectFormSectionService -> projectFormSectionService.canShowInTaskList(projectDetail))
+        .filter(projectFormSectionService -> projectFormSectionService.isTaskValidForProjectDetail(projectDetail))
         .allMatch(projectFormSectionService -> projectFormSectionService.isComplete(projectDetail));
   }
 

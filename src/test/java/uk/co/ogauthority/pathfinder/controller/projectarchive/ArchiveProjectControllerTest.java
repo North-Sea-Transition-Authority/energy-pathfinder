@@ -59,12 +59,12 @@ public class ArchiveProjectControllerTest extends ProjectContextAbstractControll
   @Before
   public void setup() {
     when(projectService.getLatestSubmittedDetailOrError(PUBLISHED_PROJECT_ID)).thenReturn(publishedProjectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(publishedProjectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(publishedProjectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(publishedProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(publishedProjectDetail, unauthenticatedUser)).thenReturn(false);
 
     when(projectService.getLatestSubmittedDetailOrError(ARCHIVED_PROJECT_ID)).thenReturn(archivedProjectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(archivedProjectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(archivedProjectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(archivedProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(archivedProjectDetail, unauthenticatedUser)).thenReturn(false);
   }
 
   @Test

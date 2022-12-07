@@ -8,12 +8,15 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
@@ -29,11 +32,16 @@ import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
+import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ForwardWorkPlanUpcomingTenderServiceTest {
@@ -55,11 +63,18 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
   @Mock
   private ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
 
+  @Mock
+  private TeamService teamService;
+
   private ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
 
   private final ForwardWorkPlanUpcomingTender upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
+
+  private final AuthenticatedUserAccount userAccount = UserTestingUtil.getAuthenticatedUserAccount();
+
+  private final PortalOrganisationGroup portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   @Before
   public void setup() {
@@ -73,8 +88,8 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
         workPlanUpcomingTenderRepository,
         searchSelectorService,
         entityDuplicationService,
-        forwardWorkPlanTenderSetupService
-    );
+        forwardWorkPlanTenderSetupService,
+        teamService);
 
     when(workPlanUpcomingTenderRepository.save(any(ForwardWorkPlanUpcomingTender.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
@@ -82,10 +97,12 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     var newUpcomingTenders = workPlanUpcomingTenderService.createUpcomingTender(
         projectDetail,
-        form
+        form,
+        userAccount
     );
     assertThat(newUpcomingTenders.getProjectDetail()).isEqualTo(projectDetail);
     assertThat(newUpcomingTenders.getDepartmentType()).isEqualTo(ForwardWorkPlanUpcomingTenderUtil.UPCOMING_TENDER_DEPARTMENT);
@@ -95,10 +112,12 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_manualDepartment() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm_manualEntry();
     var newUpcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
         projectDetail,
-        form
+        form,
+        userAccount
     );
     assertThat(newUpcomingTender.getProjectDetail()).isEqualTo(projectDetail);
     assertThat(newUpcomingTender.getManualDepartmentType()).isEqualTo(SearchSelectorService.removePrefix(
@@ -109,12 +128,14 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_whenNoContractTermPeriod_thenNoContractTermColumnsPopulatedInEntity() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     var form = ForwardWorkPlanUpcomingTenderUtil.getCompleteForm();
     form.setContractTermDurationPeriod(null);
 
     var upcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
         projectDetail,
-        form
+        form,
+        userAccount
     );
 
     assertThat(upcomingTender.getContractTermDurationPeriod()).isNull();
@@ -125,6 +146,7 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_whenNoContractTermPeriodIsDays_thenNoContractTermColumnsPopulatedInEntity() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
 
     final var expectedContractTermDuration = 10;
     final var expectedContractTermDurationPeriod = DurationPeriod.DAYS;
@@ -138,7 +160,8 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
     var upcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
         projectDetail,
-        form
+        form,
+        userAccount
     );
 
     assertExpectedContractTermDurationAndPeriod(
@@ -151,6 +174,7 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_whenNoContractTermPeriodIsWeeks_thenNoContractTermColumnsPopulatedInEntity() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
 
     final var expectedContractTermDuration = 11;
     final var expectedContractTermDurationPeriod = DurationPeriod.WEEKS;
@@ -164,7 +188,8 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
     var upcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
         projectDetail,
-        form
+        form,
+        userAccount
     );
 
     assertExpectedContractTermDurationAndPeriod(
@@ -177,6 +202,7 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_whenNoContractTermPeriodIsMonths_thenNoContractTermColumnsPopulatedInEntity() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
 
     final var expectedContractTermDuration = 12;
     final var expectedContractTermDurationPeriod = DurationPeriod.MONTHS;
@@ -190,7 +216,8 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
     var upcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
         projectDetail,
-        form
+        form,
+        userAccount
     );
 
     assertExpectedContractTermDurationAndPeriod(
@@ -203,6 +230,7 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_whenNoContractTermPeriodIsYears_thenNoContractTermColumnsPopulatedInEntity() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
 
     final var expectedContractTermDuration = 13;
     final var expectedContractTermDurationPeriod = DurationPeriod.YEARS;
@@ -216,7 +244,8 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
     var upcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
         projectDetail,
-        form
+        form,
+        userAccount
     );
 
     assertExpectedContractTermDurationAndPeriod(
@@ -229,11 +258,13 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   @Test
   public void createUpcomingTender_whenEmptyForm() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     var form = ForwardWorkPlanUpcomingTenderUtil.getEmptyForm();
 
     var upcomingTender = workPlanUpcomingTenderService.createUpcomingTender(
         projectDetail,
-        form
+        form,
+        userAccount
     );
     assertThat(upcomingTender.getProjectDetail()).isEqualTo(projectDetail);
     checkAllFieldsAreNull(upcomingTender);
@@ -256,6 +287,7 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
     assertThat(form.getContactDetail().getPhoneNumber()).isEqualTo(upcomingTender.getPhoneNumber());
     assertThat(form.getContactDetail().getJobTitle()).isEqualTo(upcomingTender.getJobTitle());
     assertThat(form.getContactDetail().getEmailAddress()).isEqualTo(upcomingTender.getEmailAddress());
+    assertThat(upcomingTender.getAddedByOrganisationGroup()).isEqualTo(portalOrganisationGroup.getOrgGrpId());
   }
 
   private void checkAllFieldsAreNull(ForwardWorkPlanUpcomingTender workPlanUpcomingTender) {
@@ -519,12 +551,35 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
   public void canShowInTaskList_whenNotForwardWorkPlan_thenFalse() {
     var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
 
-    assertThat(workPlanUpcomingTenderService.canShowInTaskList(projectDetail)).isFalse();
+    assertThat(workPlanUpcomingTenderService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR)))
+        .isFalse();
   }
 
   @Test
   public void canShowInTaskList_whenForwardWorkPlan_thenTrue() {
-    assertThat(workPlanUpcomingTenderService.canShowInTaskList(projectDetail)).isTrue();
+    assertThat(workPlanUpcomingTenderService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR)))
+        .isTrue();
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        workPlanUpcomingTenderService,
+        projectDetail,
+        Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)
+    );
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_whenNotForwardWorkPlan_thenFalse() {
+    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
+
+    assertThat(workPlanUpcomingTenderService.isTaskValidForProjectDetail(projectDetail)).isFalse();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_whenForwardWorkPlan_thenTrue() {
+    assertThat(workPlanUpcomingTenderService.isTaskValidForProjectDetail(projectDetail)).isTrue();
   }
 
   @Test

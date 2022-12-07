@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -31,11 +33,15 @@ import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -62,6 +68,9 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
   @Mock
   private EntityDuplicationService entityDuplicationService;
 
+  @Mock
+  private TeamService teamService;
+
   private InfrastructureCollaborationOpportunitiesService infrastructureCollaborationOpportunitiesService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
@@ -71,6 +80,8 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
   );
 
   private final AuthenticatedUserAccount userAccount = UserTestingUtil.getAuthenticatedUserAccount();
+
+  private final PortalOrganisationGroup portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   @Before
   public void setUp() {
@@ -87,8 +98,8 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
         infrastructureCollaborationOpportunityFileLinkService,
         projectDetailFileService,
         projectSetupService,
-        entityDuplicationService
-    );
+        entityDuplicationService,
+        teamService);
 
     when(infrastructureCollaborationOpportunitiesRepository.save(any(InfrastructureCollaborationOpportunity.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
@@ -96,7 +107,7 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
 
   @Test
   public void createCollaborationOpportunity() {
-
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     final var selectedFunction = InfrastructureCollaborationOpportunityTestUtil.FUNCTION;
 
     var form = InfrastructureCollaborationOpportunityTestUtil.getCompleteForm();
@@ -114,6 +125,7 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
 
   @Test
   public void createCollaborationOpportunity_manualFunction() {
+    when(teamService.getContributorPortalOrganisationGroup(userAccount)).thenReturn(portalOrganisationGroup);
     var form = InfrastructureCollaborationOpportunityTestUtil.getCompletedForm_manualEntry();
     var opportunity = infrastructureCollaborationOpportunitiesService.createCollaborationOpportunity(
         detail,
@@ -199,6 +211,7 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
     assertThat(infrastructureCollaborationOpportunity.getPhoneNumber()).isEqualTo(form.getContactDetail().getPhoneNumber());
     assertThat(infrastructureCollaborationOpportunity.getJobTitle()).isEqualTo(form.getContactDetail().getJobTitle());
     assertThat(infrastructureCollaborationOpportunity.getEmailAddress()).isEqualTo(form.getContactDetail().getEmailAddress());
+    assertThat(infrastructureCollaborationOpportunity.getAddedByOrganisationGroup()).isEqualTo(portalOrganisationGroup.getOrgGrpId());
   }
 
   private void checkCommonFormFields(InfrastructureCollaborationOpportunityForm form, InfrastructureCollaborationOpportunity infrastructureCollaborationOpportunity) {
@@ -228,13 +241,41 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
   @Test
   public void canShowInTaskList_true() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(true);
-    assertThat(infrastructureCollaborationOpportunitiesService.canShowInTaskList(detail)).isTrue();
+    assertThat(infrastructureCollaborationOpportunitiesService.canShowInTaskList(
+        detail,
+        Set.of(UserToProjectRelationship.OPERATOR))
+    ).isTrue();
   }
 
   @Test
   public void canShowInTaskList_false() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(false);
-    assertThat(infrastructureCollaborationOpportunitiesService.canShowInTaskList(detail)).isFalse();
+    assertThat(infrastructureCollaborationOpportunitiesService.canShowInTaskList(
+        detail,
+        Set.of(UserToProjectRelationship.OPERATOR))
+    ).isFalse();
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(true);
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        infrastructureCollaborationOpportunitiesService,
+        detail,
+        Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)
+    );
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_true() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(true);
+    assertThat(infrastructureCollaborationOpportunitiesService.isTaskValidForProjectDetail(detail)).isTrue();
+  }
+
+  @Test
+  public void isTaskValidForProjectDetail_false() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.COLLABORATION_OPPORTUNITIES)).thenReturn(false);
+    assertThat(infrastructureCollaborationOpportunitiesService.isTaskValidForProjectDetail(detail)).isFalse();
   }
 
   @Test

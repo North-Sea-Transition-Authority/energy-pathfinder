@@ -34,6 +34,7 @@
       contactPhoneNumber=awardedContractView.contactPhoneNumber
       contactJobTitle=awardedContractView.contactJobTitle
       contactEmailAddress=awardedContractView.contactEmailAddress
+      addedByPortalOrganisationGroup=awardedContractView.addedByPortalOrganisationGroup
     />
   </@summaryViewWrapper.summaryViewItemWrapper>
 </#macro>
@@ -67,6 +68,7 @@
       contactPhoneNumber=awardedContractDiff.AwardedContractView_contactPhoneNumber
       contactJobTitle=awardedContractDiff.AwardedContractView_contactJobTitle
       contactEmailAddress=awardedContractDiff.AwardedContractView_contactEmailAddress
+      addedByPortalOrganisationGroup=awardedContractDiff.AwardedContractView_addedByPortalOrganisationGroup
     />
   </@summaryViewWrapper.summaryViewItemWrapper>
 </#macro>
@@ -82,6 +84,7 @@
   contactPhoneNumber=""
   contactJobTitle=""
   contactEmailAddress=""
+  addedByPortalOrganisationGroup=""
 >
   <@checkAnswers.checkAnswersStandardOrDiffRow
     prompt="Contractor name"
@@ -128,6 +131,11 @@
   <@checkAnswers.checkAnswersRowEmailOrDiff
     prompt="Email address"
     fieldValue=contactEmailAddress
+    isDiffedField=useDiffedField
+  />
+  <@checkAnswers.checkAnswersStandardOrDiffRow
+    prompt="Added by"
+    fieldValue=addedByPortalOrganisationGroup
     isDiffedField=useDiffedField
   />
 </#macro>

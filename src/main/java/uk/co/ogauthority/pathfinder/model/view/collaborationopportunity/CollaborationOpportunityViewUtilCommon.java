@@ -1,6 +1,9 @@
 package uk.co.ogauthority.pathfinder.model.view.collaborationopportunity;
 
+import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityCommon;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
@@ -18,10 +21,12 @@ public class CollaborationOpportunityViewUtilCommon {
   public static CollaborationOpportunityViewCommon populateView(
       CollaborationOpportunityViewCommon view,
       CollaborationOpportunityCommon opportunity,
+      boolean includeSummaryLinks,
       Integer displayOrder,
       List<UploadedFileView> uploadedFileViews,
       String editUrl,
-      String deleteUrl
+      String deleteUrl,
+      PortalOrganisationGroup addedByPortalOrganisationGroup
   ) {
 
     var projectId = opportunity.getProjectDetail().getProject().getId();
@@ -45,17 +50,23 @@ public class CollaborationOpportunityViewUtilCommon {
 
     view.setUploadedFileViews(uploadedFileViews);
 
-    final var editLink = new SummaryLink(
-        SummaryLinkText.EDIT.getDisplayName(),
-        editUrl
-    );
+    ArrayList<SummaryLink> summaryLinks = new ArrayList<>();
+    if (includeSummaryLinks) {
+      final var editLink = new SummaryLink(
+          SummaryLinkText.EDIT.getDisplayName(),
+          editUrl
+      );
+      summaryLinks.add(editLink);
 
-    final var removeLink = new SummaryLink(
-        SummaryLinkText.DELETE.getDisplayName(),
-        deleteUrl
-    );
+      final var removeLink = new SummaryLink(
+          SummaryLinkText.DELETE.getDisplayName(),
+          deleteUrl
+      );
+      summaryLinks.add(removeLink);
+    }
 
-    view.setSummaryLinks(List.of(editLink, removeLink));
+    view.setSummaryLinks(summaryLinks);
+    view.setAddedByPortalOrganisationGroup(resolvePortalOrganisationGroupName(addedByPortalOrganisationGroup));
 
     return view;
   }
@@ -63,21 +74,32 @@ public class CollaborationOpportunityViewUtilCommon {
   public static CollaborationOpportunityViewCommon populateView(
       CollaborationOpportunityViewCommon opportunityView,
       CollaborationOpportunityCommon opportunity,
+      boolean includeSummaryLinks,
       Integer displayOrder,
       List<UploadedFileView> uploadedFileViews,
       String editUrl,
       String deleteUrl,
-      Boolean isValid
+      Boolean isValid,
+      PortalOrganisationGroup addedByPortalOrganisationGroup
   ) {
     final var populatedOpportunityView = populateView(
         opportunityView,
         opportunity,
+        includeSummaryLinks,
         displayOrder,
         uploadedFileViews,
         editUrl,
-        deleteUrl
+        deleteUrl,
+        addedByPortalOrganisationGroup
     );
     populatedOpportunityView.setIsValid(isValid);
     return populatedOpportunityView;
+  }
+
+  private static String resolvePortalOrganisationGroupName(PortalOrganisationGroup portalOrganisationGroup) {
+    if (StringUtils.isBlank(portalOrganisationGroup.getName())) {
+      return "Unknown organisation";
+    }
+    return portalOrganisationGroup.getName();
   }
 }

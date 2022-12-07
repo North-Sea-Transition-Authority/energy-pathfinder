@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +29,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline.De
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedpipeline.DecommissionedPipelineRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.pipeline.PipelineService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.DecommissionedPipelineTestUtil;
@@ -274,7 +276,8 @@ public class DecommissionedPipelineServiceTest {
   // Pipelines disabled: PAT-457
   @Test
   public void canShowInTaskList() {
-    assertThat(decommissionedPipelineService.canShowInTaskList(projectDetail)).isFalse();
+    assertThat(decommissionedPipelineService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR)))
+        .isFalse();
 
     verify(projectSetupService, never()).taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.PIPELINES);
   }
@@ -290,6 +293,11 @@ public class DecommissionedPipelineServiceTest {
   //   when(projectSetupService.taskSelectedForProjectDetail(projectDetail, ProjectTask.PIPELINES)).thenReturn(false);
   //   assertThat(decommissionedPipelineService.canShowInTaskList(projectDetail)).isFalse();
   // }
+
+  @Test
+  public void isTaskValidForProjectDetail_false() {
+    assertThat(decommissionedPipelineService.isTaskValidForProjectDetail(projectDetail)).isFalse();
+  }
 
   @Test
   public void removeSectionData_verifyInteractions() {

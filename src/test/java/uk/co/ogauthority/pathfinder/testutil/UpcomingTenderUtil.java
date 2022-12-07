@@ -87,6 +87,7 @@ public class UpcomingTenderUtil {
     tender.setPhoneNumber(PHONE_NUMBER);
     tender.setJobTitle(JOB_TITLE);
     tender.setEmailAddress(EMAIL);
+    tender.setAddedByOrganisationGroup(1);
   }
 
   private static void setUpcomingTenderFields(UpcomingTenderForm form) {

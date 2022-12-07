@@ -92,6 +92,6 @@ public class ProjectInformationSectionSummaryService implements ProjectSectionSu
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return projectInformationService.canShowInTaskList(detail);
+    return projectInformationService.isTaskValidForProjectDetail(detail);
   }
 }

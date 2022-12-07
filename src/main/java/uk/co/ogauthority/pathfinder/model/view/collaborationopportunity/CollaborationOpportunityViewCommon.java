@@ -17,6 +17,8 @@ public class CollaborationOpportunityViewCommon extends ContactDetailProjectSumm
 
   private List<UploadedFileView> uploadedFileViews;
 
+  private String addedByPortalOrganisationGroup;
+
   public CollaborationOpportunityViewCommon() {
     this.uploadedFileViews = new ArrayList<>();
   }
@@ -52,6 +54,14 @@ public class CollaborationOpportunityViewCommon extends ContactDetailProjectSumm
   public void setUploadedFileViews(
       List<UploadedFileView> uploadedFileViews) {
     this.uploadedFileViews = uploadedFileViews;
+  }
+
+  public String getAddedByPortalOrganisationGroup() {
+    return addedByPortalOrganisationGroup;
+  }
+
+  public void setAddedByPortalOrganisationGroup(String addedByPortalOrganisationGroup) {
+    this.addedByPortalOrganisationGroup = addedByPortalOrganisationGroup;
   }
 
   @Override

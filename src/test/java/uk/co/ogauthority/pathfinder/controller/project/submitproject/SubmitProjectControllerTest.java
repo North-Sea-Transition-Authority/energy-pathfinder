@@ -63,8 +63,8 @@ public class SubmitProjectControllerTest extends ProjectContextAbstractControlle
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(detail);
     when(projectSummaryViewService.getProjectSummaryView(detail)).thenReturn(new ProjectSummaryView("",
         Collections.emptyList()));
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(detail, unAuthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(detail, unAuthenticatedUser)).thenReturn(false);
   }
 
   @Test
@@ -129,7 +129,7 @@ public class SubmitProjectControllerTest extends ProjectContextAbstractControlle
     var projectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
 
     when(projectService.getLatestDetailOrError(projectId)).thenReturn(projectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
 
     mockMvc.perform(get(ReverseRouter.route(
         on(SubmitProjectController.class).submitProjectConfirmation(projectId, null)))

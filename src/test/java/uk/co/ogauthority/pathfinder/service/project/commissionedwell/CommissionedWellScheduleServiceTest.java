@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,8 +31,10 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxD
 import uk.co.ogauthority.pathfinder.model.form.project.commissionedwell.CommissionedWellForm;
 import uk.co.ogauthority.pathfinder.repository.project.commissionedwell.CommissionedWellScheduleRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.testutil.CommissionedWellTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.WellboreTestUtil;
 
@@ -119,7 +122,10 @@ class CommissionedWellScheduleServiceTest {
         ProjectTask.COMMISSIONED_WELLS
     )).thenReturn(true);
 
-    var canShowInTaskList = commissionedWellScheduleService.canShowInTaskList(projectDetail);
+    var canShowInTaskList = commissionedWellScheduleService.canShowInTaskList(
+        projectDetail,
+        Set.of(UserToProjectRelationship.OPERATOR)
+    );
 
     assertTrue(canShowInTaskList);
   }
@@ -132,10 +138,25 @@ class CommissionedWellScheduleServiceTest {
         ProjectTask.COMMISSIONED_WELLS
     )).thenReturn(false);
 
-    var canShowInTaskList = commissionedWellScheduleService.canShowInTaskList(projectDetail);
+    var canShowInTaskList = commissionedWellScheduleService.canShowInTaskList(
+        projectDetail,
+        Set.of(UserToProjectRelationship.OPERATOR)
+    );
 
     assertFalse(canShowInTaskList);
 
+  }
+
+  @Test
+  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+    when(projectSetupService.taskValidAndSelectedForProjectDetail(projectDetail, ProjectTask.COMMISSIONED_WELLS))
+        .thenReturn(true);
+
+    ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
+        commissionedWellScheduleService,
+        projectDetail,
+        Set.of(UserToProjectRelationship.OPERATOR)
+    );
   }
 
   @Test

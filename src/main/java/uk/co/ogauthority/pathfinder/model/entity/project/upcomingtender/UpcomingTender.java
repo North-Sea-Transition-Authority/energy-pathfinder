@@ -43,6 +43,8 @@ public class UpcomingTender
 
   private String emailAddress;
 
+  private Integer addedByOrganisationGroup;
+
   public UpcomingTender() {
   }
 
@@ -130,6 +132,15 @@ public class UpcomingTender
     return getContactName();
   }
 
+  public Integer getAddedByOrganisationGroup() {
+    return addedByOrganisationGroup;
+  }
+
+  public void setAddedByOrganisationGroup(
+      Integer portalOrganisationGroupId) {
+    this.addedByOrganisationGroup = portalOrganisationGroupId;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -150,7 +161,8 @@ public class UpcomingTender
         && Objects.equals(contactName, that.contactName)
         && Objects.equals(phoneNumber, that.phoneNumber)
         && Objects.equals(jobTitle, that.jobTitle)
-        && Objects.equals(emailAddress, that.emailAddress);
+        && Objects.equals(emailAddress, that.emailAddress)
+        && Objects.equals(addedByOrganisationGroup, that.addedByOrganisationGroup);
   }
 
   @Override
@@ -165,7 +177,8 @@ public class UpcomingTender
         contactName,
         phoneNumber,
         jobTitle,
-        emailAddress
+        emailAddress,
+        addedByOrganisationGroup
     );
   }
 }

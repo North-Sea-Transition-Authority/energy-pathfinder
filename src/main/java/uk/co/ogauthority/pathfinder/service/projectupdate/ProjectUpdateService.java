@@ -80,7 +80,7 @@ public class ProjectUpdateService {
             // only copy sections which are always copied or are shown in the task list
             projectFormSectionService.alwaysCopySectionData(fromDetail)
             ||
-            projectFormSectionService.canShowInTaskList(fromDetail)
+            projectFormSectionService.isTaskValidForProjectDetail(fromDetail)
         )
         .forEach(projectFormSectionService -> projectFormSectionService.copySectionData(fromDetail, newDetail));
     return newDetail;

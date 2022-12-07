@@ -15,13 +15,16 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorForm;
 import uk.co.ogauthority.pathfinder.model.form.project.selectoperator.ProjectOperatorFormValidator;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
 public class SelectOperatorService implements ProjectFormSectionService {
@@ -129,6 +132,11 @@ public class SelectOperatorService implements ProjectFormSectionService {
   }
 
   @Override
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
+    return ProjectService.isInfrastructureProject(detail);
+  }
+
+  @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
     entityDuplicationService.duplicateEntityAndSetNewParent(
         getProjectOperatorOrError(fromDetail),
@@ -143,8 +151,9 @@ public class SelectOperatorService implements ProjectFormSectionService {
   }
 
   @Override
-  public boolean canShowInTaskList(ProjectDetail detail) {
-    return ProjectService.isInfrastructureProject(detail);
+  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
+    return isTaskValidForProjectDetail(detail)
+        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.PROJECT_OPERATOR, userToProjectRelationships);
   }
 
   @Override

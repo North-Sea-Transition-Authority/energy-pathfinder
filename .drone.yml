@@ -3,6 +3,20 @@ type: docker
 name: default
 
 steps:
+  - name: restore-cache
+    image: drillster/drone-volume-cache
+    volumes:
+      - name: drone-cache
+        path: /cache
+    settings:
+      restore: true
+      mount:
+        - ./node_modules
+        # We can only mount volume caches into the working directory, so all steps which use Gradle must have
+        # the GRADLE_USER_HOME environment variable pointing here.
+        - ./gradle_cache
+        - ./sonar_cache
+
   - name: fetch-fds-submodule
     image: alpine/git:v2.26.2
     commands:
@@ -29,6 +43,9 @@ steps:
     environment:
       SONAR_TOKEN:
         from_secret: sonar_token
+      GRADLE_USER_HOME: /drone/src/gradle_cache
+      # This SONAR_USER_HOME is the cache path - not the actual user home
+      SONAR_USER_HOME: /drone/src/sonar_cache
     commands:
       - chmod +x gradlew
       - ./gradlew test jacocoTestReport checkstyleMain bootWar bootJar sonarqube
@@ -67,23 +84,36 @@ steps:
       status:
         - success
 
-#  - name: vulnerability-scan-java
-#    image: openjdk:11-jdk-slim
-#    commands:
-#      - chmod +x gradlew
-#      - ./gradlew dependencyCheckAnalyze --stacktrace
-#    volumes:
-#      - name: nvd-db
-#        path: /var/nvd-db
-#    when:
-#      branch: develop
-
   - name: vulnerability-scan-npm
     image: node:10.12.0
     commands:
       - npm audit > build/reports/npm-audit-report.txt || true # dont fail build if non 0 exit code
     when:
       branch: develop
+
+  - name: trivy-build-image
+    image: docker:19.03.8
+    volumes:
+      - name: docker-sock
+        path: /var/run/docker.sock
+    commands:
+      - docker build -t quay.io/fivium/pathfinder:trivy-scan-target .
+
+  - name: trivy-scan
+    image: aquasec/trivy:0.20.0
+    volumes:
+      - name: docker-sock
+        path: /var/run/docker.sock
+      - name: drone-trivy-cache
+        path: /root/trivy-cache
+      - name: webfiles
+        path: /var/webfiles
+    commands:
+      # timeout set as initial cache population can seemingly take a while sometimes
+      - trivy image --timeout 30m --exit-code 1 quay.io/fivium/pathfinder:trivy-scan-target
+    when:
+      status:
+        - success
 
   - name: sync-reports
     image: alpine:3.12.1
@@ -111,6 +141,18 @@ steps:
       status:
         - success
 
+  - name: rebuild-cache
+    image: drillster/drone-volume-cache
+    volumes:
+      - name: drone-cache
+        path: /cache
+    settings:
+      rebuild: true
+      mount:
+        - ./node_modules
+        - ./gradle_cache
+        - ./sonar_cache
+
   - name: slack
     image: plugins/slack:linux-amd64
     settings:
@@ -130,3 +172,15 @@ volumes:
   - name: nvd-db
     host:
       path: /home/fivium/nvd-db-pathfinder
+
+  - name: drone-cache
+    host:
+      path: /home/fivium/drone-cache
+
+  - name: docker-sock
+    host:
+      path: /var/run/docker.sock
+
+  - name: drone-trivy-cache
+    host:
+      path: /root/.cache/

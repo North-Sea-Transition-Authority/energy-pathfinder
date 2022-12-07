@@ -1,11 +1,13 @@
 package uk.co.ogauthority.pathfinder.service.project.projectcontext;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.AllowProjectContributorAccess;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
@@ -16,18 +18,26 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontribution.ProjectContributorsCommonService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
 
 @Service
 public class ProjectContextService {
 
   private final ProjectService projectService;
   private final ProjectOperatorService projectOperatorService;
+  private final ProjectContributorsCommonService projectContributorsCommonService;
+  private final TeamService teamService;
 
   @Autowired
   public ProjectContextService(ProjectService projectService,
-                               ProjectOperatorService projectOperatorService) {
+                               ProjectOperatorService projectOperatorService,
+                               ProjectContributorsCommonService projectContributorsCommonService,
+                               TeamService teamService) {
     this.projectService = projectService;
     this.projectOperatorService = projectOperatorService;
+    this.projectContributorsCommonService = projectContributorsCommonService;
+    this.teamService = teamService;
   }
 
   public boolean canBuildContext(ProjectDetail detail,
@@ -36,9 +46,10 @@ public class ProjectContextService {
     var statusCheck = getProjectStatusesForClass(controllerClass);
     var permissionCheck = getProjectPermissionsForClass(controllerClass);
     final var allowedProjectTypes = getProjectTypesForClass(controllerClass);
+    var allowProjectContributors = getContributorsAllowedForClass(controllerClass);
 
     try {
-      buildProjectContext(detail, user, statusCheck, permissionCheck, allowedProjectTypes);
+      buildProjectContext(detail, user, statusCheck, permissionCheck, allowedProjectTypes, allowProjectContributors);
       return true;
     } catch (AccessDeniedException exception) {
       return false;
@@ -62,8 +73,30 @@ public class ProjectContextService {
                                             AuthenticatedUserAccount user,
                                             Set<ProjectStatus> statusCheck,
                                             Set<ProjectPermission> permissionCheck,
-                                            Set<ProjectType> allowedProjectTypes) {
-    if (!projectOperatorService.isUserInProjectTeamOrRegulator(detail, user)) {
+                                            Set<ProjectType> allowedProjectTypes,
+                                            boolean allowProjectContributors) {
+    var isRegulator = teamService.isPersonMemberOfRegulatorTeam(user.getLinkedPerson());
+    var isOperator = projectOperatorService.isUserInProjectTeam(detail, user);
+    var canAccessAsContributor = false;
+    if (!isOperator) {
+      canAccessAsContributor = allowProjectContributors && userBelongsAsContributor(
+          user,
+          detail.getProject().getId()
+      );
+    }
+    Set<UserToProjectRelationship> relationships = new HashSet<>();
+
+    if (isRegulator) {
+      relationships.add(UserToProjectRelationship.REGULATOR);
+    }
+    if (isOperator) {
+      relationships.add(UserToProjectRelationship.OPERATOR);
+    }
+    if (canAccessAsContributor) {
+      relationships.add(UserToProjectRelationship.CONTRIBUTOR);
+    }
+
+    if (!isRegulator && !isOperator && !canAccessAsContributor) {
       throw new AccessDeniedException(
           String.format(
               "User with wua: %d does not have access to view projectDetail with id: %d",
@@ -101,17 +134,18 @@ public class ProjectContextService {
       );
     }
 
-    return getProjectContext(detail, user, userPermissions);
+    return getProjectContext(detail, user, userPermissions, relationships);
   }
 
   public ProjectContext getProjectContext(ProjectDetail detail,
                                           AuthenticatedUserAccount user,
-                                          Set<ProjectPermission> projectPermissions) {
+                                          Set<ProjectPermission> projectPermissions,
+                                          Set<UserToProjectRelationship> relationships) {
     return new ProjectContext(
         detail,
         projectPermissions,
-        user
-    );
+        user,
+        relationships);
   }
 
   public ProjectDetail getProjectDetailsOrError(Integer projectId, ProjectDetailVersionType projectDetailVersionType) {
@@ -164,5 +198,27 @@ public class ProjectContextService {
         .map(annotation -> Arrays.stream(((ProjectTypeCheck) annotation).types()).collect(Collectors.toSet()))
         .findFirst()
         .orElse(Set.of());
+  }
+
+  public boolean getContributorsAllowedForClass(Class<?> clazz) {
+    return Arrays.stream(clazz.getAnnotations())
+        .anyMatch(annotation -> annotation.annotationType().equals(AllowProjectContributorAccess.class));
+  }
+
+  private boolean userBelongsAsContributor(AuthenticatedUserAccount user, int projectId) {
+    var detail = getProjectDetailsOrError(projectId, ProjectDetailVersionType.CURRENT_VERSION);
+    var projectContributorsIdList = projectContributorsCommonService.getProjectContributorsForDetail(detail)
+        .stream()
+        .map(projectContributor -> projectContributor.getContributionOrganisationGroup().getOrgGrpId())
+        .collect(Collectors.toList());
+
+    var userOrganisationsIdList = teamService.getOrganisationTeamsPersonIsMemberOf(user.getLinkedPerson())
+        .stream()
+        .map(organisationTeam -> organisationTeam.getPortalOrganisationGroup().getOrgGrpId())
+        .collect(Collectors.toList());
+
+    return projectContributorsIdList
+        .stream()
+        .anyMatch(userOrganisationsIdList::contains);
   }
 }

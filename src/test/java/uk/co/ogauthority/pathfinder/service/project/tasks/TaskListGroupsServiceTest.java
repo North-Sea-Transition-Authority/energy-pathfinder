@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.Before;
@@ -16,6 +17,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTaskGroup;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.TaskListTestUtil;
 
@@ -38,7 +40,7 @@ public class TaskListGroupsServiceTest {
         projectTaskService,
         taskListEntryCreatorService
     );
-    when(projectTaskService.canShowTask(any(), any())).thenReturn(true);
+    when(projectTaskService.canShowTask(any(), any(), any())).thenReturn(true);
     when(taskListEntryCreatorService.createTaskListEntry(any(), any())).thenReturn(TaskListTestUtil.getTaskListEntry());
   }
 
@@ -65,23 +67,28 @@ public class TaskListGroupsServiceTest {
 
   private void assertThatCorrectProjectTaskGroupsAreReturned(ProjectType projectType,
                                                              ProjectDetail projectDetail) {
-    var taskListGroupsForProjectDetail = taskListGroupsService.getTaskListGroups(projectDetail);
+    var taskListGroupsForProjectDetail = taskListGroupsService.getTaskListGroups(
+        projectDetail,
+        Set.of(UserToProjectRelationship.OPERATOR)
+    );
     var expectedProjectTaskGroups = getProjectTaskGroupsByProjectType(projectType);
     assertThat(taskListGroupsForProjectDetail.size()).isEqualTo(expectedProjectTaskGroups.size() + 1); // +1 for review and submit
   }
 
   @Test
   public void getTaskListGroups_correctOrder() {
-    var groups = taskListGroupsService.getTaskListGroups(detail);
+    var groups = taskListGroupsService.getTaskListGroups(detail, Set.of(UserToProjectRelationship.OPERATOR));
     IntStream.range(0, groups.size())
         .forEach(index -> assertThat(groups.get(index).getDisplayOrder()).isEqualTo(index + 1));
   }
 
   @Test
   public void getTaskListGroups_groupNotReturnedWhenNoTasks() {
-    when(projectTaskService.canShowTask(ProjectTask.PROJECT_OPERATOR, detail)).thenReturn(false);
+    var relationships = Set.of(UserToProjectRelationship.OPERATOR);
+    when(projectTaskService.canShowTask(ProjectTask.PROJECT_OPERATOR, detail, relationships))
+        .thenReturn(false);
 
-    var groups = taskListGroupsService.getTaskListGroups(detail);
+    var groups = taskListGroupsService.getTaskListGroups(detail, relationships);
     assertThat(groups).noneMatch(g -> g.getGroupName().equals(ProjectTaskGroup.PROJECT_OPERATOR.getDisplayName()));
   }
 }

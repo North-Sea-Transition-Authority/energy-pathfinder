@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,16 +17,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
+import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectManagementViewService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.service.projectmanagement.ProjectManagementViewService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -39,22 +43,77 @@ public class ManageProjectControllerTest extends ProjectContextAbstractControlle
   @MockBean
   private ProjectManagementViewService projectManagementViewService;
 
+  private ProjectControllerTesterService projectControllerTesterService;
+
   private final ProjectDetail publishedProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.PUBLISHED);
   private final ProjectDetail unsubmittedProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
 
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       ProjectPermission.VIEW.getUserPrivileges());
   private final AuthenticatedUserAccount unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
+  private final Set<ProjectStatus> permittedProjectStatuses = Set.of(
+      ProjectStatus.QA,
+      ProjectStatus.PUBLISHED,
+      ProjectStatus.ARCHIVED
+  );
+  private final Set<ProjectType> permittedProjectTypes = Set.of(ProjectType.INFRASTRUCTURE, ProjectType.FORWARD_WORK_PLAN);
+  private final Set<ProjectPermission> requiredPermissions = Set.of(ProjectPermission.VIEW);
 
   @Before
   public void setup() {
     when(projectService.getLatestSubmittedDetailOrError(PUBLISHED_PROJECT_ID)).thenReturn(publishedProjectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(publishedProjectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(publishedProjectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectService.getLatestDetailOrError(PUBLISHED_PROJECT_ID)).thenReturn(publishedProjectDetail);
+    when(projectOperatorService.isUserInProjectTeam(publishedProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(publishedProjectDetail, unauthenticatedUser)).thenReturn(false);
 
     doThrow(new PathfinderEntityNotFoundException("test")).when(projectService).getLatestSubmittedDetailOrError(UNSUBMITTED_PROJECT_ID);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(unsubmittedProjectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(unsubmittedProjectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(unsubmittedProjectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(unsubmittedProjectDetail, unauthenticatedUser)).thenReturn(false);
+
+    projectControllerTesterService = new ProjectControllerTesterService(
+        mockMvc,
+        projectOperatorService,
+        projectContributorsCommonService,
+        teamService
+    );
+  }
+
+  @Test
+  public void getProject_projectContextSmokeTest() {
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.GET)
+        .withProjectDetail(publishedProjectDetail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(ManageProjectController.class).getProject(PUBLISHED_PROJECT_ID, null, null, null),
+        status().isOk(),
+        status().isForbidden()
+    );
+  }
+
+  @Test
+  public void updateProjectVersion_projectContextSmokeTest() {
+
+    projectControllerTesterService
+        .withHttpRequestMethod(HttpMethod.POST)
+        .withProjectDetail(publishedProjectDetail)
+        .withUser(authenticatedUser)
+        .withPermittedProjectStatuses(permittedProjectStatuses)
+        .withPermittedProjectTypes(permittedProjectTypes)
+        .withRequiredProjectPermissions(requiredPermissions)
+        .withProjectContributorAccess();
+
+    projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
+        on(ManageProjectController.class).updateProjectVersion(PUBLISHED_PROJECT_ID, null, null, null),
+        status().is3xxRedirection(),
+        status().isForbidden()
+    );
   }
 
   @Test

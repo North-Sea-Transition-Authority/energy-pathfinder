@@ -215,6 +215,26 @@ public class TeamService {
 
   }
 
+  //TODO PAT-685 make sure only one org is saved when user belongs to multiple ones
+  /**
+   * Get the PortalOrganisationGroup of an user account to save as a section item's portalOrganisationGroup
+   * This is used to determine an item's owner and needs to return only one organisation even when a user belongs to
+   * multiple ones.
+   * @param userAccount The current user
+   * @return The PortalOrganisationGroup who owns a section item
+   */
+  public PortalOrganisationGroup getContributorPortalOrganisationGroup(AuthenticatedUserAccount userAccount) {
+    return getOrganisationTeamsPersonIsMemberOf(userAccount.getLinkedPerson())
+        .stream()
+        .map(OrganisationTeam::getPortalOrganisationGroup)
+        .findFirst()
+        .orElseThrow(() -> {
+          throw new PathfinderEntityNotFoundException(
+              String.format("Could not get user with WuaId: %s portal organisation team", userAccount.getWuaId())
+          );
+        });
+  }
+
   public List<UserPrivilege> getAllUserPrivilegesForPerson(Person person) {
     // get privileges available to the user through res type role membership
     var portalPrivileges = teamDtoFactory.createUserPrivilegeSet(

@@ -1,0 +1,18 @@
+# Vulnerability only effects Java versions 6 or lower
+CVE-2022-24823
+
+# com.fasterxml.jackson.core:jackson-databind
+CVE-2022-42003
+CVE-2022-42004
+
+# org.springframework.security:spring-security-core
+CVE-2022-31692
+CVE-2022-31690
+
+# org.yaml:snakeyaml
+CVE-2022-25857
+CVE-2022-38749
+CVE-2022-38750
+CVE-2022-38751
+CVE-2022-38752
+CVE-2022-41854

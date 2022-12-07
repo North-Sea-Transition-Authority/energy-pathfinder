@@ -23,12 +23,14 @@ import uk.co.ogauthority.pathfinder.config.file.FileUploadResult;
 import uk.co.ogauthority.pathfinder.controller.file.FileDownloadService;
 import uk.co.ogauthority.pathfinder.controller.file.PathfinderFileUploadController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.AllowProjectContributorAccess;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.InfrastructureCollaborationOpportunityRestController;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -40,6 +42,8 @@ import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
+import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunityFileLinkService;
@@ -52,6 +56,7 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
 @ProjectFormPagePermissionCheck
+@AllowProjectContributorAccess
 @ProjectTypeCheck(types = ProjectType.INFRASTRUCTURE)
 @RequestMapping("/project/{projectId}/infrastructure/collaboration-opportunities")
 public class InfrastructureCollaborationOpportunitiesController extends PathfinderFileUploadController {
@@ -64,6 +69,7 @@ public class InfrastructureCollaborationOpportunitiesController extends Pathfind
   private final ControllerHelperService controllerHelperService;
   private final InfrastructureCollaborationOpportunitiesService infrastructureCollaborationOpportunitiesService;
   private final InfrastructureCollaborationOpportunitiesSummaryService infrastructureCollaborationOpportunitiesSummaryService;
+  private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
 
   @Autowired
@@ -73,13 +79,14 @@ public class InfrastructureCollaborationOpportunitiesController extends Pathfind
       InfrastructureCollaborationOpportunitiesService infrastructureCollaborationOpportunitiesService,
       InfrastructureCollaborationOpportunitiesSummaryService infrastructureCollaborationOpportunitiesSummaryService,
       ProjectDetailFileService projectDetailFileService,
-      FileDownloadService fileDownloadService
-  ) {
+      FileDownloadService fileDownloadService,
+      ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     super(projectDetailFileService, fileDownloadService);
     this.breadcrumbService = breadcrumbService;
     this.controllerHelperService = controllerHelperService;
     this.infrastructureCollaborationOpportunitiesService = infrastructureCollaborationOpportunitiesService;
     this.infrastructureCollaborationOpportunitiesSummaryService = infrastructureCollaborationOpportunitiesSummaryService;
+    this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
   }
 
   @GetMapping
@@ -163,6 +170,7 @@ public class InfrastructureCollaborationOpportunitiesController extends Pathfind
                                                    @PathVariable("opportunityId") Integer opportunityId,
                                                    ProjectContext projectContext) {
     var opportunity = infrastructureCollaborationOpportunitiesService.getOrError(opportunityId);
+    checkIfUserHasAccessToCollaborationOpportunity(opportunity);
     return getCollaborationOpportunityModelAndView(
         projectContext.getProjectDetails(),
         infrastructureCollaborationOpportunitiesService.getForm(opportunity)
@@ -178,6 +186,7 @@ public class InfrastructureCollaborationOpportunitiesController extends Pathfind
                                                      ValidationType validationType,
                                                      ProjectContext projectContext) {
     var opportunity = infrastructureCollaborationOpportunitiesService.getOrError(opportunityId);
+    checkIfUserHasAccessToCollaborationOpportunity(opportunity);
     bindingResult = infrastructureCollaborationOpportunitiesService.validate(form, bindingResult, validationType);
 
     return controllerHelperService.checkErrorsAndRedirect(
@@ -211,7 +220,7 @@ public class InfrastructureCollaborationOpportunitiesController extends Pathfind
                                                             @PathVariable("displayOrder") Integer displayOrder,
                                                             ProjectContext projectContext) {
     var opportunity = infrastructureCollaborationOpportunitiesService.getOrError(opportunityId);
-
+    checkIfUserHasAccessToCollaborationOpportunity(opportunity);
     var modelAndView = new ModelAndView(
         "project/collaborationopportunities/infrastructure/removeInfrastructureCollaborationOpportunity"
     )
@@ -229,6 +238,7 @@ public class InfrastructureCollaborationOpportunitiesController extends Pathfind
                                                      @PathVariable("displayOrder") Integer displayOrder,
                                                      ProjectContext projectContext) {
     var opportunity = infrastructureCollaborationOpportunitiesService.getOrError(opportunityId);
+    checkIfUserHasAccessToCollaborationOpportunity(opportunity);
     infrastructureCollaborationOpportunitiesService.delete(opportunity);
     AuditService.audit(
         AuditEvent.COLLABORATION_OPPORTUNITY_REMOVED,
@@ -344,5 +354,18 @@ public class InfrastructureCollaborationOpportunitiesController extends Pathfind
         PAGE_NAME_SINGULAR
     );
     return modelAndView;
+  }
+
+  private void checkIfUserHasAccessToCollaborationOpportunity(InfrastructureCollaborationOpportunity opportunity) {
+    if (!projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+        opportunity.getProjectDetail(),
+        new OrganisationGroupIdWrapper(opportunity.getAddedByOrganisationGroup())
+    )) {
+      throw new AccessDeniedException(
+          String.format(
+              "User does not have access to the InfrastructureCollaborationOpportunity with id: %d",
+              opportunity.getId())
+      );
+    }
   }
 }

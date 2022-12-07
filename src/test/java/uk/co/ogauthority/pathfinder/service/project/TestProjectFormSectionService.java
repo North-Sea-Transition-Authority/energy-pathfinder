@@ -15,6 +15,11 @@ public class TestProjectFormSectionService implements ProjectFormSectionService 
   }
 
   @Override
+  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
+    return false;
+  }
+
+  @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
 
   }

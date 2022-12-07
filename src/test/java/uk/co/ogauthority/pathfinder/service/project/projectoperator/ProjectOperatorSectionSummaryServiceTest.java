@@ -137,14 +137,14 @@ public class ProjectOperatorSectionSummaryServiceTest {
 
   @Test
   public void canShowSection_whenCanShowInTaskList_thenTrue() {
-    when(selectOperatorService.canShowInTaskList(details)).thenReturn(true);
+    when(selectOperatorService.isTaskValidForProjectDetail(details)).thenReturn(true);
 
     assertThat(projectOperatorSectionSummaryService.canShowSection(details)).isTrue();
   }
 
   @Test
   public void canShowSection_whenCannotShowInTaskList_thenFalse() {
-    when(selectOperatorService.canShowInTaskList(details)).thenReturn(false);
+    when(selectOperatorService.isTaskValidForProjectDetail(details)).thenReturn(false);
 
     assertThat(projectOperatorSectionSummaryService.canShowSection(details)).isFalse();
   }

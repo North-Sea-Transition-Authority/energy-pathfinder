@@ -47,7 +47,7 @@ public class ProjectLocationSectionSummaryService implements ProjectSectionSumma
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return projectLocationService.canShowInTaskList(detail);
+    return projectLocationService.isTaskValidForProjectDetail(detail);
   }
 
   @Override

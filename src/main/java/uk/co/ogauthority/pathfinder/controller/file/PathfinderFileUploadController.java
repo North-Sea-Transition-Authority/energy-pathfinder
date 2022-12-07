@@ -25,7 +25,6 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 public abstract class PathfinderFileUploadController {
 
   protected final ProjectDetailFileService projectDetailFileService;
-
   protected final FileDownloadService fileDownloadService;
 
   @Autowired

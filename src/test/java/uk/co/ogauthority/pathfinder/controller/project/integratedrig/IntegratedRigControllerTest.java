@@ -72,8 +72,8 @@ public class IntegratedRigControllerTest extends ProjectContextAbstractControlle
     unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
 
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUser)).thenReturn(true);
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, unauthenticatedUser)).thenReturn(false);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, unauthenticatedUser)).thenReturn(false);
 
     when(integratedRigService.getFacilityRestUrl()).thenReturn("testUrl");
     when(integratedRigService.createIntegratedRig(any(), any())).thenReturn(IntegratedRigTestUtil.createIntegratedRig_withDevUkFacility());

@@ -49,6 +49,8 @@ public class ForwardWorkPlanUpcomingTender extends ProjectDetailEntity implement
   @Enumerated(EnumType.STRING)
   private DurationPeriod contractTermDurationPeriod;
 
+  private Integer addedByOrganisationGroup;
+
   public ForwardWorkPlanUpcomingTender() {
   }
 
@@ -160,6 +162,14 @@ public class ForwardWorkPlanUpcomingTender extends ProjectDetailEntity implement
     this.contractTermDurationPeriod = contractTermDurationPeriod;
   }
 
+  public Integer getAddedByOrganisationGroup() {
+    return addedByOrganisationGroup;
+  }
+
+  public void setAddedByOrganisationGroup(Integer addedByOrganisationGroup) {
+    this.addedByOrganisationGroup = addedByOrganisationGroup;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -183,7 +193,8 @@ public class ForwardWorkPlanUpcomingTender extends ProjectDetailEntity implement
         && Objects.equals(emailAddress, that.emailAddress)
         && contractBand == that.contractBand
         && Objects.equals(contractTermDuration, that.contractTermDuration)
-        && contractTermDurationPeriod == that.contractTermDurationPeriod;
+        && contractTermDurationPeriod == that.contractTermDurationPeriod
+        && Objects.equals(addedByOrganisationGroup, that.addedByOrganisationGroup);
   }
 
   @Override
@@ -201,7 +212,8 @@ public class ForwardWorkPlanUpcomingTender extends ProjectDetailEntity implement
         emailAddress,
         contractBand,
         contractTermDuration,
-        contractTermDurationPeriod
+        contractTermDurationPeriod,
+        addedByOrganisationGroup
     );
   }
 }

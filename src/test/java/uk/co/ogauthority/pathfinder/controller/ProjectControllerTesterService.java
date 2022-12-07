@@ -10,6 +10,7 @@ import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUs
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.http.HttpMethod;
@@ -18,13 +19,19 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
+import uk.co.ogauthority.pathfinder.controller.project.annotation.AllowProjectContributorAccess;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.service.project.projectcontribution.ProjectContributorsCommonService;
+import uk.co.ogauthority.pathfinder.service.team.TeamService;
+import uk.co.ogauthority.pathfinder.testutil.ProjectContributorTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 public class ProjectControllerTesterService {
@@ -40,6 +47,10 @@ public class ProjectControllerTesterService {
 
   private final ProjectOperatorService projectOperatorService;
 
+  private final ProjectContributorsCommonService projectContributorsCommonService;
+
+  private final TeamService teamService;
+
   private final Map<String, String> requestParams = new HashMap<>();
 
   private HttpMethod requestMethod;
@@ -54,10 +65,16 @@ public class ProjectControllerTesterService {
 
   private Set<ProjectPermission> requiredPermissions;
 
+  private boolean allowContributorAccess = false;
+
   public ProjectControllerTesterService(MockMvc mockMvc,
-                                        ProjectOperatorService projectOperatorService) {
+                                        ProjectOperatorService projectOperatorService,
+                                        ProjectContributorsCommonService projectContributorsCommonService,
+                                        TeamService teamService) {
     this.projectOperatorService = projectOperatorService;
     this.mockMvc = mockMvc;
+    this.projectContributorsCommonService = projectContributorsCommonService;
+    this.teamService = teamService;
   }
 
   public ProjectControllerTesterService withHttpRequestMethod(HttpMethod requestMethod) {
@@ -103,6 +120,11 @@ public class ProjectControllerTesterService {
     return this;
   }
 
+  public ProjectControllerTesterService withProjectContributorAccess() {
+    allowContributorAccess = true;
+    return this;
+  }
+
   public void smokeTestProjectContextAnnotationsForControllerEndpoint(
       Object controllerMethodToCheck,
       ResultMatcher successMatcher,
@@ -138,6 +160,14 @@ public class ProjectControllerTesterService {
     );
 
     resetProjectDetail(originalProjectType, originalProjectStatus);
+
+    smokeTestProjectContributorAccess(
+        controllerMethodToCheck,
+        successMatcher,
+        failedMatcher
+    );
+
+    resetProjectDetail(originalProjectType, originalProjectStatus);
   }
 
   private void resetProjectDetail(ProjectType projectType, ProjectStatus projectStatus) {
@@ -152,7 +182,7 @@ public class ProjectControllerTesterService {
       ResultMatcher matcherWhenNonPermittedStatus
   ) {
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUserAccount)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUserAccount)).thenReturn(true);
 
     Arrays.asList(ProjectStatus.values()).forEach(projectStatus -> {
 
@@ -185,7 +215,7 @@ public class ProjectControllerTesterService {
       ResultMatcher matcherWhenNonPermittedType
   ) {
 
-    when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUserAccount)).thenReturn(true);
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUserAccount)).thenReturn(true);
 
     Arrays.asList(ProjectType.values()).forEach(projectType -> {
 
@@ -224,7 +254,7 @@ public class ProjectControllerTesterService {
           projectPermission.getUserPrivileges()
       );
 
-      when(projectOperatorService.isUserInProjectTeamOrRegulator(projectDetail, authenticatedUserWithPrivilege)).thenReturn(true);
+      when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUserWithPrivilege)).thenReturn(true);
 
       try {
         final var response = makeRequestWithUser(
@@ -246,6 +276,61 @@ public class ProjectControllerTesterService {
     });
 
     makeRequestWithUnauthenticatedUser(controllerMethodToCheck);
+  }
+
+  public void smokeTestProjectContributorAccess(
+      Object controllerMethodToCheck,
+      ResultMatcher matcherWhenRequiredPermission,
+      ResultMatcher matcherWhenNotRequiredPermission
+  ) {
+    when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUserAccount))
+        .thenReturn(false);
+
+    var hasAllowContributorAccess = hasProjectContributorAnnotation(
+        (MvcUriComponentsBuilder.MethodInvocationInfo) controllerMethodToCheck
+    );
+
+    //If the controller has @AllowProjectContributorAccess the projectControllerTesterService must have allowContributorAccess = true
+    if (hasAllowContributorAccess && !allowContributorAccess) {
+      throw new IllegalStateException("Controller contains @AllowProjectContributorAccess but smoke test was not properly" +
+          " setup to test it. Fix: Use withProjectContributorAccess() when setting your projectControllerTesterService");
+    }
+
+    if (allowContributorAccess) {
+      var organisationGroup = TeamTestingUtil.generateOrganisationGroup(100, "my Org", "org");
+      when(projectContributorsCommonService.getProjectContributorsForDetail(projectDetail)).thenReturn(List.of(
+          ProjectContributorTestUtil.contributorWithGroupOrgId(projectDetail, organisationGroup.getOrgGrpId())
+      ));
+
+      when(teamService.getOrganisationTeamsPersonIsMemberOf(authenticatedUserAccount.getLinkedPerson())).thenReturn(
+          List.of(TeamTestingUtil.getOrganisationTeam(organisationGroup)));
+
+      try {
+        final var response = makeRequestWithUser(
+            controllerMethodToCheck,
+            authenticatedUserAccount
+        );
+        response.andExpect(matcherWhenRequiredPermission);
+      } catch (AssertionError | Exception ex) {
+        throw new AssertionError(
+            String.format("Failed to access endpoint as a contributor %s", ex.getMessage()),
+            ex
+        );
+      }
+    } else {
+      try {
+        final var response = makeRequestWithUser(
+            controllerMethodToCheck,
+            authenticatedUserAccount
+        );
+        response.andExpect(matcherWhenNotRequiredPermission);
+      } catch (AssertionError | Exception ex) {
+        throw new AssertionError(
+            String.format("Failed, access was granted without being a contributor %s", ex.getMessage()),
+            ex
+        );
+      }
+    }
   }
 
   public void makeRequestAndAssertMatcher(
@@ -311,5 +396,10 @@ public class ProjectControllerTesterService {
     } catch (AssertionError | Exception ex) {
       throw new AssertionError(String.format("Unauthenticated check expected 3xx redirect\n %s", ex.getMessage()), ex);
     }
+  }
+
+  private boolean hasProjectContributorAnnotation(MvcUriComponentsBuilder.MethodInvocationInfo controllerMethodToCheck) {
+    return controllerMethodToCheck.getControllerType().isAnnotationPresent(AllowProjectContributorAccess.class)
+        || controllerMethodToCheck.getControllerMethod().isAnnotationPresent(AllowProjectContributorAccess.class);
   }
 }
