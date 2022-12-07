@@ -77,7 +77,7 @@ class UploadFileWithDescriptionFormValidationTest extends AbstractControllerTest
         .forEach(validationType -> { var constraintViolations = validator.validate(form, validationType.getValidationClass());
           if(PERMITTED_VALIDATION_GROUPS.contains(validationType)) {
             assertThat(constraintViolations).extracting(ConstraintViolation::getMessage)
-                .containsExactly(String.format("The file description can not be more than %s characters (currently %s characters)", MAX_DESCRIPTION_SIZE, form.getUploadedFileDescription().length()));
+                .containsExactly(String.format("The file description must be %s characters or fewer", MAX_DESCRIPTION_SIZE));
           } else {
             assertThat(constraintViolations).isEmpty();
           }

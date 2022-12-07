@@ -28,7 +28,7 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 public class FileDownloadControllerTest extends AbstractControllerTest {
 
   @MockBean
-  private FileDownloadService fileDownloadService;
+  FileDownloadService fileDownloadService;
 
   @MockBean
   private FileUploadService fileUploadService;

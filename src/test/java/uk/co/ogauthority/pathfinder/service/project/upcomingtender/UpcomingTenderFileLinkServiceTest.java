@@ -207,6 +207,8 @@ public class UpcomingTenderFileLinkServiceTest {
     projectDetailFile1.setId(1);
 
     final var upcomingTender1 = UpcomingTenderUtil.getUpcomingTender(projectDetail);
+    upcomingTender1.setContactName("upcomingTender1");
+
     final var upcomingTenderFileLink1 = UpcomingTenderFileLinkUtil.createUpcomingTenderFileLink(
         upcomingTender1,
         projectDetailFile1
@@ -220,6 +222,8 @@ public class UpcomingTenderFileLinkServiceTest {
     projectDetailFile1.setId(2);
 
     final var upcomingTender2 = UpcomingTenderUtil.getUpcomingTender(projectDetail);
+    upcomingTender2.setContactName("upcomingTender2");
+
     final var upcomingTenderFileLink2 = UpcomingTenderFileLinkUtil.createUpcomingTenderFileLink(
         upcomingTender2,
         projectDetailFile2

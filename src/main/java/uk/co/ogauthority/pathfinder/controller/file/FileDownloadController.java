@@ -17,8 +17,8 @@ public class FileDownloadController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileDownloadController.class);
 
-  private FileUploadService fileUploadService;
-  private FileDownloadService fileDownloadService;
+  private final FileUploadService fileUploadService;
+  private final FileDownloadService fileDownloadService;
 
   @Autowired
   public FileDownloadController(FileUploadService fileUploadService,

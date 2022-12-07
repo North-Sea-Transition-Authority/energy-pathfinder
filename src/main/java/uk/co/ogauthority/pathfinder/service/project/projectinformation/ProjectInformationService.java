@@ -208,6 +208,11 @@ public class ProjectInformationService implements ProjectFormSectionService {
         .orElse(false);
   }
 
+  public Optional<FieldStage> getFieldStage(ProjectDetail projectDetail) {
+    return getProjectInformation(projectDetail)
+        .map(ProjectInformation::getFieldStage);
+  }
+
   @Override
   public boolean isComplete(ProjectDetail details) {
     var form = getForm(details);

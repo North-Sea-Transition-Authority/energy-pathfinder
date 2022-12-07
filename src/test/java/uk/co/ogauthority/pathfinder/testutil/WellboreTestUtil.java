@@ -29,28 +29,29 @@ public class WellboreTestUtil {
 
   public static List<Wellbore> getOrderedWellbores() {
     return List.of(
-        createWellbore("20/01- 1", "20", "01", "", "", "1", ""),
-        createWellbore("22/01- 1", "22", "01", "", "", "1", ""),
+        createWellbore(1, "20/01- 1", "20", "01", "", "", "1", ""),
+        createWellbore(2, "22/01- 1", "22", "01", "", "", "1", ""),
 
-        createWellbore("24/01- 1", "24", "01", "", "", "1", ""),
-        createWellbore("24/02- 1", "24", "02", "", "", "1", ""),
+        createWellbore(3, "24/01- 1", "24", "01", "", "", "1", ""),
+        createWellbore(4, "24/02- 1", "24", "02", "", "", "1", ""),
 
-        createWellbore("26/01a- 1", "26", "01", "a", "", "1", ""),
-        createWellbore("26/01b- 1", "26", "01", "b", "", "1", ""),
+        createWellbore(5, "26/01a- 1", "26", "01", "a", "", "1", ""),
+        createWellbore(6, "26/01b- 1", "26", "01", "b", "", "1", ""),
 
-        createWellbore("28/01-L1", "28", "01", "", "L", "1", ""),
-        createWellbore("28/01-M1", "28", "01", "", "M", "1", ""),
+        createWellbore(7, "28/01-L1", "28", "01", "", "L", "1", ""),
+        createWellbore(8, "28/01-M1", "28", "01", "", "M", "1", ""),
 
-        createWellbore("30/01- 1", "30", "01", "", "", "1", ""),
-        createWellbore("30/01- 2", "30", "01", "", "", "2", ""),
+        createWellbore(9, "30/01- 1", "30", "01", "", "", "1", ""),
+        createWellbore(10, "30/01- 2", "30", "01", "", "", "2", ""),
 
-        createWellbore("32/01- 1W", "32", "01", "", "", "1", "W"),
-        createWellbore("32/01- 1Y", "32", "01", "", "", "1", "Y")
+        createWellbore(11, "32/01- 1W", "32", "01", "", "", "1", "W"),
+        createWellbore(12, "32/01- 1Y", "32", "01", "", "", "1", "Y")
     );
   }
 
   public static Wellbore createWellbore() {
     return createWellbore(
+        ID,
         REGISTRATION_NO,
         QUADRANT_NUMBER,
         BLOCK_NUMBER,
@@ -61,7 +62,21 @@ public class WellboreTestUtil {
     );
   }
 
-  public static Wellbore createWellbore(String registrationNo,
+  public static Wellbore createWellbore(int id) {
+    return createWellbore(
+        id,
+        REGISTRATION_NO,
+        QUADRANT_NUMBER,
+        BLOCK_NUMBER,
+        BLOCK_SUFFIX,
+        PLATFORM_LETTER,
+        DRILLING_SEQ_NUMBER,
+        WELL_SUFFIX
+    );
+  }
+
+  public static Wellbore createWellbore(int id,
+                                        String registrationNo,
                                         String quadrantNumber,
                                         String blockNumber,
                                         String blockSuffix,
@@ -69,7 +84,7 @@ public class WellboreTestUtil {
                                         String drillingSeqNumber,
                                         String wellSuffix) {
     return new Wellbore(
-        ID,
+        id,
         registrationNo,
         quadrantNumber,
         blockNumber,

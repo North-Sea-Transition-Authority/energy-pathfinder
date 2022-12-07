@@ -50,6 +50,12 @@ public enum ProjectTaskGroup {
       Set.of(ProjectType.INFRASTRUCTURE),
       30
   ),
+  COMMISSIONING_SCHEDULES(
+      "Commissioning schedules",
+      List.of(ProjectTask.COMMISSIONED_WELLS),
+      Set.of(ProjectType.INFRASTRUCTURE),
+      35
+  ),
   DECOMMISSIONING_SCHEDULES(
       "Scope & schedule information",
       List.of(
@@ -80,7 +86,6 @@ public enum ProjectTaskGroup {
       Set.of(ProjectType.FORWARD_WORK_PLAN),
       20
   );
-
 
   private final String displayName;
   private final List<ProjectTask> tasks;

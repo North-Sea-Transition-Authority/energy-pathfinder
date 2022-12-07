@@ -194,7 +194,7 @@ public class ForwardWorkPlanCollaborationOpportunityFileLinkServiceTest {
 
     var projectDetailFile2 = new ProjectDetailFile();
     projectDetailFile1.setId(2);
-    final var collaborationOpportunity2 = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(
+    final var collaborationOpportunity2 = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity_manualEntry(
         ProjectUtil.getProjectDetails()
     );
 

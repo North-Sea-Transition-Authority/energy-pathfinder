@@ -1,16 +1,16 @@
 package uk.co.ogauthority.pathfinder.service.project.setup;
 
-import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +20,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.tasks.ProjectTaskListSetup;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
@@ -58,9 +59,9 @@ public class ProjectSetupServiceTest {
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
 
-  private final ProjectTaskListSetup setup = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_nonDecom(details);
+  private final ProjectTaskListSetup setup = ProjectTaskListSetupTestUtil.getProjectTaskListSetupWithFieldStageIndependentSectionsAnswered(details);
 
-  private final ProjectTaskListSetup decomSetup = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_decomSections(details);
+  private final ProjectTaskListSetup decomSetup = ProjectTaskListSetupTestUtil.getProjectSetupWithDecommissioningSectionsAnswered(details);
 
   @Before
   public void setUp() {
@@ -77,62 +78,67 @@ public class ProjectSetupServiceTest {
   }
 
   @Test
-  public void getSectionQuestionsForProjectDetail() {
-    when(projectInformationService.isDecomRelated(details)).thenReturn(false);
-    var questions = projectSetupService.getSectionQuestionsForProjectDetail(details);
-    assertThat(questions).isEqualTo(TaskListSectionQuestion.getNonDecommissioningRelatedValues());
+  public void getSectionQuestionsForProjectDetail_whenFieldStageSelected_thenReturnOnlySectionsSupportingFieldStage() {
+
+    var selectedFieldStage = FieldStage.DEVELOPMENT;
+
+    var expectedSectionQuestions = Arrays.stream(TaskListSectionQuestion.values())
+        .filter(sectionQuestion -> sectionQuestion.getApplicableFieldStages().contains(selectedFieldStage))
+        .collect(Collectors.toList());
+
+    when(projectInformationService.getFieldStage(details)).thenReturn(Optional.of(selectedFieldStage));
+
+    var resultingSectionQuestions = projectSetupService.getSectionQuestionsForProjectDetail(details);
+
+    assertThat(resultingSectionQuestions).isEqualTo(expectedSectionQuestions);
   }
 
   @Test
-  public void getSectionQuestionsForProjectDetail_decomRelated() {
-    when(projectInformationService.isDecomRelated(details)).thenReturn(true);
-    var questions = projectSetupService.getSectionQuestionsForProjectDetail(details);
-    assertThat(questions).isEqualTo(TaskListSectionQuestion.getAllValues());
+  public void getSectionQuestionsForProjectDetail_whenNoFieldStageSelected_thenReturnOnlySectionsSupportingFieldStage() {
+
+    var expectedSectionQuestions = Arrays.stream(TaskListSectionQuestion.values())
+        .filter(sectionQuestion -> sectionQuestion.getApplicableFieldStages().containsAll(Set.of(FieldStage.values())))
+        .collect(Collectors.toList());
+
+    when(projectInformationService.getFieldStage(details)).thenReturn(Optional.empty());
+
+    var resultingSectionQuestions = projectSetupService.getSectionQuestionsForProjectDetail(details);
+
+    assertThat(resultingSectionQuestions).isEqualTo(expectedSectionQuestions);
   }
 
   @Test
   public void getProjectSetupModelAndView() {
-    when(projectInformationService.isDecomRelated(details)).thenReturn(false);
-    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm_nonDecom();
+
+    var form = new ProjectSetupForm();
+
     var modelAndView = projectSetupService.getProjectSetupModelAndView(details, form);
 
     assertThat(modelAndView.getViewName()).isEqualTo(ProjectSetupService.MODEL_AND_VIEW_PATH);
-    assertThat(modelAndView.getModel()).contains(
-        entry("sections", TaskListSectionQuestion.getNonDecommissioningRelatedValues()),
-        entry("form", form)
-    );
-  }
 
-  @Test
-  public void getProjectSetupModelAndView_decomRelated() {
-    when(projectInformationService.isDecomRelated(details)).thenReturn(true);
-    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm_nonDecom();
-    var modelAndView = projectSetupService.getProjectSetupModelAndView(details, form);
+    var modelMap = modelAndView.getModel();
 
-    assertThat(modelAndView.getViewName()).isEqualTo(ProjectSetupService.MODEL_AND_VIEW_PATH);
-    assertThat(modelAndView.getModel()).contains(
-        entry("sections", TaskListSectionQuestion.getAllValues()),
-        entry("form", form)
-    );
+    assertThat(modelMap).containsOnlyKeys("sections", "form");
+    assertThat(modelMap.get("sections")).isNotNull();
   }
 
   @Test
   public void createOrUpdateProjectTaskListSetup() {
     when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
-    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm_nonDecom();
+    var form = ProjectTaskListSetupTestUtil.getProjectSetupFormWithFieldStageIndependentSectionsAnswered();
     var projectTaskListSetup = projectSetupService.createOrUpdateProjectTaskListSetup(details, form);
-    assertThat(projectTaskListSetup.getTaskListSections()).containsExactlyInAnyOrderElementsOf(ProjectTaskListSetupTestUtil.NON_DECOM_SECTIONS);
-    assertThat(projectTaskListSetup.getTaskListAnswers()).containsExactlyInAnyOrderElementsOf(ProjectTaskListSetupTestUtil.NON_DECOM_ANSWERS);
+    assertThat(projectTaskListSetup.getTaskListSections()).containsExactlyInAnyOrderElementsOf(ProjectTaskListSetupTestUtil.FIELD_STAGE_INDEPENDENT_SECTIONS);
+    assertThat(projectTaskListSetup.getTaskListAnswers()).containsExactlyInAnyOrderElementsOf(ProjectTaskListSetupTestUtil.FIELD_STAGE_INDEPENDENT_SETUP_ANSWERS);
     assertThat(projectTaskListSetup.getProjectDetail()).isEqualTo(details);
   }
 
   @Test
   public void createOrUpdateProjectTaskListSetup_decomRelated() {
     when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
-    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm_withDecomSections();
+    var form = ProjectTaskListSetupTestUtil.getProjectSetupFormWithDecommissioningSectionsAnswered();
     var projectTaskListSetup = projectSetupService.createOrUpdateProjectTaskListSetup(details, form);
-    assertThat(projectTaskListSetup.getTaskListSections()).containsExactlyInAnyOrderElementsOf(ProjectTaskListSetupTestUtil.DECOM_SECTIONS);
-    assertThat(projectTaskListSetup.getTaskListAnswers()).containsExactlyInAnyOrderElementsOf(ProjectTaskListSetupTestUtil.DECOM_ANSWERS);
+    assertThat(projectTaskListSetup.getTaskListSections()).containsExactlyInAnyOrderElementsOf(ProjectTaskListSetupTestUtil.DECOMMISSIONING_FIELD_STAGE_SECTIONS);
+    assertThat(projectTaskListSetup.getTaskListAnswers()).containsExactlyInAnyOrderElementsOf(ProjectTaskListSetupTestUtil.DECOMMISSIONING_FIELD_STAGE_SETUP_ANSWERS);
     assertThat(projectTaskListSetup.getProjectDetail()).isEqualTo(details);
   }
 
@@ -141,10 +147,10 @@ public class ProjectSetupServiceTest {
     when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(
         Optional.of(decomSetup)
     );
-    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm_nonDecom();
+    var form = ProjectTaskListSetupTestUtil.getProjectSetupFormWithFieldStageIndependentSectionsAnswered();
     var projectTaskListSetup = projectSetupService.createOrUpdateProjectTaskListSetup(details, form);
-    assertThat(projectTaskListSetup.getTaskListSections()).containsExactlyInAnyOrderElementsOf(ProjectTaskListSetupTestUtil.NON_DECOM_SECTIONS);
-    assertThat(projectTaskListSetup.getTaskListAnswers()).containsExactlyInAnyOrderElementsOf(ProjectTaskListSetupTestUtil.NON_DECOM_ANSWERS);
+    assertThat(projectTaskListSetup.getTaskListSections()).containsExactlyInAnyOrderElementsOf(ProjectTaskListSetupTestUtil.FIELD_STAGE_INDEPENDENT_SECTIONS);
+    assertThat(projectTaskListSetup.getTaskListAnswers()).containsExactlyInAnyOrderElementsOf(ProjectTaskListSetupTestUtil.FIELD_STAGE_INDEPENDENT_SETUP_ANSWERS);
     assertThat(projectTaskListSetup.getProjectDetail()).isEqualTo(details);
   }
 
@@ -161,7 +167,7 @@ public class ProjectSetupServiceTest {
         Optional.of(setup)
       );
     var form = projectSetupService.getForm(details);
-    checkCommonFieldsMatch(ProjectTaskListSetupTestUtil.getProjectSetupForm_nonDecom(), form);
+    checkCommonFieldsMatch(ProjectTaskListSetupTestUtil.getProjectSetupFormWithFieldStageIndependentSectionsAnswered(), form);
   }
 
   @Test
@@ -170,22 +176,22 @@ public class ProjectSetupServiceTest {
         Optional.of(decomSetup)
     );
     var form = projectSetupService.getForm(details);
-    checkCommonFieldsMatch(ProjectTaskListSetupTestUtil.getProjectSetupForm_withDecomSections(), form);
+    checkCommonFieldsMatch(ProjectTaskListSetupTestUtil.getProjectSetupFormWithDecommissioningSectionsAnswered(), form);
   }
 
   @Test
   public void getTaskListSectionQuestionsForForm() {
-    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm_nonDecom();
+    var form = ProjectTaskListSetupTestUtil.getProjectSetupFormWithFieldStageIndependentSectionsAnswered();
     assertThat(projectSetupService.getTaskListSectionQuestionsFromForm(form)).containsExactlyInAnyOrderElementsOf(
-        ProjectTaskListSetupTestUtil.NON_DECOM_SECTIONS
+        ProjectTaskListSetupTestUtil.FIELD_STAGE_INDEPENDENT_SECTIONS
     );
   }
 
   @Test
   public void getTaskListSectionQuestionsForForm_decomRelated() {
-    var form = ProjectTaskListSetupTestUtil.getProjectSetupForm_withDecomSections();
+    var form = ProjectTaskListSetupTestUtil.getProjectSetupFormWithDecommissioningSectionsAnswered();
     assertThat(projectSetupService.getTaskListSectionQuestionsFromForm(form)).containsExactlyInAnyOrderElementsOf(
-        ProjectTaskListSetupTestUtil.DECOM_SECTIONS
+        ProjectTaskListSetupTestUtil.DECOMMISSIONING_FIELD_STAGE_SECTIONS
     );
   }
 
@@ -221,63 +227,49 @@ public class ProjectSetupServiceTest {
     verify(validationService, times(1)).validate(form, bindingResult, ValidationType.FULL);
   }
 
-
   @Test
-  public void removeDecomSelectionsIfPresent() {
-    var setupToTest = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_nonDecom(details);
-    var answerList = new ArrayList<>(ProjectTaskListSetupTestUtil.NON_DECOM_ANSWERS);
-    var sectionList = new ArrayList<>(ProjectTaskListSetupTestUtil.NON_DECOM_SECTIONS);
-    setupToTest.setTaskListAnswers(answerList);
-    setupToTest.setTaskListSections(sectionList);
+  public void removeTaskListSetupSectionsNotApplicableToFieldStage_whenNoSetupSectionFound_thenNoDatabaseInteraction() {
 
-    when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(
-        Optional.of(setupToTest)
-    );
+    when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
 
-    projectSetupService.removeDecomSelectionsIfPresent(details);
+    projectSetupService.removeTaskListSetupSectionsNotApplicableToFieldStage(details, FieldStage.DEVELOPMENT);
 
-    assertThat(setupToTest.getTaskListSections()).containsExactlyInAnyOrderElementsOf(setupToTest.getTaskListSections());
-    assertThat(setupToTest.getTaskListAnswers()).containsExactlyInAnyOrderElementsOf(setupToTest.getTaskListAnswers());
+    verify(projectTaskListSetupRepository, never()).save(any());
   }
 
   @Test
-  public void removeDecomSelectionsIfPresent_decomRelated() {
-    var setupToTest = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_decomSections(details);
-    var answerList = new ArrayList<>(ProjectTaskListSetupTestUtil.DECOM_ANSWERS);
-    var sectionList = new ArrayList<>(ProjectTaskListSetupTestUtil.DECOM_SECTIONS);
-    setupToTest.setTaskListAnswers(answerList);
-    setupToTest.setTaskListSections(sectionList);
+  public void removeTaskListSetupSectionsNotApplicableToFieldStage_whenSectionsNotApplicableFound_thenVerifyCorrectSectionsAreRemoved() {
 
-    var setupToCompare = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_nonDecom(details);
-    when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(
-        Optional.of(setupToTest)
-    );
+    var nonDecommissioningFieldStage = FieldStage.ENERGY_TRANSITION;
 
-    projectSetupService.removeDecomSelectionsIfPresent(details);
+    var decommissioningFieldStageSetupEntityToTest = createProjectTaskListSetupEntityWithFieldStageSection(FieldStage.DECOMMISSIONING);
 
-    assertThat(setupToTest.getTaskListSections()).containsExactlyInAnyOrderElementsOf(setupToCompare.getTaskListSections());
-    assertThat(setupToTest.getTaskListAnswers()).containsExactlyInAnyOrderElementsOf(setupToCompare.getTaskListAnswers());
+    when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(Optional.of(decommissioningFieldStageSetupEntityToTest));
+
+    projectSetupService.removeTaskListSetupSectionsNotApplicableToFieldStage(details, nonDecommissioningFieldStage);
+
+    // the saved entity should be the same as this one e.g. with the decommissioning related sections removed
+    var nonDecommissioningFieldStageSetupEntity = createProjectTaskListSetupEntityWithFieldStageSection(nonDecommissioningFieldStage);
+
+    verify(projectTaskListSetupRepository, times(1)).save(nonDecommissioningFieldStageSetupEntity);
   }
 
-  @Test
-  public void removeDecomSelectionsIfPresent_onlyDecomRelated() {
-    var setupToTest = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_decomSections(details);
-    var answerList = new ArrayList<>(ProjectTaskListSetupTestUtil.ONLY_DECOM_ANSWERS);
-    var sectionList = new ArrayList<>(ProjectTaskListSetupTestUtil.ONLY_DECOM_SECTIONS);
-    setupToTest.setTaskListAnswers(answerList);
-    setupToTest.setTaskListSections(sectionList);
+  private ProjectTaskListSetup createProjectTaskListSetupEntityWithFieldStageSection(FieldStage fieldStage) {
 
-    var setupToCompare = new ProjectTaskListSetup(details);
-    setupToCompare.setTaskListAnswers(Collections.emptyList());
-    setupToCompare.setTaskListSections(Collections.emptyList());
-    when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(
-        Optional.of(setupToTest)
-    );
+    var taskListSectionsForFieldStage = Arrays.stream(TaskListSectionQuestion.values())
+        .filter(sectionQuestion -> sectionQuestion.getApplicableFieldStages().contains(fieldStage))
+        .collect(Collectors.toList());
 
-    projectSetupService.removeDecomSelectionsIfPresent(details);
+    var taskListAnswers = taskListSectionsForFieldStage
+        .stream()
+        .map(TaskListSectionQuestion::getYesAnswer)
+        .collect(Collectors.toList());
 
-    assertThat(setupToTest.getTaskListSections()).containsExactlyInAnyOrderElementsOf(setupToCompare.getTaskListSections());
-    assertThat(setupToTest.getTaskListAnswers()).containsExactlyInAnyOrderElementsOf(setupToCompare.getTaskListAnswers());
+    var sectionsSetupEntity = new ProjectTaskListSetup(details);
+    sectionsSetupEntity.setTaskListSections(taskListSectionsForFieldStage);
+    sectionsSetupEntity.setTaskListAnswers(taskListAnswers);
+
+    return sectionsSetupEntity;
   }
 
   @Test
@@ -293,7 +285,7 @@ public class ProjectSetupServiceTest {
     final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
     final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
 
-    final var fromTaskListSetup = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_nonDecom(fromProjectDetail);
+    final var fromTaskListSetup = ProjectTaskListSetupTestUtil.getProjectSetupWithDecommissioningSectionsAnswered(fromProjectDetail);
     when(projectTaskListSetupRepository.findByProjectDetail(fromProjectDetail)).thenReturn(Optional.of(fromTaskListSetup));
 
     projectSetupService.copySectionData(fromProjectDetail, toProjectDetail);

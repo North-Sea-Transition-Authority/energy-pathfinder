@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.entity.project;
 
+import java.util.Objects;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -46,4 +47,24 @@ public abstract class ProjectDetailEntity implements ChildEntity<Integer, Projec
     return getProjectDetail();
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ProjectDetailEntity)) {
+      return false;
+    }
+    ProjectDetailEntity that = (ProjectDetailEntity) o;
+    return Objects.equals(id, that.id)
+        && Objects.equals(projectDetail, that.projectDetail);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        id,
+        projectDetail
+    );
+  }
 }

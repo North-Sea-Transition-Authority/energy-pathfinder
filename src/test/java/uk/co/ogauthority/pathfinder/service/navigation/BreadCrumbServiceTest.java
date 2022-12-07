@@ -14,6 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
+import uk.co.ogauthority.pathfinder.controller.project.commissionedwell.CommissionedWellController;
 import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderController;
 import uk.co.ogauthority.pathfinder.controller.projectmanagement.ManageProjectController;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -138,6 +139,36 @@ public class BreadCrumbServiceTest {
         ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class)
             .viewCollaborationOpportunities(projectId, null)),
         ForwardWorkPlanCollaborationOpportunityModelService.PAGE_NAME
+    );
+
+    assertModelAndViewProperties(
+        modelAndView,
+        expectedBreadCrumbMap,
+        currentPageName
+    );
+  }
+
+  @Test
+  public void fromCommissionedWells() {
+
+    final var modelAndView = new ModelAndView();
+    final var currentPageName = "current page";
+    final var projectId = 1;
+
+    breadcrumbService.fromCommissionedWells(projectId, modelAndView, currentPageName);
+
+    final var expectedBreadCrumbMap = new LinkedHashMap<String, String>();
+    expectedBreadCrumbMap.put(
+        ReverseRouter.route(on(WorkAreaController.class).getWorkArea(null, null)),
+        BreadcrumbService.WORK_AREA_CRUMB_PROMPT
+    );
+    expectedBreadCrumbMap.put(
+        ReverseRouter.route(on(TaskListController.class).viewTaskList(projectId, null)),
+        BreadcrumbService.TASK_LIST_CRUMB_PROMPT
+    );
+    expectedBreadCrumbMap.put(
+        ReverseRouter.route(on(CommissionedWellController.class).viewWellsToCommission(projectId, null)),
+        CommissionedWellController.TASK_LIST_NAME
     );
 
     assertModelAndViewProperties(

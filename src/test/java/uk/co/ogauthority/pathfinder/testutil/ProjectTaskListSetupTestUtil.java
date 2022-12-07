@@ -13,14 +13,14 @@ import uk.co.ogauthority.pathfinder.model.form.project.setup.ProjectSetupForm;
  */
 public class ProjectTaskListSetupTestUtil {
 
-  public static final List<TaskListSectionQuestion> NON_DECOM_SECTIONS = List.of(
+  public static final List<TaskListSectionQuestion> FIELD_STAGE_INDEPENDENT_SECTIONS = List.of(
       TaskListSectionQuestion.PROJECT_CONTRIBUTORS,
       TaskListSectionQuestion.AWARDED_CONTRACTS,
       TaskListSectionQuestion.UPCOMING_TENDERS,
       TaskListSectionQuestion.CAMPAIGN_INFORMATION
   );
 
-  public static final List<TaskListSectionAnswer> NON_DECOM_ANSWERS = List.of(
+  public static final List<TaskListSectionAnswer> FIELD_STAGE_INDEPENDENT_SETUP_ANSWERS = List.of(
       TaskListSectionAnswer.PROJECT_CONTRIBUTORS_YES,
       TaskListSectionAnswer.AWARDED_CONTRACTS_YES,
       TaskListSectionAnswer.UPCOMING_TENDERS_YES,
@@ -28,7 +28,7 @@ public class ProjectTaskListSetupTestUtil {
       TaskListSectionAnswer.CAMPAIGN_INFORMATION_YES
   );
 
-  public static final List<TaskListSectionQuestion> DECOM_SECTIONS = List.of(
+  public static final List<TaskListSectionQuestion> DECOMMISSIONING_FIELD_STAGE_SECTIONS = List.of(
       TaskListSectionQuestion.PROJECT_CONTRIBUTORS,
       TaskListSectionQuestion.UPCOMING_TENDERS,
       TaskListSectionQuestion.AWARDED_CONTRACTS,
@@ -37,7 +37,7 @@ public class ProjectTaskListSetupTestUtil {
       TaskListSectionQuestion.SUBSEA_INFRASTRUCTURE
   );
 
-  public static final List<TaskListSectionAnswer> DECOM_ANSWERS = List.of(
+  public static final List<TaskListSectionAnswer> DECOMMISSIONING_FIELD_STAGE_SETUP_ANSWERS = List.of(
       TaskListSectionAnswer.PROJECT_CONTRIBUTORS_YES,
       TaskListSectionAnswer.UPCOMING_TENDERS_YES,
       TaskListSectionAnswer.AWARDED_CONTRACTS_YES,
@@ -50,47 +50,46 @@ public class ProjectTaskListSetupTestUtil {
       // TaskListSectionAnswer.PIPELINES_NO // Pipelines disabled: PAT-457
   );
 
-  public static final List<TaskListSectionAnswer> ONLY_DECOM_ANSWERS = List.of(
-      TaskListSectionAnswer.WELLS_YES,
-      TaskListSectionAnswer.PLATFORM_FPSO_NO,
-      TaskListSectionAnswer.INTEGRATED_RIGS_NO,
-      TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES
-      // TaskListSectionAnswer.PIPELINES_NO // Pipelines disabled: PAT-457
-  );
-
-  public static final List<TaskListSectionQuestion> ONLY_DECOM_SECTIONS = List.of(
-      TaskListSectionQuestion.WELLS,
-      TaskListSectionQuestion.SUBSEA_INFRASTRUCTURE
-  );
-
-
-  public static ProjectTaskListSetup getProjectTaskListSetup_nonDecom(ProjectDetail detail) {
+  public static ProjectTaskListSetup getProjectTaskListSetupWithFieldStageIndependentSectionsAnswered(ProjectDetail detail) {
     var setup = new ProjectTaskListSetup(detail);
-    setup.setTaskListAnswers(NON_DECOM_ANSWERS);
-    setup.setTaskListSections(NON_DECOM_SECTIONS);
+    setup.setTaskListAnswers(FIELD_STAGE_INDEPENDENT_SETUP_ANSWERS);
+    setup.setTaskListSections(FIELD_STAGE_INDEPENDENT_SECTIONS);
     return setup;
   }
 
-  public static ProjectTaskListSetup getProjectTaskListSetup_decomSections(ProjectDetail detail) {
+  public static ProjectTaskListSetup getProjectSetupWithDecommissioningSectionsAnswered(ProjectDetail detail) {
     var setup = new ProjectTaskListSetup(detail);
-    setup.setTaskListAnswers(DECOM_ANSWERS);
-    setup.setTaskListSections(DECOM_SECTIONS);
+    setup.setTaskListAnswers(DECOMMISSIONING_FIELD_STAGE_SETUP_ANSWERS);
+    setup.setTaskListSections(DECOMMISSIONING_FIELD_STAGE_SECTIONS);
     return setup;
   }
 
-  public static ProjectSetupForm getProjectSetupForm_nonDecom() {
+  public static ProjectSetupForm getProjectSetupFormWithFieldStageIndependentSectionsAnswered() {
     var form = new ProjectSetupForm();
     setCommonFields(form);
     return form;
   }
 
-  public static ProjectSetupForm getProjectSetupForm_withDecomSections(){
-    var form = getProjectSetupForm_nonDecom();
+  public static ProjectSetupForm getProjectSetupFormWithDecommissioningSectionsAnswered() {
+    var form = new ProjectSetupForm();
+    setCommonFields(form);
     form.setWellsIncluded(TaskListSectionAnswer.WELLS_YES);
     form.setPlatformsFpsosIncluded(TaskListSectionAnswer.PLATFORM_FPSO_NO);
     form.setSubseaInfrastructureIncluded(TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES);
     form.setIntegratedRigsIncluded(TaskListSectionAnswer.INTEGRATED_RIGS_NO);
     // form.setPipelinesIncluded(TaskListSectionAnswer.PIPELINES_NO); // Pipelines disabled: PAT-457
+    return form;
+  }
+
+  public static ProjectSetupForm getProjectSetupFormWithAllSectionsAnswered() {
+    var form = new ProjectSetupForm();
+    setCommonFields(form);
+    form.setWellsIncluded(TaskListSectionAnswer.WELLS_YES);
+    form.setPlatformsFpsosIncluded(TaskListSectionAnswer.PLATFORM_FPSO_NO);
+    form.setSubseaInfrastructureIncluded(TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES);
+    form.setIntegratedRigsIncluded(TaskListSectionAnswer.INTEGRATED_RIGS_NO);
+    // form.setPipelinesIncluded(TaskListSectionAnswer.PIPELINES_NO); // Pipelines disabled: PAT-457
+    form.setCommissionedWellsIncluded(TaskListSectionAnswer.COMMISSION_WELLS_YES);
     return form;
   }
 

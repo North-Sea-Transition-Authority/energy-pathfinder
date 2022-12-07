@@ -30,7 +30,9 @@ public enum AuditEvent {
   WORK_PLAN_UPCOMING_TENDER_REMOVED(AuditLevel.INFO, "Work plan upcoming tender with id: %d removed for projectDetail with id: %d"),
   WORK_PLAN_COLLABORATION_UPDATED(AuditLevel.INFO, "Work plan collaboration opportunity with id: %d updated for projectDetail with id: %d"),
   WORK_PLAN_COLLABORATION_REMOVED(AuditLevel.INFO, "Work plan collaboration opportunity with id: %d removed for projectDetail with id: %d"),
-  CAMPAIGN_INFORMATION_UPDATED(AuditLevel.INFO, "Campaign information with id: %d updated for projectDetail with id: %d");
+  CAMPAIGN_INFORMATION_UPDATED(AuditLevel.INFO, "Campaign information with id: %d updated for projectDetail with id: %d"),
+  COMMISSIONED_WELL_SCHEDULE_UPDATED(AuditLevel.INFO, "Commissioned well schedule with id: %d updated for projectDetail with id: %d"),
+  COMMISSIONED_WELL_SCHEDULE_REMOVED(AuditLevel.INFO, "Commissioned well schedule with id: %d removed for projectDetail with id: %d");
 
   private final AuditLevel auditLevel;
   private final String message;

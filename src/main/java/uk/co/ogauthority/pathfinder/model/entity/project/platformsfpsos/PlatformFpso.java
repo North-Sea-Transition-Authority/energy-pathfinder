@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos;
 
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -189,5 +190,43 @@ public class PlatformFpso extends ProjectDetailEntity {
 
   public void setFuturePlans(FuturePlans futurePlans) {
     this.futurePlans = futurePlans;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof PlatformFpso)) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    PlatformFpso that = (PlatformFpso) o;
+    return infrastructureType == that.infrastructureType
+        && Objects.equals(structure, that.structure)
+        && Objects.equals(manualStructureName, that.manualStructureName)
+        && Objects.equals(topsideFpsoMass, that.topsideFpsoMass)
+        && Objects.equals(earliestRemovalYear, that.earliestRemovalYear)
+        && Objects.equals(latestRemovalYear, that.latestRemovalYear)
+        && Objects.equals(substructuresExpectedToBeRemoved, that.substructuresExpectedToBeRemoved)
+        && substructureRemovalPremise == that.substructureRemovalPremise
+        && Objects.equals(substructureRemovalMass, that.substructureRemovalMass)
+        && Objects.equals(subStructureRemovalEarliestYear, that.subStructureRemovalEarliestYear)
+        && Objects.equals(subStructureRemovalLatestYear, that.subStructureRemovalLatestYear)
+        && Objects.equals(fpsoType, that.fpsoType)
+        && Objects.equals(fpsoDimensions, that.fpsoDimensions)
+        && futurePlans == that.futurePlans;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), infrastructureType, structure, manualStructureName, topsideFpsoMass,
+        earliestRemovalYear, latestRemovalYear, substructuresExpectedToBeRemoved, substructureRemovalPremise,
+        substructureRemovalMass, subStructureRemovalEarliestYear, subStructureRemovalLatestYear, fpsoType,
+        fpsoDimensions,
+        futurePlans);
   }
 }

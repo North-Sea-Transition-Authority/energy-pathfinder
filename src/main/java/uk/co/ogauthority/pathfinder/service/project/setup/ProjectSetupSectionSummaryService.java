@@ -11,7 +11,6 @@ import uk.co.ogauthority.pathfinder.controller.project.setup.ProjectSetupControl
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionAnswer;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionQuestion;
 import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.setup.ProjectSetupSummaryItem;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
@@ -93,27 +92,21 @@ public class ProjectSetupSectionSummaryService implements ProjectSectionSummaryS
   }
 
   protected List<ProjectSetupSummaryItem> getSummaryItems(ProjectDetail projectDetail) {
-    var answers = getAllSummaryItems(projectSetupService.isDecomRelated(projectDetail));
+
+    var setupSummaryItems = projectSetupService.getSectionQuestionsForProjectDetail(projectDetail)
+        .stream()
+        .map(sectionQuestion -> new ProjectSetupSummaryItem(sectionQuestion, sectionQuestion.getPrompt()))
+        .collect(Collectors.toList());
 
     projectSetupService.getProjectTaskListSetup(projectDetail).ifPresent(
-        ts -> ts.getTaskListAnswers().forEach(
-            a -> setAnswer(a, answers)
+        taskListSetup -> taskListSetup.getTaskListAnswers().forEach(
+            taskListSectionAnswer -> setAnswer(taskListSectionAnswer, setupSummaryItems)
         ));
 
-    return answers;
+    return setupSummaryItems;
   }
 
-  private List<ProjectSetupSummaryItem> getAllSummaryItems(boolean isDecomRelated) {
-    var items = isDecomRelated
-        ? TaskListSectionQuestion.getAllValues()
-        : TaskListSectionQuestion.getNonDecommissioningRelatedValues();
-
-    return items.stream()
-        .map(tlq -> new ProjectSetupSummaryItem(tlq, tlq.getPrompt()))
-        .collect(Collectors.toList());
-  }
-
-  //For the given answer set it's value in the list
+  //For the given answer set its value in the list
   private void setAnswer(TaskListSectionAnswer answer, List<ProjectSetupSummaryItem> summaryItems) {
     summaryItems.stream()
         .filter(si -> si.getQuestion().getYesAnswer().equals(answer) || si.getQuestion().getNoAnswer().equals(answer))

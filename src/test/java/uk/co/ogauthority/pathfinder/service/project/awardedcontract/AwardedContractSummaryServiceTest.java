@@ -77,7 +77,7 @@ public class AwardedContractSummaryServiceTest {
   public void getValidatedAwardedContractViews() {
 
     var awardedContract1 = AwardedContractTestUtil.createAwardedContract();
-    var awardedContract2 = AwardedContractTestUtil.createAwardedContract();
+    var awardedContract2 = AwardedContractTestUtil.createAwardedContract_withManualEntryFunction("function");
 
     var projectDetail = awardedContract1.getProjectDetail();
 

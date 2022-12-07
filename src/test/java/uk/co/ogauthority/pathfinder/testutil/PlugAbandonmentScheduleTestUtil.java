@@ -27,10 +27,17 @@ public class PlugAbandonmentScheduleTestUtil {
   }
 
   public static PlugAbandonmentSchedule createPlugAbandonmentSchedule() {
+    return createPlugAbandonmentSchedule(
+        EARLIEST_PLUG_ABANDONMENT_START_YEAR,
+        LATEST_PLUG_ABANDONMENT_COMPLETION_YEAR
+    );
+  }
+
+  public static PlugAbandonmentSchedule createPlugAbandonmentSchedule(int earliestStartYear, int latestStartYear) {
     var plugAbandonmentSchedule = new PlugAbandonmentSchedule();
     plugAbandonmentSchedule.setProjectDetail(ProjectUtil.getProjectDetails());
-    plugAbandonmentSchedule.setEarliestStartYear(EARLIEST_PLUG_ABANDONMENT_START_YEAR);
-    plugAbandonmentSchedule.setLatestCompletionYear(LATEST_PLUG_ABANDONMENT_COMPLETION_YEAR);
+    plugAbandonmentSchedule.setEarliestStartYear(earliestStartYear);
+    plugAbandonmentSchedule.setLatestCompletionYear(latestStartYear);
     return plugAbandonmentSchedule;
   }
 

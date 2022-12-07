@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender;
 
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -167,5 +168,52 @@ public class ForwardWorkPlanUpcomingTender extends ProjectDetailEntity implement
 
   public void setAddedByOrganisationGroup(Integer addedByOrganisationGroup) {
     this.addedByOrganisationGroup = addedByOrganisationGroup;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ForwardWorkPlanUpcomingTender)) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    ForwardWorkPlanUpcomingTender that = (ForwardWorkPlanUpcomingTender) o;
+    return departmentType == that.departmentType
+        && Objects.equals(manualDepartmentType, that.manualDepartmentType)
+        && Objects.equals(descriptionOfWork, that.descriptionOfWork)
+        && estimatedTenderDateQuarter == that.estimatedTenderDateQuarter
+        && Objects.equals(estimatedTenderDateYear, that.estimatedTenderDateYear)
+        && Objects.equals(contactName, that.contactName)
+        && Objects.equals(phoneNumber, that.phoneNumber)
+        && Objects.equals(jobTitle, that.jobTitle)
+        && Objects.equals(emailAddress, that.emailAddress)
+        && contractBand == that.contractBand
+        && Objects.equals(contractTermDuration, that.contractTermDuration)
+        && contractTermDurationPeriod == that.contractTermDurationPeriod
+        && Objects.equals(addedByOrganisationGroup, that.addedByOrganisationGroup);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        super.hashCode(),
+        departmentType,
+        manualDepartmentType,
+        descriptionOfWork,
+        estimatedTenderDateQuarter,
+        estimatedTenderDateYear,
+        contactName,
+        phoneNumber,
+        jobTitle,
+        emailAddress,
+        contractBand,
+        contractTermDuration,
+        contractTermDurationPeriod,
+        addedByOrganisationGroup
+    );
   }
 }

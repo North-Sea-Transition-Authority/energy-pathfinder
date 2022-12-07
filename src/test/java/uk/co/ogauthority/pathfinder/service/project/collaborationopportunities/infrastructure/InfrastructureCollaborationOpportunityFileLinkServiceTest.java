@@ -193,7 +193,7 @@ public class InfrastructureCollaborationOpportunityFileLinkServiceTest {
 
     var projectDetailFile2 = new ProjectDetailFile();
     projectDetailFile1.setId(2);
-    final var collaborationOpportunity2 = InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(
+    final var collaborationOpportunity2 = InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity_manualEntry(
         ProjectUtil.getProjectDetails()
     );
 

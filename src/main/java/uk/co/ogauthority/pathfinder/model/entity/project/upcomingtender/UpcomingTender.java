@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -138,5 +139,46 @@ public class UpcomingTender
   public void setAddedByOrganisationGroup(
       Integer portalOrganisationGroupId) {
     this.addedByOrganisationGroup = portalOrganisationGroupId;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof UpcomingTender)) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    UpcomingTender that = (UpcomingTender) o;
+    return tenderFunction == that.tenderFunction
+        && Objects.equals(manualTenderFunction, that.manualTenderFunction)
+        && Objects.equals(descriptionOfWork, that.descriptionOfWork)
+        && Objects.equals(estimatedTenderDate, that.estimatedTenderDate)
+        && contractBand == that.contractBand
+        && Objects.equals(contactName, that.contactName)
+        && Objects.equals(phoneNumber, that.phoneNumber)
+        && Objects.equals(jobTitle, that.jobTitle)
+        && Objects.equals(emailAddress, that.emailAddress)
+        && Objects.equals(addedByOrganisationGroup, that.addedByOrganisationGroup)
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        super.hashCode(),
+        tenderFunction,
+        manualTenderFunction,
+        descriptionOfWork,
+        estimatedTenderDate,
+        contractBand,
+        contactName,
+        phoneNumber,
+        jobTitle,
+        emailAddress,
+        addedByOrganisationGroup
+    );
   }
 }

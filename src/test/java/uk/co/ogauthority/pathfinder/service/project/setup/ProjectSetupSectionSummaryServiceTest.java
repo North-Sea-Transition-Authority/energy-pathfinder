@@ -7,9 +7,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +23,6 @@ import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
-import uk.co.ogauthority.pathfinder.testutil.ProjectTaskListSetupTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -43,10 +44,6 @@ public class ProjectSetupSectionSummaryServiceTest {
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
 
-  private final ProjectTaskListSetup setup = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_nonDecom(details);
-
-  private final ProjectTaskListSetup decomSetup = ProjectTaskListSetupTestUtil.getProjectTaskListSetup_decomSections(details);
-
   @Before
   public void setUp() throws Exception {
     projectSetupSectionSummaryService = new ProjectSetupSectionSummaryService(
@@ -60,7 +57,7 @@ public class ProjectSetupSectionSummaryServiceTest {
   @Test
   public void getSummary() {
     when(projectSetupService.getProjectTaskListSetup(details)).thenReturn(Optional.empty());
-    when(projectSetupService.isDecomRelated(details)).thenReturn(false);
+
     var summary = projectSetupSectionSummaryService.getSummary(details);
     var modelMap = summary.getTemplateModel();
 
@@ -86,57 +83,67 @@ public class ProjectSetupSectionSummaryServiceTest {
   }
 
   @Test
-  public void getSummaryItems_noQuestionAnswered_nonDecom() {
-    when(projectSetupService.getProjectTaskListSetup(details)).thenReturn(Optional.empty());
-    when(projectSetupService.isDecomRelated(details)).thenReturn(false);
-    var summaryItems = projectSetupSectionSummaryService.getSummaryItems(details);
+  public void getSummaryItems_whenNoSetupQuestionsAnswered_thenAllSummaryResponsesNull() {
 
-    assertThat(summaryItems.size()).isEqualTo(TaskListSectionQuestion.getNonDecommissioningRelatedValues().size());
+    var taskListSectionsQuestions = Arrays.asList(TaskListSectionQuestion.values());
 
-    summaryItems.forEach(si -> assertThat(si.getAnswerValue()).isNull());
+    when(projectSetupService.getSectionQuestionsForProjectDetail(details))
+        .thenReturn(taskListSectionsQuestions);
+
+    var resultingSummaryItems = projectSetupSectionSummaryService.getSummaryItems(details);
+
+    resultingSummaryItems.forEach(summaryItem -> {
+      var taskListSectionQuestion = taskListSectionsQuestions
+          .stream()
+          .filter(sectionQuestion -> sectionQuestion.equals(summaryItem.getQuestion()))
+          .findFirst()
+          .orElseThrow(() -> new AssertionError(String.format(
+              "Could not find TaskListSectionQuestion with name %s",
+              summaryItem.getQuestion().name()
+          )));
+
+      assertThat(summaryItem.getQuestion()).isEqualTo(taskListSectionQuestion);
+      assertThat(summaryItem.getPrompt()).isEqualTo(taskListSectionQuestion.getPrompt());
+      assertThat(summaryItem.getAnswerValue()).isNull();
+    });
   }
 
   @Test
-  public void getSummaryItems_correctQuestionAnswered_nonDecom() {
-    when(projectSetupService.getProjectTaskListSetup(details)).thenReturn(Optional.of(setup));
-    when(projectSetupService.isDecomRelated(details)).thenReturn(false);
-    var summaryItems = projectSetupSectionSummaryService.getSummaryItems(details);
+  public void getSummaryItems_whenSetupQuestionsAnswered_thenAllSummaryItemsAnswersPopulated() {
 
-    assertThat(summaryItems.size()).isEqualTo(TaskListSectionQuestion.getNonDecommissioningRelatedValues().size());
+    var taskListSectionsQuestions = Arrays.asList(TaskListSectionQuestion.values());
 
-    assertThat(summaryItems.get(0).getAnswerValue()).isEqualTo(setup.getTaskListAnswers().get(0).getAnswerValue());
-    assertThat(summaryItems.get(1).getAnswerValue()).isEqualTo(setup.getTaskListAnswers().get(1).getAnswerValue());
-    assertThat(summaryItems.get(2).getAnswerValue()).isEqualTo(setup.getTaskListAnswers().get(2).getAnswerValue());
-  }
+    var expectedTaskListSectionAnswers = taskListSectionsQuestions
+        .stream()
+        .map(TaskListSectionQuestion::getYesAnswer)
+        .collect(Collectors.toUnmodifiableList());
 
-  @Test
-  public void getSummaryItems_noQuestionAnswered_decom() {
-    when(projectSetupService.getProjectTaskListSetup(details)).thenReturn(Optional.empty());
-    when(projectSetupService.isDecomRelated(details)).thenReturn(true);
-    var summaryItems = projectSetupSectionSummaryService.getSummaryItems(details);
+    when(projectSetupService.getSectionQuestionsForProjectDetail(details))
+        .thenReturn(Arrays.asList(TaskListSectionQuestion.values()));
 
-    assertThat(summaryItems.size()).isEqualTo(TaskListSectionQuestion.getAllValues().size());
+    var projectTaskListSetup = new ProjectTaskListSetup(details);
+    projectTaskListSetup.setTaskListSections(taskListSectionsQuestions);
+    projectTaskListSetup.setTaskListAnswers(expectedTaskListSectionAnswers);
 
-    summaryItems.forEach(si -> assertThat(si.getAnswerValue()).isNull());
-  }
+    when(projectSetupService.getProjectTaskListSetup(details))
+        .thenReturn(Optional.of(projectTaskListSetup));
 
-  @Test
-  public void getSummaryItems_correctQuestionAnswered_decom() {
-    when(projectSetupService.getProjectTaskListSetup(details)).thenReturn(Optional.of(decomSetup));
-    when(projectSetupService.isDecomRelated(details)).thenReturn(true);
-    var summaryItems = projectSetupSectionSummaryService.getSummaryItems(details);
+    var resultingSummaryItems = projectSetupSectionSummaryService.getSummaryItems(details);
 
-    assertThat(summaryItems.size()).isEqualTo(TaskListSectionQuestion.getAllValues().size());
+    resultingSummaryItems.forEach(summaryItem -> {
+      var taskListSectionQuestion = taskListSectionsQuestions
+          .stream()
+          .filter(sectionQuestion -> sectionQuestion.equals(summaryItem.getQuestion()))
+          .findFirst()
+          .orElseThrow(() -> new AssertionError(String.format(
+              "Could not find TaskListSectionQuestion with name %s",
+              summaryItem.getQuestion().name()
+          )));
 
-    assertThat(summaryItems.get(0).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(0).getAnswerValue());
-    assertThat(summaryItems.get(1).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(1).getAnswerValue());
-    assertThat(summaryItems.get(2).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(2).getAnswerValue());
-    assertThat(summaryItems.get(3).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(3).getAnswerValue());
-    assertThat(summaryItems.get(4).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(4).getAnswerValue());
-    assertThat(summaryItems.get(5).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(5).getAnswerValue());
-    assertThat(summaryItems.get(6).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(6).getAnswerValue());
-    // Pipelines disabled: PAT-457
-    // assertThat(summaryItems.get(7).getAnswerValue()).isEqualTo(decomSetup.getTaskListAnswers().get(7).getAnswerValue());
+      assertThat(summaryItem.getQuestion()).isEqualTo(taskListSectionQuestion);
+      assertThat(summaryItem.getPrompt()).isEqualTo(taskListSectionQuestion.getPrompt());
+      assertThat(summaryItem.getAnswerValue()).isEqualTo(taskListSectionQuestion.getYesAnswer().getAnswerValue());
+    });
   }
 
   @Test

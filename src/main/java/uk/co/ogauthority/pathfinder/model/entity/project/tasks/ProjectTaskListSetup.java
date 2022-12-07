@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.tasks;
 
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -34,14 +35,6 @@ public class ProjectTaskListSetup extends ProjectDetailEntity {
     this.projectDetail = detail;
   }
 
-  public ProjectTaskListSetup(ProjectDetail detail,
-                              List<TaskListSectionQuestion> taskListSections,
-                              List<TaskListSectionAnswer> taskListAnswers) {
-    this.projectDetail = detail;
-    this.taskListSections = taskListSections;
-    this.taskListAnswers = taskListAnswers;
-  }
-
   public List<TaskListSectionQuestion> getTaskListSections() {
     return taskListSections;
   }
@@ -57,5 +50,35 @@ public class ProjectTaskListSetup extends ProjectDetailEntity {
 
   public void setTaskListAnswers(List<TaskListSectionAnswer> taskListAnswers) {
     this.taskListAnswers = taskListAnswers;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if (!(o instanceof ProjectTaskListSetup)) {
+      return false;
+    }
+    ProjectTaskListSetup that = (ProjectTaskListSetup) o;
+    return Objects.equals(taskListSections, that.taskListSections)
+        && Objects.equals(taskListAnswers, that.taskListAnswers);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        taskListSections,
+        taskListAnswers
+    );
+  }
+
+  @Override
+  public String toString() {
+    return "ProjectTaskListSetup{" +
+        "taskListSections=" + taskListSections +
+        ", taskListAnswers=" + taskListAnswers +
+        '}';
   }
 }

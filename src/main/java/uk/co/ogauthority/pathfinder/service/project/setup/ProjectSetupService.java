@@ -17,6 +17,7 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.tasks.ProjectTaskListSetup;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionAnswer;
@@ -60,10 +61,19 @@ public class ProjectSetupService implements ProjectFormSectionService {
     this.entityDuplicationService = entityDuplicationService;
   }
 
-  public List<TaskListSectionQuestion> getSectionQuestionsForProjectDetail(ProjectDetail detail) {
-    return projectInformationService.isDecomRelated(detail)
-        ? TaskListSectionQuestion.getAllValues()
-        : TaskListSectionQuestion.getNonDecommissioningRelatedValues();
+  public List<TaskListSectionQuestion> getSectionQuestionsForProjectDetail(ProjectDetail projectDetail) {
+    return projectInformationService.getFieldStage(projectDetail)
+        .map(fieldStage -> TaskListSectionQuestion.getAllValues()
+            .stream()
+            .filter(taskListSectionQuestion -> taskListSectionQuestion.getApplicableFieldStages().contains(fieldStage))
+            .collect(Collectors.toList()))
+        // if no field stage specified yet show all the questions which are allowed under any field stage
+        .orElseGet(() -> TaskListSectionQuestion.getAllValues()
+            .stream()
+            .filter(taskListSectionQuestion ->
+                taskListSectionQuestion.getApplicableFieldStages().containsAll(Set.of(FieldStage.values()))
+            )
+            .collect(Collectors.toList()));
   }
 
   public ModelAndView getProjectSetupModelAndView(ProjectDetail detail, ProjectSetupForm form) {
@@ -147,6 +157,10 @@ public class ProjectSetupService implements ProjectFormSectionService {
     // form.setPipelinesIncluded(
     //     getAnswerForQuestion(taskListSetup.getTaskListAnswers(), TaskListSectionQuestion.PIPELINES)
     // );
+
+    form.setCommissionedWellsIncluded(
+        getAnswerForQuestion(taskListSetup.getTaskListAnswers(), TaskListSectionQuestion.COMMISSIONED_WELLS)
+    );
   }
 
   private TaskListSectionAnswer getAnswerForQuestion(List<TaskListSectionAnswer> answers, TaskListSectionQuestion question) {
@@ -194,35 +208,45 @@ public class ProjectSetupService implements ProjectFormSectionService {
                                 BindingResult bindingResult,
                                 ValidationType validationType,
                                 ProjectDetail detail) {
-    var hint = new ProjectSetupFormValidationHint(projectInformationService.isDecomRelated(detail), validationType);
+    var fieldStage = projectInformationService.getFieldStage(detail).orElse(null);
+    var hint = new ProjectSetupFormValidationHint(fieldStage, validationType);
     projectSetupFormValidator.validate(form, bindingResult, hint);
     return validationService.validate(form, bindingResult, validationType);
   }
 
   /**
-   * Removes any decommissioning related sections and their answers if the project is no longer decommissioning related.
-   * @param detail project detail to remove the answers for.
+   * Remove any task list setup section answers that exist for sections that are not applicable to the
+   * field stage of the project.
+   * @param projectDetail The project detail of the project
+   * @param fieldStage The field stage of the project
    */
   @Transactional
-  public void removeDecomSelectionsIfPresent(ProjectDetail detail) {
-    if (!projectInformationService.isDecomRelated(detail)) {
-      getProjectTaskListSetup(detail).ifPresent(tls -> {
-        var sections = tls.getTaskListSections();
-        var answers = tls.getTaskListAnswers();
+  public void removeTaskListSetupSectionsNotApplicableToFieldStage(ProjectDetail projectDetail, FieldStage fieldStage) {
 
-        TaskListSectionQuestion.getAllValues().forEach(s -> {
-          if (s.isDecommissioningRelated()) {
-            answers.remove(s.getYesAnswer());
-            answers.remove(s.getNoAnswer());
-          }
-        });
-        sections.removeIf(TaskListSectionQuestion::isDecommissioningRelated);
+    getProjectTaskListSetup(projectDetail).ifPresent(projectTaskListSetup -> {
 
-        tls.setTaskListAnswers(answers);
-        tls.setTaskListSections(sections);
-        projectTaskListSetupRepository.save(tls);
+      var sections = projectTaskListSetup.getTaskListSections();
+      var answers = projectTaskListSetup.getTaskListAnswers();
+
+      TaskListSectionQuestion.getAllValues().forEach(taskListSectionQuestion -> {
+
+        if (!isSectionApplicableToFieldStage(taskListSectionQuestion, fieldStage)) {
+          answers.remove(taskListSectionQuestion.getYesAnswer());
+          answers.remove(taskListSectionQuestion.getNoAnswer());
+          sections.remove(taskListSectionQuestion);
+        }
+
       });
-    }
+
+      projectTaskListSetup.setTaskListSections(sections);
+      projectTaskListSetup.setTaskListAnswers(answers);
+      projectTaskListSetupRepository.save(projectTaskListSetup);
+    });
+  }
+
+  private boolean isSectionApplicableToFieldStage(TaskListSectionQuestion sectionQuestion, FieldStage fieldStage) {
+    return (fieldStage == null && sectionQuestion.getApplicableFieldStages().containsAll(Set.of(FieldStage.values())))
+        || (fieldStage != null && sectionQuestion.getApplicableFieldStages().contains(fieldStage));
   }
 
   public boolean taskValidAndSelectedForProjectDetail(ProjectDetail detail, ProjectTask task) {
@@ -235,10 +259,6 @@ public class ProjectSetupService implements ProjectFormSectionService {
         .orElse(false);
 
     return taskValidForProjectType && taskSelectedInProjectSetup;
-  }
-
-  boolean isDecomRelated(ProjectDetail detail) {
-    return projectInformationService.isDecomRelated(detail);
   }
 
   @Override

@@ -3,7 +3,8 @@ package uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 
 /**
@@ -21,8 +22,7 @@ public enum TaskListSectionQuestion {
       "",
       "form.upcomingTendersIncluded",
       TaskListSectionAnswer.UPCOMING_TENDERS_YES,
-      TaskListSectionAnswer.UPCOMING_TENDERS_NO,
-      false
+      TaskListSectionAnswer.UPCOMING_TENDERS_NO
   ),
   AWARDED_CONTRACTS(
       ProjectTask.AWARDED_CONTRACTS,
@@ -31,8 +31,7 @@ public enum TaskListSectionQuestion {
       "",
       "form.awardedContractsIncluded",
       TaskListSectionAnswer.AWARDED_CONTRACTS_YES,
-      TaskListSectionAnswer.AWARDED_CONTRACTS_NO,
-       false
+      TaskListSectionAnswer.AWARDED_CONTRACTS_NO
   ),
   COLLABORATION_OPPORTUNITIES(
       ProjectTask.COLLABORATION_OPPORTUNITIES,
@@ -41,8 +40,7 @@ public enum TaskListSectionQuestion {
       "This area is for operators to use when seeking engagement with the supply chain to offer solutions to aid project delivery",
       "form.collaborationOpportunitiesIncluded",
       TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_YES,
-      TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_NO,
-      false
+      TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_NO
   ),
   WELLS(
       ProjectTask.WELLS,
@@ -52,7 +50,7 @@ public enum TaskListSectionQuestion {
       "form.wellsIncluded",
       TaskListSectionAnswer.WELLS_YES,
       TaskListSectionAnswer.WELLS_NO,
-      true
+      Set.of(FieldStage.DECOMMISSIONING)
   ),
   PLATFORM_FPSO(
       ProjectTask.PLATFORM_FPSO,
@@ -62,7 +60,7 @@ public enum TaskListSectionQuestion {
       "form.platformsFpsosIncluded",
       TaskListSectionAnswer.PLATFORM_FPSO_YES,
       TaskListSectionAnswer.PLATFORM_FPSO_NO,
-      true
+      Set.of(FieldStage.DECOMMISSIONING)
   ),
   INTEGRATED_RIGS(
       ProjectTask.INTEGRATED_RIGS,
@@ -72,7 +70,7 @@ public enum TaskListSectionQuestion {
       "form.integratedRigsIncluded",
       TaskListSectionAnswer.INTEGRATED_RIGS_YES,
       TaskListSectionAnswer.INTEGRATED_RIGS_NO,
-      true
+      Set.of(FieldStage.DECOMMISSIONING)
   ),
   CAMPAIGN_INFORMATION(
       ProjectTask.CAMPAIGN_INFORMATION,
@@ -81,8 +79,7 @@ public enum TaskListSectionQuestion {
       "",
       "form.campaignInformationIncluded",
       TaskListSectionAnswer.CAMPAIGN_INFORMATION_YES,
-      TaskListSectionAnswer.CAMPAIGN_INFORMATION_NO,
-      false
+      TaskListSectionAnswer.CAMPAIGN_INFORMATION_NO
   ),
   SUBSEA_INFRASTRUCTURE(
       ProjectTask.SUBSEA_INFRASTRUCTURE,
@@ -92,7 +89,7 @@ public enum TaskListSectionQuestion {
       "form.subseaInfrastructureIncluded",
       TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
       TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_NO,
-      true
+      Set.of(FieldStage.DECOMMISSIONING)
   ),
   PROJECT_CONTRIBUTORS(
       ProjectTask.PROJECT_CONTRIBUTORS,
@@ -102,8 +99,7 @@ public enum TaskListSectionQuestion {
           " and awarded contracts to this project",
       "form.projectContributorsIncluded",
       TaskListSectionAnswer.PROJECT_CONTRIBUTORS_YES,
-      TaskListSectionAnswer.PROJECT_CONTRIBUTORS_NO,
-      false
+      TaskListSectionAnswer.PROJECT_CONTRIBUTORS_NO
   );
   // Pipelines disabled: PAT-457
   // PIPELINES(
@@ -116,6 +112,16 @@ public enum TaskListSectionQuestion {
   //     TaskListSectionAnswer.PIPELINES_NO,
   //     true
   // );
+  COMMISSIONED_WELLS(
+      ProjectTask.COMMISSIONED_WELLS,
+      "Are wells being commissioned on this project?",
+          "Wells to commission",
+          "",
+          "form.commissionedWellsIncluded",
+      TaskListSectionAnswer.COMMISSION_WELLS_YES,
+      TaskListSectionAnswer.COMMISSION_WELLS_NO,
+      Set.of(FieldStage.DISCOVERY, FieldStage.DEVELOPMENT)
+  );
 
   private final ProjectTask projectTask;
   private final String displayName;
@@ -124,7 +130,26 @@ public enum TaskListSectionQuestion {
   private final String formField;
   private final TaskListSectionAnswer yesAnswer;
   private final TaskListSectionAnswer noAnswer;
-  private final boolean decommissioningRelated;
+  private final Set<FieldStage> applicableFieldStages;
+
+  TaskListSectionQuestion(ProjectTask projectTask,
+                          String displayName,
+                          String prompt,
+                          String guidance,
+                          String formField,
+                          TaskListSectionAnswer yesAnswer,
+                          TaskListSectionAnswer noAnswer) {
+    this(
+        projectTask,
+        displayName,
+        prompt,
+        guidance,
+        formField,
+        yesAnswer,
+        noAnswer,
+        Set.of(FieldStage.values())
+    );
+  }
 
   TaskListSectionQuestion(ProjectTask projectTask,
                           String displayName,
@@ -133,7 +158,7 @@ public enum TaskListSectionQuestion {
                           String formField,
                           TaskListSectionAnswer yesAnswer,
                           TaskListSectionAnswer noAnswer,
-                          boolean decommissioningRelated) {
+                          Set<FieldStage> applicableFieldStages) {
     this.projectTask = projectTask;
     this.displayName = displayName;
     this.prompt = prompt;
@@ -141,7 +166,7 @@ public enum TaskListSectionQuestion {
     this.formField = formField;
     this.yesAnswer = yesAnswer;
     this.noAnswer = noAnswer;
-    this.decommissioningRelated = decommissioningRelated;
+    this.applicableFieldStages = applicableFieldStages;
   }
 
   public ProjectTask getProjectTask() {
@@ -172,20 +197,12 @@ public enum TaskListSectionQuestion {
     return noAnswer;
   }
 
-  public boolean isDecommissioningRelated() {
-    return decommissioningRelated;
+  public Set<FieldStage> getApplicableFieldStages() {
+    return applicableFieldStages;
   }
 
   public static List<TaskListSectionQuestion> getAllValues() {
     var questions = Arrays.asList(values());
-    sort(questions);
-    return questions;
-  }
-
-  public static List<TaskListSectionQuestion> getNonDecommissioningRelatedValues() {
-    var questions = Arrays.stream(values())
-        .filter(tlq -> !tlq.isDecommissioningRelated())
-        .collect(Collectors.toList());
     sort(questions);
     return questions;
   }
