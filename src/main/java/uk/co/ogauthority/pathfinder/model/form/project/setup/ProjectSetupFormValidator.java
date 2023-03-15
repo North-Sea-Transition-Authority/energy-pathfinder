@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.form.project.setup;
 
 import java.util.Arrays;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
@@ -27,7 +28,7 @@ public class ProjectSetupFormValidator implements SmartValidator {
   static final String COMMISSIONED_WELLS_REQUIRED_TEXT = "Select yes if you plan to add any wells to be commissioned to your project";
 
   @Override
-  public void validate(Object target, Errors errors, Object... validationHints) {
+  public void validate(@NonNull Object target, @NonNull Errors errors, @NonNull Object... validationHints) {
 
     ProjectSetupFormValidationHint validationHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(ProjectSetupFormValidationHint.class))
@@ -55,10 +56,11 @@ public class ProjectSetupFormValidator implements SmartValidator {
         ValidationUtils.rejectIfEmpty(errors, "integratedRigsIncluded", "integratedRigsIncluded.invalid",
             INTEGRATED_RIGS_REQUIRED_TEXT
         );
-        // Pipelines disabled: PAT-457
-        // ValidationUtils.rejectIfEmpty(errors, "pipelinesIncluded", "pipelinesIncluded.invalid",
-        //     ProjectSetupFormValidationHint.PIPELINES_REQUIRED_TEXT
-        // );
+
+        ValidationUtils.rejectIfEmpty(errors, "pipelinesIncluded", "pipelinesIncluded.invalid",
+            PIPELINES_REQUIRED_TEXT
+        );
+
       } else if (FieldStage.DISCOVERY.equals(validationHint.fieldStage)) {
         validateCommissionedWellsInput(errors);
       } else if (FieldStage.DEVELOPMENT.equals(validationHint.fieldStage)) {
@@ -68,7 +70,7 @@ public class ProjectSetupFormValidator implements SmartValidator {
   }
 
   @Override
-  public void validate(Object target, Errors errors) {
+  public void validate(@NonNull Object target, @NonNull Errors errors) {
     validate(target, errors, new Object[0]);
   }
 

@@ -5,7 +5,6 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +41,6 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @ProjectFormPagePermissionCheck
 @ProjectTypeCheck(types = ProjectType.INFRASTRUCTURE)
 @RequestMapping("/project/{projectId}/pipelines")
-@Profile("pipelines") // PAT-457
 public class DecommissionedPipelineController extends ProjectFormPageController {
 
   public static final String TASK_LIST_NAME = "Pipelines";
@@ -228,7 +226,7 @@ public class DecommissionedPipelineController extends ProjectFormPageController 
         .addObject("pipelineRestUrl", decommissionedPipelineService.getPipelineRestUrl())
         .addObject("preSelectedPipelineMap", decommissionedPipelineService.getPreSelectedPipeline(form))
         .addObject("pipelineStatuses", InfrastructureStatus.getAllAsMap())
-        .addObject("pipelineRemovalPremises", PipelineRemovalPremise.getAllAsMap());
+        .addObject("pipelineRemovalPremises", PipelineRemovalPremise.getAllAsSelectableItems());
 
     breadcrumbService.fromDecommissionedPipelines(projectId, modelAndView, FORM_PAGE_NAME);
 

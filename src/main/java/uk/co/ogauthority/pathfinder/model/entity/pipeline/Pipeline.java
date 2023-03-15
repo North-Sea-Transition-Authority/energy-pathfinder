@@ -17,6 +17,8 @@ public class Pipeline implements SearchSelectable {
 
   private String name;
 
+  private Boolean historicStatus;
+
   public Pipeline() {}
 
   @VisibleForTesting
@@ -31,6 +33,14 @@ public class Pipeline implements SearchSelectable {
 
   public String getName() {
     return name;
+  }
+
+  public Boolean getIsHistoricStatus() {
+    return historicStatus;
+  }
+
+  public void setIsHistoricStatus(Boolean historicStatus) {
+    this.historicStatus = historicStatus;
   }
 
   @Override

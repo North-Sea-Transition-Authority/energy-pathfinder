@@ -26,7 +26,6 @@
     <@_decommissionedPipelineSummaryFields
       useDiffedField=false
       pipeline=decommissionedPipelineView.pipeline
-      materialType=decommissionedPipelineView.materialType
       status=decommissionedPipelineView.status
       decommissioningEarliestYear=decommissionedPipelineView.decommissioningEarliestYear
       decommissioningLatestYear=decommissionedPipelineView.decommissioningLatestYear
@@ -56,7 +55,6 @@
     <@_decommissionedPipelineSummaryFields
       useDiffedField=true
       pipeline=decommissionedPipelineDiff.DecommissionedPipelineView_pipeline
-      materialType=decommissionedPipelineDiff.DecommissionedPipelineView_materialType
       status=decommissionedPipelineDiff.DecommissionedPipelineView_status
       decommissioningEarliestYear=decommissionedPipelineDiff.DecommissionedPipelineView_decommissioningEarliestYear
       decommissioningLatestYear=decommissionedPipelineDiff.DecommissionedPipelineView_decommissioningLatestYear
@@ -68,7 +66,6 @@
 <#macro _decommissionedPipelineSummaryFields
   useDiffedField
   pipeline=""
-  materialType=""
   status=""
   decommissioningEarliestYear=""
   decommissioningLatestYear=""
@@ -77,11 +74,6 @@
   <@checkAnswers.checkAnswersStandardOrDiffRow
     prompt="Pipeline"
     fieldValue=pipeline
-    isDiffedField=useDiffedField
-  />
-  <@checkAnswers.checkAnswersStandardOrDiffRow
-    prompt="Material type"
-    fieldValue=materialType
     isDiffedField=useDiffedField
   />
   <@checkAnswers.checkAnswersStandardOrDiffRow
@@ -96,7 +88,7 @@
     latestYear=decommissioningLatestYear
   />
   <@checkAnswers.checkAnswersStandardOrDiffRow
-    prompt="Removal premise"
+    prompt="Decommissioning premise"
     fieldValue=removalPremise
     isDiffedField=useDiffedField
   />

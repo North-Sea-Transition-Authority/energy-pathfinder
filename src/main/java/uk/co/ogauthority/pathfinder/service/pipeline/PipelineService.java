@@ -29,7 +29,7 @@ public class PipelineService {
   }
 
   public List<RestSearchItem> searchPipelinesWithNameContaining(String searchTerm) {
-    var searchableList = findByNameContaining(searchTerm);
+    var searchableList = findSelectablePipelinesByNameContaining(searchTerm);
     return searchSelectorService.search(searchTerm, searchableList);
   }
 
@@ -42,9 +42,9 @@ public class PipelineService {
   public Map<String, String> getPreSelectedPipeline(String pipelineFromForm) {
     return (pipelineFromForm != null)
         ? searchSelectorService.getPreSelectedSearchSelectorValue(
-            pipelineFromForm,
-            getPipelineAsList(pipelineFromForm)
-        )
+        pipelineFromForm,
+        getPipelineAsList(pipelineFromForm)
+    )
         : Map.of();
   }
 
@@ -64,7 +64,12 @@ public class PipelineService {
     return pipelineRepository.findById(pipelineId);
   }
 
-  private List<Pipeline> findByNameContaining(String searchTerm) {
-    return pipelineRepository.findAllByNameContainingIgnoreCase(searchTerm);
+  public boolean isPipelineSelectable(int pipelineId) {
+    var pipeline = findById(pipelineId);
+    return pipeline.isPresent() && !pipeline.get().getIsHistoricStatus();
+  }
+
+  private List<Pipeline> findSelectablePipelinesByNameContaining(String searchTerm) {
+    return pipelineRepository.findAllByNameContainingIgnoreCaseAndHistoricStatusFalse(searchTerm);
   }
 }

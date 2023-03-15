@@ -1,0 +1,1 @@
+GRANT SELECT ON pwa.api_vw_current_pipeline_data TO ${datasource.user} WITH GRANT OPTION;

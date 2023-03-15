@@ -6,6 +6,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
@@ -67,7 +68,6 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
     }
 
     form.setPipeline(pipeline);
-    form.setMaterialType(decommissionedPipeline.getMaterialType());
     form.setStatus(decommissionedPipeline.getStatus());
     form.setDecommissioningDate(new MinMaxDateInput(
         decommissionedPipeline.getEarliestRemovalYear(),
@@ -125,12 +125,10 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
   }
 
   public boolean isValid(DecommissionedPipeline decommissionedPipeline, ValidationType validationType) {
-    // Pipelines disabled: PAT-457
-    // var form = getForm(decommissionedPipeline);
-    // BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
-    // bindingResult = validate(form, bindingResult, validationType);
-    // return !bindingResult.hasErrors();
-    return true;
+    var form = getForm(decommissionedPipeline);
+    BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
+    bindingResult = validate(form, bindingResult, validationType);
+    return !bindingResult.hasErrors();
   }
 
   @Transactional
@@ -149,7 +147,6 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
       decommissionedPipeline.setPipeline(null);
     }
 
-    decommissionedPipeline.setMaterialType(form.getMaterialType());
     decommissionedPipeline.setStatus(form.getStatus());
     decommissionedPipeline.setEarliestRemovalYear(form.getDecommissioningDate().getMinYear());
     decommissionedPipeline.setLatestRemovalYear(form.getDecommissioningDate().getMaxYear());
@@ -174,8 +171,7 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
 
   @Override
   public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
-    // return projectSetupService.taskSelectedForProjectDetail(detail, ProjectTask.PIPELINES);
-    return false; // Pipelines disabled: PAT-457
+    return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.PIPELINES);
   }
 
   @Override
@@ -191,12 +187,11 @@ public class DecommissionedPipelineService implements ProjectFormSectionService 
 
   @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
-    // Pipelines disabled: PAT-457
-    // entityDuplicationService.duplicateEntitiesAndSetNewParent(
-    //     getDecommissionedPipelines(fromDetail),
-    //     toDetail,
-    //     DecommissionedPipeline.class
-    // );
+    entityDuplicationService.duplicateEntitiesAndSetNewParent(
+        getDecommissionedPipelines(fromDetail),
+        toDetail,
+        DecommissionedPipeline.class
+    );
   }
 
   @Override

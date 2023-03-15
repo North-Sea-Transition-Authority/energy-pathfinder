@@ -1,28 +1,53 @@
 package uk.co.ogauthority.pathfinder.model.enums.project.decommissionedpipeline;
 
 import java.util.Arrays;
-import java.util.Map;
-import uk.co.ogauthority.pathfinder.util.StreamUtil;
+import java.util.List;
+import java.util.stream.Collectors;
+import uk.co.ogauthority.pathfinder.model.form.forminput.selectableitem.SelectableItem;
 
 public enum PipelineRemovalPremise {
 
-  LEAVE_IN_PLACE("Leave in place"),
-  LEAVE_IN_SITU_BURIED_TO_1M("Leave in situ buried to 1m"),
-  PARTIAL_REMOVAL_AND_BURY("Partial removal and bury"),
-  FULL_REMOVAL("Full removal");
+  FULL_REMOVAL(
+      "Full removal",
+      ""
+  ),
+  MAJOR_INTERVENTION(
+      "Decommission in situ with major intervention",
+      "Includes rock cover or trench and bury of entire length"
+  ),
+  MINOR_INTERVENTION(
+      "Decommission in situ with minor intervention",
+      "Includes rock cover, trench and bury or cut and lift of only exposed or shallow buried sections"
+  ),
+  MINIMAL_INTERVENTION(
+      "Decommission in situ with minimal intervention",
+      "Includes removal of ends and remediation of snag risk"
+  );
 
   private final String displayName;
 
-  PipelineRemovalPremise(String displayName) {
+  private final String hintText;
+
+  PipelineRemovalPremise(String displayName, String hintText) {
     this.displayName = displayName;
+    this.hintText = hintText;
   }
 
   public String getDisplayName() {
     return displayName;
   }
 
-  public static Map<String, String> getAllAsMap() {
+  public String getHintText() {
+    return hintText;
+  }
+
+  public static List<SelectableItem> getAllAsSelectableItems() {
     return Arrays.stream(values())
-        .collect(StreamUtil.toLinkedHashMap(Enum::name, PipelineRemovalPremise::getDisplayName));
+        .map(pipelineRemovalPremise -> new SelectableItem(
+            pipelineRemovalPremise.name(),
+            pipelineRemovalPremise.getDisplayName(),
+            pipelineRemovalPremise.getHintText()
+        ))
+        .collect(Collectors.toUnmodifiableList());
   }
 }

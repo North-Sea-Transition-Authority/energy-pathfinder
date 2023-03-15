@@ -5,12 +5,11 @@
   <@fdsForm.htmlForm>
     <@fdsSearchSelector.searchSelectorRest
       path="form.pipeline"
-      selectorMinInputLength=1
+      selectorMinInputLength=3
       labelText="What is the pipeline number?"
       restUrl=springUrl(pipelineRestUrl)
       preselectedItems=preSelectedPipelineMap!{}
     />
-    <@fdsTextInput.textInput path="form.materialType" labelText="What is the material type of the pipeline?"/>
     <@fdsRadio.radio path="form.status" labelText="What is the status of the pipeline?" radioItems=pipelineStatuses/>
     <@minMaxDateInput
       minFormPath="form.decommissioningDate.minYear"
@@ -20,7 +19,11 @@
       altMaxLabel="Latest completion year"
       formId="decommissioning-period"
     />
-    <@fdsRadio.radio path="form.removalPremise" labelText="Pipeline removal premise" radioItems=pipelineRemovalPremises/>
+    <@radio.radioItems
+      path="form.removalPremise"
+      labelText="Pipeline decommissioning premise"
+      selectableItems=pipelineRemovalPremises
+    />
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
   </@fdsForm.htmlForm>
 </@defaultPage>

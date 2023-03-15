@@ -29,7 +29,7 @@ public class ProjectSetupFormValidatorTest {
   }
 
   @Test
-  public void validate_whenDecommissioningFieldStageAndFulLValidationAndNoSectionsCompleted_thenErrors() {
+  public void validate_whenDecommissioningFieldStageAndFullValidationAndNoSectionsCompleted_thenErrors() {
 
     var decommissioningFieldStage = FieldStage.DECOMMISSIONING;
 
@@ -45,18 +45,22 @@ public class ProjectSetupFormValidatorTest {
 
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
 
-    assertThat(fieldErrors).contains(
+    assertThat(fieldErrors).containsExactly(
         entry("wellsIncluded", Set.of(String.format("wellsIncluded%s", FieldValidationErrorCodes.INVALID.getCode()))),
         entry("platformsFpsosIncluded", Set.of(String.format("platformsFpsosIncluded%s", FieldValidationErrorCodes.INVALID.getCode()))),
-        entry("integratedRigsIncluded", Set.of(String.format("integratedRigsIncluded%s", FieldValidationErrorCodes.INVALID.getCode())))
+        entry("subseaInfrastructureIncluded", Set.of(String.format("subseaInfrastructureIncluded%s", FieldValidationErrorCodes.INVALID.getCode()))),
+        entry("integratedRigsIncluded", Set.of(String.format("integratedRigsIncluded%s", FieldValidationErrorCodes.INVALID.getCode()))),
+        entry("pipelinesIncluded", Set.of(String.format("pipelinesIncluded%s", FieldValidationErrorCodes.INVALID.getCode())))
     );
 
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrorMessages).contains(
+    assertThat(fieldErrorMessages).containsExactly(
       entry("wellsIncluded", Set.of(ProjectSetupFormValidator.WELLS_REQUIRED_TEXT)),
       entry("platformsFpsosIncluded", Set.of(ProjectSetupFormValidator.PLATFORMS_FPSOS_REQUIRED_TEXT)),
-      entry("integratedRigsIncluded", Set.of(ProjectSetupFormValidator.INTEGRATED_RIGS_REQUIRED_TEXT))
+      entry("subseaInfrastructureIncluded", Set.of(ProjectSetupFormValidator.SUBSEA_INFRASTRUCTURE_REQUIRED_TEXT)),
+      entry("integratedRigsIncluded", Set.of(ProjectSetupFormValidator.INTEGRATED_RIGS_REQUIRED_TEXT)),
+      entry("pipelinesIncluded", Set.of(ProjectSetupFormValidator.PIPELINES_REQUIRED_TEXT))
     );
   }
 

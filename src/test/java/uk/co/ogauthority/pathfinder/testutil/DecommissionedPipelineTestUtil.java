@@ -10,12 +10,10 @@ import uk.co.ogauthority.pathfinder.model.view.decommissionedpipeline.Decommissi
 import uk.co.ogauthority.pathfinder.model.view.decommissionedpipeline.DecommissionedPipelineViewUtil;
 
 public class DecommissionedPipelineTestUtil {
-
-  private static final String MATERIAL_TYPE = "materialType";
   private static final InfrastructureStatus INFRASTRUCTURE_STATUS = InfrastructureStatus.READY_TO_DECOMMISSION;
   private static final Integer EARLIEST_DECOM_START = 2020;
   private static final Integer LATEST_DECOM_COMPLETION = LocalDate.now().getYear();
-  private static final PipelineRemovalPremise REMOVAL_PREMISE = PipelineRemovalPremise.PARTIAL_REMOVAL_AND_BURY;
+  private static final PipelineRemovalPremise REMOVAL_PREMISE = PipelineRemovalPremise.FULL_REMOVAL;
 
   private DecommissionedPipelineTestUtil() {
     throw new IllegalStateException("DecommissionedPipelineTestUtil is a utility class and should not be instantiated");
@@ -25,7 +23,6 @@ public class DecommissionedPipelineTestUtil {
     var decommissionedPipeline = new DecommissionedPipeline();
     decommissionedPipeline.setProjectDetail(ProjectUtil.getProjectDetails());
     decommissionedPipeline.setPipeline(PipelineTestUtil.getPipeline());
-    decommissionedPipeline.setMaterialType(MATERIAL_TYPE);
     decommissionedPipeline.setStatus(INFRASTRUCTURE_STATUS);
     decommissionedPipeline.setEarliestRemovalYear(String.valueOf(EARLIEST_DECOM_START));
     decommissionedPipeline.setLatestRemovalYear(String.valueOf(LATEST_DECOM_COMPLETION));
@@ -37,7 +34,6 @@ public class DecommissionedPipelineTestUtil {
   public static DecommissionedPipelineForm createDecommissionedPipelineForm() {
     var form = new DecommissionedPipelineForm();
     form.setPipeline("1");
-    form.setMaterialType(MATERIAL_TYPE);
     form.setStatus(INFRASTRUCTURE_STATUS);
     form.setDecommissioningDate(
         new MinMaxDateInput(String.valueOf(EARLIEST_DECOM_START), String.valueOf(LATEST_DECOM_COMPLETION))

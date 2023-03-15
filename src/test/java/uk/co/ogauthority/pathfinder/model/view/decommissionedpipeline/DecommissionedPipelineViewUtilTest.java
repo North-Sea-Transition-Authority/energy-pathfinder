@@ -21,7 +21,6 @@ public class DecommissionedPipelineViewUtilTest {
     assertThat(decommissionedPipelineView.getDisplayOrder()).isEqualTo(displayOrder);
     assertThat(decommissionedPipelineView.isValid()).isEqualTo(isValid);
     assertThat(decommissionedPipelineView.getProjectId()).isEqualTo(decommissionedPipeline.getProjectDetail().getProject().getId());
-    assertThat(decommissionedPipelineView.getMaterialType()).isEqualTo(decommissionedPipeline.getMaterialType());
     assertThat(decommissionedPipelineView.getStatus()).isEqualTo(decommissionedPipeline.getStatus().getDisplayName());
     assertThat(decommissionedPipelineView.getRemovalPremise()).isEqualTo(decommissionedPipeline.getRemovalPremise().getDisplayName());
   }
