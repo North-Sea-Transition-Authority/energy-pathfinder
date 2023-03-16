@@ -40,7 +40,7 @@ public class PipelineServiceTest {
   public void searchPipelinesWithNameContaining() {
     var searchTerm = "pipe";
     var pipeline = PipelineTestUtil.getPipeline();
-    when(pipelineRepository.findAllByNameContainingIgnoreCase(searchTerm)).thenReturn(
+    when(pipelineRepository.findAllByNameContainingIgnoreCaseAndHistoricStatusFalse(searchTerm)).thenReturn(
         Collections.singletonList(pipeline)
     );
     var results = pipelineService.searchPipelinesWithNameContaining(searchTerm);
@@ -51,7 +51,7 @@ public class PipelineServiceTest {
   @Test
   public void searchPipelinesWithNameContaining_whenNoResults() {
     var searchTerm = "pipe";
-    when(pipelineRepository.findAllByNameContainingIgnoreCase(searchTerm)).thenReturn(
+    when(pipelineRepository.findAllByNameContainingIgnoreCaseAndHistoricStatusFalse(searchTerm)).thenReturn(
         Collections.emptyList()
     );
     var results = pipelineService.searchPipelinesWithNameContaining(searchTerm);
@@ -157,5 +157,43 @@ public class PipelineServiceTest {
 
     var result = pipelineService.findById(pipelineId);
     assertThat(result).isNotPresent();
+  }
+
+  @Test
+  public void isPipelineSelectable_whenPipelineDoesNotExist_thenReturnFalse() {
+
+    int pipelineId = 100;
+
+    when(pipelineRepository.findById(pipelineId)).thenReturn(Optional.empty());
+
+    var isPipelineSelectable = pipelineService.isPipelineSelectable(pipelineId);
+
+    assertThat(isPipelineSelectable).isFalse();
+  }
+
+  @Test
+  public void isPipelineSelectable_whenPipelineExistsAndHasHistoricalStatus_thenReturnFalse() {
+
+    var pipeline = PipelineTestUtil.getPipeline();
+    pipeline.setIsHistoricStatus(true);
+
+    when(pipelineRepository.findById(pipeline.getId())).thenReturn(Optional.of(pipeline));
+
+    var isPipelineSelectable = pipelineService.isPipelineSelectable(pipeline.getId());
+
+    assertThat(isPipelineSelectable).isFalse();
+  }
+
+  @Test
+  public void isPipelineSelectable_whenPipelineExistsAndHasNoHistoricalStatus_thenReturnTrue() {
+
+    var pipeline = PipelineTestUtil.getPipeline();
+    pipeline.setIsHistoricStatus(false);
+
+    when(pipelineRepository.findById(pipeline.getId())).thenReturn(Optional.of(pipeline));
+
+    var isPipelineSelectable = pipelineService.isPipelineSelectable(pipeline.getId());
+
+    assertThat(isPipelineSelectable).isTrue();
   }
 }

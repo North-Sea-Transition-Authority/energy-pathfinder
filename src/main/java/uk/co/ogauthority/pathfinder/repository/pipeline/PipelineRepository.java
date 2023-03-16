@@ -8,5 +8,5 @@ import uk.co.ogauthority.pathfinder.model.entity.pipeline.Pipeline;
 @Repository
 public interface PipelineRepository extends CrudRepository<Pipeline, Integer> {
 
-  List<Pipeline> findAllByNameContainingIgnoreCase(String searchTerm);
+  List<Pipeline> findAllByNameContainingIgnoreCaseAndHistoricStatusFalse(String searchTerm);
 }

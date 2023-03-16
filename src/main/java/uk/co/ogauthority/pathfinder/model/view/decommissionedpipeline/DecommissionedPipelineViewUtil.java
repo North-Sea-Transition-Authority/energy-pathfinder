@@ -38,8 +38,6 @@ public class DecommissionedPipelineViewUtil {
         : null;
     decommissionedPipelineView.setPipeline(pipeline);
 
-    decommissionedPipelineView.setMaterialType(decommissionedPipeline.getMaterialType());
-
     var status = (decommissionedPipeline.getStatus() != null)
         ? decommissionedPipeline.getStatus().getDisplayName()
         : null;

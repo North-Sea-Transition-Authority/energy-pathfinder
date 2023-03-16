@@ -21,6 +21,7 @@
 <#import 'macros/checkboxtoggler/checkboxToggler.ftl' as checkboxToggler>
 <#import 'macros/hiddeninput/hiddenInput.ftl' as hiddenInputs>
 <#import 'macros/mailto/mailTo.ftl' as mailTo>
+<#import 'macros/radio/radio.ftl' as radio>
 <#import 'macros/servicecontact/serviceContact.ftl' as serviceContact>
 <#import 'macros/useraction/userAction.ftl' as userAction>
 <#import 'macros/defaultPageWithSidebar.ftl' as defaultPageWithSidebar>

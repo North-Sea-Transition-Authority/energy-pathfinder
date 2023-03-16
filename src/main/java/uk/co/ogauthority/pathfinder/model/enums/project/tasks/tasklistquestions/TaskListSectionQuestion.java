@@ -101,17 +101,16 @@ public enum TaskListSectionQuestion {
       TaskListSectionAnswer.PROJECT_CONTRIBUTORS_YES,
       TaskListSectionAnswer.PROJECT_CONTRIBUTORS_NO
   ),
-  // Pipelines disabled: PAT-457
-  // PIPELINES(
-  //     ProjectTask.PIPELINES,
-  //     "Are pipelines being decommissioned on this project?",
-  //     "Pipelines to be decommissioned",
-  //     "",
-  //     "form.pipelinesIncluded",
-  //     TaskListSectionAnswer.PIPELINES_YES,
-  //     TaskListSectionAnswer.PIPELINES_NO,
-  //     true
-  // );
+   PIPELINES(
+       ProjectTask.PIPELINES,
+       "Are pipelines being decommissioned on this project?",
+       "Pipelines to be decommissioned",
+       "",
+       "form.pipelinesIncluded",
+       TaskListSectionAnswer.PIPELINES_YES,
+       TaskListSectionAnswer.PIPELINES_NO,
+       Set.of(FieldStage.DECOMMISSIONING)
+   ),
   COMMISSIONED_WELLS(
       ProjectTask.COMMISSIONED_WELLS,
       "Are wells being commissioned on this project?",

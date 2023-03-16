@@ -19,8 +19,6 @@ public class DecommissionedPipeline extends ProjectDetailEntity {
   @JoinColumn(name = "pipeline_id")
   private Pipeline pipeline;
 
-  private String materialType;
-
   @Enumerated(EnumType.STRING)
   private InfrastructureStatus status;
 
@@ -37,14 +35,6 @@ public class DecommissionedPipeline extends ProjectDetailEntity {
 
   public void setPipeline(Pipeline pipeline) {
     this.pipeline = pipeline;
-  }
-
-  public String getMaterialType() {
-    return materialType;
-  }
-
-  public void setMaterialType(String materialType) {
-    this.materialType = materialType;
   }
 
   public InfrastructureStatus getStatus() {

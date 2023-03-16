@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.model.form.project.decommissionedpipeline;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 
@@ -19,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxD
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.validationhint.MaxYearMustBeInFutureHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
 import uk.co.ogauthority.pathfinder.model.form.validation.minmaxdate.MinMaxDateInputValidator;
+import uk.co.ogauthority.pathfinder.service.pipeline.PipelineService;
 import uk.co.ogauthority.pathfinder.testutil.DecommissionedPipelineTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
@@ -29,15 +31,22 @@ public class DecommissionedPipelineFormValidatorTest {
   @Mock
   private MinMaxDateInputValidator minMaxDateInputValidator;
 
+  @Mock
+  private PipelineService pipelineService;
+
   private DecommissionedPipelineFormValidator decommissionedPipelineFormValidator;
 
   private DecommissionedPipelineValidationHint decommissionedPipelineValidationHint;
 
   @Before
   public void setup() {
-    decommissionedPipelineFormValidator = new DecommissionedPipelineFormValidator(minMaxDateInputValidator);
+    decommissionedPipelineFormValidator = new DecommissionedPipelineFormValidator(
+        minMaxDateInputValidator,
+        pipelineService
+    );
     doCallRealMethod().when(minMaxDateInputValidator).validate(any(), any(), any());
     when(minMaxDateInputValidator.supports(any())).thenReturn(true);
+    when(pipelineService.isPipelineSelectable(anyInt())).thenReturn(true);
   }
 
   @Test
@@ -167,5 +176,85 @@ public class DecommissionedPipelineFormValidatorTest {
             DecommissionedPipelineValidationHint.DECOMMISSIONING_YEAR_LABELS.getMaxYearLabel())
         ))
     );
+  }
+
+  @Test
+  public void validate_whenInvalidPipeline_assertError() {
+
+    var invalidPipelineId = 100;
+
+    var form = DecommissionedPipelineTestUtil.createDecommissionedPipelineForm();
+    form.setPipeline(String.valueOf(invalidPipelineId));
+
+    when(pipelineService.isPipelineSelectable(invalidPipelineId)).thenReturn(false);
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+
+    Set.of(ValidationType.FULL, ValidationType.PARTIAL).forEach(validationType -> {
+
+      decommissionedPipelineValidationHint = new DecommissionedPipelineValidationHint(validationType);
+
+      ValidationUtils.invokeValidator(
+          decommissionedPipelineFormValidator,
+          form,
+          errors,
+          decommissionedPipelineValidationHint
+      );
+
+      var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+      var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+      assertThat(fieldErrors).containsExactly(
+          entry(
+              DecommissionedPipelineFormValidator.PIPELINE_FIELD_ID,
+              Set.of(
+                  String.format(
+                      "%s.%s",
+                      DecommissionedPipelineFormValidator.PIPELINE_FIELD_ID,
+                      DecommissionedPipelineFormValidator.INVALID_PIPELINE_ERROR_CODE
+                  )
+              )
+          )
+      );
+
+      assertThat(fieldErrorMessages).containsExactly(
+          entry(
+              DecommissionedPipelineFormValidator.PIPELINE_FIELD_ID,
+              Set.of(DecommissionedPipelineFormValidator.INVALID_PIPELINE_ERROR_MESSAGE)
+          )
+      );
+    });
+  }
+
+  @Test
+  public void validate_whenValidPipeline_assertNoErrors() {
+
+    var validPipelineId = 100;
+
+    var form = DecommissionedPipelineTestUtil.createDecommissionedPipelineForm();
+    form.setPipeline(String.valueOf(validPipelineId));
+
+    when(pipelineService.isPipelineSelectable(validPipelineId)).thenReturn(true);
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+
+    Set.of(ValidationType.FULL, ValidationType.PARTIAL).forEach(validationType -> {
+
+      decommissionedPipelineValidationHint = new DecommissionedPipelineValidationHint(validationType);
+
+      ValidationUtils.invokeValidator(
+          decommissionedPipelineFormValidator,
+          form,
+          errors,
+          decommissionedPipelineValidationHint
+      );
+
+      var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+      var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+      assertThat(fieldErrors).isEmpty();
+      assertThat(fieldErrorMessages).isEmpty();
+    });
+
   }
 }

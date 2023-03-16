@@ -7,8 +7,6 @@ public class DecommissionedPipelineView extends ProjectSummaryItem {
 
   private String pipeline;
 
-  private String materialType;
-
   private String status;
 
   private String decommissioningEarliestYear;
@@ -23,14 +21,6 @@ public class DecommissionedPipelineView extends ProjectSummaryItem {
 
   public void setPipeline(String pipeline) {
     this.pipeline = pipeline;
-  }
-
-  public String getMaterialType() {
-    return materialType;
-  }
-
-  public void setMaterialType(String materialType) {
-    this.materialType = materialType;
   }
 
   public String getStatus() {
@@ -78,7 +68,6 @@ public class DecommissionedPipelineView extends ProjectSummaryItem {
     }
     DecommissionedPipelineView that = (DecommissionedPipelineView) o;
     return Objects.equals(pipeline, that.pipeline)
-        && Objects.equals(materialType, that.materialType)
         && Objects.equals(status, that.status)
         && Objects.equals(decommissioningEarliestYear, that.decommissioningEarliestYear)
         && Objects.equals(decommissioningLatestYear, that.decommissioningLatestYear)
@@ -90,7 +79,6 @@ public class DecommissionedPipelineView extends ProjectSummaryItem {
     return Objects.hash(
         super.hashCode(),
         pipeline,
-        materialType,
         status,
         decommissioningEarliestYear,
         decommissioningLatestYear,
