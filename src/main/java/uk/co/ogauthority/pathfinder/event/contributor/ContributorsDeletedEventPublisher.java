@@ -19,7 +19,7 @@ public class ContributorsDeletedEventPublisher {
 
   public void publishContributorsDeletedEvent(final List<ProjectContributor> projectContributors,
                                               ProjectDetail projectDetail) {
-    var event = new ContributorsDeletedEvent(this, projectContributors, projectDetail);
+    var event = new ContributorsDeletedEvent(this, projectContributors, projectDetail.getId());
     applicationEventPublisher.publishEvent(event);
   }
 }

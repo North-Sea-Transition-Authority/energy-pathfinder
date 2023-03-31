@@ -19,7 +19,7 @@ public class ContributorsAddedEventPublisher {
 
   public void publishContributorsAddedEvent(final List<ProjectContributor> projectContributors,
                                             ProjectDetail projectDetail) {
-    var event = new ContributorsAddedEvent(this, projectContributors, projectDetail);
+    var event = new ContributorsAddedEvent(this, projectContributors, projectDetail.getId());
     applicationEventPublisher.publishEvent(event);
   }
 }
