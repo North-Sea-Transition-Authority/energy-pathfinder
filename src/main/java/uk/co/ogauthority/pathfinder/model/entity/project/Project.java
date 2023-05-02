@@ -2,12 +2,14 @@ package uk.co.ogauthority.pathfinder.model.entity.project;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -21,6 +23,13 @@ public class Project implements Serializable {
 
   @Column(name = "created_datetime")
   private Instant createdInstant;
+
+  /**
+   * One-to-many relationships like this should generally be avoided, this relationship exists purely to allow the
+   * Criteria API to be able to find associated data, and should not be used anywhere else.
+   */
+  @OneToMany(mappedBy = "project")
+  private List<ProjectDetail> projectDetails;
 
   public Project() {
     this.createdInstant = Instant.now();

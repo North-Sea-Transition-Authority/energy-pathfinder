@@ -21,6 +21,10 @@ tasks {
   }
 }
 
+compileJava {
+  options.annotationProcessorGeneratedSourcesDirectory = file("${buildDir}/generated")
+}
+
 repositories {
   mavenCentral()
   maven {
@@ -61,6 +65,9 @@ dependencies {
   implementation group: 'commons-validator', name: 'commons-validator', version: '1.7'
   implementation group: 'com.googlecode.libphonenumber', name: 'libphonenumber', version: '8.12.8'
   implementation group: 'fi.solita.clamav', name: 'clamav-client', version: '1.0.1'
+
+  annotationProcessor("org.hibernate:hibernate-jpamodelgen")
+  annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
   testImplementation(
       'com.h2database:h2:1.4.197',
