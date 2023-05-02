@@ -71,7 +71,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/accessibility-statement",
             "/assets/**",
             "/error",
-            "/public/file"
+            "/public/file",
+            "/pathfinder-api/**"
         )
           .permitAll()
 

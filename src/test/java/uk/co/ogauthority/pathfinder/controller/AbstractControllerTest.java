@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
 import uk.co.ogauthority.pathfinder.analytics.EnableAnalyticsConfiguration;
+import uk.co.ogauthority.pathfinder.config.ExternalApiAuthenticationEntryPoint;
 import uk.co.ogauthority.pathfinder.config.ExternalApiConfiguration;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.config.file.FileUploadProperties;
@@ -151,6 +153,11 @@ public abstract class AbstractControllerTest {
           "customer-name",
           false,
           "supply-chain-interface-url");
+    }
+
+    @Bean
+    public ExternalApiAuthenticationEntryPoint externalApiAuthenticationEntryPoint() {
+      return new ExternalApiAuthenticationEntryPoint(new ObjectMapper());
     }
 
   }

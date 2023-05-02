@@ -80,15 +80,16 @@ public class ProjectDtoControllerTest extends AbstractControllerTest {
                 null
             )))
             .header("Authorization", String.format("Bearer %s", PRE_SHARED_KEY)))
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isBadRequest())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON));
   }
 
   @Test
   public void searchPathfinderProjects_NoBearerToken_AssertForbidden() throws Exception {
     mockMvc.perform(post(
-        ReverseRouter.route(on(ProjectDtoController.class).searchProjectDtos(
-            null, null, null, null, null
-        ))))
-        .andExpect(status().isForbidden());
+        ReverseRouter.route(on(ProjectDtoController.class)
+            .searchProjectDtos(null, null, null, null, null))))
+        .andExpect(status().isUnauthorized())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON));
   }
 }

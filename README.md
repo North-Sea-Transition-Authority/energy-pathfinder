@@ -155,4 +155,3 @@ Commit and push the changes to both files and once the build has passed the Prox
 #### Run the app
 IntelliJ should auto detect the Spring application and create a run configuration.
 Run the project and navigate to `https://itportal.dev.fivium.local/engedudev1/<CONTEXT_SUFFIX>/work-area`
-    

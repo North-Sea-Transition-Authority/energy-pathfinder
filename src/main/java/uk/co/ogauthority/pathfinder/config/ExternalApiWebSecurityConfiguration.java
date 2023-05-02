@@ -15,12 +15,15 @@ import uk.co.ogauthority.pathfinder.externalapi.ProjectDtoController;
 class ExternalApiWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   private final String preSharedKey;
+  private final ExternalApiAuthenticationEntryPoint externalApiAuthenticationEntryPoint;
   private static final String ENERGY_PORTAL_API_PATH_MATCHER =
       ProjectDtoController.ENERGY_PORTAL_API_BASE_PATH + "/**";
 
   @Autowired
-  public ExternalApiWebSecurityConfiguration(ExternalApiConfiguration externalApiConfiguration) {
+  public ExternalApiWebSecurityConfiguration(ExternalApiConfiguration externalApiConfiguration,
+                                             ExternalApiAuthenticationEntryPoint externalApiAuthenticationEntryPoint) {
     this.preSharedKey = externalApiConfiguration.getPreSharedKey();
+    this.externalApiAuthenticationEntryPoint = externalApiAuthenticationEntryPoint;
   }
 
   @Override
@@ -32,7 +35,10 @@ class ExternalApiWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .addFilter(filter).authorizeRequests()
-          .anyRequest().authenticated();
+          .anyRequest().authenticated()
+        .and()
+        .exceptionHandling()
+          .authenticationEntryPoint(externalApiAuthenticationEntryPoint);
 
     httpSecurity.csrf().ignoringAntMatchers(ENERGY_PORTAL_API_PATH_MATCHER);
   }
