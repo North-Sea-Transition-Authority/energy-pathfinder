@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.entity.project;
 
-import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,16 +12,17 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.service.entityduplication.ParentEntity;
 
 @Entity
 @Table(name = "project_details")
-public class ProjectDetail implements ParentEntity, Serializable {
+public class ProjectDetail implements ParentEntity {
 
-  private static final long serialVersionUID = -2707724149810437190L;
   private static final Integer FIRST_VERSION = 1;
 
   @Id
@@ -50,6 +51,20 @@ public class ProjectDetail implements ParentEntity, Serializable {
 
   @Enumerated(EnumType.STRING)
   private ProjectType projectType;
+
+  /**
+   * One-to-many relationships like this should generally be avoided, this relationship exists purely to allow the
+   * Criteria API to be able to find associated data, and should not be used anywhere else.
+   */
+  @OneToMany(mappedBy = "projectDetail")
+  private List<ProjectOperator> projectOperators;
+
+  /**
+   * One-to-many relationships like this should generally be avoided, this relationship exists purely to allow the
+   * Criteria API to be able to find associated data, and should not be used anywhere else.
+   */
+  @OneToMany(mappedBy = "projectDetail")
+  private List<ProjectInformation> projectInformation;
 
   public ProjectDetail() {
   }

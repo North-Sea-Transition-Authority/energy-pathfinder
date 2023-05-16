@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -15,6 +16,7 @@ import uk.co.ogauthority.pathfinder.service.FoxUrlService;
 
 @Configuration
 @EnableWebSecurity
+@Order(2)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebSecurityConfig.class);
@@ -69,14 +71,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/accessibility-statement",
             "/assets/**",
             "/error",
-            "/public/file"
+            "/public/file",
+            "/pathfinder-api/**"
         )
           .permitAll()
 
         .anyRequest()
           .authenticated();
 
-    http.csrf().ignoringAntMatchers("/notify/callback", "/subscribe", "/unsubscribe/**", "/analytics/collect");
+    http.csrf().ignoringAntMatchers(
+        "/notify/callback",
+        "/subscribe",
+        "/unsubscribe/**",
+        "/analytics/collect"
+    );
 
     try {
       // Redirect to FOX for login if the request is unauthenticated.

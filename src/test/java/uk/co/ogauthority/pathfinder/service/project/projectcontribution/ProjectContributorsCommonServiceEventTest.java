@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +33,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectcontribution.ProjectContributor;
 import uk.co.ogauthority.pathfinder.model.form.project.projectcontributor.ProjectContributorsForm;
+import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.projectcontributor.ProjectContributorRepository;
 import uk.co.ogauthority.pathfinder.service.email.ProjectContributorMailService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
@@ -77,6 +79,9 @@ public class ProjectContributorsCommonServiceEventTest {
     @MockBean
     private ProjectContributorMailService projectContributorMailService;
 
+    @MockBean
+    private ProjectDetailsRepository projectDetailsRepository;
+
     @Before
     public void setup() {
         when(projectOperatorService.getProjectOperatorByProjectDetailOrError(detail)).thenReturn(projectOperator);
@@ -93,6 +98,7 @@ public class ProjectContributorsCommonServiceEventTest {
         var portalOrganisationGroup2 = TeamTestingUtil.generateOrganisationGroup(2, "org", "org");
         var projectContributorOld = ProjectContributorTestUtil.contributorWithGroupOrg(detail, portalOrganisationGroup2);
 
+        when(projectDetailsRepository.findById(detail.getId())).thenReturn(Optional.of(detail));
         when(projectContributorRepository.findAllByProjectDetail(detail)).thenReturn(List.of(projectContributorOld));
 
         transactionWrapper.runInNewTransaction(() -> projectContributorsCommonService.saveProjectContributors(form, detail));
@@ -132,6 +138,7 @@ public class ProjectContributorsCommonServiceEventTest {
         var portalOrganisationGroup2 = TeamTestingUtil.generateOrganisationGroup(2, "org", "org");
         var projectContributor = ProjectContributorTestUtil.contributorWithGroupOrg(detail, portalOrganisationGroup2);
 
+        when(projectDetailsRepository.findById(detail.getId())).thenReturn(Optional.of(detail));
         when(projectContributorRepository.findAllByProjectDetail(detail)).thenReturn(List.of(projectContributor));
 
         transactionWrapper.runInNewTransaction(() -> projectContributorsCommonService.deleteProjectContributors(detail));
@@ -142,9 +149,6 @@ public class ProjectContributorsCommonServiceEventTest {
 
     @Test
     public void deleteProjectContributors_whenRollback_thenVerifyNoMailSent() {
-        var form = new ProjectContributorsForm();
-        form.setContributors(List.of(portalOrganisationGroup1.getOrgGrpId()));
-
         try {
             transactionWrapper.runInNewTransaction(() -> {
                 projectContributorsCommonService.deleteProjectContributors(detail);
