@@ -67,9 +67,17 @@ public class UpcomingTenderSectionSummaryService implements ProjectSectionSummar
 
     List<Map<String, ?>> upcomingTendersDiffList = new ArrayList<>();
 
-    currentUpcomingTenderViews.forEach(upcomingTenderView -> {
+    var diffList = differenceService.getDiffableList(currentUpcomingTenderViews, previousUpcomingTenderViews);
+
+    diffList.forEach(upcomingTenderView -> {
 
       var upcomingTenderModel = new HashMap<String, Object>();
+
+      var currentUpcomingTenderView = currentUpcomingTenderViews
+          .stream()
+          .filter(view -> view.getDisplayOrder().equals(upcomingTenderView.getDisplayOrder()))
+          .findFirst()
+          .orElse(new UpcomingTenderView());
 
       var previousUpcomingTenderView = previousUpcomingTenderViews
           .stream()
@@ -78,13 +86,13 @@ public class UpcomingTenderSectionSummaryService implements ProjectSectionSummar
           .orElse(new UpcomingTenderView());
 
       var upcomingTenderDiffModel = differenceService.differentiate(
-          upcomingTenderView,
+          currentUpcomingTenderView,
           previousUpcomingTenderView,
           Set.of("summaryLinks", "uploadedFileViews")
       );
 
       var uploadedFileDiffModel = differenceService.differentiateComplexLists(
-          upcomingTenderView.getUploadedFileViews(),
+          currentUpcomingTenderView.getUploadedFileViews(),
           previousUpcomingTenderView.getUploadedFileViews(),
           Set.of("fileUploadedTime"),
           Set.of("fileUrl"),

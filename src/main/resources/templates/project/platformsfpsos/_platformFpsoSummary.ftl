@@ -71,6 +71,7 @@
     showActions=showActions
     headingSize=headingSize
     headingClass=headingClass
+    diffObject=diffModel
   >
     <@_platformFpsoSummaryFields
       useDiffedField=true

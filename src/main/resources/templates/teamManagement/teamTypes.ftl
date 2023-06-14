@@ -6,7 +6,7 @@
       <li class="govuk-list__item category-list__item">
         <#assign hintIdentifier="team-type-${teamType.identifier}-hint" />
         <@fdsAction.link linkText="${teamType.linkText}" linkClass="govuk-link govuk-link--no-visited-state category-list__link" linkUrl=springUrl(url) ariaDescribedBy=hintIdentifier/>
-        <span class="govuk-hint" id="${hintIdentifier}">${teamType.linkHint}</span>
+        <div class="govuk-hint" id="${hintIdentifier}">${teamType.linkHint}</div>
       </li>
     </#list>
   </ul>

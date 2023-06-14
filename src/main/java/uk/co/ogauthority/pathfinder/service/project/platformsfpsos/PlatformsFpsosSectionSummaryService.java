@@ -17,6 +17,7 @@ import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.platformfpso.PlatformFpsoView;
 import uk.co.ogauthority.pathfinder.model.view.platformfpso.PlatformFpsoViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
+import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
@@ -88,8 +89,16 @@ public class PlatformsFpsosSectionSummaryService implements ProjectSectionSummar
 
     List<Map<String, ?>> platformFpsoDiffList = new ArrayList<>();
 
-    currentPlatformFpsoViews.forEach(platformFpsoView -> {
+    var diff = differenceService.getDiffableList(currentPlatformFpsoViews, previousPlatformFpsoViews);
+
+    diff.forEach(platformFpsoView -> {
       var platformFpsoModel = new HashMap<String, Object>();
+
+      var currentPlatformFpsoView = currentPlatformFpsoViews
+          .stream()
+          .filter(view -> view.getDisplayOrder().equals(platformFpsoView.getDisplayOrder()))
+          .findFirst()
+          .orElse(new PlatformFpsoView());
 
       var previousPlatformFpsoView = previousPlatformFpsoViews
           .stream()
@@ -98,7 +107,7 @@ public class PlatformsFpsosSectionSummaryService implements ProjectSectionSummar
           .orElse(new PlatformFpsoView());
 
       var platformFpsoDiffModel = differenceService.differentiate(
-          platformFpsoView,
+          currentPlatformFpsoView,
           previousPlatformFpsoView,
           Set.of("summaryLinks")
       );

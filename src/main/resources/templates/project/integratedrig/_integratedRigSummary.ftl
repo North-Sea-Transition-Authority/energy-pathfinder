@@ -50,6 +50,7 @@
     showActions=showActions
     headingSize=headingSize
     headingClass=headingClass
+    diffObject=integratedRigDiff
   >
     <@_integratedRigSummaryFields
       useDiffedField=true

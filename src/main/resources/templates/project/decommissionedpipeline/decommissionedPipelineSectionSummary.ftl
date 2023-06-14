@@ -10,6 +10,7 @@
         showActions=false
         headingSize="h3"
         headingClass="govuk-heading-m"
+        diffModel=decommissionedPipelineDiff
       />
     </#list>
   <#else>

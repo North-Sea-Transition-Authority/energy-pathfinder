@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.forwardworkplan.ForwardWorkPlanCollaborationOpportunityView;
@@ -45,6 +47,9 @@ public class ForwardWorkPlanCollaborationOpportunitiesSectionSummaryServiceTest 
 
   @Before
   public void setup() {
+    when(differenceService.getDiffableList(any(), any()))
+        .thenCallRealMethod();
+
     forwardWorkPlanCollaborationOpportunitiesSectionSummaryService = new ForwardWorkPlanCollaborationOpportunitiesSectionSummaryService(
         forwardWorkPlanCollaborationOpportunitiesSummaryService,
         forwardWorkPlanCollaborationSetupService,
@@ -152,7 +157,16 @@ public class ForwardWorkPlanCollaborationOpportunitiesSectionSummaryServiceTest 
   private void assertInteractions(List<ForwardWorkPlanCollaborationOpportunityView> currentCollaborationOpportunityViews,
                                   List<ForwardWorkPlanCollaborationOpportunityView> previousCollaborationOpportunityViews) {
 
-    currentCollaborationOpportunityViews.forEach(collaborationOpportunityView -> {
+    var diffList = differenceService.getDiffableList(currentCollaborationOpportunityViews,
+        previousCollaborationOpportunityViews);
+
+    diffList.forEach(collaborationOpportunityView -> {
+
+      var currentCollaborationOpportunityView = currentCollaborationOpportunityViews
+          .stream()
+          .filter(view -> view.getDisplayOrder().equals(collaborationOpportunityView.getDisplayOrder()))
+          .findFirst()
+          .orElse(new ForwardWorkPlanCollaborationOpportunityView());
 
       var previousCollaborationOpportunityView = previousCollaborationOpportunityViews
           .stream()
@@ -160,13 +174,16 @@ public class ForwardWorkPlanCollaborationOpportunitiesSectionSummaryServiceTest 
           .findFirst()
           .orElse(new ForwardWorkPlanCollaborationOpportunityView());
 
+      verify(differenceService, atLeastOnce()) // One extra for the call at the top of the test
+          .getDiffableList(currentCollaborationOpportunityViews, previousCollaborationOpportunityViews);
+
       verify(differenceService, times(1)).differentiate(
-          collaborationOpportunityView,
+          currentCollaborationOpportunityView,
           previousCollaborationOpportunityView,
           Set.of("summaryLinks", "uploadedFileViews")
       );
 
-      verify(differenceService, times(1)).differentiateComplexLists(
+      verify(differenceService, atLeastOnce()).differentiateComplexLists(
           eq(collaborationOpportunityView.getUploadedFileViews()),
           eq(previousCollaborationOpportunityView.getUploadedFileViews()),
           eq(Set.of("fileUploadedTime")),
