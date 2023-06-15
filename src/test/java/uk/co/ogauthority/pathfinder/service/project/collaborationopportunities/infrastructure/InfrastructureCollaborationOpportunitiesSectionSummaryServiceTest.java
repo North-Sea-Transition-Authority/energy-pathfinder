@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,6 +42,8 @@ public class InfrastructureCollaborationOpportunitiesSectionSummaryServiceTest {
 
   @Before
   public void setup() {
+    when(differenceService.getDiffableList(any(), any()))
+        .thenCallRealMethod();
     infrastructureCollaborationOpportunitiesSectionSummaryService = new InfrastructureCollaborationOpportunitiesSectionSummaryService(
         infrastructureCollaborationOpportunitiesSummaryService,
         differenceService,
@@ -120,7 +123,18 @@ public class InfrastructureCollaborationOpportunitiesSectionSummaryServiceTest {
   private void assertInteractions(List<InfrastructureCollaborationOpportunityView> currentInfrastructureCollaborationOpportunityViews,
                                   List<InfrastructureCollaborationOpportunityView> previousInfrastructureCollaborationOpportunityViews) {
 
-    currentInfrastructureCollaborationOpportunityViews.forEach(collaborationOpportunityView -> {
+    var diffList = differenceService.getDiffableList(
+        currentInfrastructureCollaborationOpportunityViews,
+        previousInfrastructureCollaborationOpportunityViews
+    );
+
+    diffList.forEach(collaborationOpportunityView -> {
+
+      var currentCollaborationOpportunityView = currentInfrastructureCollaborationOpportunityViews
+          .stream()
+          .filter(view -> view.getDisplayOrder().equals(collaborationOpportunityView.getDisplayOrder()))
+          .findFirst()
+          .orElse(new InfrastructureCollaborationOpportunityView());
 
       var previousCollaborationOpportunityView = previousInfrastructureCollaborationOpportunityViews
           .stream()
@@ -129,12 +143,12 @@ public class InfrastructureCollaborationOpportunitiesSectionSummaryServiceTest {
           .orElse(new InfrastructureCollaborationOpportunityView());
 
       verify(differenceService, times(1)).differentiate(
-          collaborationOpportunityView,
+          currentCollaborationOpportunityView,
           previousCollaborationOpportunityView,
           Set.of("summaryLinks", "uploadedFileViews")
       );
 
-      verify(differenceService, times(1)).differentiateComplexLists(
+      verify(differenceService, atLeastOnce()).differentiateComplexLists(
           eq(collaborationOpportunityView.getUploadedFileViews()),
           eq(previousCollaborationOpportunityView.getUploadedFileViews()),
           eq(Set.of("fileUploadedTime")),

@@ -77,6 +77,8 @@ public class UpcomingTenderSectionSummaryServiceTest {
         projectDetail.getVersion() - 1
     )).thenReturn(previousUpcomingTenderViews);
 
+    when(differenceService.getDiffableList(currentUpcomingTenderViews, previousUpcomingTenderViews)).thenCallRealMethod();
+
     final var sectionSummary = upcomingTenderSectionSummaryService.getSummary(projectDetail);
     assertModelProperties(sectionSummary, projectDetail);
     assertInteractions(currentUpcomingTenderViews, previousUpcomingTenderViews);
@@ -116,7 +118,16 @@ public class UpcomingTenderSectionSummaryServiceTest {
   private void assertInteractions(List<UpcomingTenderView> currentTenderViews,
                                   List<UpcomingTenderView> previousTenderViews) {
 
-    currentTenderViews.forEach(upcomingTenderView -> {
+    var functionalDifferenceService = new DifferenceService();
+    var diffList = functionalDifferenceService.getDiffableList(currentTenderViews, previousTenderViews);
+
+    diffList.forEach(upcomingTenderView -> {
+
+      var currentUpcomingTenderView = currentTenderViews
+          .stream()
+          .filter(view -> view.getDisplayOrder().equals(upcomingTenderView.getDisplayOrder()))
+          .findFirst()
+          .orElse(new UpcomingTenderView());
 
       var previousUpcomingTenderView = previousTenderViews
           .stream()
@@ -125,20 +136,20 @@ public class UpcomingTenderSectionSummaryServiceTest {
           .orElse(new UpcomingTenderView());
 
       verify(differenceService, times(1)).differentiate(
-          upcomingTenderView,
+          currentUpcomingTenderView,
           previousUpcomingTenderView,
           Set.of("summaryLinks", "uploadedFileViews")
       );
 
-      verify(differenceService, times(1)).differentiateComplexLists(
-          eq(upcomingTenderView.getUploadedFileViews()),
-          eq(previousUpcomingTenderView.getUploadedFileViews()),
-          eq(Set.of("fileUploadedTime")),
-          eq(Set.of("fileUrl")),
-          any(),
-          any()
-      );
-
     });
+
+    verify(differenceService, times(diffList.size())).differentiateComplexLists(
+        any(),
+        any(),
+        eq(Set.of("fileUploadedTime")),
+        eq(Set.of("fileUrl")),
+        any(),
+        any()
+    );
   }
 }

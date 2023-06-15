@@ -63,6 +63,7 @@
     showActions=showActions
     headingSize=headingSize
     headingClass=headingClass
+    diffObject=diffModel
   >
     <@_subseaInfrastructureSummaryFields
       useDiffedField=true

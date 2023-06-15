@@ -88,8 +88,17 @@ public class SubseaInfrastructureSectionSummaryService implements ProjectSection
 
     List<Map<String, ?>> subseaInfrastructureDiffList = new ArrayList<>();
 
-    currentSubseaInfrastructureViews.forEach(subseaInfrastructureView -> {
+    var diffList = differenceService.getDiffableList(currentSubseaInfrastructureViews,
+        previousSubseaInfrastructureViews);
+
+    diffList.forEach(subseaInfrastructureView -> {
       var subseaInfrastructureModel = new HashMap<String, Object>();
+
+      var currentSubseaInfrastructureView = currentSubseaInfrastructureViews
+          .stream()
+          .filter(view -> view.getDisplayOrder().equals(subseaInfrastructureView.getDisplayOrder()))
+          .findFirst()
+          .orElse(new SubseaInfrastructureView());
 
       var previousSubseaInfrastructureView = previousSubseaInfrastructureViews
           .stream()
@@ -98,7 +107,7 @@ public class SubseaInfrastructureSectionSummaryService implements ProjectSection
           .orElse(new SubseaInfrastructureView());
 
       var subseaInfrastructureDiffModel = differenceService.differentiate(
-          subseaInfrastructureView,
+          currentSubseaInfrastructureView,
           previousSubseaInfrastructureView,
           Set.of("summaryLinks")
       );

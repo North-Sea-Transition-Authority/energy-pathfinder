@@ -61,6 +61,7 @@
     showActions=showActions
     headingSize=headingSize
     headingClass=headingClass
+    diffObject=diffModel
   >
     <@_upcomingTenderSummaryFields
       useDiffedField=true

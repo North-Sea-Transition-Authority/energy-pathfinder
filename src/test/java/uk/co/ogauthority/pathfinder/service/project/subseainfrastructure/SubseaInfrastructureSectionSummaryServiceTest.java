@@ -42,6 +42,7 @@ public class SubseaInfrastructureSectionSummaryServiceTest {
 
   @Before
   public void setup() {
+    when(differenceService.getDiffableList(any(), any())).thenCallRealMethod();
     subseaInfrastructureSectionSummaryService = new SubseaInfrastructureSectionSummaryService(
         subseaInfrastructureService,
         differenceService,
@@ -120,7 +121,16 @@ public class SubseaInfrastructureSectionSummaryServiceTest {
   private void assertInteractions(List<SubseaInfrastructureView> currentSubseaInfrastructureViews,
                                   List<SubseaInfrastructureView> previousSubseaInfrastructureViews) {
 
-    currentSubseaInfrastructureViews.forEach(subseaInfrastructureView -> {
+    var diffList = differenceService.getDiffableList(currentSubseaInfrastructureViews,
+        previousSubseaInfrastructureViews);
+
+    diffList.forEach(subseaInfrastructureView -> {
+
+      var currentSubseaInfrastructureView = currentSubseaInfrastructureViews
+          .stream()
+          .filter(view -> view.getDisplayOrder().equals(subseaInfrastructureView.getDisplayOrder()))
+          .findFirst()
+          .orElse(new SubseaInfrastructureView());
 
       var previousSubseaInfrastructureView = previousSubseaInfrastructureViews
           .stream()
@@ -129,7 +139,7 @@ public class SubseaInfrastructureSectionSummaryServiceTest {
           .orElse(new SubseaInfrastructureView());
 
       verify(differenceService, times(1)).differentiate(
-          subseaInfrastructureView,
+          currentSubseaInfrastructureView,
           previousSubseaInfrastructureView,
           Set.of("summaryLinks")
       );

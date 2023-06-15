@@ -2,6 +2,8 @@ package uk.co.ogauthority.pathfinder.service.difference;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -9,11 +11,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.exception.DifferenceProcessingException;
 import uk.co.ogauthority.pathfinder.model.difference.DiffedField;
 import uk.co.ogauthority.pathfinder.model.difference.DifferenceType;
+import uk.co.ogauthority.pathfinder.model.view.ProjectSummaryItem;
 import uk.co.ogauthority.pathfinder.service.difference.comparisonstrategy.StringComparisonStrategy;
 
 /**
@@ -192,6 +197,23 @@ public class DifferenceService {
     );
   }
 
+
+  public <T extends ProjectSummaryItem> List<T> getDiffableList(List<T> current, List<T> previous) {
+    // Get the display order of the current items
+    var currentOrder = current.stream()
+        .map(ProjectSummaryItem::getDisplayOrder)
+        .collect(Collectors.toList());
+
+    // Remove all previous items that clash with existing display orders
+    var removedPreviousItems = previous.stream()
+        .filter(t -> !currentOrder.contains(t.getDisplayOrder()))
+        .collect(Collectors.toList());
+
+    // Return combined list of previous and new values.
+    return Stream.of(current, removedPreviousItems)
+        .flatMap(Collection::stream)
+        .collect(Collectors.toList());
+  }
 
 
   /**

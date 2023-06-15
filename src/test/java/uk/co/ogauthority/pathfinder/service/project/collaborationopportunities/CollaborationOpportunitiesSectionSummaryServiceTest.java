@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.TestCollaborationOpportunityViewCommon;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
@@ -20,7 +21,7 @@ public class CollaborationOpportunitiesSectionSummaryServiceTest {
   @Mock
   private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
-  @Mock
+  @Spy
   private DifferenceService differenceService;
 
   private TestCollaborationOpportunitySectionSummaryService testCollaborationOpportunitySectionSummaryService;

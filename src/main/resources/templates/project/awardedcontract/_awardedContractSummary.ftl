@@ -56,6 +56,7 @@
     showActions=showActions
     headingSize=headingSize
     headingClass=headingClass
+    diffObject=awardedContractDiff
   >
     <@_awardedContractSummaryFields
       useDiffedField=true

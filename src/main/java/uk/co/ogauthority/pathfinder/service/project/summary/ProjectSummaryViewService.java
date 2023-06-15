@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSummaryView;
+import uk.co.ogauthority.pathfinder.service.difference.DifferenceFreemarkerService;
 import uk.co.ogauthority.pathfinder.service.rendering.TemplateRenderingService;
 
 /**
@@ -17,18 +18,23 @@ public class ProjectSummaryViewService {
 
   private final ProjectSummaryService projectSummaryService;
   private final TemplateRenderingService templateRenderingService;
+  private final DifferenceFreemarkerService differenceFreemarkerService;
 
   @Autowired
   public ProjectSummaryViewService(
       ProjectSummaryService projectSummaryService,
-      TemplateRenderingService templateRenderingService) {
+      TemplateRenderingService templateRenderingService,
+      DifferenceFreemarkerService differenceFreemarkerService) {
     this.projectSummaryService = projectSummaryService;
     this.templateRenderingService = templateRenderingService;
+    this.differenceFreemarkerService = differenceFreemarkerService;
   }
 
   public ProjectSummaryView getProjectSummaryView(ProjectDetail detail) {
     var summarisedSections = projectSummaryService.summarise(detail);
     String combinedRenderedSummaryHtml = summarisedSections.stream()
+        .peek(projectSectionSummary ->
+            projectSectionSummary.getTemplateModel().put("differenceFreemarkerService", differenceFreemarkerService))
         .map(summary -> templateRenderingService.render(summary.getTemplatePath(), summary.getTemplateModel(), true))
         .collect(Collectors.joining());
 

@@ -49,6 +49,7 @@
     showActions=showActions
     headingSize=headingSize
     headingClass=headingClass
+    diffObject=commissionedWellScheduleDiff
   >
     <@_commissionedWellSummaryFields
       useDiffedField=true

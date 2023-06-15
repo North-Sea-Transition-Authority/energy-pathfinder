@@ -42,6 +42,8 @@ public class PlatformsFpsosSectionSummaryServiceTest {
 
   @Before
   public void setup() {
+    when(differenceService.getDiffableList(any(), any())).thenCallRealMethod();
+
     platformsFpsosSectionSummaryService = new PlatformsFpsosSectionSummaryService(
         platformsFpsosService,
         differenceService,
@@ -120,7 +122,15 @@ public class PlatformsFpsosSectionSummaryServiceTest {
   private void assertInteractions(List<PlatformFpsoView> currentPlatformFpsoViews,
                                   List<PlatformFpsoView> previousPlatformFpsoViews) {
 
-    currentPlatformFpsoViews.forEach(platformFpsoView -> {
+    var diffList = differenceService.getDiffableList(currentPlatformFpsoViews, previousPlatformFpsoViews);
+
+    diffList.forEach(platformFpsoView -> {
+
+      var currentPlatformFpsoView = currentPlatformFpsoViews
+          .stream()
+          .filter(view -> view.getDisplayOrder().equals(platformFpsoView.getDisplayOrder()))
+          .findFirst()
+          .orElse(new PlatformFpsoView());
 
       var previousPlatformFpsoView = previousPlatformFpsoViews
           .stream()
@@ -129,7 +139,7 @@ public class PlatformsFpsosSectionSummaryServiceTest {
           .orElse(new PlatformFpsoView());
 
       verify(differenceService, times(1)).differentiate(
-          platformFpsoView,
+          currentPlatformFpsoView,
           previousPlatformFpsoView,
           Set.of("summaryLinks")
       );

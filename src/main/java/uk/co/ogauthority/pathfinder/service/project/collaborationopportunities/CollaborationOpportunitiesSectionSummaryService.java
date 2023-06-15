@@ -10,13 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
+import uk.co.ogauthority.pathfinder.model.view.collaborationopportunity.CollaborationOpportunityViewCommon;
 import uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 
 @Service
-public abstract class CollaborationOpportunitiesSectionSummaryService<V> {
+public abstract class CollaborationOpportunitiesSectionSummaryService<V extends CollaborationOpportunityViewCommon> {
 
   private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
   private final DifferenceService differenceService;
@@ -72,9 +73,17 @@ public abstract class CollaborationOpportunitiesSectionSummaryService<V> {
 
     List<Map<String, ?>> collaborationOpportunitiesDiffList = new ArrayList<>();
 
-    currentCollaborationOpportunityViews.forEach(collaborationOpportunityView -> {
+    var diffList = differenceService.getDiffableList(currentCollaborationOpportunityViews, previousCollaborationOpportunityViews);
+
+    diffList.forEach(collaborationOpportunityView -> {
 
       var collaborationOpportunityModel = new HashMap<String, Object>();
+
+      var currentCollaborationOpportunityView = currentCollaborationOpportunityViews
+          .stream()
+          .filter(view -> getViewDisplayOrder(view).equals(getViewDisplayOrder(collaborationOpportunityView)))
+          .findFirst()
+          .orElse(createNewViewInstantiation(viewClass));
 
       var previousCollaborationOpportunityView = previousCollaborationOpportunityViews
           .stream()
@@ -83,13 +92,13 @@ public abstract class CollaborationOpportunitiesSectionSummaryService<V> {
           .orElse(createNewViewInstantiation(viewClass));
 
       var collaborationOpportunityDiffModel = differenceService.differentiate(
-          collaborationOpportunityView,
+          currentCollaborationOpportunityView,
           previousCollaborationOpportunityView,
           Set.of("summaryLinks", "uploadedFileViews")
       );
 
       var uploadedFileDiffModel = differenceService.differentiateComplexLists(
-          getUploadedFileViews(collaborationOpportunityView),
+          getUploadedFileViews(currentCollaborationOpportunityView),
           getUploadedFileViews(previousCollaborationOpportunityView),
           Set.of("fileUploadedTime"),
           Set.of("fileUrl"),

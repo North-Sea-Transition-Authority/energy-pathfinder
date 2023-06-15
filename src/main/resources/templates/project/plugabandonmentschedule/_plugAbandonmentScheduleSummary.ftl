@@ -49,6 +49,7 @@
     showActions=showActions
     headingSize=headingSize
     headingClass=headingClass
+    diffObject=plugAbandonmentScheduleDiff
   >
     <@_plugAbandonmentScheduleSummaryFields
       useDiffedField=true

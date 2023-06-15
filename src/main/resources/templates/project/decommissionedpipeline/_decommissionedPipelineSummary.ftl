@@ -35,6 +35,7 @@
 </#macro>
 
 <#macro decommissionedPipelineDiffSummary
+  diffModel
   decommissionedPipelineDiff
   showHeader=false
   showActions=false
@@ -51,6 +52,7 @@
     showActions=showActions
     headingSize=headingSize
     headingClass=headingClass
+    diffObject=diffModel
   >
     <@_decommissionedPipelineSummaryFields
       useDiffedField=true
