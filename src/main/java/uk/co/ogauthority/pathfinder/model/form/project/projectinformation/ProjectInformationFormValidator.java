@@ -55,7 +55,9 @@ public class ProjectInformationFormValidator implements SmartValidator {
     validateFieldStage(form, errors, projectInformationValidationHint);
   }
 
-  private void validateFieldStage(ProjectInformationForm form, Errors errors, ProjectInformationValidationHint projectInformationValidationHint) {
+  private void validateFieldStage(ProjectInformationForm form,
+                                  Errors errors,
+                                  ProjectInformationValidationHint projectInformationValidationHint) {
     var fieldStage = form.getFieldStage();
     var fieldStagesWithStageCategories = FieldStageSubCategory.getAllFieldStagesWithSubCategories();
 

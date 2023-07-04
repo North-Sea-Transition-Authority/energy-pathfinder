@@ -66,7 +66,8 @@ public class ProjectInformationSectionSummaryService implements ProjectSectionSu
     final var fieldStage = projectInformationView.getFieldStage();
     summaryModel.put("isDevelopmentFieldStage", FieldStage.DEVELOPMENT.getDisplayName().equals(fieldStage));
     summaryModel.put("isDiscoveryFieldStage", FieldStage.DISCOVERY.getDisplayName().equals(fieldStage));
-    summaryModel.put("hasFieldStageSubCategories", FieldStageSubCategory.getAllFieldStagesWithSubCategoriesAsStrings().contains(fieldStage));
+    summaryModel.put("hasFieldStageSubCategories",
+        FieldStageSubCategory.getAllFieldStagesWithSubCategoriesAsStrings().contains(fieldStage));
 
     return new ProjectSectionSummary(
         List.of(SECTION_LINK),

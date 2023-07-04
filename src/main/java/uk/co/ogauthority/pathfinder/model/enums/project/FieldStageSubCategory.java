@@ -12,7 +12,8 @@ public enum FieldStageSubCategory {
   FIXED_BOTTOM_OFFSHORE_WIND("Fixed bottom offshore wind", "", FieldStage.OFFSHORE_WIND),
   FLOATING_OFFSHORE_WIND("Floating offshore wind", "", FieldStage.OFFSHORE_WIND),
   CAPTURE_AND_ONSHORE("Capture and onshore", "Emitters and onshore pipelines", FieldStage.CARBON_CAPTURE_AND_STORAGE),
-  TRANSPORTATION_AND_STORAGE("Transportation and storage", "Offshore pipelines and reservoir storage", FieldStage.CARBON_CAPTURE_AND_STORAGE);
+  TRANSPORTATION_AND_STORAGE("Transportation and storage",
+      "Offshore pipelines and reservoir storage", FieldStage.CARBON_CAPTURE_AND_STORAGE);
 
   private final String displayName;
 
@@ -45,7 +46,7 @@ public enum FieldStageSubCategory {
         .collect(StreamUtil.toLinkedHashMap(Enum::name, FieldStageSubCategory::getDisplayName));
   }
 
-  public static List<FieldStage> getAllFieldStagesWithSubCategories(){
+  public static List<FieldStage> getAllFieldStagesWithSubCategories() {
     return Arrays.stream(values())
         .map(FieldStageSubCategory::getFieldStage)
         .distinct()
