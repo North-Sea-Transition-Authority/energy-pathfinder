@@ -4,12 +4,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
-import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -67,7 +69,7 @@ public class ProjectInformationViewUtilTest {
         firstProductionYear
     );
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isEqualTo(expectedFirstProductionDate);
-    assertThat(projectInformationView.getEnergyTransitionCategory()).isNull();
+    assertThat(projectInformationView.getFieldStageSubCategory()).isNull();
   }
 
   @Test
@@ -88,14 +90,13 @@ public class ProjectInformationViewUtilTest {
     assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
 
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
-    assertThat(projectInformationView.getEnergyTransitionCategory()).isNull();
+    assertThat(projectInformationView.getFieldStageSubCategory()).isNull();
   }
 
-  @Test
-  public void from_whenDecommissioningFieldStage() {
-
-    final var fieldStage = FieldStage.DECOMMISSIONING;
-
+  @ParameterizedTest
+  @EnumSource(value = FieldStage.class, names = {"DECOMMISSIONING", "HYDROGEN", "OFFSHORE_ELECTRIFICATION"}, mode = EnumSource.Mode.INCLUDE)
+  public void from_FieldStageWithoutHiddenFields(FieldStage fieldStage) {
+    setup();
     projectInformation.setFieldStage(fieldStage);
 
     var projectInformationView = ProjectInformationViewUtil.from(projectInformation);
@@ -104,31 +105,45 @@ public class ProjectInformationViewUtilTest {
     assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
 
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
-    assertThat(projectInformationView.getEnergyTransitionCategory()).isNull();
+    assertThat(projectInformationView.getFieldStageSubCategory()).isNull();
   }
 
   @Test
-  public void from_whenEnergyTransitionFieldStage() {
-
-    final var fieldStage = FieldStage.ENERGY_TRANSITION;
-
-    final var energyTransitionCategory = EnergyTransitionCategory.HYDROGEN;
+  public void from_whenCarbonCaptureAndStorageFieldStage() {
+    final var fieldStage = FieldStage.CARBON_CAPTURE_AND_STORAGE;
+    final var subCategory = FieldStageSubCategory.TRANSPORTATION_AND_STORAGE;
 
     projectInformation.setFieldStage(fieldStage);
-    projectInformation.setEnergyTransitionCategory(energyTransitionCategory);
+    projectInformation.setFieldStageSubCategory(subCategory);
 
     var projectInformationView = ProjectInformationViewUtil.from(projectInformation);
 
     assertCommonProperties(projectInformationView, projectInformation);
     assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
 
-    assertThat(projectInformationView.getEnergyTransitionCategory()).isEqualTo(energyTransitionCategory.getDisplayName());
+    assertThat(projectInformationView.getFieldStageSubCategory()).isEqualTo(subCategory.getDisplayName());
+    assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
+  }
+
+  @Test
+  public void from_whenOffshoreWindFieldStage() {
+    final var fieldStage = FieldStage.OFFSHORE_WIND;
+    final var subCategory = FieldStageSubCategory.FLOATING_OFFSHORE_WIND;
+
+    projectInformation.setFieldStage(fieldStage);
+    projectInformation.setFieldStageSubCategory(subCategory);
+
+    var projectInformationView = ProjectInformationViewUtil.from(projectInformation);
+
+    assertCommonProperties(projectInformationView, projectInformation);
+    assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
+
+    assertThat(projectInformationView.getFieldStageSubCategory()).isEqualTo(subCategory.getDisplayName());
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
   }
 
   @Test
   public void from_whenFieldStageWithNoHiddenContent() {
-
     final var fieldStage = FieldStage.DECOMMISSIONING;
 
     projectInformation.setFieldStage(fieldStage);
@@ -138,6 +153,6 @@ public class ProjectInformationViewUtilTest {
     assertCommonProperties(projectInformationView, projectInformation);
     assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
-    assertThat(projectInformationView.getEnergyTransitionCategory()).isNull();
+    assertThat(projectInformationView.getFieldStageSubCategory()).isNull();
   }
 }

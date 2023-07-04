@@ -32,14 +32,25 @@
         <@firstProductionDate path="form.developmentFirstProductionDate" nestingPath="form.fieldStage"/>
       </@fdsRadio.radioItem>
       <@fdsRadio.radioItem path="form.fieldStage" itemMap=decommissioningFieldStage itemHintText=decommissioningFieldStageDescription/>
-      <@fdsRadio.radioItem path="form.fieldStage" itemMap=energyTransitionFieldStage itemHintText=energyTransitionFieldStageDescription>
-        <@fdsRadio.radio
-          path="form.energyTransitionCategory"
-          labelText="Energy transition category"
-          radioItems=energyTransitionCategories
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=carbonCaptureAndStorageFieldStage itemHintText=carbonCaptureAndStorageFieldStageDescription>
+          <@fdsRadio.radio
+          path="form.fieldStageSubCategory"
+          labelText="Carbon Capture and Storgae (CCS) category"
+          radioItems=carbonCaptureAndStorageCategories
           nestingPath="form.fieldStage"
-        />
+          />
       </@fdsRadio.radioItem>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=hydrogenFieldStage itemHintText=hydrogenFieldStageDescription/>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=offshoreElectrificationFieldStage itemHintText=offshoreElectrificationFieldStageDescription/>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=offshoreWindFieldStage itemHintText=offshoreWindFieldStageDescription>
+          <@fdsRadio.radio
+          path="form.fieldStageSubCategory"
+          labelText="Offshore wind category"
+          radioItems=offshoreWindCategories
+          nestingPath="form.fieldStage"
+          />
+      </@fdsRadio.radioItem>
+
     </@fdsRadio.radioGroup>
 
     <@contactDetails.standardContactDetails path="form.contactDetail"/>

@@ -3,8 +3,8 @@ package uk.co.ogauthority.pathfinder.model.form.project.projectinformation;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
@@ -25,7 +25,7 @@ public class ProjectInformationForm {
 
   private QuarterYearInput developmentFirstProductionDate;
 
-  private EnergyTransitionCategory energyTransitionCategory;
+  private FieldStageSubCategory fieldStageSubCategory;
 
   @Valid
   private ContactDetailForm contactDetail;
@@ -62,20 +62,20 @@ public class ProjectInformationForm {
     this.contactDetail = contactDetail;
   }
 
-  public EnergyTransitionCategory getEnergyTransitionCategory() {
-    return energyTransitionCategory;
-  }
-
-  public void setEnergyTransitionCategory(
-      EnergyTransitionCategory energyTransitionCategory) {
-    this.energyTransitionCategory = energyTransitionCategory;
-  }
-
   public QuarterYearInput getDevelopmentFirstProductionDate() {
     return developmentFirstProductionDate;
   }
 
   public void setDevelopmentFirstProductionDate(QuarterYearInput developmentFirstProductionDate) {
     this.developmentFirstProductionDate = developmentFirstProductionDate;
+  }
+
+  public FieldStageSubCategory getFieldStageSubCategory() {
+    return fieldStageSubCategory;
+  }
+
+  public void setFieldStageSubCategory(
+      FieldStageSubCategory fieldStageSubCategory) {
+    this.fieldStageSubCategory = fieldStageSubCategory;
   }
 }

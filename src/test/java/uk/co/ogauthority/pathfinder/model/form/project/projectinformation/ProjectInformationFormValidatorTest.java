@@ -17,8 +17,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.quarteryear.QuarterYearInputValidator;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
@@ -116,10 +116,10 @@ public class ProjectInformationFormValidatorTest {
   }
 
   @Test
-  public void validate_whenEnergyTransitionFieldStageAndEmptyHiddenQuestionsWithPartialValidation_thenValid() {
+  public void validate_whenFieldStageWithSubCategoryAndEmptyHiddenQuestionsWithPartialValidation_thenValid() {
     var form = ProjectInformationUtil.getCompleteForm();
-    form.setFieldStage(FieldStage.ENERGY_TRANSITION);
-    form.setEnergyTransitionCategory(null);
+    form.setFieldStage(FieldStage.CARBON_CAPTURE_AND_STORAGE);
+    form.setFieldStageSubCategory(null);
 
     var errors = getErrors(form, ValidationType.PARTIAL);
 
@@ -129,10 +129,10 @@ public class ProjectInformationFormValidatorTest {
   }
 
   @Test
-  public void validate_whenEnergyTransitionFieldStageAndValidHiddenQuestionsWithFullValidation_thenValid() {
+  public void validate_whenFieldStageWithSubCategoryAndValidHiddenQuestionsWithFullValidation_thenValid() {
     var form = ProjectInformationUtil.getCompleteForm();
-    form.setFieldStage(FieldStage.ENERGY_TRANSITION);
-    form.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
+    form.setFieldStage(FieldStage.CARBON_CAPTURE_AND_STORAGE);
+    form.setFieldStageSubCategory(FieldStageSubCategory.CAPTURE_AND_ONSHORE);
 
     var errors = getErrors(form, ValidationType.FULL);
 
@@ -142,10 +142,10 @@ public class ProjectInformationFormValidatorTest {
   }
 
   @Test
-  public void validate_whenEnergyTransitionFieldStageAndEmptyHiddenQuestionsWithFullValidation_thenInvalid() {
+  public void validate_whenFieldStageWithSubCategoryAndEmptyHiddenQuestionsWithFullValidation_thenInvalid() {
     var form = ProjectInformationUtil.getCompleteForm();
-    form.setFieldStage(FieldStage.ENERGY_TRANSITION);
-    form.setEnergyTransitionCategory(null);
+    form.setFieldStage(FieldStage.OFFSHORE_WIND);
+    form.setFieldStageSubCategory(null);
 
     var errors = getErrors(form, ValidationType.FULL);
 
@@ -153,11 +153,11 @@ public class ProjectInformationFormValidatorTest {
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
     assertThat(fieldErrors).containsExactly(
-        entry("energyTransitionCategory", Set.of("energyTransitionCategory.invalid"))
+        entry("fieldStageSubCategory", Set.of("fieldStageSubCategory.invalid"))
     );
 
     assertThat(fieldErrorMessages).containsExactly(
-        entry("energyTransitionCategory", Set.of(ProjectInformationFormValidator.MISSING_ENERGY_TRANSITION_CATEGORY_ERROR))
+        entry("fieldStageSubCategory", Set.of(ProjectInformationFormValidator.MISSING_FIELD_STAGE_CATEGORY_ERROR))
     );
   }
 
@@ -171,6 +171,25 @@ public class ProjectInformationFormValidatorTest {
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
 
     assertThat(fieldErrors).isEmpty();
+  }
+
+  @Test
+  public void validate_whenFieldStageSubCategoryDoesNotMapToFieldStage_thenInvalid() {
+    var form = ProjectInformationUtil.getCompleteForm();
+    form.setFieldStage(FieldStage.OFFSHORE_WIND);
+    form.setFieldStageSubCategory(FieldStageSubCategory.CAPTURE_AND_ONSHORE);
+
+    var errors = getErrors(form, ValidationType.FULL);
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).containsExactly(
+        entry("fieldStageSubCategory", Set.of("fieldStageSubCategory.invalid"))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("fieldStageSubCategory", Set.of(ProjectInformationFormValidator.INVALID_FIELD_STAGE_CATEGORY_ERROR))
+    );
   }
 
 }

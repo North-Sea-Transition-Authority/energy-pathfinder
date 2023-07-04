@@ -12,7 +12,7 @@ public class ProjectInformationView {
 
   private String developmentFirstProductionDate;
 
-  private String energyTransitionCategory;
+  private String fieldStageSubCategory;
 
   private String contactName;
 
@@ -54,12 +54,12 @@ public class ProjectInformationView {
     this.developmentFirstProductionDate = developmentFirstProductionDate;
   }
 
-  public String getEnergyTransitionCategory() {
-    return energyTransitionCategory;
+  public String getFieldStageSubCategory() {
+    return fieldStageSubCategory;
   }
 
-  public void setEnergyTransitionCategory(String energyTransitionCategory) {
-    this.energyTransitionCategory = energyTransitionCategory;
+  public void setFieldStageSubCategory(String fieldStageSubCategory) {
+    this.fieldStageSubCategory = fieldStageSubCategory;
   }
 
   public String getContactName() {
@@ -112,7 +112,8 @@ public class ProjectInformationView {
         && Objects.equals(that.getContactName(), getContactName())
         && Objects.equals(that.getContactPhoneNumber(), getContactPhoneNumber())
         && Objects.equals(that.getContactJobTitle(), getContactJobTitle())
-        && Objects.equals(that.getContactEmailAddress(), getContactEmailAddress());
+        && Objects.equals(that.getContactEmailAddress(), getContactEmailAddress())
+        && Objects.equals(that.getFieldStageSubCategory(), getFieldStageSubCategory());
   }
 
   @Override
@@ -125,7 +126,8 @@ public class ProjectInformationView {
         getContactName(),
         getContactPhoneNumber(),
         getContactJobTitle(),
-        getContactEmailAddress()
+        getContactEmailAddress(),
+        getFieldStageSubCategory()
     );
   }
 }

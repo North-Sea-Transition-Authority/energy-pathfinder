@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project.projectinformation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -21,14 +23,14 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationFormValidator;
+import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationValidationHint;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
@@ -52,6 +54,7 @@ public class ProjectInformationServiceTest {
   @Mock
   private EntityDuplicationService entityDuplicationService;
 
+  @InjectMocks
   private ProjectInformationService projectInformationService;
 
   private final ProjectDetail details = ProjectUtil.getProjectDetails();
@@ -60,13 +63,6 @@ public class ProjectInformationServiceTest {
 
   @Before
   public void setUp() {
-    projectInformationService = new ProjectInformationService(
-        projectInformationRepository,
-        validationService,
-        projectInformationFormValidator,
-        entityDuplicationService
-    );
-
     when(projectInformationRepository.save(any(ProjectInformation.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
@@ -114,7 +110,7 @@ public class ProjectInformationServiceTest {
 
     // the following should not be persisted
     form.setDevelopmentFirstProductionDate(notPersistedQuarterYearInput);
-    form.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
+    form.setFieldStageSubCategory(FieldStageSubCategory.CAPTURE_AND_ONSHORE);
 
     when(projectInformationRepository.findByProjectDetail(details))
         .thenReturn(Optional.of(ProjectInformationUtil.getProjectInformation_withCompleteDetails(details)));
@@ -124,7 +120,7 @@ public class ProjectInformationServiceTest {
     assertThat(projectInformation.getFieldStage()).isEqualTo(FieldStage.DISCOVERY);
     assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
     assertThat(projectInformation.getFirstProductionDateYear()).isNull();
-    assertThat(projectInformation.getEnergyTransitionCategory()).isNull();
+    assertThat(projectInformation.getFieldStageSubCategory()).isNull();
   }
 
   @Test
@@ -137,7 +133,7 @@ public class ProjectInformationServiceTest {
     form.setDevelopmentFirstProductionDate(persistedQuarterYearInput);
 
     // the following should not be persisted
-    form.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
+    form.setFieldStageSubCategory(FieldStageSubCategory.CAPTURE_AND_ONSHORE);
 
     when(projectInformationRepository.findByProjectDetail(details))
         .thenReturn(Optional.of(ProjectInformationUtil.getProjectInformation_withCompleteDetails(details)));
@@ -147,16 +143,16 @@ public class ProjectInformationServiceTest {
     assertThat(projectInformation.getFieldStage()).isEqualTo(FieldStage.DEVELOPMENT);
     assertThat(projectInformation.getFirstProductionDateQuarter()).isEqualTo(persistedQuarterYearInput.getQuarter());
     assertThat(projectInformation.getFirstProductionDateYear()).isEqualTo(Integer.parseInt(persistedQuarterYearInput.getYear()));
-    assertThat(projectInformation.getEnergyTransitionCategory()).isNull();
+    assertThat(projectInformation.getFieldStageSubCategory()).isNull();
   }
 
   @Test
-  public void createOrUpdate_whenEnergyTransitionFieldStage_thenHiddenFieldsSaved() {
+  public void createOrUpdate_whenFieldStageWithSubCategory_thenHiddenFieldsSaved() {
 
     var form = ProjectInformationUtil.getCompleteForm();
-    form.setFieldStage(FieldStage.ENERGY_TRANSITION);
+    form.setFieldStage(FieldStage.OFFSHORE_WIND);
 
-    form.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
+    form.setFieldStageSubCategory(FieldStageSubCategory.FLOATING_OFFSHORE_WIND);
 
     var notPersistedQuarterYearInput = new QuarterYearInput(Quarter.Q2, "2021");
 
@@ -168,10 +164,10 @@ public class ProjectInformationServiceTest {
 
     projectInformation = projectInformationService.createOrUpdate(details, form);
 
-    assertThat(projectInformation.getFieldStage()).isEqualTo(FieldStage.ENERGY_TRANSITION);
+    assertThat(projectInformation.getFieldStage()).isEqualTo(FieldStage.OFFSHORE_WIND);
     assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
     assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
-    assertThat(projectInformation.getEnergyTransitionCategory()).isEqualTo(EnergyTransitionCategory.HYDROGEN);
+    assertThat(projectInformation.getFieldStageSubCategory()).isEqualTo(FieldStageSubCategory.FLOATING_OFFSHORE_WIND);
   }
 
   @Test
@@ -184,7 +180,7 @@ public class ProjectInformationServiceTest {
 
     // the following should not be persisted
     form.setDevelopmentFirstProductionDate(notPersistedQuarterYearInput);
-    form.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
+    form.setFieldStageSubCategory(FieldStageSubCategory.FIXED_BOTTOM_OFFSHORE_WIND);
 
     when(projectInformationRepository.findByProjectDetail(details))
         .thenReturn(Optional.of(ProjectInformationUtil.getProjectInformation_withCompleteDetails(details)));
@@ -194,7 +190,7 @@ public class ProjectInformationServiceTest {
     assertThat(projectInformation.getFieldStage()).isNull();
     assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
     assertThat(projectInformation.getFirstProductionDateQuarter()).isNull();
-    assertThat(projectInformation.getEnergyTransitionCategory()).isNull();
+    assertThat(projectInformation.getFieldStageSubCategory()).isNull();
   }
 
   @Test
@@ -290,7 +286,7 @@ public class ProjectInformationServiceTest {
     projectInformation.setFirstProductionDateYear(Integer.parseInt(persistedFirstProductionDate.getYear()));
 
     // The following should not be populated to the forms
-    projectInformation.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
+    projectInformation.setFieldStageSubCategory(FieldStageSubCategory.FIXED_BOTTOM_OFFSHORE_WIND);
 
     when(projectInformationRepository.findByProjectDetail(details))
         .thenReturn(Optional.of(projectInformation));
@@ -300,7 +296,7 @@ public class ProjectInformationServiceTest {
     assertThat(form.getFieldStage()).isEqualTo(FieldStage.DISCOVERY);
 
     assertThat(form.getDevelopmentFirstProductionDate()).isNull();
-    assertThat(form.getEnergyTransitionCategory()).isNull();
+    assertThat(form.getFieldStageSubCategory()).isNull();
   }
 
   @Test
@@ -314,7 +310,7 @@ public class ProjectInformationServiceTest {
     projectInformation.setFirstProductionDateYear(Integer.parseInt(persistedFirstProductionDate.getYear()));
 
     // The following should not be populated to the forms
-    projectInformation.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
+    projectInformation.setFieldStageSubCategory(FieldStageSubCategory.FIXED_BOTTOM_OFFSHORE_WIND);
 
     when(projectInformationRepository.findByProjectDetail(details))
         .thenReturn(Optional.of(projectInformation));
@@ -324,16 +320,16 @@ public class ProjectInformationServiceTest {
     assertThat(form.getFieldStage()).isEqualTo(FieldStage.DEVELOPMENT);
     assertThat(form.getDevelopmentFirstProductionDate()).isEqualTo(persistedFirstProductionDate);
 
-    assertThat(form.getEnergyTransitionCategory()).isNull();
+    assertThat(form.getFieldStageSubCategory()).isNull();
   }
 
   @Test
-  public void getForm_whenEnergyTransitionFieldStage_thenHiddenFieldsPopulated() {
+  public void getForm_whenFieldStageWithSubCategory_thenHiddenFieldsPopulated() {
 
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
-    projectInformation.setFieldStage(FieldStage.ENERGY_TRANSITION);
+    projectInformation.setFieldStage(FieldStage.OFFSHORE_WIND);
 
-    projectInformation.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
+    projectInformation.setFieldStageSubCategory(FieldStageSubCategory.FLOATING_OFFSHORE_WIND);
 
     // The following should not be populated to the forms
     var invalidPersistedFirstProductionDate = new QuarterYearInput(Quarter.Q2, "2021");
@@ -345,8 +341,8 @@ public class ProjectInformationServiceTest {
 
     ProjectInformationForm form = projectInformationService.getForm(details);
 
-    assertThat(form.getFieldStage()).isEqualTo(FieldStage.ENERGY_TRANSITION);
-    assertThat(form.getEnergyTransitionCategory()).isEqualTo(EnergyTransitionCategory.HYDROGEN);
+    assertThat(form.getFieldStage()).isEqualTo(FieldStage.OFFSHORE_WIND);
+    assertThat(form.getFieldStageSubCategory()).isEqualTo(FieldStageSubCategory.FLOATING_OFFSHORE_WIND);
 
     assertThat(form.getDevelopmentFirstProductionDate()).isNull();
   }
@@ -358,7 +354,7 @@ public class ProjectInformationServiceTest {
     projectInformation.setFieldStage(null);
 
     // The following should not be populated to the forms
-    projectInformation.setEnergyTransitionCategory(EnergyTransitionCategory.HYDROGEN);
+    projectInformation.setFieldStageSubCategory(FieldStageSubCategory.FLOATING_OFFSHORE_WIND);
 
     var invalidPersistedFirstProductionDate = new QuarterYearInput(Quarter.Q2, "2021");
     projectInformation.setFirstProductionDateQuarter(invalidPersistedFirstProductionDate.getQuarter());
@@ -371,7 +367,7 @@ public class ProjectInformationServiceTest {
 
     assertThat(form.getFieldStage()).isNull();
     assertThat(form.getDevelopmentFirstProductionDate()).isNull();
-    assertThat(form.getEnergyTransitionCategory()).isNull();
+    assertThat(form.getFieldStageSubCategory()).isNull();
   }
 
   @Test
@@ -385,6 +381,7 @@ public class ProjectInformationServiceTest {
         ValidationType.PARTIAL
     );
     verify(validationService, times(1)).validate(form, bindingResult, ValidationType.PARTIAL);
+    verify(projectInformationFormValidator).validate(eq(form), eq(bindingResult), any(ProjectInformationValidationHint.class));
   }
 
   @Test
@@ -399,6 +396,7 @@ public class ProjectInformationServiceTest {
     );
 
     verify(validationService, times(1)).validate(form, bindingResult, ValidationType.FULL);
+    verify(projectInformationFormValidator).validate(eq(form), eq(bindingResult), any(ProjectInformationValidationHint.class));
   }
 
   @Test
@@ -531,7 +529,7 @@ public class ProjectInformationServiceTest {
   @Test
   public void isEnergyTransitionProject_whenProjectDetailAndEnergyTransitionFieldStage_thenTrue() {
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
-    projectInformation.setFieldStage(FieldStage.ENERGY_TRANSITION);
+    projectInformation.setFieldStage(FieldStage.HYDROGEN);
 
     when(projectInformationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectInformation));
 
@@ -541,7 +539,7 @@ public class ProjectInformationServiceTest {
   @Test
   public void isEnergyTransitionProject_whenProjectDetailAndNotEnergyTransitionFieldStage_thenFalse() {
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
-    projectInformation.setFieldStage(FieldStage.DISCOVERY);
+    projectInformation.setFieldStage(FieldStage.DEVELOPMENT);
 
     when(projectInformationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectInformation));
 
@@ -558,7 +556,7 @@ public class ProjectInformationServiceTest {
   @Test
   public void isEnergyTransitionProject_whenProjectInformationAndEnergyTransitionFieldStage_thenTrue() {
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
-    projectInformation.setFieldStage(FieldStage.ENERGY_TRANSITION);
+    projectInformation.setFieldStage(FieldStage.OFFSHORE_ELECTRIFICATION);
 
     assertThat(projectInformationService.isEnergyTransitionProject(projectInformation)).isTrue();
   }
@@ -566,7 +564,7 @@ public class ProjectInformationServiceTest {
   @Test
   public void isEnergyTransitionProject_whenProjectInformationAndNotEnergyTransitionFieldStage_thenFalse() {
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
-    projectInformation.setFieldStage(FieldStage.DISCOVERY);
+    projectInformation.setFieldStage(FieldStage.DECOMMISSIONING);
 
     assertThat(projectInformationService.isEnergyTransitionProject(projectInformation)).isFalse();
   }
@@ -586,7 +584,7 @@ public class ProjectInformationServiceTest {
   public void isOilAndGasProject_whenOilAndGasFieldStage_thenReturnTrue() {
 
     var oilAndGasFieldStages = Arrays.stream(FieldStage.values())
-        .filter(fieldStage -> !FieldStage.ENERGY_TRANSITION.equals(fieldStage))
+        .filter(fieldStage -> !FieldStage.getEnergyTransitionProjectFieldStages().contains(fieldStage))
         .collect(Collectors.toList());
 
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
@@ -606,13 +604,13 @@ public class ProjectInformationServiceTest {
   @Test
   public void isOilAndGasProject_whenNotOilAndGasFieldStage_thenReturnFalse() {
 
-    var oilAndGasFieldStages = Arrays.stream(FieldStage.values())
-        .filter(FieldStage.ENERGY_TRANSITION::equals)
+    var energyTransitionFieldStages = Arrays.stream(FieldStage.values())
+        .filter(fieldStage -> FieldStage.getEnergyTransitionProjectFieldStages().contains(fieldStage))
         .collect(Collectors.toList());
 
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(details);
 
-    oilAndGasFieldStages.forEach(fieldStage -> {
+    energyTransitionFieldStages.forEach(fieldStage -> {
       projectInformation.setFieldStage(fieldStage);
 
       when(projectInformationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectInformation));

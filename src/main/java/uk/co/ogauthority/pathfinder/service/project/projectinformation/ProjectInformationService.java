@@ -13,6 +13,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
@@ -30,11 +31,6 @@ import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshi
 
 @Service
 public class ProjectInformationService implements ProjectFormSectionService {
-
-  private static final Set<FieldStage> FIELD_STAGES_WITH_HIDDEN_INPUTS = Set.of(
-      FieldStage.DEVELOPMENT,
-      FieldStage.ENERGY_TRANSITION
-  );
 
   private final ProjectInformationRepository projectInformationRepository;
   private final ValidationService validationService;
@@ -82,12 +78,12 @@ public class ProjectInformationService implements ProjectFormSectionService {
     form.setDevelopmentFirstProductionDate(null);
   }
 
-  private void clearEnergyTransitionCategory(ProjectInformation projectInformation) {
-    projectInformation.setEnergyTransitionCategory(null);
+  private void clearFieldStageCategory(ProjectInformation projectInformation) {
+    projectInformation.setFieldStageSubCategory(null);
   }
 
-  private void clearEnergyTransitionCategory(ProjectInformationForm form) {
-    form.setEnergyTransitionCategory(null);
+  private void clearFieldStageCategory(ProjectInformationForm form) {
+    form.setFieldStageSubCategory(null);
   }
 
   public Optional<ProjectInformation> getProjectInformationByProjectAndVersion(Project project, Integer version) {
@@ -148,10 +144,12 @@ public class ProjectInformationService implements ProjectFormSectionService {
   private void setEntityHiddenFieldStageData(ProjectInformationForm form, ProjectInformation projectInformation) {
 
     var fieldStage = form.getFieldStage();
+    var fieldStagesWithHiddenInputs = FieldStage.getAllWithHiddenInputs();
+    var fieldStagesWithSubCategories = FieldStageSubCategory.getAllFieldStagesWithSubCategories();
 
-    if (fieldStage == null || !FIELD_STAGES_WITH_HIDDEN_INPUTS.contains(fieldStage)) {
+    if (fieldStage == null || !fieldStagesWithHiddenInputs.contains(fieldStage)) {
       clearFirstProductionDate(projectInformation);
-      clearEnergyTransitionCategory(projectInformation);
+      clearFieldStageCategory(projectInformation);
     } else if (fieldStage.equals(FieldStage.DEVELOPMENT)) {
       form.getDevelopmentFirstProductionDate()
           .create()
@@ -161,10 +159,10 @@ public class ProjectInformationService implements ProjectFormSectionService {
           });
 
       // These inputs are hidden if development field stage
-      clearEnergyTransitionCategory(projectInformation);
+      clearFieldStageCategory(projectInformation);
 
-    } else if (fieldStage.equals(FieldStage.ENERGY_TRANSITION)) {
-      projectInformation.setEnergyTransitionCategory(form.getEnergyTransitionCategory());
+    } else if (fieldStagesWithSubCategories.contains(fieldStage)) {
+      projectInformation.setFieldStageSubCategory(form.getFieldStageSubCategory());
 
       // These inputs are hidden if energy transition field stage
       clearFirstProductionDate(projectInformation);
@@ -174,15 +172,17 @@ public class ProjectInformationService implements ProjectFormSectionService {
   private void setFormHiddenFieldStageData(ProjectInformation projectInformation, ProjectInformationForm form) {
 
     var fieldStage = projectInformation.getFieldStage();
+    var fieldStagesWithHiddenInputs = FieldStage.getAllWithHiddenInputs();
+    var fieldStagesWithSubCategories = FieldStageSubCategory.getAllFieldStagesWithSubCategories();
 
-    if (fieldStage == null || !FIELD_STAGES_WITH_HIDDEN_INPUTS.contains(fieldStage)) {
+    if (fieldStage == null || !fieldStagesWithHiddenInputs.contains(fieldStage)) {
       clearFirstProductionDate(form);
-      clearEnergyTransitionCategory(form);
+      clearFieldStageCategory(form);
     } else if (fieldStage.equals(FieldStage.DEVELOPMENT)) {
       form.setDevelopmentFirstProductionDate(getFirstProductionDate(projectInformation));
-      clearEnergyTransitionCategory(form);
-    } else if (fieldStage.equals(FieldStage.ENERGY_TRANSITION)) {
-      form.setEnergyTransitionCategory(projectInformation.getEnergyTransitionCategory());
+      clearFieldStageCategory(form);
+    } else if (fieldStagesWithSubCategories.contains(fieldStage)) {
+      form.setFieldStageSubCategory(projectInformation.getFieldStageSubCategory());
       clearFirstProductionDate(form);
     }
   }
@@ -199,7 +199,7 @@ public class ProjectInformationService implements ProjectFormSectionService {
   }
 
   public boolean isEnergyTransitionProject(ProjectInformation projectInformation) {
-    return FieldStage.ENERGY_TRANSITION.equals(projectInformation.getFieldStage());
+    return FieldStage.getEnergyTransitionProjectFieldStages().contains(projectInformation.getFieldStage());
   }
 
   public boolean isOilAndGasProject(ProjectDetail projectDetail) {

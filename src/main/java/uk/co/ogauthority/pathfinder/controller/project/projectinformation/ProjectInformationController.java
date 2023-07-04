@@ -20,8 +20,8 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeChe
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
-import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
@@ -96,6 +96,7 @@ public class ProjectInformationController extends ProjectFormPageController {
   }
 
   private ModelAndView getProjectInformationModelAndView(Integer projectId, ProjectInformationForm form) {
+
     var modelAndView = new ModelAndView("project/projectinformation/projectInformation")
         .addObject("form", form)
         .addObject("pageName", PAGE_NAME)
@@ -105,9 +106,16 @@ public class ProjectInformationController extends ProjectFormPageController {
         .addObject("developmentFieldStageDescription", FieldStage.DEVELOPMENT.getDescription())
         .addObject("decommissioningFieldStage", FieldStage.getEntryAsMap(FieldStage.DECOMMISSIONING))
         .addObject("decommissioningFieldStageDescription", FieldStage.DECOMMISSIONING.getDescription())
-        .addObject("energyTransitionFieldStage", FieldStage.getEntryAsMap(FieldStage.ENERGY_TRANSITION))
-        .addObject("energyTransitionFieldStageDescription", FieldStage.ENERGY_TRANSITION.getDescription())
-        .addObject("energyTransitionCategories", EnergyTransitionCategory.getAllAsMap())
+        .addObject("carbonCaptureAndStorageFieldStage", FieldStage.getEntryAsMap(FieldStage.CARBON_CAPTURE_AND_STORAGE))
+        .addObject("carbonCaptureAndStorageFieldStageDescription", FieldStage.CARBON_CAPTURE_AND_STORAGE.getDescription())
+        .addObject("carbonCaptureAndStorageCategories", FieldStageSubCategory.getAllAsMap(FieldStage.CARBON_CAPTURE_AND_STORAGE))
+        .addObject("hydrogenFieldStage", FieldStage.getEntryAsMap(FieldStage.HYDROGEN))
+        .addObject("hydrogenFieldStageDescription", FieldStage.HYDROGEN.getDescription())
+        .addObject("offshoreElectrificationFieldStage", FieldStage.getEntryAsMap(FieldStage.OFFSHORE_ELECTRIFICATION))
+        .addObject("offshoreElectrificationFieldStageDescription", FieldStage.OFFSHORE_ELECTRIFICATION.getDescription())
+        .addObject("offshoreWindFieldStage", FieldStage.getEntryAsMap(FieldStage.OFFSHORE_WIND))
+        .addObject("offshoreWindFieldStageDescription", FieldStage.OFFSHORE_WIND.getDescription())
+        .addObject("offshoreWindCategories", FieldStageSubCategory.getAllAsMap(FieldStage.OFFSHORE_WIND))
         .addObject("quarters", Quarter.getAllAsMap());
 
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);

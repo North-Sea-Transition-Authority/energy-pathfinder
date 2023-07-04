@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.projectinformation.ProjectInformationView;
@@ -65,7 +66,7 @@ public class ProjectInformationSectionSummaryService implements ProjectSectionSu
     final var fieldStage = projectInformationView.getFieldStage();
     summaryModel.put("isDevelopmentFieldStage", FieldStage.DEVELOPMENT.getDisplayName().equals(fieldStage));
     summaryModel.put("isDiscoveryFieldStage", FieldStage.DISCOVERY.getDisplayName().equals(fieldStage));
-    summaryModel.put("isEnergyTransitionFieldStage", FieldStage.ENERGY_TRANSITION.getDisplayName().equals(fieldStage));
+    summaryModel.put("hasFieldStageSubCategories", FieldStageSubCategory.getAllFieldStagesWithSubCategoriesAsStrings().contains(fieldStage));
 
     return new ProjectSectionSummary(
         List.of(SECTION_LINK),

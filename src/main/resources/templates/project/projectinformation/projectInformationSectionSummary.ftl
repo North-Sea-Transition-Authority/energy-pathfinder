@@ -4,7 +4,7 @@
 <#-- @ftlvariable name="sectionTitle" type="String" -->
 <#-- @ftlvariable name="projectInformationDiffModel" type="java.util.Map<String, Object>" -->
 <#-- @ftlvariable name="isDevelopmentFieldStage" type="Boolean" -->
-<#-- @ftlvariable name="isEnergyTransitionFieldStage" type="Boolean" -->
+<#-- @ftlvariable name="hasFieldStageSubCategories" type="Boolean" -->
 
 <@sectionSummaryWrapper.sectionSummaryWrapper sectionId=sectionId sectionTitle=sectionTitle>
   <@fdsCheckAnswers.checkAnswers >
@@ -26,10 +26,10 @@
         diffedField=projectInformationDiffModel.ProjectInformationView_developmentFirstProductionDate
       />
     </#if>
-    <#if isEnergyTransitionFieldStage>
+    <#if hasFieldStageSubCategories>
       <@checkAnswers.diffedCheckAnswersRowNoActions
-        prompt="Energy transition category"
-        diffedField=projectInformationDiffModel.ProjectInformationView_energyTransitionCategory
+        prompt="Field stage category"
+        diffedField=projectInformationDiffModel.ProjectInformationView_fieldStageSubCategory
       />
     </#if>
     <@checkAnswers.diffedCheckAnswersRowNoActions
