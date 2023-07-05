@@ -39,7 +39,7 @@ public enum FieldStage {
     return description;
   }
 
-  public boolean isHasHiddenInputs() {
+  public boolean hasHiddenInputs() {
     return hasHiddenInputs;
   }
 
@@ -58,7 +58,7 @@ public enum FieldStage {
 
   public static List<FieldStage> getAllWithHiddenInputs() {
     return Arrays.stream(values())
-        .filter(FieldStage::isHasHiddenInputs)
+        .filter(FieldStage::hasHiddenInputs)
         .collect(Collectors.toList());
   }
 

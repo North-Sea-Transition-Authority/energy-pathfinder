@@ -153,7 +153,7 @@ public class ProjectInformationFormValidatorTest {
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
     assertThat(fieldErrors).containsExactly(
-        entry("fieldStageSubCategory", Set.of("fieldStageSubCategory.invalid"))
+        entry("fieldStageSubCategory", Set.of("fieldStageSubCategory.required"))
     );
 
     assertThat(fieldErrorMessages).containsExactly(

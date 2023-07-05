@@ -75,19 +75,17 @@ public class ProjectInformationFormValidator implements SmartValidator {
         ValidationUtils.rejectIfEmptyOrWhitespace(
             errors,
             "fieldStageSubCategory",
-            "fieldStageSubCategory.invalid",
+            "fieldStageSubCategory.required",
             MISSING_FIELD_STAGE_CATEGORY_ERROR
         );
 
         var fieldStageSubCategory = form.getFieldStageSubCategory();
-        if (Objects.nonNull(fieldStageSubCategory)) {
-          if (!fieldStageSubCategory.getFieldStage().equals(fieldStage)) {
-            errors.rejectValue(
-                "fieldStageSubCategory",
-                "fieldStageSubCategory.invalid",
-                INVALID_FIELD_STAGE_CATEGORY_ERROR
-            );
-          }
+        if (Objects.nonNull(fieldStageSubCategory) && !fieldStageSubCategory.getFieldStage().equals(fieldStage)) {
+          errors.rejectValue(
+              "fieldStageSubCategory",
+              "fieldStageSubCategory.invalid",
+              INVALID_FIELD_STAGE_CATEGORY_ERROR
+          );
         }
       }
     }

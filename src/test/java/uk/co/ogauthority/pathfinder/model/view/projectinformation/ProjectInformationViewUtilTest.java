@@ -2,8 +2,8 @@ package uk.co.ogauthority.pathfinder.model.view.projectinformation;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.runner.RunWith;
@@ -17,12 +17,12 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ProjectInformationViewUtilTest {
+class ProjectInformationViewUtilTest {
 
   private ProjectInformation projectInformation;
 
-  @Before
-  public void setup() {
+  @BeforeEach
+  void setup() {
     var projectDetail = ProjectUtil.getProjectDetails();
     projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
   }
@@ -95,7 +95,7 @@ public class ProjectInformationViewUtilTest {
 
   @ParameterizedTest
   @EnumSource(value = FieldStage.class, names = {"DECOMMISSIONING", "HYDROGEN", "OFFSHORE_ELECTRIFICATION"}, mode = EnumSource.Mode.INCLUDE)
-  public void from_FieldStageWithoutHiddenFields(FieldStage fieldStage) {
+  void from_FieldStageWithoutHiddenFields(FieldStage fieldStage) {
     setup();
     projectInformation.setFieldStage(fieldStage);
 
