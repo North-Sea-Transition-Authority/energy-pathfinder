@@ -74,7 +74,7 @@ public class QuarterlyUpdateInitialReminderServiceTest {
   public void getRemindableProjects_whenRemindableProjectsFound_thenReturnPopulatedList() {
 
     var expectedRemindableProjects = List.of(
-        new RemindableProject(1, 2, "project name")
+        new RemindableProject(1, 2, "project name", true)
     );
 
     when(quarterlyUpdateReminderService.getAllRemindableProjects()).thenReturn(expectedRemindableProjects);
@@ -91,6 +91,8 @@ public class QuarterlyUpdateInitialReminderServiceTest {
     var operatorName = "operator name";
     var serviceUrl = "/service-url";
     var projectNameList = List.of("project A", "project B");
+    var pastUpcomingTendersList = List.of("project B");
+
 
     when(linkService.getWorkAreaUrl()).thenReturn(serviceUrl);
 
@@ -98,13 +100,15 @@ public class QuarterlyUpdateInitialReminderServiceTest {
         recipientIdentifier,
         operatorName,
         projectNameList,
-        serviceUrl
+        serviceUrl,
+        pastUpcomingTendersList
     );
 
     var resultingEmailProperties = quarterlyUpdateInitialReminderService.getReminderEmailProperties(
         recipientIdentifier,
         operatorName,
-        projectNameList
+        projectNameList,
+        pastUpcomingTendersList
     );
 
     assertThat(resultingEmailProperties).isEqualTo(expectedEmailProperties);
@@ -113,7 +117,9 @@ public class QuarterlyUpdateInitialReminderServiceTest {
         "OPERATOR_NAME", operatorName,
         "OPERATOR_PROJECTS", projectNameList,
         "SERVICE_LOGIN_URL", serviceUrl,
-        CommonEmailMergeField.RECIPIENT_IDENTIFIER, recipientIdentifier
+        CommonEmailMergeField.RECIPIENT_IDENTIFIER, recipientIdentifier,
+        "PAST_UPCOMING_TENDERS", pastUpcomingTendersList,
+        "SHOW_PAST_UPCOMING_TENDERS", "yes"
     ));
   }
 }

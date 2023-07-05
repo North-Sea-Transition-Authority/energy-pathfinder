@@ -19,9 +19,11 @@ public interface QuarterlyUpdateReminder {
    * @param recipientIdentifier the name of the person receiving the email
    * @param operatorName the name of the operator group the recipient is part of
    * @param remindableProjects a list of all the remindable project names to include in the email
+   * @param pastUpcomingTenders a list of all the remindable projects with upcoming tenders in the past
    * @return a class containing the required email properties for the implementation
    */
   QuarterlyUpdateReminderEmailProperties getReminderEmailProperties(String recipientIdentifier,
                                                                     String operatorName,
-                                                                    List<String> remindableProjects);
+                                                                    List<String> remindableProjects,
+                                                                    List<String> pastUpcomingTenders);
 }

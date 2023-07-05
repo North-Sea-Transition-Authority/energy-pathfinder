@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -449,5 +450,45 @@ public class UpcomingTenderServiceTest {
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(detail), any())).thenReturn(false);
 
     assertThat(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).isFalse();
+  }
+
+  @Test
+  public void doesDetailHaveUpcomingTendersInThePast_whenAllUpcomingTendersAreInThePast_verifyIsTrue() {
+    var upcomingTender = UpcomingTenderUtil.getUpcomingTender(detail);
+    upcomingTender.setEstimatedTenderDate(LocalDate.now().minusDays(1));
+    when(upcomingTenderRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(List.of(upcomingTender));
+
+    var result = upcomingTenderService.doesDetailHaveUpcomingTendersInThePast(detail);
+    assertThat(result).isTrue();
+  }
+
+  @Test
+  public void doesDetailHaveUpcomingTendersInThePast_whenAtLeastOneUpcomingTenderIsInThePast_verifyIsTrue() {
+    var upcomingTender1 = UpcomingTenderUtil.getUpcomingTender(detail);
+    upcomingTender1.setEstimatedTenderDate(LocalDate.now().minusDays(1));
+    var upcomingTender2 = UpcomingTenderUtil.getUpcomingTender(detail);
+    upcomingTender2.setEstimatedTenderDate(LocalDate.now().plusDays(10));
+    when(upcomingTenderRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(List.of(upcomingTender1, upcomingTender2));
+
+    var result = upcomingTenderService.doesDetailHaveUpcomingTendersInThePast(detail);
+    assertThat(result).isTrue();
+  }
+
+  @Test
+  public void doesDetailHaveUpcomingTendersInThePast_whenNoUpcomingTenders_verifyIsFalse() {
+    when(upcomingTenderRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(Collections.emptyList());
+
+    var result = upcomingTenderService.doesDetailHaveUpcomingTendersInThePast(detail);
+    assertThat(result).isFalse();
+  }
+
+  @Test
+  public void doesDetailHaveUpcomingTendersInThePast_whenNoUpcomingTendersInPast_verifyIsFalse() {
+    var upcomingTender = UpcomingTenderUtil.getUpcomingTender(detail);
+    upcomingTender.setEstimatedTenderDate(LocalDate.now().plusDays(10));
+    when(upcomingTenderRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(List.of(upcomingTender));
+
+    var result = upcomingTenderService.doesDetailHaveUpcomingTendersInThePast(detail);
+    assertThat(result).isFalse();
   }
 }

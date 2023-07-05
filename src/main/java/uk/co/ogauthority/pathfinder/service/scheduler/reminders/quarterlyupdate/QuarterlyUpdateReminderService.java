@@ -11,6 +11,8 @@ import uk.co.ogauthority.pathfinder.energyportal.service.organisation.Organisati
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationGroupPersonMembershipService;
 import uk.co.ogauthority.pathfinder.model.entity.quarterlystatistics.ReportableProject;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.quarterlystatistics.ReportableProjectService;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
@@ -20,16 +22,22 @@ public class QuarterlyUpdateReminderService {
   private final ReportableProjectService reportableProjectService;
   private final PortalOrganisationGroupPersonMembershipService portalOrganisationGroupPersonMembershipService;
   private final EmailService emailService;
+  private final UpcomingTenderService upcomingTenderService;
+  private final ProjectService projectService;
 
   @Autowired
   public QuarterlyUpdateReminderService(
       ReportableProjectService reportableProjectService,
       PortalOrganisationGroupPersonMembershipService portalOrganisationGroupPersonMembershipService,
-      EmailService emailService
+      EmailService emailService,
+      UpcomingTenderService upcomingTenderService,
+      ProjectService projectService
   ) {
     this.reportableProjectService = reportableProjectService;
     this.portalOrganisationGroupPersonMembershipService = portalOrganisationGroupPersonMembershipService;
     this.emailService = emailService;
+    this.upcomingTenderService = upcomingTenderService;
+    this.projectService = projectService;
   }
 
   public List<RemindableProject> getAllRemindableProjects() {
@@ -101,12 +109,19 @@ public class QuarterlyUpdateReminderService {
         .map(RemindableProject::getProjectDisplayName)
         .collect(Collectors.toList());
 
+    var upcomingTenders = operatorRemindableProjects
+        .stream()
+        .filter(RemindableProject::hasUpcomingTendersInPast)
+        .map(RemindableProject::getProjectDisplayName)
+        .collect(Collectors.toList());
+
     teamMembers.forEach(teamMember -> {
 
       var emailProperties = quarterlyUpdateReminder.getReminderEmailProperties(
           teamMember.getForename(),
           organisationGroup.getName(),
-          projectsDisplayNames
+          projectsDisplayNames,
+          upcomingTenders
       );
 
       emailService.sendEmail(
@@ -118,10 +133,13 @@ public class QuarterlyUpdateReminderService {
   }
 
   private RemindableProject convertToRemindableProject(ReportableProject reportableProject) {
+    var projectDetail = projectService.getDetailByIdOrError(reportableProject.getProjectDetailId());
+    var hasPastUpcomingTenders = upcomingTenderService.doesDetailHaveUpcomingTendersInThePast(projectDetail);
     return new RemindableProject(
         reportableProject.getProjectDetailId(),
         reportableProject.getOperatorGroupId(),
-        reportableProject.getProjectDisplayName()
+        reportableProject.getProjectDisplayName(),
+        hasPastUpcomingTenders
     );
   }
 }

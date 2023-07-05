@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -256,5 +257,22 @@ public class ProjectServiceTest {
       final var expectedReturnValue = projectType.getDisplayName();
       assertThat(ProjectService.getProjectTypeDisplayName(projectDetail)).isEqualTo(expectedReturnValue);
     });
+  }
+
+  @Test
+  public void getDetailByIdOrError() {
+    var projectDetailId = projectDetail.getId();
+    when(projectDetailsRepository.findById(projectDetailId)).thenReturn(Optional.of(projectDetail));
+
+    var result = projectService.getDetailByIdOrError(projectDetailId);
+    assertThat(result).isEqualTo(projectDetail);
+  }
+
+  @Test
+  public void getDetailByIdOrError_error() {
+    var projectDetailId = 1;
+    when(projectDetailsRepository.findById(projectDetailId)).thenReturn(Optional.empty());
+
+    assertThrows(PathfinderEntityNotFoundException.class, () ->  projectService.getDetailByIdOrError(projectDetailId));
   }
 }

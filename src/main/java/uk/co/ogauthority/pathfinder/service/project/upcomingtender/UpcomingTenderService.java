@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.project.upcomingtender;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -247,6 +248,14 @@ public class UpcomingTenderService implements ProjectFormSectionService {
    */
   public List<RestSearchItem> findTenderFunctionsLikeWithManualEntry(String searchTerm) {
     return functionService.findFunctionsLikeWithManualEntry(searchTerm, FunctionType.UPCOMING_TENDER);
+  }
+
+  public boolean doesDetailHaveUpcomingTendersInThePast(ProjectDetail detail) {
+    var upcomingTenders =  getUpcomingTendersForDetail(detail);
+    var currentDate = LocalDate.now();
+    return !upcomingTenders.isEmpty()
+        && upcomingTenders.stream()
+        .anyMatch(ut -> ut.getEstimatedTenderDate().isBefore(currentDate));
   }
 
   @Override
