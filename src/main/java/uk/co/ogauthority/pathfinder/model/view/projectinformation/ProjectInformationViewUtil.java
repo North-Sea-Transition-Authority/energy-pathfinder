@@ -48,9 +48,9 @@ public class ProjectInformationViewUtil {
   private static void setSubCategoryFields(ProjectInformationView projectInformationView,
                                            ProjectInformation projectInformation) {
     var fieldStageSubCategory = projectInformation.getFieldStageSubCategory();
-    projectInformationView.setFieldStageSubCategory(
+    projectInformationView.setFieldStage(
         fieldStageSubCategory != null
-            ? fieldStageSubCategory.getDisplayName()
+            ? projectInformationView.getFieldStage().concat(String.format(": %s", fieldStageSubCategory.getDisplayName()))
             : ""
     );
   }

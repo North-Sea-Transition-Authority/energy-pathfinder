@@ -13,7 +13,6 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
-import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
@@ -83,7 +82,8 @@ public class ProjectInformationService implements ProjectFormSectionService {
   }
 
   private void clearFieldStageCategory(ProjectInformationForm form) {
-    form.setFieldStageSubCategory(null);
+    form.setCarbonCaptureSubCategory(null);
+    form.setOffshoreWindSubCategory(null);
   }
 
   public Optional<ProjectInformation> getProjectInformationByProjectAndVersion(Project project, Integer version) {
@@ -145,7 +145,6 @@ public class ProjectInformationService implements ProjectFormSectionService {
 
     var fieldStage = form.getFieldStage();
     var fieldStagesWithHiddenInputs = FieldStage.getAllWithHiddenInputs();
-    var fieldStagesWithSubCategories = FieldStageSubCategory.getAllFieldStagesWithSubCategories();
 
     if (fieldStage == null || !fieldStagesWithHiddenInputs.contains(fieldStage)) {
       clearFirstProductionDate(projectInformation);
@@ -161,10 +160,11 @@ public class ProjectInformationService implements ProjectFormSectionService {
       // These inputs are hidden if development field stage
       clearFieldStageCategory(projectInformation);
 
-    } else if (fieldStagesWithSubCategories.contains(fieldStage)) {
-      projectInformation.setFieldStageSubCategory(form.getFieldStageSubCategory());
-
-      // These inputs are hidden if energy transition field stage
+    } else if (fieldStage.equals(FieldStage.CARBON_CAPTURE_AND_STORAGE)) {
+      projectInformation.setFieldStageSubCategory(form.getCarbonCaptureSubCategory());
+      clearFirstProductionDate(projectInformation);
+    } else if (fieldStage.equals(FieldStage.OFFSHORE_WIND)) {
+      projectInformation.setFieldStageSubCategory(form.getOffshoreWindSubCategory());
       clearFirstProductionDate(projectInformation);
     }
   }
@@ -173,7 +173,6 @@ public class ProjectInformationService implements ProjectFormSectionService {
 
     var fieldStage = projectInformation.getFieldStage();
     var fieldStagesWithHiddenInputs = FieldStage.getAllWithHiddenInputs();
-    var fieldStagesWithSubCategories = FieldStageSubCategory.getAllFieldStagesWithSubCategories();
 
     if (fieldStage == null || !fieldStagesWithHiddenInputs.contains(fieldStage)) {
       clearFirstProductionDate(form);
@@ -181,8 +180,11 @@ public class ProjectInformationService implements ProjectFormSectionService {
     } else if (fieldStage.equals(FieldStage.DEVELOPMENT)) {
       form.setDevelopmentFirstProductionDate(getFirstProductionDate(projectInformation));
       clearFieldStageCategory(form);
-    } else if (fieldStagesWithSubCategories.contains(fieldStage)) {
-      form.setFieldStageSubCategory(projectInformation.getFieldStageSubCategory());
+    } else if (fieldStage.equals(FieldStage.CARBON_CAPTURE_AND_STORAGE)) {
+      form.setCarbonCaptureSubCategory(projectInformation.getFieldStageSubCategory());
+      clearFirstProductionDate(form);
+    } else if (fieldStage.equals(FieldStage.OFFSHORE_WIND)) {
+      form.setOffshoreWindSubCategory(projectInformation.getFieldStageSubCategory());
       clearFirstProductionDate(form);
     }
   }

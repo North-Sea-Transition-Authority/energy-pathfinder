@@ -69,7 +69,6 @@ class ProjectInformationViewUtilTest {
         firstProductionYear
     );
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isEqualTo(expectedFirstProductionDate);
-    assertThat(projectInformationView.getFieldStageSubCategory()).isNull();
   }
 
   @Test
@@ -90,7 +89,6 @@ class ProjectInformationViewUtilTest {
     assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
 
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
-    assertThat(projectInformationView.getFieldStageSubCategory()).isNull();
   }
 
   @ParameterizedTest
@@ -105,7 +103,6 @@ class ProjectInformationViewUtilTest {
     assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
 
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
-    assertThat(projectInformationView.getFieldStageSubCategory()).isNull();
   }
 
   @Test
@@ -113,15 +110,16 @@ class ProjectInformationViewUtilTest {
     final var fieldStage = FieldStage.CARBON_CAPTURE_AND_STORAGE;
     final var subCategory = FieldStageSubCategory.TRANSPORTATION_AND_STORAGE;
 
+    var expectedFieldStage = String.format("%s: %s", fieldStage.getDisplayName(), subCategory.getDisplayName());
+
     projectInformation.setFieldStage(fieldStage);
     projectInformation.setFieldStageSubCategory(subCategory);
 
     var projectInformationView = ProjectInformationViewUtil.from(projectInformation);
 
     assertCommonProperties(projectInformationView, projectInformation);
-    assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
+    assertThat(projectInformationView.getFieldStage()).isEqualTo(expectedFieldStage);
 
-    assertThat(projectInformationView.getFieldStageSubCategory()).isEqualTo(subCategory.getDisplayName());
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
   }
 
@@ -130,15 +128,16 @@ class ProjectInformationViewUtilTest {
     final var fieldStage = FieldStage.OFFSHORE_WIND;
     final var subCategory = FieldStageSubCategory.FLOATING_OFFSHORE_WIND;
 
+    var expectedFieldStage = String.format("%s: %s", fieldStage.getDisplayName(), subCategory.getDisplayName());
+
     projectInformation.setFieldStage(fieldStage);
     projectInformation.setFieldStageSubCategory(subCategory);
 
     var projectInformationView = ProjectInformationViewUtil.from(projectInformation);
 
     assertCommonProperties(projectInformationView, projectInformation);
-    assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
+    assertThat(projectInformationView.getFieldStage()).isEqualTo(expectedFieldStage);
 
-    assertThat(projectInformationView.getFieldStageSubCategory()).isEqualTo(subCategory.getDisplayName());
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
   }
 
@@ -153,6 +152,5 @@ class ProjectInformationViewUtilTest {
     assertCommonProperties(projectInformationView, projectInformation);
     assertThat(projectInformationView.getFieldStage()).isEqualTo(fieldStage.getDisplayName());
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
-    assertThat(projectInformationView.getFieldStageSubCategory()).isNull();
   }
 }

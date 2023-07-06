@@ -46,7 +46,7 @@ public class ProjectInformationUtil {
     );
     form.setContactDetail(contactDetailForm);
     form.setDevelopmentFirstProductionDate(new QuarterYearInput(null, null));
-    form.setFieldStageSubCategory(FIELD_STAGE_SUB_CATEGORY);
+    form.setOffshoreWindSubCategory(FIELD_STAGE_SUB_CATEGORY);
 
     return form;
   }

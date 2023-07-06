@@ -110,7 +110,7 @@ public class ProjectInformationServiceTest {
 
     // the following should not be persisted
     form.setDevelopmentFirstProductionDate(notPersistedQuarterYearInput);
-    form.setFieldStageSubCategory(FieldStageSubCategory.CAPTURE_AND_ONSHORE);
+    form.setCarbonCaptureSubCategory(FieldStageSubCategory.CAPTURE_AND_ONSHORE);
 
     when(projectInformationRepository.findByProjectDetail(details))
         .thenReturn(Optional.of(ProjectInformationUtil.getProjectInformation_withCompleteDetails(details)));
@@ -133,7 +133,7 @@ public class ProjectInformationServiceTest {
     form.setDevelopmentFirstProductionDate(persistedQuarterYearInput);
 
     // the following should not be persisted
-    form.setFieldStageSubCategory(FieldStageSubCategory.CAPTURE_AND_ONSHORE);
+    form.setCarbonCaptureSubCategory(FieldStageSubCategory.CAPTURE_AND_ONSHORE);
 
     when(projectInformationRepository.findByProjectDetail(details))
         .thenReturn(Optional.of(ProjectInformationUtil.getProjectInformation_withCompleteDetails(details)));
@@ -152,7 +152,7 @@ public class ProjectInformationServiceTest {
     var form = ProjectInformationUtil.getCompleteForm();
     form.setFieldStage(FieldStage.OFFSHORE_WIND);
 
-    form.setFieldStageSubCategory(FieldStageSubCategory.FLOATING_OFFSHORE_WIND);
+    form.setOffshoreWindSubCategory(FieldStageSubCategory.FLOATING_OFFSHORE_WIND);
 
     var notPersistedQuarterYearInput = new QuarterYearInput(Quarter.Q2, "2021");
 
@@ -180,7 +180,7 @@ public class ProjectInformationServiceTest {
 
     // the following should not be persisted
     form.setDevelopmentFirstProductionDate(notPersistedQuarterYearInput);
-    form.setFieldStageSubCategory(FieldStageSubCategory.FIXED_BOTTOM_OFFSHORE_WIND);
+    form.setOffshoreWindSubCategory(FieldStageSubCategory.FIXED_BOTTOM_OFFSHORE_WIND);
 
     when(projectInformationRepository.findByProjectDetail(details))
         .thenReturn(Optional.of(ProjectInformationUtil.getProjectInformation_withCompleteDetails(details)));
@@ -296,7 +296,8 @@ public class ProjectInformationServiceTest {
     assertThat(form.getFieldStage()).isEqualTo(FieldStage.DISCOVERY);
 
     assertThat(form.getDevelopmentFirstProductionDate()).isNull();
-    assertThat(form.getFieldStageSubCategory()).isNull();
+    assertThat(form.getCarbonCaptureSubCategory()).isNull();
+    assertThat(form.getOffshoreWindSubCategory()).isNull();
   }
 
   @Test
@@ -320,7 +321,8 @@ public class ProjectInformationServiceTest {
     assertThat(form.getFieldStage()).isEqualTo(FieldStage.DEVELOPMENT);
     assertThat(form.getDevelopmentFirstProductionDate()).isEqualTo(persistedFirstProductionDate);
 
-    assertThat(form.getFieldStageSubCategory()).isNull();
+    assertThat(form.getCarbonCaptureSubCategory()).isNull();
+    assertThat(form.getOffshoreWindSubCategory()).isNull();
   }
 
   @Test
@@ -342,9 +344,10 @@ public class ProjectInformationServiceTest {
     ProjectInformationForm form = projectInformationService.getForm(details);
 
     assertThat(form.getFieldStage()).isEqualTo(FieldStage.OFFSHORE_WIND);
-    assertThat(form.getFieldStageSubCategory()).isEqualTo(FieldStageSubCategory.FLOATING_OFFSHORE_WIND);
+    assertThat(form.getOffshoreWindSubCategory()).isEqualTo(FieldStageSubCategory.FLOATING_OFFSHORE_WIND);
 
     assertThat(form.getDevelopmentFirstProductionDate()).isNull();
+    assertThat(form.getCarbonCaptureSubCategory()).isNull();
   }
 
   @Test
@@ -367,7 +370,8 @@ public class ProjectInformationServiceTest {
 
     assertThat(form.getFieldStage()).isNull();
     assertThat(form.getDevelopmentFirstProductionDate()).isNull();
-    assertThat(form.getFieldStageSubCategory()).isNull();
+    assertThat(form.getCarbonCaptureSubCategory()).isNull();
+    assertThat(form.getOffshoreWindSubCategory()).isNull();
   }
 
   @Test

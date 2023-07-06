@@ -20,12 +20,14 @@ public class ProjectInformationForm {
   @NotEmpty(message = "Provide a summary of the project", groups = FullValidation.class)
   private String projectSummary;
 
-  @NotNull(message = "Select a field stage", groups = FullValidation.class)
+  @NotNull(message = "Select an energy project", groups = FullValidation.class)
   private FieldStage fieldStage;
 
   private QuarterYearInput developmentFirstProductionDate;
 
-  private FieldStageSubCategory fieldStageSubCategory;
+  private FieldStageSubCategory carbonCaptureSubCategory;
+
+  private FieldStageSubCategory offshoreWindSubCategory;
 
   @Valid
   private ContactDetailForm contactDetail;
@@ -70,12 +72,19 @@ public class ProjectInformationForm {
     this.developmentFirstProductionDate = developmentFirstProductionDate;
   }
 
-  public FieldStageSubCategory getFieldStageSubCategory() {
-    return fieldStageSubCategory;
+  public FieldStageSubCategory getCarbonCaptureSubCategory() {
+    return carbonCaptureSubCategory;
   }
 
-  public void setFieldStageSubCategory(
-      FieldStageSubCategory fieldStageSubCategory) {
-    this.fieldStageSubCategory = fieldStageSubCategory;
+  public void setCarbonCaptureSubCategory(FieldStageSubCategory carbonCaptureSubCategory) {
+    this.carbonCaptureSubCategory = carbonCaptureSubCategory;
+  }
+
+  public FieldStageSubCategory getOffshoreWindSubCategory() {
+    return offshoreWindSubCategory;
+  }
+
+  public void setOffshoreWindSubCategory(FieldStageSubCategory offshoreWindSubCategory) {
+    this.offshoreWindSubCategory = offshoreWindSubCategory;
   }
 }

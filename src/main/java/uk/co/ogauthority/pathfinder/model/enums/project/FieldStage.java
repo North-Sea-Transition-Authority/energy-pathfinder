@@ -4,17 +4,18 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
 public enum FieldStage {
-  DISCOVERY("Discovery", "Exploration phase", false, false),
-  DEVELOPMENT("Development", "Industry engagement throughout project development cycle up to first oil", true, false),
-  DECOMMISSIONING("Decommissioning", "Decommissioning planning commenced either pre/post Cessation of Production", false, false),
-  CARBON_CAPTURE_AND_STORAGE("Carbon Capture and Storage (CCS)", "", true, true),
-  HYDROGEN("Hydrogen", "", false, true),
-  OFFSHORE_ELECTRIFICATION("Offshore electrification", "", false, true),
-  OFFSHORE_WIND("Offshore Wind", "", true, true);
+  DISCOVERY("Discovery", "Exploration phase", false, Set.of(EnergyType.OIL_AND_GAS)),
+  DEVELOPMENT("Development", "Industry engagement throughout project development cycle up to first oil", true, Set.of(EnergyType.OIL_AND_GAS)),
+  DECOMMISSIONING("Decommissioning", "Decommissioning planning commenced either pre/post Cessation of Production", false, Set.of(EnergyType.OIL_AND_GAS)),
+  CARBON_CAPTURE_AND_STORAGE("Carbon Capture and Storage (CCS)", "", true, Set.of(EnergyType.TRANSITION)),
+  HYDROGEN("Hydrogen", "", false, Set.of(EnergyType.TRANSITION)),
+  OFFSHORE_ELECTRIFICATION("Offshore electrification", "", false, Set.of(EnergyType.TRANSITION)),
+  OFFSHORE_WIND("Offshore wind", "", true, Set.of(EnergyType.TRANSITION));
 
   private final String displayName;
 
@@ -22,13 +23,13 @@ public enum FieldStage {
 
   private final boolean hasHiddenInputs;
 
-  private final boolean isEnergyTransitionProject;
+  private final Set<EnergyType> energyType;
 
-  FieldStage(String displayName, String description, boolean hasHiddenInputs, boolean isEnergyTransitionProject) {
+  FieldStage(String displayName, String description, boolean hasHiddenInputs, Set<EnergyType> energyType) {
     this.displayName = displayName;
     this.description = description;
     this.hasHiddenInputs = hasHiddenInputs;
-    this.isEnergyTransitionProject = isEnergyTransitionProject;
+    this.energyType = energyType;
   }
 
   public String getDisplayName() {
@@ -43,8 +44,8 @@ public enum FieldStage {
     return hasHiddenInputs;
   }
 
-  public boolean isEnergyTransitionProject() {
-    return isEnergyTransitionProject;
+  public Set<EnergyType> getEnergyType() {
+    return energyType;
   }
 
   public static Map<String, String> getEntryAsMap(FieldStage fieldStage) {
@@ -64,7 +65,7 @@ public enum FieldStage {
 
   public static List<FieldStage> getEnergyTransitionProjectFieldStages() {
     return Arrays.stream(values())
-        .filter(FieldStage::isEnergyTransitionProject)
+        .filter(fs -> fs.energyType.contains(EnergyType.TRANSITION))
         .collect(Collectors.toList());
   }
 }

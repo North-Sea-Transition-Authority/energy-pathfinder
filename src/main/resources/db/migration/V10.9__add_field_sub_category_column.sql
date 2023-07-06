@@ -24,5 +24,7 @@ SET field_stage = 'OFFSHORE_ELECTRIFICATION'
 WHERE field_stage = 'ENERGY_TRANSITION'
 AND energy_transition_category = 'ELECTRIFICATION';
 
-ALTER TABLE ${datasource.user}.project_information
-DROP COLUMN energy_transition_category;
+UPDATE ${datasource.user}.project_information
+SET field_stage = NULL
+WHERE field_stage = 'ENERGY_TRANSITION'
+AND energy_transition_category IS NULL;

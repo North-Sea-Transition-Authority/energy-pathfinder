@@ -119,7 +119,7 @@ public class ProjectInformationFormValidatorTest {
   public void validate_whenFieldStageWithSubCategoryAndEmptyHiddenQuestionsWithPartialValidation_thenValid() {
     var form = ProjectInformationUtil.getCompleteForm();
     form.setFieldStage(FieldStage.CARBON_CAPTURE_AND_STORAGE);
-    form.setFieldStageSubCategory(null);
+    form.setCarbonCaptureSubCategory(null);
 
     var errors = getErrors(form, ValidationType.PARTIAL);
 
@@ -132,7 +132,7 @@ public class ProjectInformationFormValidatorTest {
   public void validate_whenFieldStageWithSubCategoryAndValidHiddenQuestionsWithFullValidation_thenValid() {
     var form = ProjectInformationUtil.getCompleteForm();
     form.setFieldStage(FieldStage.CARBON_CAPTURE_AND_STORAGE);
-    form.setFieldStageSubCategory(FieldStageSubCategory.CAPTURE_AND_ONSHORE);
+    form.setCarbonCaptureSubCategory(FieldStageSubCategory.CAPTURE_AND_ONSHORE);
 
     var errors = getErrors(form, ValidationType.FULL);
 
@@ -145,7 +145,8 @@ public class ProjectInformationFormValidatorTest {
   public void validate_whenFieldStageWithSubCategoryAndEmptyHiddenQuestionsWithFullValidation_thenInvalid() {
     var form = ProjectInformationUtil.getCompleteForm();
     form.setFieldStage(FieldStage.OFFSHORE_WIND);
-    form.setFieldStageSubCategory(null);
+    form.setOffshoreWindSubCategory(null);
+    var errorMessage = String.format("Select a %s category", FieldStage.OFFSHORE_WIND.getDisplayName());
 
     var errors = getErrors(form, ValidationType.FULL);
 
@@ -157,7 +158,7 @@ public class ProjectInformationFormValidatorTest {
     );
 
     assertThat(fieldErrorMessages).containsExactly(
-        entry("fieldStageSubCategory", Set.of(ProjectInformationFormValidator.MISSING_FIELD_STAGE_CATEGORY_ERROR))
+        entry("fieldStageSubCategory", Set.of(errorMessage))
     );
   }
 
@@ -177,7 +178,9 @@ public class ProjectInformationFormValidatorTest {
   public void validate_whenFieldStageSubCategoryDoesNotMapToFieldStage_thenInvalid() {
     var form = ProjectInformationUtil.getCompleteForm();
     form.setFieldStage(FieldStage.OFFSHORE_WIND);
-    form.setFieldStageSubCategory(FieldStageSubCategory.CAPTURE_AND_ONSHORE);
+    form.setOffshoreWindSubCategory(FieldStageSubCategory.CAPTURE_AND_ONSHORE);
+    var errorMessage = String.format("Select a %s category", FieldStage.OFFSHORE_WIND.getDisplayName());
+
 
     var errors = getErrors(form, ValidationType.FULL);
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
@@ -188,7 +191,7 @@ public class ProjectInformationFormValidatorTest {
     );
 
     assertThat(fieldErrorMessages).containsExactly(
-        entry("fieldStageSubCategory", Set.of(ProjectInformationFormValidator.INVALID_FIELD_STAGE_CATEGORY_ERROR))
+        entry("fieldStageSubCategory", Set.of(errorMessage))
     );
   }
 

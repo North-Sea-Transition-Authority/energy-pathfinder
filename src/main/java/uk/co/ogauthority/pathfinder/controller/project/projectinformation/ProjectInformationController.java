@@ -108,14 +108,15 @@ public class ProjectInformationController extends ProjectFormPageController {
         .addObject("decommissioningFieldStageDescription", FieldStage.DECOMMISSIONING.getDescription())
         .addObject("carbonCaptureAndStorageFieldStage", FieldStage.getEntryAsMap(FieldStage.CARBON_CAPTURE_AND_STORAGE))
         .addObject("carbonCaptureAndStorageFieldStageDescription", FieldStage.CARBON_CAPTURE_AND_STORAGE.getDescription())
-        .addObject("carbonCaptureAndStorageCategories", FieldStageSubCategory.getAllAsMap(FieldStage.CARBON_CAPTURE_AND_STORAGE))
+        .addObject("carbonAndOnshoreCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.CAPTURE_AND_ONSHORE))
+        .addObject("carbonAndOnshoreDescription", FieldStageSubCategory.CAPTURE_AND_ONSHORE.getDescription())
+        .addObject("transportationAndStorageCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.TRANSPORTATION_AND_STORAGE))
+        .addObject("transportationAndStorageDescription", FieldStageSubCategory.TRANSPORTATION_AND_STORAGE.getDescription())
         .addObject("hydrogenFieldStage", FieldStage.getEntryAsMap(FieldStage.HYDROGEN))
-        .addObject("hydrogenFieldStageDescription", FieldStage.HYDROGEN.getDescription())
         .addObject("offshoreElectrificationFieldStage", FieldStage.getEntryAsMap(FieldStage.OFFSHORE_ELECTRIFICATION))
-        .addObject("offshoreElectrificationFieldStageDescription", FieldStage.OFFSHORE_ELECTRIFICATION.getDescription())
         .addObject("offshoreWindFieldStage", FieldStage.getEntryAsMap(FieldStage.OFFSHORE_WIND))
-        .addObject("offshoreWindFieldStageDescription", FieldStage.OFFSHORE_WIND.getDescription())
-        .addObject("offshoreWindCategories", FieldStageSubCategory.getAllAsMap(FieldStage.OFFSHORE_WIND))
+        .addObject("fixedBottomOffshoreWindCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.FIXED_BOTTOM_OFFSHORE_WIND))
+        .addObject("floatingOffshoreWindCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.FLOATING_OFFSHORE_WIND))
         .addObject("quarters", Quarter.getAllAsMap());
 
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);

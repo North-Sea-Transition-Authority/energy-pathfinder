@@ -17,19 +17,13 @@
       diffedField=projectInformationDiffModel.ProjectInformationView_projectSummary
     />
     <@checkAnswers.diffedCheckAnswersRowNoActions
-      prompt="Field stage"
+      prompt="Energy project"
       diffedField=projectInformationDiffModel.ProjectInformationView_fieldStage
     />
     <#if isDevelopmentFieldStage>
       <@checkAnswers.diffedCheckAnswersRowNoActions
         prompt="Development first production date"
         diffedField=projectInformationDiffModel.ProjectInformationView_developmentFirstProductionDate
-      />
-    </#if>
-    <#if hasFieldStageSubCategories>
-      <@checkAnswers.diffedCheckAnswersRowNoActions
-        prompt="Field stage category"
-        diffedField=projectInformationDiffModel.ProjectInformationView_fieldStageSubCategory
       />
     </#if>
     <@checkAnswers.diffedCheckAnswersRowNoActions

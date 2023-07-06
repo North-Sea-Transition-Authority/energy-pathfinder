@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.enums.project;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -46,17 +47,14 @@ public enum FieldStageSubCategory {
         .collect(StreamUtil.toLinkedHashMap(Enum::name, FieldStageSubCategory::getDisplayName));
   }
 
+  public static Map<String, String> getEntryAsMap(FieldStageSubCategory fieldStageSubCategory) {
+    return Collections.singletonMap(fieldStageSubCategory.name(), fieldStageSubCategory.getDisplayName());
+  }
+
   public static List<FieldStage> getAllFieldStagesWithSubCategories() {
     return Arrays.stream(values())
         .map(FieldStageSubCategory::getFieldStage)
         .distinct()
-        .collect(Collectors.toList());
-  }
-
-  public static List<String> getAllFieldStagesWithSubCategoriesAsStrings() {
-    return getAllFieldStagesWithSubCategories()
-        .stream()
-        .map(FieldStage::getDisplayName)
         .collect(Collectors.toList());
   }
 
