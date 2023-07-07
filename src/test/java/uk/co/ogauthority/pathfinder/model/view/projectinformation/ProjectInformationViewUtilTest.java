@@ -2,8 +2,8 @@ package uk.co.ogauthority.pathfinder.model.view.projectinformation;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.runner.RunWith;
@@ -38,7 +38,7 @@ class ProjectInformationViewUtilTest {
   }
 
   @Test
-  public void from_whenNoFieldStage() {
+  void from_whenNoFieldStage() {
 
     projectInformation.setFieldStage(null);
 
@@ -49,7 +49,7 @@ class ProjectInformationViewUtilTest {
   }
 
   @Test
-  public void from_whenDevelopmentFieldStage() {
+  void from_whenDevelopmentFieldStage() {
 
     final var fieldStage = FieldStage.DEVELOPMENT;
     final var firstProductionQuarter = Quarter.Q1;
@@ -72,7 +72,7 @@ class ProjectInformationViewUtilTest {
   }
 
   @Test
-  public void from_whenDiscoveryFieldStage() {
+  void from_whenDiscoveryFieldStage() {
     final var fieldStage = FieldStage.DISCOVERY;
     final var firstProductionQuarter = Quarter.Q1;
     final var firstProductionYear = 2020;
@@ -94,7 +94,6 @@ class ProjectInformationViewUtilTest {
   @ParameterizedTest
   @EnumSource(value = FieldStage.class, names = {"DECOMMISSIONING", "HYDROGEN", "OFFSHORE_ELECTRIFICATION"}, mode = EnumSource.Mode.INCLUDE)
   void from_FieldStageWithoutHiddenFields(FieldStage fieldStage) {
-    setup();
     projectInformation.setFieldStage(fieldStage);
 
     var projectInformationView = ProjectInformationViewUtil.from(projectInformation);
@@ -106,7 +105,7 @@ class ProjectInformationViewUtilTest {
   }
 
   @Test
-  public void from_whenCarbonCaptureAndStorageFieldStage() {
+  void from_whenCarbonCaptureAndStorageFieldStage() {
     final var fieldStage = FieldStage.CARBON_CAPTURE_AND_STORAGE;
     final var subCategory = FieldStageSubCategory.TRANSPORTATION_AND_STORAGE;
 
@@ -124,7 +123,7 @@ class ProjectInformationViewUtilTest {
   }
 
   @Test
-  public void from_whenOffshoreWindFieldStage() {
+  void from_whenOffshoreWindFieldStage() {
     final var fieldStage = FieldStage.OFFSHORE_WIND;
     final var subCategory = FieldStageSubCategory.FLOATING_OFFSHORE_WIND;
 
@@ -142,7 +141,7 @@ class ProjectInformationViewUtilTest {
   }
 
   @Test
-  public void from_whenFieldStageWithNoHiddenContent() {
+  void from_whenFieldStageWithNoHiddenContent() {
     final var fieldStage = FieldStage.DECOMMISSIONING;
 
     projectInformation.setFieldStage(fieldStage);

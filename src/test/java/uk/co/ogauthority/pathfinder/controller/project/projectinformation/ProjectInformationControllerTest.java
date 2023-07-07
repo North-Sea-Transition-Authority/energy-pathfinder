@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.controller.project.projectinformation;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -10,6 +11,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
@@ -29,7 +31,10 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
@@ -70,11 +75,39 @@ public class ProjectInformationControllerTest extends ProjectContextAbstractCont
 
   @Test
   public void authenticatedUser_hasAccessToProjectInformation() throws Exception {
-    when(projectInformationService.getForm(detail)).thenReturn(new ProjectInformationForm());
-    mockMvc.perform(get(ReverseRouter.route(
+    var form = new ProjectInformationForm();
+    when(projectInformationService.getForm(detail)).thenReturn(form);
+    var modelAndView = mockMvc.perform(get(ReverseRouter.route(
         on(ProjectInformationController.class).getProjectInformation(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
-        .andExpect(status().isOk());
+        .andExpect(status().isOk())
+        .andExpect(view().name("project/projectinformation/projectInformation"))
+        .andReturn()
+        .getModelAndView();
+
+    assertThat(modelAndView).isNotNull();
+    var model = modelAndView.getModel();
+
+    assertThat(model)
+        .containsEntry("form", form)
+        .containsEntry("pageName", ProjectInformationController.PAGE_NAME)
+        .containsEntry("discoveryFieldStage", FieldStage.getEntryAsMap(FieldStage.DISCOVERY))
+        .containsEntry("discoveryFieldStageDescription", FieldStage.DISCOVERY.getDescription())
+        .containsEntry("developmentFieldStage", FieldStage.getEntryAsMap(FieldStage.DEVELOPMENT))
+        .containsEntry("developmentFieldStageDescription", FieldStage.DEVELOPMENT.getDescription())
+        .containsEntry("decommissioningFieldStage", FieldStage.getEntryAsMap(FieldStage.DECOMMISSIONING))
+        .containsEntry("decommissioningFieldStageDescription", FieldStage.DECOMMISSIONING.getDescription())
+        .containsEntry("carbonCaptureAndStorageFieldStage", FieldStage.getEntryAsMap(FieldStage.CARBON_CAPTURE_AND_STORAGE))
+        .containsEntry("carbonAndOnshoreCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.CAPTURE_AND_ONSHORE))
+        .containsEntry("carbonAndOnshoreDescription", FieldStageSubCategory.CAPTURE_AND_ONSHORE.getDescription())
+        .containsEntry("transportationAndStorageCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.TRANSPORTATION_AND_STORAGE))
+        .containsEntry("transportationAndStorageDescription", FieldStageSubCategory.TRANSPORTATION_AND_STORAGE.getDescription())
+        .containsEntry("hydrogenFieldStage", FieldStage.getEntryAsMap(FieldStage.HYDROGEN))
+        .containsEntry("offshoreElectrificationFieldStage", FieldStage.getEntryAsMap(FieldStage.OFFSHORE_ELECTRIFICATION))
+        .containsEntry("offshoreWindFieldStage", FieldStage.getEntryAsMap(FieldStage.OFFSHORE_WIND))
+        .containsEntry("fixedBottomOffshoreWindCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.FIXED_BOTTOM_OFFSHORE_WIND))
+        .containsEntry("floatingOffshoreWindCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.FLOATING_OFFSHORE_WIND))
+        .containsEntry("quarters", Quarter.getAllAsMap());
   }
 
   @Test

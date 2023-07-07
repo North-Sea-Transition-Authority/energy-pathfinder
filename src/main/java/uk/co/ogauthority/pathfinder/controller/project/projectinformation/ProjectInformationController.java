@@ -110,7 +110,8 @@ public class ProjectInformationController extends ProjectFormPageController {
         .addObject("carbonCaptureAndStorageFieldStageDescription", FieldStage.CARBON_CAPTURE_AND_STORAGE.getDescription())
         .addObject("carbonAndOnshoreCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.CAPTURE_AND_ONSHORE))
         .addObject("carbonAndOnshoreDescription", FieldStageSubCategory.CAPTURE_AND_ONSHORE.getDescription())
-        .addObject("transportationAndStorageCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.TRANSPORTATION_AND_STORAGE))
+        .addObject("transportationAndStorageCategory",
+            FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.TRANSPORTATION_AND_STORAGE))
         .addObject("transportationAndStorageDescription", FieldStageSubCategory.TRANSPORTATION_AND_STORAGE.getDescription())
         .addObject("hydrogenFieldStage", FieldStage.getEntryAsMap(FieldStage.HYDROGEN))
         .addObject("offshoreElectrificationFieldStage", FieldStage.getEntryAsMap(FieldStage.OFFSHORE_ELECTRIFICATION))

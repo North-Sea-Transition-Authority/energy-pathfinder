@@ -7,11 +7,15 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ValidationUtils;
@@ -24,23 +28,14 @@ import uk.co.ogauthority.pathfinder.model.form.validation.quarteryear.QuarterYea
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ProjectInformationFormValidatorTest {
+@ExtendWith(MockitoExtension.class)
+class ProjectInformationFormValidatorTest {
 
   @Mock
   private QuarterYearInputValidator quarterYearInputValidator;
 
+  @InjectMocks
   private ProjectInformationFormValidator projectInformationFormValidator;
-
-  @Before
-  public void setup() {
-    projectInformationFormValidator = new ProjectInformationFormValidator(
-        quarterYearInputValidator
-    );
-
-    doCallRealMethod().when(quarterYearInputValidator).validate(any(), any(), any());
-    when(quarterYearInputValidator.supports(any())).thenReturn(true);
-  }
 
   private BindingResult getErrors(ProjectInformationForm form, ValidationType validationType) {
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -52,7 +47,7 @@ public class ProjectInformationFormValidatorTest {
   }
 
   @Test
-  public void validate_whenCompleteForm_thenValid() {
+  void validate_whenCompleteForm_thenValid() {
 
     var form = ProjectInformationUtil.getCompleteForm();
     var errors = getErrors(form, ValidationType.FULL);
@@ -63,7 +58,10 @@ public class ProjectInformationFormValidatorTest {
   }
 
   @Test
-  public void validate_whenDevelopmentFieldStageAndEmptyHiddenQuestionsWithPartialValidation_thenValid() {
+  void validate_whenDevelopmentFieldStageAndEmptyHiddenQuestionsWithPartialValidation_thenValid() {
+    doCallRealMethod().when(quarterYearInputValidator).validate(any(), any(), any());
+    when(quarterYearInputValidator.supports(any())).thenReturn(true);
+
     var form = ProjectInformationUtil.getCompleteForm();
     form.setFieldStage(FieldStage.DEVELOPMENT);
     form.setDevelopmentFirstProductionDate(new QuarterYearInput(null, null));
@@ -76,7 +74,10 @@ public class ProjectInformationFormValidatorTest {
   }
 
   @Test
-  public void validate_whenDevelopmentFieldStageAndValidHiddenQuestionsWithFullValidation_thenValid() {
+  void validate_whenDevelopmentFieldStageAndValidHiddenQuestionsWithFullValidation_thenValid() {
+    doCallRealMethod().when(quarterYearInputValidator).validate(any(), any(), any());
+    when(quarterYearInputValidator.supports(any())).thenReturn(true);
+
     var form = ProjectInformationUtil.getCompleteForm();
     form.setFieldStage(FieldStage.DEVELOPMENT);
     form.setDevelopmentFirstProductionDate(new QuarterYearInput(Quarter.Q1, "2020"));
@@ -89,7 +90,10 @@ public class ProjectInformationFormValidatorTest {
   }
 
   @Test
-  public void validate_whenDevelopmentFieldStageAndEmptyHiddenQuestionsWithFullValidation_thenInvalid() {
+  void validate_whenDevelopmentFieldStageAndEmptyHiddenQuestionsWithFullValidation_thenInvalid() {
+    doCallRealMethod().when(quarterYearInputValidator).validate(any(), any(), any());
+    when(quarterYearInputValidator.supports(any())).thenReturn(true);
+
     var form = ProjectInformationUtil.getCompleteForm();
     form.setFieldStage(FieldStage.DEVELOPMENT);
     form.setDevelopmentFirstProductionDate(new QuarterYearInput(null, null));
@@ -115,21 +119,31 @@ public class ProjectInformationFormValidatorTest {
     );
   }
 
-  @Test
-  public void validate_whenFieldStageWithSubCategoryAndEmptyHiddenQuestionsWithPartialValidation_thenValid() {
+  @ParameterizedTest
+  @MethodSource("fieldStageWithSubCategoryMissing_arguments")
+  void validate_whenFieldStageWithSubCategoryAndEmptyHiddenQuestionsWithPartialValidation_thenInvalid(FieldStage fieldStage,
+                                                                                                      String field,
+                                                                                                      String errorMessage) {
     var form = ProjectInformationUtil.getCompleteForm();
-    form.setFieldStage(FieldStage.CARBON_CAPTURE_AND_STORAGE);
+    form.setFieldStage(fieldStage);
     form.setCarbonCaptureSubCategory(null);
+    form.setOffshoreWindSubCategory(null);
 
     var errors = getErrors(form, ValidationType.PARTIAL);
-
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors).isEmpty();
+    assertThat(fieldErrors).containsExactly(
+        entry(field, Set.of(field.concat(".required")))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry(field, Set.of(errorMessage))
+    );
   }
 
   @Test
-  public void validate_whenFieldStageWithSubCategoryAndValidHiddenQuestionsWithFullValidation_thenValid() {
+  void validate_whenFieldStageWithSubCategoryAndValidHiddenQuestionsWithFullValidation_thenValid() {
     var form = ProjectInformationUtil.getCompleteForm();
     form.setFieldStage(FieldStage.CARBON_CAPTURE_AND_STORAGE);
     form.setCarbonCaptureSubCategory(FieldStageSubCategory.CAPTURE_AND_ONSHORE);
@@ -141,29 +155,31 @@ public class ProjectInformationFormValidatorTest {
     assertThat(fieldErrors).isEmpty();
   }
 
-  @Test
-  public void validate_whenFieldStageWithSubCategoryAndEmptyHiddenQuestionsWithFullValidation_thenInvalid() {
+  @ParameterizedTest
+  @MethodSource("fieldStageWithSubCategoryMissing_arguments")
+  void validate_whenFieldStageWithSubCategoryAndEmptyHiddenQuestionsWithFullValidation_thenInvalid(FieldStage fieldStage,
+                                                                                                          String field,
+                                                                                                          String errorMessage) {
     var form = ProjectInformationUtil.getCompleteForm();
-    form.setFieldStage(FieldStage.OFFSHORE_WIND);
+    form.setFieldStage(fieldStage);
+    form.setCarbonCaptureSubCategory(null);
     form.setOffshoreWindSubCategory(null);
-    var errorMessage = String.format("Select a %s category", FieldStage.OFFSHORE_WIND.getDisplayName());
 
     var errors = getErrors(form, ValidationType.FULL);
-
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
     var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
     assertThat(fieldErrors).containsExactly(
-        entry("fieldStageSubCategory", Set.of("fieldStageSubCategory.required"))
+        entry(field, Set.of(field.concat(".required")))
     );
 
     assertThat(fieldErrorMessages).containsExactly(
-        entry("fieldStageSubCategory", Set.of(errorMessage))
+        entry(field, Set.of(errorMessage))
     );
   }
 
   @Test
-  public void validate_whenNullFieldStageAndPartialValidation_thenValid() {
+  void validate_whenNullFieldStageAndPartialValidation_thenValid() {
     var form = ProjectInformationUtil.getCompleteForm();
     form.setFieldStage(null);
 
@@ -174,24 +190,10 @@ public class ProjectInformationFormValidatorTest {
     assertThat(fieldErrors).isEmpty();
   }
 
-  @Test
-  public void validate_whenFieldStageSubCategoryDoesNotMapToFieldStage_thenInvalid() {
-    var form = ProjectInformationUtil.getCompleteForm();
-    form.setFieldStage(FieldStage.OFFSHORE_WIND);
-    form.setOffshoreWindSubCategory(FieldStageSubCategory.CAPTURE_AND_ONSHORE);
-    var errorMessage = String.format("Select a %s category", FieldStage.OFFSHORE_WIND.getDisplayName());
-
-
-    var errors = getErrors(form, ValidationType.FULL);
-    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
-    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
-
-    assertThat(fieldErrors).containsExactly(
-        entry("fieldStageSubCategory", Set.of("fieldStageSubCategory.invalid"))
-    );
-
-    assertThat(fieldErrorMessages).containsExactly(
-        entry("fieldStageSubCategory", Set.of(errorMessage))
+  private static Stream<Arguments> fieldStageWithSubCategoryMissing_arguments() {
+    return Stream.of(
+        Arguments.of(FieldStage.OFFSHORE_WIND, ProjectInformationFormValidator.OFFSHORE_WIND_FIELD, ProjectInformationFormValidator.OFFSHORE_WIND_MISSING_ERROR),
+        Arguments.of(FieldStage.CARBON_CAPTURE_AND_STORAGE, ProjectInformationFormValidator.CARBON_CAPTURE_AND_STORAGE_FIELD, ProjectInformationFormValidator.CARBON_CAPTURE_AND_STORAGE_MISSING_ERROR)
     );
   }
 

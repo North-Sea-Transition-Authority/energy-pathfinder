@@ -17,6 +17,13 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 @Component
 public class ProjectInformationFormValidator implements SmartValidator {
 
+  public static final String CARBON_CAPTURE_AND_STORAGE_FIELD = "carbonCaptureSubCategory";
+  public static final String CARBON_CAPTURE_AND_STORAGE_MISSING_ERROR =
+      String.format("Select a %s category", FieldStage.CARBON_CAPTURE_AND_STORAGE.getDisplayName());
+  public static final String OFFSHORE_WIND_FIELD = "offshoreWindSubCategory";
+  public static final String OFFSHORE_WIND_MISSING_ERROR =
+      String.format("Select an %s category", FieldStage.OFFSHORE_WIND.getDisplayName().toLowerCase());
+
   private final QuarterYearInputValidator quarterYearInputValidator;
 
   @Autowired
@@ -64,19 +71,19 @@ public class ProjectInformationFormValidator implements SmartValidator {
             errors
         );
       } else if (fieldStagesWithStageCategories.contains(fieldStage)) {
-        if(BooleanUtils.isTrue(fieldStage.equals(FieldStage.CARBON_CAPTURE_AND_STORAGE))) {
+        if (BooleanUtils.isTrue(fieldStage.equals(FieldStage.CARBON_CAPTURE_AND_STORAGE))) {
           ValidationUtils.rejectIfEmptyOrWhitespace(
               errors,
-              "carbonCaptureSubCategory",
-              "carbonAndOnshore.required",
-              String.format("Select a %s category", fieldStage.getDisplayName())
+              CARBON_CAPTURE_AND_STORAGE_FIELD,
+              CARBON_CAPTURE_AND_STORAGE_FIELD.concat(".required"),
+              CARBON_CAPTURE_AND_STORAGE_MISSING_ERROR
           );
         } else if (BooleanUtils.isTrue(fieldStage.equals(FieldStage.OFFSHORE_WIND))) {
           ValidationUtils.rejectIfEmptyOrWhitespace(
               errors,
-              "offshoreWindSubCategory",
-              "offshoreWindSubCategory.required",
-              String.format("Select an %s category", fieldStage.getDisplayName().toLowerCase())
+              OFFSHORE_WIND_FIELD,
+              OFFSHORE_WIND_FIELD.concat(".required"),
+              OFFSHORE_WIND_MISSING_ERROR
           );
         }
       }

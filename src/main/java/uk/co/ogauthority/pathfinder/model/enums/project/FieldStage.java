@@ -9,13 +9,47 @@ import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
 public enum FieldStage {
-  DISCOVERY("Discovery", "Exploration phase", false, Set.of(EnergyType.OIL_AND_GAS)),
-  DEVELOPMENT("Development", "Industry engagement throughout project development cycle up to first oil", true, Set.of(EnergyType.OIL_AND_GAS)),
-  DECOMMISSIONING("Decommissioning", "Decommissioning planning commenced either pre/post Cessation of Production", false, Set.of(EnergyType.OIL_AND_GAS)),
-  CARBON_CAPTURE_AND_STORAGE("Carbon Capture and Storage (CCS)", "", true, Set.of(EnergyType.TRANSITION)),
-  HYDROGEN("Hydrogen", "", false, Set.of(EnergyType.TRANSITION)),
-  OFFSHORE_ELECTRIFICATION("Offshore electrification", "", false, Set.of(EnergyType.TRANSITION)),
-  OFFSHORE_WIND("Offshore wind", "", true, Set.of(EnergyType.TRANSITION));
+  DISCOVERY(
+      "Discovery",
+      "Exploration phase",
+      false, Set.of(EnergyType.OIL_AND_GAS)
+  ),
+  DEVELOPMENT(
+      "Development",
+      "Industry engagement throughout project development cycle up to first oil",
+      true,
+      Set.of(EnergyType.OIL_AND_GAS)
+  ),
+  DECOMMISSIONING(
+      "Decommissioning",
+      "Decommissioning planning commenced either pre/post Cessation of Production",
+      false,
+      Set.of(EnergyType.OIL_AND_GAS)
+  ),
+  CARBON_CAPTURE_AND_STORAGE(
+      "Carbon Capture and Storage (CCS)",
+      "",
+      true,
+      Set.of(EnergyType.TRANSITION)
+  ),
+  HYDROGEN(
+      "Hydrogen",
+      "",
+      false,
+      Set.of(EnergyType.TRANSITION)
+  ),
+  OFFSHORE_ELECTRIFICATION(
+      "Offshore electrification",
+      "",
+      false,
+      Set.of(EnergyType.TRANSITION)
+  ),
+  OFFSHORE_WIND(
+      "Offshore wind",
+      "",
+      true,
+      Set.of(EnergyType.TRANSITION)
+  );
 
   private final String displayName;
 
