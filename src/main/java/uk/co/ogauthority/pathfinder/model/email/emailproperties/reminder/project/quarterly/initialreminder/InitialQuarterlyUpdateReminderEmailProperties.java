@@ -10,14 +10,14 @@ public class InitialQuarterlyUpdateReminderEmailProperties extends QuarterlyUpda
                                                        String operatorName,
                                                        List<String> remindableProjects,
                                                        String serviceLoginUrl,
-                                                       List<String> pastUpcomingTenders) {
+                                                       List<String> projectsWithPastUpcomingTenders) {
     super(
         NotifyTemplate.INITIAL_QUARTERLY_PROJECT_UPDATE_REMINDER,
         recipientIdentifier,
         operatorName,
         remindableProjects,
         serviceLoginUrl,
-        pastUpcomingTenders
+        projectsWithPastUpcomingTenders
     );
   }
 }

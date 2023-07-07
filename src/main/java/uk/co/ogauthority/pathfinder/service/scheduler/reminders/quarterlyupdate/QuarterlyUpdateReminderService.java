@@ -109,9 +109,10 @@ public class QuarterlyUpdateReminderService {
         .map(RemindableProject::getProjectDisplayName)
         .collect(Collectors.toList());
 
-    var upcomingTenders = operatorRemindableProjects
+    var projectsWithPastUpcomingTenders = operatorRemindableProjects
         .stream()
         .filter(RemindableProject::hasUpcomingTendersInPast)
+        .sorted(Comparator.comparing(remindableProject -> remindableProject.getProjectDisplayName().toLowerCase()))
         .map(RemindableProject::getProjectDisplayName)
         .collect(Collectors.toList());
 
@@ -121,7 +122,7 @@ public class QuarterlyUpdateReminderService {
           teamMember.getForename(),
           organisationGroup.getName(),
           projectsDisplayNames,
-          upcomingTenders
+          projectsWithPastUpcomingTenders
       );
 
       emailService.sendEmail(

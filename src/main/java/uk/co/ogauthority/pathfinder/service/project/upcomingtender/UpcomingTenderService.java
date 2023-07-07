@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
@@ -253,7 +254,7 @@ public class UpcomingTenderService implements ProjectFormSectionService {
   public boolean doesDetailHaveUpcomingTendersInThePast(ProjectDetail detail) {
     var upcomingTenders =  getUpcomingTendersForDetail(detail);
     var currentDate = LocalDate.now();
-    return !upcomingTenders.isEmpty()
+    return !CollectionUtils.isEmpty(upcomingTenders)
         && upcomingTenders.stream()
         .anyMatch(ut -> ut.getEstimatedTenderDate().isBefore(currentDate));
   }

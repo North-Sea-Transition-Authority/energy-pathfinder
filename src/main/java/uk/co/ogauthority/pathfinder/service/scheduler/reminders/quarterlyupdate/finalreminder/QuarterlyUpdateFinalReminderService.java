@@ -45,13 +45,13 @@ class QuarterlyUpdateFinalReminderService implements QuarterlyUpdateReminder {
   public QuarterlyUpdateReminderEmailProperties getReminderEmailProperties(String recipientIdentifier,
                                                                            String operatorName,
                                                                            List<String> remindableProjects,
-                                                                           List<String> pastUpcomingTenders) {
+                                                                           List<String> projectsWithPastUpcomingTenders) {
     return new FinalQuarterlyUpdateReminderEmailProperties(
         recipientIdentifier,
         operatorName,
         remindableProjects,
         linkService.getWorkAreaUrl(),
-        pastUpcomingTenders
+        projectsWithPastUpcomingTenders
     );
   }
 }

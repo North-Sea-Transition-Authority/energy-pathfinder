@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.model.email.emailproperties.reminder.projec
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.apache.commons.collections.CollectionUtils;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplate;
 
@@ -11,30 +12,31 @@ public abstract class QuarterlyUpdateReminderEmailProperties extends EmailProper
   private final String operatorName;
   private final List<String> remindableProjects;
   private final String serviceLoginUrl;
-  private final List<String> pastUpcomingTenders;
+  private final List<String> projectsWithPastUpcomingTenders;
 
   public QuarterlyUpdateReminderEmailProperties(NotifyTemplate template,
                                                 String recipientIdentifier,
                                                 String operatorName,
                                                 List<String> remindableProjects,
                                                 String serviceLoginUrl,
-                                                List<String> pastUpcomingTenders) {
+                                                List<String> projectsWithPastUpcomingTenders) {
     super(template, recipientIdentifier);
     this.operatorName = operatorName;
     this.remindableProjects = remindableProjects;
     this.serviceLoginUrl = serviceLoginUrl;
-    this.pastUpcomingTenders = pastUpcomingTenders;
+    this.projectsWithPastUpcomingTenders = projectsWithPastUpcomingTenders;
   }
 
   @Override
   public Map<String, Object> getEmailPersonalisation() {
     var emailPersonalisation = super.getEmailPersonalisation();
-    var showPastUpcomingTenders = pastUpcomingTenders.isEmpty() ? "no" : "yes";
+    var showProjectsWithPastUpcomingTenders = CollectionUtils.isEmpty(projectsWithPastUpcomingTenders)  ? "no" : "yes";
+
     emailPersonalisation.put("OPERATOR_NAME", operatorName);
     emailPersonalisation.put("OPERATOR_PROJECTS", remindableProjects);
     emailPersonalisation.put("SERVICE_LOGIN_URL", serviceLoginUrl);
-    emailPersonalisation.put("SHOW_PAST_UPCOMING_TENDERS", showPastUpcomingTenders);
-    emailPersonalisation.put("PAST_UPCOMING_TENDERS", pastUpcomingTenders);
+    emailPersonalisation.put("SHOW_PROJECTS_WITH_PAST_UPCOMING_TENDERS", showProjectsWithPastUpcomingTenders);
+    emailPersonalisation.put("PROJECTS_WITH_PAST_UPCOMING_TENDERS", projectsWithPastUpcomingTenders);
     return emailPersonalisation;
   }
 
@@ -57,7 +59,7 @@ public abstract class QuarterlyUpdateReminderEmailProperties extends EmailProper
     return Objects.equals(operatorName, that.operatorName)
         && Objects.equals(remindableProjects, that.remindableProjects)
         && Objects.equals(serviceLoginUrl, that.serviceLoginUrl)
-        && Objects.equals(pastUpcomingTenders, that.pastUpcomingTenders);
+        && Objects.equals(projectsWithPastUpcomingTenders, that.projectsWithPastUpcomingTenders);
   }
 
   @Override
@@ -67,7 +69,7 @@ public abstract class QuarterlyUpdateReminderEmailProperties extends EmailProper
         operatorName,
         remindableProjects,
         serviceLoginUrl,
-        pastUpcomingTenders
+        projectsWithPastUpcomingTenders
     );
   }
 }

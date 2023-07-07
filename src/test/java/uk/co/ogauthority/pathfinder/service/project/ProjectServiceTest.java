@@ -46,7 +46,7 @@ public class ProjectServiceTest {
   }
 
   @Test
-  public void getLatestDetail() {
+  public void getLatestDetail_whenFound_thenReturned() {
     var projectDetail = ProjectUtil.getProjectDetails();
 
     when(projectDetailsRepository.findByProjectIdAndIsCurrentVersionIsTrue(PROJECT_ID)).thenReturn(
@@ -79,7 +79,7 @@ public class ProjectServiceTest {
   }
 
   @Test
-  public void getLatestSubmittedDetail() {
+  public void getLatestSubmittedDetail_whenFound_thenReturned() {
     var projectDetail = ProjectUtil.getProjectDetails();
 
     when(projectDetailsRepository.findByProjectIdAndIsLatestSubmittedVersion(PROJECT_ID)).thenReturn(
@@ -260,7 +260,7 @@ public class ProjectServiceTest {
   }
 
   @Test
-  public void getDetailByIdOrError() {
+  public void getDetailByIdOrError_whenFound_thenReturned() {
     var projectDetailId = projectDetail.getId();
     when(projectDetailsRepository.findById(projectDetailId)).thenReturn(Optional.of(projectDetail));
 
@@ -269,7 +269,7 @@ public class ProjectServiceTest {
   }
 
   @Test
-  public void getDetailByIdOrError_error() {
+  public void getDetailByIdOrError_whenNotFound_thenException() {
     var projectDetailId = 1;
     when(projectDetailsRepository.findById(projectDetailId)).thenReturn(Optional.empty());
 
