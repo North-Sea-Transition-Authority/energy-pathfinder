@@ -44,7 +44,7 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @ExtendWith(MockitoExtension.class)
-public class ProjectInformationServiceTest {
+class ProjectInformationServiceTest {
 
   @Mock
   private ProjectInformationRepository projectInformationRepository;

@@ -3,15 +3,15 @@ package uk.co.ogauthority.pathfinder.model.enums.project;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
 public enum FieldStageSubCategory {
 
-  FIXED_BOTTOM_OFFSHORE_WIND("Fixed bottom offshore wind", "", FieldStage.OFFSHORE_WIND),
-  FLOATING_OFFSHORE_WIND("Floating offshore wind", "", FieldStage.OFFSHORE_WIND),
+  FIXED_BOTTOM_OFFSHORE_WIND("Fixed bottom offshore wind", FieldStage.OFFSHORE_WIND),
+  FLOATING_OFFSHORE_WIND("Floating offshore wind", FieldStage.OFFSHORE_WIND),
   CAPTURE_AND_ONSHORE("Capture and onshore", "Emitters and onshore pipelines", FieldStage.CARBON_CAPTURE_AND_STORAGE),
   TRANSPORTATION_AND_STORAGE("Transportation and storage",
       "Offshore pipelines and reservoir storage", FieldStage.CARBON_CAPTURE_AND_STORAGE);
@@ -26,6 +26,12 @@ public enum FieldStageSubCategory {
     this.displayName = displayName;
     this.description = description;
     this.fieldStage = fieldStage;
+  }
+
+  FieldStageSubCategory(String displayName, FieldStage fieldStage) {
+    this.displayName = displayName;
+    this.fieldStage = fieldStage;
+    this.description = "";
   }
 
   public String getDisplayName() {
@@ -51,11 +57,10 @@ public enum FieldStageSubCategory {
     return Collections.singletonMap(fieldStageSubCategory.name(), fieldStageSubCategory.getDisplayName());
   }
 
-  public static List<FieldStage> getAllFieldStagesWithSubCategories() {
+  public static Set<FieldStage> getAllFieldStagesWithSubCategories() {
     return Arrays.stream(values())
         .map(FieldStageSubCategory::getFieldStage)
-        .distinct()
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
   }
 
 }
