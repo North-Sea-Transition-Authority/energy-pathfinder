@@ -10,13 +10,10 @@ public class RemindableProject {
 
   private final String projectDisplayName;
 
-  private final boolean hasUpcomingTendersInPast;
-
-  public RemindableProject(int projectDetailId, int operatorGroupId, String projectDisplayName, boolean hasUpcomingTendersInPast) {
+  public RemindableProject(int projectDetailId, int operatorGroupId, String projectDisplayName) {
     this.projectDetailId = projectDetailId;
     this.operatorGroupId = operatorGroupId;
     this.projectDisplayName = projectDisplayName;
-    this.hasUpcomingTendersInPast = hasUpcomingTendersInPast;
   }
 
   public int getProjectDetailId() {
@@ -31,10 +28,6 @@ public class RemindableProject {
     return projectDisplayName;
   }
 
-  public boolean hasUpcomingTendersInPast() {
-    return hasUpcomingTendersInPast;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -47,8 +40,7 @@ public class RemindableProject {
     RemindableProject that = (RemindableProject) o;
     return projectDetailId == that.projectDetailId
         && operatorGroupId == that.operatorGroupId
-        && Objects.equals(projectDisplayName, that.projectDisplayName)
-        && Objects.equals(hasUpcomingTendersInPast, that.hasUpcomingTendersInPast);
+        && Objects.equals(projectDisplayName, that.projectDisplayName);
   }
 
   @Override
@@ -56,8 +48,7 @@ public class RemindableProject {
     return Objects.hash(
         projectDetailId,
         operatorGroupId,
-        projectDisplayName,
-        hasUpcomingTendersInPast
+        projectDisplayName
     );
   }
 

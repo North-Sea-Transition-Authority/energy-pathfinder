@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -13,17 +14,19 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.util.CollectionUtils;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.OrganisationGroupMembership;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationGroupPersonMembershipService;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
-import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.quarterlystatistics.ReportableProjectService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -31,8 +34,8 @@ import uk.co.ogauthority.pathfinder.testutil.ReportableProjectTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
-@RunWith(MockitoJUnitRunner.class)
-public class QuarterlyUpdateReminderServiceTest {
+@ExtendWith(SpringExtension.class)
+class QuarterlyUpdateReminderServiceTest {
 
   @Mock
   private ReportableProjectService reportableProjectService;
@@ -49,34 +52,23 @@ public class QuarterlyUpdateReminderServiceTest {
   @Mock
   private UpcomingTenderService upcomingTenderService;
 
-  @Mock
-  private ProjectService projectService;
-
   @InjectMocks
   private QuarterlyUpdateReminderService quarterlyUpdateReminderService;
 
   @Test
-  public void getAllRemindableProjects_whenNoRemindableProjectsFound_thenReturnEmptyList() {
+  void getAllRemindableProjects_whenNoRemindableProjectsFound_thenReturnEmptyList() {
 
     when(reportableProjectService.getReportableProjects()).thenReturn(Collections.emptyList());
 
     var resultingRemindableProjects = quarterlyUpdateReminderService.getAllRemindableProjects();
 
     assertThat(resultingRemindableProjects).isEmpty();
-    verify(projectService, never()).getDetailByIdOrError(any());
-    verify(upcomingTenderService, never()).doesDetailHaveUpcomingTendersInThePast(any());
   }
 
   @Test
-  public void getAllRemindableProjects_whenRemindableProjectsFound_thenReturnPopulatedList() {
+  void getAllRemindableProjects_whenRemindableProjectsFound_thenReturnPopulatedList() {
     var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.DEVELOPMENT);
-    var projectDetailId = reportableProject.getProjectDetailId();
-    var projectDetail = ProjectUtil.getProjectDetails();
-    projectDetail.setId(projectDetailId);
-
     when(reportableProjectService.getReportableProjects()).thenReturn(List.of(reportableProject));
-    when(projectService.getDetailByIdOrError(projectDetailId)).thenReturn(projectDetail);
-    when(upcomingTenderService.doesDetailHaveUpcomingTendersInThePast(projectDetail)).thenReturn(true);
 
     var resultingRemindableProjects = quarterlyUpdateReminderService.getAllRemindableProjects();
 
@@ -84,26 +76,20 @@ public class QuarterlyUpdateReminderServiceTest {
         new RemindableProject(
             reportableProject.getProjectDetailId(),
             reportableProject.getOperatorGroupId(),
-            reportableProject.getProjectDisplayName(),
-            true
+            reportableProject.getProjectDisplayName()
         )
     );
-
-    verify(projectService).getDetailByIdOrError(projectDetailId);
-    verify(upcomingTenderService).doesDetailHaveUpcomingTendersInThePast(projectDetail);
   }
 
   @Test
-  public void sendQuarterlyProjectUpdateReminderToOperators_whenNoRemindableProjects_verifyNoEmailsSent() {
-
+  void sendQuarterlyProjectUpdateReminderToOperators_whenNoRemindableProjects_verifyNoEmailsSent() {
     quarterlyUpdateReminderService.sendQuarterlyProjectUpdateReminderToOperators(testQuarterlyUpdateReminderService);
 
     verify(emailService, never()).sendEmail(any(), anyString(), anyString());
   }
 
   @Test
-  public void sendQuarterlyProjectUpdateReminderToOperators_whenRemindableProjects_verifyEmailToEachTeamMember() {
-
+  void sendQuarterlyProjectUpdateReminderToOperators_whenRemindableProjects_verifyEmailToEachTeamMember() {
     var organisationGroupA = TeamTestingUtil.generateOrganisationGroup(10, "organisation group A", "A short name");
 
     var firstMemberOfOrganisationA = createPerson(1000, "person1@organisationA.com");
@@ -133,17 +119,36 @@ public class QuarterlyUpdateReminderServiceTest {
     when(portalOrganisationGroupPersonMembershipService.getOrganisationGroupMembershipForOrganisationGroupIdsIn(any()))
         .thenReturn(organisationGroupMembershipList);
 
-    var remindableProjectA = new RemindableProject(1, organisationGroupA.getOrgGrpId(), "A project", true);
-    var remindableProjectB = new RemindableProject(2, organisationGroupB.getOrgGrpId(), "B project", false);
-    var remindableProjectC = new RemindableProject(3, organisationGroupB.getOrgGrpId(), "C project", false);
+    var remindableProjectA = new RemindableProject(1, organisationGroupA.getOrgGrpId(), "A project");
+    var remindableProjectB = new RemindableProject(2, organisationGroupB.getOrgGrpId(), "B project");
+    var remindableProjectC = new RemindableProject(3, organisationGroupB.getOrgGrpId(), "C project");
 
     var remindableProjectList = List.of(remindableProjectC, remindableProjectB, remindableProjectA);
 
     when(testQuarterlyUpdateReminderService.getRemindableProjects()).thenReturn(remindableProjectList);
 
+    var remindableProjectAUpcomingTender = mock(UpcomingTender.class);
+    var projectDetailA = mock(ProjectDetail.class);
+    when(remindableProjectAUpcomingTender.getProjectDetail()).thenReturn(projectDetailA);
+    when(projectDetailA.getId()).thenReturn(1);
+
+    var remindableProjectCUpcomingTender = mock(UpcomingTender.class);
+    var projectDetailC = mock(ProjectDetail.class);
+    when(remindableProjectCUpcomingTender.getProjectDetail()).thenReturn(projectDetailC);
+    when(projectDetailC.getId()).thenReturn(3);
+
+    var pastUpcomingTenders = List.of(remindableProjectCUpcomingTender, remindableProjectAUpcomingTender);
+    var projectsWithPastUpcomingTenders = List.of(remindableProjectA, remindableProjectC);
+    when(upcomingTenderService.getPastUpcomingTendersForRemindableProjects(remindableProjectList))
+        .thenReturn(pastUpcomingTenders);
+
     quarterlyUpdateReminderService.sendQuarterlyProjectUpdateReminderToOperators(testQuarterlyUpdateReminderService);
 
     var remindableProjectListByOperator = remindableProjectList
+        .stream()
+        .collect(Collectors.groupingBy(RemindableProject::getOperatorGroupId, Collectors.toList()));
+
+    var projectsWithPastUpcomingTendersByOperator = projectsWithPastUpcomingTenders
         .stream()
         .collect(Collectors.groupingBy(RemindableProject::getOperatorGroupId, Collectors.toList()));
 
@@ -157,11 +162,16 @@ public class QuarterlyUpdateReminderServiceTest {
           .map(RemindableProject::getProjectDisplayName)
           .collect(Collectors.toList());
 
-      var upcomingTenders = remindableProjectListByOperator.get(organisationGroup.getOrgGrpId())
-          .stream()
-          .filter(RemindableProject::hasUpcomingTendersInPast)
-          .map(RemindableProject::getProjectDisplayName)
-          .collect(Collectors.toList());
+      List<String> sortedProjectsWithPastUpcomingTendersDisplayNames;
+      if (CollectionUtils.isEmpty(projectsWithPastUpcomingTendersByOperator)) {
+        sortedProjectsWithPastUpcomingTendersDisplayNames = Collections.emptyList();
+      } else {
+        sortedProjectsWithPastUpcomingTendersDisplayNames = projectsWithPastUpcomingTendersByOperator.get(organisationGroup.getOrgGrpId())
+            .stream()
+            .sorted(Comparator.comparing(remindableProject -> remindableProject.getProjectDisplayName().toLowerCase()))
+            .map(RemindableProject::getProjectDisplayName)
+            .collect(Collectors.toList());
+      }
 
       organisationGroupMembership.getTeamMembers().forEach(teamMember -> {
 
@@ -169,7 +179,7 @@ public class QuarterlyUpdateReminderServiceTest {
             teamMember.getForename(),
             organisationGroup.getName(),
             sortedProjectsDisplayNames,
-            upcomingTenders
+            sortedProjectsWithPastUpcomingTendersDisplayNames
         );
 
         verify(emailService, times(1)).sendEmail(
@@ -183,8 +193,7 @@ public class QuarterlyUpdateReminderServiceTest {
   }
 
   @Test
-  public void getRemindableProjectsNotUpdatedInCurrentQuarter_whenNoRemindableProjectsFound_thenReturnEmptyList() {
-
+  void getRemindableProjectsNotUpdatedInCurrentQuarter_whenNoRemindableProjectsFound_thenReturnEmptyList() {
     when(reportableProjectService.getReportableProjectsNotUpdatedBetween(any(), any())).thenReturn(Collections.emptyList());
 
     var resultingRemindableProjects = quarterlyUpdateReminderService.getRemindableProjectsNotUpdatedInCurrentQuarter();
@@ -193,15 +202,13 @@ public class QuarterlyUpdateReminderServiceTest {
   }
 
   @Test
-  public void getRemindableProjectsNotUpdatedInCurrentQuarter_whenRemindableProjectsFound_thenReturnPopulatedList() {
+  void getRemindableProjectsNotUpdatedInCurrentQuarter_whenRemindableProjectsFound_thenReturnPopulatedList() {
     var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.DEVELOPMENT);
     var projectDetailId = reportableProject.getProjectDetailId();
     var projectDetail = ProjectUtil.getProjectDetails();
     projectDetail.setId(projectDetailId);
 
     when(reportableProjectService.getReportableProjectsNotUpdatedBetween(any(), any())).thenReturn(List.of(reportableProject));
-    when(projectService.getDetailByIdOrError(projectDetailId)).thenReturn(projectDetail);
-    when(upcomingTenderService.doesDetailHaveUpcomingTendersInThePast(projectDetail)).thenReturn(false);
 
     var resultingRemindableProjects = quarterlyUpdateReminderService.getRemindableProjectsNotUpdatedInCurrentQuarter();
 
@@ -209,8 +216,7 @@ public class QuarterlyUpdateReminderServiceTest {
         new RemindableProject(
             reportableProject.getProjectDetailId(),
             reportableProject.getOperatorGroupId(),
-            reportableProject.getProjectDisplayName(),
-            false
+            reportableProject.getProjectDisplayName()
         )
     );
   }

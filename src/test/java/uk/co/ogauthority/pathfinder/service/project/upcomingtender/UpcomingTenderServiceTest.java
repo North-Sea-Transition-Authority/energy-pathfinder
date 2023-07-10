@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -15,8 +16,6 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -42,6 +41,7 @@ import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
+import uk.co.ogauthority.pathfinder.service.scheduler.reminders.quarterlyupdate.RemindableProject;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -94,7 +94,6 @@ class UpcomingTenderServiceTest {
 
   @BeforeEach
   void setUp() {
-
     SearchSelectorService searchSelectorService = new SearchSelectorService();
     FunctionService functionService = new FunctionService(searchSelectorService);
 
@@ -287,7 +286,6 @@ class UpcomingTenderServiceTest {
 
   @Test
   void deleteUpcomingTenderFile_whenTemporaryFileStatus_dontRemoveFileLink() {
-
     var fileId = "fileId";
     var projectDetail = ProjectUtil.getProjectDetails();
     var authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount();
@@ -306,7 +304,6 @@ class UpcomingTenderServiceTest {
 
   @Test
   void deleteUpcomingTenderFile_whenFullFileStatus_thenRemoveFileLink() {
-
     var fileId = "fileId";
     var projectDetail = ProjectUtil.getProjectDetails();
     var authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount();
@@ -456,43 +453,41 @@ class UpcomingTenderServiceTest {
   }
 
   @Test
-  void doesDetailHaveUpcomingTendersInThePast_whenAllUpcomingTendersAreInThePast_verifyIsTrue() {
-    var upcomingTender = UpcomingTenderUtil.getUpcomingTender(detail);
-    upcomingTender.setEstimatedTenderDate(LocalDate.now().minusDays(1));
-    when(upcomingTenderRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(List.of(upcomingTender));
+  void getPastUpcomingTendersForRemindableProjects_whenFound_thenReturn() {
+    var currentDate = LocalDate.now();
 
-    var result = upcomingTenderService.doesDetailHaveUpcomingTendersInThePast(detail);
-    assertThat(result).isTrue();
+    var remindableProjectWithPastUpcomingTender = mock(RemindableProject.class);
+    when(remindableProjectWithPastUpcomingTender.getProjectDetailId()).thenReturn(1);
+    var upcomingTenderInPast = mock(UpcomingTender.class);
+    when(upcomingTenderInPast.getEstimatedTenderDate()).thenReturn(currentDate.minusDays(1));
+
+    var remindableProjectWithNoPastUpcomingTenders = mock(RemindableProject.class);
+    when(remindableProjectWithNoPastUpcomingTenders.getProjectDetailId()).thenReturn(2);
+    var upcomingTenderInFuture = mock(UpcomingTender.class);
+    when(upcomingTenderInFuture.getEstimatedTenderDate()).thenReturn(currentDate.plusDays(5));
+
+    var remindableProjectWithNoUpcomingTenders = mock(RemindableProject.class);
+    when(remindableProjectWithNoUpcomingTenders.getProjectDetailId()).thenReturn(3);
+
+    when(upcomingTenderRepository.findAllByProjectDetail_IdIn(List.of(1,2,3))).thenReturn(List.of(upcomingTenderInPast, upcomingTenderInFuture));
+
+    var result = upcomingTenderService.getPastUpcomingTendersForRemindableProjects(
+        List.of(remindableProjectWithPastUpcomingTender, remindableProjectWithNoPastUpcomingTenders, remindableProjectWithNoUpcomingTenders)
+    );
+
+    assertThat(result).containsOnly(upcomingTenderInPast);
   }
 
   @Test
-  void doesDetailHaveUpcomingTendersInThePast_whenAtLeastOneUpcomingTenderIsInThePast_verifyIsTrue() {
-    var upcomingTenderInPast = UpcomingTenderUtil.getUpcomingTender(detail);
-    upcomingTenderInPast.setEstimatedTenderDate(LocalDate.now().minusDays(1));
-    var upcomingTenderInFuture = UpcomingTenderUtil.getUpcomingTender(detail);
-    upcomingTenderInFuture.setEstimatedTenderDate(LocalDate.now().plusDays(10));
-    when(upcomingTenderRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(List.of(upcomingTenderInPast, upcomingTenderInFuture));
+  void getPastUpcomingTendersForRemindableProjects_whenNoneFound_thenReturnEmptyList() {
+    var projectDetailIdList = List.of(1);
+    when(upcomingTenderRepository.findAllByProjectDetail_IdIn(projectDetailIdList)).thenReturn(Collections.emptyList());
 
-    var result = upcomingTenderService.doesDetailHaveUpcomingTendersInThePast(detail);
-    assertThat(result).isTrue();
-  }
+    var remindableProjectWithNoUpcomingTenders = mock(RemindableProject.class);
+    when(remindableProjectWithNoUpcomingTenders.getProjectDetailId()).thenReturn(1);
 
-  @ParameterizedTest
-  @NullAndEmptySource
-  void doesDetailHaveUpcomingTendersInThePast_whenNoUpcomingTenders_verifyIsFalse(List<UpcomingTender> upcomingTenderList) {
-    when(upcomingTenderRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(upcomingTenderList);
+    var result = upcomingTenderService.getPastUpcomingTendersForRemindableProjects(List.of(remindableProjectWithNoUpcomingTenders));
 
-    var result = upcomingTenderService.doesDetailHaveUpcomingTendersInThePast(detail);
-    assertThat(result).isFalse();
-  }
-
-  @Test
-  void doesDetailHaveUpcomingTendersInThePast_whenNoUpcomingTendersInPast_verifyIsFalse() {
-    var upcomingTender = UpcomingTenderUtil.getUpcomingTender(detail);
-    upcomingTender.setEstimatedTenderDate(LocalDate.now().plusDays(10));
-    when(upcomingTenderRepository.findByProjectDetailOrderByIdAsc(detail)).thenReturn(List.of(upcomingTender));
-
-    var result = upcomingTenderService.doesDetailHaveUpcomingTendersInThePast(detail);
-    assertThat(result).isFalse();
+    assertThat(result).isEmpty();
   }
 }

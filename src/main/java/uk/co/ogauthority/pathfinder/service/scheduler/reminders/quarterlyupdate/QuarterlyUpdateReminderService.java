@@ -1,17 +1,19 @@
 package uk.co.ogauthority.pathfinder.service.scheduler.reminders.quarterlyupdate;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.OrganisationGroupMembership;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationGroupPersonMembershipService;
+import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.entity.quarterlystatistics.ReportableProject;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
-import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.quarterlystatistics.ReportableProjectService;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
@@ -23,21 +25,18 @@ public class QuarterlyUpdateReminderService {
   private final PortalOrganisationGroupPersonMembershipService portalOrganisationGroupPersonMembershipService;
   private final EmailService emailService;
   private final UpcomingTenderService upcomingTenderService;
-  private final ProjectService projectService;
 
   @Autowired
   public QuarterlyUpdateReminderService(
       ReportableProjectService reportableProjectService,
       PortalOrganisationGroupPersonMembershipService portalOrganisationGroupPersonMembershipService,
       EmailService emailService,
-      UpcomingTenderService upcomingTenderService,
-      ProjectService projectService
+      UpcomingTenderService upcomingTenderService
   ) {
     this.reportableProjectService = reportableProjectService;
     this.portalOrganisationGroupPersonMembershipService = portalOrganisationGroupPersonMembershipService;
     this.emailService = emailService;
     this.upcomingTenderService = upcomingTenderService;
-    this.projectService = projectService;
   }
 
   public List<RemindableProject> getAllRemindableProjects() {
@@ -60,13 +59,34 @@ public class QuarterlyUpdateReminderService {
         .collect(Collectors.toList());
   }
 
-  public void sendQuarterlyProjectUpdateReminderToOperators(QuarterlyUpdateReminder quarterlyUpdateReminder) {
+  private List<RemindableProject> getRemindableProjectsWithPastUpcomingTenders(List<UpcomingTender> pastUpcomingTenders,
+                                                                               List<RemindableProject> remindableProjects) {
+    if (pastUpcomingTenders.isEmpty()) {
+      return Collections.emptyList();
+    }
 
+    var pastUpcomingTenderProjectDetailIds = pastUpcomingTenders.stream()
+        .map(ut -> ut.getProjectDetail().getId())
+        .collect(Collectors.toSet());
+
+    return remindableProjects
+        .stream()
+        .filter(rp -> pastUpcomingTenderProjectDetailIds.contains(rp.getProjectDetailId()))
+        .collect(Collectors.toList());
+  }
+
+  public void sendQuarterlyProjectUpdateReminderToOperators(QuarterlyUpdateReminder quarterlyUpdateReminder) {
     var remindableProjects = quarterlyUpdateReminder.getRemindableProjects();
+    var pastUpcomingTenders = upcomingTenderService.getPastUpcomingTendersForRemindableProjects(remindableProjects);
+    var remindableProjectsWithPastUpcomingTenders = getRemindableProjectsWithPastUpcomingTenders(pastUpcomingTenders, remindableProjects);
 
     var organisationGroupMemberships = getOrganisationGroupMemberships(remindableProjects);
 
     var remindableProjectsByOrganisationGroup = remindableProjects
+        .stream()
+        .collect(Collectors.groupingBy(RemindableProject::getOperatorGroupId, Collectors.toList()));
+
+    var projectsWithPastUpcomingTendersByOrganisationGroup = remindableProjectsWithPastUpcomingTenders
         .stream()
         .collect(Collectors.groupingBy(RemindableProject::getOperatorGroupId, Collectors.toList()));
 
@@ -75,12 +95,15 @@ public class QuarterlyUpdateReminderService {
       var organisationGroup = organisationGroupMembership.getOrganisationGroup();
 
       var organisationGroupRemindableProjects = remindableProjectsByOrganisationGroup.get(organisationGroup.getOrgGrpId());
+      var organisationGroupProjectsWithPastUpcomingTenders =
+          projectsWithPastUpcomingTendersByOrganisationGroup.get(organisationGroup.getOrgGrpId());
 
       sendQuarterlyReminderToTeamMembers(
           quarterlyUpdateReminder,
           organisationGroup,
           organisationGroupRemindableProjects,
-          organisationGroupMembership.getTeamMembers()
+          organisationGroupMembership.getTeamMembers(),
+          organisationGroupProjectsWithPastUpcomingTenders
       );
     });
   }
@@ -101,7 +124,8 @@ public class QuarterlyUpdateReminderService {
   private void sendQuarterlyReminderToTeamMembers(QuarterlyUpdateReminder quarterlyUpdateReminder,
                                                   PortalOrganisationGroup organisationGroup,
                                                   List<RemindableProject> operatorRemindableProjects,
-                                                  List<Person> teamMembers) {
+                                                  List<Person> teamMembers,
+                                                  List<RemindableProject> projectsWithPastUpcomingTenders) {
 
     var projectsDisplayNames =  operatorRemindableProjects
         .stream()
@@ -109,12 +133,16 @@ public class QuarterlyUpdateReminderService {
         .map(RemindableProject::getProjectDisplayName)
         .collect(Collectors.toList());
 
-    var projectsWithPastUpcomingTenders = operatorRemindableProjects
-        .stream()
-        .filter(RemindableProject::hasUpcomingTendersInPast)
-        .sorted(Comparator.comparing(remindableProject -> remindableProject.getProjectDisplayName().toLowerCase()))
-        .map(RemindableProject::getProjectDisplayName)
-        .collect(Collectors.toList());
+    List<String> projectsWithPastUpcomingTenderDisplayNames;
+    if (CollectionUtils.isEmpty(projectsWithPastUpcomingTenders)) {
+      projectsWithPastUpcomingTenderDisplayNames = Collections.emptyList();
+    } else {
+      projectsWithPastUpcomingTenderDisplayNames = projectsWithPastUpcomingTenders
+          .stream()
+          .sorted(Comparator.comparing(remindableProject -> remindableProject.getProjectDisplayName().toLowerCase()))
+          .map(RemindableProject::getProjectDisplayName)
+          .collect(Collectors.toList());
+    }
 
     teamMembers.forEach(teamMember -> {
 
@@ -122,7 +150,7 @@ public class QuarterlyUpdateReminderService {
           teamMember.getForename(),
           organisationGroup.getName(),
           projectsDisplayNames,
-          projectsWithPastUpcomingTenders
+          projectsWithPastUpcomingTenderDisplayNames
       );
 
       emailService.sendEmail(
@@ -134,13 +162,10 @@ public class QuarterlyUpdateReminderService {
   }
 
   private RemindableProject convertToRemindableProject(ReportableProject reportableProject) {
-    var projectDetail = projectService.getDetailByIdOrError(reportableProject.getProjectDetailId());
-    var hasPastUpcomingTenders = upcomingTenderService.doesDetailHaveUpcomingTendersInThePast(projectDetail);
     return new RemindableProject(
         reportableProject.getProjectDetailId(),
         reportableProject.getOperatorGroupId(),
-        reportableProject.getProjectDisplayName(),
-        hasPastUpcomingTenders
+        reportableProject.getProjectDisplayName()
     );
   }
 }

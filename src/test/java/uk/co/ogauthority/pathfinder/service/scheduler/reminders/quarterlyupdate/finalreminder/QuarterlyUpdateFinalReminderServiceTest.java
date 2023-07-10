@@ -74,7 +74,7 @@ public class QuarterlyUpdateFinalReminderServiceTest {
   public void getRemindableProjects_whenRemindableProjectsFound_thenReturnPopulatedList() {
 
     var expectedRemindableProjects = List.of(
-        new RemindableProject(1, 2, "project name", true)
+        new RemindableProject(1, 2, "project name")
     );
 
     when(quarterlyUpdateReminderService.getRemindableProjectsNotUpdatedInCurrentQuarter()).thenReturn(expectedRemindableProjects);

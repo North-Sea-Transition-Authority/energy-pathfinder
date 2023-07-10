@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
@@ -40,6 +39,7 @@ import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipS
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
+import uk.co.ogauthority.pathfinder.service.scheduler.reminders.quarterlyupdate.RemindableProject;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -251,12 +251,19 @@ public class UpcomingTenderService implements ProjectFormSectionService {
     return functionService.findFunctionsLikeWithManualEntry(searchTerm, FunctionType.UPCOMING_TENDER);
   }
 
-  public boolean doesDetailHaveUpcomingTendersInThePast(ProjectDetail detail) {
-    var upcomingTenders =  getUpcomingTendersForDetail(detail);
+  public List<UpcomingTender> getPastUpcomingTendersForRemindableProjects(List<RemindableProject> remindableProjects) {
+    var projectDetailIds = remindableProjects
+        .stream()
+        .map(RemindableProject::getProjectDetailId)
+        .collect(Collectors.toList());
+
+    var pastUpcomingTenders =  upcomingTenderRepository.findAllByProjectDetail_IdIn(projectDetailIds);
     var currentDate = LocalDate.now();
-    return !CollectionUtils.isEmpty(upcomingTenders)
-        && upcomingTenders.stream()
-        .anyMatch(ut -> ut.getEstimatedTenderDate().isBefore(currentDate));
+
+    return pastUpcomingTenders
+        .stream()
+        .filter(ut -> ut.getEstimatedTenderDate().isBefore(currentDate))
+        .collect(Collectors.toList());
   }
 
   @Override
