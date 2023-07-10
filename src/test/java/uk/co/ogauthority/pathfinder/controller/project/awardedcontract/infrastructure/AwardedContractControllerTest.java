@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.controller.project.awardedcontract;
+package uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastructure;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -32,7 +32,7 @@ import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerT
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContract;
+import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure.AwardedContract;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;

@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract;
+package uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure;
 
 import java.time.LocalDate;
 import java.util.Objects;
