@@ -120,7 +120,7 @@ class QuarterlyUpdateReminderServiceTest {
         .thenReturn(organisationGroupMembershipList);
 
     var remindableProjectA = new RemindableProject(1, organisationGroupA.getOrgGrpId(), "A project");
-    var remindableProjectB = new RemindableProject(2, organisationGroupB.getOrgGrpId(), "B project");
+    var remindableProjectB = new RemindableProject(2, organisationGroupB.getOrgGrpId(), "b project");
     var remindableProjectC = new RemindableProject(3, organisationGroupB.getOrgGrpId(), "C project");
 
     var remindableProjectList = List.of(remindableProjectC, remindableProjectB, remindableProjectA);
