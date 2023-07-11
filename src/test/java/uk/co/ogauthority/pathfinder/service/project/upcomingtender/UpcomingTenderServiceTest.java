@@ -469,10 +469,17 @@ class UpcomingTenderServiceTest {
     var remindableProjectWithNoUpcomingTenders = mock(RemindableProject.class);
     when(remindableProjectWithNoUpcomingTenders.getProjectDetailId()).thenReturn(3);
 
-    when(upcomingTenderRepository.findAllByProjectDetail_IdIn(List.of(1,2,3))).thenReturn(List.of(upcomingTenderInPast, upcomingTenderInFuture));
+    var remindableProjectWithUpcomingTendersDueToday = mock(RemindableProject.class);
+    when(remindableProjectWithUpcomingTendersDueToday.getProjectDetailId()).thenReturn(4);
+    var upcomingTenderDueToday = mock(UpcomingTender.class);
+    when(upcomingTenderDueToday.getEstimatedTenderDate()).thenReturn(currentDate);
+
+    when(upcomingTenderRepository.findAllByProjectDetail_IdIn(List.of(1,2,3,4)))
+        .thenReturn(List.of(upcomingTenderInPast, upcomingTenderInFuture, upcomingTenderDueToday));
 
     var result = upcomingTenderService.getPastUpcomingTendersForRemindableProjects(
-        List.of(remindableProjectWithPastUpcomingTender, remindableProjectWithNoPastUpcomingTenders, remindableProjectWithNoUpcomingTenders)
+        List.of(remindableProjectWithPastUpcomingTender, remindableProjectWithNoPastUpcomingTenders,
+            remindableProjectWithNoUpcomingTenders, remindableProjectWithUpcomingTendersDueToday)
     );
 
     assertThat(result).containsOnly(upcomingTenderInPast);
