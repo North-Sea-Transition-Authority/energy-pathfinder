@@ -68,13 +68,6 @@ public class ProjectService {
             String.format("Unable to find project detail with version %s for project with id %s", version, projectId)));
   }
 
-  public ProjectDetail getDetailByIdOrError(Integer projectDetailId) {
-    return projectDetailsRepository.findById(projectDetailId)
-        .orElseThrow(() -> new PathfinderEntityNotFoundException(
-            String.format("Unable to find project detail for the project detail with id %s", projectDetailId)
-        ));
-  }
-
   public ProjectDetail createNewProjectDetailVersion(ProjectDetail fromDetail,
                                                      ProjectStatus newStatus,
                                                      AuthenticatedUserAccount userAccount) {
