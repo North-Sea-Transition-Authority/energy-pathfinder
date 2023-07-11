@@ -11,15 +11,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.util.CollectionUtils;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.OrganisationGroupMembership;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationGroupPersonMembershipService;
@@ -54,6 +54,12 @@ class QuarterlyUpdateReminderServiceTest {
 
   @InjectMocks
   private QuarterlyUpdateReminderService quarterlyUpdateReminderService;
+
+  @Captor
+  private ArgumentCaptor<List<String>> projectsWithPastUpcomingTendersCaptor;
+
+  @Captor
+  private ArgumentCaptor<List<String>> remindableProjectsCaptor;
 
   @Test
   void getAllRemindableProjects_whenNoRemindableProjectsFound_thenReturnEmptyList() {
@@ -138,48 +144,32 @@ class QuarterlyUpdateReminderServiceTest {
     when(projectDetailC.getId()).thenReturn(3);
 
     var pastUpcomingTenders = List.of(remindableProjectCUpcomingTender, remindableProjectAUpcomingTender);
-    var projectsWithPastUpcomingTenders = List.of(remindableProjectA, remindableProjectC);
     when(upcomingTenderService.getPastUpcomingTendersForRemindableProjects(remindableProjectList))
         .thenReturn(pastUpcomingTenders);
 
     quarterlyUpdateReminderService.sendQuarterlyProjectUpdateReminderToOperators(testQuarterlyUpdateReminderService);
 
-    var remindableProjectListByOperator = remindableProjectList
-        .stream()
-        .collect(Collectors.groupingBy(RemindableProject::getOperatorGroupId, Collectors.toList()));
-
-    var projectsWithPastUpcomingTendersByOperator = projectsWithPastUpcomingTenders
-        .stream()
-        .collect(Collectors.groupingBy(RemindableProject::getOperatorGroupId, Collectors.toList()));
-
     organisationGroupMembershipList.forEach(organisationGroupMembership -> {
 
       var organisationGroup = organisationGroupMembership.getOrganisationGroup();
 
-      var sortedProjectsDisplayNames = remindableProjectListByOperator.get(organisationGroup.getOrgGrpId())
-          .stream()
-          .sorted(Comparator.comparing(remindableProject -> remindableProject.getProjectDisplayName().toLowerCase()))
-          .map(RemindableProject::getProjectDisplayName)
-          .collect(Collectors.toList());
+      var expectedRemindableProjects = Map.of(
+          organisationGroupA.getOrgGrpId(), List.of("A project"),
+          organisationGroupB.getOrgGrpId(), List.of("b project", "C project")
+      );
 
-      List<String> sortedProjectsWithPastUpcomingTendersDisplayNames;
-      if (CollectionUtils.isEmpty(projectsWithPastUpcomingTendersByOperator)) {
-        sortedProjectsWithPastUpcomingTendersDisplayNames = Collections.emptyList();
-      } else {
-        sortedProjectsWithPastUpcomingTendersDisplayNames = projectsWithPastUpcomingTendersByOperator.get(organisationGroup.getOrgGrpId())
-            .stream()
-            .sorted(Comparator.comparing(remindableProject -> remindableProject.getProjectDisplayName().toLowerCase()))
-            .map(RemindableProject::getProjectDisplayName)
-            .collect(Collectors.toList());
-      }
+      var expectedProjectsWithPastUpcomingTenders = Map.of(
+          organisationGroupA.getOrgGrpId(), List.of("A project"),
+          organisationGroupB.getOrgGrpId(), List.of("C project")
+      );
 
       organisationGroupMembership.getTeamMembers().forEach(teamMember -> {
 
         verify(testQuarterlyUpdateReminderService, times(1)).getReminderEmailProperties(
-            teamMember.getForename(),
-            organisationGroup.getName(),
-            sortedProjectsDisplayNames,
-            sortedProjectsWithPastUpcomingTendersDisplayNames
+            eq(teamMember.getForename()),
+            eq(organisationGroup.getName()),
+            remindableProjectsCaptor.capture(),
+            projectsWithPastUpcomingTendersCaptor.capture()
         );
 
         verify(emailService, times(1)).sendEmail(
@@ -188,8 +178,52 @@ class QuarterlyUpdateReminderServiceTest {
             eq(teamMember.getForename())
         );
 
+        assertThat(remindableProjectsCaptor.getValue()).isEqualTo(expectedRemindableProjects.get(organisationGroup.getOrgGrpId()));
+        assertThat(projectsWithPastUpcomingTendersCaptor.getValue())
+            .isEqualTo(expectedProjectsWithPastUpcomingTenders.get(organisationGroup.getOrgGrpId()));
       });
     });
+  }
+
+  @Test
+  void sendQuarterlyProjectUpdateReminderToOperators_whenRemindableProjectsAndNoUpcomingTenders_verifyEmailToEachTeamMember() {
+    var organisationGroup = TeamTestingUtil.generateOrganisationGroup(10, "organisation group", "short name");
+
+    var memberOfOrganisation = createPerson(1000, "person1@organisation.com");
+
+    var organisationMembership = new OrganisationGroupMembership(
+        100,
+        organisationGroup,
+        List.of(memberOfOrganisation)
+    );
+
+    when(portalOrganisationGroupPersonMembershipService.getOrganisationGroupMembershipForOrganisationGroupIdsIn(any()))
+        .thenReturn(List.of(organisationMembership));
+
+    var remindableProject = new RemindableProject(1, organisationGroup.getOrgGrpId(), "project display name");
+    var remindableProjectList = List.of(remindableProject);
+    when(testQuarterlyUpdateReminderService.getRemindableProjects()).thenReturn(remindableProjectList);
+
+    when(upcomingTenderService.getPastUpcomingTendersForRemindableProjects(remindableProjectList))
+        .thenReturn(Collections.emptyList());
+
+    quarterlyUpdateReminderService.sendQuarterlyProjectUpdateReminderToOperators(testQuarterlyUpdateReminderService);
+
+    verify(testQuarterlyUpdateReminderService, times(1)).getReminderEmailProperties(
+        eq(memberOfOrganisation.getForename()),
+        eq(organisationGroup.getName()),
+        remindableProjectsCaptor.capture(),
+        projectsWithPastUpcomingTendersCaptor.capture()
+    );
+
+    verify(emailService, times(1)).sendEmail(
+        any(),
+        eq(memberOfOrganisation.getEmailAddress()),
+        eq(memberOfOrganisation.getForename())
+    );
+
+    assertThat(remindableProjectsCaptor.getValue()).isEqualTo(List.of("project display name"));
+    assertThat(projectsWithPastUpcomingTendersCaptor.getValue()).isEqualTo(Collections.emptyList());
   }
 
   @Test
