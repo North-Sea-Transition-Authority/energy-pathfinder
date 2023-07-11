@@ -4,8 +4,10 @@ import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
-public class FieldStageSubCategoryTest {
+class FieldStageSubCategoryTest {
 
   @Test
   void getAllAsMap_offshoreWind() {
@@ -32,5 +34,18 @@ public class FieldStageSubCategoryTest {
     var result = FieldStageSubCategory.getAllAsMap(FieldStage.DISCOVERY);
 
     assertThat(result).isEmpty();
+  }
+
+  @Test
+  void getAllFieldStagesWithSubCategories() {
+    var result = FieldStageSubCategory.getAllFieldStagesWithSubCategories();
+    assertThat(result).containsExactlyInAnyOrder(FieldStage.OFFSHORE_WIND, FieldStage.CARBON_CAPTURE_AND_STORAGE);
+  }
+
+  @ParameterizedTest
+  @EnumSource(value = FieldStageSubCategory.class)
+  void getEntryAsMap(FieldStageSubCategory fieldStageSubCategory) {
+    var result = FieldStageSubCategory.getEntryAsMap(fieldStageSubCategory);
+    assertThat(result).containsEntry(fieldStageSubCategory.name(), fieldStageSubCategory.getDisplayName());
   }
 }

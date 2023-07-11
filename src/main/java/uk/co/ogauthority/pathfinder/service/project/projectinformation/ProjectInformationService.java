@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.project.projectinformation;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,10 +142,14 @@ public class ProjectInformationService implements ProjectFormSectionService {
     return validationService.validate(form, bindingResult, validationType);
   }
 
+  private List<FieldStage> getFieldStagesWithHiddenInputs() {
+    return List.of(FieldStage.DEVELOPMENT, FieldStage.CARBON_CAPTURE_AND_STORAGE, FieldStage.OFFSHORE_WIND);
+  }
+
   private void setEntityHiddenFieldStageData(ProjectInformationForm form, ProjectInformation projectInformation) {
 
     var fieldStage = form.getFieldStage();
-    var fieldStagesWithHiddenInputs = FieldStage.getAllWithHiddenInputs();
+    var fieldStagesWithHiddenInputs = getFieldStagesWithHiddenInputs();
 
     if (fieldStage == null || !fieldStagesWithHiddenInputs.contains(fieldStage)) {
       clearFirstProductionDate(projectInformation);
@@ -172,7 +177,7 @@ public class ProjectInformationService implements ProjectFormSectionService {
   private void setFormHiddenFieldStageData(ProjectInformation projectInformation, ProjectInformationForm form) {
 
     var fieldStage = projectInformation.getFieldStage();
-    var fieldStagesWithHiddenInputs = FieldStage.getAllWithHiddenInputs();
+    var fieldStagesWithHiddenInputs = getFieldStagesWithHiddenInputs();
 
     if (fieldStage == null || !fieldStagesWithHiddenInputs.contains(fieldStage)) {
       clearFirstProductionDate(form);

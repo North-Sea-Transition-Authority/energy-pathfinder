@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.view.projectinformation;
 
+import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
@@ -32,7 +33,9 @@ public class ProjectInformationViewUtil {
     if (fieldStage != null) {
       if (fieldStage.equals(FieldStage.DEVELOPMENT)) {
         setDevelopmentFields(projectInformationView, projectInformation);
-      } else if (FieldStageSubCategory.getAllFieldStagesWithSubCategories().contains(fieldStage)) {
+      } else if (FieldStageSubCategory.getAllFieldStagesWithSubCategories().contains(fieldStage)
+          && Objects.nonNull(projectInformation.getFieldStageSubCategory())
+      ) {
         setSubCategoryFields(projectInformationView, projectInformation);
       }
     }
@@ -49,10 +52,8 @@ public class ProjectInformationViewUtil {
                                            ProjectInformation projectInformation) {
     var fieldStageSubCategory = projectInformation.getFieldStageSubCategory();
     projectInformationView.setFieldStage(
-        fieldStageSubCategory != null
-            ? projectInformationView.getFieldStage().concat(String.format(": %s", fieldStageSubCategory.getDisplayName()))
-            : ""
-    );
+        projectInformationView.getFieldStage()
+          .concat(String.format(": %s", fieldStageSubCategory.getDisplayName())));
   }
 
   private static String getFirstProductionDate(ProjectInformation projectInformation) {

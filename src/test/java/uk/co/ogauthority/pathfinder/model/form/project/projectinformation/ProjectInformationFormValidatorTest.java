@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -120,10 +121,8 @@ class ProjectInformationFormValidatorTest {
   }
 
   @ParameterizedTest
-  @MethodSource("fieldStageWithSubCategoryMissing_arguments")
-  void validate_whenFieldStageWithSubCategoryAndEmptyHiddenQuestionsWithPartialValidation_thenInvalid(FieldStage fieldStage,
-                                                                                                      String field,
-                                                                                                      String errorMessage) {
+  @EnumSource(value = FieldStage.class, names = {"OFFSHORE_WIND", "CARBON_CAPTURE_AND_STORAGE"}, mode = EnumSource.Mode.INCLUDE)
+  void validate_whenFieldStageWithSubCategoryAndEmptyHiddenQuestionsWithPartialValidation_thenValid(FieldStage fieldStage) {
     var form = ProjectInformationUtil.getCompleteForm();
     form.setFieldStage(fieldStage);
     form.setCarbonCaptureSubCategory(null);
@@ -131,15 +130,8 @@ class ProjectInformationFormValidatorTest {
 
     var errors = getErrors(form, ValidationType.PARTIAL);
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
-    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
 
-    assertThat(fieldErrors).containsExactly(
-        entry(field, Set.of(field.concat(".required")))
-    );
-
-    assertThat(fieldErrorMessages).containsExactly(
-        entry(field, Set.of(errorMessage))
-    );
+    assertThat(fieldErrors).isEmpty();
   }
 
   @Test
@@ -156,7 +148,7 @@ class ProjectInformationFormValidatorTest {
   }
 
   @ParameterizedTest
-  @MethodSource("fieldStageWithSubCategoryMissing_arguments")
+  @MethodSource("fieldStageWithSubCategoryMissing_fullValidation_arguments")
   void validate_whenFieldStageWithSubCategoryAndEmptyHiddenQuestionsWithFullValidation_thenInvalid(FieldStage fieldStage,
                                                                                                           String field,
                                                                                                           String errorMessage) {
@@ -190,7 +182,7 @@ class ProjectInformationFormValidatorTest {
     assertThat(fieldErrors).isEmpty();
   }
 
-  private static Stream<Arguments> fieldStageWithSubCategoryMissing_arguments() {
+  private static Stream<Arguments> fieldStageWithSubCategoryMissing_fullValidation_arguments() {
     return Stream.of(
         Arguments.of(FieldStage.OFFSHORE_WIND, ProjectInformationFormValidator.OFFSHORE_WIND_FIELD, ProjectInformationFormValidator.OFFSHORE_WIND_MISSING_ERROR),
         Arguments.of(FieldStage.CARBON_CAPTURE_AND_STORAGE, ProjectInformationFormValidator.CARBON_CAPTURE_AND_STORAGE_FIELD, ProjectInformationFormValidator.CARBON_CAPTURE_AND_STORAGE_MISSING_ERROR)

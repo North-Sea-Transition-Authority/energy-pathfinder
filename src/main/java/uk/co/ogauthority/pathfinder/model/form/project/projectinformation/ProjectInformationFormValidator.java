@@ -8,8 +8,8 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
 import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
-import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.quarteryear.QuarterYearInputValidator;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
@@ -61,7 +61,6 @@ public class ProjectInformationFormValidator implements SmartValidator {
                                   Errors errors,
                                   ProjectInformationValidationHint projectInformationValidationHint) {
     var fieldStage = form.getFieldStage();
-    var fieldStagesWithStageCategories = FieldStageSubCategory.getAllFieldStagesWithSubCategories();
 
     if (fieldStage != null) {
       if (BooleanUtils.isTrue(fieldStage.equals(FieldStage.DEVELOPMENT))) {
@@ -70,15 +69,15 @@ public class ProjectInformationFormValidator implements SmartValidator {
             projectInformationValidationHint,
             errors
         );
-      } else if (fieldStagesWithStageCategories.contains(fieldStage)) {
-        if (BooleanUtils.isTrue(fieldStage.equals(FieldStage.CARBON_CAPTURE_AND_STORAGE))) {
+      } else if (ValidationType.FULL.equals(projectInformationValidationHint.getValidationType())) {
+        if (fieldStage.equals(FieldStage.CARBON_CAPTURE_AND_STORAGE)) {
           ValidationUtils.rejectIfEmptyOrWhitespace(
               errors,
               CARBON_CAPTURE_AND_STORAGE_FIELD,
               CARBON_CAPTURE_AND_STORAGE_FIELD.concat(".required"),
               CARBON_CAPTURE_AND_STORAGE_MISSING_ERROR
           );
-        } else if (BooleanUtils.isTrue(fieldStage.equals(FieldStage.OFFSHORE_WIND))) {
+        } else if (fieldStage.equals(FieldStage.OFFSHORE_WIND)) {
           ValidationUtils.rejectIfEmptyOrWhitespace(
               errors,
               OFFSHORE_WIND_FIELD,

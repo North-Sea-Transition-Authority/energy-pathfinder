@@ -122,6 +122,20 @@ class ProjectInformationViewUtilTest {
     assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
   }
 
+  @ParameterizedTest
+  @EnumSource(value = FieldStage.class, names = {"CARBON_CAPTURE_AND_STORAGE", "OFFSHORE_WIND"}, mode = EnumSource.Mode.INCLUDE)
+  void from_whenFieldStageWithoutSubCategorySet(FieldStage fieldStage) {
+    var expectedFieldStage = fieldStage.getDisplayName();
+    projectInformation.setFieldStage(fieldStage);
+
+    var projectInformationView = ProjectInformationViewUtil.from(projectInformation);
+
+    assertCommonProperties(projectInformationView, projectInformation);
+    assertThat(projectInformationView.getFieldStage()).isEqualTo(expectedFieldStage);
+
+    assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
+  }
+
   @Test
   void from_whenOffshoreWindFieldStage() {
     final var fieldStage = FieldStage.OFFSHORE_WIND;

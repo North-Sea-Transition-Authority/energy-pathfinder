@@ -80,10 +80,6 @@ public enum FieldStage {
         .collect(StreamUtil.toLinkedHashMap(Enum::name, FieldStage::getDisplayName));
   }
 
-  public static List<FieldStage> getAllWithHiddenInputs() {
-    return List.of(DEVELOPMENT, CARBON_CAPTURE_AND_STORAGE, OFFSHORE_WIND);
-  }
-
   public static List<FieldStage> getEnergyTransitionProjectFieldStages() {
     return Arrays.stream(values())
         .filter(fs -> fs.energyType.contains(EnergyType.TRANSITION))
