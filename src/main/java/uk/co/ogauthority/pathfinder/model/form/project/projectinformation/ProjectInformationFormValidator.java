@@ -70,14 +70,14 @@ public class ProjectInformationFormValidator implements SmartValidator {
             errors
         );
       } else if (ValidationType.FULL.equals(projectInformationValidationHint.getValidationType())) {
-        if (fieldStage.equals(FieldStage.CARBON_CAPTURE_AND_STORAGE)) {
+        if (FieldStage.CARBON_CAPTURE_AND_STORAGE.equals(fieldStage)) {
           ValidationUtils.rejectIfEmptyOrWhitespace(
               errors,
               CARBON_CAPTURE_AND_STORAGE_FIELD,
               CARBON_CAPTURE_AND_STORAGE_FIELD.concat(".required"),
               CARBON_CAPTURE_AND_STORAGE_MISSING_ERROR
           );
-        } else if (fieldStage.equals(FieldStage.OFFSHORE_WIND)) {
+        } else if (FieldStage.OFFSHORE_WIND.equals(fieldStage)) {
           ValidationUtils.rejectIfEmptyOrWhitespace(
               errors,
               OFFSHORE_WIND_FIELD,
