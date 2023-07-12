@@ -41,8 +41,8 @@ import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractVi
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.infrastructure.InfrastructureAwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.infrastructure.InfrastructureAwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
@@ -52,10 +52,10 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(
-    value = AwardedContractController.class,
+    value = InfrastructureAwardedContractController.class,
     includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ProjectContextService.class)
 )
-public class AwardedContractControllerTest extends ProjectContextAbstractControllerTest {
+public class InfrastructureAwardedContractControllerTest extends ProjectContextAbstractControllerTest {
 
   private static final Integer PROJECT_ID = 1;
   private static final Integer AWARDED_CONTRACT_ID = 10;
@@ -67,10 +67,10 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
   private final Set<ProjectPermission> requiredPermissions = ProjectControllerTesterService.PROJECT_CREATE_PERMISSION_SET;
 
   @MockBean
-  private AwardedContractService awardedContractService;
+  private InfrastructureAwardedContractService awardedContractService;
 
   @MockBean
-  private AwardedContractSummaryService awardedContractSummaryService;
+  private InfrastructureAwardedContractSummaryService awardedContractSummaryService;
 
   @MockBean
   private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
@@ -106,7 +106,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
   @Test
   public void authenticatedUser_hasAccessToAwardedContractSummary() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(AwardedContractController.class).viewAwardedContracts(PROJECT_ID, null)))
+        on(InfrastructureAwardedContractController.class).viewAwardedContracts(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -114,7 +114,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
   @Test
   public void unauthenticatedUser_noAccessToAwardedContractSummary() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(AwardedContractController.class).viewAwardedContracts(PROJECT_ID, null)))
+        on(InfrastructureAwardedContractController.class).viewAwardedContracts(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -122,7 +122,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
   @Test
   public void authenticatedUser_hasAccessToAddAwardedContract() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(AwardedContractController.class).addAwardedContract(PROJECT_ID, null)))
+        on(InfrastructureAwardedContractController.class).addAwardedContract(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -130,7 +130,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
   @Test
   public void unauthenticatedUser_noAccessToAddAwardedContract() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(AwardedContractController.class).addAwardedContract(PROJECT_ID, null)))
+        on(InfrastructureAwardedContractController.class).addAwardedContract(PROJECT_ID, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -142,7 +142,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(awardedContractService.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
     when(awardedContractService.getForm(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(new AwardedContractForm());
     mockMvc.perform(get(ReverseRouter.route(
-        on(AwardedContractController.class).getAwardedContract(PROJECT_ID, AWARDED_CONTRACT_ID, null)))
+        on(InfrastructureAwardedContractController.class).getAwardedContract(PROJECT_ID, AWARDED_CONTRACT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isOk());
   }
@@ -150,7 +150,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
   @Test
   public void unauthenticatedUser_noAccessToAwardedContract() throws Exception {
     mockMvc.perform(get(ReverseRouter.route(
-        on(AwardedContractController.class).getAwardedContract(PROJECT_ID, AWARDED_CONTRACT_ID, null)))
+        on(InfrastructureAwardedContractController.class).getAwardedContract(PROJECT_ID, AWARDED_CONTRACT_ID, null)))
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
   }
@@ -167,7 +167,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .saveAwardedContract(PROJECT_ID, form, bindingResult, ValidationType.PARTIAL, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
@@ -191,7 +191,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .saveAwardedContract(PROJECT_ID, form, bindingResult, ValidationType.PARTIAL, null)
         ))
             .with(authenticatedUserAndSession(unauthenticatedUser))
@@ -216,7 +216,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .saveAwardedContract(PROJECT_ID, form, bindingResult, ValidationType.PARTIAL, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
@@ -240,7 +240,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .saveAwardedContract(PROJECT_ID, form, bindingResult, ValidationType.FULL, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
@@ -264,7 +264,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .saveAwardedContract(PROJECT_ID, form, bindingResult, ValidationType.PARTIAL, null)
         ))
             .with(authenticatedUserAndSession(unauthenticatedUser))
@@ -289,7 +289,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .saveAwardedContract(PROJECT_ID, form, bindingResult, ValidationType.FULL, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
@@ -317,7 +317,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .saveAwardedContract(PROJECT_ID, AWARDED_CONTRACT_ID, form, bindingResult, ValidationType.PARTIAL, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
@@ -341,7 +341,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .saveAwardedContract(PROJECT_ID, form, bindingResult, ValidationType.PARTIAL, null)
         ))
             .with(authenticatedUserAndSession(unauthenticatedUser))
@@ -370,7 +370,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .saveAwardedContract(PROJECT_ID, AWARDED_CONTRACT_ID, form, bindingResult, ValidationType.PARTIAL, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
@@ -398,7 +398,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .saveAwardedContract(PROJECT_ID, AWARDED_CONTRACT_ID, form, bindingResult, ValidationType.FULL, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
@@ -422,7 +422,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .saveAwardedContract(PROJECT_ID, AWARDED_CONTRACT_ID, form, bindingResult, ValidationType.PARTIAL, null)
         ))
             .with(authenticatedUserAndSession(unauthenticatedUser))
@@ -451,7 +451,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .saveAwardedContract(PROJECT_ID, AWARDED_CONTRACT_ID, form, bindingResult, ValidationType.FULL, null)
         ))
             .with(authenticatedUserAndSession(authenticatedUser))
@@ -476,7 +476,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
         .thenReturn(awardedContractView);
 
     mockMvc.perform(
-        get(ReverseRouter.route(on(AwardedContractController.class)
+        get(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .removeAwardedContractConfirmation(PROJECT_ID, AWARDED_CONTRACT_ID, 1, null))
         )
         .with(authenticatedUserAndSession(authenticatedUser)))
@@ -486,7 +486,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
   @Test
   public void removeAwardedContractConfirmation_unauthenticated_thenInvalid() throws Exception {
     mockMvc.perform(
-        get(ReverseRouter.route(on(AwardedContractController.class)
+        get(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .removeAwardedContractConfirmation(PROJECT_ID, AWARDED_CONTRACT_ID, 1, null))
         )
         .with(authenticatedUserAndSession(unauthenticatedUser)))
@@ -496,7 +496,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
   @Test
   public void removeAwardedContract_unauthenticated_thenInvalid() throws Exception {
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .removeAwardedContract(PROJECT_ID, AWARDED_CONTRACT_ID, 1, null))
         )
         .with(authenticatedUserAndSession(unauthenticatedUser)))
@@ -519,7 +519,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     }};
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .removeAwardedContract(
                 PROJECT_ID,
                 AWARDED_CONTRACT_ID,
@@ -545,7 +545,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(awardedContractSummaryService.validateViews(any())).thenReturn(ValidationResult.VALID);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .saveAwardedContractSummary(PROJECT_ID, null))
         )
         .with(authenticatedUserAndSession(authenticatedUser))
@@ -564,7 +564,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     when(awardedContractSummaryService.validateViews(any())).thenReturn(ValidationResult.INVALID);
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .saveAwardedContractSummary(PROJECT_ID, null))
         )
             .with(authenticatedUserAndSession(authenticatedUser))
@@ -581,7 +581,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     }};
 
     mockMvc.perform(
-        post(ReverseRouter.route(on(AwardedContractController.class)
+        post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
             .saveAwardedContractSummary(PROJECT_ID, null))
         )
             .with(authenticatedUserAndSession(unauthenticatedUser))
@@ -602,7 +602,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
         .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
-        on(AwardedContractController.class).viewAwardedContracts(projectDetail.getProject().getId(), null),
+        on(InfrastructureAwardedContractController.class).viewAwardedContracts(projectDetail.getProject().getId(), null),
         status().isOk(),
         status().isForbidden()
     );
@@ -620,7 +620,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
         .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
-        on(AwardedContractController.class).addAwardedContract(projectDetail.getProject().getId(), null),
+        on(InfrastructureAwardedContractController.class).addAwardedContract(projectDetail.getProject().getId(), null),
         status().isOk(),
         status().isForbidden()
     );
@@ -645,7 +645,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
         .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
-        on(AwardedContractController.class).getAwardedContract(
+        on(InfrastructureAwardedContractController.class).getAwardedContract(
             projectDetail.getProject().getId(),
             AWARDED_CONTRACT_ID,
             null
@@ -674,7 +674,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
         .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
-        on(AwardedContractController.class).removeAwardedContractConfirmation(
+        on(InfrastructureAwardedContractController.class).removeAwardedContractConfirmation(
             projectDetail.getProject().getId(),
             AWARDED_CONTRACT_ID,
             1,
@@ -703,7 +703,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
         .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
-        on(AwardedContractController.class).saveAwardedContract(
+        on(InfrastructureAwardedContractController.class).saveAwardedContract(
             projectDetail.getProject().getId(),
             form,
             bindingResult,
@@ -733,7 +733,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
         .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
-        on(AwardedContractController.class).removeAwardedContract(
+        on(InfrastructureAwardedContractController.class).removeAwardedContract(
             projectDetail.getProject().getId(),
             AWARDED_CONTRACT_ID,
             1,
@@ -761,7 +761,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
         .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
-        on(AwardedContractController.class).saveAwardedContractSummary(
+        on(InfrastructureAwardedContractController.class).saveAwardedContractSummary(
             projectDetail.getProject().getId(),
             null
         ),
@@ -781,7 +781,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     ).thenReturn(false);
 
     mockMvc.perform(
-            get(ReverseRouter.route(on(AwardedContractController.class)
+            get(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
                 .getAwardedContract(PROJECT_ID, 1, null)
             ))
                 .with(authenticatedUserAndSession(authenticatedUser)))
@@ -799,7 +799,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     ).thenReturn(false);
 
     mockMvc.perform(
-            get(ReverseRouter.route(on(AwardedContractController.class)
+            get(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
                 .removeAwardedContractConfirmation(PROJECT_ID, AWARDED_CONTRACT_ID, 1, null)
             ))
                 .with(authenticatedUserAndSession(authenticatedUser)))
@@ -821,7 +821,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     }};
 
     mockMvc.perform(
-            post(ReverseRouter.route(on(AwardedContractController.class)
+            post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
                 .saveAwardedContract(
                     PROJECT_ID,
                     AWARDED_CONTRACT_ID,
@@ -852,7 +852,7 @@ public class AwardedContractControllerTest extends ProjectContextAbstractControl
     }};
 
     mockMvc.perform(
-            post(ReverseRouter.route(on(AwardedContractController.class)
+            post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
                 .removeAwardedContract(
                     PROJECT_ID,
                     AWARDED_CONTRACT_ID,
