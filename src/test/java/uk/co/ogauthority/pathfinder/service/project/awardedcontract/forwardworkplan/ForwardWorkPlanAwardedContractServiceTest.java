@@ -1,7 +1,8 @@
 package uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -12,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetup;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
@@ -36,24 +36,16 @@ public class ForwardWorkPlanAwardedContractServiceTest {
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
 
   @Test
-  public void isComplete_completedAwardedContractSetupFound_returnTrue() {
-    var awardedContractSetup = new ForwardWorkPlanAwardedContractSetup();
-    awardedContractSetup.setHasContractToAdd(false);
-
-    when(setupService.getForwardWorkPlanAwardedContractSetup(projectDetail))
-        .thenReturn(Optional.of(awardedContractSetup));
+  public void isComplete_true() {
+    when(setupService.isValid(projectDetail)).thenReturn(true);
 
     var result = forwardWorkPlanAwardedContractService.isComplete(projectDetail);
     assertThat(result).isTrue();
   }
 
   @Test
-  public void isComplete_incompleteAwardedContractSetupFound_returnFalse() {
-    var awardedContractSetup = new ForwardWorkPlanAwardedContractSetup();
-    awardedContractSetup.setHasContractToAdd(null);
-
-    when(setupService.getForwardWorkPlanAwardedContractSetup(projectDetail))
-        .thenReturn(Optional.of(awardedContractSetup));
+  public void isComplete_false() {
+    when(setupService.isValid(projectDetail)).thenReturn(false);
 
     var result = forwardWorkPlanAwardedContractService.isComplete(projectDetail);
     assertThat(result).isFalse();
@@ -61,8 +53,6 @@ public class ForwardWorkPlanAwardedContractServiceTest {
 
   @Test
   public void isComplete_noAwardedContractSetupFound_returnFalse() {
-    when(setupService.getForwardWorkPlanAwardedContractSetup(projectDetail)).thenReturn(Optional.empty());
-
     var result = forwardWorkPlanAwardedContractService.isComplete(projectDetail);
     assertThat(result).isFalse();
   }
@@ -90,7 +80,7 @@ public class ForwardWorkPlanAwardedContractServiceTest {
   }
 
   @Test
-  public void copySectionData_whenNoAwardedContractSetupFound_thenThrowError() {
+  public void copySectionData_whenNoAwardedContractSetupFound_thenDoNothing() {
     var fromProjectDetail = projectDetail;
     fromProjectDetail.setVersion(1);
     var toProjectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
@@ -99,9 +89,8 @@ public class ForwardWorkPlanAwardedContractServiceTest {
     when(setupService.getForwardWorkPlanAwardedContractSetup(projectDetail))
         .thenReturn(Optional.empty());
 
-    assertThatThrownBy(
-        () -> forwardWorkPlanAwardedContractService.copySectionData(fromProjectDetail, toProjectDetail)
-    ).isInstanceOf(PathfinderEntityNotFoundException.class);
+    forwardWorkPlanAwardedContractService.copySectionData(fromProjectDetail, toProjectDetail);
+    verify(entityDuplicationService, never()).duplicateEntityAndSetNewParent(any(), any(), any());
   }
 
   @Test

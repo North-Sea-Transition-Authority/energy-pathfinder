@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.controller.project.awardedcontract.forwardw
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import javax.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +20,6 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPag
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupForm;
@@ -29,7 +29,6 @@ import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
-import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 
 @Controller
@@ -41,20 +40,17 @@ import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 public class ForwardWorkPlanAwardedContractSetupController extends ProjectFormPageController {
 
   public static final String PAGE_NAME = "Awarded contracts";
-  public static final String REMOVE_PAGE_NAME = "Remove award contract";
   public static final String SETUP_TEMPLATE_PATH = "project/awardedcontract/forwardworkplan/setupForwardWorkPlanAwardedContracts";
 
 
   private final ForwardWorkPlanAwardedContractSetupService setupService;
-  private final ValidationService validationService;
 
+  @Autowired
   public ForwardWorkPlanAwardedContractSetupController(BreadcrumbService breadcrumbService,
                                                        ControllerHelperService controllerHelperService,
-                                                       ForwardWorkPlanAwardedContractSetupService setupService,
-                                                       ValidationService validationService) {
+                                                       ForwardWorkPlanAwardedContractSetupService setupService) {
     super(breadcrumbService, controllerHelperService);
     this.setupService = setupService;
-    this.validationService = validationService;
   }
 
   @GetMapping()
@@ -62,10 +58,10 @@ public class ForwardWorkPlanAwardedContractSetupController extends ProjectFormPa
                                               ProjectContext projectContext,
                                               AuthenticatedUserAccount userAccount) {
     var projectDetail = projectContext.getProjectDetails();
-    var form = setupService.getForwardWorkPlanAwardedContractSetupFormFromDetail(projectDetail);
-    // SW: This will be updated in a later branch to redirect the user to the View Contracts page if they have
+    var form = setupService.getAwardedContractSetupFormFromDetail(projectDetail);
+    // TODO (EDU-6597): This will be updated in a later branch to redirect the user to the View Contracts page if they have
     // already said they will be adding awarded contracts and have some on the project
-    return getAwardedContractSetuoModelAndView(projectDetail, form);
+    return getAwardedContractSetupModelAndView(projectDetail, form);
   }
 
   @PostMapping()
@@ -75,12 +71,11 @@ public class ForwardWorkPlanAwardedContractSetupController extends ProjectFormPa
                                                ProjectContext projectContext,
                                                AuthenticatedUserAccount userAccount) {
     var projectDetail = projectContext.getProjectDetails();
-    //Do a full validation as there is no partial save option
-    validationService.validate(form, bindingResult, ValidationType.FULL);
+    setupService.validate(form, bindingResult);
 
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getAwardedContractSetuoModelAndView(projectDetail, form),
+        getAwardedContractSetupModelAndView(projectDetail, form),
         form,
         () -> saveAndContinueContractJourney(form, projectDetail)
     );
@@ -90,11 +85,11 @@ public class ForwardWorkPlanAwardedContractSetupController extends ProjectFormPa
                                                       ProjectDetail projectDetail) {
     var projectId = projectDetail.getProject().getId();
     setupService.saveAwardedContractSetup(form, projectDetail);
-    // SW: I will be adding the View Contracts endpoints in a later branch, so just redirecting to the task list for now
+    // TODO (EDU-6597): I will be adding the View Contracts endpoints in a later branch, so just redirecting to the task list for now
     return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
   }
 
-  private ModelAndView getAwardedContractSetuoModelAndView(ProjectDetail projectDetail,
+  private ModelAndView getAwardedContractSetupModelAndView(ProjectDetail projectDetail,
                                                            ForwardWorkPlanAwardedContractSetupForm form) {
     var projectId = projectDetail.getProject().getId();
 

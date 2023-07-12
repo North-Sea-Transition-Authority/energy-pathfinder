@@ -1,9 +1,8 @@
 package uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan;
 
-import java.util.Objects;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetup;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
@@ -20,6 +19,7 @@ public class ForwardWorkPlanAwardedContractService implements ProjectFormSection
   private final EntityDuplicationService entityDuplicationService;
   private final ForwardWorkPlanAwardedContractSetupService setupService;
 
+  @Autowired
   ForwardWorkPlanAwardedContractService(EntityDuplicationService entityDuplicationService,
                                         ForwardWorkPlanAwardedContractSetupService setupService) {
     this.entityDuplicationService = entityDuplicationService;
@@ -28,31 +28,19 @@ public class ForwardWorkPlanAwardedContractService implements ProjectFormSection
 
   @Override
   public boolean isComplete(ProjectDetail projectDetail) {
-    // SW: This will be updated in another branch when the rest of the awarded contracts is added
-    var awardedContractSetupOptional = setupService.getForwardWorkPlanAwardedContractSetup(projectDetail);
-
-    return awardedContractSetupOptional.filter(
-        forwardWorkPlanAwardedContractSetup ->
-            Objects.nonNull(forwardWorkPlanAwardedContractSetup.getHasContractToAdd())).isPresent();
+    // TODO (EDU-6597): This will be updated in another branch when the rest of the awarded contracts is added
+    return setupService.isValid(projectDetail);
   }
 
   @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
-    entityDuplicationService.duplicateEntityAndSetNewParent(
-        getForwardWorkPlanAwardedContractSetup(fromDetail),
-        toDetail,
-        ForwardWorkPlanAwardedContractSetup.class
-    );
-  }
-
-  private ForwardWorkPlanAwardedContractSetup getForwardWorkPlanAwardedContractSetup(ProjectDetail projectDetail) {
-    return setupService.getForwardWorkPlanAwardedContractSetup(projectDetail)
-        .orElseThrow(
-            () -> new PathfinderEntityNotFoundException(
-                String.format("Could not find ForwardWorkPlanAwardedContractSetup for project detail with ID %d",
-                projectDetail.getId())
-            )
-        );
+    var awardedContractSetupOptional = setupService.getForwardWorkPlanAwardedContractSetup(fromDetail);
+    awardedContractSetupOptional.ifPresent(
+        awardedContractSetup -> entityDuplicationService.duplicateEntityAndSetNewParent(
+            awardedContractSetup,
+            toDetail,
+            ForwardWorkPlanAwardedContractSetup.class
+        ));
   }
 
   @Override
