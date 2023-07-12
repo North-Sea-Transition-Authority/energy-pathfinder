@@ -12,12 +12,11 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
-import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormValidator;
+import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.infrastructure.InfrastructureAwardedContractFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.infrastructure.AwardedContractRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
@@ -46,17 +45,17 @@ public class AwardedContractServiceValidationTest {
   @Mock
   private TeamService teamService;
 
-  private AwardedContractService awardedContractService;
+  private InfrastructureAwardedContractService awardedContractService;
 
   @Before
   public void setup() {
     var validator = new SpringValidatorAdapter(Validation.buildDefaultValidatorFactory().getValidator());
     var validationService = new ValidationService(validator);
 
-    AwardedContractFormValidator awardedContractFormValidator = new AwardedContractFormValidator(
+    InfrastructureAwardedContractFormValidator awardedContractFormValidator = new InfrastructureAwardedContractFormValidator(
         new DateInputValidator());
 
-    awardedContractService = new AwardedContractService(
+    awardedContractService = new InfrastructureAwardedContractService(
         functionService,
         validationService,
         awardedContractRepository,

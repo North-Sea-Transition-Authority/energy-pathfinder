@@ -17,24 +17,25 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.infrastructure.InfrastructureAwardedContractFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AwardedContractFormValidatorTest {
+public class InfrastructureAwardedContractFormValidatorTest {
 
   @Mock
   private DateInputValidator dateInputValidator;
 
-  private AwardedContractFormValidator awardedContractFormValidator;
+  private InfrastructureAwardedContractFormValidator awardedContractFormValidator;
 
   private AwardedContractValidationHint awardedContractValidationHint;
 
   @Before
   public void setup() {
-    awardedContractFormValidator = new AwardedContractFormValidator(dateInputValidator);
+    awardedContractFormValidator = new InfrastructureAwardedContractFormValidator(dateInputValidator);
     awardedContractValidationHint = new AwardedContractValidationHint(ValidationType.FULL);
     doCallRealMethod().when(dateInputValidator).validate(any(), any(), any());
     when(dateInputValidator.supports(any())).thenReturn(true);

@@ -35,8 +35,8 @@ import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.infrastructure.InfrastructureAwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.infrastructure.InfrastructureAwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
@@ -48,22 +48,22 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @AllowProjectContributorAccess
 @ProjectTypeCheck(types = ProjectType.INFRASTRUCTURE)
 @RequestMapping("/project/{projectId}/awarded-contracts")
-public class AwardedContractController extends ProjectFormPageController {
+public class InfrastructureAwardedContractController extends ProjectFormPageController {
 
   public static final String PAGE_NAME = "Awarded contracts";
   public static final String PAGE_NAME_SINGULAR = "Awarded contract";
   public static final String REMOVE_PAGE_NAME = "Remove awarded contract";
 
-  private final AwardedContractService awardedContractService;
-  private final AwardedContractSummaryService awardedContractSummaryService;
+  private final InfrastructureAwardedContractService awardedContractService;
+  private final InfrastructureAwardedContractSummaryService awardedContractSummaryService;
   private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   @Autowired
-  public AwardedContractController(BreadcrumbService breadcrumbService,
-                                   AwardedContractService awardedContractService,
-                                   ControllerHelperService controllerHelperService,
-                                   AwardedContractSummaryService awardedContractSummaryService,
-                                   ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
+  public InfrastructureAwardedContractController(BreadcrumbService breadcrumbService,
+                                                 InfrastructureAwardedContractService awardedContractService,
+                                                 ControllerHelperService controllerHelperService,
+                                                 InfrastructureAwardedContractSummaryService awardedContractSummaryService,
+                                                 ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     super(breadcrumbService, controllerHelperService);
     this.awardedContractService = awardedContractService;
     this.awardedContractSummaryService = awardedContractSummaryService;
@@ -223,7 +223,7 @@ public class AwardedContractController extends ProjectFormPageController {
         .addObject("pageTitle", PAGE_NAME)
         .addObject("awardedContractViews", awardedContractViews)
         .addObject("addAwardedContractUrl",
-            ReverseRouter.route(on(AwardedContractController.class).addAwardedContract(projectId, null))
+            ReverseRouter.route(on(InfrastructureAwardedContractController.class).addAwardedContract(projectId, null))
         )
         .addObject("backToTaskListUrl",
             ControllerUtils.getBackToTaskListUrl(projectId)
@@ -264,7 +264,7 @@ public class AwardedContractController extends ProjectFormPageController {
   }
 
   private ModelAndView getAwardedContractSummaryRedirect(Integer projectId) {
-    return ReverseRouter.redirect(on(AwardedContractController.class).viewAwardedContracts(projectId, null));
+    return ReverseRouter.redirect(on(InfrastructureAwardedContractController.class).viewAwardedContracts(projectId, null));
   }
 
   private String getContractFunctionSearchUrl() {
@@ -274,7 +274,7 @@ public class AwardedContractController extends ProjectFormPageController {
   }
 
   private String getAwardedContractSummaryUrl(Integer projectId) {
-    return ReverseRouter.route(on(AwardedContractController.class).viewAwardedContracts(projectId, null));
+    return ReverseRouter.route(on(InfrastructureAwardedContractController.class).viewAwardedContracts(projectId, null));
   }
 
   private void checkIfUserHasAccessAwardedContract(AwardedContract awardedContract) {

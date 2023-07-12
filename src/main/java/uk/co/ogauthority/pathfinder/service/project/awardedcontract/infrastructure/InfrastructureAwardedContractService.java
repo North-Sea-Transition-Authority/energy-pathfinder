@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.project.awardedcontract;
+package uk.co.ogauthority.pathfinder.service.project.awardedcontract.infrastructure;
 
 import java.util.List;
 import java.util.Map;
@@ -22,8 +22,8 @@ import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractForm;
-import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractValidationHint;
+import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.infrastructure.InfrastructureAwardedContractFormValidator;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.infrastructure.AwardedContractRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
@@ -36,26 +36,26 @@ import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
-public class AwardedContractService implements ProjectFormSectionService {
+public class InfrastructureAwardedContractService implements ProjectFormSectionService {
 
   private final FunctionService functionService;
   private final ValidationService validationService;
   private final AwardedContractRepository awardedContractRepository;
-  private final AwardedContractFormValidator awardedContractFormValidator;
+  private final InfrastructureAwardedContractFormValidator awardedContractFormValidator;
   private final SearchSelectorService searchSelectorService;
   private final ProjectSetupService projectSetupService;
   private final EntityDuplicationService entityDuplicationService;
   private final TeamService teamService;
 
   @Autowired
-  public AwardedContractService(FunctionService functionService,
-                                ValidationService validationService,
-                                AwardedContractRepository awardedContractRepository,
-                                AwardedContractFormValidator awardedContractFormValidator,
-                                SearchSelectorService searchSelectorService,
-                                ProjectSetupService projectSetupService,
-                                EntityDuplicationService entityDuplicationService,
-                                TeamService teamService) {
+  public InfrastructureAwardedContractService(FunctionService functionService,
+                                              ValidationService validationService,
+                                              AwardedContractRepository awardedContractRepository,
+                                              InfrastructureAwardedContractFormValidator awardedContractFormValidator,
+                                              SearchSelectorService searchSelectorService,
+                                              ProjectSetupService projectSetupService,
+                                              EntityDuplicationService entityDuplicationService,
+                                              TeamService teamService) {
     this.functionService = functionService;
     this.validationService = validationService;
     this.awardedContractRepository = awardedContractRepository;

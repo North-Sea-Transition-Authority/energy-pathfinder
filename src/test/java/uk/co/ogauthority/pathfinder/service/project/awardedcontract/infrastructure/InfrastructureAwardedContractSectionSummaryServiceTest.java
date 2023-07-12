@@ -20,17 +20,15 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSectionSummaryService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AwardedContractSectionSummaryServiceTest {
+public class InfrastructureAwardedContractSectionSummaryServiceTest {
 
   @Mock
-  private AwardedContractService awardedContractService;
+  private InfrastructureAwardedContractService awardedContractService;
 
   @Mock
   private DifferenceService differenceService;
@@ -44,13 +42,13 @@ public class AwardedContractSectionSummaryServiceTest {
   @Mock
   private PortalOrganisationAccessor portalOrganisationAccessor;
 
-  private AwardedContractSectionSummaryService awardedContractSectionSummaryService;
+  private InfrastructureAwardedContractSectionSummaryService awardedContractSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
   @Before
   public void setup() {
-    awardedContractSectionSummaryService = new AwardedContractSectionSummaryService(
+    awardedContractSectionSummaryService = new InfrastructureAwardedContractSectionSummaryService(
         awardedContractService,
         differenceService,
         projectSectionSummaryCommonModelService,
@@ -111,16 +109,17 @@ public class AwardedContractSectionSummaryServiceTest {
   }
 
   private void assertModelProperties(ProjectSectionSummary projectSectionSummary, ProjectDetail projectDetail) {
-    assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(AwardedContractSectionSummaryService.DISPLAY_ORDER);
-    assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(AwardedContractSectionSummaryService.SECTION_LINK));
-    assertThat(projectSectionSummary.getTemplatePath()).isEqualTo(AwardedContractSectionSummaryService.TEMPLATE_PATH);
+    assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(InfrastructureAwardedContractSectionSummaryService.DISPLAY_ORDER);
+    assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(
+        InfrastructureAwardedContractSectionSummaryService.SECTION_LINK));
+    assertThat(projectSectionSummary.getTemplatePath()).isEqualTo(InfrastructureAwardedContractSectionSummaryService.TEMPLATE_PATH);
 
     var model = projectSectionSummary.getTemplateModel();
 
     verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
         projectDetail,
-        AwardedContractSectionSummaryService.PAGE_NAME,
-        AwardedContractSectionSummaryService.SECTION_ID
+        InfrastructureAwardedContractSectionSummaryService.PAGE_NAME,
+        InfrastructureAwardedContractSectionSummaryService.SECTION_ID
     );
 
     assertThat(model).containsOnlyKeys("awardedContractDiffModel");

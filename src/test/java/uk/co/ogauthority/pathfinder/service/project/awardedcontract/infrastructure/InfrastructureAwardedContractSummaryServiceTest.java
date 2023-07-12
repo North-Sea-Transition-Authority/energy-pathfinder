@@ -13,17 +13,15 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AwardedContractSummaryServiceTest {
+public class InfrastructureAwardedContractSummaryServiceTest {
 
   @Mock
-  private AwardedContractService awardedContractService;
+  private InfrastructureAwardedContractService awardedContractService;
 
   @Mock
   private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
@@ -31,11 +29,11 @@ public class AwardedContractSummaryServiceTest {
   @Mock
   private PortalOrganisationAccessor portalOrganisationAccessor;
 
-  private AwardedContractSummaryService awardedContractSummaryService;
+  private InfrastructureAwardedContractSummaryService awardedContractSummaryService;
 
   @Before
   public void setup() {
-    awardedContractSummaryService = new AwardedContractSummaryService(awardedContractService,
+    awardedContractSummaryService = new InfrastructureAwardedContractSummaryService(awardedContractService,
         projectSectionItemOwnershipService,
         portalOrganisationAccessor
     );
@@ -136,10 +134,10 @@ public class AwardedContractSummaryServiceTest {
 
     var errorItem = errorItems.get(0);
     assertThat(errorItem.getFieldName()).isEqualTo(
-        String.format(AwardedContractSummaryService.ERROR_FIELD_NAME, displayOrderOfInvalidView)
+        String.format(InfrastructureAwardedContractSummaryService.ERROR_FIELD_NAME, displayOrderOfInvalidView)
     );
     assertThat(errorItem.getErrorMessage()).isEqualTo(
-        String.format(AwardedContractSummaryService.ERROR_MESSAGE, displayOrderOfInvalidView)
+        String.format(InfrastructureAwardedContractSummaryService.ERROR_MESSAGE, displayOrderOfInvalidView)
     );
     assertThat(errorItem.getDisplayOrder()).isEqualTo(displayOrderOfInvalidView);
   }
@@ -195,7 +193,7 @@ public class AwardedContractSummaryServiceTest {
     var errors = awardedContractSummaryService.getAwardedContractViewErrors(Collections.emptyList());
     assertThat(errors).hasSize(1);
     assertThat(errors.get(0).getDisplayOrder()).isEqualTo(1);
-    assertThat(errors.get(0).getFieldName()).isEqualTo(AwardedContractSummaryService.EMPTY_LIST_ERROR);
-    assertThat(errors.get(0).getErrorMessage()).isEqualTo(AwardedContractSummaryService.EMPTY_LIST_ERROR);
+    assertThat(errors.get(0).getFieldName()).isEqualTo(InfrastructureAwardedContractSummaryService.EMPTY_LIST_ERROR);
+    assertThat(errors.get(0).getErrorMessage()).isEqualTo(InfrastructureAwardedContractSummaryService.EMPTY_LIST_ERROR);
   }
 }

@@ -28,12 +28,11 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractForm;
-import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormValidator;
+import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.infrastructure.InfrastructureAwardedContractFormValidator;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectablePrefix;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.infrastructure.AwardedContractRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -46,7 +45,7 @@ import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AwardedContractServiceTest {
+public class InfrastructureAwardedContractServiceTest {
 
   @Mock
   private ValidationService validationService;
@@ -55,7 +54,7 @@ public class AwardedContractServiceTest {
   private AwardedContractRepository awardedContractRepository;
 
   @Mock
-  private AwardedContractFormValidator awardedContractFormValidator;
+  private InfrastructureAwardedContractFormValidator awardedContractFormValidator;
 
   @Mock
   private ProjectSetupService projectSetupService;
@@ -66,7 +65,7 @@ public class AwardedContractServiceTest {
   @Mock
   private TeamService teamService;
 
-  private AwardedContractService awardedContractService;
+  private InfrastructureAwardedContractService awardedContractService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
   private final AuthenticatedUserAccount userAccount = UserTestingUtil.getAuthenticatedUserAccount();
@@ -78,7 +77,7 @@ public class AwardedContractServiceTest {
     SearchSelectorService searchSelectorService = new SearchSelectorService();
     FunctionService functionService = new FunctionService(searchSelectorService);
 
-    awardedContractService = new AwardedContractService(
+    awardedContractService = new InfrastructureAwardedContractService(
         functionService,
         validationService,
         awardedContractRepository,

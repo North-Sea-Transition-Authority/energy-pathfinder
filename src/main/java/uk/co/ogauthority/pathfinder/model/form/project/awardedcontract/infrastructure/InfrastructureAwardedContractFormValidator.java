@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.model.form.project.awardedcontract;
+package uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.infrastructure;
 
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,16 +6,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
 import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
+import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractForm;
+import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractValidationHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 
 @Component
-public class AwardedContractFormValidator implements SmartValidator {
+public class InfrastructureAwardedContractFormValidator implements SmartValidator {
 
   private final DateInputValidator dateInputValidator;
 
   @Autowired
-  public AwardedContractFormValidator(DateInputValidator dateInputValidator) {
+  public InfrastructureAwardedContractFormValidator(DateInputValidator dateInputValidator) {
     this.dateInputValidator = dateInputValidator;
   }
 
