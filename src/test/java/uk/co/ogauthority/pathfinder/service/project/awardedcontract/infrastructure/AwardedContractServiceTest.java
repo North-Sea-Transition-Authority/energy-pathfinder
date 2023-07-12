@@ -155,7 +155,7 @@ public class AwardedContractServiceTest {
     var selectedFunction= Function.FACILITIES_OFFSHORE;
     var results = awardedContractService.findContractFunctionsLikeWithManualEntry(selectedFunction.getDisplayName());
 
-    assertThat(results.size()).isEqualTo(1);
+    assertThat(results).hasSize(1);
     assertThat(results.get(0).getId()).isEqualTo(selectedFunction.name());
   }
 
@@ -164,7 +164,7 @@ public class AwardedContractServiceTest {
     var manualEntry = "manual entry";
     var results = awardedContractService.findContractFunctionsLikeWithManualEntry(manualEntry);
 
-    assertThat(results.size()).isEqualTo(1);
+    assertThat(results).hasSize(1);
     assertThat(results.get(0).getId()).isEqualTo(SearchSelectablePrefix.FREE_TEXT_PREFIX + manualEntry);
   }
 

@@ -73,6 +73,7 @@ public class ForwardWorkPlanAwardedContractSetupServiceTest {
     verify(repository).save(awardedContractSetupCaptor.capture());
     var awardedContractSetup = awardedContractSetupCaptor.getValue();
     assertThat(awardedContractSetup.getHasContractToAdd()).isFalse();
+    assertThat(awardedContractSetup.getProjectDetail()).isEqualTo(projectDetail);
   }
 
   @Test
@@ -82,6 +83,7 @@ public class ForwardWorkPlanAwardedContractSetupServiceTest {
 
     var awardedContractSetup = new ForwardWorkPlanAwardedContractSetup();
     awardedContractSetup.setHasContractToAdd(true);
+    awardedContractSetup.setProjectDetail(projectDetail);
     when(repository.findByProjectDetail(projectDetail)).thenReturn(Optional.of(awardedContractSetup));
 
     setupService.saveAwardedContractSetup(form, projectDetail);
@@ -89,6 +91,7 @@ public class ForwardWorkPlanAwardedContractSetupServiceTest {
     verify(repository).save(awardedContractSetupCaptor.capture());
     var result = awardedContractSetupCaptor.getValue();
     assertThat(result.getHasContractToAdd()).isFalse();
+    assertThat(result.getProjectDetail()).isEqualTo(projectDetail);
   }
 
   @Test
