@@ -138,12 +138,14 @@ class QuarterlyUpdateReminderServiceTest {
     when(remindableProjectAUpcomingTender.getProjectDetail()).thenReturn(projectDetailA);
     when(projectDetailA.getId()).thenReturn(1);
 
-    var remindableProjectCUpcomingTender = mock(UpcomingTender.class);
+    var remindableProjectCUpcomingTenderFirst = mock(UpcomingTender.class);
+    var remindableProjectCUpcomingTenderSecond = mock(UpcomingTender.class);
     var projectDetailC = mock(ProjectDetail.class);
-    when(remindableProjectCUpcomingTender.getProjectDetail()).thenReturn(projectDetailC);
     when(projectDetailC.getId()).thenReturn(3);
+    when(remindableProjectCUpcomingTenderFirst.getProjectDetail()).thenReturn(projectDetailC);
+    when(remindableProjectCUpcomingTenderSecond.getProjectDetail()).thenReturn(projectDetailC);
 
-    var pastUpcomingTenders = List.of(remindableProjectCUpcomingTender, remindableProjectAUpcomingTender);
+    var pastUpcomingTenders = List.of(remindableProjectCUpcomingTenderFirst, remindableProjectCUpcomingTenderSecond, remindableProjectAUpcomingTender);
     when(upcomingTenderService.getPastUpcomingTendersForRemindableProjects(remindableProjectList))
         .thenReturn(pastUpcomingTenders);
 
