@@ -109,13 +109,13 @@ public class DashboardFilterServiceTest {
 
   @Test
   public void fieldStageMatches_whenFilterSet_filterMatches() {
-    filter.setFieldStages(List.of(FIELD_STAGE, FieldStage.ENERGY_TRANSITION));
+    filter.setFieldStages(List.of(FIELD_STAGE, FieldStage.OFFSHORE_WIND));
     assertThat(dashboardFilterService.fieldStageMatches(FIELD_STAGE_ITEM, filter)).isTrue();
   }
 
   @Test
   public void fieldStageMatches_whenFilterSet_filterDoesNotMatch() {
-    filter.setFieldStages(List.of(FieldStage.DISCOVERY, FieldStage.ENERGY_TRANSITION));
+    filter.setFieldStages(List.of(FieldStage.DISCOVERY, FieldStage.OFFSHORE_ELECTRIFICATION));
     assertThat(dashboardFilterService.fieldStageMatches(FIELD_STAGE_ITEM, filter)).isFalse();
   }
 
