@@ -1,7 +1,9 @@
 package uk.co.ogauthority.pathfinder.model.view.projectinformation;
 
+import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class ProjectInformationViewUtil {
@@ -31,8 +33,10 @@ public class ProjectInformationViewUtil {
     if (fieldStage != null) {
       if (fieldStage.equals(FieldStage.DEVELOPMENT)) {
         setDevelopmentFields(projectInformationView, projectInformation);
-      } else if (fieldStage.equals(FieldStage.ENERGY_TRANSITION)) {
-        setEnergyTransitionFields(projectInformationView, projectInformation);
+      } else if (FieldStageSubCategory.getAllFieldStagesWithSubCategories().contains(fieldStage)
+          && Objects.nonNull(projectInformation.getFieldStageSubCategory())
+      ) {
+        setSubCategoryFields(projectInformationView, projectInformation);
       }
     }
 
@@ -44,14 +48,12 @@ public class ProjectInformationViewUtil {
     projectInformationView.setDevelopmentFirstProductionDate(getFirstProductionDate(projectInformation));
   }
 
-  private static void setEnergyTransitionFields(ProjectInformationView projectInformationView,
-                                                ProjectInformation projectInformation) {
-    var energyTransitionCategory = projectInformation.getEnergyTransitionCategory();
-    projectInformationView.setEnergyTransitionCategory(
-        energyTransitionCategory != null
-            ? energyTransitionCategory.getDisplayName()
-            : ""
-    );
+  private static void setSubCategoryFields(ProjectInformationView projectInformationView,
+                                           ProjectInformation projectInformation) {
+    var fieldStageSubCategory = projectInformation.getFieldStageSubCategory();
+    projectInformationView.setFieldStage(
+        projectInformationView.getFieldStage()
+          .concat(String.format(": %s", fieldStageSubCategory.getDisplayName())));
   }
 
   private static String getFirstProductionDate(ProjectInformation projectInformation) {

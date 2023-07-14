@@ -12,8 +12,6 @@ public class ProjectInformationView {
 
   private String developmentFirstProductionDate;
 
-  private String energyTransitionCategory;
-
   private String contactName;
 
   private String contactPhoneNumber;
@@ -52,14 +50,6 @@ public class ProjectInformationView {
 
   public void setDevelopmentFirstProductionDate(String developmentFirstProductionDate) {
     this.developmentFirstProductionDate = developmentFirstProductionDate;
-  }
-
-  public String getEnergyTransitionCategory() {
-    return energyTransitionCategory;
-  }
-
-  public void setEnergyTransitionCategory(String energyTransitionCategory) {
-    this.energyTransitionCategory = energyTransitionCategory;
   }
 
   public String getContactName() {

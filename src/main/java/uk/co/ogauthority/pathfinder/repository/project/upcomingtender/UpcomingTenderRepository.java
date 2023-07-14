@@ -15,4 +15,5 @@ public interface UpcomingTenderRepository extends CrudRepository<UpcomingTender,
   List<UpcomingTender> findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(Project project,
                                                                                        Integer version);
 
+  List<UpcomingTender> findAllByProjectDetail_IdIn(List<Integer> projectDetailIds);
 }

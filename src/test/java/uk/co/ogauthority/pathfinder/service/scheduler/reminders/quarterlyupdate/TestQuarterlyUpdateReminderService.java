@@ -15,7 +15,8 @@ public class TestQuarterlyUpdateReminderService implements QuarterlyUpdateRemind
   @Override
   public QuarterlyUpdateReminderEmailProperties getReminderEmailProperties(String recipientIdentifier,
                                                                            String operatorName,
-                                                                           List<String> remindableProjects) {
+                                                                           List<String> remindableProjects,
+                                                                           List<String> projectsWithPastUpcomingTenders) {
     return null;
   }
 }
