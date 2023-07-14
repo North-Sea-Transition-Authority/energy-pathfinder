@@ -5,7 +5,8 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.Set;
 import java.util.stream.Stream;
 import uk.co.ogauthority.pathfinder.controller.project.OverviewController;
-import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardedContractController;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupController;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastructure.AwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.campaigninformation.CampaignInformationController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
@@ -28,6 +29,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.campaigninformation.CampaignInformationService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityModelService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityService;
@@ -198,6 +200,13 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       ForwardWorkPlanCollaborationOpportunityService.class,
       Set.of(ProjectType.FORWARD_WORK_PLAN),
       30,
+      Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)),
+  WORK_PLAN_AWARDED_CONTRACTS(
+      ForwardWorkPlanAwardedContractSetupController.PAGE_NAME,
+      ForwardWorkPlanAwardedContractSetupController.class,
+      ForwardWorkPlanAwardedContractService.class,
+      Set.of(ProjectType.FORWARD_WORK_PLAN),
+      25,
       Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR))
   ;
 
@@ -329,6 +338,8 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
         return ReverseRouter.route(on(ForwardWorkPlanProjectContributorsController.class).renderProjectContributors(projectId, null));
       case OVERVIEW:
         return ReverseRouter.route(on(OverviewController.class).getOverview(projectId, null));
+      case WORK_PLAN_AWARDED_CONTRACTS:
+        return ReverseRouter.route(on(ForwardWorkPlanAwardedContractSetupController.class).getAwardedContractSetup(projectId, null, null));
       default:
         return "";
     }

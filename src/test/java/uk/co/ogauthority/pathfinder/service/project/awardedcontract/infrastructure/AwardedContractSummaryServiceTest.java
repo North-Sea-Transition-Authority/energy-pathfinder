@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.project.awardedcontract;
+package uk.co.ogauthority.pathfinder.service.project.awardedcontract.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -13,6 +13,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
@@ -50,7 +52,7 @@ public class AwardedContractSummaryServiceTest {
         .thenReturn(List.of(awardedContract1, awardedContract2));
 
     var awardedContractViews = awardedContractSummaryService.getAwardedContractViews(projectDetail);
-    assertThat(awardedContractViews.size()).isEqualTo(2);
+    assertThat(awardedContractViews).hasSize(2);
 
     var awardedContractView1 = awardedContractViews.get(0);
     assertThat(awardedContractView1.getDisplayOrder()).isEqualTo(1);
@@ -88,7 +90,7 @@ public class AwardedContractSummaryServiceTest {
     when(awardedContractService.isValid(awardedContract2, ValidationType.FULL)).thenReturn(false);
 
     var awardedContractViews = awardedContractSummaryService.getValidatedAwardedContractViews(projectDetail);
-    assertThat(awardedContractViews.size()).isEqualTo(2);
+    assertThat(awardedContractViews).hasSize(2);
 
     var awardedContractView1 = awardedContractViews.get(0);
     assertThat(awardedContractView1.getDisplayOrder()).isEqualTo(1);
@@ -130,7 +132,7 @@ public class AwardedContractSummaryServiceTest {
         List.of(awardedContractView1, awardedContractView2)
     );
 
-    assertThat(errorItems.size()).isEqualTo(1);
+    assertThat(errorItems).hasSize(1);
 
     var errorItem = errorItems.get(0);
     assertThat(errorItem.getFieldName()).isEqualTo(
@@ -191,7 +193,7 @@ public class AwardedContractSummaryServiceTest {
   @Test
   public void getErrors_emptyList() {
     var errors = awardedContractSummaryService.getAwardedContractViewErrors(Collections.emptyList());
-    assertThat(errors.size()).isEqualTo(1);
+    assertThat(errors).hasSize(1);
     assertThat(errors.get(0).getDisplayOrder()).isEqualTo(1);
     assertThat(errors.get(0).getFieldName()).isEqualTo(AwardedContractSummaryService.EMPTY_LIST_ERROR);
     assertThat(errors.get(0).getErrorMessage()).isEqualTo(AwardedContractSummaryService.EMPTY_LIST_ERROR);
