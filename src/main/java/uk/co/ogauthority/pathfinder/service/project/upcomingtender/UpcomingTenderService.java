@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.project.upcomingtender;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +39,7 @@ import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipS
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
+import uk.co.ogauthority.pathfinder.service.scheduler.reminders.quarterlyupdate.RemindableProject;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -247,6 +249,21 @@ public class UpcomingTenderService implements ProjectFormSectionService {
    */
   public List<RestSearchItem> findTenderFunctionsLikeWithManualEntry(String searchTerm) {
     return functionService.findFunctionsLikeWithManualEntry(searchTerm, FunctionType.UPCOMING_TENDER);
+  }
+
+  public List<UpcomingTender> getPastUpcomingTendersForRemindableProjects(List<RemindableProject> remindableProjects) {
+    var projectDetailIds = remindableProjects
+        .stream()
+        .map(RemindableProject::getProjectDetailId)
+        .collect(Collectors.toList());
+
+    var pastUpcomingTenders =  upcomingTenderRepository.findAllByProjectDetail_IdIn(projectDetailIds);
+    var currentDate = LocalDate.now();
+
+    return pastUpcomingTenders
+        .stream()
+        .filter(ut -> ut.getEstimatedTenderDate().isBefore(currentDate))
+        .collect(Collectors.toList());
   }
 
   @Override
