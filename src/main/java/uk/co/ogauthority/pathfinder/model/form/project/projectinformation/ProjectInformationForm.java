@@ -3,8 +3,8 @@ package uk.co.ogauthority.pathfinder.model.form.project.projectinformation;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
@@ -20,12 +20,14 @@ public class ProjectInformationForm {
   @NotEmpty(message = "Provide a summary of the project", groups = FullValidation.class)
   private String projectSummary;
 
-  @NotNull(message = "Select a field stage", groups = FullValidation.class)
+  @NotNull(message = "Select an energy project", groups = FullValidation.class)
   private FieldStage fieldStage;
 
   private QuarterYearInput developmentFirstProductionDate;
 
-  private EnergyTransitionCategory energyTransitionCategory;
+  private FieldStageSubCategory carbonCaptureSubCategory;
+
+  private FieldStageSubCategory offshoreWindSubCategory;
 
   @Valid
   private ContactDetailForm contactDetail;
@@ -62,20 +64,27 @@ public class ProjectInformationForm {
     this.contactDetail = contactDetail;
   }
 
-  public EnergyTransitionCategory getEnergyTransitionCategory() {
-    return energyTransitionCategory;
-  }
-
-  public void setEnergyTransitionCategory(
-      EnergyTransitionCategory energyTransitionCategory) {
-    this.energyTransitionCategory = energyTransitionCategory;
-  }
-
   public QuarterYearInput getDevelopmentFirstProductionDate() {
     return developmentFirstProductionDate;
   }
 
   public void setDevelopmentFirstProductionDate(QuarterYearInput developmentFirstProductionDate) {
     this.developmentFirstProductionDate = developmentFirstProductionDate;
+  }
+
+  public FieldStageSubCategory getCarbonCaptureSubCategory() {
+    return carbonCaptureSubCategory;
+  }
+
+  public void setCarbonCaptureSubCategory(FieldStageSubCategory carbonCaptureSubCategory) {
+    this.carbonCaptureSubCategory = carbonCaptureSubCategory;
+  }
+
+  public FieldStageSubCategory getOffshoreWindSubCategory() {
+    return offshoreWindSubCategory;
+  }
+
+  public void setOffshoreWindSubCategory(FieldStageSubCategory offshoreWindSubCategory) {
+    this.offshoreWindSubCategory = offshoreWindSubCategory;
   }
 }

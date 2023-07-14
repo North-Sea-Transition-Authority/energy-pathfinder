@@ -10,13 +10,15 @@ public class FinalQuarterlyUpdateReminderEmailProperties extends QuarterlyUpdate
   public FinalQuarterlyUpdateReminderEmailProperties(String recipientIdentifier,
                                                      String operatorName,
                                                      List<String> remindableProjects,
-                                                     String serviceLoginUrl) {
+                                                     String serviceLoginUrl,
+                                                     List<String> projectsWithPastUpcomingTenders) {
     super(
         NotifyTemplate.FINAL_QUARTERLY_PROJECT_UPDATE_REMINDER,
         recipientIdentifier,
         operatorName,
         remindableProjects,
-        serviceLoginUrl
+        serviceLoginUrl,
+        projectsWithPastUpcomingTenders
     );
   }
 }

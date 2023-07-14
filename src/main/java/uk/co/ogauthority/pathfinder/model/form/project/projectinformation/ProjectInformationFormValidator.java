@@ -17,7 +17,12 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationUtil;
 @Component
 public class ProjectInformationFormValidator implements SmartValidator {
 
-  public static final String MISSING_ENERGY_TRANSITION_CATEGORY_ERROR = "Select an energy transition category";
+  public static final String CARBON_CAPTURE_AND_STORAGE_FIELD = "carbonCaptureSubCategory";
+  public static final String CARBON_CAPTURE_AND_STORAGE_MISSING_ERROR =
+      String.format("Select a %s category", FieldStage.CARBON_CAPTURE_AND_STORAGE.getDisplayName());
+  public static final String OFFSHORE_WIND_FIELD = "offshoreWindSubCategory";
+  public static final String OFFSHORE_WIND_MISSING_ERROR =
+      String.format("Select an %s category", FieldStage.OFFSHORE_WIND.getDisplayName().toLowerCase());
 
   private final QuarterYearInputValidator quarterYearInputValidator;
 
@@ -41,7 +46,7 @@ public class ProjectInformationFormValidator implements SmartValidator {
 
     var form = (ProjectInformationForm) target;
 
-    ProjectInformationValidationHint projectInformationValidationHint = Arrays.stream(validationHints)
+    var projectInformationValidationHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(ProjectInformationValidationHint.class))
         .map(ProjectInformationValidationHint.class::cast)
         .findFirst()
@@ -49,38 +54,48 @@ public class ProjectInformationFormValidator implements SmartValidator {
             () -> new ActionNotAllowedException("Expected ProjectInformationValidationHint validation hint to be provided")
         );
 
+    validateFieldStage(form, errors, projectInformationValidationHint);
+  }
+
+  private void validateFieldStage(ProjectInformationForm form,
+                                  Errors errors,
+                                  ProjectInformationValidationHint projectInformationValidationHint) {
     var fieldStage = form.getFieldStage();
 
     if (fieldStage != null) {
       if (BooleanUtils.isTrue(fieldStage.equals(FieldStage.DEVELOPMENT))) {
         validateFirstProductionDate(
-            "developmentFirstProductionDate",
             form.getDevelopmentFirstProductionDate(),
             projectInformationValidationHint,
             errors
         );
-      } else if (
-          BooleanUtils.isTrue(fieldStage.equals(FieldStage.ENERGY_TRANSITION))
-          && ValidationType.FULL.equals(projectInformationValidationHint.getValidationType())
-      ) {
-        ValidationUtils.rejectIfEmptyOrWhitespace(
-            errors,
-            "energyTransitionCategory",
-            "energyTransitionCategory.invalid",
-            MISSING_ENERGY_TRANSITION_CATEGORY_ERROR
-        );
+      } else if (ValidationType.FULL.equals(projectInformationValidationHint.getValidationType())) {
+        if (FieldStage.CARBON_CAPTURE_AND_STORAGE.equals(fieldStage)) {
+          ValidationUtils.rejectIfEmptyOrWhitespace(
+              errors,
+              CARBON_CAPTURE_AND_STORAGE_FIELD,
+              CARBON_CAPTURE_AND_STORAGE_FIELD.concat(".required"),
+              CARBON_CAPTURE_AND_STORAGE_MISSING_ERROR
+          );
+        } else if (FieldStage.OFFSHORE_WIND.equals(fieldStage)) {
+          ValidationUtils.rejectIfEmptyOrWhitespace(
+              errors,
+              OFFSHORE_WIND_FIELD,
+              OFFSHORE_WIND_FIELD.concat(".required"),
+              OFFSHORE_WIND_MISSING_ERROR
+          );
+        }
       }
     }
   }
 
-  private void validateFirstProductionDate(String formTarget,
-                                           QuarterYearInput firstProductionDate,
+  private void validateFirstProductionDate(QuarterYearInput firstProductionDate,
                                            ProjectInformationValidationHint projectInformationValidationHint,
                                            Errors errors) {
     ValidationUtil.invokeNestedValidator(
         errors,
         quarterYearInputValidator,
-        formTarget,
+        "developmentFirstProductionDate",
         firstProductionDate,
         projectInformationValidationHint.getFirstProductionDateValidationHints()
     );

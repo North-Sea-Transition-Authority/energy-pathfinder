@@ -4,18 +4,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
@@ -39,6 +41,7 @@ import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
+import uk.co.ogauthority.pathfinder.service.scheduler.reminders.quarterlyupdate.RemindableProject;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -49,8 +52,8 @@ import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
-@RunWith(MockitoJUnitRunner.class)
-public class UpcomingTenderServiceTest {
+@ExtendWith(MockitoExtension.class)
+class UpcomingTenderServiceTest {
 
   @Mock
   private UpcomingTenderRepository upcomingTenderRepository;
@@ -89,9 +92,8 @@ public class UpcomingTenderServiceTest {
 
   private final PortalOrganisationGroup portalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
-  @Before
-  public void setUp() {
-
+  @BeforeEach
+  void setUp() {
     SearchSelectorService searchSelectorService = new SearchSelectorService();
     FunctionService functionService = new FunctionService(searchSelectorService);
 
@@ -108,15 +110,14 @@ public class UpcomingTenderServiceTest {
         teamService,
         projectSectionItemOwnershipService
         );
-
-    when(upcomingTenderRepository.save(any(UpcomingTender.class)))
-        .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
 
   @Test
-  public void createUpcomingTender() {
+  void createUpcomingTender() {
     when(teamService.getContributorPortalOrganisationGroup(authenticatedUserAccount)).thenReturn(portalOrganisationGroup);
+    when(upcomingTenderRepository.save(any(UpcomingTender.class)))
+        .thenAnswer(invocation -> invocation.getArguments()[0]);
     var form = UpcomingTenderUtil.getCompleteForm();
     var newUpcomingTender = upcomingTenderService.createUpcomingTender(
         detail,
@@ -129,8 +130,10 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void createUpcomingTender_manualFunction() {
+  void createUpcomingTender_manualFunction() {
     when(teamService.getContributorPortalOrganisationGroup(authenticatedUserAccount)).thenReturn(portalOrganisationGroup);
+    when(upcomingTenderRepository.save(any(UpcomingTender.class)))
+        .thenAnswer(invocation -> invocation.getArguments()[0]);
     var form = UpcomingTenderUtil.getCompletedForm_manualEntry();
     var newUpcomingTender = upcomingTenderService.createUpcomingTender(
         detail,
@@ -142,7 +145,10 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void updateUpcomingTender() {
+  void updateUpcomingTender() {
+    when(upcomingTenderRepository.save(any(UpcomingTender.class)))
+        .thenAnswer(invocation -> invocation.getArguments()[0]);
+
     var form = UpcomingTenderUtil.getCompleteForm();
     form.setTenderFunction(Function.DRILLING.name());
     var existingUpcomingTender = upcomingTender;
@@ -157,7 +163,10 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void updateUpcomingTender_manualFunction() {
+  void updateUpcomingTender_manualFunction() {
+    when(upcomingTenderRepository.save(any(UpcomingTender.class)))
+        .thenAnswer(invocation -> invocation.getArguments()[0]);
+
     var form = UpcomingTenderUtil.getCompleteForm();
     form.setTenderFunction(null);
     form.setTenderFunction(UpcomingTenderUtil.MANUAL_TENDER_FUNCTION);
@@ -169,14 +178,14 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void getForm() {
+  void getForm() {
     var form = upcomingTenderService.getForm(upcomingTender);
     assertThat(form.getTenderFunction()).isEqualTo(upcomingTender.getTenderFunction().name());
     checkCommonFormFields(form, upcomingTender);
   }
 
   @Test
-  public void getForm_manualEntry() {
+  void getForm_manualEntry() {
     var manualEntryTender = UpcomingTenderUtil.getUpcomingTender_manualEntry(detail);
     var form = upcomingTenderService.getForm(manualEntryTender);
     assertThat(form.getTenderFunction()).isEqualTo(SearchSelectorService.getValueWithManualEntryPrefix(manualEntryTender.getManualTenderFunction()));
@@ -184,8 +193,7 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void getForm_withFile() {
-
+  void getForm_withFile() {
     var uploadedFileView = UploadedFileUtil.createUploadedFileView();
     var upcomingTenderLink = new UpcomingTenderFileLink();
     upcomingTenderLink.setProjectDetailFile(new ProjectDetailFile());
@@ -204,8 +212,7 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void getForm_withoutFile() {
-
+  void getForm_withoutFile() {
     when(upcomingTenderFileLinkService.getAllByUpcomingTender(upcomingTender)).thenReturn(List.of());
 
     var form = upcomingTenderService.getForm(upcomingTender);
@@ -215,7 +222,7 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void validate_partial() {
+  void validate_partial() {
     var form = new UpcomingTenderForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
@@ -228,7 +235,7 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void validate_full() {
+  void validate_full() {
     var form = UpcomingTenderUtil.getCompleteForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
@@ -263,14 +270,14 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void findTenderFunctionsLikeWithManualEntry() {
+  void findTenderFunctionsLikeWithManualEntry() {
     var results = upcomingTenderService.findTenderFunctionsLikeWithManualEntry(Function.FACILITIES_OFFSHORE.getDisplayName());
     assertThat(results.size()).isEqualTo(1);
     assertThat(results.get(0).getId()).isEqualTo(Function.FACILITIES_OFFSHORE.name());
   }
 
   @Test
-  public void findTenderFunctionsLikeWithManualEntry_withManualEntry() {
+  void findTenderFunctionsLikeWithManualEntry_withManualEntry() {
     var manualEntry = "manual entry";
     var results = upcomingTenderService.findTenderFunctionsLikeWithManualEntry(manualEntry);
     assertThat(results.size()).isEqualTo(1);
@@ -278,8 +285,7 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void deleteUpcomingTenderFile_whenTemporaryFileStatus_dontRemoveFileLink() {
-
+  void deleteUpcomingTenderFile_whenTemporaryFileStatus_dontRemoveFileLink() {
     var fileId = "fileId";
     var projectDetail = ProjectUtil.getProjectDetails();
     var authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount();
@@ -297,8 +303,7 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void deleteUpcomingTenderFile_whenFullFileStatus_thenRemoveFileLink() {
-
+  void deleteUpcomingTenderFile_whenFullFileStatus_thenRemoveFileLink() {
     var fileId = "fileId";
     var projectDetail = ProjectUtil.getProjectDetails();
     var authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount();
@@ -316,19 +321,19 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void canShowInTaskList_true() {
+  void canShowInTaskList_true() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(true);
     assertThat(upcomingTenderService.canShowInTaskList(detail, Set.of(UserToProjectRelationship.OPERATOR))).isTrue();
   }
 
   @Test
-  public void canShowInTaskList_false() {
+  void canShowInTaskList_false() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(false);
     assertThat(upcomingTenderService.canShowInTaskList(detail, Set.of(UserToProjectRelationship.OPERATOR))).isFalse();
   }
 
   @Test
-  public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
+  void canShowInTaskList_userToProjectRelationshipSmokeTest() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(true);
     ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
         upcomingTenderService,
@@ -338,20 +343,19 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void isTaskValidForProjectDetail_true() {
+  void isTaskValidForProjectDetail_true() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(true);
     assertThat(upcomingTenderService.isTaskValidForProjectDetail(detail)).isTrue();
   }
 
   @Test
-  public void isTaskValidForProjectDetail_false() {
+  void isTaskValidForProjectDetail_false() {
     when(projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.UPCOMING_TENDERS)).thenReturn(false);
     assertThat(upcomingTenderService.isTaskValidForProjectDetail(detail)).isFalse();
   }
 
   @Test
-  public void removeSectionData_verifyInteractions() {
-
+  void removeSectionData_verifyInteractions() {
     final var upcomingTender1 = UpcomingTenderUtil.getUpcomingTender(detail);
     final var upcomingTender2 = UpcomingTenderUtil.getUpcomingTender(detail);
     final var upcomingTenders = List.of(upcomingTender1, upcomingTender2);
@@ -365,8 +369,7 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void copySectionData_verifyDuplicationServiceInteraction() {
-
+  void copySectionData_verifyDuplicationServiceInteraction() {
     final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
     final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
     final var upcomingTenders = List.of(
@@ -393,8 +396,7 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void getUpcomingTendersForProjectVersion_whenFound_thenReturnPopulatedList() {
-
+  void getUpcomingTendersForProjectVersion_whenFound_thenReturnPopulatedList() {
     final var upcomingTender = UpcomingTenderUtil.getUpcomingTender(detail);
     final var upcomingTenderList = List.of(upcomingTender);
 
@@ -409,8 +411,7 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void getUpcomingTendersForProjectVersion_whenNotFound_thenReturnEmptyList() {
-
+  void getUpcomingTendersForProjectVersion_whenNotFound_thenReturnEmptyList() {
     final var project = detail.getProject();
     final var version = detail.getVersion();
 
@@ -422,32 +423,78 @@ public class UpcomingTenderServiceTest {
   }
 
   @Test
-  public void getSupportedProjectTypes_verifyInfrastructure() {
+  void getSupportedProjectTypes_verifyInfrastructure() {
     assertThat(upcomingTenderService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
   }
 
   @Test
-  public void alwaysCopySectionData_verifyFalse() {
+  void alwaysCopySectionData_verifyFalse() {
     assertThat(upcomingTenderService.alwaysCopySectionData(detail)).isFalse();
   }
 
   @Test
-  public void allowSectionDataCleanUp_verifyIsTrue() {
+  void allowSectionDataCleanUp_verifyIsTrue() {
     final var allowSectionDateCleanUp = upcomingTenderService.allowSectionDataCleanUp(detail);
     assertThat(allowSectionDateCleanUp).isTrue();
   }
 
   @Test
-  public void canCurrentUserAccessTender_whenCurrentUserHasAccessToProjectSectionInfo_thenTrue() {
+  void canCurrentUserAccessTender_whenCurrentUserHasAccessToProjectSectionInfo_thenTrue() {
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(detail), any())).thenReturn(true);
 
     assertThat(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).isTrue();
   }
 
   @Test
-  public void canCurrentUserAccessTender_whenCurrentUserHasNoAccessToProjectSectionInfo_thenTrue() {
+  void canCurrentUserAccessTender_whenCurrentUserHasNoAccessToProjectSectionInfo_thenTrue() {
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(detail), any())).thenReturn(false);
 
     assertThat(upcomingTenderService.canCurrentUserAccessTender(upcomingTender)).isFalse();
+  }
+
+  @Test
+  void getPastUpcomingTendersForRemindableProjects_whenFound_thenReturn() {
+    var currentDate = LocalDate.now();
+
+    var remindableProjectWithPastUpcomingTender = mock(RemindableProject.class);
+    when(remindableProjectWithPastUpcomingTender.getProjectDetailId()).thenReturn(1);
+    var upcomingTenderInPast = mock(UpcomingTender.class);
+    when(upcomingTenderInPast.getEstimatedTenderDate()).thenReturn(currentDate.minusDays(1));
+
+    var remindableProjectWithNoPastUpcomingTenders = mock(RemindableProject.class);
+    when(remindableProjectWithNoPastUpcomingTenders.getProjectDetailId()).thenReturn(2);
+    var upcomingTenderInFuture = mock(UpcomingTender.class);
+    when(upcomingTenderInFuture.getEstimatedTenderDate()).thenReturn(currentDate.plusDays(5));
+
+    var remindableProjectWithNoUpcomingTenders = mock(RemindableProject.class);
+    when(remindableProjectWithNoUpcomingTenders.getProjectDetailId()).thenReturn(3);
+
+    var remindableProjectWithUpcomingTendersDueToday = mock(RemindableProject.class);
+    when(remindableProjectWithUpcomingTendersDueToday.getProjectDetailId()).thenReturn(4);
+    var upcomingTenderDueToday = mock(UpcomingTender.class);
+    when(upcomingTenderDueToday.getEstimatedTenderDate()).thenReturn(currentDate);
+
+    when(upcomingTenderRepository.findAllByProjectDetail_IdIn(List.of(1,2,3,4)))
+        .thenReturn(List.of(upcomingTenderInPast, upcomingTenderInFuture, upcomingTenderDueToday));
+
+    var result = upcomingTenderService.getPastUpcomingTendersForRemindableProjects(
+        List.of(remindableProjectWithPastUpcomingTender, remindableProjectWithNoPastUpcomingTenders,
+            remindableProjectWithNoUpcomingTenders, remindableProjectWithUpcomingTendersDueToday)
+    );
+
+    assertThat(result).containsOnly(upcomingTenderInPast);
+  }
+
+  @Test
+  void getPastUpcomingTendersForRemindableProjects_whenNoneFound_thenReturnEmptyList() {
+    var projectDetailIdList = List.of(1);
+    when(upcomingTenderRepository.findAllByProjectDetail_IdIn(projectDetailIdList)).thenReturn(Collections.emptyList());
+
+    var remindableProjectWithNoUpcomingTenders = mock(RemindableProject.class);
+    when(remindableProjectWithNoUpcomingTenders.getProjectDetailId()).thenReturn(1);
+
+    var result = upcomingTenderService.getPastUpcomingTendersForRemindableProjects(List.of(remindableProjectWithNoUpcomingTenders));
+
+    assertThat(result).isEmpty();
   }
 }
