@@ -239,7 +239,7 @@ public class ProjectSetupServiceTest {
   @Test
   public void removeTaskListSetupSectionsNotApplicableToFieldStage_whenSectionsNotApplicableFound_thenVerifyCorrectSectionsAreRemoved() {
 
-    var nonDecommissioningFieldStage = FieldStage.ENERGY_TRANSITION;
+    var nonDecommissioningFieldStage = FieldStage.HYDROGEN;
 
     var decommissioningFieldStageSetupEntityToTest = createProjectTaskListSetupEntityWithFieldStageSection(FieldStage.DECOMMISSIONING);
 
