@@ -1,4 +1,4 @@
-package uk.co.ogauthority.pathfinder.service.project.awardedcontract.infrastructure;
+package uk.co.ogauthority.pathfinder.service.project.awardedcontract;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,20 +20,20 @@ import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Service
-public class InfrastructureAwardedContractSummaryService {
+public class AwardedContractSummaryService {
 
   public static final String ERROR_FIELD_NAME = "awarded-contract-%d";
   public static final String ERROR_MESSAGE = "Awarded contract %d is incomplete";
   public static final String EMPTY_LIST_ERROR = "You must add at least one awarded contract";
 
-  private final InfrastructureAwardedContractService awardedContractService;
+  private final AwardedContractServiceCommon awardedContractService;
   private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
   private final PortalOrganisationAccessor portalOrganisationAccessor;
 
   @Autowired
-  public InfrastructureAwardedContractSummaryService(InfrastructureAwardedContractService awardedContractService,
-                                                     ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
-                                                     PortalOrganisationAccessor portalOrganisationAccessor) {
+  public AwardedContractSummaryService(AwardedContractServiceCommon awardedContractService,
+                                       ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
+                                       PortalOrganisationAccessor portalOrganisationAccessor) {
     this.awardedContractService = awardedContractService;
     this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
     this.portalOrganisationAccessor = portalOrganisationAccessor;

@@ -1,5 +1,5 @@
-<#include '../../layout.ftl'>
-<#import '_awardedContractSummary.ftl' as awardedContractSummary>
+<#include '../../../layout.ftl'>
+<#import '../_awardedContractSummary.ftl' as awardedContractSummary>
 
 <@defaultPage htmlTitle=pageTitle pageHeading=pageTitle breadcrumbs=true errorItems=errorList>
 

@@ -59,11 +59,11 @@ public class BreadcrumbService {
     return map;
   }
 
-  public void fromAwardedContracts(Integer projectId, ModelAndView modelAndView, String thisPage) {
-    addAttrs(modelAndView, awardedContracts(projectId), thisPage);
+  public void fromInfrastructureAwardedContracts(Integer projectId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, infrastructureAwardedContracts(projectId), thisPage);
   }
 
-  private Map<String, String> awardedContracts(Integer projectId) {
+  private Map<String, String> infrastructureAwardedContracts(Integer projectId) {
     var map = taskList(projectId);
     String route = ReverseRouter.route(on(InfrastructureAwardedContractController.class).viewAwardedContracts(projectId, null));
     map.put(route, InfrastructureAwardedContractController.PAGE_NAME);

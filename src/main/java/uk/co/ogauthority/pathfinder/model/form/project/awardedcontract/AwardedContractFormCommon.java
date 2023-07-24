@@ -10,7 +10,7 @@ import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.lengthrestrictedstring.LengthRestrictedString;
 
-public class AwardedContractForm {
+public abstract class AwardedContractFormCommon {
 
   @NotEmpty(message = "Enter a contractor name", groups = FullValidation.class)
   @LengthRestrictedString(messagePrefix = "The contractor name", groups = {FullValidation.class, PartialValidation.class})

@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractServiceCommon;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
@@ -36,6 +37,7 @@ public class InfrastructureAwardedContractSectionSummaryService implements Proje
   public static final int DISPLAY_ORDER = ProjectTask.AWARDED_CONTRACTS.getDisplayOrder();
 
   private final InfrastructureAwardedContractService awardedContractService;
+  private final AwardedContractServiceCommon awardedContractServiceCommon;
   private final DifferenceService differenceService;
   private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
   private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
@@ -44,11 +46,13 @@ public class InfrastructureAwardedContractSectionSummaryService implements Proje
   @Autowired
   public InfrastructureAwardedContractSectionSummaryService(
       InfrastructureAwardedContractService awardedContractService,
+      AwardedContractServiceCommon awardedContractServiceCommon,
       DifferenceService differenceService,
       ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService,
       ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
       PortalOrganisationAccessor portalOrganisationAccessor) {
     this.awardedContractService = awardedContractService;
+    this.awardedContractServiceCommon = awardedContractServiceCommon;
     this.differenceService = differenceService;
     this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
     this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
@@ -69,7 +73,7 @@ public class InfrastructureAwardedContractSectionSummaryService implements Proje
         SECTION_ID
     );
 
-    var awardedContracts = awardedContractService.getAwardedContracts(detail);
+    var awardedContracts = awardedContractServiceCommon.getAwardedContracts(detail);
     var awardedContractViews = getAwardedContractViews(awardedContracts);
     summaryModel.put("awardedContractDiffModel", getAwardedContractDifferenceModel(
         detail,
@@ -87,7 +91,7 @@ public class InfrastructureAwardedContractSectionSummaryService implements Proje
       ProjectDetail projectDetail,
       List<AwardedContractView> currentAwardedContractViews
   ) {
-    var previousAwardedContracts = awardedContractService.getAwardedContractsByProjectAndVersion(
+    var previousAwardedContracts = awardedContractServiceCommon.getAwardedContractsByProjectAndVersion(
         projectDetail.getProject(),
         projectDetail.getVersion() - 1
     );

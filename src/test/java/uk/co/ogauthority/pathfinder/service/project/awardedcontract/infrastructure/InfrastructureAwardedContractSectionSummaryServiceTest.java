@@ -10,21 +10,22 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractServiceCommon;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class InfrastructureAwardedContractSectionSummaryServiceTest {
 
   @Mock
@@ -40,16 +41,20 @@ public class InfrastructureAwardedContractSectionSummaryServiceTest {
   private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
   @Mock
+  private AwardedContractServiceCommon awardedContractServiceCommon;
+
+  @Mock
   private PortalOrganisationAccessor portalOrganisationAccessor;
 
   private InfrastructureAwardedContractSectionSummaryService awardedContractSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
-  @Before
+  @BeforeEach
   public void setup() {
     awardedContractSectionSummaryService = new InfrastructureAwardedContractSectionSummaryService(
         awardedContractService,
+        awardedContractServiceCommon,
         differenceService,
         projectSectionSummaryCommonModelService,
         projectSectionItemOwnershipService,
@@ -73,12 +78,12 @@ public class InfrastructureAwardedContractSectionSummaryServiceTest {
 
   @Test
   public void getSummary() {
-    when(awardedContractService.getAwardedContracts(detail)).thenReturn(List.of(
+    when(awardedContractServiceCommon.getAwardedContracts(detail)).thenReturn(List.of(
         AwardedContractTestUtil.createAwardedContract(),
         AwardedContractTestUtil.createAwardedContract()
     ));
 
-    when(awardedContractService.getAwardedContractsByProjectAndVersion(
+    when(awardedContractServiceCommon.getAwardedContractsByProjectAndVersion(
         detail.getProject(),
         detail.getVersion() - 1
     )).thenReturn(List.of(
@@ -101,7 +106,7 @@ public class InfrastructureAwardedContractSectionSummaryServiceTest {
 
   @Test
   public void getSummary_noAwardedContracts() {
-    when(awardedContractService.getAwardedContracts(detail)).thenReturn(Collections.emptyList());
+    when(awardedContractServiceCommon.getAwardedContracts(detail)).thenReturn(Collections.emptyList());
 
     var sectionSummary = awardedContractSectionSummaryService.getSummary(detail);
 
