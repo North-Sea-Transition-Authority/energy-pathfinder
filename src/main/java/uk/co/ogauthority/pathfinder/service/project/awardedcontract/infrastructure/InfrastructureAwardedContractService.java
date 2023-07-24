@@ -31,7 +31,7 @@ public class InfrastructureAwardedContractService implements ProjectFormSectionS
                                               AwardedContractRepository awardedContractRepository) {
     this.projectSetupService = projectSetupService;
     this.entityDuplicationService = entityDuplicationService;
-    this.awardedContractServiceCommon =awardedContractServiceCommon;
+    this.awardedContractServiceCommon = awardedContractServiceCommon;
     this.awardedContractRepository = awardedContractRepository;
   }
 
