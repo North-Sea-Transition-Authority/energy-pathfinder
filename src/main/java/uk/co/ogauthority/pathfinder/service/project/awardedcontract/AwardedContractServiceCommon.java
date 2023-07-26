@@ -153,6 +153,10 @@ public class AwardedContractServiceCommon {
     return awardedContractRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version);
   }
 
+  public boolean hasAwardedContracts(ProjectDetail projectDetail) {
+    return awardedContractRepository.existsByProjectDetail(projectDetail);
+  }
+
   public BindingResult validate(AwardedContractFormCommon form,
                                 BindingResult bindingResult,
                                 ValidationType validationType) {

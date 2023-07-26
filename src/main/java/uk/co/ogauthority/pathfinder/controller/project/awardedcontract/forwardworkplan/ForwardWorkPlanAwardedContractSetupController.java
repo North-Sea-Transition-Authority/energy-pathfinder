@@ -27,6 +27,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractServiceCommon;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
@@ -44,13 +45,16 @@ public class ForwardWorkPlanAwardedContractSetupController extends ProjectFormPa
 
 
   private final ForwardWorkPlanAwardedContractSetupService setupService;
+  private final AwardedContractServiceCommon awardedContractServiceCommon;
 
   @Autowired
   public ForwardWorkPlanAwardedContractSetupController(BreadcrumbService breadcrumbService,
                                                        ControllerHelperService controllerHelperService,
-                                                       ForwardWorkPlanAwardedContractSetupService setupService) {
+                                                       ForwardWorkPlanAwardedContractSetupService setupService,
+                                                       AwardedContractServiceCommon awardedContractServiceCommon) {
     super(breadcrumbService, controllerHelperService);
     this.setupService = setupService;
+    this.awardedContractServiceCommon = awardedContractServiceCommon;
   }
 
   @GetMapping()
@@ -59,8 +63,10 @@ public class ForwardWorkPlanAwardedContractSetupController extends ProjectFormPa
                                               AuthenticatedUserAccount userAccount) {
     var projectDetail = projectContext.getProjectDetails();
     var form = setupService.getAwardedContractSetupFormFromDetail(projectDetail);
-    // TODO (EDU-6597): This will be updated in a later branch to redirect the user to the View Contracts page if they have
-    // already said they will be adding awarded contracts and have some on the project
+    var hasAwardedContracts = awardedContractServiceCommon.hasAwardedContracts(projectDetail);
+    if (Boolean.TRUE.equals(form.getHasContractToAdd()) && hasAwardedContracts) {
+      return goToAwardedContractSummary(projectId);
+    }
     return getAwardedContractSetupModelAndView(projectDetail, form);
   }
 
@@ -85,8 +91,14 @@ public class ForwardWorkPlanAwardedContractSetupController extends ProjectFormPa
                                                       ProjectDetail projectDetail) {
     var projectId = projectDetail.getProject().getId();
     setupService.saveAwardedContractSetup(form, projectDetail);
-    // TODO (EDU-6597): I will be adding the View Contracts endpoints in a later branch, so just redirecting to the task list for now
-    return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
+    if (Boolean.TRUE.equals(form.getHasContractToAdd())) {
+      return goToAwardedContractSummary(projectId);
+    }
+      return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
+  }
+
+  private ModelAndView goToAwardedContractSummary(Integer projectId) {
+    return ReverseRouter.redirect(on(ForwardWorkPlanAwardedContractSummaryController.class).viewAwardedContracts(projectId, null));
   }
 
   private ModelAndView getAwardedContractSetupModelAndView(ProjectDetail projectDetail,

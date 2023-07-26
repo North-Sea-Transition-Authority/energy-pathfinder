@@ -18,4 +18,6 @@ public interface AwardedContractRepository extends CrudRepository<AwardedContrac
   List<AwardedContract> findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(Project project, Integer version);
 
   void deleteAllByProjectDetail(ProjectDetail projectDetail);
+
+  boolean existsByProjectDetail(ProjectDetail projectDetail);
 }

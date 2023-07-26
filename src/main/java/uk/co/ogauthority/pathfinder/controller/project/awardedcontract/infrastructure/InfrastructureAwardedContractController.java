@@ -230,7 +230,7 @@ public class InfrastructureAwardedContractController extends AwardContractContro
 
     var modelAndView = new ModelAndView("project/awardedcontract/awardedContract")
         .addObject("form", form)
-        .addObject("contractBands", ContractBand.getAllAsMap())
+        .addObject("contractBands", ContractBand.getAllAsMap(ProjectType.INFRASTRUCTURE))
         .addObject("contractFunctionRestUrl", getContractFunctionSearchUrl())
         .addObject("preSelectedContractFunctionMap", preSelectedContractFunctionMap);
 

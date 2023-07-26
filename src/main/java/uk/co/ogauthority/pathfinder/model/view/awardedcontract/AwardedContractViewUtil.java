@@ -4,9 +4,12 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.ArrayList;
 import org.apache.commons.lang3.StringUtils;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractController;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractRemovalController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastructure.InfrastructureAwardedContractController;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure.AwardedContract;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
@@ -16,14 +19,27 @@ import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class AwardedContractViewUtil {
 
+  private static final Class<InfrastructureAwardedContractController> INFRASTRUCTURE_CONTROLLER = InfrastructureAwardedContractController.class;
+  private static final Class<ForwardWorkPlanAwardedContractController> FORWARD_WORK_PLAN_CONTROLLER = ForwardWorkPlanAwardedContractController.class;
+
   private AwardedContractViewUtil() {
     throw new IllegalStateException("AwardedContractViewUtil is a util class and should not be instantiated");
   }
 
-  public static SummaryLink getEditLink(Integer projectId, Integer awardedContractId) {
+  public static SummaryLink getEditLink(Integer projectId, Integer awardedContractId, ProjectType projectType) {
+    if (ProjectType.INFRASTRUCTURE.equals(projectType)) {
+      return new SummaryLink(
+          SummaryLinkText.EDIT.getDisplayName(),
+          ReverseRouter.route(on(INFRASTRUCTURE_CONTROLLER).getAwardedContract(
+              projectId,
+              awardedContractId,
+              null
+          ))
+      );
+    }
     return new SummaryLink(
         SummaryLinkText.EDIT.getDisplayName(),
-        ReverseRouter.route(on(InfrastructureAwardedContractController.class).getAwardedContract(
+        ReverseRouter.route(on(FORWARD_WORK_PLAN_CONTROLLER).getAwardedContract(
             projectId,
             awardedContractId,
             null
@@ -31,10 +47,21 @@ public class AwardedContractViewUtil {
     );
   }
 
-  public static SummaryLink getDeleteLink(Integer projectId, Integer awardedContractId, Integer displayOrder) {
+  public static SummaryLink getDeleteLink(Integer projectId, Integer awardedContractId, Integer displayOrder, ProjectType projectType) {
+    if (ProjectType.INFRASTRUCTURE.equals(projectType)) {
+      return new SummaryLink(
+          SummaryLinkText.DELETE.getDisplayName(),
+          ReverseRouter.route(on(INFRASTRUCTURE_CONTROLLER).removeAwardedContract(
+              projectId,
+              awardedContractId,
+              displayOrder,
+              null
+          ))
+      );
+    }
     return new SummaryLink(
         SummaryLinkText.DELETE.getDisplayName(),
-        ReverseRouter.route(on(InfrastructureAwardedContractController.class).removeAwardedContract(
+        ReverseRouter.route(on(ForwardWorkPlanAwardedContractRemovalController.class).removeAwardedContract(
             projectId,
             awardedContractId,
             displayOrder,
@@ -92,6 +119,8 @@ public class AwardedContractViewUtil {
       awardedContractView.setProjectId(projectId);
       awardedContractView.setContractorName(awardedContract.getContractorName());
 
+      var projectType = awardedContract.getProjectDetail().getProjectType();
+
       var contractFunction = (awardedContract.getContractFunction() != null)
           ? new StringWithTag(awardedContract.getContractFunction().getDisplayName(), Tag.NONE)
           : new StringWithTag(awardedContract.getManualContractFunction(), Tag.NOT_FROM_LIST);
@@ -112,8 +141,8 @@ public class AwardedContractViewUtil {
 
       var summaryLinks = new ArrayList<SummaryLink>();
       if (includeSummaryLinks) {
-        summaryLinks.add(getEditLink(projectId, awardedContract.getId()));
-        summaryLinks.add(getDeleteLink(projectId, awardedContract.getId(), displayOrder));
+        summaryLinks.add(getEditLink(projectId, awardedContract.getId(), projectType));
+        summaryLinks.add(getDeleteLink(projectId, awardedContract.getId(), displayOrder, projectType));
       }
 
       awardedContractView.setSummaryLinks(summaryLinks);

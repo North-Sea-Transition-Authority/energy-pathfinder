@@ -2,10 +2,13 @@ package uk.co.ogauthority.pathfinder.controller.project.awardedcontract;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSummaryController;
 import uk.co.ogauthority.pathfinder.controller.rest.ContractFunctionRestController;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure.AwardedContract;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
@@ -52,6 +55,11 @@ public abstract class AwardContractController extends ProjectFormPageController 
               awardedContract.getId())
       );
     }
+  }
+
+  protected ModelAndView getForwardWorkPlanAwardedContractSummaryRedirect(Integer projectId) {
+    return ReverseRouter.redirect(on(ForwardWorkPlanAwardedContractSummaryController.class)
+        .viewAwardedContracts(projectId, null));
   }
 
 }

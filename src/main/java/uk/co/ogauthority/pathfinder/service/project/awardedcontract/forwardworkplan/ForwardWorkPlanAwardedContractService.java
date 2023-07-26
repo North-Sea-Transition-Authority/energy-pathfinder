@@ -9,27 +9,44 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
+import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
 @Service
 public class ForwardWorkPlanAwardedContractService implements ProjectFormSectionService {
 
   private final EntityDuplicationService entityDuplicationService;
   private final ForwardWorkPlanAwardedContractSetupService setupService;
+  private final AwardedContractSummaryService awardedContractSummaryService;
 
   @Autowired
   ForwardWorkPlanAwardedContractService(EntityDuplicationService entityDuplicationService,
-                                        ForwardWorkPlanAwardedContractSetupService setupService) {
+                                        ForwardWorkPlanAwardedContractSetupService setupService,
+                                        AwardedContractSummaryService awardedContractSummaryService) {
     this.entityDuplicationService = entityDuplicationService;
     this.setupService = setupService;
+    this.awardedContractSummaryService = awardedContractSummaryService;
   }
 
   @Override
   public boolean isComplete(ProjectDetail projectDetail) {
-    // TODO (EDU-6597): This will be updated in another branch when the rest of the awarded contracts is added
-    return setupService.isValid(projectDetail);
+    var awardedContractSetupOptional = setupService.getForwardWorkPlanAwardedContractSetup(projectDetail);
+    if (awardedContractSetupOptional.isEmpty()) {
+      return false;
+    }
+    var awardedContractSetup = awardedContractSetupOptional.get();
+    if (Boolean.FALSE.equals(awardedContractSetup.getHasContractToAdd())) {
+      return true;
+    }
+
+    var awardedContractViews = awardedContractSummaryService.getValidatedAwardedContractViews(projectDetail);
+    var validationResult = awardedContractSummaryService.validateViews(awardedContractViews);
+    return ValidationResult.VALID.equals(validationResult)
+        && Boolean.FALSE.equals(awardedContractSetup.getHasOtherContractToAdd())
+        && !awardedContractViews.isEmpty();
   }
 
   @Override

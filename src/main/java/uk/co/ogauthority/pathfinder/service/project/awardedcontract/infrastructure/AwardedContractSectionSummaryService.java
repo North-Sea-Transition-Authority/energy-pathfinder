@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardContractController;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
+import uk.co.ogauthority.pathfinder.exception.UnsupportedProjectSubmissionSummaryServiceException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure.AwardedContract;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractView;
@@ -21,11 +23,12 @@ import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractServiceCommon;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
 @Service
-public class InfrastructureAwardedContractSectionSummaryService implements ProjectSectionSummaryService {
+public class AwardedContractSectionSummaryService implements ProjectSectionSummaryService {
 
   public static final String TEMPLATE_PATH = "project/awardedcontract/awardedContractSectionSummary.ftl";
   public static final String PAGE_NAME = AwardContractController.PAGE_NAME;
@@ -36,37 +39,51 @@ public class InfrastructureAwardedContractSectionSummaryService implements Proje
   );
   public static final int DISPLAY_ORDER = ProjectTask.AWARDED_CONTRACTS.getDisplayOrder();
 
-  private final InfrastructureAwardedContractService awardedContractService;
+  private final InfrastructureAwardedContractService infrastructureAwardedContractService;
   private final AwardedContractServiceCommon awardedContractServiceCommon;
   private final DifferenceService differenceService;
   private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
   private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
   private final PortalOrganisationAccessor portalOrganisationAccessor;
+  private final ForwardWorkPlanAwardedContractService forwardWorkPlanAwardedContractService;
 
   @Autowired
-  public InfrastructureAwardedContractSectionSummaryService(
-      InfrastructureAwardedContractService awardedContractService,
+  public AwardedContractSectionSummaryService(
+      InfrastructureAwardedContractService infrastructureAwardedContractService,
       AwardedContractServiceCommon awardedContractServiceCommon,
       DifferenceService differenceService,
       ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService,
       ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
-      PortalOrganisationAccessor portalOrganisationAccessor) {
-    this.awardedContractService = awardedContractService;
+      PortalOrganisationAccessor portalOrganisationAccessor,
+      ForwardWorkPlanAwardedContractService forwardWorkPlanAwardedContractService) {
+    this.infrastructureAwardedContractService = infrastructureAwardedContractService;
     this.awardedContractServiceCommon = awardedContractServiceCommon;
     this.differenceService = differenceService;
     this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
     this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
     this.portalOrganisationAccessor = portalOrganisationAccessor;
+    this.forwardWorkPlanAwardedContractService = forwardWorkPlanAwardedContractService;
   }
 
   @Override
   public boolean canShowSection(ProjectDetail detail) {
-    return awardedContractService.isTaskValidForProjectDetail(detail);
+    var projectType = detail.getProjectType();
+    if (ProjectType.INFRASTRUCTURE.equals(projectType)) {
+      return infrastructureAwardedContractService.isTaskValidForProjectDetail(detail);
+    } else if (ProjectType.FORWARD_WORK_PLAN.equals(projectType)) {
+      return forwardWorkPlanAwardedContractService.isTaskValidForProjectDetail(detail);
+    } else {
+      throw new UnsupportedProjectSubmissionSummaryServiceException(
+          String.format(
+              "Could not find implementation of ProjectSubmissionSummaryService supporting project type %s",
+              projectType
+          )
+      );
+    }
   }
 
   @Override
   public ProjectSectionSummary getSummary(ProjectDetail detail) {
-
     final var summaryModel = projectSectionSummaryCommonModelService.getCommonSummaryModelMap(
         detail,
         PAGE_NAME,
