@@ -5,6 +5,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.Set;
 import java.util.stream.Stream;
 import uk.co.ogauthority.pathfinder.controller.project.OverviewController;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardContractController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastructure.InfrastructureAwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.campaigninformation.CampaignInformationController;
@@ -110,7 +111,7 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       50,
       Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)),
   AWARDED_CONTRACTS(
-      InfrastructureAwardedContractController.PAGE_NAME,
+      AwardContractController.PAGE_NAME,
       InfrastructureAwardedContractController.class,
       InfrastructureAwardedContractService.class,
       Set.of(ProjectType.INFRASTRUCTURE),

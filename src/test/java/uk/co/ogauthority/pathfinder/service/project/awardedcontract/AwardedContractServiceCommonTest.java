@@ -299,7 +299,7 @@ class AwardedContractServiceCommonTest {
   }
 
   @Test
-  public void isValid_whenValid_thenTrue() {
+  void isValid_whenValid_thenTrue() {
     BindingResult bindingResult = new BeanPropertyBindingResult(AwardedContractFormCommon.class, "form");
     when(validationService.validate(any(), any(), any(ValidationType.class))).thenReturn(bindingResult);
 
@@ -310,7 +310,7 @@ class AwardedContractServiceCommonTest {
   }
 
   @Test
-  public void isValid_whenInvalid_thenFalse() {
+  void isValid_whenInvalid_thenFalse() {
     BindingResult bindingResult = new BeanPropertyBindingResult(AwardedContractFormCommon.class, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
     when(validationService.validate(any(), any(), any(ValidationType.class))).thenReturn(bindingResult);

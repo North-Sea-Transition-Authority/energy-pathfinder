@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastructure.InfrastructureAwardedContractController;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardContractController;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -28,7 +28,7 @@ import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummar
 public class InfrastructureAwardedContractSectionSummaryService implements ProjectSectionSummaryService {
 
   public static final String TEMPLATE_PATH = "project/awardedcontract/awardedContractSectionSummary.ftl";
-  public static final String PAGE_NAME = InfrastructureAwardedContractController.PAGE_NAME;
+  public static final String PAGE_NAME = AwardContractController.PAGE_NAME;
   public static final String SECTION_ID = "awardedContract";
   public static final SidebarSectionLink SECTION_LINK = SidebarSectionLink.createAnchorLink(
       PAGE_NAME,

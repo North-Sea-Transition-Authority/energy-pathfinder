@@ -26,7 +26,7 @@ import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @ExtendWith(MockitoExtension.class)
-public class InfrastructureAwardedContractSectionSummaryServiceTest {
+class InfrastructureAwardedContractSectionSummaryServiceTest {
 
   @Mock
   private InfrastructureAwardedContractService awardedContractService;
@@ -51,7 +51,7 @@ public class InfrastructureAwardedContractSectionSummaryServiceTest {
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     awardedContractSectionSummaryService = new InfrastructureAwardedContractSectionSummaryService(
         awardedContractService,
         awardedContractServiceCommon,
@@ -63,21 +63,21 @@ public class InfrastructureAwardedContractSectionSummaryServiceTest {
   }
 
   @Test
-  public void canShowSection_whenCanShowInTaskList_thenTrue() {
+  void canShowSection_whenCanShowInTaskList_thenTrue() {
     when(awardedContractService.isTaskValidForProjectDetail(detail)).thenReturn(true);
 
     assertThat(awardedContractSectionSummaryService.canShowSection(detail)).isTrue();
   }
 
   @Test
-  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
+  void canShowSection_whenCannotShowInTaskList_thenFalse() {
     when(awardedContractService.isTaskValidForProjectDetail(detail)).thenReturn(false);
 
     assertThat(awardedContractSectionSummaryService.canShowSection(detail)).isFalse();
   }
 
   @Test
-  public void getSummary() {
+  void getSummary() {
     when(awardedContractServiceCommon.getAwardedContracts(detail)).thenReturn(List.of(
         AwardedContractTestUtil.createAwardedContract(),
         AwardedContractTestUtil.createAwardedContract()
@@ -105,7 +105,7 @@ public class InfrastructureAwardedContractSectionSummaryServiceTest {
   }
 
   @Test
-  public void getSummary_noAwardedContracts() {
+  void getSummary_noAwardedContracts() {
     when(awardedContractServiceCommon.getAwardedContracts(detail)).thenReturn(Collections.emptyList());
 
     var sectionSummary = awardedContractSectionSummaryService.getSummary(detail);
