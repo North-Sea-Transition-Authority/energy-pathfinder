@@ -1,5 +1,5 @@
 <#include '../../../layout.ftl'>
-<#import '../_awardedContractSummary.ftl' as awardedContractSummary>
+<#import '../_awardedContractSummaryCommon.ftl' as awardedContractSummary>
 
 <#-- @ftlvariable name="errorList" type="java.util.List<uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem>" -->
 <#-- @ftlvariable name="projectTypeDisplayNameLowercase" type="String" -->

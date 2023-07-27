@@ -23,13 +23,11 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSummaryForm;
-import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractView;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractServiceCommon;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -43,19 +41,16 @@ import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 @RequestMapping("/project/{projectId}/work-plan-awarded-contracts/summary")
 public class ForwardWorkPlanAwardedContractSummaryController extends AwardContractController {
 
-  private final ForwardWorkPlanAwardedContractSummaryService forwardWorkPlanAwardedContractSummaryService;
+  private final ForwardWorkPlanAwardedContractSummaryService awardedContractSummaryService;
   private final ValidationService validationService;
 
   public ForwardWorkPlanAwardedContractSummaryController(BreadcrumbService breadcrumbService,
                                                          ControllerHelperService controllerHelperService,
                                                          ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
-                                                         AwardedContractServiceCommon awardedContractServiceCommon,
-                                                         AwardedContractSummaryService awardedContractSummaryService,
-                                                         ForwardWorkPlanAwardedContractSummaryService forwardWorkPlanAwardedContractSummaryService,
+                                                         ForwardWorkPlanAwardedContractSummaryService awardedContractSummaryService,
                                                          ValidationService validationService) {
-    super(breadcrumbService, controllerHelperService, projectSectionItemOwnershipService, awardedContractServiceCommon,
-        awardedContractSummaryService);
-    this.forwardWorkPlanAwardedContractSummaryService = forwardWorkPlanAwardedContractSummaryService;
+    super(breadcrumbService, controllerHelperService, projectSectionItemOwnershipService);
+    this.awardedContractSummaryService = awardedContractSummaryService;
     this.validationService = validationService;
   }
 
@@ -64,7 +59,7 @@ public class ForwardWorkPlanAwardedContractSummaryController extends AwardContra
                                            ProjectContext projectContext) {
     var projectDetail = projectContext.getProjectDetails();
     var awardedContractViews = awardedContractSummaryService.getAwardedContractViews(projectDetail);
-    var form = forwardWorkPlanAwardedContractSummaryService.getForm(projectDetail);
+    var form = awardedContractSummaryService.getForm(projectDetail);
     return getAwardedContractsSummaryModelAndView(projectId, awardedContractViews, form, projectDetail);
   }
 
@@ -87,19 +82,19 @@ public class ForwardWorkPlanAwardedContractSummaryController extends AwardContra
   private ModelAndView saveAwardedContractSummary(ForwardWorkPlanAwardedContractSummaryForm form,
                                                   ProjectDetail projectDetail,
                                                   Integer projectId) {
-    forwardWorkPlanAwardedContractSummaryService.saveAwardedContractSummary(form, projectDetail);
+    awardedContractSummaryService.saveAwardedContractSummary(form, projectDetail);
     return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
   }
 
   private ModelAndView getAwardedContractsSummaryModelAndView(Integer projectId,
-                                                              List<AwardedContractView> awardedContractViews,
+                                                              List<ForwardWorkPlanAwardedContractView> awardedContractViews,
                                                               ForwardWorkPlanAwardedContractSummaryForm form,
                                                               ProjectDetail projectDetail) {
     var modelAndView = new ModelAndView("project/awardedcontract/forwardworkplan/forwardWorkPlanAwardedContractFormSummary")
         .addObject("pageTitle", PAGE_NAME)
         .addObject("awardedContractViews", awardedContractViews)
         .addObject("addAwardedContractUrl",
-            ReverseRouter.route(on(ForwardWorkPlanAwardedContractController.class).addAwardedContract(projectId))
+            ReverseRouter.route(on(ForwardWorkPlanAwardedContractController.class).addAwardedContract(projectId, null))
         )
         .addObject("backToTaskListUrl",
             ControllerUtils.getBackToTaskListUrl(projectId)

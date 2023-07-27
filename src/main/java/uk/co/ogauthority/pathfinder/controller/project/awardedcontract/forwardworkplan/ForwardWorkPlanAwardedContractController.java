@@ -16,17 +16,14 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeChe
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardContractController;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
-import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormCommon;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractForm;
 import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractServiceCommon;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 
 @Controller
@@ -37,30 +34,36 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 @RequestMapping("/project/{projectId}/work-plan-awarded-contracts")
 public class ForwardWorkPlanAwardedContractController extends AwardContractController {
 
+  private final ForwardWorkPlanAwardedContractService awardedContractService;
+
   public ForwardWorkPlanAwardedContractController(BreadcrumbService breadcrumbService,
                                                   ControllerHelperService controllerHelperService,
                                                   ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
-                                                  AwardedContractServiceCommon awardedContractServiceCommon,
-                                                  AwardedContractSummaryService awardedContractSummaryService) {
-    super(breadcrumbService, controllerHelperService, projectSectionItemOwnershipService,
-        awardedContractServiceCommon, awardedContractSummaryService);
+                                                  ForwardWorkPlanAwardedContractService awardedContractService) {
+    super(breadcrumbService, controllerHelperService, projectSectionItemOwnershipService);
+    this.awardedContractService = awardedContractService;
   }
 
   @GetMapping("/awarded-contract")
-  public ModelAndView addAwardedContract(@PathVariable("projectId") Integer projectId) {
-    return getAwardedContractModelAndView(projectId, new ForwardWorkPlanAwardedContractForm());
+  public ModelAndView addAwardedContract(@PathVariable("projectId") Integer projectId,
+                                         ProjectContext projectContext) {
+    var form = new ForwardWorkPlanAwardedContractForm();
+    var preSelectedContractFunctionMap = awardedContractService.getPreSelectedContractFunction(form);
+    return getAwardedContractModelAndView(projectId, form, preSelectedContractFunctionMap, projectContext.getProjectDetails());
   }
 
   @GetMapping("/awarded-contract/{awardedContractId}/edit")
   public ModelAndView getAwardedContract(@PathVariable("projectId") Integer projectId,
                                          @PathVariable("awardedContractId") Integer awardedProjectId,
                                          ProjectContext projectContext) {
-    var awardedContract = awardedContractServiceCommon.getAwardedContract(
+    var projectDetails = projectContext.getProjectDetails();
+    var awardedContract = awardedContractService.getAwardedContract(
         awardedProjectId,
-        projectContext.getProjectDetails());
+        projectDetails);
     checkIfUserHasAccessAwardedContract(awardedContract);
-    var form = awardedContractServiceCommon.getForm(awardedProjectId, projectContext.getProjectDetails());
-    return getAwardedContractModelAndView(projectId, form);
+    var form = awardedContractService.getForm(awardedProjectId, projectDetails);
+    var preSelectedContractFunctionMap = awardedContractService.getPreSelectedContractFunction(form);
+    return getAwardedContractModelAndView(projectId, form, preSelectedContractFunctionMap, projectDetails);
   }
 
   @PostMapping("/awarded-contract")
@@ -69,14 +72,16 @@ public class ForwardWorkPlanAwardedContractController extends AwardContractContr
                                           BindingResult bindingResult,
                                           ValidationType validationType,
                                           ProjectContext projectContext) {
-    bindingResult = awardedContractServiceCommon.validate(form, bindingResult, validationType);
+    var preSelectedContractFunctionMap = awardedContractService.getPreSelectedContractFunction(form);
+    var projectDetails = projectContext.getProjectDetails();
+    bindingResult = awardedContractService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getAwardedContractModelAndView(projectId, form),
+        getAwardedContractModelAndView(projectId, form, preSelectedContractFunctionMap, projectDetails),
         form,
         () -> {
-          var contract = awardedContractServiceCommon.createAwardedContract(
-              projectContext.getProjectDetails(),
+          var contract = awardedContractService.createAwardedContract(
+              projectDetails,
               form,
               projectContext.getUserAccount()
           );
@@ -85,7 +90,7 @@ public class ForwardWorkPlanAwardedContractController extends AwardContractContr
               String.format(
                   AuditEvent.AWARDED_CONTRACT_UPDATED.getMessage(),
                   contract.getId(),
-                  projectContext.getProjectDetails().getId()
+                  projectDetails.getId()
               )
           );
           return getForwardWorkPlanAwardedContractSummaryRedirect(projectId);
@@ -100,46 +105,33 @@ public class ForwardWorkPlanAwardedContractController extends AwardContractContr
                                           BindingResult bindingResult,
                                           ValidationType validationType,
                                           ProjectContext projectContext) {
-    var awardedContract = awardedContractServiceCommon.getAwardedContract(
+    var preSelectedContractFunctionMap = awardedContractService.getPreSelectedContractFunction(form);
+    var projectDetails = projectContext.getProjectDetails();
+    var awardedContract = awardedContractService.getAwardedContract(
         awardedContractId,
-        projectContext.getProjectDetails()
+        projectDetails
     );
     checkIfUserHasAccessAwardedContract(awardedContract);
-    bindingResult = awardedContractServiceCommon.validate(form, bindingResult, validationType);
+    bindingResult = awardedContractService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getAwardedContractModelAndView(projectId, form),
+        getAwardedContractModelAndView(projectId, form, preSelectedContractFunctionMap, projectDetails),
         form,
         () -> {
-          var contract = awardedContractServiceCommon.updateAwardedContract(awardedContractId,
-              projectContext.getProjectDetails(), form);
+          var contract = awardedContractService.updateAwardedContract(awardedContractId,
+              projectDetails, form);
           AuditService.audit(
               AuditEvent.AWARDED_CONTRACT_UPDATED,
               String.format(
                   AuditEvent.AWARDED_CONTRACT_UPDATED.getMessage(),
                   contract.getId(),
-                  projectContext.getProjectDetails().getId()
+                  projectDetails.getId()
               )
           );
 
           return getForwardWorkPlanAwardedContractSummaryRedirect(projectId);
         }
     );
-  }
-
-  private ModelAndView getAwardedContractModelAndView(Integer projectId, AwardedContractFormCommon form) {
-
-    var preSelectedContractFunctionMap = awardedContractServiceCommon.getPreSelectedContractFunction(form);
-
-    var modelAndView = new ModelAndView("project/awardedcontract/awardedContract")
-        .addObject("form", form)
-        .addObject("contractBands", ContractBand.getAllAsMap(ProjectType.FORWARD_WORK_PLAN))
-        .addObject("contractFunctionRestUrl", getContractFunctionSearchUrl())
-        .addObject("preSelectedContractFunctionMap", preSelectedContractFunctionMap);
-
-    breadcrumbService.fromForwardWorkPlanAwardedContracts(projectId, modelAndView, PAGE_NAME_SINGULAR);
-
-    return modelAndView;
   }
 
 }

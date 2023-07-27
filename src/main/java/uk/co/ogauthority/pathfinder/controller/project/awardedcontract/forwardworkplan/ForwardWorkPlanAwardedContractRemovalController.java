@@ -16,14 +16,14 @@ import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardCont
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractView;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractServiceCommon;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 
 @Controller
@@ -34,13 +34,18 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 @RequestMapping("/project/{projectId}/work-plan-awarded-contracts/awarded-contract/{awardedContractId}/remove/{displayOrder}")
 public class ForwardWorkPlanAwardedContractRemovalController extends AwardContractController {
 
+  private final ForwardWorkPlanAwardedContractService awardedContractService;
+  private final ForwardWorkPlanAwardedContractSummaryService awardedContractSummaryService;
+
   public ForwardWorkPlanAwardedContractRemovalController(BreadcrumbService breadcrumbService,
                                                          ControllerHelperService controllerHelperService,
                                                          ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
-                                                         AwardedContractServiceCommon awardedContractServiceCommon,
-                                                         AwardedContractSummaryService awardedContractSummaryService) {
-    super(breadcrumbService, controllerHelperService, projectSectionItemOwnershipService, awardedContractServiceCommon,
-        awardedContractSummaryService);
+                                                         ForwardWorkPlanAwardedContractService awardedContractService,
+                                                         ForwardWorkPlanAwardedContractSummaryService awardedContractSummaryService
+                                                         ) {
+    super(breadcrumbService, controllerHelperService, projectSectionItemOwnershipService);
+    this.awardedContractService = awardedContractService;
+    this.awardedContractSummaryService = awardedContractSummaryService;
   }
 
   @GetMapping()
@@ -48,7 +53,7 @@ public class ForwardWorkPlanAwardedContractRemovalController extends AwardContra
                                                         @PathVariable("awardedContractId") Integer awardedProjectId,
                                                         @PathVariable("displayOrder") Integer displayOrder,
                                                         ProjectContext projectContext) {
-    var awardedContract = awardedContractServiceCommon.getAwardedContract(
+    var awardedContract = awardedContractService.getAwardedContract(
         awardedProjectId,
         projectContext.getProjectDetails()
     );
@@ -67,12 +72,12 @@ public class ForwardWorkPlanAwardedContractRemovalController extends AwardContra
                                             @PathVariable("displayOrder") Integer displayOrder,
                                             ProjectContext projectContext) {
     var projectDetails = projectContext.getProjectDetails();
-    var awardedContract = awardedContractServiceCommon.getAwardedContract(
+    var awardedContract = awardedContractService.getAwardedContract(
         awardedContractId,
         projectDetails
     );
     checkIfUserHasAccessAwardedContract(awardedContract);
-    awardedContractServiceCommon.deleteAwardedContract(awardedContract);
+    awardedContractService.deleteAwardedContract(awardedContract);
     AuditService.audit(
         AuditEvent.AWARDED_CONTRACT_REMOVED,
         String.format(
@@ -82,7 +87,7 @@ public class ForwardWorkPlanAwardedContractRemovalController extends AwardContra
         )
     );
 
-    if (awardedContractServiceCommon.hasAwardedContracts(projectDetails)) {
+    if (awardedContractService.hasAwardedContracts(projectDetails)) {
       return getForwardWorkPlanAwardedContractSummaryRedirect(projectId);
     } else {
       return getForwardWorkPlanAwardedContractSetupRedirect(projectId);
@@ -90,7 +95,7 @@ public class ForwardWorkPlanAwardedContractRemovalController extends AwardContra
   }
 
 
-  private ModelAndView removeAwardedContractModelAndView(Integer projectId, AwardedContractView awardedContractView) {
+  private ModelAndView removeAwardedContractModelAndView(Integer projectId, ForwardWorkPlanAwardedContractView awardedContractView) {
     var modelAndView = new ModelAndView("project/awardedcontract/removeAwardedContract")
         .addObject("awardedContractView", awardedContractView)
         .addObject("cancelUrl", getAwardedContractSummaryUrl(projectId));

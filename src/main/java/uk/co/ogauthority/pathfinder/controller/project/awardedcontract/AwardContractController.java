@@ -2,19 +2,21 @@ package uk.co.ogauthority.pathfinder.controller.project.awardedcontract;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Map;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSummaryController;
 import uk.co.ogauthority.pathfinder.controller.rest.ContractFunctionRestController;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
-import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure.AwardedContract;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContractCommon;
+import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
+import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormCommon;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.OrganisationGroupIdWrapper;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractServiceCommon;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 
 public abstract class AwardContractController extends ProjectFormPageController {
@@ -24,18 +26,12 @@ public abstract class AwardContractController extends ProjectFormPageController 
   public static final String REMOVE_PAGE_NAME = "Remove awarded contract";
 
   protected final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
-  protected final AwardedContractServiceCommon awardedContractServiceCommon;
-  protected final AwardedContractSummaryService awardedContractSummaryService;
 
   public AwardContractController(BreadcrumbService breadcrumbService,
                                  ControllerHelperService controllerHelperService,
-                                 ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
-                                 AwardedContractServiceCommon awardedContractServiceCommon,
-                                 AwardedContractSummaryService awardedContractSummaryService) {
+                                 ProjectSectionItemOwnershipService projectSectionItemOwnershipService) {
     super(breadcrumbService, controllerHelperService);
     this.projectSectionItemOwnershipService = projectSectionItemOwnershipService;
-    this.awardedContractServiceCommon = awardedContractServiceCommon;
-    this.awardedContractSummaryService = awardedContractSummaryService;
   }
 
   protected String getContractFunctionSearchUrl() {
@@ -44,7 +40,7 @@ public abstract class AwardContractController extends ProjectFormPageController 
     );
   }
 
-  protected void checkIfUserHasAccessAwardedContract(AwardedContract awardedContract) {
+  protected <E extends AwardedContractCommon> void checkIfUserHasAccessAwardedContract(E awardedContract) {
     if (!projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         awardedContract.getProjectDetail(),
         new OrganisationGroupIdWrapper(awardedContract.getAddedByOrganisationGroup())
@@ -60,6 +56,24 @@ public abstract class AwardContractController extends ProjectFormPageController 
   protected ModelAndView getForwardWorkPlanAwardedContractSummaryRedirect(Integer projectId) {
     return ReverseRouter.redirect(on(ForwardWorkPlanAwardedContractSummaryController.class)
         .viewAwardedContracts(projectId, null));
+  }
+
+  protected <E extends AwardedContractFormCommon> ModelAndView getAwardedContractModelAndView(
+      Integer projectId,
+      E form,
+      Map<String, String> preSelectedContractFunctionMap,
+      ProjectDetail projectDetail
+  ) {
+    var projectType = projectDetail.getProjectType();
+    var modelAndView = new ModelAndView("project/awardedcontract/awardedContract")
+        .addObject("form", form)
+        .addObject("contractBands", ContractBand.getAllAsMap(projectType))
+        .addObject("contractFunctionRestUrl", getContractFunctionSearchUrl())
+        .addObject("preSelectedContractFunctionMap", preSelectedContractFunctionMap);
+
+    breadcrumbService.fromInfrastructureAwardedContracts(projectId, modelAndView, PAGE_NAME_SINGULAR);
+
+    return modelAndView;
   }
 
 }

@@ -59,4 +59,8 @@ public class ForwardWorkPlanAwardedContractSetupService {
     contractSetup.setHasContractToAdd(form.getHasContractToAdd());
     repository.save(contractSetup);
   }
+
+  public void deleteAllByProjectDetail(ProjectDetail projectDetail) {
+    repository.deleteAllByProjectDetail(projectDetail);
+  }
 }

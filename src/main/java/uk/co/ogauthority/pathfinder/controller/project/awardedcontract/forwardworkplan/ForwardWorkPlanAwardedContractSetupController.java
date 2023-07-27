@@ -27,7 +27,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractServiceCommon;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
@@ -45,16 +45,16 @@ public class ForwardWorkPlanAwardedContractSetupController extends ProjectFormPa
 
 
   private final ForwardWorkPlanAwardedContractSetupService setupService;
-  private final AwardedContractServiceCommon awardedContractServiceCommon;
+  private final ForwardWorkPlanAwardedContractService awardedContractService;
 
   @Autowired
   public ForwardWorkPlanAwardedContractSetupController(BreadcrumbService breadcrumbService,
                                                        ControllerHelperService controllerHelperService,
                                                        ForwardWorkPlanAwardedContractSetupService setupService,
-                                                       AwardedContractServiceCommon awardedContractServiceCommon) {
+                                                       ForwardWorkPlanAwardedContractService awardedContractService) {
     super(breadcrumbService, controllerHelperService);
     this.setupService = setupService;
-    this.awardedContractServiceCommon = awardedContractServiceCommon;
+    this.awardedContractService = awardedContractService;
   }
 
   @GetMapping()
@@ -63,7 +63,7 @@ public class ForwardWorkPlanAwardedContractSetupController extends ProjectFormPa
                                               AuthenticatedUserAccount userAccount) {
     var projectDetail = projectContext.getProjectDetails();
     var form = setupService.getAwardedContractSetupFormFromDetail(projectDetail);
-    var hasAwardedContracts = awardedContractServiceCommon.hasAwardedContracts(projectDetail);
+    var hasAwardedContracts = awardedContractService.hasAwardedContracts(projectDetail);
     if (Boolean.TRUE.equals(form.getHasContractToAdd()) && hasAwardedContracts) {
       return goToAwardedContractSummary(projectId);
     }

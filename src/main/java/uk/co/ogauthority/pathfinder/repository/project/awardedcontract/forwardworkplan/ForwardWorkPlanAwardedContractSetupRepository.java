@@ -10,4 +10,6 @@ import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.forward
 public interface ForwardWorkPlanAwardedContractSetupRepository extends CrudRepository<ForwardWorkPlanAwardedContractSetup, Integer> {
 
   Optional<ForwardWorkPlanAwardedContractSetup> findByProjectDetail(ProjectDetail projectDetail);
+
+  void deleteAllByProjectDetail(ProjectDetail projectDetail);
 }
