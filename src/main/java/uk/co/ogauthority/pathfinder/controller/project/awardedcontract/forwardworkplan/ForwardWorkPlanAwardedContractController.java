@@ -61,7 +61,7 @@ public class ForwardWorkPlanAwardedContractController extends AwardContractContr
         awardedProjectId,
         projectDetails);
     checkIfUserHasAccessAwardedContract(awardedContract);
-    var form = awardedContractService.getForm(awardedProjectId, projectDetails);
+    var form = awardedContractService.getForm(awardedContract);
     var preSelectedContractFunctionMap = awardedContractService.getPreSelectedContractFunction(form);
     return getAwardedContractModelAndView(projectId, form, preSelectedContractFunctionMap, projectDetails);
   }

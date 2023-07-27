@@ -75,28 +75,29 @@ public class ForwardWorkPlanAwardedContractViewUtil {
           isValid
       );
     }
-
-    private static SummaryLink getEditLink(Integer projectId, Integer awardedContractId) {
-      return new SummaryLink(
-          SummaryLinkText.EDIT.getDisplayName(),
-          ReverseRouter.route(on(ForwardWorkPlanAwardedContractController.class).getAwardedContract(
-              projectId,
-              awardedContractId,
-              null
-          ))
-      );
-    }
-
-    public static SummaryLink getDeleteLink(Integer projectId, Integer awardedContractId, Integer displayOrder) {
-      return new SummaryLink(
-          SummaryLinkText.DELETE.getDisplayName(),
-          ReverseRouter.route(on(ForwardWorkPlanAwardedContractRemovalController.class).removeAwardedContract(
-              projectId,
-              awardedContractId,
-              displayOrder,
-              null
-          ))
-      );
-    }
   }
+
+  public static SummaryLink getEditLink(Integer projectId, Integer awardedContractId) {
+    return new SummaryLink(
+        SummaryLinkText.EDIT.getDisplayName(),
+        ReverseRouter.route(on(ForwardWorkPlanAwardedContractController.class).getAwardedContract(
+            projectId,
+            awardedContractId,
+            null
+        ))
+    );
+  }
+
+  public static SummaryLink getDeleteLink(Integer projectId, Integer awardedContractId, Integer displayOrder) {
+    return new SummaryLink(
+        SummaryLinkText.DELETE.getDisplayName(),
+        ReverseRouter.route(on(ForwardWorkPlanAwardedContractRemovalController.class).removeAwardedContract(
+            projectId,
+            awardedContractId,
+            displayOrder,
+            null
+        ))
+    );
+  }
+
 }

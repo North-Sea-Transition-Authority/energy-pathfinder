@@ -33,12 +33,12 @@ import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
-import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupForm;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
@@ -54,13 +54,15 @@ public class ForwardWorkPlanAwardedContractSetupControllerTest extends ProjectCo
 
   private static final Integer PROJECT_ID = 1;
   private static final Class<ForwardWorkPlanAwardedContractSetupController> CONTROLLER = ForwardWorkPlanAwardedContractSetupController.class;
-  private static final Class<TaskListController> TASK_LIST_CONTROLLER = TaskListController.class;
+  private static final Class<ForwardWorkPlanAwardedContractSummaryController> SUMMARY_CONTROLLER = ForwardWorkPlanAwardedContractSummaryController.class;
 
   @MockBean
   private ForwardWorkPlanAwardedContractSetupService setupService;
 
-  private ProjectDetail projectDetail;
+  @MockBean
+  private ForwardWorkPlanAwardedContractService awardedContractService;
 
+  private ProjectDetail projectDetail;
   private AuthenticatedUserAccount authenticatedUser;
   private ArgumentCaptor<ForwardWorkPlanAwardedContractSetupForm> formCaptor;
   private ArgumentCaptor<BindingResult> bindingResultCaptor;
@@ -90,9 +92,10 @@ public class ForwardWorkPlanAwardedContractSetupControllerTest extends ProjectCo
   }
 
   @Test
-  public void getAwardedContractSetup_authenticatedUser_thenReturnEmptyForm() throws Exception {
+  public void getAwardedContractSetup_hasNoAwardedContracts_thenReturnEmptyForm() throws Exception {
     var form = new ForwardWorkPlanAwardedContractSetupForm();
     when(setupService.getAwardedContractSetupFormFromDetail(projectDetail)).thenReturn(form);
+    when(awardedContractService.hasAwardedContracts(projectDetail)).thenReturn(false);
 
     var modelAndView = mockMvc.perform(
         get(route(on(CONTROLLER).getAwardedContractSetup(PROJECT_ID, null, null)))
@@ -110,6 +113,51 @@ public class ForwardWorkPlanAwardedContractSetupControllerTest extends ProjectCo
         entry("form", form),
         entry("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(PROJECT_ID))
     );
+
+    verify(awardedContractService).hasAwardedContracts(projectDetail);
+  }
+
+  @Test
+  public void getAwardedContractSetup_hasAwardedContracts_thenReturnFilledForm() throws Exception {
+    var form = new ForwardWorkPlanAwardedContractSetupForm();
+    form.setHasContractToAdd(true);
+    when(setupService.getAwardedContractSetupFormFromDetail(projectDetail)).thenReturn(form);
+    when(awardedContractService.hasAwardedContracts(projectDetail)).thenReturn(true);
+
+    mockMvc.perform(
+        get(route(on(CONTROLLER).getAwardedContractSetup(PROJECT_ID, null, null)))
+            .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl(route(on(SUMMARY_CONTROLLER).viewAwardedContracts(PROJECT_ID, null))));
+
+    verify(awardedContractService).hasAwardedContracts(projectDetail);
+  }
+
+  @Test
+  public void getAwardedContractSetup_willAddContract_hasNoContracts_thenRedirectToAwardedContractSummary() throws Exception {
+    var form = new ForwardWorkPlanAwardedContractSetupForm();
+    form.setHasContractToAdd(true);
+    when(setupService.getAwardedContractSetupFormFromDetail(projectDetail)).thenReturn(form);
+    when(awardedContractService.hasAwardedContracts(projectDetail)).thenReturn(false);
+
+    var modelAndView = mockMvc.perform(
+            get(route(on(CONTROLLER).getAwardedContractSetup(PROJECT_ID, null, null)))
+                .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isOk())
+        .andExpect(view().name(ForwardWorkPlanAwardedContractSetupController.SETUP_TEMPLATE_PATH))
+        .andReturn()
+        .getModelAndView();
+
+    assertThat(modelAndView).isNotNull();
+    var model = modelAndView.getModel();
+
+    assertThat(model).contains(
+        entry("pageName", ForwardWorkPlanAwardedContractSetupController.PAGE_NAME),
+        entry("form", form),
+        entry("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(PROJECT_ID))
+    );
+
+    verify(awardedContractService).hasAwardedContracts(projectDetail);
   }
 
   @Test
@@ -124,7 +172,7 @@ public class ForwardWorkPlanAwardedContractSetupControllerTest extends ProjectCo
         .param("hasContractToAdd", "true")
     )
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl(route(on(TASK_LIST_CONTROLLER).viewTaskList(PROJECT_ID, null))));
+        .andExpect(redirectedUrl(route(on(SUMMARY_CONTROLLER).viewAwardedContracts(PROJECT_ID, null))));
 
     verify(setupService).validate(formCaptor.capture(), bindingResultCaptor.capture());
 

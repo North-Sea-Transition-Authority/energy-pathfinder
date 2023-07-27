@@ -9,13 +9,13 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContractCommon;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContract;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormCommon;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractForm;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractRepository;
-import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
@@ -64,8 +64,7 @@ public class ForwardWorkPlanAwardedContractService extends AwardedContractServic
   }
 
   @Override
-  public AwardedContractFormCommon getForm(Integer awardedContractId, ProjectDetail projectDetail) {
-    var awardedContract = getAwardedContract(awardedContractId, projectDetail);
+  public AwardedContractFormCommon getForm(AwardedContractCommon awardedContract) {
     var awardedContractForm = new ForwardWorkPlanAwardedContractForm();
     return super.populateAwardedContractForm(awardedContract, awardedContractForm);
   }

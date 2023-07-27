@@ -71,10 +71,10 @@ public class ForwardWorkPlanAwardedContractRemovalController extends AwardContra
                                             @PathVariable("awardedContractId") Integer awardedContractId,
                                             @PathVariable("displayOrder") Integer displayOrder,
                                             ProjectContext projectContext) {
-    var projectDetails = projectContext.getProjectDetails();
+    var projectDetail = projectContext.getProjectDetails();
     var awardedContract = awardedContractService.getAwardedContract(
         awardedContractId,
-        projectDetails
+        projectDetail
     );
     checkIfUserHasAccessAwardedContract(awardedContract);
     awardedContractService.deleteAwardedContract(awardedContract);
@@ -83,11 +83,11 @@ public class ForwardWorkPlanAwardedContractRemovalController extends AwardContra
         String.format(
             AuditEvent.AWARDED_CONTRACT_REMOVED.getMessage(),
             awardedContractId,
-            projectDetails.getId()
+            projectDetail.getId()
         )
     );
 
-    if (awardedContractService.hasAwardedContracts(projectDetails)) {
+    if (awardedContractService.hasAwardedContracts(projectDetail)) {
       return getForwardWorkPlanAwardedContractSummaryRedirect(projectId);
     } else {
       return getForwardWorkPlanAwardedContractSetupRedirect(projectId);

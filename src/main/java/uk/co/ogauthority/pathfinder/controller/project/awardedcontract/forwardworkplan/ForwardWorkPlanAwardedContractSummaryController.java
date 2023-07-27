@@ -99,7 +99,6 @@ public class ForwardWorkPlanAwardedContractSummaryController extends AwardContra
         .addObject("backToTaskListUrl",
             ControllerUtils.getBackToTaskListUrl(projectId)
         )
-        .addObject("projectSetupUrl", ControllerUtils.getProjectSetupUrl(projectId))
         .addObject("form", form)
         .addObject("projectTypeDisplayNameLowercase", projectDetail.getProjectType().getLowercaseDisplayName());
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);

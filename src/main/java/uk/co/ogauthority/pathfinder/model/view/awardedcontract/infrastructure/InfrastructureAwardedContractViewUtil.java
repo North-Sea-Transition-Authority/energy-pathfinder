@@ -75,28 +75,28 @@ public class InfrastructureAwardedContractViewUtil {
           isValid
       );
     }
+  }
 
-    private static SummaryLink getEditLink(Integer projectId, Integer awardedContractId) {
-      return new SummaryLink(
-          SummaryLinkText.EDIT.getDisplayName(),
-          ReverseRouter.route(on(INFRASTRUCTURE_CONTROLLER).getAwardedContract(
-              projectId,
-              awardedContractId,
-              null
-          ))
-      );
-    }
+  public static SummaryLink getEditLink(Integer projectId, Integer awardedContractId) {
+    return new SummaryLink(
+        SummaryLinkText.EDIT.getDisplayName(),
+        ReverseRouter.route(on(INFRASTRUCTURE_CONTROLLER).getAwardedContract(
+            projectId,
+            awardedContractId,
+            null
+        ))
+    );
+  }
 
-    public static SummaryLink getDeleteLink(Integer projectId, Integer awardedContractId, Integer displayOrder) {
-      return new SummaryLink(
-          SummaryLinkText.DELETE.getDisplayName(),
-          ReverseRouter.route(on(INFRASTRUCTURE_CONTROLLER).removeAwardedContract(
-              projectId,
-              awardedContractId,
-              displayOrder,
-              null
-          ))
-      );
-    }
+  public static SummaryLink getDeleteLink(Integer projectId, Integer awardedContractId, Integer displayOrder) {
+    return new SummaryLink(
+        SummaryLinkText.DELETE.getDisplayName(),
+        ReverseRouter.route(on(INFRASTRUCTURE_CONTROLLER).removeAwardedContract(
+            projectId,
+            awardedContractId,
+            displayOrder,
+            null
+        ))
+    );
   }
 }

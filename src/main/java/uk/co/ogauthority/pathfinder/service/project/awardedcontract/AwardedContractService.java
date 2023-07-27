@@ -16,7 +16,6 @@ import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDat
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormCommon;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractValidationHint;
-import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -47,13 +46,7 @@ public abstract class AwardedContractService {
 
   public abstract AwardedContractCommon getAwardedContract(Integer awardedContractId, ProjectDetail projectDetail);
 
-  public abstract AwardedContractFormCommon getForm(Integer awardedContractId, ProjectDetail projectDetail);
-
-  protected <E extends AwardedContractCommon> AwardedContractFormCommon getForm(E awardedContract) {
-    var projectDetail = awardedContract.getProjectDetail();
-    var awardedContractId = awardedContract.getId();
-    return getForm(awardedContractId, projectDetail);
-  }
+  public abstract <E extends AwardedContractCommon> AwardedContractFormCommon getForm(E awardedContract);
 
   protected <F extends AwardedContractFormCommon> BindingResult validate(F form,
                                                                          BindingResult bindingResult,
@@ -87,7 +80,7 @@ public abstract class AwardedContractService {
   }
 
   protected void populateAwardedContract(AwardedContractFormCommon form,
-                                                          AwardedContractCommon awardedContract) {
+                                         AwardedContractCommon awardedContract) {
     awardedContract.setContractorName(form.getContractorName());
 
     searchSelectorService.mapSearchSelectorFormEntryToEntity(
