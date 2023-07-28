@@ -40,7 +40,7 @@ public class InfrastructureAwardedContractSectionSummaryService
         projectSectionSummaryCommonModelService,
         projectSectionItemOwnershipService,
         portalOrganisationAccessor
-        );
+    );
     this.awardedContractService = awardedContractService;
   }
 

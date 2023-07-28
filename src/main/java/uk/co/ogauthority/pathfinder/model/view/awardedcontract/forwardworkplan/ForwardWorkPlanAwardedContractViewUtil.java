@@ -25,9 +25,9 @@ public class ForwardWorkPlanAwardedContractViewUtil {
     private boolean isValid = true;
     private boolean includeSummaryLinks = false;
 
-    public ForwardWorkPlanAwardedContractViewBuilder (ForwardWorkPlanAwardedContract awardedContract,
-                                                      Integer displayOrder,
-                                                      PortalOrganisationGroup addedByPortalOrganisationGroup) {
+    public ForwardWorkPlanAwardedContractViewBuilder(ForwardWorkPlanAwardedContract awardedContract,
+                                                     Integer displayOrder,
+                                                     PortalOrganisationGroup addedByPortalOrganisationGroup) {
       this.awardedContract = awardedContract;
       this.displayOrder = displayOrder;
       this.addedByPortalOrganisationGroup = addedByPortalOrganisationGroup;

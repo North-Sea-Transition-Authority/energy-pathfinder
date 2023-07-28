@@ -12,7 +12,8 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
 public class InfrastructureAwardedContractViewUtil {
 
-  private static final Class<InfrastructureAwardedContractController> INFRASTRUCTURE_CONTROLLER = InfrastructureAwardedContractController.class;
+  private static final Class<InfrastructureAwardedContractController> INFRASTRUCTURE_CONTROLLER
+      = InfrastructureAwardedContractController.class;
 
   private InfrastructureAwardedContractViewUtil() {
     throw new IllegalStateException("InfrastructureAwardedContractViewUtil is a utility class and should not be instantiated");

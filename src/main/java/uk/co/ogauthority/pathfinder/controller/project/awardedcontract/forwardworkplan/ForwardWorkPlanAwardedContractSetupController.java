@@ -94,7 +94,7 @@ public class ForwardWorkPlanAwardedContractSetupController extends ProjectFormPa
     if (Boolean.TRUE.equals(form.getHasContractToAdd())) {
       return goToAwardedContractSummary(projectId);
     }
-      return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
+    return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
   }
 
   private ModelAndView goToAwardedContractSummary(Integer projectId) {
