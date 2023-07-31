@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.newsletters;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +53,15 @@ public class NewsletterService {
 
     try {
 
-      final var projectsUpdatedInTheLastMonth = newsletterProjectService.getProjectsUpdatedInTheLastMonth();
+      var projectsUpdatedInTheLastMonth = newsletterProjectService.getProjectsUpdatedInTheLastMonth();
 
       subscriberAccessor.getAllSubscribers().forEach(subscriber -> {
-        var emailProperties = getEmailProperties(subscriber, projectsUpdatedInTheLastMonth);
+        var fieldStages = subscriberAccessor.getSubscriberFieldStages(subscriber);
+        var projects = projectsUpdatedInTheLastMonth.stream()
+            .filter(project -> fieldStages.contains(project.getFieldStage()))
+            .map(NewsletterProjectView::getProject)
+            .collect(Collectors.toList());
+        var emailProperties = getEmailProperties(subscriber, projects);
         emailService.sendEmail(emailProperties, subscriber.getEmailAddress());
       });
 
@@ -82,14 +88,14 @@ public class NewsletterService {
     if (projectsUpdated.isEmpty()) {
       return new NoProjectsUpdatedNewsletterEmailProperties(
           subscriber.getForename(),
-          linkService.getUnsubscribeUrl(subscriber.getUuid().toString()),
+          linkService.getManageSubscriptionUrl(subscriber.getUuid().toString()),
           serviceName,
           customerMnemonic
       );
     } else {
       return new ProjectsUpdatedNewsletterEmailProperties(
           subscriber.getForename(),
-          linkService.getUnsubscribeUrl(subscriber.getUuid().toString()),
+          linkService.getManageSubscriptionUrl(subscriber.getUuid().toString()),
           projectsUpdated,
           serviceName,
           customerMnemonic

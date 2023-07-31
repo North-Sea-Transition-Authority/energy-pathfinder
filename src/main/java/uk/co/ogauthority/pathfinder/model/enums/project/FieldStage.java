@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.model.enums.project;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -78,6 +79,17 @@ public enum FieldStage {
   public static Map<String, String> getAllAsMap() {
     return Arrays.stream(values())
         .collect(StreamUtil.toLinkedHashMap(Enum::name, FieldStage::getDisplayName));
+  }
+
+  public static Map<String, String> getAllAsMapOrdered() {
+    return Arrays.stream(values())
+        .sorted(Comparator.comparing(FieldStage::getDisplayName))
+        .collect(StreamUtil.toLinkedHashMap(Enum::name, FieldStage::getDisplayName));
+  }
+
+  public static List<FieldStage> getAllAsList() {
+    return Arrays.stream(values())
+        .collect(Collectors.toList());
   }
 
   public static List<FieldStage> getEnergyTransitionProjectFieldStages() {

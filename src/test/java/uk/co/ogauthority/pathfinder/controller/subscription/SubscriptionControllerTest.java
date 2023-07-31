@@ -59,7 +59,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     var form = new SubscribeForm();
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
-    when(subscriptionService.validate(any(), any())).thenReturn(bindingResult);
+    when(subscriptionService.validateSubscribeForm(any(), any())).thenReturn(bindingResult);
     when(subscriptionService.getSubscribeConfirmationModelAndView()).thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
     mockMvc.perform(
@@ -68,7 +68,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
         )))
         .andExpect(status().isOk());
 
-    verify(subscriptionService, times(1)).validate(any(), any());
+    verify(subscriptionService, times(1)).validateSubscribeForm(any(), any());
     verify(subscriptionService, times(1)).subscribe(any());
     verify(metricsProvider.getSubscribePagePostCounter(), times(1)).increment();
     verify(analyticsService, times(1)).sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.NEW_SUBSCRIBER));
@@ -81,7 +81,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
 
-    when(subscriptionService.validate(any(), any())).thenReturn(bindingResult);
+    when(subscriptionService.validateSubscribeForm(any(), any())).thenReturn(bindingResult);
     when(subscriptionService.getSubscribeModelAndView(any())).thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
     mockMvc.perform(
@@ -90,14 +90,15 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
         )))
         .andExpect(status().isOk());
 
-    verify(subscriptionService, times(1)).validate(any(), any());
+    verify(subscriptionService, times(1)).validateSubscribeForm(any(), any());
     verify(subscriptionService, never()).subscribe(any());
     verify(metricsProvider.getSubscribePagePostCounter(), times(1)).increment();
   }
 
   @Test
   public void getUnsubscribe_userIsSubscribed() throws Exception {
-    when(subscriptionService.getUnsubscribeModelAndView()).thenReturn(new ModelAndView(TEST_VIEW_NAME));
+    when(subscriptionService.getUnsubscribeModelAndView(SUBSCRIBER_UUID.toString()))
+        .thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
     var modelAndView = mockMvc.perform(get(ReverseRouter.route(
         on(SubscriptionController.class).getUnsubscribe(SUBSCRIBER_UUID.toString()))))

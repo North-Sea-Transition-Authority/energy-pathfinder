@@ -10,6 +10,7 @@ import uk.co.ogauthority.pathfinder.model.enums.subscription.RelationToPathfinde
 public class SubscribeFormValidator implements SmartValidator {
 
   public static final String MISSING_SUBSCRIBE_REASON_ERROR = "Enter a reason for subscribing";
+  public static final String MISSING_FIELD_STAGES_ERROR = "Select at least one project to be updated on";
 
   @Override
   public void validate(Object target, Errors errors, Object... validationHints) {
@@ -21,6 +22,15 @@ public class SubscribeFormValidator implements SmartValidator {
           "subscribeReason",
           "subscribeReason.invalid",
           MISSING_SUBSCRIBE_REASON_ERROR
+      );
+    }
+
+    if (Boolean.FALSE.equals(form.getInterestedInAllProjects())) {
+      ValidationUtils.rejectIfEmpty(
+          errors,
+          "fieldStages",
+          "fieldStages.invalid",
+          MISSING_FIELD_STAGES_ERROR
       );
     }
   }

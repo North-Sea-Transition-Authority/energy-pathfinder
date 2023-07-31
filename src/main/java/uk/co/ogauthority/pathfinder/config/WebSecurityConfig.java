@@ -67,6 +67,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/notify/callback",
             "/contact",
             "/subscribe",
+            "/subscription/**",
             "/unsubscribe/**",
             "/accessibility-statement",
             "/assets/**",
@@ -83,6 +84,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         "/notify/callback",
         "/subscribe",
         "/unsubscribe/**",
+        "/subscription/**",
         "/analytics/collect"
     );
 

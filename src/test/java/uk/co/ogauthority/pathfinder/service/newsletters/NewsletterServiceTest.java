@@ -21,11 +21,13 @@ import uk.co.ogauthority.pathfinder.model.email.emailproperties.newsletter.Proje
 import uk.co.ogauthority.pathfinder.model.entity.newsletters.MonthlyNewsletter;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
 import uk.co.ogauthority.pathfinder.model.enums.NewsletterSendingResult;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.repository.newsletters.MonthlyNewsletterRepository;
 import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
 import uk.co.ogauthority.pathfinder.service.email.notify.DefaultEmailPersonalisationService;
 import uk.co.ogauthority.pathfinder.service.subscription.SubscriberAccessor;
+import uk.co.ogauthority.pathfinder.testutil.ReportableProjectTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.SubscriptionTestUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -67,7 +69,7 @@ public class NewsletterServiceTest {
         defaultEmailPersonalisationService
     );
 
-    when(linkService.getUnsubscribeUrl(any())).thenCallRealMethod();
+    when(linkService.getManageSubscriptionUrl(any())).thenCallRealMethod();
   }
 
   @Test
@@ -75,7 +77,7 @@ public class NewsletterServiceTest {
     when(subscriberAccessor.getAllSubscribers()).thenReturn(Collections.singletonList(SUBSCRIBER));
     newsletterService.sendNewsletterToSubscribers();
 
-    verify(linkService, times(1)).getUnsubscribeUrl(SUBSCRIBER.getUuid().toString());
+    verify(linkService, times(1)).getManageSubscriptionUrl(SUBSCRIBER.getUuid().toString());
     verify(emailService, times(1)).sendEmail(any(), eq(SUBSCRIBER.getEmailAddress()));
     verify(monthlyNewsletterRepository, times(1)).save(monthlyNewsletterArgumentCaptor.capture());
     verify(newsletterProjectService, times(1)).getProjectsUpdatedInTheLastMonth();
@@ -91,7 +93,7 @@ public class NewsletterServiceTest {
     when(subscriberAccessor.getAllSubscribers()).thenThrow(new RuntimeException());
     newsletterService.sendNewsletterToSubscribers();
 
-    verify(linkService, times(0)).getUnsubscribeUrl(SUBSCRIBER.getUuid().toString());
+    verify(linkService, times(0)).getManageSubscriptionUrl(SUBSCRIBER.getUuid().toString());
     verify(emailService, times(0)).sendEmail(any(), any());
     verify(monthlyNewsletterRepository, times(1)).save(monthlyNewsletterArgumentCaptor.capture());
     verify(newsletterProjectService, times(1)).getProjectsUpdatedInTheLastMonth();
@@ -118,7 +120,7 @@ public class NewsletterServiceTest {
 
     final var expectedEmailProperties = new NoProjectsUpdatedNewsletterEmailProperties(
         SUBSCRIBER.getForename(),
-        linkService.getUnsubscribeUrl(SUBSCRIBER.getUuid().toString()),
+        linkService.getManageSubscriptionUrl(SUBSCRIBER.getUuid().toString()),
         serviceName,
         customerMnemonic
     );
@@ -128,10 +130,12 @@ public class NewsletterServiceTest {
 
   @Test
   public void sendNewsletterToSubscribers_whenProjectUpdated_assertCorrectEmailPropertiesUsed() {
-
-    final var projectsUpdate = List.of("example");
+    var fieldStage = FieldStage.HYDROGEN;
+    var project = new NewsletterProjectView(ReportableProjectTestUtil.createReportableProject(fieldStage));
+    final var projectsUpdate = List.of(project);
 
     when(subscriberAccessor.getAllSubscribers()).thenReturn(Collections.singletonList(SUBSCRIBER));
+    when(subscriberAccessor.getSubscriberFieldStages(SUBSCRIBER)).thenReturn(List.of(FieldStage.HYDROGEN));
     when(newsletterProjectService.getProjectsUpdatedInTheLastMonth()).thenReturn(projectsUpdate);
 
     final var serviceName = "service name";
@@ -144,8 +148,8 @@ public class NewsletterServiceTest {
 
     final var expectedEmailProperties = new ProjectsUpdatedNewsletterEmailProperties(
         SUBSCRIBER.getForename(),
-        linkService.getUnsubscribeUrl(SUBSCRIBER.getUuid().toString()),
-        projectsUpdate,
+        linkService.getManageSubscriptionUrl(SUBSCRIBER.getUuid().toString()),
+        List.of(project.getProject()),
         serviceName,
         customerMnemonic
     );

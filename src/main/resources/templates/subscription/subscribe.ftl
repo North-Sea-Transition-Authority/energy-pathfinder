@@ -43,6 +43,30 @@
         />
       </@fdsRadio.radioItem>
     </@fdsRadio.radioGroup>
-    <@fdsAction.button buttonText="Subscribe"/>
+    <@fdsRadio.radioGroup
+      labelText="Are you interested in being updated on all ${serviceName} projects?"
+      path="form.interestedInAllProjects"
+      hiddenContent=true
+    >
+        <@fdsRadio.radioYes path="form.interestedInAllProjects"/>
+        <@fdsRadio.radioNo path="form.interestedInAllProjects">
+            <@fdsCheckbox.checkboxes
+              path="form.fieldStages"
+              checkboxes=fieldStages
+            />
+        </@fdsRadio.radioNo>
+
+    </@fdsRadio.radioGroup>
+      <#if backToManageUrl?has_content>
+          <@fdsAction.submitButtons
+          primaryButtonText="Save"
+          secondaryLinkText="Back to manage subscription"
+          linkSecondaryAction=true
+          linkSecondaryActionUrl=springUrl(backToManageUrl)
+          />
+        <#else>
+            <@fdsAction.button buttonText="Subscribe"/>
+      </#if>
+
   </@fdsForm.htmlForm>
 </@defaultPage>

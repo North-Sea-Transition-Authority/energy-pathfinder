@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.subscription;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -11,27 +12,30 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.UUID;
 import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.controller.subscription.SubscriptionController;
 import uk.co.ogauthority.pathfinder.exception.SubscriberNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.subscription.RelationToPathfinder;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeFormValidator;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.repository.subscription.SubscriberFieldStageRepository;
 import uk.co.ogauthority.pathfinder.repository.subscription.SubscriberRepository;
 import uk.co.ogauthority.pathfinder.service.email.SubscriberEmailService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.SubscriptionTestUtil;
 
-@RunWith(MockitoJUnitRunner.class)
-public class SubscriptionServiceTest {
+@ExtendWith(MockitoExtension.class)
+class SubscriptionServiceTest {
 
   @Mock
   private SubscriberRepository subscriberRepository;
@@ -45,22 +49,20 @@ public class SubscriptionServiceTest {
   @Mock
   private SubscribeFormValidator subscribeFormValidator;
 
+  @Mock
+  private SubscriberFieldStageRepository fieldStageRepository;
+
+  @InjectMocks
   private SubscriptionService subscriptionService;
 
   @Before
   public void setup() {
-    subscriptionService = new SubscriptionService(
-        subscriberRepository,
-        validationService,
-        subscriberEmailService,
-        subscribeFormValidator
-    );
 
     when(subscriberRepository.save(any(Subscriber.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
   @Test
-  public void isSubscribed_whenNotExists_thenFalse() {
+  void isSubscribed_whenNotExists_thenFalse() {
     var emailAddress = "test@test.com";
 
     when(subscriberRepository.existsByEmailAddress(emailAddress)).thenReturn(false);
@@ -69,7 +71,7 @@ public class SubscriptionServiceTest {
   }
 
   @Test
-  public void isSubscribed_whenExists_thenTrue() {
+  void isSubscribed_whenExists_thenTrue() {
     var emailAddress = "test@test.com";
 
     when(subscriberRepository.existsByEmailAddress(emailAddress)).thenReturn(true);
@@ -77,26 +79,28 @@ public class SubscriptionServiceTest {
     assertThat(subscriptionService.isSubscribed(emailAddress)).isTrue();
   }
 
-  @Test(expected = SubscriberNotFoundException.class)
-  public void verifyIsSubscribed_whenInvalidUuid_thenError() {
+  @Test
+  void verifyIsSubscribed_whenInvalidUuid_thenError() {
     var subscriberUuid = "invaliduuid";
 
-    subscriptionService.verifyIsSubscribed(subscriberUuid);
+    assertThrows(SubscriberNotFoundException.class,
+        () -> subscriptionService.verifyIsSubscribed(subscriberUuid));
 
     verify(subscriberRepository, never()).existsByUuid(any());
   }
 
-  @Test(expected = SubscriberNotFoundException.class)
-  public void verifyIsSubscribed_whenNotExists_thenError() {
+  @Test
+  void verifyIsSubscribed_whenNotExists_thenError() {
     var subscriberUuid = UUID.randomUUID();
 
     when(subscriberRepository.existsByUuid(subscriberUuid)).thenReturn(false);
 
-    subscriptionService.verifyIsSubscribed(subscriberUuid.toString());
+    assertThrows(SubscriberNotFoundException.class,
+        () ->subscriptionService.verifyIsSubscribed(subscriberUuid.toString()));
   }
 
   @Test
-  public void verifyIsSubscribed_whenExists_thenReturnUuid() {
+  void verifyIsSubscribed_whenExists_thenReturnUuid() {
     var subscriberUuid = UUID.randomUUID();
 
     when(subscriberRepository.existsByUuid(subscriberUuid)).thenReturn(true);
@@ -106,7 +110,8 @@ public class SubscriptionServiceTest {
   }
 
   @Test
-  public void subscribe_whenNotSubscribedAndOtherRelationToPathfinder_thenSubscribe() {
+  void subscribe_whenNotSubscribedAndOtherRelationToPathfinder_thenSubscribe() {
+    when(subscriberRepository.save(any(Subscriber.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
     var form = SubscriptionTestUtil.createSubscribeForm();
     form.setRelationToPathfinder(RelationToPathfinder.OTHER);
     form.setSubscribeReason("Subscribe reason");
@@ -131,7 +136,8 @@ public class SubscriptionServiceTest {
   }
 
   @Test
-  public void subscribe_whenNotSubscribedAndNotOtherRelationToPathfinder_thenSubscribe() {
+  void subscribe_whenNotSubscribedAndNotOtherRelationToPathfinder_thenSubscribe() {
+    when(subscriberRepository.save(any(Subscriber.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
     var form = SubscriptionTestUtil.createSubscribeForm();
     form.setRelationToPathfinder(RelationToPathfinder.SUPPLY_CHAIN);
     form.setSubscribeReason("Subscribe reason");
@@ -156,7 +162,7 @@ public class SubscriptionServiceTest {
   }
 
   @Test
-  public void unsubscribe_uuidVariant_verifyInteractions() {
+  void unsubscribe_uuidVariant_verifyInteractions() {
     var subscriberUuid = UUID.randomUUID();
 
     subscriptionService.unsubscribe(subscriberUuid);
@@ -165,8 +171,7 @@ public class SubscriptionServiceTest {
   }
 
   @Test
-  public void unsubscribe_emailAddressVariant_verifyInteractions() {
-
+  void unsubscribe_emailAddressVariant_verifyInteractions() {
     final var subscriberEmailAddress = "someone@example.com";
 
     subscriptionService.unsubscribe(subscriberEmailAddress);
@@ -175,7 +180,7 @@ public class SubscriptionServiceTest {
   }
 
   @Test
-  public void subscribe_whenSubscribed_thenNoSubscribe() {
+  void subscribe_whenSubscribed_thenNoSubscribe() {
     var form = SubscriptionTestUtil.createSubscribeForm();
 
     when(subscriberRepository.existsByEmailAddress(form.getEmailAddress())).thenReturn(true);
@@ -186,18 +191,18 @@ public class SubscriptionServiceTest {
   }
 
   @Test
-  public void validate() {
+  void validate() {
     var form = new SubscribeForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
-    subscriptionService.validate(form, bindingResult);
+    subscriptionService.validateSubscribeForm(form, bindingResult);
 
     verify(subscribeFormValidator, times(1)).validate(form, bindingResult);
     verify(validationService, times(1)).validate(form, bindingResult, ValidationType.FULL);
   }
 
   @Test
-  public void getSubscribeModelAndView() {
+  void getSubscribeModelAndView() {
     var form = new SubscribeForm();
 
     var modelAndView = subscriptionService.getSubscribeModelAndView(form);
@@ -208,26 +213,27 @@ public class SubscriptionServiceTest {
         entry("supplyChainRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.SUPPLY_CHAIN)),
         entry("operatorRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OPERATOR)),
         entry("otherRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OTHER)),
-        entry("developerRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.DEVELOPER))
+        entry("developerRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.DEVELOPER)),
+        entry("fieldStages", FieldStage.getAllAsMapOrdered())
     );
   }
 
   @Test
-  public void getSubscribeConfirmationModelAndView() {
+  void getSubscribeConfirmationModelAndView() {
     var modelAndView = subscriptionService.getSubscribeConfirmationModelAndView();
 
     assertThat(modelAndView.getViewName()).isEqualTo(SubscriptionService.SUBSCRIBE_CONFIRMATION_TEMPLATE_PATH);
   }
 
   @Test
-  public void getUnsubscribeModelAndView() {
-    var modelAndView = subscriptionService.getUnsubscribeModelAndView();
+  void getUnsubscribeModelAndView() {
+    var modelAndView = subscriptionService.getUnsubscribeModelAndView(UUID.randomUUID().toString());
 
     assertThat(modelAndView.getViewName()).isEqualTo(SubscriptionService.UNSUBSCRIBE_TEMPLATE_PATH);
   }
 
   @Test
-  public void getUnsubscribeConfirmationModelAndView() {
+  void getUnsubscribeConfirmationModelAndView() {
     var modelAndView = subscriptionService.getUnsubscribeConfirmationModelAndView();
 
     assertThat(modelAndView.getViewName()).isEqualTo(SubscriptionService.UNSUBSCRIBE_CONFIRMATION_TEMPLATE_PATH);
@@ -237,7 +243,7 @@ public class SubscriptionServiceTest {
   }
 
   @Test
-  public void getAlreadyUnsubscribedModelAndView() {
+  void getAlreadyUnsubscribedModelAndView() {
     var modelAndView = subscriptionService.getAlreadyUnsubscribedModelAndView();
 
     assertThat(modelAndView.getViewName()).isEqualTo(SubscriptionService.ALREADY_UNSUBSCRIBED_TEMPLATE_PATH);

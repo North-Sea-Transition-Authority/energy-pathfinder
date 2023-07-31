@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.newsletters;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -17,11 +18,11 @@ public class NewsletterProjectService {
     this.reportableProjectService = reportableProjectService;
   }
 
-  protected List<String> getProjectsUpdatedInTheLastMonth() {
+  protected List<NewsletterProjectView> getProjectsUpdatedInTheLastMonth() {
     return getReportableProjectsUpdatedInTheLastMonth()
         .stream()
-        .map(this::convertReportableProjectToEmailRepresentation)
-        .sorted()
+        .map(this::convertToNewsletterProjectView)
+        .sorted(Comparator.comparing(NewsletterProjectView::getProject))
         .collect(Collectors.toList());
   }
 
@@ -35,11 +36,7 @@ public class NewsletterProjectService {
     );
   }
 
-  private String convertReportableProjectToEmailRepresentation(ReportableProject reportableProject) {
-    return String.format(
-        "%s - %s",
-        reportableProject.getOperatorName(),
-        reportableProject.getProjectDisplayName()
-    );
+  private NewsletterProjectView convertToNewsletterProjectView(ReportableProject reportableProject) {
+    return new NewsletterProjectView(reportableProject);
   }
 }
