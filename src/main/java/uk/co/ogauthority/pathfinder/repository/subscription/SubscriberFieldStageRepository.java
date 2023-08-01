@@ -9,7 +9,9 @@ import uk.co.ogauthority.pathfinder.model.entity.subscription.SubscriberFieldSta
 @Repository
 public interface SubscriberFieldStageRepository extends CrudRepository<SubscriberFieldStage, Integer> {
 
-  List<SubscriberFieldStage> findAllBySubscriberUuid(UUID subscriberId);
+  List<SubscriberFieldStage> findAllBySubscriberUuid(UUID subscriberUuid);
 
-  void deleteAllBySubscriberUuid(UUID subscriberId);
+  void deleteAllBySubscriberUuid(UUID subscriberUuid);
+
+  void deleteAllBySubscriberUuidIn(List<UUID> subscriberUuids);
 }

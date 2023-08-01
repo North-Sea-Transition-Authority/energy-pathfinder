@@ -10,8 +10,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -22,9 +24,12 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.controller.subscription.SubscriptionController;
 import uk.co.ogauthority.pathfinder.exception.SubscriberNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
+import uk.co.ogauthority.pathfinder.model.entity.subscription.SubscriberFieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.subscription.RelationToPathfinder;
+import uk.co.ogauthority.pathfinder.model.enums.subscription.SubscriptionManagementOption;
+import uk.co.ogauthority.pathfinder.model.form.subscription.ManageSubscriptionForm;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeFormValidator;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -54,12 +59,6 @@ class SubscriptionServiceTest {
 
   @InjectMocks
   private SubscriptionService subscriptionService;
-
-  @Before
-  public void setup() {
-
-    when(subscriberRepository.save(any(Subscriber.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
-  }
 
   @Test
   void isSubscribed_whenNotExists_thenFalse() {
@@ -92,11 +91,12 @@ class SubscriptionServiceTest {
   @Test
   void verifyIsSubscribed_whenNotExists_thenError() {
     var subscriberUuid = UUID.randomUUID();
+    var subscriberUuidString = subscriberUuid.toString();
 
     when(subscriberRepository.existsByUuid(subscriberUuid)).thenReturn(false);
 
     assertThrows(SubscriberNotFoundException.class,
-        () ->subscriptionService.verifyIsSubscribed(subscriberUuid.toString()));
+        () ->subscriptionService.verifyIsSubscribed(subscriberUuidString));
   }
 
   @Test
@@ -132,15 +132,28 @@ class SubscriptionServiceTest {
     assertThat(subscriber.getSubscribeReason()).isEqualTo(form.getSubscribeReason());
     assertThat(subscriber.getSubscribedInstant()).isNotNull();
 
+    ArgumentCaptor<List<SubscriberFieldStage>> fieldStagesCaptor = ArgumentCaptor.forClass(List.class);
+    verify(fieldStageRepository).deleteAllBySubscriberUuid(subscriber.getUuid());
+    verify(fieldStageRepository).saveAll(fieldStagesCaptor.capture());
+    var subscriberFieldStages = fieldStagesCaptor.getValue();
+
+    assertThat(subscriberFieldStages).hasSize(2);
+    assertThat(subscriberFieldStages.get(0).getFieldStage()).isEqualTo(FieldStage.DEVELOPMENT);
+    assertThat(subscriberFieldStages.get(0).getSubscriberUuid()).isEqualTo(subscriber.getUuid());
+    assertThat(subscriberFieldStages.get(1).getFieldStage()).isEqualTo(FieldStage.OFFSHORE_WIND);
+    assertThat(subscriberFieldStages.get(1).getSubscriberUuid()).isEqualTo(subscriber.getUuid());
+
     verify(subscriberEmailService, times(1)).sendSubscribedEmail(form.getForename(), form.getEmailAddress(), subscriber.getUuid());
   }
 
   @Test
-  void subscribe_whenNotSubscribedAndNotOtherRelationToPathfinder_thenSubscribe() {
+  void subscribe_whenNotSubscribedAndNotOtherRelationToPathfinderAndInterestedInAllProjects_thenSubscribe() {
     when(subscriberRepository.save(any(Subscriber.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
     var form = SubscriptionTestUtil.createSubscribeForm();
     form.setRelationToPathfinder(RelationToPathfinder.SUPPLY_CHAIN);
     form.setSubscribeReason("Subscribe reason");
+    form.setInterestedInAllProjects(true);
+    form.setFieldStages(Collections.emptyList());
 
     when(subscriberRepository.existsByEmailAddress(form.getEmailAddress())).thenReturn(false);
 
@@ -158,6 +171,12 @@ class SubscriptionServiceTest {
     assertThat(subscriber.getSubscribeReason()).isNull();
     assertThat(subscriber.getSubscribedInstant()).isNotNull();
 
+    ArgumentCaptor<List<SubscriberFieldStage>> fieldStagesCaptor = ArgumentCaptor.forClass(List.class);
+    verify(fieldStageRepository).deleteAllBySubscriberUuid(subscriber.getUuid());
+    verify(fieldStageRepository).saveAll(fieldStagesCaptor.capture());
+    var subscriberFieldStages = fieldStagesCaptor.getValue();
+    assertThat(subscriberFieldStages).hasSize(FieldStage.getAllAsMap().size());
+
     verify(subscriberEmailService, times(1)).sendSubscribedEmail(form.getForename(), form.getEmailAddress(), subscriber.getUuid());
   }
 
@@ -168,15 +187,20 @@ class SubscriptionServiceTest {
     subscriptionService.unsubscribe(subscriberUuid);
 
     verify(subscriberRepository, times(1)).deleteByUuid(subscriberUuid);
+    verify(fieldStageRepository).deleteAllBySubscriberUuid(subscriberUuid);
   }
 
   @Test
   void unsubscribe_emailAddressVariant_verifyInteractions() {
     final var subscriberEmailAddress = "someone@example.com";
+    var subscriber = SubscriptionTestUtil.createSubscriber(subscriberEmailAddress);
+    var subscriberUuids = List.of(subscriber.getUuid());
 
+    when(subscriberRepository.findAllByEmailAddress(subscriberEmailAddress)).thenReturn(List.of(subscriber));
     subscriptionService.unsubscribe(subscriberEmailAddress);
 
-    verify(subscriberRepository, times(1)).deleteByEmailAddress(subscriberEmailAddress);
+    verify(fieldStageRepository).deleteAllBySubscriberUuidIn(subscriberUuids);
+    verify(subscriberRepository).deleteByEmailAddress(subscriberEmailAddress);
   }
 
   @Test
@@ -191,7 +215,43 @@ class SubscriptionServiceTest {
   }
 
   @Test
-  void validate() {
+  void updateSubscriptionPreferences() {
+    when(subscriberRepository.save(any(Subscriber.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
+
+    var subscriber = SubscriptionTestUtil.createSubscriber();
+    var subscriberUuid = subscriber.getUuid();
+    when(subscriberRepository.findByUuid(subscriberUuid)).thenReturn(Optional.of(subscriber));
+
+    var form = SubscriptionTestUtil.createSubscribeForm();
+    form.setForename("new forename");
+    form.setFieldStages(List.of(FieldStage.HYDROGEN));
+
+    subscriptionService.updateSubscriptionPreferences(form, subscriberUuid);
+
+    ArgumentCaptor<Subscriber> subscriberCaptor = ArgumentCaptor.forClass(Subscriber.class);
+    verify(subscriberRepository, times(1)).save(subscriberCaptor.capture());
+    var updatedSubscriber = subscriberCaptor.getValue();
+
+    assertThat(updatedSubscriber.getUuid()).isNotNull();
+    assertThat(updatedSubscriber.getForename()).isEqualTo(form.getForename());
+    assertThat(updatedSubscriber.getSurname()).isEqualTo(form.getSurname());
+    assertThat(updatedSubscriber.getEmailAddress()).isEqualTo(form.getEmailAddress());
+    assertThat(updatedSubscriber.getRelationToPathfinder()).isEqualTo(form.getRelationToPathfinder());
+    assertThat(updatedSubscriber.getSubscribeReason()).isEqualTo(form.getSubscribeReason());
+    assertThat(updatedSubscriber.getSubscribedInstant()).isNotNull();
+
+    ArgumentCaptor<List<SubscriberFieldStage>> fieldStagesCaptor = ArgumentCaptor.forClass(List.class);
+    verify(fieldStageRepository).deleteAllBySubscriberUuid(subscriberUuid);
+    verify(fieldStageRepository).saveAll(fieldStagesCaptor.capture());
+
+    var subscriberFieldStages = fieldStagesCaptor.getValue();
+    assertThat(subscriberFieldStages).hasSize(1);
+    assertThat(subscriberFieldStages.get(0).getFieldStage()).isEqualTo(FieldStage.HYDROGEN);
+    assertThat(subscriberFieldStages.get(0).getSubscriberUuid()).isEqualTo(subscriberUuid);
+  }
+
+  @Test
+  void validateSubscribeForm() {
     var form = new SubscribeForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
@@ -202,14 +262,25 @@ class SubscriptionServiceTest {
   }
 
   @Test
+  void validateManageSubscriptionForm() {
+    var form = new ManageSubscriptionForm();
+    var bindingResult = new BeanPropertyBindingResult(form, "form");
+
+    subscriptionService.validateManageSubscriptionForm(form, bindingResult);
+    verify(validationService).validate(form, bindingResult, ValidationType.FULL);
+  }
+
+  @Test
   void getSubscribeModelAndView() {
     var form = new SubscribeForm();
+    var pageHeading = "Subscribe to";
 
-    var modelAndView = subscriptionService.getSubscribeModelAndView(form);
+    var modelAndView = subscriptionService.getSubscribeModelAndView(form, pageHeading);
 
     assertThat(modelAndView.getViewName()).isEqualTo(SubscriptionService.SUBSCRIBE_TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
         entry("form", form),
+        entry("pageHeadingPrefix", pageHeading),
         entry("supplyChainRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.SUPPLY_CHAIN)),
         entry("operatorRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OPERATOR)),
         entry("otherRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OTHER)),
@@ -226,10 +297,27 @@ class SubscriptionServiceTest {
   }
 
   @Test
+  void getSubscriptionUpdatedConfirmationModelAndView() {
+    var subscriberUuid = UUID.randomUUID();
+    var modelAndView = subscriptionService.getSubscriptionUpdatedConfirmationModelAndView(subscriberUuid);
+
+    assertThat(modelAndView.getViewName()).isEqualTo(SubscriptionService.SUBSCRIPTION_UPDATED_TEMPLATE_PATH);
+    assertThat(modelAndView.getModel()).containsExactly(
+        entry("backToManageUrl", ReverseRouter.route(on(SubscriptionController.class)
+            .getManageSubscription(subscriberUuid.toString())))
+    );
+  }
+
+  @Test
   void getUnsubscribeModelAndView() {
-    var modelAndView = subscriptionService.getUnsubscribeModelAndView(UUID.randomUUID().toString());
+    var subscriberUuid = UUID.randomUUID();
+    var modelAndView = subscriptionService.getUnsubscribeModelAndView(subscriberUuid.toString());
 
     assertThat(modelAndView.getViewName()).isEqualTo(SubscriptionService.UNSUBSCRIBE_TEMPLATE_PATH);
+    assertThat(modelAndView.getModel()).containsExactly(
+        entry("backToManageUrl", ReverseRouter.route(on(SubscriptionController.class)
+            .getManageSubscription(subscriberUuid.toString())))
+    );
   }
 
   @Test
@@ -250,5 +338,111 @@ class SubscriptionServiceTest {
     assertThat(modelAndView.getModel()).containsExactly(
       entry("resubscribeUrl", ReverseRouter.route(on(SubscriptionController.class).getSubscribe()))
     );
+  }
+
+  @Test
+  void getManageSubscriptionModelAndView() {
+    var subscriberUuid = UUID.randomUUID();
+    var form = new ManageSubscriptionForm();
+    var email = "test@email.com";
+    var subscriber = SubscriptionTestUtil.createSubscriber(email);
+    subscriber.setUuid(subscriberUuid);
+    when(subscriberRepository.findByUuid(subscriberUuid)).thenReturn(Optional.of(subscriber));
+
+    var modelAndView = subscriptionService.getManageSubscriptionModelAndView(subscriberUuid, form);
+
+    assertThat(modelAndView.getViewName()).isEqualTo(SubscriptionService.MANAGE_SUBSCRIPTION_TEMPLATE_PATH);
+    assertThat(modelAndView.getModel()).containsExactly(
+        entry("form", form),
+        entry("subscriberEmail", email),
+        entry("managementOptions", SubscriptionManagementOption.getAllAsMap())
+    );
+  }
+
+  @Test
+  void getManagementRouting_unsubscribe() {
+    var form = new ManageSubscriptionForm();
+    form.setSubscriptionManagementOption(SubscriptionManagementOption.UNSUBSCRIBE);
+    var subscriberUuid = UUID.randomUUID();
+
+    var modelAndView = subscriptionService.getManagementRouting(subscriberUuid, form);
+    var expectedViewName = ReverseRouter.redirect(on(SubscriptionController.class)
+            .getUnsubscribe(subscriberUuid.toString())).getViewName();
+    assertThat(modelAndView.getViewName()).isEqualTo(expectedViewName);
+  }
+
+  @Test
+  void getManagementRouting_updateSubscriptionPreferences() {
+    var form = new ManageSubscriptionForm();
+    form.setSubscriptionManagementOption(SubscriptionManagementOption.UPDATE_SUBSCRIPTION);
+    var subscriberUuid = UUID.randomUUID();
+
+    var modelAndView = subscriptionService.getManagementRouting(subscriberUuid, form);
+    var expectedViewName = ReverseRouter.redirect(on(SubscriptionController.class)
+        .getUpdateSubscriptionPreferences(subscriberUuid.toString())).getViewName();
+    assertThat(modelAndView.getViewName()).isEqualTo(expectedViewName);
+  }
+
+  @Test
+  void getUpdateSubscriptionPreferencesModelAndView() {
+    var subscriberUuid = UUID.randomUUID();
+    var form = SubscriptionTestUtil.createSubscribeForm();
+    var modelAndView = subscriptionService.getUpdateSubscriptionPreferencesModelAndView(subscriberUuid, form);
+
+    assertThat(modelAndView.getViewName()).isEqualTo(SubscriptionService.SUBSCRIBE_TEMPLATE_PATH);
+    assertThat(modelAndView.getModel()).containsExactly(
+        entry("form", form),
+        entry("pageHeadingPrefix", SubscriptionService.UPDATE_SUBSCRIPTION_PAGE_HEADING_PREFIX),
+        entry("supplyChainRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.SUPPLY_CHAIN)),
+        entry("operatorRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OPERATOR)),
+        entry("otherRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OTHER)),
+        entry("developerRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.DEVELOPER)),
+        entry("fieldStages", FieldStage.getAllAsMapOrdered()),
+        entry("backToManageUrl",
+            ReverseRouter.route(on(SubscriptionController.class).getManageSubscription(subscriberUuid.toString())))
+    );
+  }
+
+  @Test
+  void getForm_interestedInAllProjects() {
+    var subscriber = SubscriptionTestUtil.createSubscriber();
+    var subscriberUuid = subscriber.getUuid();
+    when(subscriberRepository.findByUuid(subscriberUuid)).thenReturn(Optional.of(subscriber));
+
+    var subscriberFieldStages = SubscriptionTestUtil.createSubscriberFieldStages(
+        FieldStage.getAllAsList(), subscriberUuid
+    );
+    when(fieldStageRepository.findAllBySubscriberUuid(subscriberUuid)).thenReturn(subscriberFieldStages);
+
+    var form = subscriptionService.getForm(subscriberUuid);
+    assertThat(form.getForename()).isEqualTo(subscriber.getForename());
+    assertThat(form.getSurname()).isEqualTo(subscriber.getSurname());
+    assertThat(form.getEmailAddress()).isEqualTo(subscriber.getEmailAddress());
+    assertThat(form.getRelationToPathfinder()).isEqualTo(subscriber.getRelationToPathfinder());
+    assertThat(form.getSubscribeReason()).isEqualTo(subscriber.getSubscribeReason());
+    assertThat(form.getInterestedInAllProjects()).isTrue();
+    assertThat(form.getFieldStages()).isEmpty();
+  }
+
+  @Test
+  void getForm_notInterestedInAllProjects() {
+    var subscriber = SubscriptionTestUtil.createSubscriber();
+    var subscriberUuid = subscriber.getUuid();
+    when(subscriberRepository.findByUuid(subscriberUuid)).thenReturn(Optional.of(subscriber));
+
+    var fieldStages = List.of(FieldStage.DISCOVERY, FieldStage.HYDROGEN);
+    var subscriberFieldStages = SubscriptionTestUtil.createSubscriberFieldStages(
+        fieldStages, subscriberUuid
+    );
+    when(fieldStageRepository.findAllBySubscriberUuid(subscriberUuid)).thenReturn(subscriberFieldStages);
+
+    var form = subscriptionService.getForm(subscriberUuid);
+    assertThat(form.getForename()).isEqualTo(subscriber.getForename());
+    assertThat(form.getSurname()).isEqualTo(subscriber.getSurname());
+    assertThat(form.getEmailAddress()).isEqualTo(subscriber.getEmailAddress());
+    assertThat(form.getRelationToPathfinder()).isEqualTo(subscriber.getRelationToPathfinder());
+    assertThat(form.getSubscribeReason()).isEqualTo(subscriber.getSubscribeReason());
+    assertThat(form.getInterestedInAllProjects()).isFalse();
+    assertThat(form.getFieldStages()).isEqualTo(fieldStages);
   }
 }

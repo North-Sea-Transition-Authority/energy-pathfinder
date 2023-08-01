@@ -9,13 +9,13 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.newsletter.NoProjectsUpdatedNewsletterEmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.newsletter.ProjectsUpdatedNewsletterEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.newsletters.MonthlyNewsletter;
@@ -30,8 +30,8 @@ import uk.co.ogauthority.pathfinder.service.subscription.SubscriberAccessor;
 import uk.co.ogauthority.pathfinder.testutil.ReportableProjectTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.SubscriptionTestUtil;
 
-@RunWith(MockitoJUnitRunner.class)
-public class NewsletterServiceTest {
+@ExtendWith(MockitoExtension.class)
+class NewsletterServiceTest {
 
   @Mock
   private SubscriberAccessor subscriberAccessor;
@@ -54,26 +54,14 @@ public class NewsletterServiceTest {
   @Captor
   private ArgumentCaptor<MonthlyNewsletter> monthlyNewsletterArgumentCaptor;
 
+  @InjectMocks
   private NewsletterService newsletterService;
 
   private static final Subscriber SUBSCRIBER = SubscriptionTestUtil.createSubscriber("someone@example.com");
 
-  @Before
-  public void setUp() throws Exception {
-    newsletterService = new NewsletterService(
-        subscriberAccessor,
-        linkService,
-        emailService,
-        monthlyNewsletterRepository,
-        newsletterProjectService,
-        defaultEmailPersonalisationService
-    );
-
-    when(linkService.getManageSubscriptionUrl(any())).thenCallRealMethod();
-  }
-
   @Test
-  public void sendNewsletterToSubscribers_whenSuccessful_thenSuccessResult() {
+  void sendNewsletterToSubscribers_whenSuccessful_thenSuccessResult() {
+    when(linkService.getManageSubscriptionUrl(any())).thenCallRealMethod();
     when(subscriberAccessor.getAllSubscribers()).thenReturn(Collections.singletonList(SUBSCRIBER));
     newsletterService.sendNewsletterToSubscribers();
 
@@ -89,7 +77,7 @@ public class NewsletterServiceTest {
   }
 
   @Test
-  public void sendNewsletterToSubscribers_whenFailure_thenFailureResult() {
+  void sendNewsletterToSubscribers_whenFailure_thenFailureResult() {
     when(subscriberAccessor.getAllSubscribers()).thenThrow(new RuntimeException());
     newsletterService.sendNewsletterToSubscribers();
 
@@ -105,8 +93,8 @@ public class NewsletterServiceTest {
   }
 
   @Test
-  public void sendNewsletterToSubscribers_whenNoProjectUpdated_assertCorrectEmailPropertiesUsed() {
-
+  void sendNewsletterToSubscribers_whenNoProjectUpdated_assertCorrectEmailPropertiesUsed() {
+    when(linkService.getManageSubscriptionUrl(any())).thenCallRealMethod();
     when(subscriberAccessor.getAllSubscribers()).thenReturn(Collections.singletonList(SUBSCRIBER));
     when(newsletterProjectService.getProjectsUpdatedInTheLastMonth()).thenReturn(Collections.emptyList());
 
@@ -129,13 +117,44 @@ public class NewsletterServiceTest {
   }
 
   @Test
-  public void sendNewsletterToSubscribers_whenProjectUpdated_assertCorrectEmailPropertiesUsed() {
+  void sendNewsletterToSubscribers_whenUnsubscribedProjectUpdated_assertCorrectEmailPropertiesUsed() {
+    when(linkService.getManageSubscriptionUrl(any())).thenCallRealMethod();
+    when(subscriberAccessor.getAllSubscribers()).thenReturn(Collections.singletonList(SUBSCRIBER));
     var fieldStage = FieldStage.HYDROGEN;
     var project = new NewsletterProjectView(ReportableProjectTestUtil.createReportableProject(fieldStage));
-    final var projectsUpdate = List.of(project);
+    when(newsletterProjectService.getProjectsUpdatedInTheLastMonth()).thenReturn(List.of(project));
+    when(subscriberAccessor.getSubscriberFieldStages(SUBSCRIBER)).thenReturn(List.of(FieldStage.DISCOVERY));
+
+    final var serviceName = "service name";
+    when(defaultEmailPersonalisationService.getServiceName()).thenReturn(serviceName);
+
+    final var customerMnemonic = "customer mnemonic";
+    when(defaultEmailPersonalisationService.getCustomerMnemonic()).thenReturn(customerMnemonic);
+
+    newsletterService.sendNewsletterToSubscribers();
+
+    final var expectedEmailProperties = new NoProjectsUpdatedNewsletterEmailProperties(
+        SUBSCRIBER.getForename(),
+        linkService.getManageSubscriptionUrl(SUBSCRIBER.getUuid().toString()),
+        serviceName,
+        customerMnemonic
+    );
+
+    verify(emailService).sendEmail(expectedEmailProperties, SUBSCRIBER.getEmailAddress());
+  }
+
+  @Test
+  void sendNewsletterToSubscribers_whenProjectUpdated_assertCorrectEmailPropertiesUsed() {
+    when(linkService.getManageSubscriptionUrl(any())).thenCallRealMethod();
+    var fieldStage = FieldStage.HYDROGEN;
+    var project = new NewsletterProjectView(ReportableProjectTestUtil.createReportableProject(fieldStage));
+    var projectNotSubscribedTo = new NewsletterProjectView(
+        ReportableProjectTestUtil.createReportableProject(FieldStage.DISCOVERY)
+    );
+    final var projectsUpdate = List.of(project, projectNotSubscribedTo);
 
     when(subscriberAccessor.getAllSubscribers()).thenReturn(Collections.singletonList(SUBSCRIBER));
-    when(subscriberAccessor.getSubscriberFieldStages(SUBSCRIBER)).thenReturn(List.of(FieldStage.HYDROGEN));
+    when(subscriberAccessor.getSubscriberFieldStages(SUBSCRIBER)).thenReturn(List.of(fieldStage));
     when(newsletterProjectService.getProjectsUpdatedInTheLastMonth()).thenReturn(projectsUpdate);
 
     final var serviceName = "service name";

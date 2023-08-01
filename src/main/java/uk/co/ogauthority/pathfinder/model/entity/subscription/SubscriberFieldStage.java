@@ -27,8 +27,6 @@ public class SubscriberFieldStage {
   @Enumerated(EnumType.STRING)
   private FieldStage fieldStage;
 
-  public SubscriberFieldStage() { }
-
   public Integer getId() {
     return id;
   }

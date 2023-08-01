@@ -3,6 +3,8 @@ package uk.co.ogauthority.pathfinder.service.subscription;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -40,6 +42,7 @@ public class SubscriptionService {
   static final String ALREADY_UNSUBSCRIBED_TEMPLATE_PATH = "subscription/alreadyUnsubscribed";
   static final String MANAGE_SUBSCRIPTION_TEMPLATE_PATH = "subscription/manageSubscription";
   static final String SUBSCRIPTION_UPDATED_TEMPLATE_PATH = "subscription/subscriptionUpdatedConfirmation";
+  static final String UPDATE_SUBSCRIPTION_PAGE_HEADING_PREFIX = "Update subscription details for";
 
   private final SubscriberRepository subscriberRepository;
   private final ValidationService validationService;
@@ -114,7 +117,10 @@ public class SubscriptionService {
   }
 
   private void saveSubscriberFieldStages(SubscribeForm form, Subscriber subscriber) {
-    var fieldStages = form.getFieldStages();
+    List<FieldStage> fieldStages = null;
+    if (Boolean.FALSE.equals(form.getInterestedInAllProjects())) {
+      fieldStages = form.getFieldStages();
+    }
     if (Objects.isNull(fieldStages)) {
       fieldStages = FieldStage.getAllAsList();
     }
@@ -141,6 +147,9 @@ public class SubscriptionService {
 
   @Transactional
   public void unsubscribe(String emailAddress) {
+    var subscribers = subscriberRepository.findAllByEmailAddress(emailAddress);
+    var subscriberUuids = subscribers.stream().map(Subscriber::getUuid).collect(Collectors.toList());
+    subscriberFieldStageRepository.deleteAllBySubscriberUuidIn(subscriberUuids);
     subscriberRepository.deleteByEmailAddress(emailAddress);
   }
 
@@ -152,9 +161,11 @@ public class SubscriptionService {
   public BindingResult validateManageSubscriptionForm(ManageSubscriptionForm form, BindingResult bindingResult) {
     return validationService.validate(form, bindingResult, ValidationType.FULL);
   }
-  public ModelAndView getSubscribeModelAndView(SubscribeForm form) {
+
+  public ModelAndView getSubscribeModelAndView(SubscribeForm form, String pageHeadingPrefix) {
     return new ModelAndView(SUBSCRIBE_TEMPLATE_PATH)
         .addObject("form", form)
+        .addObject("pageHeadingPrefix", pageHeadingPrefix)
         .addObject("supplyChainRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.SUPPLY_CHAIN))
         .addObject("operatorRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OPERATOR))
         .addObject("otherRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OTHER))
@@ -168,12 +179,14 @@ public class SubscriptionService {
 
   public ModelAndView getSubscriptionUpdatedConfirmationModelAndView(UUID subscriberUuid) {
     return new ModelAndView(SUBSCRIPTION_UPDATED_TEMPLATE_PATH)
-        .addObject("backToManageUrl", ReverseRouter.route(on(SubscriptionController.class).getManageSubscription(subscriberUuid.toString())));
+        .addObject("backToManageUrl",
+            ReverseRouter.route(on(SubscriptionController.class).getManageSubscription(subscriberUuid.toString())));
   }
 
   public ModelAndView getUnsubscribeModelAndView(String subscriberUuid) {
     return new ModelAndView(UNSUBSCRIBE_TEMPLATE_PATH)
-        .addObject("backToManageUrl", ReverseRouter.route(on(SubscriptionController.class).getManageSubscription(subscriberUuid)));
+        .addObject("backToManageUrl",
+            ReverseRouter.route(on(SubscriptionController.class).getManageSubscription(subscriberUuid)));
   }
 
   public ModelAndView getUnsubscribeConfirmationModelAndView() {
@@ -189,8 +202,6 @@ public class SubscriptionService {
   public ModelAndView getManageSubscriptionModelAndView(UUID subscriberUuid, ManageSubscriptionForm form) {
     var subscriber = getSubscriber(subscriberUuid);
     return new ModelAndView(MANAGE_SUBSCRIPTION_TEMPLATE_PATH)
-        .addObject("unsubscribeUrl", ReverseRouter.route(on(SubscriptionController.class).getUnsubscribe(subscriberUuid.toString())))
-        .addObject("updateSubscriptionUrl", ReverseRouter.route(on(SubscriptionController.class).getUpdateSubscriptionPreferences(subscriberUuid.toString())))
         .addObject("form", form)
         .addObject("subscriberEmail", subscriber.getEmailAddress())
         .addObject("managementOptions", SubscriptionManagementOption.getAllAsMap());
@@ -205,8 +216,9 @@ public class SubscriptionService {
   }
 
   public ModelAndView getUpdateSubscriptionPreferencesModelAndView(UUID subscriberUuid, SubscribeForm form) {
-    return getSubscribeModelAndView(form)
-        .addObject("backToManageUrl", ReverseRouter.route(on(SubscriptionController.class).getManageSubscription(subscriberUuid.toString())));
+    return getSubscribeModelAndView(form, UPDATE_SUBSCRIPTION_PAGE_HEADING_PREFIX)
+        .addObject("backToManageUrl",
+            ReverseRouter.route(on(SubscriptionController.class).getManageSubscription(subscriberUuid.toString())));
   }
 
   private Subscriber getSubscriber(UUID subscriberUuid) {
@@ -232,6 +244,7 @@ public class SubscriptionService {
 
     if (FieldStage.getAllAsList().equals(fieldStages)) {
       form.setInterestedInAllProjects(true);
+      form.setFieldStages(Collections.emptyList());
     } else {
       form.setInterestedInAllProjects(false);
       form.setFieldStages(fieldStages);

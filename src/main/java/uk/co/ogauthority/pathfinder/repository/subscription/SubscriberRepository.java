@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.repository.subscription;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.repository.CrudRepository;
@@ -18,4 +19,6 @@ public interface SubscriberRepository extends CrudRepository<Subscriber, Integer
   void deleteByEmailAddress(String emailAddress);
 
   Optional<Subscriber> findByUuid(UUID uuid);
+
+  List<Subscriber> findAllByEmailAddress(String emailAddress);
 }

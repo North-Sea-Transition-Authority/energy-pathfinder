@@ -30,6 +30,7 @@ import uk.co.ogauthority.pathfinder.service.subscription.SubscriptionService;
 public class SubscriptionController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SubscriptionController.class);
+  static final String SUBSCRIBE_PAGE_HEADING_PREFIX = "Subscribe to";
 
   private final SubscriptionService subscriptionService;
   private final ControllerHelperService controllerHelperService;
@@ -51,7 +52,7 @@ public class SubscriptionController {
   @GetMapping("/subscribe")
   public ModelAndView getSubscribe() {
     metricsProvider.getSubscribePageHitCounter().increment();
-    return subscriptionService.getSubscribeModelAndView(new SubscribeForm());
+    return subscriptionService.getSubscribeModelAndView(new SubscribeForm(), SUBSCRIBE_PAGE_HEADING_PREFIX);
   }
 
   @PostMapping("/subscribe")
@@ -63,7 +64,7 @@ public class SubscriptionController {
     bindingResult = subscriptionService.validateSubscribeForm(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        subscriptionService.getSubscribeModelAndView(form),
+        subscriptionService.getSubscribeModelAndView(form, SUBSCRIBE_PAGE_HEADING_PREFIX),
         form,
         () -> {
           subscriptionService.subscribe(form);

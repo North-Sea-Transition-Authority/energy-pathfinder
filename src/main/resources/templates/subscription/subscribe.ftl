@@ -9,7 +9,7 @@
 <#-- @ftlvariable name="otherRelation" type="uk.co.ogauthority.pathfinder.model.enums.subscription.RelationToPathfinder" -->
 
 <#assign serviceName = service.serviceName>
-<#assign pageHeading = "Subscribe to ${serviceName}">
+<#assign pageHeading = "${pageHeadingPrefix} ${serviceName}">
 
 <@defaultPage
   htmlTitle=pageHeading
@@ -59,10 +59,10 @@
     </@fdsRadio.radioGroup>
       <#if backToManageUrl?has_content>
           <@fdsAction.submitButtons
-          primaryButtonText="Save"
-          secondaryLinkText="Back to manage subscription"
-          linkSecondaryAction=true
-          linkSecondaryActionUrl=springUrl(backToManageUrl)
+            primaryButtonText="Save"
+            secondaryLinkText="Back to manage subscription"
+            linkSecondaryAction=true
+            linkSecondaryActionUrl=springUrl(backToManageUrl)
           />
         <#else>
             <@fdsAction.button buttonText="Subscribe"/>

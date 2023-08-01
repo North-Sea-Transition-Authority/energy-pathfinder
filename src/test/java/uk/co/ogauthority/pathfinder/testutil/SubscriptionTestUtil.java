@@ -1,8 +1,12 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
+import uk.co.ogauthority.pathfinder.model.entity.subscription.SubscriberFieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.subscription.RelationToPathfinder;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
 
@@ -25,6 +29,8 @@ public class SubscriptionTestUtil {
     subscribeForm.setEmailAddress(EMAIL_ADDRESS);
     subscribeForm.setRelationToPathfinder(RELATION_TO_PATHFINDER);
     subscribeForm.setSubscribeReason(SUBSCRIBE_REASON);
+    subscribeForm.setInterestedInAllProjects(false);
+    subscribeForm.setFieldStages(List.of(FieldStage.DEVELOPMENT, FieldStage.OFFSHORE_WIND));
     return subscribeForm;
   }
 
@@ -44,5 +50,17 @@ public class SubscriptionTestUtil {
     final var subscriber = createSubscriber();
     subscriber.setEmailAddress(emailAddress);
     return subscriber;
+  }
+
+  public static List<SubscriberFieldStage> createSubscriberFieldStages(List<FieldStage> fieldStages, UUID subscriberUuid) {
+    return fieldStages
+        .stream()
+        .map(fieldStage -> {
+          var subscriberFieldStage = new SubscriberFieldStage();
+          subscriberFieldStage.setFieldStage(fieldStage);
+          subscriberFieldStage.setSubscriberUuid(subscriberUuid);
+          return subscriberFieldStage;
+        })
+        .collect(Collectors.toList());
   }
 }

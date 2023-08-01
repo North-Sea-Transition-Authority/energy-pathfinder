@@ -14,7 +14,7 @@ public final class NewsletterProjectView {
         reportableProject.getOperatorName(),
         reportableProject.getProjectDisplayName(),
         reportableProject.getFieldStage()
-        );
+    );
   }
 
   private NewsletterProjectView(

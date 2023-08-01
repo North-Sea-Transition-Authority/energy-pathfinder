@@ -17,9 +17,9 @@
     </p>
 
       <@fdsRadio.radio
-      path="form.subscriptionManagementOption"
-      radioItems=managementOptions
-      labelText="What would you like to change about your subscription?"
+        path="form.subscriptionManagementOption"
+        radioItems=managementOptions
+        labelText="What would you like to change about your subscription?"
       />
 
       <@fdsAction.button buttonText="Continue" />
