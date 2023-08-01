@@ -108,8 +108,9 @@ public class ForwardWorkPlanAwardedContractControllerTest extends ProjectContext
     assertThat(modelAndView).isNotNull();
     var model = modelAndView.getModel();
 
-    assertThat(model).containsEntry("contractBands", ContractBand.getAllAsMap(ProjectType.FORWARD_WORK_PLAN));
-    assertThat(model).containsKeys("form", "contractFunctionRestUrl", "preSelectedContractFunctionMap");
+    assertThat(model)
+        .containsEntry("contractBands", ContractBand.getAllAsMap(ProjectType.FORWARD_WORK_PLAN))
+        .containsKeys("form", "contractFunctionRestUrl", "preSelectedContractFunctionMap");
   }
 
   @Test

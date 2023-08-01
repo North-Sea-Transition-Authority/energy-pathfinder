@@ -83,10 +83,6 @@ public class InfrastructureAwardedContractService extends AwardedContractService
     return super.populateAwardedContractForm(awardedContract, awardedContractForm);
   }
 
-  public boolean isValid(InfrastructureAwardedContract awardedContract, ValidationType validationType) {
-    return super.isValid(awardedContract, validationType);
-  }
-
   public BindingResult validate(InfrastructureAwardedContractForm form,
                                 BindingResult bindingResult,
                                 ValidationType validationType) {

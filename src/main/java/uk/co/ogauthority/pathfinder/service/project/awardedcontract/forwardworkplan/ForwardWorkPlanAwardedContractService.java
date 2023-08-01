@@ -73,10 +73,6 @@ public class ForwardWorkPlanAwardedContractService extends AwardedContractServic
     return awardedContractRepository.existsByProjectDetail(projectDetail);
   }
 
-  public boolean isValid(ForwardWorkPlanAwardedContract awardedContract, ValidationType validationType) {
-    return super.isValid(awardedContract, validationType);
-  }
-
   public BindingResult validate(ForwardWorkPlanAwardedContractForm form,
                                 BindingResult bindingResult,
                                 ValidationType validationType) {
