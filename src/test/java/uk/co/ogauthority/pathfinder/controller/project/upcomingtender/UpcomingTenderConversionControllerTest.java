@@ -17,6 +17,7 @@ import static uk.co.ogauthority.pathfinder.mvc.ReverseRouter.route;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
 import java.util.Set;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,12 +33,16 @@ import org.springframework.validation.FieldError;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastructure.InfrastructureAwardedContractController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
+import uk.co.ogauthority.pathfinder.model.enums.notificationbanner.NotificationBannerType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderConversionForm;
+import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerBodyLine;
+import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerView;
 import uk.co.ogauthority.pathfinder.model.view.upcomingtender.UpcomingTenderView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
@@ -49,6 +54,7 @@ import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTende
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
+import uk.co.ogauthority.pathfinder.util.notificationbanner.NotificationBannerUtils;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(
@@ -156,19 +162,40 @@ public class UpcomingTenderConversionControllerTest extends ProjectContextAbstra
         any(BindingResult.class))
     ).thenReturn(bindingResult);
 
-    mockMvc.perform(
+    var flashMap = mockMvc.perform(
             post(route(on(CONTROLLER)
-                .convertUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null, null, null)))
+                .convertUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null, null, null, null)))
                 .with(authenticatedUserAndSession(authenticatedUser))
                 .with(csrf()))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl(route(on(SUMMARY_CONTROLLER).viewUpcomingTenders(PROJECT_ID, null))));
+        .andExpect(redirectedUrl(route(on(SUMMARY_CONTROLLER).viewUpcomingTenders(PROJECT_ID, null))))
+        .andReturn()
+        .getFlashMap();
 
     verify(conversionService).validate(any(), any());
     verify(conversionService).convertUpcomingTenderToAwardedContract(
         any(UpcomingTender.class),
         any(UpcomingTenderConversionForm.class)
     );
+
+    assertThat(flashMap.get(NotificationBannerUtils.NOTIFICATION_BANNER_OBJECT_NAME))
+        .isNotNull()
+        .asInstanceOf(InstanceOfAssertFactories.type(NotificationBannerView.class))
+        .extracting(
+            NotificationBannerView::getTitle,
+            NotificationBannerView::getBannerType
+        ).containsExactly(
+            "Success",
+            NotificationBannerType.SUCCESS
+        );
+
+    var bannerView = (NotificationBannerView) flashMap.get(NotificationBannerUtils.NOTIFICATION_BANNER_OBJECT_NAME);
+    assertThat(bannerView.getBannerLink().getLinkText()).isEqualTo(UpcomingTenderConversionController.BANNER_LINK_TEXT);
+    assertThat(bannerView.getBannerLink().getLinkUrl()).isEqualTo(
+        ReverseRouter.route(on(InfrastructureAwardedContractController.class).viewAwardedContracts(PROJECT_ID, null)));
+    assertThat(bannerView.getBodyLines()).hasSize(1);
+    assertThat(bannerView.getBodyLines().get(0).getLineText()).isEqualTo(UpcomingTenderConversionController.BANNER_BODY_LINE);
+    assertThat(bannerView.getBodyLines().get(0).getLineClass()).isEqualTo(NotificationBannerBodyLine.DEFAULT_CLASS);
   }
 
   @Test
@@ -183,7 +210,7 @@ public class UpcomingTenderConversionControllerTest extends ProjectContextAbstra
 
     mockMvc.perform(
             post(route(on(CONTROLLER)
-                .convertUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null, null, null)))
+                .convertUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null, null, null, null)))
                 .with(authenticatedUserAndSession(authenticatedUser))
                 .with(csrf()))
         .andExpect(status().is2xxSuccessful())
@@ -212,7 +239,7 @@ public class UpcomingTenderConversionControllerTest extends ProjectContextAbstra
         .withProjectContributorAccess();
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
-        on(CONTROLLER).convertUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null, null, null),
+        on(CONTROLLER).convertUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null, null, null, null),
         status().is3xxRedirection(),
         status().isForbidden()
     );

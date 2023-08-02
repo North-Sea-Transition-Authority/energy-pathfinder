@@ -12,17 +12,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.AllowProjectContributorAccess;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastructure.InfrastructureAwardedContractController;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderConversionForm;
+import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerBodyLine;
+import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerLink;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
@@ -33,6 +37,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContex
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderConversionService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderSummaryService;
+import uk.co.ogauthority.pathfinder.util.notificationbanner.NotificationBannerUtils;
 
 @Controller
 @ProjectStatusCheck(status = ProjectStatus.DRAFT)
@@ -43,6 +48,8 @@ import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTende
 public class UpcomingTenderConversionController extends ProjectFormPageController {
 
   public static final String CONVERT_PAGE_NAME = "Convert upcoming tender to awarded contract";
+  public static final String BANNER_BODY_LINE = "The upcoming tender has been converted to an awarded contract";
+  public static final String BANNER_LINK_TEXT = "View awarded contracts";
 
   private final UpcomingTenderService upcomingTenderService;
   private final UpcomingTenderSummaryService upcomingTenderSummaryService;
@@ -79,7 +86,8 @@ public class UpcomingTenderConversionController extends ProjectFormPageControlle
                                             @PathVariable("displayOrder") Integer displayOrder,
                                             @Valid @ModelAttribute("form") UpcomingTenderConversionForm form,
                                             BindingResult bindingResult,
-                                            ProjectContext projectContext) {
+                                            ProjectContext projectContext,
+                                            RedirectAttributes redirectAttributes) {
     var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
     checkIfUserHasAccessToTender(upcomingTender);
     bindingResult = conversionService.validate(form, bindingResult);
@@ -97,6 +105,7 @@ public class UpcomingTenderConversionController extends ProjectFormPageControlle
                   projectContext.getProjectDetails().getId()
               )
           );
+          addSuccessBanner(redirectAttributes, projectId);
           return ReverseRouter.redirect(on(UpcomingTendersController.class).viewUpcomingTenders(projectId, null));
         }
     );
@@ -125,5 +134,16 @@ public class UpcomingTenderConversionController extends ProjectFormPageControlle
               upcomingTender.getId())
       );
     }
+  }
+
+  private void addSuccessBanner(RedirectAttributes redirectAttributes, Integer projectId) {
+    NotificationBannerUtils.successBannerWithLink(
+        "Success",
+        NotificationBannerBodyLine.withDefaultClass(BANNER_BODY_LINE),
+        new NotificationBannerLink(
+            ReverseRouter.route(on(InfrastructureAwardedContractController.class).viewAwardedContracts(projectId, null)),
+            BANNER_LINK_TEXT),
+        redirectAttributes
+    );
   }
 }
