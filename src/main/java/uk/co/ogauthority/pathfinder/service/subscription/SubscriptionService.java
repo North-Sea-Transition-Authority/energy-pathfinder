@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.controller.subscription.SubscriptionController;
 import uk.co.ogauthority.pathfinder.exception.SubscriberNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
@@ -49,6 +51,7 @@ public class SubscriptionService {
   private final SubscriberEmailService subscriberEmailService;
   private final SubscribeFormValidator subscribeFormValidator;
   private final SubscriberFieldStageRepository subscriberFieldStageRepository;
+  private final ServiceProperties serviceProperties;
 
   @Autowired
   public SubscriptionService(
@@ -56,29 +59,32 @@ public class SubscriptionService {
       ValidationService validationService,
       SubscriberEmailService subscriberEmailService,
       SubscribeFormValidator subscribeFormValidator,
-      SubscriberFieldStageRepository subscriberFieldStageRepository) {
+      SubscriberFieldStageRepository subscriberFieldStageRepository,
+      ServiceProperties serviceProperties) {
     this.subscriberRepository = subscriberRepository;
     this.validationService = validationService;
     this.subscriberEmailService = subscriberEmailService;
     this.subscribeFormValidator = subscribeFormValidator;
     this.subscriberFieldStageRepository = subscriberFieldStageRepository;
+    this.serviceProperties = serviceProperties;
   }
 
   public boolean isSubscribed(String emailAddress) {
     return subscriberRepository.existsByEmailAddress(emailAddress);
   }
 
-  public UUID verifyIsSubscribed(String subscriberUuid) {
+  public String getSubscribeFormPageHeading(String pageHeadingPrefix) {
+    return String.format("%s %s", pageHeadingPrefix, serviceProperties.getServiceName());
+  }
+
+  public Optional<Subscriber> verifyIsSubscribed(String subscriberUuid) {
     UUID uuid;
     try {
       uuid = UUID.fromString(subscriberUuid);
     } catch (IllegalArgumentException exception) {
       throw new SubscriberNotFoundException(String.format("Unable to convert %s to UUID", subscriberUuid));
     }
-    if (!subscriberRepository.existsByUuid(uuid)) {
-      throw new SubscriberNotFoundException(String.format("Unable to find subscriber with UUID %s", subscriberUuid));
-    }
-    return uuid;
+    return subscriberRepository.findByUuid(uuid);
   }
 
   @Transactional
@@ -119,7 +125,7 @@ public class SubscriptionService {
   private void saveSubscriberFieldStages(SubscribeForm form, Subscriber subscriber) {
     List<FieldStage> fieldStages = null;
     if (Boolean.FALSE.equals(form.getInterestedInAllProjects())) {
-      fieldStages = form.getFieldStages();
+      fieldStages = convertStringsToFieldStages(form.getFieldStages());
     }
     if (Objects.isNull(fieldStages)) {
       fieldStages = FieldStage.getAllAsList();
@@ -162,15 +168,15 @@ public class SubscriptionService {
     return validationService.validate(form, bindingResult, ValidationType.FULL);
   }
 
-  public ModelAndView getSubscribeModelAndView(SubscribeForm form, String pageHeadingPrefix) {
+  public ModelAndView getSubscribeModelAndView(SubscribeForm form, String pageHeading) {
     return new ModelAndView(SUBSCRIBE_TEMPLATE_PATH)
         .addObject("form", form)
-        .addObject("pageHeadingPrefix", pageHeadingPrefix)
+        .addObject("pageHeading", pageHeading)
         .addObject("supplyChainRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.SUPPLY_CHAIN))
         .addObject("operatorRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OPERATOR))
         .addObject("otherRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OTHER))
         .addObject("developerRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.DEVELOPER))
-        .addObject("fieldStages", FieldStage.getAllAsMapOrdered());
+        .addObject("fieldStages", FieldStage.getAllAsMap());
   }
 
   public ModelAndView getSubscribeConfirmationModelAndView() {
@@ -216,7 +222,7 @@ public class SubscriptionService {
   }
 
   public ModelAndView getUpdateSubscriptionPreferencesModelAndView(UUID subscriberUuid, SubscribeForm form) {
-    return getSubscribeModelAndView(form, UPDATE_SUBSCRIPTION_PAGE_HEADING_PREFIX)
+    return getSubscribeModelAndView(form, getSubscribeFormPageHeading(UPDATE_SUBSCRIPTION_PAGE_HEADING_PREFIX))
         .addObject("backToManageUrl",
             ReverseRouter.route(on(SubscriptionController.class).getManageSubscription(subscriberUuid.toString())));
   }
@@ -247,8 +253,21 @@ public class SubscriptionService {
       form.setFieldStages(Collections.emptyList());
     } else {
       form.setInterestedInAllProjects(false);
-      form.setFieldStages(fieldStages);
+      form.setFieldStages(convertFieldStagesToString(fieldStages));
     }
     return form;
   }
+
+  private List<FieldStage> convertStringsToFieldStages(List<String> fieldStageStrings) {
+    return fieldStageStrings.stream()
+        .map(FieldStage::valueOf)
+        .collect(Collectors.toList());
+  }
+
+  private List<String> convertFieldStagesToString(List<FieldStage> fieldStages) {
+    return fieldStages.stream()
+        .map((FieldStage::name))
+        .collect(Collectors.toList());
+  }
 }
+

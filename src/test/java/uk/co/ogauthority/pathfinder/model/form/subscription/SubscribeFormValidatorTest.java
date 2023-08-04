@@ -11,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.ValidationUtils;
-import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.subscription.RelationToPathfinder;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 
@@ -112,9 +111,29 @@ class SubscribeFormValidatorTest {
   }
 
   @Test
+  void validate_whenNotInterestedInAllProjectsAndInvalidFieldStages_thenErrors() {
+    form.setInterestedInAllProjects(false);
+    form.setFieldStages(List.of("Testing"));
+    var errors = new BeanPropertyBindingResult(form, "form");
+
+    ValidationUtils.invokeValidator(subscribeFormValidator, form, errors);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).containsExactly(
+        entry("fieldStages", Set.of("fieldStages.invalid"))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("fieldStages", Set.of(SubscribeFormValidator.INVALID_FIELD_STAGE_ERROR))
+    );
+  }
+
+  @Test
   void validate_whenNotInterestedInAllProjectsAndHasFieldStages_thenNoErrors() {
     form.setInterestedInAllProjects(false);
-    form.setFieldStages(List.of(FieldStage.DEVELOPMENT, FieldStage.CARBON_CAPTURE_AND_STORAGE));
+    form.setFieldStages(List.of("DEVELOPMENT", "CARBON_CAPTURE_AND_STORAGE"));
     var errors = new BeanPropertyBindingResult(form, "form");
 
     ValidationUtils.invokeValidator(subscribeFormValidator, form, errors);

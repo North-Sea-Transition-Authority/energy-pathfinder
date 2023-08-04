@@ -21,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.controller.subscription.SubscriptionController;
 import uk.co.ogauthority.pathfinder.exception.SubscriberNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
@@ -57,8 +58,22 @@ class SubscriptionServiceTest {
   @Mock
   private SubscriberFieldStageRepository fieldStageRepository;
 
+  @Mock
+  private ServiceProperties serviceProperties;
+
   @InjectMocks
   private SubscriptionService subscriptionService;
+
+  private static final String SERVICE_NAME = "Service name";
+
+  @Test
+  void getSubscribeFormPageHeading() {
+    when(serviceProperties.getServiceName()).thenReturn(SERVICE_NAME);
+
+    var pageHeading = subscriptionService.getSubscribeFormPageHeading("Subscribe to");
+    var expectedPageHeading = String.format("Subscribe to %s", SERVICE_NAME);
+    assertThat(pageHeading).isEqualTo(expectedPageHeading);
+  }
 
   @Test
   void isSubscribed_whenNotExists_thenFalse() {
@@ -85,7 +100,7 @@ class SubscriptionServiceTest {
     assertThrows(SubscriberNotFoundException.class,
         () -> subscriptionService.verifyIsSubscribed(subscriberUuid));
 
-    verify(subscriberRepository, never()).existsByUuid(any());
+    verify(subscriberRepository, never()).findByUuid(any());
   }
 
   @Test
@@ -93,20 +108,21 @@ class SubscriptionServiceTest {
     var subscriberUuid = UUID.randomUUID();
     var subscriberUuidString = subscriberUuid.toString();
 
-    when(subscriberRepository.existsByUuid(subscriberUuid)).thenReturn(false);
+    when(subscriberRepository.findByUuid(subscriberUuid)).thenReturn(Optional.empty());
 
-    assertThrows(SubscriberNotFoundException.class,
-        () ->subscriptionService.verifyIsSubscribed(subscriberUuidString));
+    var result = subscriptionService.verifyIsSubscribed(subscriberUuidString);
+    assertThat(result).isEmpty();
   }
 
   @Test
   void verifyIsSubscribed_whenExists_thenReturnUuid() {
     var subscriberUuid = UUID.randomUUID();
+    var subscriber = SubscriptionTestUtil.createSubscriber();
 
-    when(subscriberRepository.existsByUuid(subscriberUuid)).thenReturn(true);
+    when(subscriberRepository.findByUuid(subscriberUuid)).thenReturn(Optional.of(subscriber));
 
     var result = subscriptionService.verifyIsSubscribed(subscriberUuid.toString());
-    assertThat(result).isEqualTo(subscriberUuid);
+    assertThat(result).isEqualTo(Optional.of(subscriber));
   }
 
   @Test
@@ -224,7 +240,7 @@ class SubscriptionServiceTest {
 
     var form = SubscriptionTestUtil.createSubscribeForm();
     form.setForename("new forename");
-    form.setFieldStages(List.of(FieldStage.HYDROGEN));
+    form.setFieldStages(List.of("HYDROGEN"));
 
     subscriptionService.updateSubscriptionPreferences(form, subscriberUuid);
 
@@ -273,19 +289,19 @@ class SubscriptionServiceTest {
   @Test
   void getSubscribeModelAndView() {
     var form = new SubscribeForm();
-    var pageHeading = "Subscribe to";
+    var pageHeading = "Subscribe to page heading";
 
     var modelAndView = subscriptionService.getSubscribeModelAndView(form, pageHeading);
 
     assertThat(modelAndView.getViewName()).isEqualTo(SubscriptionService.SUBSCRIBE_TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
         entry("form", form),
-        entry("pageHeadingPrefix", pageHeading),
+        entry("pageHeading", pageHeading),
         entry("supplyChainRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.SUPPLY_CHAIN)),
         entry("operatorRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OPERATOR)),
         entry("otherRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OTHER)),
         entry("developerRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.DEVELOPER)),
-        entry("fieldStages", FieldStage.getAllAsMapOrdered())
+        entry("fieldStages", FieldStage.getAllAsMap())
     );
   }
 
@@ -385,19 +401,24 @@ class SubscriptionServiceTest {
 
   @Test
   void getUpdateSubscriptionPreferencesModelAndView() {
+    when(serviceProperties.getServiceName()).thenReturn(SERVICE_NAME);
     var subscriberUuid = UUID.randomUUID();
     var form = SubscriptionTestUtil.createSubscribeForm();
+    var expectedPageHeading = String.format("%s %s",
+        SubscriptionService.UPDATE_SUBSCRIPTION_PAGE_HEADING_PREFIX,
+        SERVICE_NAME
+    );
     var modelAndView = subscriptionService.getUpdateSubscriptionPreferencesModelAndView(subscriberUuid, form);
 
     assertThat(modelAndView.getViewName()).isEqualTo(SubscriptionService.SUBSCRIBE_TEMPLATE_PATH);
     assertThat(modelAndView.getModel()).containsExactly(
         entry("form", form),
-        entry("pageHeadingPrefix", SubscriptionService.UPDATE_SUBSCRIPTION_PAGE_HEADING_PREFIX),
+        entry("pageHeading", expectedPageHeading),
         entry("supplyChainRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.SUPPLY_CHAIN)),
         entry("operatorRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OPERATOR)),
         entry("otherRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.OTHER)),
         entry("developerRelation", RelationToPathfinder.getEntryAsMap(RelationToPathfinder.DEVELOPER)),
-        entry("fieldStages", FieldStage.getAllAsMapOrdered()),
+        entry("fieldStages", FieldStage.getAllAsMap()),
         entry("backToManageUrl",
             ReverseRouter.route(on(SubscriptionController.class).getManageSubscription(subscriberUuid.toString())))
     );
@@ -431,6 +452,7 @@ class SubscriptionServiceTest {
     when(subscriberRepository.findByUuid(subscriberUuid)).thenReturn(Optional.of(subscriber));
 
     var fieldStages = List.of(FieldStage.DISCOVERY, FieldStage.HYDROGEN);
+    var expectedFieldStages = List.of("DISCOVERY", "HYDROGEN");
     var subscriberFieldStages = SubscriptionTestUtil.createSubscriberFieldStages(
         fieldStages, subscriberUuid
     );
@@ -443,6 +465,6 @@ class SubscriptionServiceTest {
     assertThat(form.getRelationToPathfinder()).isEqualTo(subscriber.getRelationToPathfinder());
     assertThat(form.getSubscribeReason()).isEqualTo(subscriber.getSubscribeReason());
     assertThat(form.getInterestedInAllProjects()).isFalse();
-    assertThat(form.getFieldStages()).isEqualTo(fieldStages);
+    assertThat(form.getFieldStages()).isEqualTo(expectedFieldStages);
   }
 }

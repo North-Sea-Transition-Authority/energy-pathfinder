@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.model.form.subscription;
 
 import java.util.List;
 import javax.validation.constraints.NotNull;
-import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.subscription.RelationToPathfinder;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.email.ValidEmail;
@@ -30,7 +29,7 @@ public class SubscribeForm {
   @NotNull(message = "Select yes if you are interested in being updated on all pathfinder projects", groups = FullValidation.class)
   private Boolean interestedInAllProjects;
 
-  private List<FieldStage> fieldStages;
+  private List<String> fieldStages;
 
   public String getForename() {
     return forename;
@@ -81,11 +80,11 @@ public class SubscribeForm {
     this.interestedInAllProjects = interestedInAllProjects;
   }
 
-  public List<FieldStage> getFieldStages() {
+  public List<String> getFieldStages() {
     return fieldStages;
   }
 
-  public void setFieldStages(List<FieldStage> fieldStages) {
+  public void setFieldStages(List<String> fieldStages) {
     this.fieldStages = fieldStages;
   }
 }

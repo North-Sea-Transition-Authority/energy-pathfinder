@@ -15,6 +15,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
@@ -28,7 +29,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.config.MetricsProvider;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
-import uk.co.ogauthority.pathfinder.exception.SubscriberNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
 import uk.co.ogauthority.pathfinder.model.form.subscription.ManageSubscriptionForm;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -43,12 +44,21 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
   private static final Class<SubscriptionController> CONTROLLER = SubscriptionController.class;
 
   private static final String TEST_VIEW_NAME = "test";
+  private static final String SUBSCRIBE_PAGE_HEADING_PREFIX
+      = SubscriptionController.SUBSCRIBE_PAGE_HEADING_PREFIX;
 
   @MockBean
   private SubscriptionService subscriptionService;
 
   @MockBean(answer = Answers.RETURNS_DEEP_STUBS)
   private MetricsProvider metricsProvider;
+  private Subscriber subscriber;
+
+  @Before
+  public void setUp() {
+    subscriber = SubscriptionTestUtil.createSubscriber();
+    subscriber.setUuid(SUBSCRIBER_UUID);
+  }
 
   @Test
   public void getSubscribe() throws Exception {
@@ -57,6 +67,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
         .andExpect(status().isOk());
 
     verify(metricsProvider.getSubscribePageHitCounter(), times(1)).increment();
+    verify(subscriptionService).getSubscribeFormPageHeading(SUBSCRIBE_PAGE_HEADING_PREFIX);
   }
 
   @Test
@@ -77,6 +88,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     verify(subscriptionService, times(1)).subscribe(any());
     verify(metricsProvider.getSubscribePagePostCounter(), times(1)).increment();
     verify(analyticsService, times(1)).sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.NEW_SUBSCRIBER));
+    verify(subscriptionService).getSubscribeFormPageHeading(SUBSCRIBE_PAGE_HEADING_PREFIX);
   }
 
   @Test
@@ -87,7 +99,9 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
 
     when(subscriptionService.validateSubscribeForm(any(), any())).thenReturn(bindingResult);
-    when(subscriptionService.getSubscribeModelAndView(any(), eq(SubscriptionController.SUBSCRIBE_PAGE_HEADING_PREFIX)))
+    when(subscriptionService.getSubscribeFormPageHeading(SUBSCRIBE_PAGE_HEADING_PREFIX))
+        .thenReturn("Page Heading");
+    when(subscriptionService.getSubscribeModelAndView(any(), eq("Page Heading")))
         .thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
     mockMvc.perform(
@@ -99,10 +113,12 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     verify(subscriptionService, times(1)).validateSubscribeForm(any(), any());
     verify(subscriptionService, never()).subscribe(any());
     verify(metricsProvider.getSubscribePagePostCounter(), times(1)).increment();
+    verify(subscriptionService).getSubscribeFormPageHeading(SUBSCRIBE_PAGE_HEADING_PREFIX);
   }
 
   @Test
   public void getUnsubscribe_userIsSubscribed() throws Exception {
+    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(Optional.of(subscriber));
     when(subscriptionService.getUnsubscribeModelAndView(SUBSCRIBER_UUID.toString()))
         .thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
@@ -120,7 +136,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
   @Test
   public void getUnsubscribe_userIsNotSubscribed() throws Exception {
     when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString()))
-      .thenThrow(new SubscriberNotFoundException("User is not subscribed"));
+      .thenReturn(Optional.empty());
     when(subscriptionService.getAlreadyUnsubscribedModelAndView()).thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
     var modelAndView = mockMvc.perform(get(ReverseRouter.route(
@@ -136,7 +152,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
 
   @Test
   public void unsubscribe_userIsSubscribed() throws Exception {
-    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(SUBSCRIBER_UUID);
+    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(Optional.of(subscriber));
     when(subscriptionService.getUnsubscribeConfirmationModelAndView()).thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
     var modelAndView = mockMvc.perform(
@@ -158,7 +174,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
   @Test
   public void unsubscribe_userIsNotSubscribed() throws Exception {
     when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString()))
-      .thenThrow(new SubscriberNotFoundException("User is not subscribed"));
+      .thenReturn(Optional.empty());
     when(subscriptionService.getAlreadyUnsubscribedModelAndView()).thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
     var modelAndView = mockMvc.perform(
@@ -177,7 +193,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
 
   @Test
   public void getManageSubscription_userIsSubscribed() throws Exception {
-    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(SUBSCRIBER_UUID);
+    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(Optional.of(subscriber));
     when(subscriptionService.getManageSubscriptionModelAndView(eq(SUBSCRIBER_UUID), any(ManageSubscriptionForm.class)))
         .thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
@@ -190,12 +206,13 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     verify(subscriptionService).verifyIsSubscribed(SUBSCRIBER_UUID.toString());
     verify(subscriptionService).getManageSubscriptionModelAndView(eq(SUBSCRIBER_UUID), any(ManageSubscriptionForm.class));
     verify(subscriptionService, never()).getAlreadyUnsubscribedModelAndView();
+    verify(metricsProvider.getManageSubscriptionCounter()).increment();
   }
 
   @Test
   public void getManageSubscription_userIsNotSubscribed() throws Exception {
     when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString()))
-        .thenThrow(new SubscriberNotFoundException("User is not subscribed"));
+        .thenReturn(Optional.empty());
     when(subscriptionService.getAlreadyUnsubscribedModelAndView()).thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
     mockMvc.perform(get(ReverseRouter
@@ -207,11 +224,12 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     verify(subscriptionService).verifyIsSubscribed(SUBSCRIBER_UUID.toString());
     verify(subscriptionService).getAlreadyUnsubscribedModelAndView();
     verify(subscriptionService, never()).getManageSubscriptionModelAndView(any(), any());
+    verify(metricsProvider.getManageSubscriptionCounter()).increment();
   }
 
   @Test
   public void continueManageSubscription_userIsSubscribed_validForm() throws Exception {
-    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(SUBSCRIBER_UUID);
+    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(Optional.of(subscriber));
     when(subscriptionService.getManagementRouting(eq(SUBSCRIBER_UUID), any(ManageSubscriptionForm.class)))
         .thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
@@ -234,7 +252,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
 
   @Test
   public void continueManageSubscription_userIsSubscribed_invalidForm() throws Exception {
-    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(SUBSCRIBER_UUID);
+    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(Optional.of(subscriber));
     when(subscriptionService.getManageSubscriptionModelAndView(eq(SUBSCRIBER_UUID), any(ManageSubscriptionForm.class)))
         .thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
@@ -260,7 +278,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
   @Test
   public void continueManageSubscription_userIsNotSubscribed() throws Exception {
     when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString()))
-        .thenThrow(new SubscriberNotFoundException("User is not subscribed"));
+        .thenReturn(Optional.empty());
     when(subscriptionService.getAlreadyUnsubscribedModelAndView()).thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
     mockMvc.perform(
@@ -281,7 +299,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     var form = SubscriptionTestUtil.createSubscribeForm();
 
     when(subscriptionService.getForm(SUBSCRIBER_UUID)).thenReturn(form);
-    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(SUBSCRIBER_UUID);
+    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(Optional.of(subscriber));
     when(subscriptionService.getUpdateSubscriptionPreferencesModelAndView(SUBSCRIBER_UUID, form))
         .thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
@@ -295,12 +313,13 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     verify(subscriptionService).getForm(SUBSCRIBER_UUID);
     verify(subscriptionService).getUpdateSubscriptionPreferencesModelAndView(SUBSCRIBER_UUID, form);
     verify(subscriptionService, never()).getAlreadyUnsubscribedModelAndView();
+    verify(metricsProvider.getUpdateSubscriptionHitCounter()).increment();
   }
 
   @Test
   public void getUpdateSubscriptionPreferences_userIsNotSubscribed() throws Exception {
     when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString()))
-        .thenThrow(new SubscriberNotFoundException("User is not subscribed"));
+        .thenReturn(Optional.empty());
     when(subscriptionService.getAlreadyUnsubscribedModelAndView()).thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
     mockMvc.perform(get(ReverseRouter
@@ -313,11 +332,12 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     verify(subscriptionService, never()).getForm(SUBSCRIBER_UUID);
     verify(subscriptionService, never()).getUpdateSubscriptionPreferencesModelAndView(any(), any());
     verify(subscriptionService).getAlreadyUnsubscribedModelAndView();
+    verify(metricsProvider.getUpdateSubscriptionHitCounter()).increment();
   }
 
   @Test
   public void saveUpdatedSubscriptionPreferences_userIsSubscribed_validForm() throws Exception {
-    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(SUBSCRIBER_UUID);
+    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(Optional.of(subscriber));
     when(subscriptionService.getSubscriptionUpdatedConfirmationModelAndView(SUBSCRIBER_UUID))
         .thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
@@ -334,11 +354,12 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     verify(subscriptionService).verifyIsSubscribed(SUBSCRIBER_UUID.toString());
     verify(subscriptionService).updateSubscriptionPreferences(any(SubscribeForm.class), eq(SUBSCRIBER_UUID));
     verify(subscriptionService, never()).getAlreadyUnsubscribedModelAndView();
+    verify(metricsProvider.getUpdateSubscriptionPostCounter()).increment();
   }
 
   @Test
   public void saveUpdatedSubscriptionPreferences_userIsSubscribed_invalidForm() throws Exception {
-    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(SUBSCRIBER_UUID);
+    when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(Optional.of(subscriber));
     when(subscriptionService.getUpdateSubscriptionPreferencesModelAndView(eq(SUBSCRIBER_UUID), any(SubscribeForm.class)))
         .thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
@@ -357,12 +378,13 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     verify(subscriptionService).getUpdateSubscriptionPreferencesModelAndView(eq(SUBSCRIBER_UUID), any(SubscribeForm.class));
     verify(subscriptionService, never()).updateSubscriptionPreferences(any(), any());
     verify(subscriptionService, never()).getAlreadyUnsubscribedModelAndView();
+    verify(metricsProvider.getUpdateSubscriptionPostCounter()).increment();
   }
 
   @Test
   public void saveUpdatedSubscriptionPreferences_userIsNotSubscribed() throws Exception {
     when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString()))
-        .thenThrow(new SubscriberNotFoundException("User is not subscribed"));
+        .thenReturn(Optional.empty());
     when(subscriptionService.getAlreadyUnsubscribedModelAndView()).thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
     mockMvc.perform(post(ReverseRouter
@@ -375,5 +397,6 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     verify(subscriptionService, never()).getUpdateSubscriptionPreferencesModelAndView(any(), any());
     verify(subscriptionService, never()).updateSubscriptionPreferences(any(), any());
     verify(subscriptionService).getAlreadyUnsubscribedModelAndView();
+    verify(metricsProvider.getUpdateSubscriptionPostCounter()).increment();
   }
 }

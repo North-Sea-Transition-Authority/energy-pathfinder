@@ -9,7 +9,7 @@
 <#-- @ftlvariable name="otherRelation" type="uk.co.ogauthority.pathfinder.model.enums.subscription.RelationToPathfinder" -->
 
 <#assign serviceName = service.serviceName>
-<#assign pageHeading = "${pageHeadingPrefix} ${serviceName}">
+<#assign pageHeading = "${pageHeading}">
 
 <@defaultPage
   htmlTitle=pageHeading
@@ -44,7 +44,7 @@
       </@fdsRadio.radioItem>
     </@fdsRadio.radioGroup>
     <@fdsRadio.radioGroup
-      labelText="Are you interested in being updated on all ${serviceName} projects?"
+      labelText="Are you interested in being updated about all types of ${serviceName} projects?"
       path="form.interestedInAllProjects"
       hiddenContent=true
     >
@@ -53,6 +53,7 @@
             <@fdsCheckbox.checkboxes
               path="form.fieldStages"
               checkboxes=fieldStages
+              fieldsetHeadingText="Select the ${serviceName} project types you are interested in"
             />
         </@fdsRadio.radioNo>
 
