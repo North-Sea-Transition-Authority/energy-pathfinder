@@ -24,6 +24,7 @@
 <#-- @ftlvariable name="flashTitle" type="String" -->
 <#-- @ftlvariable name="flashClass" type="String" -->
 <#-- @ftlvariable name="flashMessage" type="String" -->
+<#-- @ftlvariable name="notificationBannerView" type="uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerView" -->
 
 <#macro cookieBannerContent>
   <@fdsCookieBanner.analyticsCookieBanner serviceName=service.serviceName cookieSettingsUrl=springUrl(cookiePrefsUrl)/>
@@ -127,6 +128,13 @@
           </@fdsFlash.flash>
           <#else>
             <@fdsFlash.flash flashTitle=flashTitle flashClass=flashClass!""/>
+        </#if>
+      </#if>
+      <#if notificationBannerView?has_content>
+        <#if notificationBannerView.bannerType.value == "notificationBannerSuccess">
+          <@notificationBanner.successNotificationBanner notificationBannerView=notificationBannerView/>
+          <#else>
+            <@notificationBanner.infoNotificationBanner notificationBannerView=notificationBannerView/>
         </#if>
       </#if>
     </#assign>
