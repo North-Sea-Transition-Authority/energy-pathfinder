@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.service;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.subscription.SubscriptionController;
@@ -27,8 +26,8 @@ public class LinkService {
     return pathfinderUrlBase + contextPath + ControllerUtils.getWorkAreaUrl();
   }
 
-  public String getUnsubscribeUrl(String subscriberUuid) {
+  public String getManageSubscriptionUrl(String subscriberUuid) {
     return pathfinderUrlBase + contextPath + ReverseRouter.route(on(SubscriptionController.class)
-        .unsubscribe(subscriberUuid, Optional.empty()));
+        .getManageSubscription(subscriberUuid));
   }
 }

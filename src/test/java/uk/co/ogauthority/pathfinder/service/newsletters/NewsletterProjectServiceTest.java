@@ -2,39 +2,34 @@ package uk.co.ogauthority.pathfinder.service.newsletters;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.ogauthority.pathfinder.model.entity.quarterlystatistics.ReportableProject;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.service.quarterlystatistics.ReportableProjectService;
 import uk.co.ogauthority.pathfinder.testutil.ReportableProjectTestUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
-@RunWith(MockitoJUnitRunner.class)
-public class NewsletterProjectServiceTest {
+@ExtendWith(MockitoExtension.class)
+class NewsletterProjectServiceTest {
 
   @Mock
   private ReportableProjectService reportableProjectService;
 
+  @InjectMocks
   private NewsletterProjectService newsletterProjectService;
 
-  @Before
-  public void setup() {
-    newsletterProjectService = new NewsletterProjectService(reportableProjectService);
-  }
-
   @Test
-  public void getProjectsUpdatedInTheLastMonth_whenNoProjects_thenEmptyList() {
+  void getProjectsUpdatedInTheLastMonth_whenNoProjects_thenEmptyList() {
     when(reportableProjectService.getReportableProjectsUpdatedBetween(any(), any()))
         .thenReturn(Collections.emptyList());
 
@@ -43,27 +38,29 @@ public class NewsletterProjectServiceTest {
   }
 
   @Test
-  public void getProjectsUpdatedInTheLastMonth_whenProjectsExist_verifyReturnFormatAndInteractions() {
+  void getProjectsUpdatedInTheLastMonth_whenProjectsExist_verifyReturnFormatAndInteractions() {
 
     final var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.DECOMMISSIONING);
     when(reportableProjectService.getReportableProjectsUpdatedBetween(any(), any())).thenReturn(List.of(reportableProject));
 
-    final var reportableProjectStrings = newsletterProjectService.getProjectsUpdatedInTheLastMonth();
+    final var newsletterProjectViews = newsletterProjectService.getProjectsUpdatedInTheLastMonth();
 
-    assertThat(reportableProjectStrings).containsExactly(
+    assertThat(newsletterProjectViews).hasSize(1);
+    var resultNewsletterProjectView = newsletterProjectViews.get(0);
+    assertThat(resultNewsletterProjectView.getProject()).contains(
         getReportableProjectStringInExpectedFormat(reportableProject)
     );
+    assertThat(resultNewsletterProjectView.getFieldStage()).isEqualTo(FieldStage.DECOMMISSIONING);
 
     final var dateOneMonthPriorToToday = LocalDate.now().minusMonths(1);
     final var minDate = DateUtil.getStartOfMonth(dateOneMonthPriorToToday);
     final var maxDate = DateUtil.getEndOfMonth(dateOneMonthPriorToToday);
 
-    verify(reportableProjectService, times(1)).getReportableProjectsUpdatedBetween(minDate, maxDate);
+    verify(reportableProjectService).getReportableProjectsUpdatedBetween(minDate, maxDate);
   }
 
   @Test
-  public void getProjectsUpdatedInTheLastMonth_whenProjectsExist_verifyOrdering() {
-
+  void getProjectsUpdatedInTheLastMonth_whenProjectsExist_verifyOrdering() {
     final var operatorNameFirstAlphabetically = "a company";
     final var operatorNameLastAlphabetically = "z company";
     final var projectTitleFirstAlphabetically = "a project";
@@ -83,17 +80,19 @@ public class NewsletterProjectServiceTest {
         operatorNameLastAlphabetically,
         projectTitleFirstAlphabetically
     );
+
     when(reportableProjectService.getReportableProjectsUpdatedBetween(any(), any())).thenReturn(
         List.of(expectedThirdReportableProject, expectedSecondReportableProject, expectedFirstReportableProject)
     );
 
-    final var reportableProjectStrings = newsletterProjectService.getProjectsUpdatedInTheLastMonth();
-
-    assertThat(reportableProjectStrings).containsExactly(
-        getReportableProjectStringInExpectedFormat(expectedFirstReportableProject),
-        getReportableProjectStringInExpectedFormat(expectedSecondReportableProject),
-        getReportableProjectStringInExpectedFormat(expectedThirdReportableProject)
-    );
+    final var newsletterProjectViews = newsletterProjectService.getProjectsUpdatedInTheLastMonth();
+    assertThat(newsletterProjectViews).hasSize(3);
+    assertThat(newsletterProjectViews.get(0).getProject())
+        .isEqualTo(getReportableProjectStringInExpectedFormat(expectedFirstReportableProject));
+    assertThat(newsletterProjectViews.get(1).getProject())
+        .isEqualTo(getReportableProjectStringInExpectedFormat(expectedSecondReportableProject));
+    assertThat(newsletterProjectViews.get(2).getProject())
+        .isEqualTo(getReportableProjectStringInExpectedFormat(expectedThirdReportableProject));
   }
 
   private String getReportableProjectStringInExpectedFormat(ReportableProject reportableProject) {

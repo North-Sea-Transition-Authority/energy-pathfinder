@@ -7,17 +7,17 @@ import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplate;
 
 public class SubscribedToNewsletterEmailProperties extends EmailProperties {
 
-  private final String unsubscribeUrl;
+  private final String manageSubscriptionUrl;
 
-  public SubscribedToNewsletterEmailProperties(String recipientName, String unsubscribeUrl) {
+  public SubscribedToNewsletterEmailProperties(String recipientName, String manageSubscriptionUrl) {
     super(NotifyTemplate.SUBSCRIBED_TO_NEWSLETTER, recipientName);
-    this.unsubscribeUrl = unsubscribeUrl;
+    this.manageSubscriptionUrl = manageSubscriptionUrl;
   }
 
   @Override
   public Map<String, Object> getEmailPersonalisation() {
     var emailPersonalisation = super.getEmailPersonalisation();
-    emailPersonalisation.put("UNSUBSCRIBE_URL", unsubscribeUrl);
+    emailPersonalisation.put("MANAGE_SUBSCRIPTION_URL", manageSubscriptionUrl);
     return emailPersonalisation;
   }
 
@@ -33,11 +33,11 @@ public class SubscribedToNewsletterEmailProperties extends EmailProperties {
       return false;
     }
     SubscribedToNewsletterEmailProperties that = (SubscribedToNewsletterEmailProperties) o;
-    return Objects.equals(unsubscribeUrl, that.unsubscribeUrl);
+    return Objects.equals(manageSubscriptionUrl, that.manageSubscriptionUrl);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), unsubscribeUrl);
+    return Objects.hash(super.hashCode(), manageSubscriptionUrl);
   }
 }

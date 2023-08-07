@@ -20,11 +20,11 @@ public class SubscriberEmailService {
   }
 
   public void sendSubscribedEmail(String forename, String emailAddress, UUID subscriberUuid) {
-    var unsubscribeUrl = linkService.getUnsubscribeUrl(subscriberUuid.toString());
+    var manageSubscriptionUrl = linkService.getManageSubscriptionUrl(subscriberUuid.toString());
 
     var emailProperties = new SubscribedToNewsletterEmailProperties(
         forename,
-        unsubscribeUrl
+        manageSubscriptionUrl
     );
 
     emailService.sendEmail(emailProperties, emailAddress);
