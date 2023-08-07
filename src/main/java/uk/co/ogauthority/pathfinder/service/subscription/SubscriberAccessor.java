@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.SubscriberFieldStage;
-import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.repository.subscription.SubscriberFieldStageRepository;
 import uk.co.ogauthority.pathfinder.repository.subscription.SubscriberRepository;
 
@@ -28,12 +27,11 @@ public class SubscriberAccessor {
     return IterableUtils.toList(subscriberRepository.findAll());
   }
 
-  public List<FieldStage> getSubscriberFieldStages(Subscriber subscriber) {
-    var subscriberFieldStages = subscriberFieldStageRepository.findAllBySubscriberUuid(subscriber.getUuid());
-    return subscriberFieldStages
-        .stream()
-        .map(SubscriberFieldStage::getFieldStage)
+  public List<SubscriberFieldStage> getAllSubscriberFieldStages(List<Subscriber> subscriber) {
+    var subscriberUuids = subscriber.stream()
+        .map(Subscriber::getUuid)
         .collect(Collectors.toList());
+    return subscriberFieldStageRepository.findAllBySubscriberUuidIn(subscriberUuids);
   }
 
 }

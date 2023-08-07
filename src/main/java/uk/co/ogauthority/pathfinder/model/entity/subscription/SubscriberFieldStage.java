@@ -13,7 +13,7 @@ import org.hibernate.annotations.Type;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 
 @Entity
-@Table(name = "subscriber_field_stages")
+@Table(name = "subscriber_field_stage_preferences")
 public class SubscriberFieldStage {
 
   @Id

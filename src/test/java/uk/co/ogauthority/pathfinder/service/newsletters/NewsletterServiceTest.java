@@ -118,12 +118,17 @@ class NewsletterServiceTest {
 
   @Test
   void sendNewsletterToSubscribers_whenUnsubscribedProjectUpdated_assertCorrectEmailPropertiesUsed() {
+    var subscribers = Collections.singletonList(SUBSCRIBER);
+    var subscriberFieldStage = SubscriptionTestUtil.createSubscriberFieldStages(
+        List.of(FieldStage.DISCOVERY), SUBSCRIBER.getUuid()
+    );
+
     when(linkService.getManageSubscriptionUrl(any())).thenCallRealMethod();
-    when(subscriberAccessor.getAllSubscribers()).thenReturn(Collections.singletonList(SUBSCRIBER));
+    when(subscriberAccessor.getAllSubscribers()).thenReturn(subscribers);
     var fieldStage = FieldStage.HYDROGEN;
     var project = new NewsletterProjectView(ReportableProjectTestUtil.createReportableProject(fieldStage));
     when(newsletterProjectService.getProjectsUpdatedInTheLastMonth()).thenReturn(List.of(project));
-    when(subscriberAccessor.getSubscriberFieldStages(SUBSCRIBER)).thenReturn(List.of(FieldStage.DISCOVERY));
+    when(subscriberAccessor.getAllSubscriberFieldStages(subscribers)).thenReturn(subscriberFieldStage);
 
     final var serviceName = "service name";
     when(defaultEmailPersonalisationService.getServiceName()).thenReturn(serviceName);
@@ -147,14 +152,19 @@ class NewsletterServiceTest {
   void sendNewsletterToSubscribers_whenProjectUpdated_assertCorrectEmailPropertiesUsed() {
     when(linkService.getManageSubscriptionUrl(any())).thenCallRealMethod();
     var fieldStage = FieldStage.HYDROGEN;
-    var project = new NewsletterProjectView(ReportableProjectTestUtil.createReportableProject(fieldStage));
+    var reportableProject = ReportableProjectTestUtil.createReportableProject(fieldStage);
+    var project = new NewsletterProjectView(reportableProject);
     var projectNotSubscribedTo = new NewsletterProjectView(
         ReportableProjectTestUtil.createReportableProject(FieldStage.DISCOVERY)
     );
     final var projectsUpdate = List.of(project, projectNotSubscribedTo);
+    var subscribers = Collections.singletonList(SUBSCRIBER);
+    var subscriberFieldStage = SubscriptionTestUtil.createSubscriberFieldStages(
+        List.of(fieldStage), SUBSCRIBER.getUuid()
+    );
 
-    when(subscriberAccessor.getAllSubscribers()).thenReturn(Collections.singletonList(SUBSCRIBER));
-    when(subscriberAccessor.getSubscriberFieldStages(SUBSCRIBER)).thenReturn(List.of(fieldStage));
+    when(subscriberAccessor.getAllSubscribers()).thenReturn(subscribers);
+    when(subscriberAccessor.getAllSubscriberFieldStages(subscribers)).thenReturn(subscriberFieldStage);
     when(newsletterProjectService.getProjectsUpdatedInTheLastMonth()).thenReturn(projectsUpdate);
 
     final var serviceName = "service name";
@@ -174,6 +184,9 @@ class NewsletterServiceTest {
     );
 
     verify(emailService, times(1)).sendEmail(expectedEmailProperties, SUBSCRIBER.getEmailAddress());
+
+    var expectedProject = String.format("%s - %s", reportableProject.getOperatorName(), reportableProject.getProjectDisplayName());
+    assertThat(project.getProject()).isEqualTo(expectedProject);
   }
 
   private void assertMonthlyNewsletterEntityHasExpectedProperties(MonthlyNewsletter monthlyNewsletter,

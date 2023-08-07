@@ -67,15 +67,6 @@ class SubscriptionServiceTest {
   private static final String SERVICE_NAME = "Service name";
 
   @Test
-  void getSubscribeFormPageHeading() {
-    when(serviceProperties.getServiceName()).thenReturn(SERVICE_NAME);
-
-    var pageHeading = subscriptionService.getSubscribeFormPageHeading("Subscribe to");
-    var expectedPageHeading = String.format("Subscribe to %s", SERVICE_NAME);
-    assertThat(pageHeading).isEqualTo(expectedPageHeading);
-  }
-
-  @Test
   void isSubscribed_whenNotExists_thenFalse() {
     var emailAddress = "test@test.com";
 

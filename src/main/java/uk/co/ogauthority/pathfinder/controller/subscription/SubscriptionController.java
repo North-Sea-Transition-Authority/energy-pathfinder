@@ -17,7 +17,7 @@ import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsUtils;
 import uk.co.ogauthority.pathfinder.config.MetricsProvider;
-import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
+import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.form.subscription.ManageSubscriptionForm;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
@@ -35,17 +35,20 @@ public class SubscriptionController {
   private final ControllerHelperService controllerHelperService;
   private final MetricsProvider metricsProvider;
   private final AnalyticsService analyticsService;
+  private final ServiceProperties serviceProperties;
 
   @Autowired
   public SubscriptionController(
       SubscriptionService subscriptionService,
       ControllerHelperService controllerHelperService,
       MetricsProvider metricsProvider,
-      AnalyticsService analyticsService) {
+      AnalyticsService analyticsService,
+      ServiceProperties serviceProperties) {
     this.subscriptionService = subscriptionService;
     this.controllerHelperService = controllerHelperService;
     this.metricsProvider = metricsProvider;
     this.analyticsService = analyticsService;
+    this.serviceProperties = serviceProperties;
   }
 
   @GetMapping("/subscribe")
@@ -53,7 +56,7 @@ public class SubscriptionController {
     metricsProvider.getSubscribePageHitCounter().increment();
     return subscriptionService.getSubscribeModelAndView(
         new SubscribeForm(),
-        subscriptionService.getSubscribeFormPageHeading(SUBSCRIBE_PAGE_HEADING_PREFIX)
+        getSubscribePageHeading()
     );
   }
 
@@ -64,7 +67,7 @@ public class SubscriptionController {
                                       Optional<String> analyticsClientId) {
     metricsProvider.getSubscribePagePostCounter().increment();
     bindingResult = subscriptionService.validateSubscribeForm(form, bindingResult);
-    var pageHeading = subscriptionService.getSubscribeFormPageHeading(SUBSCRIBE_PAGE_HEADING_PREFIX);
+    var pageHeading = getSubscribePageHeading();
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
         subscriptionService.getSubscribeModelAndView(form, pageHeading),
@@ -80,6 +83,10 @@ public class SubscriptionController {
         });
   }
 
+  private String getSubscribePageHeading() {
+    return String.format("%s %s", SUBSCRIBE_PAGE_HEADING_PREFIX, serviceProperties.getServiceName());
+  }
+
   @GetMapping("/unsubscribe/{subscriberUuid}")
   public ModelAndView getUnsubscribe(@PathVariable("subscriberUuid") String subscriberUuid) {
     metricsProvider.getUnSubscribePageHitCounter().increment();
@@ -88,12 +95,12 @@ public class SubscriptionController {
         String.format(AuditEvent.UNSUBSCRIBE_GET_REQUEST.getMessage(), subscriberUuid)
     );
 
-    var logMessage = String.format(
-        "No subscriber found when attempting to unsubscribe subscriber with UUID %s using GET endpoint",
-        subscriberUuid
-    );
-    var subscriberOptional = verifyIsSubscribed(subscriberUuid, logMessage);
-    if (subscriberOptional.isEmpty()) {
+    var subscriber = subscriptionService.verifyIsSubscribed(subscriberUuid);
+    if (subscriber.isEmpty()) {
+      LOGGER.info(String.format(
+          "No subscriber found when attempting to unsubscribe subscriber with UUID %s using GET endpoint",
+          subscriberUuid
+      ));
       return subscriptionService.getAlreadyUnsubscribedModelAndView();
     }
 
@@ -110,12 +117,12 @@ public class SubscriptionController {
         String.format(AuditEvent.UNSUBSCRIBE_GET_REQUEST.getMessage(), subscriberUuid)
     );
 
-    var logMessage = String.format(
-        "No subscriber found when attempting to unsubscribe subscriber with UUID %s using POST endpoint",
-        subscriberUuid
-    );
-    var subscriberOptional = verifyIsSubscribed(subscriberUuid, logMessage);
+    var subscriberOptional = subscriptionService.verifyIsSubscribed(subscriberUuid);
     if (subscriberOptional.isEmpty()) {
+      LOGGER.info(String.format(
+          "No subscriber found when attempting to unsubscribe subscriber with UUID %s using POST endpoint",
+          subscriberUuid
+      ));
       return subscriptionService.getAlreadyUnsubscribedModelAndView();
     }
 
@@ -126,16 +133,16 @@ public class SubscriptionController {
 
   }
 
-  @GetMapping("/subscription/manage/{subscriberUuid}")
+  @GetMapping("/subscription/{subscriberUuid}/manage")
   public ModelAndView getManageSubscription(@PathVariable("subscriberUuid") String subscriberUuid) {
     metricsProvider.getManageSubscriptionCounter().increment();
 
-    var logMessage = String.format(
-        "No subscriber found when attempting to manage subscription with UUID %s using GET endpoint",
-        subscriberUuid
-    );
-    var subscriberOptional = verifyIsSubscribed(subscriberUuid, logMessage);
+    var subscriberOptional = subscriptionService.verifyIsSubscribed(subscriberUuid);
     if (subscriberOptional.isEmpty()) {
+      LOGGER.info(String.format(
+          "No subscriber found when attempting to manage subscription with UUID %s using GET endpoint",
+          subscriberUuid
+      ));
       return subscriptionService.getAlreadyUnsubscribedModelAndView();
     }
 
@@ -143,16 +150,16 @@ public class SubscriptionController {
     return subscriptionService.getManageSubscriptionModelAndView(subscriber.getUuid(), new ManageSubscriptionForm());
   }
 
-  @PostMapping("/subscription/manage/{subscriberUuid}")
+  @PostMapping("/subscription/{subscriberUuid}/manage")
   public ModelAndView continueManageSubscription(@PathVariable("subscriberUuid") String subscriberUuid,
                                                  @Valid @ModelAttribute("form") ManageSubscriptionForm form,
                                                  BindingResult bindingResult) {
-    var logMessage = String.format(
-        "No subscriber found when attempting to continue with subscription management with UUID %s using POST endpoint",
-        subscriberUuid
-    );
-    var subscriberOptional = verifyIsSubscribed(subscriberUuid, logMessage);
+    var subscriberOptional = subscriptionService.verifyIsSubscribed(subscriberUuid);
     if (subscriberOptional.isEmpty()) {
+      LOGGER.info(String.format(
+          "No subscriber found when attempting to continue with subscription management with UUID %s using POST endpoint",
+          subscriberUuid
+      ));
       return subscriptionService.getAlreadyUnsubscribedModelAndView();
     }
 
@@ -165,16 +172,16 @@ public class SubscriptionController {
         () -> subscriptionService.getManagementRouting(subscriber.getUuid(), form));
   }
 
-  @GetMapping("/subscription/update-preferences/{subscriberUuid}")
+  @GetMapping("/subscription/{subscriberUuid}/preferences")
   public ModelAndView getUpdateSubscriptionPreferences(@PathVariable("subscriberUuid") String subscriberUuid) {
     metricsProvider.getUpdateSubscriptionHitCounter().increment();
 
-    var logMessage = String.format(
-        "No subscriber found when attempting to update subscription preferences with UUID %s using GET endpoint",
-        subscriberUuid
-    );
-    var subscriberOptional = verifyIsSubscribed(subscriberUuid, logMessage);
+    var subscriberOptional = subscriptionService.verifyIsSubscribed(subscriberUuid);
     if (subscriberOptional.isEmpty()) {
+      LOGGER.info(String.format(
+          "No subscriber found when attempting to update subscription preferences with UUID %s using GET endpoint",
+          subscriberUuid
+      ));
       return subscriptionService.getAlreadyUnsubscribedModelAndView();
     }
 
@@ -183,18 +190,18 @@ public class SubscriptionController {
     return subscriptionService.getUpdateSubscriptionPreferencesModelAndView(subscriber.getUuid(), form);
   }
 
-  @PostMapping("/subscription/update-preferences/{subscriberUuid}")
+  @PostMapping("/subscription/{subscriberUuid}/preferences")
   public ModelAndView saveUpdatedSubscriptionPreferences(@PathVariable("subscriberUuid") String subscriberUuid,
                                                          @Valid @ModelAttribute("form") SubscribeForm form,
                                                          BindingResult bindingResult) {
     metricsProvider.getUpdateSubscriptionPostCounter().increment();
 
-    var logMessage = String.format(
-        "No subscriber found when attempting to update subscription preferences with UUID %s using POST endpoint",
-        subscriberUuid
-    );
-    var subscriberOptional = verifyIsSubscribed(subscriberUuid, logMessage);
+    var subscriberOptional = subscriptionService.verifyIsSubscribed(subscriberUuid);
     if (subscriberOptional.isEmpty()) {
+      LOGGER.info(String.format(
+          "No subscriber found when attempting to update subscription preferences with UUID %s using POST endpoint",
+          subscriberUuid
+      ));
       return subscriptionService.getAlreadyUnsubscribedModelAndView();
     }
 
@@ -212,14 +219,6 @@ public class SubscriptionController {
           );
           return subscriptionService.getSubscriptionUpdatedConfirmationModelAndView(subscriber.getUuid());
         });
-  }
-
-  private Optional<Subscriber> verifyIsSubscribed(String subscriberUuid, String logMessage) {
-    var subscriber = subscriptionService.verifyIsSubscribed(subscriberUuid);
-    if (subscriber.isEmpty()) {
-      LOGGER.info(logMessage);
-    }
-    return subscriber;
   }
 
 }

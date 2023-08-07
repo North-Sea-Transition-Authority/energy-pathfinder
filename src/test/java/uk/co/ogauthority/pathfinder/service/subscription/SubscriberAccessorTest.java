@@ -12,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.SubscriberFieldStage;
-import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.repository.subscription.SubscriberFieldStageRepository;
 import uk.co.ogauthority.pathfinder.repository.subscription.SubscriberRepository;
 import uk.co.ogauthority.pathfinder.testutil.SubscriptionTestUtil;
@@ -49,12 +48,10 @@ class SubscriberAccessorTest {
     var subscriber = SubscriptionTestUtil.createSubscriber();
     var subscriberUuid = subscriber.getUuid();
     var subscriberFieldStage = mock(SubscriberFieldStage.class);
-    var fieldStage = FieldStage.DECOMMISSIONING;
 
-    when(subscriberFieldStage.getFieldStage()).thenReturn(fieldStage);
-    when(subscriberFieldStageRepository.findAllBySubscriberUuid(subscriberUuid)).thenReturn(List.of(subscriberFieldStage));
+    when(subscriberFieldStageRepository.findAllBySubscriberUuidIn(List.of(subscriberUuid))).thenReturn(List.of(subscriberFieldStage));
 
-    var result = subscriberAccessor.getSubscriberFieldStages(subscriber);
-    assertThat(result).containsExactly(fieldStage);
+    var result = subscriberAccessor.getAllSubscriberFieldStages(List.of(subscriber));
+    assertThat(result).isEqualTo(List.of(subscriberFieldStage));
   }
 }

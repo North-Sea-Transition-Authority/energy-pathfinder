@@ -53,7 +53,7 @@
             <@fdsCheckbox.checkboxes
               path="form.fieldStages"
               checkboxes=fieldStages
-              fieldsetHeadingText="Select the ${serviceName} project types you are interested in"
+              fieldsetHeadingText="Select the types of ${serviceName} project you are interested in"
             />
         </@fdsRadio.radioNo>
 

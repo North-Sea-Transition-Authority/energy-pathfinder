@@ -13,9 +13,9 @@ import uk.co.ogauthority.pathfinder.model.enums.subscription.RelationToPathfinde
 @Component
 public class SubscribeFormValidator implements SmartValidator {
 
-  public static final String MISSING_SUBSCRIBE_REASON_ERROR = "Enter a reason for subscribing";
-  public static final String MISSING_FIELD_STAGES_ERROR = "Select at least one project type to be updated on";
-  public static final String INVALID_FIELD_STAGE_ERROR = "Select a valid energy project type";
+  static final String MISSING_SUBSCRIBE_REASON_ERROR = "Enter a reason for subscribing";
+  static final String MISSING_FIELD_STAGES_ERROR = "Select at least one project type to be updated about";
+  static final String INVALID_FIELD_STAGE_ERROR = "Select a valid energy project type";
 
   @Override
   public void validate(Object target, Errors errors, Object... validationHints) {

@@ -28,6 +28,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.config.MetricsProvider;
+import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
 import uk.co.ogauthority.pathfinder.model.form.subscription.ManageSubscriptionForm;
@@ -42,13 +43,13 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
 
   private static final UUID SUBSCRIBER_UUID = UUID.randomUUID();
   private static final Class<SubscriptionController> CONTROLLER = SubscriptionController.class;
-
   private static final String TEST_VIEW_NAME = "test";
-  private static final String SUBSCRIBE_PAGE_HEADING_PREFIX
-      = SubscriptionController.SUBSCRIBE_PAGE_HEADING_PREFIX;
 
   @MockBean
   private SubscriptionService subscriptionService;
+
+  @MockBean
+  private ServiceProperties serviceProperties;
 
   @MockBean(answer = Answers.RETURNS_DEEP_STUBS)
   private MetricsProvider metricsProvider;
@@ -58,6 +59,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
   public void setUp() {
     subscriber = SubscriptionTestUtil.createSubscriber();
     subscriber.setUuid(SUBSCRIBER_UUID);
+    when(serviceProperties.getServiceName()).thenReturn("Service");
   }
 
   @Test
@@ -67,7 +69,6 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
         .andExpect(status().isOk());
 
     verify(metricsProvider.getSubscribePageHitCounter(), times(1)).increment();
-    verify(subscriptionService).getSubscribeFormPageHeading(SUBSCRIBE_PAGE_HEADING_PREFIX);
   }
 
   @Test
@@ -88,7 +89,6 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     verify(subscriptionService, times(1)).subscribe(any());
     verify(metricsProvider.getSubscribePagePostCounter(), times(1)).increment();
     verify(analyticsService, times(1)).sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.NEW_SUBSCRIBER));
-    verify(subscriptionService).getSubscribeFormPageHeading(SUBSCRIBE_PAGE_HEADING_PREFIX);
   }
 
   @Test
@@ -99,9 +99,7 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
 
     when(subscriptionService.validateSubscribeForm(any(), any())).thenReturn(bindingResult);
-    when(subscriptionService.getSubscribeFormPageHeading(SUBSCRIBE_PAGE_HEADING_PREFIX))
-        .thenReturn("Page Heading");
-    when(subscriptionService.getSubscribeModelAndView(any(), eq("Page Heading")))
+    when(subscriptionService.getSubscribeModelAndView(any(), any()))
         .thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
     mockMvc.perform(
@@ -113,7 +111,6 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     verify(subscriptionService, times(1)).validateSubscribeForm(any(), any());
     verify(subscriptionService, never()).subscribe(any());
     verify(metricsProvider.getSubscribePagePostCounter(), times(1)).increment();
-    verify(subscriptionService).getSubscribeFormPageHeading(SUBSCRIBE_PAGE_HEADING_PREFIX);
   }
 
   @Test

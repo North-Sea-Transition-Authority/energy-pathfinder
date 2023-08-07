@@ -73,10 +73,6 @@ public class SubscriptionService {
     return subscriberRepository.existsByEmailAddress(emailAddress);
   }
 
-  public String getSubscribeFormPageHeading(String pageHeadingPrefix) {
-    return String.format("%s %s", pageHeadingPrefix, serviceProperties.getServiceName());
-  }
-
   public Optional<Subscriber> verifyIsSubscribed(String subscriberUuid) {
     UUID uuid;
     try {
@@ -222,7 +218,8 @@ public class SubscriptionService {
   }
 
   public ModelAndView getUpdateSubscriptionPreferencesModelAndView(UUID subscriberUuid, SubscribeForm form) {
-    return getSubscribeModelAndView(form, getSubscribeFormPageHeading(UPDATE_SUBSCRIPTION_PAGE_HEADING_PREFIX))
+    var pageHeading = String.format("%s %s", UPDATE_SUBSCRIPTION_PAGE_HEADING_PREFIX, serviceProperties.getServiceName());
+    return getSubscribeModelAndView(form, pageHeading)
         .addObject("backToManageUrl",
             ReverseRouter.route(on(SubscriptionController.class).getManageSubscription(subscriberUuid.toString())));
   }
