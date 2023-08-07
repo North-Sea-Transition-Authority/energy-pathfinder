@@ -4,7 +4,7 @@ import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.view.ContactDetailProjectSummaryItem;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 
-public class AwardedContractView extends ContactDetailProjectSummaryItem {
+public class AwardedContractViewCommon extends ContactDetailProjectSummaryItem {
 
   private String contractorName;
 
@@ -77,7 +77,7 @@ public class AwardedContractView extends ContactDetailProjectSummaryItem {
     if (!super.equals(o)) {
       return false;
     }
-    AwardedContractView that = (AwardedContractView) o;
+    AwardedContractViewCommon that = (AwardedContractViewCommon) o;
     return Objects.equals(contractorName, that.contractorName)
         && Objects.equals(contractFunction, that.contractFunction)
         && Objects.equals(descriptionOfWork, that.descriptionOfWork)

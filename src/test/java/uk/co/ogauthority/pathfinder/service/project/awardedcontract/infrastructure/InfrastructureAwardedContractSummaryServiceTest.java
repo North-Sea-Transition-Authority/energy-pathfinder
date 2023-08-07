@@ -5,25 +5,24 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractServiceCommon;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
-@RunWith(MockitoJUnitRunner.class)
-public class AwardedContractSummaryServiceTest {
+@ExtendWith(MockitoExtension.class)
+class InfrastructureAwardedContractSummaryServiceTest {
 
   @Mock
-  private AwardedContractServiceCommon awardedContractService;
+  private InfrastructureAwardedContractService awardedContractService;
 
   @Mock
   private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
@@ -31,21 +30,21 @@ public class AwardedContractSummaryServiceTest {
   @Mock
   private PortalOrganisationAccessor portalOrganisationAccessor;
 
-  private AwardedContractSummaryService awardedContractSummaryService;
+  private InfrastructureAwardedContractSummaryService awardedContractSummaryService;
 
-  @Before
-  public void setup() {
-    awardedContractSummaryService = new AwardedContractSummaryService(awardedContractService,
+  @BeforeEach
+  void setUp() {
+    awardedContractSummaryService = new InfrastructureAwardedContractSummaryService(
         projectSectionItemOwnershipService,
-        portalOrganisationAccessor
+        portalOrganisationAccessor,
+        awardedContractService
     );
   }
 
   @Test
-  public void getAwardedContractViews() {
-
-    var awardedContract1 = AwardedContractTestUtil.createAwardedContract();
-    var awardedContract2 = AwardedContractTestUtil.createAwardedContract();
+  void getAwardedContractViews() {
+    var awardedContract1 = AwardedContractTestUtil.createInfrastructureAwardedContract();
+    var awardedContract2 = AwardedContractTestUtil.createInfrastructureAwardedContract();
     var projectDetail = awardedContract1.getProjectDetail();
 
     when(awardedContractService.getAwardedContracts(projectDetail))
@@ -64,8 +63,7 @@ public class AwardedContractSummaryServiceTest {
   }
 
   @Test
-  public void getAwardedContractViews_whenNoAwardedContracts_thenEmpty() {
-
+  void getAwardedContractViews_whenNoAwardedContracts_thenEmpty() {
     var projectDetail = ProjectUtil.getProjectDetails();
 
     when(awardedContractService.getAwardedContracts(projectDetail))
@@ -76,10 +74,9 @@ public class AwardedContractSummaryServiceTest {
   }
 
   @Test
-  public void getValidatedAwardedContractViews() {
-
-    var awardedContract1 = AwardedContractTestUtil.createAwardedContract();
-    var awardedContract2 = AwardedContractTestUtil.createAwardedContract_withManualEntryFunction("function");
+  void getValidatedAwardedContractViews() {
+    var awardedContract1 = AwardedContractTestUtil.createInfrastructureAwardedContract();
+    var awardedContract2 = AwardedContractTestUtil.createInfrastructureAwardedContract_withManualEntryFunction("function");
 
     var projectDetail = awardedContract1.getProjectDetail();
 
@@ -99,12 +96,11 @@ public class AwardedContractSummaryServiceTest {
     var awardedContractView2 = awardedContractViews.get(1);
     assertThat(awardedContractView2.getDisplayOrder()).isEqualTo(2);
     assertThat(awardedContractView2.isValid()).isFalse();
-
   }
 
   @Test
-  public void getAwardedContractView() {
-    final var awardedContract = AwardedContractTestUtil.createAwardedContract();
+  void getAwardedContractView() {
+    final var awardedContract = AwardedContractTestUtil.createInfrastructureAwardedContract();
     final var displayOrder = 10;
 
     when(awardedContractService.getAwardedContract(awardedContract.getId(), awardedContract.getProjectDetail()))
@@ -120,12 +116,12 @@ public class AwardedContractSummaryServiceTest {
   }
 
   @Test
-  public void getAwardedContractViewErrors_whenErrors() {
-    var awardedContractView1 = AwardedContractTestUtil.createAwardedContractView(1);
+  void getAwardedContractViewErrors_whenErrors() {
+    var awardedContractView1 = AwardedContractTestUtil.createInfrastructureAwardedContractView(1);
     awardedContractView1.setIsValid(true);
 
     final var displayOrderOfInvalidView = 2;
-    var awardedContractView2 = AwardedContractTestUtil.createAwardedContractView(displayOrderOfInvalidView);
+    var awardedContractView2 = AwardedContractTestUtil.createInfrastructureAwardedContractView(displayOrderOfInvalidView);
     awardedContractView2.setIsValid(false);
 
     var errorItems = awardedContractSummaryService.getAwardedContractViewErrors(
@@ -145,12 +141,12 @@ public class AwardedContractSummaryServiceTest {
   }
 
   @Test
-  public void getAwardedContractViewErrors_whenNoErrors() {
+  void getAwardedContractViewErrors_whenNoErrors() {
 
-    var awardedContractView1 = AwardedContractTestUtil.createAwardedContractView(1);
+    var awardedContractView1 = AwardedContractTestUtil.createInfrastructureAwardedContractView(1);
     awardedContractView1.setIsValid(true);
 
-    var awardedContractView2 = AwardedContractTestUtil.createAwardedContractView(2);
+    var awardedContractView2 = AwardedContractTestUtil.createInfrastructureAwardedContractView(2);
     awardedContractView2.setIsValid(true);
 
     var errorItems = awardedContractSummaryService.getAwardedContractViewErrors(
@@ -161,12 +157,11 @@ public class AwardedContractSummaryServiceTest {
   }
 
   @Test
-  public void areAllAwardedContractsValid_whenValid_thenTrue() {
-
-    var awardedContractView1 = AwardedContractTestUtil.createAwardedContractView(1);
+  void areAllAwardedContractsValid_whenValid_thenTrue() {
+    var awardedContractView1 = AwardedContractTestUtil.createInfrastructureAwardedContractView(1);
     awardedContractView1.setIsValid(true);
 
-    var awardedContractView2 = AwardedContractTestUtil.createAwardedContractView(2);
+    var awardedContractView2 = AwardedContractTestUtil.createInfrastructureAwardedContractView(2);
     awardedContractView2.setIsValid(true);
 
     var allValid = awardedContractSummaryService.validateViews(
@@ -176,12 +171,11 @@ public class AwardedContractSummaryServiceTest {
   }
 
   @Test
-  public void areAllAwardedContractsValid_whenInvalid_thenFalse() {
-
-    var awardedContractView1 = AwardedContractTestUtil.createAwardedContractView(1);
+  void areAllAwardedContractsValid_whenInvalid_thenFalse() {
+    var awardedContractView1 = AwardedContractTestUtil.createInfrastructureAwardedContractView(1);
     awardedContractView1.setIsValid(true);
 
-    var awardedContractView2 = AwardedContractTestUtil.createAwardedContractView(2);
+    var awardedContractView2 = AwardedContractTestUtil.createInfrastructureAwardedContractView(2);
     awardedContractView2.setIsValid(false);
 
     var allValid = awardedContractSummaryService.validateViews(
@@ -191,7 +185,7 @@ public class AwardedContractSummaryServiceTest {
   }
 
   @Test
-  public void getErrors_emptyList() {
+  void getErrors_emptyList() {
     var errors = awardedContractSummaryService.getAwardedContractViewErrors(Collections.emptyList());
     assertThat(errors).hasSize(1);
     assertThat(errors.get(0).getDisplayOrder()).isEqualTo(1);

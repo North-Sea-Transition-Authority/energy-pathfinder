@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastr
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Collections;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,19 +22,17 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeChe
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardContractController;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
-import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormCommon;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.infrastructure.InfrastructureAwardedContractForm;
-import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractView;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.infrastructure.InfrastructureAwardedContractView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractServiceCommon;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.infrastructure.InfrastructureAwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.infrastructure.InfrastructureAwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
@@ -46,14 +45,18 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 @RequestMapping("/project/{projectId}/awarded-contracts")
 public class InfrastructureAwardedContractController extends AwardContractController {
 
+  private final InfrastructureAwardedContractService awardedContractService;
+  private final InfrastructureAwardedContractSummaryService awardedContractSummaryService;
+
   @Autowired
   public InfrastructureAwardedContractController(BreadcrumbService breadcrumbService,
                                                  ControllerHelperService controllerHelperService,
-                                                 AwardedContractSummaryService awardedContractSummaryService,
                                                  ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
-                                                 AwardedContractServiceCommon awardedContractServiceCommon) {
-    super(breadcrumbService, controllerHelperService, projectSectionItemOwnershipService,
-        awardedContractServiceCommon, awardedContractSummaryService);
+                                                 InfrastructureAwardedContractService awardedContractService,
+                                                 InfrastructureAwardedContractSummaryService awardedContractSummaryService) {
+    super(breadcrumbService, controllerHelperService, projectSectionItemOwnershipService);
+    this.awardedContractService = awardedContractService;
+    this.awardedContractSummaryService = awardedContractSummaryService;
   }
 
   @GetMapping
@@ -68,19 +71,22 @@ public class InfrastructureAwardedContractController extends AwardContractContro
   @GetMapping("/awarded-contract")
   public ModelAndView addAwardedContract(@PathVariable("projectId") Integer projectId,
                                          ProjectContext projectContext) {
-    return getAwardedContractModelAndView(projectId, new InfrastructureAwardedContractForm());
+    var form = new InfrastructureAwardedContractForm();
+    return getAwardedContractModelAndView(projectId, form, Collections.emptyMap(), projectContext.getProjectDetails());
   }
 
   @GetMapping("/awarded-contract/{awardedContractId}/edit")
   public ModelAndView getAwardedContract(@PathVariable("projectId") Integer projectId,
                                          @PathVariable("awardedContractId") Integer awardedProjectId,
                                          ProjectContext projectContext) {
-    var awardedContract = awardedContractServiceCommon.getAwardedContract(
+    var projectDetails = projectContext.getProjectDetails();
+    var awardedContract = awardedContractService.getAwardedContract(
         awardedProjectId,
-        projectContext.getProjectDetails());
+        projectDetails);
     checkIfUserHasAccessAwardedContract(awardedContract);
-    var form = awardedContractServiceCommon.getForm(awardedProjectId, projectContext.getProjectDetails());
-    return getAwardedContractModelAndView(projectId, form);
+    var form = awardedContractService.getForm(awardedContract);
+    var preSelectedContractFunctionMap = awardedContractService.getPreSelectedContractFunction(form);
+    return getAwardedContractModelAndView(projectId, form, preSelectedContractFunctionMap, projectDetails);
   }
 
   @GetMapping("/awarded-contract/{awardedContractId}/remove/{displayOrder}")
@@ -88,7 +94,7 @@ public class InfrastructureAwardedContractController extends AwardContractContro
                                                         @PathVariable("awardedContractId") Integer awardedProjectId,
                                                         @PathVariable("displayOrder") Integer displayOrder,
                                                         ProjectContext projectContext) {
-    var awardedContract = awardedContractServiceCommon.getAwardedContract(
+    var awardedContract = awardedContractService.getAwardedContract(
         awardedProjectId,
         projectContext.getProjectDetails()
     );
@@ -107,14 +113,16 @@ public class InfrastructureAwardedContractController extends AwardContractContro
                                           BindingResult bindingResult,
                                           ValidationType validationType,
                                           ProjectContext projectContext) {
-    bindingResult = awardedContractServiceCommon.validate(form, bindingResult, validationType);
+    var preSelectedContractFunctionMap = awardedContractService.getPreSelectedContractFunction(form);
+    var projectDetails = projectContext.getProjectDetails();
+    bindingResult = awardedContractService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getAwardedContractModelAndView(projectId, form),
+        getAwardedContractModelAndView(projectId, form, preSelectedContractFunctionMap, projectDetails),
         form,
         () -> {
-          var contract = awardedContractServiceCommon.createAwardedContract(
-              projectContext.getProjectDetails(),
+          var contract = awardedContractService.createAwardedContract(
+              projectDetails,
               form,
               projectContext.getUserAccount()
           );
@@ -123,7 +131,7 @@ public class InfrastructureAwardedContractController extends AwardContractContro
               String.format(
                   AuditEvent.AWARDED_CONTRACT_UPDATED.getMessage(),
                   contract.getId(),
-                  projectContext.getProjectDetails().getId()
+                  projectDetails.getId()
               )
           );
           return getAwardedContractSummaryRedirect(projectId);
@@ -138,25 +146,28 @@ public class InfrastructureAwardedContractController extends AwardContractContro
                                           BindingResult bindingResult,
                                           ValidationType validationType,
                                           ProjectContext projectContext) {
-    var awardedContract = awardedContractServiceCommon.getAwardedContract(
+    var preSelectedContractFunctionMap = awardedContractService.getPreSelectedContractFunction(form);
+    var projectDetails = projectContext.getProjectDetails();
+    var awardedContract = awardedContractService.getAwardedContract(
         awardedContractId,
-        projectContext.getProjectDetails()
+        projectDetails
     );
     checkIfUserHasAccessAwardedContract(awardedContract);
-    bindingResult = awardedContractServiceCommon.validate(form, bindingResult, validationType);
+    bindingResult = awardedContractService.validate(form, bindingResult, validationType);
+
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getAwardedContractModelAndView(projectId, form),
+        getAwardedContractModelAndView(projectId, form, preSelectedContractFunctionMap, projectDetails),
         form,
         () -> {
-          var contract = awardedContractServiceCommon.updateAwardedContract(awardedContractId,
-              projectContext.getProjectDetails(), form);
+          var contract = awardedContractService.updateAwardedContract(awardedContractId,
+              projectDetails, form);
           AuditService.audit(
               AuditEvent.AWARDED_CONTRACT_UPDATED,
               String.format(
                   AuditEvent.AWARDED_CONTRACT_UPDATED.getMessage(),
                   contract.getId(),
-                  projectContext.getProjectDetails().getId()
+                  projectDetails.getId()
               )
           );
 
@@ -170,12 +181,12 @@ public class InfrastructureAwardedContractController extends AwardContractContro
                                             @PathVariable("awardedContractId") Integer awardedContractId,
                                             @PathVariable("displayOrder") Integer displayOrder,
                                             ProjectContext projectContext) {
-    var awardedContract = awardedContractServiceCommon.getAwardedContract(
+    var awardedContract = awardedContractService.getAwardedContract(
         awardedContractId,
         projectContext.getProjectDetails()
     );
     checkIfUserHasAccessAwardedContract(awardedContract);
-    awardedContractServiceCommon.deleteAwardedContract(awardedContract);
+    awardedContractService.deleteAwardedContract(awardedContract);
     AuditService.audit(
         AuditEvent.AWARDED_CONTRACT_REMOVED,
         String.format(
@@ -203,9 +214,9 @@ public class InfrastructureAwardedContractController extends AwardContractContro
   }
 
   private ModelAndView getAwardedContractsSummaryModelAndView(Integer projectId,
-                                                              List<AwardedContractView> awardedContractViews,
+                                                              List<InfrastructureAwardedContractView> awardedContractViews,
                                                               ValidationResult validationResult) {
-    var modelAndView = new ModelAndView("project/awardedcontract/infrastructure/infrastructureAwardedContractFormSummary")
+    var modelAndView = new ModelAndView("project/awardedcontract/infrastructure/_infrastructureAwardedContractFormSummary")
         .addObject("pageTitle", PAGE_NAME)
         .addObject("awardedContractViews", awardedContractViews)
         .addObject("addAwardedContractUrl",
@@ -224,22 +235,7 @@ public class InfrastructureAwardedContractController extends AwardContractContro
     return modelAndView;
   }
 
-  private ModelAndView getAwardedContractModelAndView(Integer projectId, AwardedContractFormCommon form) {
-
-    var preSelectedContractFunctionMap = awardedContractServiceCommon.getPreSelectedContractFunction(form);
-
-    var modelAndView = new ModelAndView("project/awardedcontract/awardedContract")
-        .addObject("form", form)
-        .addObject("contractBands", ContractBand.getAllAsMap())
-        .addObject("contractFunctionRestUrl", getContractFunctionSearchUrl())
-        .addObject("preSelectedContractFunctionMap", preSelectedContractFunctionMap);
-
-    breadcrumbService.fromInfrastructureAwardedContracts(projectId, modelAndView, PAGE_NAME_SINGULAR);
-
-    return modelAndView;
-  }
-
-  private ModelAndView removeAwardedContractModelAndView(Integer projectId, AwardedContractView awardedContractView) {
+  private ModelAndView removeAwardedContractModelAndView(Integer projectId, InfrastructureAwardedContractView awardedContractView) {
     var modelAndView = new ModelAndView("project/awardedcontract/removeAwardedContract")
         .addObject("awardedContractView", awardedContractView)
         .addObject("cancelUrl", getAwardedContractSummaryUrl(projectId));

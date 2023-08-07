@@ -10,6 +10,7 @@ import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.communication.CommunicationSummaryController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardContractController;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSummaryController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastructure.InfrastructureAwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
@@ -67,6 +68,17 @@ public class BreadcrumbService {
   private Map<String, String> infrastructureAwardedContracts(Integer projectId) {
     var map = taskList(projectId);
     String route = ReverseRouter.route(on(InfrastructureAwardedContractController.class).viewAwardedContracts(projectId, null));
+    map.put(route, AwardContractController.PAGE_NAME);
+    return map;
+  }
+
+  public void fromForwardWorkPlanAwardedContracts(Integer projectId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, forwardWorkPlanAwardedContracts(projectId), thisPage);
+  }
+
+  private Map<String, String> forwardWorkPlanAwardedContracts(Integer projectId) {
+    var map = taskList(projectId);
+    String route = ReverseRouter.route(on(ForwardWorkPlanAwardedContractSummaryController.class).viewAwardedContracts(projectId, null));
     map.put(route, AwardContractController.PAGE_NAME);
     return map;
   }

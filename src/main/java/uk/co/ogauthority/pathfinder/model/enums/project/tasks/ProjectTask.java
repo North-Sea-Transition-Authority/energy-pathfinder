@@ -29,7 +29,7 @@ import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.Fo
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractFormSectionService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.infrastructure.InfrastructureAwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.campaigninformation.CampaignInformationService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityModelService;
@@ -205,7 +205,7 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
   WORK_PLAN_AWARDED_CONTRACTS(
       ForwardWorkPlanAwardedContractSetupController.PAGE_NAME,
       ForwardWorkPlanAwardedContractSetupController.class,
-      ForwardWorkPlanAwardedContractService.class,
+      ForwardWorkPlanAwardedContractFormSectionService.class,
       Set.of(ProjectType.FORWARD_WORK_PLAN),
       25,
       Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR))

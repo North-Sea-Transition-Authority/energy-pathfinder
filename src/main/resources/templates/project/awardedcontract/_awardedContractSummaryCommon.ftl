@@ -23,7 +23,7 @@
     headingSize=headingSize
     headingClass=headingClass
   >
-    <@_awardedContractSummaryFields
+    <@awardedContractSummaryFields
       useDiffedField=false
       contractorName=awardedContractView.contractorName
       contractFunction=awardedContractView.contractFunction
@@ -39,42 +39,7 @@
   </@summaryViewWrapper.summaryViewItemWrapper>
 </#macro>
 
-<#macro awardedContractDiffSummary
-  awardedContractDiff
-  showHeader=false
-  showActions=false
-  headingSize=defaultHeadingSize
-  headingClass=defaultHeadingClass
->
-  <@summaryViewWrapper.summaryViewItemWrapper
-    idPrefix=idPrefix
-    headingPrefix=headingPrefix
-    displayOrder=awardedContractDiff.AwardedContractView_displayOrder.currentValue
-    isValid=true
-    summaryLinkList=[]
-    showHeader=showHeader
-    showActions=showActions
-    headingSize=headingSize
-    headingClass=headingClass
-    diffObject=awardedContractDiff
-  >
-    <@_awardedContractSummaryFields
-      useDiffedField=true
-      contractorName=awardedContractDiff.AwardedContractView_contractorName
-      contractFunction=awardedContractDiff.AwardedContractView_contractFunction
-      descriptionOfWork=awardedContractDiff.AwardedContractView_descriptionOfWork
-      dateAwarded=awardedContractDiff.AwardedContractView_dateAwarded
-      contractBand=awardedContractDiff.AwardedContractView_contractBand
-      contactName=awardedContractDiff.AwardedContractView_contactName
-      contactPhoneNumber=awardedContractDiff.AwardedContractView_contactPhoneNumber
-      contactJobTitle=awardedContractDiff.AwardedContractView_contactJobTitle
-      contactEmailAddress=awardedContractDiff.AwardedContractView_contactEmailAddress
-      addedByPortalOrganisationGroup=awardedContractDiff.AwardedContractView_addedByPortalOrganisationGroup
-    />
-  </@summaryViewWrapper.summaryViewItemWrapper>
-</#macro>
-
-<#macro _awardedContractSummaryFields
+<#macro awardedContractSummaryFields
   useDiffedField
   contractorName=""
   contractFunction=""

@@ -1,22 +1,23 @@
-package uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure;
+package uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.time.LocalDate;
 import java.util.Objects;
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Lob;
-import javax.persistence.Table;
+import javax.persistence.MappedSuperclass;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
+import uk.co.ogauthority.pathfinder.service.entityduplication.ParentEntity;
 
-@Entity
-@Table(name = "awarded_contracts")
-public class AwardedContract extends ProjectDetailEntity implements ContactDetailCapture {
+@MappedSuperclass
+public abstract class AwardedContractCommon
+    extends ProjectDetailEntity implements ContactDetailCapture, ParentEntity {
 
   private String contractorName;
 
@@ -44,10 +45,17 @@ public class AwardedContract extends ProjectDetailEntity implements ContactDetai
 
   private Integer addedByOrganisationGroup;
 
-  public AwardedContract() {}
+  public AwardedContractCommon() {
 
-  public AwardedContract(ProjectDetail projectDetail) {
+  }
+
+  public AwardedContractCommon(ProjectDetail projectDetail) {
     this.projectDetail = projectDetail;
+  }
+
+  @VisibleForTesting
+  public void setId(Integer id) {
+    this.id = id;
   }
 
   public String getContractorName() {
@@ -157,7 +165,7 @@ public class AwardedContract extends ProjectDetailEntity implements ContactDetai
     if (!super.equals(o)) {
       return false;
     }
-    AwardedContract that = (AwardedContract) o;
+    AwardedContractCommon that = (AwardedContractCommon) o;
     return Objects.equals(contractorName, that.contractorName)
         && contractFunction == that.contractFunction
         && Objects.equals(manualContractFunction, that.manualContractFunction)
