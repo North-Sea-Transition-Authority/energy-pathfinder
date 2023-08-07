@@ -18,9 +18,9 @@ import uk.co.ogauthority.pathfinder.controller.rest.WorkPlanUpcomingTenderRestCo
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
+import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanTenderCompletionForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanTenderSetupForm;
 import uk.co.ogauthority.pathfinder.model.form.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderForm;
@@ -79,7 +79,7 @@ public class ForwardWorkPlanUpcomingTenderModelServiceTest {
         entry("pageNameSingular", ForwardWorkPlanUpcomingTenderController.PAGE_NAME_SINGULAR),
         entry("form", form),
         entry("preSelectedFunction", workPlanUpcomingTenderModelService.getPreSelectedFunction(form)),
-        entry("contractBands", WorkPlanUpcomingTenderContractBand.getAllAsMap()),
+        entry("contractBands", ContractBand.getAllAsMap(ProjectType.FORWARD_WORK_PLAN)),
         entry("departmentTenderRestUrl",
             SearchSelectorService.route(on(WorkPlanUpcomingTenderRestController.class).searchTenderDepartments(null))
         ),

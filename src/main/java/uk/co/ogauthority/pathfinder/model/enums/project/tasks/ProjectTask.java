@@ -5,8 +5,9 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.Set;
 import java.util.stream.Stream;
 import uk.co.ogauthority.pathfinder.controller.project.OverviewController;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardContractController;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupController;
-import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastructure.AwardedContractController;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastructure.InfrastructureAwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.campaigninformation.CampaignInformationController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
@@ -28,8 +29,8 @@ import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.Fo
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractFormSectionService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.infrastructure.InfrastructureAwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.campaigninformation.CampaignInformationService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityModelService;
 import uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityService;
@@ -110,9 +111,9 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       50,
       Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)),
   AWARDED_CONTRACTS(
-      AwardedContractController.PAGE_NAME,
-      AwardedContractController.class,
-      AwardedContractService.class,
+      AwardContractController.PAGE_NAME,
+      InfrastructureAwardedContractController.class,
+      InfrastructureAwardedContractService.class,
       Set.of(ProjectType.INFRASTRUCTURE),
       60,
       Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR)),
@@ -204,7 +205,7 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
   WORK_PLAN_AWARDED_CONTRACTS(
       ForwardWorkPlanAwardedContractSetupController.PAGE_NAME,
       ForwardWorkPlanAwardedContractSetupController.class,
-      ForwardWorkPlanAwardedContractService.class,
+      ForwardWorkPlanAwardedContractFormSectionService.class,
       Set.of(ProjectType.FORWARD_WORK_PLAN),
       25,
       Set.of(UserToProjectRelationship.OPERATOR, UserToProjectRelationship.CONTRIBUTOR))
@@ -300,7 +301,7 @@ public enum ProjectTask implements GeneralPurposeProjectTask {
       case UPCOMING_TENDERS:
         return ReverseRouter.route(on(UpcomingTendersController.class).viewUpcomingTenders(projectId, null));
       case AWARDED_CONTRACTS:
-        return ReverseRouter.route(on(AwardedContractController.class).viewAwardedContracts(projectId, null));
+        return ReverseRouter.route(on(InfrastructureAwardedContractController.class).viewAwardedContracts(projectId, null));
       case COLLABORATION_OPPORTUNITIES:
         return ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
             .viewCollaborationOpportunities(projectId, null));

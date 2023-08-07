@@ -6,10 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetup;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupForm;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupView;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupViewUtil;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupRepository;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
@@ -39,6 +42,13 @@ public class ForwardWorkPlanAwardedContractSetupService {
     return repository.findByProjectDetail(projectDetail);
   }
 
+  public Optional<ForwardWorkPlanAwardedContractSetup> getForwardWorkPlanAwardedContractSetupForProjectVersion(
+      Project project,
+      int version
+  ) {
+    return repository.findByProjectDetail_ProjectAndProjectDetail_Version(project, version);
+  }
+
   public BindingResult validate(ForwardWorkPlanAwardedContractSetupForm form,
                                 BindingResult bindingResult) {
     return validationService.validate(form, bindingResult, ValidationType.FULL);
@@ -58,5 +68,22 @@ public class ForwardWorkPlanAwardedContractSetupService {
 
     contractSetup.setHasContractToAdd(form.getHasContractToAdd());
     repository.save(contractSetup);
+  }
+
+  @Transactional
+  public void deleteByProjectDetail(ProjectDetail projectDetail) {
+    repository.deleteByProjectDetail(projectDetail);
+  }
+
+  protected ForwardWorkPlanAwardedContractSetupView getAwardedContractSetupView(ProjectDetail projectDetail) {
+    var setUp = getForwardWorkPlanAwardedContractSetup(projectDetail)
+        .orElse(new ForwardWorkPlanAwardedContractSetup());
+    return ForwardWorkPlanAwardedContractSetupViewUtil.from(setUp);
+  }
+
+  protected ForwardWorkPlanAwardedContractSetupView getAwardedContractSetupView(Project project, int version) {
+    var setUp = getForwardWorkPlanAwardedContractSetupForProjectVersion(project, version)
+        .orElse(new ForwardWorkPlanAwardedContractSetup());
+    return ForwardWorkPlanAwardedContractSetupViewUtil.from(setUp);
   }
 }

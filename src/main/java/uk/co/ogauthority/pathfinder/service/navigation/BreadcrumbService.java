@@ -9,7 +9,9 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.WorkAreaController;
 import uk.co.ogauthority.pathfinder.controller.communication.CommunicationSummaryController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
-import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastructure.AwardedContractController;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardContractController;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSummaryController;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastructure.InfrastructureAwardedContractController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.forwardworkplan.ForwardWorkPlanCollaborationOpportunityController;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.controller.project.commissionedwell.CommissionedWellController;
@@ -59,14 +61,25 @@ public class BreadcrumbService {
     return map;
   }
 
-  public void fromAwardedContracts(Integer projectId, ModelAndView modelAndView, String thisPage) {
-    addAttrs(modelAndView, awardedContracts(projectId), thisPage);
+  public void fromInfrastructureAwardedContracts(Integer projectId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, infrastructureAwardedContracts(projectId), thisPage);
   }
 
-  private Map<String, String> awardedContracts(Integer projectId) {
+  private Map<String, String> infrastructureAwardedContracts(Integer projectId) {
     var map = taskList(projectId);
-    String route = ReverseRouter.route(on(AwardedContractController.class).viewAwardedContracts(projectId, null));
-    map.put(route, AwardedContractController.PAGE_NAME);
+    String route = ReverseRouter.route(on(InfrastructureAwardedContractController.class).viewAwardedContracts(projectId, null));
+    map.put(route, AwardContractController.PAGE_NAME);
+    return map;
+  }
+
+  public void fromForwardWorkPlanAwardedContracts(Integer projectId, ModelAndView modelAndView, String thisPage) {
+    addAttrs(modelAndView, forwardWorkPlanAwardedContracts(projectId), thisPage);
+  }
+
+  private Map<String, String> forwardWorkPlanAwardedContracts(Integer projectId) {
+    var map = taskList(projectId);
+    String route = ReverseRouter.route(on(ForwardWorkPlanAwardedContractSummaryController.class).viewAwardedContracts(projectId, null));
+    map.put(route, AwardContractController.PAGE_NAME);
     return map;
   }
 

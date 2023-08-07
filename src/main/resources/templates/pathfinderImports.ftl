@@ -33,6 +33,7 @@
 <#import 'macros/textUtil.ftl' as textUtil>
 <#import 'macros/panel.ftl' as panel>
 <#import 'macros/footerLinks.ftl' as pathfinderFooter>
+<#import 'macros/notificationbanner/notificationBanner.ftl' as notificationBanner>
 
 <#function springUrl url>
   <#local springUrl>
