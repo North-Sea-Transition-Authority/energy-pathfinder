@@ -26,12 +26,12 @@ public class AwardedContractSummaryService {
   public static final String ERROR_MESSAGE = "Awarded contract %d is incomplete";
   public static final String EMPTY_LIST_ERROR = "You must add at least one awarded contract";
 
-  private final AwardedContractService awardedContractService;
+  private final AwardedContractServiceCommon awardedContractService;
   private final ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
   private final PortalOrganisationAccessor portalOrganisationAccessor;
 
   @Autowired
-  public AwardedContractSummaryService(AwardedContractService awardedContractService,
+  public AwardedContractSummaryService(AwardedContractServiceCommon awardedContractService,
                                        ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
                                        PortalOrganisationAccessor portalOrganisationAccessor) {
     this.awardedContractService = awardedContractService;

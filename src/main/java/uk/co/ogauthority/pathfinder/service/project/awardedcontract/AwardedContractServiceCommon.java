@@ -2,8 +2,6 @@ package uk.co.ogauthority.pathfinder.service.project.awardedcontract;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -16,63 +14,49 @@ import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrast
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
-import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
-import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractForm;
+import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormCommon;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractValidationHint;
+import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.infrastructure.InfrastructureAwardedContractForm;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.infrastructure.AwardedContractRepository;
-import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.FunctionService;
-import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
-import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
-import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
-import uk.co.ogauthority.pathfinder.util.projectcontext.UserToProjectRelationshipUtil;
 
 @Service
-public class AwardedContractService implements ProjectFormSectionService {
-
-  private final FunctionService functionService;
-  private final ValidationService validationService;
+public class AwardedContractServiceCommon {
   private final AwardedContractRepository awardedContractRepository;
-  private final AwardedContractFormValidator awardedContractFormValidator;
-  private final SearchSelectorService searchSelectorService;
-  private final ProjectSetupService projectSetupService;
-  private final EntityDuplicationService entityDuplicationService;
+  private final FunctionService functionService;
   private final TeamService teamService;
+  private final SearchSelectorService searchSelectorService;
+  private final ValidationService validationService;
+  private final AwardedContractFormValidator validator;
 
-  @Autowired
-  public AwardedContractService(FunctionService functionService,
-                                ValidationService validationService,
-                                AwardedContractRepository awardedContractRepository,
-                                AwardedContractFormValidator awardedContractFormValidator,
-                                SearchSelectorService searchSelectorService,
-                                ProjectSetupService projectSetupService,
-                                EntityDuplicationService entityDuplicationService,
-                                TeamService teamService) {
-    this.functionService = functionService;
-    this.validationService = validationService;
+  public AwardedContractServiceCommon(AwardedContractRepository awardedContractRepository,
+                                      FunctionService functionService,
+                                      TeamService teamService,
+                                      SearchSelectorService searchSelectorService,
+                                      ValidationService validationService,
+                                      AwardedContractFormValidator validator) {
     this.awardedContractRepository = awardedContractRepository;
-    this.awardedContractFormValidator = awardedContractFormValidator;
-    this.searchSelectorService = searchSelectorService;
-    this.projectSetupService = projectSetupService;
-    this.entityDuplicationService = entityDuplicationService;
+    this.functionService = functionService;
     this.teamService = teamService;
+    this.searchSelectorService = searchSelectorService;
+    this.validationService = validationService;
+    this.validator = validator;
   }
 
-  public AwardedContractForm getForm(Integer awardedContractId, ProjectDetail projectDetail) {
+  public AwardedContractFormCommon getForm(Integer awardedContractId, ProjectDetail projectDetail) {
     var awardedContract = getAwardedContract(awardedContractId, projectDetail);
     return getForm(awardedContract);
   }
 
-  public AwardedContractForm getForm(AwardedContract awardedContract) {
-    var awardedContractForm = new AwardedContractForm();
+  public AwardedContractFormCommon getForm(AwardedContract awardedContract) {
+    var awardedContractForm = new InfrastructureAwardedContractForm();
     awardedContractForm.setContractorName(awardedContract.getContractorName());
 
     String contractFunction = null;
@@ -103,17 +87,20 @@ public class AwardedContractService implements ProjectFormSectionService {
     return functionService.findFunctionsLikeWithManualEntry(searchTerm, FunctionType.AWARDED_CONTRACT);
   }
 
-  public BindingResult validate(AwardedContractForm form,
-                                BindingResult bindingResult,
-                                ValidationType validationType) {
-    var awardedContractValidationHint = new AwardedContractValidationHint(validationType);
-    awardedContractFormValidator.validate(form, bindingResult, awardedContractValidationHint);
-    return validationService.validate(form, bindingResult, validationType);
+  public AwardedContract getAwardedContract(Integer awardedContractId, ProjectDetail projectDetail) {
+    return awardedContractRepository.findByIdAndProjectDetail(awardedContractId, projectDetail)
+        .orElseThrow(() -> new PathfinderEntityNotFoundException(
+            String.format(
+                "No AwardedContract found with id %s for ProjectDetail with id %s",
+                awardedContractId,
+                projectDetail != null ? projectDetail.getId() : "null"
+            )
+        ));
   }
 
   @Transactional
   public AwardedContract createAwardedContract(ProjectDetail projectDetail,
-                                               AwardedContractForm form,
+                                               AwardedContractFormCommon form,
                                                AuthenticatedUserAccount userAccount) {
     var awardedContract = new AwardedContract(projectDetail);
     var portalOrganisationGroup = teamService.getContributorPortalOrganisationGroup(userAccount);
@@ -125,12 +112,12 @@ public class AwardedContractService implements ProjectFormSectionService {
   @Transactional
   public AwardedContract updateAwardedContract(Integer awardedContractId,
                                                ProjectDetail projectDetail,
-                                               AwardedContractForm form) {
+                                               AwardedContractFormCommon form) {
     var awardedContract = getAwardedContract(awardedContractId, projectDetail);
     return createOrUpdateAwardedContract(awardedContract, form);
   }
 
-  private AwardedContract createOrUpdateAwardedContract(AwardedContract awardedContract, AwardedContractForm form) {
+  private AwardedContract createOrUpdateAwardedContract(AwardedContract awardedContract, AwardedContractFormCommon form) {
 
     awardedContract.setContractorName(form.getContractorName());
 
@@ -154,7 +141,7 @@ public class AwardedContractService implements ProjectFormSectionService {
     return awardedContractRepository.save(awardedContract);
   }
 
-  public Map<String, String> getPreSelectedContractFunction(AwardedContractForm form) {
+  public Map<String, String> getPreSelectedContractFunction(AwardedContractFormCommon form) {
     return searchSelectorService.getPreSelectedSearchSelectorValue(form.getContractFunction(), Function.values());
   }
 
@@ -166,20 +153,12 @@ public class AwardedContractService implements ProjectFormSectionService {
     return awardedContractRepository.findByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version);
   }
 
-  public AwardedContract getAwardedContract(Integer awardedContractId, ProjectDetail projectDetail) {
-    return awardedContractRepository.findByIdAndProjectDetail(awardedContractId, projectDetail)
-        .orElseThrow(() -> new PathfinderEntityNotFoundException(
-            String.format(
-                "No AwardedContract found with id %s for ProjectDetail with id %s",
-                awardedContractId,
-                projectDetail != null ? projectDetail.getId() : "null"
-            )
-        ));
-  }
-
-  @Transactional
-  public void deleteAwardedContract(AwardedContract awardedContract) {
-    awardedContractRepository.delete(awardedContract);
+  public BindingResult validate(AwardedContractFormCommon form,
+                                BindingResult bindingResult,
+                                ValidationType validationType) {
+    var awardedContractValidationHint = new AwardedContractValidationHint(validationType);
+    validator.validate(form, bindingResult, awardedContractValidationHint);
+    return validationService.validate(form, bindingResult, validationType);
   }
 
   public boolean isValid(AwardedContract awardedContract, ValidationType validationType) {
@@ -189,42 +168,8 @@ public class AwardedContractService implements ProjectFormSectionService {
     return !bindingResult.hasErrors();
   }
 
-  @Override
-  public boolean isComplete(ProjectDetail projectDetail) {
-    var awardedContracts = getAwardedContracts(projectDetail);
-    return !awardedContracts.isEmpty()
-        && awardedContracts
-        .stream()
-        .allMatch(awardedContract -> isValid(awardedContract, ValidationType.FULL));
-  }
-
-  @Override
-  public boolean canShowInTaskList(ProjectDetail detail, Set<UserToProjectRelationship> userToProjectRelationships) {
-    return isTaskValidForProjectDetail(detail)
-        && UserToProjectRelationshipUtil.canAccessProjectTask(ProjectTask.AWARDED_CONTRACTS, userToProjectRelationships);
-  }
-
-  @Override
-  public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
-    return projectSetupService.taskValidAndSelectedForProjectDetail(detail, ProjectTask.AWARDED_CONTRACTS);
-  }
-
-  @Override
-  public void removeSectionData(ProjectDetail projectDetail) {
-    awardedContractRepository.deleteAllByProjectDetail(projectDetail);
-  }
-
-  @Override
-  public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
-    entityDuplicationService.duplicateEntitiesAndSetNewParent(
-        getAwardedContracts(fromDetail),
-        toDetail,
-        AwardedContract.class
-    );
-  }
-
-  @Override
-  public Set<ProjectType> getSupportedProjectTypes() {
-    return Set.of(ProjectType.INFRASTRUCTURE);
+  @Transactional
+  public void deleteAwardedContract(AwardedContract awardedContract) {
+    awardedContractRepository.delete(awardedContract);
   }
 }

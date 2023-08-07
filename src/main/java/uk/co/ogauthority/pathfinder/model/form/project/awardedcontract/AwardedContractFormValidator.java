@@ -21,7 +21,7 @@ public class AwardedContractFormValidator implements SmartValidator {
 
   @Override
   public boolean supports(Class<?> clazz) {
-    return clazz.equals(AwardedContractForm.class);
+    return AwardedContractFormCommon.class.isAssignableFrom(clazz);
   }
 
   @Override
@@ -32,7 +32,7 @@ public class AwardedContractFormValidator implements SmartValidator {
   @Override
   public void validate(Object target, Errors errors, Object... validationHints) {
 
-    var form = (AwardedContractForm) target;
+    var form = (AwardedContractFormCommon) target;
 
     var awardedContractValidationHint = Arrays.stream(validationHints)
         .filter(hint -> hint.getClass().equals(AwardedContractValidationHint.class))

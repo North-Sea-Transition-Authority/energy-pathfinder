@@ -13,7 +13,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractServiceCommon;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -23,7 +23,7 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 public class AwardedContractSummaryServiceTest {
 
   @Mock
-  private AwardedContractService awardedContractService;
+  private AwardedContractServiceCommon awardedContractService;
 
   @Mock
   private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;

@@ -10,27 +10,26 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSectionSummaryService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractServiceCommon;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
-@RunWith(MockitoJUnitRunner.class)
-public class AwardedContractSectionSummaryServiceTest {
+@ExtendWith(MockitoExtension.class)
+class InfrastructureAwardedContractSectionSummaryServiceTest {
 
   @Mock
-  private AwardedContractService awardedContractService;
+  private InfrastructureAwardedContractService awardedContractService;
 
   @Mock
   private DifferenceService differenceService;
@@ -42,16 +41,20 @@ public class AwardedContractSectionSummaryServiceTest {
   private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
   @Mock
+  private AwardedContractServiceCommon awardedContractServiceCommon;
+
+  @Mock
   private PortalOrganisationAccessor portalOrganisationAccessor;
 
-  private AwardedContractSectionSummaryService awardedContractSectionSummaryService;
+  private InfrastructureAwardedContractSectionSummaryService awardedContractSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
-  @Before
-  public void setup() {
-    awardedContractSectionSummaryService = new AwardedContractSectionSummaryService(
+  @BeforeEach
+  void setup() {
+    awardedContractSectionSummaryService = new InfrastructureAwardedContractSectionSummaryService(
         awardedContractService,
+        awardedContractServiceCommon,
         differenceService,
         projectSectionSummaryCommonModelService,
         projectSectionItemOwnershipService,
@@ -60,27 +63,27 @@ public class AwardedContractSectionSummaryServiceTest {
   }
 
   @Test
-  public void canShowSection_whenCanShowInTaskList_thenTrue() {
+  void canShowSection_whenCanShowInTaskList_thenTrue() {
     when(awardedContractService.isTaskValidForProjectDetail(detail)).thenReturn(true);
 
     assertThat(awardedContractSectionSummaryService.canShowSection(detail)).isTrue();
   }
 
   @Test
-  public void canShowSection_whenCannotShowInTaskList_thenFalse() {
+  void canShowSection_whenCannotShowInTaskList_thenFalse() {
     when(awardedContractService.isTaskValidForProjectDetail(detail)).thenReturn(false);
 
     assertThat(awardedContractSectionSummaryService.canShowSection(detail)).isFalse();
   }
 
   @Test
-  public void getSummary() {
-    when(awardedContractService.getAwardedContracts(detail)).thenReturn(List.of(
+  void getSummary() {
+    when(awardedContractServiceCommon.getAwardedContracts(detail)).thenReturn(List.of(
         AwardedContractTestUtil.createAwardedContract(),
         AwardedContractTestUtil.createAwardedContract()
     ));
 
-    when(awardedContractService.getAwardedContractsByProjectAndVersion(
+    when(awardedContractServiceCommon.getAwardedContractsByProjectAndVersion(
         detail.getProject(),
         detail.getVersion() - 1
     )).thenReturn(List.of(
@@ -102,8 +105,8 @@ public class AwardedContractSectionSummaryServiceTest {
   }
 
   @Test
-  public void getSummary_noAwardedContracts() {
-    when(awardedContractService.getAwardedContracts(detail)).thenReturn(Collections.emptyList());
+  void getSummary_noAwardedContracts() {
+    when(awardedContractServiceCommon.getAwardedContracts(detail)).thenReturn(Collections.emptyList());
 
     var sectionSummary = awardedContractSectionSummaryService.getSummary(detail);
 
@@ -111,16 +114,17 @@ public class AwardedContractSectionSummaryServiceTest {
   }
 
   private void assertModelProperties(ProjectSectionSummary projectSectionSummary, ProjectDetail projectDetail) {
-    assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(AwardedContractSectionSummaryService.DISPLAY_ORDER);
-    assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(AwardedContractSectionSummaryService.SECTION_LINK));
-    assertThat(projectSectionSummary.getTemplatePath()).isEqualTo(AwardedContractSectionSummaryService.TEMPLATE_PATH);
+    assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(InfrastructureAwardedContractSectionSummaryService.DISPLAY_ORDER);
+    assertThat(projectSectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(
+        InfrastructureAwardedContractSectionSummaryService.SECTION_LINK));
+    assertThat(projectSectionSummary.getTemplatePath()).isEqualTo(InfrastructureAwardedContractSectionSummaryService.TEMPLATE_PATH);
 
     var model = projectSectionSummary.getTemplateModel();
 
     verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
         projectDetail,
-        AwardedContractSectionSummaryService.PAGE_NAME,
-        AwardedContractSectionSummaryService.SECTION_ID
+        InfrastructureAwardedContractSectionSummaryService.PAGE_NAME,
+        InfrastructureAwardedContractSectionSummaryService.SECTION_ID
     );
 
     assertThat(model).containsOnlyKeys("awardedContractDiffModel");

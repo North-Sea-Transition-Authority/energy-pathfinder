@@ -7,16 +7,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchResult;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractServiceCommon;
 
 @RestController
 @RequestMapping("/api/contract")
 public class ContractFunctionRestController {
 
-  private final AwardedContractService awardedContractService;
+  private final AwardedContractServiceCommon awardedContractService;
 
   @Autowired
-  public ContractFunctionRestController(AwardedContractService awardedContractService) {
+  public ContractFunctionRestController(AwardedContractServiceCommon awardedContractService) {
     this.awardedContractService = awardedContractService;
   }
 

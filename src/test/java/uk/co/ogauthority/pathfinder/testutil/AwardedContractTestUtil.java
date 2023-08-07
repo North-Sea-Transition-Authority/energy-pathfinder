@@ -8,7 +8,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
-import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractForm;
+import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.infrastructure.InfrastructureAwardedContractForm;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractView;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractViewUtil;
 
@@ -95,7 +95,7 @@ public class AwardedContractTestUtil {
     );
   }
 
-  public static AwardedContractForm createAwardedContractForm(
+  public static InfrastructureAwardedContractForm createInfrastructureAwardedContractForm(
       String contractorName,
       String contractFunction,
       String descriptionOfWork,
@@ -106,7 +106,7 @@ public class AwardedContractTestUtil {
       String emailAddress,
       String jobTitle
   ) {
-    var form = new AwardedContractForm();
+    var form = new InfrastructureAwardedContractForm();
     form.setContractorName(contractorName);
     form.setContractFunction(contractFunction);
     form.setDescriptionOfWork(descriptionOfWork);
@@ -123,8 +123,8 @@ public class AwardedContractTestUtil {
     return form;
   }
 
-  public static AwardedContractForm createAwardedContractForm() {
-    return createAwardedContractForm(
+  public static InfrastructureAwardedContractForm createInfrastructureAwardedContractForm() {
+    return createInfrastructureAwardedContractForm(
         CONTRACTOR_NAME,
         CONTRACT_FUNCTION.getSelectionId(),
         DESCRIPTION_OF_WORK,

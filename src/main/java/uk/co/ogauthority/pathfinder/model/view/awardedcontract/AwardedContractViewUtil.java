@@ -4,7 +4,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 
 import java.util.ArrayList;
 import org.apache.commons.lang3.StringUtils;
-import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastructure.AwardedContractController;
+import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastructure.InfrastructureAwardedContractController;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure.AwardedContract;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
@@ -23,7 +23,7 @@ public class AwardedContractViewUtil {
   public static SummaryLink getEditLink(Integer projectId, Integer awardedContractId) {
     return new SummaryLink(
         SummaryLinkText.EDIT.getDisplayName(),
-        ReverseRouter.route(on(AwardedContractController.class).getAwardedContract(
+        ReverseRouter.route(on(InfrastructureAwardedContractController.class).getAwardedContract(
             projectId,
             awardedContractId,
             null
@@ -34,7 +34,7 @@ public class AwardedContractViewUtil {
   public static SummaryLink getDeleteLink(Integer projectId, Integer awardedContractId, Integer displayOrder) {
     return new SummaryLink(
         SummaryLinkText.DELETE.getDisplayName(),
-        ReverseRouter.route(on(AwardedContractController.class).removeAwardedContract(
+        ReverseRouter.route(on(InfrastructureAwardedContractController.class).removeAwardedContract(
             projectId,
             awardedContractId,
             displayOrder,

@@ -25,7 +25,7 @@ import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSummaryView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.service.email.RegulatorEmailService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.infrastructure.InfrastructureAwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.cleanup.ProjectCleanUpService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.submission.ProjectSubmissionSummaryViewService;
@@ -55,7 +55,7 @@ public class SubmitProjectServiceTest {
   private ProjectInformationService projectInformationService;
 
   @Mock
-  private AwardedContractService awardedContractService;
+  private InfrastructureAwardedContractService awardedContractService;
 
   @Mock
   private RegulatorEmailService regulatorEmailService;
