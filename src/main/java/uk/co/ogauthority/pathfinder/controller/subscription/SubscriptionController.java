@@ -97,10 +97,10 @@ public class SubscriptionController {
 
     var subscriber = subscriptionService.verifyIsSubscribed(subscriberUuid);
     if (subscriber.isEmpty()) {
-      LOGGER.info(String.format(
-          "No subscriber found when attempting to unsubscribe subscriber with UUID %s using GET endpoint",
+      LOGGER.info(
+          "No subscriber found when attempting to unsubscribe subscriber with UUID {} using GET endpoint",
           subscriberUuid
-      ));
+      );
       return subscriptionService.getAlreadyUnsubscribedModelAndView();
     }
 
@@ -119,10 +119,10 @@ public class SubscriptionController {
 
     var subscriberOptional = subscriptionService.verifyIsSubscribed(subscriberUuid);
     if (subscriberOptional.isEmpty()) {
-      LOGGER.info(String.format(
-          "No subscriber found when attempting to unsubscribe subscriber with UUID %s using POST endpoint",
+      LOGGER.info(
+          "No subscriber found when attempting to unsubscribe subscriber with UUID {} using POST endpoint",
           subscriberUuid
-      ));
+      );
       return subscriptionService.getAlreadyUnsubscribedModelAndView();
     }
 
@@ -139,10 +139,10 @@ public class SubscriptionController {
 
     var subscriberOptional = subscriptionService.verifyIsSubscribed(subscriberUuid);
     if (subscriberOptional.isEmpty()) {
-      LOGGER.info(String.format(
-          "No subscriber found when attempting to manage subscription with UUID %s using GET endpoint",
+      LOGGER.info(
+          "No subscriber found when attempting to manage subscription with UUID {} using GET endpoint",
           subscriberUuid
-      ));
+      );
       return subscriptionService.getAlreadyUnsubscribedModelAndView();
     }
 
@@ -156,10 +156,10 @@ public class SubscriptionController {
                                                  BindingResult bindingResult) {
     var subscriberOptional = subscriptionService.verifyIsSubscribed(subscriberUuid);
     if (subscriberOptional.isEmpty()) {
-      LOGGER.info(String.format(
-          "No subscriber found when attempting to continue with subscription management with UUID %s using POST endpoint",
+      LOGGER.info(
+          "No subscriber found when attempting to continue with subscription management with UUID {} using POST endpoint",
           subscriberUuid
-      ));
+      );
       return subscriptionService.getAlreadyUnsubscribedModelAndView();
     }
 
@@ -178,10 +178,10 @@ public class SubscriptionController {
 
     var subscriberOptional = subscriptionService.verifyIsSubscribed(subscriberUuid);
     if (subscriberOptional.isEmpty()) {
-      LOGGER.info(String.format(
-          "No subscriber found when attempting to update subscription preferences with UUID %s using GET endpoint",
+      LOGGER.info(
+          "No subscriber found when attempting to update subscription preferences with UUID {} using GET endpoint",
           subscriberUuid
-      ));
+      );
       return subscriptionService.getAlreadyUnsubscribedModelAndView();
     }
 
@@ -198,10 +198,10 @@ public class SubscriptionController {
 
     var subscriberOptional = subscriptionService.verifyIsSubscribed(subscriberUuid);
     if (subscriberOptional.isEmpty()) {
-      LOGGER.info(String.format(
-          "No subscriber found when attempting to update subscription preferences with UUID %s using POST endpoint",
+      LOGGER.info(
+          "No subscriber found when attempting to update subscription preferences with UUID {} using POST endpoint",
           subscriberUuid
-      ));
+      );
       return subscriptionService.getAlreadyUnsubscribedModelAndView();
     }
 
