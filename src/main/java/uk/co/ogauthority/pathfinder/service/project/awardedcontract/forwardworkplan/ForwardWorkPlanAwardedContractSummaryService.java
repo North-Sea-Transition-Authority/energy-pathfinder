@@ -49,7 +49,7 @@ public class ForwardWorkPlanAwardedContractSummaryService extends AwardedContrac
   }
 
   @Transactional
-  public void saveAwardedContractSummary(ForwardWorkPlanAwardedContractSummaryForm form, ProjectDetail projectDetail){
+  public void saveAwardedContractSummary(ForwardWorkPlanAwardedContractSummaryForm form, ProjectDetail projectDetail) {
     var awardedContractSetup = getForwardWorkPlanAwardedContractSetup(projectDetail)
         .orElse(new ForwardWorkPlanAwardedContractSetup(projectDetail));
 

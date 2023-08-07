@@ -8,13 +8,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -24,10 +24,11 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupForm;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupRepository;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ForwardWorkPlanAwardedContractSetupServiceTest {
+@ExtendWith(MockitoExtension.class)
+class ForwardWorkPlanAwardedContractSetupServiceTest {
 
   @Mock
   private ForwardWorkPlanAwardedContractSetupRepository repository;
@@ -44,7 +45,7 @@ public class ForwardWorkPlanAwardedContractSetupServiceTest {
   private ArgumentCaptor<ForwardWorkPlanAwardedContractSetup> awardedContractSetupCaptor;
 
   @Test
-  public void getAwardedContractSetupFormFromDetail_noAwardedContractFound() {
+  void getAwardedContractSetupFormFromDetail_noAwardedContractFound() {
     when(repository.findByProjectDetail(projectDetail)).thenReturn(Optional.empty());
 
     var form = setupService.getAwardedContractSetupFormFromDetail(projectDetail);
@@ -52,9 +53,8 @@ public class ForwardWorkPlanAwardedContractSetupServiceTest {
   }
 
   @Test
-  public void getAwardedContractSetupFormFromDetail_awardedContractFound() {
-    var awardedContractSetup = new ForwardWorkPlanAwardedContractSetup();
-    awardedContractSetup.setHasContractToAdd(true);
+  void getAwardedContractSetupFormFromDetail_awardedContractFound() {
+    var awardedContractSetup = AwardedContractTestUtil.createForwardWorkPlanAwardedContractSetup(projectDetail);
     when(repository.findByProjectDetail(projectDetail)).thenReturn(Optional.of(awardedContractSetup));
 
     var form = setupService.getAwardedContractSetupFormFromDetail(projectDetail);
@@ -62,7 +62,7 @@ public class ForwardWorkPlanAwardedContractSetupServiceTest {
   }
 
   @Test
-  public void saveAwardedContractSetup_firstTimeSaving() {
+  void saveAwardedContractSetup_firstTimeSaving() {
     var form = new ForwardWorkPlanAwardedContractSetupForm();
     form.setHasContractToAdd(false);
 
@@ -77,7 +77,7 @@ public class ForwardWorkPlanAwardedContractSetupServiceTest {
   }
 
   @Test
-  public void saveAwardedContractSetup_updateExisting() {
+  void saveAwardedContractSetup_updateExisting() {
     var form = new ForwardWorkPlanAwardedContractSetupForm();
     form.setHasContractToAdd(false);
 
@@ -95,8 +95,8 @@ public class ForwardWorkPlanAwardedContractSetupServiceTest {
   }
 
   @Test
-  public void getForwardWorkPlanAwardedContractSetup_foundAwardedContractSetup() {
-    var awardedContractSetup = new ForwardWorkPlanAwardedContractSetup();
+  void getForwardWorkPlanAwardedContractSetup_foundAwardedContractSetup() {
+    var awardedContractSetup = AwardedContractTestUtil.createForwardWorkPlanAwardedContractSetup(projectDetail);
     when(repository.findByProjectDetail(projectDetail)).thenReturn(Optional.of(awardedContractSetup));
 
     var resultOptional = setupService.getForwardWorkPlanAwardedContractSetup(projectDetail);
@@ -106,7 +106,7 @@ public class ForwardWorkPlanAwardedContractSetupServiceTest {
   }
 
   @Test
-  public void getForwardWorkPlanAwardedContractSetup_notFound() {
+  void getForwardWorkPlanAwardedContractSetup_notFound() {
     when(repository.findByProjectDetail(projectDetail)).thenReturn(Optional.empty());
 
     var resultOptional = setupService.getForwardWorkPlanAwardedContractSetup(projectDetail);
@@ -114,7 +114,7 @@ public class ForwardWorkPlanAwardedContractSetupServiceTest {
   }
 
   @Test
-  public void validate_withErrorsFound() {
+  void validate_withErrorsFound() {
     var validationMessage = "validationMessage";
     doAnswer(invocation -> {
       var bindingResult = invocation.getArgument(1, BindingResult.class);
@@ -136,7 +136,7 @@ public class ForwardWorkPlanAwardedContractSetupServiceTest {
   }
 
   @Test
-  public void validate_noErrorsFound() {
+  void validate_noErrorsFound() {
     var form = new ForwardWorkPlanAwardedContractSetupForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
@@ -148,10 +148,8 @@ public class ForwardWorkPlanAwardedContractSetupServiceTest {
   }
 
   @Test
-  public void isValid_true() {
-    var awardedContractSetup = new ForwardWorkPlanAwardedContractSetup();
-    awardedContractSetup.setHasContractToAdd(true);
-
+  void isValid_true() {
+    var awardedContractSetup = AwardedContractTestUtil.createForwardWorkPlanAwardedContractSetup(projectDetail);
     var bindingResult = new BeanPropertyBindingResult(ForwardWorkPlanAwardedContractSetupForm.class, "form");
 
     when(repository.findByProjectDetail(projectDetail)).thenReturn(Optional.of(awardedContractSetup));
@@ -166,8 +164,9 @@ public class ForwardWorkPlanAwardedContractSetupServiceTest {
   }
 
   @Test
-  public void isValid_false() {
-    var awardedContractSetup = new ForwardWorkPlanAwardedContractSetup();
+  void isValid_false() {
+    var awardedContractSetup = AwardedContractTestUtil.createForwardWorkPlanAwardedContractSetup(projectDetail);
+    awardedContractSetup.setHasContractToAdd(null);
     when(repository.findByProjectDetail(projectDetail)).thenReturn(Optional.of(awardedContractSetup));
 
     var validationMessage = "validationMessage";
@@ -183,5 +182,11 @@ public class ForwardWorkPlanAwardedContractSetupServiceTest {
 
     var result = setupService.isValid(projectDetail);
     assertThat(result).isFalse();
+  }
+
+  @Test
+  void deleteAllByProjectDetail() {
+    setupService.deleteAllByProjectDetail(projectDetail);
+    verify(repository).deleteAllByProjectDetail(projectDetail);
   }
 }

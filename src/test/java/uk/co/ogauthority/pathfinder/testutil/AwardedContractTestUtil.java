@@ -1,16 +1,32 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.LocalDate;
+import java.util.List;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure.AwardedContract;
+import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContractCommon;
+import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContract;
+import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetup;
+import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure.InfrastructureAwardedContract;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
+import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractFormCommon;
+import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractForm;
+import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSummaryForm;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.infrastructure.InfrastructureAwardedContractForm;
-import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractView;
-import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractViewUtil;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractViewCommon;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractView;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractViewUtil;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.infrastructure.InfrastructureAwardedContractView;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.infrastructure.InfrastructureAwardedContractViewUtil;
+import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSectionSummaryService;
+import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class AwardedContractTestUtil {
 
@@ -18,7 +34,8 @@ public class AwardedContractTestUtil {
   public static final Function CONTRACT_FUNCTION = Function.LOGISTICS;
   public static final String DESCRIPTION_OF_WORK = "Description of work";
   public static final LocalDate DATE_AWARDED = LocalDate.now();
-  public static final ContractBand CONTRACT_BAND = ContractBand.GREATER_THAN_OR_EQUAL_TO_25M;
+  public static final ContractBand INFRASTRUCTURE_CONTRACT_BAND = ContractBand.GREATER_THAN_OR_EQUAL_TO_25M;
+  public static final ContractBand WORK_PLAN_CONTRACT_BAND = ContractBand.LESS_THAN_5M;
   public static final String CONTACT_NAME = ContactDetailsTestUtil.CONTACT_NAME;
   public static final String PHONE_NUMBER = ContactDetailsTestUtil.PHONE_NUMBER;
   public static final String JOB_TITLE = ContactDetailsTestUtil.JOB_TITLE;
@@ -31,7 +48,7 @@ public class AwardedContractTestUtil {
     throw new IllegalStateException("AwardedContractTestUtil is a utility class and should not be instantiated");
   }
 
-  public static AwardedContract createAwardedContract(
+  public static InfrastructureAwardedContract createInfrastructureAwardedContract(
       ProjectDetail projectDetail,
       String contractorName,
       Function contractFunction,
@@ -45,7 +62,73 @@ public class AwardedContractTestUtil {
       String jobTitle,
       int addedByOrganisationGroup
   ) {
-    var awardedContract = new AwardedContract();
+    var awardedContract = new InfrastructureAwardedContract();
+    setAwardedContractCommonFields(
+        awardedContract,
+        projectDetail,
+        contractorName,
+        contractFunction,
+        manualEntryContractFunction,
+        descriptionOfWork,
+        dateAwarded,
+        contractBand,
+        contactName,
+        phoneNumber,
+        emailAddress,
+        jobTitle,
+        addedByOrganisationGroup
+    );
+    return awardedContract;
+  }
+
+  public static ForwardWorkPlanAwardedContract createForwardWorkPlanAwardedContract(
+      ProjectDetail projectDetail,
+      String contractorName,
+      Function contractFunction,
+      String manualEntryContractFunction,
+      String descriptionOfWork,
+      LocalDate dateAwarded,
+      ContractBand contractBand,
+      String contactName,
+      String phoneNumber,
+      String emailAddress,
+      String jobTitle,
+      int addedByOrganisationGroup
+  ) {
+    var awardedContract = new ForwardWorkPlanAwardedContract();
+    setAwardedContractCommonFields(
+        awardedContract,
+        projectDetail,
+        contractorName,
+        contractFunction,
+        manualEntryContractFunction,
+        descriptionOfWork,
+        dateAwarded,
+        contractBand,
+        contactName,
+        phoneNumber,
+        emailAddress,
+        jobTitle,
+        addedByOrganisationGroup
+    );
+    return awardedContract;
+  }
+
+  private static void setAwardedContractCommonFields(
+      AwardedContractCommon awardedContract,
+      ProjectDetail projectDetail,
+      String contractorName,
+      Function contractFunction,
+      String manualEntryContractFunction,
+      String descriptionOfWork,
+      LocalDate dateAwarded,
+      ContractBand contractBand,
+      String contactName,
+      String phoneNumber,
+      String emailAddress,
+      String jobTitle,
+      int addedByOrganisationGroup
+  ) {
     awardedContract.setProjectDetail(projectDetail);
     awardedContract.setContractorName(contractorName);
     awardedContract.setContractFunction(contractFunction);
@@ -58,18 +141,17 @@ public class AwardedContractTestUtil {
     awardedContract.setEmailAddress(emailAddress);
     awardedContract.setJobTitle(jobTitle);
     awardedContract.setAddedByOrganisationGroup(addedByOrganisationGroup);
-    return awardedContract;
   }
 
-  public static AwardedContract createAwardedContract() {
-    return createAwardedContract(
-        ProjectUtil.getProjectDetails(),
+  public static InfrastructureAwardedContract createInfrastructureAwardedContract() {
+    return createInfrastructureAwardedContract(
+        ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE),
         CONTRACTOR_NAME,
         CONTRACT_FUNCTION,
         null,
         DESCRIPTION_OF_WORK,
         DATE_AWARDED,
-        CONTRACT_BAND,
+        INFRASTRUCTURE_CONTRACT_BAND,
         CONTACT_NAME,
         PHONE_NUMBER,
         EMAIL_ADDRESS,
@@ -78,15 +160,49 @@ public class AwardedContractTestUtil {
     );
   }
 
-  public static AwardedContract createAwardedContract_withManualEntryFunction(String function) {
-    return createAwardedContract(
+  public static ForwardWorkPlanAwardedContract createForwardWorkPlanAwardedContract() {
+    return createForwardWorkPlanAwardedContract(
+        ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN),
+        CONTRACTOR_NAME,
+        CONTRACT_FUNCTION,
+        null,
+        DESCRIPTION_OF_WORK,
+        DATE_AWARDED,
+        WORK_PLAN_CONTRACT_BAND,
+        CONTACT_NAME,
+        PHONE_NUMBER,
+        EMAIL_ADDRESS,
+        JOB_TITLE,
+        ADDED_BY_ORGANISATION_GROUP
+    );
+  }
+
+  public static InfrastructureAwardedContract createInfrastructureAwardedContract_withManualEntryFunction(String function) {
+    return createInfrastructureAwardedContract(
         ProjectUtil.getProjectDetails(),
         CONTRACTOR_NAME,
         null,
         function,
         DESCRIPTION_OF_WORK,
         DATE_AWARDED,
-        CONTRACT_BAND,
+        INFRASTRUCTURE_CONTRACT_BAND,
+        CONTACT_NAME,
+        PHONE_NUMBER,
+        EMAIL_ADDRESS,
+        JOB_TITLE,
+        ADDED_BY_ORGANISATION_GROUP
+    );
+  }
+
+  public static ForwardWorkPlanAwardedContract createForwardWorkPlanAwardedContract_withManualEntryFunction(String function) {
+    return createForwardWorkPlanAwardedContract(
+        ProjectUtil.getProjectDetails(),
+        CONTRACTOR_NAME,
+        null,
+        function,
+        DESCRIPTION_OF_WORK,
+        DATE_AWARDED,
+        WORK_PLAN_CONTRACT_BAND,
         CONTACT_NAME,
         PHONE_NUMBER,
         EMAIL_ADDRESS,
@@ -107,6 +223,62 @@ public class AwardedContractTestUtil {
       String jobTitle
   ) {
     var form = new InfrastructureAwardedContractForm();
+    populateAwardedContractForm(
+        form,
+        contractorName,
+        contractFunction,
+        descriptionOfWork,
+        dateAwarded,
+        contractBand,
+        contactName,
+        phoneNumber,
+        emailAddress,
+        jobTitle
+    );
+
+    return form;
+  }
+
+  public static ForwardWorkPlanAwardedContractForm createForwardWorkPlanAwardedContractForm(
+      String contractorName,
+      String contractFunction,
+      String descriptionOfWork,
+      ThreeFieldDateInput dateAwarded,
+      ContractBand contractBand,
+      String contactName,
+      String phoneNumber,
+      String emailAddress,
+      String jobTitle
+  ) {
+    var form = new ForwardWorkPlanAwardedContractForm();
+    populateAwardedContractForm(
+        form,
+        contractorName,
+        contractFunction,
+        descriptionOfWork,
+        dateAwarded,
+        contractBand,
+        contactName,
+        phoneNumber,
+        emailAddress,
+        jobTitle
+    );
+
+    return form;
+  }
+
+  private static void populateAwardedContractForm(
+      AwardedContractFormCommon form,
+      String contractorName,
+      String contractFunction,
+      String descriptionOfWork,
+      ThreeFieldDateInput dateAwarded,
+      ContractBand contractBand,
+      String contactName,
+      String phoneNumber,
+      String emailAddress,
+      String jobTitle
+  ) {
     form.setContractorName(contractorName);
     form.setContractFunction(contractFunction);
     form.setDescriptionOfWork(descriptionOfWork);
@@ -119,9 +291,8 @@ public class AwardedContractTestUtil {
     contactDetailForm.setJobTitle(jobTitle);
     contactDetailForm.setEmailAddress(emailAddress);
     form.setContactDetail(contactDetailForm);
-
-    return form;
   }
+
 
   public static InfrastructureAwardedContractForm createInfrastructureAwardedContractForm() {
     return createInfrastructureAwardedContractForm(
@@ -129,7 +300,7 @@ public class AwardedContractTestUtil {
         CONTRACT_FUNCTION.getSelectionId(),
         DESCRIPTION_OF_WORK,
         new ThreeFieldDateInput(DATE_AWARDED),
-        CONTRACT_BAND,
+        INFRASTRUCTURE_CONTRACT_BAND,
         CONTACT_NAME,
         PHONE_NUMBER,
         EMAIL_ADDRESS,
@@ -137,12 +308,75 @@ public class AwardedContractTestUtil {
     );
   }
 
-  public static AwardedContractView createAwardedContractView(Integer displayOrder) {
-    return new AwardedContractViewUtil.AwardedContractViewBuilder(
-        AwardedContractTestUtil.createAwardedContract(),
+  public static ForwardWorkPlanAwardedContractForm createForwardWorkPlanAwardedContractForm() {
+    return createForwardWorkPlanAwardedContractForm(
+        CONTRACTOR_NAME,
+        CONTRACT_FUNCTION.getSelectionId(),
+        DESCRIPTION_OF_WORK,
+        new ThreeFieldDateInput(DATE_AWARDED),
+        WORK_PLAN_CONTRACT_BAND,
+        CONTACT_NAME,
+        PHONE_NUMBER,
+        EMAIL_ADDRESS,
+        JOB_TITLE
+    );
+  }
+
+  public static InfrastructureAwardedContractView createInfrastructureAwardedContractView(Integer displayOrder) {
+    return new InfrastructureAwardedContractViewUtil.InfrastructureAwardedContractViewBuilder(
+        createInfrastructureAwardedContract(),
         displayOrder,
         ADDED_BY_PORTAL_ORGANISATION_GROUP
     )
         .build() ;
+  }
+
+  public static ForwardWorkPlanAwardedContractView createForwardWorkPlanAwardedContractView(Integer displayOrder) {
+    return new ForwardWorkPlanAwardedContractViewUtil.ForwardWorkPlanAwardedContractViewBuilder(
+        createForwardWorkPlanAwardedContract(),
+        displayOrder,
+        ADDED_BY_PORTAL_ORGANISATION_GROUP
+    )
+        .build() ;
+  }
+
+  public static void assertModelProperties(ProjectSectionSummary projectSectionSummary,
+                                           String templatePath) {
+    assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(AwardedContractSectionSummaryService.DISPLAY_ORDER);
+    assertThat(projectSectionSummary.getSidebarSectionLinks())
+        .isEqualTo(List.of(AwardedContractSectionSummaryService.SECTION_LINK));
+    assertThat(projectSectionSummary.getTemplatePath())
+        .isEqualTo(templatePath);
+
+    var model = projectSectionSummary.getTemplateModel();
+    assertThat(model).containsOnlyKeys("awardedContractDiffModel");
+  }
+
+  public static ForwardWorkPlanAwardedContractSetup createForwardWorkPlanAwardedContractSetup(ProjectDetail projectDetail) {
+    var contractSetup = new ForwardWorkPlanAwardedContractSetup(projectDetail);
+    contractSetup.setHasContractToAdd(true);
+    return contractSetup;
+  }
+
+  public static ForwardWorkPlanAwardedContractSummaryForm createForwardWorkPlanAwardedContractSummaryForm() {
+    var form = new ForwardWorkPlanAwardedContractSummaryForm();
+    form.setHasOtherContractsToAdd(true);
+    return form;
+  }
+
+  public static void checkCommonViewFields(AwardedContractCommon source,
+                                           AwardedContractViewCommon destination,
+                                           Integer displayOrder,
+                                           PortalOrganisationGroup addedByPortalOrganisationGroup) {
+    assertThat(destination.getDisplayOrder()).isEqualTo(displayOrder);
+    assertThat(destination.getContractorName()).isEqualTo(source.getContractorName());
+    assertThat(destination.getDescriptionOfWork()).isEqualTo(source.getDescriptionOfWork());
+    assertThat(destination.getDateAwarded()).isEqualTo(DateUtil.formatDate(source.getDateAwarded()));
+
+    assertThat(destination.getContactName()).isEqualTo(source.getContactName());
+    assertThat(destination.getContactPhoneNumber()).isEqualTo(source.getPhoneNumber());
+    assertThat(destination.getContactEmailAddress()).isEqualTo(source.getEmailAddress());
+    assertThat(destination.getContactJobTitle()).isEqualTo(source.getJobTitle());
+    assertThat(destination.getAddedByPortalOrganisationGroup()).isEqualTo(addedByPortalOrganisationGroup.getName());
   }
 }

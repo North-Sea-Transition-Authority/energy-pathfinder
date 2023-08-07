@@ -10,6 +10,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContractCommon;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure.InfrastructureAwardedContract;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
@@ -19,7 +20,6 @@ import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedCo
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.infrastructure.InfrastructureAwardedContractForm;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.infrastructure.InfrastructureAwardedContractRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
-import uk.co.ogauthority.pathfinder.service.project.FunctionService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.UserToProjectRelationship;
 import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
@@ -78,14 +78,9 @@ public class InfrastructureAwardedContractService extends AwardedContractService
   }
 
   @Override
-  public AwardedContractFormCommon getForm(Integer awardedContractId, ProjectDetail projectDetail) {
-    var awardedContract = getAwardedContract(awardedContractId, projectDetail);
+  public AwardedContractFormCommon getForm(AwardedContractCommon awardedContract) {
     var awardedContractForm = new InfrastructureAwardedContractForm();
     return super.populateAwardedContractForm(awardedContract, awardedContractForm);
-  }
-
-  public boolean isValid(InfrastructureAwardedContract awardedContract, ValidationType validationType) {
-    return super.isValid(awardedContract, validationType);
   }
 
   public BindingResult validate(InfrastructureAwardedContractForm form,

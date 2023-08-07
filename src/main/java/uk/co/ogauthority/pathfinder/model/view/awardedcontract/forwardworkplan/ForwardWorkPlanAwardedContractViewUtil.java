@@ -25,9 +25,9 @@ public class ForwardWorkPlanAwardedContractViewUtil {
     private boolean isValid = true;
     private boolean includeSummaryLinks = false;
 
-    public ForwardWorkPlanAwardedContractViewBuilder (ForwardWorkPlanAwardedContract awardedContract,
-                                                      Integer displayOrder,
-                                                      PortalOrganisationGroup addedByPortalOrganisationGroup) {
+    public ForwardWorkPlanAwardedContractViewBuilder(ForwardWorkPlanAwardedContract awardedContract,
+                                                     Integer displayOrder,
+                                                     PortalOrganisationGroup addedByPortalOrganisationGroup) {
       this.awardedContract = awardedContract;
       this.displayOrder = displayOrder;
       this.addedByPortalOrganisationGroup = addedByPortalOrganisationGroup;
@@ -75,28 +75,29 @@ public class ForwardWorkPlanAwardedContractViewUtil {
           isValid
       );
     }
-
-    private static SummaryLink getEditLink(Integer projectId, Integer awardedContractId) {
-      return new SummaryLink(
-          SummaryLinkText.EDIT.getDisplayName(),
-          ReverseRouter.route(on(ForwardWorkPlanAwardedContractController.class).getAwardedContract(
-              projectId,
-              awardedContractId,
-              null
-          ))
-      );
-    }
-
-    public static SummaryLink getDeleteLink(Integer projectId, Integer awardedContractId, Integer displayOrder) {
-      return new SummaryLink(
-          SummaryLinkText.DELETE.getDisplayName(),
-          ReverseRouter.route(on(ForwardWorkPlanAwardedContractRemovalController.class).removeAwardedContract(
-              projectId,
-              awardedContractId,
-              displayOrder,
-              null
-          ))
-      );
-    }
   }
+
+  public static SummaryLink getEditLink(Integer projectId, Integer awardedContractId) {
+    return new SummaryLink(
+        SummaryLinkText.EDIT.getDisplayName(),
+        ReverseRouter.route(on(ForwardWorkPlanAwardedContractController.class).getAwardedContract(
+            projectId,
+            awardedContractId,
+            null
+        ))
+    );
+  }
+
+  public static SummaryLink getDeleteLink(Integer projectId, Integer awardedContractId, Integer displayOrder) {
+    return new SummaryLink(
+        SummaryLinkText.DELETE.getDisplayName(),
+        ReverseRouter.route(on(ForwardWorkPlanAwardedContractRemovalController.class).removeAwardedContract(
+            projectId,
+            awardedContractId,
+            displayOrder,
+            null
+        ))
+    );
+  }
+
 }

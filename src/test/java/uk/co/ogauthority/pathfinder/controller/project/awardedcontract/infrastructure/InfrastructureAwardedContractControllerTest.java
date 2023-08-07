@@ -32,17 +32,15 @@ import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerT
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure.AwardedContract;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.infrastructure.InfrastructureAwardedContractForm;
-import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractServiceCommon;
-import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSummaryService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.infrastructure.InfrastructureAwardedContractService;
+import uk.co.ogauthority.pathfinder.service.project.awardedcontract.infrastructure.InfrastructureAwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
@@ -67,10 +65,10 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
   private final Set<ProjectPermission> requiredPermissions = ProjectControllerTesterService.PROJECT_CREATE_PERMISSION_SET;
 
   @MockBean
-  private AwardedContractSummaryService awardedContractSummaryService;
+  private InfrastructureAwardedContractSummaryService awardedContractSummaryService;
 
   @MockBean
-  private AwardedContractServiceCommon awardedContractServiceCommon;
+  private InfrastructureAwardedContractService awardedContractService;
 
   @MockBean
   private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
@@ -98,8 +96,8 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
     when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeam(projectDetail, unauthenticatedUser)).thenReturn(false);
-    when(awardedContractServiceCommon.createAwardedContract(any(), any(), any())).thenReturn(AwardedContractTestUtil.createAwardedContract());
-    when(awardedContractServiceCommon.updateAwardedContract(any(), any(), any())).thenReturn(AwardedContractTestUtil.createAwardedContract());
+    when(awardedContractService.createAwardedContract(any(), any(), any())).thenReturn(AwardedContractTestUtil.createInfrastructureAwardedContract());
+    when(awardedContractService.updateAwardedContract(any(), any(), any())).thenReturn(AwardedContractTestUtil.createInfrastructureAwardedContract());
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(eq(projectDetail), any())).thenReturn(true);
   }
 
@@ -137,10 +135,10 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
 
   @Test
   public void authenticatedUser_hasAccessToAwardedContract() throws Exception {
-    AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
+    var awardedContract = AwardedContractTestUtil.createInfrastructureAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
-    when(awardedContractServiceCommon.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
-    when(awardedContractServiceCommon.getForm(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(new InfrastructureAwardedContractForm());
+    when(awardedContractService.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
+    when(awardedContractService.getForm(awardedContract)).thenReturn(new InfrastructureAwardedContractForm());
     mockMvc.perform(get(ReverseRouter.route(
         on(InfrastructureAwardedContractController.class).getAwardedContract(PROJECT_ID, AWARDED_CONTRACT_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
@@ -164,7 +162,7 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
     var form = new InfrastructureAwardedContractForm();
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
-    when(awardedContractServiceCommon.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
@@ -175,8 +173,8 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
             .params(completeLaterParams))
         .andExpect(status().is3xxRedirection());
 
-    verify(awardedContractServiceCommon, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(awardedContractServiceCommon, times(1)).createAwardedContract(any(), any(), any());
+    verify(awardedContractService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(awardedContractService, times(1)).createAwardedContract(any(), any(), any());
   }
 
   @Test
@@ -188,7 +186,7 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
     var form = new InfrastructureAwardedContractForm();
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
-    when(awardedContractServiceCommon.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
@@ -199,8 +197,8 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
             .params(completeLaterParams))
         .andExpect(status().isForbidden());
 
-    verify(awardedContractServiceCommon, times(0)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(awardedContractServiceCommon, times(0)).createAwardedContract(any(), any(), any());
+    verify(awardedContractService, times(0)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(awardedContractService, times(0)).createAwardedContract(any(), any(), any());
   }
 
   @Test
@@ -213,7 +211,7 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
-    when(awardedContractServiceCommon.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
@@ -224,8 +222,8 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
             .params(completeLaterParams))
         .andExpect(status().isOk());
 
-    verify(awardedContractServiceCommon, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(awardedContractServiceCommon, times(0)).createAwardedContract(any(), any(), any());
+    verify(awardedContractService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(awardedContractService, times(0)).createAwardedContract(any(), any(), any());
   }
 
   @Test
@@ -237,7 +235,7 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
     var form = new InfrastructureAwardedContractForm();
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
-    when(awardedContractServiceCommon.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
@@ -248,8 +246,8 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
             .params(completeLaterParams))
         .andExpect(status().is3xxRedirection());
 
-    verify(awardedContractServiceCommon, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(awardedContractServiceCommon, times(1)).createAwardedContract(any(), any(), any());
+    verify(awardedContractService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(awardedContractService, times(1)).createAwardedContract(any(), any(), any());
   }
 
   @Test
@@ -261,7 +259,7 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
     var form = new InfrastructureAwardedContractForm();
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
-    when(awardedContractServiceCommon.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
@@ -272,8 +270,8 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
             .params(completeLaterParams))
         .andExpect(status().isForbidden());
 
-    verify(awardedContractServiceCommon, times(0)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(awardedContractServiceCommon, times(0)).createAwardedContract(any(), any(), any());
+    verify(awardedContractService, times(0)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(awardedContractService, times(0)).createAwardedContract(any(), any(), any());
   }
 
   @Test
@@ -286,7 +284,7 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
-    when(awardedContractServiceCommon.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
@@ -297,16 +295,16 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
             .params(completeLaterParams))
         .andExpect(status().isOk());
 
-    verify(awardedContractServiceCommon, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(awardedContractServiceCommon, times(0)).createAwardedContract(any(), any(), any());
+    verify(awardedContractService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(awardedContractService, times(0)).createAwardedContract(any(), any(), any());
   }
 
   @Test
   public void saveAwardedContract_existingContract_partialValidation_validForm() throws Exception {
-    AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
+    var awardedContract = AwardedContractTestUtil.createInfrastructureAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
 
-    when(awardedContractServiceCommon.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
+    when(awardedContractService.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
     }};
@@ -314,7 +312,7 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
     var form = new InfrastructureAwardedContractForm();
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
-    when(awardedContractServiceCommon.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
@@ -325,8 +323,8 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
             .params(params))
         .andExpect(status().is3xxRedirection());
 
-    verify(awardedContractServiceCommon, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(awardedContractServiceCommon, times(1)).updateAwardedContract(eq(AWARDED_CONTRACT_ID), any(), any());
+    verify(awardedContractService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(awardedContractService, times(1)).updateAwardedContract(eq(AWARDED_CONTRACT_ID), any(), any());
   }
 
   @Test
@@ -338,7 +336,7 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
     var form = new InfrastructureAwardedContractForm();
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
-    when(awardedContractServiceCommon.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
@@ -349,16 +347,16 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
             .params(params))
         .andExpect(status().isForbidden());
 
-    verify(awardedContractServiceCommon, times(0)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(awardedContractServiceCommon, times(0)).updateAwardedContract(eq(AWARDED_CONTRACT_ID), any(), any());
+    verify(awardedContractService, times(0)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(awardedContractService, times(0)).updateAwardedContract(eq(AWARDED_CONTRACT_ID), any(), any());
   }
 
   @Test
   public void saveAwardedContract_existingContract__partialValidation_invalidForm() throws Exception {
-    AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
+    var awardedContract = AwardedContractTestUtil.createInfrastructureAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
 
-    when(awardedContractServiceCommon.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
+    when(awardedContractService.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
     }};
@@ -367,7 +365,7 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
-    when(awardedContractServiceCommon.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
@@ -378,16 +376,16 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
             .params(params))
         .andExpect(status().isOk());
 
-    verify(awardedContractServiceCommon, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(awardedContractServiceCommon, times(0)).updateAwardedContract(eq(AWARDED_CONTRACT_ID), any(), any());
+    verify(awardedContractService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(awardedContractService, times(0)).updateAwardedContract(eq(AWARDED_CONTRACT_ID), any(), any());
   }
 
   @Test
   public void saveAwardedContract_existingContract__fullValidation_validForm() throws Exception {
-    AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
+    var awardedContract = AwardedContractTestUtil.createInfrastructureAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
 
-    when(awardedContractServiceCommon.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
+    when(awardedContractService.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
@@ -395,7 +393,7 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
     var form = new InfrastructureAwardedContractForm();
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
-    when(awardedContractServiceCommon.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
@@ -406,8 +404,8 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
             .params(params))
         .andExpect(status().is3xxRedirection());
 
-    verify(awardedContractServiceCommon, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(awardedContractServiceCommon, times(1)).updateAwardedContract(eq(AWARDED_CONTRACT_ID), any(), any());
+    verify(awardedContractService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(awardedContractService, times(1)).updateAwardedContract(eq(AWARDED_CONTRACT_ID), any(), any());
   }
 
   @Test
@@ -419,7 +417,7 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
     var form = new InfrastructureAwardedContractForm();
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
-    when(awardedContractServiceCommon.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
@@ -430,16 +428,16 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
             .params(params))
         .andExpect(status().isForbidden());
 
-    verify(awardedContractServiceCommon, times(0)).validate(any(), any(), eq(ValidationType.PARTIAL));
-    verify(awardedContractServiceCommon, times(0)).updateAwardedContract(eq(AWARDED_CONTRACT_ID), any(), any());
+    verify(awardedContractService, times(0)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(awardedContractService, times(0)).updateAwardedContract(eq(AWARDED_CONTRACT_ID), any(), any());
   }
 
   @Test
   public void saveAwardedContract_existingContract_fullValidation_invalidForm() throws Exception {
-    AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
+    var awardedContract = AwardedContractTestUtil.createInfrastructureAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
 
-    when(awardedContractServiceCommon.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
+    when(awardedContractService.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
@@ -448,7 +446,7 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
 
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
-    when(awardedContractServiceCommon.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(InfrastructureAwardedContractController.class)
@@ -459,18 +457,18 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
             .params(params))
         .andExpect(status().isOk());
 
-    verify(awardedContractServiceCommon, times(1)).validate(any(), any(), eq(ValidationType.FULL));
-    verify(awardedContractServiceCommon, times(0)).updateAwardedContract(eq(AWARDED_CONTRACT_ID), any(), any());
+    verify(awardedContractService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(awardedContractService, times(0)).updateAwardedContract(eq(AWARDED_CONTRACT_ID), any(), any());
   }
 
   @Test
   public void removeAwardedContractConfirmation_authenticated_thenValid() throws Exception {
-    AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
+    var awardedContract = AwardedContractTestUtil.createInfrastructureAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
 
-    when(awardedContractServiceCommon.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
+    when(awardedContractService.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
 
-    AwardedContractView awardedContractView = AwardedContractTestUtil.createAwardedContractView(1);
+    var awardedContractView = AwardedContractTestUtil.createInfrastructureAwardedContractView(1);
 
     when(awardedContractSummaryService.getAwardedContractView(AWARDED_CONTRACT_ID, projectDetail, 1))
         .thenReturn(awardedContractView);
@@ -502,16 +500,15 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
         .with(authenticatedUserAndSession(unauthenticatedUser)))
         .andExpect(status().isForbidden());
 
-    verify(awardedContractServiceCommon, times(0)).deleteAwardedContract(any());
+    verify(awardedContractService, times(0)).deleteAwardedContract(any());
   }
 
   @Test
   public void removeAwardedContract_authenticated_thenValid() throws Exception {
-
-    AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
+    var awardedContract = AwardedContractTestUtil.createInfrastructureAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
 
-    when(awardedContractServiceCommon.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail))
+    when(awardedContractService.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail))
         .thenReturn(awardedContract);
 
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
@@ -532,12 +529,11 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
         .params(params))
         .andExpect(status().is3xxRedirection());
 
-    verify(awardedContractServiceCommon, times(1)).deleteAwardedContract(awardedContract);
+    verify(awardedContractService, times(1)).deleteAwardedContract(awardedContract);
   }
 
   @Test
   public void saveAwardedContractSummary_authenticatedAndAllValid_thenRedirect() throws Exception {
-
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
@@ -556,7 +552,6 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
 
   @Test
   public void saveAwardedContractSummary_authenticatedAndAllInvalid_thenStayOnSummary() throws Exception {
-
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
@@ -575,7 +570,6 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
 
   @Test
   public void saveAwardedContractSummary_unauthenticated_thenInvalid() throws Exception {
-
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
     }};
@@ -628,11 +622,11 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
 
   @Test
   public void getAwardedContract_projectContextSmokeTest() {
-    AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
+    var awardedContract = AwardedContractTestUtil.createInfrastructureAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
 
-    when(awardedContractServiceCommon.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
-    when(awardedContractServiceCommon.getForm(eq(AWARDED_CONTRACT_ID), any()))
+    when(awardedContractService.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
+    when(awardedContractService.getForm(awardedContract))
         .thenReturn(AwardedContractTestUtil.createInfrastructureAwardedContractForm());
 
     projectControllerTesterService
@@ -657,12 +651,12 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
 
   @Test
   public void removeAwardedContractConfirmation_projectContextSmokeTest() {
-    AwardedContractView awardedContractView = AwardedContractTestUtil.createAwardedContractView(1);
+    var awardedContractView = AwardedContractTestUtil.createInfrastructureAwardedContractView(1);
     when(awardedContractSummaryService.getAwardedContractView(AWARDED_CONTRACT_ID, projectDetail, 1))
         .thenReturn(awardedContractView);
-    AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
+    var awardedContract = AwardedContractTestUtil.createInfrastructureAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
-    when(awardedContractServiceCommon.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
+    when(awardedContractService.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail)).thenReturn(awardedContract);
 
     projectControllerTesterService
         .withHttpRequestMethod(HttpMethod.GET)
@@ -690,7 +684,7 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
     var form = new InfrastructureAwardedContractForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
-    when(awardedContractServiceCommon.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(awardedContractService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     projectControllerTesterService
         .withHttpRequestMethod(HttpMethod.POST)
@@ -717,10 +711,10 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
 
   @Test
   public void removeAwardedContract_projectContextSmokeTest() {
-    AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
+    var awardedContract = AwardedContractTestUtil.createInfrastructureAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
 
-    when(awardedContractServiceCommon.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail))
+    when(awardedContractService.getAwardedContract(AWARDED_CONTRACT_ID, projectDetail))
         .thenReturn(awardedContract);
 
     projectControllerTesterService
@@ -746,7 +740,7 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
 
   @Test
   public void saveAwardedContractSummary_projectContextSmokeTest() {
-    var awardedContractViews = List.of(AwardedContractTestUtil.createAwardedContractView(1));
+    var awardedContractViews = List.of(AwardedContractTestUtil.createInfrastructureAwardedContractView(1));
     when(awardedContractSummaryService.getValidatedAwardedContractViews(projectDetail))
         .thenReturn(awardedContractViews);
     when(awardedContractSummaryService.validateViews(awardedContractViews)).thenReturn(ValidationResult.VALID);
@@ -772,9 +766,9 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
 
   @Test
   public void getAwardedContract_userCantAccessAwardedContract_thenAccessForbidden() throws Exception {
-    AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
+    var awardedContract = AwardedContractTestUtil.createInfrastructureAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
-    when(awardedContractServiceCommon.getAwardedContract(any(), any())).thenReturn(awardedContract);
+    when(awardedContractService.getAwardedContract(any(), any())).thenReturn(awardedContract);
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(awardedContract.getProjectDetail()),
         any())
@@ -790,9 +784,9 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
 
   @Test
   public void removeAwardedContractConfirmation_userCantAccessAwardedContract_thenAccessForbidden() throws Exception {
-    AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
+    var awardedContract = AwardedContractTestUtil.createInfrastructureAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
-    when(awardedContractServiceCommon.getAwardedContract(any(), any())).thenReturn(awardedContract);
+    when(awardedContractService.getAwardedContract(any(), any())).thenReturn(awardedContract);
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(awardedContract.getProjectDetail()),
         any())
@@ -808,9 +802,9 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
 
   @Test
   public void saveAwardedContract_userCantAccessAwardedContract_thenAccessForbidden() throws Exception {
-    AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
+    var awardedContract = AwardedContractTestUtil.createInfrastructureAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
-    when(awardedContractServiceCommon.getAwardedContract(any(), any())).thenReturn(awardedContract);
+    when(awardedContractService.getAwardedContract(any(), any())).thenReturn(awardedContract);
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(awardedContract.getProjectDetail()),
         any())
@@ -839,9 +833,9 @@ public class InfrastructureAwardedContractControllerTest extends ProjectContextA
 
   @Test
   public void removeAwardedContract_userCantAccessAwardedContract_thenAccessForbidden() throws Exception {
-    AwardedContract awardedContract = AwardedContractTestUtil.createAwardedContract();
+    var awardedContract = AwardedContractTestUtil.createInfrastructureAwardedContract();
     awardedContract.setProjectDetail(projectDetail);
-    when(awardedContractServiceCommon.getAwardedContract(any(), any())).thenReturn(awardedContract);
+    when(awardedContractService.getAwardedContract(any(), any())).thenReturn(awardedContract);
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         eq(awardedContract.getProjectDetail()),
         any())

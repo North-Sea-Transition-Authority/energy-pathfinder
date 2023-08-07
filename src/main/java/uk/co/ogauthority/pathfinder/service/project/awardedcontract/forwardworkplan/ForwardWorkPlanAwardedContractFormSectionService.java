@@ -46,27 +46,27 @@ public class ForwardWorkPlanAwardedContractFormSectionService implements Project
     var awardedContractViews = awardedContractSummaryService.getValidatedAwardedContractViews(projectDetail);
     var validationResult = awardedContractSummaryService.validateViews(awardedContractViews);
     return ValidationResult.VALID.equals(validationResult)
-        && Boolean.FALSE.equals(awardedContractSetup.getHasOtherContractToAdd())
-        && !awardedContractViews.isEmpty();
+        && Boolean.FALSE.equals(awardedContractSetup.getHasOtherContractToAdd());
   }
 
   @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
     var awardedContractSetupOptional = setupService.getForwardWorkPlanAwardedContractSetup(fromDetail);
-    awardedContractSetupOptional.ifPresent(
-        awardedContractSetup -> entityDuplicationService.duplicateEntityAndSetNewParent(
-            awardedContractSetup,
-            toDetail,
-            ForwardWorkPlanAwardedContractSetup.class
-        ));
-
-    var awardContracts = awardedContractService.getAwardedContracts(fromDetail);
-    if (!awardContracts.isEmpty()) {
-      entityDuplicationService.duplicateEntitiesAndSetNewParent(
-          awardContracts,
+    if (awardedContractSetupOptional.isPresent()) {
+      entityDuplicationService.duplicateEntityAndSetNewParent(
+          awardedContractSetupOptional.get(),
           toDetail,
-          ForwardWorkPlanAwardedContract.class
+          ForwardWorkPlanAwardedContractSetup.class
       );
+
+      var awardContracts = awardedContractService.getAwardedContracts(fromDetail);
+      if (!awardContracts.isEmpty()) {
+        entityDuplicationService.duplicateEntitiesAndSetNewParent(
+            awardContracts,
+            toDetail,
+            ForwardWorkPlanAwardedContract.class
+        );
+      }
     }
   }
 

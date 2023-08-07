@@ -12,7 +12,8 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
 public class InfrastructureAwardedContractViewUtil {
 
-  private static final Class<InfrastructureAwardedContractController> INFRASTRUCTURE_CONTROLLER = InfrastructureAwardedContractController.class;
+  private static final Class<InfrastructureAwardedContractController> INFRASTRUCTURE_CONTROLLER
+      = InfrastructureAwardedContractController.class;
 
   private InfrastructureAwardedContractViewUtil() {
     throw new IllegalStateException("InfrastructureAwardedContractViewUtil is a utility class and should not be instantiated");
@@ -75,28 +76,28 @@ public class InfrastructureAwardedContractViewUtil {
           isValid
       );
     }
+  }
 
-    private static SummaryLink getEditLink(Integer projectId, Integer awardedContractId) {
-      return new SummaryLink(
-          SummaryLinkText.EDIT.getDisplayName(),
-          ReverseRouter.route(on(INFRASTRUCTURE_CONTROLLER).getAwardedContract(
-              projectId,
-              awardedContractId,
-              null
-          ))
-      );
-    }
+  public static SummaryLink getEditLink(Integer projectId, Integer awardedContractId) {
+    return new SummaryLink(
+        SummaryLinkText.EDIT.getDisplayName(),
+        ReverseRouter.route(on(INFRASTRUCTURE_CONTROLLER).getAwardedContract(
+            projectId,
+            awardedContractId,
+            null
+        ))
+    );
+  }
 
-    public static SummaryLink getDeleteLink(Integer projectId, Integer awardedContractId, Integer displayOrder) {
-      return new SummaryLink(
-          SummaryLinkText.DELETE.getDisplayName(),
-          ReverseRouter.route(on(INFRASTRUCTURE_CONTROLLER).removeAwardedContract(
-              projectId,
-              awardedContractId,
-              displayOrder,
-              null
-          ))
-      );
-    }
+  public static SummaryLink getDeleteLink(Integer projectId, Integer awardedContractId, Integer displayOrder) {
+    return new SummaryLink(
+        SummaryLinkText.DELETE.getDisplayName(),
+        ReverseRouter.route(on(INFRASTRUCTURE_CONTROLLER).removeAwardedContract(
+            projectId,
+            awardedContractId,
+            displayOrder,
+            null
+        ))
+    );
   }
 }

@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.time.LocalDate;
 import java.util.Objects;
 import javax.persistence.Column;
@@ -50,6 +51,11 @@ public abstract class AwardedContractCommon
 
   public AwardedContractCommon(ProjectDetail projectDetail) {
     this.projectDetail = projectDetail;
+  }
+
+  @VisibleForTesting
+  public void setId(Integer id) {
+    this.id = id;
   }
 
   public String getContractorName() {
