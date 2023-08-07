@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTenderConversionController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
@@ -207,6 +208,7 @@ public class UpcomingTenderSummaryServiceTest {
 
     assertThat(view.getSummaryLinks()).extracting(SummaryLink::getLinkText).containsExactly(
         SummaryLinkText.EDIT.getDisplayName(),
+        SummaryLinkText.CONVERT_TO_AWARDED.getDisplayName(),
         SummaryLinkText.DELETE.getDisplayName()
     );
   }
@@ -279,6 +281,17 @@ public class UpcomingTenderSummaryServiceTest {
             null
         ))
     );
+
+    var convertLink = new SummaryLink(
+        SummaryLinkText.CONVERT_TO_AWARDED.getDisplayName(),
+        ReverseRouter.route(on(UpcomingTenderConversionController.class).convertUpcomingTenderConfirm(
+            upcomingTender.getProjectDetail().getProject().getId(),
+            upcomingTender.getId(),
+            1,
+            null
+        ))
+    );
+
     var removeLink = new SummaryLink(
         SummaryLinkText.DELETE.getDisplayName(),
         ReverseRouter.route(on(UpcomingTendersController.class).removeUpcomingTenderConfirm(
@@ -291,7 +304,7 @@ public class UpcomingTenderSummaryServiceTest {
 
     var upcomingTenderView = upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, 1);
 
-    assertThat(upcomingTenderView.getSummaryLinks()).containsExactly(editLink, removeLink);
+    assertThat(upcomingTenderView.getSummaryLinks()).containsExactly(editLink, convertLink, removeLink);
   }
 
   @Test

@@ -4,10 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTenderConversionController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -26,23 +27,21 @@ import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
-@RunWith(MockitoJUnitRunner.class)
-public class UpcomingTenderViewUtilTest {
+@ExtendWith(MockitoExtension.class)
+class UpcomingTenderViewUtilTest {
 
-  private PortalOrganisationGroup addedByPortalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
+  private final PortalOrganisationGroup addedByPortalOrganisationGroup = TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
   private ProjectDetail projectDetail;
   private List<UploadedFileView> uploadedFileViews;
 
-  @Before
-  public void setup() {
+  @BeforeEach
+  void setup() {
     projectDetail = ProjectUtil.getProjectDetails();
     uploadedFileViews = List.of(UploadedFileUtil.createUploadedFileView());
-
   }
 
   @Test
-  public void createUpComingTenderView_whenNoTenderFunction_thenEmptyStringWithTag() {
-
+  void createUpComingTenderView_whenNoTenderFunction_thenEmptyStringWithTag() {
     var upcomingTender = UpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setTenderFunction(null);
     upcomingTender.setManualTenderFunction(null);
@@ -66,8 +65,7 @@ public class UpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_whenFromListTenderFunction_thenFromListStringWithTag() {
-
+  void createUpComingTenderView_whenFromListTenderFunction_thenFromListStringWithTag() {
     final var tenderFunction = Function.DRILLING;
 
     var upcomingTender = UpcomingTenderUtil.getUpcomingTender(projectDetail);
@@ -95,8 +93,7 @@ public class UpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_whenNotFromListTenderFunction_thenNotFromListStringWithTag() {
-
+  void createUpComingTenderView_whenNotFromListTenderFunction_thenNotFromListStringWithTag() {
     final var tenderFunction = "Manual entry";
 
     var upcomingTender = UpcomingTenderUtil.getUpcomingTender(projectDetail);
@@ -124,8 +121,7 @@ public class UpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_whenContractBandProvided_thenContractBandPopulated() {
-
+  void createUpComingTenderView_whenContractBandProvided_thenContractBandPopulated() {
     final var contractBand = ContractBand.LESS_THAN_25M;
 
     var upcomingTender = UpcomingTenderUtil.getUpcomingTender(projectDetail);
@@ -150,8 +146,7 @@ public class UpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_whenContractBandNotProvided_thenEmptyString() {
-
+  void createUpComingTenderView_whenContractBandNotProvided_thenEmptyString() {
     var upcomingTender = UpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setContractBand(null);
 
@@ -174,8 +169,7 @@ public class UpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_whenIsValidTrue_thenIsValidTrueInView() {
-
+  void createUpComingTenderView_whenIsValidTrue_thenIsValidTrueInView() {
     var upcomingTender = UpcomingTenderUtil.getUpcomingTender(projectDetail);
 
     final var displayOrder = 3;
@@ -198,8 +192,7 @@ public class UpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_whenIsValidFalse_thenIsValidFalseInView() {
-
+  void createUpComingTenderView_whenIsValidFalse_thenIsValidFalseInView() {
     var upcomingTender = UpcomingTenderUtil.getUpcomingTender(projectDetail);
 
     final var displayOrder = 3;
@@ -222,8 +215,7 @@ public class UpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_doNotIncludeSummaryLinks_thenEmptyLinkList() {
-
+  void createUpComingTenderView_doNotIncludeSummaryLinks_thenEmptyLinkList() {
     var upcomingTender = UpcomingTenderUtil.getUpcomingTender(projectDetail);
     var includeSummaryLinks = false;
 
@@ -244,7 +236,7 @@ public class UpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_cannotFindPortalOrgGroup_thenDefaultAddedByPortalOrgGroupString() {
+  void createUpComingTenderView_cannotFindPortalOrgGroup_thenDefaultAddedByPortalOrgGroupString() {
     var upcomingTender = UpcomingTenderUtil.getUpcomingTender(projectDetail);
     var includeSummaryLinks = false;
     var emptyPortalOrganisationGroup = new PortalOrganisationGroup();
@@ -300,8 +292,18 @@ public class UpcomingTenderViewUtilTest {
         ))
     );
 
+    final var convertLink = new SummaryLink(
+        SummaryLinkText.CONVERT_TO_AWARDED.getDisplayName(),
+        ReverseRouter.route(on(UpcomingTenderConversionController.class).convertUpcomingTenderConfirm(
+            upcomingTenderView.getProjectId(),
+            upcomingTenderView.getId(),
+            displayOrder,
+            null
+        ))
+    );
+
     if (canAccessTenderLinks) {
-      assertThat(upcomingTenderView.getSummaryLinks()).containsExactly(editSummaryLink, removeSummaryLink);
+      assertThat(upcomingTenderView.getSummaryLinks()).containsExactly(editSummaryLink, convertLink, removeSummaryLink);
     } else {
       assertThat(upcomingTenderView.getSummaryLinks()).isEmpty();
     }

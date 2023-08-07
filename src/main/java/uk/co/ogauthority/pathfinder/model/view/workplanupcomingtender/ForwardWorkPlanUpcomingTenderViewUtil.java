@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderController;
+import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderConversionController;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
@@ -118,6 +119,17 @@ public class ForwardWorkPlanUpcomingTenderViewUtil {
             ))
         );
         summaryLinks.add(editLink);
+
+        var convertLink = new SummaryLink(
+            SummaryLinkText.CONVERT_TO_AWARDED.getDisplayName(),
+            ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderConversionController.class).convertUpcomingTenderConfirm(
+                projectId,
+                forwardWorkPlanUpcomingTender.getId(),
+                displayOrder,
+                null
+            ))
+        );
+        summaryLinks.add(convertLink);
 
         var removeLink = new SummaryLink(
             SummaryLinkText.DELETE.getDisplayName(),
