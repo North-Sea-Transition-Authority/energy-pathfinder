@@ -48,7 +48,7 @@ public class UpcomingTenderConversionFormValidator implements SmartValidator {
 
   @Override
   public void validate(Object target, Errors errors) {
-    validate(target, errors, new Object[0]);
+    validate(target, errors, (Object) null);
   }
 
 }
