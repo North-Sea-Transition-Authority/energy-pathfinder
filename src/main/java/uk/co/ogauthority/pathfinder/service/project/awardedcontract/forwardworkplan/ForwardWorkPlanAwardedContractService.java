@@ -105,6 +105,7 @@ public class ForwardWorkPlanAwardedContractService extends AwardedContractServic
     awardedContractRepository.delete(awardedContract);
   }
 
+  @Transactional
   public void deleteAllByProjectDetail(ProjectDetail projectDetail) {
     awardedContractRepository.deleteAllByProjectDetail(projectDetail);
   }

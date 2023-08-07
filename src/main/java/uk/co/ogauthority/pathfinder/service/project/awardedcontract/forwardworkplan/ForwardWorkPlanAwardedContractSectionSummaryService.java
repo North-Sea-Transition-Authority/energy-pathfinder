@@ -11,6 +11,7 @@ import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.Porta
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContract;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractView;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
@@ -28,7 +29,10 @@ public class ForwardWorkPlanAwardedContractSectionSummaryService
     implements ProjectSectionSummaryService {
 
   private final ForwardWorkPlanAwardedContractService awardedContractService;
+  private final ForwardWorkPlanAwardedContractSetupService setupService;
+
   public static final String TEMPLATE_PATH = "project/awardedcontract/forwardworkplan/forwardWorkPlanAwardedContractSectionSummary.ftl";
+  public static final int DISPLAY_ORDER = ProjectTask.WORK_PLAN_AWARDED_CONTRACTS.getDisplayOrder();
 
   @Autowired
   public ForwardWorkPlanAwardedContractSectionSummaryService(
@@ -36,10 +40,12 @@ public class ForwardWorkPlanAwardedContractSectionSummaryService
       ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService,
       ProjectSectionItemOwnershipService projectSectionItemOwnershipService,
       PortalOrganisationAccessor portalOrganisationAccessor,
-      ForwardWorkPlanAwardedContractService awardedContractService) {
+      ForwardWorkPlanAwardedContractService awardedContractService,
+      ForwardWorkPlanAwardedContractSetupService setupService) {
     super(differenceService, projectSectionSummaryCommonModelService, projectSectionItemOwnershipService,
         portalOrganisationAccessor);
     this.awardedContractService = awardedContractService;
+    this.setupService = setupService;
   }
 
   @Override
@@ -56,7 +62,9 @@ public class ForwardWorkPlanAwardedContractSectionSummaryService
         awardedContractViews
     );
 
-    return super.getSummary(detail, awardedContractViewDifferenceModel, TEMPLATE_PATH);
+    var summaryModel =  super.getSummaryModel(detail, awardedContractViewDifferenceModel);
+    summaryModel.put("awardedContractSetupDiffModel", getAwardedContractSetupDifferenceModel(detail));
+    return super.getSummary(summaryModel, TEMPLATE_PATH, DISPLAY_ORDER);
   }
 
   private List<Map<String, ?>> getAwardedContractDifferenceModel(
@@ -75,6 +83,19 @@ public class ForwardWorkPlanAwardedContractSectionSummaryService
         Set.of("summaryLinks"),
         ForwardWorkPlanAwardedContractView::getDisplayOrder,
         ForwardWorkPlanAwardedContractView::getDisplayOrder
+    );
+  }
+
+  private Map<String, Object> getAwardedContractSetupDifferenceModel(ProjectDetail projectDetail) {
+    var currentSetupView = setupService.getAwardedContractSetupView(projectDetail);
+    var previousSetupView = setupService.getAwardedContractSetupView(
+        projectDetail.getProject(),
+        projectDetail.getVersion() - 1
+    );
+
+    return differenceService.differentiate(
+        currentSetupView,
+        previousSetupView
     );
   }
 

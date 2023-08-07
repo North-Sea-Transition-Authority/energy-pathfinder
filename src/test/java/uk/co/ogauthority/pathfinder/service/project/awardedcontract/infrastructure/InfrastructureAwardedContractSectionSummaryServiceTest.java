@@ -88,7 +88,11 @@ class InfrastructureAwardedContractSectionSummaryServiceTest {
 
     var sectionSummary = awardedContractSectionSummaryService.getSummary(detail);
 
-    AwardedContractTestUtil.assertModelProperties(sectionSummary, InfrastructureAwardedContractSectionSummaryService.TEMPLATE_PATH);
+    AwardedContractTestUtil.assertInfrastructureModelProperties(
+        sectionSummary,
+        InfrastructureAwardedContractSectionSummaryService.TEMPLATE_PATH,
+        InfrastructureAwardedContractSectionSummaryService.DISPLAY_ORDER
+    );
 
     verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
         detail,
@@ -111,7 +115,12 @@ class InfrastructureAwardedContractSectionSummaryServiceTest {
 
     var sectionSummary = awardedContractSectionSummaryService.getSummary(detail);
 
-    AwardedContractTestUtil.assertModelProperties(sectionSummary, InfrastructureAwardedContractSectionSummaryService.TEMPLATE_PATH);
+    AwardedContractTestUtil.assertInfrastructureModelProperties(
+        sectionSummary,
+        InfrastructureAwardedContractSectionSummaryService.TEMPLATE_PATH,
+        InfrastructureAwardedContractSectionSummaryService.DISPLAY_ORDER
+    );
+
     verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
         detail,
         AwardedContractSectionSummaryService.PAGE_NAME,

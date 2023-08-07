@@ -159,7 +159,7 @@ public class ForwardWorkPlanAwardedContractSummaryControllerTest extends Project
   }
 
   @Test
-  public void saveAwardedContractSummary_validForm() throws Exception {
+  public void saveAwardedContractSummary_validFormWithAnotherContractToAdd_redirectToNewContract() throws Exception {
     var awardedContractView = AwardedContractTestUtil.createForwardWorkPlanAwardedContractView(1);
     var awardedContractViewList = List.of(awardedContractView);
     when(summaryService.getAwardedContractViews(projectDetail)).thenReturn(awardedContractViewList);
@@ -174,11 +174,36 @@ public class ForwardWorkPlanAwardedContractSummaryControllerTest extends Project
                 .param("hasOtherContractsToAdd", "true")
         )
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl(route(on(TASK_LIST_CONTROLLER).viewTaskList(PROJECT_ID, null))));
+        .andExpect(redirectedUrl(route(on(AWARDED_CONTRACT_CONTROLLER).addAwardedContract(PROJECT_ID, null))));
 
     verify(validationService).validate(formCaptor.capture(), any(), eq(ValidationType.FULL));
     var form = formCaptor.getValue();
     assertThat(form.getHasOtherContractsToAdd()).isTrue();
+
+    verify(summaryService).saveAwardedContractSummary(form, projectDetail);
+  }
+
+  @Test
+  public void saveAwardedContractSummary_validFormWithNoMoreContractsToAdd_redirectToTaskList() throws Exception {
+    var awardedContractView = AwardedContractTestUtil.createForwardWorkPlanAwardedContractView(1);
+    var awardedContractViewList = List.of(awardedContractView);
+    when(summaryService.getAwardedContractViews(projectDetail)).thenReturn(awardedContractViewList);
+
+    var bindingResult = new BeanPropertyBindingResult(SUMMARY_FORM, "form");
+    when(validationService.validate(any(), any(), eq(ValidationType.FULL))).thenReturn(bindingResult);
+
+    mockMvc.perform(
+            post(route(on(CONTROLLER).saveAwardedContractSummary(PROJECT_ID, null, bindingResult, null)))
+                .with(authenticatedUserAndSession(authenticatedUser))
+                .with(csrf())
+                .param("hasOtherContractsToAdd", "false")
+        )
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl(route(on(TASK_LIST_CONTROLLER).viewTaskList(PROJECT_ID, null))));
+
+    verify(validationService).validate(formCaptor.capture(), any(), eq(ValidationType.FULL));
+    var form = formCaptor.getValue();
+    assertThat(form.getHasOtherContractsToAdd()).isFalse();
 
     verify(summaryService).saveAwardedContractSummary(form, projectDetail);
   }

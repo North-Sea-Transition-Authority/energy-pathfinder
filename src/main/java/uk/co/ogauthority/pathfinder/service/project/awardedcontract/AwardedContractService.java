@@ -3,7 +3,6 @@ package uk.co.ogauthority.pathfinder.service.project.awardedcontract;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
@@ -20,7 +19,6 @@ import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
-@Service
 public abstract class AwardedContractService {
 
   private final ValidationService validationService;

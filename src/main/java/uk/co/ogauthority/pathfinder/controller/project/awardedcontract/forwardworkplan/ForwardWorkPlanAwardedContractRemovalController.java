@@ -100,7 +100,7 @@ public class ForwardWorkPlanAwardedContractRemovalController extends AwardContra
         .addObject("awardedContractView", awardedContractView)
         .addObject("cancelUrl", getAwardedContractSummaryUrl(projectId));
 
-    breadcrumbService.fromInfrastructureAwardedContracts(projectId, modelAndView, REMOVE_PAGE_NAME);
+    breadcrumbService.fromForwardWorkPlanAwardedContracts(projectId, modelAndView, REMOVE_PAGE_NAME);
 
     return modelAndView;
   }

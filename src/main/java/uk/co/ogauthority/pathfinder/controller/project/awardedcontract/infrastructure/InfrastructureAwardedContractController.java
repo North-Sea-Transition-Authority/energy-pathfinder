@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastr
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.Collections;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,8 +72,7 @@ public class InfrastructureAwardedContractController extends AwardContractContro
   public ModelAndView addAwardedContract(@PathVariable("projectId") Integer projectId,
                                          ProjectContext projectContext) {
     var form = new InfrastructureAwardedContractForm();
-    var preSelectedContractFunctionMap = awardedContractService.getPreSelectedContractFunction(form);
-    return getAwardedContractModelAndView(projectId, form, preSelectedContractFunctionMap, projectContext.getProjectDetails());
+    return getAwardedContractModelAndView(projectId, form, Collections.emptyMap(), projectContext.getProjectDetails());
   }
 
   @GetMapping("/awarded-contract/{awardedContractId}/edit")

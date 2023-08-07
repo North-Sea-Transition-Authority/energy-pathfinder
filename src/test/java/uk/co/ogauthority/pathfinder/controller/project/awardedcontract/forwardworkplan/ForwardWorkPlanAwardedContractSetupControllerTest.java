@@ -33,6 +33,7 @@ import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
+import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -55,6 +56,8 @@ public class ForwardWorkPlanAwardedContractSetupControllerTest extends ProjectCo
   private static final Integer PROJECT_ID = 1;
   private static final Class<ForwardWorkPlanAwardedContractSetupController> CONTROLLER = ForwardWorkPlanAwardedContractSetupController.class;
   private static final Class<ForwardWorkPlanAwardedContractSummaryController> SUMMARY_CONTROLLER = ForwardWorkPlanAwardedContractSummaryController.class;
+  private static final Class<ForwardWorkPlanAwardedContractController> AWARDED_CONTRACT_CONTROLLER = ForwardWorkPlanAwardedContractController.class;
+  private static final Class<TaskListController> TASK_LIST_CONTROLLER = TaskListController.class;
 
   @MockBean
   private ForwardWorkPlanAwardedContractSetupService setupService;
@@ -161,7 +164,7 @@ public class ForwardWorkPlanAwardedContractSetupControllerTest extends ProjectCo
   }
 
   @Test
-  public void saveAwardedContractSetup_whenValidForm_thenRedirect() throws Exception {
+  public void saveAwardedContractSetup_whenValidFormAndContractToAdd_thenRedirectToNewContract() throws Exception {
     var expectedBindingResult = new BeanPropertyBindingResult(ForwardWorkPlanAwardedContractSetupForm.class, "form");
     when(setupService.validate(any(), any()))
         .thenReturn(expectedBindingResult);
@@ -172,12 +175,37 @@ public class ForwardWorkPlanAwardedContractSetupControllerTest extends ProjectCo
         .param("hasContractToAdd", "true")
     )
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl(route(on(SUMMARY_CONTROLLER).viewAwardedContracts(PROJECT_ID, null))));
+        .andExpect(redirectedUrl(route(on(AWARDED_CONTRACT_CONTROLLER).addAwardedContract(PROJECT_ID, null))));
 
     verify(setupService).validate(formCaptor.capture(), bindingResultCaptor.capture());
 
     var form = formCaptor.getValue();
     assertThat(form.getHasContractToAdd()).isTrue();
+
+    var bindingResult = bindingResultCaptor.getValue();
+    assertThat(bindingResult.hasErrors()).isFalse();
+
+    verify(setupService).saveAwardedContractSetup(form, projectDetail);
+  }
+
+  @Test
+  public void saveAwardedContractSetup_whenValidFormAndNoContractsToAdd_thenRedirectToTasklist() throws Exception {
+    var expectedBindingResult = new BeanPropertyBindingResult(ForwardWorkPlanAwardedContractSetupForm.class, "form");
+    when(setupService.validate(any(), any()))
+        .thenReturn(expectedBindingResult);
+
+    mockMvc.perform(post(route(on(CONTROLLER).saveAwardedContractSetup(PROJECT_ID, null, null, null, null)))
+            .with(authenticatedUserAndSession(authenticatedUser))
+            .with(csrf())
+            .param("hasContractToAdd", "false")
+        )
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl(route(on(TASK_LIST_CONTROLLER).viewTaskList(PROJECT_ID, null))));
+
+    verify(setupService).validate(formCaptor.capture(), bindingResultCaptor.capture());
+
+    var form = formCaptor.getValue();
+    assertThat(form.getHasContractToAdd()).isFalse();
 
     var bindingResult = bindingResultCaptor.getValue();
     assertThat(bindingResult.hasErrors()).isFalse();

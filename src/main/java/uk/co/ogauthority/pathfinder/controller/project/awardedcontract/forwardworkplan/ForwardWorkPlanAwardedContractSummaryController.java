@@ -60,7 +60,7 @@ public class ForwardWorkPlanAwardedContractSummaryController extends AwardContra
     var projectDetail = projectContext.getProjectDetails();
     var awardedContractViews = awardedContractSummaryService.getAwardedContractViews(projectDetail);
     var form = awardedContractSummaryService.getForm(projectDetail);
-    return getAwardedContractsSummaryModelAndView(projectId, awardedContractViews, form, projectDetail);
+    return getForwardWorkPlanAwardedContractsSummaryModelAndView(projectId, awardedContractViews, form, projectDetail);
   }
 
   @PostMapping
@@ -73,7 +73,7 @@ public class ForwardWorkPlanAwardedContractSummaryController extends AwardContra
     var awardedContractViews = awardedContractSummaryService.getAwardedContractViews(projectDetail);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getAwardedContractsSummaryModelAndView(projectId, awardedContractViews, form, projectDetail),
+        getForwardWorkPlanAwardedContractsSummaryModelAndView(projectId, awardedContractViews, form, projectDetail),
         form,
         () -> saveAwardedContractSummary(form, projectDetail, projectId)
     );
@@ -83,13 +83,17 @@ public class ForwardWorkPlanAwardedContractSummaryController extends AwardContra
                                                   ProjectDetail projectDetail,
                                                   Integer projectId) {
     awardedContractSummaryService.saveAwardedContractSummary(form, projectDetail);
+    if (Boolean.TRUE.equals(form.getHasOtherContractsToAdd())) {
+      return ReverseRouter.redirect(on(ForwardWorkPlanAwardedContractController.class)
+          .addAwardedContract(projectId, null));
+    }
     return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
   }
 
-  private ModelAndView getAwardedContractsSummaryModelAndView(Integer projectId,
-                                                              List<ForwardWorkPlanAwardedContractView> awardedContractViews,
-                                                              ForwardWorkPlanAwardedContractSummaryForm form,
-                                                              ProjectDetail projectDetail) {
+  private ModelAndView getForwardWorkPlanAwardedContractsSummaryModelAndView(Integer projectId,
+                                                                             List<ForwardWorkPlanAwardedContractView> awardedContractViews,
+                                                                             ForwardWorkPlanAwardedContractSummaryForm form,
+                                                                             ProjectDetail projectDetail) {
     var modelAndView = new ModelAndView("project/awardedcontract/forwardworkplan/forwardWorkPlanAwardedContractFormSummary")
         .addObject("pageTitle", PAGE_NAME)
         .addObject("awardedContractViews", awardedContractViews)

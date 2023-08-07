@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.forwardwo
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSummaryForm;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.infrastructure.InfrastructureAwardedContractForm;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.AwardedContractViewCommon;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupView;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractView;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.infrastructure.InfrastructureAwardedContractView;
@@ -340,22 +341,46 @@ public class AwardedContractTestUtil {
         .build() ;
   }
 
-  public static void assertModelProperties(ProjectSectionSummary projectSectionSummary,
-                                           String templatePath) {
-    assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(AwardedContractSectionSummaryService.DISPLAY_ORDER);
+  private static void assertModelPropertiesCommon(ProjectSectionSummary projectSectionSummary,
+                                           String templatePath,
+                                           int displayOrder) {
+    assertThat(projectSectionSummary.getDisplayOrder()).isEqualTo(displayOrder);
     assertThat(projectSectionSummary.getSidebarSectionLinks())
         .isEqualTo(List.of(AwardedContractSectionSummaryService.SECTION_LINK));
     assertThat(projectSectionSummary.getTemplatePath())
         .isEqualTo(templatePath);
+  }
+
+  public static void assertInfrastructureModelProperties(ProjectSectionSummary projectSectionSummary,
+                                                         String templatePath,
+                                                         int displayOrder) {
+    assertModelPropertiesCommon(projectSectionSummary, templatePath, displayOrder);
 
     var model = projectSectionSummary.getTemplateModel();
     assertThat(model).containsOnlyKeys("awardedContractDiffModel");
   }
 
+  public static void assertForwardWorkPlanModelProperties(ProjectSectionSummary projectSectionSummary,
+                                                         String templatePath,
+                                                         int displayOrder) {
+    assertModelPropertiesCommon(projectSectionSummary, templatePath, displayOrder);
+
+    var model = projectSectionSummary.getTemplateModel();
+    assertThat(model).containsOnlyKeys("awardedContractDiffModel", "awardedContractSetupDiffModel");
+  }
+
+
+
   public static ForwardWorkPlanAwardedContractSetup createForwardWorkPlanAwardedContractSetup(ProjectDetail projectDetail) {
     var contractSetup = new ForwardWorkPlanAwardedContractSetup(projectDetail);
     contractSetup.setHasContractToAdd(true);
     return contractSetup;
+  }
+
+  public static ForwardWorkPlanAwardedContractSetupView createForwardWorkPlanAwardedContractSetupView() {
+    var setUpView = new ForwardWorkPlanAwardedContractSetupView();
+    setUpView.setHasContractsToAdd("Yes");
+    return setUpView;
   }
 
   public static ForwardWorkPlanAwardedContractSummaryForm createForwardWorkPlanAwardedContractSummaryForm() {
