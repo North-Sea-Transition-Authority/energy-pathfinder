@@ -11,7 +11,7 @@ public interface SubscriberFieldStageRepository extends CrudRepository<Subscribe
 
   List<SubscriberFieldStage> findAllBySubscriberUuid(UUID subscriberUuid);
 
-  List<SubscriberFieldStage> findAllBySubscriberUuidIn (List<UUID> subscriberUuids);
+  List<SubscriberFieldStage> findAllBySubscriberUuidIn(List<UUID> subscriberUuids);
 
   void deleteAllBySubscriberUuid(UUID subscriberUuid);
 
