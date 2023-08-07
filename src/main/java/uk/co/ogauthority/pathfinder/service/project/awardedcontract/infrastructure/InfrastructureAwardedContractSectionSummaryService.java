@@ -11,6 +11,7 @@ import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.Porta
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure.InfrastructureAwardedContract;
+import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.infrastructure.InfrastructureAwardedContractView;
 import uk.co.ogauthority.pathfinder.model.view.awardedcontract.infrastructure.InfrastructureAwardedContractViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
@@ -28,6 +29,7 @@ public class InfrastructureAwardedContractSectionSummaryService
 
   private final InfrastructureAwardedContractService awardedContractService;
   public static final String TEMPLATE_PATH = "project/awardedcontract/infrastructure/infrastructureAwardedContractSectionSummary.ftl";
+  public static final int DISPLAY_ORDER = ProjectTask.UPCOMING_TENDERS.getDisplayOrder();
 
   @Autowired
   public InfrastructureAwardedContractSectionSummaryService(DifferenceService differenceService,
@@ -58,7 +60,8 @@ public class InfrastructureAwardedContractSectionSummaryService
         awardedContractViews
     );
 
-    return super.getSummary(detail, awardedContractViewDifferenceModel, TEMPLATE_PATH);
+    var summaryModel =  super.getSummaryModel(detail, awardedContractViewDifferenceModel);
+    return super.getSummary(summaryModel, TEMPLATE_PATH, DISPLAY_ORDER);
   }
 
   private List<Map<String, ?>> getAwardedContractDifferenceModel(

@@ -3,18 +3,15 @@ package uk.co.ogauthority.pathfinder.service.project.awardedcontract;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.AwardContractController;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 
-@Service
 public abstract class AwardedContractSectionSummaryService {
 
   public static final String PAGE_NAME = AwardContractController.PAGE_NAME;
@@ -23,7 +20,6 @@ public abstract class AwardedContractSectionSummaryService {
       PAGE_NAME,
       SECTION_ID
   );
-  public static final int DISPLAY_ORDER = ProjectTask.AWARDED_CONTRACTS.getDisplayOrder();
 
   protected final DifferenceService differenceService;
   protected final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
@@ -44,9 +40,8 @@ public abstract class AwardedContractSectionSummaryService {
 
   public abstract boolean canShowSection(ProjectDetail detail);
 
-  protected ProjectSectionSummary getSummary(ProjectDetail detail,
-                                             List<Map<String, ?>> awardedContractViewDifferenceModel,
-                                             String templatePath) {
+  protected Map<String, Object> getSummaryModel(ProjectDetail detail,
+                                                List<Map<String, ?>> awardedContractViewDifferenceModel) {
     var summaryModel = projectSectionSummaryCommonModelService.getCommonSummaryModelMap(
         detail,
         PAGE_NAME,
@@ -55,11 +50,17 @@ public abstract class AwardedContractSectionSummaryService {
 
     summaryModel.put("awardedContractDiffModel", awardedContractViewDifferenceModel);
 
+    return summaryModel;
+  }
+
+  protected ProjectSectionSummary getSummary(Map<String, Object> summaryModel,
+                                             String templatePath,
+                                             int displayOrder) {
     return new ProjectSectionSummary(
         List.of(SECTION_LINK),
         templatePath,
         summaryModel,
-        DISPLAY_ORDER
+        displayOrder
     );
   }
 

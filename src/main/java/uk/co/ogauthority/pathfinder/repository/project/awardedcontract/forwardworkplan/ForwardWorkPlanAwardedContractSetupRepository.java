@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.repository.project.awardedcontract.forwardw
 import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetup;
 
@@ -11,5 +12,8 @@ public interface ForwardWorkPlanAwardedContractSetupRepository extends CrudRepos
 
   Optional<ForwardWorkPlanAwardedContractSetup> findByProjectDetail(ProjectDetail projectDetail);
 
-  void deleteAllByProjectDetail(ProjectDetail projectDetail);
+  Optional<ForwardWorkPlanAwardedContractSetup> findByProjectDetail_ProjectAndProjectDetail_Version(Project project,
+                                                                                                    int version);
+
+  void deleteByProjectDetail(ProjectDetail projectDetail);
 }

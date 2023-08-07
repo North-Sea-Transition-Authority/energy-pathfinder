@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.view.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetupView;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.AwardedContractSectionSummaryService;
@@ -43,6 +44,9 @@ class ForwardWorkPlanAwardedContractSectionSummaryServiceTest {
   @Mock
   private PortalOrganisationAccessor portalOrganisationAccessor;
 
+  @Mock
+  private ForwardWorkPlanAwardedContractSetupService setupService;
+
   private ForwardWorkPlanAwardedContractSectionSummaryService sectionSummaryService;
 
   private final ProjectType projectType = ProjectType.FORWARD_WORK_PLAN;
@@ -55,7 +59,8 @@ class ForwardWorkPlanAwardedContractSectionSummaryServiceTest {
         projectSectionSummaryCommonModelService,
         projectSectionItemOwnershipService,
         portalOrganisationAccessor,
-        awardedContractService
+        awardedContractService,
+        setupService
     );
   }
 
@@ -85,11 +90,20 @@ class ForwardWorkPlanAwardedContractSectionSummaryServiceTest {
         AwardedContractTestUtil.createForwardWorkPlanAwardedContract()
     ));
 
+    when(setupService.getAwardedContractSetupView(detail))
+        .thenReturn(AwardedContractTestUtil.createForwardWorkPlanAwardedContractSetupView());
+
+    when(setupService.getAwardedContractSetupView(
+        detail.getProject(),
+        detail.getVersion() -1 )
+    ).thenReturn(new ForwardWorkPlanAwardedContractSetupView());
+
     var sectionSummary = sectionSummaryService.getSummary(detail);
 
-    AwardedContractTestUtil.assertModelProperties(
+    AwardedContractTestUtil.assertForwardWorkPlanModelProperties(
         sectionSummary,
-        ForwardWorkPlanAwardedContractSectionSummaryService.TEMPLATE_PATH
+        ForwardWorkPlanAwardedContractSectionSummaryService.TEMPLATE_PATH,
+        ForwardWorkPlanAwardedContractSectionSummaryService.DISPLAY_ORDER
     );
 
     verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(
@@ -113,9 +127,10 @@ class ForwardWorkPlanAwardedContractSectionSummaryServiceTest {
 
     var sectionSummary = sectionSummaryService.getSummary(detail);
 
-    AwardedContractTestUtil.assertModelProperties(
+    AwardedContractTestUtil.assertForwardWorkPlanModelProperties(
         sectionSummary,
-        ForwardWorkPlanAwardedContractSectionSummaryService.TEMPLATE_PATH
+        ForwardWorkPlanAwardedContractSectionSummaryService.TEMPLATE_PATH,
+        ForwardWorkPlanAwardedContractSectionSummaryService.DISPLAY_ORDER
     );
 
     verify(projectSectionSummaryCommonModelService, times(1)).getCommonSummaryModelMap(

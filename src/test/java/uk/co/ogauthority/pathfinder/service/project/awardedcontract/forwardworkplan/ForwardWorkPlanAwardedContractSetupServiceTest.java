@@ -62,6 +62,37 @@ class ForwardWorkPlanAwardedContractSetupServiceTest {
   }
 
   @Test
+  void getForwardWorkPlanAwardedContractSetupForProjectVersion_setUpFound() {
+    var awardedContractSetup = AwardedContractTestUtil.createForwardWorkPlanAwardedContractSetup(projectDetail);
+    when(repository.findByProjectDetail_ProjectAndProjectDetail_Version(
+        projectDetail.getProject(),
+        projectDetail.getVersion())
+    ).thenReturn(Optional.of(awardedContractSetup));
+
+    var resultOptional = setupService.getForwardWorkPlanAwardedContractSetupForProjectVersion(
+        projectDetail.getProject(),
+        projectDetail.getVersion()
+    );
+    assertThat(resultOptional).isPresent();
+    var result = resultOptional.get();
+    assertThat(result).isEqualTo(awardedContractSetup);
+  }
+
+  @Test
+  void getForwardWorkPlanAwardedContractSetupForProjectVersion_notFound() {
+    when(repository.findByProjectDetail_ProjectAndProjectDetail_Version(
+        projectDetail.getProject(),
+        projectDetail.getVersion())
+    ).thenReturn(Optional.empty());
+
+    var resultOptional = setupService.getForwardWorkPlanAwardedContractSetupForProjectVersion(
+        projectDetail.getProject(),
+        projectDetail.getVersion()
+    );
+    assertThat(resultOptional).isEmpty();
+  }
+
+  @Test
   void saveAwardedContractSetup_firstTimeSaving() {
     var form = new ForwardWorkPlanAwardedContractSetupForm();
     form.setHasContractToAdd(false);
@@ -186,7 +217,7 @@ class ForwardWorkPlanAwardedContractSetupServiceTest {
 
   @Test
   void deleteAllByProjectDetail() {
-    setupService.deleteAllByProjectDetail(projectDetail);
-    verify(repository).deleteAllByProjectDetail(projectDetail);
+    setupService.deleteByProjectDetail(projectDetail);
+    verify(repository).deleteByProjectDetail(projectDetail);
   }
 }

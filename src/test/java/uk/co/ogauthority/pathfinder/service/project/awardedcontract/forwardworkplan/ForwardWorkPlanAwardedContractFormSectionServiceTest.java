@@ -169,8 +169,6 @@ class ForwardWorkPlanAwardedContractFormSectionServiceTest {
     var fromProjectDetail = projectDetail;
     fromProjectDetail.setVersion(1);
 
-    when(awardedContractService.getAwardedContracts(fromProjectDetail)).thenReturn(Collections.emptyList());
-
     var toProjectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
     toProjectDetail.setVersion(2);
 
@@ -178,7 +176,6 @@ class ForwardWorkPlanAwardedContractFormSectionServiceTest {
     awardedContractSetup.setHasContractToAdd(false);
     when(setupService.getForwardWorkPlanAwardedContractSetup(projectDetail))
         .thenReturn(Optional.of(awardedContractSetup));
-
     formSectionService.copySectionData(fromProjectDetail, toProjectDetail);
 
     verify(entityDuplicationService).duplicateEntityAndSetNewParent(
@@ -243,7 +240,7 @@ class ForwardWorkPlanAwardedContractFormSectionServiceTest {
   @Test
   void removeSectionData() {
     formSectionService.removeSectionData(projectDetail);
-    verify(setupService).deleteAllByProjectDetail(projectDetail);
+    verify(setupService).deleteByProjectDetail(projectDetail);
     verify(awardedContractService).deleteAllByProjectDetail(projectDetail);
   }
 }

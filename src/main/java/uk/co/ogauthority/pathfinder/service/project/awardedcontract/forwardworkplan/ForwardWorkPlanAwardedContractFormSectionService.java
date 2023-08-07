@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardwork
 
 import java.util.Set;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContract;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSetup;
@@ -59,13 +60,15 @@ public class ForwardWorkPlanAwardedContractFormSectionService implements Project
           ForwardWorkPlanAwardedContractSetup.class
       );
 
-      var awardContracts = awardedContractService.getAwardedContracts(fromDetail);
-      if (!awardContracts.isEmpty()) {
-        entityDuplicationService.duplicateEntitiesAndSetNewParent(
-            awardContracts,
-            toDetail,
-            ForwardWorkPlanAwardedContract.class
-        );
+      if (Boolean.TRUE.equals(awardedContractSetupOptional.get().getHasContractToAdd())) {
+        var awardContracts = awardedContractService.getAwardedContracts(fromDetail);
+        if (!CollectionUtils.isEmpty(awardContracts)) {
+          entityDuplicationService.duplicateEntitiesAndSetNewParent(
+              awardContracts,
+              toDetail,
+              ForwardWorkPlanAwardedContract.class
+          );
+        }
       }
     }
   }
@@ -88,7 +91,7 @@ public class ForwardWorkPlanAwardedContractFormSectionService implements Project
 
   @Override
   public void removeSectionData(ProjectDetail projectDetail) {
-    setupService.deleteAllByProjectDetail(projectDetail);
+    setupService.deleteByProjectDetail(projectDetail);
     awardedContractService.deleteAllByProjectDetail(projectDetail);
   }
 }

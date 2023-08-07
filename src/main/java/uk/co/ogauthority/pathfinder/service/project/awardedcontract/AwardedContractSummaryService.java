@@ -3,7 +3,6 @@ package uk.co.ogauthority.pathfinder.service.project.awardedcontract;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
@@ -12,7 +11,6 @@ import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipS
 import uk.co.ogauthority.pathfinder.util.summary.SummaryUtil;
 import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 
-@Service
 public abstract class AwardedContractSummaryService {
 
   public static final String ERROR_FIELD_NAME = "awarded-contract-%d";

@@ -5,7 +5,7 @@ import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
 public class ForwardWorkPlanAwardedContractSetupForm {
 
-  @NotNull(message = "Select Yes if you have any upcoming tenders to add", groups = FullValidation.class)
+  @NotNull(message = "Select Yes if you have any awarded contracts to add", groups = FullValidation.class)
   private Boolean hasContractToAdd;
 
   public Boolean getHasContractToAdd() {
