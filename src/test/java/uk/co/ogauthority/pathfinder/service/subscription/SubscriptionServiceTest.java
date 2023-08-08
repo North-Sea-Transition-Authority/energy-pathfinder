@@ -31,6 +31,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.subscription.RelationToPathfinder;
 import uk.co.ogauthority.pathfinder.model.enums.subscription.SubscriptionManagementOption;
 import uk.co.ogauthority.pathfinder.model.form.subscription.ManageSubscriptionForm;
+import uk.co.ogauthority.pathfinder.model.form.subscription.ManageSubscriptionFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeFormValidator;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -60,6 +61,9 @@ class SubscriptionServiceTest {
 
   @Mock
   private ServiceProperties serviceProperties;
+
+  @Mock
+  private ManageSubscriptionFormValidator manageSubscriptionFormValidator;
 
   @InjectMocks
   private SubscriptionService subscriptionService;
@@ -274,6 +278,7 @@ class SubscriptionServiceTest {
     var bindingResult = new BeanPropertyBindingResult(form, "form");
 
     subscriptionService.validateManageSubscriptionForm(form, bindingResult);
+    verify(manageSubscriptionFormValidator).validate(form, bindingResult);
     verify(validationService).validate(form, bindingResult, ValidationType.FULL);
   }
 
@@ -369,7 +374,7 @@ class SubscriptionServiceTest {
   @Test
   void getManagementRouting_unsubscribe() {
     var form = new ManageSubscriptionForm();
-    form.setSubscriptionManagementOption(SubscriptionManagementOption.UNSUBSCRIBE);
+    form.setSubscriptionManagementOption(SubscriptionManagementOption.UNSUBSCRIBE.name());
     var subscriberUuid = UUID.randomUUID();
 
     var modelAndView = subscriptionService.getManagementRouting(subscriberUuid, form);
@@ -381,7 +386,7 @@ class SubscriptionServiceTest {
   @Test
   void getManagementRouting_updateSubscriptionPreferences() {
     var form = new ManageSubscriptionForm();
-    form.setSubscriptionManagementOption(SubscriptionManagementOption.UPDATE_SUBSCRIPTION);
+    form.setSubscriptionManagementOption(SubscriptionManagementOption.UPDATE_SUBSCRIPTION.name());
     var subscriberUuid = UUID.randomUUID();
 
     var modelAndView = subscriptionService.getManagementRouting(subscriberUuid, form);

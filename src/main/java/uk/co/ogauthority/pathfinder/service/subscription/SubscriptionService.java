@@ -25,6 +25,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.subscription.RelationToPathfinder;
 import uk.co.ogauthority.pathfinder.model.enums.subscription.SubscriptionManagementOption;
 import uk.co.ogauthority.pathfinder.model.form.subscription.ManageSubscriptionForm;
+import uk.co.ogauthority.pathfinder.model.form.subscription.ManageSubscriptionFormValidator;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeForm;
 import uk.co.ogauthority.pathfinder.model.form.subscription.SubscribeFormValidator;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -52,6 +53,7 @@ public class SubscriptionService {
   private final SubscribeFormValidator subscribeFormValidator;
   private final SubscriberFieldStageRepository subscriberFieldStageRepository;
   private final ServiceProperties serviceProperties;
+  private final ManageSubscriptionFormValidator manageSubscriptionFormValidator;
 
   @Autowired
   public SubscriptionService(
@@ -60,13 +62,16 @@ public class SubscriptionService {
       SubscriberEmailService subscriberEmailService,
       SubscribeFormValidator subscribeFormValidator,
       SubscriberFieldStageRepository subscriberFieldStageRepository,
-      ServiceProperties serviceProperties) {
+      ServiceProperties serviceProperties,
+      ManageSubscriptionFormValidator manageSubscriptionFormValidator
+  ) {
     this.subscriberRepository = subscriberRepository;
     this.validationService = validationService;
     this.subscriberEmailService = subscriberEmailService;
     this.subscribeFormValidator = subscribeFormValidator;
     this.subscriberFieldStageRepository = subscriberFieldStageRepository;
     this.serviceProperties = serviceProperties;
+    this.manageSubscriptionFormValidator = manageSubscriptionFormValidator;
   }
 
   public boolean isSubscribed(String emailAddress) {
@@ -161,6 +166,7 @@ public class SubscriptionService {
   }
 
   public BindingResult validateManageSubscriptionForm(ManageSubscriptionForm form, BindingResult bindingResult) {
+    manageSubscriptionFormValidator.validate(form, bindingResult);
     return validationService.validate(form, bindingResult, ValidationType.FULL);
   }
 
@@ -210,7 +216,7 @@ public class SubscriptionService {
   }
 
   public ModelAndView getManagementRouting(UUID subscriberUuid, ManageSubscriptionForm form) {
-    if (SubscriptionManagementOption.UNSUBSCRIBE.equals(form.getSubscriptionManagementOption())) {
+    if (SubscriptionManagementOption.UNSUBSCRIBE.name().equals(form.getSubscriptionManagementOption())) {
       return ReverseRouter.redirect(on(SubscriptionController.class).getUnsubscribe(subscriberUuid.toString()));
     } else {
       return ReverseRouter.redirect(on(SubscriptionController.class).getUpdateSubscriptionPreferences(subscriberUuid.toString()));
