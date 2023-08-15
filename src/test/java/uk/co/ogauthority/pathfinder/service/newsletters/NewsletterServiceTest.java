@@ -117,7 +117,7 @@ class NewsletterServiceTest {
   }
 
   @Test
-  void sendNewsletterToSubscribers_whenUnsubscribedProjectUpdated_assertCorrectEmailPropertiesUsed() {
+  void sendNewsletterToSubscribers_whenProjectsUpdatedNotInSubscription_thenNoUpdateEmailSent() {
     var subscribers = Collections.singletonList(SUBSCRIBER);
     var subscriberFieldStage = SubscriptionTestUtil.createSubscriberFieldStages(
         List.of(FieldStage.DISCOVERY), SUBSCRIBER.getUuid()
@@ -149,7 +149,7 @@ class NewsletterServiceTest {
   }
 
   @Test
-  void sendNewsletterToSubscribers_whenProjectUpdated_assertCorrectEmailPropertiesUsed() {
+  void sendNewsletterToSubscribers_whenProjectUpdatedInSubscription_thenUpdateEmailSent() {
     when(linkService.getManageSubscriptionUrl(any())).thenCallRealMethod();
     var fieldStage = FieldStage.HYDROGEN;
     var reportableProject = ReportableProjectTestUtil.createReportableProject(fieldStage);

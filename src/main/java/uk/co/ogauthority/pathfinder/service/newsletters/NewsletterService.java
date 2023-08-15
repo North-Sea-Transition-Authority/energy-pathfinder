@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.newsletters;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -58,10 +59,16 @@ public class NewsletterService {
 
       var projectsUpdatedInTheLastMonth = newsletterProjectService.getProjectsUpdatedInTheLastMonth();
       var subscribers = subscriberAccessor.getAllSubscribers();
-      var allSubscriberFieldStages = subscriberAccessor.getAllSubscriberFieldStages(subscribers);
+      Map<UUID, List<FieldStage>> allSubscriberFieldStages = subscriberAccessor
+          .getAllSubscriberFieldStages(subscribers)
+          .stream()
+          .collect(Collectors.groupingBy(
+              SubscriberFieldStage::getSubscriberUuid,
+              Collectors.mapping(SubscriberFieldStage::getFieldStage, Collectors.toList())
+          ));
 
       subscribers.forEach(subscriber -> {
-        var fieldStages = getFieldStagesForSubscriber(allSubscriberFieldStages, subscriber.getUuid());
+        var fieldStages = allSubscriberFieldStages.get(subscriber.getUuid());
         var projects = projectsUpdatedInTheLastMonth.stream()
             .filter(project -> fieldStages.contains(project.getFieldStage()))
             .map(NewsletterProjectView::getProject)
@@ -82,14 +89,6 @@ public class NewsletterService {
     newsletter.setResult(result);
     newsletter.setResultDateTime(Instant.now());
     monthlyNewsletterRepository.save(newsletter);
-  }
-
-  private List<FieldStage> getFieldStagesForSubscriber(List<SubscriberFieldStage> allSubscriberFieldStages,
-                                                       UUID subscriberUuid) {
-    return allSubscriberFieldStages.stream()
-        .filter(subscriberFieldStage -> subscriberUuid.equals(subscriberFieldStage.getSubscriberUuid()))
-        .map(SubscriberFieldStage::getFieldStage)
-        .collect(Collectors.toList());
   }
 
   private ProjectNewsletterEmailProperties getEmailProperties(Subscriber subscriber,
