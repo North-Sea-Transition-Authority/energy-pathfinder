@@ -142,7 +142,7 @@ public class UpcomingTenderConversionController extends ProjectFormPageControlle
   }
 
   private void checkIfUpcomingTenderIsValid(UpcomingTender upcomingTender) {
-    if(!upcomingTenderService.isValid(upcomingTender, ValidationType.FULL)) {
+    if (!upcomingTenderService.isValid(upcomingTender, ValidationType.FULL)) {
       throw new InvalidUpcomingTenderException(
           String.format(
               "Upcoming tender with id: %d is not in a valid state for conversion",

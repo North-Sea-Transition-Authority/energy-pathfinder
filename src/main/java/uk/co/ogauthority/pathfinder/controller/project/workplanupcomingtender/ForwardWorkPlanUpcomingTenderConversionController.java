@@ -141,7 +141,7 @@ public class ForwardWorkPlanUpcomingTenderConversionController extends ProjectFo
   }
 
   private void checkIfUpcomingTenderIsValid(ForwardWorkPlanUpcomingTender upcomingTender) {
-    if(!upcomingTenderService.isValid(upcomingTender, ValidationType.FULL)) {
+    if (!upcomingTenderService.isValid(upcomingTender, ValidationType.FULL)) {
       throw new InvalidUpcomingTenderException(
           String.format(
               "Upcoming tender with id: %d is not in a valid state for conversion",
