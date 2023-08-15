@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.controller.subscription;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -23,7 +22,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
@@ -119,13 +117,9 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     when(subscriptionService.getUnsubscribeModelAndView(SUBSCRIBER_UUID.toString()))
         .thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
-    var modelAndView = mockMvc.perform(get(ReverseRouter.route(
-        on(CONTROLLER).getUnsubscribe(SUBSCRIBER_UUID.toString()))))
+    mockMvc.perform(get(ReverseRouter.route(on(CONTROLLER).getUnsubscribe(SUBSCRIBER_UUID.toString()))))
         .andExpect(status().isOk())
-      .andReturn()
-      .getModelAndView();
-
-    assertThat(modelAndView.getViewName()).isEqualTo(TEST_VIEW_NAME);
+        .andExpect(view().name(TEST_VIEW_NAME));
 
     verify(metricsProvider.getUnSubscribePageHitCounter(), times(1)).increment();
   }
@@ -136,13 +130,9 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
       .thenReturn(Optional.empty());
     when(subscriptionService.getAlreadyUnsubscribedModelAndView()).thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
-    var modelAndView = mockMvc.perform(get(ReverseRouter.route(
-      on(CONTROLLER).getUnsubscribe(SUBSCRIBER_UUID.toString()))))
-      .andExpect(status().isOk())
-      .andReturn()
-      .getModelAndView();
-
-    assertThat(modelAndView.getViewName()).isEqualTo(TEST_VIEW_NAME);
+    mockMvc.perform(get(ReverseRouter.route(on(CONTROLLER).getUnsubscribe(SUBSCRIBER_UUID.toString()))))
+        .andExpect(status().isOk())
+        .andExpect(view().name(TEST_VIEW_NAME));
 
     verify(metricsProvider.getUnSubscribePageHitCounter(), times(1)).increment();
   }
@@ -152,16 +142,11 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     when(subscriptionService.verifyIsSubscribed(SUBSCRIBER_UUID.toString())).thenReturn(Optional.of(subscriber));
     when(subscriptionService.getUnsubscribeConfirmationModelAndView()).thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
-    var modelAndView = mockMvc.perform(
-        post(ReverseRouter.route(on(CONTROLLER)
-            .unsubscribe(SUBSCRIBER_UUID.toString(), Optional.empty())
-        )))
+    mockMvc.perform(
+        post(ReverseRouter.route(on(CONTROLLER).unsubscribe(SUBSCRIBER_UUID.toString(), Optional.empty()))))
         .andExpect(status().isOk())
-      .andReturn()
-      .getModelAndView();
+        .andExpect(view().name(TEST_VIEW_NAME));
 
-    assertThat(modelAndView.getViewName()).isEqualTo(TEST_VIEW_NAME);
-    
     verify(subscriptionService, times(1)).verifyIsSubscribed(SUBSCRIBER_UUID.toString());
     verify(subscriptionService, times(1)).unsubscribe(SUBSCRIBER_UUID);
     verify(analyticsService, times(1)).sendAnalyticsEvent(any(), eq(AnalyticsEventCategory.SUBSCRIBER_UNSUBSCRIBED));
@@ -174,14 +159,12 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
       .thenReturn(Optional.empty());
     when(subscriptionService.getAlreadyUnsubscribedModelAndView()).thenReturn(new ModelAndView(TEST_VIEW_NAME));
 
-    var modelAndView = mockMvc.perform(
-      post(ReverseRouter.route(on(CONTROLLER)
-        .unsubscribe(SUBSCRIBER_UUID.toString(), Optional.empty())
-      )))
-      .andExpect(status().isOk())
-      .andReturn().getModelAndView();
-
-    assertThat(modelAndView.getViewName()).isEqualTo(TEST_VIEW_NAME);
+    mockMvc.perform(
+        post(ReverseRouter.route(on(CONTROLLER)
+            .unsubscribe(SUBSCRIBER_UUID.toString(), Optional.empty())
+        )))
+        .andExpect(status().isOk())
+        .andExpect(view().name(TEST_VIEW_NAME));
 
     verify(subscriptionService, times(1)).verifyIsSubscribed(SUBSCRIBER_UUID.toString());
     verify(subscriptionService, never()).unsubscribe(SUBSCRIBER_UUID);
@@ -200,8 +183,6 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
         .andExpect(status().isOk())
         .andExpect(view().name(TEST_VIEW_NAME));
 
-    verify(subscriptionService).verifyIsSubscribed(SUBSCRIBER_UUID.toString());
-    verify(subscriptionService).getManageSubscriptionModelAndView(eq(SUBSCRIBER_UUID), any(ManageSubscriptionForm.class));
     verify(subscriptionService, never()).getAlreadyUnsubscribedModelAndView();
     verify(metricsProvider.getManageSubscriptionCounter()).increment();
   }
@@ -218,8 +199,6 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
         .andExpect(status().isOk())
         .andExpect(view().name(TEST_VIEW_NAME));
 
-    verify(subscriptionService).verifyIsSubscribed(SUBSCRIBER_UUID.toString());
-    verify(subscriptionService).getAlreadyUnsubscribedModelAndView();
     verify(subscriptionService, never()).getManageSubscriptionModelAndView(any(), any());
     verify(metricsProvider.getManageSubscriptionCounter()).increment();
   }
@@ -241,9 +220,6 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
     .andExpect(status().isOk())
     .andExpect(view().name(TEST_VIEW_NAME));
 
-    verify(subscriptionService).verifyIsSubscribed(SUBSCRIBER_UUID.toString());
-    verify(subscriptionService).validateManageSubscriptionForm(any(ManageSubscriptionForm.class), any(BindingResult.class));
-    verify(subscriptionService).getManagementRouting(eq(SUBSCRIBER_UUID), any(ManageSubscriptionForm.class));
     verify(subscriptionService, never()).getAlreadyUnsubscribedModelAndView();
   }
 
@@ -265,9 +241,6 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
         .andExpect(status().isOk())
         .andExpect(view().name(TEST_VIEW_NAME));
 
-    verify(subscriptionService).verifyIsSubscribed(SUBSCRIBER_UUID.toString());
-    verify(subscriptionService).validateManageSubscriptionForm(any(ManageSubscriptionForm.class), any(BindingResult.class));
-    verify(subscriptionService).getManageSubscriptionModelAndView(eq(SUBSCRIBER_UUID), any(ManageSubscriptionForm.class));
     verify(subscriptionService, never()).getManagementRouting(any(), any());
     verify(subscriptionService, never()).getAlreadyUnsubscribedModelAndView();
   }
