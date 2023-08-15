@@ -97,9 +97,6 @@ public class ForwardWorkPlanAwardedContractSummaryController extends AwardContra
     var modelAndView = new ModelAndView("project/awardedcontract/forwardworkplan/forwardWorkPlanAwardedContractFormSummary")
         .addObject("pageTitle", PAGE_NAME)
         .addObject("awardedContractViews", awardedContractViews)
-        .addObject("addAwardedContractUrl",
-            ReverseRouter.route(on(ForwardWorkPlanAwardedContractController.class).addAwardedContract(projectId, null))
-        )
         .addObject("backToTaskListUrl",
             ControllerUtils.getBackToTaskListUrl(projectId)
         )

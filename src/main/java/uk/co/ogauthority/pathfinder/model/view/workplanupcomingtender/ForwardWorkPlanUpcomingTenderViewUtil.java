@@ -121,7 +121,7 @@ public class ForwardWorkPlanUpcomingTenderViewUtil {
         summaryLinks.add(editLink);
 
         var convertLink = new SummaryLink(
-            SummaryLinkText.CONVERT_TO_AWARDED.getDisplayName(),
+            SummaryLinkText.CONVERT_TO_AWARDED_CONTRACT.getDisplayName(),
             ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderConversionController.class).convertUpcomingTenderConfirm(
                 projectId,
                 forwardWorkPlanUpcomingTender.getId(),

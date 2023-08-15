@@ -137,7 +137,7 @@ public class ForwardWorkPlanAwardedContractSetupControllerTest extends ProjectCo
   }
 
   @Test
-  public void getAwardedContractSetup_willAddContract_hasNoContracts_thenRedirectToAwardedContractSummary() throws Exception {
+  public void getAwardedContractSetup_willAddContract_hasNoContracts_thenRemainOnAwardedContractSetup() throws Exception {
     var form = new ForwardWorkPlanAwardedContractSetupForm();
     form.setHasContractToAdd(true);
     when(setupService.getAwardedContractSetupFormFromDetail(projectDetail)).thenReturn(form);

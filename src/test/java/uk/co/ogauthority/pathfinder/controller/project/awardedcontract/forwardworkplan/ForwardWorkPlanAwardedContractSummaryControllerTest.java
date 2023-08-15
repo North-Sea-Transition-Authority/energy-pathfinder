@@ -44,7 +44,6 @@ import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSummaryForm;
-import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
@@ -127,7 +126,6 @@ public class ForwardWorkPlanAwardedContractSummaryControllerTest extends Project
     assertThat(model).contains(
         entry("pageTitle", AwardContractController.PAGE_NAME),
         entry("awardedContractViews", awardedContractViewList),
-        entry("addAwardedContractUrl", ReverseRouter.route(on(AWARDED_CONTRACT_CONTROLLER).addAwardedContract(PROJECT_ID, null))),
         entry("backToTaskListUrl", ControllerUtils.getBackToTaskListUrl(PROJECT_ID)),
         entry("projectTypeDisplayNameLowercase", projectDetail.getProjectType().getLowercaseDisplayName())
     );

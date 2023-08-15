@@ -18,7 +18,7 @@ class InfrastructureAwardedContractViewUtilTest {
 
   private static final Integer DISPLAY_ORDER = 1;
   private final PortalOrganisationGroup addedByPortalOrganisationGroup =
-      TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
+      TeamTestingUtil.generateOrganisationGroup(1, "org name", "org short name");
 
   @Test
   void awardedContractViewBuilder_withFromListFunction() {
