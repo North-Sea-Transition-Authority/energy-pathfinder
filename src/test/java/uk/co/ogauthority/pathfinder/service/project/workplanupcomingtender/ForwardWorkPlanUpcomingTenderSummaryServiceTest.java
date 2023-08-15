@@ -176,13 +176,6 @@ public class ForwardWorkPlanUpcomingTenderSummaryServiceTest {
 
   @Test
   public void getValidatedUpcomingTenderView() {
-    when(workPlanUpcomingTenderService.isValid(workPlanUpcomingTender, ValidationType.FULL)).thenReturn(true);
-
-    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
-        eq(workPlanUpcomingTender.getProjectDetail()),
-        any())
-    ).thenReturn(true);
-
     var upcomingTenderView = workPlanUpcomingTenderSummaryService.getUpcomingTenderView(workPlanUpcomingTender, 1);
 
     assertThat(upcomingTenderView.isValid()).isTrue();
