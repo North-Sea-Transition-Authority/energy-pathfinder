@@ -58,7 +58,7 @@ class UpcomingTenderConversionServiceTest {
 
     conversionService.validate(form, bindingResult);
     verify(validator).validate(eq(form), eq(bindingResult), any(AwardedContractValidationHint.class));
-    verify(validationService).validate(form, bindingResult, ValidationType.PARTIAL);
+    verify(validationService).validate(form, bindingResult, ValidationType.FULL);
   }
 
   @Test

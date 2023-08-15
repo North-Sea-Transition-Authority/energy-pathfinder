@@ -1,12 +1,12 @@
 package uk.co.ogauthority.pathfinder.model.form.project.upcomingtender;
 
 import java.util.Arrays;
-import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
+import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractValidationHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
@@ -39,15 +39,25 @@ public class UpcomingTenderConversionFormValidator implements SmartValidator {
             () -> new ActionNotAllowedException("Expected AwardedContractValidationHint validation hint to be provided")
         );
 
-    if (Objects.nonNull(form.getDateAwarded())) {
-      ValidationUtil.invokeNestedValidator(
-          errors,
-          dateInputValidator,
-          "dateAwarded",
-          form.getDateAwarded(),
-          awardedContractValidationHint.getDateAwardedValidationHints()
-      );
+    ValidationUtils.rejectIfEmpty(
+        errors,
+        "dateAwarded",
+        "dateAwarded.invalid",
+        "Enter a date awarded"
+    );
+
+    if (errors.hasErrors()) {
+      return;
     }
+
+    ValidationUtil.invokeNestedValidator(
+        errors,
+        dateInputValidator,
+        "dateAwarded",
+        form.getDateAwarded(),
+        awardedContractValidationHint.getDateAwardedValidationHints()
+    );
+
   }
 
   @Override

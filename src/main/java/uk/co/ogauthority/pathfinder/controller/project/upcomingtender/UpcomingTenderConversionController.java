@@ -121,7 +121,7 @@ public class UpcomingTenderConversionController extends ProjectFormPageControlle
                                                                    UpcomingTenderConversionForm form) {
     var modelAndView = new ModelAndView("project/upcomingtender/convertUpcomingTender")
         .addObject("form", form)
-        .addObject("view", upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, displayOrder))
+        .addObject("view", upcomingTenderSummaryService.getValidatedUpcomingTenderView(upcomingTender, displayOrder))
         .addObject("cancelUrl", ReverseRouter.route(on(UpcomingTendersController.class).viewUpcomingTenders(projectId, null)));
     breadcrumbService.fromUpcomingTenders(projectId, modelAndView, CONVERT_PAGE_NAME);
     return modelAndView;

@@ -38,9 +38,9 @@ public class ForwardWorkPlanUpcomingTenderConversionService {
   }
 
   public BindingResult validate(UpcomingTenderConversionForm form, BindingResult bindingResult) {
-    var awardedContractValidationHint = new AwardedContractValidationHint(ValidationType.PARTIAL);
+    var awardedContractValidationHint = new AwardedContractValidationHint(ValidationType.FULL);
     validator.validate(form, bindingResult, awardedContractValidationHint);
-    return validationService.validate(form, bindingResult, ValidationType.PARTIAL);
+    return validationService.validate(form, bindingResult, ValidationType.FULL);
   }
 
   @Transactional

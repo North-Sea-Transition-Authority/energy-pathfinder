@@ -114,6 +114,8 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
 
   @Test
   public void convertUpcomingTenderConfirm() throws Exception {
+    when(upcomingTenderSummaryService.getValidatedUpcomingTenderView(upcomingTender, 1)).thenReturn(upcomingTenderView);
+
     var modelAndView = mockMvc.perform(
             get(route(on(CONTROLLER).convertUpcomingTenderConfirm(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)))
                 .with(authenticatedUserAndSession(authenticatedUser)))
@@ -133,6 +135,8 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
 
   @Test
   public void convertUpcomingTenderConfirm_projectContextSmokeTest() {
+    when(upcomingTenderSummaryService.getValidatedUpcomingTenderView(upcomingTender, 1)).thenReturn(upcomingTenderView);
+
     projectControllerTesterService
         .withHttpRequestMethod(HttpMethod.GET)
         .withProjectDetail(projectDetail)
@@ -205,6 +209,8 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
   public void convertUpcomingTender_invalidForm() throws Exception {
     var form = new UpcomingTenderConversionForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
+    when(upcomingTenderSummaryService.getValidatedUpcomingTenderView(upcomingTender, 1)).thenReturn(upcomingTenderView);
+
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default Message"));
     when(conversionService.validate(
         any(UpcomingTenderConversionForm.class),
@@ -215,7 +221,9 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
             post(route(on(CONTROLLER)
                 .convertUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null, null, null, null)))
                 .with(authenticatedUserAndSession(authenticatedUser))
-                .with(csrf()))
+                .with(csrf())
+                .param("isUpcomingTenderValid", "true")
+        )
         .andExpect(status().is2xxSuccessful())
         .andExpect(view().name(VIEW_NAME));
 
@@ -231,6 +239,7 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
         any(UpcomingTenderConversionForm.class),
         any(BindingResult.class))
     ).thenReturn(bindingResult);
+    when(upcomingTenderSummaryService.getValidatedUpcomingTenderView(upcomingTender, 1)).thenReturn(upcomingTenderView);
 
     projectControllerTesterService
         .withHttpRequestMethod(HttpMethod.POST)

@@ -63,6 +63,15 @@ public class ForwardWorkPlanUpcomingTenderSummaryService {
         .build();
   }
 
+  public ForwardWorkPlanUpcomingTenderView getValidatedUpcomingTenderView(ForwardWorkPlanUpcomingTender workPlanUpcomingTender,
+                                                                          Integer displayOrder) {
+    return getUpcomingTenderView(
+        workPlanUpcomingTender,
+        displayOrder,
+        workPlanUpcomingTenderService.isValid(workPlanUpcomingTender, ValidationType.FULL)
+    );
+  }
+
   private ForwardWorkPlanUpcomingTenderView getUpcomingTenderView(ForwardWorkPlanUpcomingTender workPlanUpcomingTender,
                                                                   Integer displayOrder,
                                                                   boolean isValid) {

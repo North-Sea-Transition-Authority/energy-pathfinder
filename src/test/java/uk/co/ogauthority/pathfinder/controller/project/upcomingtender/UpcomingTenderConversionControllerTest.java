@@ -113,6 +113,8 @@ public class UpcomingTenderConversionControllerTest extends ProjectContextAbstra
 
   @Test
   public void convertUpcomingTenderConfirm() throws Exception {
+    when(upcomingTenderSummaryService.getValidatedUpcomingTenderView(upcomingTender, 1)).thenReturn(upcomingTenderView);
+
     var modelAndView = mockMvc.perform(
             get(route(on(CONTROLLER).convertUpcomingTenderConfirm(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)))
                 .with(authenticatedUserAndSession(authenticatedUser)))
@@ -132,6 +134,8 @@ public class UpcomingTenderConversionControllerTest extends ProjectContextAbstra
 
   @Test
   public void convertUpcomingTenderConfirm_projectContextSmokeTest() {
+    when(upcomingTenderSummaryService.getValidatedUpcomingTenderView(upcomingTender, 1)).thenReturn(upcomingTenderView);
+
     projectControllerTesterService
         .withHttpRequestMethod(HttpMethod.GET)
         .withProjectDetail(projectDetail)
@@ -209,6 +213,7 @@ public class UpcomingTenderConversionControllerTest extends ProjectContextAbstra
         any(UpcomingTenderConversionForm.class),
         any(BindingResult.class))
     ).thenReturn(bindingResult);
+    when(upcomingTenderSummaryService.getValidatedUpcomingTenderView(upcomingTender, 1)).thenReturn(upcomingTenderView);
 
     mockMvc.perform(
             post(route(on(CONTROLLER)

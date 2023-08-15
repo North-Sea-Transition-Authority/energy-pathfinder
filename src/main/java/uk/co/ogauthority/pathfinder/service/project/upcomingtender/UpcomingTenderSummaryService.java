@@ -105,6 +105,15 @@ public class UpcomingTenderSummaryService {
         .build();
   }
 
+  public UpcomingTenderView getValidatedUpcomingTenderView(UpcomingTender workPlanUpcomingTender,
+                                                           Integer displayOrder) {
+    return getUpcomingTenderView(
+        workPlanUpcomingTender,
+        displayOrder,
+        upcomingTenderService.isValid(workPlanUpcomingTender, ValidationType.FULL)
+    );
+  }
+
   private UpcomingTenderView getUpcomingTenderView(UpcomingTender upcomingTender,
                                                    Integer displayOrder,
                                                    boolean isValid) {

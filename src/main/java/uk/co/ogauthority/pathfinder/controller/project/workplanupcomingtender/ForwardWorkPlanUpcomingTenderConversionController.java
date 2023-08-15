@@ -119,7 +119,7 @@ public class ForwardWorkPlanUpcomingTenderConversionController extends ProjectFo
                                                                    UpcomingTenderConversionForm form) {
     var modelAndView = new ModelAndView("project/workplanupcomingtender/convertForwardWorkPlanUpcomingTender")
         .addObject("form", form)
-        .addObject("view", upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, displayOrder))
+        .addObject("view", upcomingTenderSummaryService.getValidatedUpcomingTenderView(upcomingTender, displayOrder))
         .addObject("cancelUrl",
             ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null)));
     breadcrumbService.fromWorkPlanUpcomingTenders(projectId, modelAndView, CONVERT_PAGE_NAME);
