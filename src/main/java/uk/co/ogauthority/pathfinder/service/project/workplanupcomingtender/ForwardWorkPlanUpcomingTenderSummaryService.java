@@ -57,12 +57,6 @@ public class ForwardWorkPlanUpcomingTenderSummaryService {
     );
   }
 
-  public ForwardWorkPlanUpcomingTenderView getUpcomingTenderView(ForwardWorkPlanUpcomingTender workPlanUpcomingTender,
-                                                                 Integer displayOrder) {
-    return getForwardWorkPlanUpcomingTenderViewBuilder(workPlanUpcomingTender, displayOrder)
-        .build();
-  }
-
   public ForwardWorkPlanUpcomingTenderView getValidatedUpcomingTenderView(ForwardWorkPlanUpcomingTender workPlanUpcomingTender,
                                                                           Integer displayOrder) {
     return getUpcomingTenderView(
@@ -70,6 +64,12 @@ public class ForwardWorkPlanUpcomingTenderSummaryService {
         displayOrder,
         workPlanUpcomingTenderService.isValid(workPlanUpcomingTender, ValidationType.FULL)
     );
+  }
+
+  public ForwardWorkPlanUpcomingTenderView getUpcomingTenderView(ForwardWorkPlanUpcomingTender workPlanUpcomingTender,
+                                                                 Integer displayOrder) {
+    return getForwardWorkPlanUpcomingTenderViewBuilder(workPlanUpcomingTender, displayOrder)
+        .build();
   }
 
   private ForwardWorkPlanUpcomingTenderView getUpcomingTenderView(ForwardWorkPlanUpcomingTender workPlanUpcomingTender,

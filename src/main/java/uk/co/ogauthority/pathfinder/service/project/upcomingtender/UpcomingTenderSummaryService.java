@@ -99,12 +99,6 @@ public class UpcomingTenderSummaryService {
     return upcomingTenderService.isTaskValidForProjectDetail(detail);
   }
 
-  public UpcomingTenderView getUpcomingTenderView(UpcomingTender upcomingTender,
-                                                  Integer displayOrder) {
-    return getUpcomingTenderViewBuilder(upcomingTender, displayOrder)
-        .build();
-  }
-
   public UpcomingTenderView getValidatedUpcomingTenderView(UpcomingTender workPlanUpcomingTender,
                                                            Integer displayOrder) {
     return getUpcomingTenderView(
@@ -112,6 +106,12 @@ public class UpcomingTenderSummaryService {
         displayOrder,
         upcomingTenderService.isValid(workPlanUpcomingTender, ValidationType.FULL)
     );
+  }
+
+  public UpcomingTenderView getUpcomingTenderView(UpcomingTender upcomingTender,
+                                                  Integer displayOrder) {
+    return getUpcomingTenderViewBuilder(upcomingTender, displayOrder)
+        .build();
   }
 
   private UpcomingTenderView getUpcomingTenderView(UpcomingTender upcomingTender,
