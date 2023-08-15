@@ -48,7 +48,7 @@ public class UpcomingTenderConversionService {
   public void convertUpcomingTenderToAwardedContract(UpcomingTender upcomingTender, UpcomingTenderConversionForm form) {
     var awardedContract = createAwardedContractFromUpcomingTender(upcomingTender, form);
 
-    updateProjectSetup(upcomingTender.getProjectDetail());
+    addAwardedContractSectionToProject(upcomingTender.getProjectDetail());
     awardedContractRepository.save(awardedContract);
     upcomingTenderService.delete(upcomingTender);
   }
@@ -72,7 +72,7 @@ public class UpcomingTenderConversionService {
     return awardedContract;
   }
 
-  private void updateProjectSetup(ProjectDetail projectDetail) {
+  private void addAwardedContractSectionToProject(ProjectDetail projectDetail) {
     var projectSetupForm = projectSetupService.getForm(projectDetail);
     projectSetupForm.setAwardedContractsIncluded(TaskListSectionAnswer.AWARDED_CONTRACTS_YES);
 

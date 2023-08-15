@@ -183,10 +183,12 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
         .isNotNull()
         .asInstanceOf(InstanceOfAssertFactories.type(NotificationBannerView.class))
         .extracting(
-            NotificationBannerView::getTitle,
+            NotificationBannerView::getTitleAsString,
+            NotificationBannerView::getHeadingAsString,
             NotificationBannerView::getBannerType
         ).containsExactly(
-            "Success",
+            ForwardWorkPlanUpcomingTenderConversionController.BANNER_TITLE,
+            ForwardWorkPlanUpcomingTenderConversionController.BANNER_HEADING,
             NotificationBannerType.SUCCESS
         );
 

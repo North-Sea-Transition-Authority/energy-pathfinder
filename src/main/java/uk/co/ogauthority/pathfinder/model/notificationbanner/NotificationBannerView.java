@@ -7,19 +7,24 @@ import uk.co.ogauthority.pathfinder.model.enums.notificationbanner.NotificationB
 
 public class NotificationBannerView implements Serializable {
 
-  private final String title;
+  private final NotificationBannerTitle title;
+  private final NotificationBannerHeading heading;
   private final List<NotificationBannerBodyLine> bodyLines;
   private final NotificationBannerType bannerType;
   private final NotificationBannerLink bannerLink;
 
   public static class BannerBuilder {
-    private final String title;
+    private final NotificationBannerTitle title;
+    private final NotificationBannerHeading heading;
     private final List<NotificationBannerBodyLine> bodyLines;
     private final NotificationBannerType bannerType;
     private  NotificationBannerLink bannerLink;
 
-    public BannerBuilder(String title, NotificationBannerType bannerType) {
+    public BannerBuilder(NotificationBannerTitle title,
+                         NotificationBannerHeading heading,
+                         NotificationBannerType bannerType) {
       this.title = title;
+      this.heading = heading;
       this.bodyLines = new ArrayList<>();
       this.bannerType = bannerType;
     }
@@ -41,13 +46,18 @@ public class NotificationBannerView implements Serializable {
 
   private NotificationBannerView(BannerBuilder bannerBuilder) {
     this.title = bannerBuilder.title;
+    this.heading = bannerBuilder.heading;
     this.bodyLines = bannerBuilder.bodyLines;
     this.bannerType = bannerBuilder.bannerType;
     this.bannerLink = bannerBuilder.bannerLink;
   }
 
-  public String getTitle() {
-    return title;
+  public String getTitleAsString() {
+    return title.getTitle();
+  }
+
+  public String getHeadingAsString() {
+    return heading.getHeading();
   }
 
   public List<NotificationBannerBodyLine> getBodyLines() {

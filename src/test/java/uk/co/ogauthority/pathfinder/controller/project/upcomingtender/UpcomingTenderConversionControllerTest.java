@@ -182,10 +182,12 @@ public class UpcomingTenderConversionControllerTest extends ProjectContextAbstra
         .isNotNull()
         .asInstanceOf(InstanceOfAssertFactories.type(NotificationBannerView.class))
         .extracting(
-            NotificationBannerView::getTitle,
+            NotificationBannerView::getTitleAsString,
+            NotificationBannerView::getHeadingAsString,
             NotificationBannerView::getBannerType
         ).containsExactly(
-            "Success",
+            UpcomingTenderConversionController.BANNER_TITLE,
+            UpcomingTenderConversionController.BANNER_HEADING,
             NotificationBannerType.SUCCESS
         );
 

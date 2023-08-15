@@ -1,7 +1,9 @@
 package uk.co.ogauthority.pathfinder.model.form.project.upcomingtender;
 
 import java.util.Arrays;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
@@ -26,7 +28,7 @@ public class UpcomingTenderConversionFormValidator implements SmartValidator {
   }
 
   @Override
-  public void validate(Object target, Errors errors, Object... validationHints) {
+  public void validate(@NonNull Object target, @NonNull Errors errors, @NonNull Object... validationHints) {
     var form = (UpcomingTenderConversionForm) target;
 
     var awardedContractValidationHint = Arrays.stream(validationHints)
@@ -37,17 +39,19 @@ public class UpcomingTenderConversionFormValidator implements SmartValidator {
             () -> new ActionNotAllowedException("Expected AwardedContractValidationHint validation hint to be provided")
         );
 
-    ValidationUtil.invokeNestedValidator(
-        errors,
-        dateInputValidator,
-        "dateAwarded",
-        form.getDateAwarded(),
-        awardedContractValidationHint.getDateAwardedValidationHints()
-    );
+    if (Objects.nonNull(form.getDateAwarded())) {
+      ValidationUtil.invokeNestedValidator(
+          errors,
+          dateInputValidator,
+          "dateAwarded",
+          form.getDateAwarded(),
+          awardedContractValidationHint.getDateAwardedValidationHints()
+      );
+    }
   }
 
   @Override
-  public void validate(Object target, Errors errors) {
+  public void validate(@NonNull Object target,@NonNull Errors errors) {
     validate(target, errors, (Object) null);
   }
 

@@ -6,9 +6,9 @@
 <@defaultPage htmlTitle=title pageHeading=title breadcrumbs=true errorItems=errorList>
 
     <@fdsForm.htmlForm>
-        <p class="govuk-body">
-            Once an upcoming tender is converted to an awarded contract, the upcoming tender will be removed.
-        </p>
+        <@fdsWarning.warning>
+          When an upcoming tender is converted to an awarded contract, the upcoming tender will be removed.
+        </@fdsWarning.warning>
 
         <@tenderSummary.workPlanUpcomingTenderSummary view=view showHeader=false showActions=false/>
 
