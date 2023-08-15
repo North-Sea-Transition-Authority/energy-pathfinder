@@ -22,6 +22,8 @@ public class ManageSubscriptionFormValidator implements Validator {
     var form = (ManageSubscriptionForm) target;
 
     var subscriptionManageOption = form.getSubscriptionManagementOption();
+
+    // The subscriptionManageOption is mandatory, and it's validation is covered in the ValidationService
     if (Objects.nonNull(subscriptionManageOption)) {
       try {
         SubscriptionManagementOption.valueOf(subscriptionManageOption);
