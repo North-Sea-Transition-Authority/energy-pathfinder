@@ -145,15 +145,15 @@ class ForwardWorkPlanAwardedContractSummaryServiceTest {
 
   @Test
   void getAwardedContractViewErrors_whenErrors() {
-    var awardedContractView1 = AwardedContractTestUtil.createForwardWorkPlanAwardedContractView(1);
-    awardedContractView1.setIsValid(true);
+    var awardedContractViewValid = AwardedContractTestUtil.createForwardWorkPlanAwardedContractView(1);
+    awardedContractViewValid.setIsValid(true);
 
     var displayOrderOfInvalidView = 2;
-    var awardedContractView2 = AwardedContractTestUtil.createForwardWorkPlanAwardedContractView(displayOrderOfInvalidView);
-    awardedContractView2.setIsValid(false);
+    var awardedContractViewInvalid = AwardedContractTestUtil.createForwardWorkPlanAwardedContractView(displayOrderOfInvalidView);
+    awardedContractViewInvalid.setIsValid(false);
 
     var errorItems = summaryService.getAwardedContractViewErrors(
-        List.of(awardedContractView1, awardedContractView2)
+        List.of(awardedContractViewValid, awardedContractViewInvalid)
     );
 
     assertThat(errorItems).hasSize(1);

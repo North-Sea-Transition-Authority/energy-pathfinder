@@ -293,7 +293,7 @@ class UpcomingTenderViewUtilTest {
     );
 
     final var convertLink = new SummaryLink(
-        SummaryLinkText.CONVERT_TO_AWARDED.getDisplayName(),
+        SummaryLinkText.CONVERT_TO_AWARDED_CONTRACT.getDisplayName(),
         ReverseRouter.route(on(UpcomingTenderConversionController.class).convertUpcomingTenderConfirm(
             upcomingTenderView.getProjectId(),
             upcomingTenderView.getId(),

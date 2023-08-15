@@ -208,7 +208,7 @@ public class UpcomingTenderSummaryServiceTest {
 
     assertThat(view.getSummaryLinks()).extracting(SummaryLink::getLinkText).containsExactly(
         SummaryLinkText.EDIT.getDisplayName(),
-        SummaryLinkText.CONVERT_TO_AWARDED.getDisplayName(),
+        SummaryLinkText.CONVERT_TO_AWARDED_CONTRACT.getDisplayName(),
         SummaryLinkText.DELETE.getDisplayName()
     );
   }
@@ -283,7 +283,7 @@ public class UpcomingTenderSummaryServiceTest {
     );
 
     var convertLink = new SummaryLink(
-        SummaryLinkText.CONVERT_TO_AWARDED.getDisplayName(),
+        SummaryLinkText.CONVERT_TO_AWARDED_CONTRACT.getDisplayName(),
         ReverseRouter.route(on(UpcomingTenderConversionController.class).convertUpcomingTenderConfirm(
             upcomingTender.getProjectDetail().getProject().getId(),
             upcomingTender.getId(),
