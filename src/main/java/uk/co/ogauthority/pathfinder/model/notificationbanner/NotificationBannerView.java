@@ -52,12 +52,12 @@ public class NotificationBannerView implements Serializable {
     this.bannerLink = bannerBuilder.bannerLink;
   }
 
-  public String getTitleAsString() {
-    return title.getTitle();
+  public NotificationBannerTitle getTitle() {
+    return title;
   }
 
-  public String getHeadingAsString() {
-    return heading.getHeading();
+  public NotificationBannerHeading getHeading() {
+    return heading;
   }
 
   public List<NotificationBannerBodyLine> getBodyLines() {

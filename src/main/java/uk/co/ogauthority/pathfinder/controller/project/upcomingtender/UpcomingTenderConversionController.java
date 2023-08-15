@@ -20,12 +20,13 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusC
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastructure.InfrastructureAwardedContractController;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
+import uk.co.ogauthority.pathfinder.exception.InvalidUpcomingTenderException;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderConversionForm;
-import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerBodyLine;
 import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerHeading;
 import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerLink;
 import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerTitle;
@@ -51,8 +52,7 @@ public class UpcomingTenderConversionController extends ProjectFormPageControlle
 
   public static final String CONVERT_PAGE_NAME = "Convert upcoming tender to awarded contract";
   public static final String BANNER_TITLE = "Success";
-  public static final String BANNER_HEADING = "Conversion was successful";
-  public static final String BANNER_BODY_LINE = "The upcoming tender has been converted to an awarded contract";
+  public static final String BANNER_HEADING = "The upcoming tender has been converted to an awarded contract";
   public static final String BANNER_LINK_TEXT = "View awarded contracts";
 
   private final UpcomingTenderService upcomingTenderService;
@@ -94,6 +94,7 @@ public class UpcomingTenderConversionController extends ProjectFormPageControlle
                                             RedirectAttributes redirectAttributes) {
     var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
     checkIfUserHasAccessToTender(upcomingTender);
+    checkIfUpcomingTenderIsValid(upcomingTender);
     bindingResult = conversionService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
@@ -140,11 +141,21 @@ public class UpcomingTenderConversionController extends ProjectFormPageControlle
     }
   }
 
+  private void checkIfUpcomingTenderIsValid(UpcomingTender upcomingTender) {
+    if(!upcomingTenderService.isValid(upcomingTender, ValidationType.FULL)) {
+      throw new InvalidUpcomingTenderException(
+          String.format(
+              "Upcoming tender with id: %d is not in a valid state for conversion",
+              upcomingTender.getId()
+          )
+      );
+    }
+  }
+
   private void addSuccessBanner(RedirectAttributes redirectAttributes, Integer projectId) {
     NotificationBannerUtils.successBannerWithLink(
         new NotificationBannerTitle(BANNER_TITLE),
         new NotificationBannerHeading(BANNER_HEADING),
-        NotificationBannerBodyLine.withDefaultClass(BANNER_BODY_LINE),
         new NotificationBannerLink(
             ReverseRouter.route(on(InfrastructureAwardedContractController.class).viewAwardedContracts(projectId, null)),
             BANNER_LINK_TEXT),

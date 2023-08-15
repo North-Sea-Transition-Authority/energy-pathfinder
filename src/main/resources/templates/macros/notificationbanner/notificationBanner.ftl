@@ -3,8 +3,8 @@
 <#-- @ftlvariable name="notificationBannerView" type="uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerView" -->
 
 <#macro successNotificationBanner notificationBannerView>
-    <#if notificationBannerView.getTitleAsString()?hasContent>
-        <@fdsNotificationBanner.notificationBannerSuccess bannerTitleText=notificationBannerView.getTitleAsString()>
+    <#if notificationBannerView.title.title?hasContent>
+        <@fdsNotificationBanner.notificationBannerSuccess bannerTitleText=notificationBannerView.title.title>
             <@_notificationBannerContent notificationBannerView=notificationBannerView/>
         </@fdsNotificationBanner.notificationBannerSuccess>
     </#if>
@@ -12,14 +12,14 @@
 
 <#macro infoNotificationBanner notificationBannerView>
     <#if notificationBannerView.getTitleAsString()?hasContent>
-        <@fdsNotificationBanner.notificationBannerInfo bannerTitleText=notificationBannerView.getTitleAsString()>
+        <@fdsNotificationBanner.notificationBannerInfo bannerTitleText=notificationBannerView.title.title>
             <@_notificationBannerContent notificationBannerView=notificationBannerView/>
         </@fdsNotificationBanner.notificationBannerInfo>
     </#if>
 </#macro>
 
 <#macro _notificationBannerContent notificationBannerView>
-    <@fdsNotificationBanner.notificationBannerContent headingText=notificationBannerView.getHeadingAsString()>
+    <@fdsNotificationBanner.notificationBannerContent headingText=notificationBannerView.heading.heading>
         <#list notificationBannerView.bodyLines as bodyLine>
             <p class="${bodyLine.lineClass!"govuk-body"}">${bodyLine.lineText}</p>
         </#list>

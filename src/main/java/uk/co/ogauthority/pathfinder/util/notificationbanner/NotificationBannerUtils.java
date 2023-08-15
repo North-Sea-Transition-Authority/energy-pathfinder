@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.util.notificationbanner;
 
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.co.ogauthority.pathfinder.model.enums.notificationbanner.NotificationBannerType;
-import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerBodyLine;
 import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerHeading;
 import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerLink;
 import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerTitle;
@@ -18,12 +17,10 @@ public class NotificationBannerUtils {
 
   public static void successBannerWithLink(NotificationBannerTitle title,
                                            NotificationBannerHeading heading,
-                                           NotificationBannerBodyLine bodyLine,
                                            NotificationBannerLink bannerLink,
                                            RedirectAttributes redirectAttributes) {
     var notificationBannerView = new NotificationBannerView
         .BannerBuilder(title, heading, NotificationBannerType.SUCCESS)
-        .addBodyLine(bodyLine)
         .addLink(bannerLink)
         .build();
     redirectAttributes.addFlashAttribute(NOTIFICATION_BANNER_OBJECT_NAME, notificationBannerView);

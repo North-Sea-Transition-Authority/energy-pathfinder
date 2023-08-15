@@ -17,7 +17,6 @@ import static uk.co.ogauthority.pathfinder.mvc.ReverseRouter.route;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
 import java.util.Set;
-import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,15 +33,14 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSummaryController;
-import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTenderConversionController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.notificationbanner.NotificationBannerType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderConversionForm;
-import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerBodyLine;
 import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerView;
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanUpcomingTenderView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -167,6 +165,8 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
         any(BindingResult.class))
     ).thenReturn(bindingResult);
 
+    when(upcomingTenderService.isValid(upcomingTender, ValidationType.FULL)).thenReturn(true);
+
     var flashMap = mockMvc.perform(
         post(route(on(CONTROLLER)
             .convertUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null, null, null, null)))
@@ -183,26 +183,15 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
         any(UpcomingTenderConversionForm.class)
     );
 
-    assertThat(flashMap.get(NotificationBannerUtils.NOTIFICATION_BANNER_OBJECT_NAME))
-        .isNotNull()
-        .asInstanceOf(InstanceOfAssertFactories.type(NotificationBannerView.class))
-        .extracting(
-            NotificationBannerView::getTitleAsString,
-            NotificationBannerView::getHeadingAsString,
-            NotificationBannerView::getBannerType
-        ).containsExactly(
-            ForwardWorkPlanUpcomingTenderConversionController.BANNER_TITLE,
-            ForwardWorkPlanUpcomingTenderConversionController.BANNER_HEADING,
-            NotificationBannerType.SUCCESS
-        );
+    assertThat(flashMap.get(NotificationBannerUtils.NOTIFICATION_BANNER_OBJECT_NAME)).isNotNull();
 
     var bannerView = (NotificationBannerView) flashMap.get(NotificationBannerUtils.NOTIFICATION_BANNER_OBJECT_NAME);
-    assertThat(bannerView.getBannerLink().getLinkText()).isEqualTo(UpcomingTenderConversionController.BANNER_LINK_TEXT);
+    assertThat(bannerView.getBannerLink().getLinkText()).isEqualTo(ForwardWorkPlanUpcomingTenderConversionController.BANNER_LINK_TEXT);
     assertThat(bannerView.getBannerLink().getLinkUrl()).isEqualTo(
         ReverseRouter.route(on(ForwardWorkPlanAwardedContractSummaryController.class).viewAwardedContracts(PROJECT_ID, null)));
-    assertThat(bannerView.getBodyLines()).hasSize(1);
-    assertThat(bannerView.getBodyLines().get(0).getLineText()).isEqualTo(UpcomingTenderConversionController.BANNER_BODY_LINE);
-    assertThat(bannerView.getBodyLines().get(0).getLineClass()).isEqualTo(NotificationBannerBodyLine.DEFAULT_CLASS);
+    assertThat(bannerView.getBannerType()).isEqualTo(NotificationBannerType.SUCCESS);
+    assertThat(bannerView.getTitle().getTitle()).isEqualTo(ForwardWorkPlanUpcomingTenderConversionController.BANNER_TITLE);
+    assertThat(bannerView.getHeading().getHeading()).isEqualTo(ForwardWorkPlanUpcomingTenderConversionController.BANNER_HEADING);
   }
 
   @Test
@@ -210,6 +199,7 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
     var form = new UpcomingTenderConversionForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
     when(upcomingTenderSummaryService.getValidatedUpcomingTenderView(upcomingTender, 1)).thenReturn(upcomingTenderView);
+    when(upcomingTenderService.isValid(upcomingTender, ValidationType.FULL)).thenReturn(true);
 
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default Message"));
     when(conversionService.validate(
@@ -232,6 +222,21 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
   }
 
   @Test
+  public void convertUpcomingTender_invalidUpcomingTender() throws Exception{
+    when(upcomingTenderService.isValid(upcomingTender, ValidationType.FULL)).thenReturn(false);
+
+    mockMvc.perform(
+            post(route(on(CONTROLLER)
+                .convertUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null, null, null, null)))
+                .with(authenticatedUserAndSession(authenticatedUser))
+                .with(csrf()))
+        .andExpect(status().isForbidden());
+
+    verify(conversionService, never()).validate(any(), any());
+    verify(conversionService, never()).convertUpcomingTenderToAwardedContract(any(), any());
+  }
+
+  @Test
   public void convertUpcomingTender_projectContextSmokeTest() {
     var form = new UpcomingTenderConversionForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
@@ -239,7 +244,7 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
         any(UpcomingTenderConversionForm.class),
         any(BindingResult.class))
     ).thenReturn(bindingResult);
-    when(upcomingTenderSummaryService.getValidatedUpcomingTenderView(upcomingTender, 1)).thenReturn(upcomingTenderView);
+    when(upcomingTenderService.isValid(upcomingTender, ValidationType.FULL)).thenReturn(true);
 
     projectControllerTesterService
         .withHttpRequestMethod(HttpMethod.POST)

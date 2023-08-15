@@ -313,4 +313,18 @@ public class UpcomingTenderSummaryServiceTest {
 
     assertThat(upcomingTenderView.getSummaryLinks()).isEmpty();
   }
+
+  @Test
+  public void getValidatedUpcomingTenderView() {
+    when(upcomingTenderService.isValid(upcomingTender, ValidationType.FULL)).thenReturn(true);
+
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+        eq(upcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(true);
+
+    var upcomingTenderView = upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, 1);
+
+    assertThat(upcomingTenderView.isValid()).isTrue();
+  }
 }
