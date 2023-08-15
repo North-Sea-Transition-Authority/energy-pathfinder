@@ -14,12 +14,6 @@
         />
     </#list>
 
-    <@fdsAction.link
-      linkText="Add awarded contract"
-      linkUrl=springUrl(addAwardedContractUrl)
-      role=true
-      linkClass="govuk-button govuk-button--blue"
-    />
     <@fdsForm.htmlForm>
 
         <#assign hasAddedAllContractsFormBind = "form.hasOtherContractsToAdd"/>
