@@ -112,8 +112,6 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
 
   @Test
   public void convertUpcomingTenderConfirm() throws Exception {
-    when(upcomingTenderSummaryService.getValidatedUpcomingTenderView(upcomingTender, 1)).thenReturn(upcomingTenderView);
-
     var modelAndView = mockMvc.perform(
             get(route(on(CONTROLLER).convertUpcomingTenderConfirm(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)))
                 .with(authenticatedUserAndSession(authenticatedUser)))
@@ -133,8 +131,6 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
 
   @Test
   public void convertUpcomingTenderConfirm_projectContextSmokeTest() {
-    when(upcomingTenderSummaryService.getValidatedUpcomingTenderView(upcomingTender, 1)).thenReturn(upcomingTenderView);
-
     projectControllerTesterService
         .withHttpRequestMethod(HttpMethod.GET)
         .withProjectDetail(projectDetail)
@@ -198,7 +194,6 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
   public void convertUpcomingTender_invalidForm() throws Exception {
     var form = new UpcomingTenderConversionForm();
     var bindingResult = new BeanPropertyBindingResult(form, "form");
-    when(upcomingTenderSummaryService.getValidatedUpcomingTenderView(upcomingTender, 1)).thenReturn(upcomingTenderView);
     when(upcomingTenderService.isValid(upcomingTender, ValidationType.FULL)).thenReturn(true);
 
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default Message"));
@@ -212,27 +207,11 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
                 .convertUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null, null, null, null)))
                 .with(authenticatedUserAndSession(authenticatedUser))
                 .with(csrf())
-                .param("isUpcomingTenderValid", "true")
         )
         .andExpect(status().is2xxSuccessful())
         .andExpect(view().name(VIEW_NAME));
 
     verify(conversionService).validate(any(), any());
-    verify(conversionService, never()).convertUpcomingTenderToAwardedContract(any(), any());
-  }
-
-  @Test
-  public void convertUpcomingTender_invalidUpcomingTender() throws Exception{
-    when(upcomingTenderService.isValid(upcomingTender, ValidationType.FULL)).thenReturn(false);
-
-    mockMvc.perform(
-            post(route(on(CONTROLLER)
-                .convertUpcomingTender(PROJECT_ID, UPCOMING_TENDER_ID, DISPLAY_ORDER, null, null, null, null)))
-                .with(authenticatedUserAndSession(authenticatedUser))
-                .with(csrf()))
-        .andExpect(status().isForbidden());
-
-    verify(conversionService, never()).validate(any(), any());
     verify(conversionService, never()).convertUpcomingTenderToAwardedContract(any(), any());
   }
 

@@ -19,9 +19,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusC
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSummaryController;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
-import uk.co.ogauthority.pathfinder.exception.InvalidUpcomingTenderException;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
-import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
@@ -92,7 +90,6 @@ public class ForwardWorkPlanUpcomingTenderConversionController extends ProjectFo
                                             RedirectAttributes redirectAttributes) {
     var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
     checkIfUserHasAccessToTender(upcomingTender);
-    checkIfUpcomingTenderIsValid(upcomingTender);
     bindingResult = conversionService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
@@ -120,7 +117,7 @@ public class ForwardWorkPlanUpcomingTenderConversionController extends ProjectFo
                                                                    UpcomingTenderConversionForm form) {
     var modelAndView = new ModelAndView("project/workplanupcomingtender/convertForwardWorkPlanUpcomingTender")
         .addObject("form", form)
-        .addObject("view", upcomingTenderSummaryService.getValidatedUpcomingTenderView(upcomingTender, displayOrder))
+        .addObject("view", upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, displayOrder))
         .addObject("cancelUrl",
             ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).viewUpcomingTenders(projectId, null)));
     breadcrumbService.fromWorkPlanUpcomingTenders(projectId, modelAndView, CONVERT_PAGE_NAME);
@@ -136,17 +133,6 @@ public class ForwardWorkPlanUpcomingTenderConversionController extends ProjectFo
           String.format(
               "User does not have access to the ForwardWorkPlanUpcomingTender with id: %d",
               upcomingTender.getId())
-      );
-    }
-  }
-
-  private void checkIfUpcomingTenderIsValid(ForwardWorkPlanUpcomingTender upcomingTender) {
-    if (!upcomingTenderService.isValid(upcomingTender, ValidationType.FULL)) {
-      throw new InvalidUpcomingTenderException(
-          String.format(
-              "Upcoming tender with id: %d must be valid before converting to an awarded contract",
-              upcomingTender.getId()
-          )
       );
     }
   }

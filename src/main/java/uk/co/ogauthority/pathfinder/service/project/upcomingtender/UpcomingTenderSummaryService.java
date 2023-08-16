@@ -99,15 +99,6 @@ public class UpcomingTenderSummaryService {
     return upcomingTenderService.isTaskValidForProjectDetail(detail);
   }
 
-  public UpcomingTenderView getValidatedUpcomingTenderView(UpcomingTender workPlanUpcomingTender,
-                                                           Integer displayOrder) {
-    return getUpcomingTenderView(
-        workPlanUpcomingTender,
-        displayOrder,
-        upcomingTenderService.isValid(workPlanUpcomingTender, ValidationType.FULL)
-    );
-  }
-
   public UpcomingTenderView getUpcomingTenderView(UpcomingTender upcomingTender,
                                                   Integer displayOrder) {
     return getUpcomingTenderViewBuilder(upcomingTender, displayOrder)
