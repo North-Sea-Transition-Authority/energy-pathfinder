@@ -2,9 +2,11 @@ package uk.co.ogauthority.pathfinder.model.form.project.upcomingtender;
 
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
+import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
 import uk.co.ogauthority.pathfinder.model.form.project.awardedcontract.AwardedContractValidationHint;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
@@ -26,7 +28,7 @@ public class UpcomingTenderConversionFormValidator implements SmartValidator {
   }
 
   @Override
-  public void validate(Object target, Errors errors, Object... validationHints) {
+  public void validate(@NonNull Object target, @NonNull Errors errors, @NonNull Object... validationHints) {
     var form = (UpcomingTenderConversionForm) target;
 
     var awardedContractValidationHint = Arrays.stream(validationHints)
@@ -37,17 +39,26 @@ public class UpcomingTenderConversionFormValidator implements SmartValidator {
             () -> new ActionNotAllowedException("Expected AwardedContractValidationHint validation hint to be provided")
         );
 
-    ValidationUtil.invokeNestedValidator(
+    ValidationUtils.rejectIfEmpty(
         errors,
-        dateInputValidator,
         "dateAwarded",
-        form.getDateAwarded(),
-        awardedContractValidationHint.getDateAwardedValidationHints()
+        "dateAwarded.invalid",
+        "Enter a date awarded"
     );
+
+    if (!errors.hasFieldErrors("dateAwarded")) {
+      ValidationUtil.invokeNestedValidator(
+          errors,
+          dateInputValidator,
+          "dateAwarded",
+          form.getDateAwarded(),
+          awardedContractValidationHint.getDateAwardedValidationHints()
+      );
+    }
   }
 
   @Override
-  public void validate(Object target, Errors errors) {
+  public void validate(@NonNull Object target,@NonNull Errors errors) {
     validate(target, errors, (Object) null);
   }
 

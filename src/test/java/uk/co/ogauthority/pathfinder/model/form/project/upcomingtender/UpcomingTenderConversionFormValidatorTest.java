@@ -59,6 +59,25 @@ class UpcomingTenderConversionFormValidatorTest {
   }
 
   @Test
+  void validate_emptyForm_thenInValid() {
+    form = new UpcomingTenderConversionForm();
+    var errors = new BeanPropertyBindingResult(form, "form");
+
+    ValidationUtils.invokeValidator(upcomingTenderConversionFormValidator, form, errors, awardedContractValidationHint);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).containsExactly(
+        entry("dateAwarded", Set.of("dateAwarded.invalid"))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("dateAwarded", Set.of("Enter a date awarded"))
+    );
+  }
+
+  @Test
   void validate_whenPartialValidationAndNoDateAwarded_thenValid() {
     doCallRealMethod().when(dateInputValidator).validate(any(), any(), any());
     when(dateInputValidator.supports(any())).thenReturn(true);
@@ -69,7 +88,6 @@ class UpcomingTenderConversionFormValidatorTest {
     ValidationUtils.invokeValidator(upcomingTenderConversionFormValidator, form, errors, awardedContractValidationHint);
 
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
-
     assertThat(fieldErrors).isEmpty();
   }
 

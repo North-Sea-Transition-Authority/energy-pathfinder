@@ -313,4 +313,11 @@ public class UpcomingTenderSummaryServiceTest {
 
     assertThat(upcomingTenderView.getSummaryLinks()).isEmpty();
   }
+
+  @Test
+  public void getValidatedUpcomingTenderView() {
+    var upcomingTenderView = upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, 1);
+
+    assertThat(upcomingTenderView.isValid()).isTrue();
+  }
 }

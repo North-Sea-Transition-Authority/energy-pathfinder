@@ -2,7 +2,9 @@ package uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.Collections;
 import java.util.List;
@@ -11,13 +13,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderController;
+import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderConversionController;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
+import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
 import uk.co.ogauthority.pathfinder.model.view.Tag;
 import uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender.ForwardWorkPlanUpcomingTenderView;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -165,5 +172,53 @@ public class ForwardWorkPlanUpcomingTenderSummaryServiceTest {
     var view2 = views.get(1);
     assertThat(view1.isValid()).isTrue();
     assertThat(view2.isValid()).isFalse();
+  }
+
+  @Test
+  public void getValidatedUpcomingTenderView() {
+    var upcomingTenderView = workPlanUpcomingTenderSummaryService.getUpcomingTenderView(workPlanUpcomingTender, 1);
+
+    assertThat(upcomingTenderView.isValid()).isTrue();
+  }
+
+  @Test
+  public void getUpcomingTenderView() {
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+        eq(workPlanUpcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(true);
+
+    var editLink = new SummaryLink(
+        SummaryLinkText.EDIT.getDisplayName(),
+        ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).editUpcomingTender(
+            workPlanUpcomingTender.getProjectDetail().getProject().getId(),
+            workPlanUpcomingTender.getId(),
+            null
+        ))
+    );
+
+    var convertLink = new SummaryLink(
+        SummaryLinkText.CONVERT_TO_AWARDED_CONTRACT.getDisplayName(),
+        ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderConversionController.class).convertUpcomingTenderConfirm(
+            workPlanUpcomingTender.getProjectDetail().getProject().getId(),
+            workPlanUpcomingTender.getId(),
+            1,
+            null
+        ))
+    );
+
+    var removeLink = new SummaryLink(
+        SummaryLinkText.DELETE.getDisplayName(),
+        ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).removeUpcomingTenderConfirm(
+            workPlanUpcomingTender.getProjectDetail().getProject().getId(),
+            workPlanUpcomingTender.getId(),
+            1,
+            null
+        ))
+    );
+
+    var upcomingTenderView = workPlanUpcomingTenderSummaryService.getUpcomingTenderView(workPlanUpcomingTender, 1);
+
+    assertThat(upcomingTenderView.getSummaryLinks()).containsExactly(editLink, convertLink, removeLink);
   }
 }

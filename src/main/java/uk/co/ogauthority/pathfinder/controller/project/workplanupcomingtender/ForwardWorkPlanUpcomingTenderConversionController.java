@@ -24,8 +24,9 @@ import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.upcomingtender.UpcomingTenderConversionForm;
-import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerBodyLine;
+import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerHeading;
 import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerLink;
+import uk.co.ogauthority.pathfinder.model.notificationbanner.NotificationBannerTitle;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.audit.AuditService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
@@ -47,7 +48,8 @@ import uk.co.ogauthority.pathfinder.util.notificationbanner.NotificationBannerUt
 public class ForwardWorkPlanUpcomingTenderConversionController extends ProjectFormPageController {
 
   public static final String CONVERT_PAGE_NAME = "Convert upcoming tender to awarded contract";
-  public static final String BANNER_BODY_LINE = "The upcoming tender has been converted to an awarded contract";
+  public static final String BANNER_TITLE = "Success";
+  public static final String BANNER_HEADING = "The upcoming tender has been converted to an awarded contract";
   public static final String BANNER_LINK_TEXT = "View awarded contracts";
 
   private final ForwardWorkPlanUpcomingTenderService upcomingTenderService;
@@ -137,8 +139,8 @@ public class ForwardWorkPlanUpcomingTenderConversionController extends ProjectFo
 
   private void addSuccessBanner(RedirectAttributes redirectAttributes, Integer projectId) {
     NotificationBannerUtils.successBannerWithLink(
-        "Success",
-        NotificationBannerBodyLine.withDefaultClass(BANNER_BODY_LINE),
+        new NotificationBannerTitle(BANNER_TITLE),
+        new NotificationBannerHeading(BANNER_HEADING),
         new NotificationBannerLink(
             ReverseRouter.route(on(ForwardWorkPlanAwardedContractSummaryController.class).viewAwardedContracts(projectId, null)),
             BANNER_LINK_TEXT),
