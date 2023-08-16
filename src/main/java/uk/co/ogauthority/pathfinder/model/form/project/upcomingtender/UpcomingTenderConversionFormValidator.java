@@ -46,18 +46,15 @@ public class UpcomingTenderConversionFormValidator implements SmartValidator {
         "Enter a date awarded"
     );
 
-    if (errors.hasErrors()) {
-      return;
+    if (!errors.hasFieldErrors("dateAwarded")) {
+      ValidationUtil.invokeNestedValidator(
+          errors,
+          dateInputValidator,
+          "dateAwarded",
+          form.getDateAwarded(),
+          awardedContractValidationHint.getDateAwardedValidationHints()
+      );
     }
-
-    ValidationUtil.invokeNestedValidator(
-        errors,
-        dateInputValidator,
-        "dateAwarded",
-        form.getDateAwarded(),
-        awardedContractValidationHint.getDateAwardedValidationHints()
-    );
-
   }
 
   @Override
