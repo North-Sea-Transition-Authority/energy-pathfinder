@@ -80,14 +80,14 @@ class ForwardWorkPlanUpcomingTenderConversionServiceTest {
     var awardedContract = awardedContractCaptor.getValue();
     assertThat(awardedContract.getContractorName()).isEqualTo(upcomingTenderConversionForm.getContractorName());
     assertThat(awardedContract.getDateAwarded()).isEqualTo(upcomingTenderConversionForm.getDateAwarded().createDateOrNull());
-    assertThat(awardedContract.getContactName()).isEqualTo(upcomingTender.getContactName());
+    assertThat(awardedContract.getContactName()).isEqualTo(upcomingTenderConversionForm.getContactDetail().getName());
     assertThat(awardedContract.getContractBand()).isEqualTo(upcomingTender.getContractBand());
     assertThat(awardedContract.getContractFunction()).isEqualTo(upcomingTender.getDepartmentType());
     assertThat(awardedContract.getManualContractFunction()).isEqualTo(upcomingTender.getManualDepartmentType());
     assertThat(awardedContract.getDescriptionOfWork()).isEqualTo(upcomingTender.getDescriptionOfWork());
-    assertThat(awardedContract.getPhoneNumber()).isEqualTo(upcomingTender.getPhoneNumber());
-    assertThat(awardedContract.getEmailAddress()).isEqualTo(upcomingTender.getEmailAddress());
-    assertThat(awardedContract.getJobTitle()).isEqualTo(upcomingTender.getJobTitle());
+    assertThat(awardedContract.getPhoneNumber()).isEqualTo(upcomingTenderConversionForm.getContactDetail().getPhoneNumber());
+    assertThat(awardedContract.getEmailAddress()).isEqualTo(upcomingTenderConversionForm.getContactDetail().getEmailAddress());
+    assertThat(awardedContract.getJobTitle()).isEqualTo(upcomingTenderConversionForm.getContactDetail().getJobTitle());
     assertThat(awardedContract.getAddedByOrganisationGroup()).isEqualTo(upcomingTender.getAddedByOrganisationGroup());
 
     verify(upcomingTenderService).delete(upcomingTender);

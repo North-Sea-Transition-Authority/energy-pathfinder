@@ -58,14 +58,16 @@ public class ForwardWorkPlanUpcomingTenderConversionService {
     awardedContract.setContractorName(form.getContractorName());
     awardedContract.setDateAwarded(form.getDateAwarded().createDateOrNull());
 
-    awardedContract.setContactName(upcomingTender.getContactName());
+    var contactDetails = form.getContactDetail();
+    awardedContract.setContactName(contactDetails.getName());
+    awardedContract.setPhoneNumber(contactDetails.getPhoneNumber());
+    awardedContract.setEmailAddress(contactDetails.getEmailAddress());
+    awardedContract.setJobTitle(contactDetails.getJobTitle());
+
     awardedContract.setContractBand(upcomingTender.getContractBand());
     awardedContract.setContractFunction(upcomingTender.getDepartmentType());
     awardedContract.setManualContractFunction(upcomingTender.getManualDepartmentType());
     awardedContract.setDescriptionOfWork(upcomingTender.getDescriptionOfWork());
-    awardedContract.setPhoneNumber(upcomingTender.getPhoneNumber());
-    awardedContract.setEmailAddress(upcomingTender.getEmailAddress());
-    awardedContract.setJobTitle(upcomingTender.getJobTitle());
     awardedContract.setAddedByOrganisationGroup(upcomingTender.getAddedByOrganisationGroup());
 
     return awardedContract;

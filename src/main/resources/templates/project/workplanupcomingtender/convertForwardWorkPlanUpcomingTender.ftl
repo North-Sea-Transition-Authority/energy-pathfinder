@@ -25,6 +25,8 @@
           formId="dateAwarded-day-month-year"
         />
 
+        <@contactDetails.standardContactDetails path="form.contactDetail" legendHeading="Contractor contact details"/>
+
         <@fdsAction.submitButtons
           primaryButtonText="Convert to awarded contract"
           secondaryLinkText="Cancel"
