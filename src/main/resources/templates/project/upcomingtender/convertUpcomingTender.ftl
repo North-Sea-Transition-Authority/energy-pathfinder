@@ -13,7 +13,7 @@
 
       <@tenderSummary.upcomingTenderSummary view=view showHeader=false showActions=false/>
 
-      <h3 class="govuk-heading-m">Awarded contract details</h3>
+      <h2 class="govuk-heading-l">Awarded contract details</h2>
 
       <@fdsTextInput.textInput path="form.contractorName" labelText="Contractor name"/>
 
@@ -24,6 +24,8 @@
         labelText="Date contract awarded"
         formId="dateAwarded-day-month-year"
       />
+
+      <@contactDetails.standardContactDetails path="form.contactDetail" legendHeading="Contractor contact details"/>
 
       <@fdsAction.submitButtons
         primaryButtonText="Convert to awarded contract"
