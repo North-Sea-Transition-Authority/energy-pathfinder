@@ -12,6 +12,9 @@ public class MetricsProvider {
   private final Counter subscribePagePostCounter;
   private final Counter unSubscribePageHitCounter;
   private final Counter unsubscribePagePostCounter;
+  private final Counter manageSubscriptionCounter;
+  private final Counter updateSubscriptionHitCounter;
+  private final Counter updateSubscriptionPostCounter;
 
   public MetricsProvider(MeterRegistry registry) {
     this.dashboardTimer = registry.timer("pathfinder.dashboardTimer");
@@ -20,6 +23,9 @@ public class MetricsProvider {
     this.unSubscribePageHitCounter = registry.counter("pathfinder.unSubscribePageHitCounter");
     this.subscribePagePostCounter = registry.counter("pathfinder.subscribePagePostCounter");
     this.unsubscribePagePostCounter = registry.counter("pathfinder.unsubscribePagePostCounter");
+    this.manageSubscriptionCounter = registry.counter("pathfinder.manageSubscriptionCounter");
+    this.updateSubscriptionHitCounter = registry.counter("pathfinder.updateSubscriptionHitCounter");
+    this.updateSubscriptionPostCounter = registry.counter("pathfinder.updateSubscriptionPostCounter");
   }
 
   public Timer getDashboardTimer() {
@@ -44,5 +50,17 @@ public class MetricsProvider {
 
   public Counter getUnsubscribePagePostCounter() {
     return unsubscribePagePostCounter;
+  }
+
+  public Counter getManageSubscriptionCounter() {
+    return manageSubscriptionCounter;
+  }
+
+  public Counter getUpdateSubscriptionHitCounter() {
+    return updateSubscriptionHitCounter;
+  }
+
+  public Counter getUpdateSubscriptionPostCounter() {
+    return updateSubscriptionPostCounter;
   }
 }

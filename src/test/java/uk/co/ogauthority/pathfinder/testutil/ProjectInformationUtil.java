@@ -2,8 +2,8 @@ package uk.co.ogauthority.pathfinder.testutil;
 
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
-import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.project.projectinformation.ProjectInformationForm;
 
@@ -12,7 +12,7 @@ public class ProjectInformationUtil {
   public static final String PROJECT_TITLE = "PROJECT TITLE";
   public static final String PROJECT_SUMMARY = "SUMMARY";
   public static final FieldStage FIELD_STAGE = FieldStage.DECOMMISSIONING;
-  public static final EnergyTransitionCategory ENERGY_TRANSITION_CATEGORY = EnergyTransitionCategory.HYDROGEN;
+  public static final FieldStageSubCategory FIELD_STAGE_SUB_CATEGORY = FieldStageSubCategory.FIXED_BOTTOM_OFFSHORE_WIND;
   public static final String CONTACT_NAME = ContactDetailsTestUtil.CONTACT_NAME;
   public static final String PHONE_NUMBER = ContactDetailsTestUtil.PHONE_NUMBER;
   public static final String JOB_TITLE = ContactDetailsTestUtil.JOB_TITLE;
@@ -46,7 +46,7 @@ public class ProjectInformationUtil {
     );
     form.setContactDetail(contactDetailForm);
     form.setDevelopmentFirstProductionDate(new QuarterYearInput(null, null));
-    form.setEnergyTransitionCategory(ENERGY_TRANSITION_CATEGORY);
+    form.setOffshoreWindSubCategory(FIELD_STAGE_SUB_CATEGORY);
 
     return form;
   }

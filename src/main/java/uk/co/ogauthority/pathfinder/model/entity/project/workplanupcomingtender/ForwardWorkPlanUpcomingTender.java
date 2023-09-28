@@ -11,8 +11,8 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
+import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
-import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
 
 @Entity
@@ -42,7 +42,7 @@ public class ForwardWorkPlanUpcomingTender extends ProjectDetailEntity implement
   private String emailAddress;
 
   @Enumerated(EnumType.STRING)
-  private WorkPlanUpcomingTenderContractBand contractBand;
+  private ContractBand contractBand;
 
   private Integer contractTermDuration;
 
@@ -138,11 +138,11 @@ public class ForwardWorkPlanUpcomingTender extends ProjectDetailEntity implement
     return getContactName();
   }
 
-  public WorkPlanUpcomingTenderContractBand getContractBand() {
+  public ContractBand getContractBand() {
     return contractBand;
   }
 
-  public void setContractBand(WorkPlanUpcomingTenderContractBand contractBand) {
+  public void setContractBand(ContractBand contractBand) {
     this.contractBand = contractBand;
   }
 

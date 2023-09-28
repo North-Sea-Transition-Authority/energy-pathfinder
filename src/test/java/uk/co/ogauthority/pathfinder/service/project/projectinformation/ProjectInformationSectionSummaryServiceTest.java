@@ -104,8 +104,7 @@ public class ProjectInformationSectionSummaryServiceTest {
     assertThat(model).containsOnlyKeys(
         "projectInformationDiffModel",
         "isDevelopmentFieldStage",
-        "isDiscoveryFieldStage",
-        "isEnergyTransitionFieldStage"
+        "isDiscoveryFieldStage"
     );
   }
 

@@ -81,6 +81,7 @@ public enum ProjectTaskGroup {
       "Commercial information",
       List.of(
           ProjectTask.WORK_PLAN_UPCOMING_TENDERS,
+          ProjectTask.WORK_PLAN_AWARDED_CONTRACTS,
           ProjectTask.WORK_PLAN_COLLABORATION_OPPORTUNITIES
       ),
       Set.of(ProjectType.FORWARD_WORK_PLAN),

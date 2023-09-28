@@ -5,13 +5,13 @@ import uk.co.ogauthority.pathfinder.model.enums.email.NotifyTemplate;
 public class NoProjectsUpdatedNewsletterEmailProperties extends ProjectNewsletterEmailProperties {
 
   public NoProjectsUpdatedNewsletterEmailProperties(String recipientIdentifier,
-                                                    String unsubscribeUrl,
+                                                    String manageSubscriptionUrl,
                                                     String serviceName,
                                                     String customerMnemonic) {
     super(
         NotifyTemplate.NEWSLETTER_NO_PROJECTS_UPDATED,
         recipientIdentifier,
-        unsubscribeUrl,
+        manageSubscriptionUrl,
         String.format(
             "No %s projects have been updated in the last month.",
             serviceName

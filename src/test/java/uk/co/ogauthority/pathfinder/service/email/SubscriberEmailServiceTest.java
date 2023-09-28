@@ -8,19 +8,19 @@ import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.UUID;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.EmailProperties;
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.subscription.SubscribedToNewsletterEmailProperties;
 import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.email.notify.CommonEmailMergeField;
 
-@RunWith(MockitoJUnitRunner.class)
-public class SubscriberEmailServiceTest {
+@ExtendWith(MockitoExtension.class)
+class SubscriberEmailServiceTest {
 
   @Mock
   private EmailService emailService;
@@ -28,21 +28,17 @@ public class SubscriberEmailServiceTest {
   @Mock
   private LinkService linkService;
 
+  @InjectMocks
   private SubscriberEmailService subscriberEmailService;
 
-  @Before
-  public void setup() {
-    subscriberEmailService = new SubscriberEmailService(emailService, linkService);
-  }
-
   @Test
-  public void sendSubscribedEmail() {
+  void sendSubscribedEmail() {
     var forename = "Test forename";
     var emailAddress = "test@test.com";
     var subscriberUuid = UUID.randomUUID();
-    var unsubscribeUrl = "testUrl";
+    var manageSubscriptionUrl = "testUrl";
 
-    when(linkService.getUnsubscribeUrl(subscriberUuid.toString())).thenReturn(unsubscribeUrl);
+    when(linkService.getManageSubscriptionUrl(subscriberUuid.toString())).thenReturn(manageSubscriptionUrl);
 
     subscriberEmailService.sendSubscribedEmail(forename, emailAddress, subscriberUuid);
 
@@ -52,7 +48,7 @@ public class SubscriberEmailServiceTest {
 
     final var expectedEmailProperties = new HashMap<String, Object>();
     expectedEmailProperties.put(CommonEmailMergeField.RECIPIENT_IDENTIFIER, forename);
-    expectedEmailProperties.put("UNSUBSCRIBE_URL", unsubscribeUrl);
+    expectedEmailProperties.put("MANAGE_SUBSCRIPTION_URL", manageSubscriptionUrl);
     assertThat(emailProperties.getEmailPersonalisation()).containsExactlyInAnyOrderEntriesOf(expectedEmailProperties);
   }
 }

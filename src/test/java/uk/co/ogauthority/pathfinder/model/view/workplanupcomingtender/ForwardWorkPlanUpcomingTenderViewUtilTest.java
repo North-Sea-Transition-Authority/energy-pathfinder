@@ -3,17 +3,18 @@ package uk.co.ogauthority.pathfinder.model.view.workplanupcomingtender;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderController;
+import uk.co.ogauthority.pathfinder.controller.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderConversionController;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
+import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
-import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
 import uk.co.ogauthority.pathfinder.model.view.StringWithTag;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLink;
 import uk.co.ogauthority.pathfinder.model.view.SummaryLinkText;
@@ -24,22 +25,21 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ForwardWorkPlanUpcomingTenderViewUtilTest {
+@ExtendWith(MockitoExtension.class)
+class ForwardWorkPlanUpcomingTenderViewUtilTest {
 
   private final PortalOrganisationGroup addedByPortalOrganisationGroup =
       TeamTestingUtil.generateOrganisationGroup(1, "org", "org");
 
   private ProjectDetail projectDetail;
 
-  @Before
-  public void setup() {
+  @BeforeEach
+  void setup() {
     projectDetail = ProjectUtil.getProjectDetails();
   }
 
   @Test
-  public void createUpcomingTenderView_whenNoTenderDepartment_thenEmptyStringWithTag() {
-
+  void createUpcomingTenderView_whenNoTenderDepartment_thenEmptyStringWithTag() {
     var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setDepartmentType(null);
     upcomingTender.setManualDepartmentType(null);
@@ -60,8 +60,7 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_whenFromListTenderDepartment_thenFromListStringWithTag() {
-
+  void createUpComingTenderView_whenFromListTenderDepartment_thenFromListStringWithTag() {
     final var tenderDepartment = Function.DRILLING;
 
     var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
@@ -87,8 +86,7 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_whenNotFromListTenderDepartment_thenNotFromListStringWithTag() {
-
+  void createUpComingTenderView_whenNotFromListTenderDepartment_thenNotFromListStringWithTag() {
     final var tenderDepartment = "Manual entry";
 
     var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
@@ -114,9 +112,8 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_whenContractBandProvided_thenContractBandPopulated() {
-
-    final var contractBand = WorkPlanUpcomingTenderContractBand.GREATER_THAN_OR_EQUAL_TO_5M;
+  void createUpComingTenderView_whenContractBandProvided_thenContractBandPopulated() {
+    final var contractBand = ContractBand.GREATER_THAN_OR_EQUAL_TO_5M;
 
     var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setContractBand(contractBand);
@@ -138,8 +135,7 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_whenContractBandNotProvided_thenEmptyString() {
-
+  void createUpComingTenderView_whenContractBandNotProvided_thenEmptyString() {
     var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setContractBand(null);
 
@@ -160,8 +156,7 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_whenIsValidTrue_thenIsValidTrueInView() {
-
+  void createUpComingTenderView_whenIsValidTrue_thenIsValidTrueInView() {
     var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
 
     final var displayOrder = 3;
@@ -183,8 +178,7 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_whenIsValidFalse_thenIsValidFalseInView() {
-
+  void createUpComingTenderView_whenIsValidFalse_thenIsValidFalseInView() {
     var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
 
     final var displayOrder = 3;
@@ -205,8 +199,7 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpcomingTenderView_whenContractTermDurationAndPeriodNull_thenContractLengthSetToEmptyString() {
-
+  void createUpcomingTenderView_whenContractTermDurationAndPeriodNull_thenContractLengthSetToEmptyString() {
     var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setContractTermDurationPeriod(null);
     upcomingTender.setContractTermDuration(null);
@@ -227,8 +220,7 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpcomingTenderView_whenContractTermDurationPeriodNull_thenContractLengthSetToEmptyString() {
-
+  void createUpcomingTenderView_whenContractTermDurationPeriodNull_thenContractLengthSetToEmptyString() {
     var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setContractTermDurationPeriod(null);
     upcomingTender.setContractTermDuration(10);
@@ -249,8 +241,7 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpcomingTenderView_whenContractTermDurationNull_thenContractLengthSetToEmptyString() {
-
+  void createUpcomingTenderView_whenContractTermDurationNull_thenContractLengthSetToEmptyString() {
     var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setContractTermDurationPeriod(DurationPeriod.DAYS);
     upcomingTender.setContractTermDuration(null);
@@ -271,8 +262,7 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpcomingTenderView_whenNotIncludeSummaryLinks_thenNoLinks() {
-
+  void createUpcomingTenderView_whenNotIncludeSummaryLinks_thenNoLinks() {
     var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
 
     final var displayOrder = 1;
@@ -290,8 +280,7 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpcomingTenderView_whenContractTermDurationAbove1AndPeriodProvided_assertPluralContractLength() {
-
+  void createUpcomingTenderView_whenContractTermDurationAbove1AndPeriodProvided_assertPluralContractLength() {
     final var contractTermDuration = 10;
     final var contractDurationPeriod = DurationPeriod.WEEKS;
     final var expectedContractLength = String.format(
@@ -304,8 +293,7 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpcomingTenderView_whenContractTermDurationEqual1AndPeriodProvided_assertSingularContractLength() {
-
+  void createUpcomingTenderView_whenContractTermDurationEqual1AndPeriodProvided_assertSingularContractLength() {
     final var contractTermDuration = 1;
     final var contractDurationPeriod = DurationPeriod.DAYS;
     final var expectedContractLength = String.format(
@@ -318,7 +306,7 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
   }
 
   @Test
-  public void createUpComingTenderView_whenAddedByPortalOrgIsEmpty_thenDefaultAddedByString() {
+  void createUpComingTenderView_whenAddedByPortalOrgIsEmpty_thenDefaultAddedByString() {
     var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     var displayOrder = 2;
     var includeSummaryLinks = true;
@@ -337,7 +325,6 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
   private void assertExpectedContractTerm(Integer contractTermDuration,
                                           DurationPeriod contractTermDurationPeriod,
                                           String expectedContractTermString) {
-
     var upcomingTender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
     upcomingTender.setContractTermDurationPeriod(contractTermDurationPeriod);
     upcomingTender.setContractTermDuration(contractTermDuration);
@@ -381,6 +368,16 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
         ))
     );
 
+    final var convertLink = new SummaryLink(
+        SummaryLinkText.CONVERT_TO_AWARDED_CONTRACT.getDisplayName(),
+        ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderConversionController.class).convertUpcomingTenderConfirm(
+            upcomingTenderView.getProjectId(),
+            upcomingTenderView.getId(),
+            displayOrder,
+            null
+        ))
+    );
+
     final var removeSummaryLink = new SummaryLink(
         SummaryLinkText.DELETE.getDisplayName(),
         ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class).removeUpcomingTenderConfirm(
@@ -391,6 +388,6 @@ public class ForwardWorkPlanUpcomingTenderViewUtilTest {
         ))
     );
 
-    assertThat(upcomingTenderView.getSummaryLinks()).containsExactly(editSummaryLink, removeSummaryLink);
+    assertThat(upcomingTenderView.getSummaryLinks()).containsExactly(editSummaryLink, convertLink, removeSummaryLink);
   }
 }

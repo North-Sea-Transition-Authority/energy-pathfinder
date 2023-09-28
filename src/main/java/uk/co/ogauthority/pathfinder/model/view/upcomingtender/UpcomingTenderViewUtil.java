@@ -5,6 +5,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTenderConversionController;
 import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
@@ -110,6 +111,17 @@ public class UpcomingTenderViewUtil {
             ))
         );
         links.add(editLink);
+
+        var convertLink = new SummaryLink(
+            SummaryLinkText.CONVERT_TO_AWARDED_CONTRACT.getDisplayName(),
+            ReverseRouter.route(on(UpcomingTenderConversionController.class).convertUpcomingTenderConfirm(
+                projectId,
+                upcomingTender.getId(),
+                displayOrder,
+                null
+            ))
+        );
+        links.add(convertLink);
 
         var removeLink = new SummaryLink(
             SummaryLinkText.DELETE.getDisplayName(),

@@ -4,7 +4,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.enums.duration.DurationPeriod;
-import uk.co.ogauthority.pathfinder.model.enums.project.WorkPlanUpcomingTenderContractBand;
+import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.quarteryearinput.QuarterYearInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
@@ -22,7 +22,7 @@ public class ForwardWorkPlanUpcomingTenderForm {
   private QuarterYearInput estimatedTenderStartDate;
 
   @NotNull(message = "Select a contract band", groups = FullValidation.class)
-  private WorkPlanUpcomingTenderContractBand contractBand;
+  private ContractBand contractBand;
 
   @NotNull(message = "Select if the contract length is measured in days, weeks, months or years", groups = FullValidation.class)
   private DurationPeriod contractTermDurationPeriod;
@@ -79,11 +79,11 @@ public class ForwardWorkPlanUpcomingTenderForm {
     this.estimatedTenderStartDate = estimatedTenderStartDate;
   }
 
-  public WorkPlanUpcomingTenderContractBand getContractBand() {
+  public ContractBand getContractBand() {
     return contractBand;
   }
 
-  public void setContractBand(WorkPlanUpcomingTenderContractBand contractBand) {
+  public void setContractBand(ContractBand contractBand) {
     this.contractBand = contractBand;
   }
 

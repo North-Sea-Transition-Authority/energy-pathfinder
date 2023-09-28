@@ -44,12 +44,14 @@ class QuarterlyUpdateInitialReminderService implements QuarterlyUpdateReminder {
   @Override
   public QuarterlyUpdateReminderEmailProperties getReminderEmailProperties(String recipientIdentifier,
                                                                            String operatorName,
-                                                                           List<String> remindableProjects) {
+                                                                           List<String> remindableProjects,
+                                                                           List<String> projectsWithPastUpcomingTenders) {
     return new InitialQuarterlyUpdateReminderEmailProperties(
         recipientIdentifier,
         operatorName,
         remindableProjects,
-        linkService.getWorkAreaUrl()
+        linkService.getWorkAreaUrl(),
+        projectsWithPastUpcomingTenders
     );
   }
 }

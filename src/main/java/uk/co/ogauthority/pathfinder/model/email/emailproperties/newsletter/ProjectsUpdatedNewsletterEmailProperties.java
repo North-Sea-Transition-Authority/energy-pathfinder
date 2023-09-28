@@ -10,14 +10,14 @@ public class ProjectsUpdatedNewsletterEmailProperties extends ProjectNewsletterE
   private final List<String> projectsUpdated;
 
   public ProjectsUpdatedNewsletterEmailProperties(String recipientIdentifier,
-                                                  String unsubscribeUrl,
+                                                  String manageSubscriptionUrl,
                                                   List<String> projectsUpdated,
                                                   String serviceName,
                                                   String customerMnemonic) {
     super(
         NotifyTemplate.NEWSLETTER_WITH_PROJECTS_UPDATED,
         recipientIdentifier,
-        unsubscribeUrl,
+        manageSubscriptionUrl,
         String.format(
             "The following %s projects have been updated in the last month:",
             serviceName

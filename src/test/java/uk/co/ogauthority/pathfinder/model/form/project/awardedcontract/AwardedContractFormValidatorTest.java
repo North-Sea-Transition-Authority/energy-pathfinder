@@ -8,11 +8,12 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -22,27 +23,27 @@ import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 import uk.co.ogauthority.pathfinder.util.StringDisplayUtil;
 
-@RunWith(MockitoJUnitRunner.class)
-public class AwardedContractFormValidatorTest {
+@ExtendWith(MockitoExtension.class)
+class AwardedContractFormValidatorTest {
 
   @Mock
   private DateInputValidator dateInputValidator;
 
+  @InjectMocks
   private AwardedContractFormValidator awardedContractFormValidator;
 
   private AwardedContractValidationHint awardedContractValidationHint;
 
-  @Before
-  public void setup() {
-    awardedContractFormValidator = new AwardedContractFormValidator(dateInputValidator);
+  @BeforeEach
+  void setup() {
     awardedContractValidationHint = new AwardedContractValidationHint(ValidationType.FULL);
     doCallRealMethod().when(dateInputValidator).validate(any(), any(), any());
     when(dateInputValidator.supports(any())).thenReturn(true);
   }
 
   @Test
-  public void validate_completeForm_thenValid() {
-    var form = AwardedContractTestUtil.createAwardedContractForm();
+  void validate_completeForm_thenValid() {
+    var form = AwardedContractTestUtil.createInfrastructureAwardedContractForm();
     var errors = new BeanPropertyBindingResult(form, "form");
 
     ValidationUtils.invokeValidator(awardedContractFormValidator, form, errors, awardedContractValidationHint);
@@ -53,8 +54,8 @@ public class AwardedContractFormValidatorTest {
   }
 
   @Test
-  public void validate_whenFullValidationAndNoDateAwarded_thenInvalid() {
-    var form = AwardedContractTestUtil.createAwardedContractForm();
+  void validate_whenFullValidationAndNoDateAwarded_thenInvalid() {
+    var form = AwardedContractTestUtil.createInfrastructureAwardedContractForm();
     form.setDateAwarded(new ThreeFieldDateInput(null, null, null));
 
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -84,8 +85,8 @@ public class AwardedContractFormValidatorTest {
   }
 
   @Test
-  public void validate_whenPartialValidationAndNoDateAwarded_thenValid() {
-    var form = AwardedContractTestUtil.createAwardedContractForm();
+  void validate_whenPartialValidationAndNoDateAwarded_thenValid() {
+    var form = AwardedContractTestUtil.createInfrastructureAwardedContractForm();
     form.setDateAwarded(new ThreeFieldDateInput(null, null, null));
 
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -99,8 +100,8 @@ public class AwardedContractFormValidatorTest {
   }
 
   @Test
-  public void validate_partialDateAwarded_thenInvalid() {
-    var form = AwardedContractTestUtil.createAwardedContractForm();
+  void validate_partialDateAwarded_thenInvalid() {
+    var form = AwardedContractTestUtil.createInfrastructureAwardedContractForm();
     form.setDateAwarded(new ThreeFieldDateInput(2020, null, null));
 
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -126,8 +127,8 @@ public class AwardedContractFormValidatorTest {
   }
 
   @Test
-  public void validate_pastDateAwarded_thenValid() {
-    var form = AwardedContractTestUtil.createAwardedContractForm();
+  void validate_pastDateAwarded_thenValid() {
+    var form = AwardedContractTestUtil.createInfrastructureAwardedContractForm();
     form.setDateAwarded(new ThreeFieldDateInput(LocalDate.now().minusYears(1)));
 
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -140,8 +141,8 @@ public class AwardedContractFormValidatorTest {
   }
 
   @Test
-  public void validate_todayDateAwarded_thenValid() {
-    var form = AwardedContractTestUtil.createAwardedContractForm();
+  void validate_todayDateAwarded_thenValid() {
+    var form = AwardedContractTestUtil.createInfrastructureAwardedContractForm();
     form.setDateAwarded(new ThreeFieldDateInput(LocalDate.now()));
 
     var errors = new BeanPropertyBindingResult(form, "form");

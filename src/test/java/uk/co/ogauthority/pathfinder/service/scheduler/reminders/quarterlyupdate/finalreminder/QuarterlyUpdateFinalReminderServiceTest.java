@@ -91,6 +91,7 @@ public class QuarterlyUpdateFinalReminderServiceTest {
     var operatorName = "operator name";
     var serviceUrl = "/service-url";
     var projectNameList = List.of("project A", "project B");
+    var projectsWithPastUpcomingTendersList = List.of("project B");
 
     when(linkService.getWorkAreaUrl()).thenReturn(serviceUrl);
 
@@ -98,13 +99,15 @@ public class QuarterlyUpdateFinalReminderServiceTest {
         recipientIdentifier,
         operatorName,
         projectNameList,
-        serviceUrl
+        serviceUrl,
+        projectsWithPastUpcomingTendersList
     );
 
     var resultingEmailProperties = quarterlyUpdateFinalReminderService.getReminderEmailProperties(
         recipientIdentifier,
         operatorName,
-        projectNameList
+        projectNameList,
+        projectsWithPastUpcomingTendersList
     );
 
     assertThat(resultingEmailProperties).isEqualTo(expectedEmailProperties);
@@ -113,7 +116,9 @@ public class QuarterlyUpdateFinalReminderServiceTest {
         "OPERATOR_NAME", operatorName,
         "OPERATOR_PROJECTS", projectNameList,
         "SERVICE_LOGIN_URL", serviceUrl,
-        CommonEmailMergeField.RECIPIENT_IDENTIFIER, recipientIdentifier
+        CommonEmailMergeField.RECIPIENT_IDENTIFIER, recipientIdentifier,
+        "PROJECTS_WITH_PAST_UPCOMING_TENDERS", projectsWithPastUpcomingTendersList,
+        "SHOW_PROJECTS_WITH_PAST_UPCOMING_TENDERS", "yes"
     ));
   }
 

@@ -57,7 +57,7 @@
   <#else>
     <#assign heading = "" />
   </#if>
-  <#if isValid?has_content && !isValid>
+  <#if isValid?has_content && !isValid && heading?has_content>
     <#assign errorMessage = "${heading} is incomplete" />
   <#else>
     <#assign errorMessage = "" />

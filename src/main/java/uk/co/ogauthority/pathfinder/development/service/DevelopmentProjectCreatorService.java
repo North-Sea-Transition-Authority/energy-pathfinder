@@ -36,7 +36,7 @@ public class DevelopmentProjectCreatorService {
   //Project Information
   public static final String PROJECT_TITLE = "AUTO PROJECT TITLE";
   public static final String PROJECT_SUMMARY = "SUMMARY";
-  public static final FieldStage FIELD_STAGE = FieldStage.ENERGY_TRANSITION;
+  public static final FieldStage FIELD_STAGE = FieldStage.HYDROGEN;
   public static final String CONTACT_NAME = "Jane Doe";
   public static final String PHONE_NUMBER = "01303 123 456";
   public static final String JOB_TITLE = "Big Boss";

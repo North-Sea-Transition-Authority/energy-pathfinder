@@ -322,7 +322,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
         ))
         .addObject("form", form)
         .addObject("preSelectedFunction", upcomingTenderService.getPreSelectedFunction(form))
-        .addObject("contractBands", ContractBand.getAllAsMap());
+        .addObject("contractBands", ContractBand.getAllAsMap(ProjectType.INFRASTRUCTURE));
     breadcrumbService.fromUpcomingTenders(projectDetail.getProject().getId(), modelAndView, PAGE_NAME_SINGULAR);
     return modelAndView;
   }

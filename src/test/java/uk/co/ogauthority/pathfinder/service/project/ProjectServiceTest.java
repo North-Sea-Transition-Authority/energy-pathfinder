@@ -45,7 +45,7 @@ public class ProjectServiceTest {
   }
 
   @Test
-  public void getLatestDetail() {
+  public void getLatestDetail_whenFound_thenReturned() {
     var projectDetail = ProjectUtil.getProjectDetails();
 
     when(projectDetailsRepository.findByProjectIdAndIsCurrentVersionIsTrue(PROJECT_ID)).thenReturn(
@@ -78,7 +78,7 @@ public class ProjectServiceTest {
   }
 
   @Test
-  public void getLatestSubmittedDetail() {
+  public void getLatestSubmittedDetail_whenFound_thenReturned() {
     var projectDetail = ProjectUtil.getProjectDetails();
 
     when(projectDetailsRepository.findByProjectIdAndIsLatestSubmittedVersion(PROJECT_ID)).thenReturn(

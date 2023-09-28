@@ -8,8 +8,8 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
-import uk.co.ogauthority.pathfinder.model.enums.project.EnergyTransitionCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailCapture;
 
 @Entity
@@ -39,7 +39,7 @@ public class ProjectInformation extends ProjectDetailEntity implements ContactDe
   private Integer firstProductionDateYear;
 
   @Enumerated(EnumType.STRING)
-  private EnergyTransitionCategory energyTransitionCategory;
+  private FieldStageSubCategory fieldStageSubCategory;
 
   public FieldStage getFieldStage() {
     return fieldStage;
@@ -121,12 +121,12 @@ public class ProjectInformation extends ProjectDetailEntity implements ContactDe
     this.firstProductionDateYear = firstProductionDateYear;
   }
 
-  public EnergyTransitionCategory getEnergyTransitionCategory() {
-    return energyTransitionCategory;
+  public FieldStageSubCategory getFieldStageSubCategory() {
+    return fieldStageSubCategory;
   }
 
-  public void setEnergyTransitionCategory(
-      EnergyTransitionCategory energyTransitionCategory) {
-    this.energyTransitionCategory = energyTransitionCategory;
+  public void setFieldStageSubCategory(
+      FieldStageSubCategory fieldStageSubCategory) {
+    this.fieldStageSubCategory = fieldStageSubCategory;
   }
 }

@@ -2,6 +2,9 @@ package uk.co.ogauthority.pathfinder.service.newsletters;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +15,9 @@ import uk.co.ogauthority.pathfinder.model.email.emailproperties.newsletter.Proje
 import uk.co.ogauthority.pathfinder.model.email.emailproperties.newsletter.ProjectsUpdatedNewsletterEmailProperties;
 import uk.co.ogauthority.pathfinder.model.entity.newsletters.MonthlyNewsletter;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
+import uk.co.ogauthority.pathfinder.model.entity.subscription.SubscriberFieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.NewsletterSendingResult;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.repository.newsletters.MonthlyNewsletterRepository;
 import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
@@ -52,10 +57,23 @@ public class NewsletterService {
 
     try {
 
-      final var projectsUpdatedInTheLastMonth = newsletterProjectService.getProjectsUpdatedInTheLastMonth();
+      var projectsUpdatedInTheLastMonth = newsletterProjectService.getProjectsUpdatedInTheLastMonth();
+      var subscribers = subscriberAccessor.getAllSubscribers();
+      Map<UUID, List<FieldStage>> allSubscriberFieldStages = subscriberAccessor
+          .getAllSubscriberFieldStages(subscribers)
+          .stream()
+          .collect(Collectors.groupingBy(
+              SubscriberFieldStage::getSubscriberUuid,
+              Collectors.mapping(SubscriberFieldStage::getFieldStage, Collectors.toList())
+          ));
 
-      subscriberAccessor.getAllSubscribers().forEach(subscriber -> {
-        var emailProperties = getEmailProperties(subscriber, projectsUpdatedInTheLastMonth);
+      subscribers.forEach(subscriber -> {
+        var fieldStages = allSubscriberFieldStages.get(subscriber.getUuid());
+        var projects = projectsUpdatedInTheLastMonth.stream()
+            .filter(project -> fieldStages.contains(project.getFieldStage()))
+            .map(NewsletterProjectView::getProject)
+            .collect(Collectors.toList());
+        var emailProperties = getEmailProperties(subscriber, projects);
         emailService.sendEmail(emailProperties, subscriber.getEmailAddress());
       });
 
@@ -82,14 +100,14 @@ public class NewsletterService {
     if (projectsUpdated.isEmpty()) {
       return new NoProjectsUpdatedNewsletterEmailProperties(
           subscriber.getForename(),
-          linkService.getUnsubscribeUrl(subscriber.getUuid().toString()),
+          linkService.getManageSubscriptionUrl(subscriber.getUuid().toString()),
           serviceName,
           customerMnemonic
       );
     } else {
       return new ProjectsUpdatedNewsletterEmailProperties(
           subscriber.getForename(),
-          linkService.getUnsubscribeUrl(subscriber.getUuid().toString()),
+          linkService.getManageSubscriptionUrl(subscriber.getUuid().toString()),
           projectsUpdated,
           serviceName,
           customerMnemonic
