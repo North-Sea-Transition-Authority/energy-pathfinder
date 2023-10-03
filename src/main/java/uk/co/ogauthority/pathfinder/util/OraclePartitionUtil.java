@@ -10,6 +10,10 @@ public class OraclePartitionUtil {
 
   public static final int ORACLE_LIMIT = 1000;
 
+  private OraclePartitionUtil() {
+    throw new IllegalStateException("OraclePartitionUtil is a utility class and should not be instantiated");
+  }
+
   /**
    * returns a partitioned list of items using the oracle limit.
    * @param list The full list of items which will be partitioned in chunks of 1000 and the remainder
