@@ -1,15 +1,14 @@
 package uk.co.ogauthority.pathfinder.service.subscription;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -70,6 +69,12 @@ class SubscriberAccessorTest {
 
     subscriberAccessor.getAllSubscriberFieldStages(subscribers);
 
-    verify(subscriberFieldStageRepository, times(2)).findAllBySubscriberUuidIn(anyList());
+    var subscriberUuidsList = subscribers.stream()
+            .map(Subscriber::getUuid)
+                .collect(Collectors.toList());
+    var partitonedSubscriberUuidList = OraclePartitionUtil.partitionedList(subscriberUuidsList);
+
+    verify(subscriberFieldStageRepository).findAllBySubscriberUuidIn(partitonedSubscriberUuidList.get(0));
+    verify(subscriberFieldStageRepository).findAllBySubscriberUuidIn(partitonedSubscriberUuidList.get(1));
   }
 }
