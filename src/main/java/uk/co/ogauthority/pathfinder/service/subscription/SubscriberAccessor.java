@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.subscription;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.IterableUtils;
@@ -9,6 +10,7 @@ import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.SubscriberFieldStage;
 import uk.co.ogauthority.pathfinder.repository.subscription.SubscriberFieldStageRepository;
 import uk.co.ogauthority.pathfinder.repository.subscription.SubscriberRepository;
+import uk.co.ogauthority.pathfinder.util.OraclePartitionUtil;
 
 @Service
 public class SubscriberAccessor {
@@ -31,7 +33,17 @@ public class SubscriberAccessor {
     var subscriberUuids = subscriber.stream()
         .map(Subscriber::getUuid)
         .collect(Collectors.toList());
-    return subscriberFieldStageRepository.findAllBySubscriberUuidIn(subscriberUuids);
+
+    List<SubscriberFieldStage> subscriberFieldStages = new ArrayList<>();
+
+    OraclePartitionUtil.partitionedList(subscriberUuids).forEach(
+        subscriberUuidsList -> {
+          var subscriberFieldStagesSubList = subscriberFieldStageRepository.findAllBySubscriberUuidIn(subscriberUuidsList);
+          subscriberFieldStages.addAll(subscriberFieldStagesSubList);
+        }
+    );
+
+    return subscriberFieldStages;
   }
 
 }
