@@ -25,17 +25,19 @@ steps:
       - git submodule update --init --recursive
 
   - name: build-fds
-    image: node:10
+    image: node:18
     commands:
       - cd fivium-design-system-core
       - npm install
       - npx gulp build
       - cd ..
 
+  # TODO: EDU-6696 - Upgrade to Node V18
   - name: build-frontend
-    image: node:10
+    image: node:14
     commands:
       - npm install
+      - npm rebuild node-sass
       - npx gulp buildAll
 
   - name: build-java

@@ -19,6 +19,7 @@
   errorItems=errorList
   pageHeadingClass="govuk-heading-l"
   phaseBanner=false
+  noIndex=false
 >
 
   <@subscribe._subscriptionSummaryText pronoun="Subscribers"/>

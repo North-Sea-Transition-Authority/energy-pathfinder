@@ -64,6 +64,10 @@ function compileSass(exitOnError) {
 .pipe(gulp.dest('./'));
 }
 
+gulp.task('copyFdsImages', () => {
+  return gulp.src(['fivium-design-system-core/fds/static/images/**/*'])
+    .pipe(gulp.dest('src/main/resources/public/assets/static/fds/images'));
+});
 
 gulp.task('copyFdsResources', () => {
   return gulp.src(['fivium-design-system-core/fds/**/*'])
@@ -90,7 +94,7 @@ gulp.task('copyHtml5Shiv', () => {
     .pipe(gulp.dest('src/main/resources/public/assets/html5shiv'))
 });
 
-gulp.task('initFds', gulp.series(['copyFdsResources', 'copyGovukResources', 'copyHtml5Shiv', 'copyFdsJs', 'copyFdsVendorJs']));
+gulp.task('initFds', gulp.series(['copyFdsResources', 'copyFdsImages', 'copyGovukResources', 'copyHtml5Shiv', 'copyFdsJs', 'copyFdsVendorJs']));
 
 gulp.task('sass', gulp.series(['initFds'], () => {
   return compileSass(false);
