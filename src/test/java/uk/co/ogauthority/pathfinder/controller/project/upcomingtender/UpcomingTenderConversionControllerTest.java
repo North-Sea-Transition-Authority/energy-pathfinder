@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.controller.project.upcomingtender;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,6 +35,8 @@ import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerT
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.infrastructure.InfrastructureAwardedContractController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -95,7 +98,7 @@ public class UpcomingTenderConversionControllerTest extends ProjectContextAbstra
   @Before
   public void setUp() {
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(any(), any())).thenReturn(true);
-    when(upcomingTenderService.getOrError(UPCOMING_TENDER_ID)).thenReturn(upcomingTender);
+    when(upcomingTenderService.getOrError(UPCOMING_TENDER_ID, projectDetail)).thenReturn(upcomingTender);
 
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
     when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
@@ -236,5 +239,34 @@ public class UpcomingTenderConversionControllerTest extends ProjectContextAbstra
         status().is3xxRedirection(),
         status().isForbidden()
     );
+  }
+
+  @Test
+  public void convertUpcomingTender_withDifferentProjectDetail_assertNotFound() throws Exception {
+    var otherAllowedProjectId = PROJECT_ID+1;
+    var otherAllowedProject = new Project();
+    otherAllowedProject.setId(otherAllowedProjectId);
+
+    var otherAllowedProjectDetail = mock(ProjectDetail.class);
+    when(otherAllowedProjectDetail.getProject())
+        .thenReturn(otherAllowedProject);
+    when(otherAllowedProjectDetail.getStatus())
+        .thenReturn(ProjectStatus.DRAFT);
+    when(otherAllowedProjectDetail.getProjectType())
+        .thenReturn(ProjectType.INFRASTRUCTURE);
+
+    when(projectService.getLatestDetailOrError(otherAllowedProjectId))
+        .thenReturn(otherAllowedProjectDetail);
+
+    when(upcomingTenderService.getOrError(UPCOMING_TENDER_ID, otherAllowedProjectDetail))
+        .thenThrow(PathfinderEntityNotFoundException.class);
+
+    when(projectOperatorService.isUserInProjectTeam(otherAllowedProjectDetail, authenticatedUser))
+        .thenReturn(true);
+
+    mockMvc.perform(
+            get(route(on(CONTROLLER).convertUpcomingTenderConfirm(otherAllowedProjectId, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)))
+                .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isNotFound());
   }
 }

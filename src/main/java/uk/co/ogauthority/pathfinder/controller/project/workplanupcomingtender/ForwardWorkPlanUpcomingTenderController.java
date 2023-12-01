@@ -201,7 +201,7 @@ public class ForwardWorkPlanUpcomingTenderController {
   public ModelAndView editUpcomingTender(@PathVariable("projectId") Integer projectId,
                                          @PathVariable("upcomingTenderId") Integer upcomingTenderId,
                                          ProjectContext projectContext) {
-    var upcomingTender = workPlanUpcomingTenderService.getOrError(upcomingTenderId);
+    var upcomingTender = workPlanUpcomingTenderService.getOrError(upcomingTenderId, projectContext.getProjectDetails());
     checkIfUserHasAccessToTender(upcomingTender);
     return workPlanUpcomingTenderModelService.getUpcomingTenderFormModelAndView(
         projectContext.getProjectDetails(),
@@ -216,7 +216,7 @@ public class ForwardWorkPlanUpcomingTenderController {
                                            @Valid @ModelAttribute("form") ForwardWorkPlanUpcomingTenderForm form,
                                            BindingResult bindingResult,
                                            ValidationType validationType) {
-    var upcomingTender = workPlanUpcomingTenderService.getOrError(upcomingTenderId);
+    var upcomingTender = workPlanUpcomingTenderService.getOrError(upcomingTenderId, projectContext.getProjectDetails());
     checkIfUserHasAccessToTender(upcomingTender);
     bindingResult = workPlanUpcomingTenderService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
@@ -248,7 +248,7 @@ public class ForwardWorkPlanUpcomingTenderController {
                                                   @PathVariable("upcomingTenderId") Integer upcomingTenderId,
                                                   @PathVariable("displayOrder") Integer displayOrder,
                                                   ProjectContext projectContext) {
-    var upcomingTender = workPlanUpcomingTenderService.getOrError(upcomingTenderId);
+    var upcomingTender = workPlanUpcomingTenderService.getOrError(upcomingTenderId, projectContext.getProjectDetails());
     checkIfUserHasAccessToTender(upcomingTender);
     var tenderView = workPlanUpcomingTenderSummaryService.getUpcomingTenderView(upcomingTender,displayOrder);
     return workPlanUpcomingTenderModelService.getRemoveUpcomingTenderConfirmModelAndView(projectId, tenderView);
@@ -259,7 +259,7 @@ public class ForwardWorkPlanUpcomingTenderController {
                                            @PathVariable("upcomingTenderId") Integer upcomingTenderId,
                                            @PathVariable("displayOrder") Integer displayOrder,
                                            ProjectContext projectContext) {
-    var upcomingTender = workPlanUpcomingTenderService.getOrError(upcomingTenderId);
+    var upcomingTender = workPlanUpcomingTenderService.getOrError(upcomingTenderId, projectContext.getProjectDetails());
     checkIfUserHasAccessToTender(upcomingTender);
     workPlanUpcomingTenderService.delete(upcomingTender);
 

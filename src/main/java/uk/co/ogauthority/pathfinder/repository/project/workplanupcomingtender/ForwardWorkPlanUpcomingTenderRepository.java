@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
@@ -16,5 +17,7 @@ public interface ForwardWorkPlanUpcomingTenderRepository extends CrudRepository<
       Project project,
       Integer version
   );
+
+  Optional<ForwardWorkPlanUpcomingTender> findByIdAndProjectDetail(Integer id, ProjectDetail projectDetail);
 
 }

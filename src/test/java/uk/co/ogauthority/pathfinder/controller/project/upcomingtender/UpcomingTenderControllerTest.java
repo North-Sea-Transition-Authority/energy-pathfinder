@@ -39,8 +39,10 @@ import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
 import uk.co.ogauthority.pathfinder.controller.file.FileDownloadService;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.file.UploadedFile;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -53,6 +55,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
+import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
@@ -112,7 +115,7 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
   @Before
   public void setUp() throws SQLException {
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(detail);
-    when(upcomingTenderService.getOrError(UPCOMING_TENDER_ID)).thenReturn(upcomingTender);
+    when(upcomingTenderService.getOrError(UPCOMING_TENDER_ID, detail)).thenReturn(upcomingTender);
     UploadedFile file = ProjectFileTestUtil.getUploadedFile();
 
     UpcomingTenderView upcomingTenderView = new UpcomingTenderViewUtil.UpcomingTenderViewBuilder(
@@ -558,6 +561,38 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
             ))
                 .with(authenticatedUserAndSession(authenticatedUser)))
         .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void editUpcomingTender_userCanAccessTender_butWithDifferentProjectId_thenNotFound() throws Exception {
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+        eq(upcomingTender.getProjectDetail()),
+        any())
+    ).thenReturn(true);
+
+    var otherAllowedProjectId = PROJECT_ID+1;
+    var otherAllowedProject = new Project();
+    otherAllowedProject.setId(otherAllowedProjectId);
+
+    var otherAllowedProjectDetail = new ProjectDetail();
+    otherAllowedProjectDetail.setProject(otherAllowedProject);
+    otherAllowedProjectDetail.setStatus(ProjectStatus.DRAFT);
+    otherAllowedProjectDetail.setProjectType(ProjectType.INFRASTRUCTURE);
+
+    when(projectService.getLatestDetailOrError(otherAllowedProjectId))
+        .thenReturn(otherAllowedProjectDetail);
+
+    when(upcomingTenderService.getOrError(UPCOMING_TENDER_ID, otherAllowedProjectDetail))
+        .thenThrow(PathfinderEntityNotFoundException.class);
+
+    when(projectOperatorService.isUserInProjectTeam(otherAllowedProjectDetail, authenticatedUser))
+        .thenReturn(true);
+
+    mockMvc.perform(
+        get(ReverseRouter.route(on(UpcomingTendersController.class)
+                .editUpcomingTender(otherAllowedProjectId, UPCOMING_TENDER_ID, null)))
+                .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isNotFound());
   }
 
   @Test

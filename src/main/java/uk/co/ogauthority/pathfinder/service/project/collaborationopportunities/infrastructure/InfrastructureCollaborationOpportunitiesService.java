@@ -158,8 +158,8 @@ public class InfrastructureCollaborationOpportunitiesService
     return super.getPreSelectedCollaborationFunction(form, Function.values());
   }
 
-  public InfrastructureCollaborationOpportunity getOrError(Integer opportunityId) {
-    return infrastructureCollaborationOpportunitiesRepository.findById(opportunityId)
+  public InfrastructureCollaborationOpportunity getOrError(Integer opportunityId, ProjectDetail projectDetail) {
+    return infrastructureCollaborationOpportunitiesRepository.findByIdAndProjectDetail(opportunityId, projectDetail)
         .orElseThrow(
             () -> new PathfinderEntityNotFoundException(
                 String.format("Unable to find InfrastructureCollaborationOpportunity with ID %d", opportunityId)

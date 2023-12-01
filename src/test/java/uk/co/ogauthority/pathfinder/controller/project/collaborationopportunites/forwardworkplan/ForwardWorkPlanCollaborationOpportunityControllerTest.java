@@ -2,6 +2,8 @@ package uk.co.ogauthority.pathfinder.controller.project.collaborationopportunite
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -40,8 +42,10 @@ import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerT
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
 import uk.co.ogauthority.pathfinder.controller.file.FileDownloadService;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.file.UploadedFile;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -183,7 +187,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
   public void editCollaborationOpportunity_projectContextSmokeTest() {
 
     final var opportunityId = 10;
-    when(forwardWorkPlanCollaborationOpportunityService.getOrError(10))
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(10, projectDetail))
         .thenReturn(ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail));
 
     projectControllerTesterService
@@ -328,7 +332,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
     final var collaborationOpportunityId = 100;
     final var collaborationOpportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
 
-    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any(), eq(projectDetail))).thenReturn(collaborationOpportunity);
     when(forwardWorkPlanCollaborationOpportunityService.updateCollaborationOpportunity(any(), any(), any())).thenReturn(collaborationOpportunity);
 
     final var bindingResult = new BeanPropertyBindingResult(ForwardWorkPlanCollaborationOpportunityForm.class, "form");
@@ -424,7 +428,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
     final var collaborationOpportunityId = 100;
     final var collaborationOpportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
 
-    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any(), eq(projectDetail))).thenReturn(collaborationOpportunity);
     when(forwardWorkPlanCollaborationOpportunityService.updateCollaborationOpportunity(any(), any(), any())).thenReturn(collaborationOpportunity);
     when(forwardWorkPlanCollaborationOpportunityModelService.getCollaborationOpportunityModelAndView(any(), any(), anyInt())).thenReturn(new ModelAndView());
 
@@ -455,7 +459,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
 
     var collaborationOpportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
 
-    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any(), eq(projectDetail))).thenReturn(collaborationOpportunity);
 
     projectControllerTesterService
         .withHttpRequestMethod(HttpMethod.GET)
@@ -568,7 +572,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
 
     final var collaborationOpportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
 
-    when(forwardWorkPlanCollaborationOpportunityService.getOrError(collaborationOpportunityId)).thenReturn(collaborationOpportunity);
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(collaborationOpportunityId, projectDetail)).thenReturn(collaborationOpportunity);
 
     projectControllerTesterService
         .withHttpRequestMethod(HttpMethod.POST)
@@ -585,7 +589,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
   public void editCollaborationOpportunity_userCantAccessTender_thenAccessForbidden() throws Exception {
     final var collaborationOpportunity =
         ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
-    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any(), eq(projectDetail))).thenReturn(collaborationOpportunity);
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         any(),
         any())
@@ -600,10 +604,42 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
   }
 
   @Test
+  public void editCollaborationOpportunity_userCanAccessTender_withWrongProjectDetail_thenNotFound() throws Exception {
+    final var otherProjectId = projectId + 1;
+
+    final var otherProject = mock(Project.class);
+    when(otherProject.getId())
+        .thenReturn(projectId+1);
+
+    final var otherProjectDetail = mock(ProjectDetail.class);
+    when(otherProjectDetail.getProject())
+        .thenReturn(otherProject);
+    when(otherProjectDetail.getStatus())
+        .thenReturn(ProjectStatus.DRAFT);
+    when(otherProjectDetail.getProjectType())
+        .thenReturn(ProjectType.FORWARD_WORK_PLAN);
+
+    when(projectService.getLatestDetailOrError(otherProjectId))
+        .thenReturn(otherProjectDetail);
+    when(teamService.isPersonMemberOfRegulatorTeam(authenticatedUser.getLinkedPerson()))
+        .thenReturn(true);
+
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(1, otherProjectDetail))
+        .thenThrow(PathfinderEntityNotFoundException.class);
+
+    mockMvc.perform(
+            get(ReverseRouter.route(on(ForwardWorkPlanCollaborationOpportunityController.class)
+                .editCollaborationOpportunity(otherProjectId, 1, null)
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
   public void updateCollaborationOpportunity_userCantAccessTender_thenAccessForbidden() throws Exception {
     final var collaborationOpportunity =
         ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
-    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any(), eq(projectDetail))).thenReturn(collaborationOpportunity);
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         any(),
         any())
@@ -634,7 +670,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
   public void removeCollaborationOpportunityConfirm_userCantAccessTender_thenAccessForbidden() throws Exception {
     final var collaborationOpportunity =
         ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
-    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any(), eq(projectDetail))).thenReturn(collaborationOpportunity);
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         any(),
         any())
@@ -652,7 +688,7 @@ public class ForwardWorkPlanCollaborationOpportunityControllerTest extends Proje
   public void removeCollaborationOpportunity_userCantAccessTender_thenAccessForbidden() throws Exception {
     final var collaborationOpportunity =
         ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
-    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any())).thenReturn(collaborationOpportunity);
+    when(forwardWorkPlanCollaborationOpportunityService.getOrError(any(), eq(projectDetail))).thenReturn(collaborationOpportunity);
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         any(),
         any())

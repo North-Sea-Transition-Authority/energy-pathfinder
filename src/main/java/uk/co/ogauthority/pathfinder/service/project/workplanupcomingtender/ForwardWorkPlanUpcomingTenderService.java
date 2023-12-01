@@ -72,10 +72,12 @@ public class ForwardWorkPlanUpcomingTenderService implements ProjectFormSectionS
     return functionService.findFunctionsLikeWithManualEntry(searchTerm, FunctionType.WORK_PLAN_UPCOMING_TENDER);
   }
 
-  public ForwardWorkPlanUpcomingTender getOrError(Integer upcomingTenderId) {
-    return workPlanUpcomingTenderRepository.findById(upcomingTenderId).orElseThrow(
+  public ForwardWorkPlanUpcomingTender getOrError(Integer upcomingTenderId, ProjectDetail projectDetail) {
+    return workPlanUpcomingTenderRepository.findByIdAndProjectDetail(upcomingTenderId, projectDetail).orElseThrow(
         () -> new PathfinderEntityNotFoundException(
-            String.format("Unable to find tender with id: %s", upcomingTenderId)
+            String.format("Unable to find tender with id: %s for project detail with id %s",
+                    upcomingTenderId,
+                    projectDetail.getId() != null ? projectDetail.getId() : "(null)")
         )
     );
   }

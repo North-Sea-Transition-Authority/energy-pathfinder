@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project.upcomingtender;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
@@ -12,6 +13,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -496,5 +499,22 @@ class UpcomingTenderServiceTest {
     var result = upcomingTenderService.getPastUpcomingTendersForRemindableProjects(List.of(remindableProjectWithNoUpcomingTenders));
 
     assertThat(result).isEmpty();
+  }
+
+  @Test
+  void getOrError_whenResultFound_thenReturn() {
+    when(upcomingTenderRepository.findByIdAndProjectDetail(upcomingTender.getId(), detail))
+        .thenReturn(Optional.of(upcomingTender));
+
+    assertThat(upcomingTenderService.getOrError(upcomingTender.getId(), detail))
+        .isEqualTo(upcomingTender);
+  }
+
+  @Test
+  void getOrError_whenNoResultFound_assertNotFound() {
+    when(upcomingTenderRepository.findByIdAndProjectDetail(upcomingTender.getId(), detail))
+        .thenReturn(Optional.empty());
+
+    assertThrows(PathfinderEntityNotFoundException.class, () -> upcomingTenderService.getOrError(upcomingTender.getId(), detail));
   }
 }

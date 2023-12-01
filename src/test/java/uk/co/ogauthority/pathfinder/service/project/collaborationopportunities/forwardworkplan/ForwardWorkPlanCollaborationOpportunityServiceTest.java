@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +21,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -419,4 +421,22 @@ public class ForwardWorkPlanCollaborationOpportunityServiceTest {
     assertThat(forwardWorkPlanCollaborationOpportunityService.getSupportedProjectTypes()).containsExactly(ProjectType.FORWARD_WORK_PLAN);
   }
 
+  @Test
+  public void getOrError_whenFound_thenReturn() {
+    final var opportunity = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
+
+    when(forwardWorkPlanCollaborationOpportunityRepository.findByIdAndProjectDetail(opportunity.getId(), projectDetail))
+        .thenReturn(Optional.of(opportunity));
+
+    assertThat(forwardWorkPlanCollaborationOpportunityService.getOrError(opportunity.getId(), projectDetail))
+        .isEqualTo(opportunity);
+  }
+
+  @Test(expected = PathfinderEntityNotFoundException.class)
+  public void getOrError_whenNotFound_thenException() {
+    when(forwardWorkPlanCollaborationOpportunityRepository.findByIdAndProjectDetail(opportunity.getId(), projectDetail))
+        .thenReturn(Optional.empty());
+
+    forwardWorkPlanCollaborationOpportunityService.getOrError(opportunity.getId(), projectDetail);
+  }
 }

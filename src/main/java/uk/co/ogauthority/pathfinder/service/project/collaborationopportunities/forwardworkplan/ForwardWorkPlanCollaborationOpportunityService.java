@@ -145,8 +145,8 @@ public class ForwardWorkPlanCollaborationOpportunityService
     forwardWorkPlanCollaborationOpportunityRepository.delete(opportunity);
   }
 
-  public ForwardWorkPlanCollaborationOpportunity getOrError(Integer opportunityId) {
-    return forwardWorkPlanCollaborationOpportunityRepository.findById(opportunityId)
+  public ForwardWorkPlanCollaborationOpportunity getOrError(Integer opportunityId, ProjectDetail projectDetail) {
+    return forwardWorkPlanCollaborationOpportunityRepository.findByIdAndProjectDetail(opportunityId, projectDetail)
         .orElseThrow(
             () -> new PathfinderEntityNotFoundException(
                 String.format("Unable to find ForwardWorkPlanCollaborationOpportunity with ID %d", opportunityId)

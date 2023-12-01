@@ -26,14 +26,20 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
+import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.project.platformsfpsos.PlatformFpsoForm;
 import uk.co.ogauthority.pathfinder.model.view.platformfpso.PlatformFpsoViewUtil;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
+import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosService;
 import uk.co.ogauthority.pathfinder.service.project.platformsfpsos.PlatformsFpsosSummaryService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
@@ -55,9 +61,14 @@ public class PlatformsFpsosControllerTest extends ProjectContextAbstractControll
   @MockBean
   private PlatformsFpsosSummaryService platformsFpsosSummaryService;
 
+  @MockBean
+  private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
+
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
   private final PlatformFpso platformFpso = PlatformFpsoTestUtil.getPlatformFpso_withPlatform(detail);
+
+  private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
 
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
@@ -69,7 +80,7 @@ public class PlatformsFpsosControllerTest extends ProjectContextAbstractControll
   @Before
   public void setUp() {
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(detail);
-    when(platformsFpsosService.getOrError(PLATFORM_FPSO_ID)).thenReturn(platformFpso);
+    when(platformsFpsosService.getOrError(PLATFORM_FPSO_ID, projectDetail)).thenReturn(platformFpso);
     var platformFpsoView = PlatformFpsoViewUtil.createView(
         platformFpso,
         DISPLAY_ORDER,
@@ -133,6 +144,7 @@ public class PlatformsFpsosControllerTest extends ProjectContextAbstractControll
   @Test
   public void authenticatedUser_hasAccessToPlatformsFpsosEdit() throws Exception {
     when(platformsFpsosService.getForm(platformFpso)).thenReturn(PlatformFpsoTestUtil.getPlatformFpsoForm_withPlatform());
+    when(platformsFpsosService.getOrError(eq(PLATFORM_FPSO_ID), any(ProjectDetail.class))).thenReturn(platformFpso);
     mockMvc.perform(get(ReverseRouter.route(
         on(PlatformsFpsosController.class).editPlatformFpso(PROJECT_ID, PLATFORM_FPSO_ID, null)))
         .with(authenticatedUserAndSession(authenticatedUser)))
@@ -279,5 +291,38 @@ public class PlatformsFpsosControllerTest extends ProjectContextAbstractControll
 
     verify(platformsFpsosService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
     verify(platformsFpsosService, times(1)).updatePlatformFpso(any(), any(), any());
+  }
+
+  @Test
+  public void editPlatformsFpsos_userHasAccess_butDifferentProjectId_thenNotFound() throws Exception {
+
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+            eq(platformFpso.getProjectDetail()),
+            any())
+    ).thenReturn(true);
+
+    var otherAllowedProjectId = PROJECT_ID+1;
+    var otherAllowedProject = new Project();
+    otherAllowedProject.setId(otherAllowedProjectId);
+
+    var otherAllowedProjectDetail = new ProjectDetail();
+    otherAllowedProjectDetail.setProject(otherAllowedProject);
+    otherAllowedProjectDetail.setStatus(ProjectStatus.DRAFT);
+    otherAllowedProjectDetail.setProjectType(ProjectType.INFRASTRUCTURE);
+
+    when(projectService.getLatestDetailOrError(otherAllowedProjectId))
+            .thenReturn(otherAllowedProjectDetail);
+
+    when(platformsFpsosService.getOrError(PLATFORM_FPSO_ID, otherAllowedProjectDetail))
+            .thenThrow(PathfinderEntityNotFoundException.class);
+
+    when(projectOperatorService.isUserInProjectTeam(otherAllowedProjectDetail, authenticatedUser))
+            .thenReturn(true);
+
+    mockMvc.perform(
+            get(ReverseRouter.route(on(PlatformsFpsosController.class)
+                .editPlatformFpso(otherAllowedProjectId, PROJECT_ID, null)))
+                .with(authenticatedUserAndSession(authenticatedUser)))
+            .andExpect(status().isNotFound());
   }
 }

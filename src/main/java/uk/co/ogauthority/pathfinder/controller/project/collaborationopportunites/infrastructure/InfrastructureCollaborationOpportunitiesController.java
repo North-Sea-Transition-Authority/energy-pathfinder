@@ -169,7 +169,7 @@ public class InfrastructureCollaborationOpportunitiesController extends Pathfind
   public ModelAndView editCollaborationOpportunity(@PathVariable("projectId") Integer projectId,
                                                    @PathVariable("opportunityId") Integer opportunityId,
                                                    ProjectContext projectContext) {
-    var opportunity = infrastructureCollaborationOpportunitiesService.getOrError(opportunityId);
+    var opportunity = infrastructureCollaborationOpportunitiesService.getOrError(opportunityId, projectContext.getProjectDetails());
     checkIfUserHasAccessToCollaborationOpportunity(opportunity);
     return getCollaborationOpportunityModelAndView(
         projectContext.getProjectDetails(),
@@ -185,7 +185,7 @@ public class InfrastructureCollaborationOpportunitiesController extends Pathfind
                                                      BindingResult bindingResult,
                                                      ValidationType validationType,
                                                      ProjectContext projectContext) {
-    var opportunity = infrastructureCollaborationOpportunitiesService.getOrError(opportunityId);
+    var opportunity = infrastructureCollaborationOpportunitiesService.getOrError(opportunityId, projectContext.getProjectDetails());
     checkIfUserHasAccessToCollaborationOpportunity(opportunity);
     bindingResult = infrastructureCollaborationOpportunitiesService.validate(form, bindingResult, validationType);
 
@@ -219,7 +219,7 @@ public class InfrastructureCollaborationOpportunitiesController extends Pathfind
                                                             @PathVariable("opportunityId") Integer opportunityId,
                                                             @PathVariable("displayOrder") Integer displayOrder,
                                                             ProjectContext projectContext) {
-    var opportunity = infrastructureCollaborationOpportunitiesService.getOrError(opportunityId);
+    var opportunity = infrastructureCollaborationOpportunitiesService.getOrError(opportunityId, projectContext.getProjectDetails());
     checkIfUserHasAccessToCollaborationOpportunity(opportunity);
     var modelAndView = new ModelAndView(
         "project/collaborationopportunities/infrastructure/removeInfrastructureCollaborationOpportunity"
@@ -237,7 +237,7 @@ public class InfrastructureCollaborationOpportunitiesController extends Pathfind
                                                      @PathVariable("opportunityId") Integer opportunityId,
                                                      @PathVariable("displayOrder") Integer displayOrder,
                                                      ProjectContext projectContext) {
-    var opportunity = infrastructureCollaborationOpportunitiesService.getOrError(opportunityId);
+    var opportunity = infrastructureCollaborationOpportunitiesService.getOrError(opportunityId, projectContext.getProjectDetails());
     checkIfUserHasAccessToCollaborationOpportunity(opportunity);
     infrastructureCollaborationOpportunitiesService.delete(opportunity);
     AuditService.audit(

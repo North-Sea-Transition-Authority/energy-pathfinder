@@ -31,8 +31,11 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
+import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -113,7 +116,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
 
   @Before
   public void setup() {
-    when(workPlanUpcomingTenderService.getOrError(UPCOMING_TENDER_ID)).thenReturn(workPlanUpcomingTender);
+    when(workPlanUpcomingTenderService.getOrError(UPCOMING_TENDER_ID, projectDetail)).thenReturn(workPlanUpcomingTender);
     var upcomingTenderView =  new ForwardWorkPlanUpcomingTenderViewUtil.ForwardWorkPlanUpcomingTenderViewBuilder(
         workPlanUpcomingTender,
         DISPLAY_ORDER,
@@ -373,7 +376,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
             .params(completeParams))
         .andExpect(status().is3xxRedirection());
 
-    verify(workPlanUpcomingTenderService, times(1)).getOrError(any());
+    verify(workPlanUpcomingTenderService, times(1)).getOrError(any(), eq(projectDetail));
     verify(workPlanUpcomingTenderService, times(1)).delete(any());
   }
 
@@ -391,7 +394,7 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
             .params(completeParams))
         .andExpect(status().isForbidden());
 
-    verify(workPlanUpcomingTenderService, never()).getOrError(any());
+    verify(workPlanUpcomingTenderService, never()).getOrError(any(), eq(projectDetail));
     verify(workPlanUpcomingTenderService, never()).delete(any());
   }
 
@@ -612,6 +615,38 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
                 .with(csrf())
                 .params(completeParams))
         .andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void editUpcomingTender_userCanAccessTender_butWithDifferentProjectId_thenNotFound() throws Exception {
+    when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
+            eq(workPlanUpcomingTender.getProjectDetail()),
+            any())
+    ).thenReturn(true);
+
+    var otherAllowedProjectId = PROJECT_ID+1;
+    var otherAllowedProject = new Project();
+    otherAllowedProject.setId(otherAllowedProjectId);
+
+    var otherAllowedProjectDetail = new ProjectDetail();
+    otherAllowedProjectDetail.setProject(otherAllowedProject);
+    otherAllowedProjectDetail.setStatus(ProjectStatus.DRAFT);
+    otherAllowedProjectDetail.setProjectType(ProjectType.FORWARD_WORK_PLAN);
+
+    when(projectService.getLatestDetailOrError(otherAllowedProjectId))
+            .thenReturn(otherAllowedProjectDetail);
+
+    when(workPlanUpcomingTenderService.getOrError(UPCOMING_TENDER_ID, otherAllowedProjectDetail))
+            .thenThrow(PathfinderEntityNotFoundException.class);
+
+    when(projectOperatorService.isUserInProjectTeam(otherAllowedProjectDetail, authenticatedUser))
+            .thenReturn(true);
+
+    mockMvc.perform(
+                    get(ReverseRouter.route(on(ForwardWorkPlanUpcomingTenderController.class)
+                            .editUpcomingTender(otherAllowedProjectId, UPCOMING_TENDER_ID, null)))
+                            .with(authenticatedUserAndSession(authenticatedUser)))
+            .andExpect(status().isNotFound());
   }
 
   @Test

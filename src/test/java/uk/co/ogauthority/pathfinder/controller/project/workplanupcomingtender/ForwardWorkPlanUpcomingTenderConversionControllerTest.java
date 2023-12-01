@@ -34,6 +34,8 @@ import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerT
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
 import uk.co.ogauthority.pathfinder.controller.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractSummaryController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -95,7 +97,7 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
   @Before
   public void setUp() {
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(any(), any())).thenReturn(true);
-    when(upcomingTenderService.getOrError(UPCOMING_TENDER_ID)).thenReturn(upcomingTender);
+    when(upcomingTenderService.getOrError(UPCOMING_TENDER_ID, projectDetail)).thenReturn(upcomingTender);
 
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(projectDetail);
     when(projectOperatorService.isUserInProjectTeam(projectDetail, authenticatedUser)).thenReturn(true);
@@ -239,5 +241,31 @@ public class ForwardWorkPlanUpcomingTenderConversionControllerTest extends Proje
         status().is3xxRedirection(),
         status().isForbidden()
     );
+  }
+
+  @Test
+  public void convertUpcomingTender_withDifferentProjectDetail_assertForbidden() throws Exception {
+    int otherAllowedProjectId = PROJECT_ID+1;
+    Project otherAllowedProject = new Project();
+    otherAllowedProject.setId(otherAllowedProjectId);
+
+    ProjectDetail otherAllowedProjectDetail = new ProjectDetail();
+    otherAllowedProjectDetail.setProject(otherAllowedProject);
+    otherAllowedProjectDetail.setStatus(ProjectStatus.DRAFT);
+    otherAllowedProjectDetail.setProjectType(ProjectType.FORWARD_WORK_PLAN);
+
+    when(projectService.getLatestDetailOrError(otherAllowedProjectId))
+            .thenReturn(otherAllowedProjectDetail);
+
+    when(upcomingTenderService.getOrError(UPCOMING_TENDER_ID, otherAllowedProjectDetail))
+            .thenThrow(PathfinderEntityNotFoundException.class);
+
+    when(projectOperatorService.isUserInProjectTeam(otherAllowedProjectDetail, authenticatedUser))
+            .thenReturn(true);
+
+    mockMvc.perform(
+                    get(route(on(CONTROLLER).convertUpcomingTenderConfirm(otherAllowedProjectId, UPCOMING_TENDER_ID, DISPLAY_ORDER, null)))
+                            .with(authenticatedUserAndSession(authenticatedUser)))
+            .andExpect(status().isNotFound());
   }
 }

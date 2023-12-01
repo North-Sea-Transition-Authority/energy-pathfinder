@@ -496,19 +496,19 @@ public class ForwardWorkPlanUpcomingTenderServiceTest {
 
   @Test(expected = PathfinderEntityNotFoundException.class)
   public void getOrError_whenNotFound_thenException() {
-    when(workPlanUpcomingTenderRepository.findById(TENDER_ID))
+    when(workPlanUpcomingTenderRepository.findByIdAndProjectDetail(TENDER_ID, projectDetail))
         .thenReturn(Optional.empty());
 
-    workPlanUpcomingTenderService.getOrError(TENDER_ID);
+    workPlanUpcomingTenderService.getOrError(TENDER_ID, projectDetail);
   }
 
   @Test
   public void getOrError_whenFound_thenReturnTender() {
     final ForwardWorkPlanUpcomingTender tender = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(projectDetail);
-    when(workPlanUpcomingTenderRepository.findById(TENDER_ID))
+    when(workPlanUpcomingTenderRepository.findByIdAndProjectDetail(TENDER_ID, projectDetail))
         .thenReturn(Optional.of(tender));
 
-    var result = workPlanUpcomingTenderService.getOrError(TENDER_ID);
+    var result = workPlanUpcomingTenderService.getOrError(TENDER_ID, projectDetail);
     assertThat(result).isEqualTo(tender);
   }
 
