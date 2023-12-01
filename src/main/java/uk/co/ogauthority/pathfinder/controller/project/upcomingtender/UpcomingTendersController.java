@@ -164,7 +164,9 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
   public ModelAndView editUpcomingTender(@PathVariable("projectId") Integer projectId,
                                          @PathVariable("upcomingTenderId") Integer upcomingTenderId,
                                          ProjectContext projectContext) {
-    var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
+    var upcomingTender = upcomingTenderService.getOrError(
+        upcomingTenderId,
+        projectContext.getProjectDetails());
     checkIfUserHasAccessToTender(upcomingTender);
     return getUpcomingTenderModelAndView(
         projectContext.getProjectDetails(),
@@ -179,7 +181,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
                                            BindingResult bindingResult,
                                            ValidationType validationType,
                                            ProjectContext projectContext) {
-    var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
+    var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId, projectContext.getProjectDetails());
     checkIfUserHasAccessToTender(upcomingTender);
     bindingResult = upcomingTenderService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
@@ -206,7 +208,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
                                                   @PathVariable("upcomingTenderId") Integer upcomingTenderId,
                                                   @PathVariable("displayOrder") Integer displayOrder,
                                                   ProjectContext projectContext) {
-    var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
+    var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId, projectContext.getProjectDetails());
     checkIfUserHasAccessToTender(upcomingTender);
     var modelAndView = new ModelAndView("project/upcomingtender/removeUpcomingTender")
           .addObject("view", upcomingTenderSummaryService.getUpcomingTenderView(upcomingTender, displayOrder))
@@ -220,7 +222,7 @@ public class UpcomingTendersController extends PathfinderFileUploadController {
                                            @PathVariable("upcomingTenderId") Integer upcomingTenderId,
                                            @PathVariable("displayOrder") Integer displayOrder,
                                            ProjectContext projectContext) {
-    var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
+    var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId, projectContext.getProjectDetails());
     checkIfUserHasAccessToTender(upcomingTender);
     upcomingTenderService.delete(upcomingTender);
     AuditService.audit(

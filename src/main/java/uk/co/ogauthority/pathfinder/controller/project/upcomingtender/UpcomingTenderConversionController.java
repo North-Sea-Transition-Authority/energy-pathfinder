@@ -77,7 +77,7 @@ public class UpcomingTenderConversionController extends ProjectFormPageControlle
                                                    @PathVariable("upcomingTenderId") Integer upcomingTenderId,
                                                    @PathVariable("displayOrder") Integer displayOrder,
                                                    ProjectContext projectContext) {
-    var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
+    var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId, projectContext.getProjectDetails());
     checkIfUserHasAccessToTender(upcomingTender);
     return getConvertUpcomingTenderConfirmModelAndView(upcomingTender, displayOrder, projectId, new UpcomingTenderConversionForm());
   }
@@ -90,7 +90,7 @@ public class UpcomingTenderConversionController extends ProjectFormPageControlle
                                             BindingResult bindingResult,
                                             ProjectContext projectContext,
                                             RedirectAttributes redirectAttributes) {
-    var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId);
+    var upcomingTender = upcomingTenderService.getOrError(upcomingTenderId, projectContext.getProjectDetails());
     checkIfUserHasAccessToTender(upcomingTender);
     bindingResult = conversionService.validate(form, bindingResult);
     return controllerHelperService.checkErrorsAndRedirect(

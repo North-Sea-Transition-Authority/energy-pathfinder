@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
@@ -10,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +21,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -369,5 +372,22 @@ public class InfrastructureCollaborationOpportunitiesServiceTest {
     assertThat(infrastructureCollaborationOpportunitiesService.getSupportedProjectTypes()).containsExactly(ProjectType.INFRASTRUCTURE);
   }
 
+  @Test
+  public void getOrError_resultFound_thenReturn() {
+    when(infrastructureCollaborationOpportunitiesRepository.findByIdAndProjectDetail(opportunity.getId(), detail))
+        .thenReturn(Optional.of(opportunity));
+
+    assertThat(infrastructureCollaborationOpportunitiesService.getOrError(opportunity.getId(), detail))
+        .isEqualTo(opportunity);
+  }
+
+  @Test
+  public void getOrError_resultNotFound_assertNotFound() {
+    when(infrastructureCollaborationOpportunitiesRepository.findByIdAndProjectDetail(opportunity.getId(), detail))
+        .thenReturn(Optional.empty());
+
+    assertThrows(PathfinderEntityNotFoundException.class,
+        () ->  infrastructureCollaborationOpportunitiesService.getOrError(opportunity.getId(), detail));
+  }
 
 }

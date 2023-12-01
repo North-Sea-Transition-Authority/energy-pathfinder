@@ -15,7 +15,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
-import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
@@ -36,6 +35,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -327,8 +327,8 @@ public class CommissionedWellControllerTest extends ProjectContextAbstractContro
 
     var commissionedWellScheduleId = 10;
 
-    when(commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId))
-        .thenReturn(Optional.of(CommissionedWellTestUtil.getCommissionedWellSchedule()));
+    when(commissionedWellScheduleService.getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectDetail))
+        .thenReturn(CommissionedWellTestUtil.getCommissionedWellSchedule());
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
         on(CommissionedWellController.class).getCommissionedWellSchedule(projectId, commissionedWellScheduleId, null),
@@ -342,8 +342,8 @@ public class CommissionedWellControllerTest extends ProjectContextAbstractContro
 
     var commissionedWellScheduleId = 10;
 
-    when(commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId))
-        .thenReturn(Optional.empty());
+    when(commissionedWellScheduleService.getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectDetail))
+        .thenThrow(PathfinderEntityNotFoundException.class);
 
     mockMvc.perform(
         get(ReverseRouter.route(on(CommissionedWellController.class).getCommissionedWellSchedule(
@@ -367,8 +367,8 @@ public class CommissionedWellControllerTest extends ProjectContextAbstractContro
     var commissionedWellSchedule = CommissionedWellTestUtil.getCommissionedWellSchedule();
     commissionedWellSchedule.setProjectDetail(projectDetail);
 
-    when(commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId))
-        .thenReturn(Optional.of(commissionedWellSchedule));
+    when(commissionedWellScheduleService.getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectDetail))
+        .thenReturn(commissionedWellSchedule);
 
     mockMvc.perform(
             get(ReverseRouter.route(on(CommissionedWellController.class).getCommissionedWellSchedule(
@@ -402,8 +402,8 @@ public class CommissionedWellControllerTest extends ProjectContextAbstractContro
 
     var commissionedWellScheduleId = 10;
 
-    when(commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId))
-        .thenReturn(Optional.of(CommissionedWellTestUtil.getCommissionedWellSchedule()));
+    when(commissionedWellScheduleService.getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectDetail))
+        .thenReturn(CommissionedWellTestUtil.getCommissionedWellSchedule());
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
         on(CommissionedWellController.class).updateCommissionedWellSchedule(
@@ -424,8 +424,8 @@ public class CommissionedWellControllerTest extends ProjectContextAbstractContro
 
     var commissionedWellScheduleId = 10;
 
-    when(commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId))
-        .thenReturn(Optional.empty());
+    when(commissionedWellScheduleService.getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectDetail))
+        .thenThrow(PathfinderEntityNotFoundException.class);
 
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
@@ -456,8 +456,8 @@ public class CommissionedWellControllerTest extends ProjectContextAbstractContro
     var commissionedWellScheduleId = 10;
     var commissionedWellSchedule = CommissionedWellTestUtil.getCommissionedWellSchedule();
 
-    when(commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId))
-        .thenReturn(Optional.of(commissionedWellSchedule));
+    when(commissionedWellScheduleService.getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectDetail))
+        .thenReturn(commissionedWellSchedule);
 
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
@@ -496,8 +496,8 @@ public class CommissionedWellControllerTest extends ProjectContextAbstractContro
     var commissionedWellScheduleId = 10;
     var commissionedWellSchedule = CommissionedWellTestUtil.getCommissionedWellSchedule();
 
-    when(commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId))
-        .thenReturn(Optional.of(commissionedWellSchedule));
+    when(commissionedWellScheduleService.getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectDetail))
+        .thenReturn(commissionedWellSchedule);
 
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
@@ -545,8 +545,8 @@ public class CommissionedWellControllerTest extends ProjectContextAbstractContro
     var commissionedWellScheduleId = 10;
     var commissionedWellSchedule = CommissionedWellTestUtil.getCommissionedWellSchedule();
 
-    when(commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId))
-        .thenReturn(Optional.of(commissionedWellSchedule));
+    when(commissionedWellScheduleService.getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectDetail))
+        .thenReturn(commissionedWellSchedule);
 
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
@@ -587,8 +587,8 @@ public class CommissionedWellControllerTest extends ProjectContextAbstractContro
     var commissionedWellScheduleId = 10;
     var commissionedWellSchedule = CommissionedWellTestUtil.getCommissionedWellSchedule();
 
-    when(commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId))
-        .thenReturn(Optional.of(commissionedWellSchedule));
+    when(commissionedWellScheduleService.getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectDetail))
+        .thenReturn(commissionedWellSchedule);
 
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER, ValidationTypeArgumentResolver.SAVE_AND_COMPLETE_LATER);
@@ -644,8 +644,8 @@ public class CommissionedWellControllerTest extends ProjectContextAbstractContro
     var displayOrder = 100;
     var commissionedWellSchedule = CommissionedWellTestUtil.getCommissionedWellSchedule();
 
-    when(commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId))
-        .thenReturn(Optional.of(commissionedWellSchedule));
+    when(commissionedWellScheduleService.getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectDetail))
+        .thenReturn(commissionedWellSchedule);
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
         on(CommissionedWellController.class).removeCommissionedWellScheduleConfirmation(
@@ -665,8 +665,8 @@ public class CommissionedWellControllerTest extends ProjectContextAbstractContro
     var commissionedWellScheduleId = 10;
     var displayOrder = 10;
 
-    when(commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId))
-        .thenReturn(Optional.empty());
+    when(commissionedWellScheduleService.getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectDetail))
+        .thenThrow(PathfinderEntityNotFoundException.class);
 
     mockMvc.perform(
         get(ReverseRouter.route(on(CommissionedWellController.class).removeCommissionedWellScheduleConfirmation(
@@ -687,8 +687,8 @@ public class CommissionedWellControllerTest extends ProjectContextAbstractContro
     var displayOrder = 10;
     var commissionedWellSchedule = CommissionedWellTestUtil.getCommissionedWellSchedule();
 
-    when(commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId))
-        .thenReturn(Optional.of(commissionedWellSchedule));
+    when(commissionedWellScheduleService.getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectDetail))
+        .thenReturn(commissionedWellSchedule);
 
     when(commissionedWellModelService.getRemoveCommissionedWellScheduleModelAndView(eq(projectId), any()))
         .thenReturn(new ModelAndView());
@@ -725,8 +725,8 @@ public class CommissionedWellControllerTest extends ProjectContextAbstractContro
     var displayOrder = 100;
     var commissionedWellSchedule = CommissionedWellTestUtil.getCommissionedWellSchedule();
 
-    when(commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId))
-        .thenReturn(Optional.of(commissionedWellSchedule));
+    when(commissionedWellScheduleService.getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectDetail))
+        .thenReturn(commissionedWellSchedule);
 
     projectControllerTesterService.smokeTestProjectContextAnnotationsForControllerEndpoint(
         on(CommissionedWellController.class).removeCommissionedWellSchedule(
@@ -746,8 +746,8 @@ public class CommissionedWellControllerTest extends ProjectContextAbstractContro
     var commissionedWellScheduleId = 10;
     var displayOrder = 10;
 
-    when(commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId))
-        .thenReturn(Optional.empty());
+    when(commissionedWellScheduleService.getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectDetail))
+        .thenThrow(PathfinderEntityNotFoundException.class);
 
     MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);
@@ -776,8 +776,8 @@ public class CommissionedWellControllerTest extends ProjectContextAbstractContro
     var displayOrder = 10;
     var commissionedWellSchedule = CommissionedWellTestUtil.getCommissionedWellSchedule();
 
-    when(commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId))
-        .thenReturn(Optional.of(commissionedWellSchedule));
+    when(commissionedWellScheduleService.getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectDetail))
+        .thenReturn(commissionedWellSchedule);
 
     MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
       add(ValidationTypeArgumentResolver.COMPLETE, ValidationTypeArgumentResolver.COMPLETE);

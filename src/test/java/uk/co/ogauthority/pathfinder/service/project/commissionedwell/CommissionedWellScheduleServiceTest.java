@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.service.project.commissionedwell;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.commissionedwell.CommissionedWell;
 import uk.co.ogauthority.pathfinder.model.entity.project.commissionedwell.CommissionedWellSchedule;
@@ -417,15 +419,12 @@ class CommissionedWellScheduleServiceTest {
   }
 
   @Test
-  void getCommissionedWellSchedule_whenNoResultFound_thenEmptyOptional() {
+  void getCommissionedWellSchedule_whenNoResultFound_assertNotFound() {
+    when(commissionedWellScheduleRepository.findByIdAndProjectDetail(1, projectDetail))
+        .thenReturn(Optional.empty());
 
-    var commissionedWellScheduleId = 10;
-
-    when(commissionedWellScheduleRepository.findById(commissionedWellScheduleId)).thenReturn(Optional.empty());
-
-    var resultingCommissionedWellSchedule = commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId);
-
-    assertThat(resultingCommissionedWellSchedule).isEmpty();
+    assertThrows(PathfinderEntityNotFoundException.class,
+        () -> commissionedWellScheduleService.getCommissionedWellScheduleOrError(1, projectDetail));
   }
 
   @Test
@@ -434,12 +433,12 @@ class CommissionedWellScheduleServiceTest {
     var commissionedWellScheduleId = 10;
     var expectedCommissionedWellSchedule = CommissionedWellTestUtil.getCommissionedWellSchedule();
 
-    when(commissionedWellScheduleRepository.findById(commissionedWellScheduleId))
+    when(commissionedWellScheduleRepository.findByIdAndProjectDetail(commissionedWellScheduleId, projectDetail))
         .thenReturn(Optional.of(expectedCommissionedWellSchedule));
 
-    var resultingCommissionedWellSchedule = commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId);
+    var resultingCommissionedWellSchedule = commissionedWellScheduleService.getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectDetail);
 
-    assertThat(resultingCommissionedWellSchedule).contains(expectedCommissionedWellSchedule);
+    assertThat(resultingCommissionedWellSchedule).isEqualTo(expectedCommissionedWellSchedule);
 
   }
 

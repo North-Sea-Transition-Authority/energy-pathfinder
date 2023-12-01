@@ -130,7 +130,7 @@ public class PlatformsFpsosController extends ProjectFormPageController {
   public ModelAndView editPlatformFpso(@PathVariable("projectId") Integer projectId,
                                        @PathVariable("platformFpsoId") Integer platformFpsoId,
                                        ProjectContext projectContext) {
-    var platformFpso = platformsFpsosService.getOrError(platformFpsoId);
+    var platformFpso = platformsFpsosService.getOrError(platformFpsoId, projectContext.getProjectDetails());
     return getPlatformFpsoFormModelAndView(
         projectId,
         platformsFpsosService.getForm(platformFpso)
@@ -144,7 +144,7 @@ public class PlatformsFpsosController extends ProjectFormPageController {
                                          BindingResult bindingResult,
                                          ValidationType validationType,
                                          ProjectContext projectContext) {
-    var platformFpso = platformsFpsosService.getOrError(platformFpsoId);
+    var platformFpso = platformsFpsosService.getOrError(platformFpsoId, projectContext.getProjectDetails());
     bindingResult = platformsFpsosService.validate(form, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
@@ -170,7 +170,7 @@ public class PlatformsFpsosController extends ProjectFormPageController {
                                                 @PathVariable("platformFpsoId") Integer platformFpsoId,
                                                 @PathVariable("displayOrder") Integer displayOrder,
                                                 ProjectContext projectContext) {
-    var platformFpso = platformsFpsosService.getOrError(platformFpsoId);
+    var platformFpso = platformsFpsosService.getOrError(platformFpsoId, projectContext.getProjectDetails());
     var modelAndView = new ModelAndView("project/platformsfpsos/removePlatformFpso")
         .addObject("view", platformsFpsosSummaryService.getView(platformFpso, displayOrder, projectId))
         .addObject("cancelUrl", ReverseRouter.route(on(PlatformsFpsosController.class).viewPlatformsFpsos(projectId, null)));
@@ -183,7 +183,7 @@ public class PlatformsFpsosController extends ProjectFormPageController {
                                          @PathVariable("platformFpsoId") Integer platformFpsoId,
                                          @PathVariable("displayOrder") Integer displayOrder,
                                          ProjectContext projectContext) {
-    var platformFpso = platformsFpsosService.getOrError(platformFpsoId);
+    var platformFpso = platformsFpsosService.getOrError(platformFpsoId, projectContext.getProjectDetails());
     platformsFpsosService.delete(platformFpso);
     AuditService.audit(
         AuditEvent.PLATFORM_FPSO_REMOVED,

@@ -227,7 +227,7 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
   public ModelAndView editCollaborationOpportunity(@PathVariable("projectId") Integer projectId,
                                                    @PathVariable("opportunityId") Integer opportunityId,
                                                    ProjectContext projectContext) {
-    var opportunity = forwardWorkPlanCollaborationOpportunityService.getOrError(opportunityId);
+    var opportunity = forwardWorkPlanCollaborationOpportunityService.getOrError(opportunityId, projectContext.getProjectDetails());
     checkIfUserHasAccessToCollaborationOpportunity(opportunity);
     return getCollaborationOpportunityModelAndView(
         (ForwardWorkPlanCollaborationOpportunityForm) forwardWorkPlanCollaborationOpportunityService.getForm(opportunity),
@@ -242,7 +242,7 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
                                                      BindingResult bindingResult,
                                                      ValidationType validationType,
                                                      ProjectContext projectContext) {
-    var opportunity = forwardWorkPlanCollaborationOpportunityService.getOrError(opportunityId);
+    var opportunity = forwardWorkPlanCollaborationOpportunityService.getOrError(opportunityId, projectContext.getProjectDetails());
     checkIfUserHasAccessToCollaborationOpportunity(opportunity);
     bindingResult = forwardWorkPlanCollaborationOpportunityService.validate(form, bindingResult, validationType);
 
@@ -276,7 +276,7 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
                                                             @PathVariable("opportunityId") Integer opportunityId,
                                                             @PathVariable("displayOrder") Integer displayOrder,
                                                             ProjectContext projectContext) {
-    var opportunity = forwardWorkPlanCollaborationOpportunityService.getOrError(opportunityId);
+    var opportunity = forwardWorkPlanCollaborationOpportunityService.getOrError(opportunityId, projectContext.getProjectDetails());
     checkIfUserHasAccessToCollaborationOpportunity(opportunity);
     return forwardWorkPlanCollaborationOpportunityModelService.getRemoveCollaborationOpportunityConfirmationModelAndView(
         projectId,
@@ -290,7 +290,7 @@ public class ForwardWorkPlanCollaborationOpportunityController extends Pathfinde
                                                      @PathVariable("opportunityId") Integer opportunityId,
                                                      @PathVariable("displayOrder") Integer displayOrder,
                                                      ProjectContext projectContext) {
-    final var opportunity = forwardWorkPlanCollaborationOpportunityService.getOrError(opportunityId);
+    final var opportunity = forwardWorkPlanCollaborationOpportunityService.getOrError(opportunityId, projectContext.getProjectDetails());
     checkIfUserHasAccessToCollaborationOpportunity(opportunity);
     forwardWorkPlanCollaborationOpportunityService.delete(opportunity);
 

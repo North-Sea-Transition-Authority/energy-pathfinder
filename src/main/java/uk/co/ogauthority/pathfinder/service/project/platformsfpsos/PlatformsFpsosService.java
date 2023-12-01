@@ -148,10 +148,12 @@ public class PlatformsFpsosService implements ProjectFormSectionService {
     return platformFpsoRepository.findAllByProjectDetail_ProjectAndProjectDetail_VersionOrderByIdAsc(project, version);
   }
 
-  public PlatformFpso getOrError(Integer platformFpsoId) {
-    return platformFpsoRepository.findById(platformFpsoId)
+  public PlatformFpso getOrError(Integer platformFpsoId, ProjectDetail projectDetail) {
+    return platformFpsoRepository.findByIdAndProjectDetail(platformFpsoId, projectDetail)
         .orElseThrow(() -> new PathfinderEntityNotFoundException(
-                String.format("Unable to find PlatformFpso with ID %d", platformFpsoId))
+            String.format("Unable to find PlatformFpso with ID %d for project detail with id %s",
+                    platformFpsoId,
+                    projectDetail != null ?  projectDetail.getId() : "(null)"))
         );
   }
 

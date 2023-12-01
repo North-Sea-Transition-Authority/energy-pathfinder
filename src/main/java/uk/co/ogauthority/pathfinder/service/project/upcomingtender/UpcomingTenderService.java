@@ -135,10 +135,12 @@ public class UpcomingTenderService implements ProjectFormSectionService {
     upcomingTenderRepository.delete(upcomingTender);
   }
 
-  public UpcomingTender getOrError(Integer upcomingTenderId) {
-    return upcomingTenderRepository.findById(upcomingTenderId).orElseThrow(() ->
+  public UpcomingTender getOrError(Integer upcomingTenderId, ProjectDetail projectDetail) {
+    return upcomingTenderRepository.findByIdAndProjectDetail(upcomingTenderId, projectDetail).orElseThrow(() ->
         new PathfinderEntityNotFoundException(
-            String.format("Unable to find tender with id: %s", upcomingTenderId)
+            String.format("Unable to find tender with id: %s for ProjectDetail with id %s",
+                upcomingTenderId,
+                projectDetail != null ? projectDetail.getId() : null)
         )
     );
   }

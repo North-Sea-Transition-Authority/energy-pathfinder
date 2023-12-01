@@ -16,8 +16,6 @@ import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusCheck;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
-import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
-import uk.co.ogauthority.pathfinder.model.entity.project.commissionedwell.CommissionedWellSchedule;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -84,11 +82,13 @@ public class CommissionedWellController  {
 
     var projectDetail = projectContext.getProjectDetails();
 
-    var validatedCommissionedWellScheduleViews = commissionedWellScheduleSummaryService.getValidatedCommissionedWellScheduleViews(
+    var validatedCommissionedWellScheduleViews =
+        commissionedWellScheduleSummaryService.getValidatedCommissionedWellScheduleViews(
         projectDetail
     );
 
-    var validationResult = commissionedWellScheduleSummaryService.determineViewValidationResult(validatedCommissionedWellScheduleViews);
+    var validationResult =
+        commissionedWellScheduleSummaryService.determineViewValidationResult(validatedCommissionedWellScheduleViews);
 
     return validationResult.equals(ValidationResult.VALID)
         ? ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null))
@@ -142,7 +142,8 @@ public class CommissionedWellController  {
 
     var projectDetail = projectContext.getProjectDetails();
 
-    var commissionedWellSchedule = getCommissionedWellScheduleOrError(commissionedWellScheduleId);
+    var commissionedWellSchedule = commissionedWellScheduleService
+        .getCommissionedWellScheduleOrError(commissionedWellScheduleId, projectContext.getProjectDetails());
 
     var commissionedWellsForSchedule = commissionedWellScheduleService.getCommissionedWellsForSchedule(commissionedWellSchedule);
 
@@ -164,7 +165,10 @@ public class CommissionedWellController  {
                                                      BindingResult bindingResult,
                                                      ValidationType validationType,
                                                      ProjectContext projectContext) {
-    var commissionedWellSchedule = getCommissionedWellScheduleOrError(commissionedWellScheduleId);
+    var commissionedWellSchedule = commissionedWellScheduleService.getCommissionedWellScheduleOrError(
+        commissionedWellScheduleId,
+        projectContext.getProjectDetails()
+    );
 
     bindingResult = commissionedWellScheduleValidationService.validate(commissionedWellForm, bindingResult, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
@@ -199,7 +203,10 @@ public class CommissionedWellController  {
       ProjectContext projectContext
   ) {
     var commissionedWellScheduleView = commissionedWellScheduleSummaryService.getCommissionedWellScheduleView(
-        getCommissionedWellScheduleOrError(commissionedWellScheduleId),
+        commissionedWellScheduleService.getCommissionedWellScheduleOrError(
+            commissionedWellScheduleId,
+            projectContext.getProjectDetails()
+        ),
         displayOrder
     );
 
@@ -216,7 +223,10 @@ public class CommissionedWellController  {
       @PathVariable("displayOrder") Integer displayOrder,
       ProjectContext projectContext
   ) {
-    var commissionedWellSchedule = getCommissionedWellScheduleOrError(commissionedWellScheduleId);
+    var commissionedWellSchedule = commissionedWellScheduleService.getCommissionedWellScheduleOrError(
+        commissionedWellScheduleId,
+        projectContext.getProjectDetails()
+    );
     commissionedWellScheduleService.deleteCommissionedWellSchedule(commissionedWellSchedule);
 
     var auditEvent = AuditEvent.COMMISSIONED_WELL_SCHEDULE_REMOVED;
@@ -231,13 +241,6 @@ public class CommissionedWellController  {
     );
 
     return getCommissionedWellScheduleSummaryRedirect(projectId);
-  }
-
-  private CommissionedWellSchedule getCommissionedWellScheduleOrError(int commissionedWellScheduleId) {
-    return commissionedWellScheduleService.getCommissionedWellSchedule(commissionedWellScheduleId)
-        .orElseThrow(() -> new PathfinderEntityNotFoundException(
-            String.format("Could not find CommissionedWellSchedule with ID %d", commissionedWellScheduleId)
-        ));
   }
 
   private ModelAndView getCommissionedWellScheduleSummaryRedirect(int projectId) {

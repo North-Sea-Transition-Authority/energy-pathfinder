@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.controller.project.collaborationopportuniti
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,8 +42,10 @@ import uk.co.ogauthority.pathfinder.controller.file.FileDownloadService;
 import uk.co.ogauthority.pathfinder.controller.project.collaborationopportunites.infrastructure.InfrastructureCollaborationOpportunitiesController;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.file.UploadedFile;
+import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -115,7 +118,7 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
     when(projectService.getLatestDetailOrError(PROJECT_ID)).thenReturn(detail);
     when(projectOperatorService.isUserInProjectTeam(detail, authenticatedUser)).thenReturn(true);
     when(projectOperatorService.isUserInProjectTeam(detail, unAuthenticatedUser)).thenReturn(false);
-    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID)).thenReturn(opportunity);
+    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID, detail)).thenReturn(opportunity);
     UploadedFile file = ProjectFileTestUtil.getUploadedFile();
 
     InfrastructureCollaborationOpportunityView collaborationOpportunityView = new InfrastructureCollaborationOpportunityViewUtil.InfrastructureCollaborationOpportunityViewBuilder(
@@ -278,7 +281,7 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
   public void updateCollaborationOpportunity_projectContextSmokeTest() {
     var opportunity = InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
     var form = new InfrastructureCollaborationOpportunityForm();
-    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID))
+    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID, detail))
         .thenReturn(opportunity);
     var bindingResult = new BeanPropertyBindingResult(InfrastructureCollaborationOpportunityForm.class, "form");
     when(infrastructureCollaborationOpportunitiesService.validate(any(), any(), any())).thenReturn(bindingResult);
@@ -318,7 +321,7 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
     )
         .includeSummaryLinks(true)
         .build();
-    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID))
+    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID, detail))
         .thenReturn(opportunity);
     when(infrastructureCollaborationOpportunitiesSummaryService.getView(opportunity, DISPLAY_ORDER))
         .thenReturn(collaborationOpportunityView);
@@ -347,7 +350,7 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
   @Test
   public void removeCollaborationOpportunity_projectContextSmokeTest() {
     var opportunity = InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
-    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID))
+    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID, detail))
         .thenReturn(opportunity);
 
     projectControllerTesterService
@@ -647,7 +650,7 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
   public void editCollaborationOpportunity_userCantAccessCollabOpportunity_thenAccessForbidden() throws Exception {
     final var collaborationOpportunity =
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
-    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID))
+    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID, detail))
         .thenReturn(collaborationOpportunity);
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         any(),
@@ -663,10 +666,42 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
   }
 
   @Test
+  public void editCollaborationOpportunity_userCanAccessCollabOpportunity_withDifferentProjectDetail_thenNotFound() throws Exception {
+    final var otherProjectId = PROJECT_ID + 1;
+
+    final var otherProject = mock(Project.class);
+    when(otherProject.getId())
+        .thenReturn(PROJECT_ID+1);
+
+    final var otherProjectDetail = mock(ProjectDetail.class);
+    when(otherProjectDetail.getProject())
+        .thenReturn(otherProject);
+    when(otherProjectDetail.getStatus())
+        .thenReturn(ProjectStatus.DRAFT);
+    when(otherProjectDetail.getProjectType())
+        .thenReturn(ProjectType.INFRASTRUCTURE);
+
+    when(projectService.getLatestDetailOrError(otherProjectId))
+        .thenReturn(otherProjectDetail);
+    when(teamService.isPersonMemberOfRegulatorTeam(authenticatedUser.getLinkedPerson()))
+        .thenReturn(true);
+
+    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID, otherProjectDetail))
+        .thenThrow(PathfinderEntityNotFoundException.class);
+
+    mockMvc.perform(
+            get(ReverseRouter.route(on(InfrastructureCollaborationOpportunitiesController.class)
+                .editCollaborationOpportunity(otherProjectId, COLLABORATION_OPPORTUNITY_ID, null)
+            ))
+                .with(authenticatedUserAndSession(authenticatedUser)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
   public void updateCollaborationOpportunity_userCantAccessCollabOpportunity_thenAccessForbidden() throws Exception {
     final var collaborationOpportunity =
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
-    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID))
+    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID, detail))
         .thenReturn(collaborationOpportunity);
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         any(),
@@ -698,7 +733,7 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
   public void removeCollaborationOpportunityConfirm_userCantAccessCollabOpportunity_thenAccessForbidden() throws Exception {
     final var collaborationOpportunity =
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
-    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID))
+    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID, detail))
         .thenReturn(collaborationOpportunity);
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         any(),
@@ -717,7 +752,7 @@ public class InfrastructureCollaborationOpportunitiesControllerTest extends Proj
   public void removeCollaborationOpportunity_userCantAccessCollabOpportunity_thenAccessForbidden() throws Exception {
     final var collaborationOpportunity =
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(detail);
-    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID))
+    when(infrastructureCollaborationOpportunitiesService.getOrError(COLLABORATION_OPPORTUNITY_ID, detail))
         .thenReturn(collaborationOpportunity);
     when(projectSectionItemOwnershipService.canCurrentUserAccessProjectSectionInfo(
         any(),

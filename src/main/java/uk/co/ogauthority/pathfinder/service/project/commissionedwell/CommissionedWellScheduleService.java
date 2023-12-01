@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.commissionedwell.CommissionedWell;
@@ -77,8 +78,13 @@ public class CommissionedWellScheduleService implements ProjectFormSectionServic
     commissionedWellService.saveCommissionedWells(commissionedWellSchedule, commissionedWellForm.getWells());
   }
 
-  public Optional<CommissionedWellSchedule> getCommissionedWellSchedule(int commissionedWellScheduleId) {
-    return commissionedWellScheduleRepository.findById(commissionedWellScheduleId);
+  public CommissionedWellSchedule getCommissionedWellScheduleOrError(Integer commissionedWellScheduleId, ProjectDetail projectDetail) {
+    return commissionedWellScheduleRepository.findByIdAndProjectDetail(commissionedWellScheduleId, projectDetail)
+        .orElseThrow(() -> new PathfinderEntityNotFoundException(
+            String.format("Could not find CommissionedWellSchedule with ID %s for ProjectDetail with ID %s",
+                commissionedWellScheduleId,
+                projectDetail != null ? projectDetail.getId() : "(null)")
+        ));
   }
 
   List<CommissionedWellSchedule> getCommissionedWellSchedules(ProjectDetail projectDetail) {

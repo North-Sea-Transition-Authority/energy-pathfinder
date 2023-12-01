@@ -69,7 +69,7 @@ No environment variables need to be added when enabling the debug profile.
 
 #### Create the Flyway user
 
-See the [environments] (https://confluence.fivium.co.uk/display/PAT/Environments) page to find the development database.
+See the [environments] (https://fivium.atlassian.net/wiki/spaces/PAT/pages/13402153/Environments) page to find the development database.
 
 This must be your DB_SCHEMA_NAME with '_flyway' appended to the end.
 
