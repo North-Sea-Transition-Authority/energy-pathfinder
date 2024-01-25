@@ -64,6 +64,7 @@ steps:
       repo: quay.io/fivium/pathfinder
       tags:
         - develop
+        - develop-${DRONE_BUILD_NUMBER}
       config:
         from_secret: docker_config
     when:
