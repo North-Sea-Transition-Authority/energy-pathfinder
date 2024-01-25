@@ -32,25 +32,30 @@ steps:
       - npx gulp build
       - cd ..
 
-  # TODO: EDU-6696 - Upgrade to Node V18
   - name: build-frontend
-    image: node:14
+    image: node:18
     commands:
       - npm install
-      - npm rebuild node-sass
       - npx gulp buildAll
 
   - name: build-java
     image: openjdk:11-jdk-slim
     environment:
+      GRADLE_USER_HOME: /drone/src/gradle_cache
+    commands:
+      - chmod +x gradlew
+      - ./gradlew test jacocoTestReport checkstyleMain bootWar bootJar
+
+  - name: code-analysis
+    image: eclipse-temurin:17-jdk
+    environment:
       SONAR_TOKEN:
         from_secret: sonar_token
-      GRADLE_USER_HOME: /drone/src/gradle_cache
       # This SONAR_USER_HOME is the cache path - not the actual user home
       SONAR_USER_HOME: /drone/src/sonar_cache
     commands:
       - chmod +x gradlew
-      - ./gradlew test jacocoTestReport checkstyleMain bootWar bootJar sonarqube
+      - ./gradlew sonarqube
 
   - name: publish-docker-develop
     image: plugins/docker:19.03.8
