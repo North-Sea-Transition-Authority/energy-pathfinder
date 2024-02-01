@@ -6,6 +6,7 @@
 * Java 11
 * Node LTS + NPM
 * IntelliJ Ultimate
+* Docker
 
 ### Steps
 
@@ -124,34 +125,15 @@ Set the profile to `development` in your run configuration
   
   Note that Checkstyle rules are checked during the build process and any broken rules will fail the build.
     
-#### Proxy routes to enable session sharing
+#### Run local fox engine to enable session sharing
+To enable Spring to access the fox session, you must run a local fox instance on your machine. To do this run the compose file provided in `/devtools-pathfinder/local-dev-compose.yml`.
 
-To enable Spring to access the fox session, you must access your local instance under the same hostname and application context (itportal.dev.fivium.local/engedudev1/).
+This will start a fox4 instance listening on `localhost:8080`.
 
-The easiest way to do this is to add a ProxyPass rule to Apache running on itportal.dev.fivium.local. You only need to do this if you have never done this before for any Energy Portal spring services
- 
-Edit the [nginx configuration file](https://bitbucket.org/fiviumuk/fivium-dev-app/src/master/app/volumes/ops/nginx_oga/nginx.conf) at and add a ProxyPass rule forwarding traffic under your CONTEXT_SUFFIX to your local machine under the `itportal.dev.fivium.local` server. An example is shown below e.g.
-
-```
-location /engedudev1/da/ {
-  proxy_pass  http://dashworth.fivium.local:8081/engedudev1/da/;
-}
-```
-
-Once you have added the ProxyPass rule you will need to increment the version number of the nginx configuration file in the [ops.yml](https://bitbucket.org/fiviumuk/fivium-dev-app/src/master/app/compose/ops.yml) file. See [OGA Bloomsbury Street infrastructure](https://confluence.fivium.co.uk/pages/viewpage.action?pageId=67733766#EDU/MMO/ETLdev/stBloomsburyStreet(OGA)-HowdoIupdatetheconfigforanapp) for more infomration.
-
-For example if the following was included in the `ops.yml` file
-
-`source: nginx_nginx.conf1`
-
-This will need to be updated to
-
-`source: nginx_nginx.conf2`
-
-There are two references to the nginx config version within this file so ensure you update both.
-
-Commit and push the changes to both files and once the build has passed the ProxyPass rule will be ready to use.
+See https://fivium.atlassian.net/wiki/spaces/JAVA/pages/15368483/Java+development+environment+setup#Javadevelopmentenvironmentsetup-Docker if you don't have Docker setup, or don't have the `repo1.dev.fivium.local` registry marked as allowing insecure connections.
 
 #### Run the app
 IntelliJ should auto detect the Spring application and create a run configuration.
-Run the project and navigate to `https://itportal.dev.fivium.local/engedudev1/<CONTEXT_SUFFIX>/work-area`
+Run the project and navigate to `http://localhost:8081/engedudev1/<CONTEXT_SUFFIX>/work-area`
+
+You will be redirected to your local fox instance for authentication, and then redirected back to your local Pathfinder instance with an active session.
