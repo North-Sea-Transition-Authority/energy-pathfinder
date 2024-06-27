@@ -102,7 +102,8 @@ public class DashboardProjectItemView {
       return false;
     }
     DashboardProjectItemView that = (DashboardProjectItemView) o;
-    return Objects.equals(projectTitle, that.projectTitle)
+    return Objects.equals(projectId, that.projectId)
+        && Objects.equals(projectTitle, that.projectTitle)
         && Objects.equals(operatorName, that.operatorName)
         && Objects.equals(status, that.status)
         && Objects.equals(updateRequested, that.updateRequested)
@@ -113,6 +114,7 @@ public class DashboardProjectItemView {
   @Override
   public int hashCode() {
     return Objects.hash(
+        projectId,
         projectTitle,
         operatorName,
         status,

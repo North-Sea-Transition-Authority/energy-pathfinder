@@ -26,9 +26,9 @@
 <#macro dashboardItemHeaderWrapper dashboardItem showOperator=true>
   <div class="dashboard-item">
     <h3 class="dashboard-item__heading">
-      <@userAction.userAction userAction=dashboardItem.dashboardLink ariaDescribeByValue="project-${dashboardItem.projectId}-update-tag"/>
+      <@userAction.userAction userAction=dashboardItem.dashboardLink ariaDescribeById="project-${dashboardItem.projectId}-update-tag"/>
       <#if dashboardItem.updateRequested>
-        <@tag.tag tagClasses="govuk-tag--orange govuk-tag--float-right" ariaDescribeById="project-${dashboardItem.projectId}-update-tag">
+        <@tag.tag tagClasses="govuk-tag--orange govuk-tag--float-right" id="project-${dashboardItem.projectId}-update-tag">
           <#if dashboardItem.updateDeadlineDate?has_content>
             Update due by ${dashboardItem.updateDeadlineDate}
           <#else>

@@ -1,5 +1,5 @@
-<#macro tag tagClasses="" ariaDescribeById="">
-  <strong class="govuk-tag ${tagClasses}" <#if ariaDescribeById?has_content> id=${ariaDescribeById}</#if>>
+<#macro tag tagClasses="" id="">
+  <strong class="govuk-tag ${tagClasses}" <#if id?has_content> id=${id}</#if>>
     <#nested/>
   </strong>
 </#macro>

@@ -1,18 +1,18 @@
 <#include '../../layout.ftl'/>
 
-<#macro userAction userAction ariaDescribeByValue="">
+<#macro userAction userAction ariaDescribeById="">
   <#if userAction.enabled>
     <#if userAction.type = "LINK_BUTTON">
       <@_linkButton userAction=userAction/>
     <#elseif userAction.type = "LINK">
       <@_link userAction=userAction/>
     <#elseif userAction.type = "DASHBOARD_LINK">
-      <@_dashboardLink userAction=userAction ariaDescribeByValue=ariaDescribeByValue applyNotVisitedClass=userAction.applyNotVisitedClass/>
+      <@_dashboardLink userAction=userAction ariaDescribeById=ariaDescribeById applyNotVisitedClass=userAction.applyNotVisitedClass/>
     </#if>
   </#if>
 </#macro>
 
-<#macro _dashboardLink userAction ariaDescribeByValue applyNotVisitedClass=true>
+<#macro _dashboardLink userAction ariaDescribeById applyNotVisitedClass=true>
   <#assign classes = "govuk-link govuk-!-font-size-24"/>
   <#if applyNotVisitedClass>
     <#assign classes = classes + " govuk-link--no-visited-state"/>
@@ -20,7 +20,7 @@
   <@_link
     userAction=userAction
     linkClass=classes
-    ariaDescribeByValue=ariaDescribeByValue
+    ariaDescribeById=ariaDescribeById
   />
 </#macro>
 
@@ -38,13 +38,13 @@
   />
 </#macro>
 
-<#macro _link userAction linkClass="govuk-link" ariaDescribeByValue="">
+<#macro _link userAction linkClass="govuk-link" ariaDescribeById="">
   <@fdsAction.link
     linkText=userAction.prompt
     linkUrl=springUrl(userAction.url)
     linkClass=linkClass
     role=false
     linkScreenReaderText=userAction.screenReaderText!""
-    ariaDescribedBy=ariaDescribeByValue
+    ariaDescribedBy=ariaDescribeById
   />
 </#macro>
