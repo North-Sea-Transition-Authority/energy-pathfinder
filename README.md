@@ -3,7 +3,7 @@
 ## Project setup
 
 ### Prerequisites
-* Java 11
+* Java 21
 * Node LTS + NPM
 * IntelliJ Ultimate
 * Docker

@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.form.validation.email;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.apache.commons.validator.routines.EmailValidator;
 
 /**

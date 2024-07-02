@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUserAndSession;
 
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +77,7 @@ public class ProjectControllerTesterService {
   }
 
   public ProjectControllerTesterService withHttpRequestMethod(HttpMethod requestMethod) {
-    if (!EnumSet.of(HttpMethod.GET, HttpMethod.POST).contains(requestMethod)) {
+    if (requestMethod != HttpMethod.GET && requestMethod != HttpMethod.POST) {
       throw new IllegalArgumentException(String.format("Only GET and POST request types are supported. Actual: %s", requestMethod));
     }
     this.requestMethod = requestMethod;

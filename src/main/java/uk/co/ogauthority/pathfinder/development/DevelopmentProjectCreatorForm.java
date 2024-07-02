@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.development;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.validation.positivewholenumber.PositiveWholeNumber;
 

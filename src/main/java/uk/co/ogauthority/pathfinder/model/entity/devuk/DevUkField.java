@@ -1,10 +1,10 @@
 package uk.co.ogauthority.pathfinder.model.entity.devuk;
 
 import com.google.common.annotations.VisibleForTesting;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 import org.hibernate.annotations.Immutable;
 import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;

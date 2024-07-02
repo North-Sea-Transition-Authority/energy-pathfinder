@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.form.feedback;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
-import javax.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.enums.feedback.ServiceFeedbackRating;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.lengthrestrictedstring.LengthRestrictedString;

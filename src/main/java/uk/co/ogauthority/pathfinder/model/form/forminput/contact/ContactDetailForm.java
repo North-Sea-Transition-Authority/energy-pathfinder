@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.form.forminput.contact;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.email.ValidEmail;

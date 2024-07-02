@@ -25,6 +25,7 @@ import uk.co.ogauthority.pathfinder.analytics.EnableAnalyticsConfiguration;
 import uk.co.ogauthority.pathfinder.config.ExternalApiAuthenticationEntryPoint;
 import uk.co.ogauthority.pathfinder.config.ExternalApiConfiguration;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
+import uk.co.ogauthority.pathfinder.config.WebSecurityConfig;
 import uk.co.ogauthority.pathfinder.config.file.FileUploadProperties;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.UserSession;
@@ -46,7 +47,10 @@ import uk.co.ogauthority.pathfinder.service.team.teammanagementcontext.TeamManag
 import uk.co.ogauthority.pathfinder.service.validation.ValidationErrorOrderingService;
 
 @EnableAnalyticsConfiguration
-@Import(AbstractControllerTest.TestConfig.class)
+@Import({
+    AbstractControllerTest.TestConfig.class,
+    WebSecurityConfig.class
+})
 public abstract class AbstractControllerTest {
 
   protected MockMvc mockMvc;

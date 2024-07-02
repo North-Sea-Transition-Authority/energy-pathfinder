@@ -51,8 +51,8 @@ import uk.co.ogauthority.pathfinder.model.enums.contact.ServiceContactDetail;
 import uk.co.ogauthority.pathfinder.model.enums.feedback.ServiceFeedbackRating;
 import uk.co.ogauthority.pathfinder.mvc.error.DefaultExceptionResolver;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
-import uk.co.ogauthority.pathfinder.service.contact.SupportContactService;
 import uk.co.ogauthority.pathfinder.service.LinkService;
+import uk.co.ogauthority.pathfinder.service.contact.SupportContactService;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
@@ -80,7 +80,7 @@ public class FeedbackIntegrationTest extends AbstractControllerTest {
   private final static Instant DATETIME = Instant.parse("2020-04-29T10:15:30Z");
   private final static Integer PROJECT_ID = 1;
   private final static String TITLE = "TestTitle";
-  private final static String PROJECT_LINK = String.format("http://test/pathfinder/project/%s/manage/", PROJECT_ID);
+  private final static String PROJECT_LINK = String.format("http://test/pathfinder/project/%s/manage", PROJECT_ID);
   private final static Integer PROJECT_DETAIL_ID = 2;
   private final static String SUPPORT_EMAIl = ServiceContactDetail.TECHNICAL_SUPPORT.getEmailAddress();
 

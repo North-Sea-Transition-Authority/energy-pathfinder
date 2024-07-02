@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.searchselector;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 public class SearchSelectableTestEntityWithEnum {
 

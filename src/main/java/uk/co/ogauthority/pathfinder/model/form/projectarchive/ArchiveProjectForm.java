@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.form.projectarchive;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 public class ArchiveProjectForm {
 

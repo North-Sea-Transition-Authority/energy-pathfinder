@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.form.projecttransfer;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
 public class ProjectTransferForm {

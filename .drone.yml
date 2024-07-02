@@ -39,7 +39,7 @@ steps:
       - npx gulp buildAll
 
   - name: build-java
-    image: openjdk:11-jdk-slim
+    image: eclipse-temurin:21-jdk
     environment:
       GRADLE_USER_HOME: /drone/src/gradle_cache
     commands:
@@ -47,7 +47,7 @@ steps:
       - ./gradlew test jacocoTestReport checkstyleMain bootWar bootJar
 
   - name: code-analysis
-    image: eclipse-temurin:17-jdk
+    image: eclipse-temurin:21-jdk
     environment:
       SONAR_TOKEN:
         from_secret: sonar_token

@@ -47,7 +47,7 @@ public class ProjectLocationFormValidatorTest {
   @Before
   public void setUp() {
     validator = new ProjectLocationFormValidator(dateInputValidator, licenceBlockValidatorService, devUkFieldService);
-    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any());
+    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any(Object[].class));
     when(dateInputValidator.supports(any())).thenReturn(true);
     var testField = new DevUkField();
     testField.setLandward(false);

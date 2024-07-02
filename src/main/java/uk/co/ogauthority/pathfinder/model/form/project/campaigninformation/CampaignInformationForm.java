@@ -1,9 +1,9 @@
 package uk.co.ogauthority.pathfinder.model.form.project.campaigninformation;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
 public class CampaignInformationForm {
