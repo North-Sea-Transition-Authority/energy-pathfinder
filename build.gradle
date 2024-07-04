@@ -45,15 +45,15 @@ dependencies {
     exclude group: 'com.zaxxer', module: 'HikariCP-java7'
     // workaround for https://github.com/spring-projects/spring-boot/issues/16489
   }
-  implementation 'io.micrometer:micrometer-registry-statsd:1.7.8'
+  implementation 'io.micrometer:micrometer-registry-statsd'
 
   implementation 'org.flywaydb:flyway-core:9.5.1-FIVIUM'
   implementation 'com.oracle.database.jdbc:ojdbc11:21.9.0.0'
   implementation 'org.springframework.session:spring-session-jdbc'
-  implementation 'uk.gov.service.notify:notifications-java-client:3.17.3-RELEASE'
+  implementation 'uk.gov.service.notify:notifications-java-client:5.1.0-RELEASE'
   implementation('uk.co.fivium.feedbackmanagementservice:client:2.1.1')
 
-  implementation 'com.google.guava:guava:31.0.1-jre'
+  implementation 'com.google.guava:guava:33.2.1-jre'
   implementation 'org.apache.commons:commons-lang3:3.12.0'
   implementation 'org.apache.commons:commons-collections4:4.4'
   implementation group: 'commons-validator', name: 'commons-validator', version: '1.7'

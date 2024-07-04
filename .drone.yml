@@ -108,7 +108,7 @@ steps:
       - docker build -t quay.io/fivium/pathfinder:trivy-scan-target .
 
   - name: trivy-scan
-    image: aquasec/trivy:0.20.0
+    image: aquasec/trivy:0.37.3
     volumes:
       - name: docker-sock
         path: /var/run/docker.sock
