@@ -48,7 +48,7 @@ class UpcomingTenderConversionFormValidatorTest {
 
   @Test
   void validate_completeForm_thenValid() {
-    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any());
+    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any(Object[].class));
     when(dateInputValidator.supports(any())).thenReturn(true);
     var errors = new BeanPropertyBindingResult(form, "form");
 
@@ -79,7 +79,7 @@ class UpcomingTenderConversionFormValidatorTest {
 
   @Test
   void validate_whenPartialValidationAndNoDateAwarded_thenValid() {
-    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any());
+    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any(Object[].class));
     when(dateInputValidator.supports(any())).thenReturn(true);
     form.setDateAwarded(new ThreeFieldDateInput(null, null, null));
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -93,7 +93,7 @@ class UpcomingTenderConversionFormValidatorTest {
 
   @Test
   void validate_partialDateAwarded_thenInvalid() {
-    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any());
+    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any(Object[].class));
     when(dateInputValidator.supports(any())).thenReturn(true);
     form.setDateAwarded(new ThreeFieldDateInput(2020, null, null));
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -120,7 +120,7 @@ class UpcomingTenderConversionFormValidatorTest {
 
   @Test
   void validate_pastDateAwarded_thenValid() {
-    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any());
+    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any(Object[].class));
     when(dateInputValidator.supports(any())).thenReturn(true);
     form.setDateAwarded(new ThreeFieldDateInput(LocalDate.now().minusYears(1)));
     var errors = new BeanPropertyBindingResult(form, "form");
@@ -134,7 +134,7 @@ class UpcomingTenderConversionFormValidatorTest {
 
   @Test
   void validate_todayDateAwarded_thenValid() {
-    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any());
+    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any(Object[].class));
     when(dateInputValidator.supports(any())).thenReturn(true);
     form.setDateAwarded(new ThreeFieldDateInput(LocalDate.now()));
     var errors = new BeanPropertyBindingResult(form, "form");

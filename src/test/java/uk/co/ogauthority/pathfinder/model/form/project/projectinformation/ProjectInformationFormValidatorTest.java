@@ -60,7 +60,7 @@ class ProjectInformationFormValidatorTest {
 
   @Test
   void validate_whenDevelopmentFieldStageAndEmptyHiddenQuestionsWithPartialValidation_thenValid() {
-    doCallRealMethod().when(quarterYearInputValidator).validate(any(), any(), any());
+    doCallRealMethod().when(quarterYearInputValidator).validate(any(), any(), any(Object[].class));
     when(quarterYearInputValidator.supports(any())).thenReturn(true);
 
     var form = ProjectInformationUtil.getCompleteForm();

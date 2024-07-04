@@ -2,8 +2,8 @@ package uk.co.ogauthority.pathfinder.service.project.location;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import jakarta.validation.Validation;
 import java.util.Collections;
-import javax.validation.Validation;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

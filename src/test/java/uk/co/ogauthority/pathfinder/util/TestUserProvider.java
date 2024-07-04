@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.util;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
@@ -8,7 +8,6 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserToken;
 import uk.co.ogauthority.pathfinder.auth.FoxSessionFilter;
-import uk.co.ogauthority.pathfinder.model.entity.UserAccount;
 
 public class TestUserProvider implements RequestPostProcessor {
 

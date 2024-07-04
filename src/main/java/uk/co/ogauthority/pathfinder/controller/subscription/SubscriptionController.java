@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.controller.subscription;
 
+import jakarta.validation.Valid;
 import java.util.Optional;
-import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

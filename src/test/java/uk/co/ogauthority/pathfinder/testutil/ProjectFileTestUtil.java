@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
 import java.sql.SQLException;
+import javax.sql.rowset.serial.SerialBlob;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
@@ -20,7 +21,7 @@ public class ProjectFileTestUtil {
     var file = new UploadedFile(FILE_ID, FILE_NAME);
     file.setFileSize(50L);
     file.setContentType("text/plain");
-    file.setFileData(new javax.sql.rowset.serial.SerialBlob(BYTES));
+    file.setFileData(new SerialBlob(BYTES));
     return file;
   }
 }

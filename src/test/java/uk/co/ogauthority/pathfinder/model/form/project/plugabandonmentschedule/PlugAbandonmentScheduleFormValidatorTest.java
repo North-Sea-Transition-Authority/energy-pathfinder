@@ -36,7 +36,7 @@ public class PlugAbandonmentScheduleFormValidatorTest {
   @Before
   public void setup() {
     plugAbandonmentScheduleFormValidator = new PlugAbandonmentScheduleFormValidator(minMaxDateInputValidator);
-    doCallRealMethod().when(minMaxDateInputValidator).validate(any(), any(), any());
+    doCallRealMethod().when(minMaxDateInputValidator).validate(any(), any(), any(Object[].class));
     when(minMaxDateInputValidator.supports(any())).thenReturn(true);
   }
 

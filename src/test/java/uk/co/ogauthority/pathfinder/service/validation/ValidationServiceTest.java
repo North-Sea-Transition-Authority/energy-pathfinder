@@ -3,9 +3,9 @@ package uk.co.ogauthority.pathfinder.service.validation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
+import jakarta.validation.Validation;
+import jakarta.validation.constraints.NotNull;
 import java.util.Set;
-import javax.validation.Validation;
-import javax.validation.constraints.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

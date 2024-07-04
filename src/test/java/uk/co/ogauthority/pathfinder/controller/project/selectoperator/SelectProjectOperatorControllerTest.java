@@ -100,7 +100,7 @@ public class SelectProjectOperatorControllerTest extends AbstractControllerTest 
         any(),
         any(),
         any()
-    )).thenReturn(new ModelAndView()); //Just return a model and view that needs no params.
+    )).thenReturn(new ModelAndView("dummy")); //Just return a model and view that needs no params.
 
     MultiValueMap<String, String> completeParams = new LinkedMultiValueMap<>() {{
       add(SelectProjectOperatorController.PRIMARY_BUTTON_TEXT, SelectProjectOperatorController.PRIMARY_BUTTON_TEXT);

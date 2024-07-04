@@ -1,8 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.form.project.plugabandonmentschedule;
 
+import jakarta.validation.constraints.NotEmpty;
 import java.util.Collections;
 import java.util.List;
-import javax.validation.constraints.NotEmpty;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 

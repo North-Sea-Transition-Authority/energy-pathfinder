@@ -38,7 +38,7 @@ public class UpcomingTenderFormValidatorTest {
   @Before
   public void setUp() {
     validator = new UpcomingTenderFormValidator(dateInputValidator);
-    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any());
+    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any(Object[].class));
     when(dateInputValidator.supports(any())).thenReturn(true);
   }
 

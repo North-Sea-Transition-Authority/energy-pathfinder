@@ -1,10 +1,10 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.util.Objects;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.CollaborationOpportunityFileLinkCommon;
 import uk.co.ogauthority.pathfinder.service.entityduplication.ChildEntity;
 

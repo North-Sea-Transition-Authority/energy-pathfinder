@@ -14,8 +14,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.co.ogauthority.pathfinder.config.ExternalApiWebSecurityConfiguration;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
@@ -23,6 +25,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(ProjectDtoController.class)
+@Import(ExternalApiWebSecurityConfiguration.class)
 public class ProjectDtoControllerTest extends AbstractControllerTest {
 
   @MockBean

@@ -1,9 +1,9 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.projectcontribution;
 
+import jakarta.persistence.AttributeConverter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.persistence.AttributeConverter;
 import org.apache.commons.lang3.StringUtils;
 
 public class ProjectContributorConverter implements AttributeConverter<List<Integer>, String> {

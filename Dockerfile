@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:alpine
+FROM eclipse-temurin:21-alpine
 COPY ./build/libs/pathfinder.jar app.jar
 
 RUN apk update && apk upgrade && apk add curl && rm -rf /var/cache/apk/*
