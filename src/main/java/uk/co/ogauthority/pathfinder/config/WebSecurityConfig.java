@@ -8,28 +8,30 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.savedrequest.RequestCacheAwareFilter;
 import uk.co.ogauthority.pathfinder.auth.FoxLoginCallbackFilter;
 import uk.co.ogauthority.pathfinder.auth.FoxSessionFilter;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
+import uk.co.ogauthority.pathfinder.service.UserSessionService;
 
 @Configuration
 public class WebSecurityConfig {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebSecurityConfig.class);
 
-  private final FoxSessionFilter foxSessionFilter;
+  private final UserSessionService userSessionService;
   private final FoxLoginCallbackFilter foxLoginCallbackFilter;
   private final FoxUrlService foxUrlService;
   private final SystemAccessService systemAccessService;
 
   @Autowired
-  public WebSecurityConfig(FoxSessionFilter foxSessionFilter,
+  public WebSecurityConfig(UserSessionService userSessionService,
                            FoxLoginCallbackFilter foxLoginCallbackFilter,
                            FoxUrlService foxUrlService,
                            SystemAccessService systemAccessService) {
-    this.foxSessionFilter = foxSessionFilter;
+    this.userSessionService = userSessionService;
     this.foxLoginCallbackFilter = foxLoginCallbackFilter;
     this.foxUrlService = foxUrlService;
     this.systemAccessService = systemAccessService;
@@ -95,7 +97,10 @@ public class WebSecurityConfig {
             response.sendRedirect(foxUrlService.getFoxLoginUrl());
           })
       )
-      .addFilterBefore(foxSessionFilter, RequestCacheAwareFilter.class)
+        .addFilterBefore(
+            new FoxSessionFilter(userSessionService, () -> httpSecurity.getSharedObject(SecurityContextRepository.class)),
+            RequestCacheAwareFilter.class
+        )
       // The FoxLoginCallbackFilter must be hit before the FoxSessionFilter, otherwise the saved request is wiped
       // when the session is cleared
       .addFilterBefore(foxLoginCallbackFilter, FoxSessionFilter.class);
