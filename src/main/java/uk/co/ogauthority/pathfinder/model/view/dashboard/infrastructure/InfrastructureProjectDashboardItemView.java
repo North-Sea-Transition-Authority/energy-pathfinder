@@ -17,6 +17,7 @@ public class InfrastructureProjectDashboardItemView extends DashboardProjectItem
                                                 String fieldStage,
                                                 String fieldName) {
     super(
+        dashboardProjectItemView.getProjectId(),
         dashboardProjectItemView.getProjectTitle(),
         dashboardProjectItemView.getOperatorName(),
         dashboardProjectItemView.getStatus(),

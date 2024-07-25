@@ -11,6 +11,7 @@ public class ForwardWorkPlanDashboardItemView extends DashboardProjectItemView {
   public ForwardWorkPlanDashboardItemView(DashboardProjectItemView dashboardProjectItemView,
                                           DashboardLink dashboardLink) {
     super(
+        dashboardProjectItemView.getProjectId(),
         dashboardProjectItemView.getProjectTitle(),
         dashboardProjectItemView.getOperatorName(),
         dashboardProjectItemView.getStatus(),

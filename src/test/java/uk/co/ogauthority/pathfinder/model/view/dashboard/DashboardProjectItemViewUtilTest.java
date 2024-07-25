@@ -21,10 +21,12 @@ public class DashboardProjectItemViewUtilTest {
   }
 
   private void assertCommonFieldsMatch(DashboardProjectItem dashboardProjectItem, DashboardProjectItemView view) {
+    assertThat(view.getProjectId()).isEqualTo(dashboardProjectItem.getProjectId());
     assertThat(view.getProjectTitle()).isEqualTo(dashboardProjectItem.getProjectTitle());
     assertThat(view.getOperatorName()).isEqualTo(dashboardProjectItem.getOperatorName());
     assertThat(view.getStatus()).isEqualTo(dashboardProjectItem.getStatus().getDisplayName());
     assertThat(view.isUpdateRequested()).isEqualTo(dashboardProjectItem.isUpdateRequested());
     assertThat(view.getUpdateDeadlineDate()).isEqualTo(DateUtil.formatDate(dashboardProjectItem.getUpdateDeadlineDate()));
   }
+
 }
