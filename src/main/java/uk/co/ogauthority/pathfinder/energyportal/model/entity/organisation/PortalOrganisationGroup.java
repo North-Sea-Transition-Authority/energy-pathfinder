@@ -1,10 +1,10 @@
 package uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import org.hibernate.annotations.Immutable;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
 

@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.form.project.upcomingtender;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;

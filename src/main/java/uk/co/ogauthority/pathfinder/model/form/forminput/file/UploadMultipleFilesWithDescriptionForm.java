@@ -1,9 +1,9 @@
 package uk.co.ogauthority.pathfinder.model.form.forminput.file;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import uk.co.ogauthority.pathfinder.model.form.validation.MandatoryUploadValidation;
 
 public abstract class UploadMultipleFilesWithDescriptionForm {

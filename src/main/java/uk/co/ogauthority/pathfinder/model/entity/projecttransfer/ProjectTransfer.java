@@ -1,12 +1,12 @@
 package uk.co.ogauthority.pathfinder.model.entity.projecttransfer;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationUnit;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;

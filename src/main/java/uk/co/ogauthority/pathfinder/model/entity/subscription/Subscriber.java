@@ -1,17 +1,18 @@
 package uk.co.ogauthority.pathfinder.model.entity.subscription;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import uk.co.ogauthority.pathfinder.model.enums.subscription.RelationToPathfinder;
 
 @Entity
@@ -22,8 +23,7 @@ public class Subscriber {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @GeneratedValue
-  @Type(type = "uuid-char")
+  @JdbcTypeCode(SqlTypes.VARCHAR)
   @Column(name = "uuid", updatable = false, nullable = false)
   private UUID uuid;
 

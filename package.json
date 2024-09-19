@@ -12,12 +12,14 @@
   "devDependencies": {
     "@babel/core": "^7.4.4",
     "@babel/preset-env": "^7.4.4",
+    "@wdio/cli": "^8.29.1",
     "autoprefixer": "^9.4.2",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
     "gulp-postcss": "^8.0.0",
     "gulp-rename": "^1.4.0",
-    "gulp-sass": "^4.0.2",
-    "gulp-sourcemaps": "^2.6.4"
+    "gulp-sass": "^5.1.0",
+    "gulp-sourcemaps": "^2.6.4",
+    "sass": "^1.70.0"
   }
 }

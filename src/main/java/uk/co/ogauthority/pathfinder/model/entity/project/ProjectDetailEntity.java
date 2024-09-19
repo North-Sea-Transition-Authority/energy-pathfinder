@@ -1,12 +1,12 @@
 package uk.co.ogauthority.pathfinder.model.entity.project;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MappedSuperclass;
 import java.util.Objects;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
 import uk.co.ogauthority.pathfinder.service.entityduplication.ChildEntity;
 
 @MappedSuperclass

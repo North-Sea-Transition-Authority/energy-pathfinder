@@ -40,7 +40,7 @@ class CommissionedWellFormValidatorTest {
     commissionedWellFormValidator = new CommissionedWellFormValidator(
         minMaxDateInputValidator
     );
-    doCallRealMethod().when(minMaxDateInputValidator).validate(any(), any(), any());
+    doCallRealMethod().when(minMaxDateInputValidator).validate(any(), any(), any(Object[].class));
     when(minMaxDateInputValidator.supports(MinMaxDateInput.class)).thenReturn(true);
   }
 

@@ -2,8 +2,8 @@ package uk.co.ogauthority.pathfinder.controller.project.collaborationopportunite
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import jakarta.validation.Valid;
 import java.util.List;
-import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;

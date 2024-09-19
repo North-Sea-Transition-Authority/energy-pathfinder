@@ -3,9 +3,9 @@ package uk.co.ogauthority.pathfinder.model.form.forminput.contact;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
+import jakarta.validation.Validation;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.Validation;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.validation.BeanPropertyBindingResult;

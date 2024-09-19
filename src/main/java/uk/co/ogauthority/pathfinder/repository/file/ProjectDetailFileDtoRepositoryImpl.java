@@ -1,8 +1,8 @@
 package uk.co.ogauthority.pathfinder.repository.file;
 
+import jakarta.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.List;
-import javax.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileUploadStatus;
@@ -49,7 +49,7 @@ public class ProjectDetailFileDtoRepositoryImpl implements ProjectDetailFileDtoR
         .setParameter("purpose", purpose)
         .setParameter("fileStatus", FileUploadStatus.CURRENT)
         .setParameter("fileLinkStatus", linkStatus)
-        .setParameter("allFileLinkStatus", FileLinkStatus.ALL.toString())
+        .setParameter("allFileLinkStatus", FileLinkStatus.ALL)
         .getResultList();
 
   }
@@ -111,7 +111,7 @@ public class ProjectDetailFileDtoRepositoryImpl implements ProjectDetailFileDtoR
         .setParameter("fileId", fileId)
         .setParameter("fileStatusList", fileStatusList)
         .setParameter("fileLinkStatus", linkStatus)
-        .setParameter("allFileLinkStatus", FileLinkStatus.ALL.toString())
+        .setParameter("allFileLinkStatus", FileLinkStatus.ALL)
         .getSingleResult();
   }
 

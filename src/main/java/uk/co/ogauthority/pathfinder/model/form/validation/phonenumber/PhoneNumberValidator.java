@@ -2,8 +2,8 @@ package uk.co.ogauthority.pathfinder.model.form.validation.phonenumber;
 
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * If a value is provided ensure it is a valid UK phone number.

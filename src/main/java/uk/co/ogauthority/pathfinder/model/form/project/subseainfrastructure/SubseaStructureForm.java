@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaStructureMass;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.validation.subseastructure.SubseaStructureFullValidation;
 

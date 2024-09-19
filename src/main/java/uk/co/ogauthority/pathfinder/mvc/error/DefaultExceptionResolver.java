@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.mvc.error;
 
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 import org.apache.catalina.connector.ClientAbortException;
 import org.slf4j.Logger;

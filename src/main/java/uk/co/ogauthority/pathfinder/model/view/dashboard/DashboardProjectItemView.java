@@ -5,6 +5,8 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 
 public class DashboardProjectItemView {
 
+  private Integer projectId;
+
   private String projectTitle;
 
   private String operatorName;
@@ -17,18 +19,28 @@ public class DashboardProjectItemView {
 
   private ProjectType projectType;
 
-  public DashboardProjectItemView(String projectTitle,
+  public DashboardProjectItemView(Integer projectId,
+                                  String projectTitle,
                                   String operatorName,
                                   String status,
                                   boolean updateRequested,
                                   String updateDeadlineDate,
                                   ProjectType projectType) {
+    this.projectId = projectId;
     this.projectTitle = projectTitle;
     this.operatorName = operatorName;
     this.status = status;
     this.updateRequested = updateRequested;
     this.updateDeadlineDate = updateDeadlineDate;
     this.projectType = projectType;
+  }
+
+  public Integer getProjectId() {
+    return projectId;
+  }
+
+  public void setProjectId(Integer projectId) {
+    this.projectId = projectId;
   }
 
   public String getProjectTitle() {
@@ -90,7 +102,8 @@ public class DashboardProjectItemView {
       return false;
     }
     DashboardProjectItemView that = (DashboardProjectItemView) o;
-    return Objects.equals(projectTitle, that.projectTitle)
+    return Objects.equals(projectId, that.projectId)
+        && Objects.equals(projectTitle, that.projectTitle)
         && Objects.equals(operatorName, that.operatorName)
         && Objects.equals(status, that.status)
         && Objects.equals(updateRequested, that.updateRequested)
@@ -101,6 +114,7 @@ public class DashboardProjectItemView {
   @Override
   public int hashCode() {
     return Objects.hash(
+        projectId,
         projectTitle,
         operatorName,
         status,

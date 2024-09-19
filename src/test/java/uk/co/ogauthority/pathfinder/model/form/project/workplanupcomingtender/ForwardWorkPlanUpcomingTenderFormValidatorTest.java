@@ -42,7 +42,7 @@ public class ForwardWorkPlanUpcomingTenderFormValidatorTest {
   @Before
   public void setUp() {
     validator = new ForwardWorkPlanUpcomingTenderFormValidator(quarterYearInputValidator);
-    doCallRealMethod().when(quarterYearInputValidator).validate(any(), any(), any());
+    doCallRealMethod().when(quarterYearInputValidator).validate(any(), any(), any(Object[].class));
     when(quarterYearInputValidator.supports(any())).thenReturn(true);
   }
 

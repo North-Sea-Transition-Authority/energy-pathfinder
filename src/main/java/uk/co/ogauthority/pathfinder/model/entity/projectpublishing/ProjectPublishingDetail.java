@@ -1,9 +1,9 @@
 package uk.co.ogauthority.pathfinder.model.entity.projectpublishing;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import java.time.Instant;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 

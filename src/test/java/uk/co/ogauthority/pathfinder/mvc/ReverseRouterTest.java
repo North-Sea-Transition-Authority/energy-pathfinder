@@ -10,9 +10,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +24,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest // We need a WebApplicationContext to test the reverse router
+@WebMvcTest(ReverseRouterTest.class) // We need a WebApplicationContext to test the reverse router
 public class ReverseRouterTest extends AbstractControllerTest {
 
   @Before
@@ -92,11 +90,6 @@ public class ReverseRouterTest extends AbstractControllerTest {
         on(TestController.class).testMethod("method_child_id"), Collections.singletonMap("parentId", "map_parent_id"),
         false);
     assertThat(redirect.getViewName()).isEqualTo("redirect:/parent/map_parent_id/child/method_child_id");
-  }
-
-  // Dummy application to stop the @WebMvcTest loading more than it needs
-  @SpringBootApplication
-  public static class TestApplication {
   }
 
   @RequestMapping("/parent/{parentId}")

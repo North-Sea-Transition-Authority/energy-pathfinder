@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.form.validation.positivewholenumber;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * If a value is present ensure it's >= 0.

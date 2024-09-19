@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.form.communication;
 
+import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
-import javax.validation.constraints.NotEmpty;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
 public class OrganisationGroupSelectorForm {

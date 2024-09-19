@@ -44,7 +44,7 @@ public class DecommissionedPipelineFormValidatorTest {
         minMaxDateInputValidator,
         pipelineService
     );
-    doCallRealMethod().when(minMaxDateInputValidator).validate(any(), any(), any());
+    doCallRealMethod().when(minMaxDateInputValidator).validate(any(), any(), any(Object[].class));
     when(minMaxDateInputValidator.supports(any())).thenReturn(true);
     when(pipelineService.isPipelineSelectable(anyInt())).thenReturn(true);
   }

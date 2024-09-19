@@ -5,9 +5,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Set;
-import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

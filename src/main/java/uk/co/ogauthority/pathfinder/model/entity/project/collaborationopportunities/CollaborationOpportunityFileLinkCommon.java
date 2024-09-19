@@ -1,12 +1,12 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.OneToOne;
 import java.util.Objects;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToOne;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.service.file.FileLinkEntity;
 

@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.service.controller;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.TwoFieldDateInput;
 
 public class SubFieldTestForm {

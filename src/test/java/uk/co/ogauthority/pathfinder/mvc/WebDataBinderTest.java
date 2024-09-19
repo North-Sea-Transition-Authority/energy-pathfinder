@@ -29,7 +29,7 @@ import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest
+@WebMvcTest(WebDataBinderTest.class)
 public class WebDataBinderTest extends AbstractControllerTest {
 
   @Autowired

@@ -3,10 +3,10 @@ package uk.co.ogauthority.pathfinder.integration.energyportal.team;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

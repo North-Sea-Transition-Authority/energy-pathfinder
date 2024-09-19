@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.form.project.decommissioningschedule;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissioningschedule.CessationOfProductionDateType;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissioningschedule.DecommissioningStartDateType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;

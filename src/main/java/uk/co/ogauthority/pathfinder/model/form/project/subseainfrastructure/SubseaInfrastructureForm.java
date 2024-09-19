@@ -1,8 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.enums.project.InfrastructureStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;

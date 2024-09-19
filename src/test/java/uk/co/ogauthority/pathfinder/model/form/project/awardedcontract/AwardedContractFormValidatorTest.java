@@ -37,7 +37,7 @@ class AwardedContractFormValidatorTest {
   @BeforeEach
   void setup() {
     awardedContractValidationHint = new AwardedContractValidationHint(ValidationType.FULL);
-    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any());
+    doCallRealMethod().when(dateInputValidator).validate(any(), any(), any(Object[].class));
     when(dateInputValidator.supports(any())).thenReturn(true);
   }
 

@@ -36,7 +36,7 @@ public class SubseaInfrastructureFormValidatorTest {
   @Before
   public void setup() {
     subseaInfrastructureFormValidator = new SubseaInfrastructureFormValidator(minMaxDateInputValidator);
-    doCallRealMethod().when(minMaxDateInputValidator).validate(any(), any(), any());
+    doCallRealMethod().when(minMaxDateInputValidator).validate(any(), any(), any(Object[].class));
     when(minMaxDateInputValidator.supports(any())).thenReturn(true);
   }
 

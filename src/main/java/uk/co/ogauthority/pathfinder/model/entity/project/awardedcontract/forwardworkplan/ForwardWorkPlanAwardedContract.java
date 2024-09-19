@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.forwardworkplan;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.AwardedContractCommon;
 

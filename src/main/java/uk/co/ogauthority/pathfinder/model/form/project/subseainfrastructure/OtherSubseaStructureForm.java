@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.validation.othersubseastructure.OtherSubseaStructureFullValidation;
 import uk.co.ogauthority.pathfinder.model.form.project.subseainfrastructure.validation.othersubseastructure.OtherSubseaStructurePartialValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.lengthrestrictedstring.LengthRestrictedString;

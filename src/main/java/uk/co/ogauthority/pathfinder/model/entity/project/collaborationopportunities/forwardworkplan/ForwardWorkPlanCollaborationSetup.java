@@ -1,8 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.forwardworkplan;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import java.util.Objects;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 

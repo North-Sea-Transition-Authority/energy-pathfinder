@@ -11,6 +11,7 @@ public class DashboardProjectItemViewUtil {
 
   public static DashboardProjectItemView from(DashboardProjectItem dashboardProjectItem) {
     return new DashboardProjectItemView(
+        dashboardProjectItem.getProjectId(),
         dashboardProjectItem.getProjectTitle(),
         dashboardProjectItem.getOperatorName(),
         dashboardProjectItem.getStatus().getDisplayName(),

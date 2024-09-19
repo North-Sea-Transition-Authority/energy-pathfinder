@@ -1,11 +1,11 @@
 package uk.co.ogauthority.pathfinder.model.entity.quarterlystatistics;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.Instant;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import org.hibernate.annotations.Immutable;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;

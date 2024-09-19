@@ -1,9 +1,9 @@
 package uk.co.ogauthority.pathfinder.energyportal.model.entity.team;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
 
 @Embeddable
 class PortalTeamTypeRoleId implements Serializable {

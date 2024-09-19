@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.model.form.projectupdate;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 
 public class RequestUpdateForm {

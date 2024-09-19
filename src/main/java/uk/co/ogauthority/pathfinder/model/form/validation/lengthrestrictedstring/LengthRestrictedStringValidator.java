@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.model.form.validation.lengthrestrictedstring;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 
 public class LengthRestrictedStringValidator implements ConstraintValidator<LengthRestrictedString, String> {
