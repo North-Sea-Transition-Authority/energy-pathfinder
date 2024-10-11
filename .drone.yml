@@ -16,6 +16,7 @@ steps:
         # the GRADLE_USER_HOME environment variable pointing here.
         - ./gradle_cache
         - ./sonar_cache
+        - ./trivy_cache
 
   - name: fetch-fds-submodule
     image: alpine/git:v2.26.2
@@ -122,13 +123,11 @@ steps:
     volumes:
       - name: docker-sock
         path: /var/run/docker.sock
-      - name: drone-trivy-cache
-        path: /root/trivy-cache
       - name: webfiles
         path: /var/webfiles
     commands:
       # timeout set as initial cache population can seemingly take a while sometimes
-      - trivy image --timeout 30m --exit-code 1 quay.io/fivium/pathfinder:trivy-scan-target
+      - trivy --cache-dir /drone/src/trivy_cache image --timeout 30m --exit-code 1 quay.io/fivium/pathfinder:trivy-scan-target
     when:
       status:
         - success
@@ -155,6 +154,7 @@ steps:
         - ./node_modules
         - ./gradle_cache
         - ./sonar_cache
+        - ./trivy_cache
 
   - name: slack
     image: plugins/slack:linux-amd64
@@ -188,10 +188,6 @@ volumes:
   - name: docker-sock
     host:
       path: /var/run/docker.sock
-
-  - name: drone-trivy-cache
-    host:
-      path: /root/.cache/
 
 ---
 kind: pipeline
