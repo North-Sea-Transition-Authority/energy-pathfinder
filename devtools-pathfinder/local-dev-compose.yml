@@ -36,3 +36,13 @@ services:
       JAVA_OPTS: -Xms1024m -Xmx1024m -Duser.country=GB
       LANG: en_GB.UTF-8
       NLS_LANG: ENGLISH_UNITED KINGDOM.AL32UTF8
+
+  minio:
+    image: bitnami/minio:latest
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+      MINIO_DEFAULT_BUCKETS: energy-pathfinder-public-data

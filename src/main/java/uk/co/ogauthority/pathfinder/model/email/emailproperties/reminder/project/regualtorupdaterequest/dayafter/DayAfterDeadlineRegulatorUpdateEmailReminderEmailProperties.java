@@ -14,7 +14,7 @@ public class DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties extends
 
   public DayAfterDeadlineRegulatorUpdateEmailReminderEmailProperties(String regulatorUpdateReason,
                                                                      String projectUrl) {
-    this (
+    this(
         regulatorUpdateReason,
         projectUrl,
         RegulatorUpdateRequestReminderEmailProperties.DEFAULT_UPDATE_REMINDER_SUBJECT_TEXT,

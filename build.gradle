@@ -71,6 +71,9 @@ dependencies {
   }
   implementation group: 'com.googlecode.libphonenumber', name: 'libphonenumber', version: '8.12.8'
   implementation group: 'fi.solita.clamav', name: 'clamav-client', version: '1.0.1'
+  implementation 'software.amazon.awssdk:s3:2.28.13'
+  implementation 'net.javacrumbs.shedlock:shedlock-spring:5.16.0'
+  implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.16.0'
 
   annotationProcessor("org.hibernate.orm:hibernate-jpamodelgen")
   annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
@@ -91,7 +94,7 @@ test {
 
 checkstyle {
   config = rootProject.resources.text.fromFile('ide/checkstyle.xml')
-  toolVersion '8.28'
+  toolVersion '10.18.1'
   ignoreFailures = false
   maxWarnings = 0
 }

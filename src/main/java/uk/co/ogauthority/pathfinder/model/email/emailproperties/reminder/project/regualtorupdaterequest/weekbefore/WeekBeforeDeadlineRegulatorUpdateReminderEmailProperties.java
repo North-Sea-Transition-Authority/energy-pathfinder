@@ -14,7 +14,7 @@ public class WeekBeforeDeadlineRegulatorUpdateReminderEmailProperties extends Re
   public WeekBeforeDeadlineRegulatorUpdateReminderEmailProperties(String formattedDeadlineDate,
                                                                   String regulatorUpdateReason,
                                                                   String projectUrl) {
-    this (
+    this(
         formattedDeadlineDate,
         regulatorUpdateReason,
         projectUrl,
