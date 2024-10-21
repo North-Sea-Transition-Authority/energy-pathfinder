@@ -1,3 +1,6 @@
+# org.springframework:spring-context
+CVE-2024-38820
+
 # org.springframework.security:spring-security-core
 CVE-2024-38810
 

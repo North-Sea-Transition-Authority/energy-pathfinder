@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 
 @ExtendWith(MockitoExtension.class)
 class PublicDataJsonServiceTest {
@@ -22,7 +21,7 @@ class PublicDataJsonServiceTest {
 
   @Test
   void getPublicDataJson() {
-    var infrastructureProjectJsons = List.of(new InfrastructureProjectJson(1, ProjectStatus.PUBLISHED, 1));
+    var infrastructureProjectJsons = List.of(InfrastructureProjectJsonTestUtil.newBuilder().build());
 
     when(infrastructureProjectJsonService.getPublishedInfrastructureProjects()).thenReturn(infrastructureProjectJsons);
 

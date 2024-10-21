@@ -73,6 +73,24 @@ public class LicenceBlockTestUtil {
     );
   }
 
+  public static ProjectLocationBlock getProjectLocationBlock(
+      ProjectLocation location,
+      String blockReference,
+      String quadrantNumber,
+      String blockNumber,
+      String blockSuffix
+  ) {
+    return new ProjectLocationBlock(
+        location,
+        PLM_ID,
+        blockReference,
+        blockNumber,
+        quadrantNumber,
+        blockSuffix,
+        BLOCK_LOCATION
+    );
+  }
+
   public static ProjectLocationBlock getProjectLocationBlock(ProjectLocation location, LicenceBlock licenceBlock) {
     return new ProjectLocationBlock(
         location,
