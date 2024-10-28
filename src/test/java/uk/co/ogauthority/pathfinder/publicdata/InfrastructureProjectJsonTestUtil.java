@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.publicdata;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 class InfrastructureProjectJsonTestUtil {
@@ -31,7 +31,7 @@ class InfrastructureProjectJsonTestUtil {
     private String ukcsArea = "CNS";
     private Integer maximumWaterDepthMeters = 60;
     private List<String> licenceBlocks = List.of("12/34, 12/56");
-    private Instant submittedOn = Instant.now();
+    private LocalDateTime submittedOn = LocalDateTime.now();
 
     Builder withId(Integer id) {
       this.id = id;
@@ -118,7 +118,7 @@ class InfrastructureProjectJsonTestUtil {
       return this;
     }
 
-    Builder withSubmittedOn(Instant submittedOn) {
+    Builder withSubmittedOn(LocalDateTime submittedOn) {
       this.submittedOn = submittedOn;
       return this;
     }

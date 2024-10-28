@@ -2,6 +2,8 @@ package uk.co.ogauthority.pathfinder.publicdata;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,7 +26,7 @@ class InfrastructureProjectJsonTest {
 
   @Test
   void from() {
-    var projectDetail = ProjectUtil.getProjectDetails();
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
 
@@ -52,7 +54,7 @@ class InfrastructureProjectJsonTest {
         projectLocation.getField().getUkcsArea().name(),
         projectLocation.getMaximumWaterDepth(),
         List.of(),
-        projectDetail.getSubmittedInstant()
+        LocalDateTime.ofInstant(projectDetail.getSubmittedInstant(), ZoneId.systemDefault())
     );
 
     assertThat(
@@ -68,7 +70,7 @@ class InfrastructureProjectJsonTest {
 
   @Test
   void from_publishedAsOperatorIsFalse() {
-    var projectDetail = ProjectUtil.getProjectDetails();
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
     projectOperator.setIsPublishedAsOperator(false);
@@ -94,7 +96,7 @@ class InfrastructureProjectJsonTest {
   @NullSource
   @ValueSource(booleans = true)
   void from_publishedAsOperatorIsNullOrTrue(Boolean publishedAsOperator) {
-    var projectDetail = ProjectUtil.getProjectDetails();
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
     projectOperator.setIsPublishedAsOperator(publishedAsOperator);
@@ -118,7 +120,7 @@ class InfrastructureProjectJsonTest {
 
   @Test
   void from_fieldStageSubCategoryIsNull() {
-    var projectDetail = ProjectUtil.getProjectDetails();
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
 
@@ -138,7 +140,7 @@ class InfrastructureProjectJsonTest {
 
   @Test
   void from_fieldStageSubCategoryIsNotNull() {
-    var projectDetail = ProjectUtil.getProjectDetails();
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
 
@@ -159,7 +161,7 @@ class InfrastructureProjectJsonTest {
 
   @Test
   void from_firstProductionDateQuarterIsNull() {
-    var projectDetail = ProjectUtil.getProjectDetails();
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
 
@@ -179,7 +181,7 @@ class InfrastructureProjectJsonTest {
 
   @Test
   void from_firstProductionDateQuarterIsNotNull() {
-    var projectDetail = ProjectUtil.getProjectDetails();
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
 
@@ -199,7 +201,7 @@ class InfrastructureProjectJsonTest {
 
   @Test
   void from_projectLocationIsNull() {
-    var projectDetail = ProjectUtil.getProjectDetails();
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
 
@@ -232,7 +234,7 @@ class InfrastructureProjectJsonTest {
 
   @Test
   void from_projectLocationIsNotNull() {
-    var projectDetail = ProjectUtil.getProjectDetails();
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
 
@@ -272,7 +274,7 @@ class InfrastructureProjectJsonTest {
 
   @Test
   void from_projectLocationIsNotNullAndUkcsAreaIsNull() {
-    var projectDetail = ProjectUtil.getProjectDetails();
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
 
@@ -296,7 +298,7 @@ class InfrastructureProjectJsonTest {
 
   @Test
   void from_projectLocationIsNotNullAndUkcsAreaIsNotNull() {
-    var projectDetail = ProjectUtil.getProjectDetails();
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
 
@@ -320,7 +322,7 @@ class InfrastructureProjectJsonTest {
 
   @Test
   void from_projectLocationIsNotNullAndProjectLocationBlocksIsNull() {
-    var projectDetail = ProjectUtil.getProjectDetails();
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
 
@@ -341,7 +343,7 @@ class InfrastructureProjectJsonTest {
 
   @Test
   void from_projectLocationIsNotNullAndLicenceBlocksIsNotNull() {
-    var projectDetail = ProjectUtil.getProjectDetails();
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
 

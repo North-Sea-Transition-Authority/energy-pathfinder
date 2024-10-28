@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.publicdata;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.lang3.BooleanUtils;
@@ -28,7 +29,7 @@ record InfrastructureProjectJson(
     String ukcsArea,
     Integer maximumWaterDepthMeters,
     List<String> licenceBlocks,
-    Instant submittedOn
+    LocalDateTime submittedOn
 ) {
 
   static InfrastructureProjectJson from(
@@ -90,7 +91,7 @@ record InfrastructureProjectJson(
       }
     }
 
-    var submittedOn = projectDetail.getSubmittedInstant();
+    var submittedOn = LocalDateTime.ofInstant(projectDetail.getSubmittedInstant(), ZoneId.systemDefault());
 
     return new InfrastructureProjectJson(
         id,

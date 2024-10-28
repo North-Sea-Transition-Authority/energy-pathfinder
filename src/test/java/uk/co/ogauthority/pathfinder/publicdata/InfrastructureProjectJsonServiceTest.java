@@ -10,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
-import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
@@ -47,15 +46,15 @@ class InfrastructureProjectJsonServiceTest {
 
   @Test
   void getPublishedInfrastructureProjects() {
-    var projectDetail1 = ProjectUtil.getProjectDetails(ProjectStatus.PUBLISHED);
+    var projectDetail1 = ProjectUtil.getPublishedProjectDetails();
     projectDetail1.setId(1);
     projectDetail1.getProject().setId(2);
 
-    var projectDetail2 = ProjectUtil.getProjectDetails(ProjectStatus.PUBLISHED);
+    var projectDetail2 = ProjectUtil.getPublishedProjectDetails();
     projectDetail2.setId(3);
     projectDetail2.getProject().setId(4);
 
-    var projectDetail3 = ProjectUtil.getProjectDetails(ProjectStatus.PUBLISHED);
+    var projectDetail3 = ProjectUtil.getPublishedProjectDetails();
     projectDetail2.setId(5);
     projectDetail2.getProject().setId(6);
 
