@@ -5,11 +5,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static uk.co.ogauthority.pathfinder.publicdata.PublicDataS3Service.PUBLIC_DATA_JSON_FILE_KEY;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.micrometer.core.instrument.util.IOUtils;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Resources;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +17,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -29,8 +31,6 @@ class PublicDataS3ServiceTest {
 
   private final String s3Bucket = "test-s3-bucket";
 
-  private final ObjectMapper objectMapper = new ObjectMapper();
-
   private PublicDataS3Service publicDataS3Service;
 
   @BeforeEach
@@ -40,14 +40,13 @@ class PublicDataS3ServiceTest {
             new PublicDataConfigurationProperties.S3(null, null, null, null, s3Bucket),
             null
         ),
-        s3Client,
-        objectMapper
+        s3Client
     );
   }
 
   @Test
-  void uploadPublicDataJsonFile() throws JsonProcessingException {
-    var publicDataJson = new PublicDataJson(List.of());
+  void uploadPublicDataJsonFile() throws IOException {
+    var publicDataJson = PublicDataJsonTestUtil.newBuilder().build();
 
     publicDataS3Service.uploadPublicDataJsonFile(publicDataJson);
 
@@ -64,9 +63,12 @@ class PublicDataS3ServiceTest {
         requestBodyCaptor.capture()
     );
 
-    assertThat(requestBodyCaptor.getValue())
-        .isNotNull()
-        .extracting(requestBody -> IOUtils.toString(requestBody.contentStreamProvider().newStream(), StandardCharsets.UTF_8))
-        .isEqualTo(objectMapper.writeValueAsString(publicDataJson));
+    var requestBody = requestBodyCaptor.getValue();
+    assertThat(requestBody).isNotNull();
+
+    var requestBodyJson = CharStreams.toString(new InputStreamReader(requestBody.contentStreamProvider().newStream(), Charsets.UTF_8));
+    var expectedJson = Resources.toString(Resources.getResource("test-public-data.json"), Charsets.UTF_8);
+
+    JSONAssert.assertEquals(requestBodyJson, expectedJson, JSONCompareMode.STRICT);
   }
 }

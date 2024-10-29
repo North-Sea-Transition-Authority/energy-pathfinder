@@ -3,7 +3,6 @@ package uk.co.ogauthority.pathfinder.publicdata;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
 import net.javacrumbs.shedlock.core.LockAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +26,7 @@ class PublicDataUploadServiceTest {
   void uploadPublicDataJsonFile() {
     LockAssert.TestHelper.makeAllAssertsPass(true);
 
-    var publicDataJson = new PublicDataJson(List.of());
+    var publicDataJson = PublicDataJsonTestUtil.newBuilder().build();
 
     when(publicDataJsonService.getPublicDataJson()).thenReturn(publicDataJson);
 

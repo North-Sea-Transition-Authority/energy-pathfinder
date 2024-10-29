@@ -84,7 +84,8 @@ dependencies {
       'org.springframework.security:spring-security-test',
       'com.squareup.okhttp3:mockwebserver:4.9.1',
       'com.squareup.okhttp3:okhttp:4.9.1', // Required otherwise MockWebServer gives ClassNotFoundException
-      'org.junit.vintage:junit-vintage-engine'
+      'org.junit.vintage:junit-vintage-engine',
+      'org.skyscreamer:jsonassert'
   )
 }
 

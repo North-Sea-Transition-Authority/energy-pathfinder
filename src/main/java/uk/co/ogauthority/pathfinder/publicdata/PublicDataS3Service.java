@@ -1,6 +1,10 @@
 package uk.co.ogauthority.pathfinder.publicdata;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +19,8 @@ class PublicDataS3Service {
   static final String PUBLIC_DATA_JSON_FILE_KEY = "public-data.json";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PublicDataS3Service.class);
+  private static final DateTimeFormatter LOCAL_DATE_TIME_DATE_TIME_FORMATTER =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
   private final PublicDataConfigurationProperties publicDataConfigurationProperties;
   private final S3Client s3Client;
@@ -22,12 +28,16 @@ class PublicDataS3Service {
 
   PublicDataS3Service(
       PublicDataConfigurationProperties publicDataConfigurationProperties,
-      S3Client s3Client,
-      ObjectMapper objectMapper
+      S3Client s3Client
   ) {
     this.publicDataConfigurationProperties = publicDataConfigurationProperties;
     this.s3Client = s3Client;
-    this.objectMapper = objectMapper;
+
+    // The EPSCI frontend expects dates to be in yyyy-MM-dd'T'HH:mm:ss format. The default Spring ObjectMapper includes fractions
+    // of seconds, so you end up with serialized values like 2023-04-27T15:38:53.509414 which do not work with the frontend.
+    this.objectMapper = new ObjectMapper()
+        .registerModule(new SimpleModule()
+            .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(LOCAL_DATE_TIME_DATE_TIME_FORMATTER)));
   }
 
   void uploadPublicDataJsonFile(PublicDataJson publicDataJson) {

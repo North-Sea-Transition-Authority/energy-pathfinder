@@ -31,7 +31,7 @@ class InfrastructureProjectJsonTestUtil {
     private String ukcsArea = "CNS";
     private Integer maximumWaterDepthMeters = 60;
     private List<String> licenceBlocks = List.of("12/34, 12/56");
-    private LocalDateTime submittedOn = LocalDateTime.now();
+    private LocalDateTime submittedOn = LocalDateTime.of(2024, 10, 29, 11, 20, 38, 424521789);
 
     Builder withId(Integer id) {
       this.id = id;

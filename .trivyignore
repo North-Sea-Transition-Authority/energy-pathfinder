@@ -4,6 +4,9 @@ CVE-2024-38820
 # org.springframework.security:spring-security-core
 CVE-2024-38810
 
+# org.springframework.security:spring-security-web
+CVE-2024-38821
+
 # org.springframework:spring-web
 CVE-2024-38809
 
