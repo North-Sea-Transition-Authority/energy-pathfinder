@@ -58,26 +58,48 @@ class InfrastructureProjectJsonServiceTest {
     projectDetail2.setId(5);
     projectDetail2.getProject().setId(6);
 
+    var projectDetail4 = ProjectUtil.getPublishedProjectDetails();
+    projectDetail4.setId(7);
+    projectDetail4.getProject().setId(8);
+
+    var projectDetail5 = ProjectUtil.getPublishedProjectDetails();
+    projectDetail5.setId(9);
+    projectDetail5.getProject().setId(10);
+
     var projectOperator1 = ProjectOperatorTestUtil.getOperator(projectDetail1);
     projectOperator1.setOrganisationGroup(
-        TeamTestingUtil.generateOrganisationGroup(7, "Org Grp 1", "OrgGrp1"));
+        TeamTestingUtil.generateOrganisationGroup(11, "A Org Grp", "AOrgGrp"));
 
     var projectOperator2 = ProjectOperatorTestUtil.getOperator(projectDetail2);
     projectOperator2.setOrganisationGroup(
-        TeamTestingUtil.generateOrganisationGroup(8, "Org Grp 2", "OrgGrp2"));
+        TeamTestingUtil.generateOrganisationGroup(12, "b Org Grp", "brgGrp"));
 
     var projectOperator3 = ProjectOperatorTestUtil.getOperator(projectDetail3);
     projectOperator3.setOrganisationGroup(
-        TeamTestingUtil.generateOrganisationGroup(9, "Org Grp 3", "OrgGrp3"));
+        TeamTestingUtil.generateOrganisationGroup(13, "C Org Grp", "COrgGrp"));
+
+    var projectOperator4 = ProjectOperatorTestUtil.getOperator(projectDetail4);
+    projectOperator4.setOrganisationGroup(
+        TeamTestingUtil.generateOrganisationGroup(14, "C Org Grp", "COrgGrp"));
+
+    var projectOperator5 = ProjectOperatorTestUtil.getOperator(projectDetail5);
+    projectOperator5.setOrganisationGroup(
+        TeamTestingUtil.generateOrganisationGroup(15, "C Org Grp", "COrgGrp"));
 
     var projectInformation1 = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail1);
-    projectInformation1.setProjectTitle("A project");
+    projectInformation1.setProjectTitle("d project");
 
     var projectInformation2 = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail2);
-    projectInformation2.setProjectTitle("b project");
+    projectInformation2.setProjectTitle("E project");
 
     var projectInformation3 = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail3);
-    projectInformation3.setProjectTitle("C project");
+    projectInformation3.setProjectTitle("A project");
+
+    var projectInformation4 = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail4);
+    projectInformation4.setProjectTitle("b project");
+
+    var projectInformation5 = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail5);
+    projectInformation5.setProjectTitle("C project");
 
     var projectLocation1 = ProjectLocationTestUtil.getProjectLocation(projectDetail1);
     projectLocation1.setFieldType(FieldType.OIL);
@@ -94,11 +116,20 @@ class InfrastructureProjectJsonServiceTest {
     var projectLocationBlock4 = LicenceBlockTestUtil.getProjectLocationBlock(projectLocation2, "18/93");
 
     when(projectDetailsRepository.getAllPublishedProjectDetailsByProjectType(ProjectType.INFRASTRUCTURE))
-        .thenReturn(List.of(projectDetail2, projectDetail3, projectDetail1));
+        .thenReturn(List.of(projectDetail2, projectDetail4, projectDetail3, projectDetail1, projectDetail5));
 
-    when(projectOperatorRepository.findAll()).thenReturn(List.of(projectOperator1, projectOperator2, projectOperator3));
+    when(projectOperatorRepository.findAll())
+        .thenReturn(List.of(projectOperator1, projectOperator2, projectOperator3, projectOperator4, projectOperator5));
 
-    when(projectInformationRepository.findAll()).thenReturn(List.of(projectInformation1, projectInformation2, projectInformation3));
+    when(projectInformationRepository.findAll()).thenReturn(
+        List.of(
+            projectInformation1,
+            projectInformation2,
+            projectInformation3,
+            projectInformation4,
+            projectInformation5
+        )
+    );
 
     when(projectLocationRepository.findAll()).thenReturn(List.of(projectLocation1, projectLocation2, projectLocation3));
 
@@ -125,6 +156,20 @@ class InfrastructureProjectJsonServiceTest {
             projectOperator3,
             projectInformation3,
             projectLocation3,
+            null
+        ),
+        InfrastructureProjectJson.from(
+            projectDetail4,
+            projectOperator4,
+            projectInformation4,
+            null,
+            null
+        ),
+        InfrastructureProjectJson.from(
+            projectDetail5,
+            projectOperator5,
+            projectInformation5,
+            null,
             null
         )
     );

@@ -16,6 +16,11 @@ import uk.co.ogauthority.pathfinder.repository.project.projectinformation.Projec
 @Service
 class InfrastructureProjectJsonService {
 
+  private static final Comparator<InfrastructureProjectJson> INFRASTRUCTURE_PROJECT_JSON_COMPARATOR =
+      Comparator.<InfrastructureProjectJson, String>
+              comparing(infrastructureProjectJson -> infrastructureProjectJson.operatorName().toLowerCase())
+          .thenComparing(infrastructureProjectJson -> infrastructureProjectJson.title().toLowerCase());
+
   private final ProjectDetailsRepository projectDetailsRepository;
   private final ProjectOperatorRepository projectOperatorRepository;
   private final ProjectInformationRepository projectInformationRepository;
@@ -64,7 +69,7 @@ class InfrastructureProjectJsonService {
                 projectLocationBlocksByProjectDetailId.get(projectDetail.getId())
             )
         )
-        .sorted(Comparator.comparing(infrastructureProjectJson -> infrastructureProjectJson.title().toLowerCase()))
+        .sorted(INFRASTRUCTURE_PROJECT_JSON_COMPARATOR)
         .toList();
   }
 }
