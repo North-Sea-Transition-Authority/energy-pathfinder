@@ -18,8 +18,8 @@ class InfrastructureProjectJsonService {
 
   private static final Comparator<InfrastructureProjectJson> INFRASTRUCTURE_PROJECT_JSON_COMPARATOR =
       Comparator.<InfrastructureProjectJson, String>
-              comparing(infrastructureProjectJson -> infrastructureProjectJson.operatorName().toLowerCase())
-          .thenComparing(infrastructureProjectJson -> infrastructureProjectJson.title().toLowerCase());
+              comparing(infrastructureProjectJson -> infrastructureProjectJson.details().operatorName().toLowerCase())
+          .thenComparing(infrastructureProjectJson -> infrastructureProjectJson.details().title().toLowerCase());
 
   private final ProjectDetailsRepository projectDetailsRepository;
   private final ProjectOperatorRepository projectOperatorRepository;

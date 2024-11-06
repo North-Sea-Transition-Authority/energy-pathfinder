@@ -136,6 +136,8 @@ class InfrastructureProjectJsonServiceTest {
     when(projectLocationBlockRepository.findAll())
         .thenReturn(List.of(projectLocationBlock1, projectLocationBlock2, projectLocationBlock3, projectLocationBlock4));
 
+    var infrastructureProjectJsons = infrastructureProjectJsonService.getPublishedInfrastructureProjects();
+
     var expectedInfrastructureProjectJsons = List.of(
         InfrastructureProjectJson.from(
             projectDetail1,
@@ -174,7 +176,6 @@ class InfrastructureProjectJsonServiceTest {
         )
     );
 
-    assertThat(infrastructureProjectJsonService.getPublishedInfrastructureProjects())
-        .isEqualTo(expectedInfrastructureProjectJsons);
+    assertThat(infrastructureProjectJsons).isEqualTo(expectedInfrastructureProjectJsons);
   }
 }

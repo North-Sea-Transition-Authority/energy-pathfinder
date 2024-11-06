@@ -2,46 +2,62 @@
   "infrastructureProjects": [
     {
       "id": 1,
-      "operatorName": "BP",
-      "title": "Test project",
-      "summary": "Test summary",
-      "fieldStage": "DECOMMISSIONING",
-      "fieldStageSubCategory": null,
-      "contactName": "Test contact name",
-      "contactPhoneNumber": "01303 123 456",
-      "contactJobTitle": "Test contact job title",
-      "contactEmailAddress": "test@email.address",
+      "details": {
+        "operatorName": "BP",
+        "title": "Test project",
+        "summary": "Test summary",
+        "projectStage": "DECOMMISSIONING",
+        "projectStageSubCategory": null
+      },
+      "contact": {
+        "name": "Test contact name",
+        "phoneNumber": "01303 123 456",
+        "jobTitle": "Test contact job title",
+        "emailAddress": "test@email.address"
+      },
       "firstProductionDateQuarter": null,
       "firstProductionDateYear": null,
-      "fieldName": "MERCURY",
-      "fieldType": "CARBON_STORAGE",
-      "ukcsArea": "CNS",
-      "maximumWaterDepthMeters": 60,
-      "licenceBlocks": [
-        "12/34, 12/56"
-      ],
+      "location": {
+        "field": {
+          "fieldName": "MERCURY",
+          "fieldType": "CARBON_STORAGE",
+          "ukcsArea": "CNS"
+        },
+        "maximumWaterDepthMeters": 60,
+        "licenceBlocks": [
+          "12/34, 12/56"
+        ]
+      },
       "submittedOn": "2024-10-29T11:20:38"
     },
     {
       "id": 2,
-      "operatorName": "BP",
-      "title": "Test project",
-      "summary": "Test summary",
-      "fieldStage": "DECOMMISSIONING",
-      "fieldStageSubCategory": null,
-      "contactName": "Test contact name",
-      "contactPhoneNumber": "01303 123 456",
-      "contactJobTitle": "Test contact job title",
-      "contactEmailAddress": "test@email.address",
+      "details": {
+        "operatorName": "BP",
+        "title": "Test project",
+        "summary": "Test summary",
+        "projectStage": "DECOMMISSIONING",
+        "projectStageSubCategory": null
+      },
+      "contact": {
+        "name": "Test contact name",
+        "phoneNumber": "01303 123 456",
+        "jobTitle": "Test contact job title",
+        "emailAddress": "test@email.address"
+      },
       "firstProductionDateQuarter": null,
       "firstProductionDateYear": null,
-      "fieldName": "MERCURY",
-      "fieldType": "CARBON_STORAGE",
-      "ukcsArea": "CNS",
-      "maximumWaterDepthMeters": 60,
-      "licenceBlocks": [
-        "12/34, 12/56"
-      ],
+      "location": {
+        "field": {
+          "fieldName": "MERCURY",
+          "fieldType": "CARBON_STORAGE",
+          "ukcsArea": "CNS"
+        },
+        "maximumWaterDepthMeters": 60,
+        "licenceBlocks": [
+          "12/34, 12/56"
+        ]
+      },
       "submittedOn": "2024-10-29T11:20:38"
     }
   ]

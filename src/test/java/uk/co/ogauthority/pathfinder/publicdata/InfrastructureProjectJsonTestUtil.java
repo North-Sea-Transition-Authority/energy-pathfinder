@@ -1,7 +1,6 @@
 package uk.co.ogauthority.pathfinder.publicdata;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 class InfrastructureProjectJsonTestUtil {
 
@@ -15,22 +14,11 @@ class InfrastructureProjectJsonTestUtil {
     }
 
     private Integer id = 1;
-    private String operatorName = "BP";
-    private String title = "Test project";
-    private String summary = "Test summary";
-    private String fieldStage = "DECOMMISSIONING";
-    private String fieldStageSubCategory;
-    private String contactName = "Test contact name";
-    private String contactPhoneNumber = "01303 123 456";
-    private String contactJobTitle = "Test contact job title";
-    private String contactEmailAddress = "test@email.address";
+    private InfrastructureProjectDetailsJson details = InfrastructureProjectDetailsJsonTestUtil.newBuilder().build();
+    private ContactJson contact = ContactJsonTestUtil.newBuilder().build();
     private String firstProductionDateQuarter;
     private Integer firstProductionDateYear;
-    private String fieldName = "MERCURY";
-    private String fieldType = "CARBON_STORAGE";
-    private String ukcsArea = "CNS";
-    private Integer maximumWaterDepthMeters = 60;
-    private List<String> licenceBlocks = List.of("12/34, 12/56");
+    private InfrastructureProjectLocationJson location = InfrastructureProjectLocationJsonTestUtil.newBuilder().build();
     private LocalDateTime submittedOn = LocalDateTime.of(2024, 10, 29, 11, 20, 38, 424521789);
 
     Builder withId(Integer id) {
@@ -38,48 +26,13 @@ class InfrastructureProjectJsonTestUtil {
       return this;
     }
 
-    Builder withOperatorName(String operatorName) {
-      this.operatorName = operatorName;
+    Builder withDetails(InfrastructureProjectDetailsJson details) {
+      this.details = details;
       return this;
     }
 
-    Builder withTitle(String title) {
-      this.title = title;
-      return this;
-    }
-
-    Builder withSummary(String summary) {
-      this.summary = summary;
-      return this;
-    }
-
-    Builder withFieldStage(String fieldStage) {
-      this.fieldStage = fieldStage;
-      return this;
-    }
-
-    Builder withFieldStageSubCategory(String fieldStageSubCategory) {
-      this.fieldStageSubCategory = fieldStageSubCategory;
-      return this;
-    }
-
-    Builder withContactName(String contactName) {
-      this.contactName = contactName;
-      return this;
-    }
-
-    Builder withContactPhoneNumber(String contactPhoneNumber) {
-      this.contactPhoneNumber = contactPhoneNumber;
-      return this;
-    }
-
-    Builder withContactJobTitle(String contactJobTitle) {
-      this.contactJobTitle = contactJobTitle;
-      return this;
-    }
-
-    Builder withContactEmailAddress(String contactEmailAddress) {
-      this.contactEmailAddress = contactEmailAddress;
+    Builder withContact(ContactJson contact) {
+      this.contact = contact;
       return this;
     }
 
@@ -93,28 +46,8 @@ class InfrastructureProjectJsonTestUtil {
       return this;
     }
 
-    Builder withFieldName(String fieldName) {
-      this.fieldName = fieldName;
-      return this;
-    }
-
-    Builder withFieldType(String fieldType) {
-      this.fieldType = fieldType;
-      return this;
-    }
-
-    Builder withUkcsArea(String ukcsArea) {
-      this.ukcsArea = ukcsArea;
-      return this;
-    }
-
-    Builder withMaximumWaterDepthMeters(Integer maximumWaterDepthMeters) {
-      this.maximumWaterDepthMeters = maximumWaterDepthMeters;
-      return this;
-    }
-
-    Builder withLicenceBlocks(List<String> licenceBlocks) {
-      this.licenceBlocks = licenceBlocks;
+    Builder withLocation(InfrastructureProjectLocationJson location) {
+      this.location = location;
       return this;
     }
 
@@ -126,22 +59,11 @@ class InfrastructureProjectJsonTestUtil {
     InfrastructureProjectJson build() {
       return new InfrastructureProjectJson(
           id,
-          operatorName,
-          title,
-          summary,
-          fieldStage,
-          fieldStageSubCategory,
-          contactName,
-          contactPhoneNumber,
-          contactJobTitle,
-          contactEmailAddress,
+          details,
+          contact,
           firstProductionDateQuarter,
           firstProductionDateYear,
-          fieldName,
-          fieldType,
-          ukcsArea,
-          maximumWaterDepthMeters,
-          licenceBlocks,
+          location,
           submittedOn
       );
     }
