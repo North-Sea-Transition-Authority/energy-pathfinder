@@ -12,3 +12,6 @@ CVE-2024-38809
 
 # commons-io:commons-io
 CVE-2024-47554
+
+# io.netty:netty-common
+CVE-2024-47535
