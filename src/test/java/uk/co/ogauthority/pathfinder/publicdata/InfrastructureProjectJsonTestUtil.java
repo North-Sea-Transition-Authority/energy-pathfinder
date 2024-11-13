@@ -16,8 +16,8 @@ class InfrastructureProjectJsonTestUtil {
     private Integer id = 1;
     private InfrastructureProjectDetailsJson details = InfrastructureProjectDetailsJsonTestUtil.newBuilder().build();
     private ContactJson contact = ContactJsonTestUtil.newBuilder().build();
-    private String firstProductionDateQuarter;
-    private Integer firstProductionDateYear;
+    private InfrastructureProjectFirstProductionDateJson firstProductionDate =
+        InfrastructureProjectFirstProductionDateJsonTestUtil.newBuilder().build();
     private InfrastructureProjectLocationJson location = InfrastructureProjectLocationJsonTestUtil.newBuilder().build();
     private LocalDateTime submittedOn = LocalDateTime.of(2024, 10, 29, 11, 20, 38, 424521789);
 
@@ -36,13 +36,8 @@ class InfrastructureProjectJsonTestUtil {
       return this;
     }
 
-    Builder withFirstProductionDateQuarter(String firstProductionDateQuarter) {
-      this.firstProductionDateQuarter = firstProductionDateQuarter;
-      return this;
-    }
-
-    Builder withFirstProductionDateYear(Integer firstProductionDateYear) {
-      this.firstProductionDateYear = firstProductionDateYear;
+    Builder withFirstProductionDate(InfrastructureProjectFirstProductionDateJson firstProductionDate) {
+      this.firstProductionDate = firstProductionDate;
       return this;
     }
 
@@ -61,8 +56,7 @@ class InfrastructureProjectJsonTestUtil {
           id,
           details,
           contact,
-          firstProductionDateQuarter,
-          firstProductionDateYear,
+          firstProductionDate,
           location,
           submittedOn
       );

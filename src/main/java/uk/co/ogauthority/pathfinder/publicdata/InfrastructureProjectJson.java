@@ -13,8 +13,7 @@ record InfrastructureProjectJson(
     Integer id,
     InfrastructureProjectDetailsJson details,
     ContactJson contact,
-    String firstProductionDateQuarter,
-    Integer firstProductionDateYear,
+    InfrastructureProjectFirstProductionDateJson firstProductionDate,
     InfrastructureProjectLocationJson location,
     LocalDateTime submittedOn
 ) {
@@ -32,11 +31,10 @@ record InfrastructureProjectJson(
 
     var contact = ContactJson.from(projectInformation);
 
-    var firstProductionDateQuarter = projectInformation.getFirstProductionDateQuarter() != null
-        ? projectInformation.getFirstProductionDateQuarter().name()
-        : null;
-
-    var firstProductionDateYear = projectInformation.getFirstProductionDateYear();
+    var firstProductionDate =
+        projectInformation.getFirstProductionDateQuarter() != null && projectInformation.getFirstProductionDateYear() != null
+            ? InfrastructureProjectFirstProductionDateJson.from(projectInformation)
+            : null;
 
     var location = projectLocation != null ? InfrastructureProjectLocationJson.from(projectLocation, projectLocationBlocks) : null;
 
@@ -46,8 +44,7 @@ record InfrastructureProjectJson(
         id,
         details,
         contact,
-        firstProductionDateQuarter,
-        firstProductionDateYear,
+        firstProductionDate,
         location,
         submittedOn
     );

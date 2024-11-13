@@ -40,7 +40,6 @@ class InfrastructureProjectJsonTest {
         InfrastructureProjectDetailsJson.from(projectOperator, projectInformation),
         ContactJson.from(projectInformation),
         null,
-        projectInformation.getFirstProductionDateYear(),
         InfrastructureProjectLocationJson.from(projectLocation, projectLocationBlocks),
         LocalDateTime.ofInstant(projectDetail.getSubmittedInstant(), ZoneId.systemDefault())
     );
@@ -49,13 +48,14 @@ class InfrastructureProjectJsonTest {
   }
 
   @Test
-  void from_firstProductionDateQuarterIsNull() {
+  void from_firstProductionDateQuarterAndYearIsNull() {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
 
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
     projectInformation.setFirstProductionDateQuarter(null);
+    projectInformation.setFirstProductionDateYear(null);
 
     var infrastructureProjectJson = InfrastructureProjectJson.from(
         projectDetail,
@@ -65,17 +65,18 @@ class InfrastructureProjectJsonTest {
         null
     );
 
-    assertThat(infrastructureProjectJson.firstProductionDateQuarter()).isNull();
+    assertThat(infrastructureProjectJson.firstProductionDate()).isNull();
   }
 
   @Test
-  void from_firstProductionDateQuarterIsNotNull() {
+  void from_firstProductionDateQuarterAndYearIsNotNull() {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
 
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
     projectInformation.setFirstProductionDateQuarter(Quarter.Q1);
+    projectInformation.setFirstProductionDateYear(2025);
 
     var infrastructureProjectJson = InfrastructureProjectJson.from(
         projectDetail,
@@ -85,7 +86,8 @@ class InfrastructureProjectJsonTest {
         null
     );
 
-    assertThat(infrastructureProjectJson.firstProductionDateQuarter()).isEqualTo(Quarter.Q1.name());
+    assertThat(infrastructureProjectJson.firstProductionDate())
+        .isEqualTo(InfrastructureProjectFirstProductionDateJson.from(projectInformation));
   }
 
   @Test

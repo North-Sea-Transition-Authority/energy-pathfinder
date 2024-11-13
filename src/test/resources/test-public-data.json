@@ -15,8 +15,10 @@
         "jobTitle": "Test contact job title",
         "emailAddress": "test@email.address"
       },
-      "firstProductionDateQuarter": null,
-      "firstProductionDateYear": null,
+      "firstProductionDate": {
+        "quarter": "Q1",
+        "year": 2025
+      },
       "location": {
         "field": {
           "fieldName": "MERCURY",
@@ -45,8 +47,10 @@
         "jobTitle": "Test contact job title",
         "emailAddress": "test@email.address"
       },
-      "firstProductionDateQuarter": null,
-      "firstProductionDateYear": null,
+      "firstProductionDate": {
+        "quarter": "Q1",
+        "year": 2025
+      },
       "location": {
         "field": {
           "fieldName": "MERCURY",
