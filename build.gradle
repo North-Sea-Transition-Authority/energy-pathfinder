@@ -1,5 +1,5 @@
 plugins {
-  id 'org.springframework.boot' version '3.3.4'
+  id 'org.springframework.boot' version '3.3.6'
   id 'io.spring.dependency-management' version '1.1.6'
   id 'java'
   id 'jacoco'
@@ -58,7 +58,7 @@ dependencies {
   implementation 'org.flywaydb:flyway-core:9.5.1-FIVIUM'
   implementation 'com.oracle.database.jdbc:ojdbc11:21.9.0.0'
   implementation 'org.springframework.session:spring-session-jdbc'
-  implementation 'uk.gov.service.notify:notifications-java-client:5.1.0-RELEASE'
+  implementation 'uk.gov.service.notify:notifications-java-client:5.2.1-RELEASE'
   implementation('uk.co.fivium.feedbackmanagementservice:client:2.1.1')
 
   implementation 'com.google.guava:guava:33.2.1-jre'
