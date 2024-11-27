@@ -45,11 +45,16 @@ public abstract class AwardedContractCommon
 
   private Integer addedByOrganisationGroup;
 
-  public AwardedContractCommon() {
+  protected AwardedContractCommon() {
 
   }
 
-  public AwardedContractCommon(ProjectDetail projectDetail) {
+  protected AwardedContractCommon(ProjectDetail projectDetail) {
+    this.projectDetail = projectDetail;
+  }
+
+  protected AwardedContractCommon(Integer id, ProjectDetail projectDetail) {
+    this.id = id;
     this.projectDetail = projectDetail;
   }
 

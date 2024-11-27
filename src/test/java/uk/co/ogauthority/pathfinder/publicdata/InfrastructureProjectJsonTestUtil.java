@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.publicdata;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 class InfrastructureProjectJsonTestUtil {
 
@@ -10,16 +11,28 @@ class InfrastructureProjectJsonTestUtil {
 
   static class Builder {
 
-    private Builder() {
-    }
-
     private Integer id = 1;
     private InfrastructureProjectDetailsJson details = InfrastructureProjectDetailsJsonTestUtil.newBuilder().build();
     private ContactJson contact = ContactJsonTestUtil.newBuilder().build();
     private InfrastructureProjectFirstProductionDateJson firstProductionDate =
         InfrastructureProjectFirstProductionDateJsonTestUtil.newBuilder().build();
     private InfrastructureProjectLocationJson location = InfrastructureProjectLocationJsonTestUtil.newBuilder().build();
+    private Set<InfrastructureProjectUpcomingTenderJson> upcomingTenders = Set.of(
+        InfrastructureProjectUpcomingTenderJsonTestUtil.newBuilder().withId(1).build(),
+        InfrastructureProjectUpcomingTenderJsonTestUtil.newBuilder().withId(2).build()
+    );
+    private Set<InfrastructureProjectAwardedContractJson> awardedContracts = Set.of(
+        InfrastructureProjectAwardedContractJsonTestUtil.newBuilder().withId(1).build(),
+        InfrastructureProjectAwardedContractJsonTestUtil.newBuilder().withId(2).build()
+    );
+    private Set<InfrastructureProjectCollaborationOpportunityJson> collaborationOpportunities = Set.of(
+        InfrastructureProjectCollaborationOpportunityJsonTestUtil.newBuilder().withId(1).build(),
+        InfrastructureProjectCollaborationOpportunityJsonTestUtil.newBuilder().withId(2).build()
+    );
     private LocalDateTime submittedOn = LocalDateTime.of(2024, 10, 29, 11, 20, 38, 424521789);
+
+    private Builder() {
+    }
 
     Builder withId(Integer id) {
       this.id = id;
@@ -46,6 +59,21 @@ class InfrastructureProjectJsonTestUtil {
       return this;
     }
 
+    Builder withUpcomingTenders(Set<InfrastructureProjectUpcomingTenderJson> upcomingTenders) {
+      this.upcomingTenders = upcomingTenders;
+      return this;
+    }
+
+    Builder withAwardedContracts(Set<InfrastructureProjectAwardedContractJson> awardedContracts) {
+      this.awardedContracts = awardedContracts;
+      return this;
+    }
+
+    Builder withCollaborationOpportunities(Set<InfrastructureProjectCollaborationOpportunityJson> collaborationOpportunities) {
+      this.collaborationOpportunities = collaborationOpportunities;
+      return this;
+    }
+
     Builder withSubmittedOn(LocalDateTime submittedOn) {
       this.submittedOn = submittedOn;
       return this;
@@ -58,6 +86,9 @@ class InfrastructureProjectJsonTestUtil {
           contact,
           firstProductionDate,
           location,
+          upcomingTenders,
+          awardedContracts,
+          collaborationOpportunities,
           submittedOn
       );
     }

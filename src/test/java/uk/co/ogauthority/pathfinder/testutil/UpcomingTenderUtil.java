@@ -44,9 +44,12 @@ public class UpcomingTenderUtil {
     return form;
   }
 
-
   public static UpcomingTender getUpcomingTender(ProjectDetail detail) {
-    var tender = new UpcomingTender(detail);
+    return getUpcomingTender(null, detail);
+  }
+
+  public static UpcomingTender getUpcomingTender(Integer id, ProjectDetail detail) {
+    var tender = new UpcomingTender(id, detail);
     tender.setTenderFunction(TENDER_FUNCTION);
     setUpcomingTenderFields(tender);
     return tender;

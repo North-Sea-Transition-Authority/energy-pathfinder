@@ -69,6 +69,6 @@ class PublicDataS3ServiceTest {
     var requestBodyJson = CharStreams.toString(new InputStreamReader(requestBody.contentStreamProvider().newStream(), Charsets.UTF_8));
     var expectedJson = Resources.toString(Resources.getResource("test-public-data.json"), Charsets.UTF_8);
 
-    JSONAssert.assertEquals(requestBodyJson, expectedJson, JSONCompareMode.STRICT);
+    JSONAssert.assertEquals(requestBodyJson, expectedJson, JSONCompareMode.NON_EXTENSIBLE);
   }
 }

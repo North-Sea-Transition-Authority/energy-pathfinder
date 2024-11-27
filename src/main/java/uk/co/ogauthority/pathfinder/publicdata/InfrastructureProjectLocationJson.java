@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.publicdata;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
@@ -13,7 +14,7 @@ record InfrastructureProjectLocationJson(
 
   static InfrastructureProjectLocationJson from(
       ProjectLocation projectLocation,
-      List<ProjectLocationBlock> projectLocationBlocks
+      Collection<ProjectLocationBlock> projectLocationBlocks
   ) {
     var field = InfrastructureProjectFieldJson.from(projectLocation);
     var maximumWaterDepthMeters = projectLocation.getMaximumWaterDepth();

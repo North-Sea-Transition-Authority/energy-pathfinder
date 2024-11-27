@@ -9,9 +9,12 @@ import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
+import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.infrastructure.InfrastructureAwardedContractRepository;
+import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationBlockRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
+import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 
 @Service
 class InfrastructureProjectJsonService {
@@ -26,19 +29,28 @@ class InfrastructureProjectJsonService {
   private final ProjectInformationRepository projectInformationRepository;
   private final ProjectLocationRepository projectLocationRepository;
   private final ProjectLocationBlockRepository projectLocationBlockRepository;
+  private final UpcomingTenderRepository upcomingTenderRepository;
+  private final InfrastructureAwardedContractRepository infrastructureAwardedContractRepository;
+  private final InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository;
 
   InfrastructureProjectJsonService(
       ProjectDetailsRepository projectDetailsRepository,
       ProjectOperatorRepository projectOperatorRepository,
       ProjectInformationRepository projectInformationRepository,
       ProjectLocationRepository projectLocationRepository,
-      ProjectLocationBlockRepository projectLocationBlockRepository
+      ProjectLocationBlockRepository projectLocationBlockRepository,
+      UpcomingTenderRepository upcomingTenderRepository,
+      InfrastructureAwardedContractRepository infrastructureAwardedContractRepository,
+      InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository
   ) {
     this.projectDetailsRepository = projectDetailsRepository;
     this.projectOperatorRepository = projectOperatorRepository;
     this.projectInformationRepository = projectInformationRepository;
     this.projectLocationRepository = projectLocationRepository;
     this.projectLocationBlockRepository = projectLocationBlockRepository;
+    this.upcomingTenderRepository = upcomingTenderRepository;
+    this.infrastructureAwardedContractRepository = infrastructureAwardedContractRepository;
+    this.infrastructureCollaborationOpportunitiesRepository = infrastructureCollaborationOpportunitiesRepository;
   }
 
   List<InfrastructureProjectJson> getPublishedInfrastructureProjects() {
@@ -58,6 +70,18 @@ class InfrastructureProjectJsonService {
     var projectLocationBlocksByProjectDetailId = Streams.stream(projectLocationBlockRepository.findAll())
         .collect(Collectors.groupingBy(projectLocationBlock -> projectLocationBlock.getProjectLocation().getProjectDetail().getId()));
 
+    var upcomingTendersByProjectDetailId = Streams.stream(upcomingTenderRepository.findAll())
+        .collect(Collectors.groupingBy(upcomingTender -> upcomingTender.getProjectDetail().getId()));
+
+    var infrastructureAwardedContractsByProjectDetailId = Streams.stream(infrastructureAwardedContractRepository.findAll())
+        .collect(Collectors.groupingBy(
+            infrastructureAwardedContract -> infrastructureAwardedContract.getProjectDetail().getId()));
+
+    var infrastructureCollaborationOpportunitiesByProjectDetailId =
+        Streams.stream(infrastructureCollaborationOpportunitiesRepository.findAll())
+            .collect(Collectors.groupingBy(
+                infrastructureCollaborationOpportunity -> infrastructureCollaborationOpportunity.getProjectDetail().getId()));
+
     return allProjectDetails
         .stream()
         .map(projectDetail ->
@@ -66,7 +90,10 @@ class InfrastructureProjectJsonService {
                 projectOperatorByProjectDetailId.get(projectDetail.getId()),
                 projectInformationByProjectDetailId.get(projectDetail.getId()),
                 projectLocationByProjectDetailId.get(projectDetail.getId()),
-                projectLocationBlocksByProjectDetailId.get(projectDetail.getId())
+                projectLocationBlocksByProjectDetailId.get(projectDetail.getId()),
+                upcomingTendersByProjectDetailId.get(projectDetail.getId()),
+                infrastructureAwardedContractsByProjectDetailId.get(projectDetail.getId()),
+                infrastructureCollaborationOpportunitiesByProjectDetailId.get(projectDetail.getId())
             )
         )
         .sorted(INFRASTRUCTURE_PROJECT_JSON_COMPARATOR)

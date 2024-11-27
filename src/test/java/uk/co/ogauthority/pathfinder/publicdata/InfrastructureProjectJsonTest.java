@@ -5,13 +5,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
-import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
+import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 
 class InfrastructureProjectJsonTest {
 
@@ -25,14 +29,31 @@ class InfrastructureProjectJsonTest {
 
     var projectLocation = ProjectLocationTestUtil.getProjectLocation(projectDetail);
 
-    var projectLocationBlocks = List.<ProjectLocationBlock>of();
+    var projectLocationBlocks = List.of(
+        LicenceBlockTestUtil.getProjectLocationBlock(projectLocation, "12/34"),
+        LicenceBlockTestUtil.getProjectLocationBlock(projectLocation, "12/56")
+    );
+
+    var upcomingTender1 = UpcomingTenderUtil.getUpcomingTender(1, projectDetail);
+    var upcomingTender2 = UpcomingTenderUtil.getUpcomingTender(2, projectDetail);
+
+    var infrastructureAwardedContract1 = AwardedContractTestUtil.createInfrastructureAwardedContract(1, projectDetail);
+    var infrastructureAwardedContract2 = AwardedContractTestUtil.createInfrastructureAwardedContract(2, projectDetail);
+
+    var infrastructureCollaborationOpportunity1 =
+        InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(1, projectDetail);
+    var infrastructureCollaborationOpportunity2 =
+        InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(2, projectDetail);
 
     var infrastructureProjectJson = InfrastructureProjectJson.from(
         projectDetail,
         projectOperator,
         projectInformation,
         projectLocation,
-        projectLocationBlocks
+        projectLocationBlocks,
+        List.of(upcomingTender1, upcomingTender2),
+        List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
+        List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2)
     );
 
     var expectedInfrastructureProjectJson = new InfrastructureProjectJson(
@@ -41,6 +62,18 @@ class InfrastructureProjectJsonTest {
         ContactJson.from(projectInformation),
         null,
         InfrastructureProjectLocationJson.from(projectLocation, projectLocationBlocks),
+        Set.of(
+            InfrastructureProjectUpcomingTenderJson.from(upcomingTender1),
+            InfrastructureProjectUpcomingTenderJson.from(upcomingTender2)
+        ),
+        Set.of(
+            InfrastructureProjectAwardedContractJson.from(infrastructureAwardedContract1),
+            InfrastructureProjectAwardedContractJson.from(infrastructureAwardedContract2)
+        ),
+        Set.of(
+            InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity1),
+            InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2)
+        ),
         LocalDateTime.ofInstant(projectDetail.getSubmittedInstant(), ZoneId.systemDefault())
     );
 
@@ -61,6 +94,9 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
+        null,
         null,
         null
     );
@@ -83,6 +119,9 @@ class InfrastructureProjectJsonTest {
         projectOperator,
         projectInformation,
         null,
+        null,
+        null,
+        null,
         null
     );
 
@@ -103,6 +142,9 @@ class InfrastructureProjectJsonTest {
         projectOperator,
         projectInformation,
         null,
+        null,
+        null,
+        null,
         null
     );
 
@@ -119,17 +161,175 @@ class InfrastructureProjectJsonTest {
 
     var projectLocation = ProjectLocationTestUtil.getProjectLocation(projectDetail);
 
-    var projectLocationBlocks = List.<ProjectLocationBlock>of();
+    var projectLocationBlocks = List.of(
+        LicenceBlockTestUtil.getProjectLocationBlock(projectLocation, "12/34"),
+        LicenceBlockTestUtil.getProjectLocationBlock(projectLocation, "12/56")
+    );
 
     var infrastructureProjectJson = InfrastructureProjectJson.from(
         projectDetail,
         projectOperator,
         projectInformation,
         projectLocation,
-        projectLocationBlocks
+        projectLocationBlocks,
+        null,
+        null,
+        null
     );
 
     assertThat(infrastructureProjectJson.location())
         .isEqualTo(InfrastructureProjectLocationJson.from(projectLocation, projectLocationBlocks));
+  }
+
+  @Test
+  void from_upcomingTendersListIsNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.upcomingTenders()).isNull();
+  }
+
+  @Test
+  void from_upcomingTendersListIsNotNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var upcomingTender1 = UpcomingTenderUtil.getUpcomingTender(1, projectDetail);
+    var upcomingTender2 = UpcomingTenderUtil.getUpcomingTender(2, projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        List.of(upcomingTender1, upcomingTender2),
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.upcomingTenders()).containsExactlyInAnyOrder(
+        InfrastructureProjectUpcomingTenderJson.from(upcomingTender1),
+        InfrastructureProjectUpcomingTenderJson.from(upcomingTender2)
+    );
+  }
+
+  @Test
+  void from_infrastructureAwardedContractsIsNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.awardedContracts()).isNull();
+  }
+
+  @Test
+  void from_infrastructureAwardedContractsIsNotNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var infrastructureAwardedContract1 = AwardedContractTestUtil.createInfrastructureAwardedContract(1, projectDetail);
+    var infrastructureAwardedContract2 = AwardedContractTestUtil.createInfrastructureAwardedContract(2, projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
+        null
+    );
+
+    assertThat(infrastructureProjectJson.awardedContracts()).containsExactlyInAnyOrder(
+        InfrastructureProjectAwardedContractJson.from(infrastructureAwardedContract1),
+        InfrastructureProjectAwardedContractJson.from(infrastructureAwardedContract2)
+    );
+  }
+
+  @Test
+  void from_infrastructureCollaborationOpportunitiesIsNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.collaborationOpportunities()).isNull();
+  }
+
+  @Test
+  void from_infrastructureCollaborationOpportunitiesIsNotNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var infrastructureCollaborationOpportunity1 =
+        InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(1, projectDetail);
+    var infrastructureCollaborationOpportunity2 =
+        InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(2, projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2)
+    );
+
+    assertThat(infrastructureProjectJson.collaborationOpportunities()).containsExactlyInAnyOrder(
+        InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity1),
+        InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2)
+    );
   }
 }

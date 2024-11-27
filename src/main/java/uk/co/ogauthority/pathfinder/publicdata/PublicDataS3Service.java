@@ -2,7 +2,9 @@ package uk.co.ogauthority.pathfinder.publicdata;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import org.apache.http.entity.ContentType;
@@ -21,6 +23,8 @@ class PublicDataS3Service {
   private static final Logger LOGGER = LoggerFactory.getLogger(PublicDataS3Service.class);
   private static final DateTimeFormatter LOCAL_DATE_TIME_DATE_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+  private static final DateTimeFormatter LOCAL_DATE_DATE_TIME_FORMATTER =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private final PublicDataConfigurationProperties publicDataConfigurationProperties;
   private final S3Client s3Client;
@@ -37,7 +41,8 @@ class PublicDataS3Service {
     // of seconds, so you end up with serialized values like 2023-04-27T15:38:53.509414 which do not work with the frontend.
     this.objectMapper = new ObjectMapper()
         .registerModule(new SimpleModule()
-            .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(LOCAL_DATE_TIME_DATE_TIME_FORMATTER)));
+            .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(LOCAL_DATE_TIME_DATE_TIME_FORMATTER))
+            .addSerializer(LocalDate.class, new LocalDateSerializer(LOCAL_DATE_DATE_TIME_FORMATTER)));
   }
 
   void uploadPublicDataJsonFile(PublicDataJson publicDataJson) {

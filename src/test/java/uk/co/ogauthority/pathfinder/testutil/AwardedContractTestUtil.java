@@ -50,6 +50,7 @@ public class AwardedContractTestUtil {
   }
 
   public static InfrastructureAwardedContract createInfrastructureAwardedContract(
+      Integer id,
       ProjectDetail projectDetail,
       String contractorName,
       Function contractFunction,
@@ -63,10 +64,9 @@ public class AwardedContractTestUtil {
       String jobTitle,
       int addedByOrganisationGroup
   ) {
-    var awardedContract = new InfrastructureAwardedContract();
+    var awardedContract = new InfrastructureAwardedContract(id, projectDetail);
     setAwardedContractCommonFields(
         awardedContract,
-        projectDetail,
         contractorName,
         contractFunction,
         manualEntryContractFunction,
@@ -96,10 +96,9 @@ public class AwardedContractTestUtil {
       String jobTitle,
       int addedByOrganisationGroup
   ) {
-    var awardedContract = new ForwardWorkPlanAwardedContract();
+    var awardedContract = new ForwardWorkPlanAwardedContract(projectDetail);
     setAwardedContractCommonFields(
         awardedContract,
-        projectDetail,
         contractorName,
         contractFunction,
         manualEntryContractFunction,
@@ -117,7 +116,6 @@ public class AwardedContractTestUtil {
 
   private static void setAwardedContractCommonFields(
       AwardedContractCommon awardedContract,
-      ProjectDetail projectDetail,
       String contractorName,
       Function contractFunction,
       String manualEntryContractFunction,
@@ -130,7 +128,6 @@ public class AwardedContractTestUtil {
       String jobTitle,
       int addedByOrganisationGroup
   ) {
-    awardedContract.setProjectDetail(projectDetail);
     awardedContract.setContractorName(contractorName);
     awardedContract.setContractFunction(contractFunction);
     awardedContract.setManualContractFunction(manualEntryContractFunction);
@@ -145,8 +142,17 @@ public class AwardedContractTestUtil {
   }
 
   public static InfrastructureAwardedContract createInfrastructureAwardedContract() {
+    return createInfrastructureAwardedContract(ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE));
+  }
+
+  public static InfrastructureAwardedContract createInfrastructureAwardedContract(ProjectDetail projectDetail) {
+    return createInfrastructureAwardedContract(null, projectDetail);
+  }
+
+  public static InfrastructureAwardedContract createInfrastructureAwardedContract(Integer id, ProjectDetail projectDetail) {
     return createInfrastructureAwardedContract(
-        ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE),
+        id,
+        projectDetail,
         CONTRACTOR_NAME,
         CONTRACT_FUNCTION,
         null,
@@ -180,6 +186,7 @@ public class AwardedContractTestUtil {
 
   public static InfrastructureAwardedContract createInfrastructureAwardedContract_withManualEntryFunction(String function) {
     return createInfrastructureAwardedContract(
+        null,
         ProjectUtil.getProjectDetails(),
         CONTRACTOR_NAME,
         null,

@@ -2,12 +2,17 @@ package uk.co.ogauthority.pathfinder.publicdata;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
+import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure.InfrastructureAwardedContract;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
+import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 
 record InfrastructureProjectJson(
     Integer id,
@@ -15,6 +20,9 @@ record InfrastructureProjectJson(
     ContactJson contact,
     InfrastructureProjectFirstProductionDateJson firstProductionDate,
     InfrastructureProjectLocationJson location,
+    Set<InfrastructureProjectUpcomingTenderJson> upcomingTenders,
+    Set<InfrastructureProjectAwardedContractJson> awardedContracts,
+    Set<InfrastructureProjectCollaborationOpportunityJson> collaborationOpportunities,
     LocalDateTime submittedOn
 ) {
 
@@ -23,7 +31,10 @@ record InfrastructureProjectJson(
       ProjectOperator projectOperator,
       ProjectInformation projectInformation,
       ProjectLocation projectLocation,
-      List<ProjectLocationBlock> projectLocationBlocks
+      Collection<ProjectLocationBlock> projectLocationBlocks,
+      Collection<UpcomingTender> upcomingTendersList,
+      Collection<InfrastructureAwardedContract> infrastructureAwardedContracts,
+      Collection<InfrastructureCollaborationOpportunity> infrastructureCollaborationOpportunities
   ) {
     var id = projectDetail.getProject().getId();
 
@@ -38,6 +49,19 @@ record InfrastructureProjectJson(
 
     var location = projectLocation != null ? InfrastructureProjectLocationJson.from(projectLocation, projectLocationBlocks) : null;
 
+    var upcomingTenders = upcomingTendersList != null
+        ? upcomingTendersList.stream().map(InfrastructureProjectUpcomingTenderJson::from).collect(Collectors.toSet())
+        : null;
+
+    var awardedContracts = infrastructureAwardedContracts != null
+        ? infrastructureAwardedContracts.stream().map(InfrastructureProjectAwardedContractJson::from).collect(Collectors.toSet())
+        : null;
+
+    var collaborationOpportunities = infrastructureCollaborationOpportunities != null
+        ? infrastructureCollaborationOpportunities.stream().map(InfrastructureProjectCollaborationOpportunityJson::from)
+            .collect(Collectors.toSet())
+        : null;
+
     var submittedOn = LocalDateTime.ofInstant(projectDetail.getSubmittedInstant(), ZoneId.systemDefault());
 
     return new InfrastructureProjectJson(
@@ -46,6 +70,9 @@ record InfrastructureProjectJson(
         contact,
         firstProductionDate,
         location,
+        upcomingTenders,
+        awardedContracts,
+        collaborationOpportunities,
         submittedOn
     );
   }

@@ -10,9 +10,6 @@ class PublicDataJsonTestUtil {
 
   static class Builder {
 
-    private Builder() {
-    }
-
     private List<InfrastructureProjectJson> infrastructureProjects = List.of(
         InfrastructureProjectJsonTestUtil.newBuilder()
             .withId(1)
@@ -21,6 +18,9 @@ class PublicDataJsonTestUtil {
             .withId(2)
             .build()
     );
+
+    private Builder() {
+    }
 
     Builder withInfrastructureProjects(List<InfrastructureProjectJson> infrastructureProjects) {
       this.infrastructureProjects = infrastructureProjects;

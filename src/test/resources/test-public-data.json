@@ -30,6 +30,96 @@
           "12/34, 12/56"
         ]
       },
+      "upcomingTenders": [
+        {
+          "id": 1,
+          "function": "DRILLING",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "estimatedTenderDate": "2025-01-01",
+          "contractBand": "GREATER_THAN_OR_EQUAL_TO_25M",
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          }
+        },
+        {
+          "id": 2,
+          "function": "DRILLING",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "estimatedTenderDate": "2025-01-01",
+          "contractBand": "GREATER_THAN_OR_EQUAL_TO_25M",
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          }
+        }
+      ],
+      "awardedContracts": [
+        {
+          "id": 1,
+          "contractorName": "Test contractor",
+          "function": "FABRICATION",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "dateAwarded": "2024-11-26",
+          "contractBand": "GREATER_THAN_OR_EQUAL_TO_25M",
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          }
+        },
+        {
+          "id": 2,
+          "contractorName": "Test contractor",
+          "function": "FABRICATION",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "dateAwarded": "2024-11-26",
+          "contractBand": "GREATER_THAN_OR_EQUAL_TO_25M",
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          }
+        }
+      ],
+      "collaborationOpportunities": [
+        {
+          "id": 1,
+          "function": "LOGISTICS",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "urgent": true,
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          }
+        },
+        {
+          "id": 2,
+          "function": "LOGISTICS",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "urgent": true,
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          }
+        }
+      ],
       "submittedOn": "2024-10-29T11:20:38"
     },
     {
@@ -62,6 +152,96 @@
           "12/34, 12/56"
         ]
       },
+      "upcomingTenders": [
+        {
+          "id": 1,
+          "function": "DRILLING",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "estimatedTenderDate": "2025-01-01",
+          "contractBand": "GREATER_THAN_OR_EQUAL_TO_25M",
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          }
+        },
+        {
+          "id": 2,
+          "function": "DRILLING",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "estimatedTenderDate": "2025-01-01",
+          "contractBand": "GREATER_THAN_OR_EQUAL_TO_25M",
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          }
+        }
+      ],
+      "awardedContracts": [
+        {
+          "id": 1,
+          "contractorName": "Test contractor",
+          "function": "FABRICATION",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "dateAwarded": "2024-11-26",
+          "contractBand": "GREATER_THAN_OR_EQUAL_TO_25M",
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          }
+        },
+        {
+          "id": 2,
+          "contractorName": "Test contractor",
+          "function": "FABRICATION",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "dateAwarded": "2024-11-26",
+          "contractBand": "GREATER_THAN_OR_EQUAL_TO_25M",
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          }
+        }
+      ],
+      "collaborationOpportunities": [
+        {
+          "id": 1,
+          "function": "LOGISTICS",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "urgent": true,
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          }
+        },
+        {
+          "id": 2,
+          "function": "LOGISTICS",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "urgent": true,
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          }
+        }
+      ],
       "submittedOn": "2024-10-29T11:20:38"
     }
   ]

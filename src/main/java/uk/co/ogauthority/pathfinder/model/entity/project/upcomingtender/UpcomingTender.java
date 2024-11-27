@@ -52,6 +52,11 @@ public class UpcomingTender
     this.projectDetail = projectDetail;
   }
 
+  public UpcomingTender(Integer id, ProjectDetail projectDetail) {
+    this.id = id;
+    this.projectDetail = projectDetail;
+  }
+
   public Function getTenderFunction() {
     return tenderFunction;
   }

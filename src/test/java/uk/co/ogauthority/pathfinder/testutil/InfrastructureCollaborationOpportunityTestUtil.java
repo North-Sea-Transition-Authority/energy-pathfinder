@@ -34,8 +34,12 @@ public class InfrastructureCollaborationOpportunityTestUtil {
   }
 
   public static InfrastructureCollaborationOpportunity getCollaborationOpportunity(ProjectDetail detail) {
+    return getCollaborationOpportunity(null, detail);
+  }
+
+  public static InfrastructureCollaborationOpportunity getCollaborationOpportunity(Integer id, ProjectDetail detail) {
     return (InfrastructureCollaborationOpportunity) CollaborationOpportunityTestUtilCommon.populateCollaborationOpportunity(
-        new InfrastructureCollaborationOpportunity(detail)
+        new InfrastructureCollaborationOpportunity(id, detail)
     );
   }
 

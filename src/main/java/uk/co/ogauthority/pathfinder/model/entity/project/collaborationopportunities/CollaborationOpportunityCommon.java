@@ -38,10 +38,15 @@ public abstract class CollaborationOpportunityCommon
 
   private Integer addedByOrganisationGroup;
 
-  public CollaborationOpportunityCommon() {
+  protected CollaborationOpportunityCommon() {
   }
 
-  public CollaborationOpportunityCommon(ProjectDetail projectDetail) {
+  protected CollaborationOpportunityCommon(ProjectDetail projectDetail) {
+    this.projectDetail = projectDetail;
+  }
+
+  protected CollaborationOpportunityCommon(Integer id, ProjectDetail projectDetail) {
+    this.id = id;
     this.projectDetail = projectDetail;
   }
 

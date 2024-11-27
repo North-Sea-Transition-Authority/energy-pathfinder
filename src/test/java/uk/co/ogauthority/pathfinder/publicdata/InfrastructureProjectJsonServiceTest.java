@@ -13,15 +13,21 @@ import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
+import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.infrastructure.InfrastructureAwardedContractRepository;
+import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationBlockRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
+import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
+import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 
 @ExtendWith(MockitoExtension.class)
 class InfrastructureProjectJsonServiceTest {
@@ -40,6 +46,15 @@ class InfrastructureProjectJsonServiceTest {
 
   @Mock
   private ProjectLocationBlockRepository projectLocationBlockRepository;
+
+  @Mock
+  private UpcomingTenderRepository upcomingTenderRepository;
+
+  @Mock
+  private InfrastructureAwardedContractRepository infrastructureAwardedContractRepository;
+
+  @Mock
+  private InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository;
 
   @InjectMocks
   private InfrastructureProjectJsonService infrastructureProjectJsonService;
@@ -115,6 +130,21 @@ class InfrastructureProjectJsonServiceTest {
     var projectLocationBlock3 = LicenceBlockTestUtil.getProjectLocationBlock(projectLocation2, "14/82");
     var projectLocationBlock4 = LicenceBlockTestUtil.getProjectLocationBlock(projectLocation2, "18/93");
 
+    var upcomingTender1 = UpcomingTenderUtil.getUpcomingTender(1, projectDetail1);
+    var upcomingTender2 = UpcomingTenderUtil.getUpcomingTender(2, projectDetail1);
+    var upcomingTender3 = UpcomingTenderUtil.getUpcomingTender(3, projectDetail2);
+
+    var infrastructureAwardedContract1 = AwardedContractTestUtil.createInfrastructureAwardedContract(1, projectDetail1);
+    var infrastructureAwardedContract2 = AwardedContractTestUtil.createInfrastructureAwardedContract(2, projectDetail1);
+    var infrastructureAwardedContract3 = AwardedContractTestUtil.createInfrastructureAwardedContract(3, projectDetail2);
+
+    var infrastructureCollaborationOpportunity1 =
+        InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(1, projectDetail1);
+    var infrastructureCollaborationOpportunity2 =
+        InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(2, projectDetail1);
+    var infrastructureCollaborationOpportunity3 =
+        InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(3, projectDetail2);
+
     when(projectDetailsRepository.getAllPublishedProjectDetailsByProjectType(ProjectType.INFRASTRUCTURE))
         .thenReturn(List.of(projectDetail2, projectDetail4, projectDetail3, projectDetail1, projectDetail5));
 
@@ -136,6 +166,19 @@ class InfrastructureProjectJsonServiceTest {
     when(projectLocationBlockRepository.findAll())
         .thenReturn(List.of(projectLocationBlock1, projectLocationBlock2, projectLocationBlock3, projectLocationBlock4));
 
+    when(upcomingTenderRepository.findAll()).thenReturn(List.of(upcomingTender1, upcomingTender2, upcomingTender3));
+
+    when(infrastructureAwardedContractRepository.findAll())
+        .thenReturn(List.of(infrastructureAwardedContract1, infrastructureAwardedContract2, infrastructureAwardedContract3));
+
+    when(infrastructureCollaborationOpportunitiesRepository.findAll()).thenReturn(
+        List.of(
+            infrastructureCollaborationOpportunity1,
+            infrastructureCollaborationOpportunity2,
+            infrastructureCollaborationOpportunity3
+        )
+    );
+
     var infrastructureProjectJsons = infrastructureProjectJsonService.getPublishedInfrastructureProjects();
 
     var expectedInfrastructureProjectJsons = List.of(
@@ -144,20 +187,29 @@ class InfrastructureProjectJsonServiceTest {
             projectOperator1,
             projectInformation1,
             projectLocation1,
-            List.of(projectLocationBlock1, projectLocationBlock2)
+            List.of(projectLocationBlock1, projectLocationBlock2),
+            List.of(upcomingTender1, upcomingTender2),
+            List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
+            List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2)
         ),
         InfrastructureProjectJson.from(
             projectDetail2,
             projectOperator2,
             projectInformation2,
             projectLocation2,
-            List.of(projectLocationBlock3, projectLocationBlock4)
+            List.of(projectLocationBlock3, projectLocationBlock4),
+            List.of(upcomingTender3),
+            List.of(infrastructureAwardedContract3),
+            List.of(infrastructureCollaborationOpportunity3)
         ),
         InfrastructureProjectJson.from(
             projectDetail3,
             projectOperator3,
             projectInformation3,
             projectLocation3,
+            null,
+            null,
+            null,
             null
         ),
         InfrastructureProjectJson.from(
@@ -165,12 +217,18 @@ class InfrastructureProjectJsonServiceTest {
             projectOperator4,
             projectInformation4,
             null,
+            null,
+            null,
+            null,
             null
         ),
         InfrastructureProjectJson.from(
             projectDetail5,
             projectOperator5,
             projectInformation5,
+            null,
+            null,
+            null,
             null,
             null
         )

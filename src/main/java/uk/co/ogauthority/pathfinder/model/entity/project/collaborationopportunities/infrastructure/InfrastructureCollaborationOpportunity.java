@@ -15,4 +15,8 @@ public class InfrastructureCollaborationOpportunity extends CollaborationOpportu
   public InfrastructureCollaborationOpportunity(ProjectDetail projectDetail) {
     super(projectDetail);
   }
+
+  public InfrastructureCollaborationOpportunity(Integer id, ProjectDetail projectDetail) {
+    super(id, projectDetail);
+  }
 }
