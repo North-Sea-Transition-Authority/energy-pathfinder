@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.publicdata;
 
-import java.util.List;
+import java.util.Set;
 
 class PublicDataJsonTestUtil {
 
@@ -10,7 +10,7 @@ class PublicDataJsonTestUtil {
 
   static class Builder {
 
-    private List<InfrastructureProjectJson> infrastructureProjects = List.of(
+    private Set<InfrastructureProjectJson> infrastructureProjects = Set.of(
         InfrastructureProjectJsonTestUtil.newBuilder()
             .withId(1)
             .build(),
@@ -22,7 +22,7 @@ class PublicDataJsonTestUtil {
     private Builder() {
     }
 
-    Builder withInfrastructureProjects(List<InfrastructureProjectJson> infrastructureProjects) {
+    Builder withInfrastructureProjects(Set<InfrastructureProjectJson> infrastructureProjects) {
       this.infrastructureProjects = infrastructureProjects;
       return this;
     }

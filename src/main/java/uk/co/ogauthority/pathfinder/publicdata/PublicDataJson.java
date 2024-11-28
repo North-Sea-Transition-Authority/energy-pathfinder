@@ -1,7 +1,7 @@
 package uk.co.ogauthority.pathfinder.publicdata;
 
-import java.util.List;
+import java.util.Set;
 
 record PublicDataJson(
-    List<InfrastructureProjectJson> infrastructureProjects
+    Set<InfrastructureProjectJson> infrastructureProjects
 ) { }

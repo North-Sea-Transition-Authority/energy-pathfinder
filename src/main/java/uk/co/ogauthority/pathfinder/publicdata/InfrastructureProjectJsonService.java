@@ -1,8 +1,7 @@
 package uk.co.ogauthority.pathfinder.publicdata;
 
 import com.google.common.collect.Streams;
-import java.util.Comparator;
-import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -18,11 +17,6 @@ import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTe
 
 @Service
 class InfrastructureProjectJsonService {
-
-  private static final Comparator<InfrastructureProjectJson> INFRASTRUCTURE_PROJECT_JSON_COMPARATOR =
-      Comparator.<InfrastructureProjectJson, String>
-              comparing(infrastructureProjectJson -> infrastructureProjectJson.details().operatorName().toLowerCase())
-          .thenComparing(infrastructureProjectJson -> infrastructureProjectJson.details().title().toLowerCase());
 
   private final ProjectDetailsRepository projectDetailsRepository;
   private final ProjectOperatorRepository projectOperatorRepository;
@@ -53,7 +47,7 @@ class InfrastructureProjectJsonService {
     this.infrastructureCollaborationOpportunitiesRepository = infrastructureCollaborationOpportunitiesRepository;
   }
 
-  List<InfrastructureProjectJson> getPublishedInfrastructureProjects() {
+  Set<InfrastructureProjectJson> getPublishedInfrastructureProjects() {
     var allProjectDetails = projectDetailsRepository.getAllPublishedProjectDetailsByProjectType(ProjectType.INFRASTRUCTURE);
 
     // TODO: When replatforming to use Postgres, switch to findAllByProjectDetail_IdIn. We can't do this with Oracle at the moment
@@ -96,7 +90,6 @@ class InfrastructureProjectJsonService {
                 infrastructureCollaborationOpportunitiesByProjectDetailId.get(projectDetail.getId())
             )
         )
-        .sorted(INFRASTRUCTURE_PROJECT_JSON_COMPARATOR)
-        .toList();
+        .collect(Collectors.toSet());
   }
 }
