@@ -6,8 +6,8 @@
         "operatorName": "BP",
         "title": "Test project",
         "summary": "Test summary",
-        "projectStage": "DECOMMISSIONING",
-        "projectStageSubCategory": null
+        "projectType": "DECOMMISSIONING",
+        "projectTypeSubCategory": null
       },
       "contact": {
         "name": "Test contact name",
@@ -128,8 +128,8 @@
         "operatorName": "BP",
         "title": "Test project",
         "summary": "Test summary",
-        "projectStage": "DECOMMISSIONING",
-        "projectStageSubCategory": null
+        "projectType": "DECOMMISSIONING",
+        "projectTypeSubCategory": null
       },
       "contact": {
         "name": "Test contact name",

@@ -11,8 +11,8 @@ class InfrastructureProjectDetailsJsonTestUtil {
     private String operatorName = "BP";
     private String title = "Test project";
     private String summary = "Test summary";
-    private String projectStage = "DECOMMISSIONING";
-    private String projectStageSubCategory;
+    private String projectType = "DECOMMISSIONING";
+    private String projectTypeSubCategory;
 
     private Builder() {
     }
@@ -32,18 +32,18 @@ class InfrastructureProjectDetailsJsonTestUtil {
       return this;
     }
 
-    Builder withProjectStage(String projectStage) {
-      this.projectStage = projectStage;
+    Builder withProjectType(String projectType) {
+      this.projectType = projectType;
       return this;
     }
 
-    Builder withProjectStageSubCategory(String projectStageSubCategory) {
-      this.projectStageSubCategory = projectStageSubCategory;
+    Builder withProjectTypeSubCategory(String projectTypeSubCategory) {
+      this.projectTypeSubCategory = projectTypeSubCategory;
       return this;
     }
 
     InfrastructureProjectDetailsJson build() {
-      return new InfrastructureProjectDetailsJson(operatorName, title, summary, projectStage, projectStageSubCategory);
+      return new InfrastructureProjectDetailsJson(operatorName, title, summary, projectType, projectTypeSubCategory);
     }
   }
 }

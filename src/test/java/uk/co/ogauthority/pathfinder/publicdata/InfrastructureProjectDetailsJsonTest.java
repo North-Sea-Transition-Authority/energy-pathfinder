@@ -74,7 +74,7 @@ class InfrastructureProjectDetailsJsonTest {
   }
 
   @Test
-  void from_projectStageSubCategoryIsNull() {
+  void from_projectTypeSubCategoryIsNull() {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
@@ -84,11 +84,11 @@ class InfrastructureProjectDetailsJsonTest {
 
     var infrastructureProjectDetailsJson = InfrastructureProjectDetailsJson.from(projectOperator, projectInformation);
 
-    assertThat(infrastructureProjectDetailsJson.projectStageSubCategory()).isNull();
+    assertThat(infrastructureProjectDetailsJson.projectTypeSubCategory()).isNull();
   }
 
   @Test
-  void from_projectStageSubCategoryIsNotNull() {
+  void from_projectTypeSubCategoryIsNotNull() {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
@@ -98,7 +98,7 @@ class InfrastructureProjectDetailsJsonTest {
 
     var infrastructureProjectDetailsJson = InfrastructureProjectDetailsJson.from(projectOperator, projectInformation);
 
-    assertThat(infrastructureProjectDetailsJson.projectStageSubCategory())
+    assertThat(infrastructureProjectDetailsJson.projectTypeSubCategory())
         .isEqualTo(FieldStageSubCategory.FIXED_BOTTOM_OFFSHORE_WIND.name());
   }
 }

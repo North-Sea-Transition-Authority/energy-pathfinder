@@ -8,8 +8,8 @@ record InfrastructureProjectDetailsJson(
     String operatorName,
     String title,
     String summary,
-    String projectStage,
-    String projectStageSubCategory
+    String projectType,
+    String projectTypeSubCategory
 ) {
 
   static InfrastructureProjectDetailsJson from(
@@ -22,9 +22,9 @@ record InfrastructureProjectDetailsJson(
 
     var title = projectInformation.getProjectTitle();
     var summary = projectInformation.getProjectSummary();
-    var projectStage = projectInformation.getFieldStage().name();
+    var projectType = projectInformation.getFieldStage().name();
 
-    var projectStageSubCategory = projectInformation.getFieldStageSubCategory() != null
+    var projectTypeSubCategory = projectInformation.getFieldStageSubCategory() != null
         ? projectInformation.getFieldStageSubCategory().name()
         : null;
 
@@ -32,8 +32,8 @@ record InfrastructureProjectDetailsJson(
         operatorName,
         title,
         summary,
-        projectStage,
-        projectStageSubCategory
+        projectType,
+        projectTypeSubCategory
     );
   }
 }
