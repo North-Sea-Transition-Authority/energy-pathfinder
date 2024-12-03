@@ -140,3 +140,9 @@ IntelliJ should auto detect the Spring application and create a run configuratio
 Run the project and navigate to `http://localhost:8081/engedudev1/<CONTEXT_SUFFIX>/work-area`
 
 You will be redirected to your local fox instance for authentication, and then redirected back to your local Pathfinder instance with an active session.
+
+## Logging
+
+Pathfinder can log in either JSON or text mode.
+
+In order to turn on JSON logging, set the profile 'json-logging'. This will automatically include any MDC attributes.
