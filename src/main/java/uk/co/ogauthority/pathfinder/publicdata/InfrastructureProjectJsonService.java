@@ -10,6 +10,7 @@ import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.infrastructure.InfrastructureAwardedContractRepository;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesRepository;
+import uk.co.ogauthority.pathfinder.repository.project.integratedrig.IntegratedRigRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationBlockRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
@@ -26,6 +27,7 @@ class InfrastructureProjectJsonService {
   private final UpcomingTenderRepository upcomingTenderRepository;
   private final InfrastructureAwardedContractRepository infrastructureAwardedContractRepository;
   private final InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository;
+  private final IntegratedRigRepository integratedRigRepository;
 
   InfrastructureProjectJsonService(
       ProjectDetailsRepository projectDetailsRepository,
@@ -35,7 +37,8 @@ class InfrastructureProjectJsonService {
       ProjectLocationBlockRepository projectLocationBlockRepository,
       UpcomingTenderRepository upcomingTenderRepository,
       InfrastructureAwardedContractRepository infrastructureAwardedContractRepository,
-      InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository
+      InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository,
+      IntegratedRigRepository integratedRigRepository
   ) {
     this.projectDetailsRepository = projectDetailsRepository;
     this.projectOperatorRepository = projectOperatorRepository;
@@ -45,6 +48,7 @@ class InfrastructureProjectJsonService {
     this.upcomingTenderRepository = upcomingTenderRepository;
     this.infrastructureAwardedContractRepository = infrastructureAwardedContractRepository;
     this.infrastructureCollaborationOpportunitiesRepository = infrastructureCollaborationOpportunitiesRepository;
+    this.integratedRigRepository = integratedRigRepository;
   }
 
   Set<InfrastructureProjectJson> getPublishedInfrastructureProjects() {
@@ -76,6 +80,9 @@ class InfrastructureProjectJsonService {
             .collect(Collectors.groupingBy(
                 infrastructureCollaborationOpportunity -> infrastructureCollaborationOpportunity.getProjectDetail().getId()));
 
+    var integratedRigsByProjectDetailId = Streams.stream(integratedRigRepository.findAll())
+        .collect(Collectors.groupingBy(integratedRig -> integratedRig.getProjectDetail().getId()));
+
     return allProjectDetails
         .stream()
         .map(projectDetail ->
@@ -87,7 +94,8 @@ class InfrastructureProjectJsonService {
                 projectLocationBlocksByProjectDetailId.get(projectDetail.getId()),
                 upcomingTendersByProjectDetailId.get(projectDetail.getId()),
                 infrastructureAwardedContractsByProjectDetailId.get(projectDetail.getId()),
-                infrastructureCollaborationOpportunitiesByProjectDetailId.get(projectDetail.getId())
+                infrastructureCollaborationOpportunitiesByProjectDetailId.get(projectDetail.getId()),
+                integratedRigsByProjectDetailId.get(projectDetail.getId())
             )
         )
         .collect(Collectors.toSet());

@@ -120,6 +120,22 @@
           }
         }
       ],
+      "integratedRigsToBeDecommissioned": [
+        {
+          "id": 1,
+          "structureName": "Test structure name",
+          "name": "Test name",
+          "status": "WARM",
+          "intentionToReactivate": "YES"
+        },
+        {
+          "id": 2,
+          "structureName": "Test structure name",
+          "name": "Test name",
+          "status": "WARM",
+          "intentionToReactivate": "YES"
+        }
+      ],
       "submittedOn": "2024-10-29T11:20:38"
     },
     {
@@ -240,6 +256,22 @@
             "jobTitle": "Test contact job title",
             "emailAddress": "test@email.address"
           }
+        }
+      ],
+      "integratedRigsToBeDecommissioned": [
+        {
+          "id": 1,
+          "structureName": "Test structure name",
+          "name": "Test name",
+          "status": "WARM",
+          "intentionToReactivate": "YES"
+        },
+        {
+          "id": 2,
+          "structureName": "Test structure name",
+          "name": "Test name",
+          "status": "WARM",
+          "intentionToReactivate": "YES"
         }
       ],
       "submittedOn": "2024-10-29T11:20:38"

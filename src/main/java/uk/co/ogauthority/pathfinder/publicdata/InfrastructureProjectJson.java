@@ -9,6 +9,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure.InfrastructureAwardedContract;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
+import uk.co.ogauthority.pathfinder.model.entity.project.integratedrig.IntegratedRig;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
@@ -23,6 +24,7 @@ record InfrastructureProjectJson(
     Set<InfrastructureProjectUpcomingTenderJson> upcomingTenders,
     Set<InfrastructureProjectAwardedContractJson> awardedContracts,
     Set<InfrastructureProjectCollaborationOpportunityJson> collaborationOpportunities,
+    Set<InfrastructureProjectIntegratedRigToBeDecommissionedJson> integratedRigsToBeDecommissioned,
     LocalDateTime submittedOn
 ) {
 
@@ -34,7 +36,8 @@ record InfrastructureProjectJson(
       Collection<ProjectLocationBlock> projectLocationBlocks,
       Collection<UpcomingTender> upcomingTendersList,
       Collection<InfrastructureAwardedContract> infrastructureAwardedContracts,
-      Collection<InfrastructureCollaborationOpportunity> infrastructureCollaborationOpportunities
+      Collection<InfrastructureCollaborationOpportunity> infrastructureCollaborationOpportunities,
+      Collection<IntegratedRig> integratedRigs
   ) {
     var id = projectDetail.getProject().getId();
 
@@ -62,6 +65,10 @@ record InfrastructureProjectJson(
             .collect(Collectors.toSet())
         : null;
 
+    var integratedRigsToBeDecommissioned = integratedRigs != null
+        ? integratedRigs.stream().map(InfrastructureProjectIntegratedRigToBeDecommissionedJson::from).collect(Collectors.toSet())
+        : null;
+
     var submittedOn = LocalDateTime.ofInstant(projectDetail.getSubmittedInstant(), ZoneId.systemDefault());
 
     return new InfrastructureProjectJson(
@@ -73,6 +80,7 @@ record InfrastructureProjectJson(
         upcomingTenders,
         awardedContracts,
         collaborationOpportunities,
+        integratedRigsToBeDecommissioned,
         submittedOn
     );
   }

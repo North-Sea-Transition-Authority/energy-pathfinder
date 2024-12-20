@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.IntegratedRigTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
@@ -45,6 +46,9 @@ class InfrastructureProjectJsonTest {
     var infrastructureCollaborationOpportunity2 =
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(2, projectDetail);
 
+    var integratedRig1 = IntegratedRigTestUtil.createIntegratedRig(1, projectDetail);
+    var integratedRig2 = IntegratedRigTestUtil.createIntegratedRig(2, projectDetail);
+
     var infrastructureProjectJson = InfrastructureProjectJson.from(
         projectDetail,
         projectOperator,
@@ -53,7 +57,8 @@ class InfrastructureProjectJsonTest {
         projectLocationBlocks,
         List.of(upcomingTender1, upcomingTender2),
         List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
-        List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2)
+        List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2),
+        List.of(integratedRig1, integratedRig2)
     );
 
     var expectedInfrastructureProjectJson = new InfrastructureProjectJson(
@@ -73,6 +78,10 @@ class InfrastructureProjectJsonTest {
         Set.of(
             InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity1),
             InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2)
+        ),
+        Set.of(
+            InfrastructureProjectIntegratedRigToBeDecommissionedJson.from(integratedRig1),
+            InfrastructureProjectIntegratedRigToBeDecommissionedJson.from(integratedRig2)
         ),
         LocalDateTime.ofInstant(projectDetail.getSubmittedInstant(), ZoneId.systemDefault())
     );
@@ -94,6 +103,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -122,6 +132,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -141,6 +152,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -174,6 +186,7 @@ class InfrastructureProjectJsonTest {
         projectLocationBlocks,
         null,
         null,
+        null,
         null
     );
 
@@ -193,6 +206,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -222,6 +236,7 @@ class InfrastructureProjectJsonTest {
         null,
         List.of(upcomingTender1, upcomingTender2),
         null,
+        null,
         null
     );
 
@@ -243,6 +258,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -272,6 +288,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
+        null,
         null
     );
 
@@ -293,6 +310,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -324,12 +342,65 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
-        List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2)
+        List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2),
+        null
     );
 
     assertThat(infrastructureProjectJson.collaborationOpportunities()).containsExactlyInAnyOrder(
         InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity1),
         InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2)
+    );
+  }
+
+  @Test
+  void from_integratedRigsIsNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.integratedRigsToBeDecommissioned()).isNull();
+  }
+
+  @Test
+  void from_integratedRigsIsNotNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var integratedRig1 = IntegratedRigTestUtil.createIntegratedRig(1, projectDetail);
+    var integratedRig2 = IntegratedRigTestUtil.createIntegratedRig(2, projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null,
+        List.of(integratedRig1, integratedRig2)
+    );
+
+    assertThat(infrastructureProjectJson.integratedRigsToBeDecommissioned()).containsExactlyInAnyOrder(
+        InfrastructureProjectIntegratedRigToBeDecommissionedJson.from(integratedRig1),
+        InfrastructureProjectIntegratedRigToBeDecommissionedJson.from(integratedRig2)
     );
   }
 }
