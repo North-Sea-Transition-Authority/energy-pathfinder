@@ -17,6 +17,7 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.SubseaInfrastructureTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 
 class InfrastructureProjectJsonTest {
@@ -53,6 +54,9 @@ class InfrastructureProjectJsonTest {
     var integratedRig1 = IntegratedRigTestUtil.createIntegratedRig(1, projectDetail);
     var integratedRig2 = IntegratedRigTestUtil.createIntegratedRig(2, projectDetail);
 
+    var subseaInfrastructure1 = SubseaInfrastructureTestUtil.createSubseaInfrastructure(1, projectDetail);
+    var subseaInfrastructure2 = SubseaInfrastructureTestUtil.createSubseaInfrastructure(2, projectDetail);
+
     var infrastructureProjectJson = InfrastructureProjectJson.from(
         projectDetail,
         projectOperator,
@@ -63,7 +67,8 @@ class InfrastructureProjectJsonTest {
         List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
         List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2),
         List.of(platformFpso1, platformFpso2),
-        List.of(integratedRig1, integratedRig2)
+        List.of(integratedRig1, integratedRig2),
+        List.of(subseaInfrastructure1, subseaInfrastructure2)
     );
 
     var expectedInfrastructureProjectJson = new InfrastructureProjectJson(
@@ -92,6 +97,10 @@ class InfrastructureProjectJsonTest {
             InfrastructureProjectIntegratedRigToBeDecommissionedJson.from(integratedRig1),
             InfrastructureProjectIntegratedRigToBeDecommissionedJson.from(integratedRig2)
         ),
+        Set.of(
+            InfrastructureProjectSubseaInfrastructureToBeDecommissionedJson.from(subseaInfrastructure1),
+            InfrastructureProjectSubseaInfrastructureToBeDecommissionedJson.from(subseaInfrastructure2)
+        ),
         LocalDateTime.ofInstant(projectDetail.getSubmittedInstant(), ZoneId.systemDefault())
     );
 
@@ -112,6 +121,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -144,6 +154,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -163,6 +174,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -200,6 +212,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -219,6 +232,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -252,6 +266,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -273,6 +288,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -306,6 +322,7 @@ class InfrastructureProjectJsonTest {
         List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
         null,
         null,
+        null,
         null
     );
 
@@ -327,6 +344,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -362,6 +380,7 @@ class InfrastructureProjectJsonTest {
         null,
         List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2),
         null,
+        null,
         null
     );
 
@@ -383,6 +402,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -416,6 +436,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         List.of(platformFpso1, platformFpso2),
+        null,
         null
     );
 
@@ -437,6 +458,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -470,12 +492,69 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
-        List.of(integratedRig1, integratedRig2)
+        List.of(integratedRig1, integratedRig2),
+        null
     );
 
     assertThat(infrastructureProjectJson.integratedRigsToBeDecommissioned()).containsExactlyInAnyOrder(
         InfrastructureProjectIntegratedRigToBeDecommissionedJson.from(integratedRig1),
         InfrastructureProjectIntegratedRigToBeDecommissionedJson.from(integratedRig2)
+    );
+  }
+
+  @Test
+  void from_subseaInfrastructuresIsNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.subseaInfrastructuresToBeDecommissioned()).isNull();
+  }
+
+  @Test
+  void from_subseaInfrastructuresIsNotNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var subseaInfrastructure1 = SubseaInfrastructureTestUtil.createSubseaInfrastructure(1, projectDetail);
+    var subseaInfrastructure2 = SubseaInfrastructureTestUtil.createSubseaInfrastructure(2, projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        List.of(subseaInfrastructure1, subseaInfrastructure2)
+    );
+
+    assertThat(infrastructureProjectJson.subseaInfrastructuresToBeDecommissioned()).containsExactlyInAnyOrder(
+        InfrastructureProjectSubseaInfrastructureToBeDecommissionedJson.from(subseaInfrastructure1),
+        InfrastructureProjectSubseaInfrastructureToBeDecommissionedJson.from(subseaInfrastructure2)
     );
   }
 }

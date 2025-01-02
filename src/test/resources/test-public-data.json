@@ -186,6 +186,58 @@
           "intentionToReactivate": "YES"
         }
       ],
+      "subseaInfrastructuresToBeDecommissioned": [
+        {
+          "id": 1,
+          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
+          "description": "Test description",
+          "status": "IN_USE",
+          "type": "CONCRETE_MATTRESSES",
+          "concreteMattressesDetails": {
+            "numberToDecommission": 7,
+            "totalEstimatedMassMetricTonnes": 277
+          },
+          "subseaStructureDetails": null,
+          "otherDetails": null,
+          "decommissioningPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          }
+        },
+        {
+          "id": 3,
+          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
+          "description": "Test description",
+          "status": "IN_USE",
+          "type": "OTHER",
+          "concreteMattressesDetails": null,
+          "subseaStructureDetails": null,
+          "otherDetails": {
+            "type": "Test type",
+            "totalEstimatedMassMetricTonnes": 47
+          },
+          "decommissioningPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          }
+        },
+        {
+          "id": 2,
+          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
+          "description": "Test description",
+          "status": "IN_USE",
+          "type": "SUBSEA_STRUCTURE",
+          "concreteMattressesDetails": null,
+          "subseaStructureDetails": {
+            "totalEstimatedMass": "GREATER_THAN_OR_EQUAL_400_TONNES"
+          },
+          "otherDetails": null,
+          "decommissioningPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          }
+        }
+      ],
       "submittedOn": "2024-10-29T11:20:38"
     },
     {
@@ -372,6 +424,58 @@
           "name": "Test name",
           "status": "WARM",
           "intentionToReactivate": "YES"
+        }
+      ],
+      "subseaInfrastructuresToBeDecommissioned": [
+        {
+          "id": 1,
+          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
+          "description": "Test description",
+          "status": "IN_USE",
+          "type": "CONCRETE_MATTRESSES",
+          "concreteMattressesDetails": {
+            "numberToDecommission": 7,
+            "totalEstimatedMassMetricTonnes": 277
+          },
+          "subseaStructureDetails": null,
+          "otherDetails": null,
+          "decommissioningPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          }
+        },
+        {
+          "id": 3,
+          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
+          "description": "Test description",
+          "status": "IN_USE",
+          "type": "OTHER",
+          "concreteMattressesDetails": null,
+          "subseaStructureDetails": null,
+          "otherDetails": {
+            "type": "Test type",
+            "totalEstimatedMassMetricTonnes": 47
+          },
+          "decommissioningPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          }
+        },
+        {
+          "id": 2,
+          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
+          "description": "Test description",
+          "status": "IN_USE",
+          "type": "SUBSEA_STRUCTURE",
+          "concreteMattressesDetails": null,
+          "subseaStructureDetails": {
+            "totalEstimatedMass": "GREATER_THAN_OR_EQUAL_400_TONNES"
+          },
+          "otherDetails": null,
+          "decommissioningPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          }
         }
       ],
       "submittedOn": "2024-10-29T11:20:38"

@@ -15,6 +15,7 @@ import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationB
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.repository.project.platformsfpsos.PlatformFpsoRepository;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
+import uk.co.ogauthority.pathfinder.repository.project.subseainfrastructure.SubseaInfrastructureRepository;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 
 @Service
@@ -30,6 +31,7 @@ class InfrastructureProjectJsonService {
   private final InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository;
   private final PlatformFpsoRepository platformFpsoRepository;
   private final IntegratedRigRepository integratedRigRepository;
+  private final SubseaInfrastructureRepository subseaInfrastructureRepository;
 
   InfrastructureProjectJsonService(
       ProjectDetailsRepository projectDetailsRepository,
@@ -41,7 +43,8 @@ class InfrastructureProjectJsonService {
       InfrastructureAwardedContractRepository infrastructureAwardedContractRepository,
       InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository,
       PlatformFpsoRepository platformFpsoRepository,
-      IntegratedRigRepository integratedRigRepository
+      IntegratedRigRepository integratedRigRepository,
+      SubseaInfrastructureRepository subseaInfrastructureRepository
   ) {
     this.projectDetailsRepository = projectDetailsRepository;
     this.projectOperatorRepository = projectOperatorRepository;
@@ -53,6 +56,7 @@ class InfrastructureProjectJsonService {
     this.infrastructureCollaborationOpportunitiesRepository = infrastructureCollaborationOpportunitiesRepository;
     this.platformFpsoRepository = platformFpsoRepository;
     this.integratedRigRepository = integratedRigRepository;
+    this.subseaInfrastructureRepository = subseaInfrastructureRepository;
   }
 
   Set<InfrastructureProjectJson> getPublishedInfrastructureProjects() {
@@ -90,6 +94,9 @@ class InfrastructureProjectJsonService {
     var integratedRigsByProjectDetailId = Streams.stream(integratedRigRepository.findAll())
         .collect(Collectors.groupingBy(integratedRig -> integratedRig.getProjectDetail().getId()));
 
+    var subseaInfrastructuresByProjectDetailId = Streams.stream(subseaInfrastructureRepository.findAll())
+        .collect(Collectors.groupingBy(subseaInfrastructure -> subseaInfrastructure.getProjectDetail().getId()));
+
     return allProjectDetails
         .stream()
         .map(projectDetail ->
@@ -103,7 +110,8 @@ class InfrastructureProjectJsonService {
                 infrastructureAwardedContractsByProjectDetailId.get(projectDetail.getId()),
                 infrastructureCollaborationOpportunitiesByProjectDetailId.get(projectDetail.getId()),
                 platformFpsosByProjectDetailId.get(projectDetail.getId()),
-                integratedRigsByProjectDetailId.get(projectDetail.getId())
+                integratedRigsByProjectDetailId.get(projectDetail.getId()),
+                subseaInfrastructuresByProjectDetailId.get(projectDetail.getId())
             )
         )
         .collect(Collectors.toSet());

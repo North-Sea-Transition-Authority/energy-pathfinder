@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.publicdata;
 import java.time.LocalDateTime;
 import java.util.Set;
 import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.PlatformFpsoInfrastructureType;
+import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureType;
 
 class InfrastructureProjectJsonTestUtil {
 
@@ -49,6 +50,36 @@ class InfrastructureProjectJsonTestUtil {
     private Set<InfrastructureProjectIntegratedRigToBeDecommissionedJson> integratedRigsToBeDecommissioned = Set.of(
         InfrastructureProjectIntegratedRigToBeDecommissionedJsonTestUtil.newBuilder().withId(1).build(),
         InfrastructureProjectIntegratedRigToBeDecommissionedJsonTestUtil.newBuilder().withId(2).build()
+    );
+    private Set<InfrastructureProjectSubseaInfrastructureToBeDecommissionedJson> subseaInfrastructuresToBeDecommissioned = Set.of(
+        InfrastructureProjectSubseaInfrastructureToBeDecommissionedJsonTestUtil.newBuilder()
+            .withId(1)
+            .withType(SubseaInfrastructureType.CONCRETE_MATTRESSES.name())
+            .withConcreteMattressesDetails(
+                InfrastructureProjectSubseaInfrastructureToBeDecommissionedConcreteMattressesDetailsJsonTestUtil.newBuilder()
+                    .build()
+            )
+            .withSubseaStructureDetails(null)
+            .withOtherDetails(null)
+            .build(),
+        InfrastructureProjectSubseaInfrastructureToBeDecommissionedJsonTestUtil.newBuilder()
+            .withId(2)
+            .withType(SubseaInfrastructureType.SUBSEA_STRUCTURE.name())
+            .withConcreteMattressesDetails(null)
+            .withSubseaStructureDetails(
+                InfrastructureProjectSubseaInfrastructureToBeDecommissionedSubseaStructureDetailsJsonTestUtil.newBuilder().build()
+            )
+            .withOtherDetails(null)
+            .build(),
+        InfrastructureProjectSubseaInfrastructureToBeDecommissionedJsonTestUtil.newBuilder()
+            .withId(3)
+            .withType(SubseaInfrastructureType.OTHER.name())
+            .withConcreteMattressesDetails(null)
+            .withSubseaStructureDetails(null)
+            .withOtherDetails(
+                InfrastructureProjectSubseaInfrastructureToBeDecommissionedOtherDetailsJsonTestUtil.newBuilder().build()
+            )
+            .build()
     );
     private LocalDateTime submittedOn = LocalDateTime.of(2024, 10, 29, 11, 20, 38, 424521789);
 
@@ -109,6 +140,13 @@ class InfrastructureProjectJsonTestUtil {
       return this;
     }
 
+    Builder withSubseaInfrastructuresToBeDecommissioned(
+        Set<InfrastructureProjectSubseaInfrastructureToBeDecommissionedJson> subseaInfrastructuresToBeDecommissioned
+    ) {
+      this.subseaInfrastructuresToBeDecommissioned = subseaInfrastructuresToBeDecommissioned;
+      return this;
+    }
+
     Builder withSubmittedOn(LocalDateTime submittedOn) {
       this.submittedOn = submittedOn;
       return this;
@@ -126,6 +164,7 @@ class InfrastructureProjectJsonTestUtil {
           collaborationOpportunities,
           platformOrFpsosToBeDecommissioned,
           integratedRigsToBeDecommissioned,
+          subseaInfrastructuresToBeDecommissioned,
           submittedOn
       );
     }

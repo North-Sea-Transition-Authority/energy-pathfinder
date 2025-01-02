@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.testutil;
 
 import java.time.LocalDate;
 import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkFacility;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.subseainfrastructure.SubseaInfrastructure;
 import uk.co.ogauthority.pathfinder.model.enums.project.InfrastructureStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure.SubseaInfrastructureType;
@@ -28,6 +29,10 @@ public class SubseaInfrastructureTestUtil {
 
   private SubseaInfrastructureTestUtil() {
     throw new IllegalStateException("SubseaInfrastructureTestUtil is a utility class and should not be instantiated");
+  }
+
+  public static SubseaInfrastructure createSubseaInfrastructure(Integer id, ProjectDetail projectDetail) {
+    return createSubseaInfrastructure(id, projectDetail, DevUkTestUtil.getDevUkFacility(), null);
   }
 
   public static SubseaInfrastructure createSubseaInfrastructure_withDevUkFacility() {
@@ -120,10 +125,18 @@ public class SubseaInfrastructureTestUtil {
     return otherSubseaStructureForm;
   }
 
-  private static SubseaInfrastructure createSubseaInfrastructure(DevUkFacility facility,
-                                                                 String manualFacility) {
-    var subseaInfrastructure = new SubseaInfrastructure();
-    subseaInfrastructure.setProjectDetail(ProjectUtil.getProjectDetails());
+  private static SubseaInfrastructure createSubseaInfrastructure(DevUkFacility facility, String manualFacility) {
+    return createSubseaInfrastructure(null, ProjectUtil.getProjectDetails(), facility, manualFacility);
+  }
+
+  private static SubseaInfrastructure createSubseaInfrastructure(
+      Integer id,
+      ProjectDetail projectDetail,
+      DevUkFacility facility,
+      String manualFacility
+  ) {
+    var subseaInfrastructure = new SubseaInfrastructure(id);
+    subseaInfrastructure.setProjectDetail(projectDetail);
     subseaInfrastructure.setFacility(facility);
     subseaInfrastructure.setManualFacility(manualFacility);
     subseaInfrastructure.setDescription(DESCRIPTION);

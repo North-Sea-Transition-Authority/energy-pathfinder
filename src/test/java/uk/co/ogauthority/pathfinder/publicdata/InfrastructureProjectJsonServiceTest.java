@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationB
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.repository.project.platformsfpsos.PlatformFpsoRepository;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
+import uk.co.ogauthority.pathfinder.repository.project.subseainfrastructure.SubseaInfrastructureRepository;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
@@ -30,6 +31,7 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.SubseaInfrastructureTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 
@@ -65,6 +67,9 @@ class InfrastructureProjectJsonServiceTest {
 
   @Mock
   private IntegratedRigRepository integratedRigRepository;
+
+  @Mock
+  private SubseaInfrastructureRepository subseaInfrastructureRepository;
 
   @InjectMocks
   private InfrastructureProjectJsonService infrastructureProjectJsonService;
@@ -141,6 +146,10 @@ class InfrastructureProjectJsonServiceTest {
     var integratedRig2 = IntegratedRigTestUtil.createIntegratedRig(2, projectDetail1);
     var integratedRig3 = IntegratedRigTestUtil.createIntegratedRig(3, projectDetail2);
 
+    var subseaInfrastructure1 = SubseaInfrastructureTestUtil.createSubseaInfrastructure(1, projectDetail1);
+    var subseaInfrastructure2 = SubseaInfrastructureTestUtil.createSubseaInfrastructure(2, projectDetail1);
+    var subseaInfrastructure3 = SubseaInfrastructureTestUtil.createSubseaInfrastructure(3, projectDetail2);
+
     when(projectDetailsRepository.getAllPublishedProjectDetailsByProjectType(ProjectType.INFRASTRUCTURE))
         .thenReturn(List.of(projectDetail1, projectDetail2, projectDetail3));
 
@@ -171,6 +180,9 @@ class InfrastructureProjectJsonServiceTest {
 
     when(integratedRigRepository.findAll()).thenReturn(List.of(integratedRig1, integratedRig2, integratedRig3));
 
+    when(subseaInfrastructureRepository.findAll())
+        .thenReturn(List.of(subseaInfrastructure1, subseaInfrastructure2, subseaInfrastructure3));
+
     var infrastructureProjectJsons = infrastructureProjectJsonService.getPublishedInfrastructureProjects();
 
     assertThat(infrastructureProjectJsons).containsExactlyInAnyOrder(
@@ -184,7 +196,8 @@ class InfrastructureProjectJsonServiceTest {
             List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
             List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2),
             List.of(platformFpso1, platformFpso2),
-            List.of(integratedRig1, integratedRig2)
+            List.of(integratedRig1, integratedRig2),
+            List.of(subseaInfrastructure1, subseaInfrastructure2)
         ),
         InfrastructureProjectJson.from(
             projectDetail2,
@@ -196,13 +209,15 @@ class InfrastructureProjectJsonServiceTest {
             List.of(infrastructureAwardedContract3),
             List.of(infrastructureCollaborationOpportunity3),
             List.of(platformFpso3),
-            List.of(integratedRig3)
+            List.of(integratedRig3),
+            List.of(subseaInfrastructure3)
         ),
         InfrastructureProjectJson.from(
             projectDetail3,
             projectOperator3,
             projectInformation3,
             projectLocation3,
+            null,
             null,
             null,
             null,
