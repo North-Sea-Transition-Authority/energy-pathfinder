@@ -81,6 +81,10 @@ class InfrastructureProjectJsonTestUtil {
             )
             .build()
     );
+    private Set<InfrastructureProjectPipelineToBeDecommissionedJson> pipelinesToBeDecommissioned = Set.of(
+        InfrastructureProjectPipelineToBeDecommissionedJsonTestUtil.newBuilder().withId(1).build(),
+        InfrastructureProjectPipelineToBeDecommissionedJsonTestUtil.newBuilder().withId(2).build()
+    );
     private LocalDateTime submittedOn = LocalDateTime.of(2024, 10, 29, 11, 20, 38, 424521789);
 
     private Builder() {
@@ -147,6 +151,13 @@ class InfrastructureProjectJsonTestUtil {
       return this;
     }
 
+    Builder withPipelinesToBeDecommissioned(
+        Set<InfrastructureProjectPipelineToBeDecommissionedJson> pipelinesToBeDecommissioned
+    ) {
+      this.pipelinesToBeDecommissioned = pipelinesToBeDecommissioned;
+      return this;
+    }
+
     Builder withSubmittedOn(LocalDateTime submittedOn) {
       this.submittedOn = submittedOn;
       return this;
@@ -165,6 +176,7 @@ class InfrastructureProjectJsonTestUtil {
           platformOrFpsosToBeDecommissioned,
           integratedRigsToBeDecommissioned,
           subseaInfrastructuresToBeDecommissioned,
+          pipelinesToBeDecommissioned,
           submittedOn
       );
     }

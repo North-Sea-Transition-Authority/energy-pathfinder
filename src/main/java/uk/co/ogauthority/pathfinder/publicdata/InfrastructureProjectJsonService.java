@@ -10,6 +10,7 @@ import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.infrastructure.InfrastructureAwardedContractRepository;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesRepository;
+import uk.co.ogauthority.pathfinder.repository.project.decommissionedpipeline.DecommissionedPipelineRepository;
 import uk.co.ogauthority.pathfinder.repository.project.integratedrig.IntegratedRigRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationBlockRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
@@ -32,6 +33,7 @@ class InfrastructureProjectJsonService {
   private final PlatformFpsoRepository platformFpsoRepository;
   private final IntegratedRigRepository integratedRigRepository;
   private final SubseaInfrastructureRepository subseaInfrastructureRepository;
+  private final DecommissionedPipelineRepository decommissionedPipelineRepository;
 
   InfrastructureProjectJsonService(
       ProjectDetailsRepository projectDetailsRepository,
@@ -44,7 +46,8 @@ class InfrastructureProjectJsonService {
       InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository,
       PlatformFpsoRepository platformFpsoRepository,
       IntegratedRigRepository integratedRigRepository,
-      SubseaInfrastructureRepository subseaInfrastructureRepository
+      SubseaInfrastructureRepository subseaInfrastructureRepository,
+      DecommissionedPipelineRepository decommissionedPipelineRepository
   ) {
     this.projectDetailsRepository = projectDetailsRepository;
     this.projectOperatorRepository = projectOperatorRepository;
@@ -57,6 +60,7 @@ class InfrastructureProjectJsonService {
     this.platformFpsoRepository = platformFpsoRepository;
     this.integratedRigRepository = integratedRigRepository;
     this.subseaInfrastructureRepository = subseaInfrastructureRepository;
+    this.decommissionedPipelineRepository = decommissionedPipelineRepository;
   }
 
   Set<InfrastructureProjectJson> getPublishedInfrastructureProjects() {
@@ -97,6 +101,9 @@ class InfrastructureProjectJsonService {
     var subseaInfrastructuresByProjectDetailId = Streams.stream(subseaInfrastructureRepository.findAll())
         .collect(Collectors.groupingBy(subseaInfrastructure -> subseaInfrastructure.getProjectDetail().getId()));
 
+    var decommissionedPipelinesByProjectDetailId = Streams.stream(decommissionedPipelineRepository.findAll())
+        .collect(Collectors.groupingBy(decommissionedPipeline -> decommissionedPipeline.getProjectDetail().getId()));
+
     return allProjectDetails
         .stream()
         .map(projectDetail ->
@@ -111,7 +118,8 @@ class InfrastructureProjectJsonService {
                 infrastructureCollaborationOpportunitiesByProjectDetailId.get(projectDetail.getId()),
                 platformFpsosByProjectDetailId.get(projectDetail.getId()),
                 integratedRigsByProjectDetailId.get(projectDetail.getId()),
-                subseaInfrastructuresByProjectDetailId.get(projectDetail.getId())
+                subseaInfrastructuresByProjectDetailId.get(projectDetail.getId()),
+                decommissionedPipelinesByProjectDetailId.get(projectDetail.getId())
             )
         )
         .collect(Collectors.toSet());

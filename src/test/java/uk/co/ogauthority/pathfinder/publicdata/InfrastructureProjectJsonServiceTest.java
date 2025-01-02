@@ -15,6 +15,7 @@ import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.infrastructure.InfrastructureAwardedContractRepository;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesRepository;
+import uk.co.ogauthority.pathfinder.repository.project.decommissionedpipeline.DecommissionedPipelineRepository;
 import uk.co.ogauthority.pathfinder.repository.project.integratedrig.IntegratedRigRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationBlockRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
@@ -23,6 +24,7 @@ import uk.co.ogauthority.pathfinder.repository.project.projectinformation.Projec
 import uk.co.ogauthority.pathfinder.repository.project.subseainfrastructure.SubseaInfrastructureRepository;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.DecommissionedPipelineTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.IntegratedRigTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
@@ -70,6 +72,9 @@ class InfrastructureProjectJsonServiceTest {
 
   @Mock
   private SubseaInfrastructureRepository subseaInfrastructureRepository;
+
+  @Mock
+  private DecommissionedPipelineRepository decommissionedPipelineRepository;
 
   @InjectMocks
   private InfrastructureProjectJsonService infrastructureProjectJsonService;
@@ -150,6 +155,10 @@ class InfrastructureProjectJsonServiceTest {
     var subseaInfrastructure2 = SubseaInfrastructureTestUtil.createSubseaInfrastructure(2, projectDetail1);
     var subseaInfrastructure3 = SubseaInfrastructureTestUtil.createSubseaInfrastructure(3, projectDetail2);
 
+    var decommissionedPipeline1 = DecommissionedPipelineTestUtil.createDecommissionedPipeline(1, projectDetail1);
+    var decommissionedPipeline2 = DecommissionedPipelineTestUtil.createDecommissionedPipeline(2, projectDetail1);
+    var decommissionedPipeline3 = DecommissionedPipelineTestUtil.createDecommissionedPipeline(3, projectDetail2);
+
     when(projectDetailsRepository.getAllPublishedProjectDetailsByProjectType(ProjectType.INFRASTRUCTURE))
         .thenReturn(List.of(projectDetail1, projectDetail2, projectDetail3));
 
@@ -183,6 +192,9 @@ class InfrastructureProjectJsonServiceTest {
     when(subseaInfrastructureRepository.findAll())
         .thenReturn(List.of(subseaInfrastructure1, subseaInfrastructure2, subseaInfrastructure3));
 
+    when(decommissionedPipelineRepository.findAll())
+        .thenReturn(List.of(decommissionedPipeline1, decommissionedPipeline2, decommissionedPipeline3));
+
     var infrastructureProjectJsons = infrastructureProjectJsonService.getPublishedInfrastructureProjects();
 
     assertThat(infrastructureProjectJsons).containsExactlyInAnyOrder(
@@ -197,7 +209,8 @@ class InfrastructureProjectJsonServiceTest {
             List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2),
             List.of(platformFpso1, platformFpso2),
             List.of(integratedRig1, integratedRig2),
-            List.of(subseaInfrastructure1, subseaInfrastructure2)
+            List.of(subseaInfrastructure1, subseaInfrastructure2),
+            List.of(decommissionedPipeline1, decommissionedPipeline2)
         ),
         InfrastructureProjectJson.from(
             projectDetail2,
@@ -210,13 +223,15 @@ class InfrastructureProjectJsonServiceTest {
             List.of(infrastructureCollaborationOpportunity3),
             List.of(platformFpso3),
             List.of(integratedRig3),
-            List.of(subseaInfrastructure3)
+            List.of(subseaInfrastructure3),
+            List.of(decommissionedPipeline3)
         ),
         InfrastructureProjectJson.from(
             projectDetail3,
             projectOperator3,
             projectInformation3,
             projectLocation3,
+            null,
             null,
             null,
             null,
