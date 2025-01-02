@@ -13,6 +13,7 @@ import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.repository.project.integratedrig.IntegratedRigRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationBlockRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
+import uk.co.ogauthority.pathfinder.repository.project.platformsfpsos.PlatformFpsoRepository;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 
@@ -27,6 +28,7 @@ class InfrastructureProjectJsonService {
   private final UpcomingTenderRepository upcomingTenderRepository;
   private final InfrastructureAwardedContractRepository infrastructureAwardedContractRepository;
   private final InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository;
+  private final PlatformFpsoRepository platformFpsoRepository;
   private final IntegratedRigRepository integratedRigRepository;
 
   InfrastructureProjectJsonService(
@@ -38,6 +40,7 @@ class InfrastructureProjectJsonService {
       UpcomingTenderRepository upcomingTenderRepository,
       InfrastructureAwardedContractRepository infrastructureAwardedContractRepository,
       InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository,
+      PlatformFpsoRepository platformFpsoRepository,
       IntegratedRigRepository integratedRigRepository
   ) {
     this.projectDetailsRepository = projectDetailsRepository;
@@ -48,6 +51,7 @@ class InfrastructureProjectJsonService {
     this.upcomingTenderRepository = upcomingTenderRepository;
     this.infrastructureAwardedContractRepository = infrastructureAwardedContractRepository;
     this.infrastructureCollaborationOpportunitiesRepository = infrastructureCollaborationOpportunitiesRepository;
+    this.platformFpsoRepository = platformFpsoRepository;
     this.integratedRigRepository = integratedRigRepository;
   }
 
@@ -80,6 +84,9 @@ class InfrastructureProjectJsonService {
             .collect(Collectors.groupingBy(
                 infrastructureCollaborationOpportunity -> infrastructureCollaborationOpportunity.getProjectDetail().getId()));
 
+    var platformFpsosByProjectDetailId = Streams.stream(platformFpsoRepository.findAll())
+        .collect(Collectors.groupingBy(platformFpso -> platformFpso.getProjectDetail().getId()));
+
     var integratedRigsByProjectDetailId = Streams.stream(integratedRigRepository.findAll())
         .collect(Collectors.groupingBy(integratedRig -> integratedRig.getProjectDetail().getId()));
 
@@ -95,6 +102,7 @@ class InfrastructureProjectJsonService {
                 upcomingTendersByProjectDetailId.get(projectDetail.getId()),
                 infrastructureAwardedContractsByProjectDetailId.get(projectDetail.getId()),
                 infrastructureCollaborationOpportunitiesByProjectDetailId.get(projectDetail.getId()),
+                platformFpsosByProjectDetailId.get(projectDetail.getId()),
                 integratedRigsByProjectDetailId.get(projectDetail.getId())
             )
         )

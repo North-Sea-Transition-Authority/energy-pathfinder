@@ -12,6 +12,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunit
 import uk.co.ogauthority.pathfinder.model.entity.project.integratedrig.IntegratedRig;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
+import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
 
@@ -24,6 +25,7 @@ record InfrastructureProjectJson(
     Set<InfrastructureProjectUpcomingTenderJson> upcomingTenders,
     Set<InfrastructureProjectAwardedContractJson> awardedContracts,
     Set<InfrastructureProjectCollaborationOpportunityJson> collaborationOpportunities,
+    Set<InfrastructureProjectPlatformOrFpsoToBeDecommissionedJson> platformOrFpsosToBeDecommissioned,
     Set<InfrastructureProjectIntegratedRigToBeDecommissionedJson> integratedRigsToBeDecommissioned,
     LocalDateTime submittedOn
 ) {
@@ -37,6 +39,7 @@ record InfrastructureProjectJson(
       Collection<UpcomingTender> upcomingTendersList,
       Collection<InfrastructureAwardedContract> infrastructureAwardedContracts,
       Collection<InfrastructureCollaborationOpportunity> infrastructureCollaborationOpportunities,
+      Collection<PlatformFpso> platformFpsos,
       Collection<IntegratedRig> integratedRigs
   ) {
     var id = projectDetail.getProject().getId();
@@ -65,6 +68,10 @@ record InfrastructureProjectJson(
             .collect(Collectors.toSet())
         : null;
 
+    var platformOrFpsosToBeDecommissioned = platformFpsos != null
+        ? platformFpsos.stream().map(InfrastructureProjectPlatformOrFpsoToBeDecommissionedJson::from).collect(Collectors.toSet())
+        : null;
+
     var integratedRigsToBeDecommissioned = integratedRigs != null
         ? integratedRigs.stream().map(InfrastructureProjectIntegratedRigToBeDecommissionedJson::from).collect(Collectors.toSet())
         : null;
@@ -80,6 +87,7 @@ record InfrastructureProjectJson(
         upcomingTenders,
         awardedContracts,
         collaborationOpportunities,
+        platformOrFpsosToBeDecommissioned,
         integratedRigsToBeDecommissioned,
         submittedOn
     );

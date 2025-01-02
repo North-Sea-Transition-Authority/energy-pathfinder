@@ -18,12 +18,14 @@ import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.repository.project.integratedrig.IntegratedRigRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationBlockRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
+import uk.co.ogauthority.pathfinder.repository.project.platformsfpsos.PlatformFpsoRepository;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.IntegratedRigTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.PlatformFpsoTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
@@ -57,6 +59,9 @@ class InfrastructureProjectJsonServiceTest {
 
   @Mock
   private InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository;
+
+  @Mock
+  private PlatformFpsoRepository platformFpsoRepository;
 
   @Mock
   private IntegratedRigRepository integratedRigRepository;
@@ -128,6 +133,10 @@ class InfrastructureProjectJsonServiceTest {
     var infrastructureCollaborationOpportunity3 =
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(3, projectDetail2);
 
+    var platformFpso1 = PlatformFpsoTestUtil.getPlatformFpso(1, projectDetail1);
+    var platformFpso2 = PlatformFpsoTestUtil.getPlatformFpso(2, projectDetail1);
+    var platformFpso3 = PlatformFpsoTestUtil.getPlatformFpso(3, projectDetail2);
+
     var integratedRig1 = IntegratedRigTestUtil.createIntegratedRig(1, projectDetail1);
     var integratedRig2 = IntegratedRigTestUtil.createIntegratedRig(2, projectDetail1);
     var integratedRig3 = IntegratedRigTestUtil.createIntegratedRig(3, projectDetail2);
@@ -158,6 +167,8 @@ class InfrastructureProjectJsonServiceTest {
         )
     );
 
+    when(platformFpsoRepository.findAll()).thenReturn(List.of(platformFpso1, platformFpso2, platformFpso3));
+
     when(integratedRigRepository.findAll()).thenReturn(List.of(integratedRig1, integratedRig2, integratedRig3));
 
     var infrastructureProjectJsons = infrastructureProjectJsonService.getPublishedInfrastructureProjects();
@@ -172,6 +183,7 @@ class InfrastructureProjectJsonServiceTest {
             List.of(upcomingTender1, upcomingTender2),
             List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
             List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2),
+            List.of(platformFpso1, platformFpso2),
             List.of(integratedRig1, integratedRig2)
         ),
         InfrastructureProjectJson.from(
@@ -183,6 +195,7 @@ class InfrastructureProjectJsonServiceTest {
             List.of(upcomingTender3),
             List.of(infrastructureAwardedContract3),
             List.of(infrastructureCollaborationOpportunity3),
+            List.of(platformFpso3),
             List.of(integratedRig3)
         ),
         InfrastructureProjectJson.from(
@@ -190,6 +203,7 @@ class InfrastructureProjectJsonServiceTest {
             projectOperator3,
             projectInformation3,
             projectLocation3,
+            null,
             null,
             null,
             null,

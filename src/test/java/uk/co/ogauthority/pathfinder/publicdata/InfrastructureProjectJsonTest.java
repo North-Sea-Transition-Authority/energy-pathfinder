@@ -12,6 +12,7 @@ import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.IntegratedRigTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.PlatformFpsoTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
@@ -46,6 +47,9 @@ class InfrastructureProjectJsonTest {
     var infrastructureCollaborationOpportunity2 =
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(2, projectDetail);
 
+    var platformFpso1 = PlatformFpsoTestUtil.getPlatformFpso(1, projectDetail);
+    var platformFpso2 = PlatformFpsoTestUtil.getPlatformFpso(2, projectDetail);
+
     var integratedRig1 = IntegratedRigTestUtil.createIntegratedRig(1, projectDetail);
     var integratedRig2 = IntegratedRigTestUtil.createIntegratedRig(2, projectDetail);
 
@@ -58,6 +62,7 @@ class InfrastructureProjectJsonTest {
         List.of(upcomingTender1, upcomingTender2),
         List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
         List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2),
+        List.of(platformFpso1, platformFpso2),
         List.of(integratedRig1, integratedRig2)
     );
 
@@ -78,6 +83,10 @@ class InfrastructureProjectJsonTest {
         Set.of(
             InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity1),
             InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2)
+        ),
+        Set.of(
+            InfrastructureProjectPlatformOrFpsoToBeDecommissionedJson.from(platformFpso1),
+            InfrastructureProjectPlatformOrFpsoToBeDecommissionedJson.from(platformFpso2)
         ),
         Set.of(
             InfrastructureProjectIntegratedRigToBeDecommissionedJson.from(integratedRig1),
@@ -108,6 +117,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -133,6 +143,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -152,6 +163,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -187,6 +199,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -206,6 +219,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -237,6 +251,7 @@ class InfrastructureProjectJsonTest {
         List.of(upcomingTender1, upcomingTender2),
         null,
         null,
+        null,
         null
     );
 
@@ -258,6 +273,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -289,6 +305,7 @@ class InfrastructureProjectJsonTest {
         null,
         List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
         null,
+        null,
         null
     );
 
@@ -310,6 +327,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -343,12 +361,67 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2),
+        null,
         null
     );
 
     assertThat(infrastructureProjectJson.collaborationOpportunities()).containsExactlyInAnyOrder(
         InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity1),
         InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2)
+    );
+  }
+
+  @Test
+  void from_platformFpsosIsNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.platformOrFpsosToBeDecommissioned()).isNull();
+  }
+
+  @Test
+  void from_platformFpsosIsNotNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var platformFpso1 = PlatformFpsoTestUtil.getPlatformFpso(1, projectDetail);
+    var platformFpso2 = PlatformFpsoTestUtil.getPlatformFpso(2, projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null,
+        List.of(platformFpso1, platformFpso2),
+        null
+    );
+
+    assertThat(infrastructureProjectJson.platformOrFpsosToBeDecommissioned()).containsExactlyInAnyOrder(
+        InfrastructureProjectPlatformOrFpsoToBeDecommissionedJson.from(platformFpso1),
+        InfrastructureProjectPlatformOrFpsoToBeDecommissionedJson.from(platformFpso2)
     );
   }
 
@@ -364,6 +437,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -390,6 +464,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,

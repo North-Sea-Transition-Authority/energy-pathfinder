@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.publicdata;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos.PlatformFpsoInfrastructureType;
 
 class InfrastructureProjectJsonTestUtil {
 
@@ -28,6 +29,22 @@ class InfrastructureProjectJsonTestUtil {
     private Set<InfrastructureProjectCollaborationOpportunityJson> collaborationOpportunities = Set.of(
         InfrastructureProjectCollaborationOpportunityJsonTestUtil.newBuilder().withId(1).build(),
         InfrastructureProjectCollaborationOpportunityJsonTestUtil.newBuilder().withId(2).build()
+    );
+    private Set<InfrastructureProjectPlatformOrFpsoToBeDecommissionedJson> platformOrFpsosToBeDecommissioned = Set.of(
+        InfrastructureProjectPlatformOrFpsoToBeDecommissionedJsonTestUtil.newBuilder()
+            .withId(1)
+            .withType(PlatformFpsoInfrastructureType.PLATFORM.name())
+            .withPlatformDetails(InfrastructureProjectPlatformOrFpsoToBeDecommissionedPlatformDetailsJsonTestUtil.newBuilder()
+                .build())
+            .withFpsoDetails(null)
+            .build(),
+        InfrastructureProjectPlatformOrFpsoToBeDecommissionedJsonTestUtil.newBuilder()
+            .withId(2)
+            .withType(PlatformFpsoInfrastructureType.FPSO.name())
+            .withPlatformDetails(null)
+            .withFpsoDetails(InfrastructureProjectPlatformOrFpsoToBeDecommissionedFpsoDetailsJsonTestUtil.newBuilder()
+                .build())
+            .build()
     );
     private Set<InfrastructureProjectIntegratedRigToBeDecommissionedJson> integratedRigsToBeDecommissioned = Set.of(
         InfrastructureProjectIntegratedRigToBeDecommissionedJsonTestUtil.newBuilder().withId(1).build(),
@@ -78,6 +95,13 @@ class InfrastructureProjectJsonTestUtil {
       return this;
     }
 
+    Builder withPlatformOrFpsosToBeDecommissioned(
+        Set<InfrastructureProjectPlatformOrFpsoToBeDecommissionedJson> platformOrFpsosToBeDecommissioned
+    ) {
+      this.platformOrFpsosToBeDecommissioned = platformOrFpsosToBeDecommissioned;
+      return this;
+    }
+
     Builder withIntegratedRigsToBeDecommissioned(
         Set<InfrastructureProjectIntegratedRigToBeDecommissionedJson> integratedRigsToBeDecommissioned
     ) {
@@ -100,6 +124,7 @@ class InfrastructureProjectJsonTestUtil {
           upcomingTenders,
           awardedContracts,
           collaborationOpportunities,
+          platformOrFpsosToBeDecommissioned,
           integratedRigsToBeDecommissioned,
           submittedOn
       );

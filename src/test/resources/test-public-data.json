@@ -120,6 +120,56 @@
           }
         }
       ],
+      "platformOrFpsosToBeDecommissioned": [
+        {
+          "id": 1,
+          "type": "PLATFORM",
+          "platformDetails": {
+            "name": "Test name"
+          },
+          "fpsoDetails": null,
+          "topsidesOrFloatingUnitMassMetricTonnes": 100,
+          "removalPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "substructureRemovalInScope": true,
+          "substructureRemovalDetails": {
+            "premise": "FULL",
+            "estimatedMassMetricTonnes": 50,
+            "period": {
+              "startYear": 2024,
+              "endYear": 2025
+            }
+          },
+          "futurePlans": "RECYCLE"
+        },
+        {
+          "id": 2,
+          "type": "FPSO",
+          "platformDetails": null,
+          "fpsoDetails": {
+            "name": "Test name",
+            "type": "Test type",
+            "dimensions": "Test dimensions"
+          },
+          "topsidesOrFloatingUnitMassMetricTonnes": 100,
+          "removalPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "substructureRemovalInScope": true,
+          "substructureRemovalDetails": {
+            "premise": "FULL",
+            "estimatedMassMetricTonnes": 50,
+            "period": {
+              "startYear": 2024,
+              "endYear": 2025
+            }
+          },
+          "futurePlans": "RECYCLE"
+        }
+      ],
       "integratedRigsToBeDecommissioned": [
         {
           "id": 1,
@@ -256,6 +306,56 @@
             "jobTitle": "Test contact job title",
             "emailAddress": "test@email.address"
           }
+        }
+      ],
+      "platformOrFpsosToBeDecommissioned": [
+        {
+          "id": 1,
+          "type": "PLATFORM",
+          "platformDetails": {
+            "name": "Test name"
+          },
+          "fpsoDetails": null,
+          "topsidesOrFloatingUnitMassMetricTonnes": 100,
+          "removalPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "substructureRemovalInScope": true,
+          "substructureRemovalDetails": {
+            "premise": "FULL",
+            "estimatedMassMetricTonnes": 50,
+            "period": {
+              "startYear": 2024,
+              "endYear": 2025
+            }
+          },
+          "futurePlans": "RECYCLE"
+        },
+        {
+          "id": 2,
+          "type": "FPSO",
+          "platformDetails": null,
+          "fpsoDetails": {
+            "name": "Test name",
+            "type": "Test type",
+            "dimensions": "Test dimensions"
+          },
+          "topsidesOrFloatingUnitMassMetricTonnes": 100,
+          "removalPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "substructureRemovalInScope": true,
+          "substructureRemovalDetails": {
+            "premise": "FULL",
+            "estimatedMassMetricTonnes": 50,
+            "period": {
+              "startYear": 2024,
+              "endYear": 2025
+            }
+          },
+          "futurePlans": "RECYCLE"
         }
       ],
       "integratedRigsToBeDecommissioned": [

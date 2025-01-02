@@ -25,6 +25,20 @@ public class PlatformFpsoTestUtil {
   public static final String FPSO_DIMENSIONS = "some dimensions";
   public static final FuturePlans FUTURE_PLANS = FuturePlans.RECYCLE;
 
+  public static PlatformFpso getPlatformFpso(Integer id, ProjectDetail detail) {
+    var platformFpso = new PlatformFpso(id);
+    platformFpso.setProjectDetail(detail);
+    platformFpso.setInfrastructureType(PlatformFpsoInfrastructureType.FPSO);
+    platformFpso.setStructure(FACILITY);
+    setCommonFields(platformFpso, true);
+    setFpsoCommonFields(platformFpso);
+    return platformFpso;
+  }
+
+  public static PlatformFpso getPlatformFpso_withFpso(ProjectDetail detail) {
+    return getPlatformFpso_withFpsoAndSubstructuresRemoved(detail);
+  }
+
   public static PlatformFpso getPlatformFpso_withFpsoAndSubstructuresRemoved(ProjectDetail detail) {
     var platformFpso = new PlatformFpso(detail);
     platformFpso.setInfrastructureType(PlatformFpsoInfrastructureType.FPSO);
@@ -35,10 +49,22 @@ public class PlatformFpsoTestUtil {
   }
 
   public static PlatformFpso getPlatformFpso_withPlatform(ProjectDetail detail) {
+    return getPlatformFpso_withPlatformAndSubstructuresRemoved(detail);
+  }
+
+  public static PlatformFpso getPlatformFpso_withPlatformAndSubstructuresRemoved(ProjectDetail detail) {
     var platformFpso = new PlatformFpso(detail);
     platformFpso.setInfrastructureType(PlatformFpsoInfrastructureType.PLATFORM);
     platformFpso.setStructure(FACILITY);
     setCommonFields(platformFpso, true);
+    return platformFpso;
+  }
+
+  public static PlatformFpso getPlatformFpso_withPlatformAndSubstructuresNotRemoved(ProjectDetail detail) {
+    var platformFpso = new PlatformFpso(detail);
+    platformFpso.setInfrastructureType(PlatformFpsoInfrastructureType.PLATFORM);
+    platformFpso.setStructure(FACILITY);
+    setCommonFields(platformFpso, false);
     return platformFpso;
   }
 
