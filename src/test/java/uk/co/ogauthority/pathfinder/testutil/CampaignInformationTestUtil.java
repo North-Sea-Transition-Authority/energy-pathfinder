@@ -12,24 +12,36 @@ public class CampaignInformationTestUtil {
   private CampaignInformationTestUtil() {
     throw new IllegalStateException("CampaignInformationTestUtil is a utility class and should not be instantiated");
   }
-  public static CampaignInformation createCampaignInformation(
-      ProjectDetail projectDetail,
-      Boolean publishedCampaign,
-      String scopeDescription
-  ) {
-    var campaignInformation = new CampaignInformation();
-    campaignInformation.setProjectDetail(projectDetail);
-    campaignInformation.setIsPartOfCampaign(publishedCampaign);
-    campaignInformation.setScopeDescription(scopeDescription);
-    return campaignInformation;
-  }
 
   public static CampaignInformation createCampaignInformation() {
     return createCampaignInformation(
+        null,
         ProjectUtil.getProjectDetails(),
         PUBLISHED_CAMPAIGN,
         SCOPE_DESCRIPTION
     );
+  }
+
+  public static CampaignInformation createCampaignInformation(Integer id, ProjectDetail projectDetail) {
+    return createCampaignInformation(
+        id,
+        projectDetail,
+        PUBLISHED_CAMPAIGN,
+        SCOPE_DESCRIPTION
+    );
+  }
+
+  public static CampaignInformation createCampaignInformation(
+      Integer id,
+      ProjectDetail projectDetail,
+      Boolean publishedCampaign,
+      String scopeDescription
+  ) {
+    var campaignInformation = new CampaignInformation(id);
+    campaignInformation.setProjectDetail(projectDetail);
+    campaignInformation.setIsPartOfCampaign(publishedCampaign);
+    campaignInformation.setScopeDescription(scopeDescription);
+    return campaignInformation;
   }
 
   public static CampaignInformationForm createCampaignInformationForm(

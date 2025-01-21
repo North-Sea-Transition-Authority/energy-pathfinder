@@ -120,6 +120,14 @@
           }
         }
       ],
+      "campaign": {
+        "scope": "Test scope",
+        "partOfExistingInfrastructureProjectCampaign": true,
+        "existingCampaignInfrastructureProjectIds": [
+          2,
+          1
+        ]
+      },
       "wellCommissioningSchedules": [
         {
           "id": 2,
@@ -260,6 +268,22 @@
       ],
       "subseaInfrastructuresToBeDecommissioned": [
         {
+          "id": 2,
+          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
+          "description": "Test description",
+          "status": "IN_USE",
+          "type": "SUBSEA_STRUCTURE",
+          "concreteMattressesDetails": null,
+          "subseaStructureDetails": {
+            "totalEstimatedMass": "GREATER_THAN_OR_EQUAL_400_TONNES"
+          },
+          "otherDetails": null,
+          "decommissioningPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          }
+        },
+        {
           "id": 3,
           "surfaceInfrastructureHostName": "Test surface infrastructure host name",
           "description": "Test description",
@@ -287,22 +311,6 @@
             "totalEstimatedMassMetricTonnes": 277
           },
           "subseaStructureDetails": null,
-          "otherDetails": null,
-          "decommissioningPeriod": {
-            "startYear": 2024,
-            "endYear": 2025
-          }
-        },
-        {
-          "id": 2,
-          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
-          "description": "Test description",
-          "status": "IN_USE",
-          "type": "SUBSEA_STRUCTURE",
-          "concreteMattressesDetails": null,
-          "subseaStructureDetails": {
-            "totalEstimatedMass": "GREATER_THAN_OR_EQUAL_400_TONNES"
-          },
           "otherDetails": null,
           "decommissioningPeriod": {
             "startYear": 2024,
@@ -454,6 +462,14 @@
           }
         }
       ],
+      "campaign": {
+        "scope": "Test scope",
+        "partOfExistingInfrastructureProjectCampaign": true,
+        "existingCampaignInfrastructureProjectIds": [
+          2,
+          1
+        ]
+      },
       "wellCommissioningSchedules": [
         {
           "id": 2,
@@ -594,6 +610,22 @@
       ],
       "subseaInfrastructuresToBeDecommissioned": [
         {
+          "id": 2,
+          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
+          "description": "Test description",
+          "status": "IN_USE",
+          "type": "SUBSEA_STRUCTURE",
+          "concreteMattressesDetails": null,
+          "subseaStructureDetails": {
+            "totalEstimatedMass": "GREATER_THAN_OR_EQUAL_400_TONNES"
+          },
+          "otherDetails": null,
+          "decommissioningPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          }
+        },
+        {
           "id": 3,
           "surfaceInfrastructureHostName": "Test surface infrastructure host name",
           "description": "Test description",
@@ -621,22 +653,6 @@
             "totalEstimatedMassMetricTonnes": 277
           },
           "subseaStructureDetails": null,
-          "otherDetails": null,
-          "decommissioningPeriod": {
-            "startYear": 2024,
-            "endYear": 2025
-          }
-        },
-        {
-          "id": 2,
-          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
-          "description": "Test description",
-          "status": "IN_USE",
-          "type": "SUBSEA_STRUCTURE",
-          "concreteMattressesDetails": null,
-          "subseaStructureDetails": {
-            "totalEstimatedMass": "GREATER_THAN_OR_EQUAL_400_TONNES"
-          },
           "otherDetails": null,
           "decommissioningPeriod": {
             "startYear": 2024,

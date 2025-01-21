@@ -15,6 +15,8 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.infrastructure.InfrastructureAwardedContractRepository;
+import uk.co.ogauthority.pathfinder.repository.project.campaigninformation.CampaignInformationRepository;
+import uk.co.ogauthority.pathfinder.repository.project.campaigninformation.CampaignProjectRepository;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesRepository;
 import uk.co.ogauthority.pathfinder.repository.project.commissionedwell.CommissionedWellRepository;
 import uk.co.ogauthority.pathfinder.repository.project.commissionedwell.CommissionedWellScheduleRepository;
@@ -41,6 +43,8 @@ class InfrastructureProjectJsonService {
   private final UpcomingTenderRepository upcomingTenderRepository;
   private final InfrastructureAwardedContractRepository infrastructureAwardedContractRepository;
   private final InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository;
+  private final CampaignInformationRepository campaignInformationRepository;
+  private final CampaignProjectRepository campaignProjectRepository;
   private final CommissionedWellScheduleRepository commissionedWellScheduleRepository;
   private final CommissionedWellRepository commissionedWellRepository;
   private final PlugAbandonmentScheduleRepository plugAbandonmentScheduleRepository;
@@ -59,6 +63,8 @@ class InfrastructureProjectJsonService {
       UpcomingTenderRepository upcomingTenderRepository,
       InfrastructureAwardedContractRepository infrastructureAwardedContractRepository,
       InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository,
+      CampaignInformationRepository campaignInformationRepository,
+      CampaignProjectRepository campaignProjectRepository,
       CommissionedWellScheduleRepository commissionedWellScheduleRepository,
       CommissionedWellRepository commissionedWellRepository,
       PlugAbandonmentScheduleRepository plugAbandonmentScheduleRepository,
@@ -76,6 +82,8 @@ class InfrastructureProjectJsonService {
     this.upcomingTenderRepository = upcomingTenderRepository;
     this.infrastructureAwardedContractRepository = infrastructureAwardedContractRepository;
     this.infrastructureCollaborationOpportunitiesRepository = infrastructureCollaborationOpportunitiesRepository;
+    this.campaignInformationRepository = campaignInformationRepository;
+    this.campaignProjectRepository = campaignProjectRepository;
     this.commissionedWellScheduleRepository = commissionedWellScheduleRepository;
     this.commissionedWellRepository = commissionedWellRepository;
     this.plugAbandonmentScheduleRepository = plugAbandonmentScheduleRepository;
@@ -114,6 +122,12 @@ class InfrastructureProjectJsonService {
         Streams.stream(infrastructureCollaborationOpportunitiesRepository.findAll())
             .collect(Collectors.groupingBy(
                 infrastructureCollaborationOpportunity -> infrastructureCollaborationOpportunity.getProjectDetail().getId()));
+
+    var campaignInformationByProjectDetailId = Streams.stream(campaignInformationRepository.findAll())
+        .collect(Collectors.toMap(campaignInformation -> campaignInformation.getProjectDetail().getId(), Function.identity()));
+
+    var campaignProjectsByProjectDetailId = Streams.stream(campaignProjectRepository.findAll())
+        .collect(Collectors.groupingBy(campaignProject -> campaignProject.getCampaignInformation().getProjectDetail().getId()));
 
     var commissionedWellsByScheduleId = Streams.stream(commissionedWellRepository.findAll())
         .collect(Collectors.groupingBy(commissionedWell -> commissionedWell.getCommissionedWellSchedule().getId()));
@@ -169,9 +183,10 @@ class InfrastructureProjectJsonService {
                 upcomingTendersByProjectDetailId.get(projectDetail.getId()),
                 infrastructureAwardedContractsByProjectDetailId.get(projectDetail.getId()),
                 infrastructureCollaborationOpportunitiesByProjectDetailId.get(projectDetail.getId()),
+                campaignInformationByProjectDetailId.get(projectDetail.getId()),
+                campaignProjectsByProjectDetailId.get(projectDetail.getId()),
                 commissionedWellsByScheduleByProjectDetailId.get(projectDetail.getId()),
                 plugAbandonmentWellsByScheduleByProjectDetailId.get(projectDetail.getId()),
-
                 platformFpsosByProjectDetailId.get(projectDetail.getId()),
                 integratedRigsByProjectDetailId.get(projectDetail.getId()),
                 subseaInfrastructuresByProjectDetailId.get(projectDetail.getId()),

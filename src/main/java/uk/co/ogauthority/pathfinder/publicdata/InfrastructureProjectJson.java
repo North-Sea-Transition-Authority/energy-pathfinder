@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure.InfrastructureAwardedContract;
+import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignInformation;
+import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignProject;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
 import uk.co.ogauthority.pathfinder.model.entity.project.commissionedwell.CommissionedWell;
 import uk.co.ogauthority.pathfinder.model.entity.project.commissionedwell.CommissionedWellSchedule;
@@ -32,6 +34,7 @@ record InfrastructureProjectJson(
     Set<InfrastructureProjectUpcomingTenderJson> upcomingTenders,
     Set<InfrastructureProjectAwardedContractJson> awardedContracts,
     Set<InfrastructureProjectCollaborationOpportunityJson> collaborationOpportunities,
+    InfrastructureProjectCampaignJson campaign,
     Set<InfrastructureProjectWellScheduleJson> wellCommissioningSchedules,
     Set<InfrastructureProjectWellScheduleJson> wellDecommissioningSchedules,
     Set<InfrastructureProjectPlatformOrFpsoToBeDecommissionedJson> platformOrFpsosToBeDecommissioned,
@@ -50,6 +53,8 @@ record InfrastructureProjectJson(
       Collection<UpcomingTender> upcomingTendersList,
       Collection<InfrastructureAwardedContract> infrastructureAwardedContracts,
       Collection<InfrastructureCollaborationOpportunity> infrastructureCollaborationOpportunities,
+      CampaignInformation campaignInformation,
+      Collection<CampaignProject> campaignProjects,
       Map<CommissionedWellSchedule, Collection<CommissionedWell>> commissionedWellsBySchedule,
       Map<PlugAbandonmentSchedule, Collection<PlugAbandonmentWell>> plugAbandonmentWellsBySchedule,
       Collection<PlatformFpso> platformFpsos,
@@ -81,6 +86,10 @@ record InfrastructureProjectJson(
     var collaborationOpportunities = infrastructureCollaborationOpportunities != null
         ? infrastructureCollaborationOpportunities.stream().map(InfrastructureProjectCollaborationOpportunityJson::from)
             .collect(Collectors.toSet())
+        : null;
+
+    var campaign = campaignInformation != null
+        ? InfrastructureProjectCampaignJson.from(campaignInformation, campaignProjects)
         : null;
 
     var wellCommissioningSchedules = commissionedWellsBySchedule != null
@@ -124,6 +133,7 @@ record InfrastructureProjectJson(
         upcomingTenders,
         awardedContracts,
         collaborationOpportunities,
+        campaign,
         wellCommissioningSchedules,
         wellDecommissioningSchedules,
         platformOrFpsosToBeDecommissioned,

@@ -16,6 +16,8 @@ import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.infrastructure.InfrastructureAwardedContractRepository;
+import uk.co.ogauthority.pathfinder.repository.project.campaigninformation.CampaignInformationRepository;
+import uk.co.ogauthority.pathfinder.repository.project.campaigninformation.CampaignProjectRepository;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesRepository;
 import uk.co.ogauthority.pathfinder.repository.project.commissionedwell.CommissionedWellRepository;
 import uk.co.ogauthority.pathfinder.repository.project.commissionedwell.CommissionedWellScheduleRepository;
@@ -30,6 +32,8 @@ import uk.co.ogauthority.pathfinder.repository.project.projectinformation.Projec
 import uk.co.ogauthority.pathfinder.repository.project.subseainfrastructure.SubseaInfrastructureRepository;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.CampaignInformationTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.CampaignProjectTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.CommissionedWellTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.DecommissionedPipelineTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
@@ -72,6 +76,12 @@ class InfrastructureProjectJsonServiceTest {
 
   @Mock
   private InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository;
+
+  @Mock
+  private CampaignInformationRepository campaignInformationRepository;
+
+  @Mock
+  private CampaignProjectRepository campaignProjectRepository;
 
   @Mock
   private CommissionedWellScheduleRepository commissionedWellScheduleRepository;
@@ -164,6 +174,14 @@ class InfrastructureProjectJsonServiceTest {
     var infrastructureCollaborationOpportunity3 =
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(3, projectDetail2);
 
+    var campaignInformation1 = CampaignInformationTestUtil.createCampaignInformation(1, projectDetail1);
+    var campaignInformation2 = CampaignInformationTestUtil.createCampaignInformation(2, projectDetail2);
+    var campaignInformation3 = CampaignInformationTestUtil.createCampaignInformation(3, projectDetail3);
+
+    var campaignProject1 = CampaignProjectTestUtil.newBuilder().withId(1).withCampaignInformation(campaignInformation1).build();
+    var campaignProject2 = CampaignProjectTestUtil.newBuilder().withId(2).withCampaignInformation(campaignInformation1).build();
+    var campaignProject3 = CampaignProjectTestUtil.newBuilder().withId(3).withCampaignInformation(campaignInformation2).build();
+
     var commissionedWellSchedule1 = CommissionedWellTestUtil.getCommissionedWellSchedule(1, projectDetail1);
     var commissionedWellSchedule2 = CommissionedWellTestUtil.getCommissionedWellSchedule(2, projectDetail1);
     var commissionedWellSchedule3 = CommissionedWellTestUtil.getCommissionedWellSchedule(3, projectDetail2);
@@ -222,6 +240,11 @@ class InfrastructureProjectJsonServiceTest {
         )
     );
 
+    when(campaignInformationRepository.findAll())
+        .thenReturn(List.of(campaignInformation1, campaignInformation2, campaignInformation3));
+
+    when(campaignProjectRepository.findAll()).thenReturn(List.of(campaignProject1, campaignProject2, campaignProject3));
+
     when(commissionedWellRepository.findAll()).thenReturn(List.of(commissionedWell1, commissionedWell2, commissionedWell3));
 
     when(commissionedWellScheduleRepository.findAll())
@@ -255,6 +278,8 @@ class InfrastructureProjectJsonServiceTest {
             List.of(upcomingTender1, upcomingTender2),
             List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
             List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2),
+            campaignInformation1,
+            List.of(campaignProject1, campaignProject2),
             Map.of(
                 commissionedWellSchedule1, List.of(commissionedWell1, commissionedWell2),
                 commissionedWellSchedule2, List.of(commissionedWell3)
@@ -277,6 +302,8 @@ class InfrastructureProjectJsonServiceTest {
             List.of(upcomingTender3),
             List.of(infrastructureAwardedContract3),
             List.of(infrastructureCollaborationOpportunity3),
+            campaignInformation2,
+            List.of(campaignProject3),
             MapUtils.of(
                 commissionedWellSchedule3, null
             ),
@@ -296,6 +323,8 @@ class InfrastructureProjectJsonServiceTest {
             null,
             null,
             null,
+            null,
+            campaignInformation3,
             null,
             null,
             null,

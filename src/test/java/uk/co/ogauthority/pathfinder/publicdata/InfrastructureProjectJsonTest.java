@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.utils.MapUtils;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.CampaignInformationTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.CampaignProjectTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.CommissionedWellTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.DecommissionedPipelineTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
@@ -53,6 +55,11 @@ class InfrastructureProjectJsonTest {
     var infrastructureCollaborationOpportunity2 =
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(2, projectDetail);
 
+    var campaignInformation = CampaignInformationTestUtil.createCampaignInformation(1, projectDetail);
+
+    var campaignProject1 = CampaignProjectTestUtil.newBuilder().withId(1).withCampaignInformation(campaignInformation).build();
+    var campaignProject2 = CampaignProjectTestUtil.newBuilder().withId(2).withCampaignInformation(campaignInformation).build();
+
     var commissionedWellSchedule1 = CommissionedWellTestUtil.getCommissionedWellSchedule(1, projectDetail);
     var commissionedWellSchedule2 = CommissionedWellTestUtil.getCommissionedWellSchedule(2, projectDetail);
 
@@ -86,6 +93,8 @@ class InfrastructureProjectJsonTest {
         List.of(upcomingTender1, upcomingTender2),
         List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
         List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2),
+        campaignInformation,
+        List.of(campaignProject1, campaignProject2),
         MapUtils.of(
             commissionedWellSchedule1, List.of(commissionedWell1, commissionedWell2),
             commissionedWellSchedule2, null
@@ -118,6 +127,7 @@ class InfrastructureProjectJsonTest {
             InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity1),
             InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2)
         ),
+        InfrastructureProjectCampaignJson.from(campaignInformation, List.of(campaignProject1, campaignProject2)),
         Set.of(
             InfrastructureProjectWellScheduleJson.from(commissionedWellSchedule1, List.of(commissionedWell1, commissionedWell2)),
             InfrastructureProjectWellScheduleJson.from(commissionedWellSchedule2, null)
@@ -172,6 +182,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -202,6 +214,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -221,6 +235,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -266,6 +282,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -285,6 +303,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -326,6 +346,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -347,6 +369,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -388,6 +412,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -409,6 +435,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -452,6 +480,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -473,6 +503,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -507,6 +539,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -551,6 +585,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -575,6 +611,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -619,6 +657,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -640,6 +680,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -681,6 +723,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -702,6 +746,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -743,6 +789,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -764,6 +812,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -805,6 +855,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -836,6 +888,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         List.of(decommissionedPipeline1, decommissionedPipeline2)
     );
 
@@ -843,5 +897,71 @@ class InfrastructureProjectJsonTest {
         InfrastructureProjectPipelineToBeDecommissionedJson.from(decommissionedPipeline1),
         InfrastructureProjectPipelineToBeDecommissionedJson.from(decommissionedPipeline2)
     );
+  }
+
+  @Test
+  void from_campaignInformationIsNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.campaign()).isNull();
+  }
+
+  @Test
+  void from_campaignInformationIsNotNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var campaignInformation = CampaignInformationTestUtil.createCampaignInformation(1, projectDetail);
+
+    var campaignProject1 = CampaignProjectTestUtil.newBuilder().withId(1).withCampaignInformation(campaignInformation).build();
+    var campaignProject2 = CampaignProjectTestUtil.newBuilder().withId(2).withCampaignInformation(campaignInformation).build();
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null,
+        campaignInformation,
+        List.of(campaignProject1, campaignProject2),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.campaign())
+        .isEqualTo(InfrastructureProjectCampaignJson.from(campaignInformation, List.of(campaignProject1, campaignProject2)));
   }
 }

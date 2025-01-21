@@ -27,6 +27,13 @@ public class CampaignProject implements ChildEntity<Integer, CampaignInformation
   @JoinColumn(name = "project_id")
   private SelectableProject project;
 
+  public CampaignProject() {
+  }
+
+  public CampaignProject(Integer id) {
+    this.id = id;
+  }
+
   public Integer getId() {
     return id;
   }
