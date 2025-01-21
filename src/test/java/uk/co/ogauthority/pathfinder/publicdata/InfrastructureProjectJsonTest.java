@@ -7,13 +7,17 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.utils.MapUtils;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.CommissionedWellTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.DecommissionedPipelineTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.IntegratedRigTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.PlatformFpsoTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentScheduleTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentWellTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
@@ -49,6 +53,18 @@ class InfrastructureProjectJsonTest {
     var infrastructureCollaborationOpportunity2 =
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(2, projectDetail);
 
+    var commissionedWellSchedule1 = CommissionedWellTestUtil.getCommissionedWellSchedule(1, projectDetail);
+    var commissionedWellSchedule2 = CommissionedWellTestUtil.getCommissionedWellSchedule(2, projectDetail);
+
+    var commissionedWell1 = CommissionedWellTestUtil.getCommissionedWell(1, commissionedWellSchedule1);
+    var commissionedWell2 = CommissionedWellTestUtil.getCommissionedWell(2, commissionedWellSchedule1);
+
+    var plugAbandonmentSchedule1 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(1, projectDetail);
+    var plugAbandonmentSchedule2 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(2, projectDetail);
+
+    var plugAbandonmentWell1 = PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(1, plugAbandonmentSchedule1);
+    var plugAbandonmentWell2 = PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(2, plugAbandonmentSchedule1);
+
     var platformFpso1 = PlatformFpsoTestUtil.getPlatformFpso(1, projectDetail);
     var platformFpso2 = PlatformFpsoTestUtil.getPlatformFpso(2, projectDetail);
 
@@ -70,6 +86,14 @@ class InfrastructureProjectJsonTest {
         List.of(upcomingTender1, upcomingTender2),
         List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
         List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2),
+        MapUtils.of(
+            commissionedWellSchedule1, List.of(commissionedWell1, commissionedWell2),
+            commissionedWellSchedule2, null
+        ),
+        MapUtils.of(
+            plugAbandonmentSchedule1, List.of(plugAbandonmentWell1, plugAbandonmentWell2),
+            plugAbandonmentSchedule2, null
+        ),
         List.of(platformFpso1, platformFpso2),
         List.of(integratedRig1, integratedRig2),
         List.of(subseaInfrastructure1, subseaInfrastructure2),
@@ -93,6 +117,14 @@ class InfrastructureProjectJsonTest {
         Set.of(
             InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity1),
             InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2)
+        ),
+        Set.of(
+            InfrastructureProjectWellScheduleJson.from(commissionedWellSchedule1, List.of(commissionedWell1, commissionedWell2)),
+            InfrastructureProjectWellScheduleJson.from(commissionedWellSchedule2, null)
+        ),
+        Set.of(
+            InfrastructureProjectWellScheduleJson.from(plugAbandonmentSchedule1, List.of(plugAbandonmentWell1, plugAbandonmentWell2)),
+            InfrastructureProjectWellScheduleJson.from(plugAbandonmentSchedule2, null)
         ),
         Set.of(
             InfrastructureProjectPlatformOrFpsoToBeDecommissionedJson.from(platformFpso1),
@@ -138,6 +170,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -166,6 +200,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -185,6 +221,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -226,6 +264,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -245,6 +285,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -282,6 +324,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -303,6 +347,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -340,6 +386,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -361,6 +409,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -400,12 +450,150 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
     assertThat(infrastructureProjectJson.collaborationOpportunities()).containsExactlyInAnyOrder(
         InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity1),
         InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2)
+    );
+  }
+
+  @Test
+  void from_commissionedWellsByScheduleIsNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.wellCommissioningSchedules()).isNull();
+  }
+
+  @Test
+  void from_commissionedWellsByScheduleIsNotNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var commissionedWellSchedule1 = CommissionedWellTestUtil.getCommissionedWellSchedule(1, projectDetail);
+    var commissionedWellSchedule2 = CommissionedWellTestUtil.getCommissionedWellSchedule(2, projectDetail);
+
+    var commissionedWell1 = CommissionedWellTestUtil.getCommissionedWell(1, commissionedWellSchedule1);
+    var commissionedWell2 = CommissionedWellTestUtil.getCommissionedWell(2, commissionedWellSchedule1);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null,
+        MapUtils.of(
+            commissionedWellSchedule1, List.of(commissionedWell1, commissionedWell2),
+            commissionedWellSchedule2, null
+        ),
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.wellCommissioningSchedules()).containsExactlyInAnyOrder(
+        InfrastructureProjectWellScheduleJson.from(commissionedWellSchedule1, List.of(commissionedWell1, commissionedWell2)),
+        InfrastructureProjectWellScheduleJson.from(commissionedWellSchedule2, null)
+    );
+  }
+
+  @Test
+  void from_plugAbandonmentWellsByScheduleIsNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.wellDecommissioningSchedules()).isNull();
+  }
+
+  @Test
+  void from_plugAbandonmentWellsByScheduleIsNotNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var plugAbandonmentSchedule1 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(1, projectDetail);
+    var plugAbandonmentSchedule2 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(2, projectDetail);
+
+    var plugAbandonmentWell1 = PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(1, plugAbandonmentSchedule1);
+    var plugAbandonmentWell2 = PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(2, plugAbandonmentSchedule1);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        MapUtils.of(
+            plugAbandonmentSchedule1, List.of(plugAbandonmentWell1, plugAbandonmentWell2),
+            plugAbandonmentSchedule2, null
+        ),
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.wellDecommissioningSchedules()).containsExactlyInAnyOrder(
+        InfrastructureProjectWellScheduleJson.from(plugAbandonmentSchedule1, List.of(plugAbandonmentWell1, plugAbandonmentWell2)),
+        InfrastructureProjectWellScheduleJson.from(plugAbandonmentSchedule2, null)
     );
   }
 
@@ -421,6 +609,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -450,6 +640,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -487,6 +679,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -508,6 +702,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -545,6 +741,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -566,6 +764,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,
@@ -603,6 +803,8 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
+        null,
         null
     );
 
@@ -624,6 +826,8 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
+        null,
         null,
         null,
         null,

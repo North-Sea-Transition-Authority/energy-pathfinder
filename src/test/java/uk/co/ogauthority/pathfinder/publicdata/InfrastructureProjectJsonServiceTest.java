@@ -4,31 +4,40 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import software.amazon.awssdk.utils.MapUtils;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.infrastructure.InfrastructureAwardedContractRepository;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesRepository;
+import uk.co.ogauthority.pathfinder.repository.project.commissionedwell.CommissionedWellRepository;
+import uk.co.ogauthority.pathfinder.repository.project.commissionedwell.CommissionedWellScheduleRepository;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedpipeline.DecommissionedPipelineRepository;
 import uk.co.ogauthority.pathfinder.repository.project.integratedrig.IntegratedRigRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationBlockRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
 import uk.co.ogauthority.pathfinder.repository.project.platformsfpsos.PlatformFpsoRepository;
+import uk.co.ogauthority.pathfinder.repository.project.plugabandonmentschedule.PlugAbandonmentScheduleRepository;
+import uk.co.ogauthority.pathfinder.repository.project.plugabandonmentschedule.PlugAbandonmentWellRepository;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
 import uk.co.ogauthority.pathfinder.repository.project.subseainfrastructure.SubseaInfrastructureRepository;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.CommissionedWellTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.DecommissionedPipelineTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.IntegratedRigTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.PlatformFpsoTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentScheduleTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.PlugAbandonmentWellTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
@@ -63,6 +72,18 @@ class InfrastructureProjectJsonServiceTest {
 
   @Mock
   private InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository;
+
+  @Mock
+  private CommissionedWellScheduleRepository commissionedWellScheduleRepository;
+
+  @Mock
+  private CommissionedWellRepository commissionedWellRepository;
+
+  @Mock
+  private PlugAbandonmentScheduleRepository plugAbandonmentScheduleRepository;
+
+  @Mock
+  private PlugAbandonmentWellRepository plugAbandonmentWellRepository;
 
   @Mock
   private PlatformFpsoRepository platformFpsoRepository;
@@ -143,6 +164,22 @@ class InfrastructureProjectJsonServiceTest {
     var infrastructureCollaborationOpportunity3 =
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(3, projectDetail2);
 
+    var commissionedWellSchedule1 = CommissionedWellTestUtil.getCommissionedWellSchedule(1, projectDetail1);
+    var commissionedWellSchedule2 = CommissionedWellTestUtil.getCommissionedWellSchedule(2, projectDetail1);
+    var commissionedWellSchedule3 = CommissionedWellTestUtil.getCommissionedWellSchedule(3, projectDetail2);
+
+    var commissionedWell1 = CommissionedWellTestUtil.getCommissionedWell(1, commissionedWellSchedule1);
+    var commissionedWell2 = CommissionedWellTestUtil.getCommissionedWell(2, commissionedWellSchedule1);
+    var commissionedWell3 = CommissionedWellTestUtil.getCommissionedWell(3, commissionedWellSchedule2);
+
+    var plugAbandonmentSchedule1 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(1, projectDetail1);
+    var plugAbandonmentSchedule2 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(2, projectDetail1);
+    var plugAbandonmentSchedule3 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(3, projectDetail2);
+
+    var plugAbandonmentWell1 = PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(1, plugAbandonmentSchedule1);
+    var plugAbandonmentWell2 = PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(2, plugAbandonmentSchedule1);
+    var plugAbandonmentWell3 = PlugAbandonmentWellTestUtil.createPlugAbandonmentWell(3, plugAbandonmentSchedule2);
+
     var platformFpso1 = PlatformFpsoTestUtil.getPlatformFpso(1, projectDetail1);
     var platformFpso2 = PlatformFpsoTestUtil.getPlatformFpso(2, projectDetail1);
     var platformFpso3 = PlatformFpsoTestUtil.getPlatformFpso(3, projectDetail2);
@@ -185,6 +222,17 @@ class InfrastructureProjectJsonServiceTest {
         )
     );
 
+    when(commissionedWellRepository.findAll()).thenReturn(List.of(commissionedWell1, commissionedWell2, commissionedWell3));
+
+    when(commissionedWellScheduleRepository.findAll())
+        .thenReturn(List.of(commissionedWellSchedule1, commissionedWellSchedule2, commissionedWellSchedule3));
+
+    when(plugAbandonmentWellRepository.findAll())
+        .thenReturn(List.of(plugAbandonmentWell1, plugAbandonmentWell2, plugAbandonmentWell3));
+
+    when(plugAbandonmentScheduleRepository.findAll())
+        .thenReturn(List.of(plugAbandonmentSchedule1, plugAbandonmentSchedule2, plugAbandonmentSchedule3));
+
     when(platformFpsoRepository.findAll()).thenReturn(List.of(platformFpso1, platformFpso2, platformFpso3));
 
     when(integratedRigRepository.findAll()).thenReturn(List.of(integratedRig1, integratedRig2, integratedRig3));
@@ -207,6 +255,14 @@ class InfrastructureProjectJsonServiceTest {
             List.of(upcomingTender1, upcomingTender2),
             List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
             List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2),
+            Map.of(
+                commissionedWellSchedule1, List.of(commissionedWell1, commissionedWell2),
+                commissionedWellSchedule2, List.of(commissionedWell3)
+            ),
+            Map.of(
+                plugAbandonmentSchedule1, List.of(plugAbandonmentWell1, plugAbandonmentWell2),
+                plugAbandonmentSchedule2, List.of(plugAbandonmentWell3)
+            ),
             List.of(platformFpso1, platformFpso2),
             List.of(integratedRig1, integratedRig2),
             List.of(subseaInfrastructure1, subseaInfrastructure2),
@@ -221,6 +277,12 @@ class InfrastructureProjectJsonServiceTest {
             List.of(upcomingTender3),
             List.of(infrastructureAwardedContract3),
             List.of(infrastructureCollaborationOpportunity3),
+            MapUtils.of(
+                commissionedWellSchedule3, null
+            ),
+            MapUtils.of(
+                plugAbandonmentSchedule3, null
+            ),
             List.of(platformFpso3),
             List.of(integratedRig3),
             List.of(subseaInfrastructure3),
@@ -231,6 +293,8 @@ class InfrastructureProjectJsonServiceTest {
             projectOperator3,
             projectInformation3,
             projectLocation3,
+            null,
+            null,
             null,
             null,
             null,

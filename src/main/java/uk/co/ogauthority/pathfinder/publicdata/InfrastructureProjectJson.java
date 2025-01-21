@@ -3,17 +3,22 @@ package uk.co.ogauthority.pathfinder.publicdata;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectOperator;
 import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrastructure.InfrastructureAwardedContract;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
+import uk.co.ogauthority.pathfinder.model.entity.project.commissionedwell.CommissionedWell;
+import uk.co.ogauthority.pathfinder.model.entity.project.commissionedwell.CommissionedWellSchedule;
 import uk.co.ogauthority.pathfinder.model.entity.project.decommissionedpipeline.DecommissionedPipeline;
 import uk.co.ogauthority.pathfinder.model.entity.project.integratedrig.IntegratedRig;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
 import uk.co.ogauthority.pathfinder.model.entity.project.platformsfpsos.PlatformFpso;
+import uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedule.PlugAbandonmentSchedule;
+import uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedule.PlugAbandonmentWell;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.entity.project.subseainfrastructure.SubseaInfrastructure;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
@@ -27,6 +32,8 @@ record InfrastructureProjectJson(
     Set<InfrastructureProjectUpcomingTenderJson> upcomingTenders,
     Set<InfrastructureProjectAwardedContractJson> awardedContracts,
     Set<InfrastructureProjectCollaborationOpportunityJson> collaborationOpportunities,
+    Set<InfrastructureProjectWellScheduleJson> wellCommissioningSchedules,
+    Set<InfrastructureProjectWellScheduleJson> wellDecommissioningSchedules,
     Set<InfrastructureProjectPlatformOrFpsoToBeDecommissionedJson> platformOrFpsosToBeDecommissioned,
     Set<InfrastructureProjectIntegratedRigToBeDecommissionedJson> integratedRigsToBeDecommissioned,
     Set<InfrastructureProjectSubseaInfrastructureToBeDecommissionedJson> subseaInfrastructuresToBeDecommissioned,
@@ -43,6 +50,8 @@ record InfrastructureProjectJson(
       Collection<UpcomingTender> upcomingTendersList,
       Collection<InfrastructureAwardedContract> infrastructureAwardedContracts,
       Collection<InfrastructureCollaborationOpportunity> infrastructureCollaborationOpportunities,
+      Map<CommissionedWellSchedule, Collection<CommissionedWell>> commissionedWellsBySchedule,
+      Map<PlugAbandonmentSchedule, Collection<PlugAbandonmentWell>> plugAbandonmentWellsBySchedule,
       Collection<PlatformFpso> platformFpsos,
       Collection<IntegratedRig> integratedRigs,
       Collection<SubseaInfrastructure> subseaInfrastructures,
@@ -71,6 +80,18 @@ record InfrastructureProjectJson(
 
     var collaborationOpportunities = infrastructureCollaborationOpportunities != null
         ? infrastructureCollaborationOpportunities.stream().map(InfrastructureProjectCollaborationOpportunityJson::from)
+            .collect(Collectors.toSet())
+        : null;
+
+    var wellCommissioningSchedules = commissionedWellsBySchedule != null
+        ? commissionedWellsBySchedule.entrySet().stream()
+            .map(entry -> InfrastructureProjectWellScheduleJson.from(entry.getKey(), entry.getValue()))
+            .collect(Collectors.toSet())
+        : null;
+
+    var wellDecommissioningSchedules = plugAbandonmentWellsBySchedule != null
+        ? plugAbandonmentWellsBySchedule.entrySet().stream()
+            .map(entry -> InfrastructureProjectWellScheduleJson.from(entry.getKey(), entry.getValue()))
             .collect(Collectors.toSet())
         : null;
 
@@ -103,6 +124,8 @@ record InfrastructureProjectJson(
         upcomingTenders,
         awardedContracts,
         collaborationOpportunities,
+        wellCommissioningSchedules,
+        wellDecommissioningSchedules,
         platformOrFpsosToBeDecommissioned,
         integratedRigsToBeDecommissioned,
         subseaInfrastructuresToBeDecommissioned,

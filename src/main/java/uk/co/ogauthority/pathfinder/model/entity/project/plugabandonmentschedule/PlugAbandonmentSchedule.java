@@ -10,6 +10,13 @@ import uk.co.ogauthority.pathfinder.service.entityduplication.ParentEntity;
 @Table(name = "plug_abandonment_schedules")
 public class PlugAbandonmentSchedule extends ProjectDetailEntity implements ParentEntity {
 
+  public PlugAbandonmentSchedule() {
+  }
+
+  public PlugAbandonmentSchedule(Integer id) {
+    this.id = id;
+  }
+
   private Integer earliestStartYear;
 
   private Integer latestCompletionYear;

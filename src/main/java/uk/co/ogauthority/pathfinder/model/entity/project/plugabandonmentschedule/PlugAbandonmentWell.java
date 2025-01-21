@@ -26,6 +26,13 @@ public class PlugAbandonmentWell implements ChildEntity<Integer, PlugAbandonment
   @JoinColumn(name = "wellbore_id")
   private Wellbore wellbore;
 
+  public PlugAbandonmentWell() {
+  }
+
+  public PlugAbandonmentWell(Integer id) {
+    this.id = id;
+  }
+
   public Integer getId() {
     return id;
   }

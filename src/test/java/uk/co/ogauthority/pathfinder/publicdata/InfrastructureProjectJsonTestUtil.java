@@ -31,6 +31,14 @@ class InfrastructureProjectJsonTestUtil {
         InfrastructureProjectCollaborationOpportunityJsonTestUtil.newBuilder().withId(1).build(),
         InfrastructureProjectCollaborationOpportunityJsonTestUtil.newBuilder().withId(2).build()
     );
+    private Set<InfrastructureProjectWellScheduleJson> wellCommissioningSchedules = Set.of(
+        InfrastructureProjectWellScheduleJsonTestUtil.newBuilder().withId(1).build(),
+        InfrastructureProjectWellScheduleJsonTestUtil.newBuilder().withId(2).build()
+    );
+    private Set<InfrastructureProjectWellScheduleJson> wellDecommissioningSchedules = Set.of(
+        InfrastructureProjectWellScheduleJsonTestUtil.newBuilder().withId(1).build(),
+        InfrastructureProjectWellScheduleJsonTestUtil.newBuilder().withId(2).build()
+    );
     private Set<InfrastructureProjectPlatformOrFpsoToBeDecommissionedJson> platformOrFpsosToBeDecommissioned = Set.of(
         InfrastructureProjectPlatformOrFpsoToBeDecommissionedJsonTestUtil.newBuilder()
             .withId(1)
@@ -130,6 +138,16 @@ class InfrastructureProjectJsonTestUtil {
       return this;
     }
 
+    Builder withWellCommissioningSchedules(Set<InfrastructureProjectWellScheduleJson> wellCommissioningSchedules) {
+      this.wellCommissioningSchedules = wellCommissioningSchedules;
+      return this;
+    }
+
+    Builder withWellDecommissioningSchedules(Set<InfrastructureProjectWellScheduleJson> wellDecommissioningSchedules) {
+      this.wellDecommissioningSchedules = wellDecommissioningSchedules;
+      return this;
+    }
+
     Builder withPlatformOrFpsosToBeDecommissioned(
         Set<InfrastructureProjectPlatformOrFpsoToBeDecommissionedJson> platformOrFpsosToBeDecommissioned
     ) {
@@ -173,6 +191,8 @@ class InfrastructureProjectJsonTestUtil {
           upcomingTenders,
           awardedContracts,
           collaborationOpportunities,
+          wellCommissioningSchedules,
+          wellDecommissioningSchedules,
           platformOrFpsosToBeDecommissioned,
           integratedRigsToBeDecommissioned,
           subseaInfrastructuresToBeDecommissioned,

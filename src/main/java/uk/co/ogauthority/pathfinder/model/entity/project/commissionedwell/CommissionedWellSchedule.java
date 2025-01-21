@@ -10,6 +10,13 @@ import uk.co.ogauthority.pathfinder.service.entityduplication.ParentEntity;
 @Table(name = "commissioned_well_schedules")
 public class CommissionedWellSchedule extends ProjectDetailEntity implements ParentEntity {
 
+  public CommissionedWellSchedule() {
+  }
+
+  public CommissionedWellSchedule(Integer id) {
+    this.id = id;
+  }
+
   private Integer earliestStartYear;
 
   private Integer latestCompletionYear;

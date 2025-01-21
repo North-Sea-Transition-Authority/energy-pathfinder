@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.testutil;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedule.PlugAbandonmentSchedule;
 import uk.co.ogauthority.pathfinder.model.form.forminput.minmaxdateinput.MinMaxDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.plugabandonmentschedule.PlugAbandonmentScheduleForm;
@@ -33,9 +34,32 @@ public class PlugAbandonmentScheduleTestUtil {
     );
   }
 
+  public static PlugAbandonmentSchedule createPlugAbandonmentSchedule(Integer id, ProjectDetail projectDetail) {
+    return createPlugAbandonmentSchedule(
+        id,
+        projectDetail,
+        EARLIEST_PLUG_ABANDONMENT_START_YEAR,
+        LATEST_PLUG_ABANDONMENT_COMPLETION_YEAR
+    );
+  }
+
   public static PlugAbandonmentSchedule createPlugAbandonmentSchedule(int earliestStartYear, int latestStartYear) {
-    var plugAbandonmentSchedule = new PlugAbandonmentSchedule();
-    plugAbandonmentSchedule.setProjectDetail(ProjectUtil.getProjectDetails());
+    return createPlugAbandonmentSchedule(
+        null,
+        ProjectUtil.getProjectDetails(),
+        earliestStartYear,
+        latestStartYear
+    );
+  }
+
+  public static PlugAbandonmentSchedule createPlugAbandonmentSchedule(
+      Integer id,
+      ProjectDetail projectDetail,
+      int earliestStartYear,
+      int latestStartYear
+  ) {
+    var plugAbandonmentSchedule = new PlugAbandonmentSchedule(id);
+    plugAbandonmentSchedule.setProjectDetail(projectDetail);
     plugAbandonmentSchedule.setEarliestStartYear(earliestStartYear);
     plugAbandonmentSchedule.setLatestCompletionYear(latestStartYear);
     return plugAbandonmentSchedule;

@@ -38,17 +38,36 @@ public class CommissionedWellTestUtil {
     );
   }
 
-  public static CommissionedWellSchedule getCommissionedWellSchedule(ProjectDetail projectDetail,
-                                                                     int earliestStartYear,
-                                                                     int latestStartYear) {
-    var commissionedWellSchedule = new CommissionedWellSchedule();
+  public static CommissionedWellSchedule getCommissionedWellSchedule(Integer id, ProjectDetail projectDetail) {
+    return getCommissionedWellSchedule(id, projectDetail, 2021, LocalDate.now().getYear());
+  }
+
+  public static CommissionedWellSchedule getCommissionedWellSchedule(
+      ProjectDetail projectDetail,
+      int earliestStartYear,
+      int latestStartYear
+  ) {
+    return getCommissionedWellSchedule(null, projectDetail, earliestStartYear, latestStartYear);
+  }
+
+  public static CommissionedWellSchedule getCommissionedWellSchedule(
+      Integer id,
+      ProjectDetail projectDetail,
+      int earliestStartYear,
+      int latestStartYear
+  ) {
+    var commissionedWellSchedule = new CommissionedWellSchedule(id);
     commissionedWellSchedule.setProjectDetail(projectDetail);
     commissionedWellSchedule.setEarliestStartYear(earliestStartYear);
     commissionedWellSchedule.setLatestCompletionYear(latestStartYear);
     return commissionedWellSchedule;
   }
 
-  public static CommissionedWell getCommissionedWell(int id,
+  public static CommissionedWell getCommissionedWell(Integer id, CommissionedWellSchedule commissionedWellSchedule) {
+    return getCommissionedWell(id, WellboreTestUtil.createWellbore(), commissionedWellSchedule);
+  }
+
+  public static CommissionedWell getCommissionedWell(Integer id,
                                                      Wellbore wellbore,
                                                      CommissionedWellSchedule commissionedWellSchedule) {
     var commissionedWell = new CommissionedWell();

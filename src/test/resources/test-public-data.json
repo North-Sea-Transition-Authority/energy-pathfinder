@@ -120,6 +120,78 @@
           }
         }
       ],
+      "wellCommissioningSchedules": [
+        {
+          "id": 2,
+          "period": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "wellbores": [
+            {
+              "registrationNumber": "48/14-G7",
+              "mechanicalStatus": "DRILLING"
+            },
+            {
+              "registrationNumber": "L46/17-A5 ",
+              "mechanicalStatus": "DRILLING"
+            }
+          ]
+        },
+        {
+          "id": 1,
+          "period": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "wellbores": [
+            {
+              "registrationNumber": "48/14-G7",
+              "mechanicalStatus": "DRILLING"
+            },
+            {
+              "registrationNumber": "L46/17-A5 ",
+              "mechanicalStatus": "DRILLING"
+            }
+          ]
+        }
+      ],
+      "wellDecommissioningSchedules": [
+        {
+          "id": 2,
+          "period": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "wellbores": [
+            {
+              "registrationNumber": "48/14-G7",
+              "mechanicalStatus": "DRILLING"
+            },
+            {
+              "registrationNumber": "L46/17-A5 ",
+              "mechanicalStatus": "DRILLING"
+            }
+          ]
+        },
+        {
+          "id": 1,
+          "period": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "wellbores": [
+            {
+              "registrationNumber": "48/14-G7",
+              "mechanicalStatus": "DRILLING"
+            },
+            {
+              "registrationNumber": "L46/17-A5 ",
+              "mechanicalStatus": "DRILLING"
+            }
+          ]
+        }
+      ],
       "platformOrFpsosToBeDecommissioned": [
         {
           "id": 2,
@@ -188,22 +260,6 @@
       ],
       "subseaInfrastructuresToBeDecommissioned": [
         {
-          "id": 2,
-          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
-          "description": "Test description",
-          "status": "IN_USE",
-          "type": "SUBSEA_STRUCTURE",
-          "concreteMattressesDetails": null,
-          "subseaStructureDetails": {
-            "totalEstimatedMass": "GREATER_THAN_OR_EQUAL_400_TONNES"
-          },
-          "otherDetails": null,
-          "decommissioningPeriod": {
-            "startYear": 2024,
-            "endYear": 2025
-          }
-        },
-        {
           "id": 3,
           "surfaceInfrastructureHostName": "Test surface infrastructure host name",
           "description": "Test description",
@@ -231,6 +287,22 @@
             "totalEstimatedMassMetricTonnes": 277
           },
           "subseaStructureDetails": null,
+          "otherDetails": null,
+          "decommissioningPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          }
+        },
+        {
+          "id": 2,
+          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
+          "description": "Test description",
+          "status": "IN_USE",
+          "type": "SUBSEA_STRUCTURE",
+          "concreteMattressesDetails": null,
+          "subseaStructureDetails": {
+            "totalEstimatedMass": "GREATER_THAN_OR_EQUAL_400_TONNES"
+          },
           "otherDetails": null,
           "decommissioningPeriod": {
             "startYear": 2024,
@@ -382,6 +454,78 @@
           }
         }
       ],
+      "wellCommissioningSchedules": [
+        {
+          "id": 2,
+          "period": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "wellbores": [
+            {
+              "registrationNumber": "48/14-G7",
+              "mechanicalStatus": "DRILLING"
+            },
+            {
+              "registrationNumber": "L46/17-A5 ",
+              "mechanicalStatus": "DRILLING"
+            }
+          ]
+        },
+        {
+          "id": 1,
+          "period": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "wellbores": [
+            {
+              "registrationNumber": "48/14-G7",
+              "mechanicalStatus": "DRILLING"
+            },
+            {
+              "registrationNumber": "L46/17-A5 ",
+              "mechanicalStatus": "DRILLING"
+            }
+          ]
+        }
+      ],
+      "wellDecommissioningSchedules": [
+        {
+          "id": 2,
+          "period": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "wellbores": [
+            {
+              "registrationNumber": "48/14-G7",
+              "mechanicalStatus": "DRILLING"
+            },
+            {
+              "registrationNumber": "L46/17-A5 ",
+              "mechanicalStatus": "DRILLING"
+            }
+          ]
+        },
+        {
+          "id": 1,
+          "period": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "wellbores": [
+            {
+              "registrationNumber": "48/14-G7",
+              "mechanicalStatus": "DRILLING"
+            },
+            {
+              "registrationNumber": "L46/17-A5 ",
+              "mechanicalStatus": "DRILLING"
+            }
+          ]
+        }
+      ],
       "platformOrFpsosToBeDecommissioned": [
         {
           "id": 2,
@@ -450,22 +594,6 @@
       ],
       "subseaInfrastructuresToBeDecommissioned": [
         {
-          "id": 2,
-          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
-          "description": "Test description",
-          "status": "IN_USE",
-          "type": "SUBSEA_STRUCTURE",
-          "concreteMattressesDetails": null,
-          "subseaStructureDetails": {
-            "totalEstimatedMass": "GREATER_THAN_OR_EQUAL_400_TONNES"
-          },
-          "otherDetails": null,
-          "decommissioningPeriod": {
-            "startYear": 2024,
-            "endYear": 2025
-          }
-        },
-        {
           "id": 3,
           "surfaceInfrastructureHostName": "Test surface infrastructure host name",
           "description": "Test description",
@@ -493,6 +621,22 @@
             "totalEstimatedMassMetricTonnes": 277
           },
           "subseaStructureDetails": null,
+          "otherDetails": null,
+          "decommissioningPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          }
+        },
+        {
+          "id": 2,
+          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
+          "description": "Test description",
+          "status": "IN_USE",
+          "type": "SUBSEA_STRUCTURE",
+          "concreteMattressesDetails": null,
+          "subseaStructureDetails": {
+            "totalEstimatedMass": "GREATER_THAN_OR_EQUAL_400_TONNES"
+          },
           "otherDetails": null,
           "decommissioningPeriod": {
             "startYear": 2024,
