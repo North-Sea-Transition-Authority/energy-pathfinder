@@ -19,14 +19,19 @@ record InfrastructureProjectCampaignJson(
   ) {
     var scope = campaignInformation.getScopeDescription();
     var partOfExistingInfrastructureProjectCampaign = campaignInformation.isPartOfCampaign();
-    var existingCampaignInfrastructureProjectIds = partOfExistingInfrastructureProjectCampaign && campaignProjects != null
-        ? campaignProjects
-            .stream()
-            .map(CampaignProject::getProject)
-            .filter(SelectableProject::isPublished)
-            .map(SelectableProject::getProjectId)
-            .collect(Collectors.toSet())
-        : null;
+    Set<Integer> existingCampaignInfrastructureProjectIds = null;
+    if (partOfExistingInfrastructureProjectCampaign && campaignProjects != null) {
+      var publishedSelectableProjectIds = campaignProjects
+          .stream()
+          .map(CampaignProject::getProject)
+          .filter(SelectableProject::isPublished)
+          .map(SelectableProject::getProjectId)
+          .collect(Collectors.toSet());
+
+      if (!publishedSelectableProjectIds.isEmpty()) {
+        existingCampaignInfrastructureProjectIds = publishedSelectableProjectIds;
+      }
+    }
 
     return new InfrastructureProjectCampaignJson(
         scope,

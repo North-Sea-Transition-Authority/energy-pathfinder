@@ -50,6 +50,30 @@ class InfrastructureProjectCampaignJsonTest {
   }
 
   @Test
+  void from_isPartOfCampaignIsTrueAndCampaignProjectsIsNotNullAndAllCampaignProjectProjectsAreNotPublished() {
+    var campaignInformation = CampaignInformationTestUtil.createCampaignInformation();
+    campaignInformation.setIsPartOfCampaign(true);
+
+    var campaignProject = CampaignProjectTestUtil.newBuilder()
+        .withProject(SelectableProjectTestUtil.newBuilder()
+            .withProjectId(1)
+            .withPublished(false)
+            .build())
+        .build();
+
+    var infrastructureProjectCampaignJson =
+        InfrastructureProjectCampaignJson.from(campaignInformation, List.of(campaignProject));
+
+    var expectedInfrastructureProjectCampaignJson = new InfrastructureProjectCampaignJson(
+        campaignInformation.getScopeDescription(),
+        true,
+        null
+    );
+
+    assertThat(infrastructureProjectCampaignJson).isEqualTo(expectedInfrastructureProjectCampaignJson);
+  }
+
+  @Test
   void from_isPartOfCampaignIsTrueAndCampaignProjectsIsNull() {
     var campaignInformation = CampaignInformationTestUtil.createCampaignInformation();
     campaignInformation.setIsPartOfCampaign(true);
