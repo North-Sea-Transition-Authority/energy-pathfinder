@@ -29,7 +29,7 @@ record InfrastructureProjectJson(
     Integer id,
     InfrastructureProjectDetailsJson details,
     ContactJson contact,
-    InfrastructureProjectFirstProductionDateJson firstProductionDate,
+    QuarterYearJson firstProductionDate,
     InfrastructureProjectLocationJson location,
     Set<InfrastructureProjectUpcomingTenderJson> upcomingTenders,
     Set<InfrastructureProjectAwardedContractJson> awardedContracts,
@@ -70,7 +70,7 @@ record InfrastructureProjectJson(
 
     var firstProductionDate =
         projectInformation.getFirstProductionDateQuarter() != null && projectInformation.getFirstProductionDateYear() != null
-            ? InfrastructureProjectFirstProductionDateJson.from(projectInformation)
+            ? QuarterYearJson.from(projectInformation.getFirstProductionDateQuarter(), projectInformation.getFirstProductionDateYear())
             : null;
 
     var location = projectLocation != null ? InfrastructureProjectLocationJson.from(projectLocation, projectLocationBlocks) : null;

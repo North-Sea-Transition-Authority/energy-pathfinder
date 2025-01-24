@@ -55,7 +55,11 @@ public class ForwardWorkPlanUpcomingTenderUtil {
   }
 
   public static ForwardWorkPlanUpcomingTender getUpcomingTender(ProjectDetail detail) {
-    var tender = new ForwardWorkPlanUpcomingTender(detail);
+    return getUpcomingTender(null, detail);
+  }
+
+  public static ForwardWorkPlanUpcomingTender getUpcomingTender(Integer id, ProjectDetail detail) {
+    var tender = new ForwardWorkPlanUpcomingTender(id, detail);
     tender.setDepartmentType(UPCOMING_TENDER_DEPARTMENT);
     setUpcomingTenderFields(tender);
     return tender;

@@ -220,7 +220,7 @@ class InfrastructureProjectJsonTest {
     );
 
     assertThat(infrastructureProjectJson.firstProductionDate())
-        .isEqualTo(InfrastructureProjectFirstProductionDateJson.from(projectInformation));
+        .isEqualTo(QuarterYearJson.from(projectInformation.getFirstProductionDateQuarter(), projectInformation.getFirstProductionDateYear()));
   }
 
   @Test

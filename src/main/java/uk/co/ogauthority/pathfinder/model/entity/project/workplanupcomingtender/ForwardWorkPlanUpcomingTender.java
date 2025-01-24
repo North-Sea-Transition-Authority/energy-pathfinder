@@ -58,6 +58,11 @@ public class ForwardWorkPlanUpcomingTender extends ProjectDetailEntity implement
     this.projectDetail = projectDetail;
   }
 
+  public ForwardWorkPlanUpcomingTender(Integer id, ProjectDetail projectDetail) {
+    this.id = id;
+    this.projectDetail = projectDetail;
+  }
+
   public Function getDepartmentType() {
     return departmentType;
   }

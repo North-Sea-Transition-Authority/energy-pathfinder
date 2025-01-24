@@ -2,7 +2,7 @@ package uk.co.ogauthority.pathfinder.publicdata;
 
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
 
-class InfrastructureProjectFirstProductionDateJsonTestUtil {
+class QuarterYearJsonTestUtil {
 
   static Builder newBuilder() {
     return new Builder();
@@ -26,8 +26,8 @@ class InfrastructureProjectFirstProductionDateJsonTestUtil {
       return this;
     }
 
-    InfrastructureProjectFirstProductionDateJson build() {
-      return new InfrastructureProjectFirstProductionDateJson(quarter, year);
+    QuarterYearJson build() {
+      return new QuarterYearJson(quarter, year);
     }
   }
 }

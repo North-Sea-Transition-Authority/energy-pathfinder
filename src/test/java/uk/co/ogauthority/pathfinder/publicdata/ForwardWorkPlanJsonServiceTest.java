@@ -12,6 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
+import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
@@ -24,6 +26,9 @@ class ForwardWorkPlanJsonServiceTest {
 
   @Mock
   private ProjectOperatorRepository projectOperatorRepository;
+
+  @Mock
+  private ForwardWorkPlanUpcomingTenderRepository forwardWorkPlanUpcomingTenderRepository;
 
   @InjectMocks
   private ForwardWorkPlanJsonService forwardWorkPlanJsonService;
@@ -54,25 +59,35 @@ class ForwardWorkPlanJsonServiceTest {
     projectOperator3.setOrganisationGroup(
         TeamTestingUtil.generateOrganisationGroup(3, "C Org Grp", "COrgGrp"));
 
+    var forwardWorkPlanUpcomingTender1 = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(1, projectDetail1);
+    var forwardWorkPlanUpcomingTender2 = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(2, projectDetail1);
+    var forwardWorkPlanUpcomingTender3 = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(3, projectDetail2);
+
     when(projectDetailsRepository.getAllPublishedProjectDetailsByProjectType(ProjectType.FORWARD_WORK_PLAN))
         .thenReturn(List.of(projectDetail1, projectDetail2, projectDetail3));
 
     when(projectOperatorRepository.findAll()).thenReturn(List.of(projectOperator1, projectOperator2, projectOperator3));
+
+    when(forwardWorkPlanUpcomingTenderRepository.findAll())
+        .thenReturn(List.of(forwardWorkPlanUpcomingTender1, forwardWorkPlanUpcomingTender2, forwardWorkPlanUpcomingTender3));
 
     var forwardWorkPlanJsons = forwardWorkPlanJsonService.getPublishedForwardWorkPlans();
 
     assertThat(forwardWorkPlanJsons).containsExactlyInAnyOrder(
         ForwardWorkPlanJson.from(
             projectDetail1,
-            projectOperator1
+            projectOperator1,
+            List.of(forwardWorkPlanUpcomingTender1, forwardWorkPlanUpcomingTender2)
         ),
         ForwardWorkPlanJson.from(
             projectDetail2,
-            projectOperator2
+            projectOperator2,
+            List.of(forwardWorkPlanUpcomingTender3)
         ),
         ForwardWorkPlanJson.from(
             projectDetail3,
-            projectOperator3
+            projectOperator3,
+            null
         )
     );
   }

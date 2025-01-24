@@ -16,8 +16,8 @@ class InfrastructureProjectJsonTestUtil {
     private Integer id = 1;
     private InfrastructureProjectDetailsJson details = InfrastructureProjectDetailsJsonTestUtil.newBuilder().build();
     private ContactJson contact = ContactJsonTestUtil.newBuilder().build();
-    private InfrastructureProjectFirstProductionDateJson firstProductionDate =
-        InfrastructureProjectFirstProductionDateJsonTestUtil.newBuilder().build();
+    private QuarterYearJson firstProductionDate =
+        QuarterYearJsonTestUtil.newBuilder().build();
     private InfrastructureProjectLocationJson location = InfrastructureProjectLocationJsonTestUtil.newBuilder().build();
     private Set<InfrastructureProjectUpcomingTenderJson> upcomingTenders = Set.of(
         InfrastructureProjectUpcomingTenderJsonTestUtil.newBuilder().withId(1).build(),
@@ -115,7 +115,7 @@ class InfrastructureProjectJsonTestUtil {
       return this;
     }
 
-    Builder withFirstProductionDate(InfrastructureProjectFirstProductionDateJson firstProductionDate) {
+    Builder withFirstProductionDate(QuarterYearJson firstProductionDate) {
       this.firstProductionDate = firstProductionDate;
       return this;
     }
