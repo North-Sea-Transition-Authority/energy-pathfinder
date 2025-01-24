@@ -50,8 +50,8 @@ class InfrastructureProjectCollaborationOpportunityJsonTestUtil {
       return this;
     }
 
-    InfrastructureProjectCollaborationOpportunityJson build() {
-      return new InfrastructureProjectCollaborationOpportunityJson(
+    CollaborationOpportunityJson build() {
+      return new CollaborationOpportunityJson(
           id,
           function,
           manualFunction,

@@ -26,8 +26,12 @@ public class ForwardWorkPlanCollaborationOpportunityTestUtil {
   }
 
   public static ForwardWorkPlanCollaborationOpportunity getCollaborationOpportunity(ProjectDetail detail) {
+    return getCollaborationOpportunity(null, detail);
+  }
+
+  public static ForwardWorkPlanCollaborationOpportunity getCollaborationOpportunity(Integer id, ProjectDetail detail) {
     return (ForwardWorkPlanCollaborationOpportunity) CollaborationOpportunityTestUtilCommon.populateCollaborationOpportunity(
-        new ForwardWorkPlanCollaborationOpportunity(detail)
+        new ForwardWorkPlanCollaborationOpportunity(id, detail)
     );
   }
 

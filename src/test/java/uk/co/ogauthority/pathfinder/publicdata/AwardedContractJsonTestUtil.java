@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import uk.co.ogauthority.pathfinder.model.enums.project.ContractBand;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 
-class InfrastructureProjectAwardedContractJsonTestUtil {
+class AwardedContractJsonTestUtil {
 
   static Builder newBuilder() {
     return new Builder();
@@ -64,8 +64,8 @@ class InfrastructureProjectAwardedContractJsonTestUtil {
       return this;
     }
 
-    InfrastructureProjectAwardedContractJson build() {
-      return new InfrastructureProjectAwardedContractJson(
+    AwardedContractJson build() {
+      return new AwardedContractJson(
           id,
           contractorName,
           function,

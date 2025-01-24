@@ -120,12 +120,12 @@ class InfrastructureProjectJsonTest {
             InfrastructureProjectUpcomingTenderJson.from(upcomingTender2)
         ),
         Set.of(
-            InfrastructureProjectAwardedContractJson.from(infrastructureAwardedContract1),
-            InfrastructureProjectAwardedContractJson.from(infrastructureAwardedContract2)
+            AwardedContractJson.from(infrastructureAwardedContract1),
+            AwardedContractJson.from(infrastructureAwardedContract2)
         ),
         Set.of(
-            InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity1),
-            InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2)
+            CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity1),
+            CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2)
         ),
         InfrastructureProjectCampaignJson.from(campaignInformation, List.of(campaignProject1, campaignProject2)),
         Set.of(
@@ -418,8 +418,8 @@ class InfrastructureProjectJsonTest {
     );
 
     assertThat(infrastructureProjectJson.awardedContracts()).containsExactlyInAnyOrder(
-        InfrastructureProjectAwardedContractJson.from(infrastructureAwardedContract1),
-        InfrastructureProjectAwardedContractJson.from(infrastructureAwardedContract2)
+        AwardedContractJson.from(infrastructureAwardedContract1),
+        AwardedContractJson.from(infrastructureAwardedContract2)
     );
   }
 
@@ -486,8 +486,8 @@ class InfrastructureProjectJsonTest {
     );
 
     assertThat(infrastructureProjectJson.collaborationOpportunities()).containsExactlyInAnyOrder(
-        InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity1),
-        InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2)
+        CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity1),
+        CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2)
     );
   }
 

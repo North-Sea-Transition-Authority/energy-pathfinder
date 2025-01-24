@@ -83,6 +83,7 @@ public class AwardedContractTestUtil {
   }
 
   public static ForwardWorkPlanAwardedContract createForwardWorkPlanAwardedContract(
+      Integer id,
       ProjectDetail projectDetail,
       String contractorName,
       Function contractFunction,
@@ -96,7 +97,7 @@ public class AwardedContractTestUtil {
       String jobTitle,
       int addedByOrganisationGroup
   ) {
-    var awardedContract = new ForwardWorkPlanAwardedContract(projectDetail);
+    var awardedContract = new ForwardWorkPlanAwardedContract(id, projectDetail);
     setAwardedContractCommonFields(
         awardedContract,
         contractorName,
@@ -168,8 +169,13 @@ public class AwardedContractTestUtil {
   }
 
   public static ForwardWorkPlanAwardedContract createForwardWorkPlanAwardedContract() {
+    return createForwardWorkPlanAwardedContract(null,  ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN));
+  }
+
+  public static ForwardWorkPlanAwardedContract createForwardWorkPlanAwardedContract(Integer id, ProjectDetail projectDetail) {
     return createForwardWorkPlanAwardedContract(
-        ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN),
+        id,
+        projectDetail,
         CONTRACTOR_NAME,
         CONTRACT_FUNCTION,
         null,
@@ -204,6 +210,7 @@ public class AwardedContractTestUtil {
 
   public static ForwardWorkPlanAwardedContract createForwardWorkPlanAwardedContract_withManualEntryFunction(String function) {
     return createForwardWorkPlanAwardedContract(
+        null,
         ProjectUtil.getProjectDetails(),
         CONTRACTOR_NAME,
         null,

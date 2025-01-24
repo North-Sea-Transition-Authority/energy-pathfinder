@@ -7,7 +7,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
-class InfrastructureProjectCollaborationOpportunityJsonTest {
+class CollaborationOpportunityJsonTest {
 
   @Test
   void from() {
@@ -17,9 +17,9 @@ class InfrastructureProjectCollaborationOpportunityJsonTest {
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
 
     var infrastructureProjectCollaborationOpportunityJson =
-        InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity);
+        CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity);
 
-    var expectedInfrastructureProjectCollaborationOpportunityJson = new InfrastructureProjectCollaborationOpportunityJson(
+    var expectedInfrastructureProjectCollaborationOpportunityJson = new CollaborationOpportunityJson(
         infrastructureCollaborationOpportunity.getId(),
         infrastructureCollaborationOpportunity.getFunction().name(),
         infrastructureCollaborationOpportunity.getManualFunction(),
@@ -42,7 +42,7 @@ class InfrastructureProjectCollaborationOpportunityJsonTest {
     infrastructureCollaborationOpportunity.setFunction(Function.LOGISTICS);
 
     var infrastructureProjectCollaborationOpportunityJson =
-        InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity);
+        CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity);
 
     assertThat(infrastructureProjectCollaborationOpportunityJson.function()).isEqualTo(Function.LOGISTICS.name());
   }
@@ -57,7 +57,7 @@ class InfrastructureProjectCollaborationOpportunityJsonTest {
     infrastructureCollaborationOpportunity.setFunction(null);
 
     var infrastructureProjectCollaborationOpportunityJson =
-        InfrastructureProjectCollaborationOpportunityJson.from(infrastructureCollaborationOpportunity);
+        CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity);
 
     assertThat(infrastructureProjectCollaborationOpportunityJson.function()).isNull();
   }

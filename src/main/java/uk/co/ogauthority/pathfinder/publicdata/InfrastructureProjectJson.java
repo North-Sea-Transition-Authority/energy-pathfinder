@@ -32,8 +32,8 @@ record InfrastructureProjectJson(
     QuarterYearJson firstProductionDate,
     InfrastructureProjectLocationJson location,
     Set<InfrastructureProjectUpcomingTenderJson> upcomingTenders,
-    Set<InfrastructureProjectAwardedContractJson> awardedContracts,
-    Set<InfrastructureProjectCollaborationOpportunityJson> collaborationOpportunities,
+    Set<AwardedContractJson> awardedContracts,
+    Set<CollaborationOpportunityJson> collaborationOpportunities,
     InfrastructureProjectCampaignJson campaign,
     Set<InfrastructureProjectWellScheduleJson> wellCommissioningSchedules,
     Set<InfrastructureProjectWellScheduleJson> wellDecommissioningSchedules,
@@ -80,11 +80,11 @@ record InfrastructureProjectJson(
         : null;
 
     var awardedContracts = infrastructureAwardedContracts != null
-        ? infrastructureAwardedContracts.stream().map(InfrastructureProjectAwardedContractJson::from).collect(Collectors.toSet())
+        ? infrastructureAwardedContracts.stream().map(AwardedContractJson::from).collect(Collectors.toSet())
         : null;
 
     var collaborationOpportunities = infrastructureCollaborationOpportunities != null
-        ? infrastructureCollaborationOpportunities.stream().map(InfrastructureProjectCollaborationOpportunityJson::from)
+        ? infrastructureCollaborationOpportunities.stream().map(CollaborationOpportunityJson::from)
             .collect(Collectors.toSet())
         : null;
 

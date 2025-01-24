@@ -23,11 +23,11 @@ class InfrastructureProjectJsonTestUtil {
         InfrastructureProjectUpcomingTenderJsonTestUtil.newBuilder().withId(1).build(),
         InfrastructureProjectUpcomingTenderJsonTestUtil.newBuilder().withId(2).build()
     );
-    private Set<InfrastructureProjectAwardedContractJson> awardedContracts = Set.of(
-        InfrastructureProjectAwardedContractJsonTestUtil.newBuilder().withId(1).build(),
-        InfrastructureProjectAwardedContractJsonTestUtil.newBuilder().withId(2).build()
+    private Set<AwardedContractJson> awardedContracts = Set.of(
+        AwardedContractJsonTestUtil.newBuilder().withId(1).build(),
+        AwardedContractJsonTestUtil.newBuilder().withId(2).build()
     );
-    private Set<InfrastructureProjectCollaborationOpportunityJson> collaborationOpportunities = Set.of(
+    private Set<CollaborationOpportunityJson> collaborationOpportunities = Set.of(
         InfrastructureProjectCollaborationOpportunityJsonTestUtil.newBuilder().withId(1).build(),
         InfrastructureProjectCollaborationOpportunityJsonTestUtil.newBuilder().withId(2).build()
     );
@@ -130,12 +130,12 @@ class InfrastructureProjectJsonTestUtil {
       return this;
     }
 
-    Builder withAwardedContracts(Set<InfrastructureProjectAwardedContractJson> awardedContracts) {
+    Builder withAwardedContracts(Set<AwardedContractJson> awardedContracts) {
       this.awardedContracts = awardedContracts;
       return this;
     }
 
-    Builder withCollaborationOpportunities(Set<InfrastructureProjectCollaborationOpportunityJson> collaborationOpportunities) {
+    Builder withCollaborationOpportunities(Set<CollaborationOpportunityJson> collaborationOpportunities) {
       this.collaborationOpportunities = collaborationOpportunities;
       return this;
     }

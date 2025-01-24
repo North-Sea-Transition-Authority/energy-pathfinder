@@ -7,7 +7,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
-class InfrastructureProjectAwardedContractJsonTest {
+class AwardedContractJsonTest {
 
   @Test
   void from() {
@@ -15,9 +15,9 @@ class InfrastructureProjectAwardedContractJsonTest {
 
     var infrastructureAwardedContract = AwardedContractTestUtil.createInfrastructureAwardedContract(projectDetail);
 
-    var infrastructureProjectAwardedContractJson = InfrastructureProjectAwardedContractJson.from(infrastructureAwardedContract);
+    var infrastructureProjectAwardedContractJson = AwardedContractJson.from(infrastructureAwardedContract);
 
-    var expectedInfrastructureProjectAwardedContractJson = new InfrastructureProjectAwardedContractJson(
+    var expectedInfrastructureProjectAwardedContractJson = new AwardedContractJson(
         infrastructureAwardedContract.getId(),
         infrastructureAwardedContract.getContractorName(),
         infrastructureAwardedContract.getContractFunction().name(),
@@ -39,7 +39,7 @@ class InfrastructureProjectAwardedContractJsonTest {
 
     infrastructureAwardedContract.setContractFunction(Function.FABRICATION);
 
-    var infrastructureProjectAwardedContractJson = InfrastructureProjectAwardedContractJson.from(infrastructureAwardedContract);
+    var infrastructureProjectAwardedContractJson = AwardedContractJson.from(infrastructureAwardedContract);
 
     assertThat(infrastructureProjectAwardedContractJson.function()).isEqualTo(Function.FABRICATION.name());
   }
@@ -52,7 +52,7 @@ class InfrastructureProjectAwardedContractJsonTest {
 
     infrastructureAwardedContract.setContractFunction(null);
 
-    var infrastructureProjectAwardedContractJson = InfrastructureProjectAwardedContractJson.from(infrastructureAwardedContract);
+    var infrastructureProjectAwardedContractJson = AwardedContractJson.from(infrastructureAwardedContract);
 
     assertThat(infrastructureProjectAwardedContractJson.function()).isNull();
   }

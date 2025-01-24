@@ -12,7 +12,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
+import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractRepository;
+import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityRepository;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderRepository;
+import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -29,6 +33,12 @@ class ForwardWorkPlanJsonServiceTest {
 
   @Mock
   private ForwardWorkPlanUpcomingTenderRepository forwardWorkPlanUpcomingTenderRepository;
+
+  @Mock
+  private ForwardWorkPlanAwardedContractRepository forwardWorkPlanAwardedContractRepository;
+
+  @Mock
+  private ForwardWorkPlanCollaborationOpportunityRepository forwardWorkPlanCollaborationOpportunityRepository;
 
   @InjectMocks
   private ForwardWorkPlanJsonService forwardWorkPlanJsonService;
@@ -63,6 +73,14 @@ class ForwardWorkPlanJsonServiceTest {
     var forwardWorkPlanUpcomingTender2 = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(2, projectDetail1);
     var forwardWorkPlanUpcomingTender3 = ForwardWorkPlanUpcomingTenderUtil.getUpcomingTender(3, projectDetail2);
 
+    var forwardWorkPlanAwardedContract1 = AwardedContractTestUtil.createForwardWorkPlanAwardedContract(1, projectDetail1);
+    var forwardWorkPlanAwardedContract2 = AwardedContractTestUtil.createForwardWorkPlanAwardedContract(2, projectDetail1);
+    var forwardWorkPlanAwardedContract3 = AwardedContractTestUtil.createForwardWorkPlanAwardedContract(3, projectDetail2);
+
+    var forwardWorkPlanCollaborationOpportunity1 = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(1, projectDetail1);
+    var forwardWorkPlanCollaborationOpportunity2 = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(2, projectDetail1);
+    var forwardWorkPlanCollaborationOpportunity3 = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(3, projectDetail2);
+
     when(projectDetailsRepository.getAllPublishedProjectDetailsByProjectType(ProjectType.FORWARD_WORK_PLAN))
         .thenReturn(List.of(projectDetail1, projectDetail2, projectDetail3));
 
@@ -71,22 +89,34 @@ class ForwardWorkPlanJsonServiceTest {
     when(forwardWorkPlanUpcomingTenderRepository.findAll())
         .thenReturn(List.of(forwardWorkPlanUpcomingTender1, forwardWorkPlanUpcomingTender2, forwardWorkPlanUpcomingTender3));
 
+    when(forwardWorkPlanAwardedContractRepository.findAll())
+        .thenReturn(List.of(forwardWorkPlanAwardedContract1, forwardWorkPlanAwardedContract2, forwardWorkPlanAwardedContract3));
+
+    when(forwardWorkPlanCollaborationOpportunityRepository.findAll())
+        .thenReturn(List.of(forwardWorkPlanCollaborationOpportunity1, forwardWorkPlanCollaborationOpportunity2, forwardWorkPlanCollaborationOpportunity3));
+
     var forwardWorkPlanJsons = forwardWorkPlanJsonService.getPublishedForwardWorkPlans();
 
     assertThat(forwardWorkPlanJsons).containsExactlyInAnyOrder(
         ForwardWorkPlanJson.from(
             projectDetail1,
             projectOperator1,
-            List.of(forwardWorkPlanUpcomingTender1, forwardWorkPlanUpcomingTender2)
+            List.of(forwardWorkPlanUpcomingTender1, forwardWorkPlanUpcomingTender2),
+            List.of(forwardWorkPlanAwardedContract1, forwardWorkPlanAwardedContract2),
+            List.of(forwardWorkPlanCollaborationOpportunity1, forwardWorkPlanCollaborationOpportunity2)
         ),
         ForwardWorkPlanJson.from(
             projectDetail2,
             projectOperator2,
-            List.of(forwardWorkPlanUpcomingTender3)
+            List.of(forwardWorkPlanUpcomingTender3),
+            List.of(forwardWorkPlanAwardedContract3),
+            List.of(forwardWorkPlanCollaborationOpportunity3)
         ),
         ForwardWorkPlanJson.from(
             projectDetail3,
             projectOperator3,
+            null,
+            null,
             null
         )
     );
