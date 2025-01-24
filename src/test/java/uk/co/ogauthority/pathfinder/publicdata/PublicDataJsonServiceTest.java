@@ -16,15 +16,21 @@ class PublicDataJsonServiceTest {
   @Mock
   private InfrastructureProjectJsonService infrastructureProjectJsonService;
 
+  @Mock
+  private ForwardWorkPlanJsonService forwardWorkPlanJsonService;
+
   @InjectMocks
   private PublicDataJsonService publicDataJsonService;
 
   @Test
   void getPublicDataJson() {
     var infrastructureProjectJsons = Set.of(InfrastructureProjectJsonTestUtil.newBuilder().build());
+    var forwardWorkPlanJsons = Set.of(ForwardWorkPlanJsonTestUtil.newBuilder().build());
 
     when(infrastructureProjectJsonService.getPublishedInfrastructureProjects()).thenReturn(infrastructureProjectJsons);
+    when(forwardWorkPlanJsonService.getPublishedForwardWorkPlans()).thenReturn(forwardWorkPlanJsons);
 
-    assertThat(publicDataJsonService.getPublicDataJson()).isEqualTo(new PublicDataJson(infrastructureProjectJsons));
+    assertThat(publicDataJsonService.getPublicDataJson())
+        .isEqualTo(new PublicDataJson(infrastructureProjectJsons, forwardWorkPlanJsons));
   }
 }

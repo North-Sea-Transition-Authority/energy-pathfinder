@@ -18,6 +18,14 @@ class PublicDataJsonTestUtil {
             .withId(2)
             .build()
     );
+    private Set<ForwardWorkPlanJson> forwardWorkPlans = Set.of(
+        ForwardWorkPlanJsonTestUtil.newBuilder()
+            .withId(1)
+            .build(),
+        ForwardWorkPlanJsonTestUtil.newBuilder()
+            .withId(2)
+            .build()
+    );
 
     private Builder() {
     }
@@ -27,8 +35,13 @@ class PublicDataJsonTestUtil {
       return this;
     }
 
+    Builder withForwardWorkPlans(Set<ForwardWorkPlanJson> forwardWorkPlans) {
+      this.forwardWorkPlans = forwardWorkPlans;
+      return this;
+    }
+
     PublicDataJson build() {
-      return new PublicDataJson(infrastructureProjects);
+      return new PublicDataJson(infrastructureProjects, forwardWorkPlans);
     }
   }
 }

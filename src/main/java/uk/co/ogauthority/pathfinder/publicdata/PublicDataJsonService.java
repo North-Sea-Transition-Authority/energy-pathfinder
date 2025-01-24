@@ -6,12 +6,20 @@ import org.springframework.stereotype.Service;
 class PublicDataJsonService {
 
   private final InfrastructureProjectJsonService infrastructureProjectJsonService;
+  private final ForwardWorkPlanJsonService forwardWorkPlanJsonService;
 
-  PublicDataJsonService(InfrastructureProjectJsonService infrastructureProjectJsonService) {
+  PublicDataJsonService(
+      InfrastructureProjectJsonService infrastructureProjectJsonService,
+      ForwardWorkPlanJsonService forwardWorkPlanJsonService
+  ) {
     this.infrastructureProjectJsonService = infrastructureProjectJsonService;
+    this.forwardWorkPlanJsonService = forwardWorkPlanJsonService;
   }
 
   PublicDataJson getPublicDataJson() {
-    return new PublicDataJson(infrastructureProjectJsonService.getPublishedInfrastructureProjects());
+    var infrastructureProjects = infrastructureProjectJsonService.getPublishedInfrastructureProjects();
+    var forwardWorkPlans = forwardWorkPlanJsonService.getPublishedForwardWorkPlans();
+
+    return new PublicDataJson(infrastructureProjects, forwardWorkPlans);
   }
 }
