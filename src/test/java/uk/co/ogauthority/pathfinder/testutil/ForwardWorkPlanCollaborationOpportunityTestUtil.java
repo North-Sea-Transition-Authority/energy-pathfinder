@@ -42,20 +42,46 @@ public class ForwardWorkPlanCollaborationOpportunityTestUtil {
   }
 
   public static ForwardWorkPlanCollaborationOpportunityFileLink createCollaborationOpportunityFileLink(
+      Integer id,
+      ForwardWorkPlanCollaborationOpportunity collaborationOpportunity
+  ) {
+    return createCollaborationOpportunityFileLink(
+        id,
+        collaborationOpportunity,
+        ProjectFileTestUtil.getProjectDetailFile(collaborationOpportunity.getProjectDetail())
+    );
+  }
+
+  public static ForwardWorkPlanCollaborationOpportunityFileLink createCollaborationOpportunityFileLink(
+      ForwardWorkPlanCollaborationOpportunity collaborationOpportunity,
+      ProjectDetailFile projectDetailFile
+  ) {
+    return createCollaborationOpportunityFileLink(
+        null,
+        collaborationOpportunity,
+        projectDetailFile
+    );
+  }
+
+  public static ForwardWorkPlanCollaborationOpportunityFileLink createCollaborationOpportunityFileLink(
+      Integer id,
       ForwardWorkPlanCollaborationOpportunity collaborationOpportunity,
       ProjectDetailFile projectDetailFile
   ) {
 
     var collaborationFileLink = new ForwardWorkPlanCollaborationOpportunityFileLink();
+    collaborationFileLink.setId(id);
     collaborationFileLink.setCollaborationOpportunity(collaborationOpportunity);
     collaborationFileLink.setProjectDetailFile(projectDetailFile);
     return collaborationFileLink;
   }
 
   public static ForwardWorkPlanCollaborationOpportunityFileLink createCollaborationOpportunityFileLink() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+
     return createCollaborationOpportunityFileLink(
-        getCollaborationOpportunity(ProjectUtil.getProjectDetails()),
-        new ProjectDetailFile()
+        getCollaborationOpportunity(projectDetail),
+        ProjectFileTestUtil.getProjectDetailFile(projectDetail)
     );
   }
 

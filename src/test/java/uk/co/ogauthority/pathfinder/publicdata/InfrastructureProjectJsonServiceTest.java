@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.publicdata;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.infrastru
 import uk.co.ogauthority.pathfinder.repository.project.campaigninformation.CampaignInformationRepository;
 import uk.co.ogauthority.pathfinder.repository.project.campaigninformation.CampaignProjectRepository;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesRepository;
+import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunityFileLinkRepository;
 import uk.co.ogauthority.pathfinder.repository.project.commissionedwell.CommissionedWellRepository;
 import uk.co.ogauthority.pathfinder.repository.project.commissionedwell.CommissionedWellScheduleRepository;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedpipeline.DecommissionedPipelineRepository;
@@ -30,6 +32,7 @@ import uk.co.ogauthority.pathfinder.repository.project.plugabandonmentschedule.P
 import uk.co.ogauthority.pathfinder.repository.project.plugabandonmentschedule.PlugAbandonmentWellRepository;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
 import uk.co.ogauthority.pathfinder.repository.project.subseainfrastructure.SubseaInfrastructureRepository;
+import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderFileLinkRepository;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.CampaignInformationTestUtil;
@@ -48,6 +51,7 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.SubseaInfrastructureTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
+import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderFileLinkUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -72,10 +76,16 @@ class InfrastructureProjectJsonServiceTest {
   private UpcomingTenderRepository upcomingTenderRepository;
 
   @Mock
+  private UpcomingTenderFileLinkRepository upcomingTenderFileLinkRepository;
+
+  @Mock
   private InfrastructureAwardedContractRepository infrastructureAwardedContractRepository;
 
   @Mock
   private InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository;
+
+  @Mock
+  private InfrastructureCollaborationOpportunityFileLinkRepository infrastructureCollaborationOpportunityFileLinkRepository;
 
   @Mock
   private CampaignInformationRepository campaignInformationRepository;
@@ -163,6 +173,9 @@ class InfrastructureProjectJsonServiceTest {
     var upcomingTender2 = UpcomingTenderUtil.getUpcomingTender(2, projectDetail1);
     var upcomingTender3 = UpcomingTenderUtil.getUpcomingTender(3, projectDetail2);
 
+    var upcomingTenderFileLink1 = UpcomingTenderFileLinkUtil.createUpcomingTenderFileLink(1, upcomingTender1);
+    var upcomingTenderFileLink2 = UpcomingTenderFileLinkUtil.createUpcomingTenderFileLink(2, upcomingTender2);
+
     var infrastructureAwardedContract1 = AwardedContractTestUtil.createInfrastructureAwardedContract(1, projectDetail1);
     var infrastructureAwardedContract2 = AwardedContractTestUtil.createInfrastructureAwardedContract(2, projectDetail1);
     var infrastructureAwardedContract3 = AwardedContractTestUtil.createInfrastructureAwardedContract(3, projectDetail2);
@@ -173,6 +186,11 @@ class InfrastructureProjectJsonServiceTest {
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(2, projectDetail1);
     var infrastructureCollaborationOpportunity3 =
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(3, projectDetail2);
+
+    var infrastructureCollaborationOpportunityFileLink1 = InfrastructureCollaborationOpportunityTestUtil
+        .createCollaborationOpportunityFileLink(1, infrastructureCollaborationOpportunity1);
+    var infrastructureCollaborationOpportunityFileLink2 = InfrastructureCollaborationOpportunityTestUtil
+        .createCollaborationOpportunityFileLink(2, infrastructureCollaborationOpportunity2);
 
     var campaignInformation1 = CampaignInformationTestUtil.createCampaignInformation(1, projectDetail1);
     var campaignInformation2 = CampaignInformationTestUtil.createCampaignInformation(2, projectDetail2);
@@ -214,7 +232,7 @@ class InfrastructureProjectJsonServiceTest {
     var decommissionedPipeline2 = DecommissionedPipelineTestUtil.createDecommissionedPipeline(2, projectDetail1);
     var decommissionedPipeline3 = DecommissionedPipelineTestUtil.createDecommissionedPipeline(3, projectDetail2);
 
-    when(projectDetailsRepository.getAllPublishedProjectDetailsByProjectType(ProjectType.INFRASTRUCTURE))
+    when(projectDetailsRepository.getAllPublishedProjectDetailsByProjectTypes(EnumSet.of(ProjectType.INFRASTRUCTURE)))
         .thenReturn(List.of(projectDetail1, projectDetail2, projectDetail3));
 
     when(projectOperatorRepository.findAll()).thenReturn(List.of(projectOperator1, projectOperator2, projectOperator3));
@@ -229,6 +247,8 @@ class InfrastructureProjectJsonServiceTest {
 
     when(upcomingTenderRepository.findAll()).thenReturn(List.of(upcomingTender1, upcomingTender2, upcomingTender3));
 
+    when(upcomingTenderFileLinkRepository.findAll()).thenReturn(List.of(upcomingTenderFileLink1, upcomingTenderFileLink2));
+
     when(infrastructureAwardedContractRepository.findAll())
         .thenReturn(List.of(infrastructureAwardedContract1, infrastructureAwardedContract2, infrastructureAwardedContract3));
 
@@ -239,6 +259,9 @@ class InfrastructureProjectJsonServiceTest {
             infrastructureCollaborationOpportunity3
         )
     );
+
+    when(infrastructureCollaborationOpportunityFileLinkRepository.findAll())
+        .thenReturn(List.of(infrastructureCollaborationOpportunityFileLink1, infrastructureCollaborationOpportunityFileLink2));
 
     when(campaignInformationRepository.findAll())
         .thenReturn(List.of(campaignInformation1, campaignInformation2, campaignInformation3));
@@ -275,9 +298,15 @@ class InfrastructureProjectJsonServiceTest {
             projectInformation1,
             projectLocation1,
             List.of(projectLocationBlock1, projectLocationBlock2),
-            List.of(upcomingTender1, upcomingTender2),
+            Map.of(
+                upcomingTender1, upcomingTenderFileLink1,
+                upcomingTender2, upcomingTenderFileLink2
+            ),
             List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
-            List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2),
+            Map.of(
+                infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunityFileLink1,
+                infrastructureCollaborationOpportunity2, infrastructureCollaborationOpportunityFileLink2
+            ),
             campaignInformation1,
             List.of(campaignProject1, campaignProject2),
             Map.of(
@@ -299,9 +328,13 @@ class InfrastructureProjectJsonServiceTest {
             projectInformation2,
             projectLocation2,
             List.of(projectLocationBlock3, projectLocationBlock4),
-            List.of(upcomingTender3),
+            MapUtils.of(
+                upcomingTender3, null
+            ),
             List.of(infrastructureAwardedContract3),
-            List.of(infrastructureCollaborationOpportunity3),
+            MapUtils.of(
+                infrastructureCollaborationOpportunity3, null
+            ),
             campaignInformation2,
             List.of(campaignProject3),
             MapUtils.of(

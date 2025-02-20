@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.repository.project;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
@@ -72,8 +73,8 @@ public interface ProjectDetailsRepository extends CrudRepository<ProjectDetail, 
         AND tpd.project.id = pd.project.id
       )
       AND pd.status = uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus.PUBLISHED
-      AND pd.projectType = :projectType
+      AND pd.projectType IN :projectTypes
       """
   )
-  List<ProjectDetail> getAllPublishedProjectDetailsByProjectType(ProjectType projectType);
+  List<ProjectDetail> getAllPublishedProjectDetailsByProjectTypes(Collection<ProjectType> projectTypes);
 }

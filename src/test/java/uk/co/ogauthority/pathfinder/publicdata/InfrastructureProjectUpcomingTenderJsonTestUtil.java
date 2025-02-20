@@ -19,6 +19,7 @@ class InfrastructureProjectUpcomingTenderJsonTestUtil {
     private LocalDate estimatedTenderDate = LocalDate.of(2025, 1, 1);
     private String contractBand = ContractBand.GREATER_THAN_OR_EQUAL_TO_25M.name();
     private ContactJson contact = ContactJsonTestUtil.newBuilder().build();
+    private UploadedFileJson supportingDocumentUploadedFile = UploadedFileJsonTestUtil.newBuilder().build();
 
     private Builder() {
     }
@@ -58,6 +59,11 @@ class InfrastructureProjectUpcomingTenderJsonTestUtil {
       return this;
     }
 
+    Builder withSupportingDocumentUploadedFile(UploadedFileJson supportingDocumentUploadedFile) {
+      this.supportingDocumentUploadedFile = supportingDocumentUploadedFile;
+      return this;
+    }
+
     InfrastructureProjectUpcomingTenderJson build() {
       return new InfrastructureProjectUpcomingTenderJson(
           id,
@@ -66,7 +72,8 @@ class InfrastructureProjectUpcomingTenderJsonTestUtil {
           descriptionOfWork,
           estimatedTenderDate,
           contractBand,
-          contact
+          contact,
+          supportingDocumentUploadedFile
       );
     }
   }

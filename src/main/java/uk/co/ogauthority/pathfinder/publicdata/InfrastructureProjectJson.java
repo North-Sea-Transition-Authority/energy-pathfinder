@@ -12,6 +12,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.awardedcontract.infrast
 import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignInformation;
 import uk.co.ogauthority.pathfinder.model.entity.project.campaigninformation.CampaignProject;
 import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunity;
+import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunityFileLink;
 import uk.co.ogauthority.pathfinder.model.entity.project.commissionedwell.CommissionedWell;
 import uk.co.ogauthority.pathfinder.model.entity.project.commissionedwell.CommissionedWellSchedule;
 import uk.co.ogauthority.pathfinder.model.entity.project.decommissionedpipeline.DecommissionedPipeline;
@@ -24,6 +25,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedule
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.entity.project.subseainfrastructure.SubseaInfrastructure;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
+import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTenderFileLink;
 
 record InfrastructureProjectJson(
     Integer id,
@@ -50,13 +52,14 @@ record InfrastructureProjectJson(
       ProjectInformation projectInformation,
       ProjectLocation projectLocation,
       Collection<ProjectLocationBlock> projectLocationBlocks,
-      Collection<UpcomingTender> upcomingTendersList,
+      Map<UpcomingTender, UpcomingTenderFileLink> upcomingTenderToFileLink,
       Collection<InfrastructureAwardedContract> infrastructureAwardedContracts,
-      Collection<InfrastructureCollaborationOpportunity> infrastructureCollaborationOpportunities,
+      Map<InfrastructureCollaborationOpportunity, InfrastructureCollaborationOpportunityFileLink>
+          infrastructureCollaborationOpportunityToFileLink,
       CampaignInformation campaignInformation,
       Collection<CampaignProject> campaignProjects,
-      Map<CommissionedWellSchedule, Collection<CommissionedWell>> commissionedWellsBySchedule,
-      Map<PlugAbandonmentSchedule, Collection<PlugAbandonmentWell>> plugAbandonmentWellsBySchedule,
+      Map<CommissionedWellSchedule, Collection<CommissionedWell>> commissionedWellScheduleToWells,
+      Map<PlugAbandonmentSchedule, Collection<PlugAbandonmentWell>> plugAbandonmentScheduleToWells,
       Collection<PlatformFpso> platformFpsos,
       Collection<IntegratedRig> integratedRigs,
       Collection<SubseaInfrastructure> subseaInfrastructures,
@@ -75,16 +78,19 @@ record InfrastructureProjectJson(
 
     var location = projectLocation != null ? InfrastructureProjectLocationJson.from(projectLocation, projectLocationBlocks) : null;
 
-    var upcomingTenders = upcomingTendersList != null
-        ? upcomingTendersList.stream().map(InfrastructureProjectUpcomingTenderJson::from).collect(Collectors.toSet())
+    var upcomingTenders = upcomingTenderToFileLink != null
+        ? upcomingTenderToFileLink.entrySet().stream()
+            .map(entry -> InfrastructureProjectUpcomingTenderJson.from(entry.getKey(), entry.getValue()))
+            .collect(Collectors.toSet())
         : null;
 
     var awardedContracts = infrastructureAwardedContracts != null
         ? infrastructureAwardedContracts.stream().map(AwardedContractJson::from).collect(Collectors.toSet())
         : null;
 
-    var collaborationOpportunities = infrastructureCollaborationOpportunities != null
-        ? infrastructureCollaborationOpportunities.stream().map(CollaborationOpportunityJson::from)
+    var collaborationOpportunities = infrastructureCollaborationOpportunityToFileLink != null
+        ? infrastructureCollaborationOpportunityToFileLink.entrySet().stream()
+            .map(entry -> CollaborationOpportunityJson.from(entry.getKey(), entry.getValue()))
             .collect(Collectors.toSet())
         : null;
 
@@ -92,14 +98,14 @@ record InfrastructureProjectJson(
         ? InfrastructureProjectCampaignJson.from(campaignInformation, campaignProjects)
         : null;
 
-    var wellCommissioningSchedules = commissionedWellsBySchedule != null
-        ? commissionedWellsBySchedule.entrySet().stream()
+    var wellCommissioningSchedules = commissionedWellScheduleToWells != null
+        ? commissionedWellScheduleToWells.entrySet().stream()
             .map(entry -> InfrastructureProjectWellScheduleJson.from(entry.getKey(), entry.getValue()))
             .collect(Collectors.toSet())
         : null;
 
-    var wellDecommissioningSchedules = plugAbandonmentWellsBySchedule != null
-        ? plugAbandonmentWellsBySchedule.entrySet().stream()
+    var wellDecommissioningSchedules = plugAbandonmentScheduleToWells != null
+        ? plugAbandonmentScheduleToWells.entrySet().stream()
             .map(entry -> InfrastructureProjectWellScheduleJson.from(entry.getKey(), entry.getValue()))
             .collect(Collectors.toSet())
         : null;

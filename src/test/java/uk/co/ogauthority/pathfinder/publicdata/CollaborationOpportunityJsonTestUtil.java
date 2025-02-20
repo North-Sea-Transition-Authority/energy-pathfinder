@@ -2,7 +2,7 @@ package uk.co.ogauthority.pathfinder.publicdata;
 
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 
-class InfrastructureProjectCollaborationOpportunityJsonTestUtil {
+class CollaborationOpportunityJsonTestUtil {
 
   static Builder newBuilder() {
     return new Builder();
@@ -16,6 +16,7 @@ class InfrastructureProjectCollaborationOpportunityJsonTestUtil {
     private String descriptionOfWork = "Test description of work";
     private Boolean urgent = true;
     private ContactJson contact = ContactJsonTestUtil.newBuilder().build();
+    private UploadedFileJson supportingDocumentUploadedFile = UploadedFileJsonTestUtil.newBuilder().build();
 
     private Builder() {
     }
@@ -50,6 +51,11 @@ class InfrastructureProjectCollaborationOpportunityJsonTestUtil {
       return this;
     }
 
+    Builder withSupportingDocumentUploadedFile(UploadedFileJson supportingDocumentUploadedFile) {
+      this.supportingDocumentUploadedFile = supportingDocumentUploadedFile;
+      return this;
+    }
+
     CollaborationOpportunityJson build() {
       return new CollaborationOpportunityJson(
           id,
@@ -57,7 +63,8 @@ class InfrastructureProjectCollaborationOpportunityJsonTestUtil {
           manualFunction,
           descriptionOfWork,
           urgent,
-          contact
+          contact,
+          supportingDocumentUploadedFile
       );
     }
   }

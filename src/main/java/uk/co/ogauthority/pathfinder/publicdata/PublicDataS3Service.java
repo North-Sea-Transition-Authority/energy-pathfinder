@@ -7,13 +7,17 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import uk.co.ogauthority.pathfinder.model.entity.file.UploadedFile;
 
 @Service
 class PublicDataS3Service {
@@ -45,11 +49,16 @@ class PublicDataS3Service {
             .addSerializer(LocalDate.class, new LocalDateSerializer(LOCAL_DATE_DATE_TIME_FORMATTER)));
   }
 
-  void uploadPublicDataJsonFile(PublicDataJson publicDataJson) {
+  void uploadPublicData(PublicDataJson publicDataJson, Collection<UploadedFile> uploadedFiles) {
     var s3Bucket = publicDataConfigurationProperties.s3().bucket();
 
-    LOGGER.info("Uploading public data json file {} to S3 bucket {}", PUBLIC_DATA_JSON_FILE_KEY, s3Bucket);
+    LOGGER.info("Uploading public data to S3 bucket {}", s3Bucket);
 
+    uploadPublicDataJsonFile(s3Bucket, publicDataJson);
+    uploadUploadedFiles(s3Bucket, uploadedFiles);
+  }
+
+  void uploadPublicDataJsonFile(String s3Bucket, PublicDataJson publicDataJson) {
     try {
       var jsonString = objectMapper.writeValueAsString(publicDataJson);
 
@@ -63,6 +72,47 @@ class PublicDataS3Service {
       );
     } catch (Exception exception) {
       LOGGER.error("Failed to upload public data json file to S3", exception);
+    }
+  }
+
+  void uploadUploadedFiles(String s3Bucket, Collection<UploadedFile> uploadedFiles) {
+    uploadedFiles.forEach(uploadedFile -> {
+      try {
+        var key = PublicDataUploadedFileUtil.getS3ObjectKey(uploadedFile);
+
+        if (doesObjectExist(s3Bucket, key)) {
+          return;
+        }
+
+        try (var inputStream = uploadedFile.getFileData().getBinaryStream()) {
+          var fileSize = uploadedFile.getFileSize();
+
+          s3Client.putObject(
+              PutObjectRequest.builder()
+                  .bucket(s3Bucket)
+                  .key(key)
+                  .contentDisposition("attachment; filename=\"%s\"".formatted(uploadedFile.getFileName()))
+                  .contentLength(fileSize)
+                  .contentType(uploadedFile.getContentType())
+                  .build(),
+              RequestBody.fromInputStream(inputStream, fileSize)
+          );
+        }
+      } catch (Exception exception) {
+        LOGGER.error("Failed to upload uploaded file {} to S3", uploadedFile.getFileId(), exception);
+      }
+    });
+  }
+
+  boolean doesObjectExist(String s3Bucket, String key) {
+    try {
+      s3Client.headObject(HeadObjectRequest.builder()
+          .bucket(s3Bucket)
+          .key(key)
+          .build());
+      return true;
+    } catch (NoSuchKeyException exception) {
+      return false;
     }
   }
 }

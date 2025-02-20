@@ -50,20 +50,46 @@ public class InfrastructureCollaborationOpportunityTestUtil {
   }
 
   public static InfrastructureCollaborationOpportunityFileLink createCollaborationOpportunityFileLink(
+      Integer id,
+      InfrastructureCollaborationOpportunity collaborationOpportunity
+  ) {
+    return createCollaborationOpportunityFileLink(
+        id,
+        collaborationOpportunity,
+        ProjectFileTestUtil.getProjectDetailFile(collaborationOpportunity.getProjectDetail())
+    );
+  }
+
+  public static InfrastructureCollaborationOpportunityFileLink createCollaborationOpportunityFileLink(
+      InfrastructureCollaborationOpportunity collaborationOpportunity,
+      ProjectDetailFile projectDetailFile
+  ) {
+    return createCollaborationOpportunityFileLink(
+        null,
+        collaborationOpportunity,
+        projectDetailFile
+    );
+  }
+
+  public static InfrastructureCollaborationOpportunityFileLink createCollaborationOpportunityFileLink(
+      Integer id,
       InfrastructureCollaborationOpportunity collaborationOpportunity,
       ProjectDetailFile projectDetailFile
   ) {
 
     var collaborationFileLink = new InfrastructureCollaborationOpportunityFileLink();
+    collaborationFileLink.setId(id);
     collaborationFileLink.setCollaborationOpportunity(collaborationOpportunity);
     collaborationFileLink.setProjectDetailFile(projectDetailFile);
     return collaborationFileLink;
   }
 
   public static InfrastructureCollaborationOpportunityFileLink createCollaborationOpportunityFileLink() {
+    var projectDetail = ProjectUtil.getProjectDetails();
+
     return createCollaborationOpportunityFileLink(
-        getCollaborationOpportunity(ProjectUtil.getProjectDetails()),
-        new ProjectDetailFile()
+        getCollaborationOpportunity(projectDetail),
+        ProjectFileTestUtil.getProjectDetailFile(projectDetail)
     );
   }
 }

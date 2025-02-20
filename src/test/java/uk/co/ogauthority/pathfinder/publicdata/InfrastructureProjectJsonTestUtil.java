@@ -28,8 +28,8 @@ class InfrastructureProjectJsonTestUtil {
         AwardedContractJsonTestUtil.newBuilder().withId(2).build()
     );
     private Set<CollaborationOpportunityJson> collaborationOpportunities = Set.of(
-        InfrastructureProjectCollaborationOpportunityJsonTestUtil.newBuilder().withId(1).build(),
-        InfrastructureProjectCollaborationOpportunityJsonTestUtil.newBuilder().withId(2).build()
+        CollaborationOpportunityJsonTestUtil.newBuilder().withId(1).build(),
+        CollaborationOpportunityJsonTestUtil.newBuilder().withId(2).build()
     );
     private InfrastructureProjectCampaignJson campaign =
         InfrastructureProjectCampaignJsonTestUtil.newBuilder().build();

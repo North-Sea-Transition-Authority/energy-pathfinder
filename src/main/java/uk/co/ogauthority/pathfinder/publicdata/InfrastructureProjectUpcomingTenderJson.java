@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.publicdata;
 
 import java.time.LocalDate;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
+import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTenderFileLink;
 
 record InfrastructureProjectUpcomingTenderJson(
     Integer id,
@@ -10,10 +11,14 @@ record InfrastructureProjectUpcomingTenderJson(
     String descriptionOfWork,
     LocalDate estimatedTenderDate,
     String contractBand,
-    ContactJson contact
+    ContactJson contact,
+    UploadedFileJson supportingDocumentUploadedFile
 ) {
 
-  static InfrastructureProjectUpcomingTenderJson from(UpcomingTender upcomingTender) {
+  static InfrastructureProjectUpcomingTenderJson from(
+      UpcomingTender upcomingTender,
+      UpcomingTenderFileLink upcomingTenderFileLink
+  ) {
     var id = upcomingTender.getId();
     var function = upcomingTender.getTenderFunction() != null ? upcomingTender.getTenderFunction().name() : null;
     var manualFunction = upcomingTender.getManualTenderFunction();
@@ -21,6 +26,9 @@ record InfrastructureProjectUpcomingTenderJson(
     var estimatedTenderDate = upcomingTender.getEstimatedTenderDate();
     var contractBand = upcomingTender.getContractBand().name();
     var contact = ContactJson.from(upcomingTender);
+    var supportingDocumentUploadedFile = upcomingTenderFileLink != null
+        ? UploadedFileJson.from(upcomingTenderFileLink.getProjectDetailFile().getUploadedFile())
+        : null;
 
     return new InfrastructureProjectUpcomingTenderJson(
         id,
@@ -29,7 +37,8 @@ record InfrastructureProjectUpcomingTenderJson(
         descriptionOfWork,
         estimatedTenderDate,
         contractBand,
-        contact
+        contact,
+        supportingDocumentUploadedFile
     );
   }
 }

@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.publicdata;
 
 import com.google.common.collect.Streams;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -18,6 +19,7 @@ import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.infrastru
 import uk.co.ogauthority.pathfinder.repository.project.campaigninformation.CampaignInformationRepository;
 import uk.co.ogauthority.pathfinder.repository.project.campaigninformation.CampaignProjectRepository;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunitiesRepository;
+import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.infrastructure.InfrastructureCollaborationOpportunityFileLinkRepository;
 import uk.co.ogauthority.pathfinder.repository.project.commissionedwell.CommissionedWellRepository;
 import uk.co.ogauthority.pathfinder.repository.project.commissionedwell.CommissionedWellScheduleRepository;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedpipeline.DecommissionedPipelineRepository;
@@ -29,6 +31,7 @@ import uk.co.ogauthority.pathfinder.repository.project.plugabandonmentschedule.P
 import uk.co.ogauthority.pathfinder.repository.project.plugabandonmentschedule.PlugAbandonmentWellRepository;
 import uk.co.ogauthority.pathfinder.repository.project.projectinformation.ProjectInformationRepository;
 import uk.co.ogauthority.pathfinder.repository.project.subseainfrastructure.SubseaInfrastructureRepository;
+import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderFileLinkRepository;
 import uk.co.ogauthority.pathfinder.repository.project.upcomingtender.UpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
@@ -41,8 +44,10 @@ class InfrastructureProjectJsonService {
   private final ProjectLocationRepository projectLocationRepository;
   private final ProjectLocationBlockRepository projectLocationBlockRepository;
   private final UpcomingTenderRepository upcomingTenderRepository;
+  private final UpcomingTenderFileLinkRepository upcomingTenderFileLinkRepository;
   private final InfrastructureAwardedContractRepository infrastructureAwardedContractRepository;
   private final InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository;
+  private final InfrastructureCollaborationOpportunityFileLinkRepository infrastructureCollaborationOpportunityFileLinkRepository;
   private final CampaignInformationRepository campaignInformationRepository;
   private final CampaignProjectRepository campaignProjectRepository;
   private final CommissionedWellScheduleRepository commissionedWellScheduleRepository;
@@ -61,8 +66,10 @@ class InfrastructureProjectJsonService {
       ProjectLocationRepository projectLocationRepository,
       ProjectLocationBlockRepository projectLocationBlockRepository,
       UpcomingTenderRepository upcomingTenderRepository,
+      UpcomingTenderFileLinkRepository upcomingTenderFileLinkRepository,
       InfrastructureAwardedContractRepository infrastructureAwardedContractRepository,
       InfrastructureCollaborationOpportunitiesRepository infrastructureCollaborationOpportunitiesRepository,
+      InfrastructureCollaborationOpportunityFileLinkRepository infrastructureCollaborationOpportunityFileLinkRepository,
       CampaignInformationRepository campaignInformationRepository,
       CampaignProjectRepository campaignProjectRepository,
       CommissionedWellScheduleRepository commissionedWellScheduleRepository,
@@ -80,8 +87,10 @@ class InfrastructureProjectJsonService {
     this.projectLocationRepository = projectLocationRepository;
     this.projectLocationBlockRepository = projectLocationBlockRepository;
     this.upcomingTenderRepository = upcomingTenderRepository;
+    this.upcomingTenderFileLinkRepository = upcomingTenderFileLinkRepository;
     this.infrastructureAwardedContractRepository = infrastructureAwardedContractRepository;
     this.infrastructureCollaborationOpportunitiesRepository = infrastructureCollaborationOpportunitiesRepository;
+    this.infrastructureCollaborationOpportunityFileLinkRepository = infrastructureCollaborationOpportunityFileLinkRepository;
     this.campaignInformationRepository = campaignInformationRepository;
     this.campaignProjectRepository = campaignProjectRepository;
     this.commissionedWellScheduleRepository = commissionedWellScheduleRepository;
@@ -95,7 +104,8 @@ class InfrastructureProjectJsonService {
   }
 
   Set<InfrastructureProjectJson> getPublishedInfrastructureProjects() {
-    var allProjectDetails = projectDetailsRepository.getAllPublishedProjectDetailsByProjectType(ProjectType.INFRASTRUCTURE);
+    var allProjectDetails =
+        projectDetailsRepository.getAllPublishedProjectDetailsByProjectTypes(EnumSet.of(ProjectType.INFRASTRUCTURE));
 
     // TODO: When replatforming to use Postgres, switch to findAllByProjectDetail_IdIn. We can't do this with Oracle at the moment
     // due to the 1000 IN clause limit.
@@ -111,17 +121,39 @@ class InfrastructureProjectJsonService {
     var projectLocationBlocksByProjectDetailId = Streams.stream(projectLocationBlockRepository.findAll())
         .collect(Collectors.groupingBy(projectLocationBlock -> projectLocationBlock.getProjectLocation().getProjectDetail().getId()));
 
-    var upcomingTendersByProjectDetailId = Streams.stream(upcomingTenderRepository.findAll())
-        .collect(Collectors.groupingBy(upcomingTender -> upcomingTender.getProjectDetail().getId()));
+    var fileLinkByUpcomingTenderId = Streams.stream(upcomingTenderFileLinkRepository.findAll())
+        .collect(Collectors.toMap(fileLink -> fileLink.getUpcomingTender().getId(), Function.identity()));
+
+    var upcomingTenderToFileLinkByProjectDetailId = Streams.stream(upcomingTenderRepository.findAll())
+        .collect(
+            Collectors.groupingBy(
+                upcomingTender -> upcomingTender.getProjectDetail().getId(),
+                StreamUtil.toMapNullValueFriendly(
+                    Function.identity(),
+                    upcomingTender -> fileLinkByUpcomingTenderId.get(upcomingTender.getId())
+                )
+            )
+        );
 
     var infrastructureAwardedContractsByProjectDetailId = Streams.stream(infrastructureAwardedContractRepository.findAll())
         .collect(Collectors.groupingBy(
             infrastructureAwardedContract -> infrastructureAwardedContract.getProjectDetail().getId()));
 
-    var infrastructureCollaborationOpportunitiesByProjectDetailId =
+    var fileLinkByInfrastructureCollaborationOpportunityId =
+        Streams.stream(infrastructureCollaborationOpportunityFileLinkRepository.findAll())
+            .collect(Collectors.toMap(fileLink -> fileLink.getCollaborationOpportunity().getId(), Function.identity()));
+
+    var infrastructureCollaborationOpportunityToFileLinkByProjectDetailId =
         Streams.stream(infrastructureCollaborationOpportunitiesRepository.findAll())
-            .collect(Collectors.groupingBy(
-                infrastructureCollaborationOpportunity -> infrastructureCollaborationOpportunity.getProjectDetail().getId()));
+            .collect(
+                Collectors.groupingBy(
+                    collaborationOpportunity -> collaborationOpportunity.getProjectDetail().getId(),
+                    StreamUtil.toMapNullValueFriendly(
+                        Function.identity(),
+                        collaborationOpportunity -> fileLinkByInfrastructureCollaborationOpportunityId.get(collaborationOpportunity.getId())
+                    )
+                )
+            );
 
     var campaignInformationByProjectDetailId = Streams.stream(campaignInformationRepository.findAll())
         .collect(Collectors.toMap(campaignInformation -> campaignInformation.getProjectDetail().getId(), Function.identity()));
@@ -132,7 +164,7 @@ class InfrastructureProjectJsonService {
     var commissionedWellsByScheduleId = Streams.stream(commissionedWellRepository.findAll())
         .collect(Collectors.groupingBy(commissionedWell -> commissionedWell.getCommissionedWellSchedule().getId()));
 
-    Map<Integer, Map<CommissionedWellSchedule, Collection<CommissionedWell>>> commissionedWellsByScheduleByProjectDetailId =
+    Map<Integer, Map<CommissionedWellSchedule, Collection<CommissionedWell>>> commissionedWellScheduleToWellsByProjectDetailId =
         Streams.stream(commissionedWellScheduleRepository.findAll())
             .collect(
                 Collectors.groupingBy(
@@ -147,7 +179,7 @@ class InfrastructureProjectJsonService {
     var plugAbandonmentWellsByScheduleId = Streams.stream(plugAbandonmentWellRepository.findAll())
         .collect(Collectors.groupingBy(plugAbandonmentWell -> plugAbandonmentWell.getPlugAbandonmentSchedule().getId()));
 
-    Map<Integer, Map<PlugAbandonmentSchedule, Collection<PlugAbandonmentWell>>> plugAbandonmentWellsByScheduleByProjectDetailId =
+    Map<Integer, Map<PlugAbandonmentSchedule, Collection<PlugAbandonmentWell>>> plugAbandonmentScheduleToWellsByProjectDetailId =
         Streams.stream(plugAbandonmentScheduleRepository.findAll())
             .collect(
                 Collectors.groupingBy(
@@ -180,13 +212,13 @@ class InfrastructureProjectJsonService {
                 projectInformationByProjectDetailId.get(projectDetail.getId()),
                 projectLocationByProjectDetailId.get(projectDetail.getId()),
                 projectLocationBlocksByProjectDetailId.get(projectDetail.getId()),
-                upcomingTendersByProjectDetailId.get(projectDetail.getId()),
+                upcomingTenderToFileLinkByProjectDetailId.get(projectDetail.getId()),
                 infrastructureAwardedContractsByProjectDetailId.get(projectDetail.getId()),
-                infrastructureCollaborationOpportunitiesByProjectDetailId.get(projectDetail.getId()),
+                infrastructureCollaborationOpportunityToFileLinkByProjectDetailId.get(projectDetail.getId()),
                 campaignInformationByProjectDetailId.get(projectDetail.getId()),
                 campaignProjectsByProjectDetailId.get(projectDetail.getId()),
-                commissionedWellsByScheduleByProjectDetailId.get(projectDetail.getId()),
-                plugAbandonmentWellsByScheduleByProjectDetailId.get(projectDetail.getId()),
+                commissionedWellScheduleToWellsByProjectDetailId.get(projectDetail.getId()),
+                plugAbandonmentScheduleToWellsByProjectDetailId.get(projectDetail.getId()),
                 platformFpsosByProjectDetailId.get(projectDetail.getId()),
                 integratedRigsByProjectDetailId.get(projectDetail.getId()),
                 subseaInfrastructuresByProjectDetailId.get(projectDetail.getId()),

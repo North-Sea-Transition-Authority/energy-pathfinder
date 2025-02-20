@@ -7,6 +7,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.utils.MapUtils;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ForwardWorkPlanUpcomingTenderUtil;
@@ -30,12 +31,18 @@ class ForwardWorkPlanJsonTest {
     var forwardWorkPlanCollaborationOpportunity1 = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(1, projectDetail);
     var forwardWorkPlanCollaborationOpportunity2 = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(2, projectDetail);
 
+    var forwardWorkPlanCollaborationOpportunityFileLink = ForwardWorkPlanCollaborationOpportunityTestUtil
+        .createCollaborationOpportunityFileLink(1, forwardWorkPlanCollaborationOpportunity1);
+
     var forwardWorkPlanJson = ForwardWorkPlanJson.from(
         projectDetail,
         projectOperator,
         List.of(forwardWorkPlanUpcomingTender1, forwardWorkPlanUpcomingTender2),
         List.of(forwardWorkPlanAwardedContract1, forwardWorkPlanAwardedContract2),
-        List.of(forwardWorkPlanCollaborationOpportunity1, forwardWorkPlanCollaborationOpportunity2)
+        MapUtils.of(
+            forwardWorkPlanCollaborationOpportunity1, forwardWorkPlanCollaborationOpportunityFileLink,
+            forwardWorkPlanCollaborationOpportunity2, null
+        )
     );
 
     var expectedForwardWorkPlanJson = new ForwardWorkPlanJson(
@@ -50,8 +57,9 @@ class ForwardWorkPlanJsonTest {
             AwardedContractJson.from(forwardWorkPlanAwardedContract2)
         ),
         Set.of(
-            CollaborationOpportunityJson.from(forwardWorkPlanCollaborationOpportunity1),
-            CollaborationOpportunityJson.from(forwardWorkPlanCollaborationOpportunity2)
+            CollaborationOpportunityJson
+                .from(forwardWorkPlanCollaborationOpportunity1, forwardWorkPlanCollaborationOpportunityFileLink),
+            CollaborationOpportunityJson.from(forwardWorkPlanCollaborationOpportunity2, null)
         ),
         LocalDateTime.ofInstant(projectDetail.getSubmittedInstant(), ZoneId.systemDefault())
     );
@@ -140,7 +148,7 @@ class ForwardWorkPlanJsonTest {
   }
 
   @Test
-  void from_forwardWorkPlanCollaborationOpportunitiesIsNull() {
+  void from_forwardWorkPlanCollaborationOpportunityToFileLinkIsNull() {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
@@ -157,7 +165,7 @@ class ForwardWorkPlanJsonTest {
   }
 
   @Test
-  void from_forwardWorkPlanCollaborationOpportunitiesIsNotNull() {
+  void from_forwardWorkPlanCollaborationOpportunityToFileLinkIsNotNull() {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
@@ -165,17 +173,24 @@ class ForwardWorkPlanJsonTest {
     var forwardWorkPlanCollaborationOpportunity1 = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(1, projectDetail);
     var forwardWorkPlanCollaborationOpportunity2 = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(2, projectDetail);
 
+    var forwardWorkPlanCollaborationOpportunityFileLink = ForwardWorkPlanCollaborationOpportunityTestUtil
+        .createCollaborationOpportunityFileLink(1, forwardWorkPlanCollaborationOpportunity1);
+
     var forwardWorkPlanJson = ForwardWorkPlanJson.from(
         projectDetail,
         projectOperator,
         null,
         null,
-        List.of(forwardWorkPlanCollaborationOpportunity1, forwardWorkPlanCollaborationOpportunity2)
+        MapUtils.of(
+            forwardWorkPlanCollaborationOpportunity1, forwardWorkPlanCollaborationOpportunityFileLink,
+            forwardWorkPlanCollaborationOpportunity2, null
+        )
     );
 
     assertThat(forwardWorkPlanJson.collaborationOpportunities()).containsExactlyInAnyOrder(
-        CollaborationOpportunityJson.from(forwardWorkPlanCollaborationOpportunity1),
-        CollaborationOpportunityJson.from(forwardWorkPlanCollaborationOpportunity2)
+        CollaborationOpportunityJson
+            .from(forwardWorkPlanCollaborationOpportunity1, forwardWorkPlanCollaborationOpportunityFileLink),
+        CollaborationOpportunityJson.from(forwardWorkPlanCollaborationOpportunity2, null)
     );
   }
 }

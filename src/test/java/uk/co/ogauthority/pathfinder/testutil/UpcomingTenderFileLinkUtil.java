@@ -7,14 +7,33 @@ import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.Upcoming
 public class UpcomingTenderFileLinkUtil {
 
   public static UpcomingTenderFileLink createUpcomingTenderFileLink() {
-    var upcomingTender = UpcomingTenderUtil.getUpcomingTender(ProjectUtil.getProjectDetails());
-    var projectDetailFile = new ProjectDetailFile();
+    var projectDetail = ProjectUtil.getProjectDetails();
+    var upcomingTender = UpcomingTenderUtil.getUpcomingTender(projectDetail);
+    var projectDetailFile = ProjectFileTestUtil.getProjectDetailFile(projectDetail);
     return createUpcomingTenderFileLink(upcomingTender, projectDetailFile);
   }
 
-  public static UpcomingTenderFileLink createUpcomingTenderFileLink(UpcomingTender upcomingTender,
-                                                                    ProjectDetailFile projectDetailFile) {
-    var upcomingTenderFileLink = new UpcomingTenderFileLink();
+  public static UpcomingTenderFileLink createUpcomingTenderFileLink(UpcomingTender upcomingTender) {
+    return createUpcomingTenderFileLink(null, upcomingTender);
+  }
+
+  public static UpcomingTenderFileLink createUpcomingTenderFileLink(Integer id, UpcomingTender upcomingTender) {
+    return createUpcomingTenderFileLink(id, upcomingTender, ProjectFileTestUtil.getProjectDetailFile(upcomingTender.getProjectDetail()));
+  }
+
+  public static UpcomingTenderFileLink createUpcomingTenderFileLink(
+      UpcomingTender upcomingTender,
+      ProjectDetailFile projectDetailFile
+  ) {
+    return createUpcomingTenderFileLink(null, upcomingTender, projectDetailFile);
+  }
+
+  public static UpcomingTenderFileLink createUpcomingTenderFileLink(
+      Integer id,
+      UpcomingTender upcomingTender,
+      ProjectDetailFile projectDetailFile
+  ) {
+    var upcomingTenderFileLink = new UpcomingTenderFileLink(id);
     upcomingTenderFileLink.setUpcomingTender(upcomingTender);
     upcomingTenderFileLink.setProjectDetailFile(projectDetailFile);
     return upcomingTenderFileLink;

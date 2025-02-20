@@ -15,9 +15,11 @@ class CollaborationOpportunityJsonTest {
 
     var infrastructureCollaborationOpportunity =
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
+    var infrastructureCollaborationOpportunityFileLink =
+        InfrastructureCollaborationOpportunityTestUtil.createCollaborationOpportunityFileLink();
 
     var infrastructureProjectCollaborationOpportunityJson =
-        CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity);
+        CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity, infrastructureCollaborationOpportunityFileLink);
 
     var expectedInfrastructureProjectCollaborationOpportunityJson = new CollaborationOpportunityJson(
         infrastructureCollaborationOpportunity.getId(),
@@ -25,7 +27,8 @@ class CollaborationOpportunityJsonTest {
         infrastructureCollaborationOpportunity.getManualFunction(),
         infrastructureCollaborationOpportunity.getDescriptionOfWork(),
         infrastructureCollaborationOpportunity.getUrgentResponseNeeded(),
-        ContactJson.from(infrastructureCollaborationOpportunity)
+        ContactJson.from(infrastructureCollaborationOpportunity),
+        UploadedFileJson.from(infrastructureCollaborationOpportunityFileLink.getProjectDetailFile().getUploadedFile())
     );
 
     assertThat(infrastructureProjectCollaborationOpportunityJson)
@@ -42,7 +45,7 @@ class CollaborationOpportunityJsonTest {
     infrastructureCollaborationOpportunity.setFunction(Function.LOGISTICS);
 
     var infrastructureProjectCollaborationOpportunityJson =
-        CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity);
+        CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity, null);
 
     assertThat(infrastructureProjectCollaborationOpportunityJson.function()).isEqualTo(Function.LOGISTICS.name());
   }
@@ -57,8 +60,37 @@ class CollaborationOpportunityJsonTest {
     infrastructureCollaborationOpportunity.setFunction(null);
 
     var infrastructureProjectCollaborationOpportunityJson =
-        CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity);
+        CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity, null);
 
     assertThat(infrastructureProjectCollaborationOpportunityJson.function()).isNull();
+  }
+
+  @Test
+  void from_collaborationOpportunityFileLinkIsNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var infrastructureCollaborationOpportunity =
+        InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
+
+    var infrastructureProjectCollaborationOpportunityJson =
+        CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity, null);
+
+    assertThat(infrastructureProjectCollaborationOpportunityJson.supportingDocumentUploadedFile()).isNull();
+  }
+
+  @Test
+  void from_collaborationOpportunityFileLinkIsNotNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var infrastructureCollaborationOpportunity =
+        InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(projectDetail);
+    var infrastructureCollaborationOpportunityFileLink =
+        InfrastructureCollaborationOpportunityTestUtil.createCollaborationOpportunityFileLink();
+
+    var infrastructureProjectCollaborationOpportunityJson =
+        CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity, infrastructureCollaborationOpportunityFileLink);
+
+    assertThat(infrastructureProjectCollaborationOpportunityJson.supportingDocumentUploadedFile())
+        .isEqualTo(UploadedFileJson.from(infrastructureCollaborationOpportunityFileLink.getProjectDetailFile().getUploadedFile()));
   }
 }

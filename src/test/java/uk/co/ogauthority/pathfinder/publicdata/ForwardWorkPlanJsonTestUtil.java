@@ -22,8 +22,8 @@ class ForwardWorkPlanJsonTestUtil {
         AwardedContractJsonTestUtil.newBuilder().withId(2).build()
     );
     private Set<CollaborationOpportunityJson> collaborationOpportunities = Set.of(
-        InfrastructureProjectCollaborationOpportunityJsonTestUtil.newBuilder().withId(1).build(),
-        InfrastructureProjectCollaborationOpportunityJsonTestUtil.newBuilder().withId(2).build()
+        CollaborationOpportunityJsonTestUtil.newBuilder().withId(1).build(),
+        CollaborationOpportunityJsonTestUtil.newBuilder().withId(2).build()
     );
     private LocalDateTime submittedOn = LocalDateTime.of(2024, 10, 29, 11, 20, 38, 424521789);
 

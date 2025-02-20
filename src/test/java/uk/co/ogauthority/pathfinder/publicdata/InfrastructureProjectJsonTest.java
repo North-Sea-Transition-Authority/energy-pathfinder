@@ -25,6 +25,7 @@ import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.SubseaInfrastructureTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderFileLinkUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 
 class InfrastructureProjectJsonTest {
@@ -47,6 +48,8 @@ class InfrastructureProjectJsonTest {
     var upcomingTender1 = UpcomingTenderUtil.getUpcomingTender(1, projectDetail);
     var upcomingTender2 = UpcomingTenderUtil.getUpcomingTender(2, projectDetail);
 
+    var upcomingTenderFileLink = UpcomingTenderFileLinkUtil.createUpcomingTenderFileLink(1, upcomingTender1);
+
     var infrastructureAwardedContract1 = AwardedContractTestUtil.createInfrastructureAwardedContract(1, projectDetail);
     var infrastructureAwardedContract2 = AwardedContractTestUtil.createInfrastructureAwardedContract(2, projectDetail);
 
@@ -54,6 +57,9 @@ class InfrastructureProjectJsonTest {
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(1, projectDetail);
     var infrastructureCollaborationOpportunity2 =
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(2, projectDetail);
+
+    var infrastructureCollaborationOpportunityFileLink = InfrastructureCollaborationOpportunityTestUtil
+        .createCollaborationOpportunityFileLink(1, infrastructureCollaborationOpportunity1);
 
     var campaignInformation = CampaignInformationTestUtil.createCampaignInformation(1, projectDetail);
 
@@ -90,9 +96,15 @@ class InfrastructureProjectJsonTest {
         projectInformation,
         projectLocation,
         projectLocationBlocks,
-        List.of(upcomingTender1, upcomingTender2),
+        MapUtils.of(
+            upcomingTender1, upcomingTenderFileLink,
+            upcomingTender2, null
+        ),
         List.of(infrastructureAwardedContract1, infrastructureAwardedContract2),
-        List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2),
+        MapUtils.of(
+            infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunityFileLink,
+            infrastructureCollaborationOpportunity2, null
+        ),
         campaignInformation,
         List.of(campaignProject1, campaignProject2),
         MapUtils.of(
@@ -116,16 +128,17 @@ class InfrastructureProjectJsonTest {
         null,
         InfrastructureProjectLocationJson.from(projectLocation, projectLocationBlocks),
         Set.of(
-            InfrastructureProjectUpcomingTenderJson.from(upcomingTender1),
-            InfrastructureProjectUpcomingTenderJson.from(upcomingTender2)
+            InfrastructureProjectUpcomingTenderJson.from(upcomingTender1, upcomingTenderFileLink),
+            InfrastructureProjectUpcomingTenderJson.from(upcomingTender2, null)
         ),
         Set.of(
             AwardedContractJson.from(infrastructureAwardedContract1),
             AwardedContractJson.from(infrastructureAwardedContract2)
         ),
         Set.of(
-            CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity1),
-            CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2)
+            CollaborationOpportunityJson
+                .from(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunityFileLink),
+            CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2, null)
         ),
         InfrastructureProjectCampaignJson.from(campaignInformation, List.of(campaignProject1, campaignProject2)),
         Set.of(
@@ -292,7 +305,7 @@ class InfrastructureProjectJsonTest {
   }
 
   @Test
-  void from_upcomingTendersListIsNull() {
+  void from_upcomingTenderToFileLinkIsNull() {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
@@ -322,7 +335,7 @@ class InfrastructureProjectJsonTest {
   }
 
   @Test
-  void from_upcomingTendersListIsNotNull() {
+  void from_upcomingTenderToFileLinkIsNotNull() {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
@@ -332,13 +345,18 @@ class InfrastructureProjectJsonTest {
     var upcomingTender1 = UpcomingTenderUtil.getUpcomingTender(1, projectDetail);
     var upcomingTender2 = UpcomingTenderUtil.getUpcomingTender(2, projectDetail);
 
+    var upcomingTenderFileLink = UpcomingTenderFileLinkUtil.createUpcomingTenderFileLink(1, upcomingTender1);
+
     var infrastructureProjectJson = InfrastructureProjectJson.from(
         projectDetail,
         projectOperator,
         projectInformation,
         null,
         null,
-        List.of(upcomingTender1, upcomingTender2),
+        MapUtils.of(
+            upcomingTender1, upcomingTenderFileLink,
+            upcomingTender2, null
+        ),
         null,
         null,
         null,
@@ -352,8 +370,8 @@ class InfrastructureProjectJsonTest {
     );
 
     assertThat(infrastructureProjectJson.upcomingTenders()).containsExactlyInAnyOrder(
-        InfrastructureProjectUpcomingTenderJson.from(upcomingTender1),
-        InfrastructureProjectUpcomingTenderJson.from(upcomingTender2)
+        InfrastructureProjectUpcomingTenderJson.from(upcomingTender1, upcomingTenderFileLink),
+        InfrastructureProjectUpcomingTenderJson.from(upcomingTender2, null)
     );
   }
 
@@ -424,7 +442,7 @@ class InfrastructureProjectJsonTest {
   }
 
   @Test
-  void from_infrastructureCollaborationOpportunitiesIsNull() {
+  void from_infrastructureCollaborationOpportunityToFileLinkIsNull() {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
@@ -454,7 +472,7 @@ class InfrastructureProjectJsonTest {
   }
 
   @Test
-  void from_infrastructureCollaborationOpportunitiesIsNotNull() {
+  void from_infrastructureCollaborationOpportunityToFileLinkIsNotNull() {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
@@ -466,6 +484,9 @@ class InfrastructureProjectJsonTest {
     var infrastructureCollaborationOpportunity2 =
         InfrastructureCollaborationOpportunityTestUtil.getCollaborationOpportunity(2, projectDetail);
 
+    var infrastructureCollaborationOpportunityFileLink = InfrastructureCollaborationOpportunityTestUtil
+        .createCollaborationOpportunityFileLink(1, infrastructureCollaborationOpportunity1);
+
     var infrastructureProjectJson = InfrastructureProjectJson.from(
         projectDetail,
         projectOperator,
@@ -474,7 +495,10 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
-        List.of(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunity2),
+        MapUtils.of(
+            infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunityFileLink,
+            infrastructureCollaborationOpportunity2, null
+        ),
         null,
         null,
         null,
@@ -486,13 +510,14 @@ class InfrastructureProjectJsonTest {
     );
 
     assertThat(infrastructureProjectJson.collaborationOpportunities()).containsExactlyInAnyOrder(
-        CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity1),
-        CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2)
+        CollaborationOpportunityJson
+            .from(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunityFileLink),
+        CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2, null)
     );
   }
 
   @Test
-  void from_commissionedWellsByScheduleIsNull() {
+  void from_commissionedWellScheduleToWellsIsNull() {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
@@ -522,7 +547,7 @@ class InfrastructureProjectJsonTest {
   }
 
   @Test
-  void from_commissionedWellsByScheduleIsNotNull() {
+  void from_commissionedWellScheduleToWellsIsNotNull() {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
@@ -564,7 +589,7 @@ class InfrastructureProjectJsonTest {
   }
 
   @Test
-  void from_plugAbandonmentWellsByScheduleIsNull() {
+  void from_plugAbandonmentScheduleToWellsIsNull() {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
@@ -594,7 +619,7 @@ class InfrastructureProjectJsonTest {
   }
 
   @Test
-  void from_plugAbandonmentWellsByScheduleIsNotNull() {
+  void from_plugAbandonmentScheduleToWellsIsNotNull() {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);

@@ -3,16 +3,20 @@ package uk.co.ogauthority.pathfinder.publicdata;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import software.amazon.awssdk.utils.MapUtils;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectOperatorRepository;
 import uk.co.ogauthority.pathfinder.repository.project.awardedcontract.forwardworkplan.ForwardWorkPlanAwardedContractRepository;
+import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityFileLinkRepository;
 import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunities.forwardworkplan.ForwardWorkPlanCollaborationOpportunityRepository;
 import uk.co.ogauthority.pathfinder.repository.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderRepository;
 import uk.co.ogauthority.pathfinder.testutil.AwardedContractTestUtil;
@@ -39,6 +43,9 @@ class ForwardWorkPlanJsonServiceTest {
 
   @Mock
   private ForwardWorkPlanCollaborationOpportunityRepository forwardWorkPlanCollaborationOpportunityRepository;
+
+  @Mock
+  private ForwardWorkPlanCollaborationOpportunityFileLinkRepository forwardWorkPlanCollaborationOpportunityFileLinkRepository;
 
   @InjectMocks
   private ForwardWorkPlanJsonService forwardWorkPlanJsonService;
@@ -81,7 +88,12 @@ class ForwardWorkPlanJsonServiceTest {
     var forwardWorkPlanCollaborationOpportunity2 = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(2, projectDetail1);
     var forwardWorkPlanCollaborationOpportunity3 = ForwardWorkPlanCollaborationOpportunityTestUtil.getCollaborationOpportunity(3, projectDetail2);
 
-    when(projectDetailsRepository.getAllPublishedProjectDetailsByProjectType(ProjectType.FORWARD_WORK_PLAN))
+    var forwardWorkPlanCollaborationOpportunityFileLink1 = ForwardWorkPlanCollaborationOpportunityTestUtil
+        .createCollaborationOpportunityFileLink(1, forwardWorkPlanCollaborationOpportunity1);
+    var forwardWorkPlanCollaborationOpportunityFileLink2 = ForwardWorkPlanCollaborationOpportunityTestUtil
+        .createCollaborationOpportunityFileLink(2, forwardWorkPlanCollaborationOpportunity2);
+
+    when(projectDetailsRepository.getAllPublishedProjectDetailsByProjectTypes(EnumSet.of(ProjectType.FORWARD_WORK_PLAN)))
         .thenReturn(List.of(projectDetail1, projectDetail2, projectDetail3));
 
     when(projectOperatorRepository.findAll()).thenReturn(List.of(projectOperator1, projectOperator2, projectOperator3));
@@ -95,6 +107,9 @@ class ForwardWorkPlanJsonServiceTest {
     when(forwardWorkPlanCollaborationOpportunityRepository.findAll())
         .thenReturn(List.of(forwardWorkPlanCollaborationOpportunity1, forwardWorkPlanCollaborationOpportunity2, forwardWorkPlanCollaborationOpportunity3));
 
+    when(forwardWorkPlanCollaborationOpportunityFileLinkRepository.findAll())
+        .thenReturn(List.of(forwardWorkPlanCollaborationOpportunityFileLink1, forwardWorkPlanCollaborationOpportunityFileLink2));
+
     var forwardWorkPlanJsons = forwardWorkPlanJsonService.getPublishedForwardWorkPlans();
 
     assertThat(forwardWorkPlanJsons).containsExactlyInAnyOrder(
@@ -103,14 +118,19 @@ class ForwardWorkPlanJsonServiceTest {
             projectOperator1,
             List.of(forwardWorkPlanUpcomingTender1, forwardWorkPlanUpcomingTender2),
             List.of(forwardWorkPlanAwardedContract1, forwardWorkPlanAwardedContract2),
-            List.of(forwardWorkPlanCollaborationOpportunity1, forwardWorkPlanCollaborationOpportunity2)
+            Map.of(
+                forwardWorkPlanCollaborationOpportunity1, forwardWorkPlanCollaborationOpportunityFileLink1,
+                forwardWorkPlanCollaborationOpportunity2, forwardWorkPlanCollaborationOpportunityFileLink2
+            )
         ),
         ForwardWorkPlanJson.from(
             projectDetail2,
             projectOperator2,
             List.of(forwardWorkPlanUpcomingTender3),
             List.of(forwardWorkPlanAwardedContract3),
-            List.of(forwardWorkPlanCollaborationOpportunity3)
+            MapUtils.of(
+                forwardWorkPlanCollaborationOpportunity3, null
+            )
         ),
         ForwardWorkPlanJson.from(
             projectDetail3,

@@ -30,6 +30,7 @@ import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFilePurpose;
+import uk.co.ogauthority.pathfinder.model.entity.file.UploadedFile;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.forminput.file.UploadFileWithDescriptionForm;
@@ -38,7 +39,9 @@ import uk.co.ogauthority.pathfinder.repository.file.ProjectDetailFileRepository;
 import uk.co.ogauthority.pathfinder.service.entityduplication.EntityDuplicationService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
+import uk.co.ogauthority.pathfinder.testutil.ProjectFileTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectDetailFileServiceTest {
@@ -75,6 +78,8 @@ public class ProjectDetailFileServiceTest {
 
   private final WebUserAccount wua = new WebUserAccount(1);
 
+  private final UploadedFile uploadedFile = UploadedFileUtil.createUploadedFile(FILE_ID);
+
   private final UploadedFileView fileView = new UploadedFileView(
       FILE_ID,
       "NAME",
@@ -95,7 +100,7 @@ public class ProjectDetailFileServiceTest {
 
     projectDetail = ProjectUtil.getProjectDetails();
     file = new ProjectDetailFile();
-    file.setFileId(FILE_ID);
+    file.setUploadedFile(uploadedFile);
     file.setPurpose(ProjectDetailFilePurpose.PLACEHOLDER);
 
     when(fileUploadService.deleteUploadedFile(any(), any())).thenAnswer(invocation ->
@@ -142,6 +147,8 @@ public class ProjectDetailFileServiceTest {
             "content"
         )
     );
+
+    when(fileUploadService.getFileById(file.getFileId())).thenReturn(uploadedFile);
 
     var fileUploadResult = projectDetailFileService.processInitialUpload(
         multiPartFile,
@@ -372,7 +379,7 @@ public class ProjectDetailFileServiceTest {
     var file2 = new ProjectDetailFile();
 
     projectDetailFileService.removeProjectDetailFiles(List.of(file1, file2));
-    
+
     verify(projectDetailFileRepository).deleteAll(List.of(file1, file2));
   }
 
@@ -405,12 +412,12 @@ public class ProjectDetailFileServiceTest {
 
   @Test
   public void getProjectDetailFileByProjectDetailAndFileId_whenFoundCorrectFileReturned() {
-    var file = new ProjectDetailFile();
-    when(projectDetailFileRepository.findByProjectDetailAndFileId(projectDetail, file.getFileId())).thenReturn(
+    var file = ProjectFileTestUtil.getProjectDetailFile(projectDetail);
+    when(projectDetailFileRepository.findByProjectDetailAndUploadedFile_FileId(projectDetail, file.getFileId())).thenReturn(
         Optional.of(file)
     );
     var returnedFile = projectDetailFileService.getProjectDetailFileByProjectDetailAndFileId(
-        projectDetail, 
+        projectDetail,
         file.getFileId()
     );
     assertThat(returnedFile).isEqualTo(file);
@@ -418,7 +425,7 @@ public class ProjectDetailFileServiceTest {
 
   @Test(expected = PathfinderEntityNotFoundException.class)
   public void getProjectDetailFileByProjectDetailAndFileId_whenNotFoundThenError() {
-    when(projectDetailFileRepository.findByProjectDetailAndFileId(projectDetail, file.getFileId())).thenReturn(
+    when(projectDetailFileRepository.findByProjectDetailAndUploadedFile_FileId(projectDetail, file.getFileId())).thenReturn(
         Optional.empty()
     );
     projectDetailFileService.getProjectDetailFileByProjectDetailAndFileId(
@@ -429,8 +436,8 @@ public class ProjectDetailFileServiceTest {
 
   @Test
   public void getProjectDetailFileByProjectDetailVersionAndFileId_whenFoundCorrectFileReturned() {
-    var file = new ProjectDetailFile();
-    when(projectDetailFileRepository.findByProjectDetailAndFileId(projectDetail, file.getFileId())).thenReturn(
+    var file = ProjectFileTestUtil.getProjectDetailFile(projectDetail);
+    when(projectDetailFileRepository.findByProjectDetailAndUploadedFile_FileId(projectDetail, file.getFileId())).thenReturn(
         Optional.of(file)
     );
     when(projectService.getDetailOrError(projectDetail.getProject().getId(), PROJECT_VERSION)).thenReturn(projectDetail);
@@ -445,7 +452,7 @@ public class ProjectDetailFileServiceTest {
   @Test(expected = PathfinderEntityNotFoundException.class)
   public void getProjectDetailFileByProjectDetailVersionAndFileId_whenNotFoundThenError() {
     when(projectService.getDetailOrError(projectDetail.getProject().getId(), PROJECT_VERSION)).thenReturn(projectDetail);
-    when(projectDetailFileRepository.findByProjectDetailAndFileId(projectDetail, file.getFileId())).thenReturn(
+    when(projectDetailFileRepository.findByProjectDetailAndUploadedFile_FileId(projectDetail, file.getFileId())).thenReturn(
         Optional.empty()
     );
     projectDetailFileService.getProjectDetailFileByProjectDetailVersionAndFileId(

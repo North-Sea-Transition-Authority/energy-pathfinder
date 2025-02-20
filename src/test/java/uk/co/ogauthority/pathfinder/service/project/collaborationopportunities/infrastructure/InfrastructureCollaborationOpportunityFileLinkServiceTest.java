@@ -103,7 +103,7 @@ public class InfrastructureCollaborationOpportunityFileLinkServiceTest {
         .thenReturn(List.of(collaborationOpportunityFileLink));
 
     var projectDetailFile = new ProjectDetailFile();
-    projectDetailFile.setFileId(uploadedFile.getUploadedFileId());
+    projectDetailFile.setUploadedFile(UploadedFileUtil.createUploadedFile(uploadedFile.getUploadedFileId()));
     projectDetailFile.setDescription(uploadedFile.getUploadedFileDescription());
 
     when(projectDetailFileService.updateFiles(any(), any(), any(), any(), any())).thenReturn(List.of(projectDetailFile));
