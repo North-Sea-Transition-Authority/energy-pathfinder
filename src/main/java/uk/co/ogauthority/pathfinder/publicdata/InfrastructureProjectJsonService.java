@@ -23,6 +23,7 @@ import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.repository.project.commissionedwell.CommissionedWellRepository;
 import uk.co.ogauthority.pathfinder.repository.project.commissionedwell.CommissionedWellScheduleRepository;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedpipeline.DecommissionedPipelineRepository;
+import uk.co.ogauthority.pathfinder.repository.project.decommissioningschedule.DecommissioningScheduleRepository;
 import uk.co.ogauthority.pathfinder.repository.project.integratedrig.IntegratedRigRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationBlockRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
@@ -52,6 +53,7 @@ class InfrastructureProjectJsonService {
   private final CampaignProjectRepository campaignProjectRepository;
   private final CommissionedWellScheduleRepository commissionedWellScheduleRepository;
   private final CommissionedWellRepository commissionedWellRepository;
+  private final DecommissioningScheduleRepository decommissioningScheduleRepository;
   private final PlugAbandonmentScheduleRepository plugAbandonmentScheduleRepository;
   private final PlugAbandonmentWellRepository plugAbandonmentWellRepository;
   private final PlatformFpsoRepository platformFpsoRepository;
@@ -74,6 +76,7 @@ class InfrastructureProjectJsonService {
       CampaignProjectRepository campaignProjectRepository,
       CommissionedWellScheduleRepository commissionedWellScheduleRepository,
       CommissionedWellRepository commissionedWellRepository,
+      DecommissioningScheduleRepository decommissioningScheduleRepository,
       PlugAbandonmentScheduleRepository plugAbandonmentScheduleRepository,
       PlugAbandonmentWellRepository plugAbandonmentWellRepository,
       PlatformFpsoRepository platformFpsoRepository,
@@ -95,6 +98,7 @@ class InfrastructureProjectJsonService {
     this.campaignProjectRepository = campaignProjectRepository;
     this.commissionedWellScheduleRepository = commissionedWellScheduleRepository;
     this.commissionedWellRepository = commissionedWellRepository;
+    this.decommissioningScheduleRepository = decommissioningScheduleRepository;
     this.plugAbandonmentScheduleRepository = plugAbandonmentScheduleRepository;
     this.plugAbandonmentWellRepository = plugAbandonmentWellRepository;
     this.platformFpsoRepository = platformFpsoRepository;
@@ -176,6 +180,9 @@ class InfrastructureProjectJsonService {
                 )
             );
 
+    var decommissioningScheduleByProjectDetailId = Streams.stream(decommissioningScheduleRepository.findAll())
+        .collect(Collectors.toMap(decommissioningSchedule -> decommissioningSchedule.getProjectDetail().getId(), Function.identity()));
+
     var plugAbandonmentWellsByScheduleId = Streams.stream(plugAbandonmentWellRepository.findAll())
         .collect(Collectors.groupingBy(plugAbandonmentWell -> plugAbandonmentWell.getPlugAbandonmentSchedule().getId()));
 
@@ -218,6 +225,7 @@ class InfrastructureProjectJsonService {
                 campaignInformationByProjectDetailId.get(projectDetail.getId()),
                 campaignProjectsByProjectDetailId.get(projectDetail.getId()),
                 commissionedWellScheduleToWellsByProjectDetailId.get(projectDetail.getId()),
+                decommissioningScheduleByProjectDetailId.get(projectDetail.getId()),
                 plugAbandonmentScheduleToWellsByProjectDetailId.get(projectDetail.getId()),
                 platformFpsosByProjectDetailId.get(projectDetail.getId()),
                 integratedRigsByProjectDetailId.get(projectDetail.getId()),

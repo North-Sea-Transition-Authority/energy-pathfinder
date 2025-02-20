@@ -16,6 +16,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.collaborationopportunit
 import uk.co.ogauthority.pathfinder.model.entity.project.commissionedwell.CommissionedWell;
 import uk.co.ogauthority.pathfinder.model.entity.project.commissionedwell.CommissionedWellSchedule;
 import uk.co.ogauthority.pathfinder.model.entity.project.decommissionedpipeline.DecommissionedPipeline;
+import uk.co.ogauthority.pathfinder.model.entity.project.decommissioningschedule.DecommissioningSchedule;
 import uk.co.ogauthority.pathfinder.model.entity.project.integratedrig.IntegratedRig;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
@@ -38,6 +39,7 @@ record InfrastructureProjectJson(
     Set<CollaborationOpportunityJson> collaborationOpportunities,
     InfrastructureProjectCampaignJson campaign,
     Set<InfrastructureProjectWellScheduleJson> wellCommissioningSchedules,
+    InfrastructureProjectDecommissioningScheduleJson decommissioningSchedule,
     Set<InfrastructureProjectWellScheduleJson> wellDecommissioningSchedules,
     Set<InfrastructureProjectPlatformOrFpsoToBeDecommissionedJson> platformOrFpsosToBeDecommissioned,
     Set<InfrastructureProjectIntegratedRigToBeDecommissionedJson> integratedRigsToBeDecommissioned,
@@ -59,6 +61,7 @@ record InfrastructureProjectJson(
       CampaignInformation campaignInformation,
       Collection<CampaignProject> campaignProjects,
       Map<CommissionedWellSchedule, Collection<CommissionedWell>> commissionedWellScheduleToWells,
+      DecommissioningSchedule decommissioningSchedule,
       Map<PlugAbandonmentSchedule, Collection<PlugAbandonmentWell>> plugAbandonmentScheduleToWells,
       Collection<PlatformFpso> platformFpsos,
       Collection<IntegratedRig> integratedRigs,
@@ -104,6 +107,10 @@ record InfrastructureProjectJson(
             .collect(Collectors.toSet())
         : null;
 
+    var decommissioningScheduleJson = decommissioningSchedule != null
+        ? InfrastructureProjectDecommissioningScheduleJson.from(decommissioningSchedule)
+        : null;
+
     var wellDecommissioningSchedules = plugAbandonmentScheduleToWells != null
         ? plugAbandonmentScheduleToWells.entrySet().stream()
             .map(entry -> InfrastructureProjectWellScheduleJson.from(entry.getKey(), entry.getValue()))
@@ -141,6 +148,7 @@ record InfrastructureProjectJson(
         collaborationOpportunities,
         campaign,
         wellCommissioningSchedules,
+        decommissioningScheduleJson,
         wellDecommissioningSchedules,
         platformOrFpsosToBeDecommissioned,
         integratedRigsToBeDecommissioned,

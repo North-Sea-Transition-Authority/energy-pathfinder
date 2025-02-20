@@ -23,7 +23,11 @@ public class DecommissioningScheduleTestUtil {
   }
 
   public static DecommissioningSchedule createDecommissioningSchedule(ProjectDetail projectDetail) {
-    var decommissioningSchedule = new DecommissioningSchedule();
+    return createDecommissioningSchedule(null, projectDetail);
+  }
+
+  public static DecommissioningSchedule createDecommissioningSchedule(Integer id, ProjectDetail projectDetail) {
+    var decommissioningSchedule = new DecommissioningSchedule(id);
     decommissioningSchedule.setProjectDetail(projectDetail);
     decommissioningSchedule.setDecommissioningStartDateType(DECOM_START_DATE_TYPE);
     decommissioningSchedule.setEstimatedDecommissioningStartDateQuarter(ESTIMATED_DECOM_START_DATE_QUARTER);

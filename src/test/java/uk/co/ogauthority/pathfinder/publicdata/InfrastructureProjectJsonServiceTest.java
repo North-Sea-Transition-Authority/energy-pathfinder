@@ -24,6 +24,7 @@ import uk.co.ogauthority.pathfinder.repository.project.collaborationopportunitie
 import uk.co.ogauthority.pathfinder.repository.project.commissionedwell.CommissionedWellRepository;
 import uk.co.ogauthority.pathfinder.repository.project.commissionedwell.CommissionedWellScheduleRepository;
 import uk.co.ogauthority.pathfinder.repository.project.decommissionedpipeline.DecommissionedPipelineRepository;
+import uk.co.ogauthority.pathfinder.repository.project.decommissioningschedule.DecommissioningScheduleRepository;
 import uk.co.ogauthority.pathfinder.repository.project.integratedrig.IntegratedRigRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationBlockRepository;
 import uk.co.ogauthority.pathfinder.repository.project.location.ProjectLocationRepository;
@@ -39,6 +40,7 @@ import uk.co.ogauthority.pathfinder.testutil.CampaignInformationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.CampaignProjectTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.CommissionedWellTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.DecommissionedPipelineTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.DecommissioningScheduleTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.IntegratedRigTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
@@ -98,6 +100,9 @@ class InfrastructureProjectJsonServiceTest {
 
   @Mock
   private CommissionedWellRepository commissionedWellRepository;
+
+  @Mock
+  private DecommissioningScheduleRepository decommissioningScheduleRepository;
 
   @Mock
   private PlugAbandonmentScheduleRepository plugAbandonmentScheduleRepository;
@@ -208,6 +213,9 @@ class InfrastructureProjectJsonServiceTest {
     var commissionedWell2 = CommissionedWellTestUtil.getCommissionedWell(2, commissionedWellSchedule1);
     var commissionedWell3 = CommissionedWellTestUtil.getCommissionedWell(3, commissionedWellSchedule2);
 
+    var decommissioningSchedule1 = DecommissioningScheduleTestUtil.createDecommissioningSchedule(1, projectDetail1);
+    var decommissioningSchedule2 = DecommissioningScheduleTestUtil.createDecommissioningSchedule(2, projectDetail2);
+
     var plugAbandonmentSchedule1 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(1, projectDetail1);
     var plugAbandonmentSchedule2 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(2, projectDetail1);
     var plugAbandonmentSchedule3 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(3, projectDetail2);
@@ -273,6 +281,8 @@ class InfrastructureProjectJsonServiceTest {
     when(commissionedWellScheduleRepository.findAll())
         .thenReturn(List.of(commissionedWellSchedule1, commissionedWellSchedule2, commissionedWellSchedule3));
 
+    when(decommissioningScheduleRepository.findAll()).thenReturn(List.of(decommissioningSchedule1, decommissioningSchedule2));
+
     when(plugAbandonmentWellRepository.findAll())
         .thenReturn(List.of(plugAbandonmentWell1, plugAbandonmentWell2, plugAbandonmentWell3));
 
@@ -313,6 +323,7 @@ class InfrastructureProjectJsonServiceTest {
                 commissionedWellSchedule1, List.of(commissionedWell1, commissionedWell2),
                 commissionedWellSchedule2, List.of(commissionedWell3)
             ),
+            decommissioningSchedule1,
             Map.of(
                 plugAbandonmentSchedule1, List.of(plugAbandonmentWell1, plugAbandonmentWell2),
                 plugAbandonmentSchedule2, List.of(plugAbandonmentWell3)
@@ -340,6 +351,7 @@ class InfrastructureProjectJsonServiceTest {
             MapUtils.of(
                 commissionedWellSchedule3, null
             ),
+            decommissioningSchedule2,
             MapUtils.of(
                 plugAbandonmentSchedule3, null
             ),
@@ -358,6 +370,7 @@ class InfrastructureProjectJsonServiceTest {
             null,
             null,
             campaignInformation3,
+            null,
             null,
             null,
             null,

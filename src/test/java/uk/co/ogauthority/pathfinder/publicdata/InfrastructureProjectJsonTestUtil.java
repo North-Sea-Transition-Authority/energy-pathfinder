@@ -37,6 +37,8 @@ class InfrastructureProjectJsonTestUtil {
         InfrastructureProjectWellScheduleJsonTestUtil.newBuilder().withId(1).build(),
         InfrastructureProjectWellScheduleJsonTestUtil.newBuilder().withId(2).build()
     );
+    private InfrastructureProjectDecommissioningScheduleJson decommissioningSchedule =
+        InfrastructureProjectDecommissioningScheduleJsonTestUtil.newBuilder().build();
     private Set<InfrastructureProjectWellScheduleJson> wellDecommissioningSchedules = Set.of(
         InfrastructureProjectWellScheduleJsonTestUtil.newBuilder().withId(1).build(),
         InfrastructureProjectWellScheduleJsonTestUtil.newBuilder().withId(2).build()
@@ -150,6 +152,11 @@ class InfrastructureProjectJsonTestUtil {
       return this;
     }
 
+    Builder withDecommissioningSchedule(InfrastructureProjectDecommissioningScheduleJson decommissioningSchedule) {
+      this.decommissioningSchedule = decommissioningSchedule;
+      return this;
+    }
+
     Builder withWellDecommissioningSchedules(Set<InfrastructureProjectWellScheduleJson> wellDecommissioningSchedules) {
       this.wellDecommissioningSchedules = wellDecommissioningSchedules;
       return this;
@@ -200,6 +207,7 @@ class InfrastructureProjectJsonTestUtil {
           collaborationOpportunities,
           campaign,
           wellCommissioningSchedules,
+          decommissioningSchedule,
           wellDecommissioningSchedules,
           platformOrFpsosToBeDecommissioned,
           integratedRigsToBeDecommissioned,

@@ -14,6 +14,7 @@ import uk.co.ogauthority.pathfinder.testutil.CampaignInformationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.CampaignProjectTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.CommissionedWellTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.DecommissionedPipelineTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.DecommissioningScheduleTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.InfrastructureCollaborationOpportunityTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.IntegratedRigTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
@@ -72,6 +73,8 @@ class InfrastructureProjectJsonTest {
     var commissionedWell1 = CommissionedWellTestUtil.getCommissionedWell(1, commissionedWellSchedule1);
     var commissionedWell2 = CommissionedWellTestUtil.getCommissionedWell(2, commissionedWellSchedule1);
 
+    var decommissioningSchedule = DecommissioningScheduleTestUtil.createDecommissioningSchedule(projectDetail);
+
     var plugAbandonmentSchedule1 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(1, projectDetail);
     var plugAbandonmentSchedule2 = PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(2, projectDetail);
 
@@ -111,6 +114,7 @@ class InfrastructureProjectJsonTest {
             commissionedWellSchedule1, List.of(commissionedWell1, commissionedWell2),
             commissionedWellSchedule2, null
         ),
+        decommissioningSchedule,
         MapUtils.of(
             plugAbandonmentSchedule1, List.of(plugAbandonmentWell1, plugAbandonmentWell2),
             plugAbandonmentSchedule2, null
@@ -145,6 +149,7 @@ class InfrastructureProjectJsonTest {
             InfrastructureProjectWellScheduleJson.from(commissionedWellSchedule1, List.of(commissionedWell1, commissionedWell2)),
             InfrastructureProjectWellScheduleJson.from(commissionedWellSchedule2, null)
         ),
+        InfrastructureProjectDecommissioningScheduleJson.from(decommissioningSchedule),
         Set.of(
             InfrastructureProjectWellScheduleJson.from(plugAbandonmentSchedule1, List.of(plugAbandonmentWell1, plugAbandonmentWell2)),
             InfrastructureProjectWellScheduleJson.from(plugAbandonmentSchedule2, null)
@@ -197,6 +202,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -229,6 +235,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -248,6 +255,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -297,6 +305,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -316,6 +325,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -366,6 +376,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -387,6 +398,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -432,6 +444,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -453,6 +466,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -506,6 +520,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -514,6 +529,74 @@ class InfrastructureProjectJsonTest {
             .from(infrastructureCollaborationOpportunity1, infrastructureCollaborationOpportunityFileLink),
         CollaborationOpportunityJson.from(infrastructureCollaborationOpportunity2, null)
     );
+  }
+
+  @Test
+  void from_campaignInformationIsNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.campaign()).isNull();
+  }
+
+  @Test
+  void from_campaignInformationIsNotNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var campaignInformation = CampaignInformationTestUtil.createCampaignInformation(1, projectDetail);
+
+    var campaignProject1 = CampaignProjectTestUtil.newBuilder().withId(1).withCampaignInformation(campaignInformation).build();
+    var campaignProject2 = CampaignProjectTestUtil.newBuilder().withId(2).withCampaignInformation(campaignInformation).build();
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null,
+        campaignInformation,
+        List.of(campaignProject1, campaignProject2),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.campaign())
+        .isEqualTo(InfrastructureProjectCampaignJson.from(campaignInformation, List.of(campaignProject1, campaignProject2)));
   }
 
   @Test
@@ -528,6 +611,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -579,6 +663,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -586,6 +671,71 @@ class InfrastructureProjectJsonTest {
         InfrastructureProjectWellScheduleJson.from(commissionedWellSchedule1, List.of(commissionedWell1, commissionedWell2)),
         InfrastructureProjectWellScheduleJson.from(commissionedWellSchedule2, null)
     );
+  }
+
+  @Test
+  void from_decommissioningScheduleIsNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.decommissioningSchedule()).isNull();
+  }
+
+  @Test
+  void from_decommissioningScheduleIsNotNull() {
+    var projectDetail = ProjectUtil.getPublishedProjectDetails();
+
+    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
+
+    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
+
+    var decommissioningSchedule = DecommissioningScheduleTestUtil.createDecommissioningSchedule(projectDetail);
+
+    var infrastructureProjectJson = InfrastructureProjectJson.from(
+        projectDetail,
+        projectOperator,
+        projectInformation,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        decommissioningSchedule,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+
+    assertThat(infrastructureProjectJson.decommissioningSchedule())
+        .isEqualTo(InfrastructureProjectDecommissioningScheduleJson.from(decommissioningSchedule));
   }
 
   @Test
@@ -600,6 +750,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -636,6 +787,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -684,6 +836,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -705,6 +858,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -750,6 +904,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -771,6 +926,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -816,6 +972,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -837,6 +994,7 @@ class InfrastructureProjectJsonTest {
         projectDetail,
         projectOperator,
         projectInformation,
+        null,
         null,
         null,
         null,
@@ -882,6 +1040,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -915,6 +1074,7 @@ class InfrastructureProjectJsonTest {
         null,
         null,
         null,
+        null,
         List.of(decommissionedPipeline1, decommissionedPipeline2)
     );
 
@@ -922,71 +1082,5 @@ class InfrastructureProjectJsonTest {
         InfrastructureProjectPipelineToBeDecommissionedJson.from(decommissionedPipeline1),
         InfrastructureProjectPipelineToBeDecommissionedJson.from(decommissionedPipeline2)
     );
-  }
-
-  @Test
-  void from_campaignInformationIsNull() {
-    var projectDetail = ProjectUtil.getPublishedProjectDetails();
-
-    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
-
-    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
-
-    var infrastructureProjectJson = InfrastructureProjectJson.from(
-        projectDetail,
-        projectOperator,
-        projectInformation,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-    );
-
-    assertThat(infrastructureProjectJson.campaign()).isNull();
-  }
-
-  @Test
-  void from_campaignInformationIsNotNull() {
-    var projectDetail = ProjectUtil.getPublishedProjectDetails();
-
-    var projectOperator = ProjectOperatorTestUtil.getOperator(projectDetail);
-
-    var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
-
-    var campaignInformation = CampaignInformationTestUtil.createCampaignInformation(1, projectDetail);
-
-    var campaignProject1 = CampaignProjectTestUtil.newBuilder().withId(1).withCampaignInformation(campaignInformation).build();
-    var campaignProject2 = CampaignProjectTestUtil.newBuilder().withId(2).withCampaignInformation(campaignInformation).build();
-
-    var infrastructureProjectJson = InfrastructureProjectJson.from(
-        projectDetail,
-        projectOperator,
-        projectInformation,
-        null,
-        null,
-        null,
-        null,
-        null,
-        campaignInformation,
-        List.of(campaignProject1, campaignProject2),
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-    );
-
-    assertThat(infrastructureProjectJson.campaign())
-        .isEqualTo(InfrastructureProjectCampaignJson.from(campaignInformation, List.of(campaignProject1, campaignProject2)));
   }
 }

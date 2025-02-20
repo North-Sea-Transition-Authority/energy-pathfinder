@@ -1,364 +1,6 @@
 {
   "infrastructureProjects": [
     {
-      "id": 1,
-      "details": {
-        "operatorName": "BP",
-        "title": "Test project",
-        "summary": "Test summary",
-        "projectType": "DECOMMISSIONING",
-        "projectTypeSubCategory": null
-      },
-      "contact": {
-        "name": "Test contact name",
-        "phoneNumber": "01303 123 456",
-        "jobTitle": "Test contact job title",
-        "emailAddress": "test@email.address"
-      },
-      "firstProductionDate": {
-        "quarter": "Q1",
-        "year": 2025
-      },
-      "location": {
-        "field": {
-          "fieldName": "MERCURY",
-          "fieldType": "CARBON_STORAGE",
-          "ukcsArea": "CNS"
-        },
-        "maximumWaterDepthMeters": 60,
-        "licenceBlocks": [
-          "12/34, 12/56"
-        ]
-      },
-      "upcomingTenders": [
-        {
-          "id": 1,
-          "function": "DRILLING",
-          "manualFunction": null,
-          "descriptionOfWork": "Test description of work",
-          "estimatedTenderDate": "2025-01-01",
-          "contractBand": "GREATER_THAN_OR_EQUAL_TO_25M",
-          "contact": {
-            "name": "Test contact name",
-            "phoneNumber": "01303 123 456",
-            "jobTitle": "Test contact job title",
-            "emailAddress": "test@email.address"
-          },
-          "supportingDocumentUploadedFile": {
-            "name": "Test PDF.pdf",
-            "s3ObjectKey": "uploaded-files/1234abc"
-          }
-        },
-        {
-          "id": 2,
-          "function": "DRILLING",
-          "manualFunction": null,
-          "descriptionOfWork": "Test description of work",
-          "estimatedTenderDate": "2025-01-01",
-          "contractBand": "GREATER_THAN_OR_EQUAL_TO_25M",
-          "contact": {
-            "name": "Test contact name",
-            "phoneNumber": "01303 123 456",
-            "jobTitle": "Test contact job title",
-            "emailAddress": "test@email.address"
-          },
-          "supportingDocumentUploadedFile": {
-            "name": "Test PDF.pdf",
-            "s3ObjectKey": "uploaded-files/1234abc"
-          }
-        }
-      ],
-      "awardedContracts": [
-        {
-          "id": 1,
-          "contractorName": "Test contractor",
-          "function": "FABRICATION",
-          "manualFunction": null,
-          "descriptionOfWork": "Test description of work",
-          "dateAwarded": "2024-11-26",
-          "contractBand": "GREATER_THAN_OR_EQUAL_TO_25M",
-          "contact": {
-            "name": "Test contact name",
-            "phoneNumber": "01303 123 456",
-            "jobTitle": "Test contact job title",
-            "emailAddress": "test@email.address"
-          }
-        },
-        {
-          "id": 2,
-          "contractorName": "Test contractor",
-          "function": "FABRICATION",
-          "manualFunction": null,
-          "descriptionOfWork": "Test description of work",
-          "dateAwarded": "2024-11-26",
-          "contractBand": "GREATER_THAN_OR_EQUAL_TO_25M",
-          "contact": {
-            "name": "Test contact name",
-            "phoneNumber": "01303 123 456",
-            "jobTitle": "Test contact job title",
-            "emailAddress": "test@email.address"
-          }
-        }
-      ],
-      "collaborationOpportunities": [
-        {
-          "id": 1,
-          "function": "LOGISTICS",
-          "manualFunction": null,
-          "descriptionOfWork": "Test description of work",
-          "urgent": true,
-          "contact": {
-            "name": "Test contact name",
-            "phoneNumber": "01303 123 456",
-            "jobTitle": "Test contact job title",
-            "emailAddress": "test@email.address"
-          },
-          "supportingDocumentUploadedFile": {
-            "name": "Test PDF.pdf",
-            "s3ObjectKey": "uploaded-files/1234abc"
-          }
-        },
-        {
-          "id": 2,
-          "function": "LOGISTICS",
-          "manualFunction": null,
-          "descriptionOfWork": "Test description of work",
-          "urgent": true,
-          "contact": {
-            "name": "Test contact name",
-            "phoneNumber": "01303 123 456",
-            "jobTitle": "Test contact job title",
-            "emailAddress": "test@email.address"
-          },
-          "supportingDocumentUploadedFile": {
-            "name": "Test PDF.pdf",
-            "s3ObjectKey": "uploaded-files/1234abc"
-          }
-        }
-      ],
-      "campaign": {
-        "scope": "Test scope",
-        "partOfExistingInfrastructureProjectCampaign": true,
-        "existingCampaignInfrastructureProjectIds": [
-          1,
-          2
-        ]
-      },
-      "wellCommissioningSchedules": [
-        {
-          "id": 1,
-          "period": {
-            "startYear": 2024,
-            "endYear": 2025
-          },
-          "wellbores": [
-            {
-              "registrationNumber": "48/14-G7",
-              "mechanicalStatus": "DRILLING"
-            },
-            {
-              "registrationNumber": "L46/17-A5 ",
-              "mechanicalStatus": "DRILLING"
-            }
-          ]
-        },
-        {
-          "id": 2,
-          "period": {
-            "startYear": 2024,
-            "endYear": 2025
-          },
-          "wellbores": [
-            {
-              "registrationNumber": "48/14-G7",
-              "mechanicalStatus": "DRILLING"
-            },
-            {
-              "registrationNumber": "L46/17-A5 ",
-              "mechanicalStatus": "DRILLING"
-            }
-          ]
-        }
-      ],
-      "wellDecommissioningSchedules": [
-        {
-          "id": 1,
-          "period": {
-            "startYear": 2024,
-            "endYear": 2025
-          },
-          "wellbores": [
-            {
-              "registrationNumber": "48/14-G7",
-              "mechanicalStatus": "DRILLING"
-            },
-            {
-              "registrationNumber": "L46/17-A5 ",
-              "mechanicalStatus": "DRILLING"
-            }
-          ]
-        },
-        {
-          "id": 2,
-          "period": {
-            "startYear": 2024,
-            "endYear": 2025
-          },
-          "wellbores": [
-            {
-              "registrationNumber": "48/14-G7",
-              "mechanicalStatus": "DRILLING"
-            },
-            {
-              "registrationNumber": "L46/17-A5 ",
-              "mechanicalStatus": "DRILLING"
-            }
-          ]
-        }
-      ],
-      "platformOrFpsosToBeDecommissioned": [
-        {
-          "id": 1,
-          "type": "PLATFORM",
-          "platformDetails": {
-            "name": "Test name"
-          },
-          "fpsoDetails": null,
-          "topsidesOrFloatingUnitMassMetricTonnes": 100,
-          "removalPeriod": {
-            "startYear": 2024,
-            "endYear": 2025
-          },
-          "substructureRemovalInScope": true,
-          "substructureRemovalDetails": {
-            "premise": "FULL",
-            "estimatedMassMetricTonnes": 50,
-            "period": {
-              "startYear": 2024,
-              "endYear": 2025
-            }
-          },
-          "futurePlans": "RECYCLE"
-        },
-        {
-          "id": 2,
-          "type": "FPSO",
-          "platformDetails": null,
-          "fpsoDetails": {
-            "name": "Test name",
-            "type": "Test type",
-            "dimensions": "Test dimensions"
-          },
-          "topsidesOrFloatingUnitMassMetricTonnes": 100,
-          "removalPeriod": {
-            "startYear": 2024,
-            "endYear": 2025
-          },
-          "substructureRemovalInScope": true,
-          "substructureRemovalDetails": {
-            "premise": "FULL",
-            "estimatedMassMetricTonnes": 50,
-            "period": {
-              "startYear": 2024,
-              "endYear": 2025
-            }
-          },
-          "futurePlans": "RECYCLE"
-        }
-      ],
-      "integratedRigsToBeDecommissioned": [
-        {
-          "id": 1,
-          "structureName": "Test structure name",
-          "name": "Test name",
-          "status": "WARM",
-          "intentionToReactivate": "YES"
-        },
-        {
-          "id": 2,
-          "structureName": "Test structure name",
-          "name": "Test name",
-          "status": "WARM",
-          "intentionToReactivate": "YES"
-        }
-      ],
-      "subseaInfrastructuresToBeDecommissioned": [
-        {
-          "id": 2,
-          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
-          "description": "Test description",
-          "status": "IN_USE",
-          "type": "SUBSEA_STRUCTURE",
-          "concreteMattressesDetails": null,
-          "subseaStructureDetails": {
-            "totalEstimatedMass": "GREATER_THAN_OR_EQUAL_400_TONNES"
-          },
-          "otherDetails": null,
-          "decommissioningPeriod": {
-            "startYear": 2024,
-            "endYear": 2025
-          }
-        },
-        {
-          "id": 1,
-          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
-          "description": "Test description",
-          "status": "IN_USE",
-          "type": "CONCRETE_MATTRESSES",
-          "concreteMattressesDetails": {
-            "numberToDecommission": 7,
-            "totalEstimatedMassMetricTonnes": 277
-          },
-          "subseaStructureDetails": null,
-          "otherDetails": null,
-          "decommissioningPeriod": {
-            "startYear": 2024,
-            "endYear": 2025
-          }
-        },
-        {
-          "id": 3,
-          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
-          "description": "Test description",
-          "status": "IN_USE",
-          "type": "OTHER",
-          "concreteMattressesDetails": null,
-          "subseaStructureDetails": null,
-          "otherDetails": {
-            "type": "Test type",
-            "totalEstimatedMassMetricTonnes": 47
-          },
-          "decommissioningPeriod": {
-            "startYear": 2024,
-            "endYear": 2025
-          }
-        }
-      ],
-      "pipelinesToBeDecommissioned": [
-        {
-          "id": 1,
-          "name": "Test name",
-          "status": "IN_USE",
-          "decommissioningPeriod": {
-            "startYear": 2024,
-            "endYear": 2025
-          },
-          "decommissioningPremise": "MAJOR_INTERVENTION"
-        },
-        {
-          "id": 2,
-          "name": "Test name",
-          "status": "IN_USE",
-          "decommissioningPeriod": {
-            "startYear": 2024,
-            "endYear": 2025
-          },
-          "decommissioningPremise": "MAJOR_INTERVENTION"
-        }
-      ],
-      "submittedOn": "2024-10-29T11:20:38"
-    },
-    {
       "id": 2,
       "details": {
         "operatorName": "BP",
@@ -390,7 +32,7 @@
       },
       "upcomingTenders": [
         {
-          "id": 1,
+          "id": 2,
           "function": "DRILLING",
           "manualFunction": null,
           "descriptionOfWork": "Test description of work",
@@ -408,7 +50,7 @@
           }
         },
         {
-          "id": 2,
+          "id": 1,
           "function": "DRILLING",
           "manualFunction": null,
           "descriptionOfWork": "Test description of work",
@@ -428,7 +70,7 @@
       ],
       "awardedContracts": [
         {
-          "id": 1,
+          "id": 2,
           "contractorName": "Test contractor",
           "function": "FABRICATION",
           "manualFunction": null,
@@ -443,7 +85,7 @@
           }
         },
         {
-          "id": 2,
+          "id": 1,
           "contractorName": "Test contractor",
           "function": "FABRICATION",
           "manualFunction": null,
@@ -460,7 +102,7 @@
       ],
       "collaborationOpportunities": [
         {
-          "id": 1,
+          "id": 2,
           "function": "LOGISTICS",
           "manualFunction": null,
           "descriptionOfWork": "Test description of work",
@@ -477,7 +119,7 @@
           }
         },
         {
-          "id": 2,
+          "id": 1,
           "function": "LOGISTICS",
           "manualFunction": null,
           "descriptionOfWork": "Test description of work",
@@ -498,13 +140,13 @@
         "scope": "Test scope",
         "partOfExistingInfrastructureProjectCampaign": true,
         "existingCampaignInfrastructureProjectIds": [
-          1,
-          2
+          2,
+          1
         ]
       },
       "wellCommissioningSchedules": [
         {
-          "id": 1,
+          "id": 2,
           "period": {
             "startYear": 2024,
             "endYear": 2025
@@ -521,7 +163,7 @@
           ]
         },
         {
-          "id": 2,
+          "id": 1,
           "period": {
             "startYear": 2024,
             "endYear": 2025
@@ -538,9 +180,20 @@
           ]
         }
       ],
+      "decommissioningSchedule": {
+        "startDateType": "EXACT",
+        "exactStartDate": "2025-02-18",
+        "estimatedStartDate": null,
+        "cessationOfProductionDateType": "ESTIMATED",
+        "exactCessationOfProductionDate": null,
+        "estimatedCessationOfProductionDate": {
+          "quarter": "Q1",
+          "year": 2025
+        }
+      },
       "wellDecommissioningSchedules": [
         {
-          "id": 1,
+          "id": 2,
           "period": {
             "startYear": 2024,
             "endYear": 2025
@@ -557,7 +210,7 @@
           ]
         },
         {
-          "id": 2,
+          "id": 1,
           "period": {
             "startYear": 2024,
             "endYear": 2025
@@ -575,29 +228,6 @@
         }
       ],
       "platformOrFpsosToBeDecommissioned": [
-        {
-          "id": 1,
-          "type": "PLATFORM",
-          "platformDetails": {
-            "name": "Test name"
-          },
-          "fpsoDetails": null,
-          "topsidesOrFloatingUnitMassMetricTonnes": 100,
-          "removalPeriod": {
-            "startYear": 2024,
-            "endYear": 2025
-          },
-          "substructureRemovalInScope": true,
-          "substructureRemovalDetails": {
-            "premise": "FULL",
-            "estimatedMassMetricTonnes": 50,
-            "period": {
-              "startYear": 2024,
-              "endYear": 2025
-            }
-          },
-          "futurePlans": "RECYCLE"
-        },
         {
           "id": 2,
           "type": "FPSO",
@@ -622,18 +252,41 @@
             }
           },
           "futurePlans": "RECYCLE"
+        },
+        {
+          "id": 1,
+          "type": "PLATFORM",
+          "platformDetails": {
+            "name": "Test name"
+          },
+          "fpsoDetails": null,
+          "topsidesOrFloatingUnitMassMetricTonnes": 100,
+          "removalPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "substructureRemovalInScope": true,
+          "substructureRemovalDetails": {
+            "premise": "FULL",
+            "estimatedMassMetricTonnes": 50,
+            "period": {
+              "startYear": 2024,
+              "endYear": 2025
+            }
+          },
+          "futurePlans": "RECYCLE"
         }
       ],
       "integratedRigsToBeDecommissioned": [
         {
-          "id": 1,
+          "id": 2,
           "structureName": "Test structure name",
           "name": "Test name",
           "status": "WARM",
           "intentionToReactivate": "YES"
         },
         {
-          "id": 2,
+          "id": 1,
           "structureName": "Test structure name",
           "name": "Test name",
           "status": "WARM",
@@ -641,22 +294,6 @@
         }
       ],
       "subseaInfrastructuresToBeDecommissioned": [
-        {
-          "id": 2,
-          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
-          "description": "Test description",
-          "status": "IN_USE",
-          "type": "SUBSEA_STRUCTURE",
-          "concreteMattressesDetails": null,
-          "subseaStructureDetails": {
-            "totalEstimatedMass": "GREATER_THAN_OR_EQUAL_400_TONNES"
-          },
-          "otherDetails": null,
-          "decommissioningPeriod": {
-            "startYear": 2024,
-            "endYear": 2025
-          }
-        },
         {
           "id": 1,
           "surfaceInfrastructureHostName": "Test surface infrastructure host name",
@@ -668,6 +305,22 @@
             "totalEstimatedMassMetricTonnes": 277
           },
           "subseaStructureDetails": null,
+          "otherDetails": null,
+          "decommissioningPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          }
+        },
+        {
+          "id": 2,
+          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
+          "description": "Test description",
+          "status": "IN_USE",
+          "type": "SUBSEA_STRUCTURE",
+          "concreteMattressesDetails": null,
+          "subseaStructureDetails": {
+            "totalEstimatedMass": "GREATER_THAN_OR_EQUAL_400_TONNES"
+          },
           "otherDetails": null,
           "decommissioningPeriod": {
             "startYear": 2024,
@@ -694,7 +347,7 @@
       ],
       "pipelinesToBeDecommissioned": [
         {
-          "id": 1,
+          "id": 2,
           "name": "Test name",
           "status": "IN_USE",
           "decommissioningPeriod": {
@@ -704,7 +357,376 @@
           "decommissioningPremise": "MAJOR_INTERVENTION"
         },
         {
+          "id": 1,
+          "name": "Test name",
+          "status": "IN_USE",
+          "decommissioningPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "decommissioningPremise": "MAJOR_INTERVENTION"
+        }
+      ],
+      "submittedOn": "2024-10-29T11:20:38"
+    },
+    {
+      "id": 1,
+      "details": {
+        "operatorName": "BP",
+        "title": "Test project",
+        "summary": "Test summary",
+        "projectType": "DECOMMISSIONING",
+        "projectTypeSubCategory": null
+      },
+      "contact": {
+        "name": "Test contact name",
+        "phoneNumber": "01303 123 456",
+        "jobTitle": "Test contact job title",
+        "emailAddress": "test@email.address"
+      },
+      "firstProductionDate": {
+        "quarter": "Q1",
+        "year": 2025
+      },
+      "location": {
+        "field": {
+          "fieldName": "MERCURY",
+          "fieldType": "CARBON_STORAGE",
+          "ukcsArea": "CNS"
+        },
+        "maximumWaterDepthMeters": 60,
+        "licenceBlocks": [
+          "12/34, 12/56"
+        ]
+      },
+      "upcomingTenders": [
+        {
           "id": 2,
+          "function": "DRILLING",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "estimatedTenderDate": "2025-01-01",
+          "contractBand": "GREATER_THAN_OR_EQUAL_TO_25M",
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          },
+          "supportingDocumentUploadedFile": {
+            "name": "Test PDF.pdf",
+            "s3ObjectKey": "uploaded-files/1234abc"
+          }
+        },
+        {
+          "id": 1,
+          "function": "DRILLING",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "estimatedTenderDate": "2025-01-01",
+          "contractBand": "GREATER_THAN_OR_EQUAL_TO_25M",
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          },
+          "supportingDocumentUploadedFile": {
+            "name": "Test PDF.pdf",
+            "s3ObjectKey": "uploaded-files/1234abc"
+          }
+        }
+      ],
+      "awardedContracts": [
+        {
+          "id": 2,
+          "contractorName": "Test contractor",
+          "function": "FABRICATION",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "dateAwarded": "2024-11-26",
+          "contractBand": "GREATER_THAN_OR_EQUAL_TO_25M",
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          }
+        },
+        {
+          "id": 1,
+          "contractorName": "Test contractor",
+          "function": "FABRICATION",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "dateAwarded": "2024-11-26",
+          "contractBand": "GREATER_THAN_OR_EQUAL_TO_25M",
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          }
+        }
+      ],
+      "collaborationOpportunities": [
+        {
+          "id": 2,
+          "function": "LOGISTICS",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "urgent": true,
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          },
+          "supportingDocumentUploadedFile": {
+            "name": "Test PDF.pdf",
+            "s3ObjectKey": "uploaded-files/1234abc"
+          }
+        },
+        {
+          "id": 1,
+          "function": "LOGISTICS",
+          "manualFunction": null,
+          "descriptionOfWork": "Test description of work",
+          "urgent": true,
+          "contact": {
+            "name": "Test contact name",
+            "phoneNumber": "01303 123 456",
+            "jobTitle": "Test contact job title",
+            "emailAddress": "test@email.address"
+          },
+          "supportingDocumentUploadedFile": {
+            "name": "Test PDF.pdf",
+            "s3ObjectKey": "uploaded-files/1234abc"
+          }
+        }
+      ],
+      "campaign": {
+        "scope": "Test scope",
+        "partOfExistingInfrastructureProjectCampaign": true,
+        "existingCampaignInfrastructureProjectIds": [
+          2,
+          1
+        ]
+      },
+      "wellCommissioningSchedules": [
+        {
+          "id": 2,
+          "period": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "wellbores": [
+            {
+              "registrationNumber": "48/14-G7",
+              "mechanicalStatus": "DRILLING"
+            },
+            {
+              "registrationNumber": "L46/17-A5 ",
+              "mechanicalStatus": "DRILLING"
+            }
+          ]
+        },
+        {
+          "id": 1,
+          "period": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "wellbores": [
+            {
+              "registrationNumber": "48/14-G7",
+              "mechanicalStatus": "DRILLING"
+            },
+            {
+              "registrationNumber": "L46/17-A5 ",
+              "mechanicalStatus": "DRILLING"
+            }
+          ]
+        }
+      ],
+      "decommissioningSchedule": {
+        "startDateType": "EXACT",
+        "exactStartDate": "2025-02-18",
+        "estimatedStartDate": null,
+        "cessationOfProductionDateType": "ESTIMATED",
+        "exactCessationOfProductionDate": null,
+        "estimatedCessationOfProductionDate": {
+          "quarter": "Q1",
+          "year": 2025
+        }
+      },
+      "wellDecommissioningSchedules": [
+        {
+          "id": 2,
+          "period": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "wellbores": [
+            {
+              "registrationNumber": "48/14-G7",
+              "mechanicalStatus": "DRILLING"
+            },
+            {
+              "registrationNumber": "L46/17-A5 ",
+              "mechanicalStatus": "DRILLING"
+            }
+          ]
+        },
+        {
+          "id": 1,
+          "period": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "wellbores": [
+            {
+              "registrationNumber": "48/14-G7",
+              "mechanicalStatus": "DRILLING"
+            },
+            {
+              "registrationNumber": "L46/17-A5 ",
+              "mechanicalStatus": "DRILLING"
+            }
+          ]
+        }
+      ],
+      "platformOrFpsosToBeDecommissioned": [
+        {
+          "id": 2,
+          "type": "FPSO",
+          "platformDetails": null,
+          "fpsoDetails": {
+            "name": "Test name",
+            "type": "Test type",
+            "dimensions": "Test dimensions"
+          },
+          "topsidesOrFloatingUnitMassMetricTonnes": 100,
+          "removalPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "substructureRemovalInScope": true,
+          "substructureRemovalDetails": {
+            "premise": "FULL",
+            "estimatedMassMetricTonnes": 50,
+            "period": {
+              "startYear": 2024,
+              "endYear": 2025
+            }
+          },
+          "futurePlans": "RECYCLE"
+        },
+        {
+          "id": 1,
+          "type": "PLATFORM",
+          "platformDetails": {
+            "name": "Test name"
+          },
+          "fpsoDetails": null,
+          "topsidesOrFloatingUnitMassMetricTonnes": 100,
+          "removalPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "substructureRemovalInScope": true,
+          "substructureRemovalDetails": {
+            "premise": "FULL",
+            "estimatedMassMetricTonnes": 50,
+            "period": {
+              "startYear": 2024,
+              "endYear": 2025
+            }
+          },
+          "futurePlans": "RECYCLE"
+        }
+      ],
+      "integratedRigsToBeDecommissioned": [
+        {
+          "id": 2,
+          "structureName": "Test structure name",
+          "name": "Test name",
+          "status": "WARM",
+          "intentionToReactivate": "YES"
+        },
+        {
+          "id": 1,
+          "structureName": "Test structure name",
+          "name": "Test name",
+          "status": "WARM",
+          "intentionToReactivate": "YES"
+        }
+      ],
+      "subseaInfrastructuresToBeDecommissioned": [
+        {
+          "id": 1,
+          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
+          "description": "Test description",
+          "status": "IN_USE",
+          "type": "CONCRETE_MATTRESSES",
+          "concreteMattressesDetails": {
+            "numberToDecommission": 7,
+            "totalEstimatedMassMetricTonnes": 277
+          },
+          "subseaStructureDetails": null,
+          "otherDetails": null,
+          "decommissioningPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          }
+        },
+        {
+          "id": 2,
+          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
+          "description": "Test description",
+          "status": "IN_USE",
+          "type": "SUBSEA_STRUCTURE",
+          "concreteMattressesDetails": null,
+          "subseaStructureDetails": {
+            "totalEstimatedMass": "GREATER_THAN_OR_EQUAL_400_TONNES"
+          },
+          "otherDetails": null,
+          "decommissioningPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          }
+        },
+        {
+          "id": 3,
+          "surfaceInfrastructureHostName": "Test surface infrastructure host name",
+          "description": "Test description",
+          "status": "IN_USE",
+          "type": "OTHER",
+          "concreteMattressesDetails": null,
+          "subseaStructureDetails": null,
+          "otherDetails": {
+            "type": "Test type",
+            "totalEstimatedMassMetricTonnes": 47
+          },
+          "decommissioningPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          }
+        }
+      ],
+      "pipelinesToBeDecommissioned": [
+        {
+          "id": 2,
+          "name": "Test name",
+          "status": "IN_USE",
+          "decommissioningPeriod": {
+            "startYear": 2024,
+            "endYear": 2025
+          },
+          "decommissioningPremise": "MAJOR_INTERVENTION"
+        },
+        {
+          "id": 1,
           "name": "Test name",
           "status": "IN_USE",
           "decommissioningPeriod": {
@@ -719,13 +741,13 @@
   ],
   "forwardWorkPlans": [
     {
-      "id": 1,
+      "id": 2,
       "details": {
         "operatorName": "BP"
       },
       "upcomingTenders": [
         {
-          "id": 1,
+          "id": 2,
           "department": "DRILLING",
           "manualDepartment": null,
           "descriptionOfWork": "Test description of work",
@@ -744,7 +766,7 @@
           }
         },
         {
-          "id": 2,
+          "id": 1,
           "department": "DRILLING",
           "manualDepartment": null,
           "descriptionOfWork": "Test description of work",
@@ -765,7 +787,7 @@
       ],
       "awardedContracts": [
         {
-          "id": 1,
+          "id": 2,
           "contractorName": "Test contractor",
           "function": "FABRICATION",
           "manualFunction": null,
@@ -780,7 +802,7 @@
           }
         },
         {
-          "id": 2,
+          "id": 1,
           "contractorName": "Test contractor",
           "function": "FABRICATION",
           "manualFunction": null,
@@ -797,7 +819,7 @@
       ],
       "collaborationOpportunities": [
         {
-          "id": 1,
+          "id": 2,
           "function": "LOGISTICS",
           "manualFunction": null,
           "descriptionOfWork": "Test description of work",
@@ -814,7 +836,7 @@
           }
         },
         {
-          "id": 2,
+          "id": 1,
           "function": "LOGISTICS",
           "manualFunction": null,
           "descriptionOfWork": "Test description of work",
@@ -834,13 +856,13 @@
       "submittedOn": "2024-10-29T11:20:38"
     },
     {
-      "id": 2,
+      "id": 1,
       "details": {
         "operatorName": "BP"
       },
       "upcomingTenders": [
         {
-          "id": 1,
+          "id": 2,
           "department": "DRILLING",
           "manualDepartment": null,
           "descriptionOfWork": "Test description of work",
@@ -859,7 +881,7 @@
           }
         },
         {
-          "id": 2,
+          "id": 1,
           "department": "DRILLING",
           "manualDepartment": null,
           "descriptionOfWork": "Test description of work",
@@ -880,7 +902,7 @@
       ],
       "awardedContracts": [
         {
-          "id": 1,
+          "id": 2,
           "contractorName": "Test contractor",
           "function": "FABRICATION",
           "manualFunction": null,
@@ -895,7 +917,7 @@
           }
         },
         {
-          "id": 2,
+          "id": 1,
           "contractorName": "Test contractor",
           "function": "FABRICATION",
           "manualFunction": null,
@@ -912,7 +934,7 @@
       ],
       "collaborationOpportunities": [
         {
-          "id": 1,
+          "id": 2,
           "function": "LOGISTICS",
           "manualFunction": null,
           "descriptionOfWork": "Test description of work",
@@ -929,7 +951,7 @@
           }
         },
         {
-          "id": 2,
+          "id": 1,
           "function": "LOGISTICS",
           "manualFunction": null,
           "descriptionOfWork": "Test description of work",
