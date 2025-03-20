@@ -72,8 +72,8 @@ public class AnalyticsService {
           .orElse("anonymous_user");
 
       var restTemplate = new RestTemplateBuilder()
-          .setConnectTimeout(Duration.ofSeconds(configurationProperties.getConfig().getConnectionTimeoutSeconds()))
-          .setReadTimeout(Duration.ofSeconds(configurationProperties.getConfig().getConnectionTimeoutSeconds()))
+          .connectTimeout(Duration.ofSeconds(configurationProperties.getConfig().getConnectionTimeoutSeconds()))
+          .readTimeout(Duration.ofSeconds(configurationProperties.getConfig().getConnectionTimeoutSeconds()))
           .defaultHeader("User-Agent", configurationProperties.getConfig().getUserAgent())
           .requestFactory(() -> requestFactory)
           .build();
@@ -139,9 +139,9 @@ public class AnalyticsService {
     var event = new AnalyticsEvent.Builder(eventCategory.name());
 
     for (Map.Entry<String, String> entry : paramMap.entrySet()) {
-      
+
       event = event.withParam(entry.getKey(), entry.getValue());
-      
+
     }
 
     var payload = new AnalyticsPayload(clientId, List.of(event.build()));
