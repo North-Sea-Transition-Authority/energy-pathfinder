@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
+import uk.co.fivium.formlibrary.input.CoordinateInput;
+import uk.co.fivium.formlibrary.input.CoordinateInputType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
@@ -11,6 +13,12 @@ import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
 import uk.co.ogauthority.pathfinder.model.form.validation.positivewholenumber.PositiveWholeNumber;
 
 public class ProjectLocationForm {
+
+  private final CoordinateInput centreOfInterestLatitude =
+      new CoordinateInput(CoordinateInputType.LATITUDE, "centreOfInterestLatitude", "centre of interest latitude");
+
+  private final CoordinateInput centreOfInterestLongitude =
+      new CoordinateInput(CoordinateInputType.LONGITUDE, "centreOfInterestLongitude", "centre of interest longitude");
 
   @NotEmpty(message = "Select a field", groups = FullValidation.class)
   private String field;
@@ -44,6 +52,14 @@ public class ProjectLocationForm {
     this.field = field;
   }
 
+  public CoordinateInput getCentreOfInterestLatitude() {
+    return centreOfInterestLatitude;
+  }
+
+  public CoordinateInput getCentreOfInterestLongitude() {
+    return centreOfInterestLongitude;
+  }
+
   public String getField() {
     return field;
   }
@@ -51,7 +67,6 @@ public class ProjectLocationForm {
   public void setField(String field) {
     this.field = field;
   }
-
 
   public FieldType getFieldType() {
     return fieldType;

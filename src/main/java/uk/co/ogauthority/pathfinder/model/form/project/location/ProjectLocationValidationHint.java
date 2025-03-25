@@ -59,4 +59,8 @@ public final class ProjectLocationValidationHint {
   private void addEmptyDateAcceptableHint(List<Object> validationHints) {
     DateInputValidator.addEmptyDateAcceptableHint(validationType, validationHints);
   }
+
+  public ValidationType getValidationType() {
+    return validationType;
+  }
 }

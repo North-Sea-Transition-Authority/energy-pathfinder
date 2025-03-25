@@ -14,6 +14,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocatio
 import uk.co.ogauthority.pathfinder.testutil.DevUkTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
+import uk.co.ogauthority.pathfinder.util.CoordinateUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -24,6 +25,18 @@ public class ProjectLocationViewUtilTest {
   private void checkCommonFields(ProjectLocationView projectLocationView,
                                  ProjectLocation projectLocation,
                                  List<ProjectLocationBlock> projectLocationBlocks) {
+    assertThat(projectLocationView.getCentreOfInterestLatitude())
+        .isEqualTo(CoordinateUtil.formatCoordinate(
+            projectLocation.getCentreOfInterestLatitudeDegrees(),
+            projectLocation.getCentreOfInterestLatitudeMinutes(),
+            projectLocation.getCentreOfInterestLatitudeSeconds(),
+            projectLocation.getCentreOfInterestLatitudeHemisphere()));
+    assertThat(projectLocationView.getCentreOfInterestLongitude())
+        .isEqualTo(CoordinateUtil.formatCoordinate(
+            projectLocation.getCentreOfInterestLongitudeDegrees(),
+            projectLocation.getCentreOfInterestLongitudeMinutes(),
+            projectLocation.getCentreOfInterestLongitudeSeconds(),
+            projectLocation.getCentreOfInterestLongitudeHemisphere()));
     assertThat(projectLocationView.getFieldType()).isEqualTo(projectLocation.getFieldType().getDisplayName());
     assertThat(projectLocationView.getMaximumWaterDepth()).isEqualTo(ProjectLocationViewUtil.getWaterDepthString(projectLocation.getMaximumWaterDepth()));
     assertThat(projectLocationView.getApprovedFieldDevelopmentPlan()).isEqualTo(projectLocation.getApprovedFieldDevelopmentPlan());

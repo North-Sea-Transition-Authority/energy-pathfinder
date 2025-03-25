@@ -7,7 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.SmartValidator;
+import uk.co.fivium.formlibrary.input.CoordinateInputLatitudeHemisphere;
+import uk.co.fivium.formlibrary.validator.coordinate.CoordinateInputValidator;
 import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
+import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
@@ -44,6 +47,32 @@ public class ProjectLocationFormValidator implements SmartValidator {
         .orElseThrow(
             () -> new ActionNotAllowedException("Expected ProjectLocationValidationHint validation hint to be provided")
         );
+
+    var validationType = projectLocationValidationHint.getValidationType();
+
+    var centreOfInterestLatitudeValidator = CoordinateInputValidator.builder()
+        .mustBeBetween(45, 0, 0, 64, 59, 59.999);
+    if (validationType == ValidationType.PARTIAL) {
+      centreOfInterestLatitudeValidator.isOptional();
+    }
+    var centreOfInterestLatitude = form.getCentreOfInterestLatitude();
+    // The only option for latitude hemisphere is north, and it is not part of the form so we need to set it manually to pass the
+    // validation. We only set it if no inputs are blank to allow partial saving.
+    if (StringUtils.isNoneBlank(
+        centreOfInterestLatitude.getDegreesInput().getInputValue(),
+        centreOfInterestLatitude.getMinutesInput().getInputValue(),
+        centreOfInterestLatitude.getSecondsInput().getInputValue()
+    )) {
+      centreOfInterestLatitude.getHemisphereInput().setInputValue(CoordinateInputLatitudeHemisphere.NORTH.name());
+    }
+    centreOfInterestLatitudeValidator.validate(centreOfInterestLatitude, errors);
+
+    var centreOfInterestLongitudeValidator = CoordinateInputValidator.builder()
+        .mustBeBetween(0, 0, 0, 30, 59, 59.999);
+    if (validationType == ValidationType.PARTIAL) {
+      centreOfInterestLongitudeValidator.isOptional();
+    }
+    centreOfInterestLongitudeValidator.validate(form.getCentreOfInterestLongitude(), errors);
 
     if (BooleanUtils.isTrue(form.getApprovedFieldDevelopmentPlan())) {
       ValidationUtil.invokeNestedValidator(

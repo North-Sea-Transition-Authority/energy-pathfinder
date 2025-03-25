@@ -72,6 +72,18 @@ public class ProjectLocationService implements ProjectFormSectionService {
   public ProjectLocation createOrUpdate(ProjectDetail detail, ProjectLocationForm form) {
     var projectLocation = getProjectLocationByProjectDetail(detail).orElse(new ProjectLocation(detail));
 
+    var centreOfInterestLatitude = form.getCentreOfInterestLatitude();
+    projectLocation.setCentreOfInterestLatitudeDegrees(centreOfInterestLatitude.getDegreesInput().getAsInteger().orElse(null));
+    projectLocation.setCentreOfInterestLatitudeMinutes(centreOfInterestLatitude.getMinutesInput().getAsInteger().orElse(null));
+    projectLocation.setCentreOfInterestLatitudeSeconds(centreOfInterestLatitude.getSecondsInput().getAsDouble().orElse(null));
+    projectLocation.setCentreOfInterestLatitudeHemisphere(centreOfInterestLatitude.getHemisphereInput().getInputValue());
+
+    var centreOfInterestLongitude = form.getCentreOfInterestLongitude();
+    projectLocation.setCentreOfInterestLongitudeDegrees(centreOfInterestLongitude.getDegreesInput().getAsInteger().orElse(null));
+    projectLocation.setCentreOfInterestLongitudeMinutes(centreOfInterestLongitude.getMinutesInput().getAsInteger().orElse(null));
+    projectLocation.setCentreOfInterestLongitudeSeconds(centreOfInterestLongitude.getSecondsInput().getAsDouble().orElse(null));
+    projectLocation.setCentreOfInterestLongitudeHemisphere(centreOfInterestLongitude.getHemisphereInput().getInputValue());
+
     if (form.getField() != null) {
       projectLocation.setField(fieldService.findByIdOrError(Integer.parseInt(form.getField())));
     } else { //The form has no data so clear the existing values
@@ -132,6 +144,29 @@ public class ProjectLocationService implements ProjectFormSectionService {
    */
   private ProjectLocationForm getForm(ProjectLocation projectLocation) {
     var form = new ProjectLocationForm();
+
+    var centreOfInterestLatitude = form.getCentreOfInterestLatitude();
+    centreOfInterestLatitude.getDegreesInput().setInputValue(projectLocation.getCentreOfInterestLatitudeDegrees() != null
+        ? projectLocation.getCentreOfInterestLatitudeDegrees().toString()
+        : null);
+    centreOfInterestLatitude.getMinutesInput().setInputValue(projectLocation.getCentreOfInterestLatitudeMinutes() != null
+        ? projectLocation.getCentreOfInterestLatitudeMinutes().toString()
+        : null);
+    centreOfInterestLatitude.getSecondsInput().setInputValue(projectLocation.getCentreOfInterestLatitudeSeconds() != null
+        ? projectLocation.getCentreOfInterestLatitudeSeconds().toString()
+        : null);
+
+    var centreOfInterestLongitude = form.getCentreOfInterestLongitude();
+    centreOfInterestLongitude.getDegreesInput().setInputValue(projectLocation.getCentreOfInterestLongitudeDegrees() != null
+        ? projectLocation.getCentreOfInterestLongitudeDegrees().toString()
+        : null);
+    centreOfInterestLongitude.getMinutesInput().setInputValue(projectLocation.getCentreOfInterestLongitudeMinutes() != null
+        ? projectLocation.getCentreOfInterestLongitudeMinutes().toString()
+        : null);
+    centreOfInterestLongitude.getSecondsInput().setInputValue(projectLocation.getCentreOfInterestLongitudeSeconds() != null
+        ? projectLocation.getCentreOfInterestLongitudeSeconds().toString()
+        : null);
+    centreOfInterestLongitude.getHemisphereInput().setInputValue(projectLocation.getCentreOfInterestLongitudeHemisphere());
 
     if (projectLocation.getField() != null) {
       form.setField(projectLocation.getField().getFieldId().toString());

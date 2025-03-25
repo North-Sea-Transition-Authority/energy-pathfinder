@@ -1,10 +1,30 @@
 <#include '../../layout.ftl'>
+<#import '../../macros/coordinateinput/coordinateInput.ftl' as coordinateInput/>
 
 <#-- @ftlvariable name="errorList" type="java.util.List<uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem>" -->
 <#-- @ftlvariable name="service" type="uk.co.ogauthority.pathfinder.config.ServiceProperties" -->
 
 <@defaultPage htmlTitle="Location" pageHeading="Location" breadcrumbs=true errorItems=errorList>
   <@fdsForm.htmlForm>
+    <@coordinateInput.latitudeInput
+      degreesPath="form.centreOfInterestLatitude.degreesInput.inputValue"
+      minutesPath="form.centreOfInterestLatitude.minutesInput.inputValue"
+      secondsPath="form.centreOfInterestLatitude.secondsInput.inputValue"
+      hemispherePath="form.centreOfInterestLatitude.hemisphereInput.inputValue"
+      formId="latitude"
+      labelText="Centre of interest latitude in ETRS89"
+    />
+
+    <@coordinateInput.longitudeInput
+      degreesPath="form.centreOfInterestLongitude.degreesInput.inputValue"
+      minutesPath="form.centreOfInterestLongitude.minutesInput.inputValue"
+      secondsPath="form.centreOfInterestLongitude.secondsInput.inputValue"
+      hemispherePath="form.centreOfInterestLongitude.hemisphereInput.inputValue"
+      hemisphereList=longitudeHemispheres
+      formId="longitude"
+      labelText="Centre of interest longitude in ETRS89"
+    />
+
     <@fdsSearchSelector.searchSelectorRest path="form.field" selectorMinInputLength=3  labelText="Which field is the project related to?" restUrl=springUrl(fieldsRestUrl)  preselectedItems=preselectedField!{} />
     <@fdsSelect.select path="form.fieldType" labelText="Field type" options=fieldTypeMap/>
     <@fdsTextInput.textInput

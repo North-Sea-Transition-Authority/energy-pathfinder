@@ -69,6 +69,386 @@ public class ProjectLocationFormValidatorTest {
   }
 
   @Test
+  public void validate_latitudeCoordinatesBlankAndValidationTypeFull_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLatitude().getDegreesInput().setInputValue("");
+    form.getCentreOfInterestLatitude().getMinutesInput().setInputValue("");
+    form.getCentreOfInterestLatitude().getSecondsInput().setInputValue("");
+    form.getCentreOfInterestLatitude().getHemisphereInput().setInputValue("");
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("centreOfInterestLatitude.degreesInput.inputValue", Set.of("Enter a complete centre of interest latitude")),
+        entry("centreOfInterestLatitude.minutesInput.inputValue", Set.of("")),
+        entry("centreOfInterestLatitude.secondsInput.inputValue", Set.of("")),
+        entry("centreOfInterestLatitude.hemisphereInput.inputValue", Set.of(""))
+    );
+  }
+
+  @Test
+  public void validate_latitudeCoordinatesBlankAndValidationTypePartial_isValid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLatitude().getDegreesInput().setInputValue("");
+    form.getCentreOfInterestLatitude().getMinutesInput().setInputValue("");
+    form.getCentreOfInterestLatitude().getSecondsInput().setInputValue("");
+    form.getCentreOfInterestLatitude().getHemisphereInput().setInputValue("");
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.PARTIAL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).isEmpty();
+  }
+
+  @Test
+  public void validate_latitudeCoordinatesAtMinimum_isValid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLatitude().getDegreesInput().setInputValue("45");
+    form.getCentreOfInterestLatitude().getMinutesInput().setInputValue("0");
+    form.getCentreOfInterestLatitude().getSecondsInput().setInputValue("0");
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).isEmpty();
+  }
+
+  @Test
+  public void validate_latitudeCoordinatesAtMaximum_isValid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLatitude().getDegreesInput().setInputValue("64");
+    form.getCentreOfInterestLatitude().getMinutesInput().setInputValue("59");
+    form.getCentreOfInterestLatitude().getSecondsInput().setInputValue("59.99");
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).isEmpty();
+  }
+
+  @Test
+  public void validate_latitudeDegreesBelowMinimum_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLatitude().getDegreesInput().setInputValue("44");
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("centreOfInterestLatitude.degreesInput.inputValue", Set.of("Centre of interest latitude must be within 45° 0' 0.0\" and 64° 59' 59.999\"")),
+        entry("centreOfInterestLatitude.minutesInput.inputValue", Set.of("")),
+        entry("centreOfInterestLatitude.secondsInput.inputValue", Set.of(""))
+    );
+  }
+
+  @Test
+  public void validate_latitudeDegreesAboveMaximum_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLatitude().getDegreesInput().setInputValue("65");
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("centreOfInterestLatitude.degreesInput.inputValue", Set.of("Centre of interest latitude must be within 45° 0' 0.0\" and 64° 59' 59.999\"")),
+        entry("centreOfInterestLatitude.minutesInput.inputValue", Set.of("")),
+        entry("centreOfInterestLatitude.secondsInput.inputValue", Set.of(""))
+    );
+  }
+
+  @Test
+  public void validate_latitudeMinutesBelowMinimum_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLatitude().getMinutesInput().setInputValue("-1");
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("centreOfInterestLatitude.minutesInput.inputValue", Set.of("Centre of interest latitude minutes must be 0 or more"))
+    );
+  }
+
+  @Test
+  public void validate_latitudeMinutesAboveMaximum_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLatitude().getMinutesInput().setInputValue("60");
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("centreOfInterestLatitude.minutesInput.inputValue", Set.of("Centre of interest latitude minutes must be 60 or fewer"))
+    );
+  }
+
+  @Test
+  public void validate_latitudeSecondsBelowMinimum_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLatitude().getSecondsInput().setInputValue("-0.001");
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("centreOfInterestLatitude.secondsInput.inputValue", Set.of("Centre of interest latitude seconds must be 0 or more"))
+    );
+  }
+
+  @Test
+  public void validate_latitudeSecondsAboveMaximum_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLatitude().getSecondsInput().setInputValue("60");
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("centreOfInterestLatitude.secondsInput.inputValue", Set.of("Centre of interest latitude seconds must be fewer than 60"))
+    );
+  }
+
+  @Test
+  public void validate_latitudeSecondsHasTooManyDecimalPlaces_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLatitude().getSecondsInput().setInputValue("59.9999");
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("centreOfInterestLatitude.secondsInput.inputValue", Set.of("Centre of interest latitude seconds must include no more than 3 decimal places"))
+    );
+  }
+
+  @Test
+  public void validate_longitudeCoordinatesBlankAndValidationTypeFull_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLongitude().getDegreesInput().setInputValue("");
+    form.getCentreOfInterestLongitude().getMinutesInput().setInputValue("");
+    form.getCentreOfInterestLongitude().getSecondsInput().setInputValue("");
+    form.getCentreOfInterestLongitude().getHemisphereInput().setInputValue("");
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("centreOfInterestLongitude.degreesInput.inputValue", Set.of("Enter a complete centre of interest longitude")),
+        entry("centreOfInterestLongitude.minutesInput.inputValue", Set.of("")),
+        entry("centreOfInterestLongitude.secondsInput.inputValue", Set.of("")),
+        entry("centreOfInterestLongitude.hemisphereInput.inputValue", Set.of(""))
+    );
+  }
+
+  @Test
+  public void validate_longitudeCoordinatesBlankAndValidationTypePartial_isValid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLongitude().getDegreesInput().setInputValue("");
+    form.getCentreOfInterestLongitude().getMinutesInput().setInputValue("");
+    form.getCentreOfInterestLongitude().getSecondsInput().setInputValue("");
+    form.getCentreOfInterestLongitude().getHemisphereInput().setInputValue("");
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.PARTIAL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).isEmpty();
+  }
+
+  @Test
+  public void validate_longitudeCoordinatesAtMinimum_isValid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLongitude().getDegreesInput().setInputValue("0");
+    form.getCentreOfInterestLongitude().getMinutesInput().setInputValue("0");
+    form.getCentreOfInterestLongitude().getSecondsInput().setInputValue("0");
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).isEmpty();
+  }
+
+  @Test
+  public void validate_longitudeCoordinatesAtMaximum_isValid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLongitude().getDegreesInput().setInputValue("30");
+    form.getCentreOfInterestLongitude().getMinutesInput().setInputValue("59");
+    form.getCentreOfInterestLongitude().getSecondsInput().setInputValue("59.99");
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).isEmpty();
+  }
+
+  @Test
+  public void validate_longitudeDegreesBelowMinimum_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLongitude().getDegreesInput().setInputValue("-1");
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("centreOfInterestLongitude.degreesInput.inputValue", Set.of("Centre of interest longitude degrees must be 0 or more"))
+    );
+  }
+
+  @Test
+  public void validate_longitudeDegreesAboveMaximum_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLongitude().getDegreesInput().setInputValue("31");
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("centreOfInterestLongitude.degreesInput.inputValue", Set.of("Centre of interest longitude must be within 0° 0' 0.0\" and 30° 59' 59.999\"")),
+        entry("centreOfInterestLongitude.minutesInput.inputValue", Set.of("")),
+        entry("centreOfInterestLongitude.secondsInput.inputValue", Set.of(""))
+    );
+  }
+
+  @Test
+  public void validate_longitudeMinutesBelowMinimum_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLongitude().getMinutesInput().setInputValue("-1");
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("centreOfInterestLongitude.minutesInput.inputValue", Set.of("Centre of interest longitude minutes must be 0 or more"))
+    );
+  }
+
+  @Test
+  public void validate_longitudeMinutesAboveMaximum_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLongitude().getMinutesInput().setInputValue("60");
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("centreOfInterestLongitude.minutesInput.inputValue", Set.of("Centre of interest longitude minutes must be 60 or fewer"))
+    );
+  }
+
+  @Test
+  public void validate_longitudeSecondsBelowMinimum_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLongitude().getSecondsInput().setInputValue("-0.001");
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("centreOfInterestLongitude.secondsInput.inputValue", Set.of("Centre of interest longitude seconds must be 0 or more"))
+    );
+  }
+
+  @Test
+  public void validate_longitudeSecondsAboveMaximum_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLongitude().getSecondsInput().setInputValue("60");
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("centreOfInterestLongitude.secondsInput.inputValue", Set.of("Centre of interest longitude seconds must be fewer than 60"))
+    );
+  }
+
+  @Test
+  public void validate_longitudeSecondsHasTooManyDecimalPlaces_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLongitude().getSecondsInput().setInputValue("59.9999");
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("centreOfInterestLongitude.secondsInput.inputValue", Set.of("Centre of interest longitude seconds must include no more than 3 decimal places"))
+    );
+  }
+
+  @Test
   public void validate_answeredTrueButMissingDate_withEmptyDateAcceptableHint() {
     var form = ProjectLocationTestUtil.getCompletedForm();
     var errors = new BeanPropertyBindingResult(form, "form");

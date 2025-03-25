@@ -9,6 +9,14 @@
 <@sectionSummaryWrapper.sectionSummaryWrapper sectionId=sectionId sectionTitle=sectionTitle>
   <@fdsCheckAnswers.checkAnswers>
     <@checkAnswers.diffedCheckAnswersRowNoActions
+      prompt="Centre of interest latitude in ETRS89"
+      diffedField=projectLocationDiffModel.ProjectLocationView_centreOfInterestLatitude
+    />
+    <@checkAnswers.diffedCheckAnswersRowNoActions
+      prompt="Centre of interest longitude in ETRS89"
+      diffedField=projectLocationDiffModel.ProjectLocationView_centreOfInterestLongitude
+    />
+    <@checkAnswers.diffedCheckAnswersRowNoActions
       prompt="Field"
       diffedField=projectLocationDiffModel.ProjectLocationView_field
     />

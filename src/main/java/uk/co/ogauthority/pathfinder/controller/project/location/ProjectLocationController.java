@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import uk.co.fivium.formlibrary.input.CoordinateInputLongitudeHemisphere;
 import uk.co.ogauthority.pathfinder.controller.project.ProjectFormPageController;
 import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectFormPagePermissionCheck;
@@ -97,6 +98,7 @@ public class ProjectLocationController extends ProjectFormPageController {
 
   public ModelAndView getLocationModelAndView(Integer projectId, ProjectLocationForm form, List<ProjectLocationBlockView> blockViews) {
     var modelAndView = new ModelAndView("project/location/location")
+        .addObject("longitudeHemispheres", CoordinateInputLongitudeHemisphere.getFdsSelectMap())
         .addObject("fieldsRestUrl", SearchSelectorService.route(on(DevUkRestController.class).searchFields(null)))
         .addObject("blocksRestUrl", SearchSelectorService.route(on(LicenceBlocksRestController.class).searchLicenceBlocks(null)))
         .addObject("form", form)

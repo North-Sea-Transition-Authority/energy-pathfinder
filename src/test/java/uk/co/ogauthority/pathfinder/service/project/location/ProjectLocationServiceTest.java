@@ -18,13 +18,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.fivium.formlibrary.input.CoordinateInputLatitudeHemisphere;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
-import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationForm;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
@@ -93,7 +93,9 @@ public class ProjectLocationServiceTest {
   public void createOrUpdate_newLocation() {
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
     when(fieldService.findByIdOrError(ProjectLocationTestUtil.FIELD_ID)).thenReturn(ProjectLocationTestUtil.FIELD);
-    projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationTestUtil.getCompletedForm());
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLatitude().getHemisphereInput().setInputValue(CoordinateInputLatitudeHemisphere.NORTH.name());
+    projectLocation = projectLocationService.createOrUpdate(details, form);
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
     assertThat(projectLocation.getField()).isEqualTo(ProjectLocationTestUtil.FIELD);
     checkCommonFieldsMatch(projectLocation);
@@ -130,6 +132,17 @@ public class ProjectLocationServiceTest {
         ));
     projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationTestUtil.getBlankForm());
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
+
+    assertThat(projectLocation.getCentreOfInterestLatitudeDegrees()).isNull();
+    assertThat(projectLocation.getCentreOfInterestLatitudeMinutes()).isNull();
+    assertThat(projectLocation.getCentreOfInterestLatitudeSeconds()).isNull();
+    assertThat(projectLocation.getCentreOfInterestLatitudeHemisphere()).isNull();
+
+    assertThat(projectLocation.getCentreOfInterestLongitudeDegrees()).isNull();
+    assertThat(projectLocation.getCentreOfInterestLongitudeMinutes()).isNull();
+    assertThat(projectLocation.getCentreOfInterestLongitudeSeconds()).isNull();
+    assertThat(projectLocation.getCentreOfInterestLongitudeHemisphere()).isNull();
+
     assertThat(projectLocation.getField()).isNull();
     assertThat(projectLocation.getFieldType()).isNull();
     assertThat(projectLocation.getMaximumWaterDepth()).isNull();
@@ -153,6 +166,17 @@ public class ProjectLocationServiceTest {
   public void getForm_noExistingLocation() {
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
     var form = projectLocationService.getForm(details);
+
+    assertThat(form.getCentreOfInterestLatitude().getDegreesInput().getAsInteger()).isEmpty();
+    assertThat(form.getCentreOfInterestLatitude().getMinutesInput().getAsInteger()).isEmpty();
+    assertThat(form.getCentreOfInterestLatitude().getSecondsInput().getAsDouble()).isEmpty();
+    assertThat(form.getCentreOfInterestLatitude().getHemisphereInput().getInputValue()).isNull();
+
+    assertThat(form.getCentreOfInterestLongitude().getDegreesInput().getAsInteger()).isEmpty();
+    assertThat(form.getCentreOfInterestLongitude().getMinutesInput().getAsInteger()).isEmpty();
+    assertThat(form.getCentreOfInterestLongitude().getSecondsInput().getAsDouble()).isEmpty();
+    assertThat(form.getCentreOfInterestLongitude().getHemisphereInput().getInputValue()).isNull();
+
     assertThat(form.getField()).isNull();
     assertThat(form.getFieldType()).isNull();
     assertThat(form.getMaximumWaterDepth()).isNull();
@@ -500,6 +524,16 @@ public class ProjectLocationServiceTest {
   }
 
   private void checkCommonFieldsMatch(ProjectLocation projectLocation) {
+    assertThat(projectLocation.getCentreOfInterestLatitudeDegrees()).isEqualTo(ProjectLocationTestUtil.CENTRE_OF_INTEREST_LATITUDE_DEGREES);
+    assertThat(projectLocation.getCentreOfInterestLatitudeMinutes()).isEqualTo(ProjectLocationTestUtil.CENTRE_OF_INTEREST_LATITUDE_MINUTES);
+    assertThat(projectLocation.getCentreOfInterestLatitudeSeconds()).isEqualTo(ProjectLocationTestUtil.CENTRE_OF_INTEREST_LATITUDE_SECONDS);
+    assertThat(projectLocation.getCentreOfInterestLatitudeHemisphere()).isEqualTo(ProjectLocationTestUtil.CENTRE_OF_INTEREST_LATITUDE_HEMISPHERE);
+
+    assertThat(projectLocation.getCentreOfInterestLongitudeDegrees()).isEqualTo(ProjectLocationTestUtil.CENTRE_OF_INTEREST_LONGITUDE_DEGREES);
+    assertThat(projectLocation.getCentreOfInterestLongitudeMinutes()).isEqualTo(ProjectLocationTestUtil.CENTRE_OF_INTEREST_LONGITUDE_MINUTES);
+    assertThat(projectLocation.getCentreOfInterestLongitudeSeconds()).isEqualTo(ProjectLocationTestUtil.CENTRE_OF_INTEREST_LONGITUDE_SECONDS);
+    assertThat(projectLocation.getCentreOfInterestLongitudeHemisphere()).isEqualTo(ProjectLocationTestUtil.CENTRE_OF_INTEREST_LONGITUDE_HEMISPHERE);
+
     assertThat(projectLocation.getFieldType()).isEqualTo(ProjectLocationTestUtil.FIELD_TYPE);
     assertThat(projectLocation.getMaximumWaterDepth()).isEqualTo(ProjectLocationTestUtil.WATER_DEPTH);
     assertThat(projectLocation.getApprovedFieldDevelopmentPlan()).isEqualTo(ProjectLocationTestUtil.APPROVED_FDP_PLAN);
@@ -508,6 +542,22 @@ public class ProjectLocationServiceTest {
   }
 
   private void checkCommonFormFieldsMatch(ProjectLocation projectLocation, ProjectLocationForm form) {
+    assertThat(form.getCentreOfInterestLatitude().getDegreesInput().getAsInteger())
+        .isEqualTo(Optional.ofNullable(projectLocation.getCentreOfInterestLatitudeDegrees()));
+    assertThat(form.getCentreOfInterestLatitude().getMinutesInput().getAsInteger())
+        .isEqualTo(Optional.ofNullable(projectLocation.getCentreOfInterestLatitudeMinutes()));
+    assertThat(form.getCentreOfInterestLatitude().getSecondsInput().getAsDouble())
+        .isEqualTo(Optional.ofNullable(projectLocation.getCentreOfInterestLatitudeSeconds()));
+
+    assertThat(form.getCentreOfInterestLongitude().getDegreesInput().getAsInteger())
+        .isEqualTo(Optional.ofNullable(projectLocation.getCentreOfInterestLongitudeDegrees()));
+    assertThat(form.getCentreOfInterestLongitude().getMinutesInput().getAsInteger())
+        .isEqualTo(Optional.ofNullable(projectLocation.getCentreOfInterestLongitudeMinutes()));
+    assertThat(form.getCentreOfInterestLongitude().getSecondsInput().getAsDouble())
+        .isEqualTo(Optional.ofNullable(projectLocation.getCentreOfInterestLongitudeSeconds()));
+    assertThat(form.getCentreOfInterestLongitude().getHemisphereInput().getInputValue())
+        .isEqualTo(projectLocation.getCentreOfInterestLongitudeHemisphere());
+
     assertThat(form.getFieldType()).isEqualTo(projectLocation.getFieldType());
     assertThat(form.getMaximumWaterDepth()).isEqualTo(projectLocation.getMaximumWaterDepth());
     assertThat(form.getApprovedFieldDevelopmentPlan()).isEqualTo(projectLocation.getApprovedFieldDevelopmentPlan());

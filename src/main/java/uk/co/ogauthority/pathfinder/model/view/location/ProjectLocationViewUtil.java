@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
+import uk.co.ogauthority.pathfinder.util.CoordinateUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class ProjectLocationViewUtil {
@@ -17,6 +18,20 @@ public class ProjectLocationViewUtil {
 
   public static ProjectLocationView from(ProjectLocation projectLocation, List<ProjectLocationBlock> projectLocationBlocks) {
     var projectLocationView = new ProjectLocationView();
+
+    projectLocationView.setCentreOfInterestLatitude(
+        CoordinateUtil.formatCoordinate(
+            projectLocation.getCentreOfInterestLatitudeDegrees(),
+            projectLocation.getCentreOfInterestLatitudeMinutes(),
+            projectLocation.getCentreOfInterestLatitudeSeconds(),
+            projectLocation.getCentreOfInterestLatitudeHemisphere()));
+
+    projectLocationView.setCentreOfInterestLongitude(
+        CoordinateUtil.formatCoordinate(
+            projectLocation.getCentreOfInterestLongitudeDegrees(),
+            projectLocation.getCentreOfInterestLongitudeMinutes(),
+            projectLocation.getCentreOfInterestLongitudeSeconds(),
+            projectLocation.getCentreOfInterestLongitudeHemisphere()));
 
     var field = projectLocation.getField();
 
