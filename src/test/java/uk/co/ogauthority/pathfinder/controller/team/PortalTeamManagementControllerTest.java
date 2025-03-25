@@ -25,9 +25,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.LinkedMultiValueMap;
@@ -66,13 +66,13 @@ public class PortalTeamManagementControllerTest extends TeamManagementContextAbs
   private static final int UNKNOWN_PERSON_ID = 123456789;
   private static final int UNKNOWN_RES_ID = 99999;
 
-  @MockBean
+  @MockitoBean
   private TeamManagementService teamManagementService;
 
-  @MockBean
+  @MockitoBean
   protected AddUserToTeamFormValidator addUserToTeamFormValidator;
 
-  @MockBean
+  @MockitoBean
   private TeamCreationService teamCreationService;
 
   protected TeamManagementContextService teamManagementContextService;

@@ -11,12 +11,12 @@ import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -58,43 +58,43 @@ public abstract class AbstractControllerTest {
   @Autowired
   protected WebApplicationContext context;
 
-  @MockBean
+  @MockitoBean
   protected FoxUrlService foxUrlService;
 
-  @MockBean
+  @MockitoBean
   protected TeamService teamService;
 
-  @MockBean
+  @MockitoBean
   protected UserSessionService userSessionService;
 
-  @MockBean
+  @MockitoBean
   protected TopNavigationService topNavigationService;
 
-  @MockBean
+  @MockitoBean
   protected ProjectContextService projectContextService;
 
-  @MockBean
+  @MockitoBean
   protected ProjectAssessmentContextService projectAssessmentContextService;
 
-  @MockBean
+  @MockitoBean
   protected OperatorProjectUpdateContextService operatorProjectUpdateContextService;
 
-  @MockBean
+  @MockitoBean
   protected RegulatorProjectUpdateContextService regulatorProjectUpdateContextService;
 
-  @MockBean
+  @MockitoBean
   protected TeamManagementContextService teamManagementContextService;
 
-  @MockBean
+  @MockitoBean
   protected CommunicationJourneyService communicationJourneyService;
 
-  @MockBean
+  @MockitoBean
   protected ErrorService errorService;
 
-  @MockBean
+  @MockitoBean
   protected FooterService footerService;
 
-  @MockBean
+  @MockitoBean
   protected AnalyticsService analyticsService;
 
   @Before

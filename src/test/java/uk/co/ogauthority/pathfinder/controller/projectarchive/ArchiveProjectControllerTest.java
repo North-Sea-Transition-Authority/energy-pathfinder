@@ -17,9 +17,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
@@ -46,7 +46,7 @@ public class ArchiveProjectControllerTest extends ProjectContextAbstractControll
   private static final Integer PUBLISHED_PROJECT_ID = 1;
   private static final Integer ARCHIVED_PROJECT_ID = 2;
 
-  @MockBean
+  @MockitoBean
   private ArchiveProjectService archiveProjectService;
 
   private final ProjectDetail publishedProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.PUBLISHED);

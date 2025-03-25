@@ -26,10 +26,10 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
@@ -66,13 +66,13 @@ public class ForwardWorkPlanAwardedContractSummaryControllerTest extends Project
   private static final Class<TaskListController> TASK_LIST_CONTROLLER = TaskListController.class;
   private static final Class<ForwardWorkPlanAwardedContractSummaryForm>  SUMMARY_FORM = ForwardWorkPlanAwardedContractSummaryForm.class;
 
-  @MockBean
+  @MockitoBean
   private ForwardWorkPlanAwardedContractSummaryService summaryService;
 
-  @MockBean
+  @MockitoBean
   private ValidationService validationService;
 
-  @MockBean
+  @MockitoBean
   private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   @Captor

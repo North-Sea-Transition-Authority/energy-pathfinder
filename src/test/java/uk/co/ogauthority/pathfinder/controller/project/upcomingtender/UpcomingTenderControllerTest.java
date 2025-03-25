@@ -22,10 +22,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.util.LinkedMultiValueMap;
@@ -55,7 +55,6 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.file.ProjectDetailFileService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectSectionItemOwnershipService;
-import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
@@ -76,19 +75,19 @@ public class UpcomingTenderControllerTest extends ProjectContextAbstractControll
   private static final Integer DISPLAY_ORDER = 1;
   private static final Integer PROJECT_VERSION = 1;
 
-  @MockBean
+  @MockitoBean
   private UpcomingTenderService upcomingTenderService;
 
-  @MockBean
+  @MockitoBean
   private UpcomingTenderSummaryService upcomingTenderSummaryService;
 
-  @MockBean
+  @MockitoBean
   ProjectDetailFileService projectDetailFileService;
 
-  @MockBean
+  @MockitoBean
   FileDownloadService fileDownloadService;
 
-  @MockBean
+  @MockitoBean
   ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private ProjectControllerTesterService projectControllerTesterService;

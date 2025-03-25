@@ -17,11 +17,11 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.PortalOrganisationAccessor;
@@ -67,19 +67,19 @@ public class ProjectContributorsCommonServiceEventTest {
 
     @Autowired TransactionWrapper transactionWrapper;
 
-    @MockBean
+    @MockitoBean
     private ProjectContributorRepository projectContributorRepository;
 
-    @MockBean
+    @MockitoBean
     private ProjectOperatorService projectOperatorService;
 
-    @MockBean
+    @MockitoBean
     private PortalOrganisationAccessor portalOrganisationAccessor;
 
-    @MockBean
+    @MockitoBean
     private ProjectContributorMailService projectContributorMailService;
 
-    @MockBean
+    @MockitoBean
     private ProjectDetailsRepository projectDetailsRepository;
 
     @Before

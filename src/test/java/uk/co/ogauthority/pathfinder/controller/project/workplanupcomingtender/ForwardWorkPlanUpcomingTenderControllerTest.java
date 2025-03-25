@@ -18,10 +18,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -31,7 +31,6 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
-import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
@@ -73,25 +72,25 @@ public class ForwardWorkPlanUpcomingTenderControllerTest extends ProjectContextA
   private static final Integer UPCOMING_TENDER_ID = 1;
   private static final Integer DISPLAY_ORDER = 1;
 
-  @MockBean
+  @MockitoBean
   private ForwardWorkPlanUpcomingTenderService workPlanUpcomingTenderService;
 
-  @MockBean
+  @MockitoBean
   private ForwardWorkPlanUpcomingTenderSummaryService workPlanUpcomingTenderSummaryService;
 
-  @MockBean
+  @MockitoBean
   private ForwardWorkPlanUpcomingTenderModelService workPlanUpcomingTenderModelService;
 
-  @MockBean
+  @MockitoBean
   protected ForwardWorkPlanTenderSetupService forwardWorkPlanTenderSetupService;
 
-  @MockBean
+  @MockitoBean
   protected ForwardWorkPlanTenderRoutingService forwardWorkPlanTenderRoutingService;
 
-  @MockBean
+  @MockitoBean
   protected ForwardWorkPlanTenderCompletionService forwardWorkPlanTenderCompletionService;
 
-  @MockBean
+  @MockitoBean
   protected ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private final AuthenticatedUserAccount unauthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();

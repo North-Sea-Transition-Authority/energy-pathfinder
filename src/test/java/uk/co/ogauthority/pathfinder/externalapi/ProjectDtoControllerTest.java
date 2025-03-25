@@ -13,9 +13,9 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.config.ExternalApiWebSecurityConfiguration;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
@@ -28,7 +28,7 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 @Import(ExternalApiWebSecurityConfiguration.class)
 public class ProjectDtoControllerTest extends AbstractControllerTest {
 
-  @MockBean
+  @MockitoBean
   private ProjectDtoRepository projectDtoRepository;
 
   private static final ObjectMapper MAPPER = new ObjectMapper();

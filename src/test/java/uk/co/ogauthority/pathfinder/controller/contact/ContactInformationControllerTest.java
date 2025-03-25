@@ -7,7 +7,7 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
@@ -17,7 +17,7 @@ import uk.co.ogauthority.pathfinder.service.contact.SupportContactService;
 @WebMvcTest(ContactInformationController.class)
 public class ContactInformationControllerTest extends AbstractControllerTest {
 
-  @MockBean
+  @MockitoBean
   SupportContactService supportContactService;
 
   @Test

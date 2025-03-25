@@ -14,7 +14,7 @@ import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUs
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -36,13 +36,13 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 @WebMvcTest(SelectProjectOperatorController.class)
 public class SelectProjectOperatorControllerTest extends AbstractControllerTest {
 
-  @MockBean
+  @MockitoBean
   private StartProjectService startProjectService;
 
-  @MockBean
+  @MockitoBean
   private SelectOperatorService selectOperatorService;
 
-  @MockBean
+  @MockitoBean
   private ProjectOperatorModelService projectOperatorModelService;
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(

@@ -16,10 +16,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -52,10 +52,10 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 )
 public class CampaignInformationControllerTest extends ProjectContextAbstractControllerTest {
 
-  @MockBean
+  @MockitoBean
   private CampaignInformationService campaignInformationService;
 
-  @MockBean
+  @MockitoBean
   private CampaignInformationModelService campaignInformationModelService;
 
   private ProjectControllerTesterService projectControllerTesterService;

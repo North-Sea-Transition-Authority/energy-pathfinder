@@ -16,9 +16,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -26,7 +26,6 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
-import uk.co.ogauthority.pathfinder.controller.project.upcomingtender.UpcomingTendersController;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
@@ -55,13 +54,13 @@ public class PlatformsFpsosControllerTest extends ProjectContextAbstractControll
   private static final Integer PLATFORM_FPSO_ID = 1;
   private static final Integer DISPLAY_ORDER = 1;
 
-  @MockBean
+  @MockitoBean
   private PlatformsFpsosService platformsFpsosService;
 
-  @MockBean
+  @MockitoBean
   private PlatformsFpsosSummaryService platformsFpsosSummaryService;
 
-  @MockBean
+  @MockitoBean
   private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();

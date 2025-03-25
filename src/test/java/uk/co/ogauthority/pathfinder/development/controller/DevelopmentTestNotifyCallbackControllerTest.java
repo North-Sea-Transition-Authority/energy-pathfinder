@@ -8,10 +8,10 @@ import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUs
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
@@ -24,7 +24,7 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 @ActiveProfiles("production")
 public class DevelopmentTestNotifyCallbackControllerTest extends AbstractControllerTest {
 
-  @MockBean
+  @MockitoBean
   NotifyCallbackService notifyCallbackService;
 
   @DynamicPropertySource

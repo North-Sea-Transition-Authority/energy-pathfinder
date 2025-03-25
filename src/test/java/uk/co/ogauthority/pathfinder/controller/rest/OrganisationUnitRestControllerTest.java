@@ -14,9 +14,9 @@ import static uk.co.ogauthority.pathfinder.util.TestUserProvider.authenticatedUs
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
@@ -36,10 +36,10 @@ public class OrganisationUnitRestControllerTest extends AbstractControllerTest {
 
   private static final String SEARCH_TERM = "search term";
 
-  @MockBean
+  @MockitoBean
   protected SearchSelectorService searchSelectorService;
 
-  @MockBean
+  @MockitoBean
   protected PortalOrganisationAccessor portalOrganisationAccessor;
 
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(

@@ -22,10 +22,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -61,10 +61,10 @@ public class ForwardWorkPlanAwardedContractControllerTest extends ProjectContext
   private static final Class<ForwardWorkPlanAwardedContractController> CONTROLLER = ForwardWorkPlanAwardedContractController.class;
   private static final Class<ForwardWorkPlanAwardedContractSummaryController> SUMMARY_CONTROLLER = ForwardWorkPlanAwardedContractSummaryController.class;
 
-  @MockBean
+  @MockitoBean
   private ForwardWorkPlanAwardedContractService awardedContractService;
 
-  @MockBean
+  @MockitoBean
   private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private ProjectDetail projectDetail;

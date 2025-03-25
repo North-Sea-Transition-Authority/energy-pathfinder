@@ -18,9 +18,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
@@ -34,10 +34,10 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.form.projectassessment.ProjectAssessmentForm;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContextService;
-import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectPermission;
+import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentContextService;
+import uk.co.ogauthority.pathfinder.service.projectassessment.ProjectAssessmentService;
 import uk.co.ogauthority.pathfinder.service.projectupdate.RegulatorUpdateRequestService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -52,10 +52,10 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
   private static final Integer QA_PROJECT_ID = 1;
   private static final Integer UNSUBMITTED_PROJECT_ID = 2;
 
-  @MockBean
+  @MockitoBean
   private ProjectAssessmentService projectAssessmentService;
 
-  @MockBean
+  @MockitoBean
   private RegulatorUpdateRequestService regulatorUpdateRequestService;
 
   private final ProjectDetail qaProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
@@ -178,7 +178,7 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
     when(projectAssessmentService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     when(regulatorUpdateRequestService.canRequestUpdate(qaProjectDetail)).thenReturn(true);
-    
+
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectAssessmentController.class)
             .createProjectAssessment(QA_PROJECT_ID, null, null, null, null)
@@ -201,7 +201,7 @@ public class ProjectAssessmentControllerTest extends ProjectAssessmentContextAbs
     when(projectAssessmentService.validate(any(), any(), any())).thenReturn(bindingResult);
 
     when(regulatorUpdateRequestService.canRequestUpdate(qaProjectDetail)).thenReturn(false);
-    
+
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectAssessmentController.class)
             .createProjectAssessment(QA_PROJECT_ID, null, null, null, null)
