@@ -20,6 +20,18 @@ class InfrastructureProjectLocationJsonTest {
     var infrastructureProjectLocationJson = InfrastructureProjectLocationJson.from(projectLocation, projectLocationBlocks);
 
     var expectedInfrastructureProjectLocationJson = new InfrastructureProjectLocationJson(
+        CoordinateJson.from(
+            projectLocation.getCentreOfInterestLatitudeDegrees(),
+            projectLocation.getCentreOfInterestLatitudeMinutes(),
+            projectLocation.getCentreOfInterestLatitudeSeconds(),
+            projectLocation.getCentreOfInterestLatitudeHemisphere()
+        ),
+        CoordinateJson.from(
+            projectLocation.getCentreOfInterestLongitudeDegrees(),
+            projectLocation.getCentreOfInterestLongitudeMinutes(),
+            projectLocation.getCentreOfInterestLongitudeSeconds(),
+            projectLocation.getCentreOfInterestLongitudeHemisphere()
+        ),
         InfrastructureProjectFieldJson.from(projectLocation),
         projectLocation.getMaximumWaterDepth(),
         List.of()
