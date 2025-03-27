@@ -12,6 +12,7 @@ import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationView;
 import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryService;
 
@@ -31,18 +32,21 @@ public class ProjectLocationSectionSummaryService implements ProjectSectionSumma
   private final ProjectLocationBlocksService projectLocationBlocksService;
   private final DifferenceService differenceService;
   private final ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
+  private final ProjectInformationService projectInformationService;
 
   @Autowired
   public ProjectLocationSectionSummaryService(
       ProjectLocationService projectLocationService,
       ProjectLocationBlocksService projectLocationBlocksService,
       DifferenceService differenceService,
-      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService
+      ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService,
+      ProjectInformationService projectInformationService
   ) {
     this.projectLocationService = projectLocationService;
     this.projectLocationBlocksService = projectLocationBlocksService;
     this.differenceService = differenceService;
     this.projectSectionSummaryCommonModelService = projectSectionSummaryCommonModelService;
+    this.projectInformationService = projectInformationService;
   }
 
   @Override
@@ -59,12 +63,14 @@ public class ProjectLocationSectionSummaryService implements ProjectSectionSumma
         SECTION_ID
     );
 
+    var isOilAndGasProject = projectInformationService.isOilAndGasProject(detail);
     var projectLocationView = projectLocationService.getProjectLocationByProjectDetail(detail)
         .map(projectLocation -> {
           var projectLocationBlocks = projectLocationBlocksService.getBlocks(projectLocation);
-          return ProjectLocationViewUtil.from(projectLocation, projectLocationBlocks);
+          return ProjectLocationViewUtil.from(projectLocation, isOilAndGasProject, projectLocationBlocks);
         })
         .orElse(new ProjectLocationView());
+    summaryModel.put("isOilAndGasProject", isOilAndGasProject);
     summaryModel.put("hasApprovedFieldDevelopmentPlan", Boolean.TRUE.equals(projectLocationView.getApprovedFieldDevelopmentPlan()));
     summaryModel.put("hasApprovedDecomProgram", Boolean.TRUE.equals(projectLocationView.getApprovedDecomProgram()));
     summaryModel.put("projectLocationDiffModel", getProjectLocationDifferenceModel(
@@ -89,8 +95,9 @@ public class ProjectLocationSectionSummaryService implements ProjectSectionSumma
         projectDetail.getVersion() - 1
     )
         .map(projectLocation -> {
+          var isOilAndGasProject = projectInformationService.isOilAndGasProject(projectLocation.getProjectDetail());
           var projectLocationBlocks = projectLocationBlocksService.getBlocks(projectLocation);
-          return ProjectLocationViewUtil.from(projectLocation, projectLocationBlocks);
+          return ProjectLocationViewUtil.from(projectLocation, isOilAndGasProject, projectLocationBlocks);
         })
         .orElse(new ProjectLocationView());
 

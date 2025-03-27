@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectStatusC
 import uk.co.ogauthority.pathfinder.controller.project.annotation.ProjectTypeCheck;
 import uk.co.ogauthority.pathfinder.controller.rest.DevUkRestController;
 import uk.co.ogauthority.pathfinder.controller.rest.LicenceBlocksRestController;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.audit.AuditEvent;
@@ -35,6 +36,7 @@ import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.navigation.BreadcrumbService;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContext;
+import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 
 @Controller
@@ -46,22 +48,27 @@ public class ProjectLocationController extends ProjectFormPageController {
   public static final String PAGE_NAME = "Location";
 
   private final ProjectLocationService locationService;
+  private final ProjectInformationService projectInformationService;
 
   @Autowired
   public ProjectLocationController(BreadcrumbService breadcrumbService,
                                    ProjectLocationService locationService,
-                                   ControllerHelperService controllerHelperService) {
+                                   ControllerHelperService controllerHelperService,
+                                   ProjectInformationService projectInformationService) {
     super(breadcrumbService, controllerHelperService);
     this.locationService = locationService;
+    this.projectInformationService = projectInformationService;
   }
 
   @GetMapping
   public ModelAndView getLocationDetails(@PathVariable("projectId") Integer projectId,
                                          ProjectContext projectContext) {
+    var projectDetail = projectContext.getProjectDetails();
     return getLocationModelAndView(
         projectId,
-        locationService.getForm(projectContext.getProjectDetails()),
-        locationService.getValidatedBlockViewsForLocation(projectContext.getProjectDetails())
+        projectDetail,
+        locationService.getForm(projectDetail),
+        locationService.getValidatedBlockViewsForLocation(projectDetail)
     );
   }
 
@@ -71,24 +78,25 @@ public class ProjectLocationController extends ProjectFormPageController {
                                           BindingResult bindingResult,
                                           ValidationType validationType,
                                           ProjectContext projectContext) {
-    bindingResult = locationService.validate(form, bindingResult, validationType);
+    var projectDetail = projectContext.getProjectDetails();
+    bindingResult = locationService.validate(form, bindingResult, projectDetail, validationType);
     return controllerHelperService.checkErrorsAndRedirect(
         bindingResult,
-        getLocationModelAndView(projectId, form, locationService.getValidatedBlockViewsFromForm(
+        getLocationModelAndView(projectId, projectDetail, form, locationService.getValidatedBlockViewsFromForm(
             form,
-            projectContext.getProjectDetails()
+            projectDetail
           )
         ),
         form,
         () -> {
-          var projectLocation = locationService.createOrUpdate(projectContext.getProjectDetails(), form);
+          var projectLocation = locationService.createOrUpdate(projectDetail, form);
           locationService.createOrUpdateBlocks(form.getLicenceBlocks(), projectLocation);
 
           AuditService.audit(
               AuditEvent.LOCATION_INFORMATION_UPDATED,
               String.format(
                   AuditEvent.LOCATION_INFORMATION_UPDATED.getMessage(),
-                  projectContext.getProjectDetails().getId()
+                  projectDetail.getId()
               )
           );
           return ReverseRouter.redirect(on(TaskListController.class).viewTaskList(projectId, null));
@@ -96,8 +104,14 @@ public class ProjectLocationController extends ProjectFormPageController {
   }
 
 
-  public ModelAndView getLocationModelAndView(Integer projectId, ProjectLocationForm form, List<ProjectLocationBlockView> blockViews) {
+  public ModelAndView getLocationModelAndView(
+      Integer projectId,
+      ProjectDetail projectDetail,
+      ProjectLocationForm form,
+      List<ProjectLocationBlockView> blockViews
+  ) {
     var modelAndView = new ModelAndView("project/location/location")
+        .addObject("isOilAndGasProject", projectInformationService.isOilAndGasProject(projectDetail))
         .addObject("longitudeHemispheres", CoordinateInputLongitudeHemisphere.getFdsSelectMap())
         .addObject("fieldsRestUrl", SearchSelectorService.route(on(DevUkRestController.class).searchFields(null)))
         .addObject("blocksRestUrl", SearchSelectorService.route(on(LicenceBlocksRestController.class).searchLicenceBlocks(null)))

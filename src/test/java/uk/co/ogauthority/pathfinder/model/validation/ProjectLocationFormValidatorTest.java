@@ -6,6 +6,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
+import static uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil.CENTRE_OF_INTEREST_LATITUDE_DEGREES;
+import static uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil.CENTRE_OF_INTEREST_LATITUDE_MINUTES;
+import static uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil.CENTRE_OF_INTEREST_LATITUDE_SECONDS;
+import static uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil.CENTRE_OF_INTEREST_LONGITUDE_DEGREES;
+import static uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil.CENTRE_OF_INTEREST_LONGITUDE_HEMISPHERE;
+import static uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil.CENTRE_OF_INTEREST_LONGITUDE_MINUTES;
+import static uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil.CENTRE_OF_INTEREST_LONGITUDE_SECONDS;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -13,11 +20,13 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkField;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
 import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationFormValidator;
@@ -25,7 +34,9 @@ import uk.co.ogauthority.pathfinder.model.form.project.location.ProjectLocationV
 import uk.co.ogauthority.pathfinder.model.form.validation.date.DateInputValidator;
 import uk.co.ogauthority.pathfinder.service.devuk.DevUkFieldService;
 import uk.co.ogauthority.pathfinder.service.project.location.LicenceBlockValidatorService;
+import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -42,11 +53,16 @@ public class ProjectLocationFormValidatorTest {
   @Mock
   private DevUkFieldService devUkFieldService;
 
+  @Mock
+  private ProjectInformationService projectInformationService;
+
+  @InjectMocks
   private ProjectLocationFormValidator validator;
+
+  private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails();
 
   @Before
   public void setUp() {
-    validator = new ProjectLocationFormValidator(dateInputValidator, licenceBlockValidatorService, devUkFieldService);
     doCallRealMethod().when(dateInputValidator).validate(any(), any(), any(Object[].class));
     when(dateInputValidator.supports(any())).thenReturn(true);
     var testField = new DevUkField();
@@ -56,10 +72,39 @@ public class ProjectLocationFormValidatorTest {
   }
 
   @Test
-  public void validate_completeForm_isValid() {
+  public void validate_oilAndGasProjectAndCompleteForm_isValid() {
     var form = ProjectLocationTestUtil.getCompletedForm();
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+
+    assertThat(fieldErrors).isEmpty();
+  }
+
+  @Test
+  public void validate_notOilAndGasProjectAndOnlyLatitudeAndLongitudeCoordinatesSet_isValid() {
+    var form = ProjectLocationTestUtil.getBlankForm();
+
+    var centreOfInterestLatitude = form.getCentreOfInterestLatitude();
+    centreOfInterestLatitude.getDegreesInput().setInteger(CENTRE_OF_INTEREST_LATITUDE_DEGREES);
+    centreOfInterestLatitude.getMinutesInput().setInteger(CENTRE_OF_INTEREST_LATITUDE_MINUTES);
+    centreOfInterestLatitude.getSecondsInput().setInputValue(Double.toString(CENTRE_OF_INTEREST_LATITUDE_SECONDS));
+
+    var centreOfInterestLongitude = form.getCentreOfInterestLongitude();
+    centreOfInterestLongitude.getDegreesInput().setInteger(CENTRE_OF_INTEREST_LONGITUDE_DEGREES);
+    centreOfInterestLongitude.getMinutesInput().setInteger(CENTRE_OF_INTEREST_LONGITUDE_MINUTES);
+    centreOfInterestLongitude.getSecondsInput().setInputValue(Double.toString(CENTRE_OF_INTEREST_LONGITUDE_SECONDS));
+    centreOfInterestLongitude.getHemisphereInput().setInputValue(CENTRE_OF_INTEREST_LONGITUDE_HEMISPHERE);
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(false);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -77,7 +122,7 @@ public class ProjectLocationFormValidatorTest {
     form.getCentreOfInterestLatitude().getHemisphereInput().setInputValue("");
 
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -100,7 +145,7 @@ public class ProjectLocationFormValidatorTest {
     form.getCentreOfInterestLatitude().getHemisphereInput().setInputValue("");
 
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.PARTIAL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.PARTIAL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -117,7 +162,7 @@ public class ProjectLocationFormValidatorTest {
     form.getCentreOfInterestLatitude().getSecondsInput().setInputValue("0");
 
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -134,7 +179,7 @@ public class ProjectLocationFormValidatorTest {
     form.getCentreOfInterestLatitude().getSecondsInput().setInputValue("59.99");
 
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -148,7 +193,7 @@ public class ProjectLocationFormValidatorTest {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.getCentreOfInterestLatitude().getDegreesInput().setInputValue("44");
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -166,7 +211,7 @@ public class ProjectLocationFormValidatorTest {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.getCentreOfInterestLatitude().getDegreesInput().setInputValue("65");
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -184,7 +229,7 @@ public class ProjectLocationFormValidatorTest {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.getCentreOfInterestLatitude().getMinutesInput().setInputValue("-1");
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -200,7 +245,7 @@ public class ProjectLocationFormValidatorTest {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.getCentreOfInterestLatitude().getMinutesInput().setInputValue("60");
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -216,7 +261,7 @@ public class ProjectLocationFormValidatorTest {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.getCentreOfInterestLatitude().getSecondsInput().setInputValue("-0.001");
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -232,7 +277,7 @@ public class ProjectLocationFormValidatorTest {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.getCentreOfInterestLatitude().getSecondsInput().setInputValue("60");
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -248,7 +293,7 @@ public class ProjectLocationFormValidatorTest {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.getCentreOfInterestLatitude().getSecondsInput().setInputValue("59.9999");
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -268,7 +313,7 @@ public class ProjectLocationFormValidatorTest {
     form.getCentreOfInterestLongitude().getHemisphereInput().setInputValue("");
 
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -291,7 +336,7 @@ public class ProjectLocationFormValidatorTest {
     form.getCentreOfInterestLongitude().getHemisphereInput().setInputValue("");
 
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.PARTIAL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.PARTIAL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -308,7 +353,7 @@ public class ProjectLocationFormValidatorTest {
     form.getCentreOfInterestLongitude().getSecondsInput().setInputValue("0");
 
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -325,7 +370,7 @@ public class ProjectLocationFormValidatorTest {
     form.getCentreOfInterestLongitude().getSecondsInput().setInputValue("59.99");
 
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -339,7 +384,7 @@ public class ProjectLocationFormValidatorTest {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.getCentreOfInterestLongitude().getDegreesInput().setInputValue("-1");
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -355,7 +400,7 @@ public class ProjectLocationFormValidatorTest {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.getCentreOfInterestLongitude().getDegreesInput().setInputValue("31");
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -373,7 +418,7 @@ public class ProjectLocationFormValidatorTest {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.getCentreOfInterestLongitude().getMinutesInput().setInputValue("-1");
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -389,7 +434,7 @@ public class ProjectLocationFormValidatorTest {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.getCentreOfInterestLongitude().getMinutesInput().setInputValue("60");
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -405,7 +450,7 @@ public class ProjectLocationFormValidatorTest {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.getCentreOfInterestLongitude().getSecondsInput().setInputValue("-0.001");
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -421,7 +466,7 @@ public class ProjectLocationFormValidatorTest {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.getCentreOfInterestLongitude().getSecondsInput().setInputValue("60");
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -437,7 +482,7 @@ public class ProjectLocationFormValidatorTest {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.getCentreOfInterestLongitude().getSecondsInput().setInputValue("59.9999");
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -449,10 +494,308 @@ public class ProjectLocationFormValidatorTest {
   }
 
   @Test
+  public void validate_oilAndGasProjectAndFieldNullAndValidationTypeFull_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.setField(null);
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("field", Set.of("Select a field"))
+    );
+  }
+
+  @Test
+  public void validate_oilAndGasProjectAndFieldNullAndValidationTypePartial_isValid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.setField(null);
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.PARTIAL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).isEmpty();
+  }
+
+  @Test
+  public void validate_oilAndGasProjectAndFieldBlankAndValidationTypeFull_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.setField("");
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("field", Set.of("Select a field"))
+    );
+  }
+
+  @Test
+  public void validate_oilAndGasProjectAndFieldBlankAndValidationTypePartial_isValid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.setField("");
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.PARTIAL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).isEmpty();
+  }
+
+  @Test
+  public void validate_oilAndGasProjectAndFieldSelectedIsNotFound_thenFail() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+
+    when(devUkFieldService.findById(Integer.parseInt(form.getField()))).thenReturn(Optional.empty());
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).contains(
+        entry("field", Set.of(ProjectLocationFormValidator.INVALID_FIELD_ERROR_CODE))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("field", Set.of(
+            ProjectLocationFormValidator.INVALID_FIELD_ERROR_MSG
+        ))
+    );
+  }
+
+  @Test
+  public void validate_oilAndGasProjectAndFieldSelectedIsNotActive_thenFail() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+
+    var testField = new DevUkField();
+    testField.setActive(false);
+    testField.setLandward(false);
+
+    when(devUkFieldService.findById(Integer.parseInt(form.getField()))).thenReturn(Optional.of(testField));
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).contains(
+        entry("field", Set.of(ProjectLocationFormValidator.INVALID_FIELD_ERROR_CODE))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("field", Set.of(
+            ProjectLocationFormValidator.INVALID_FIELD_ERROR_MSG
+        ))
+    );
+  }
+
+  @Test
+  public void validate_oilAndGasProjectAndFieldSelectedIsLandward_thenFail() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+
+    var testField = new DevUkField();
+    testField.setActive(true);
+    testField.setLandward(true);
+
+    when(devUkFieldService.findById(Integer.parseInt(form.getField()))).thenReturn(Optional.of(testField));
+
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrors).contains(
+        entry("field", Set.of(ProjectLocationFormValidator.INVALID_FIELD_ERROR_CODE))
+    );
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("field", Set.of(
+            ProjectLocationFormValidator.INVALID_FIELD_ERROR_MSG
+        ))
+    );
+  }
+
+  @Test
+  public void validate_oilAndGasProjectAndFieldTypeNullAndValidationTypeFull_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.setFieldType(null);
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("fieldType", Set.of("Select a field type"))
+    );
+  }
+
+  @Test
+  public void validate_oilAndGasProjectAndFieldTypeNullAndValidationTypePartial_isValid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.setFieldType(null);
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.PARTIAL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).isEmpty();
+  }
+
+  @Test
+  public void validate_oilAndGasProjectAndMaximumWaterDepthNullAndValidationTypeFull_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.setMaximumWaterDepth(null);
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("maximumWaterDepth", Set.of("Enter the maximum water depth"))
+    );
+  }
+
+  @Test
+  public void validate_oilAndGasProjectAndMaximumWaterDepthNullAndValidationTypePartial_isValid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.setMaximumWaterDepth(null);
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.PARTIAL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).isEmpty();
+  }
+
+  @Test
+  public void validate_oilAndGasProjectAndMaximumWaterDepthZeroAndValidationTypeFullOrPartial_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.setMaximumWaterDepth(0);
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("maximumWaterDepth", Set.of("Maximum water depth must be a positive whole number greater than zero with no decimal places"))
+    );
+  }
+
+  @Test
+  public void validate_oilAndGasProjectAndMaximumWaterDepthZeroAndValidationTypePartial_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.setMaximumWaterDepth(0);
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.PARTIAL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("maximumWaterDepth", Set.of("Maximum water depth must be a positive whole number greater than zero with no decimal places"))
+    );
+  }
+
+  @Test
+  public void validate_oilAndGasProjectAndApprovedFieldDevelopmentPlanNullAndValidationTypeFull_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.setApprovedFieldDevelopmentPlan(null);
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("approvedFieldDevelopmentPlan", Set.of("Select yes if you have an approved Field Development Plan"))
+    );
+  }
+
+  @Test
+  public void validate_oilAndGasProjectAndApprovedFieldDevelopmentPlanNullAndValidationTypePartial_isValid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.setApprovedFieldDevelopmentPlan(null);
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.PARTIAL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).isEmpty();
+  }
+
+  @Test
   public void validate_answeredTrueButMissingDate_withEmptyDateAcceptableHint() {
     var form = ProjectLocationTestUtil.getCompletedForm();
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.PARTIAL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.PARTIAL);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -462,11 +805,13 @@ public class ProjectLocationFormValidatorTest {
   }
 
   @Test
-  public void validate_answeredTrueButMissingDate() {
+  public void validate_oilAndGasProjectAndAnsweredTrueButMissingDate() {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.setApprovedFdpDate(new ThreeFieldDateInput(null, null, null));
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -489,11 +834,47 @@ public class ProjectLocationFormValidatorTest {
   }
 
   @Test
-  public void validate_answeredTrueButMissingDate_isInvalid() {
+  public void validate_oilAndGasProjectAndApprovedDecomProgramNullAndValidationTypeFull_isInvalid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.setApprovedDecomProgram(null);
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).containsExactly(
+        entry("approvedDecomProgram", Set.of("Select yes if you have an approved Decommissioning Programme"))
+    );
+  }
+
+  @Test
+  public void validate_oilAndGasProjectAndApprovedDecomProgramNullAndValidationTypePartial_isValid() {
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.setApprovedDecomProgram(null);
+    var errors = new BeanPropertyBindingResult(form, "form");
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.PARTIAL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
+
+    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
+
+    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
+
+    assertThat(fieldErrorMessages).isEmpty();
+  }
+
+  @Test
+  public void validate_oilAndGasProjectAndAnsweredTrueButMissingDate_isInvalid() {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.setApprovedFdpDate(BAD_THREE_FIELD_DATE);
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -516,12 +897,14 @@ public class ProjectLocationFormValidatorTest {
   }
 
   @Test
-  public void validate_answeredTrueToBoth_bothDatesMissing() {
+  public void validate_oilAndGasProjectAndAnsweredTrueToBoth_bothDatesMissing() {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.setApprovedFdpDate(new ThreeFieldDateInput(null, null, null));
     form.setApprovedDecomProgram(true);
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -552,13 +935,15 @@ public class ProjectLocationFormValidatorTest {
   }
 
   @Test
-  public void validate_answeredTrueToBoth_bothDatesMissing_areInvalid() {
+  public void validate_oilAndGasProjectAndAnsweredTrueToBoth_bothDatesMissing_areInvalid() {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.setApprovedFdpDate(BAD_THREE_FIELD_DATE);
     form.setApprovedDecomProgram(true);
     form.setApprovedDecomProgramDate(BAD_THREE_FIELD_DATE);
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -589,12 +974,14 @@ public class ProjectLocationFormValidatorTest {
   }
 
   @Test
-  public void validate_fdpApprovalDateCannotBeInFuture_whenInFuture_thenFail() {
+  public void validate_oilAndGasProjectAndFdpApprovalDateCannotBeInFuture_whenInFuture_thenFail() {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.setApprovedFdpDate(new ThreeFieldDateInput(LocalDate.now().plusYears(1)));
 
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -616,12 +1003,14 @@ public class ProjectLocationFormValidatorTest {
   }
 
   @Test
-  public void validate_fdpApprovalDateCannotBeInFuture_whenTheSameAs_thenPass() {
+  public void validate_oilAndGasProjectAndFdpApprovalDateCannotBeInFuture_whenTheSameAs_thenPass() {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.setApprovedFdpDate(new ThreeFieldDateInput(LocalDate.now()));
 
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -631,13 +1020,15 @@ public class ProjectLocationFormValidatorTest {
   }
 
   @Test
-  public void validate_fdpApprovalDateCannotBeInFuture_whenBefore_thenPass() {
+  public void validate_oilAndGasProjectAndFdpApprovalDateCannotBeInFuture_whenBefore_thenPass() {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.setApprovedFieldDevelopmentPlan(true);
     form.setApprovedFdpDate(new ThreeFieldDateInput(LocalDate.now().minusYears(1)));
 
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -647,13 +1038,15 @@ public class ProjectLocationFormValidatorTest {
   }
 
   @Test
-  public void validate_decomProgramApprovalCannotBeInFuture_whenInFuture_thenFail() {
+  public void validate_oilAndGasProjectAndDecomProgramApprovalCannotBeInFuture_whenInFuture_thenFail() {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.setApprovedDecomProgram(true);
     form.setApprovedDecomProgramDate(new ThreeFieldDateInput(LocalDate.now().plusYears(1)));
 
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -675,12 +1068,14 @@ public class ProjectLocationFormValidatorTest {
   }
 
   @Test
-  public void validate_decomProgramApprovalCannotBeInFuture_whenTheSameAs_thenPass() {
+  public void validate_oilAndGasProjectAndDecomProgramApprovalCannotBeInFuture_whenTheSameAs_thenPass() {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.setApprovedDecomProgramDate(new ThreeFieldDateInput(LocalDate.now()));
 
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
@@ -690,103 +1085,19 @@ public class ProjectLocationFormValidatorTest {
   }
 
   @Test
-  public void validate_decomProgramApprovalDateCannotBeInFuture_whenBefore_thenPass() {
+  public void validate_oilAndGasProjectAndDecomProgramApprovalDateCannotBeInFuture_whenBefore_thenPass() {
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.setApprovedDecomProgramDate(new ThreeFieldDateInput(LocalDate.now().minusYears(1)));
 
     var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, ValidationType.FULL);
+
+    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
 
     ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
 
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
 
     assertThat(fieldErrors).isEmpty();
-  }
-
-  @Test
-  public void validate_fieldSelectedIsNotFound_thenFail() {
-    var form = ProjectLocationTestUtil.getCompletedForm();
-
-    when(devUkFieldService.findById(Integer.parseInt(form.getField()))).thenReturn(Optional.empty());
-
-    var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
-
-    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
-
-    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
-
-    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
-
-    assertThat(fieldErrors).contains(
-        entry("field", Set.of(ProjectLocationFormValidator.INVALID_FIELD_ERROR_CODE))
-    );
-
-    assertThat(fieldErrorMessages).containsExactly(
-        entry("field", Set.of(
-            ProjectLocationFormValidator.INVALID_FIELD_ERROR_MSG
-        ))
-    );
-  }
-
-  @Test
-  public void validate_fieldSelectedIsNotActive_thenFail() {
-    var form = ProjectLocationTestUtil.getCompletedForm();
-
-    var testField = new DevUkField();
-    testField.setActive(false);
-    testField.setLandward(false);
-
-    when(devUkFieldService.findById(Integer.parseInt(form.getField()))).thenReturn(Optional.of(testField));
-
-    var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
-
-    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
-
-    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
-
-    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
-
-    assertThat(fieldErrors).contains(
-        entry("field", Set.of(ProjectLocationFormValidator.INVALID_FIELD_ERROR_CODE))
-    );
-
-    assertThat(fieldErrorMessages).containsExactly(
-        entry("field", Set.of(
-            ProjectLocationFormValidator.INVALID_FIELD_ERROR_MSG
-        ))
-    );
-  }
-
-  @Test
-  public void validate_fieldSelectedIsLandward_thenFail() {
-    var form = ProjectLocationTestUtil.getCompletedForm();
-
-    var testField = new DevUkField();
-    testField.setActive(true);
-    testField.setLandward(true);
-
-    when(devUkFieldService.findById(Integer.parseInt(form.getField()))).thenReturn(Optional.of(testField));
-
-    var errors = new BeanPropertyBindingResult(form, "form");
-    var projectLocationValidationHint = new ProjectLocationValidationHint(ValidationType.FULL);
-
-    ValidationUtils.invokeValidator(validator, form, errors, projectLocationValidationHint);
-
-    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
-
-    var fieldErrorMessages = ValidatorTestingUtil.extractErrorMessages(errors);
-
-    assertThat(fieldErrors).contains(
-        entry("field", Set.of(ProjectLocationFormValidator.INVALID_FIELD_ERROR_CODE))
-    );
-
-    assertThat(fieldErrorMessages).containsExactly(
-        entry("field", Set.of(
-            ProjectLocationFormValidator.INVALID_FIELD_ERROR_MSG
-        ))
-    );
   }
 }

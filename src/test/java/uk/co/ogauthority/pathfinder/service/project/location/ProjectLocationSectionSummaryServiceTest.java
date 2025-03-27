@@ -8,22 +8,25 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationView;
 import uk.co.ogauthority.pathfinder.model.view.location.ProjectLocationViewUtil;
 import uk.co.ogauthority.pathfinder.model.view.summary.ProjectSectionSummary;
 import uk.co.ogauthority.pathfinder.service.difference.DifferenceService;
+import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.project.summary.ProjectSectionSummaryCommonModelService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ProjectLocationSectionSummaryServiceTest {
 
   @Mock
@@ -38,18 +41,22 @@ public class ProjectLocationSectionSummaryServiceTest {
   @Mock
   private ProjectSectionSummaryCommonModelService projectSectionSummaryCommonModelService;
 
+  @Mock
+  private ProjectInformationService projectInformationService;
+
   private ProjectLocationSectionSummaryService projectLocationSectionSummaryService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
   private final ProjectLocation projectLocation = ProjectLocationTestUtil.getProjectLocation(detail);
 
-  @Before
+  @BeforeEach
   public void setup() {
     projectLocationSectionSummaryService = new ProjectLocationSectionSummaryService(
         projectLocationService,
         projectLocationBlocksService,
         differenceService,
-        projectSectionSummaryCommonModelService
+        projectSectionSummaryCommonModelService,
+        projectInformationService
     );
   }
 
@@ -67,11 +74,22 @@ public class ProjectLocationSectionSummaryServiceTest {
     assertThat(projectLocationSectionSummaryService.canShowSection(detail)).isFalse();
   }
 
-  @Test
-  public void getSummary() {
-    when(projectLocationService.getProjectLocationByProjectDetail(detail)).thenReturn(Optional.of(projectLocation));
+  @ParameterizedTest
+  @CsvSource({
+      "true, true",
+      "true, false",
+      "false, true",
+      "false, false"
+  })
+  public void getSummary(boolean isOilAndGasProject, boolean previouslyOilAndGasProject) {
+    var previousProjectDetail = ProjectUtil.getProjectDetails();
+    previousProjectDetail.setVersion(detail.getVersion() - 1);
+    var previousProjectLocation = ProjectLocationTestUtil.getProjectLocation(previousProjectDetail);
 
-    var previousProjectLocation = ProjectLocationTestUtil.getProjectLocation(detail);
+    when(projectInformationService.isOilAndGasProject(detail)).thenReturn(isOilAndGasProject);
+    when(projectInformationService.isOilAndGasProject(previousProjectDetail)).thenReturn(previouslyOilAndGasProject);
+
+    when(projectLocationService.getProjectLocationByProjectDetail(detail)).thenReturn(Optional.of(projectLocation));
 
     when(projectLocationService.getProjectLocationByProjectAndVersion(
         detail.getProject(),
@@ -84,8 +102,9 @@ public class ProjectLocationSectionSummaryServiceTest {
     assertThat(sectionSummary.getSidebarSectionLinks()).isEqualTo(List.of(ProjectLocationSectionSummaryService.SECTION_LINK));
     assertThat(sectionSummary.getTemplatePath()).isEqualTo(ProjectLocationSectionSummaryService.TEMPLATE_PATH);
 
-    var currentProjectLocationView = ProjectLocationViewUtil.from(projectLocation, Collections.emptyList());
-    var previousProjectLocationView = ProjectLocationViewUtil.from(previousProjectLocation, Collections.emptyList());
+    var currentProjectLocationView = ProjectLocationViewUtil.from(projectLocation, isOilAndGasProject, Collections.emptyList());
+    var previousProjectLocationView =
+        ProjectLocationViewUtil.from(previousProjectLocation, previouslyOilAndGasProject, Collections.emptyList());
 
     assertModelProperties(sectionSummary, detail);
     assertInteractions(currentProjectLocationView, previousProjectLocationView);
@@ -119,6 +138,7 @@ public class ProjectLocationSectionSummaryServiceTest {
     );
 
     assertThat(model).containsOnlyKeys(
+        "isOilAndGasProject",
         "projectLocationDiffModel",
         "hasApprovedFieldDevelopmentPlan",
         "hasApprovedDecomProgram"

@@ -16,7 +16,11 @@ public class ProjectLocationViewUtil {
     throw new IllegalStateException("ProjectLocationViewUtil is a util class and should not be instantiated");
   }
 
-  public static ProjectLocationView from(ProjectLocation projectLocation, List<ProjectLocationBlock> projectLocationBlocks) {
+  public static ProjectLocationView from(
+      ProjectLocation projectLocation,
+      boolean isOilAndGasProject,
+      List<ProjectLocationBlock> projectLocationBlocks
+  ) {
     var projectLocationView = new ProjectLocationView();
 
     projectLocationView.setCentreOfInterestLatitude(
@@ -33,34 +37,36 @@ public class ProjectLocationViewUtil {
             projectLocation.getCentreOfInterestLongitudeSeconds(),
             projectLocation.getCentreOfInterestLongitudeHemisphere()));
 
-    var field = projectLocation.getField();
+    if (isOilAndGasProject) {
+      var field = projectLocation.getField();
 
-    var fieldName = field != null
-        ? field.getFieldName()
-        : null;
-    projectLocationView.setField(fieldName);
+      var fieldName = field != null
+          ? field.getFieldName()
+          : null;
+      projectLocationView.setField(fieldName);
 
-    var ukcsArea = field != null && field.getUkcsArea() != null
-        ? field.getUkcsArea().getDisplayName()
-        : UKCS_AREA_NOT_SET_MESSAGE;
-    projectLocationView.setUkcsArea(ukcsArea);
+      var ukcsArea = field != null && field.getUkcsArea() != null
+          ? field.getUkcsArea().getDisplayName()
+          : UKCS_AREA_NOT_SET_MESSAGE;
+      projectLocationView.setUkcsArea(ukcsArea);
 
-    var fieldType = projectLocation.getFieldType() != null
-        ? projectLocation.getFieldType().getDisplayName()
-        : null;
-    projectLocationView.setFieldType(fieldType);
+      var fieldType = projectLocation.getFieldType() != null
+          ? projectLocation.getFieldType().getDisplayName()
+          : null;
+      projectLocationView.setFieldType(fieldType);
 
-    projectLocationView.setMaximumWaterDepth(projectLocation.getMaximumWaterDepth() != null
-        ? getWaterDepthString(projectLocation.getMaximumWaterDepth())
-        : "");
-    projectLocationView.setApprovedFieldDevelopmentPlan(projectLocation.getApprovedFieldDevelopmentPlan());
-    projectLocationView.setApprovedFdpDate(DateUtil.formatDate(projectLocation.getApprovedFdpDate()));
-    projectLocationView.setApprovedDecomProgram(projectLocation.getApprovedDecomProgram());
-    projectLocationView.setApprovedDecomProgramDate(DateUtil.formatDate(projectLocation.getApprovedDecomProgramDate()));
+      projectLocationView.setMaximumWaterDepth(projectLocation.getMaximumWaterDepth() != null
+          ? getWaterDepthString(projectLocation.getMaximumWaterDepth())
+          : "");
+      projectLocationView.setApprovedFieldDevelopmentPlan(projectLocation.getApprovedFieldDevelopmentPlan());
+      projectLocationView.setApprovedFdpDate(DateUtil.formatDate(projectLocation.getApprovedFdpDate()));
+      projectLocationView.setApprovedDecomProgram(projectLocation.getApprovedDecomProgram());
+      projectLocationView.setApprovedDecomProgramDate(DateUtil.formatDate(projectLocation.getApprovedDecomProgramDate()));
 
-    projectLocationView.setLicenceBlocks(projectLocationBlocks.stream()
-        .map(ProjectLocationBlock::getBlockReference)
-        .collect(Collectors.toList()));
+      projectLocationView.setLicenceBlocks(projectLocationBlocks.stream()
+          .map(ProjectLocationBlock::getBlockReference)
+          .collect(Collectors.toList()));
+    }
 
     return projectLocationView;
   }

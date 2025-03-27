@@ -56,16 +56,16 @@ public class ProjectLocationServiceTest {
   private ValidationService validationService;
 
   @Mock
-  ProjectLocationFormValidator projectLocationFormValidator;
+  private ProjectLocationFormValidator projectLocationFormValidator;
 
   @Mock
-  ProjectLocationBlocksService projectLocationBlocksService;
-
-  @Mock
-  private ProjectInformationService projectInformationService;
+  private ProjectLocationBlocksService projectLocationBlocksService;
 
   @Mock
   private EntityDuplicationService entityDuplicationService;
+
+  @Mock
+  private ProjectInformationService projectInformationService;
 
   private ProjectLocationService projectLocationService;
 
@@ -82,16 +82,17 @@ public class ProjectLocationServiceTest {
         validationService,
         projectLocationFormValidator,
         projectLocationBlocksService,
-        projectInformationService,
-        entityDuplicationService
+        entityDuplicationService,
+        projectInformationService
     );
     when(projectLocationRepository.save(any(ProjectLocation.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 
   @Test
-  public void createOrUpdate_newLocation() {
+  public void createOrUpdate_newLocation_oilAndGasProject() {
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
+    when(projectInformationService.isOilAndGasProject(details)).thenReturn(true);
     when(fieldService.findByIdOrError(ProjectLocationTestUtil.FIELD_ID)).thenReturn(ProjectLocationTestUtil.FIELD);
     var form = ProjectLocationTestUtil.getCompletedForm();
     form.getCentreOfInterestLatitude().getHemisphereInput().setInputValue(CoordinateInputLatitudeHemisphere.NORTH.name());
@@ -99,6 +100,20 @@ public class ProjectLocationServiceTest {
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
     assertThat(projectLocation.getField()).isEqualTo(ProjectLocationTestUtil.FIELD);
     checkCommonFieldsMatch(projectLocation);
+    checkOilAndGasFieldsMatch(projectLocation);
+  }
+
+  @Test
+  public void createOrUpdate_newLocation_notOilAndGasProject() {
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
+    when(projectInformationService.isOilAndGasProject(details)).thenReturn(false);
+    var form = ProjectLocationTestUtil.getCompletedForm();
+    form.getCentreOfInterestLatitude().getHemisphereInput().setInputValue(CoordinateInputLatitudeHemisphere.NORTH.name());
+    projectLocation = projectLocationService.createOrUpdate(details, form);
+    assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
+    assertThat(projectLocation.getField()).isNull();
+    checkCommonFieldsMatch(projectLocation);
+    checkOilAndGasFieldsAreNull(projectLocation);
   }
 
   @Test
@@ -110,6 +125,7 @@ public class ProjectLocationServiceTest {
         Optional.of(
             projectLocation
         ));
+    when(projectInformationService.isOilAndGasProject(details)).thenReturn(true);
 
     //before call fdp date set
     assertThat(projectLocation.getApprovedFieldDevelopmentPlan()).isTrue();
@@ -130,6 +146,7 @@ public class ProjectLocationServiceTest {
         Optional.of(
             ProjectLocationTestUtil.getProjectLocation(details)
         ));
+    when(projectInformationService.isOilAndGasProject(details)).thenReturn(true);
     projectLocation = projectLocationService.createOrUpdate(details, ProjectLocationTestUtil.getBlankForm());
     assertThat(projectLocation.getProjectDetail()).isEqualTo(details);
 
@@ -152,14 +169,41 @@ public class ProjectLocationServiceTest {
   }
 
   @Test
-  public void getForm_existingLocation_withField() {
+  public void getForm_existingLocation_withField_oilAndGasProject() {
     projectLocation = ProjectLocationTestUtil.getProjectLocation(details);
     when(projectLocationRepository.findByProjectDetail(details)).thenReturn(
         Optional.of(projectLocation)
     );
+    when(projectInformationService.isOilAndGasProject(details)).thenReturn(true);
     var form = projectLocationService.getForm(details);
     assertThat(form.getField()).isEqualTo(ProjectLocationTestUtil.FIELD_ID.toString());
     checkCommonFormFieldsMatch(projectLocation, form);
+
+    assertThat(form.getFieldType()).isEqualTo(projectLocation.getFieldType());
+    assertThat(form.getMaximumWaterDepth()).isEqualTo(projectLocation.getMaximumWaterDepth());
+    assertThat(form.getApprovedFieldDevelopmentPlan()).isEqualTo(projectLocation.getApprovedFieldDevelopmentPlan());
+    assertThat(form.getApprovedFdpDate()).isEqualTo(new ThreeFieldDateInput(projectLocation.getApprovedFdpDate()));
+    assertThat(form.getApprovedDecomProgram()).isEqualTo(projectLocation.getApprovedDecomProgram());
+    assertThat(form.getApprovedDecomProgramDate()).isEqualTo(new ThreeFieldDateInput(projectLocation.getApprovedDecomProgramDate()));
+  }
+
+  @Test
+  public void getForm_existingLocation_notOilAndGasProject() {
+    projectLocation = ProjectLocationTestUtil.getProjectLocation(details);
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(
+        Optional.of(projectLocation)
+    );
+    when(projectInformationService.isOilAndGasProject(details)).thenReturn(false);
+    var form = projectLocationService.getForm(details);
+    assertThat(form.getField()).isNull();
+    checkCommonFormFieldsMatch(projectLocation, form);
+
+    assertThat(form.getFieldType()).isNull();
+    assertThat(form.getMaximumWaterDepth()).isNull();
+    assertThat(form.getApprovedFieldDevelopmentPlan()).isNull();
+    assertThat(form.getApprovedFdpDate()).isNull();
+    assertThat(form.getApprovedDecomProgram()).isNull();
+    assertThat(form.getApprovedDecomProgramDate()).isNull();
   }
 
   @Test
@@ -193,6 +237,7 @@ public class ProjectLocationServiceTest {
     projectLocationService.validate(
         form,
         bindingResult,
+        details,
         ValidationType.PARTIAL
     );
     verify(validationService, times(1)).validate(form, bindingResult, ValidationType.PARTIAL);
@@ -206,6 +251,7 @@ public class ProjectLocationServiceTest {
     projectLocationService.validate(
         form,
         bindingResult,
+        details,
         ValidationType.FULL
     );
 
@@ -401,6 +447,46 @@ public class ProjectLocationServiceTest {
   }
 
   @Test
+  public void removeSectionDataIfNotRelevant_whenLocationNotFound_thenNonRelevantDataNotRemoved() {
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
+
+    projectLocationService.removeSectionDataIfNotRelevant(details);
+
+    verify(projectLocationRepository, never()).delete(any());
+    verify(projectLocationBlocksService, never()).deleteBlocks(any());
+  }
+
+  @Test
+  public void removeSectionDataIfNotRelevant_whenLocationFound_oilAndGasProject_thenNonRelevantDataNotRemoved() {
+    projectLocation = ProjectLocationTestUtil.getProjectLocation(details);
+
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectLocation));
+    when(projectInformationService.isOilAndGasProject(details)).thenReturn(true);
+
+    projectLocationService.removeSectionDataIfNotRelevant(details);
+
+    checkOilAndGasFieldsMatch(projectLocation);
+
+    verify(projectLocationRepository, never()).save(projectLocation);
+    verify(projectLocationBlocksService, never()).deleteBlocks(projectLocation);
+  }
+
+  @Test
+  public void removeSectionDataIfNotRelevant_whenLocationFound_notOilAndGasProject_thenNonRelevantDataRemoved() {
+    projectLocation = ProjectLocationTestUtil.getProjectLocation(details);
+
+    when(projectLocationRepository.findByProjectDetail(details)).thenReturn(Optional.of(projectLocation));
+    when(projectInformationService.isOilAndGasProject(details)).thenReturn(false);
+
+    projectLocationService.removeSectionDataIfNotRelevant(details);
+
+    checkOilAndGasFieldsAreNull(projectLocation);
+
+    verify(projectLocationRepository).save(projectLocation);
+    verify(projectLocationBlocksService).deleteBlocks(projectLocation);
+  }
+
+  @Test
   public void copySectionData_verifyDuplicationServiceInteraction() {
 
     final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
@@ -440,21 +526,10 @@ public class ProjectLocationServiceTest {
   }
 
   @Test
-  public void canShowInTaskList_whenInfrastructureProjectAndOilAndGasProject_thenTrue() {
+  public void canShowInTaskList_whenInfrastructureProject_thenTrue() {
     var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
-
-    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
 
     assertThat(projectLocationService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR))).isTrue();
-  }
-
-  @Test
-  public void canShowInTaskList_whenInfrastructureProjectAndNotOilAndGasProject_thenFalse() {
-    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
-
-    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(false);
-
-    assertThat(projectLocationService.canShowInTaskList(projectDetail, Set.of(UserToProjectRelationship.OPERATOR))).isFalse();
   }
 
   @Test
@@ -474,8 +549,6 @@ public class ProjectLocationServiceTest {
   public void canShowInTaskList_userToProjectRelationshipSmokeTest() {
     var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
 
-    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
-
     ProjectFormSectionServiceTestUtil.canShowInTaskList_userToProjectRelationshipSmokeTest(
         projectLocationService,
         projectDetail,
@@ -484,21 +557,9 @@ public class ProjectLocationServiceTest {
   }
 
   @Test
-  public void isTaskValidForProjectDetail_whenInfrastructureProjectAndOilAndGasProject_thenTrue() {
+  public void isTaskValidForProjectDetail_whenInfrastructureProject_thenTrue() {
     var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
-
-    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(true);
-
     assertThat(projectLocationService.isTaskValidForProjectDetail(projectDetail)).isTrue();
-  }
-
-  @Test
-  public void isTaskValidForProjectDetail_whenInfrastructureProjectAndNotOilAndGasProject_thenFalse() {
-    var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
-
-    when(projectInformationService.isOilAndGasProject(projectDetail)).thenReturn(false);
-
-    assertThat(projectLocationService.isTaskValidForProjectDetail(projectDetail)).isFalse();
   }
 
   @Test
@@ -533,12 +594,22 @@ public class ProjectLocationServiceTest {
     assertThat(projectLocation.getCentreOfInterestLongitudeMinutes()).isEqualTo(ProjectLocationTestUtil.CENTRE_OF_INTEREST_LONGITUDE_MINUTES);
     assertThat(projectLocation.getCentreOfInterestLongitudeSeconds()).isEqualTo(ProjectLocationTestUtil.CENTRE_OF_INTEREST_LONGITUDE_SECONDS);
     assertThat(projectLocation.getCentreOfInterestLongitudeHemisphere()).isEqualTo(ProjectLocationTestUtil.CENTRE_OF_INTEREST_LONGITUDE_HEMISPHERE);
+  }
 
+  private void checkOilAndGasFieldsMatch(ProjectLocation projectLocation) {
     assertThat(projectLocation.getFieldType()).isEqualTo(ProjectLocationTestUtil.FIELD_TYPE);
     assertThat(projectLocation.getMaximumWaterDepth()).isEqualTo(ProjectLocationTestUtil.WATER_DEPTH);
     assertThat(projectLocation.getApprovedFieldDevelopmentPlan()).isEqualTo(ProjectLocationTestUtil.APPROVED_FDP_PLAN);
     assertThat(projectLocation.getApprovedFdpDate()).isEqualTo(ProjectLocationTestUtil.APPROVED_FDP_DATE);
     assertThat(projectLocation.getApprovedDecomProgram()).isEqualTo(ProjectLocationTestUtil.APPROVED_DECOM_PROGRAM);
+  }
+
+  private void checkOilAndGasFieldsAreNull(ProjectLocation projectLocation) {
+    assertThat(projectLocation.getFieldType()).isNull();
+    assertThat(projectLocation.getMaximumWaterDepth()).isNull();
+    assertThat(projectLocation.getApprovedFieldDevelopmentPlan()).isNull();
+    assertThat(projectLocation.getApprovedFdpDate()).isNull();
+    assertThat(projectLocation.getApprovedDecomProgram()).isNull();
   }
 
   private void checkCommonFormFieldsMatch(ProjectLocation projectLocation, ProjectLocationForm form) {
@@ -557,12 +628,5 @@ public class ProjectLocationServiceTest {
         .isEqualTo(Optional.ofNullable(projectLocation.getCentreOfInterestLongitudeSeconds()));
     assertThat(form.getCentreOfInterestLongitude().getHemisphereInput().getInputValue())
         .isEqualTo(projectLocation.getCentreOfInterestLongitudeHemisphere());
-
-    assertThat(form.getFieldType()).isEqualTo(projectLocation.getFieldType());
-    assertThat(form.getMaximumWaterDepth()).isEqualTo(projectLocation.getMaximumWaterDepth());
-    assertThat(form.getApprovedFieldDevelopmentPlan()).isEqualTo(projectLocation.getApprovedFieldDevelopmentPlan());
-    assertThat(form.getApprovedFdpDate()).isEqualTo(new ThreeFieldDateInput(projectLocation.getApprovedFdpDate()));
-    assertThat(form.getApprovedDecomProgram()).isEqualTo(projectLocation.getApprovedDecomProgram());
-    assertThat(form.getApprovedDecomProgramDate()).isEqualTo(new ThreeFieldDateInput(projectLocation.getApprovedDecomProgramDate()));
   }
 }

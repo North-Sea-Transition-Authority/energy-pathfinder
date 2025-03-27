@@ -42,6 +42,16 @@ public interface ProjectFormSectionService {
     // implement and remove relevant data
   }
 
+  /**
+   * Method to remove section data that is not relevant (e.g. values for conditional questions that are not shown).
+   * This method will be called when submitting a project if the section associated is on the task list.
+   * @param projectDetail the project detail to remove data from
+   */
+  default void removeSectionDataIfNotRelevant(ProjectDetail projectDetail) {
+    // default is to not do anything. If appropriate consumers can
+    // implement and remove relevant data
+  }
+
   void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail);
 
   Set<ProjectType> getSupportedProjectTypes();

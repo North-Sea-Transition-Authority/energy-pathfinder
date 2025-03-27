@@ -22,6 +22,7 @@ import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectIn
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
+import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectLocationServiceValidationTest {
@@ -42,10 +43,10 @@ public class ProjectLocationServiceValidationTest {
   private ProjectLocationBlocksService projectLocationBlocksService;
 
   @Mock
-  private ProjectInformationService projectInformationService;
+  private EntityDuplicationService entityDuplicationService;
 
   @Mock
-  private EntityDuplicationService entityDuplicationService;
+  private ProjectInformationService projectInformationService;
 
   private ProjectLocationService projectLocationService;
 
@@ -61,8 +62,8 @@ public class ProjectLocationServiceValidationTest {
         validationService,
         projectLocationFormValidator,
         projectLocationBlocksService,
-        projectInformationService,
-        entityDuplicationService
+        entityDuplicationService,
+        projectInformationService
     );
   }
 
@@ -105,7 +106,7 @@ public class ProjectLocationServiceValidationTest {
   private BindingResult validateProjectLocationForm(ProjectLocationForm form,
                                                     ValidationType validationType) {
     final var bindingResult = new BeanPropertyBindingResult(form, "form");
-    return projectLocationService.validate(form, bindingResult, validationType);
+    return projectLocationService.validate(form, bindingResult, ProjectUtil.getProjectDetails(), validationType);
   }
 
 }
