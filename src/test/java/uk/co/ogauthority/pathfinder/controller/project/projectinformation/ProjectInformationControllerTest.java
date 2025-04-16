@@ -103,10 +103,15 @@ public class ProjectInformationControllerTest extends ProjectContextAbstractCont
         .containsEntry("transportationAndStorageCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.TRANSPORTATION_AND_STORAGE))
         .containsEntry("transportationAndStorageDescription", FieldStageSubCategory.TRANSPORTATION_AND_STORAGE.getDescription())
         .containsEntry("hydrogenFieldStage", FieldStage.getEntryAsMap(FieldStage.HYDROGEN))
-        .containsEntry("offshoreElectrificationFieldStage", FieldStage.getEntryAsMap(FieldStage.OFFSHORE_ELECTRIFICATION))
-        .containsEntry("offshoreWindFieldStage", FieldStage.getEntryAsMap(FieldStage.OFFSHORE_WIND))
+        .containsEntry("offshoreHydrogenCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.OFFSHORE_HYDROGEN))
+        .containsEntry("onshoreHydrogenCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.ONSHORE_HYDROGEN))
+        .containsEntry("electrificationFieldStage", FieldStage.getEntryAsMap(FieldStage.ELECTRIFICATION))
+        .containsEntry("offshoreElectrificationCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.OFFSHORE_ELECTRIFICATION))
+        .containsEntry("onshoreElectrificationCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.ONSHORE_ELECTRIFICATION))
+        .containsEntry("windEnergyFieldStage", FieldStage.getEntryAsMap(FieldStage.WIND_ENERGY))
         .containsEntry("fixedBottomOffshoreWindCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.FIXED_BOTTOM_OFFSHORE_WIND))
         .containsEntry("floatingOffshoreWindCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.FLOATING_OFFSHORE_WIND))
+        .containsEntry("onshoreWindCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.ONSHORE_WIND))
         .containsEntry("quarters", Quarter.getAllAsMap());
   }
 

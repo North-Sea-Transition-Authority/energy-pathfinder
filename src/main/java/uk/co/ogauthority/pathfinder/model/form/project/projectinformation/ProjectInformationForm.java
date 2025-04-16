@@ -27,7 +27,11 @@ public class ProjectInformationForm {
 
   private FieldStageSubCategory carbonCaptureSubCategory;
 
-  private FieldStageSubCategory offshoreWindSubCategory;
+  private FieldStageSubCategory hydrogenSubCategory;
+
+  private FieldStageSubCategory electrificationSubCategory;
+
+  private FieldStageSubCategory windEnergySubCategory;
 
   @Valid
   private ContactDetailForm contactDetail;
@@ -80,11 +84,27 @@ public class ProjectInformationForm {
     this.carbonCaptureSubCategory = carbonCaptureSubCategory;
   }
 
-  public FieldStageSubCategory getOffshoreWindSubCategory() {
-    return offshoreWindSubCategory;
+  public FieldStageSubCategory getHydrogenSubCategory() {
+    return hydrogenSubCategory;
   }
 
-  public void setOffshoreWindSubCategory(FieldStageSubCategory offshoreWindSubCategory) {
-    this.offshoreWindSubCategory = offshoreWindSubCategory;
+  public void setHydrogenSubCategory(FieldStageSubCategory hydrogenSubCategory) {
+    this.hydrogenSubCategory = hydrogenSubCategory;
+  }
+
+  public FieldStageSubCategory getElectrificationSubCategory() {
+    return electrificationSubCategory;
+  }
+
+  public void setElectrificationSubCategory(FieldStageSubCategory electrificationSubCategory) {
+    this.electrificationSubCategory = electrificationSubCategory;
+  }
+
+  public FieldStageSubCategory getWindEnergySubCategory() {
+    return windEnergySubCategory;
+  }
+
+  public void setWindEnergySubCategory(FieldStageSubCategory windEnergySubCategory) {
+    this.windEnergySubCategory = windEnergySubCategory;
   }
 }

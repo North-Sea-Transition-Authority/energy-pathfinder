@@ -114,10 +114,15 @@ public class ProjectInformationController extends ProjectFormPageController {
             FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.TRANSPORTATION_AND_STORAGE))
         .addObject("transportationAndStorageDescription", FieldStageSubCategory.TRANSPORTATION_AND_STORAGE.getDescription())
         .addObject("hydrogenFieldStage", FieldStage.getEntryAsMap(FieldStage.HYDROGEN))
-        .addObject("offshoreElectrificationFieldStage", FieldStage.getEntryAsMap(FieldStage.OFFSHORE_ELECTRIFICATION))
-        .addObject("offshoreWindFieldStage", FieldStage.getEntryAsMap(FieldStage.OFFSHORE_WIND))
+        .addObject("offshoreHydrogenCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.OFFSHORE_HYDROGEN))
+        .addObject("onshoreHydrogenCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.ONSHORE_HYDROGEN))
+        .addObject("electrificationFieldStage", FieldStage.getEntryAsMap(FieldStage.ELECTRIFICATION))
+        .addObject("offshoreElectrificationCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.OFFSHORE_ELECTRIFICATION))
+        .addObject("onshoreElectrificationCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.ONSHORE_ELECTRIFICATION))
+        .addObject("windEnergyFieldStage", FieldStage.getEntryAsMap(FieldStage.WIND_ENERGY))
         .addObject("fixedBottomOffshoreWindCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.FIXED_BOTTOM_OFFSHORE_WIND))
         .addObject("floatingOffshoreWindCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.FLOATING_OFFSHORE_WIND))
+        .addObject("onshoreWindCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.ONSHORE_WIND))
         .addObject("quarters", Quarter.getAllAsMap());
 
     breadcrumbService.fromTaskList(projectId, modelAndView, PAGE_NAME);

@@ -51,22 +51,60 @@
               />
           </@fdsRadio.radioGroup>
       </@fdsRadio.radioItem>
-      <@fdsRadio.radioItem path="form.fieldStage" itemMap=hydrogenFieldStage/>
-      <@fdsRadio.radioItem path="form.fieldStage" itemMap=offshoreElectrificationFieldStage/>
-      <@fdsRadio.radioItem path="form.fieldStage" itemMap=offshoreWindFieldStage>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=hydrogenFieldStage>
+        <@fdsRadio.radioGroup
+          labelText="Hydrogen category"
+          path="form.hydrogenSubCategory"
+          hiddenContent=false
+          nestingPath="form.fieldStage"
+        >
+          <@fdsRadio.radioItem
+            path="form.hydrogenSubCategory"
+            itemMap=offshoreHydrogenCategory
+            isFirstItem=true
+          />
+          <@fdsRadio.radioItem
+            path="form.hydrogenSubCategory"
+            itemMap=onshoreHydrogenCategory
+          />
+        </@fdsRadio.radioGroup>
+      </@fdsRadio.radioItem>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=electrificationFieldStage>
+        <@fdsRadio.radioGroup
+          labelText="Electrification category"
+          path="form.electrificationSubCategory"
+          hiddenContent=false
+          nestingPath="form.fieldStage"
+        >
+          <@fdsRadio.radioItem
+            path="form.electrificationSubCategory"
+            itemMap=offshoreElectrificationCategory
+            isFirstItem=true
+          />
+          <@fdsRadio.radioItem
+            path="form.electrificationSubCategory"
+            itemMap=onshoreElectrificationCategory
+          />
+        </@fdsRadio.radioGroup>
+      </@fdsRadio.radioItem>
+      <@fdsRadio.radioItem path="form.fieldStage" itemMap=windEnergyFieldStage>
           <@fdsRadio.radioGroup
-            labelText="Offshore wind category"
-            path="form.offshoreWindSubCategory"
+            labelText="Wind energy category"
+            path="form.windEnergySubCategory"
             hiddenContent=false
             nestingPath="form.fieldStage">
               <@fdsRadio.radioItem
-                path="form.offshoreWindSubCategory"
+                path="form.windEnergySubCategory"
                 itemMap=fixedBottomOffshoreWindCategory
                 isFirstItem=true
               />
               <@fdsRadio.radioItem
-                path="form.offshoreWindSubCategory"
+                path="form.windEnergySubCategory"
                 itemMap=floatingOffshoreWindCategory
+              />
+              <@fdsRadio.radioItem
+                path="form.windEnergySubCategory"
+                itemMap=onshoreWindCategory
               />
           </@fdsRadio.radioGroup>
       </@fdsRadio.radioItem>

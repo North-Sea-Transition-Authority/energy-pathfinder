@@ -32,12 +32,12 @@ public enum FieldStage {
       "Hydrogen",
       Set.of(EnergyType.TRANSITION)
   ),
-  OFFSHORE_ELECTRIFICATION(
-      "Offshore electrification",
+  ELECTRIFICATION(
+      "Electrification",
       Set.of(EnergyType.TRANSITION)
   ),
-  OFFSHORE_WIND(
-      "Offshore wind",
+  WIND_ENERGY(
+      "Wind energy",
       Set.of(EnergyType.TRANSITION)
   );
 

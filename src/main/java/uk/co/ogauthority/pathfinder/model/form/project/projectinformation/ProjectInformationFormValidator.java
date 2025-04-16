@@ -20,9 +20,18 @@ public class ProjectInformationFormValidator implements SmartValidator {
   public static final String CARBON_CAPTURE_AND_STORAGE_FIELD = "carbonCaptureSubCategory";
   public static final String CARBON_CAPTURE_AND_STORAGE_MISSING_ERROR =
       String.format("Select a %s category", FieldStage.CARBON_CAPTURE_AND_STORAGE.getDisplayName());
-  public static final String OFFSHORE_WIND_FIELD = "offshoreWindSubCategory";
-  public static final String OFFSHORE_WIND_MISSING_ERROR =
-      String.format("Select an %s category", FieldStage.OFFSHORE_WIND.getDisplayName().toLowerCase());
+
+  public static final String HYDROGEN_FIELD = "hydrogenSubCategory";
+  public static final String HYDROGEN_MISSING_ERROR =
+      String.format("Select a %s category", FieldStage.HYDROGEN.getDisplayName().toLowerCase());
+
+  public static final String ELECTRIFICATION_FIELD = "electrificationSubCategory";
+  public static final String ELECTRIFICATION_MISSING_ERROR =
+      String.format("Select an %s category", FieldStage.ELECTRIFICATION.getDisplayName().toLowerCase());
+
+  public static final String WIND_ENERGY_FIELD = "windEnergySubCategory";
+  public static final String WIND_ENERGY_MISSING_ERROR =
+      String.format("Select a %s category", FieldStage.WIND_ENERGY.getDisplayName().toLowerCase());
 
   private final QuarterYearInputValidator quarterYearInputValidator;
 
@@ -77,12 +86,26 @@ public class ProjectInformationFormValidator implements SmartValidator {
               CARBON_CAPTURE_AND_STORAGE_FIELD.concat(".required"),
               CARBON_CAPTURE_AND_STORAGE_MISSING_ERROR
           );
-        } else if (FieldStage.OFFSHORE_WIND.equals(fieldStage)) {
+        } else if (FieldStage.HYDROGEN.equals(fieldStage)) {
           ValidationUtils.rejectIfEmptyOrWhitespace(
               errors,
-              OFFSHORE_WIND_FIELD,
-              OFFSHORE_WIND_FIELD.concat(".required"),
-              OFFSHORE_WIND_MISSING_ERROR
+              HYDROGEN_FIELD,
+              HYDROGEN_FIELD.concat(".required"),
+              HYDROGEN_MISSING_ERROR
+          );
+        } else if (FieldStage.ELECTRIFICATION.equals(fieldStage)) {
+          ValidationUtils.rejectIfEmptyOrWhitespace(
+              errors,
+              ELECTRIFICATION_FIELD,
+              ELECTRIFICATION_FIELD.concat(".required"),
+              ELECTRIFICATION_MISSING_ERROR
+          );
+        } else if (FieldStage.WIND_ENERGY.equals(fieldStage)) {
+          ValidationUtils.rejectIfEmptyOrWhitespace(
+              errors,
+              WIND_ENERGY_FIELD,
+              WIND_ENERGY_FIELD.concat(".required"),
+              WIND_ENERGY_MISSING_ERROR
           );
         }
       }

@@ -151,7 +151,7 @@ class SubscriptionServiceTest {
     assertThat(subscriberFieldStages).hasSize(2);
     assertThat(subscriberFieldStages.get(0).getFieldStage()).isEqualTo(FieldStage.DEVELOPMENT);
     assertThat(subscriberFieldStages.get(0).getSubscriberUuid()).isEqualTo(subscriber.getUuid());
-    assertThat(subscriberFieldStages.get(1).getFieldStage()).isEqualTo(FieldStage.OFFSHORE_WIND);
+    assertThat(subscriberFieldStages.get(1).getFieldStage()).isEqualTo(FieldStage.WIND_ENERGY);
     assertThat(subscriberFieldStages.get(1).getSubscriberUuid()).isEqualTo(subscriber.getUuid());
 
     verify(subscriberEmailService, times(1)).sendSubscribedEmail(form.getForename(), form.getEmailAddress(), subscriber.getUuid());

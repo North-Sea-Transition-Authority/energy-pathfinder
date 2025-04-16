@@ -121,12 +121,18 @@ class ProjectInformationFormValidatorTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = FieldStage.class, names = {"OFFSHORE_WIND", "CARBON_CAPTURE_AND_STORAGE"}, mode = EnumSource.Mode.INCLUDE)
+  @EnumSource(
+      value = FieldStage.class,
+      names = { "CARBON_CAPTURE_AND_STORAGE", "HYDROGEN", "ELECTRIFICATION", "WIND_ENERGY" },
+      mode = EnumSource.Mode.INCLUDE
+  )
   void validate_whenFieldStageWithSubCategoryAndEmptyHiddenQuestionsWithPartialValidation_thenValid(FieldStage fieldStage) {
     var form = ProjectInformationUtil.getCompleteForm();
     form.setFieldStage(fieldStage);
     form.setCarbonCaptureSubCategory(null);
-    form.setOffshoreWindSubCategory(null);
+    form.setHydrogenSubCategory(null);
+    form.setElectrificationSubCategory(null);
+    form.setWindEnergySubCategory(null);
 
     var errors = getErrors(form, ValidationType.PARTIAL);
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
@@ -155,7 +161,9 @@ class ProjectInformationFormValidatorTest {
     var form = ProjectInformationUtil.getCompleteForm();
     form.setFieldStage(fieldStage);
     form.setCarbonCaptureSubCategory(null);
-    form.setOffshoreWindSubCategory(null);
+    form.setHydrogenSubCategory(null);
+    form.setElectrificationSubCategory(null);
+    form.setWindEnergySubCategory(null);
 
     var errors = getErrors(form, ValidationType.FULL);
     var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
@@ -184,8 +192,10 @@ class ProjectInformationFormValidatorTest {
 
   private static Stream<Arguments> fieldStageWithSubCategoryMissing_fullValidation_arguments() {
     return Stream.of(
-        Arguments.of(FieldStage.OFFSHORE_WIND, ProjectInformationFormValidator.OFFSHORE_WIND_FIELD, ProjectInformationFormValidator.OFFSHORE_WIND_MISSING_ERROR),
-        Arguments.of(FieldStage.CARBON_CAPTURE_AND_STORAGE, ProjectInformationFormValidator.CARBON_CAPTURE_AND_STORAGE_FIELD, ProjectInformationFormValidator.CARBON_CAPTURE_AND_STORAGE_MISSING_ERROR)
+        Arguments.of(FieldStage.CARBON_CAPTURE_AND_STORAGE, ProjectInformationFormValidator.CARBON_CAPTURE_AND_STORAGE_FIELD, ProjectInformationFormValidator.CARBON_CAPTURE_AND_STORAGE_MISSING_ERROR),
+        Arguments.of(FieldStage.HYDROGEN, ProjectInformationFormValidator.HYDROGEN_FIELD, ProjectInformationFormValidator.HYDROGEN_MISSING_ERROR),
+        Arguments.of(FieldStage.ELECTRIFICATION, ProjectInformationFormValidator.ELECTRIFICATION_FIELD, ProjectInformationFormValidator.ELECTRIFICATION_MISSING_ERROR),
+        Arguments.of(FieldStage.WIND_ENERGY, ProjectInformationFormValidator.WIND_ENERGY_FIELD, ProjectInformationFormValidator.WIND_ENERGY_MISSING_ERROR)
     );
   }
 
