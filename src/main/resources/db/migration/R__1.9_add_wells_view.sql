@@ -8,7 +8,8 @@ SELECT
 , aew.platform_letter
 , aew.drilling_seq_no
 , aew.well_suffix
-, wms.display_name mechanical_status
+, aew.mechanical_status
+, wms.display_name mechanical_status_display_name
 , aew.operational_status
 , aew.subsea_wellhead is_subsea_wellhead
 , aew.subarea_operator_ou_id
