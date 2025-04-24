@@ -335,7 +335,13 @@ public class ProjectLocationService implements ProjectFormSectionService {
   @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
 
-    final var fromLocation = getOrError(fromDetail);
+    Optional<ProjectLocation> optionalFromLocation = getProjectLocationByProjectDetail(fromDetail);
+
+    if (optionalFromLocation.isEmpty()) {
+      return;
+    }
+
+    var fromLocation = optionalFromLocation.get();
 
     // duplicate ProjectLocation entity and reparent to toDetail
     final var toLocation = entityDuplicationService.duplicateEntityAndSetNewParent(

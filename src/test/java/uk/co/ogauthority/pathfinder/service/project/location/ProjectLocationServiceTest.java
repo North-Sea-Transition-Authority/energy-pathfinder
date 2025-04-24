@@ -526,6 +526,22 @@ public class ProjectLocationServiceTest {
   }
 
   @Test
+  public void copySectionData_whenNoProjectLocationEntityFound() {
+
+    final var fromProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.QA);
+    final var toProjectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);
+
+    when(projectLocationRepository.findByProjectDetail(fromProjectDetail))
+        .thenReturn(Optional.empty());
+
+    projectLocationService.copySectionData(fromProjectDetail, toProjectDetail);
+
+    verify(projectLocationBlocksService, never()).getBlocks(any());
+    verify(entityDuplicationService, never()).duplicateEntityAndSetNewParent(any(), any(), any());
+    verify(entityDuplicationService, never()).duplicateEntitiesAndSetNewParent(any(), any(), any());
+  }
+
+  @Test
   public void canShowInTaskList_whenInfrastructureProject_thenTrue() {
     var projectDetail = ProjectUtil.getProjectDetails(ProjectType.INFRASTRUCTURE);
 
