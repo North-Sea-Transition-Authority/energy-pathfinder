@@ -79,7 +79,9 @@ record InfrastructureProjectJson(
             ? QuarterYearJson.from(projectInformation.getFirstProductionDateQuarter(), projectInformation.getFirstProductionDateYear())
             : null;
 
-    var location = projectLocation != null ? InfrastructureProjectLocationJson.from(projectLocation, projectLocationBlocks) : null;
+    var location = projectLocation != null
+        ? InfrastructureProjectLocationJson.from(projectInformation, projectLocation, projectLocationBlocks)
+        : null;
 
     var upcomingTenders = upcomingTenderToFileLink != null
         ? upcomingTenderToFileLink.entrySet().stream()

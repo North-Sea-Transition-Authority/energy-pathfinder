@@ -130,7 +130,7 @@ class InfrastructureProjectJsonTest {
         InfrastructureProjectDetailsJson.from(projectOperator, projectInformation),
         ContactJson.from(projectInformation),
         null,
-        InfrastructureProjectLocationJson.from(projectLocation, projectLocationBlocks),
+        InfrastructureProjectLocationJson.from(projectInformation, projectLocation, projectLocationBlocks),
         Set.of(
             InfrastructureProjectUpcomingTenderJson.from(upcomingTender1, upcomingTenderFileLink),
             InfrastructureProjectUpcomingTenderJson.from(upcomingTender2, null)
@@ -310,7 +310,7 @@ class InfrastructureProjectJsonTest {
     );
 
     assertThat(infrastructureProjectJson.location())
-        .isEqualTo(InfrastructureProjectLocationJson.from(projectLocation, projectLocationBlocks));
+        .isEqualTo(InfrastructureProjectLocationJson.from(projectInformation, projectLocation, projectLocationBlocks));
   }
 
   @Test

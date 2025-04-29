@@ -90,4 +90,8 @@ public enum FieldStage {
         .filter(fs -> fs.energyType.contains(EnergyType.TRANSITION))
         .collect(Collectors.toList());
   }
+
+  public static boolean isEnergyTransition(FieldStage fieldStage) {
+    return fieldStage.getEnergyType().contains(EnergyType.TRANSITION);
+  }
 }

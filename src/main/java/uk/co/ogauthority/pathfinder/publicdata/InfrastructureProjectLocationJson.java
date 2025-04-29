@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
+import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 
 record InfrastructureProjectLocationJson(
     CoordinateJson centreOfInterestLatitude,
@@ -15,6 +17,7 @@ record InfrastructureProjectLocationJson(
 ) {
 
   static InfrastructureProjectLocationJson from(
+      ProjectInformation projectInformation,
       ProjectLocation projectLocation,
       Collection<ProjectLocationBlock> projectLocationBlocks
   ) {
@@ -31,16 +34,21 @@ record InfrastructureProjectLocationJson(
         projectLocation.getCentreOfInterestLongitudeHemisphere()
     );
 
-    var field = InfrastructureProjectFieldJson.from(projectLocation);
-    var maximumWaterDepthMeters = projectLocation.getMaximumWaterDepth();
-
+    InfrastructureProjectFieldJson field = null;
+    Integer maximumWaterDepthMeters = null;
     List<String> licenceBlocks = null;
-    if (projectLocationBlocks != null) {
-      licenceBlocks = projectLocationBlocks
-          .stream()
-          .sorted(Comparator.comparing(ProjectLocationBlock::getSortKey))
-          .map(ProjectLocationBlock::getBlockReference)
-          .toList();
+
+    if (!FieldStage.isEnergyTransition(projectInformation.getFieldStage())) {
+      field = InfrastructureProjectFieldJson.from(projectLocation);
+      maximumWaterDepthMeters = projectLocation.getMaximumWaterDepth();
+
+      if (projectLocationBlocks != null) {
+        licenceBlocks = projectLocationBlocks
+            .stream()
+            .sorted(Comparator.comparing(ProjectLocationBlock::getSortKey))
+            .map(ProjectLocationBlock::getBlockReference)
+            .toList();
+      }
     }
 
     return new InfrastructureProjectLocationJson(
