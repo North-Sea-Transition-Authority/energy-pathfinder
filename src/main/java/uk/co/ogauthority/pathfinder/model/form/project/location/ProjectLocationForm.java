@@ -1,33 +1,30 @@
 package uk.co.ogauthority.pathfinder.model.form.project.location;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
+import uk.co.fivium.formlibrary.input.CoordinateInput;
+import uk.co.fivium.formlibrary.input.CoordinateInputType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.ThreeFieldDateInput;
-import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
-import uk.co.ogauthority.pathfinder.model.form.validation.PartialValidation;
-import uk.co.ogauthority.pathfinder.model.form.validation.positivewholenumber.PositiveWholeNumber;
 
 public class ProjectLocationForm {
 
-  @NotEmpty(message = "Select a field", groups = FullValidation.class)
+  private final CoordinateInput centreOfInterestLatitude =
+      new CoordinateInput(CoordinateInputType.LATITUDE, "centreOfInterestLatitude", "centre of interest latitude");
+
+  private final CoordinateInput centreOfInterestLongitude =
+      new CoordinateInput(CoordinateInputType.LONGITUDE, "centreOfInterestLongitude", "centre of interest longitude");
+
   private String field;
 
-  @NotNull(message = "Select a field type", groups = FullValidation.class)
   private FieldType fieldType;
 
-  @NotNull(message = "Enter the maximum water depth", groups = FullValidation.class)
-  @PositiveWholeNumber(messagePrefix = "Maximum water depth", groups = {FullValidation.class, PartialValidation.class})
   private Integer maximumWaterDepth;
 
-  @NotNull(message = "Select yes if you have an approved Field Development Plan", groups = FullValidation.class)
   private Boolean approvedFieldDevelopmentPlan;
 
   private ThreeFieldDateInput approvedFdpDate;
 
-  @NotNull(message = "Select yes if you have an approved Decommissioning Programme", groups = FullValidation.class)
   private Boolean approvedDecomProgram;
 
   private ThreeFieldDateInput approvedDecomProgramDate;
@@ -44,6 +41,14 @@ public class ProjectLocationForm {
     this.field = field;
   }
 
+  public CoordinateInput getCentreOfInterestLatitude() {
+    return centreOfInterestLatitude;
+  }
+
+  public CoordinateInput getCentreOfInterestLongitude() {
+    return centreOfInterestLongitude;
+  }
+
   public String getField() {
     return field;
   }
@@ -51,7 +56,6 @@ public class ProjectLocationForm {
   public void setField(String field) {
     this.field = field;
   }
-
 
   public FieldType getFieldType() {
     return fieldType;

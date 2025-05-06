@@ -51,6 +51,13 @@ public class SubseaInfrastructure extends ProjectDetailEntity {
   @Column(name = "latest_decom_completion_year")
   private Integer latestDecommissioningCompletionYear;
 
+  public SubseaInfrastructure() {
+  }
+
+  public SubseaInfrastructure(Integer id) {
+    this.id = id;
+  }
+
   public DevUkFacility getFacility() {
     return facility;
   }

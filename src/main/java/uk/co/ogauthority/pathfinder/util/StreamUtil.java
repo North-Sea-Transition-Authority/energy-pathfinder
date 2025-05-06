@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.util;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +29,20 @@ public class StreamUtil {
           throw new IllegalStateException(String.format("Duplicate key %s", u));
         },
         LinkedHashMap::new
+    );
+  }
+
+  public static <T, K, U> Collector<T, ?, Map<K,U>> toMapNullValueFriendly(
+      Function<? super T, ? extends K> keyMapper,
+      Function<? super T, ? extends U> valueMapper
+  ) {
+    return Collector.of(
+        HashMap::new,
+        (map, element) -> map.put(keyMapper.apply(element), valueMapper.apply(element)),
+        (map1, map2) -> {
+          map1.putAll(map2);
+          return map1;
+        }
     );
   }
 

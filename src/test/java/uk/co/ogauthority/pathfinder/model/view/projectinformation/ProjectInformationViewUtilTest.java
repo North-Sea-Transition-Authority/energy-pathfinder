@@ -92,7 +92,7 @@ class ProjectInformationViewUtilTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = FieldStage.class, names = {"DECOMMISSIONING", "HYDROGEN", "OFFSHORE_ELECTRIFICATION"}, mode = EnumSource.Mode.INCLUDE)
+  @EnumSource(value = FieldStage.class, names = {"DECOMMISSIONING"}, mode = EnumSource.Mode.INCLUDE)
   void from_FieldStageWithoutHiddenFields(FieldStage fieldStage) {
     projectInformation.setFieldStage(fieldStage);
 
@@ -123,7 +123,11 @@ class ProjectInformationViewUtilTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = FieldStage.class, names = {"CARBON_CAPTURE_AND_STORAGE", "OFFSHORE_WIND"}, mode = EnumSource.Mode.INCLUDE)
+  @EnumSource(
+      value = FieldStage.class,
+      names = { "CARBON_CAPTURE_AND_STORAGE", "HYDROGEN", "ELECTRIFICATION", "WIND_ENERGY" },
+      mode = EnumSource.Mode.INCLUDE
+  )
   void from_whenFieldStageWithoutSubCategorySet(FieldStage fieldStage) {
     var expectedFieldStage = fieldStage.getDisplayName();
     projectInformation.setFieldStage(fieldStage);
@@ -137,8 +141,44 @@ class ProjectInformationViewUtilTest {
   }
 
   @Test
-  void from_whenOffshoreWindFieldStage() {
-    final var fieldStage = FieldStage.OFFSHORE_WIND;
+  void from_whenHydrogenFieldStage() {
+    final var fieldStage = FieldStage.HYDROGEN;
+    final var subCategory = FieldStageSubCategory.OFFSHORE_HYDROGEN;
+
+    var expectedFieldStage = String.format("%s: %s", fieldStage.getDisplayName(), subCategory.getDisplayName());
+
+    projectInformation.setFieldStage(fieldStage);
+    projectInformation.setFieldStageSubCategory(subCategory);
+
+    var projectInformationView = ProjectInformationViewUtil.from(projectInformation);
+
+    assertCommonProperties(projectInformationView, projectInformation);
+    assertThat(projectInformationView.getFieldStage()).isEqualTo(expectedFieldStage);
+
+    assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
+  }
+
+  @Test
+  void from_whenElectrificationFieldStage() {
+    final var fieldStage = FieldStage.ELECTRIFICATION;
+    final var subCategory = FieldStageSubCategory.ONSHORE_ELECTRIFICATION;
+
+    var expectedFieldStage = String.format("%s: %s", fieldStage.getDisplayName(), subCategory.getDisplayName());
+
+    projectInformation.setFieldStage(fieldStage);
+    projectInformation.setFieldStageSubCategory(subCategory);
+
+    var projectInformationView = ProjectInformationViewUtil.from(projectInformation);
+
+    assertCommonProperties(projectInformationView, projectInformation);
+    assertThat(projectInformationView.getFieldStage()).isEqualTo(expectedFieldStage);
+
+    assertThat(projectInformationView.getDevelopmentFirstProductionDate()).isNull();
+  }
+
+  @Test
+  void from_whenWindEnergyFieldStage() {
+    final var fieldStage = FieldStage.WIND_ENERGY;
     final var subCategory = FieldStageSubCategory.FLOATING_OFFSHORE_WIND;
 
     var expectedFieldStage = String.format("%s: %s", fieldStage.getDisplayName(), subCategory.getDisplayName());

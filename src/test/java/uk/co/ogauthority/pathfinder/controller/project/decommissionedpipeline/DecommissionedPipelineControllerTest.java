@@ -18,9 +18,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -53,10 +53,10 @@ public class DecommissionedPipelineControllerTest extends ProjectContextAbstract
   private static final Integer DECOMMISSIONED_PIPELINE_ID = 10;
   private static final Integer DISPLAY_ORDER = 2;
 
-  @MockBean
+  @MockitoBean
   private DecommissionedPipelineService decommissionedPipelineService;
 
-  @MockBean
+  @MockitoBean
   private DecommissionedPipelineSummaryService decommissionedPipelineSummaryService;
 
   private ProjectDetail projectDetail;

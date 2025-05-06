@@ -10,11 +10,16 @@ import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
 public enum FieldStageSubCategory {
 
-  FIXED_BOTTOM_OFFSHORE_WIND("Fixed bottom offshore wind", FieldStage.OFFSHORE_WIND),
-  FLOATING_OFFSHORE_WIND("Floating offshore wind", FieldStage.OFFSHORE_WIND),
   CAPTURE_AND_ONSHORE("Capture and onshore", "Emitters and onshore pipelines", FieldStage.CARBON_CAPTURE_AND_STORAGE),
   TRANSPORTATION_AND_STORAGE("Transportation and storage",
-      "Offshore pipelines and reservoir storage", FieldStage.CARBON_CAPTURE_AND_STORAGE);
+      "Offshore pipelines and reservoir storage", FieldStage.CARBON_CAPTURE_AND_STORAGE),
+  OFFSHORE_HYDROGEN("Offshore hydrogen", FieldStage.HYDROGEN),
+  ONSHORE_HYDROGEN("Onshore hydrogen", FieldStage.HYDROGEN),
+  OFFSHORE_ELECTRIFICATION("Offshore electrification", FieldStage.ELECTRIFICATION),
+  ONSHORE_ELECTRIFICATION("Onshore electrification", FieldStage.ELECTRIFICATION),
+  FIXED_BOTTOM_OFFSHORE_WIND("Fixed bottom offshore wind", FieldStage.WIND_ENERGY),
+  FLOATING_OFFSHORE_WIND("Floating offshore wind", FieldStage.WIND_ENERGY),
+  ONSHORE_WIND("Onshore wind", FieldStage.WIND_ENERGY);
 
   private final String displayName;
 

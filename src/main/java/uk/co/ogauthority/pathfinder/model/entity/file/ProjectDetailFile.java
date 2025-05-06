@@ -3,6 +3,8 @@ package uk.co.ogauthority.pathfinder.model.entity.file;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -12,8 +14,9 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetailEntity;
 @Table(name = "project_detail_files")
 public class ProjectDetailFile extends ProjectDetailEntity {
 
-  // not entity mapped to avoid selecting file data when not needed
-  private String fileId;
+  @OneToOne
+  @JoinColumn(name = "file_id")
+  private UploadedFile uploadedFile;
 
   private String description;
 
@@ -27,11 +30,11 @@ public class ProjectDetailFile extends ProjectDetailEntity {
   }
 
   public ProjectDetailFile(ProjectDetail projectDetail,
-                           String fileId,
+                           UploadedFile uploadedFile,
                            ProjectDetailFilePurpose projectDetailFilePurpose,
                            FileLinkStatus fileLinkStatus) {
     this.projectDetail = projectDetail;
-    this.fileId = fileId;
+    this.uploadedFile = uploadedFile;
     this.purpose = projectDetailFilePurpose;
     this.fileLinkStatus = fileLinkStatus;
   }
@@ -55,12 +58,16 @@ public class ProjectDetailFile extends ProjectDetailEntity {
     this.projectDetail = projectDetail;
   }
 
-  public String getFileId() {
-    return fileId;
+  public UploadedFile getUploadedFile() {
+    return uploadedFile;
   }
 
-  public void setFileId(String fileId) {
-    this.fileId = fileId;
+  public void setUploadedFile(UploadedFile uploadedFile) {
+    this.uploadedFile = uploadedFile;
+  }
+
+  public String getFileId() {
+    return uploadedFile.getFileId();
   }
 
   public String getDescription() {
@@ -98,7 +105,8 @@ public class ProjectDetailFile extends ProjectDetailEntity {
     ProjectDetailFile projectDetailFile = (ProjectDetailFile) o;
     return Objects.equals(id, projectDetailFile.id)
         && Objects.equals(projectDetail, projectDetailFile.projectDetail)
-        && Objects.equals(fileId, projectDetailFile.fileId)
+        && Objects.equals(uploadedFile != null ? uploadedFile.getFileId() : null,
+            projectDetailFile.uploadedFile != null ? projectDetailFile.uploadedFile.getFileId() : null)
         && Objects.equals(description, projectDetailFile.description)
         && purpose == projectDetailFile.purpose
         && fileLinkStatus == projectDetailFile.fileLinkStatus;
@@ -106,7 +114,14 @@ public class ProjectDetailFile extends ProjectDetailEntity {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, projectDetail, fileId, description, purpose, fileLinkStatus);
+    return Objects.hash(
+        id,
+        projectDetail,
+        uploadedFile != null ? uploadedFile.getFileId() : null,
+        description,
+        purpose,
+        fileLinkStatus
+    );
   }
 
 }

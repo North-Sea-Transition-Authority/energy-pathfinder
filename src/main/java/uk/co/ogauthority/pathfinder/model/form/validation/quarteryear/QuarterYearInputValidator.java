@@ -83,7 +83,7 @@ public class QuarterYearInputValidator implements SmartValidator {
                     YEAR + hint.getCode(),
                     hint.getErrorMessage()
                 )
-          );
+            );
 
         if (DateInputValidator.isYearInInvalidFormat(quarterYearInput.getYear())) {
 

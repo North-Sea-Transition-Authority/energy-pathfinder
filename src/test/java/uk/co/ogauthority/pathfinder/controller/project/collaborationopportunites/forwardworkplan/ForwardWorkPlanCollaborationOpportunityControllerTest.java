@@ -25,10 +25,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.util.LinkedMultiValueMap;
@@ -81,34 +81,34 @@ import uk.co.ogauthority.pathfinder.util.validation.ValidationResult;
 )
 public class ForwardWorkPlanCollaborationOpportunityControllerTest extends ProjectContextAbstractControllerTest {
 
-  @MockBean
+  @MockitoBean
   protected ForwardWorkPlanCollaborationOpportunityModelService forwardWorkPlanCollaborationOpportunityModelService;
 
-  @MockBean
+  @MockitoBean
   protected ForwardWorkPlanCollaborationOpportunityFileLinkService forwardWorkPlanCollaborationOpportunityFileLinkService;
 
-  @MockBean
+  @MockitoBean
   protected ForwardWorkPlanCollaborationOpportunityService forwardWorkPlanCollaborationOpportunityService;
 
-  @MockBean
+  @MockitoBean
   protected ProjectDetailFileService projectDetailFileService;
 
-  @MockBean
+  @MockitoBean
   protected ForwardWorkPlanCollaborationRoutingService forwardWorkPlanCollaborationRoutingService;
 
-  @MockBean
+  @MockitoBean
   protected ForwardWorkPlanCollaborationSetupService forwardWorkPlanCollaborationSetupService;
 
-  @MockBean
+  @MockitoBean
   protected ForwardWorkPlanCollaborationOpportunitiesSummaryService forwardWorkPlanCollaborationOpportunitiesSummaryService;
 
-  @MockBean
+  @MockitoBean
   protected ForwardWorkPlanCollaborationCompletionService forwardWorkPlanCollaborationCompletionService;
 
-  @MockBean
+  @MockitoBean
   protected FileDownloadService fileDownloadService;
 
-  @MockBean
+  @MockitoBean
   protected ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private ProjectControllerTesterService projectControllerTesterService;

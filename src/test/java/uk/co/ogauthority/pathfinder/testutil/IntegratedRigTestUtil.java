@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
 import uk.co.ogauthority.pathfinder.model.entity.devuk.DevUkFacility;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.integratedrig.IntegratedRig;
 import uk.co.ogauthority.pathfinder.model.enums.project.integratedrig.IntegratedRigIntentionToReactivate;
 import uk.co.ogauthority.pathfinder.model.enums.project.integratedrig.IntegratedRigStatus;
@@ -18,12 +19,16 @@ public class IntegratedRigTestUtil {
     throw new IllegalStateException("IntegratedRigTestUtil is a utility class and should not be instantiated");
   }
 
+  public static IntegratedRig createIntegratedRig(Integer id, ProjectDetail projectDetail) {
+    return createIntegratedRig(id, projectDetail, DevUkTestUtil.getDevUkFacility(), null);
+  }
+
   public static IntegratedRig createIntegratedRig_withDevUkFacility() {
-    return createIntegratedRig(DevUkTestUtil.getDevUkFacility(), null);
+    return createIntegratedRig(null, ProjectUtil.getProjectDetails(), DevUkTestUtil.getDevUkFacility(), null);
   }
 
   public static IntegratedRig createIntegratedRig_withManualFacility() {
-    return createIntegratedRig(null, "manual facility name");
+    return createIntegratedRig(null, ProjectUtil.getProjectDetails(), null, "manual facility name");
   }
 
   public static IntegratedRigForm createIntegratedRigForm() {
@@ -47,10 +52,14 @@ public class IntegratedRigTestUtil {
     return integratedRigView;
   }
 
-  private static IntegratedRig createIntegratedRig(DevUkFacility facility,
-                                                   String manualFacility) {
-    var integratedRig = new IntegratedRig();
-    integratedRig.setProjectDetail(ProjectUtil.getProjectDetails());
+  private static IntegratedRig createIntegratedRig(
+      Integer id,
+      ProjectDetail projectDetail,
+      DevUkFacility facility,
+      String manualFacility
+  ) {
+    var integratedRig = new IntegratedRig(id);
+    integratedRig.setProjectDetail(projectDetail);
     integratedRig.setFacility(facility);
     integratedRig.setManualFacility(manualFacility);
     integratedRig.setName(NAME);

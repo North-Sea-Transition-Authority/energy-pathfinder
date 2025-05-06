@@ -23,10 +23,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
@@ -59,10 +59,10 @@ public class ForwardWorkPlanAwardedContractSetupControllerTest extends ProjectCo
   private static final Class<ForwardWorkPlanAwardedContractController> AWARDED_CONTRACT_CONTROLLER = ForwardWorkPlanAwardedContractController.class;
   private static final Class<TaskListController> TASK_LIST_CONTROLLER = TaskListController.class;
 
-  @MockBean
+  @MockitoBean
   private ForwardWorkPlanAwardedContractSetupService setupService;
 
-  @MockBean
+  @MockitoBean
   private ForwardWorkPlanAwardedContractService awardedContractService;
 
   private ProjectDetail projectDetail;

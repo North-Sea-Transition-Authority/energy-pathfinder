@@ -16,13 +16,18 @@ steps:
         # the GRADLE_USER_HOME environment variable pointing here.
         - ./gradle_cache
         - ./sonar_cache
+        - ./trivy_cache
 
   - name: fetch-fds-submodule
     image: alpine/git:v2.26.2
     commands:
-      # Drone cannot auth to a ssh based repo, so override to https to make use of .netrc
-      - git config submodule.fivium-design-system-core.url https://bitbucket.org/fiviumuk/fivium-design-system-core.git
+      - echo "$${BITBUCKET_SSH_KEY}" > bitbucket_ssh_key
+      - chmod 600 bitbucket_ssh_key
+      - export GIT_SSH_COMMAND="ssh -i bitbucket_ssh_key -F /dev/null  -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
       - git submodule update --init --recursive
+    environment:
+      BITBUCKET_SSH_KEY:
+        from_secret: bitbucket_ssh_key
 
   - name: build-fds
     image: node:18
@@ -49,13 +54,51 @@ steps:
   - name: code-analysis
     image: eclipse-temurin:21-jdk
     environment:
-      SONAR_TOKEN:
-        from_secret: sonar_token
+      SONARCLOUD_TOKEN:
+        from_secret: sonarcloud_token
       # This SONAR_USER_HOME is the cache path - not the actual user home
       SONAR_USER_HOME: /drone/src/sonar_cache
     commands:
       - chmod +x gradlew
-      - ./gradlew sonarqube
+      - ./gradlew sonarqube -info
+    when:
+      # The Pull Request Pipeline will run the Code Analysis on all other branches (once a PR is open)
+      branch:
+        - develop
+        - main
+        - drone/*
+
+  - name: vulnerability-scan-npm
+    image: node:10.12.0
+    commands:
+      - npm audit > build/reports/npm-audit-report.txt || true # dont fail build if non 0 exit code
+    when:
+      branch: develop
+
+  - name: trivy-build-image
+    image: docker:19.03.8
+    volumes:
+      - name: docker-sock
+        path: /var/run/docker.sock
+    commands:
+      - docker build -t quay.io/fivium/pathfinder:trivy-scan-target .
+
+  - name: trivy-scan
+    image: aquasec/trivy:0.57.1
+    environment:
+      TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db,aquasec/trivy-db,ghcr.io/aquasecurity/trivy-db
+      TRIVY_JAVA_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-java-db,aquasec/trivy-java-db,ghcr.io/aquasecurity/trivy-java-db
+    volumes:
+      - name: docker-sock
+        path: /var/run/docker.sock
+      - name: webfiles
+        path: /var/webfiles
+    commands:
+      # timeout set as initial cache population can seemingly take a while sometimes
+      - trivy --cache-dir /drone/src/trivy_cache image --timeout 30m --exit-code 1 quay.io/fivium/pathfinder:trivy-scan-target
+    when:
+      status:
+        - success
 
   - name: publish-docker-develop
     image: plugins/docker:19.03.8
@@ -84,42 +127,11 @@ steps:
         from_secret: docker_config
     when:
       branch:
-        - master
+        - main
         - release/**
         - hotfix/**
         - publish-to-docker
         - rebrand-to-nsta
-      status:
-        - success
-
-  - name: vulnerability-scan-npm
-    image: node:10.12.0
-    commands:
-      - npm audit > build/reports/npm-audit-report.txt || true # dont fail build if non 0 exit code
-    when:
-      branch: develop
-
-  - name: trivy-build-image
-    image: docker:19.03.8
-    volumes:
-      - name: docker-sock
-        path: /var/run/docker.sock
-    commands:
-      - docker build -t quay.io/fivium/pathfinder:trivy-scan-target .
-
-  - name: trivy-scan
-    image: aquasec/trivy:0.37.3
-    volumes:
-      - name: docker-sock
-        path: /var/run/docker.sock
-      - name: drone-trivy-cache
-        path: /root/trivy-cache
-      - name: webfiles
-        path: /var/webfiles
-    commands:
-      # timeout set as initial cache population can seemingly take a while sometimes
-      - trivy image --timeout 30m --exit-code 1 quay.io/fivium/pathfinder:trivy-scan-target
-    when:
       status:
         - success
 
@@ -134,21 +146,6 @@ steps:
     when:
       status: [ success, failure ]
 
-  - name: deploy-dev-st
-    image: plugins/downstream:linux-amd64
-    settings:
-      server: https://drone.fivium.co.uk
-      token:
-        from_secret: drone_token
-      fork: true
-      repositories:
-        - fiviumuk/fivium-dev-app@master
-    when:
-      branch:
-        - develop
-      status:
-        - success
-
   - name: rebuild-cache
     image: drillster/drone-volume-cache
     volumes:
@@ -160,6 +157,7 @@ steps:
         - ./node_modules
         - ./gradle_cache
         - ./sonar_cache
+        - ./trivy_cache
 
   - name: slack
     image: plugins/slack:linux-amd64
@@ -171,6 +169,11 @@ steps:
         Reports published to: http://drone-assets.fivium.local:9090/pathfinder/{{build.number}}/
     when:
       status: [ success, failure ]
+
+trigger:
+  event:
+    include:
+      - push
 
 volumes:
   - name: webfiles
@@ -189,6 +192,118 @@ volumes:
     host:
       path: /var/run/docker.sock
 
-  - name: drone-trivy-cache
+---
+kind: pipeline
+type: docker
+name: github-pr
+
+clone:
+  disable: true
+
+steps:
+  - name: clone
+    image: alpine/git:v2.26.2
+    commands:
+      # Manually cloning as there seems to be a bug with DRONE_BRANCH on Pull Request Events
+      # DRONE_BRANCH is set to the target branch, rather than the current branch
+      # This means that Sonarcloud doesn't think anything has changed
+      - git clone https://github.com/Fivium/energy-pathfinder.git .
+      - git checkout $DRONE_SOURCE_BRANCH
+
+  - name: restore-cache
+    image: drillster/drone-volume-cache
+    volumes:
+      - name: drone-cache
+        path: /cache
+    settings:
+      restore: true
+      mount:
+        - ./node_modules
+        # We can only mount volume caches into the working directory, so all steps which use Gradle must have
+        # the GRADLE_USER_HOME environment variable pointing here.
+        - ./gradle_cache
+        - ./sonar_cache
+
+  - name: fetch-fds-submodule
+    image: alpine/git:v2.26.2
+    commands:
+      - echo "$${BITBUCKET_SSH_KEY}" > bitbucket_ssh_key
+      - chmod 600 bitbucket_ssh_key
+      - export GIT_SSH_COMMAND="ssh -i bitbucket_ssh_key -F /dev/null  -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+      - git submodule update --init --recursive
+    environment:
+      BITBUCKET_SSH_KEY:
+        from_secret: bitbucket_ssh_key
+
+  - name: build-fds
+    image: node:18
+    commands:
+      - cd fivium-design-system-core
+      - npm install
+      - npx gulp build
+      - cd ..
+
+  - name: build-frontend
+    image: node:18
+    commands:
+      - npm install
+      - npx gulp buildAll
+
+  - name: build-java
+    image: eclipse-temurin:21-jdk
+    environment:
+      GRADLE_USER_HOME: /drone/src/gradle_cache
+    commands:
+      - chmod +x gradlew
+      - ./gradlew test jacocoTestReport checkstyleMain bootWar bootJar
+
+  # This is in the PR pipeline as only PR events get the necessary information for proper github integration
+  - name: code-analysis
+    image: eclipse-temurin:21-jdk
+    environment:
+      SONARCLOUD_TOKEN:
+        from_secret: sonarcloud_token
+      # This SONAR_USER_HOME is the cache path - not the actual user home
+      SONAR_USER_HOME: /drone/src/sonar_cache
+    commands:
+      - chmod +x gradlew
+      - ./gradlew sonarqube -info
+
+  - name: rebuild-cache
+    image: drillster/drone-volume-cache
+    volumes:
+      - name: drone-cache
+        path: /cache
+    settings:
+      rebuild: true
+      mount:
+        - ./node_modules
+        - ./gradle_cache
+        - ./sonar_cache
+
+trigger:
+  event:
+    - pull_request
+
+volumes:
+  - name: drone-cache
     host:
-      path: /root/.cache/
+      path: /home/fivium/drone-cache
+
+---
+
+kind: secret
+name: docker_config
+data: iZXBxgUq+ITrcATl/ojPntLjxVaX6PV0GKUhZraSbsR5s8kUFkhVnLyY4NrDxY24P1i5oPAxIkhTmAZTLS475SUR7/A89FsYZqx9tkD2+uFFKmqjA0w5t2RYseN1G/mhTOyp/dUbfzRNw9UXfsC5XYA+Zwpbj+2l2SsBv+HT8ZXjPZmhMTamfDpnOQXBjjLo868pGMMfF2QqhgCp0xKN/4zLiBzh2SrHR4Gs1q2D4pAM4Pb8jhoIV8/VdLWZHhj1DPawhRXYXyXjVQYaG7MWla2WIbr9md0tOn0/A65t56W89UclAWB0vSaxrWSd7k4v3S/Dwg6VKG41M+/JRludD6sk60L0tNw+SdLbQUHG
+
+---
+
+kind: secret
+name: sonarcloud_token
+data: eiNR5WJcD2vcbz7f/ettGbV8YUj17Q6gtz5lLuEEjJEwuptbVWWL3Qb0gKTPKP3ZnQQqFHMAr9TlYo3KCgHJuUq9Hsc=
+
+---
+
+kind: secret
+name: bitbucket_ssh_key
+data: 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

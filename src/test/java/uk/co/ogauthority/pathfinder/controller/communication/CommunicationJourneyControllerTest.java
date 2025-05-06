@@ -16,7 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
@@ -50,13 +50,13 @@ public class CommunicationJourneyControllerTest extends AbstractControllerTest {
 
   private Communication communication;
 
-  @MockBean
+  @MockitoBean
   protected CommunicationService communicationService;
 
-  @MockBean
+  @MockitoBean
   protected CommunicationModelService communicationModelService;
 
-  @MockBean
+  @MockitoBean
   protected OrganisationGroupCommunicationService organisationGroupCommunicationService;
 
   @Before

@@ -34,6 +34,9 @@ public class Wellbore implements SearchSelectable, SortableWellbore {
 
   private String wellSuffix;
 
+  @Column(name = "mechanical_status_display_name")
+  private String mechanicalStatus;
+
   public Wellbore() {}
 
   @VisibleForTesting
@@ -101,5 +104,9 @@ public class Wellbore implements SearchSelectable, SortableWellbore {
   @Override
   public String getWellSuffix() {
     return wellSuffix;
+  }
+
+  public String getMechanicalStatus() {
+    return mechanicalStatus;
   }
 }

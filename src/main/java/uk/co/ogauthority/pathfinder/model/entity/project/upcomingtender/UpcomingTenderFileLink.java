@@ -30,6 +30,13 @@ public class UpcomingTenderFileLink implements FileLinkEntity, ChildEntity<Integ
   @JoinColumn(name = "project_detail_file_id")
   private ProjectDetailFile projectDetailFile;
 
+  public UpcomingTenderFileLink() {
+  }
+
+  public UpcomingTenderFileLink(Integer id) {
+    this.id = id;
+  }
+
   public UpcomingTender getUpcomingTender() {
     return upcomingTender;
   }

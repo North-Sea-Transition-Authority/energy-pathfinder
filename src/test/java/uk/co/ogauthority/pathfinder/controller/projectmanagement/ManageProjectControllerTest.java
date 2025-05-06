@@ -14,10 +14,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
@@ -40,7 +40,7 @@ public class ManageProjectControllerTest extends ProjectContextAbstractControlle
   private static final Integer PUBLISHED_PROJECT_ID = 1;
   private static final Integer UNSUBMITTED_PROJECT_ID = 2;
 
-  @MockBean
+  @MockitoBean
   private ProjectManagementViewService projectManagementViewService;
 
   private ProjectControllerTesterService projectControllerTesterService;

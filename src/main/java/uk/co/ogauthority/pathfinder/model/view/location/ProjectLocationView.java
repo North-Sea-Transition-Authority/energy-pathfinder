@@ -6,6 +6,10 @@ import java.util.Objects;
 
 public class ProjectLocationView {
 
+  private String centreOfInterestLatitude;
+
+  private String centreOfInterestLongitude;
+
   private String field;
 
   private String fieldType;
@@ -23,6 +27,22 @@ public class ProjectLocationView {
   private String ukcsArea;
 
   private List<String> licenceBlocks = new ArrayList<>();
+
+  public String getCentreOfInterestLatitude() {
+    return centreOfInterestLatitude;
+  }
+
+  public void setCentreOfInterestLatitude(String centreOfInterestLatitude) {
+    this.centreOfInterestLatitude = centreOfInterestLatitude;
+  }
+
+  public String getCentreOfInterestLongitude() {
+    return centreOfInterestLongitude;
+  }
+
+  public void setCentreOfInterestLongitude(String centreOfInterestLongitude) {
+    this.centreOfInterestLongitude = centreOfInterestLongitude;
+  }
 
   public String getField() {
     return field;
@@ -105,7 +125,9 @@ public class ProjectLocationView {
       return false;
     }
     ProjectLocationView that = (ProjectLocationView) o;
-    return Objects.equals(field, that.field)
+    return Objects.equals(centreOfInterestLatitude, that.centreOfInterestLatitude)
+        && Objects.equals(centreOfInterestLongitude, that.centreOfInterestLongitude)
+        && Objects.equals(field, that.field)
         && Objects.equals(fieldType, that.fieldType)
         && Objects.equals(maximumWaterDepth, that.maximumWaterDepth)
         && Objects.equals(approvedFieldDevelopmentPlan, that.approvedFieldDevelopmentPlan)
@@ -119,13 +141,17 @@ public class ProjectLocationView {
   @Override
   public int hashCode() {
     return Objects.hash(
+        centreOfInterestLatitude,
+        centreOfInterestLongitude,
         field,
         fieldType,
         maximumWaterDepth,
         approvedFieldDevelopmentPlan,
         approvedFdpDate,
         approvedDecomProgram,
-        approvedDecomProgramDate, ukcsArea, licenceBlocks
+        approvedDecomProgramDate,
+        ukcsArea,
+        licenceBlocks
     );
   }
 }

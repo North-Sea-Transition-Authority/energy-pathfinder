@@ -29,6 +29,13 @@ public class DecommissionedPipeline extends ProjectDetailEntity {
   @Enumerated(EnumType.STRING)
   private PipelineRemovalPremise removalPremise;
 
+  public DecommissionedPipeline() {
+  }
+
+  public DecommissionedPipeline(Integer id) {
+    this.id = id;
+  }
+
   public Pipeline getPipeline() {
     return pipeline;
   }

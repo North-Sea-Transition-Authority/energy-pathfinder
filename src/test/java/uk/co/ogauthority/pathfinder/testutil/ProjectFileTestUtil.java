@@ -14,14 +14,18 @@ public class ProjectFileTestUtil {
   public static final byte[] BYTES = "bytesbytesbytes".getBytes();
 
   public static ProjectDetailFile getProjectDetailFile(ProjectDetail detail) {
-    return new ProjectDetailFile(detail, FILE_ID, ProjectDetailFilePurpose.UPCOMING_TENDER, FileLinkStatus.FULL);
+    return new ProjectDetailFile(detail, getUploadedFile(), ProjectDetailFilePurpose.UPCOMING_TENDER, FileLinkStatus.FULL);
   }
 
-  public static UploadedFile getUploadedFile() throws SQLException {
+  public static UploadedFile getUploadedFile() {
     var file = new UploadedFile(FILE_ID, FILE_NAME);
     file.setFileSize(50L);
     file.setContentType("text/plain");
-    file.setFileData(new SerialBlob(BYTES));
+    try {
+      file.setFileData(new SerialBlob(BYTES));
+    } catch (SQLException exception) {
+      throw new RuntimeException(exception);
+    }
     return file;
   }
 }

@@ -52,6 +52,13 @@ public class DecommissioningSchedule extends ProjectDetailEntity {
   @Column(name = "cop_date_not_provided_reason", columnDefinition = "CLOB")
   private String cessationOfProductionDateNotProvidedReason;
 
+  public DecommissioningSchedule() {
+  }
+
+  public DecommissioningSchedule(Integer id) {
+    this.id = id;
+  }
+
   public DecommissioningStartDateType getDecommissioningStartDateType() {
     return decommissioningStartDateType;
   }

@@ -21,10 +21,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
@@ -57,13 +57,13 @@ public class ForwardWorkPlanAwardedContractRemovalControllerTest extends Project
   private static final Class<ForwardWorkPlanAwardedContractSetupController> SETUP_CONTROLLER = ForwardWorkPlanAwardedContractSetupController.class;
 
 
-  @MockBean
+  @MockitoBean
   private ForwardWorkPlanAwardedContractService awardedContractService;
 
-  @MockBean
+  @MockitoBean
   private ForwardWorkPlanAwardedContractSummaryService summaryService;
 
-  @MockBean
+  @MockitoBean
   private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
   private ProjectDetail projectDetail;

@@ -123,8 +123,8 @@ public class ProjectDetailFileService {
     var result = fileUploadService.processUpload(file, user);
 
     if (result.isValid()) {
-      String fileId = result.getFileId().orElseThrow();
-      var projectDetailFile = new ProjectDetailFile(projectDetail, fileId, purpose, FileLinkStatus.TEMPORARY);
+      var uploadedFile = fileUploadService.getFileById(result.getFileId().orElseThrow());
+      var projectDetailFile = new ProjectDetailFile(projectDetail, uploadedFile, purpose, FileLinkStatus.TEMPORARY);
       projectDetailFileRepository.save(projectDetailFile);
     }
 
@@ -297,7 +297,7 @@ public class ProjectDetailFileService {
 
   public ProjectDetailFile getProjectDetailFileByProjectDetailAndFileId(ProjectDetail projectDetail,
                                                                         String fileId) {
-    return projectDetailFileRepository.findByProjectDetailAndFileId(projectDetail, fileId)
+    return projectDetailFileRepository.findByProjectDetailAndUploadedFile_FileId(projectDetail, fileId)
         .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format(
             "Couldn't find a ProjectDetailFile for project detail with ID: %s and fileId: %s",
             projectDetail.getId(),
@@ -308,7 +308,7 @@ public class ProjectDetailFileService {
                                                                                Integer projectDetailVersion,
                                                                                String fileId) {
     var detail = projectService.getDetailOrError(project.getId(), projectDetailVersion);
-    return projectDetailFileRepository.findByProjectDetailAndFileId(detail, fileId)
+    return projectDetailFileRepository.findByProjectDetailAndUploadedFile_FileId(detail, fileId)
         .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format(
             "Couldn't find a ProjectDetailFile for project detail with ID: %s and version %s and fileId: %s",
             detail.getId(),

@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
+import java.time.Instant;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -15,6 +16,12 @@ public class ProjectUtil {
 
   public static ProjectDetail getProjectDetails() {
     return getProjectDetails(STATUS);
+  }
+
+  public static ProjectDetail getPublishedProjectDetails() {
+    var projectDetails = getProjectDetails(ProjectStatus.PUBLISHED);
+    projectDetails.setSubmittedInstant(Instant.now());
+    return projectDetails;
   }
 
   public static ProjectDetail getProjectDetails(ProjectStatus projectStatus) {

@@ -101,7 +101,7 @@ public class MinMaxDateInputValidator implements SmartValidator {
                 hint.getCode(),
                 hint.getErrorMessage()
             )
-      );
+        );
 
   }
 

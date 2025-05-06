@@ -19,10 +19,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
@@ -48,7 +48,7 @@ public class CancelDraftProjectVersionControllerTest extends ProjectContextAbstr
 
   private static final Integer PROJECT_ID = 1;
 
-  @MockBean
+  @MockitoBean
   private CancelDraftProjectVersionService cancelDraftProjectVersionService;
 
   private final ProjectDetail projectDetail = ProjectUtil.getProjectDetails(ProjectStatus.DRAFT);

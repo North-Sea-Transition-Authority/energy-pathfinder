@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
 import java.time.LocalDate;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.decommissionedpipeline.DecommissionedPipeline;
 import uk.co.ogauthority.pathfinder.model.enums.project.InfrastructureStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.decommissionedpipeline.PipelineRemovalPremise;
@@ -20,8 +21,12 @@ public class DecommissionedPipelineTestUtil {
   }
 
   public static DecommissionedPipeline createDecommissionedPipeline() {
-    var decommissionedPipeline = new DecommissionedPipeline();
-    decommissionedPipeline.setProjectDetail(ProjectUtil.getProjectDetails());
+    return createDecommissionedPipeline(null, ProjectUtil.getProjectDetails());
+  }
+
+  public static DecommissionedPipeline createDecommissionedPipeline(Integer id, ProjectDetail projectDetail) {
+    var decommissionedPipeline = new DecommissionedPipeline(id);
+    decommissionedPipeline.setProjectDetail(projectDetail);
     decommissionedPipeline.setPipeline(PipelineTestUtil.getPipeline());
     decommissionedPipeline.setStatus(INFRASTRUCTURE_STATUS);
     decommissionedPipeline.setEarliestRemovalYear(String.valueOf(EARLIEST_DECOM_START));

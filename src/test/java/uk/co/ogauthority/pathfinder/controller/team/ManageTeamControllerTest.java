@@ -12,7 +12,7 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
@@ -26,7 +26,7 @@ import uk.co.ogauthority.pathfinder.service.team.ManageTeamService;
 @WebMvcTest(ManageTeamController.class)
 public class ManageTeamControllerTest extends AbstractControllerTest {
 
-  @MockBean
+  @MockitoBean
   private ManageTeamService manageTeamService;
 
   private final AuthenticatedUserAccount user = new AuthenticatedUserAccount(

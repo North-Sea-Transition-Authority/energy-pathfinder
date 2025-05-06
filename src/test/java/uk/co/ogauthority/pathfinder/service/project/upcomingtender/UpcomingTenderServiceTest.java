@@ -28,7 +28,6 @@ import uk.co.ogauthority.pathfinder.model.entity.file.FileLinkStatus;
 import uk.co.ogauthority.pathfinder.model.entity.file.ProjectDetailFile;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTender;
-import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.UpcomingTenderFileLink;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
@@ -51,6 +50,7 @@ import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectFormSectionServiceTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
+import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderFileLinkUtil;
 import uk.co.ogauthority.pathfinder.testutil.UpcomingTenderUtil;
 import uk.co.ogauthority.pathfinder.testutil.UploadedFileUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
@@ -198,9 +198,7 @@ class UpcomingTenderServiceTest {
   @Test
   void getForm_withFile() {
     var uploadedFileView = UploadedFileUtil.createUploadedFileView();
-    var upcomingTenderLink = new UpcomingTenderFileLink();
-    upcomingTenderLink.setProjectDetailFile(new ProjectDetailFile());
-    upcomingTenderLink.setUpcomingTender(upcomingTender);
+    var upcomingTenderLink = UpcomingTenderFileLinkUtil.createUpcomingTenderFileLink(upcomingTender);
 
     when(upcomingTenderFileLinkService.getAllByUpcomingTender(upcomingTender)).thenReturn(List.of(upcomingTenderLink));
     when(projectDetailFileService.getUploadedFileView(any(), any(), any(), any())).thenReturn(uploadedFileView);

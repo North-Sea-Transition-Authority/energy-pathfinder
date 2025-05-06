@@ -1,6 +1,6 @@
 plugins {
-  id 'org.springframework.boot' version '3.3.1'
-  id 'io.spring.dependency-management' version '1.1.5'
+  id 'org.springframework.boot' version '3.4.5'
+  id 'io.spring.dependency-management' version '1.1.7'
   id 'java'
   id 'jacoco'
   id 'checkstyle'
@@ -58,8 +58,9 @@ dependencies {
   implementation 'org.flywaydb:flyway-core:9.5.1-FIVIUM'
   implementation 'com.oracle.database.jdbc:ojdbc11:21.9.0.0'
   implementation 'org.springframework.session:spring-session-jdbc'
-  implementation 'uk.gov.service.notify:notifications-java-client:5.1.0-RELEASE'
+  implementation 'uk.gov.service.notify:notifications-java-client:5.2.1-RELEASE'
   implementation('uk.co.fivium.feedbackmanagementservice:client:2.1.1')
+  implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:v4.0.0'
 
   implementation 'com.google.guava:guava:33.2.1-jre'
   implementation 'org.apache.commons:commons-lang3:3.12.0'
@@ -71,6 +72,11 @@ dependencies {
   }
   implementation group: 'com.googlecode.libphonenumber', name: 'libphonenumber', version: '8.12.8'
   implementation group: 'fi.solita.clamav', name: 'clamav-client', version: '1.0.1'
+  implementation 'software.amazon.awssdk:s3:2.28.13'
+  implementation 'net.javacrumbs.shedlock:shedlock-spring:5.16.0'
+  implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.16.0'
+
+  implementation 'net.logstash.logback:logstash-logback-encoder:7.2'
 
   annotationProcessor("org.hibernate.orm:hibernate-jpamodelgen")
   annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
@@ -81,7 +87,8 @@ dependencies {
       'org.springframework.security:spring-security-test',
       'com.squareup.okhttp3:mockwebserver:4.9.1',
       'com.squareup.okhttp3:okhttp:4.9.1', // Required otherwise MockWebServer gives ClassNotFoundException
-      'org.junit.vintage:junit-vintage-engine'
+      'org.junit.vintage:junit-vintage-engine',
+      'org.skyscreamer:jsonassert'
   )
 }
 
@@ -91,7 +98,7 @@ test {
 
 checkstyle {
   config = rootProject.resources.text.fromFile('ide/checkstyle.xml')
-  toolVersion '8.28'
+  toolVersion '10.18.1'
   ignoreFailures = false
   maxWarnings = 0
 }
@@ -112,15 +119,26 @@ dependencyCheck {
 
 sonarqube {
   properties {
-    property("sonar.projectKey", "fiviumuk_pathfinder")
-    property("sonar.host.url", "https://sonarcloud.io")
-    property("sonar.login", System.getenv("SONAR_TOKEN"))
-    property("sonar.organization", "fivium")
-    property("sonar.branch.name", System.getenv("DRONE_BRANCH"))
-    if (System.getenv("DRONE_BRANCH").startsWith("feature")) {
-      property("sonar.branch.target", "develop")
-    }
+    property 'sonar.projectKey', "Fivium_energy-pathfinder"
+    property 'sonar.organization', 'fivium-gh'
+    property 'sonar.host.url', 'https://sonarcloud.io'
+    property 'sonar.login', System.getenv('SONARCLOUD_TOKEN')
     property("sonar.exclusions", "src/test/**, src/main/resources/public/assets/**, fivium-design-system-core/**, src/main/resources/templates/fds/**, build/**")
     property("sonar.sources", "src")
+
+    if (System.getenv('DRONE_PULL_REQUEST') != null) {
+      property 'sonar.pullrequest.key', System.getenv('DRONE_PULL_REQUEST')
+      property 'sonar.pullrequest.base', System.getenv('DRONE_TARGET_BRANCH')
+      property 'sonar.pullrequest.branch', System.getenv('DRONE_SOURCE_BRANCH')
+      property 'sonar.pullrequest.provider', 'github'
+      property 'sonar.pullrequest.github.repository', 'energy-pathfinder'
+      property 'sonar.pullrequest.github.endpoint', 'https://api.github.com/'
+    } else {
+      property 'sonar.branch.name', System.getenv('DRONE_BRANCH')
+      if (System.getenv('DRONE_BRANCH') != 'develop') {
+        property 'sonar.branch.target', 'develop'
+      }
+      property 'sonar.coverage.jacoco.xmlReportPaths', "${layout.buildDirectory}/reports/jacoco/test/jacocoTestReport.xml"
+    }
   }
 }

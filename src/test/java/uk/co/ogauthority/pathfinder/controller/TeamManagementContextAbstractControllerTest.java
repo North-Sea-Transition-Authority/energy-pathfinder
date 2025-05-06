@@ -10,16 +10,16 @@ import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.SimpleThreadScope;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.co.ogauthority.pathfinder.analytics.EnableAnalyticsConfiguration;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
+import uk.co.ogauthority.pathfinder.analytics.EnableAnalyticsConfiguration;
 import uk.co.ogauthority.pathfinder.model.entity.UserSession;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
 import uk.co.ogauthority.pathfinder.service.FoxUrlService;
@@ -44,46 +44,46 @@ public abstract class TeamManagementContextAbstractControllerTest {
   @Autowired
   protected WebApplicationContext context;
 
-  @MockBean
+  @MockitoBean
   private FoxUrlService foxUrlService;
 
-  @MockBean
+  @MockitoBean
   protected TeamService teamService;
 
-  @MockBean
+  @MockitoBean
   protected UserSessionService userSessionService;
 
-  @MockBean
+  @MockitoBean
   protected TopNavigationService topNavigationService;
 
-  @MockBean
+  @MockitoBean
   protected ProjectContextService projectContextService;
 
-  @MockBean
+  @MockitoBean
   protected ProjectService projectService;
 
-  @MockBean
+  @MockitoBean
   protected ProjectOperatorService projectOperatorService;
 
-  @MockBean
+  @MockitoBean
   protected ProjectAssessmentContextService projectAssessmentContextService;
 
-  @MockBean
+  @MockitoBean
   protected OperatorProjectUpdateContextService operatorProjectUpdateContextService;
 
-  @MockBean
+  @MockitoBean
   protected RegulatorProjectUpdateContextService regulatorProjectUpdateContextService;
 
-  @MockBean
+  @MockitoBean
   protected CommunicationJourneyService communicationJourneyService;
 
-  @MockBean
+  @MockitoBean
   protected FooterService footerService;
 
   @Autowired
   protected TeamManagementContextService teamManagementContextService;
 
-  @MockBean
+  @MockitoBean
   protected AnalyticsService analyticsService;
 
   @Before

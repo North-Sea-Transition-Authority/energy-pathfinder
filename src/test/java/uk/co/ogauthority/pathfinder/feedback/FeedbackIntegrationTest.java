@@ -31,7 +31,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
@@ -40,6 +39,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.fivium.feedbackmanagementservice.client.FeedbackClientService;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
@@ -87,13 +87,13 @@ public class FeedbackIntegrationTest extends AbstractControllerTest {
   @Autowired
   ObjectMapper objectMapper;
 
-  @MockBean
+  @MockitoBean
   ProjectDetailsRepository projectDetailsRepository;
 
-  @MockBean
+  @MockitoBean
   ProjectInformationService projectInformationService;
 
-  @MockBean
+  @MockitoBean
   EmailService emailService;
 
   private AuthenticatedUserAccount user;

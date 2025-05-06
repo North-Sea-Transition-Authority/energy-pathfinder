@@ -22,10 +22,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
@@ -72,16 +72,16 @@ public class UpcomingTenderConversionControllerTest extends ProjectContextAbstra
   private static final Class<UpcomingTendersController> SUMMARY_CONTROLLER = UpcomingTendersController.class;
   private static final String VIEW_NAME = "project/upcomingtender/convertUpcomingTender";
 
-  @MockBean
+  @MockitoBean
   private UpcomingTenderService upcomingTenderService;
 
-  @MockBean
+  @MockitoBean
   private UpcomingTenderSummaryService upcomingTenderSummaryService;
 
-  @MockBean
+  @MockitoBean
   private ProjectSectionItemOwnershipService projectSectionItemOwnershipService;
 
-  @MockBean
+  @MockitoBean
   private UpcomingTenderConversionService conversionService;
 
   private final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(

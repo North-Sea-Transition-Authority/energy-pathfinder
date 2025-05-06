@@ -18,19 +18,17 @@ import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.AbstractControllerTest;
-import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
-import uk.co.ogauthority.pathfinder.model.form.feedback.FeedbackForm;
-import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.feedback.FeedbackModelService;
 import uk.co.ogauthority.pathfinder.feedback.FeedbackService;
+import uk.co.ogauthority.pathfinder.model.form.feedback.FeedbackForm;
+import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 
@@ -38,10 +36,10 @@ import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 @WebMvcTest(FeedbackController.class)
 public class FeedbackControllerTest extends AbstractControllerTest {
 
-  @MockBean
+  @MockitoBean
   FeedbackModelService feedbackModelService;
 
-  @MockBean
+  @MockitoBean
   FeedbackService feedbackService;
 
   private static final AuthenticatedUserAccount AUTHENTICATED_USER = UserTestingUtil.getAuthenticatedUserAccount();

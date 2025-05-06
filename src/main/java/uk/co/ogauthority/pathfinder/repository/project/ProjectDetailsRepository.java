@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.repository.project;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
@@ -8,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.co.ogauthority.pathfinder.model.dto.project.ProjectVersionDto;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 
 @Repository
 public interface ProjectDetailsRepository extends CrudRepository<ProjectDetail, Integer> {
@@ -56,4 +58,23 @@ public interface ProjectDetailsRepository extends CrudRepository<ProjectDetail, 
          ") " +
          "ORDER BY pd.version DESC")
   List<ProjectVersionDto> getSubmittedProjectVersionDtos(@Param("projectId") Integer projectId);
+
+  @Query(
+      """
+      SELECT pd
+      FROM ProjectDetail pd
+      WHERE pd.version = (
+        SELECT MAX(tpd.version)
+        FROM ProjectDetail tpd
+        WHERE tpd.status IN (
+          uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus.PUBLISHED,
+          uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus.ARCHIVED
+        )
+        AND tpd.project.id = pd.project.id
+      )
+      AND pd.status = uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus.PUBLISHED
+      AND pd.projectType IN :projectTypes
+      """
+  )
+  List<ProjectDetail> getAllPublishedProjectDetailsByProjectTypes(Collection<ProjectType> projectTypes);
 }

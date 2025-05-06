@@ -36,7 +36,7 @@ public class ProjectCleanUpServiceTest {
   }
 
   @Test
-  public void removeProjectSectionDataIfNotRelevant_whenAllSectionsInTaskListAndAllowDataCleanUp_noRemoveMethodInvoked() {
+  public void removeProjectSectionDataIfNotRelevant_whenAllSectionsInTaskListAndAllowDataCleanUp_onlyRemoveSectionDataIfNotRelevantInvoked() {
 
     when(testProjectFormSectionServiceA.isTaskValidForProjectDetail(projectDetail)).thenReturn(true);
     when(testProjectFormSectionServiceB.isTaskValidForProjectDetail(projectDetail)).thenReturn(true);
@@ -48,10 +48,13 @@ public class ProjectCleanUpServiceTest {
 
     verify(testProjectFormSectionServiceA, times(0)).removeSectionData(projectDetail);
     verify(testProjectFormSectionServiceB, times(0)).removeSectionData(projectDetail);
+
+    verify(testProjectFormSectionServiceA).removeSectionDataIfNotRelevant(projectDetail);
+    verify(testProjectFormSectionServiceB).removeSectionDataIfNotRelevant(projectDetail);
   }
 
   @Test
-  public void removeProjectSectionDataIfNotRelevant_whenAllSectionsNotInTaskListAndAllowDataCleanUp_removeMethodInvoked() {
+  public void removeProjectSectionDataIfNotRelevant_whenAllSectionsNotInTaskListAndAllowDataCleanUp_onlyRemoveSectionDataInvoked() {
 
     when(testProjectFormSectionServiceA.isTaskValidForProjectDetail(projectDetail)).thenReturn(false);
     when(testProjectFormSectionServiceB.isTaskValidForProjectDetail(projectDetail)).thenReturn(false);
@@ -63,10 +66,13 @@ public class ProjectCleanUpServiceTest {
 
     verify(testProjectFormSectionServiceA, times(1)).removeSectionData(projectDetail);
     verify(testProjectFormSectionServiceB, times(1)).removeSectionData(projectDetail);
+
+    verify(testProjectFormSectionServiceA, never()).removeSectionDataIfNotRelevant(projectDetail);
+    verify(testProjectFormSectionServiceB, never()).removeSectionDataIfNotRelevant(projectDetail);
   }
 
   @Test
-  public void removeProjectSectionDataIfNotRelevant_whenSomeSectionsNotInTaskListAndAllAllowDataCleanUp_removeMethodInvokedOnSelectedSections() {
+  public void removeProjectSectionDataIfNotRelevant_whenSomeSectionsNotInTaskListAndAllAllowDataCleanUp_correctRemoveMethodInvoked() {
 
     when(testProjectFormSectionServiceA.isTaskValidForProjectDetail(projectDetail)).thenReturn(true);
     when(testProjectFormSectionServiceB.isTaskValidForProjectDetail(projectDetail)).thenReturn(false);
@@ -78,10 +84,13 @@ public class ProjectCleanUpServiceTest {
 
     verify(testProjectFormSectionServiceA, never()).removeSectionData(projectDetail);
     verify(testProjectFormSectionServiceB, times(1)).removeSectionData(projectDetail);
+
+    verify(testProjectFormSectionServiceA, times(1)).removeSectionDataIfNotRelevant(projectDetail);
+    verify(testProjectFormSectionServiceB, never()).removeSectionDataIfNotRelevant(projectDetail);
   }
 
   @Test
-  public void removeProjectSectionDataIfNotRelevant_whenAllSectionsNotAllowDataCleanUp_removeMethodNotInvoked() {
+  public void removeProjectSectionDataIfNotRelevant_whenAllSectionsNotAllowDataCleanUp_noRemoveMethodInvoked() {
 
     when(testProjectFormSectionServiceA.allowSectionDataCleanUp(projectDetail)).thenReturn(false);
     when(testProjectFormSectionServiceB.allowSectionDataCleanUp(projectDetail)).thenReturn(false);
@@ -90,10 +99,13 @@ public class ProjectCleanUpServiceTest {
 
     verify(testProjectFormSectionServiceA, never()).removeSectionData(projectDetail);
     verify(testProjectFormSectionServiceB, never()).removeSectionData(projectDetail);
+
+    verify(testProjectFormSectionServiceA, never()).removeSectionDataIfNotRelevant(projectDetail);
+    verify(testProjectFormSectionServiceB, never()).removeSectionDataIfNotRelevant(projectDetail);
   }
 
   @Test
-  public void removeProjectSectionDataIfNotRelevant_whenSomeSectionsNotAllowDataCleanUp_removeMethodInvokedOnSelectedSections() {
+  public void removeProjectSectionDataIfNotRelevant_whenSomeSectionsNotAllowDataCleanUp_onlyRemoveSectionDataMethodInvokedOnSelectedSections() {
 
     when(testProjectFormSectionServiceA.allowSectionDataCleanUp(projectDetail)).thenReturn(false);
     when(testProjectFormSectionServiceB.allowSectionDataCleanUp(projectDetail)).thenReturn(true);
@@ -104,5 +116,8 @@ public class ProjectCleanUpServiceTest {
 
     verify(testProjectFormSectionServiceA, never()).removeSectionData(projectDetail);
     verify(testProjectFormSectionServiceB, times(1)).removeSectionData(projectDetail);
+
+    verify(testProjectFormSectionServiceA, never()).removeSectionDataIfNotRelevant(projectDetail);
+    verify(testProjectFormSectionServiceB, never()).removeSectionDataIfNotRelevant(projectDetail);
   }
 }

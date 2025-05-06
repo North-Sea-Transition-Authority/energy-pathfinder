@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.model.form.project.location;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.forminput.FormInputLabel;
 import uk.co.ogauthority.pathfinder.model.form.forminput.dateinput.validationhint.DateHint;
@@ -14,11 +15,13 @@ public final class ProjectLocationValidationHint {
   public static final FormInputLabel APPROVED_FDP_LABEL = new FormInputLabel("approved Field Development Plan date");
   public static final FormInputLabel APPROVED_DECOM_LABEL = new FormInputLabel("approved Decommissioning Program date");
 
+  private final ProjectDetail projectDetail;
   private final OnOrBeforeDateHint fdpApprovalDateHint;
   private final OnOrBeforeDateHint decomProgramApprovalDateHint;
   private final ValidationType validationType;
 
-  public ProjectLocationValidationHint(ValidationType validationType) {
+  public ProjectLocationValidationHint(ProjectDetail projectDetail, ValidationType validationType) {
+    this.projectDetail = projectDetail;
 
     this.fdpApprovalDateHint = new OnOrBeforeDateHint(
         APPROVED_FDP_LABEL,
@@ -32,6 +35,10 @@ public final class ProjectLocationValidationHint {
     );
 
     this.validationType = validationType;
+  }
+
+  public ProjectDetail getProjectDetail() {
+    return projectDetail;
   }
 
   public Object[] getFdpApprovalDateValidationHints() {
@@ -58,5 +65,9 @@ public final class ProjectLocationValidationHint {
 
   private void addEmptyDateAcceptableHint(List<Object> validationHints) {
     DateInputValidator.addEmptyDateAcceptableHint(validationType, validationHints);
+  }
+
+  public ValidationType getValidationType() {
+    return validationType;
   }
 }

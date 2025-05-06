@@ -9,6 +9,7 @@ SELECT
 , aew.drilling_seq_no
 , aew.well_suffix
 , aew.mechanical_status
+, wms.display_name mechanical_status_display_name
 , aew.operational_status
 , aew.subsea_wellhead is_subsea_wellhead
 , aew.subarea_operator_ou_id
@@ -18,4 +19,5 @@ SELECT
 , aew.licence_type
 , aew.licence_no
 FROM wellmgr.api_extant_wellbores aew
+JOIN wellmgr.wellbore_mechanical_statuses wms on wms.mnem = aew.mechanical_status
 WHERE aew.mechanical_status != 'PLANNED';

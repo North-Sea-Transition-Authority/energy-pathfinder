@@ -10,10 +10,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.controller.ProjectContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.controller.ProjectControllerTesterService;
@@ -37,7 +37,7 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 )
 public class ForwardWorkPlanProjectStartControllerTest extends ProjectContextAbstractControllerTest {
 
-  @MockBean
+  @MockitoBean
   protected ForwardWorkPlanStartModelService forwardWorkPlanStartModelService;
 
   private ProjectControllerTesterService projectControllerTesterService;

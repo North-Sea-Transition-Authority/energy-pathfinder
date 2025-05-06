@@ -13,5 +13,9 @@ public class ForwardWorkPlanCollaborationOpportunity extends CollaborationOpport
     super(projectDetail);
   }
 
+  public ForwardWorkPlanCollaborationOpportunity(Integer id, ProjectDetail projectDetail) {
+    super(id, projectDetail);
+  }
+
   public ForwardWorkPlanCollaborationOpportunity() {}
 }

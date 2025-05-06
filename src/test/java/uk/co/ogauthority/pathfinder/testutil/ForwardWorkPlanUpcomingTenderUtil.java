@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.testutil;
 
+import java.time.LocalDate;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.workplanupcomingtender.ForwardWorkPlanUpcomingTender;
 import uk.co.ogauthority.pathfinder.model.enums.Quarter;
@@ -20,7 +21,7 @@ public class ForwardWorkPlanUpcomingTenderUtil {
   public static final String MANUAL_TENDER_DEPARTMENT = SearchSelectablePrefix.FREE_TEXT_PREFIX + "manual department type";
   public static final String DESCRIPTION_OF_WORK = "work description";
   public static final Quarter ESTIMATED_TENDER_QUARTER = Quarter.Q1;
-  public static final Integer ESTIMATED_TENDER_YEAR = 2025;
+  public static final Integer ESTIMATED_TENDER_YEAR = LocalDate.now().getYear() + 1;
   public static final ContractBand CONTRACT_BAND = ContractBand.GREATER_THAN_OR_EQUAL_TO_5M;
   public static final String CONTACT_NAME = ContactDetailsTestUtil.CONTACT_NAME;
   public static final String PHONE_NUMBER = ContactDetailsTestUtil.PHONE_NUMBER;
@@ -55,7 +56,11 @@ public class ForwardWorkPlanUpcomingTenderUtil {
   }
 
   public static ForwardWorkPlanUpcomingTender getUpcomingTender(ProjectDetail detail) {
-    var tender = new ForwardWorkPlanUpcomingTender(detail);
+    return getUpcomingTender(null, detail);
+  }
+
+  public static ForwardWorkPlanUpcomingTender getUpcomingTender(Integer id, ProjectDetail detail) {
+    var tender = new ForwardWorkPlanUpcomingTender(id, detail);
     tender.setDepartmentType(UPCOMING_TENDER_DEPARTMENT);
     setUpcomingTenderFields(tender);
     return tender;

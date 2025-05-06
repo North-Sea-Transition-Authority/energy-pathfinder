@@ -46,54 +46,71 @@ public class ProjectLocationService implements ProjectFormSectionService {
   private final ValidationService validationService;
   private final ProjectLocationFormValidator projectLocationFormValidator;
   private final ProjectLocationBlocksService projectLocationBlocksService;
-  private final ProjectInformationService projectInformationService;
   private final EntityDuplicationService entityDuplicationService;
+  private final ProjectInformationService projectInformationService;
 
   @Autowired
-  public ProjectLocationService(ProjectLocationRepository projectLocationRepository,
-                                DevUkFieldService fieldService,
-                                SearchSelectorService searchSelectorService,
-                                ValidationService validationService,
-                                ProjectLocationFormValidator projectLocationFormValidator,
-                                ProjectLocationBlocksService projectLocationBlocksService,
-                                ProjectInformationService projectInformationService,
-                                EntityDuplicationService entityDuplicationService) {
+  public ProjectLocationService(
+      ProjectLocationRepository projectLocationRepository,
+      DevUkFieldService fieldService,
+      SearchSelectorService searchSelectorService,
+      ValidationService validationService,
+      ProjectLocationFormValidator projectLocationFormValidator,
+      ProjectLocationBlocksService projectLocationBlocksService,
+      EntityDuplicationService entityDuplicationService,
+      ProjectInformationService projectInformationService
+  ) {
     this.projectLocationRepository = projectLocationRepository;
     this.fieldService = fieldService;
     this.searchSelectorService = searchSelectorService;
     this.validationService = validationService;
     this.projectLocationFormValidator = projectLocationFormValidator;
     this.projectLocationBlocksService = projectLocationBlocksService;
-    this.projectInformationService = projectInformationService;
     this.entityDuplicationService = entityDuplicationService;
+    this.projectInformationService = projectInformationService;
   }
 
   @Transactional
   public ProjectLocation createOrUpdate(ProjectDetail detail, ProjectLocationForm form) {
     var projectLocation = getProjectLocationByProjectDetail(detail).orElse(new ProjectLocation(detail));
 
-    if (form.getField() != null) {
-      projectLocation.setField(fieldService.findByIdOrError(Integer.parseInt(form.getField())));
-    } else { //The form has no data so clear the existing values
-      projectLocation.setField(null);
+    var centreOfInterestLatitude = form.getCentreOfInterestLatitude();
+    projectLocation.setCentreOfInterestLatitudeDegrees(centreOfInterestLatitude.getDegreesInput().getAsInteger().orElse(null));
+    projectLocation.setCentreOfInterestLatitudeMinutes(centreOfInterestLatitude.getMinutesInput().getAsInteger().orElse(null));
+    projectLocation.setCentreOfInterestLatitudeSeconds(centreOfInterestLatitude.getSecondsInput().getAsDouble().orElse(null));
+    projectLocation.setCentreOfInterestLatitudeHemisphere(centreOfInterestLatitude.getHemisphereInput().getInputValue());
+
+    var centreOfInterestLongitude = form.getCentreOfInterestLongitude();
+    projectLocation.setCentreOfInterestLongitudeDegrees(centreOfInterestLongitude.getDegreesInput().getAsInteger().orElse(null));
+    projectLocation.setCentreOfInterestLongitudeMinutes(centreOfInterestLongitude.getMinutesInput().getAsInteger().orElse(null));
+    projectLocation.setCentreOfInterestLongitudeSeconds(centreOfInterestLongitude.getSecondsInput().getAsDouble().orElse(null));
+    projectLocation.setCentreOfInterestLongitudeHemisphere(centreOfInterestLongitude.getHemisphereInput().getInputValue());
+
+    var isOilAndGasProject = projectInformationService.isOilAndGasProject(detail);
+    if (isOilAndGasProject) {
+      if (form.getField() != null) {
+        projectLocation.setField(fieldService.findByIdOrError(Integer.parseInt(form.getField())));
+      } else { //The form has no data so clear the existing values
+        projectLocation.setField(null);
+      }
+
+      projectLocation.setFieldType(form.getFieldType());
+      projectLocation.setMaximumWaterDepth(form.getMaximumWaterDepth());
+
+      projectLocation.setApprovedFieldDevelopmentPlan(form.getApprovedFieldDevelopmentPlan());
+      projectLocation.setApprovedFdpDate(
+          BooleanUtils.isTrue(form.getApprovedFieldDevelopmentPlan())
+              ? form.getApprovedFdpDate().createDateOrNull()
+              : null
+      );
+
+      projectLocation.setApprovedDecomProgram(form.getApprovedDecomProgram());
+      projectLocation.setApprovedDecomProgramDate(
+          BooleanUtils.isTrue(form.getApprovedDecomProgram())
+              ? form.getApprovedDecomProgramDate().createDateOrNull()
+              : null
+      );
     }
-
-    projectLocation.setFieldType(form.getFieldType());
-    projectLocation.setMaximumWaterDepth(form.getMaximumWaterDepth());
-
-    projectLocation.setApprovedFieldDevelopmentPlan(form.getApprovedFieldDevelopmentPlan());
-    projectLocation.setApprovedFdpDate(
-        BooleanUtils.isTrue(form.getApprovedFieldDevelopmentPlan())
-            ? form.getApprovedFdpDate().createDateOrNull()
-            : null
-    );
-
-    projectLocation.setApprovedDecomProgram(form.getApprovedDecomProgram());
-    projectLocation.setApprovedDecomProgramDate(
-        BooleanUtils.isTrue(form.getApprovedDecomProgram())
-            ? form.getApprovedDecomProgramDate().createDateOrNull()
-            : null
-    );
 
     return projectLocationRepository.save(projectLocation);
   }
@@ -121,7 +138,7 @@ public class ProjectLocationService implements ProjectFormSectionService {
 
   public ProjectLocationForm getForm(ProjectDetail detail) {
     return getProjectLocationByProjectDetail(detail)
-        .map(this::getForm).orElse(new ProjectLocationForm());
+        .map(location -> this.getForm(detail, location)).orElse(new ProjectLocationForm());
   }
 
   /**
@@ -130,22 +147,48 @@ public class ProjectLocationService implements ProjectFormSectionService {
    * @param projectLocation ProjectLocation to turn into a form
    * @return completed form object if ProjectLocation has any field data else a new form.
    */
-  private ProjectLocationForm getForm(ProjectLocation projectLocation) {
+  private ProjectLocationForm getForm(ProjectDetail detail, ProjectLocation projectLocation) {
     var form = new ProjectLocationForm();
 
-    if (projectLocation.getField() != null) {
-      form.setField(projectLocation.getField().getFieldId().toString());
+    var centreOfInterestLatitude = form.getCentreOfInterestLatitude();
+    centreOfInterestLatitude.getDegreesInput().setInputValue(projectLocation.getCentreOfInterestLatitudeDegrees() != null
+        ? projectLocation.getCentreOfInterestLatitudeDegrees().toString()
+        : null);
+    centreOfInterestLatitude.getMinutesInput().setInputValue(projectLocation.getCentreOfInterestLatitudeMinutes() != null
+        ? projectLocation.getCentreOfInterestLatitudeMinutes().toString()
+        : null);
+    centreOfInterestLatitude.getSecondsInput().setInputValue(projectLocation.getCentreOfInterestLatitudeSeconds() != null
+        ? projectLocation.getCentreOfInterestLatitudeSeconds().toString()
+        : null);
+
+    var centreOfInterestLongitude = form.getCentreOfInterestLongitude();
+    centreOfInterestLongitude.getDegreesInput().setInputValue(projectLocation.getCentreOfInterestLongitudeDegrees() != null
+        ? projectLocation.getCentreOfInterestLongitudeDegrees().toString()
+        : null);
+    centreOfInterestLongitude.getMinutesInput().setInputValue(projectLocation.getCentreOfInterestLongitudeMinutes() != null
+        ? projectLocation.getCentreOfInterestLongitudeMinutes().toString()
+        : null);
+    centreOfInterestLongitude.getSecondsInput().setInputValue(projectLocation.getCentreOfInterestLongitudeSeconds() != null
+        ? projectLocation.getCentreOfInterestLongitudeSeconds().toString()
+        : null);
+    centreOfInterestLongitude.getHemisphereInput().setInputValue(projectLocation.getCentreOfInterestLongitudeHemisphere());
+
+    var isOilAndGasProject = projectInformationService.isOilAndGasProject(detail);
+    if (isOilAndGasProject) {
+      if (projectLocation.getField() != null) {
+        form.setField(projectLocation.getField().getFieldId().toString());
+      }
+
+      form.setFieldType(projectLocation.getFieldType());
+      form.setMaximumWaterDepth(projectLocation.getMaximumWaterDepth());
+
+      form.setApprovedDecomProgram(projectLocation.getApprovedDecomProgram());
+      form.setApprovedDecomProgramDate(new ThreeFieldDateInput(projectLocation.getApprovedDecomProgramDate()));
+
+      form.setApprovedFieldDevelopmentPlan(projectLocation.getApprovedFieldDevelopmentPlan());
+      form.setApprovedFdpDate(new ThreeFieldDateInput(projectLocation.getApprovedFdpDate()));
+      projectLocationBlocksService.addBlocksToForm(form, projectLocation);
     }
-
-    form.setFieldType(projectLocation.getFieldType());
-    form.setMaximumWaterDepth(projectLocation.getMaximumWaterDepth());
-
-    form.setApprovedDecomProgram(projectLocation.getApprovedDecomProgram());
-    form.setApprovedDecomProgramDate(new ThreeFieldDateInput(projectLocation.getApprovedDecomProgramDate()));
-
-    form.setApprovedFieldDevelopmentPlan(projectLocation.getApprovedFieldDevelopmentPlan());
-    form.setApprovedFdpDate(new ThreeFieldDateInput(projectLocation.getApprovedFdpDate()));
-    projectLocationBlocksService.addBlocksToForm(form, projectLocation);
 
     return form;
   }
@@ -156,14 +199,11 @@ public class ProjectLocationService implements ProjectFormSectionService {
    */
   public BindingResult validate(ProjectLocationForm form,
                                 BindingResult bindingResult,
+                                ProjectDetail projectDetail,
                                 ValidationType validationType) {
-    var projectLocationValidationHint = createProjectLocationValidationHint(validationType);
+    var projectLocationValidationHint = new ProjectLocationValidationHint(projectDetail, validationType);
     projectLocationFormValidator.validate(form, bindingResult, projectLocationValidationHint);
     return validationService.validate(form, bindingResult, validationType);
-  }
-
-  private ProjectLocationValidationHint createProjectLocationValidationHint(ValidationType validationType) {
-    return new ProjectLocationValidationHint(validationType);
   }
 
   /**
@@ -255,14 +295,13 @@ public class ProjectLocationService implements ProjectFormSectionService {
   public boolean isComplete(ProjectDetail details) {
     var form = getForm(details);
     BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
-    bindingResult = validate(form, bindingResult, ValidationType.FULL);
+    bindingResult = validate(form, bindingResult, details, ValidationType.FULL);
     return !bindingResult.hasErrors();
   }
 
   @Override
   public boolean isTaskValidForProjectDetail(ProjectDetail detail) {
-    return ProjectService.isInfrastructureProject(detail)
-        && projectInformationService.isOilAndGasProject(detail);
+    return ProjectService.isInfrastructureProject(detail);
   }
 
   @Override
@@ -274,9 +313,35 @@ public class ProjectLocationService implements ProjectFormSectionService {
   }
 
   @Override
+  public void removeSectionDataIfNotRelevant(ProjectDetail projectDetail) {
+    getProjectLocationByProjectDetail(projectDetail).ifPresent(projectLocation -> {
+      var isOilAndGasProject = projectInformationService.isOilAndGasProject(projectDetail);
+      if (!isOilAndGasProject) {
+        projectLocation.setField(null);
+        projectLocation.setFieldType(null);
+        projectLocation.setMaximumWaterDepth(null);
+        projectLocation.setApprovedFieldDevelopmentPlan(null);
+        projectLocation.setApprovedFdpDate(null);
+        projectLocation.setApprovedDecomProgram(null);
+        projectLocation.setApprovedDecomProgramDate(null);
+
+        projectLocationRepository.save(projectLocation);
+
+        projectLocationBlocksService.deleteBlocks(projectLocation);
+      }
+    });
+  }
+
+  @Override
   public void copySectionData(ProjectDetail fromDetail, ProjectDetail toDetail) {
 
-    final var fromLocation = getOrError(fromDetail);
+    Optional<ProjectLocation> optionalFromLocation = getProjectLocationByProjectDetail(fromDetail);
+
+    if (optionalFromLocation.isEmpty()) {
+      return;
+    }
+
+    var fromLocation = optionalFromLocation.get();
 
     // duplicate ProjectLocation entity and reparent to toDetail
     final var toLocation = entityDuplicationService.duplicateEntityAndSetNewParent(

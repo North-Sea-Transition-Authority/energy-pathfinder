@@ -13,5 +13,9 @@ public class InfrastructureAwardedContract extends AwardedContractCommon {
     super(projectDetail);
   }
 
+  public InfrastructureAwardedContract(Integer id, ProjectDetail projectDetail) {
+    super(id, projectDetail);
+  }
+
   public InfrastructureAwardedContract() {}
 }

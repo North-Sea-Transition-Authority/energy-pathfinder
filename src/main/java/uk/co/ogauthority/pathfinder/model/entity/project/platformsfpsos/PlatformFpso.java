@@ -63,6 +63,10 @@ public class PlatformFpso extends ProjectDetailEntity {
   public PlatformFpso() {
   }
 
+  public PlatformFpso(Integer id) {
+    this.id = id;
+  }
+
   public PlatformFpso(ProjectDetail projectDetail) {
     this.projectDetail = projectDetail;
   }

@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
@@ -43,13 +43,13 @@ public class SubscriptionControllerTest extends AbstractControllerTest {
   private static final Class<SubscriptionController> CONTROLLER = SubscriptionController.class;
   private static final String TEST_VIEW_NAME = "test";
 
-  @MockBean
+  @MockitoBean
   private SubscriptionService subscriptionService;
 
-  @MockBean
+  @MockitoBean
   private ServiceProperties serviceProperties;
 
-  @MockBean(answer = Answers.RETURNS_DEEP_STUBS)
+  @MockitoBean(answers = Answers.RETURNS_DEEP_STUBS)
   private MetricsProvider metricsProvider;
   private Subscriber subscriber;
 

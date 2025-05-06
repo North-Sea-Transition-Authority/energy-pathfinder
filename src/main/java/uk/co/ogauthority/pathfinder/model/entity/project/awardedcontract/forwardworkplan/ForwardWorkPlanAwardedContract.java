@@ -13,5 +13,9 @@ public class ForwardWorkPlanAwardedContract extends AwardedContractCommon {
     super(projectDetail);
   }
 
+  public ForwardWorkPlanAwardedContract(Integer id, ProjectDetail projectDetail) {
+    super(id, projectDetail);
+  }
+
   public ForwardWorkPlanAwardedContract() {}
 }

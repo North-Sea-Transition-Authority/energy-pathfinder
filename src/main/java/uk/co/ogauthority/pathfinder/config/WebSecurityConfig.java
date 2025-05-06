@@ -101,9 +101,9 @@ public class WebSecurityConfig {
             new FoxSessionFilter(userSessionService, () -> httpSecurity.getSharedObject(SecurityContextRepository.class)),
             RequestCacheAwareFilter.class
         )
-      // The FoxLoginCallbackFilter must be hit before the FoxSessionFilter, otherwise the saved request is wiped
-      // when the session is cleared
-      .addFilterBefore(foxLoginCallbackFilter, FoxSessionFilter.class);
+        // The FoxLoginCallbackFilter must be hit before the FoxSessionFilter, otherwise the saved request is wiped
+        // when the session is cleared
+        .addFilterBefore(foxLoginCallbackFilter, FoxSessionFilter.class);
 
     return httpSecurity.build();
   }

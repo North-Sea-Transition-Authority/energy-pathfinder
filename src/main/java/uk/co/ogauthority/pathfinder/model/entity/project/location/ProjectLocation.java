@@ -18,6 +18,22 @@ import uk.co.ogauthority.pathfinder.service.entityduplication.ParentEntity;
 @Table(name = "project_locations")
 public class ProjectLocation extends ProjectDetailEntity implements ParentEntity {
 
+  private Integer centreOfInterestLatitudeDegrees;
+
+  private Integer centreOfInterestLatitudeMinutes;
+
+  private Double centreOfInterestLatitudeSeconds;
+
+  private String centreOfInterestLatitudeHemisphere;
+
+  private Integer centreOfInterestLongitudeDegrees;
+
+  private Integer centreOfInterestLongitudeMinutes;
+
+  private Double centreOfInterestLongitudeSeconds;
+
+  private String centreOfInterestLongitudeHemisphere;
+
   @ManyToOne
   @JoinColumn(name = "field_id")
   private DevUkField field;
@@ -46,6 +62,70 @@ public class ProjectLocation extends ProjectDetailEntity implements ParentEntity
   public ProjectLocation(ProjectDetail projectDetail, DevUkField field) {
     this.projectDetail = projectDetail;
     this.field = field;
+  }
+
+  public Integer getCentreOfInterestLatitudeDegrees() {
+    return centreOfInterestLatitudeDegrees;
+  }
+
+  public void setCentreOfInterestLatitudeDegrees(Integer centreOfInterestLatitudeDegrees) {
+    this.centreOfInterestLatitudeDegrees = centreOfInterestLatitudeDegrees;
+  }
+
+  public Integer getCentreOfInterestLatitudeMinutes() {
+    return centreOfInterestLatitudeMinutes;
+  }
+
+  public void setCentreOfInterestLatitudeMinutes(Integer centreOfInterestLatitudeMinutes) {
+    this.centreOfInterestLatitudeMinutes = centreOfInterestLatitudeMinutes;
+  }
+
+  public Double getCentreOfInterestLatitudeSeconds() {
+    return centreOfInterestLatitudeSeconds;
+  }
+
+  public void setCentreOfInterestLatitudeSeconds(Double centreOfInterestLatitudeSeconds) {
+    this.centreOfInterestLatitudeSeconds = centreOfInterestLatitudeSeconds;
+  }
+
+  public String getCentreOfInterestLatitudeHemisphere() {
+    return centreOfInterestLatitudeHemisphere;
+  }
+
+  public void setCentreOfInterestLatitudeHemisphere(String centreOfInterestLatitudeHemisphere) {
+    this.centreOfInterestLatitudeHemisphere = centreOfInterestLatitudeHemisphere;
+  }
+
+  public Integer getCentreOfInterestLongitudeDegrees() {
+    return centreOfInterestLongitudeDegrees;
+  }
+
+  public void setCentreOfInterestLongitudeDegrees(Integer centreOfInterestLongitudeDegrees) {
+    this.centreOfInterestLongitudeDegrees = centreOfInterestLongitudeDegrees;
+  }
+
+  public Integer getCentreOfInterestLongitudeMinutes() {
+    return centreOfInterestLongitudeMinutes;
+  }
+
+  public void setCentreOfInterestLongitudeMinutes(Integer centreOfInterestLongitudeMinutes) {
+    this.centreOfInterestLongitudeMinutes = centreOfInterestLongitudeMinutes;
+  }
+
+  public Double getCentreOfInterestLongitudeSeconds() {
+    return centreOfInterestLongitudeSeconds;
+  }
+
+  public void setCentreOfInterestLongitudeSeconds(Double centreOfInterestLongitudeSeconds) {
+    this.centreOfInterestLongitudeSeconds = centreOfInterestLongitudeSeconds;
+  }
+
+  public String getCentreOfInterestLongitudeHemisphere() {
+    return centreOfInterestLongitudeHemisphere;
+  }
+
+  public void setCentreOfInterestLongitudeHemisphere(String centreOfInterestLongitudeHemisphere) {
+    this.centreOfInterestLongitudeHemisphere = centreOfInterestLongitudeHemisphere;
   }
 
   public DevUkField getField() {

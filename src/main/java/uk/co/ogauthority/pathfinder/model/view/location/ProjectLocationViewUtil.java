@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
 import uk.co.ogauthority.pathfinder.model.enums.MeasurementUnits;
+import uk.co.ogauthority.pathfinder.util.CoordinateUtil;
 import uk.co.ogauthority.pathfinder.util.DateUtil;
 
 public class ProjectLocationViewUtil {
@@ -15,37 +16,57 @@ public class ProjectLocationViewUtil {
     throw new IllegalStateException("ProjectLocationViewUtil is a util class and should not be instantiated");
   }
 
-  public static ProjectLocationView from(ProjectLocation projectLocation, List<ProjectLocationBlock> projectLocationBlocks) {
+  public static ProjectLocationView from(
+      ProjectLocation projectLocation,
+      boolean isOilAndGasProject,
+      List<ProjectLocationBlock> projectLocationBlocks
+  ) {
     var projectLocationView = new ProjectLocationView();
 
-    var field = projectLocation.getField();
+    projectLocationView.setCentreOfInterestLatitude(
+        CoordinateUtil.formatCoordinate(
+            projectLocation.getCentreOfInterestLatitudeDegrees(),
+            projectLocation.getCentreOfInterestLatitudeMinutes(),
+            projectLocation.getCentreOfInterestLatitudeSeconds(),
+            projectLocation.getCentreOfInterestLatitudeHemisphere()));
 
-    var fieldName = field != null
-        ? field.getFieldName()
-        : null;
-    projectLocationView.setField(fieldName);
+    projectLocationView.setCentreOfInterestLongitude(
+        CoordinateUtil.formatCoordinate(
+            projectLocation.getCentreOfInterestLongitudeDegrees(),
+            projectLocation.getCentreOfInterestLongitudeMinutes(),
+            projectLocation.getCentreOfInterestLongitudeSeconds(),
+            projectLocation.getCentreOfInterestLongitudeHemisphere()));
 
-    var ukcsArea = field != null && field.getUkcsArea() != null
-        ? field.getUkcsArea().getDisplayName()
-        : UKCS_AREA_NOT_SET_MESSAGE;
-    projectLocationView.setUkcsArea(ukcsArea);
+    if (isOilAndGasProject) {
+      var field = projectLocation.getField();
 
-    var fieldType = projectLocation.getFieldType() != null
-        ? projectLocation.getFieldType().getDisplayName()
-        : null;
-    projectLocationView.setFieldType(fieldType);
+      var fieldName = field != null
+          ? field.getFieldName()
+          : null;
+      projectLocationView.setField(fieldName);
 
-    projectLocationView.setMaximumWaterDepth(projectLocation.getMaximumWaterDepth() != null
-        ? getWaterDepthString(projectLocation.getMaximumWaterDepth())
-        : "");
-    projectLocationView.setApprovedFieldDevelopmentPlan(projectLocation.getApprovedFieldDevelopmentPlan());
-    projectLocationView.setApprovedFdpDate(DateUtil.formatDate(projectLocation.getApprovedFdpDate()));
-    projectLocationView.setApprovedDecomProgram(projectLocation.getApprovedDecomProgram());
-    projectLocationView.setApprovedDecomProgramDate(DateUtil.formatDate(projectLocation.getApprovedDecomProgramDate()));
+      var ukcsArea = field != null && field.getUkcsArea() != null
+          ? field.getUkcsArea().getDisplayName()
+          : UKCS_AREA_NOT_SET_MESSAGE;
+      projectLocationView.setUkcsArea(ukcsArea);
 
-    projectLocationView.setLicenceBlocks(projectLocationBlocks.stream()
-        .map(ProjectLocationBlock::getBlockReference)
-        .collect(Collectors.toList()));
+      var fieldType = projectLocation.getFieldType() != null
+          ? projectLocation.getFieldType().getDisplayName()
+          : null;
+      projectLocationView.setFieldType(fieldType);
+
+      projectLocationView.setMaximumWaterDepth(projectLocation.getMaximumWaterDepth() != null
+          ? getWaterDepthString(projectLocation.getMaximumWaterDepth())
+          : "");
+      projectLocationView.setApprovedFieldDevelopmentPlan(projectLocation.getApprovedFieldDevelopmentPlan());
+      projectLocationView.setApprovedFdpDate(DateUtil.formatDate(projectLocation.getApprovedFdpDate()));
+      projectLocationView.setApprovedDecomProgram(projectLocation.getApprovedDecomProgram());
+      projectLocationView.setApprovedDecomProgramDate(DateUtil.formatDate(projectLocation.getApprovedDecomProgramDate()));
+
+      projectLocationView.setLicenceBlocks(projectLocationBlocks.stream()
+          .map(ProjectLocationBlock::getBlockReference)
+          .collect(Collectors.toList()));
+    }
 
     return projectLocationView;
   }

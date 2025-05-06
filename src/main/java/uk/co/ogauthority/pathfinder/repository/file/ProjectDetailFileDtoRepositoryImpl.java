@@ -31,16 +31,15 @@ public class ProjectDetailFileDtoRepositoryImpl implements ProjectDetailFileDtoR
 
     return entityManager.createQuery("" +
             "SELECT new uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView(" +
-            "  uf.fileId" +
-            ", uf.fileName" +
-            ", uf.fileSize" +
+            "  pf.uploadedFile.fileId" +
+            ", pf.uploadedFile.fileName" +
+            ", pf.uploadedFile.fileSize" +
             ", pf.description" +
-            ", uf.uploadDatetime" +
+            ", pf.uploadedFile.uploadDatetime" +
             ", '#' " + //link updated after construction as requires reverse router
             ") " +
             "FROM ProjectDetailFile pf " +
-            "JOIN UploadedFile uf ON pf.fileId = uf.fileId " +
-            "WHERE uf.status = :fileStatus " +
+            "WHERE pf.uploadedFile.status = :fileStatus " +
             "AND pf.projectDetail = :projectDetail " +
             "AND pf.purpose = :purpose " +
             "AND (pf.fileLinkStatus = :fileLinkStatus OR :fileLinkStatus = :allFileLinkStatus)",
@@ -91,17 +90,16 @@ public class ProjectDetailFileDtoRepositoryImpl implements ProjectDetailFileDtoR
   ) {
     return entityManager.createQuery(
             "SELECT new uk.co.ogauthority.pathfinder.model.view.file.UploadedFileView(" +
-            "  uf.fileId" +
-            ", uf.fileName" +
-            ", uf.fileSize" +
+            "  pf.uploadedFile.fileId" +
+            ", pf.uploadedFile.fileName" +
+            ", pf.uploadedFile.fileSize" +
             ", pf.description" +
-            ", uf.uploadDatetime" +
+            ", pf.uploadedFile.uploadDatetime" +
             ", '#' " + //link updated after construction as requires reverse router
             ") " +
             "FROM ProjectDetailFile pf " +
-            "JOIN UploadedFile uf ON pf.fileId = uf.fileId " +
-            "WHERE pf.fileId = :fileId " +
-            "AND uf.status IN (:fileStatusList) " +
+            "WHERE pf.uploadedFile.fileId = :fileId " +
+            "AND pf.uploadedFile.status IN (:fileStatusList) " +
             "AND pf.projectDetail = :projectDetail " +
             "AND pf.purpose = :purpose " +
             "AND (pf.fileLinkStatus = :fileLinkStatus OR :fileLinkStatus = :allFileLinkStatus)",

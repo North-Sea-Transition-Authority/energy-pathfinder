@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.testutil;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedule.PlugAbandonmentSchedule;
 import uk.co.ogauthority.pathfinder.model.entity.project.plugabandonmentschedule.PlugAbandonmentWell;
 import uk.co.ogauthority.pathfinder.model.entity.wellbore.Wellbore;
 
@@ -29,9 +30,21 @@ public class PlugAbandonmentWellTestUtil {
     return createPlugAbandonmentWell(WellboreTestUtil.createWellbore());
   }
 
+  public static PlugAbandonmentWell createPlugAbandonmentWell(Integer id, PlugAbandonmentSchedule plugAbandonmentSchedule) {
+    return createPlugAbandonmentWell(id, plugAbandonmentSchedule, WellboreTestUtil.createWellbore());
+  }
+
   public static PlugAbandonmentWell createPlugAbandonmentWell(Wellbore wellbore) {
-    var plugAbandonmentWell = new PlugAbandonmentWell();
-    plugAbandonmentWell.setPlugAbandonmentSchedule(PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule());
+    return createPlugAbandonmentWell(null, PlugAbandonmentScheduleTestUtil.createPlugAbandonmentSchedule(), wellbore);
+  }
+
+  public static PlugAbandonmentWell createPlugAbandonmentWell(
+      Integer id,
+      PlugAbandonmentSchedule plugAbandonmentSchedule,
+      Wellbore wellbore
+  ) {
+    var plugAbandonmentWell = new PlugAbandonmentWell(id);
+    plugAbandonmentWell.setPlugAbandonmentSchedule(plugAbandonmentSchedule);
     plugAbandonmentWell.setWellbore(wellbore);
     return plugAbandonmentWell;
   }

@@ -16,9 +16,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -34,26 +34,28 @@ import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.mvc.argumentresolver.ValidationTypeArgumentResolver;
 import uk.co.ogauthority.pathfinder.service.project.location.ProjectLocationService;
 import uk.co.ogauthority.pathfinder.service.project.projectcontext.ProjectContextService;
+import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = ProjectLocationController.class, includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = ProjectContextService.class))
 public class ProjectLocationControllerTest extends ProjectContextAbstractControllerTest {
+
   private static final Integer PROJECT_ID = 1;
 
-
-  @MockBean
+  @MockitoBean
   private ProjectLocationService projectLocationService;
 
-  private final ProjectDetail detail = ProjectUtil.getProjectDetails();
+  @MockitoBean
+  private ProjectInformationService projectInformationService;
 
+  private final ProjectDetail detail = ProjectUtil.getProjectDetails();
 
   private static final AuthenticatedUserAccount authenticatedUser = UserTestingUtil.getAuthenticatedUserAccount(
       SystemAccessService.CREATE_PROJECT_PRIVILEGES);
 
   private static final AuthenticatedUserAccount unAuthenticatedUser = UserTestingUtil.getAuthenticatedUserAccount();
-
 
   @Before
   public void setUp() throws Exception {
@@ -86,7 +88,7 @@ public class ProjectLocationControllerTest extends ProjectContextAbstractControl
     }};
 
     var bindingResult = new BeanPropertyBindingResult(ProjectLocationForm.class, "form");
-    when(projectLocationService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(projectLocationService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectLocationController.class)
@@ -97,7 +99,7 @@ public class ProjectLocationControllerTest extends ProjectContextAbstractControl
             .params(completeLaterParams))
         .andExpect(status().is3xxRedirection());
 
-    verify(projectLocationService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
+    verify(projectLocationService, times(1)).validate(any(), any(), any(), eq(ValidationType.PARTIAL));
     verify(projectLocationService, times(1)).createOrUpdate(any(), any());
     verify(projectLocationService, times(1)).createOrUpdateBlocks(any(), any());
   }
@@ -112,7 +114,7 @@ public class ProjectLocationControllerTest extends ProjectContextAbstractControl
 
     var bindingResult = new BeanPropertyBindingResult(ProjectLocationForm.class, "form");
     bindingResult.addError(new FieldError("Error", "ErrorMessage", "default message"));
-    when(projectLocationService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(projectLocationService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectLocationController.class)
@@ -123,7 +125,7 @@ public class ProjectLocationControllerTest extends ProjectContextAbstractControl
             .params(completeParams))
         .andExpect(status().is2xxSuccessful());
 
-    verify(projectLocationService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(projectLocationService, times(1)).validate(any(), any(), any(), eq(ValidationType.FULL));
     verify(projectLocationService, times(0)).createOrUpdate(any(), any());
     verify(projectLocationService, times(0)).createOrUpdateBlocks(any(), any());
   }
@@ -135,7 +137,7 @@ public class ProjectLocationControllerTest extends ProjectContextAbstractControl
     }};
 
     var bindingResult = new BeanPropertyBindingResult(ProjectLocationForm.class, "form");
-    when(projectLocationService.validate(any(), any(), any())).thenReturn(bindingResult);
+    when(projectLocationService.validate(any(), any(), any(), any())).thenReturn(bindingResult);
 
     mockMvc.perform(
         post(ReverseRouter.route(on(ProjectLocationController.class)
@@ -146,7 +148,7 @@ public class ProjectLocationControllerTest extends ProjectContextAbstractControl
             .params(completeParams))
         .andExpect(status().is3xxRedirection());
 
-    verify(projectLocationService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
+    verify(projectLocationService, times(1)).validate(any(), any(), any(), eq(ValidationType.FULL));
     verify(projectLocationService, times(1)).createOrUpdate(any(), any());
     verify(projectLocationService, times(1)).createOrUpdateBlocks(any(), any());
   }

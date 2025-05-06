@@ -32,12 +32,12 @@ public enum FieldStage {
       "Hydrogen",
       Set.of(EnergyType.TRANSITION)
   ),
-  OFFSHORE_ELECTRIFICATION(
-      "Offshore electrification",
+  ELECTRIFICATION(
+      "Electrification",
       Set.of(EnergyType.TRANSITION)
   ),
-  OFFSHORE_WIND(
-      "Offshore wind",
+  WIND_ENERGY(
+      "Wind energy",
       Set.of(EnergyType.TRANSITION)
   );
 
@@ -89,5 +89,9 @@ public enum FieldStage {
     return Arrays.stream(values())
         .filter(fs -> fs.energyType.contains(EnergyType.TRANSITION))
         .collect(Collectors.toList());
+  }
+
+  public static boolean isEnergyTransition(FieldStage fieldStage) {
+    return fieldStage.getEnergyType().contains(EnergyType.TRANSITION);
   }
 }

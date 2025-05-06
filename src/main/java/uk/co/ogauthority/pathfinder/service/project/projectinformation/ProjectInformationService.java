@@ -84,7 +84,9 @@ public class ProjectInformationService implements ProjectFormSectionService {
 
   private void clearFieldStageCategory(ProjectInformationForm form) {
     form.setCarbonCaptureSubCategory(null);
-    form.setOffshoreWindSubCategory(null);
+    form.setHydrogenSubCategory(null);
+    form.setElectrificationSubCategory(null);
+    form.setWindEnergySubCategory(null);
   }
 
   public Optional<ProjectInformation> getProjectInformationByProjectAndVersion(Project project, Integer version) {
@@ -143,7 +145,13 @@ public class ProjectInformationService implements ProjectFormSectionService {
   }
 
   private List<FieldStage> getFieldStagesWithHiddenInputs() {
-    return List.of(FieldStage.DEVELOPMENT, FieldStage.CARBON_CAPTURE_AND_STORAGE, FieldStage.OFFSHORE_WIND);
+    return List.of(
+        FieldStage.DEVELOPMENT,
+        FieldStage.CARBON_CAPTURE_AND_STORAGE,
+        FieldStage.HYDROGEN,
+        FieldStage.ELECTRIFICATION,
+        FieldStage.WIND_ENERGY
+    );
   }
 
   private void setEntityHiddenFieldStageData(ProjectInformationForm form, ProjectInformation projectInformation) {
@@ -168,8 +176,14 @@ public class ProjectInformationService implements ProjectFormSectionService {
     } else if (fieldStage.equals(FieldStage.CARBON_CAPTURE_AND_STORAGE)) {
       projectInformation.setFieldStageSubCategory(form.getCarbonCaptureSubCategory());
       clearFirstProductionDate(projectInformation);
-    } else if (fieldStage.equals(FieldStage.OFFSHORE_WIND)) {
-      projectInformation.setFieldStageSubCategory(form.getOffshoreWindSubCategory());
+    } else if (fieldStage.equals(FieldStage.HYDROGEN)) {
+      projectInformation.setFieldStageSubCategory(form.getHydrogenSubCategory());
+      clearFirstProductionDate(projectInformation);
+    } else if (fieldStage.equals(FieldStage.ELECTRIFICATION)) {
+      projectInformation.setFieldStageSubCategory(form.getElectrificationSubCategory());
+      clearFirstProductionDate(projectInformation);
+    } else if (fieldStage.equals(FieldStage.WIND_ENERGY)) {
+      projectInformation.setFieldStageSubCategory(form.getWindEnergySubCategory());
       clearFirstProductionDate(projectInformation);
     }
   }
@@ -188,8 +202,14 @@ public class ProjectInformationService implements ProjectFormSectionService {
     } else if (fieldStage.equals(FieldStage.CARBON_CAPTURE_AND_STORAGE)) {
       form.setCarbonCaptureSubCategory(projectInformation.getFieldStageSubCategory());
       clearFirstProductionDate(form);
-    } else if (fieldStage.equals(FieldStage.OFFSHORE_WIND)) {
-      form.setOffshoreWindSubCategory(projectInformation.getFieldStageSubCategory());
+    } else if (fieldStage.equals(FieldStage.HYDROGEN)) {
+      form.setHydrogenSubCategory(projectInformation.getFieldStageSubCategory());
+      clearFirstProductionDate(form);
+    } else if (fieldStage.equals(FieldStage.ELECTRIFICATION)) {
+      form.setElectrificationSubCategory(projectInformation.getFieldStageSubCategory());
+      clearFirstProductionDate(form);
+    } else if (fieldStage.equals(FieldStage.WIND_ENERGY)) {
+      form.setWindEnergySubCategory(projectInformation.getFieldStageSubCategory());
       clearFirstProductionDate(form);
     }
   }

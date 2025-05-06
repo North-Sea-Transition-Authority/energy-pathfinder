@@ -31,8 +31,12 @@ public class UploadedFileUtil {
   }
 
   public static UploadedFile createUploadedFile() {
+    return createUploadedFile(FILE_ID);
+  }
+
+  public static UploadedFile createUploadedFile(String fileId) {
     var uploadedFile = new UploadedFile();
-    uploadedFile.setFileId(FILE_ID);
+    uploadedFile.setFileId(fileId);
     uploadedFile.setFileName(FILE_NAME);
     uploadedFile.setFileData(null);
     uploadedFile.setContentType("CONTENT_TYPE");

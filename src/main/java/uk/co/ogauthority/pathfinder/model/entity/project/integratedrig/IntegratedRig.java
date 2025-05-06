@@ -29,6 +29,13 @@ public class IntegratedRig extends ProjectDetailEntity {
   @Enumerated(EnumType.STRING)
   private IntegratedRigIntentionToReactivate intentionToReactivate;
 
+  public IntegratedRig() {
+  }
+
+  public IntegratedRig(Integer id) {
+    this.id = id;
+  }
+
   public DevUkFacility getFacility() {
     return facility;
   }

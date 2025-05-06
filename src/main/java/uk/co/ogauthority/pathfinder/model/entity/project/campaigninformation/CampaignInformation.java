@@ -10,6 +10,13 @@ import uk.co.ogauthority.pathfinder.service.entityduplication.ParentEntity;
 @Table(name = "campaign_information")
 public class CampaignInformation extends ProjectDetailEntity implements ParentEntity {
 
+  public CampaignInformation() {
+  }
+
+  public CampaignInformation(Integer id) {
+    this.id = id;
+  }
+
   private String scopeDescription;
 
   private Boolean isPartOfCampaign;

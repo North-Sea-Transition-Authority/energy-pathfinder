@@ -14,9 +14,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -42,10 +42,10 @@ public class ChangeProjectOperatorControllerTest extends ProjectContextAbstractC
 
   private static final Integer PROJECT_ID = 1;
 
-  @MockBean
+  @MockitoBean
   private SelectOperatorService selectOperatorService;
 
-  @MockBean
+  @MockitoBean
   private ProjectOperatorModelService projectOperatorModelService;
 
   private final ProjectDetail detail = ProjectUtil.getProjectDetails();
