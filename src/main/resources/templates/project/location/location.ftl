@@ -83,6 +83,10 @@
         </p>
       </@fdsDetails.summaryDetails>
     </#if>
-    <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
+    <@fdsAction.submitButtons
+      primaryButtonText="Save and complete"
+      secondaryButtonText="Save and complete later"
+      disableOnSubmit=true
+    />
   </@fdsForm.htmlForm>
 </@defaultPage>
