@@ -145,6 +145,21 @@ steps:
         path: /var/webfiles
     when:
       status: [ success, failure ]
+      
+  - name: scan-and-sync-public-repo
+    image: quay.io/fivium/drone-trufflehog-plugin:v1.0
+    settings:
+      scan_since_commit_hash: 10d38ac5a33de31651ae3f6330969f601905627b
+      sync_to_mirror: true
+      mirror_remote_url: git@github.com:North-Sea-Transition-Authority/energy-pathfinder.git
+      mirror_branch_to_sync: develop
+      mirror_remote_ssh_key:
+        from_secret: sync_ssh_key
+    when:
+      event:
+        - push
+      branch:
+        - develop
 
   - name: rebuild-cache
     image: drillster/drone-volume-cache
@@ -314,4 +329,11 @@ data: qJLvp1RXmrKy+DTDstPa8nlstJUMDbPsKwOUFTo/aZd37TaDUuXngnQm77trbJEML+1fZjQsNZ
 kind: secret
 name: slack_webhook
 data: EV3J36arn96t9mrPi+ev7/hliTCZIWl+iOswME6xmcOCTRSKtePYLxJpPpiDuWdTOc0nyx8hvF+Xo/BKdYFWExOG+DktqQ5oBI55Q2v6kCOcC8v242FBAuSX5gv4+JiYiqZSqwvy2TRp3IQ=
+
+---
+
+kind: secret
+name: sync_ssh_key
+data: 7D+ABl8j6WFPOOdcPy9IRVZsJWS9CqLhUty8+MKL6vkzxg3USlu2DPtnJAQh1d/KxR074BFQvF0HYM7OwGOSHNFhL5neoTgz6kyZkvkw8GNZgwPYLYcj/TaqvwiVWJ7CEySE2y3UMu3kiJfEOWzY88JJ3N4hvVNSfttitmlLIanziQ8qQmW1ikOiv1t5rrLl/r+dxDIJKSD6d9u1+IOihjHKuS2YnC1d6XImSdRQFVRmnuEeSktAl+LBzIWh20rvMw7IFKAIFGwMBq8pIHVfreBkMIkyRa+EguuhPnWXNY2ftxrTTeKXgZ8vSmKVByvdtoa/fR/DIlE5xD3HuRT+pDkLpigmcnNnUmtZJKQWVqRGNeFcqZ5hMEfVstW/M28xU++Ho+he55s8KjW5xbBPrJVQjiDA7ClSv4UZh2ryqJx9hFn5/Rlfolb0rlmIEGQHof0r5SCKDmjU8FuMFzg2SO/IGUjXqRk79B9JqzwEQzS8jfOgMxgTjPxz/O7gn3fJpHM884qmMDAGz9TbYeKm+xAQ0p5H09ICc2VUZ9/uD9pzMab1FkshCluQLUuuf6EO/T/AlOgokladpm55elCE8KB008tiG6CqcShpCts=
+
 
