@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfigurationProperties;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
@@ -49,11 +50,18 @@ public class ErrorService {
   }
 
   private void addErrorReference(ModelAndView modelAndView, Throwable throwable) {
-    if (throwable != null) {
-      var errorReference = getErrorReference();
-      modelAndView.addObject("errorRef", errorReference);
-      LOGGER.error("Caught unhandled exception (errorRef {})", errorReference, throwable);
+    if (throwable == null) {
+      return;
     }
+
+    // don't log client errors
+    if (throwable instanceof ResponseStatusException exception && exception.getStatusCode().is4xxClientError()) {
+      return;
+    }
+
+    var errorReference = getErrorReference();
+    modelAndView.addObject("errorRef", errorReference);
+    LOGGER.error("Caught unhandled exception (errorRef {})", errorReference, throwable);
   }
 
   private void addTechnicalSupportContactDetails(ModelAndView modelAndView) {
@@ -78,10 +86,8 @@ public class ErrorService {
   }
 
   public ModelAndView addErrorAttributesToModel(ModelAndView modelAndView, Throwable throwable) {
-    if (throwable != null) {
-      addStackTraceToModel(modelAndView, throwable);
-      addErrorReference(modelAndView, throwable);
-    }
+    addStackTraceToModel(modelAndView, throwable);
+    addErrorReference(modelAndView, throwable);
     addTechnicalSupportContactDetails(modelAndView);
     addServiceProperties(modelAndView);
     addCommonUrls(modelAndView);

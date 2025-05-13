@@ -7,7 +7,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.HttpStatus;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfigurationProperties;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
@@ -84,6 +86,15 @@ public class ErrorServiceTest {
         SHOW_DIFFS_PROJECT_EVENT_CATEGORY_ATTRIBUTE_NAME
     );
     assertCommonModelProperties(resultingModelMap);
+  }
+
+  @Test
+  public void addErrorAttributesToModel_whenClientException_assertExpectedModelAttributes() {
+    var modelAndView = new ModelAndView();
+    var throwable = new ResponseStatusException(HttpStatus.NOT_FOUND);
+
+    assertThat(errorService.addErrorAttributesToModel(modelAndView, throwable).getModelMap())
+        .doesNotContainKey(ERROR_REF_ATTRIBUTE_NAME);
   }
 
   private void assertCommonModelProperties(ModelMap modelMap) {
