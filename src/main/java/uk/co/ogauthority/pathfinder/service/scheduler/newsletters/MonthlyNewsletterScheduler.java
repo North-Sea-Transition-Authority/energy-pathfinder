@@ -6,6 +6,7 @@ import static org.quartz.TriggerKey.triggerKey;
 import org.quartz.JobKey;
 import org.quartz.TriggerKey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -16,13 +17,17 @@ public class MonthlyNewsletterScheduler {
 
   static final JobKey JOB_KEY = jobKey("MONTHLY_NEWSLETTER_JOB", "NEWSLETTER_SCHEDULER_JOBS");
   static final TriggerKey TRIGGER_KEY = triggerKey("MONTHLY_NEWSLETTER_JOB_TRIGGER_KEY", "NEWSLETTER_SCHEDULER_TRIGGERS");
-  static final String FIRST_OF_EVERY_MONTH_AT_9AM = "0 0 09 01 * ?";
 
   private final SchedulerService schedulerService;
+  private final String cron;
 
   @Autowired
-  public MonthlyNewsletterScheduler(SchedulerService schedulerService) {
+  public MonthlyNewsletterScheduler(
+      SchedulerService schedulerService,
+      @Value("${monthly-newsletter.cron}") String cron
+  ) {
     this.schedulerService = schedulerService;
+    this.cron = cron;
   }
 
   @EventListener(classes = ApplicationReadyEvent.class)
@@ -31,7 +36,7 @@ public class MonthlyNewsletterScheduler {
         JOB_KEY,
         TRIGGER_KEY,
         MonthlyNewsletterJob.class,
-        FIRST_OF_EVERY_MONTH_AT_9AM
+        cron
     );
   }
 }

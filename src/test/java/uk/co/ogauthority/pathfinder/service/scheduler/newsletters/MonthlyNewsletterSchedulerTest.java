@@ -13,6 +13,8 @@ import uk.co.ogauthority.pathfinder.service.scheduler.SchedulerService;
 @RunWith(MockitoJUnitRunner.class)
 public class MonthlyNewsletterSchedulerTest {
 
+  private final String cron = "0 0 09 01 * ?";
+
   @Mock
   private SchedulerService schedulerService;
 
@@ -20,7 +22,7 @@ public class MonthlyNewsletterSchedulerTest {
 
   @Before
   public void setup() {
-    monthlyNewsletterScheduler = new MonthlyNewsletterScheduler(schedulerService);
+    monthlyNewsletterScheduler = new MonthlyNewsletterScheduler(schedulerService, cron);
   }
 
   @Test
@@ -32,7 +34,7 @@ public class MonthlyNewsletterSchedulerTest {
         MonthlyNewsletterScheduler.JOB_KEY,
         MonthlyNewsletterScheduler.TRIGGER_KEY,
         MonthlyNewsletterJob.class,
-        MonthlyNewsletterScheduler.FIRST_OF_EVERY_MONTH_AT_9AM
+        cron
     );
   }
 }

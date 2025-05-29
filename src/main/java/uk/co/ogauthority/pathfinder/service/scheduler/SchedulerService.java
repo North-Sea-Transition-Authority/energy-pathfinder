@@ -86,31 +86,31 @@ public class SchedulerService {
    * @param trigger The trigger to fire the job against
    */
   public void scheduleJobIfNoJobExists(JobDetail jobDetail, Trigger trigger) {
-
     var jobKey = jobDetail.getKey();
     var jobKeyString = jobKeyToString(jobKey);
 
     if (doesJobWithKeyExist(jobDetail.getKey())) {
+      LOGGER.info("Job {}, already exists. Job creation not required. Rescheduling trigger", jobKeyString);
 
-      LOGGER.info(
-          "Job {}, already exist. Job creation not required.",
-          jobKeyString
-      );
+      try {
+        var currentTriggers = scheduler.getTriggersOfJob(jobKey);
+        if (currentTriggers.size() != 1) {
+          throw new IllegalStateException("Expected exactly 1 trigger but found %d".formatted(currentTriggers.size()));
+        }
 
-    } else {
+        scheduler.rescheduleJob(currentTriggers.getFirst().getKey(), trigger);
+      } catch (SchedulerException e) {
+        throw new JobSchedulingException("Error rescheduling trigger", e);
+      }
 
-      LOGGER.info(
-          "Job {}, does not exist. Starting job creation...",
-          jobKeyString
-      );
-
-      scheduleJob(jobDetail, trigger);
-
-      LOGGER.info(
-          "Job {} created successfully",
-          jobKeyString
-      );
+      return;
     }
+
+    LOGGER.info("Job {}, does not exist. Starting job creation...", jobKeyString);
+
+    scheduleJob(jobDetail, trigger);
+
+    LOGGER.info("Job {} created successfully", jobKeyString);
   }
 
   /**
