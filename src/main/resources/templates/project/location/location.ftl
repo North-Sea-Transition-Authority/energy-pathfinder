@@ -12,7 +12,7 @@
       secondsPath="form.centreOfInterestLatitude.secondsInput.inputValue"
       hemispherePath="form.centreOfInterestLatitude.hemisphereInput.inputValue"
       formId="latitude"
-      labelText="Centre of interest latitude in ETRS89"
+      labelText="Centre of interest latitude in WGS84"
     />
 
     <@coordinateInput.longitudeInput
@@ -22,7 +22,7 @@
       hemispherePath="form.centreOfInterestLongitude.hemisphereInput.inputValue"
       hemisphereList=longitudeHemispheres
       formId="longitude"
-      labelText="Centre of interest longitude in ETRS89"
+      labelText="Centre of interest longitude in WGS84"
     />
 
     <#if isOilAndGasProject>
