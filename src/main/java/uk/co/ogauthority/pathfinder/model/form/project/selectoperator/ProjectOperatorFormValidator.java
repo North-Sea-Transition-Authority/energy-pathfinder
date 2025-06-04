@@ -14,10 +14,10 @@ import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCo
 public class ProjectOperatorFormValidator implements SmartValidator {
 
   public static final String MISSING_PUBLISHABLE_ORGANISATION_ERROR_MESSAGE =
-      "Select the operator you want shown on the supply chain interface";
+      "Select the operator/developer you want shown on the supply chain interface";
 
   public static final String ORGANISATION_UNIT_NOT_IN_GROUP_ERROR_MESSAGE =
-      "Select an operator who is part of the project operator's group";
+      "Select an operator/developer who is part of the project operator/developer's group";
 
   public static final String ORGANISATION_UNIT_NOT_IN_GROUP_ERROR_CODE = ".notInOrganisationGroup";
 

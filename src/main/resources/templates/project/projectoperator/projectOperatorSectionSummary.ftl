@@ -8,16 +8,16 @@
 <@sectionSummaryWrapper.sectionSummaryWrapper sectionId=sectionId sectionTitle=sectionTitle>
   <@fdsCheckAnswers.checkAnswers>
     <@checkAnswers.diffedCheckAnswersRowNoActions
-      prompt="Project operator"
+      prompt="Project operator/developer"
       diffedField=projectOperatorDiffModel.ProjectOperatorView_operatorName
     />
     <@checkAnswers.diffedCheckAnswersRowNoActions
-      prompt="Show project operator on supply chain interface"
+      prompt="Show project operator/developer on supply chain interface"
       diffedField=projectOperatorDiffModel.ProjectOperatorView_isPublishedAsOperator
     />
     <#if !isPublishedAsOperator>
       <@checkAnswers.diffedCheckAnswersRowNoActions
-        prompt="Operator to show on supply chain interface"
+        prompt="Operator/Developer to show on supply chain interface"
         diffedField=projectOperatorDiffModel.ProjectOperatorView_publishableOrganisationName
       />
     </#if>

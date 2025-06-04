@@ -6,7 +6,7 @@ import uk.co.ogauthority.pathfinder.model.form.validation.positivewholenumber.Po
 
 public class DevelopmentProjectCreatorForm {
 
-  @NotNull(message = "Select an operator")
+  @NotNull(message = "Select an operator/developer")
   private String organisationGroup;
 
   @NotNull(message = "Enter a number of projects")

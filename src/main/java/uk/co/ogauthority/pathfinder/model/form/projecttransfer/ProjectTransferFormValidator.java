@@ -12,7 +12,8 @@ import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCo
 @Component
 public class ProjectTransferFormValidator implements SmartValidator {
 
-  protected static final String SAME_OPERATOR_ERROR_MESSAGE = "The new operator must be different to the current operator";
+  protected static final String SAME_OPERATOR_ERROR_MESSAGE =
+      "The new operator/developer must be different to the current operator/developer";
 
   private final ProjectOperatorFormValidator projectOperatorFormValidator;
 

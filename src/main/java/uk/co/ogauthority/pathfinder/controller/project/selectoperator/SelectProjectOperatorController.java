@@ -29,7 +29,7 @@ import uk.co.ogauthority.pathfinder.service.project.selectoperator.SelectOperato
 public class SelectProjectOperatorController {
 
   public static final String PRIMARY_BUTTON_TEXT = "Save and continue";
-  protected static final String PAGE_NAME = "Project operator";
+  protected static final String PAGE_NAME = "Project operator/developer";
 
   private final StartProjectService startProjectService;
   private final SelectOperatorService selectOperatorService;

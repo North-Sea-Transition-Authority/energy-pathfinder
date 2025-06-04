@@ -22,17 +22,17 @@
       <h2 class="govuk-heading-l">${title}</h2>
 
       <@fdsInsetText.insetText insetTextClass="govuk-inset-text--yellow">
-        By changing this ${projectTypeDisplayNameLowercase}'s operator, any in progress updates will no longer be able to be submitted.
+        By changing this ${projectTypeDisplayNameLowercase}'s operator/developer, any in progress updates will no longer be able to be submitted.
       </@fdsInsetText.insetText>
 
       <@fdsDataItems.dataItem>
-        <@fdsDataItems.dataValues key="Current ${projectTypeDisplayNameLowercase} operator" value=currentOperator />
+        <@fdsDataItems.dataValues key="Current ${projectTypeDisplayNameLowercase} operator/developer" value=currentOperator />
       </@fdsDataItems.dataItem>
 
       <@fdsForm.htmlForm>
         <@fdsSearchSelector.searchSelectorRest
           path="form.newOrganisationGroup"
-          labelText="Who is the new operator for the ${projectTypeDisplayNameLowercase}?"
+          labelText="Who is the new operator/developer for the ${projectTypeDisplayNameLowercase}?"
           selectorMinInputLength=3
           restUrl=springUrl(operatorsRestUrl)
           preselectedItems=preselectedOperator!{}
@@ -40,7 +40,7 @@
 
         <@fdsTextarea.textarea
           path="form.transferReason"
-          labelText="What is the reason you are changing this ${projectTypeDisplayNameLowercase}'s operator?"
+          labelText="What is the reason you are changing this ${projectTypeDisplayNameLowercase}'s operator/developer?"
         />
 
         <#assign customerMnemonic = service.customerMnemonic />
@@ -50,23 +50,23 @@
 
         <@fdsRadio.radioGroup
           path=isPublishedAsOperatorFormBind
-          labelText="Is this the operator that should be shown on the ${customerSupplyChainInterfaceText}?"
+          labelText="Is this the operator/developer that should be shown on the ${customerSupplyChainInterfaceText}?"
           hiddenContent=true
         >
           <@fdsRadio.radioYes path=isPublishedAsOperatorFormBind/>
           <@fdsRadio.radioNo path=isPublishedAsOperatorFormBind>
             <@fdsSearchSelector.searchSelectorRest
               path="form.publishableOrganisation"
-              labelText="Which operator should be shown on the ${customerSupplyChainInterfaceText}?"
+              labelText="Which operator/developer should be shown on the ${customerSupplyChainInterfaceText}?"
               selectorMinInputLength=3
               restUrl=springUrl(organisationUnitRestUrl)
               preselectedItems=preselectedPublishableOrganisation!{}
               nestingPath=isPublishedAsOperatorFormBind
               formGroupClass="govuk-!-margin-bottom-5"
             />
-            <@fdsDetails.summaryDetails summaryTitle="The operator I want shown is not listed">
+            <@fdsDetails.summaryDetails summaryTitle="The operator/developer I want shown is not listed">
               <p class="govuk-body">
-                If the operator that should be shown on the ${customerSupplyChainInterfaceText} is not shown in the list,
+                If the operator/developer that should be shown on the ${customerSupplyChainInterfaceText} is not shown in the list,
                 you must check the organisation is registered on the Energy Portal.
               </p>
             </@fdsDetails.summaryDetails>

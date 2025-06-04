@@ -1,2 +1,6 @@
+# org.springframework:spring-context
+CVE-2025-22233
+# org.apache.tomcat.embed:tomcat-embed-core
+CVE-2025-46701
 # commons-beanutils:commons-beanutils
 CVE-2025-48734

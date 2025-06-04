@@ -48,7 +48,7 @@ public class ProjectContributorsFormValidator implements SmartValidator {
       errors.rejectValue(
           "contributorsSelect",
           "contributorsSelect.notEmpty",
-          "You must select at least one operator"
+          "You must select at least one operator/developer"
       );
     }
 
@@ -58,7 +58,7 @@ public class ProjectContributorsFormValidator implements SmartValidator {
       errors.rejectValue(
           "contributorsSelect",
           "contributorsSelect.notAllowed",
-          "The operator of the project cannot be added as a contributor"
+          "The operator/developer of the project cannot be added as a contributor"
       );
     }
   }

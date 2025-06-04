@@ -40,7 +40,7 @@ import uk.co.ogauthority.pathfinder.service.projecttransfer.ProjectTransferServi
 @RequestMapping("/project/{projectId}/change-operator")
 public class ProjectTransferController extends ProjectFormPageController {
 
-  public static final String PAGE_NAME = "Change project operator";
+  public static final String PAGE_NAME = "Change project operator/developer";
 
   private final ProjectTransferService projectTransferService;
   private final ProjectTransferModelService projectTransferModelService;

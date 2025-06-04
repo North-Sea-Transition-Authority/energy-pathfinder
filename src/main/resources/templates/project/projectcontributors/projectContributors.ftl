@@ -27,8 +27,8 @@
     />
     <@fdsDetails.summaryDetails summaryTitle="The organisation I want to contribute to this ${projectTypeDisplayNameLowercase} is not listed">
       <p class="govuk-body">
-        If the organisation you want to contribute to this ${projectTypeDisplayNameLowercase} is not shown in the list then ask the organisation
-        in question to contact the <@mailTo.mailToLink linkText=service.customerMnemonic mailToEmailAddress=regulatorEmailAddress />
+        If the organisation you want to contribute to this ${projectTypeDisplayNameLowercase} is not shown in the list then
+        contact the <@mailTo.mailToLink linkText=service.customerMnemonic mailToEmailAddress=regulatorEmailAddress />
       </p>
     </@fdsDetails.summaryDetails>
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>

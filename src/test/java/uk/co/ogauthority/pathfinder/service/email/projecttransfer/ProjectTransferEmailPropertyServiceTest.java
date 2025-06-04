@@ -43,7 +43,7 @@ public class ProjectTransferEmailPropertyServiceTest {
 
     final var projectDetail = ProjectUtil.getProjectDetails(supportedProjectType);
     final var transferReason = "transfer reason";
-    final var previousOperatorName = "previous operator name";
+    final var previousOperatorName = "previous operator/developer name";
     final var projectUrl = "project url";
 
     final var customIntroText = "custom intro text";
@@ -99,7 +99,7 @@ public class ProjectTransferEmailPropertyServiceTest {
     final var projectDetail = ProjectUtil.getProjectDetails(unsupportedProjectType);
 
     final var transferReason = "transfer reason";
-    final var previousOperatorName = "previous operator name";
+    final var previousOperatorName = "previous operator/developer name";
     final var projectUrl = "project url";
 
     when(testProjectTransferEmailPropertyProvider.getSupportedProjectType()).thenReturn(supportedProjectType);
@@ -137,7 +137,7 @@ public class ProjectTransferEmailPropertyServiceTest {
 
     final var projectDetail = ProjectUtil.getProjectDetails(supportedProjectType);
     final var transferReason = "transfer reason";
-    final var currentOperatorName = "current operator name";
+    final var currentOperatorName = "current operator/developer name";
 
     final var customIntroText = "custom intro text";
     final var customSubjectText = "custom subject text";
@@ -189,7 +189,7 @@ public class ProjectTransferEmailPropertyServiceTest {
 
     final var projectDetail = ProjectUtil.getProjectDetails(unsupportedProjectType);
     final var transferReason = "transfer reason";
-    final var currentOperatorName = "current operator name";
+    final var currentOperatorName = "current operator/developer name";
 
     when(testProjectTransferEmailPropertyProvider.getSupportedProjectType()).thenReturn(supportedProjectType);
 

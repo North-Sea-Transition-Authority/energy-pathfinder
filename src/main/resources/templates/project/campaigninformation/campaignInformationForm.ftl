@@ -12,12 +12,12 @@
   <@fdsForm.htmlForm>
     <@fdsTextarea.textarea path="form.scopeDescription" labelText="What is the scope of the campaign?"/>
     <@fdsDetails.summaryDetails summaryTitle="What should I provide for the scope of the campaign?">
-      <p class="govuk-body">For all the assets involved in the campaign include:</p>
+      <p class="govuk-body">For all the assets involved in the campaign you may want to include:</p>
       <ul class="govuk-list govuk-list--bullet">
-        <li>the number of wells to be drilled or decommissioned</li>
         <li>a description of infrastructure to be installed or removed</li>
         <li>any logistics sharing</li>
         <li>any pipeline installation or removal</li>
+        <li>the number of wells to be drilled or decommissioned</li>
       </ul>
     </@fdsDetails.summaryDetails>
 

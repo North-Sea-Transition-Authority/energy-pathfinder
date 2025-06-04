@@ -146,7 +146,7 @@ public class ProjectContributorMailServiceTest {
   public void sendContributorsEmail_noProjectOperator_thenProjectTitleDetailsReturned() {
     var membership = createOrganisationGroupMembershipForContributor(projectContributor1, 1);
     detail.setProjectType(ProjectType.FORWARD_WORK_PLAN);
-    var expectedOperatorValue = String.format("The %s operator", ProjectService.getProjectTypeDisplayNameLowercase(detail));
+    var expectedOperatorValue = String.format("The %s operator/developer", ProjectService.getProjectTypeDisplayNameLowercase(detail));
     var emptyProjectOperator = new ProjectOperator();
     when(projectOperatorService.getProjectOperatorByProjectDetail(detail)).thenReturn(Optional.of(emptyProjectOperator));
     when(portalOrganisationGroupPersonMembershipService.getOrganisationGroupMembershipForOrganisationGroupIn(

@@ -37,7 +37,8 @@ public enum TaskListSectionQuestion {
       ProjectTask.COLLABORATION_OPPORTUNITIES,
       "Do you have any collaboration opportunities on this project?",
       "Collaboration opportunities",
-      "This area is for operators to use when seeking engagement with the supply chain to offer solutions to aid project delivery",
+      "This area is for operators/developers to use when seeking engagement " +
+          "with the supply chain to offer solutions to aid project delivery",
       "form.collaborationOpportunitiesIncluded",
       TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_YES,
       TaskListSectionAnswer.COLLABORATION_OPPORTUNITIES_NO
@@ -74,7 +75,7 @@ public enum TaskListSectionQuestion {
   ),
   CAMPAIGN_INFORMATION(
       ProjectTask.CAMPAIGN_INFORMATION,
-      "Are you willing to combine your work with other operators or the Supply Chain to form a campaign?",
+      "Are you willing to combine your work with other operators/developers or the Supply Chain to form a campaign?",
       "Campaign information",
       "",
       "form.campaignInformationIncluded",

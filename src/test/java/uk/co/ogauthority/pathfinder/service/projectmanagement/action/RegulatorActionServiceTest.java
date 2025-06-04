@@ -177,7 +177,7 @@ public class RegulatorActionServiceTest {
 
     var linkButton = (LinkButton) action.getUserAction();
 
-    final var expectedButtonPrompt = String.format("Change %s operator", projectDetail.getProjectType().getLowercaseDisplayName());
+    final var expectedButtonPrompt = String.format("Change %s operator/developer", projectDetail.getProjectType().getLowercaseDisplayName());
     assertThat(linkButton.getPrompt()).isEqualTo(expectedButtonPrompt);
 
     assertThat(linkButton.getUrl()).isEqualTo(

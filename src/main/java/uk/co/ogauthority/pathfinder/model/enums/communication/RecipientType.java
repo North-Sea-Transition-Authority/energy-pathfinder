@@ -6,7 +6,7 @@ import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
 public enum RecipientType {
 
-  OPERATORS("Operators"),
+  OPERATORS("Operators/Developers"),
   SUBSCRIBERS("Subscribers");
 
   private final String displayName;

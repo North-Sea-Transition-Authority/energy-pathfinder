@@ -19,9 +19,9 @@
 
 <#assign operatorContactText>
   <#if canDisplayEmail>
-    <@mailTo.mailToLink linkText="${projectTypeDisplayNameLowercase} operator" mailToEmailAddress=ownerEmail/>
+    <@mailTo.mailToLink linkText="${projectTypeDisplayNameLowercase} operator/developer" mailToEmailAddress=ownerEmail/>
   <#else>
-    ${projectTypeDisplayNameLowercase} operator
+    ${projectTypeDisplayNameLowercase} operator/developer
   </#if>
 </#assign>
 
@@ -34,11 +34,11 @@
       bannerClass="govuk-notification-banner--full-width-content"
     >
       <h3 class="govuk-notification-banner__heading">
-        You have been given access to this ${projectTypeDisplayNameLowercase} by the operator
+        You have been given access to this ${projectTypeDisplayNameLowercase} by the operator/developer
       </h3>
       <p class="govuk-body">
-        Only the operator can submit or start an update on this ${projectTypeDisplayNameLowercase}.
-        The operator can also view, edit and remove your contributions if required.
+        Only the operator/developer can submit or start an update on this ${projectTypeDisplayNameLowercase}.
+        The operator/developer can also view, edit and remove your contributions if required.
       </p>
     </@fdsNotificationBanner.notificationBannerInfo>
   </#if>

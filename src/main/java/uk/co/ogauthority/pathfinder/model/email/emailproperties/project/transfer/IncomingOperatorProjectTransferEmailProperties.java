@@ -13,12 +13,12 @@ public class IncomingOperatorProjectTransferEmailProperties extends ProjectTrans
   public static final String INCOMING_OPERATOR_SUBJECT_TEXT_MAIL_MERGE_FIELD_NAME = "INCOMING_OPERATOR_SUBJECT_TEXT";
 
   public static final String DEFAULT_INCOMING_OPERATOR_SUBJECT_TEXT = String.format(
-      "You have been added as the operator for a %s",
+      "You have been added as the operator/developer for a %s",
       DEFAULT_TRANSFERABLE_ITEM_NAME
   );
 
   public static final String DEFAULT_INCOMING_OPERATOR_INTRO_TEXT = String.format(
-      "The regulator has added you as the operator for a %s",
+      "The regulator has added you as the operator/developer for a %s",
       DEFAULT_TRANSFERABLE_ITEM_NAME
   );
 

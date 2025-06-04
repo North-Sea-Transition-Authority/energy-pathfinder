@@ -11,17 +11,17 @@ import uk.co.ogauthority.pathfinder.util.StreamUtil;
 public enum FieldStage {
   DISCOVERY(
       "Discovery",
-      "Exploration phase",
+      "Oil & Gas - Exploration phase",
       Set.of(EnergyType.OIL_AND_GAS)
   ),
   DEVELOPMENT(
       "Development",
-      "Industry engagement throughout project development cycle up to first oil",
+      "Oil & Gas - Industry engagement throughout project development cycle up to first oil",
       Set.of(EnergyType.OIL_AND_GAS)
   ),
   DECOMMISSIONING(
       "Decommissioning",
-      "Decommissioning planning commenced either pre/post Cessation of Production",
+      "Oil & Gas - Planning commenced either pre/post Cessation of Production",
       Set.of(EnergyType.OIL_AND_GAS)
   ),
   CARBON_CAPTURE_AND_STORAGE(

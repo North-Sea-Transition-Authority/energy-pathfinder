@@ -47,7 +47,7 @@
 <#macro _recipientSummary communicationView>
   <#if communicationView.operatorRecipientType>
     <#assign recipientListSize=communicationView.emailView.recipientList?size/>
-    <span>${recipientListSize} ${textUtil.pluralise(recipientListSize, "operator", "operators")}</span>
+    <span>${recipientListSize} ${textUtil.pluralise(recipientListSize, "operator/developer", "operators/developers")}</span>
     <#elseif communicationView.subscriberRecipientType>
       <span>${service.serviceName} subscribers</span>
   </#if>

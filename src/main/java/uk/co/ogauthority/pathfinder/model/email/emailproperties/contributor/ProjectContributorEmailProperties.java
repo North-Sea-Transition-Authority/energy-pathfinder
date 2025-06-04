@@ -61,7 +61,7 @@ abstract class ProjectContributorEmailProperties extends EmailProperties {
     if (projectOperator.getOrganisationGroup() != null) {
       return projectOperator.getOrganisationGroup().getName();
     }
-    return String.format("The %s operator", ProjectService.getProjectTypeDisplayNameLowercase(detail));
+    return String.format("The %s operator/developer", ProjectService.getProjectTypeDisplayNameLowercase(detail));
   }
 
   @Override

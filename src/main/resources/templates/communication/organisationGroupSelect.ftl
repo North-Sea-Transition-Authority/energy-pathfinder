@@ -18,9 +18,9 @@
           checkboxContainerId=checkboxContainerId
           prefixText="Select"
           selectAllLinkText="all"
-          selectAllScreenReaderText="Select all of the available operators"
+          selectAllScreenReaderText="Select all of the available operators/developers"
           selectNoneLinkText="none"
-          selectNoneScreenReaderText="Select none of the available operators"
+          selectNoneScreenReaderText="Select none of the available operators/developers"
         />
         <@fdsCheckbox.checkboxes
           path="form.organisationGroups"

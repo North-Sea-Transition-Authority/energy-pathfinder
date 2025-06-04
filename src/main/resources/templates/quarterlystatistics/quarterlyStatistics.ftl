@@ -13,7 +13,7 @@
   <@fdsTabs.tabs tabsHeading="Quarterly statistics">
     <@fdsTabs.tabList>
       <@fdsTabs.tab tabLabel="Overview" tabAnchor="overview"/>
-      <@fdsTabs.tab tabLabel="Operators" tabAnchor="operators"/>
+      <@fdsTabs.tab tabLabel="Operators/Developers" tabAnchor="operators"/>
     </@fdsTabs.tabList>
     <@fdsTabs.tabContent tabAnchor="overview">
       <@projectUpdateStatistic._projectUpdateStatisticGroup projectUpdateStatistics=projectUpdateStatistics />

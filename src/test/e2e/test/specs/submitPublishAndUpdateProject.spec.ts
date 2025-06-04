@@ -1,4 +1,4 @@
-import { faker } from "@faker-js/faker";
+import {faker} from "@faker-js/faker";
 import {LoginPage} from "./page-objects/login.page"
 import {FdsButton} from "../test-library/page-objects/components/FdsButton";
 import {FdsLink} from "../test-library/page-objects/components/FdsLink";
@@ -29,9 +29,9 @@ describe('Submit, publish and update project', () => {
         await expect(browser).toHaveTitle(expect.stringContaining('Work area - Energy Pathfinder'));
         await FdsButton.clickButtonWithText("Create project");
         await FdsButton.clickButtonWithPartialText("Start project");
-        await FdsLink.clickLinkWithText("Project operator");
-        await FdsSearchSelector.searchAndSelectOption("Who is the operator for the project?", "AUTOMATED TEST ORGANISATION GROUP");
-        await FdsRadio.selectRadioItemWithText("Is this the operator you want shown on the NSTA supply chain interface?", "Yes");
+        await FdsLink.clickLinkWithText("Project operator/developer");
+        await FdsSearchSelector.searchAndSelectOption("Who is the operator/developer for the project?", "AUTOMATED TEST ORGANISATION GROUP");
+        await FdsRadio.selectRadioItemWithText("Is this the operator/developer you want shown on the NSTA supply chain interface?", "Yes");
         await FdsButton.clickButtonWithText("Save and continue");
         await FdsLink.clickLinkWithText("Project information & contact details");
         const projectInformation = new ProjectInformationPage();
@@ -55,7 +55,7 @@ describe('Submit, publish and update project', () => {
         await FdsRadio.selectRadioItemWithText("Do you have any upcoming tenders on this project?", "No");
         await FdsRadio.selectRadioItemWithText("Do you have any awarded contracts on this project?", "No");
         await FdsRadio.selectRadioItemWithText("Do you have any collaboration opportunities on this project?", "No");
-        await FdsRadio.selectRadioItemWithText("Are you willing to combine your work with other operators or the Supply Chain to form a campaign?", "No");
+        await FdsRadio.selectRadioItemWithText("Are you willing to combine your work with other operators/developers or the Supply Chain to form a campaign?", "No");
         await FdsRadio.selectRadioItemWithText("Are wells being commissioned on this project?", "No");
         await FdsButton.clickButtonWithText("Save and complete");
         await FdsLink.clickLinkWithText("Review and submit");

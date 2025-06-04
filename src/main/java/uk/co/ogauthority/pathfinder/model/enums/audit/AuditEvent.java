@@ -7,7 +7,7 @@ public enum AuditEvent {
   UNSUBSCRIBE_POST_REQUEST(AuditLevel.INFO, "Subscriber unsubscribe request made with uuid: %s"),
   SUBSCRIBER_DETAILS_UPDATED(AuditLevel.INFO, "Subscription details updated for subscriber with uuid: %s"),
   //Form page POSTS
-  PROJECT_OPERATOR_UPDATED(AuditLevel.INFO, "Project operator with id: %d updated for projectDetail with id: %d"),
+  PROJECT_OPERATOR_UPDATED(AuditLevel.INFO, "Project operator/developer with id: %d updated for projectDetail with id: %d"),
   PROJECT_INFORMATION_UPDATED(AuditLevel.INFO, "Project information updated for projectDetail with id: %d"),
   LOCATION_INFORMATION_UPDATED(AuditLevel.INFO, "Location information updated for projectDetail with id: %d"),
   PROJECT_SETUP_UPDATED(AuditLevel.INFO, "Project setup information updated for projectDetail with id: %d"),

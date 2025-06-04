@@ -6,7 +6,7 @@ import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
 public class OrganisationGroupSelectorForm {
 
-  @NotEmpty(message = "You must select at least one operator", groups = FullValidation.class)
+  @NotEmpty(message = "You must select at least one operator/developer", groups = FullValidation.class)
   private List<Integer> organisationGroups;
 
   public List<Integer> getOrganisationGroups() {

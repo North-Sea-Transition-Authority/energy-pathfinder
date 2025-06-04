@@ -7,18 +7,14 @@
     <@fdsTextInput.textInput path="form.projectTitle" labelText="What is the project title?"/>
     <@fdsTextarea.textarea path="form.projectSummary" labelText="Provide a summary of the project"  />
     <@fdsDetails.summaryDetails summaryTitle="What should I provide for the summary of the project?">
-      <p class="govuk-body">Provide a description of the project and future plans and include the following where appropriate:</p>
+      <p class="govuk-body">Provide a description of the project and future plans. Things you may want to include:</p>
       <ul class="govuk-list govuk-list--bullet">
-        <li>location in UKCS and high level scope/infrastructure summary</li>
-        <li>current stage of the project, for example: Pre-Feed, decommissioning</li>
-        <li>
-          current view of the timing/schedule for upcoming work, including key constraints, for example:
-          <ul class="govuk-list govuk-list--bullet">
-            <li>estimated year when the platform will go cold following well decommissioning</li>
-            <li>market engagement plan, for example when will tenders come to the market</li>
-          </ul>
-        </li>
-        <li>receptiveness to campaign/aggregation proposals</li>
+        <li>high level scope/infrastructure summary/construction phase</li>
+        <li>specific details of contract opportunities (to avoid unnecessary enquiries from unqualified suppliers)</li>
+        <li>current stage of the project</li>
+        <li>estimated timing/schedule for upcoming work</li>
+        <li>number of turbines & install capacity in megawatts</li>
+        <li>estimated year when the platform will go cold following well decommissioning</li>
       </ul>
     </@fdsDetails.summaryDetails>
 
@@ -111,7 +107,8 @@
 
     </@fdsRadio.radioGroup>
 
-    <@contactDetails.standardContactDetails path="form.contactDetail"/>
+    <@contactDetails.standardContactDetails path="form.contactDetail"
+      hintText="For example, project manager, procurement manager etc"/>
     <@fdsAction.submitButtons primaryButtonText="Save and complete" secondaryButtonText="Save and complete later"/>
   </@fdsForm.htmlForm>
 </@defaultPage>

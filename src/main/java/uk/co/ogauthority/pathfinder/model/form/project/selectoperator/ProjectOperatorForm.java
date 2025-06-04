@@ -6,11 +6,11 @@ import uk.co.ogauthority.pathfinder.model.form.validation.FullValidation;
 
 public class ProjectOperatorForm {
 
-  @NotNull(message = "Select the operator of the project", groups = FullValidation.class)
+  @NotNull(message = "Select the operator/developer of the project", groups = FullValidation.class)
   private String operator;
 
   @NotNull(
-      message = "Select if this is the operator you want shown on the supply chain interface",
+      message = "Select if this is the operator/developer you want shown on the supply chain interface",
       groups = FullValidation.class
   )
   private Boolean isPublishedAsOperator;

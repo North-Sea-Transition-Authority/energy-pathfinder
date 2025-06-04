@@ -13,12 +13,12 @@ public class OutgoingOperatorProjectTransferEmailProperties extends ProjectTrans
   public static final String OUTGOING_OPERATOR_SUBJECT_TEXT_MAIL_MERGE_FIELD_NAME = "OUTGOING_OPERATOR_SUBJECT_TEXT";
 
   public static final String DEFAULT_OUTGOING_OPERATOR_SUBJECT_TEXT = String.format(
-      "You have been removed as the operator of a %s",
+      "You have been removed as the operator/developer of a %s",
       DEFAULT_TRANSFERABLE_ITEM_NAME
   );
 
   public static final String DEFAULT_OUTGOING_OPERATOR_INTRO_TEXT = String.format(
-      "The regulator has removed you as the operator for a %s",
+      "The regulator has removed you as the operator/developer for a %s",
       DEFAULT_TRANSFERABLE_ITEM_NAME
   );
 

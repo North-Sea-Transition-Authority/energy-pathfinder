@@ -117,7 +117,7 @@ public class RegulatorActionService {
   protected UserActionWithDisplayOrder getTransferProjectAction(ProjectDetail projectDetail) {
     return new UserActionWithDisplayOrder(
         new LinkButton(
-            String.format("Change %s operator", projectDetail.getProjectType().getLowercaseDisplayName()),
+            String.format("Change %s operator/developer", projectDetail.getProjectType().getLowercaseDisplayName()),
             ReverseRouter.route(on(ProjectTransferController.class).getTransferProject(
                 projectDetail.getProject().getId(),
                 null,

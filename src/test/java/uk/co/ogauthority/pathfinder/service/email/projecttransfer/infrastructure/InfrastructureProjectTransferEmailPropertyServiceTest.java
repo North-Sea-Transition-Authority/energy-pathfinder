@@ -52,7 +52,7 @@ public class InfrastructureProjectTransferEmailPropertyServiceTest {
     final var projectUrl = "project url";
     final var projectDetail = ProjectUtil.getProjectDetails();
     final var transferReason = "transfer reason";
-    final var previousOperatorName = "previous operator name";
+    final var previousOperatorName = "previous operator/developer name";
     final var projectTitle = "project title";
     final var customerMnemonic = "customer mnemonic";
 
@@ -70,7 +70,7 @@ public class InfrastructureProjectTransferEmailPropertyServiceTest {
     expectedEmailPersonalisation.put(
         IncomingOperatorProjectTransferEmailProperties.INCOMING_OPERATOR_SUBJECT_TEXT_MAIL_MERGE_FIELD_NAME,
         String.format(
-            "You have been added as the operator for the %s: %s",
+            "You have been added as the operator/developer for the %s: %s",
             projectTypeLowerCaseDisplayName,
             projectTitle
         )
@@ -79,7 +79,7 @@ public class InfrastructureProjectTransferEmailPropertyServiceTest {
     expectedEmailPersonalisation.put(
         IncomingOperatorProjectTransferEmailProperties.INCOMING_OPERATOR_INTRO_TEXT_MAIL_MERGE_FIELD_NAME,
         String.format(
-            "The %s have added you as the operator for the %s: %s.",
+            "The %s have added you as the operator/developer for the %s: %s.",
             customerMnemonic,
             projectTypeLowerCaseDisplayName,
             projectTitle
@@ -101,7 +101,7 @@ public class InfrastructureProjectTransferEmailPropertyServiceTest {
 
     final var projectDetail = ProjectUtil.getProjectDetails();
     final var transferReason = "transfer reason";
-    final var currentOperatorName = "current operator name";
+    final var currentOperatorName = "current operator/developer name";
     final var projectTitle = "project title";
     final var customerMnemonic = "customer mnemonic";
 
@@ -117,7 +117,7 @@ public class InfrastructureProjectTransferEmailPropertyServiceTest {
     expectedEmailPersonalisation.put(
         InfrastructureOutgoingOperatorTransferEmailProperties.OUTGOING_OPERATOR_SUBJECT_TEXT_MAIL_MERGE_FIELD_NAME,
         String.format(
-            "You have been removed as the operator for the %s: %s",
+            "You have been removed as the operator/developer for the %s: %s",
             projectTypeLowerCaseDisplayName,
             projectTitle
         )
@@ -126,7 +126,7 @@ public class InfrastructureProjectTransferEmailPropertyServiceTest {
     expectedEmailPersonalisation.put(
         InfrastructureOutgoingOperatorTransferEmailProperties.OUTGOING_OPERATOR_INTRO_TEXT_MAIL_MERGE_FIELD_NAME,
         String.format(
-            "The %s have removed you as the operator of the %s: %s.",
+            "The %s have removed you as the operator/developer of the %s: %s.",
             customerMnemonic,
             projectTypeLowerCaseDisplayName,
             projectTitle

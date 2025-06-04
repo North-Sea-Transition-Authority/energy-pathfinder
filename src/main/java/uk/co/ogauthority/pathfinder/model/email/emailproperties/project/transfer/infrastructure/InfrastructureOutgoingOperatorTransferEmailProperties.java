@@ -30,7 +30,7 @@ public class InfrastructureOutgoingOperatorTransferEmailProperties extends Outgo
     emailPersonalisation.put(
         OutgoingOperatorProjectTransferEmailProperties.OUTGOING_OPERATOR_SUBJECT_TEXT_MAIL_MERGE_FIELD_NAME,
         String.format(
-            "You have been removed as the operator for the %s: %s",
+            "You have been removed as the operator/developer for the %s: %s",
             projectTypeLowerCaseDisplayName,
             projectTitle
         )
@@ -39,7 +39,7 @@ public class InfrastructureOutgoingOperatorTransferEmailProperties extends Outgo
     emailPersonalisation.put(
         OutgoingOperatorProjectTransferEmailProperties.OUTGOING_OPERATOR_INTRO_TEXT_MAIL_MERGE_FIELD_NAME,
         String.format("" +
-            "The %s have removed you as the operator of the %s: %s.",
+            "The %s have removed you as the operator/developer of the %s: %s.",
             customerMnemonic,
             projectTypeLowerCaseDisplayName,
             projectTitle

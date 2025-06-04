@@ -21,8 +21,8 @@
 </#macro>
 
 <#macro regulatorFilters>
-  <@fdsSearch.searchFilterItem itemName="Project operator">
-    <@fdsSearch.searchTextInput path="form.operatorName" labelText="Project operator" labelClass="govuk-visually-hidden"/>
+  <@fdsSearch.searchFilterItem itemName="Project operator/developer">
+    <@fdsSearch.searchTextInput path="form.operatorName" labelText="Project operator/developer" labelClass="govuk-visually-hidden"/>
   </@fdsSearch.searchFilterItem>
   <@defaultFilters/>
 </#macro>

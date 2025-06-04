@@ -31,7 +31,7 @@ public class InfrastructureIncomingOperatorTransferEmailProperties extends Incom
     emailPersonalisation.put(
         IncomingOperatorProjectTransferEmailProperties.INCOMING_OPERATOR_SUBJECT_TEXT_MAIL_MERGE_FIELD_NAME,
         String.format(
-            "You have been added as the operator for the %s: %s",
+            "You have been added as the operator/developer for the %s: %s",
             projectTypeLowerCaseDisplayName,
             projectTitle
         )
@@ -40,7 +40,7 @@ public class InfrastructureIncomingOperatorTransferEmailProperties extends Incom
     emailPersonalisation.put(
         IncomingOperatorProjectTransferEmailProperties.INCOMING_OPERATOR_INTRO_TEXT_MAIL_MERGE_FIELD_NAME,
         String.format(
-            "The %s have added you as the operator for the %s: %s.",
+            "The %s have added you as the operator/developer for the %s: %s.",
             customerMnemonic,
             projectTypeLowerCaseDisplayName,
             projectTitle
