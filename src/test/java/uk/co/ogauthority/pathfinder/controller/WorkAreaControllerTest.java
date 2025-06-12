@@ -50,7 +50,7 @@ public class WorkAreaControllerTest extends AbstractControllerTest {
 
   private static final String TITLE = "a test project title";
   private static final String FIELD = "Field name";
-  private static final List<FieldStage> FIELD_STAGES = List.of(FieldStage.DISCOVERY, FieldStage.CARBON_CAPTURE_AND_STORAGE);
+  private static final List<FieldStage> FIELD_STAGES = List.of(FieldStage.OIL_AND_GAS, FieldStage.CARBON_CAPTURE_AND_STORAGE);
   private static final List<UkcsArea> UKCS_AREAS = List.of(UkcsArea.IS, UkcsArea.CNS);
   private static final List<ProjectStatus> STATUSES = List.of(ProjectStatus.DRAFT, ProjectStatus.QA);
 

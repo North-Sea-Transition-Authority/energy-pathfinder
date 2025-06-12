@@ -19,13 +19,9 @@ class FieldStageTest {
     );
   }
 
-  @ParameterizedTest
-  @EnumSource(
-      value = FieldStage.class,
-      names = {"DISCOVERY", "DEVELOPMENT", "DECOMMISSIONING"}
-  )
-  void isEnergyTransition_fieldStageEnergyTypeIsNotEnergyTransition(FieldStage fieldStage) {
-    assertThat(FieldStage.isEnergyTransition(fieldStage)).isFalse();
+  @Test
+  void isEnergyTransition_fieldStageEnergyTypeIsNotEnergyTransition() {
+    assertThat(FieldStage.isEnergyTransition(FieldStage.OIL_AND_GAS)).isFalse();
   }
 
   @ParameterizedTest

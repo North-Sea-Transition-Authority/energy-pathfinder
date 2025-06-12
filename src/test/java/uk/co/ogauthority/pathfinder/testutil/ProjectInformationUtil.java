@@ -11,8 +11,8 @@ public class ProjectInformationUtil {
 
   public static final String PROJECT_TITLE = "PROJECT TITLE";
   public static final String PROJECT_SUMMARY = "SUMMARY";
-  public static final FieldStage FIELD_STAGE = FieldStage.DECOMMISSIONING;
-  public static final FieldStageSubCategory FIELD_STAGE_SUB_CATEGORY = FieldStageSubCategory.FIXED_BOTTOM_OFFSHORE_WIND;
+  public static final FieldStage FIELD_STAGE = FieldStage.OIL_AND_GAS;
+  public static final FieldStageSubCategory FIELD_STAGE_SUB_CATEGORY = FieldStageSubCategory.DECOMMISSIONING;
   public static final String CONTACT_NAME = ContactDetailsTestUtil.CONTACT_NAME;
   public static final String PHONE_NUMBER = ContactDetailsTestUtil.PHONE_NUMBER;
   public static final String JOB_TITLE = ContactDetailsTestUtil.JOB_TITLE;
@@ -22,6 +22,7 @@ public class ProjectInformationUtil {
     var projectInformation = new ProjectInformation();
     projectInformation.setProjectDetail(details);
     projectInformation.setFieldStage(FIELD_STAGE);
+    projectInformation.setFieldStageSubCategory(FIELD_STAGE_SUB_CATEGORY);
     projectInformation.setProjectTitle(PROJECT_TITLE);
     projectInformation.setProjectSummary(PROJECT_SUMMARY);
     projectInformation.setContactName(CONTACT_NAME);
@@ -46,7 +47,7 @@ public class ProjectInformationUtil {
     );
     form.setContactDetail(contactDetailForm);
     form.setDevelopmentFirstProductionDate(new QuarterYearInput(null, null));
-    form.setWindEnergySubCategory(FIELD_STAGE_SUB_CATEGORY);
+    form.setOilAndGasSubCategory(FIELD_STAGE_SUB_CATEGORY);
 
     return form;
   }

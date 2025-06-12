@@ -79,9 +79,10 @@ public class ProjectInformationController extends ProjectFormPageController {
               form
           );
 
-          projectSetupService.removeTaskListSetupSectionsNotApplicableToFieldStage(
+          projectSetupService.removeTaskListSetupSectionsNotApplicableToFieldStageAndSubCategory(
               projectContext.getProjectDetails(),
-              projectInformation.getFieldStage()
+              projectInformation.getFieldStage(),
+              projectInformation.getFieldStageSubCategory()
           );
 
           AuditService.audit(
@@ -100,25 +101,25 @@ public class ProjectInformationController extends ProjectFormPageController {
     var modelAndView = new ModelAndView("project/projectinformation/projectInformation")
         .addObject("form", form)
         .addObject("pageName", PAGE_NAME)
-        .addObject("discoveryFieldStage", FieldStage.getEntryAsMap(FieldStage.DISCOVERY))
-        .addObject("discoveryFieldStageDescription", FieldStage.DISCOVERY.getDescription())
-        .addObject("developmentFieldStage", FieldStage.getEntryAsMap(FieldStage.DEVELOPMENT))
-        .addObject("developmentFieldStageDescription", FieldStage.DEVELOPMENT.getDescription())
-        .addObject("decommissioningFieldStage", FieldStage.getEntryAsMap(FieldStage.DECOMMISSIONING))
-        .addObject("decommissioningFieldStageDescription", FieldStage.DECOMMISSIONING.getDescription())
         .addObject("carbonCaptureAndStorageFieldStage", FieldStage.getEntryAsMap(FieldStage.CARBON_CAPTURE_AND_STORAGE))
-        .addObject("carbonCaptureAndStorageFieldStageDescription", FieldStage.CARBON_CAPTURE_AND_STORAGE.getDescription())
         .addObject("carbonAndOnshoreCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.CAPTURE_AND_ONSHORE))
         .addObject("carbonAndOnshoreDescription", FieldStageSubCategory.CAPTURE_AND_ONSHORE.getDescription())
         .addObject("transportationAndStorageCategory",
             FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.TRANSPORTATION_AND_STORAGE))
         .addObject("transportationAndStorageDescription", FieldStageSubCategory.TRANSPORTATION_AND_STORAGE.getDescription())
-        .addObject("hydrogenFieldStage", FieldStage.getEntryAsMap(FieldStage.HYDROGEN))
-        .addObject("offshoreHydrogenCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.OFFSHORE_HYDROGEN))
-        .addObject("onshoreHydrogenCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.ONSHORE_HYDROGEN))
         .addObject("electrificationFieldStage", FieldStage.getEntryAsMap(FieldStage.ELECTRIFICATION))
         .addObject("offshoreElectrificationCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.OFFSHORE_ELECTRIFICATION))
         .addObject("onshoreElectrificationCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.ONSHORE_ELECTRIFICATION))
+        .addObject("hydrogenFieldStage", FieldStage.getEntryAsMap(FieldStage.HYDROGEN))
+        .addObject("offshoreHydrogenCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.OFFSHORE_HYDROGEN))
+        .addObject("onshoreHydrogenCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.ONSHORE_HYDROGEN))
+        .addObject("oilAndGasFieldStage", FieldStage.getEntryAsMap(FieldStage.OIL_AND_GAS))
+        .addObject("discoveryCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.DISCOVERY))
+        .addObject("discoveryCategoryDescription", FieldStageSubCategory.DISCOVERY.getDescription())
+        .addObject("developmentCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.DEVELOPMENT))
+        .addObject("developmentCategoryDescription", FieldStageSubCategory.DEVELOPMENT.getDescription())
+        .addObject("decommissioningCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.DECOMMISSIONING))
+        .addObject("decommissioningCategoryDescription", FieldStageSubCategory.DECOMMISSIONING.getDescription())
         .addObject("windEnergyFieldStage", FieldStage.getEntryAsMap(FieldStage.WIND_ENERGY))
         .addObject("fixedBottomOffshoreWindCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.FIXED_BOTTOM_OFFSHORE_WIND))
         .addObject("floatingOffshoreWindCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.FLOATING_OFFSHORE_WIND))

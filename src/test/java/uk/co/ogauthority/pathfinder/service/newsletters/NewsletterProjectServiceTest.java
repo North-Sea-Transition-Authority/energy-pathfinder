@@ -40,17 +40,17 @@ class NewsletterProjectServiceTest {
   @Test
   void getProjectsUpdatedInTheLastMonth_whenProjectsExist_verifyReturnFormatAndInteractions() {
 
-    final var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.DECOMMISSIONING);
+    final var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.OIL_AND_GAS);
     when(reportableProjectService.getReportableProjectsUpdatedBetween(any(), any())).thenReturn(List.of(reportableProject));
 
     final var newsletterProjectViews = newsletterProjectService.getProjectsUpdatedInTheLastMonth();
 
     assertThat(newsletterProjectViews).hasSize(1);
-    var resultNewsletterProjectView = newsletterProjectViews.get(0);
+    var resultNewsletterProjectView = newsletterProjectViews.getFirst();
     assertThat(resultNewsletterProjectView.getProject()).contains(
         getReportableProjectStringInExpectedFormat(reportableProject)
     );
-    assertThat(resultNewsletterProjectView.getFieldStage()).isEqualTo(FieldStage.DECOMMISSIONING);
+    assertThat(resultNewsletterProjectView.getFieldStage()).isEqualTo(FieldStage.OIL_AND_GAS);
 
     final var dateOneMonthPriorToToday = LocalDate.now().minusMonths(1);
     final var minDate = DateUtil.getStartOfMonth(dateOneMonthPriorToToday);

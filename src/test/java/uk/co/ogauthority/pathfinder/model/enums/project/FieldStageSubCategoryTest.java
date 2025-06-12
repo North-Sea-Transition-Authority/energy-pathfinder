@@ -51,19 +51,13 @@ class FieldStageSubCategoryTest {
   }
 
   @Test
-  void getAllAsMap_invalidFieldStage() {
-    var result = FieldStageSubCategory.getAllAsMap(FieldStage.DISCOVERY);
-
-    assertThat(result).isEmpty();
-  }
-
-  @Test
   void getAllFieldStagesWithSubCategories() {
     var result = FieldStageSubCategory.getAllFieldStagesWithSubCategories();
     assertThat(result).containsExactlyInAnyOrder(
         FieldStage.CARBON_CAPTURE_AND_STORAGE,
-        FieldStage.HYDROGEN,
         FieldStage.ELECTRIFICATION,
+        FieldStage.HYDROGEN,
+        FieldStage.OIL_AND_GAS,
         FieldStage.WIND_ENERGY
     );
   }

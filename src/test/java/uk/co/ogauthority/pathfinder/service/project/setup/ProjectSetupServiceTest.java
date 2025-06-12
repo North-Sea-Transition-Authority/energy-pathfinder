@@ -2,15 +2,18 @@ package uk.co.ogauthority.pathfinder.service.project.setup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +24,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.tasks.ProjectTaskListSetup;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionQuestion;
@@ -77,15 +81,19 @@ public class ProjectSetupServiceTest {
   }
 
   @Test
-  public void getSectionQuestionsForProjectDetail_whenFieldStageSelected_thenReturnOnlySectionsSupportingFieldStage() {
+  public void getSectionQuestionsForProjectDetail_whenFieldStageSubCategorySelected_thenReturnOnlySectionsSupportingFieldStageSubCategory() {
 
-    var selectedFieldStage = FieldStage.DEVELOPMENT;
+    var selectedFieldStage = FieldStage.OIL_AND_GAS;
+    var selectedFieldStageSubCategory = FieldStageSubCategory.DEVELOPMENT;
 
     var expectedSectionQuestions = Arrays.stream(TaskListSectionQuestion.values())
-        .filter(sectionQuestion -> sectionQuestion.getApplicableFieldStages().contains(selectedFieldStage))
-        .collect(Collectors.toList());
+        .filter(sectionQuestion ->
+            sectionQuestion.getApplicableFieldStages().contains(selectedFieldStage)
+                && sectionQuestion.getApplicableFieldStageSubCategories().contains(selectedFieldStageSubCategory))
+        .toList();
 
     when(projectInformationService.getFieldStage(details)).thenReturn(Optional.of(selectedFieldStage));
+    when(projectInformationService.getFieldStageSubCategory(details)).thenReturn(Optional.of(selectedFieldStageSubCategory));
 
     var resultingSectionQuestions = projectSetupService.getSectionQuestionsForProjectDetail(details);
 
@@ -93,13 +101,16 @@ public class ProjectSetupServiceTest {
   }
 
   @Test
-  public void getSectionQuestionsForProjectDetail_whenNoFieldStageSelected_thenReturnOnlySectionsSupportingFieldStage() {
+  public void getSectionQuestionsForProjectDetail_whenNoFieldStageOrSubCategorySelected_thenReturnOnlySectionsSupportingThis() {
 
     var expectedSectionQuestions = Arrays.stream(TaskListSectionQuestion.values())
-        .filter(sectionQuestion -> sectionQuestion.getApplicableFieldStages().containsAll(Set.of(FieldStage.values())))
-        .collect(Collectors.toList());
+        .filter(sectionQuestion ->
+            sectionQuestion.getApplicableFieldStages().containsAll(Set.of(FieldStage.values()))
+                && sectionQuestion.getApplicableFieldStageSubCategories().containsAll(Set.of(FieldStageSubCategory.values())))
+        .toList();
 
     when(projectInformationService.getFieldStage(details)).thenReturn(Optional.empty());
+    when(projectInformationService.getFieldStageSubCategory(details)).thenReturn(Optional.empty());
 
     var resultingSectionQuestions = projectSetupService.getSectionQuestionsForProjectDetail(details);
 
@@ -227,45 +238,160 @@ public class ProjectSetupServiceTest {
   }
 
   @Test
-  public void removeTaskListSetupSectionsNotApplicableToFieldStage_whenNoSetupSectionFound_thenNoDatabaseInteraction() {
+  public void removeTaskListSetupSectionsNotApplicableToFieldStageAndSubCategory_whenNoSetupSectionFound_thenNoDatabaseInteractionSubCategory() {
 
     when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(Optional.empty());
 
-    projectSetupService.removeTaskListSetupSectionsNotApplicableToFieldStage(details, FieldStage.DEVELOPMENT);
+    projectSetupService.removeTaskListSetupSectionsNotApplicableToFieldStageAndSubCategory(details, FieldStage.OIL_AND_GAS, FieldStageSubCategory.DEVELOPMENT);
 
     verify(projectTaskListSetupRepository, never()).save(any());
   }
 
   @Test
-  public void removeTaskListSetupSectionsNotApplicableToFieldStage_whenSectionsNotApplicableFound_thenVerifyCorrectSectionsAreRemoved() {
+  public void removeTaskListSetupSectionsNotApplicableToFieldStageAndSubCategory_whenSectionsNotApplicableFound_thenVerifyCorrectSectionsAreRemovedSubCategory() {
 
     var nonDecommissioningFieldStage = FieldStage.HYDROGEN;
+    var nonDecommissioningFieldStageSubCategory = FieldStageSubCategory.ONSHORE_HYDROGEN;
 
-    var decommissioningFieldStageSetupEntityToTest = createProjectTaskListSetupEntityWithFieldStageSection(FieldStage.DECOMMISSIONING);
+    var decommissioningFieldStageSetupEntityToTest = createProjectTaskListSetupEntityWithFieldStageSection(
+        FieldStage.OIL_AND_GAS, FieldStageSubCategory.DECOMMISSIONING);
 
     when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(Optional.of(decommissioningFieldStageSetupEntityToTest));
 
-    projectSetupService.removeTaskListSetupSectionsNotApplicableToFieldStage(details, nonDecommissioningFieldStage);
+    projectSetupService.removeTaskListSetupSectionsNotApplicableToFieldStageAndSubCategory(
+        details, nonDecommissioningFieldStage, nonDecommissioningFieldStageSubCategory);
 
     // the saved entity should be the same as this one e.g. with the decommissioning related sections removed
-    var nonDecommissioningFieldStageSetupEntity = createProjectTaskListSetupEntityWithFieldStageSection(nonDecommissioningFieldStage);
+    var nonDecommissioningFieldStageSetupEntity = createProjectTaskListSetupEntityWithFieldStageSection(
+        nonDecommissioningFieldStage, nonDecommissioningFieldStageSubCategory);
 
     verify(projectTaskListSetupRepository, times(1)).save(nonDecommissioningFieldStageSetupEntity);
   }
 
-  private ProjectTaskListSetup createProjectTaskListSetupEntityWithFieldStageSection(FieldStage fieldStage) {
+  @Test
+  public void removeTaskListSetupSectionsNotApplicableToFieldStageAndSubCategory_whenAllSectionsApplicable_thenNoSectionsRemoved() {
+      // Setup entity with sections already applicable to the target field stage/subcategory
+      var fieldStage = FieldStage.OIL_AND_GAS;
+      var fieldStageSubCategory = FieldStageSubCategory.DEVELOPMENT;
 
-    var taskListSectionsForFieldStage = Arrays.stream(TaskListSectionQuestion.values())
-        .filter(sectionQuestion -> sectionQuestion.getApplicableFieldStages().contains(fieldStage))
+      var setupEntity = createProjectTaskListSetupEntityWithFieldStageSection(fieldStage, fieldStageSubCategory);
+
+      when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(Optional.of(setupEntity));
+
+      // Execute method with same field stage/subcategory
+      projectSetupService.removeTaskListSetupSectionsNotApplicableToFieldStageAndSubCategory(
+          details, fieldStage, fieldStageSubCategory);
+
+      // Verify the entity was saved without changes (same sections remain)
+      verify(projectTaskListSetupRepository, times(1)).save(setupEntity);
+  }
+
+  @Test
+  public void removeTaskListSetupSectionsNotApplicableToFieldStageAndSubCategory_whenNullFieldStageAndSubCategory_thenOnlyUniversalSectionsRemain() {
+      // Setup with mixed sections
+      var setupEntity = new ProjectTaskListSetup(details);
+      var allSections = Arrays.asList(TaskListSectionQuestion.values());
+      setupEntity.setTaskListSections(new ArrayList<>(allSections));
+
+      // Add all possible answers
+      var allAnswers = allSections.stream()
+          .flatMap(q -> Stream.of(q.getYesAnswer(), q.getNoAnswer()))
+          .toList();
+      setupEntity.setTaskListAnswers(new ArrayList<>(allAnswers));
+
+      when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(Optional.of(setupEntity));
+
+      // Execute with null field stage and subcategory
+      projectSetupService.removeTaskListSetupSectionsNotApplicableToFieldStageAndSubCategory(
+          details, null, null);
+
+      // Expected: only sections applicable to ALL field stages and subcategories remain
+      var expectedSections = TaskListSectionQuestion.getAllValues().stream()
+          .filter(q -> q.getApplicableFieldStages().containsAll(Set.of(FieldStage.values()))
+              && q.getApplicableFieldStageSubCategories().containsAll(Set.of(FieldStageSubCategory.values())))
+          .collect(Collectors.toList());
+
+      var expectedAnswers = expectedSections.stream()
+          .flatMap(q -> Stream.of(q.getYesAnswer(), q.getNoAnswer()))
+          .collect(Collectors.toList());
+
+      var expectedEntity = new ProjectTaskListSetup(details);
+      expectedEntity.setTaskListSections(expectedSections);
+      expectedEntity.setTaskListAnswers(expectedAnswers);
+
+      verify(projectTaskListSetupRepository, times(1)).save(argThat(entity ->
+          entity.getTaskListSections().size() == expectedSections.size() &&
+          entity.getTaskListAnswers().size() == expectedAnswers.size() &&
+          entity.getTaskListSections().containsAll(expectedSections)));
+  }
+
+  @Test
+  public void removeTaskListSetupSectionsNotApplicableToFieldStageAndSubCategory_whenMixedApplicability_thenOnlyApplicableSectionsRemain() {
+      // Setup with mixed sections from two different field stages
+      var initialFieldStage = FieldStage.OIL_AND_GAS;
+      var initialSubCategory = FieldStageSubCategory.DECOMMISSIONING;
+      var targetFieldStage = FieldStage.HYDROGEN;
+      var targetSubCategory = FieldStageSubCategory.ONSHORE_HYDROGEN;
+
+      // Create entity with sections from both field stages
+      var setupEntity = new ProjectTaskListSetup(details);
+
+      var oilAndGasSections = Arrays.stream(TaskListSectionQuestion.values())
+          .filter(q -> q.getApplicableFieldStages().contains(initialFieldStage) &&
+                       q.getApplicableFieldStageSubCategories().contains(initialSubCategory))
+          .toList();
+
+      var hydrogenSections = Arrays.stream(TaskListSectionQuestion.values())
+          .filter(q -> q.getApplicableFieldStages().contains(targetFieldStage) &&
+                       q.getApplicableFieldStageSubCategories().contains(targetSubCategory))
+          .toList();
+
+      // Combine sections from both field stages
+      var allSections = new ArrayList<TaskListSectionQuestion>();
+      allSections.addAll(oilAndGasSections);
+      allSections.addAll(hydrogenSections);
+
+      // Remove duplicates (sections that apply to both field stages)
+      var distinctSections = allSections.stream().distinct().toList();
+      setupEntity.setTaskListSections(new ArrayList<>(distinctSections));
+
+      // Add all answers
+      var allAnswers = distinctSections.stream()
+          .flatMap(q -> Stream.of(q.getYesAnswer(), q.getNoAnswer()))
+          .toList();
+      setupEntity.setTaskListAnswers(new ArrayList<>(allAnswers));
+
+      when(projectTaskListSetupRepository.findByProjectDetail(details)).thenReturn(Optional.of(setupEntity));
+
+      // Execute with target field stage and subcategory
+      projectSetupService.removeTaskListSetupSectionsNotApplicableToFieldStageAndSubCategory(
+          details, targetFieldStage, targetSubCategory);
+
+      // Verify only sections applicable to target field stage/subcategory remain
+      verify(projectTaskListSetupRepository, times(1)).save(argThat(entity ->
+          entity.getTaskListSections().stream().allMatch(section ->
+              section.getApplicableFieldStages().contains(targetFieldStage) &&
+              section.getApplicableFieldStageSubCategories().contains(targetSubCategory))));
+  }
+
+  private ProjectTaskListSetup createProjectTaskListSetupEntityWithFieldStageSection(
+      FieldStage  fieldStage,
+      FieldStageSubCategory fieldStageSubCategory
+  ) {
+
+    var taskListSectionsForFieldStageAndSubCategory = Arrays.stream(TaskListSectionQuestion.values())
+        .filter(sectionQuestion ->
+            sectionQuestion.getApplicableFieldStages().contains(fieldStage)
+                && sectionQuestion.getApplicableFieldStageSubCategories().contains(fieldStageSubCategory))
         .collect(Collectors.toList());
 
-    var taskListAnswers = taskListSectionsForFieldStage
+    var taskListAnswers = taskListSectionsForFieldStageAndSubCategory
         .stream()
         .map(TaskListSectionQuestion::getYesAnswer)
         .collect(Collectors.toList());
 
     var sectionsSetupEntity = new ProjectTaskListSetup(details);
-    sectionsSetupEntity.setTaskListSections(taskListSectionsForFieldStage);
+    sectionsSetupEntity.setTaskListSections(taskListSectionsForFieldStageAndSubCategory);
     sectionsSetupEntity.setTaskListAnswers(taskListAnswers);
 
     return sectionsSetupEntity;

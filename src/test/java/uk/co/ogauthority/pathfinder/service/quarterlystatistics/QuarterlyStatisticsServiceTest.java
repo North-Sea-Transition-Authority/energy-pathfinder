@@ -64,25 +64,25 @@ public class QuarterlyStatisticsServiceTest {
   @Test
   public void getQuarterlyStatisticsByFieldStage_assertProjectTotalsAreCorrect() {
 
-    final var developmentReportableProjectView1 = ReportableProjectTestUtil.createReportableProjectView(FieldStage.DEVELOPMENT);
-    final var developmentReportableProjectView2 = ReportableProjectTestUtil.createReportableProjectView(FieldStage.DEVELOPMENT);
-    final var decommissioningReportableProjectView = ReportableProjectTestUtil.createReportableProjectView(FieldStage.DECOMMISSIONING);
+    final var oilAndGasReportableProjectView1 = ReportableProjectTestUtil.createReportableProjectView(FieldStage.OIL_AND_GAS);
+    final var oilAndGasReportableProjectView2 = ReportableProjectTestUtil.createReportableProjectView(FieldStage.OIL_AND_GAS);
+    final var ccsReportableProjectView = ReportableProjectTestUtil.createReportableProjectView(FieldStage.CARBON_CAPTURE_AND_STORAGE);
 
     final var reportableProjectViews = List.of(
-        developmentReportableProjectView1,
-        developmentReportableProjectView2,
-        decommissioningReportableProjectView
+        oilAndGasReportableProjectView1,
+        oilAndGasReportableProjectView2,
+        ccsReportableProjectView
     );
 
     final var statistics = quarterlyStatisticsService.getQuarterlyStatisticsByFieldStage(
         reportableProjectViews
     );
 
-    assertThat(getProjectUpdateStatisticByFieldStage(statistics, FieldStage.DEVELOPMENT).getTotalProjects()).isEqualTo(2);
-    assertThat(getProjectUpdateStatisticByFieldStage(statistics, FieldStage.DECOMMISSIONING).getTotalProjects()).isEqualTo(1);
+    assertThat(getProjectUpdateStatisticByFieldStage(statistics, FieldStage.OIL_AND_GAS).getTotalProjects()).isEqualTo(2);
+    assertThat(getProjectUpdateStatisticByFieldStage(statistics, FieldStage.CARBON_CAPTURE_AND_STORAGE).getTotalProjects()).isEqualTo(1);
 
     final var fieldStagesWithZeroTotalExpected = Lists.newArrayList(FieldStage.values());
-    fieldStagesWithZeroTotalExpected.removeAll(List.of(FieldStage.DECOMMISSIONING, FieldStage.DEVELOPMENT));
+    fieldStagesWithZeroTotalExpected.removeAll(List.of(FieldStage.OIL_AND_GAS, FieldStage.CARBON_CAPTURE_AND_STORAGE));
 
     fieldStagesWithZeroTotalExpected.forEach(fieldStage -> {
       final var fieldStageStatistic = getProjectUpdateStatisticByFieldStage(statistics, fieldStage);
@@ -97,22 +97,22 @@ public class QuarterlyStatisticsServiceTest {
     final var timeNotInCurrentQuarter = Instant.now().minus(100, ChronoUnit.DAYS);
 
     final var reportableProjectView1 = ReportableProjectTestUtil.createReportableProjectView(
-        FieldStage.DISCOVERY,
+        FieldStage.OIL_AND_GAS,
         1,
         timeInCurrentQuarter
     );
     final var reportableProjectView2 = ReportableProjectTestUtil.createReportableProjectView(
-        FieldStage.DISCOVERY,
+        FieldStage.OIL_AND_GAS,
         2,
         timeInCurrentQuarter
     );
     final var reportableProjectView3 = ReportableProjectTestUtil.createReportableProjectView(
-        FieldStage.DECOMMISSIONING,
+        FieldStage.HYDROGEN,
         3,
         timeNotInCurrentQuarter
     );
     final var reportableProjectView4 = ReportableProjectTestUtil.createReportableProjectView(
-        FieldStage.DECOMMISSIONING,
+        FieldStage.HYDROGEN,
         4,
         timeInCurrentQuarter
     );
@@ -128,17 +128,17 @@ public class QuarterlyStatisticsServiceTest {
         reportableProjectViews
     );
 
-    final var discoveryStat = getProjectUpdateStatisticByFieldStage(statistics, FieldStage.DISCOVERY);
+    final var oilAndGasStat = getProjectUpdateStatisticByFieldStage(statistics, FieldStage.OIL_AND_GAS);
 
-    assertThat(discoveryStat.getTotalProjects()).isEqualTo(2);
-    assertThat(discoveryStat.getTotalProjectsUpdated()).isEqualTo(2);
-    assertThat(discoveryStat.getPercentageOfProjectsUpdated()).isEqualTo(100.0);
+    assertThat(oilAndGasStat.getTotalProjects()).isEqualTo(2);
+    assertThat(oilAndGasStat.getTotalProjectsUpdated()).isEqualTo(2);
+    assertThat(oilAndGasStat.getPercentageOfProjectsUpdated()).isEqualTo(100.0);
 
-    final var decommissioningStat = getProjectUpdateStatisticByFieldStage(statistics, FieldStage.DECOMMISSIONING);
+    final var hydrogenStat = getProjectUpdateStatisticByFieldStage(statistics, FieldStage.HYDROGEN);
 
-    assertThat(decommissioningStat.getTotalProjects()).isEqualTo(2);
-    assertThat(decommissioningStat.getTotalProjectsUpdated()).isEqualTo(1);
-    assertThat(decommissioningStat.getPercentageOfProjectsUpdated()).isEqualTo(50.0);
+    assertThat(hydrogenStat.getTotalProjects()).isEqualTo(2);
+    assertThat(hydrogenStat.getTotalProjectsUpdated()).isEqualTo(1);
+    assertThat(hydrogenStat.getPercentageOfProjectsUpdated()).isEqualTo(50.0);
 
   }
 

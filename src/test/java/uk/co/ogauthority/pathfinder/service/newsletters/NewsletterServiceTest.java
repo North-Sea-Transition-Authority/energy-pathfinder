@@ -120,7 +120,7 @@ class NewsletterServiceTest {
   void sendNewsletterToSubscribers_whenProjectsUpdatedNotInSubscription_thenNoUpdateEmailSent() {
     var subscribers = Collections.singletonList(SUBSCRIBER);
     var subscriberFieldStage = SubscriptionTestUtil.createSubscriberFieldStages(
-        List.of(FieldStage.DISCOVERY), SUBSCRIBER.getUuid()
+        List.of(FieldStage.OIL_AND_GAS), SUBSCRIBER.getUuid()
     );
 
     when(linkService.getManageSubscriptionUrl(any())).thenCallRealMethod();
@@ -155,7 +155,7 @@ class NewsletterServiceTest {
     var reportableProject = ReportableProjectTestUtil.createReportableProject(fieldStage);
     var project = new NewsletterProjectView(reportableProject);
     var projectNotSubscribedTo = new NewsletterProjectView(
-        ReportableProjectTestUtil.createReportableProject(FieldStage.DISCOVERY)
+        ReportableProjectTestUtil.createReportableProject(FieldStage.OIL_AND_GAS)
     );
     final var projectsUpdate = List.of(project, projectNotSubscribedTo);
     var subscribers = Collections.singletonList(SUBSCRIBER);

@@ -30,7 +30,7 @@ public class SubscriptionTestUtil {
     subscribeForm.setRelationToPathfinder(RELATION_TO_PATHFINDER);
     subscribeForm.setSubscribeReason(SUBSCRIBE_REASON);
     subscribeForm.setInterestedInAllProjects(false);
-    subscribeForm.setFieldStages(List.of("DEVELOPMENT", "WIND_ENERGY"));
+    subscribeForm.setFieldStages(List.of("OIL_AND_GAS", "WIND_ENERGY"));
     return subscribeForm;
   }
 

@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 
 /**
@@ -51,7 +52,8 @@ public enum TaskListSectionQuestion {
       "form.wellsIncluded",
       TaskListSectionAnswer.WELLS_YES,
       TaskListSectionAnswer.WELLS_NO,
-      Set.of(FieldStage.DECOMMISSIONING)
+      Set.of(FieldStage.OIL_AND_GAS),
+      Set.of(FieldStageSubCategory.DECOMMISSIONING)
   ),
   PLATFORM_FPSO(
       ProjectTask.PLATFORM_FPSO,
@@ -61,7 +63,8 @@ public enum TaskListSectionQuestion {
       "form.platformsFpsosIncluded",
       TaskListSectionAnswer.PLATFORM_FPSO_YES,
       TaskListSectionAnswer.PLATFORM_FPSO_NO,
-      Set.of(FieldStage.DECOMMISSIONING)
+      Set.of(FieldStage.OIL_AND_GAS),
+      Set.of(FieldStageSubCategory.DECOMMISSIONING)
   ),
   INTEGRATED_RIGS(
       ProjectTask.INTEGRATED_RIGS,
@@ -71,7 +74,8 @@ public enum TaskListSectionQuestion {
       "form.integratedRigsIncluded",
       TaskListSectionAnswer.INTEGRATED_RIGS_YES,
       TaskListSectionAnswer.INTEGRATED_RIGS_NO,
-      Set.of(FieldStage.DECOMMISSIONING)
+      Set.of(FieldStage.OIL_AND_GAS),
+      Set.of(FieldStageSubCategory.DECOMMISSIONING)
   ),
   CAMPAIGN_INFORMATION(
       ProjectTask.CAMPAIGN_INFORMATION,
@@ -90,7 +94,8 @@ public enum TaskListSectionQuestion {
       "form.subseaInfrastructureIncluded",
       TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_YES,
       TaskListSectionAnswer.SUBSEA_INFRASTRUCTURE_NO,
-      Set.of(FieldStage.DECOMMISSIONING)
+      Set.of(FieldStage.OIL_AND_GAS),
+      Set.of(FieldStageSubCategory.DECOMMISSIONING)
   ),
   PROJECT_CONTRIBUTORS(
       ProjectTask.PROJECT_CONTRIBUTORS,
@@ -110,7 +115,8 @@ public enum TaskListSectionQuestion {
        "form.pipelinesIncluded",
        TaskListSectionAnswer.PIPELINES_YES,
        TaskListSectionAnswer.PIPELINES_NO,
-       Set.of(FieldStage.DECOMMISSIONING)
+       Set.of(FieldStage.OIL_AND_GAS),
+       Set.of(FieldStageSubCategory.DECOMMISSIONING)
    ),
   COMMISSIONED_WELLS(
       ProjectTask.COMMISSIONED_WELLS,
@@ -120,7 +126,8 @@ public enum TaskListSectionQuestion {
           "form.commissionedWellsIncluded",
       TaskListSectionAnswer.COMMISSION_WELLS_YES,
       TaskListSectionAnswer.COMMISSION_WELLS_NO,
-      Set.of(FieldStage.DISCOVERY, FieldStage.DEVELOPMENT)
+      Set.of(FieldStage.OIL_AND_GAS),
+      Set.of(FieldStageSubCategory.DISCOVERY, FieldStageSubCategory.DEVELOPMENT)
   );
 
   private final ProjectTask projectTask;
@@ -131,6 +138,7 @@ public enum TaskListSectionQuestion {
   private final TaskListSectionAnswer yesAnswer;
   private final TaskListSectionAnswer noAnswer;
   private final Set<FieldStage> applicableFieldStages;
+  private final Set<FieldStageSubCategory> applicableFieldStageSubCategories;
 
   TaskListSectionQuestion(ProjectTask projectTask,
                           String displayName,
@@ -147,7 +155,8 @@ public enum TaskListSectionQuestion {
         formField,
         yesAnswer,
         noAnswer,
-        Set.of(FieldStage.values())
+        Set.of(FieldStage.values()),
+        Set.of(FieldStageSubCategory.values())
     );
   }
 
@@ -158,7 +167,8 @@ public enum TaskListSectionQuestion {
                           String formField,
                           TaskListSectionAnswer yesAnswer,
                           TaskListSectionAnswer noAnswer,
-                          Set<FieldStage> applicableFieldStages) {
+                          Set<FieldStage> applicableFieldStages,
+                          Set<FieldStageSubCategory> applicableFieldStageSubCategories) {
     this.projectTask = projectTask;
     this.displayName = displayName;
     this.prompt = prompt;
@@ -167,6 +177,7 @@ public enum TaskListSectionQuestion {
     this.yesAnswer = yesAnswer;
     this.noAnswer = noAnswer;
     this.applicableFieldStages = applicableFieldStages;
+    this.applicableFieldStageSubCategories = applicableFieldStageSubCategories;
   }
 
   public ProjectTask getProjectTask() {
@@ -199,6 +210,10 @@ public enum TaskListSectionQuestion {
 
   public Set<FieldStage> getApplicableFieldStages() {
     return applicableFieldStages;
+  }
+
+  public Set<FieldStageSubCategory> getApplicableFieldStageSubCategories() {
+    return applicableFieldStageSubCategories;
   }
 
   public static List<TaskListSectionQuestion> getAllValues() {

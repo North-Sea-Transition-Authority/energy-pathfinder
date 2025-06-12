@@ -18,6 +18,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.tasks.ProjectTaskListSetup;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.tasklistquestions.TaskListSectionAnswer;
@@ -62,18 +63,14 @@ public class ProjectSetupService implements ProjectFormSectionService {
   }
 
   public List<TaskListSectionQuestion> getSectionQuestionsForProjectDetail(ProjectDetail projectDetail) {
-    return projectInformationService.getFieldStage(projectDetail)
-        .map(fieldStage -> TaskListSectionQuestion.getAllValues()
-            .stream()
-            .filter(taskListSectionQuestion -> taskListSectionQuestion.getApplicableFieldStages().contains(fieldStage))
-            .collect(Collectors.toList()))
-        // if no field stage specified yet show all the questions which are allowed under any field stage
-        .orElseGet(() -> TaskListSectionQuestion.getAllValues()
-            .stream()
-            .filter(taskListSectionQuestion ->
-                taskListSectionQuestion.getApplicableFieldStages().containsAll(Set.of(FieldStage.values()))
-            )
-            .collect(Collectors.toList()));
+    var fieldStage = projectInformationService.getFieldStage(projectDetail).orElse(null);
+    var fieldStageSubCategory = projectInformationService.getFieldStageSubCategory(projectDetail).orElse(null);
+
+    return TaskListSectionQuestion.getAllValues()
+        .stream()
+        .filter(taskListSectionQuestion ->
+                isSectionApplicableToFieldStageAndSubCategory(taskListSectionQuestion, fieldStage, fieldStageSubCategory))
+        .toList();
   }
 
   public ModelAndView getProjectSetupModelAndView(ProjectDetail detail, ProjectSetupForm form) {
@@ -208,19 +205,25 @@ public class ProjectSetupService implements ProjectFormSectionService {
                                 ValidationType validationType,
                                 ProjectDetail detail) {
     var fieldStage = projectInformationService.getFieldStage(detail).orElse(null);
-    var hint = new ProjectSetupFormValidationHint(fieldStage, validationType);
+    var fieldStageSubCategory = projectInformationService.getFieldStageSubCategory(detail).orElse(null);
+    var hint = new ProjectSetupFormValidationHint(fieldStage, fieldStageSubCategory, validationType);
     projectSetupFormValidator.validate(form, bindingResult, hint);
     return validationService.validate(form, bindingResult, validationType);
   }
 
   /**
    * Remove any task list setup section answers that exist for sections that are not applicable to the
-   * field stage of the project.
+   * field stage subcategory of the project.
    * @param projectDetail The project detail of the project
    * @param fieldStage The field stage of the project
+   * @param fieldStageSubCategory The field stage subcategory of the project
    */
   @Transactional
-  public void removeTaskListSetupSectionsNotApplicableToFieldStage(ProjectDetail projectDetail, FieldStage fieldStage) {
+  public void removeTaskListSetupSectionsNotApplicableToFieldStageAndSubCategory(
+      ProjectDetail projectDetail,
+      FieldStage fieldStage,
+      FieldStageSubCategory fieldStageSubCategory
+  ) {
 
     getProjectTaskListSetup(projectDetail).ifPresent(projectTaskListSetup -> {
 
@@ -229,7 +232,7 @@ public class ProjectSetupService implements ProjectFormSectionService {
 
       TaskListSectionQuestion.getAllValues().forEach(taskListSectionQuestion -> {
 
-        if (!isSectionApplicableToFieldStage(taskListSectionQuestion, fieldStage)) {
+        if (!isSectionApplicableToFieldStageAndSubCategory(taskListSectionQuestion, fieldStage, fieldStageSubCategory)) {
           answers.remove(taskListSectionQuestion.getYesAnswer());
           answers.remove(taskListSectionQuestion.getNoAnswer());
           sections.remove(taskListSectionQuestion);
@@ -243,9 +246,24 @@ public class ProjectSetupService implements ProjectFormSectionService {
     });
   }
 
-  private boolean isSectionApplicableToFieldStage(TaskListSectionQuestion sectionQuestion, FieldStage fieldStage) {
+  private boolean isSectionApplicableToFieldStageAndSubCategory(
+      TaskListSectionQuestion sectionQuestion,
+      FieldStage fieldStage,
+      FieldStageSubCategory fieldStageSubCategory
+  ) {
+    return isFieldStageApplicable(sectionQuestion, fieldStage)
+        && isFieldStageSubCategoryApplicable(sectionQuestion, fieldStageSubCategory);
+  }
+
+  private boolean isFieldStageApplicable(TaskListSectionQuestion sectionQuestion, FieldStage fieldStage) {
     return (fieldStage == null && sectionQuestion.getApplicableFieldStages().containsAll(Set.of(FieldStage.values())))
         || (fieldStage != null && sectionQuestion.getApplicableFieldStages().contains(fieldStage));
+  }
+
+  private boolean isFieldStageSubCategoryApplicable(TaskListSectionQuestion sectionQuestion, FieldStageSubCategory fieldStageSubCategory) {
+    return (fieldStageSubCategory == null && sectionQuestion.getApplicableFieldStageSubCategories()
+        .containsAll(Set.of(FieldStageSubCategory.values())))
+        || (fieldStageSubCategory != null && sectionQuestion.getApplicableFieldStageSubCategories().contains(fieldStageSubCategory));
   }
 
   public boolean taskValidAndSelectedForProjectDetail(ProjectDetail detail, ProjectTask task) {

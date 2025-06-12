@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.controller.project.projectinformation.ProjectInformationController;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
-import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.view.SidebarSectionLink;
 import uk.co.ogauthority.pathfinder.model.view.projectinformation.ProjectInformationView;
@@ -53,7 +53,8 @@ public class ProjectInformationSectionSummaryService implements ProjectSectionSu
         SECTION_ID
     );
 
-    var projectInformationView = projectInformationService.getProjectInformation(detail)
+    var projectInformationOptional = projectInformationService.getProjectInformation(detail);
+    var projectInformationView = projectInformationOptional
         .map(ProjectInformationViewUtil::from)
         .orElse(new ProjectInformationView());
 
@@ -61,10 +62,13 @@ public class ProjectInformationSectionSummaryService implements ProjectSectionSu
         detail,
         projectInformationView
     ));
-
-    final var fieldStage = projectInformationView.getFieldStage();
-    summaryModel.put("isDevelopmentFieldStage", FieldStage.DEVELOPMENT.getDisplayName().equals(fieldStage));
-    summaryModel.put("isDiscoveryFieldStage", FieldStage.DISCOVERY.getDisplayName().equals(fieldStage));
+    
+    summaryModel.put(
+        "isDevelopmentFieldStageSubCategory",
+        projectInformationOptional
+            .map(projectInformation -> FieldStageSubCategory.DEVELOPMENT.equals(projectInformation.getFieldStageSubCategory()))
+            .orElse(false)
+    );
 
     return new ProjectSectionSummary(
         List.of(SECTION_LINK),

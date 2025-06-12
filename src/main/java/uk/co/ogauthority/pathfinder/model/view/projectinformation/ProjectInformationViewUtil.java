@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.model.view.projectinformation;
 
-import java.util.Objects;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
@@ -23,6 +22,7 @@ public class ProjectInformationViewUtil {
     projectInformationView.setContactEmailAddress(projectInformation.getEmailAddress());
 
     final var fieldStage = projectInformation.getFieldStage();
+    final var fieldStageSubCategory = projectInformation.getFieldStageSubCategory();
 
     projectInformationView.setFieldStage(
         fieldStage != null
@@ -31,11 +31,10 @@ public class ProjectInformationViewUtil {
     );
 
     if (fieldStage != null) {
-      if (fieldStage.equals(FieldStage.DEVELOPMENT)) {
+      if (fieldStage == FieldStage.OIL_AND_GAS && fieldStageSubCategory == FieldStageSubCategory.DEVELOPMENT) {
         setDevelopmentFields(projectInformationView, projectInformation);
-      } else if (FieldStageSubCategory.getAllFieldStagesWithSubCategories().contains(fieldStage)
-          && Objects.nonNull(projectInformation.getFieldStageSubCategory())
-      ) {
+      }
+      if (FieldStageSubCategory.getAllFieldStagesWithSubCategories().contains(fieldStage) && fieldStageSubCategory != null) {
         setSubCategoryFields(projectInformationView, projectInformation);
       }
     }

@@ -6,32 +6,35 @@ import static org.assertj.core.api.Assertions.entry;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.form.validation.FieldValidationErrorCodes;
 import uk.co.ogauthority.pathfinder.testutil.ProjectTaskListSetupTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ValidatorTestingUtil;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ProjectSetupFormValidatorTest {
+@ExtendWith(MockitoExtension.class)
+class ProjectSetupFormValidatorTest {
 
   private ProjectSetupFormValidator validator;
 
-  @Before
-  public void setUp() throws Exception {
+  @BeforeEach
+  void setUp() {
     validator = new ProjectSetupFormValidator();
   }
 
   @Test
-  public void validate_whenDecommissioningFieldStageAndFullValidationAndNoSectionsCompleted_thenErrors() {
-
-    var decommissioningFieldStage = FieldStage.DECOMMISSIONING;
+  void validate_whenDecommissioningFieldStageSubCategoryAndFullValidationAndNoSectionsCompleted_thenErrors() {
+    var oilAndGasFieldStage = FieldStage.OIL_AND_GAS;
+    var decommissioningFieldStageSubCategory = FieldStageSubCategory.DECOMMISSIONING;
 
     var fullValidationType = ValidationType.FULL;
 
@@ -39,7 +42,7 @@ public class ProjectSetupFormValidatorTest {
 
     var errors =  new BeanPropertyBindingResult(emptySetupForm, "form");
 
-    var hint = new ProjectSetupFormValidationHint(decommissioningFieldStage, fullValidationType);
+    var hint = new ProjectSetupFormValidationHint(oilAndGasFieldStage, decommissioningFieldStageSubCategory, fullValidationType);
 
     ValidationUtils.invokeValidator(validator, emptySetupForm, errors, hint);
 
@@ -65,9 +68,9 @@ public class ProjectSetupFormValidatorTest {
   }
 
   @Test
-  public void validate_whenDiscoveryFieldStageAndFulLValidationAndNoSectionsCompleted_thenErrors() {
-
-    var discoveryFieldStage = FieldStage.DISCOVERY;
+  void validate_whenDiscoveryFieldStageAndFulLValidationAndNoSectionsCompleted_thenErrors() {
+    var oilAndGasFieldStage = FieldStage.OIL_AND_GAS;
+    var discoveryFieldStageSubCategory = FieldStageSubCategory.DISCOVERY;
 
     var fullValidationType = ValidationType.FULL;
 
@@ -75,7 +78,7 @@ public class ProjectSetupFormValidatorTest {
 
     var errors =  new BeanPropertyBindingResult(emptySetupForm, "form");
 
-    var hint = new ProjectSetupFormValidationHint(discoveryFieldStage, fullValidationType);
+    var hint = new ProjectSetupFormValidationHint(oilAndGasFieldStage, discoveryFieldStageSubCategory, fullValidationType);
 
     ValidationUtils.invokeValidator(validator, emptySetupForm, errors, hint);
 
@@ -93,9 +96,9 @@ public class ProjectSetupFormValidatorTest {
   }
 
   @Test
-  public void validate_whenDevelopmentFieldStageAndFulLValidationAndNoSectionsCompleted_thenErrors() {
-
-    var discoveryFieldStage = FieldStage.DEVELOPMENT;
+  void validate_whenDevelopmentFieldStageSubCategoryAndFulLValidationAndNoSectionsCompleted_thenErrors() {
+    var oilAndGasFieldStage = FieldStage.OIL_AND_GAS;
+    var discoveryFieldStageSubCategory = FieldStageSubCategory.DEVELOPMENT;
 
     var fullValidationType = ValidationType.FULL;
 
@@ -103,7 +106,7 @@ public class ProjectSetupFormValidatorTest {
 
     var errors =  new BeanPropertyBindingResult(emptySetupForm, "form");
 
-    var hint = new ProjectSetupFormValidationHint(discoveryFieldStage, fullValidationType);
+    var hint = new ProjectSetupFormValidationHint(oilAndGasFieldStage, discoveryFieldStageSubCategory, fullValidationType);
 
     ValidationUtils.invokeValidator(validator, emptySetupForm, errors, hint);
 
@@ -120,16 +123,17 @@ public class ProjectSetupFormValidatorTest {
     );
   }
 
-  @Test
-  public void validate_whenPartialValidationAndNoSectionsCompleted_fieldStageSmokeTest_thenNoErrors() {
-    Arrays.stream(FieldStage.values()).forEach(fieldStage -> {
+  @ParameterizedTest
+  @EnumSource(FieldStage.class)
+  void validate_whenPartialValidationAndNoSectionsCompleted_fieldStageSubCategorySmokeTest_thenNoErrors(FieldStage fieldStage) {
+    Arrays.stream(FieldStageSubCategory.values()).forEach(fieldStageSubCategory -> {
       var partialValidationType = ValidationType.PARTIAL;
 
       var emptySetupForm = new ProjectSetupForm();
 
       var errors =  new BeanPropertyBindingResult(emptySetupForm, "form");
 
-      var hint = new ProjectSetupFormValidationHint(fieldStage, partialValidationType);
+      var hint = new ProjectSetupFormValidationHint(fieldStage, fieldStageSubCategory, partialValidationType);
 
       ValidationUtils.invokeValidator(validator, emptySetupForm, errors, hint);
 
@@ -139,22 +143,24 @@ public class ProjectSetupFormValidatorTest {
     });
   }
 
-  @Test
-  public void validate_whenAllSectionsCompleted_validationTypeAndFieldStageSmokeTest_thenNoErrors() {
+  @ParameterizedTest
+  @EnumSource(FieldStage.class)
+  void validate_whenAllSectionsCompleted_validationTypeAndFieldStageSubCategorySmokeTest_thenNoErrors(FieldStage fieldStage) {
 
     var setupForm = ProjectTaskListSetupTestUtil.getProjectSetupFormWithAllSectionsAnswered();
 
     var errors =  new BeanPropertyBindingResult(setupForm, "form");
 
-    Arrays.stream(FieldStage.values()).forEach(fieldStage -> List.of(ValidationType.FULL, ValidationType.PARTIAL).forEach(validationType -> {
+    Arrays.stream(FieldStageSubCategory.values())
+        .forEach(fieldStageSubCategory -> List.of(ValidationType.FULL, ValidationType.PARTIAL).forEach(validationType -> {
 
-      var hint = new ProjectSetupFormValidationHint(fieldStage, validationType);
+          var hint = new ProjectSetupFormValidationHint(fieldStage, fieldStageSubCategory, validationType);
 
-      ValidationUtils.invokeValidator(validator, setupForm, errors, hint);
+          ValidationUtils.invokeValidator(validator, setupForm, errors, hint);
 
-      var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
+          var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
 
-      assertThat(fieldErrors).isEmpty();
-    }));
+          assertThat(fieldErrors).isEmpty();
+        }));
   }
 }

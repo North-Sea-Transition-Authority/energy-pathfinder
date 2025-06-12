@@ -133,7 +133,7 @@ class SubscribeFormValidatorTest {
   @Test
   void validate_whenNotInterestedInAllProjectsAndHasFieldStages_thenNoErrors() {
     form.setInterestedInAllProjects(false);
-    form.setFieldStages(List.of("DEVELOPMENT", "CARBON_CAPTURE_AND_STORAGE"));
+    form.setFieldStages(List.of("OIL_AND_GAS", "CARBON_CAPTURE_AND_STORAGE"));
     var errors = new BeanPropertyBindingResult(form, "form");
 
     ValidationUtils.invokeValidator(subscribeFormValidator, form, errors);

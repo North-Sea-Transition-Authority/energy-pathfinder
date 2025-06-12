@@ -73,7 +73,7 @@ class QuarterlyUpdateReminderServiceTest {
 
   @Test
   void getAllRemindableProjects_whenRemindableProjectsFound_thenReturnPopulatedList() {
-    var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.DEVELOPMENT);
+    var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.OIL_AND_GAS);
     when(reportableProjectService.getReportableProjects()).thenReturn(List.of(reportableProject));
 
     var resultingRemindableProjects = quarterlyUpdateReminderService.getAllRemindableProjects();
@@ -239,7 +239,7 @@ class QuarterlyUpdateReminderServiceTest {
 
   @Test
   void getRemindableProjectsNotUpdatedInCurrentQuarter_whenRemindableProjectsFound_thenReturnPopulatedList() {
-    var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.DEVELOPMENT);
+    var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.OIL_AND_GAS);
     var projectDetailId = reportableProject.getProjectDetailId();
     var projectDetail = ProjectUtil.getProjectDetails();
     projectDetail.setId(projectDetailId);

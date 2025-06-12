@@ -59,12 +59,13 @@ class ProjectInformationFormValidatorTest {
   }
 
   @Test
-  void validate_whenDevelopmentFieldStageAndEmptyHiddenQuestionsWithPartialValidation_thenValid() {
+  void validate_whenDevelopmentFieldStageSubCategoryAndEmptyHiddenQuestionsWithPartialValidation_thenValid() {
     doCallRealMethod().when(quarterYearInputValidator).validate(any(), any(), any(Object[].class));
     when(quarterYearInputValidator.supports(any())).thenReturn(true);
 
     var form = ProjectInformationUtil.getCompleteForm();
-    form.setFieldStage(FieldStage.DEVELOPMENT);
+    form.setFieldStage(FieldStage.OIL_AND_GAS);
+    form.setOilAndGasSubCategory(FieldStageSubCategory.DEVELOPMENT);
     form.setDevelopmentFirstProductionDate(new QuarterYearInput(null, null));
 
     var errors = getErrors(form, ValidationType.PARTIAL);
@@ -75,12 +76,13 @@ class ProjectInformationFormValidatorTest {
   }
 
   @Test
-  void validate_whenDevelopmentFieldStageAndValidHiddenQuestionsWithFullValidation_thenValid() {
+  void validate_whenDevelopmentFieldStageSubCategoryAndValidHiddenQuestionsWithFullValidation_thenValid() {
     doCallRealMethod().when(quarterYearInputValidator).validate(any(), any(), any());
     when(quarterYearInputValidator.supports(any())).thenReturn(true);
 
     var form = ProjectInformationUtil.getCompleteForm();
-    form.setFieldStage(FieldStage.DEVELOPMENT);
+    form.setFieldStage(FieldStage.OIL_AND_GAS);
+    form.setOilAndGasSubCategory(FieldStageSubCategory.DEVELOPMENT);
     form.setDevelopmentFirstProductionDate(new QuarterYearInput(Quarter.Q1, "2020"));
 
     var errors = getErrors(form, ValidationType.FULL);
@@ -91,12 +93,13 @@ class ProjectInformationFormValidatorTest {
   }
 
   @Test
-  void validate_whenDevelopmentFieldStageAndEmptyHiddenQuestionsWithFullValidation_thenInvalid() {
+  void validate_whenDevelopmentFieldStageSubCategoryAndEmptyHiddenQuestionsWithFullValidation_thenInvalid() {
     doCallRealMethod().when(quarterYearInputValidator).validate(any(), any(), any());
     when(quarterYearInputValidator.supports(any())).thenReturn(true);
 
     var form = ProjectInformationUtil.getCompleteForm();
-    form.setFieldStage(FieldStage.DEVELOPMENT);
+    form.setFieldStage(FieldStage.OIL_AND_GAS);
+    form.setOilAndGasSubCategory(FieldStageSubCategory.DEVELOPMENT);
     form.setDevelopmentFirstProductionDate(new QuarterYearInput(null, null));
 
     var errors = getErrors(form, ValidationType.FULL);
@@ -121,17 +124,14 @@ class ProjectInformationFormValidatorTest {
   }
 
   @ParameterizedTest
-  @EnumSource(
-      value = FieldStage.class,
-      names = { "CARBON_CAPTURE_AND_STORAGE", "HYDROGEN", "ELECTRIFICATION", "WIND_ENERGY" },
-      mode = EnumSource.Mode.INCLUDE
-  )
+  @EnumSource(value = FieldStage.class)
   void validate_whenFieldStageWithSubCategoryAndEmptyHiddenQuestionsWithPartialValidation_thenValid(FieldStage fieldStage) {
     var form = ProjectInformationUtil.getCompleteForm();
     form.setFieldStage(fieldStage);
     form.setCarbonCaptureSubCategory(null);
     form.setHydrogenSubCategory(null);
     form.setElectrificationSubCategory(null);
+    form.setOilAndGasSubCategory(null);
     form.setWindEnergySubCategory(null);
 
     var errors = getErrors(form, ValidationType.PARTIAL);
@@ -156,13 +156,14 @@ class ProjectInformationFormValidatorTest {
   @ParameterizedTest
   @MethodSource("fieldStageWithSubCategoryMissing_fullValidation_arguments")
   void validate_whenFieldStageWithSubCategoryAndEmptyHiddenQuestionsWithFullValidation_thenInvalid(FieldStage fieldStage,
-                                                                                                          String field,
-                                                                                                          String errorMessage) {
+                                                                                                   String field,
+                                                                                                   String errorMessage) {
     var form = ProjectInformationUtil.getCompleteForm();
     form.setFieldStage(fieldStage);
     form.setCarbonCaptureSubCategory(null);
     form.setHydrogenSubCategory(null);
     form.setElectrificationSubCategory(null);
+    form.setOilAndGasSubCategory(null);
     form.setWindEnergySubCategory(null);
 
     var errors = getErrors(form, ValidationType.FULL);
@@ -195,6 +196,7 @@ class ProjectInformationFormValidatorTest {
         Arguments.of(FieldStage.CARBON_CAPTURE_AND_STORAGE, ProjectInformationFormValidator.CARBON_CAPTURE_AND_STORAGE_FIELD, ProjectInformationFormValidator.CARBON_CAPTURE_AND_STORAGE_MISSING_ERROR),
         Arguments.of(FieldStage.HYDROGEN, ProjectInformationFormValidator.HYDROGEN_FIELD, ProjectInformationFormValidator.HYDROGEN_MISSING_ERROR),
         Arguments.of(FieldStage.ELECTRIFICATION, ProjectInformationFormValidator.ELECTRIFICATION_FIELD, ProjectInformationFormValidator.ELECTRIFICATION_MISSING_ERROR),
+        Arguments.of(FieldStage.OIL_AND_GAS, ProjectInformationFormValidator.OIL_AND_GAS_FIELD, ProjectInformationFormValidator.OIL_AND_GAS_MISSING_ERROR),
         Arguments.of(FieldStage.WIND_ENERGY, ProjectInformationFormValidator.WIND_ENERGY_FIELD, ProjectInformationFormValidator.WIND_ENERGY_MISSING_ERROR)
     );
   }

@@ -149,7 +149,7 @@ class SubscriptionServiceTest {
     var subscriberFieldStages = fieldStagesCaptor.getValue();
 
     assertThat(subscriberFieldStages).hasSize(2);
-    assertThat(subscriberFieldStages.get(0).getFieldStage()).isEqualTo(FieldStage.DEVELOPMENT);
+    assertThat(subscriberFieldStages.get(0).getFieldStage()).isEqualTo(FieldStage.OIL_AND_GAS);
     assertThat(subscriberFieldStages.get(0).getSubscriberUuid()).isEqualTo(subscriber.getUuid());
     assertThat(subscriberFieldStages.get(1).getFieldStage()).isEqualTo(FieldStage.WIND_ENERGY);
     assertThat(subscriberFieldStages.get(1).getSubscriberUuid()).isEqualTo(subscriber.getUuid());
@@ -257,8 +257,8 @@ class SubscriptionServiceTest {
 
     var subscriberFieldStages = fieldStagesCaptor.getValue();
     assertThat(subscriberFieldStages).hasSize(1);
-    assertThat(subscriberFieldStages.get(0).getFieldStage()).isEqualTo(FieldStage.HYDROGEN);
-    assertThat(subscriberFieldStages.get(0).getSubscriberUuid()).isEqualTo(subscriberUuid);
+    assertThat(subscriberFieldStages.getFirst().getFieldStage()).isEqualTo(FieldStage.HYDROGEN);
+    assertThat(subscriberFieldStages.getFirst().getSubscriberUuid()).isEqualTo(subscriberUuid);
   }
 
   @Test
@@ -447,8 +447,8 @@ class SubscriptionServiceTest {
     var subscriberUuid = subscriber.getUuid();
     when(subscriberRepository.findByUuid(subscriberUuid)).thenReturn(Optional.of(subscriber));
 
-    var fieldStages = List.of(FieldStage.DISCOVERY, FieldStage.HYDROGEN);
-    var expectedFieldStages = List.of("DISCOVERY", "HYDROGEN");
+    var fieldStages = List.of(FieldStage.OIL_AND_GAS, FieldStage.HYDROGEN);
+    var expectedFieldStages = List.of("OIL_AND_GAS", "HYDROGEN");
     var subscriberFieldStages = SubscriptionTestUtil.createSubscriberFieldStages(
         fieldStages, subscriberUuid
     );

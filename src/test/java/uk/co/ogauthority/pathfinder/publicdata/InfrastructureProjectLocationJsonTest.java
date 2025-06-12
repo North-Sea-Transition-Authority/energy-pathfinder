@@ -6,6 +6,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectInformationUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectLocationTestUtil;
@@ -18,7 +19,8 @@ class InfrastructureProjectLocationJsonTest {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
-    projectInformation.setFieldStage(FieldStage.DECOMMISSIONING);
+    projectInformation.setFieldStage(FieldStage.OIL_AND_GAS);
+    projectInformation.setFieldStageSubCategory(FieldStageSubCategory.DECOMMISSIONING);
 
     var projectLocation = ProjectLocationTestUtil.getProjectLocation(projectDetail);
 
@@ -53,7 +55,8 @@ class InfrastructureProjectLocationJsonTest {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
-    projectInformation.setFieldStage(FieldStage.DECOMMISSIONING);
+    projectInformation.setFieldStage(FieldStage.OIL_AND_GAS);
+    projectInformation.setFieldStageSubCategory(FieldStageSubCategory.DECOMMISSIONING);
 
     var projectLocation = ProjectLocationTestUtil.getProjectLocation(projectDetail);
 
@@ -68,7 +71,8 @@ class InfrastructureProjectLocationJsonTest {
     var projectDetail = ProjectUtil.getPublishedProjectDetails();
 
     var projectInformation = ProjectInformationUtil.getProjectInformation_withCompleteDetails(projectDetail);
-    projectInformation.setFieldStage(FieldStage.DECOMMISSIONING);
+    projectInformation.setFieldStage(FieldStage.OIL_AND_GAS);
+    projectInformation.setFieldStageSubCategory(FieldStageSubCategory.DECOMMISSIONING);
 
     var projectLocation = ProjectLocationTestUtil.getProjectLocation(projectDetail);
 

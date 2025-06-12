@@ -91,12 +91,6 @@ public class ProjectInformationControllerTest extends ProjectContextAbstractCont
     assertThat(model)
         .containsEntry("form", form)
         .containsEntry("pageName", ProjectInformationController.PAGE_NAME)
-        .containsEntry("discoveryFieldStage", FieldStage.getEntryAsMap(FieldStage.DISCOVERY))
-        .containsEntry("discoveryFieldStageDescription", FieldStage.DISCOVERY.getDescription())
-        .containsEntry("developmentFieldStage", FieldStage.getEntryAsMap(FieldStage.DEVELOPMENT))
-        .containsEntry("developmentFieldStageDescription", FieldStage.DEVELOPMENT.getDescription())
-        .containsEntry("decommissioningFieldStage", FieldStage.getEntryAsMap(FieldStage.DECOMMISSIONING))
-        .containsEntry("decommissioningFieldStageDescription", FieldStage.DECOMMISSIONING.getDescription())
         .containsEntry("carbonCaptureAndStorageFieldStage", FieldStage.getEntryAsMap(FieldStage.CARBON_CAPTURE_AND_STORAGE))
         .containsEntry("carbonAndOnshoreCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.CAPTURE_AND_ONSHORE))
         .containsEntry("carbonAndOnshoreDescription", FieldStageSubCategory.CAPTURE_AND_ONSHORE.getDescription())
@@ -108,6 +102,13 @@ public class ProjectInformationControllerTest extends ProjectContextAbstractCont
         .containsEntry("electrificationFieldStage", FieldStage.getEntryAsMap(FieldStage.ELECTRIFICATION))
         .containsEntry("offshoreElectrificationCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.OFFSHORE_ELECTRIFICATION))
         .containsEntry("onshoreElectrificationCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.ONSHORE_ELECTRIFICATION))
+        .containsEntry("oilAndGasFieldStage", FieldStage.getEntryAsMap(FieldStage.OIL_AND_GAS))
+        .containsEntry("discoveryCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.DISCOVERY))
+        .containsEntry("discoveryCategoryDescription", FieldStageSubCategory.DISCOVERY.getDescription())
+        .containsEntry("developmentCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.DEVELOPMENT))
+        .containsEntry("developmentCategoryDescription", FieldStageSubCategory.DEVELOPMENT.getDescription())
+        .containsEntry("decommissioningCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.DECOMMISSIONING))
+        .containsEntry("decommissioningCategoryDescription", FieldStageSubCategory.DECOMMISSIONING.getDescription())
         .containsEntry("windEnergyFieldStage", FieldStage.getEntryAsMap(FieldStage.WIND_ENERGY))
         .containsEntry("fixedBottomOffshoreWindCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.FIXED_BOTTOM_OFFSHORE_WIND))
         .containsEntry("floatingOffshoreWindCategory", FieldStageSubCategory.getEntryAsMap(FieldStageSubCategory.FLOATING_OFFSHORE_WIND))
@@ -146,9 +147,10 @@ public class ProjectInformationControllerTest extends ProjectContextAbstractCont
 
     verify(projectInformationService, times(1)).validate(any(), any(), eq(ValidationType.PARTIAL));
     verify(projectInformationService, times(1)).createOrUpdate(any(), any());
-    verify(projectSetupService, times(1)).removeTaskListSetupSectionsNotApplicableToFieldStage(
+    verify(projectSetupService, times(1)).removeTaskListSetupSectionsNotApplicableToFieldStageAndSubCategory(
         detail,
-        projectInformationEntity.getFieldStage()
+        projectInformationEntity.getFieldStage(),
+        projectInformationEntity.getFieldStageSubCategory()
     );
   }
 
@@ -175,8 +177,9 @@ public class ProjectInformationControllerTest extends ProjectContextAbstractCont
 
     verify(projectInformationService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
     verify(projectInformationService, times(0)).createOrUpdate(any(), any());
-    verify(projectSetupService, never()).removeTaskListSetupSectionsNotApplicableToFieldStage(
+    verify(projectSetupService, never()).removeTaskListSetupSectionsNotApplicableToFieldStageAndSubCategory(
         eq(detail),
+        any(),
         any()
     );
   }
@@ -208,9 +211,10 @@ public class ProjectInformationControllerTest extends ProjectContextAbstractCont
     verify(projectInformationService, times(1)).validate(any(), any(), eq(ValidationType.FULL));
     verify(projectInformationService, times(1)).createOrUpdate(any(), any());
 
-    verify(projectSetupService, times(1)).removeTaskListSetupSectionsNotApplicableToFieldStage(
+    verify(projectSetupService, times(1)).removeTaskListSetupSectionsNotApplicableToFieldStageAndSubCategory(
         detail,
-        projectInformationEntity.getFieldStage()
+        projectInformationEntity.getFieldStage(),
+        projectInformationEntity.getFieldStageSubCategory()
     );
   }
 }

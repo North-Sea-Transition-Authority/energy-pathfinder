@@ -6,8 +6,6 @@ import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.UkcsArea;
-import uk.co.ogauthority.pathfinder.model.view.dashboard.DashboardProjectItemView;
-import uk.co.ogauthority.pathfinder.model.view.dashboard.DashboardProjectItemViewUtil;
 
 public class DashboardProjectItemTestUtil {
   public static final Integer PROJECT_ID = 1;
@@ -15,7 +13,7 @@ public class DashboardProjectItemTestUtil {
   public static final Instant CREATED_INSTANT = Instant.now();
   public static final ProjectStatus PROJECT_STATUS = ProjectStatus.DRAFT;
   public static final Integer VERSION = 1;
-  public static final FieldStage FIELD_STAGE = FieldStage.DECOMMISSIONING;
+  public static final FieldStage FIELD_STAGE = FieldStage.HYDROGEN;
   public static final String PROJECT_TITLE = "Dummy title";
   public static final String FIELD_NAME = "A field";
   public static final UkcsArea UKCS_AREA = UkcsArea.WOS;
@@ -74,9 +72,5 @@ public class DashboardProjectItemTestUtil {
     dashboardProjectItem.setUpdateSortKey(UPDATE_SORT_KEY);
     dashboardProjectItem.setProjectType(ProjectType.INFRASTRUCTURE);
     return dashboardProjectItem;
-  }
-
-  public static DashboardProjectItemView getDashboardProjectItemView() {
-    return DashboardProjectItemViewUtil.from(getDashboardProjectItem());
   }
 }

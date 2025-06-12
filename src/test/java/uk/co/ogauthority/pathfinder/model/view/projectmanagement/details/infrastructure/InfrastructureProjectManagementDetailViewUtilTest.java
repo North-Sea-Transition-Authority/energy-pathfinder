@@ -39,7 +39,7 @@ public class InfrastructureProjectManagementDetailViewUtilTest {
 
     final var devUkField = DevUkTestUtil.getDevUkField();
 
-    final var fieldStage = FieldStage.DISCOVERY;
+    final var fieldStage = FieldStage.OIL_AND_GAS;
     final var submitterAccount = UserTestingUtil.getAuthenticatedUserAccount();
     final var isEnergyTransitionProject = false;
 
@@ -60,7 +60,7 @@ public class InfrastructureProjectManagementDetailViewUtilTest {
 
     final DevUkField devUkField = null;
 
-    final var fieldStage = FieldStage.DECOMMISSIONING;
+    final var fieldStage = FieldStage.CARBON_CAPTURE_AND_STORAGE;
     final var submitterAccount = UserTestingUtil.getAuthenticatedUserAccount();
     final var isEnergyTransitionProject = true;
 

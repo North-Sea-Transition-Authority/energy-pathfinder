@@ -23,7 +23,7 @@ public class DashboardFilterServiceTest {
 
   private static final String OPERATOR = "Test operator";
   private static final String TITLE = "Test project";
-  private static final FieldStage FIELD_STAGE = FieldStage.DEVELOPMENT;
+  private static final FieldStage FIELD_STAGE = FieldStage.OIL_AND_GAS;
   private static final String FIELD_NAME = "Filter Test Field";
   private static final ProjectStatus PROJECT_STATUS = ProjectStatus.PUBLISHED;
   private static final UkcsArea UKCS_AREA = UkcsArea.NNS;
@@ -115,7 +115,7 @@ public class DashboardFilterServiceTest {
 
   @Test
   public void fieldStageMatches_whenFilterSet_filterDoesNotMatch() {
-    filter.setFieldStages(List.of(FieldStage.DISCOVERY, FieldStage.ELECTRIFICATION));
+    filter.setFieldStages(List.of(FieldStage.WIND_ENERGY, FieldStage.ELECTRIFICATION));
     assertThat(dashboardFilterService.fieldStageMatches(FIELD_STAGE_ITEM, filter)).isFalse();
   }
 
@@ -195,7 +195,7 @@ public class DashboardFilterServiceTest {
     var results = dashboardFilterService.filter(dashboardProjectItems, filter);
 
     assertThat(results.size()).isEqualTo(1);
-    assertThat(results.get(0)).isEqualTo(OPERATOR_ITEM);
+    assertThat(results.getFirst()).isEqualTo(OPERATOR_ITEM);
   }
 
   @Test
@@ -204,7 +204,7 @@ public class DashboardFilterServiceTest {
     var results = dashboardFilterService.filter(dashboardProjectItems, filter);
 
     assertThat(results.size()).isEqualTo(1);
-    assertThat(results.get(0)).isEqualTo(TITLE_ITEM);
+    assertThat(results.getFirst()).isEqualTo(TITLE_ITEM);
   }
 
   @Test
@@ -213,7 +213,7 @@ public class DashboardFilterServiceTest {
     var results = dashboardFilterService.filter(dashboardProjectItems, filter);
 
     assertThat(results.size()).isEqualTo(1);
-    assertThat(results.get(0)).isEqualTo(FIELD_STAGE_ITEM);
+    assertThat(results.getFirst()).isEqualTo(FIELD_STAGE_ITEM);
   }
 
   @Test
@@ -222,7 +222,7 @@ public class DashboardFilterServiceTest {
     var results = dashboardFilterService.filter(dashboardProjectItems, filter);
 
     assertThat(results.size()).isEqualTo(1);
-    assertThat(results.get(0)).isEqualTo(FIELD_ITEM);
+    assertThat(results.getFirst()).isEqualTo(FIELD_ITEM);
   }
 
   @Test
@@ -231,7 +231,7 @@ public class DashboardFilterServiceTest {
     var results = dashboardFilterService.filter(dashboardProjectItems, filter);
 
     assertThat(results.size()).isEqualTo(1);
-    assertThat(results.get(0)).isEqualTo(UKCS_ITEM);
+    assertThat(results.getFirst()).isEqualTo(UKCS_ITEM);
   }
 
   @Test
@@ -240,7 +240,7 @@ public class DashboardFilterServiceTest {
     var results = dashboardFilterService.filter(dashboardProjectItems, filter);
 
     assertThat(results.size()).isEqualTo(1);
-    assertThat(results.get(0)).isEqualTo(STATUS_ITEM);
+    assertThat(results.getFirst()).isEqualTo(STATUS_ITEM);
   }
 
   @Test
@@ -255,7 +255,7 @@ public class DashboardFilterServiceTest {
 
     var results = dashboardFilterService.filter(List.of(dashboardItem), filter);
     assertThat(results.size()).isEqualTo(1);
-    assertThat(results.get(0)).isEqualTo(dashboardItem);
+    assertThat(results.getFirst()).isEqualTo(dashboardItem);
   }
 
   @Test

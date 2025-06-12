@@ -8,7 +8,7 @@ import uk.co.ogauthority.pathfinder.service.quarterlystatistics.ReportableProjec
 
 public class ReportableProjectTestUtil {
 
-  private static final FieldStage FIELD_STAGE = FieldStage.DEVELOPMENT;
+  private static final FieldStage FIELD_STAGE = FieldStage.OIL_AND_GAS;
   private static final int PROJECT_DETAIL_ID = 12;
   private static final int PROJECT_ID = 10;
   private static final Instant LAST_UPDATE_DATETIME = Instant.now();

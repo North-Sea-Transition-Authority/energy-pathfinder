@@ -1,6 +1,5 @@
 package uk.co.ogauthority.pathfinder.service.project.projectinformation;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.entity.project.projectinformation.ProjectInformation;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.forminput.contact.ContactDetailForm;
@@ -84,8 +84,9 @@ public class ProjectInformationService implements ProjectFormSectionService {
 
   private void clearFieldStageCategory(ProjectInformationForm form) {
     form.setCarbonCaptureSubCategory(null);
-    form.setHydrogenSubCategory(null);
     form.setElectrificationSubCategory(null);
+    form.setHydrogenSubCategory(null);
+    form.setOilAndGasSubCategory(null);
     form.setWindEnergySubCategory(null);
   }
 
@@ -144,35 +145,26 @@ public class ProjectInformationService implements ProjectFormSectionService {
     return validationService.validate(form, bindingResult, validationType);
   }
 
-  private List<FieldStage> getFieldStagesWithHiddenInputs() {
-    return List.of(
-        FieldStage.DEVELOPMENT,
-        FieldStage.CARBON_CAPTURE_AND_STORAGE,
-        FieldStage.HYDROGEN,
-        FieldStage.ELECTRIFICATION,
-        FieldStage.WIND_ENERGY
-    );
-  }
-
   private void setEntityHiddenFieldStageData(ProjectInformationForm form, ProjectInformation projectInformation) {
 
     var fieldStage = form.getFieldStage();
-    var fieldStagesWithHiddenInputs = getFieldStagesWithHiddenInputs();
+    var oilAndGasSubCategory = form.getOilAndGasSubCategory();
 
-    if (fieldStage == null || !fieldStagesWithHiddenInputs.contains(fieldStage)) {
+    if (fieldStage == null) {
       clearFirstProductionDate(projectInformation);
       clearFieldStageCategory(projectInformation);
-    } else if (fieldStage.equals(FieldStage.DEVELOPMENT)) {
-      form.getDevelopmentFirstProductionDate()
-          .create()
-          .ifPresent(quarterYearInput -> {
-            projectInformation.setFirstProductionDateQuarter(quarterYearInput.getQuarter());
-            projectInformation.setFirstProductionDateYear(Integer.parseInt(quarterYearInput.getYear()));
-          });
-
-      // These inputs are hidden if development field stage
-      clearFieldStageCategory(projectInformation);
-
+    } else if (fieldStage.equals(FieldStage.OIL_AND_GAS)) {
+      projectInformation.setFieldStageSubCategory(form.getOilAndGasSubCategory());
+      if (oilAndGasSubCategory == FieldStageSubCategory.DEVELOPMENT) {
+        form.getDevelopmentFirstProductionDate()
+            .create()
+            .ifPresent(quarterYearInput -> {
+              projectInformation.setFirstProductionDateQuarter(quarterYearInput.getQuarter());
+              projectInformation.setFirstProductionDateYear(Integer.parseInt(quarterYearInput.getYear()));
+            });
+      } else {
+        clearFirstProductionDate(projectInformation);
+      }
     } else if (fieldStage.equals(FieldStage.CARBON_CAPTURE_AND_STORAGE)) {
       projectInformation.setFieldStageSubCategory(form.getCarbonCaptureSubCategory());
       clearFirstProductionDate(projectInformation);
@@ -191,31 +183,36 @@ public class ProjectInformationService implements ProjectFormSectionService {
   private void setFormHiddenFieldStageData(ProjectInformation projectInformation, ProjectInformationForm form) {
 
     var fieldStage = projectInformation.getFieldStage();
-    var fieldStagesWithHiddenInputs = getFieldStagesWithHiddenInputs();
+    var subCategory = projectInformation.getFieldStageSubCategory();
 
-    if (fieldStage == null || !fieldStagesWithHiddenInputs.contains(fieldStage)) {
+    if (fieldStage == null) {
       clearFirstProductionDate(form);
       clearFieldStageCategory(form);
-    } else if (fieldStage.equals(FieldStage.DEVELOPMENT)) {
-      form.setDevelopmentFirstProductionDate(getFirstProductionDate(projectInformation));
-      clearFieldStageCategory(form);
+    } else if (fieldStage.equals(FieldStage.OIL_AND_GAS)) {
+      form.setOilAndGasSubCategory(subCategory);
+      if (subCategory == FieldStageSubCategory.DEVELOPMENT) {
+        form.setDevelopmentFirstProductionDate(getFirstProductionDate(projectInformation));
+      } else {
+        clearFirstProductionDate(form);
+      }
     } else if (fieldStage.equals(FieldStage.CARBON_CAPTURE_AND_STORAGE)) {
-      form.setCarbonCaptureSubCategory(projectInformation.getFieldStageSubCategory());
+      form.setCarbonCaptureSubCategory(subCategory);
       clearFirstProductionDate(form);
     } else if (fieldStage.equals(FieldStage.HYDROGEN)) {
-      form.setHydrogenSubCategory(projectInformation.getFieldStageSubCategory());
+      form.setHydrogenSubCategory(subCategory);
       clearFirstProductionDate(form);
     } else if (fieldStage.equals(FieldStage.ELECTRIFICATION)) {
-      form.setElectrificationSubCategory(projectInformation.getFieldStageSubCategory());
+      form.setElectrificationSubCategory(subCategory);
       clearFirstProductionDate(form);
     } else if (fieldStage.equals(FieldStage.WIND_ENERGY)) {
-      form.setWindEnergySubCategory(projectInformation.getFieldStageSubCategory());
+      form.setWindEnergySubCategory(subCategory);
       clearFirstProductionDate(form);
     }
   }
 
   public boolean isDecomRelated(ProjectDetail detail) {
-    return getProjectInformation(detail).map(p -> FieldStage.DECOMMISSIONING.equals(p.getFieldStage()))
+    return getProjectInformation(detail)
+        .map(p -> FieldStageSubCategory.DECOMMISSIONING.equals(p.getFieldStageSubCategory()))
         .orElse(false);
   }
 
@@ -238,6 +235,11 @@ public class ProjectInformationService implements ProjectFormSectionService {
   public Optional<FieldStage> getFieldStage(ProjectDetail projectDetail) {
     return getProjectInformation(projectDetail)
         .map(ProjectInformation::getFieldStage);
+  }
+
+  public Optional<FieldStageSubCategory> getFieldStageSubCategory(ProjectDetail projectDetail) {
+    return getProjectInformation(projectDetail)
+        .map(ProjectInformation::getFieldStageSubCategory);
   }
 
   @Override

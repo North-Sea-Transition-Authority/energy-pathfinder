@@ -29,7 +29,7 @@ class InfrastructureProjectDetailsJsonTest {
         projectInformation.getProjectTitle(),
         projectInformation.getProjectSummary(),
         projectInformation.getFieldStage().name(),
-        null
+        projectInformation.getFieldStageSubCategory().name()
     );
 
     assertThat(infrastructureProjectDetailsJson).isEqualTo(expectedInfrastructureProjectDetailsJson);

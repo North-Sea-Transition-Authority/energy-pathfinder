@@ -9,6 +9,7 @@ import org.springframework.validation.ValidationUtils;
 import uk.co.ogauthority.pathfinder.exception.ActionNotAllowedException;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
+import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 
 @Component
 public class ProjectSetupFormValidator implements SmartValidator {
@@ -38,9 +39,9 @@ public class ProjectSetupFormValidator implements SmartValidator {
             () -> new ActionNotAllowedException("Expected ProjectSetupFormValidationHint to be provided")
         );
 
-    if (ValidationType.FULL.equals(validationHint.getValidationType())) {
+    if (ValidationType.FULL.equals(validationHint.validationType()) && FieldStage.OIL_AND_GAS.equals(validationHint.fieldStage())) {
 
-      if (FieldStage.DECOMMISSIONING.equals(validationHint.fieldStage)) {
+      if (FieldStageSubCategory.DECOMMISSIONING.equals(validationHint.fieldStageSubCategory())) {
 
         ValidationUtils.rejectIfEmpty(errors, "wellsIncluded", "wellsIncluded.invalid",
             WELLS_REQUIRED_TEXT
@@ -61,9 +62,9 @@ public class ProjectSetupFormValidator implements SmartValidator {
             PIPELINES_REQUIRED_TEXT
         );
 
-      } else if (FieldStage.DISCOVERY.equals(validationHint.fieldStage)) {
+      } else if (FieldStageSubCategory.DISCOVERY.equals(validationHint.fieldStageSubCategory())) {
         validateCommissionedWellsInput(errors);
-      } else if (FieldStage.DEVELOPMENT.equals(validationHint.fieldStage)) {
+      } else if (FieldStageSubCategory.DEVELOPMENT.equals(validationHint.fieldStageSubCategory())) {
         validateCommissionedWellsInput(errors);
       }
     }

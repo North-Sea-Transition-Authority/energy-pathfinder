@@ -45,9 +45,9 @@ public class ReportableProjectServiceTest {
 
   @Test
   public void getReportableProjectViews_whenResults_thenPopulatedList() {
-    final var reportableProject1 = ReportableProjectTestUtil.createReportableProject(FieldStage.DEVELOPMENT);
-    final var reportableProject2 = ReportableProjectTestUtil.createReportableProject(FieldStage.DECOMMISSIONING);
-    final var reportableProject3 = ReportableProjectTestUtil.createReportableProject(FieldStage.DEVELOPMENT);
+    final var reportableProject1 = ReportableProjectTestUtil.createReportableProject(FieldStage.OIL_AND_GAS);
+    final var reportableProject2 = ReportableProjectTestUtil.createReportableProject(FieldStage.HYDROGEN);
+    final var reportableProject3 = ReportableProjectTestUtil.createReportableProject(FieldStage.OIL_AND_GAS);
 
     when(reportableProjectRepository.findAll()).thenReturn(List.of(reportableProject1, reportableProject2, reportableProject3));
 
@@ -64,7 +64,7 @@ public class ReportableProjectServiceTest {
   @Test
   public void getReportableProjectViews_confirmDerivedField_whenUpdatedInQuarter() {
 
-    var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.DEVELOPMENT);
+    var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.OIL_AND_GAS);
 
     final var timeInCurrentQuarter = DateUtil.getQuarterFromLocalDate(LocalDate.now()).getEndDateAsInstant();
     reportableProject.setLastUpdatedDatetime(timeInCurrentQuarter);
@@ -74,7 +74,7 @@ public class ReportableProjectServiceTest {
     final var reportableProjectViews = reportableProjectService.getReportableProjectViews();
     assertThat(reportableProjectViews).hasSize(1);
 
-    final var reportableProjectView = reportableProjectViews.get(0);
+    final var reportableProjectView = reportableProjectViews.getFirst();
 
     assertCommonDerivedFields(reportableProjectView, reportableProject);
     assertThat(reportableProjectView.hasUpdateInQuarter()).isTrue();
@@ -83,7 +83,7 @@ public class ReportableProjectServiceTest {
   @Test
   public void getReportableProjectViews_confirmDerivedField_whenNoUpdateInQuarter() {
 
-    var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.DEVELOPMENT);
+    var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.OIL_AND_GAS);
     reportableProject.setLastUpdatedDatetime(Instant.now().minus(200, ChronoUnit.DAYS));
 
     when(reportableProjectRepository.findAll()).thenReturn(List.of(reportableProject));
@@ -91,7 +91,7 @@ public class ReportableProjectServiceTest {
     final var reportableProjectViews = reportableProjectService.getReportableProjectViews();
     assertThat(reportableProjectViews).hasSize(1);
 
-    final var reportableProjectView = reportableProjectViews.get(0);
+    final var reportableProjectView = reportableProjectViews.getFirst();
 
     assertCommonDerivedFields(reportableProjectView, reportableProject);
     assertThat(reportableProjectView.hasUpdateInQuarter()).isFalse();
@@ -110,7 +110,7 @@ public class ReportableProjectServiceTest {
   @Test
   public void getReportableProjectsUpdatedBetween_whenResults_thenEmptyListReturned() {
 
-    final var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.DISCOVERY);
+    final var reportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.HYDROGEN);
     when(reportableProjectRepository.findByLastUpdatedDatetimeBetween(any(), any())).thenReturn(List.of(reportableProject));
 
     final var reportableProjects = reportableProjectService.getReportableProjectsUpdatedBetween(
@@ -131,7 +131,7 @@ public class ReportableProjectServiceTest {
   public void getReportableProjects_whenReportableProjectsFound_thenReturnPopulatedList() {
 
     var expectedReportableProjects = List.of(
-        ReportableProjectTestUtil.createReportableProject(FieldStage.DEVELOPMENT)
+        ReportableProjectTestUtil.createReportableProject(FieldStage.OIL_AND_GAS)
     );
 
     when(reportableProjectRepository.findAll()).thenReturn(expectedReportableProjects);
@@ -164,7 +164,7 @@ public class ReportableProjectServiceTest {
     var earliestUpdatedDatetime = Instant.MIN;
     var latestUpdatedDatetime = Instant.MIN;
 
-    var expectedReportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.DECOMMISSIONING);
+    var expectedReportableProject = ReportableProjectTestUtil.createReportableProject(FieldStage.HYDROGEN);
 
     when(reportableProjectRepository.findByLastUpdatedDatetimeNotBetween(earliestUpdatedDatetime, latestUpdatedDatetime))
         .thenReturn(List.of(expectedReportableProject));
