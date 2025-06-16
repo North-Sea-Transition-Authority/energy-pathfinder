@@ -3,7 +3,7 @@ package uk.co.ogauthority.pathfinder.feedback;
 import java.time.Instant;
 import uk.co.fivium.feedbackmanagementservice.client.FeedbackManagementServiceFeedback;
 
-class Feedback implements FeedbackManagementServiceFeedback {
+public class Feedback implements FeedbackManagementServiceFeedback {
 
   private String submitterName;
   private String submitterEmail;
@@ -76,5 +76,19 @@ class Feedback implements FeedbackManagementServiceFeedback {
 
   public void setTransactionLink(String transactionLink) {
     this.transactionLink = transactionLink;
+  }
+
+  @Override
+  public String toString() {
+    return "Feedback{" +
+      "submitterName='" + submitterName + '\'' +
+      ", submitterEmail='" + submitterEmail + '\'' +
+      ", serviceRating='" + serviceRating + '\'' +
+      ", comment='" + comment + '\'' +
+      ", givenDatetime=" + givenDatetime +
+      ", transactionId=" + transactionId +
+      ", transactionReference='" + transactionReference + '\'' +
+      ", transactionLink='" + transactionLink + '\'' +
+      '}';
   }
 }

@@ -72,7 +72,9 @@ public class WebSecurityConfig {
                 "/assets/**",
                 "/error",
                 "/public/file",
-                "/pathfinder-api/**"
+                "/pathfinder-api/**",
+                "/energy-pathfinder-feedback",
+                "/energy-pathfinder-feedback/submitted"
             )
             .permitAll()
 
