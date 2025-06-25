@@ -3,6 +3,8 @@ package uk.co.ogauthority.pathfinder.google.recaptcha;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -13,8 +15,10 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
@@ -30,14 +34,28 @@ public class RecaptchaService {
   public static final String RESPONSE_REQUEST_PARAMETER_NAME = "g-recaptcha-response";
   private static final Logger LOGGER = LoggerFactory.getLogger(RecaptchaService.class);
 
-  RecaptchaService(GoogleConfig googleConfig, ObjectMapper objectMapper) {
+  RecaptchaService(GoogleConfig googleConfig, ObjectMapper objectMapper,
+                   @Value("${pathfinder.proxy.host:#{null}}") String proxyHost,
+                   @Value("${pathfinder.proxy.port:#{null}}") String proxyPort) {
     this.googleConfig = googleConfig;
-    this.httpClient = HttpClient.newBuilder().build();
+    var httpClientBuilder = HttpClient.newBuilder();
+
+    // Pathfinder doesn't use the standard java proxy settings :(
+    if (proxyHost != null && proxyPort != null) {
+      httpClientBuilder = httpClientBuilder
+        .proxy(ProxySelector.of(new InetSocketAddress(proxyHost, Integer.parseInt(proxyPort))));
+
+      LOGGER.info("Using proxy at {}:{}", proxyHost, proxyPort);
+    } else if (proxyHost != null || proxyPort != null) {
+      throw new IllegalArgumentException(
+        "Proxy host [%s] or proxy port [%s] not specified".formatted(proxyHost, proxyPort));
+    }
+    httpClient = httpClientBuilder.build();
     this.objectMapper = objectMapper;
   }
 
   boolean isValid(String response) {
-    if (response == null) {
+    if (StringUtils.isBlank(response)) {
       LOGGER.info("Recaptcha response is null");
       return false;
     }
