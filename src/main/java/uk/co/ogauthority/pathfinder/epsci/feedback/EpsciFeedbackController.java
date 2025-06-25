@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import uk.co.ogauthority.pathfinder.google.recaptcha.RecaptchaService;
 import uk.co.ogauthority.pathfinder.model.enums.feedback.ServiceFeedbackRating;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
@@ -23,11 +24,15 @@ public class EpsciFeedbackController {
 
   private final ControllerHelperService controllerHelperService;
   private final EpsciFeedbackService epsciFeedbackService;
+  private final RecaptchaService recaptchaService;
 
   @Autowired
-  public EpsciFeedbackController(ControllerHelperService controllerHelperService, EpsciFeedbackService epsciFeedbackService) {
+  public EpsciFeedbackController(ControllerHelperService controllerHelperService,
+                                 EpsciFeedbackService epsciFeedbackService,
+                                 RecaptchaService recaptchaService) {
     this.controllerHelperService = controllerHelperService;
     this.epsciFeedbackService = epsciFeedbackService;
+    this.recaptchaService = recaptchaService;
   }
 
   @GetMapping
@@ -57,7 +62,9 @@ public class EpsciFeedbackController {
   }
 
   private ModelAndView getFeedbackModelAndView() {
-    return new ModelAndView("epsci/feedback")
-      .addObject("serviceRatings", ServiceFeedbackRating.getAllAsMap());
+    var modelAndView =  new ModelAndView("epsci/feedback")
+        .addObject("serviceRatings", ServiceFeedbackRating.getAllAsMap());
+    recaptchaService.addRecaptchaToModelAndView(modelAndView);
+    return modelAndView;
   }
 }

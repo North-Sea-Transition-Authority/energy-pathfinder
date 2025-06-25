@@ -3,6 +3,7 @@
 <#-- @ftlvariable name="errorList" type="java.util.List<uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem>" -->
 <#-- @ftlvariable name="service" type="uk.co.ogauthority.pathfinder.config.ServiceProperties" -->
 <#-- @ftlvariable name="serviceRatings" type="java.util.Map<String, String>" -->
+<#-- @ftlvariable name="recaptchaSiteKey" type="java.lang.String" -->
 
 <#assign pageTitle = "Give feedback on ${service.serviceName}"/>
 
@@ -13,8 +14,10 @@
   backLink=false
   phaseBanner=false
   errorItems=errorList
+
 >
   <@fdsForm.htmlForm>
+    <script src="https://www.google.com/recaptcha/api.js" async defer> </script>
     <@fdsRadio.radio
       path="form.serviceRating"
       labelText="Overall, how did you feel about using this service?"
@@ -30,6 +33,7 @@
       rows="10"
     />
     <input type="hidden" name="form.epsciPath" id="epsciPath" />
+    <div class="g-recaptcha govuk-!-margin-bottom-6" data-sitekey="${recaptchaSiteKey}" data-action="SUBMIT"></div>
     <@fdsAction.button buttonText="Send feedback"/>
     <script type="text/javascript">
       const urlParams = new URLSearchParams(window.location.search);

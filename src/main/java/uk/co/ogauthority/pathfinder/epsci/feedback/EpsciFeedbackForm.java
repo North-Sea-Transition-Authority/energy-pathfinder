@@ -2,13 +2,14 @@ package uk.co.ogauthority.pathfinder.epsci.feedback;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import uk.co.ogauthority.pathfinder.google.recaptcha.RecaptchaProtectedForm;
 import uk.co.ogauthority.pathfinder.model.enums.feedback.ServiceFeedbackRating;
 
-
-@Valid public record EpsciFeedbackForm(
-  @NotNull(message = "You must choose a rating") ServiceFeedbackRating serviceRating,
+@Valid
+public record EpsciFeedbackForm(
+    @NotNull(message = "You must choose a rating") ServiceFeedbackRating serviceRating,
     String feedback,
-    String epsciPath) {
+    String epsciPath) implements RecaptchaProtectedForm {
 
   @Override
   public String toString() {
