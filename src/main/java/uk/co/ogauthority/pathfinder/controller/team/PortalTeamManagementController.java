@@ -34,7 +34,7 @@ import uk.co.ogauthority.pathfinder.model.teammanagement.TeamMemberView;
 import uk.co.ogauthority.pathfinder.model.teammanagement.TeamRoleView;
 import uk.co.ogauthority.pathfinder.model.teammanagement.TeamView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.FoxUrlService;
+import uk.co.ogauthority.pathfinder.service.EnergyPortalUrlService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.team.TeamCreationService;
@@ -51,19 +51,19 @@ public class PortalTeamManagementController {
 
   private final TeamManagementService teamManagementService;
   private final AddUserToTeamFormValidator addUserToTeamFormValidator;
-  private final FoxUrlService foxUrlService;
+  private final EnergyPortalUrlService energyPortalUrlService;
   private final ControllerHelperService controllerHelperService;
   private final TeamCreationService teamCreationService;
 
   @Autowired
   public PortalTeamManagementController(TeamManagementService teamManagementService,
                                         AddUserToTeamFormValidator addUserToTeamFormValidator,
-                                        FoxUrlService foxUrlService,
+                                        EnergyPortalUrlService energyPortalUrlService,
                                         ControllerHelperService controllerHelperService,
                                         TeamCreationService teamCreationService) {
     this.teamManagementService = teamManagementService;
     this.addUserToTeamFormValidator = addUserToTeamFormValidator;
-    this.foxUrlService = foxUrlService;
+    this.energyPortalUrlService = energyPortalUrlService;
     this.controllerHelperService = controllerHelperService;
     this.teamCreationService = teamCreationService;
   }
@@ -170,7 +170,7 @@ public class PortalTeamManagementController {
         .addObject("cancelUrl", ReverseRouter.route(
             on(PortalTeamManagementController.class).renderTeamMembers(team.getId(), null))
         )
-        .addObject("portalRegistrationUrl", foxUrlService.getFoxRegistrationUrl());
+        .addObject("portalRegistrationUrl", energyPortalUrlService.getRegistrationUrl());
   }
 
   @PostMapping("/teams/{resId}/member/new")

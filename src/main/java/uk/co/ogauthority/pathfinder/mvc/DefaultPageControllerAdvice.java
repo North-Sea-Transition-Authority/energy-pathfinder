@@ -14,7 +14,7 @@ import uk.co.ogauthority.pathfinder.analytics.AnalyticsUtils;
 import uk.co.ogauthority.pathfinder.auth.CurrentUserView;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
-import uk.co.ogauthority.pathfinder.service.FoxUrlService;
+import uk.co.ogauthority.pathfinder.service.EnergyPortalUrlService;
 import uk.co.ogauthority.pathfinder.service.navigation.TopNavigationService;
 import uk.co.ogauthority.pathfinder.util.ControllerUtils;
 import uk.co.ogauthority.pathfinder.util.SecurityUtil;
@@ -22,7 +22,7 @@ import uk.co.ogauthority.pathfinder.util.SecurityUtil;
 @ControllerAdvice
 public class DefaultPageControllerAdvice {
 
-  private final FoxUrlService foxUrlService;
+  private final EnergyPortalUrlService energyPortalUrlService;
   private final ServiceProperties serviceProperties;
   private final TopNavigationService topNavigationService;
   private final HttpServletRequest request;
@@ -31,13 +31,13 @@ public class DefaultPageControllerAdvice {
   private final String analyticsMeasurementUrl;
 
   @Autowired
-  public DefaultPageControllerAdvice(FoxUrlService foxUrlService,
+  public DefaultPageControllerAdvice(EnergyPortalUrlService energyPortalUrlService,
                                      ServiceProperties serviceProperties,
                                      TopNavigationService topNavigationService,
                                      HttpServletRequest request,
                                      FooterService footerService,
                                      AnalyticsConfigurationProperties analyticsConfigurationProperties) {
-    this.foxUrlService = foxUrlService;
+    this.energyPortalUrlService = energyPortalUrlService;
     this.serviceProperties = serviceProperties;
     this.topNavigationService = topNavigationService;
     this.request = request;
@@ -75,7 +75,7 @@ public class DefaultPageControllerAdvice {
   }
 
   private void addCommonUrls(Model model) {
-    model.addAttribute("foxLogoutUrl", foxUrlService.getFoxLogoutUrl());
+    model.addAttribute("logoutUrl", energyPortalUrlService.getLogoutUrl());
     model.addAttribute("feedbackUrl", ControllerUtils.getFeedbackUrl());
     model.addAttribute("serviceHomeUrl", ControllerUtils.getWorkAreaUrl());
     footerService.addFooterUrlsToModel(model);

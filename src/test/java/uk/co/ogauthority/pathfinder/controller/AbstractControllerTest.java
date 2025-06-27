@@ -31,7 +31,7 @@ import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
 import uk.co.ogauthority.pathfinder.model.entity.UserSession;
 import uk.co.ogauthority.pathfinder.mvc.error.ErrorService;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
-import uk.co.ogauthority.pathfinder.service.FoxUrlService;
+import uk.co.ogauthority.pathfinder.service.EnergyPortalUrlService;
 import uk.co.ogauthority.pathfinder.service.UserSessionService;
 import uk.co.ogauthority.pathfinder.service.communication.CommunicationJourneyService;
 import uk.co.ogauthority.pathfinder.service.controller.ControllerHelperService;
@@ -59,7 +59,7 @@ public abstract class AbstractControllerTest {
   protected WebApplicationContext context;
 
   @MockitoBean
-  protected FoxUrlService foxUrlService;
+  protected EnergyPortalUrlService energyPortalUrlService;
 
   @MockitoBean
   protected TeamService teamService;
@@ -104,9 +104,9 @@ public abstract class AbstractControllerTest {
         .apply(SecurityMockMvcConfigurers.springSecurity())
         .build();
 
-    when(foxUrlService.getFoxLoginUrl()).thenReturn("test-login-url");
-    when(foxUrlService.getFoxLogoutUrl()).thenReturn("test-logout-url");
-    when(foxUrlService.getFoxRegistrationUrl()).thenReturn("test-registration-url");
+    when(energyPortalUrlService.getLoginUrl()).thenReturn("test-login-url");
+    when(energyPortalUrlService.getLogoutUrl()).thenReturn("test-logout-url");
+    when(energyPortalUrlService.getRegistrationUrl()).thenReturn("test-registration-url");
 
     when(userSessionService.getAndValidateSession(any(), anyBoolean())).thenReturn(Optional.of(new UserSession()));
 

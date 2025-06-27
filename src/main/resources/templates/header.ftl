@@ -1,7 +1,7 @@
 <#include 'layout.ftl'/>
 
 <#-- @ftlvariable name="currentUserView" type="uk.co.ogauthority.pathfinder.auth.CurrentUserView" -->
-<#-- @ftlvariable name="foxLogoutUrl" type="String" -->
+<#-- @ftlvariable name="logoutUrl" type="String" -->
 
 <#macro header
   homePageUrl="/"
@@ -37,7 +37,7 @@
         />
         <@fdsHeader.headerNavigationSignOutLink
           linkText="Sign out"
-          linkUrl=foxLogoutUrl
+          linkUrl=logoutUrl
         />
       </#if>
     </@fdsHeader.headerNavigation>

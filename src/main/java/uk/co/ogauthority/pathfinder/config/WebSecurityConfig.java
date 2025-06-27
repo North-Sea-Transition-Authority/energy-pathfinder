@@ -13,7 +13,7 @@ import org.springframework.security.web.savedrequest.RequestCacheAwareFilter;
 import uk.co.ogauthority.pathfinder.auth.FoxLoginCallbackFilter;
 import uk.co.ogauthority.pathfinder.auth.FoxSessionFilter;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
-import uk.co.ogauthority.pathfinder.service.FoxUrlService;
+import uk.co.ogauthority.pathfinder.service.EnergyPortalUrlService;
 import uk.co.ogauthority.pathfinder.service.UserSessionService;
 
 @Configuration
@@ -23,17 +23,17 @@ public class WebSecurityConfig {
 
   private final UserSessionService userSessionService;
   private final FoxLoginCallbackFilter foxLoginCallbackFilter;
-  private final FoxUrlService foxUrlService;
+  private final EnergyPortalUrlService energyPortalUrlService;
   private final SystemAccessService systemAccessService;
 
   @Autowired
   public WebSecurityConfig(UserSessionService userSessionService,
                            FoxLoginCallbackFilter foxLoginCallbackFilter,
-                           FoxUrlService foxUrlService,
+                           EnergyPortalUrlService energyPortalUrlService,
                            SystemAccessService systemAccessService) {
     this.userSessionService = userSessionService;
     this.foxLoginCallbackFilter = foxLoginCallbackFilter;
-    this.foxUrlService = foxUrlService;
+    this.energyPortalUrlService = energyPortalUrlService;
     this.systemAccessService = systemAccessService;
   }
 
@@ -96,7 +96,8 @@ public class WebSecurityConfig {
                 "Unauthenticated user attempted to access authenticated resource: '{}' Redirecting to login screen...",
                 request.getRequestURI()
             );
-            response.sendRedirect(foxUrlService.getFoxLoginUrl());
+
+            response.sendRedirect(energyPortalUrlService.getLoginUrl());
           })
       )
         .addFilterBefore(

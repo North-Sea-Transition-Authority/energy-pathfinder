@@ -67,7 +67,7 @@ public class FeedbackControllerTest extends AbstractControllerTest {
 
   @Test
   public void getFeedback_whenUnauthenticated_thenRedirectionToLoginPage() throws Exception {
-    when(foxUrlService.getFoxLoginUrl()).thenReturn(EXPECTED_LOGIN_URL);
+    when(energyPortalUrlService.getLoginUrl()).thenReturn(EXPECTED_LOGIN_URL);
 
     mockMvc.perform(
             get(ReverseRouter.route(on(FeedbackController.class).getFeedback(Optional.empty(), null)))
@@ -129,7 +129,7 @@ public class FeedbackControllerTest extends AbstractControllerTest {
 
     when(feedbackModelService.getFeedbackModelAndView(any())).thenReturn(new ModelAndView(DUMMY_MODEL_NAME));
 
-    when(foxUrlService.getFoxLoginUrl()).thenReturn(EXPECTED_LOGIN_URL);
+    when(energyPortalUrlService.getLoginUrl()).thenReturn(EXPECTED_LOGIN_URL);
 
     mockMvc.perform(
             post(ReverseRouter.route(on(FeedbackController.class).getFeedback(Optional.empty(), null)))
