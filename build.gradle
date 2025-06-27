@@ -59,8 +59,11 @@ dependencies {
   implementation 'com.oracle.database.jdbc:ojdbc11:21.9.0.0'
   implementation 'org.springframework.session:spring-session-jdbc'
   implementation 'uk.gov.service.notify:notifications-java-client:5.2.1-RELEASE'
+
   implementation('uk.co.fivium.feedbackmanagementservice:client:2.1.1')
   implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:v4.0.0'
+  implementation 'uk.co.fivium.energyportal.accounts:energy-portal-accounts-spring-boot-starter:v0.5'
+  implementation 'uk.co.fivium.energyportalmessagequeue:spring-boot-starter:v4.4.0'
 
   implementation 'com.google.guava:guava:33.2.1-jre'
   implementation 'org.apache.commons:commons-lang3:3.12.0'
@@ -73,6 +76,10 @@ dependencies {
   implementation group: 'com.googlecode.libphonenumber', name: 'libphonenumber', version: '8.12.8'
   implementation group: 'fi.solita.clamav', name: 'clamav-client', version: '1.0.1'
   implementation 'software.amazon.awssdk:s3:2.28.13'
+  // there is a conflict between sns & sqs with another dependency which prevents the service from booting
+  // manually fixing the same version as the s3 one above as a work around
+  implementation 'software.amazon.awssdk:sns:2.28.13'
+  implementation 'software.amazon.awssdk:sqs:2.28.13'
   implementation 'net.javacrumbs.shedlock:shedlock-spring:5.16.0'
   implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.16.0'
 

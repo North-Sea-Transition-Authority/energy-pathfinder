@@ -12,8 +12,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.exception.team.PortalTeamNotFoundException;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalRoleDto;
@@ -29,6 +31,7 @@ import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeam;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeamTypeRole;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeamUsagePurpose;
 import uk.co.ogauthority.pathfinder.energyportal.repository.team.PortalTeamRepository;
+import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
 import uk.co.ogauthority.pathfinder.model.team.TeamType;
 
 @Service
@@ -36,12 +39,21 @@ public class PortalTeamAccessor {
 
   private final PortalTeamRepository portalTeamRepository;
   private final EntityManager entityManager;
+  private final EnergyPortalServiceAccessService energyPortalServiceAccessService;
+  private final WebUserAccountService webUserAccountService;
+  private final boolean useEpas;
 
   @Autowired
   public PortalTeamAccessor(PortalTeamRepository portalTeamRepository,
-                            EntityManager entityManager) {
+                            EntityManager entityManager,
+                            EnergyPortalServiceAccessService energyPortalServiceAccessService,
+                            WebUserAccountService webUserAccountService,
+                            Environment environment) {
     this.portalTeamRepository = portalTeamRepository;
     this.entityManager = entityManager;
+    this.energyPortalServiceAccessService = energyPortalServiceAccessService;
+    this.webUserAccountService = webUserAccountService;
+    this.useEpas = environment.matchesProfiles("use-epas");
   }
 
   public Optional<PortalTeamDto> findPortalTeamById(int resId) {
@@ -292,8 +304,14 @@ public class PortalTeamAccessor {
    */
   @Transactional
   public void removePersonFromTeam(int resId, Person personToBeRemovedFromTeam, WebUserAccount actionPerformedBy) {
+
     try {
       portalTeamRepository.removeUserFromTeam(resId, personToBeRemovedFromTeam.getId().asInt(), actionPerformedBy.getWuaId());
+
+      if (useEpas && !hasAccessToService(personToBeRemovedFromTeam)) {
+        energyPortalServiceAccessService.removeUser(getWebUserAccount(personToBeRemovedFromTeam).getWuaId());
+      }
+
     } catch (Exception e) {
       String msg = String.format(
           "Error Removing person from team. paramSummary: resId:%s; personId:%s; actingPersonId:%s;",
@@ -315,9 +333,17 @@ public class PortalTeamAccessor {
    */
   @Transactional
   public void addPersonToTeamWithRoles(int resId, Person person, Collection<String> roleNames, WebUserAccount actionPerformedBy) {
+
+    var hasExistingAccessToService = hasAccessToService(person);
+
     String roleNameCsv = String.join(",", roleNames);
     try {
       portalTeamRepository.updateUserRoles(resId, roleNameCsv, person.getId().asInt(), actionPerformedBy.getWuaId());
+
+      if (!hasExistingAccessToService && useEpas) {
+        energyPortalServiceAccessService.addUser(getWebUserAccount(person).getWuaId());
+      }
+
     } catch (Exception e) {
       String msg = String.format("Error adding person to team. paramSummary: resId:%s; roleNameCSV:%s; personId:%s; actingPersonId:%s;",
           resId,
@@ -493,5 +519,29 @@ public class PortalTeamAccessor {
             PortalTeamPersonMembershipDto.class)
         .setParameter("portalTeamIds", resourceIds)
         .getResultList();
+  }
+
+  public boolean hasAccessToService(Person person) {
+
+    var teamTypes = Set.of(TeamType.ORGANISATION.getPortalTeamType(), TeamType.REGULATOR.getPortalTeamType());
+
+    var roleCount = (Long) entityManager.createQuery("""
+          SELECT COUNT(ptmr)
+          FROM PortalTeamMemberRole ptmr
+          WHERE ptmr.portalTeamTypeRole.portalTeamType.type IN (:teamTypes)
+          AND ptmr.portalTeamMemberRoleId.personId = :personId
+        """)
+        .setParameter("teamTypes", teamTypes)
+        .setParameter("personId", person.getId().asInt())
+        .getSingleResult();
+
+    return roleCount > 0;
+  }
+
+  private WebUserAccount getWebUserAccount(Person person) {
+    return webUserAccountService.findByPerson(person)
+        .orElseThrow(() -> new IllegalStateException(
+            "Unable to find WUA for person with ID %s".formatted(person.getId())
+        ));
   }
 }

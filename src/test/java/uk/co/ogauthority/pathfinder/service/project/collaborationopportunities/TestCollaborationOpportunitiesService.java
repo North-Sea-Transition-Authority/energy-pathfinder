@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project.collaborationopportunities;
 
 import java.util.List;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
@@ -14,6 +15,7 @@ import uk.co.ogauthority.pathfinder.service.project.setup.ProjectSetupService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 
+@Profile("test")
 @Service
 public class TestCollaborationOpportunitiesService extends CollaborationOpportunitiesService {
 

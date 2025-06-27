@@ -1,11 +1,14 @@
 package uk.co.ogauthority.pathfinder.config;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.SecurityContextRepository;
@@ -13,6 +16,7 @@ import org.springframework.security.web.savedrequest.RequestCacheAwareFilter;
 import uk.co.ogauthority.pathfinder.auth.FoxLoginCallbackFilter;
 import uk.co.ogauthority.pathfinder.auth.FoxSessionFilter;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.logout.ServiceLogoutSuccessHandler;
 import uk.co.ogauthority.pathfinder.service.EnergyPortalUrlService;
 import uk.co.ogauthority.pathfinder.service.UserSessionService;
 
@@ -25,16 +29,22 @@ public class WebSecurityConfig {
   private final FoxLoginCallbackFilter foxLoginCallbackFilter;
   private final EnergyPortalUrlService energyPortalUrlService;
   private final SystemAccessService systemAccessService;
+  private final ServiceLogoutSuccessHandler serviceLogoutSuccessHandler;
+  private final boolean useEpas;
 
   @Autowired
   public WebSecurityConfig(UserSessionService userSessionService,
                            FoxLoginCallbackFilter foxLoginCallbackFilter,
                            EnergyPortalUrlService energyPortalUrlService,
-                           SystemAccessService systemAccessService) {
+                           SystemAccessService systemAccessService,
+                           ServiceLogoutSuccessHandler serviceLogoutSuccessHandler,
+                           Environment environment) {
     this.userSessionService = userSessionService;
     this.foxLoginCallbackFilter = foxLoginCallbackFilter;
     this.energyPortalUrlService = energyPortalUrlService;
     this.systemAccessService = systemAccessService;
+    this.serviceLogoutSuccessHandler = serviceLogoutSuccessHandler;
+    this.useEpas = environment.matchesProfiles("use-epas");
   }
 
   @Bean
@@ -90,6 +100,7 @@ public class WebSecurityConfig {
               "/analytics/collect"
           )
       )
+      .logout(logout -> logout.logoutSuccessHandler(serviceLogoutSuccessHandler))
       .exceptionHandling(exceptionHandling -> exceptionHandling
           .authenticationEntryPoint((request, response, authException) -> {
             LOGGER.warn(
@@ -97,7 +108,15 @@ public class WebSecurityConfig {
                 request.getRequestURI()
             );
 
-            response.sendRedirect(energyPortalUrlService.getLoginUrl());
+            if (useEpas) {
+              var loginUrlWithRelayState = energyPortalUrlService.getLoginUrl() + "?RelayState=" + URLEncoder.encode(
+                  String.valueOf(request.getRequestURL()), StandardCharsets.UTF_8);
+
+              response.sendRedirect(loginUrlWithRelayState);
+
+            } else {
+              response.sendRedirect(energyPortalUrlService.getLoginUrl());
+            }
           })
       )
         .addFilterBefore(

@@ -1,8 +1,10 @@
 package uk.co.ogauthority.pathfinder.energyportal.repository;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import uk.co.ogauthority.pathfinder.energyportal.model.WebUserAccountStatus;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 
 public interface WebUserAccountRepository extends CrudRepository<WebUserAccount, Integer> {
@@ -12,4 +14,6 @@ public interface WebUserAccountRepository extends CrudRepository<WebUserAccount,
   List<WebUserAccount> findAllByLoginIdIgnoreCaseAndAccountStatusNot(String loginId, WebUserAccountStatus accountStatus);
 
   List<WebUserAccount> findAllByWuaIdIn(List<Integer> webUserAccounts);
+
+  Optional<WebUserAccount> findByPerson(Person person);
 }

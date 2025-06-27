@@ -20,6 +20,15 @@
 
 #### Configure the following environment variables
 
+##### Regardless of profile
+
+| Environment Variable                             | Description                                                                                                                                                                                                                                                                                               |
+|--------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| PATHFINDER_EPMQ_SNS_SQS_AWS_ACCESS_KEY_ID        | AWS access key id for SNS/SQS. For local: https://tpm.fivium.co.uk/index.php/pwd/view/2134                                                                                                                                                                                                                |
+| PATHFINDER_EPMQ_SNS_SQS_AWS_SECRET_ACCESS_KEY    | AWS secret access key for SNS/SQS. For local: https://tpm.fivium.co.uk/index.php/pwd/view/2134                                                                                                                                                                                                            |
+| PATHFINDER_EPMQ_SNS_SQS_AWS_REGION_ID (optional) | The AWS region to run in. Defaults to `eu-west-2`                                                                                                                                                                                                                                                         |
+| PATHFINDER_EPMQ_ENVIRONMENT_SUFFIX               | Something unique per environment, e.g. `dev`. For local dev this can be your initials.                                                                                                                                                                                                                    |
+
 ##### Development profile (`development`)
 
 | Environment Variable                   | Description                                                                                                                                       |
@@ -72,6 +81,17 @@
 Add the debug profile to enable hibernate SQL and descriptor output. You can look in the `application-debug.properties` file to enable other debug properties if requried.
 
 No environment variables need to be added when enabling the debug profile.
+
+##### Energy Portal Accounts Service (`use-epas`)
+
+To integrate with the Energy Portal Accounts Service you need to add the `use-epas` profile and set the following
+environment variables. This is locally and on deployed environments:
+- `EPAS_LOGIN_URL`: The url to the `EPAS_REDIRECT` Fox module
+- `EPAS_LOGOUT_URL`: The logout url of the new IDP
+- `EPAS_REGISTRATION_URL`: The registration URL of the new IDP
+
+Note: To run pathfinder locally requires an updated by the EPAS team to not have a locally running Fox engine. This 
+will be done shortly. If required speak to the Venn team.
 
 #### Create the Flyway user
 

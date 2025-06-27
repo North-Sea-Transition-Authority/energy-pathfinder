@@ -20,6 +20,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
 import uk.co.ogauthority.pathfinder.analytics.EnableAnalyticsConfiguration;
 import uk.co.ogauthority.pathfinder.config.ExternalApiAuthenticationEntryPoint;
@@ -28,6 +29,7 @@ import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.config.WebSecurityConfig;
 import uk.co.ogauthority.pathfinder.config.file.FileUploadProperties;
 import uk.co.ogauthority.pathfinder.energyportal.service.SystemAccessService;
+import uk.co.ogauthority.pathfinder.logout.ServiceLogoutSuccessHandler;
 import uk.co.ogauthority.pathfinder.model.entity.UserSession;
 import uk.co.ogauthority.pathfinder.mvc.error.ErrorService;
 import uk.co.ogauthority.pathfinder.mvc.footer.FooterService;
@@ -49,7 +51,8 @@ import uk.co.ogauthority.pathfinder.service.validation.ValidationErrorOrderingSe
 @EnableAnalyticsConfiguration
 @Import({
     AbstractControllerTest.TestConfig.class,
-    WebSecurityConfig.class
+    WebSecurityConfig.class,
+    ServiceLogoutSuccessHandler.class
 })
 public abstract class AbstractControllerTest {
 
@@ -96,6 +99,9 @@ public abstract class AbstractControllerTest {
 
   @MockitoBean
   protected AnalyticsService analyticsService;
+
+  @MockitoBean
+  protected EnergyPortalServiceAccessService energyPortalServiceAccessService;
 
   @Before
   public void abstractControllerTestSetup() {

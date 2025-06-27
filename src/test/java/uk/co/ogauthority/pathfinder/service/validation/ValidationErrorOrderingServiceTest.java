@@ -13,8 +13,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.service.controller.FieldOrderTestForm;
 import uk.co.ogauthority.pathfinder.service.controller.ListTestForm;
@@ -32,6 +34,9 @@ public class ValidationErrorOrderingServiceTest {
 
   @Autowired
   private MessageSource messageSource;
+
+  @MockitoBean
+  private EnergyPortalServiceAccessService energyPortalServiceAccessService;
 
   private ValidationErrorOrderingService validationErrorOrderingService;
 

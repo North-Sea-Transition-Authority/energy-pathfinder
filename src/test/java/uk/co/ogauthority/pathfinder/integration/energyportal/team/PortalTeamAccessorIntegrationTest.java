@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.integration.energyportal.team;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 import jakarta.persistence.EntityManager;
 import java.util.List;
@@ -10,14 +11,18 @@ import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
 import uk.co.ogauthority.pathfinder.energyportal.exception.team.PortalTeamNotFoundException;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalRoleDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalSystemPrivilegeDto;
@@ -32,8 +37,10 @@ import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeamUsa
 import uk.co.ogauthority.pathfinder.energyportal.repository.PersonRepository;
 import uk.co.ogauthority.pathfinder.energyportal.repository.team.PortalTeamRepository;
 import uk.co.ogauthority.pathfinder.energyportal.service.team.PortalTeamAccessor;
+import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
 import uk.co.ogauthority.pathfinder.model.team.TeamType;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
+import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -44,6 +51,7 @@ import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 @SuppressWarnings({"SqlNoDataSourceInspection"}) // IJ seems to give spurious warnings when running with embedded H2
 public class PortalTeamAccessorIntegrationTest {
 
+  private static Person PERSON;
 
   private final String WITH_SCOPE_SCOPED_WITHIN = "PARENT";
   private final String WITHOUT_SCOPE_SCOPED_WITHIN = "UNIVERSAL_SET";
@@ -86,6 +94,15 @@ public class PortalTeamAccessorIntegrationTest {
   @Autowired
   private PortalTeamRepository portalTeamRepository;
 
+  @MockitoBean
+  private EnergyPortalServiceAccessService energyPortalServiceAccessService;
+
+  @Mock
+  private Environment environment;
+
+  @MockitoBean
+  private WebUserAccountService webUserAccountService;
+
   private PortalTeamAccessor portalTeamAccessor;
 
   private Person unscopedTeamMemberPerson_2Roles;
@@ -94,7 +111,17 @@ public class PortalTeamAccessorIntegrationTest {
 
   @Before
   public void setup() {
-    portalTeamAccessor = new PortalTeamAccessor(portalTeamRepository, entityManager);
+
+    when(environment.matchesProfiles("use-epas"))
+        .thenReturn(false);
+
+    portalTeamAccessor = new PortalTeamAccessor(
+        portalTeamRepository,
+        entityManager,
+        energyPortalServiceAccessService,
+        webUserAccountService,
+        environment
+    );
 
     insertPerson(10);
     unscopedTeamMemberPerson_2Roles = personRepository.findById(10).orElse(null);
@@ -102,6 +129,9 @@ public class PortalTeamAccessorIntegrationTest {
     scopedTeamMemberPerson_2Roles = personRepository.findById(20).orElse(null);
     insertPerson(30);
     scopedTeamMemberPerson_1Role = personRepository.findById(30).orElse(null);
+
+    insertPerson(40);
+    PERSON = personRepository.findById(40).orElse(null);
 
     insertPortalOrganisationGroup(PORTAL_ORGANISATION_GROUP);
 
@@ -596,6 +626,30 @@ public class PortalTeamAccessorIntegrationTest {
         new PortalTeamPersonMembershipDto(SCOPED_TEAM_RES_ID, scopedTeamMemberPerson_1Role),
         new PortalTeamPersonMembershipDto(SCOPED_TEAM_RES_ID, scopedTeamMemberPerson_2Roles)
     );
+  }
+
+  @Test
+  @Transactional
+  public void hasAccessToService_whenNoAccess() {
+
+    when(webUserAccountService.findByPerson(PERSON))
+        .thenReturn(Optional.of(UserTestingUtil.getWebUserAccount()));
+
+    var hasAccessToService = portalTeamAccessor.hasAccessToService(PERSON);
+
+    assertThat(hasAccessToService).isFalse();
+  }
+
+  @Test
+  @Transactional
+  public void hasAccessToService_whenAccess() {
+
+    when(webUserAccountService.findByPerson(scopedTeamMemberPerson_2Roles))
+        .thenReturn(Optional.of(UserTestingUtil.getWebUserAccount()));
+
+    var hasAccessToService = portalTeamAccessor.hasAccessToService(scopedTeamMemberPerson_2Roles);
+
+    assertThat(hasAccessToService).isTrue();
   }
 
   private void assertPortalTeamInstanceDtoMappingAsExpected(PortalTeamDto portalTeamDto,

@@ -40,11 +40,6 @@ public class BeanConfig {
   }
 
   @Bean
-  public Clock tzClock() {
-    return Clock.systemDefaultZone();
-  }
-
-  @Bean
   public MetricsProvider metricsProvider(MeterRegistry meterRegistry) {
     return new MetricsProvider(meterRegistry);
   }

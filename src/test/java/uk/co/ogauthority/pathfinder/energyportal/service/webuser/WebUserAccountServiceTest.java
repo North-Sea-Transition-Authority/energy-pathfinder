@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.repository.WebUserAccountRepository;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
@@ -90,5 +91,31 @@ public class WebUserAccountServiceTest {
     when(webUserAccountRepository.findAllByWuaIdIn(webUserAccountIds)).thenReturn(List.of());
     final var result = webUserAccountService.getWebUserAccounts(webUserAccountIds);
     assertThat(result).isEmpty();
+  }
+
+  @Test
+  public void findByPerson_whenExists_thenReturn() {
+
+    Person person = UserTestingUtil.getPerson();
+
+    when(webUserAccountRepository.findByPerson(person))
+        .thenReturn(Optional.of(webUserAccount));
+
+    var resultingWebUserAccount = webUserAccountService.findByPerson(person);
+
+    assertThat(resultingWebUserAccount).isEqualTo(Optional.of(webUserAccount));
+  }
+
+  @Test
+  public void findByPerson_whenDoesNotExists_thenEmpty() {
+
+    Person person = UserTestingUtil.getPerson();
+
+    when(webUserAccountRepository.findByPerson(person))
+        .thenReturn(Optional.empty());
+
+    var resultingWebUserAccount = webUserAccountService.findByPerson(person);
+
+    assertThat(resultingWebUserAccount).isEmpty();
   }
 }
