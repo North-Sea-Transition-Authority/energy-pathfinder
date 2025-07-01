@@ -13,7 +13,6 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -24,15 +23,12 @@ public class AnalyticsService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AnalyticsService.class);
 
-  private final ClientHttpRequestFactory requestFactory;
   private final AnalyticsConfigurationProperties configurationProperties;
   private final ObjectMapper objectMapper;
 
   @Autowired
-  public AnalyticsService(ClientHttpRequestFactory requestFactory,
-                          AnalyticsConfigurationProperties configurationProperties,
+  public AnalyticsService(AnalyticsConfigurationProperties configurationProperties,
                           ObjectMapper objectMapper) {
-    this.requestFactory = requestFactory;
     this.configurationProperties = configurationProperties;
     this.objectMapper = objectMapper;
   }
@@ -75,7 +71,6 @@ public class AnalyticsService {
           .connectTimeout(Duration.ofSeconds(configurationProperties.getConfig().getConnectionTimeoutSeconds()))
           .readTimeout(Duration.ofSeconds(configurationProperties.getConfig().getConnectionTimeoutSeconds()))
           .defaultHeader("User-Agent", configurationProperties.getConfig().getUserAgent())
-          .requestFactory(() -> requestFactory)
           .build();
 
       sendEventForTag(

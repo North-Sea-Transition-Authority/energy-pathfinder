@@ -18,6 +18,7 @@ HELP.md
 *.iml
 *.ipr
 /out/
+.env
 
 ### NetBeans ###
 /nbproject/private/
