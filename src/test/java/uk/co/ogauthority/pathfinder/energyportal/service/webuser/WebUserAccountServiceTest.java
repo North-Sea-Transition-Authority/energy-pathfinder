@@ -1,23 +1,27 @@
 package uk.co.ogauthority.pathfinder.energyportal.service.webuser;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.ogauthority.pathfinder.energyportal.model.WebUserAccountStatus;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.repository.WebUserAccountRepository;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
-@RunWith(MockitoJUnitRunner.class)
-public class WebUserAccountServiceTest {
+@ExtendWith(MockitoExtension.class)
+class WebUserAccountServiceTest {
 
   private static final int WUA_ID = 4;
 
@@ -28,15 +32,15 @@ public class WebUserAccountServiceTest {
 
   private WebUserAccount webUserAccount;
 
-  @Before
-  public void setup() {
+  @BeforeEach
+  void setup() {
     webUserAccountService = new WebUserAccountService(webUserAccountRepository);
 
     webUserAccount = UserTestingUtil.getWebUserAccount();
   }
 
   @Test
-  public void getWebUserAccountOrError_whenExists_thenReturn() {
+  void getWebUserAccountOrError_whenExists_thenReturn() {
     when(webUserAccountRepository.findById(WUA_ID)).thenReturn(
         Optional.of(webUserAccount)
     );
@@ -46,17 +50,18 @@ public class WebUserAccountServiceTest {
     assertThat(result).isEqualTo(webUserAccount);
   }
 
-  @Test(expected = PathfinderEntityNotFoundException.class)
-  public void getWebUserAccountOrError_whenNotFound_thenException() {
+  @Test
+  void getWebUserAccountOrError_whenNotFound_thenException() {
     when(webUserAccountRepository.findById(WUA_ID)).thenReturn(
         Optional.empty()
     );
 
-    webUserAccountService.getWebUserAccountOrError(WUA_ID);
+    assertThatThrownBy(() -> webUserAccountService.getWebUserAccountOrError(WUA_ID))
+        .isInstanceOf(PathfinderEntityNotFoundException.class);
   }
 
   @Test
-  public void getWebUserAccount_whenExists_thenReturn() {
+  void getWebUserAccount_whenExists_thenReturn() {
     when(webUserAccountRepository.findById(WUA_ID)).thenReturn(
         Optional.of(webUserAccount)
     );
@@ -67,7 +72,7 @@ public class WebUserAccountServiceTest {
   }
 
   @Test
-  public void getWebUserAccount_whenNotExists_thenReturnEmpty() {
+  void getWebUserAccount_whenNotExists_thenReturnEmpty() {
     when(webUserAccountRepository.findById(WUA_ID)).thenReturn(
         Optional.empty()
     );
@@ -78,7 +83,7 @@ public class WebUserAccountServiceTest {
   }
 
   @Test
-  public void getWebUserAccounts_whenFound_thenReturnPopulatedList() {
+  void getWebUserAccounts_whenFound_thenReturnPopulatedList() {
     final var webUserAccountIds = List.of(webUserAccount.getWuaId());
     when(webUserAccountRepository.findAllByWuaIdIn(webUserAccountIds)).thenReturn(List.of(webUserAccount));
     final var result = webUserAccountService.getWebUserAccounts(webUserAccountIds);
@@ -86,7 +91,7 @@ public class WebUserAccountServiceTest {
   }
 
   @Test
-  public void getWebUserAccounts_whenNotFound_thenReturnEmptyList() {
+  void getWebUserAccounts_whenNotFound_thenReturnEmptyList() {
     final var webUserAccountIds = List.of(webUserAccount.getWuaId());
     when(webUserAccountRepository.findAllByWuaIdIn(webUserAccountIds)).thenReturn(List.of());
     final var result = webUserAccountService.getWebUserAccounts(webUserAccountIds);
@@ -94,12 +99,12 @@ public class WebUserAccountServiceTest {
   }
 
   @Test
-  public void findByPerson_whenExists_thenReturn() {
+  void findByPerson_whenExists_thenReturn() {
 
     Person person = UserTestingUtil.getPerson();
 
     when(webUserAccountRepository.findByPerson(person))
-        .thenReturn(Optional.of(webUserAccount));
+        .thenReturn(List.of(webUserAccount));
 
     var resultingWebUserAccount = webUserAccountService.findByPerson(person);
 
@@ -107,12 +112,84 @@ public class WebUserAccountServiceTest {
   }
 
   @Test
-  public void findByPerson_whenDoesNotExists_thenEmpty() {
+  void findByPerson_whenDoesNotExists_thenEmpty() {
 
     Person person = UserTestingUtil.getPerson();
 
     when(webUserAccountRepository.findByPerson(person))
-        .thenReturn(Optional.empty());
+        .thenReturn(List.of());
+
+    var resultingWebUserAccount = webUserAccountService.findByPerson(person);
+
+    assertThat(resultingWebUserAccount).isEmpty();
+  }
+
+  @ParameterizedTest
+  @EnumSource(value = WebUserAccountStatus.class, mode = EnumSource.Mode.EXCLUDE, names = "ACTIVE")
+  void findByPerson_whenMultipleAccounts_activeOnly(WebUserAccountStatus nonActiveWebUserAccountStatus) {
+
+    Person person = UserTestingUtil.getPerson();
+
+    var activeWebUserAccount = new WebUserAccount(
+        10,
+        "title",
+        "forename",
+        "surname",
+        "email-address",
+        "loginId",
+        WebUserAccountStatus.ACTIVE,
+        person
+    );
+
+    var cancelledWebUserAccount = new WebUserAccount(
+        20,
+        "title",
+        "forename",
+        "surname",
+        "email-address",
+        "loginId",
+        nonActiveWebUserAccountStatus,
+        person
+    );
+
+    when(webUserAccountRepository.findByPerson(person))
+        .thenReturn(List.of(activeWebUserAccount, cancelledWebUserAccount));
+
+    var resultingWebUserAccount = webUserAccountService.findByPerson(person);
+
+    assertThat(resultingWebUserAccount).isEqualTo(Optional.of(activeWebUserAccount));
+
+  }
+
+  @Test
+  void findByPerson_whenNoActiveAccounts_activeOnly() {
+
+    Person person = UserTestingUtil.getPerson();
+
+    var suspendedWebUserAccount = new WebUserAccount(
+        10,
+        "title",
+        "forename",
+        "surname",
+        "email-address",
+        "loginId",
+        WebUserAccountStatus.SUSPENDED,
+        person
+    );
+
+    var cancelledWebUserAccount = new WebUserAccount(
+        20,
+        "title",
+        "forename",
+        "surname",
+        "email-address",
+        "loginId",
+        WebUserAccountStatus.CANCELLED,
+        person
+    );
+
+    when(webUserAccountRepository.findByPerson(person))
+        .thenReturn(List.of(suspendedWebUserAccount, cancelledWebUserAccount));
 
     var resultingWebUserAccount = webUserAccountService.findByPerson(person);
 

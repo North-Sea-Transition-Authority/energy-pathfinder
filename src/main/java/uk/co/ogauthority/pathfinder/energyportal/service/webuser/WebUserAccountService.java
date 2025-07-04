@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.ogauthority.pathfinder.energyportal.model.WebUserAccountStatus;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.repository.WebUserAccountRepository;
@@ -33,6 +34,9 @@ public class WebUserAccountService {
   }
 
   public Optional<WebUserAccount> findByPerson(Person person) {
-    return webUserAccountRepository.findByPerson(person);
+    return webUserAccountRepository.findByPerson(person)
+        .stream()
+        .filter(webUserAccount -> WebUserAccountStatus.ACTIVE.equals(webUserAccount.getAccountStatus()))
+        .findFirst();
   }
 }
