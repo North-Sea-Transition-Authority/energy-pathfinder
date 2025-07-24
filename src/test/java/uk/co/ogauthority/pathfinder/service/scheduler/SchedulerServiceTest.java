@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.scheduler;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.ArgumentMatchers.eq;
@@ -11,8 +12,8 @@ import static org.mockito.Mockito.when;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
 
+import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
@@ -109,7 +110,7 @@ public class SchedulerServiceTest {
   }
 
   @Test
-  public void scheduleJobIfNoJobExists_cronScheduleVariation_whenJobExist_thenNoJobScheduled() throws SchedulerException {
+  public void scheduleJobIfNoJobExists_cronScheduleVariation_whenJobExistAndTriggerFound_thenJobRescheduled() throws SchedulerException {
 
     var triggerKey = getTestTriggerKey();
 
@@ -117,16 +118,8 @@ public class SchedulerServiceTest {
 
     var cronSchedule = "0 0 09 01 * ?";
 
-    var currentCronTrigger = TriggerBuilder.newTrigger()
-        .withIdentity(triggerKey)
-        .withSchedule(CronScheduleBuilder.cronSchedule(cronSchedule))
-        .build();
-
-    @SuppressWarnings("rawtypes")
-    List triggers = List.of(currentCronTrigger);
-
     when(scheduler.checkExists(jobKey)).thenReturn(true);
-    when(scheduler.getTriggersOfJob(jobKey)).thenReturn(triggers);
+    when(scheduler.rescheduleJob(eq(triggerKey), any())).thenReturn(new Date());
 
     schedulerService.scheduleJobIfNoJobExists(
         jobKey,
@@ -134,6 +127,37 @@ public class SchedulerServiceTest {
         TestJob.class,
         cronSchedule
     );
+
+    verify(scheduler).rescheduleJob(
+        eq(triggerKey),
+        assertArg(trigger -> assertThat(trigger.getKey()).isEqualTo(triggerKey))
+    );
+
+    verify(scheduler, never()).scheduleJob(any(), any());
+  }
+
+  @Test
+  public void scheduleJobIfNoJobExists_cronScheduleVariation_whenJobExistAndTriggerNotFound_thenException() throws SchedulerException {
+
+    var triggerKey = getTestTriggerKey();
+
+    var jobKey = getTestJobKey();
+
+    var cronSchedule = "0 0 09 01 * ?";
+
+    when(scheduler.checkExists(jobKey)).thenReturn(true);
+    when(scheduler.rescheduleJob(eq(triggerKey), any())).thenReturn(null);
+
+    assertThatThrownBy(() ->
+        schedulerService.scheduleJobIfNoJobExists(
+            jobKey,
+            triggerKey,
+            TestJob.class,
+            cronSchedule
+        )
+    )
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Unable to reschedule trigger with key %s".formatted(triggerKey));
 
     verify(scheduler).rescheduleJob(
         eq(triggerKey),
@@ -162,26 +186,44 @@ public class SchedulerServiceTest {
   }
 
   @Test
-  public void scheduleJobIfNoJobExists_triggerVariation_whenJobExist_thenJobRescheduled() throws SchedulerException {
+  public void scheduleJobIfNoJobExists_triggerVariation_whenJobExistAndTriggerFound_thenJobRescheduled() throws SchedulerException {
     var jobDetail = getTestJobDetail(Map.of());
     var trigger = getTestImmediateJobTrigger();
     var jobKey = getTestJobKey();
 
-    var currentCronTrigger = TriggerBuilder.newTrigger()
-        .withIdentity(trigger.getKey())
-        .withSchedule(CronScheduleBuilder.cronSchedule("0 0 9 * * ?"))
-        .build();
-
-    @SuppressWarnings("rawtypes")
-    List triggers = List.of(currentCronTrigger);
-
     when(scheduler.checkExists(jobKey)).thenReturn(true);
-    when(scheduler.getTriggersOfJob(jobKey)).thenReturn(triggers);
+    when(scheduler.rescheduleJob(eq(trigger.getKey()), any())).thenReturn(new Date());
 
     schedulerService.scheduleJobIfNoJobExists(
         jobDetail,
         trigger
     );
+
+    verify(scheduler).rescheduleJob(
+        eq(trigger.getKey()),
+        assertArg(capturedTrigger -> assertThat(trigger.getKey()).isEqualTo(capturedTrigger.getKey()))
+    );
+
+    verify(scheduler, never()).scheduleJob(any(), any());
+  }
+
+  @Test
+  public void scheduleJobIfNoJobExists_triggerVariation_whenJobExistAndTriggerNotFound_thenException() throws SchedulerException {
+    var jobDetail = getTestJobDetail(Map.of());
+    var trigger = getTestImmediateJobTrigger();
+    var jobKey = getTestJobKey();
+
+    when(scheduler.checkExists(jobKey)).thenReturn(true);
+    when(scheduler.rescheduleJob(eq(trigger.getKey()), any())).thenReturn(null);
+
+    assertThatThrownBy(() ->
+        schedulerService.scheduleJobIfNoJobExists(
+          jobDetail,
+          trigger
+        )
+    )
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessage("Unable to reschedule trigger with key %s".formatted(trigger.getKey()));
 
     verify(scheduler).rescheduleJob(
         eq(trigger.getKey()),

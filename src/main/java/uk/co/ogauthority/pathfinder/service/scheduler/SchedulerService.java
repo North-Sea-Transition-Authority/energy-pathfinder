@@ -93,12 +93,9 @@ public class SchedulerService {
       LOGGER.info("Job {}, already exists. Job creation not required. Rescheduling trigger", jobKeyString);
 
       try {
-        var currentTriggers = scheduler.getTriggersOfJob(jobKey);
-        if (currentTriggers.size() != 1) {
-          throw new IllegalStateException("Expected exactly 1 trigger but found %d".formatted(currentTriggers.size()));
+        if (scheduler.rescheduleJob(trigger.getKey(), trigger) == null) {
+          throw new IllegalStateException("Unable to reschedule trigger with key %s".formatted(trigger.getKey()));
         }
-
-        scheduler.rescheduleJob(currentTriggers.getFirst().getKey(), trigger);
       } catch (SchedulerException e) {
         throw new JobSchedulingException("Error rescheduling trigger", e);
       }
