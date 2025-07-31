@@ -30,7 +30,6 @@ public class WebSecurityConfig {
   private final EnergyPortalUrlService energyPortalUrlService;
   private final SystemAccessService systemAccessService;
   private final ServiceLogoutSuccessHandler serviceLogoutSuccessHandler;
-  private final boolean useEpas;
 
   @Autowired
   public WebSecurityConfig(UserSessionService userSessionService,
@@ -44,7 +43,6 @@ public class WebSecurityConfig {
     this.energyPortalUrlService = energyPortalUrlService;
     this.systemAccessService = systemAccessService;
     this.serviceLogoutSuccessHandler = serviceLogoutSuccessHandler;
-    this.useEpas = environment.matchesProfiles("use-epas");
   }
 
   @Bean
@@ -108,15 +106,10 @@ public class WebSecurityConfig {
                 request.getRequestURI()
             );
 
-            if (useEpas) {
-              var loginUrlWithRelayState = energyPortalUrlService.getLoginUrl() + "?RelayState=" + URLEncoder.encode(
-                  String.valueOf(request.getRequestURL()), StandardCharsets.UTF_8);
+            var loginUrlWithRelayState = energyPortalUrlService.getLoginUrl() + "?RelayState=" + URLEncoder.encode(
+                String.valueOf(request.getRequestURL()), StandardCharsets.UTF_8);
 
-              response.sendRedirect(loginUrlWithRelayState);
-
-            } else {
-              response.sendRedirect(energyPortalUrlService.getLoginUrl());
-            }
+            response.sendRedirect(loginUrlWithRelayState);
           })
       )
         .addFilterBefore(

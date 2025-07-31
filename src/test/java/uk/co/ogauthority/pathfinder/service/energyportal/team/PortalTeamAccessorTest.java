@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.core.env.Environment;
 import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
@@ -45,9 +44,6 @@ public class PortalTeamAccessorTest {
   private EnergyPortalServiceAccessService energyPortalServiceAccessService;
 
   @Mock
-  private Environment environment;
-
-  @Mock
   private WebUserAccountService webUserAccountService;
 
   private PortalTeamAccessor portalTeamAccessor;
@@ -56,16 +52,11 @@ public class PortalTeamAccessorTest {
 
   @Before
   public void setup() {
-
-    when(environment.matchesProfiles("use-epas"))
-        .thenReturn(false);
-
     portalTeamAccessor = spy(new PortalTeamAccessor(
         portalTeamRepository,
         entityManager,
         energyPortalServiceAccessService,
-        webUserAccountService,
-        environment
+        webUserAccountService
     ));
 
     authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount(Set.of(UserPrivilege.PATHFINDER_REG_ORG_MANAGER));
@@ -84,60 +75,12 @@ public class PortalTeamAccessorTest {
   }
 
   @Test
-  public void addPersonToTeamWithRoles_whenNoPreviousAccess_andFoxIdp() {
-
-    var personToAdd = UserTestingUtil.getPerson();
-    var actionedByWua = UserTestingUtil.getWebUserAccount();
-
-    when(environment.matchesProfiles("use-epas"))
-        .thenReturn(false);
-
-    portalTeamAccessor = spy(new PortalTeamAccessor(
-        portalTeamRepository,
-        entityManager,
-        energyPortalServiceAccessService,
-        webUserAccountService,
-        environment
-    ));
-
-    doReturn(false)
-        .when(portalTeamAccessor).hasAccessToService(personToAdd);
-
-    portalTeamAccessor.addPersonToTeamWithRoles(
-        TEAM_RES_ID,
-        personToAdd,
-        List.of("ROLE_NAME_1", "ROLE_NAME_2"),
-        actionedByWua
-    );
-
-    verify(portalTeamRepository).updateUserRoles(
-        TEAM_RES_ID,
-        "ROLE_NAME_1,ROLE_NAME_2",
-        personToAdd.getId().asInt(),
-        actionedByWua.getWuaId()
-    );
-
-    verify(energyPortalServiceAccessService, never()).addUser(anyLong());
-  }
-
-  @Test
-  public void addPersonToTeamWithRoles_whenNoPreviousAccess_andNonFoxIdp() {
+  public void addPersonToTeamWithRoles_whenNoPreviousAccess() {
 
     var personToAdd = UserTestingUtil.getPerson();
     var wuaOfPersonToAdd = UserTestingUtil.getWebUserAccount(2, personToAdd);
 
     var actionedByWua = UserTestingUtil.getWebUserAccount(1, UserTestingUtil.getPerson());
-
-    when(environment.matchesProfiles("use-epas"))
-        .thenReturn(true);
-
-    portalTeamAccessor = spy(new PortalTeamAccessor(
-        portalTeamRepository,
-        entityManager,
-        energyPortalServiceAccessService,
-        webUserAccountService,
-        environment
-    ));
 
     doReturn(false)
         .when(portalTeamAccessor).hasAccessToService(personToAdd);
@@ -164,22 +107,11 @@ public class PortalTeamAccessorTest {
   }
 
   @Test
-  public void addPersonToTeamWithRoles_whenPreviousAccess_andNonFoxIdp() {
+  public void addPersonToTeamWithRoles_whenPreviousAccess() {
 
     var personToAdd = UserTestingUtil.getPerson();
 
     var actionedByWua = UserTestingUtil.getWebUserAccount(1, UserTestingUtil.getPerson());
-
-    when(environment.matchesProfiles("use-epas"))
-        .thenReturn(true);
-
-    portalTeamAccessor = spy(new PortalTeamAccessor(
-        portalTeamRepository,
-        entityManager,
-        energyPortalServiceAccessService,
-        webUserAccountService,
-        environment
-    ));
 
     doReturn(true)
         .when(portalTeamAccessor).hasAccessToService(personToAdd);
@@ -208,17 +140,6 @@ public class PortalTeamAccessorTest {
 
     var actionedByWua = UserTestingUtil.getWebUserAccount(1, UserTestingUtil.getPerson());
 
-    when(environment.matchesProfiles("use-epas"))
-        .thenReturn(true);
-
-    portalTeamAccessor = spy(new PortalTeamAccessor(
-        portalTeamRepository,
-        entityManager,
-        energyPortalServiceAccessService,
-        webUserAccountService,
-        environment
-    ));
-
     doReturn(false)
         .when(portalTeamAccessor).hasAccessToService(personToAdd);
 
@@ -236,46 +157,7 @@ public class PortalTeamAccessorTest {
   }
 
   @Test
-  public void removePersonFromTeam_whenStillHasAccess_andFoxIdp() {
-
-    when(environment.matchesProfiles("use-epas"))
-        .thenReturn(false);
-
-    portalTeamAccessor = spy(new PortalTeamAccessor(
-        portalTeamRepository,
-        entityManager,
-        energyPortalServiceAccessService,
-        webUserAccountService,
-        environment
-    ));
-
-    var personToRemove = UserTestingUtil.getPerson();
-
-    var actionPerformedBy = UserTestingUtil.getWebUserAccount(1, UserTestingUtil.getPerson());
-
-    portalTeamAccessor.removePersonFromTeam(TEAM_RES_ID, personToRemove, actionPerformedBy);
-
-    verify(portalTeamRepository)
-        .removeUserFromTeam(TEAM_RES_ID, personToRemove.getId().asInt(), actionPerformedBy.getWuaId());
-
-    verify(energyPortalServiceAccessService, never()).removeUser(anyLong());
-
-  }
-
-  @Test
-  public void removePersonFromTeam_whenStillHasAccess_andNonFoxIdp() {
-
-    when(environment.matchesProfiles("use-epas"))
-        .thenReturn(true);
-
-    portalTeamAccessor = spy(new PortalTeamAccessor(
-        portalTeamRepository,
-        entityManager,
-        energyPortalServiceAccessService,
-        webUserAccountService,
-        environment
-    ));
-
+  public void removePersonFromTeam_whenStillHasAccess() {
     var personToRemove = UserTestingUtil.getPerson();
 
     var actionPerformedBy = UserTestingUtil.getWebUserAccount(1, UserTestingUtil.getPerson());
@@ -291,19 +173,7 @@ public class PortalTeamAccessorTest {
   }
 
   @Test
-  public void removePersonFromTeam_whenNoLongerHasAccess_andNonFoxIdp() {
-
-    when(environment.matchesProfiles("use-epas"))
-        .thenReturn(true);
-
-    portalTeamAccessor = spy(new PortalTeamAccessor(
-        portalTeamRepository,
-        entityManager,
-        energyPortalServiceAccessService,
-        webUserAccountService,
-        environment
-    ));
-
+  public void removePersonFromTeam_whenNoLongerHasAccess() {
     var personToRemove = UserTestingUtil.getPerson();
     var personToRemoveWua = UserTestingUtil.getWebUserAccount(1, personToRemove);
 
@@ -324,24 +194,12 @@ public class PortalTeamAccessorTest {
 
   @Test
   public void removePersonFromTeam_whenUnexpectedError_thenRethrown() {
-
-    when(environment.matchesProfiles("use-epas"))
-        .thenReturn(false);
-
-    portalTeamAccessor = spy(new PortalTeamAccessor(
-        portalTeamRepository,
-        entityManager,
-        energyPortalServiceAccessService,
-        webUserAccountService,
-        environment
-    ));
-
     var personToRemove = UserTestingUtil.getPerson();
 
     var actionPerformedBy = UserTestingUtil.getWebUserAccount(2, UserTestingUtil.getPerson());
 
     doThrow(new IllegalStateException("test")).when(portalTeamRepository)
-            .removeUserFromTeam(TEAM_RES_ID, personToRemove.getId().asInt(), actionPerformedBy.getWuaId());
+        .removeUserFromTeam(TEAM_RES_ID, personToRemove.getId().asInt(), actionPerformedBy.getWuaId());
 
     assertThatThrownBy(() -> portalTeamAccessor.removePersonFromTeam(TEAM_RES_ID, personToRemove, actionPerformedBy))
         .isInstanceOf(RuntimeException.class)

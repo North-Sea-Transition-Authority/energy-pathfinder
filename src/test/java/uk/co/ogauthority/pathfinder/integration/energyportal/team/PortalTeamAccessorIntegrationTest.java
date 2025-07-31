@@ -11,18 +11,18 @@ import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
+import uk.co.fivium.energyportalmessagequeue.sns.SnsService;
+import uk.co.fivium.energyportalmessagequeue.sqs.SqsService;
 import uk.co.ogauthority.pathfinder.energyportal.exception.team.PortalTeamNotFoundException;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalRoleDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalSystemPrivilegeDto;
@@ -97,8 +97,11 @@ public class PortalTeamAccessorIntegrationTest {
   @MockitoBean
   private EnergyPortalServiceAccessService energyPortalServiceAccessService;
 
-  @Mock
-  private Environment environment;
+  @MockitoBean
+  private SqsService sqsService;
+
+  @MockitoBean
+  private SnsService snsService;
 
   @MockitoBean
   private WebUserAccountService webUserAccountService;
@@ -111,16 +114,11 @@ public class PortalTeamAccessorIntegrationTest {
 
   @Before
   public void setup() {
-
-    when(environment.matchesProfiles("use-epas"))
-        .thenReturn(false);
-
     portalTeamAccessor = new PortalTeamAccessor(
         portalTeamRepository,
         entityManager,
         energyPortalServiceAccessService,
-        webUserAccountService,
-        environment
+        webUserAccountService
     );
 
     insertPerson(10);

@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
@@ -41,19 +40,16 @@ public class PortalTeamAccessor {
   private final EntityManager entityManager;
   private final EnergyPortalServiceAccessService energyPortalServiceAccessService;
   private final WebUserAccountService webUserAccountService;
-  private final boolean useEpas;
 
   @Autowired
   public PortalTeamAccessor(PortalTeamRepository portalTeamRepository,
                             EntityManager entityManager,
                             EnergyPortalServiceAccessService energyPortalServiceAccessService,
-                            WebUserAccountService webUserAccountService,
-                            Environment environment) {
+                            WebUserAccountService webUserAccountService) {
     this.portalTeamRepository = portalTeamRepository;
     this.entityManager = entityManager;
     this.energyPortalServiceAccessService = energyPortalServiceAccessService;
     this.webUserAccountService = webUserAccountService;
-    this.useEpas = environment.matchesProfiles("use-epas");
   }
 
   public Optional<PortalTeamDto> findPortalTeamById(int resId) {
@@ -308,7 +304,7 @@ public class PortalTeamAccessor {
     try {
       portalTeamRepository.removeUserFromTeam(resId, personToBeRemovedFromTeam.getId().asInt(), actionPerformedBy.getWuaId());
 
-      if (useEpas && !hasAccessToService(personToBeRemovedFromTeam)) {
+      if (!hasAccessToService(personToBeRemovedFromTeam)) {
         energyPortalServiceAccessService.removeUser(getWebUserAccount(personToBeRemovedFromTeam).getWuaId());
       }
 
@@ -340,7 +336,7 @@ public class PortalTeamAccessor {
     try {
       portalTeamRepository.updateUserRoles(resId, roleNameCsv, person.getId().asInt(), actionPerformedBy.getWuaId());
 
-      if (!hasExistingAccessToService && useEpas) {
+      if (!hasExistingAccessToService) {
         energyPortalServiceAccessService.addUser(getWebUserAccount(person).getWuaId());
       }
 

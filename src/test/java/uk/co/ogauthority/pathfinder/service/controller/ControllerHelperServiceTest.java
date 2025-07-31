@@ -17,6 +17,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
+import uk.co.fivium.energyportalmessagequeue.sns.SnsService;
+import uk.co.fivium.energyportalmessagequeue.sqs.SqsService;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationErrorOrderingService;
 
@@ -32,6 +34,12 @@ public class ControllerHelperServiceTest {
 
   @MockitoBean
   private EnergyPortalServiceAccessService energyPortalServiceAccessService;
+
+  @MockitoBean
+  private SqsService sqsService;
+
+  @MockitoBean
+  private SnsService snsService;
 
   private ControllerHelperService controllerHelperService;
 

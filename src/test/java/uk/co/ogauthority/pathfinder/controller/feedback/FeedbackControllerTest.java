@@ -73,7 +73,7 @@ public class FeedbackControllerTest extends AbstractControllerTest {
             get(ReverseRouter.route(on(FeedbackController.class).getFeedback(Optional.empty(), null)))
         )
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl(EXPECTED_LOGIN_URL));
+        .andExpect(redirectedUrl(EXPECTED_LOGIN_URL + "?RelayState=http%3A%2F%2Flocalhost%2Ffeedback"));
   }
 
   @Test
@@ -136,7 +136,7 @@ public class FeedbackControllerTest extends AbstractControllerTest {
                 .with(csrf())
         )
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl(EXPECTED_LOGIN_URL));
+        .andExpect(redirectedUrl(EXPECTED_LOGIN_URL + "?RelayState=http%3A%2F%2Flocalhost%2Ffeedback"));
 
     verify(feedbackService, never()).saveFeedback(any(), any());
   }
