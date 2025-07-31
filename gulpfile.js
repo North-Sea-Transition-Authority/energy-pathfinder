@@ -89,17 +89,12 @@ gulp.task('copyFdsVendorJs', () => {
     .pipe(gulp.dest('src/main/resources/public/assets/static/js/vendor'))
 });
 
-gulp.task('copyHtml5Shiv', () => {
-  return gulp.src(['fivium-design-system-core/node_modules/html5shiv/dist/html5shiv.min.js'])
-    .pipe(gulp.dest('src/main/resources/public/assets/html5shiv'))
-});
-
 gulp.task('copyFdsTestLibrary', () => {
   return gulp.src(['fivium-design-system-core/test-library/**/*.ts'])
     .pipe(gulp.dest('src/test/e2e/test/test-library'));
 });
 
-gulp.task('initFds', gulp.series(['copyFdsResources', 'copyFdsImages', 'copyGovukResources', 'copyHtml5Shiv', 'copyFdsJs', 'copyFdsVendorJs']));
+gulp.task('initFds', gulp.series(['copyFdsResources', 'copyFdsImages', 'copyGovukResources', 'copyFdsJs', 'copyFdsVendorJs']));
 
 gulp.task('sass', gulp.series(['initFds'], () => {
   return compileSass(false);

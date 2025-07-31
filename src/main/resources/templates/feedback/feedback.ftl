@@ -13,7 +13,6 @@
   pageHeading=pageTitle
   topNavigation=false
   backLink=showBackLink
-  phaseBanner=false
   errorItems=errorList
 >
   <@fdsForm.htmlForm>

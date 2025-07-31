@@ -12,7 +12,6 @@
   pageHeading=pageTitle
   topNavigation=false
   twoThirdsColumn=true
-  phaseBanner=false
 >
   <p class="govuk-body">Try again later.</p>
   <p class="govuk-body">

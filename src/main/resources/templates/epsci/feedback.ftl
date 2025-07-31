@@ -12,7 +12,6 @@
   pageHeading=pageTitle
   topNavigation=false
   backLink=false
-  phaseBanner=false
   errorItems=errorList
 
 >

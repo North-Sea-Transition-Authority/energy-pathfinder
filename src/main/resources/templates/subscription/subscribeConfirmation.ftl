@@ -11,7 +11,6 @@
   pageHeading=""
   breadcrumbs=false
   topNavigation=false
-  phaseBanner=false
 >
   <@fdsFlash.flash
     flashTitle="You have successfully subscribed to ${serviceName}"

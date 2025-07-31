@@ -12,7 +12,7 @@
 
 #### Initialise the Fivium Design System
 * `git submodule update --init --recursive`    
-* `cd fivium-design-system-core && npm install && npx gulp build && cd ..`
+* `cd fivium-design-system-core && npm install && npx gulp buildAll && cd ..`
 
 #### Build frontend components
 * `npm install`

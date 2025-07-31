@@ -9,7 +9,6 @@
   pageHeading=pageTitle
   topNavigation=false
   backLink=false
-  phaseBanner=false
 >
 
   <p class="govuk-body">You can now close this tab to return to ${service.serviceName}</p>

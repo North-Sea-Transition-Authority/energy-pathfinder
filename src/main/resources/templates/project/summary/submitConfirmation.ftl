@@ -17,7 +17,7 @@
   <#assign title = "${projectTypeDisplayName} submitted">
 </#if>
 
-<@defaultPage htmlTitle=title pageHeading="" breadcrumbs=false phaseBanner=false>
+<@defaultPage htmlTitle=title pageHeading="" breadcrumbs=false>
   <@fdsPanel.panel
     panelTitle=title
     panelText="${projectSubmissionSummaryView.projectDisplayName}"

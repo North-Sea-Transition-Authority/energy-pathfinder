@@ -49,8 +49,6 @@
   backLinkUrl=""
   backLinkText="Back"
   breadcrumbs=false
-  phaseBanner=true
-  phaseBannerLink=feedbackUrl!""
   topNavigation=true
   wrapperWidth=false
   masthead=false
@@ -61,44 +59,18 @@
 >
   <@genericLayout htmlTitle=htmlTitle htmlAppTitle=service.serviceName errorCheck=errorCheck noIndex=noIndex cookieBannerMacro=cookieBannerContent>
 
-    <#local serviceHomeUrl = springUrl(serviceHomeUrl) />
-
     <#--Header-->
-    <@applicationHeader.header
-      homePageUrl=serviceHomeUrl
-      serviceUrl=serviceHomeUrl
-      topNavigation=topNavigation
-      wrapperWidth=wrapperWidth
-      headerLogo=headerLogo
-      logoText=service.customerMnemonic
-      serviceName=service.serviceName
-      headerNav=true
-    />
-
-    <#--Phase banner-->
-    <#if phaseBanner && feedbackUrl?has_content>
-      <div class="govuk-phase-banner__wrapper">
-        <div class="govuk-phase-banner<#if wrapperWidth> govuk-width-container-wide<#else> govuk-width-container</#if><#if topNavigation> govuk-phase-banner--no-border</#if>">
-          <p class="govuk-phase-banner__content">
-            <strong class="govuk-tag govuk-phase-banner__content__tag ">beta</strong>
-            <span class="govuk-phase-banner__text">
-              <span>This is a new service – your</span>
-              <@fdsAction.link
-                linkText="feedback"
-                linkUrl=springUrl(phaseBannerLink)
-                openInNewTab=false
-                linkClass="govuk-link govuk-link--no-visited-state"
-              />
-              <span> will help us to improve it.</span>
-            </span>
-          </p>
-        </div>
-      </div>
-    </#if>
+    <@applicationHeader.header wrapperWidth=wrapperWidth/>
 
     <#--Navigation-->
     <#if topNavigation>
-      <@fdsNavigation.navigation navigationItems=navigationItems currentEndPoint=currentEndPoint wrapperWidth=wrapperWidth />
+      <@fdsNavigation.navigation
+        navigationItems=navigationItems
+        currentEndPoint=currentEndPoint
+        wrapperWidth=wrapperWidth
+        serviceName=service.serviceName
+        serviceUrl=springUrl(serviceHomeUrl)
+      />
     </#if>
 
     <@fdsGoogleAnalytics.googleAnalytics measurementId=analytics.appTag />

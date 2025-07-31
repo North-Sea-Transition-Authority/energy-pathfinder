@@ -11,7 +11,6 @@
   fullWidthColumn=true
   topNavigation=false
   backLink=(!opensInNewTab)!true
-  phaseBanner=false
 >
   <#list contacts as contact>
     <@serviceContact.serviceContact serviceContact=contact includeHeader=true />

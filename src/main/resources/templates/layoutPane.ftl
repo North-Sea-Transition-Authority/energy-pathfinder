@@ -2,7 +2,10 @@
 <#include 'fds/objects/layouts/generic.ftl'>
 <#import 'fds/objects/grid/grid.ftl' as grid>
 
-<#-- @ftlvariable name="feedbackUrl" type="String" -->
+<#-- @ftlvariable name="service" type="uk.co.ogauthority.pathfinder.config.ServiceProperties" -->
+<#-- @ftlvariable name="navigationItems" type="java.util.List<uk.co.ogauthority.pathfinder.model.navigation.TopNavigationItem>" -->
+<#-- @ftlvariable name="currentEndPoint" type="String" -->
+<#-- @ftlvariable name="serviceHomeUrl" type="String" -->
 
 <#include 'pathfinderImports.ftl'>
 
@@ -11,8 +14,6 @@
   wrapperClasses=""
   wrapperWidth=false
   topNavigation=true
-  phaseBanner=true
-  phaseBannerLink=springUrl(feedbackUrl)!""
   headerLogo="GOVUK_CREST"
   errorCheck=false
   noIndex=false
@@ -22,30 +23,17 @@
   <@genericLayout htmlTitle=htmlTitle htmlAppTitle=service.serviceName errorCheck=errorCheck noIndex=noIndex>
     <div class="fds-pane fds-pane--enabled" id="top">
       <#--Header-->
-      <@applicationHeader.header
-        topNavigation=topNavigation
-        wrapperWidth=wrapperWidth
-        headerLogo=headerLogo
-        logoText=service.customerMnemonic
-        serviceName=service.serviceName
-        headerNav=true
-      />
-
-      <#--Phase banner -->
-      <#if phaseBanner>
-        <div class="govuk-phase-banner__wrapper">
-          <div class="govuk-phase-banner govuk-phase-banner--no-border<#if wrapperWidth> govuk-width-container-wide<#else> govuk-width-container</#if>">
-            <p class="govuk-phase-banner__content">
-              <strong class="govuk-tag govuk-phase-banner__content__tag ">beta</strong>
-              <span class="govuk-phase-banner__text">This is a new service – your <a class="govuk-link" href="${phaseBannerLink}">feedback</a> will help us to improve it.</span>
-            </p>
-          </div>
-        </div>
-      </#if>
+      <@applicationHeader.header wrapperWidth=wrapperWidth/>
 
       <#--Top navigation -->
       <#if topNavigation>
-        <@fdsNavigation.navigation navigationItems=navigationItems currentEndPoint=currentEndPoint wrapperWidth=wrapperWidth/>
+        <@fdsNavigation.navigation
+          navigationItems=navigationItems
+          currentEndPoint=currentEndPoint
+          wrapperWidth=wrapperWidth
+          serviceName=service.serviceName
+          serviceUrl=springUrl(serviceHomeUrl)
+        />
       </#if>
 
       <div class="fds-pane__body ${wrapperClasses}<#if wrapperWidth> govuk-width-container-wide<#else> govuk-width-container</#if>">

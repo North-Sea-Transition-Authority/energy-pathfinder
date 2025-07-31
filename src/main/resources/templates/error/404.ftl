@@ -10,7 +10,6 @@
   pageHeading=pageTitle
   topNavigation=false
   twoThirdsColumn=true
-  phaseBanner=false
 >
   <p class="govuk-body">
     If you typed the web address, check it is correct.
