@@ -67,7 +67,7 @@
             <@fdsDetails.summaryDetails summaryTitle="The operator/developer I want shown is not listed">
               <p class="govuk-body">
                 If the operator/developer that should be shown on the ${customerSupplyChainInterfaceText} is not shown in the list,
-                you must check the organisation is registered on the Energy Portal.
+                you must check the organisation is registered on the ${energyPortalName}.
               </p>
             </@fdsDetails.summaryDetails>
           </@fdsRadio.radioNo>

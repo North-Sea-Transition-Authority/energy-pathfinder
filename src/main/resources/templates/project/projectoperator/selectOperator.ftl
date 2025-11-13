@@ -60,7 +60,7 @@
         <@fdsDetails.summaryDetails summaryTitle="The operator/developer I want shown is not listed">
           <p class="govuk-body">
             If the operator/developer you want shown on the ${customerSupplyChainInterfaceText} is not shown in the list then you must contact
-            the <@mailTo.mailToLink linkText=customerMnemonic mailToEmailAddress=regulatorEmailAddress /> to register your organisation on the Energy Portal.
+            the <@mailTo.mailToLink linkText=customerMnemonic mailToEmailAddress=regulatorEmailAddress /> to register your organisation on the ${energyPortalName}.
           </p>
         </@fdsDetails.summaryDetails>
       </@fdsRadio.radioNo>

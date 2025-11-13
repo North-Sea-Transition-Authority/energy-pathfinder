@@ -19,7 +19,7 @@
     <@fdsDetails.summaryDetails summaryTitle="The organisation I want to create a team for is not listed">
       <p class="govuk-body">
         If the organisation you need to create a team for is not shown in the list
-        then you must contact the person responsible for managing organisations on the U.K Energy Portal
+        then you must contact the person responsible for managing organisations on the ${energyPortalName}
       </p>
     </@fdsDetails.summaryDetails>
     <@fdsAction.submitButtons

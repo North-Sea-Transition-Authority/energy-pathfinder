@@ -2,16 +2,16 @@ package uk.co.ogauthority.pathfinder.model.form.teammanagement;
 
 public class AddUserToTeamForm {
 
-  private String userIdentifier;
+  private String emailAddress;
 
   private Integer resId;
 
-  public String getUserIdentifier() {
-    return userIdentifier;
+  public String getEmailAddress() {
+    return emailAddress;
   }
 
-  public void setUserIdentifier(String userIdentifier) {
-    this.userIdentifier = userIdentifier;
+  public void setEmailAddress(String emailAddress) {
+    this.emailAddress = emailAddress;
   }
 
   public Integer getResId() {

@@ -416,38 +416,30 @@ public class TeamManagementService {
   }
 
   /**
-   * Finds the Person linked to the WebUserAccount with the given email or loginId.
+   * Finds the Person linked to the WebUserAccount with the given email.
    */
-  public Optional<Person> getPersonByEmailAddressOrLoginId(String emailOrLoginId) {
+  public Optional<Person> getPersonByEmailAddress(String emailAddress) {
 
     List<WebUserAccount> webUserAccounts =
-        webUserAccountRepository.findAllByEmailAddressIgnoreCaseAndAccountStatusNot(emailOrLoginId,
+        webUserAccountRepository.findAllByEmailAddressIgnoreCaseAndAccountStatusNot(emailAddress,
             WebUserAccountStatus.CANCELLED);
 
     if (webUserAccounts.size() == 1) {
-      return Optional.of(webUserAccounts.get(0).getLinkedPerson());
-    }
-
-    webUserAccounts.addAll(
-        webUserAccountRepository.findAllByLoginIdIgnoreCaseAndAccountStatusNot(emailOrLoginId, WebUserAccountStatus.CANCELLED));
-
-    if (webUserAccounts.size() == 1) {
-      return Optional.of(webUserAccounts.get(0).getLinkedPerson());
+      return Optional.of(webUserAccounts.getFirst().getLinkedPerson());
     } else {
-
       Set<Person> distinctPeople = webUserAccounts.stream()
           .map(WebUserAccount::getLinkedPerson)
           .collect(Collectors.toSet());
 
       if (distinctPeople.size() > 1) {
         throw new RuntimeException(
-            String.format("getPersonByEmailAddressOrLoginId returned %d different people with email/loginId '%s'",
-                distinctPeople.size(), emailOrLoginId)
+            String.format("getPersonByEmailAddress returned %d different people with email '%s'",
+                distinctPeople.size(), emailAddress)
         );
       } else if (distinctPeople.isEmpty()) {
         return Optional.empty();
       } else {
-        return Optional.of(webUserAccounts.get(0).getLinkedPerson());
+        return Optional.of(webUserAccounts.getFirst().getLinkedPerson());
       }
 
     }

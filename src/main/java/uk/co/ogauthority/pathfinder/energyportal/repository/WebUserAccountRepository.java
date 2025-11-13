@@ -10,8 +10,6 @@ public interface WebUserAccountRepository extends CrudRepository<WebUserAccount,
 
   List<WebUserAccount> findAllByEmailAddressIgnoreCaseAndAccountStatusNot(String emailAddress, WebUserAccountStatus accountStatus);
 
-  List<WebUserAccount> findAllByLoginIdIgnoreCaseAndAccountStatusNot(String loginId, WebUserAccountStatus accountStatus);
-
   List<WebUserAccount> findAllByWuaIdIn(List<Integer> webUserAccounts);
 
   List<WebUserAccount> findByPerson(Person person);

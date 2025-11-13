@@ -52,66 +52,39 @@ public class TeamManagementServiceIntegrationTest {
   }
 
   @Test
-  public void getPersonByEmailAddressOrLoginId_whenSearchByEmailAddressAndCaseMatches_assertWebUserAccountFound() {
+  public void getPersonByEmailAddress_whenSearchByEmailAddressAndCaseMatches_assertWebUserAccountFound() {
 
     var emailAddressLowercase = "someone@example.com";
 
     createWebUserAccount(emailAddressLowercase);
 
-    var resultingUserAccount = teamManagementService.getPersonByEmailAddressOrLoginId(emailAddressLowercase);
+    var resultingUserAccount = teamManagementService.getPersonByEmailAddress(emailAddressLowercase);
 
     assertThat(resultingUserAccount).isPresent();
   }
 
   @Test
-  public void getPersonByEmailAddressOrLoginId_whenSearchByEmailAddressAndCaseNotMatching_assertWebUserAccountFound() {
+  public void getPersonByEmailAddress_whenSearchByEmailAddressAndCaseNotMatching_assertWebUserAccountFound() {
 
     var emailAddressLowercase = "someone@example.com";
     var emailAddressUppercase = emailAddressLowercase.toUpperCase();
 
     createWebUserAccount(emailAddressLowercase);
 
-    var resultingUserAccount = teamManagementService.getPersonByEmailAddressOrLoginId(emailAddressUppercase);
+    var resultingUserAccount = teamManagementService.getPersonByEmailAddress(emailAddressUppercase);
 
     assertThat(resultingUserAccount).isPresent();
   }
 
   @Test
-  public void getPersonByEmailAddressOrLoginId_whenSearchByLoginIdAndCaseMatches_assertWebUserAccountFound() {
-
-    var emailAddress = "someone@example.com";
-    var loginIdLowercase = "someone";
-
-    createWebUserAccount(emailAddress, loginIdLowercase);
-
-    var resultingUserAccount = teamManagementService.getPersonByEmailAddressOrLoginId(loginIdLowercase);
-
-    assertThat(resultingUserAccount).isPresent();
-  }
-
-  @Test
-  public void getPersonByEmailAddressOrLoginId_whenSearchByLoginIdAndCaseNotMatching_assertWebUserAccountFound() {
-
-    var emailAddress = "someone@example.com";
-    var loginIdLowercase = "someone";
-    var loginIdUppercase = loginIdLowercase.toUpperCase();
-
-    createWebUserAccount(emailAddress, loginIdLowercase);
-
-    var resultingUserAccount = teamManagementService.getPersonByEmailAddressOrLoginId(loginIdUppercase);
-
-    assertThat(resultingUserAccount).isPresent();
-  }
-
-  @Test
-  public void getPersonByEmailAddressOrLoginId_whenUserNotFound_assertEmptyOptionalResponse() {
+  public void getPersonByEmailAddress_whenUserNotFound_assertEmptyOptionalResponse() {
 
     var matchingEmailAddress = "someone@example.com";
     var unmatchedEmailAddress = String.format("%s.uk", matchingEmailAddress);
 
     createWebUserAccount(matchingEmailAddress);
 
-    var resultingUserAccount = teamManagementService.getPersonByEmailAddressOrLoginId(unmatchedEmailAddress);
+    var resultingUserAccount = teamManagementService.getPersonByEmailAddress(unmatchedEmailAddress);
 
     assertThat(resultingUserAccount).isEmpty();
   }

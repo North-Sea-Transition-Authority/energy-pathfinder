@@ -451,13 +451,13 @@ public class PortalTeamManagementControllerTest extends TeamManagementContextAbs
 
   @Test
   public void handleAddUserToTeamSubmit_whenTeamExists_andUserCanManageTeam_andFormIsValid() throws Exception {
-    when(teamManagementService.getPersonByEmailAddressOrLoginId(organisationTeamAdminPerson.getEmailAddress()))
+    when(teamManagementService.getPersonByEmailAddress(organisationTeamAdminPerson.getEmailAddress()))
         .thenReturn(Optional.of(organisationTeamAdminPerson));
 
     mockMvc.perform(post("/team-management/teams/{resId}/member/new", regulatorTeam.getId())
         .with(authenticatedUserAndSession(regulatorTeamAdmin))
         .with(csrf())
-        .param("userIdentifier", organisationTeamAdminPerson.getEmailAddress()))
+        .param("emailAddress", organisationTeamAdminPerson.getEmailAddress()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrlTemplate("/team-management/teams/{resId}/member/{personId}/roles",
             regulatorTeam.getId(),
@@ -469,20 +469,20 @@ public class PortalTeamManagementControllerTest extends TeamManagementContextAbs
     mockMvc.perform(post("/team-management/teams/{resId}/member/new", regulatorTeam.getId())
         .with(authenticatedUserAndSession(regulatorTeamAdmin))
         .with(csrf())
-        .param("userIdentifier", "Some.Unknown@email.com"))
+        .param("emailAddress", "Some.Unknown@email.com"))
         .andExpect(status().isNotFound());
   }
 
   @Test
   public void handleAddUserToTeamSubmit_whenTeamExists_andUserCanManageTeam_andFormIsInvalid() throws Exception {
 
-    ControllerTestUtil.mockValidatorErrors(addUserToTeamFormValidator, List.of("userIdentifier"));
+    ControllerTestUtil.mockValidatorErrors(addUserToTeamFormValidator, List.of("emailAddress"));
 
     mockMvc.perform(
         post("/team-management/teams/{resId}/member/new", regulatorTeam.getId())
             .with(authenticatedUserAndSession(regulatorTeamAdmin))
             .with(csrf())
-            .param("userIdentifier", ""))
+            .param("emailAddress", ""))
         .andExpect(status().isOk())
         .andExpect(model().attributeHasErrors("form"));
   }

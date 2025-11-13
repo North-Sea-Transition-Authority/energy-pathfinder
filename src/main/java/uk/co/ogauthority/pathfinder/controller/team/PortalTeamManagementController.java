@@ -188,9 +188,9 @@ public class PortalTeamManagementController {
       getAddUserToTeamModelAndView(team),
       userForm,
       () -> {
-        var person = teamManagementService.getPersonByEmailAddressOrLoginId(userForm.getUserIdentifier())
+        var person = teamManagementService.getPersonByEmailAddress(userForm.getEmailAddress())
             .orElseThrow(() -> new PathfinderEntityNotFoundException(String.format(
-                "No person found with email/loginId %s. This should have been caught by form validation.", userForm.getUserIdentifier())
+                "No person found with email %s. This should have been caught by form validation.", userForm.getEmailAddress())
             ));
         return ReverseRouter.redirect(on(PortalTeamManagementController.class)
             .renderMemberRoles(team.getId(), person.getId().asInt(), null, null));

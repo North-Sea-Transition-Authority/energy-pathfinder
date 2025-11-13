@@ -2,6 +2,7 @@ package uk.co.ogauthority.pathfinder.mvc;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
@@ -27,18 +28,23 @@ public class DefaultPageControllerAdvice {
   private final FooterService footerService;
   private final AnalyticsConfigurationProperties analyticsConfigurationProperties;
   private final String analyticsMeasurementUrl;
+  private final String energyPortalName;
 
   @Autowired
-  public DefaultPageControllerAdvice(ServiceProperties serviceProperties,
-                                     TopNavigationService topNavigationService,
-                                     HttpServletRequest request,
-                                     FooterService footerService,
-                                     AnalyticsConfigurationProperties analyticsConfigurationProperties) {
+  public DefaultPageControllerAdvice(
+      ServiceProperties serviceProperties,
+      TopNavigationService topNavigationService,
+      HttpServletRequest request,
+      FooterService footerService,
+      AnalyticsConfigurationProperties analyticsConfigurationProperties,
+      @Value("${energy-portal.name}") String energyPortalName
+  ) {
     this.serviceProperties = serviceProperties;
     this.topNavigationService = topNavigationService;
     this.request = request;
     this.footerService = footerService;
     this.analyticsConfigurationProperties = analyticsConfigurationProperties;
+    this.energyPortalName = energyPortalName;
     this.analyticsMeasurementUrl = ControllerUtils.getAnalyticsMeasurementUrl();
   }
 
@@ -53,6 +59,7 @@ public class DefaultPageControllerAdvice {
     addCurrentUserView(model);
     addCommonUrls(model);
     addServiceSpecificAttributes(model);
+    addIdpSpecificAttributes(model);
     addTopNavigationItems(model, request);
     addAnalyticsItems(model);
   }
@@ -78,6 +85,10 @@ public class DefaultPageControllerAdvice {
 
   private void addServiceSpecificAttributes(Model model) {
     model.addAttribute("service", serviceProperties);
+  }
+
+  private void addIdpSpecificAttributes(Model model) {
+    model.addAttribute("energyPortalName", energyPortalName);
   }
 
   private void addTopNavigationItems(Model model, HttpServletRequest request) {
