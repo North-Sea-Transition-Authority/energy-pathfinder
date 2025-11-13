@@ -25,6 +25,7 @@
         linkSecondaryAction=true
         secondaryLinkText="Cancel"
         linkSecondaryActionUrl=springUrl(cancelUrl)
+        disableOnSubmit=true
       />
   </@fdsForm.htmlForm>
 </@defaultPage>
