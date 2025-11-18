@@ -20,7 +20,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
+import uk.co.fivium.energyportal.starter.accounts.EnergyPortalServiceAccessService;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsService;
 import uk.co.ogauthority.pathfinder.analytics.EnableAnalyticsConfiguration;
 import uk.co.ogauthority.pathfinder.config.ExternalApiAuthenticationEntryPoint;

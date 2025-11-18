@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.energyportal.service.webuser;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,5 +39,12 @@ public class WebUserAccountService {
         .stream()
         .filter(webUserAccount -> WebUserAccountStatus.ACTIVE.equals(webUserAccount.getAccountStatus()))
         .findFirst();
+  }
+
+  public List<WebUserAccount> findAllByPersonIdIn(Collection<Integer> personIds) {
+    return webUserAccountRepository.findAllByPerson_IdIn(personIds)
+        .stream()
+        .filter(webUserAccount -> WebUserAccountStatus.ACTIVE.equals(webUserAccount.getAccountStatus()))
+        .toList();
   }
 }

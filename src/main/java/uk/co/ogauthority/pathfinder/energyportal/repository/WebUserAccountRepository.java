@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.energyportal.repository;
 
+import java.util.Collection;
 import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 import uk.co.ogauthority.pathfinder.energyportal.model.WebUserAccountStatus;
@@ -13,4 +14,6 @@ public interface WebUserAccountRepository extends CrudRepository<WebUserAccount,
   List<WebUserAccount> findAllByWuaIdIn(List<Integer> webUserAccounts);
 
   List<WebUserAccount> findByPerson(Person person);
+
+  List<WebUserAccount> findAllByPerson_IdIn(Collection<Integer> personIds);
 }

@@ -6,6 +6,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+import uk.co.fivium.energyportal.serviceproviders.epmq.ScopeType;
+import uk.co.fivium.energyportal.serviceproviders.epmq.messages.ServiceProviderTeamDto;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderTeamService;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.team.PortalTeamManagementController;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto;
@@ -18,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.form.teammanagement.NewTeamForm;
 import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.model.form.useraction.UserAction;
+import uk.co.ogauthority.pathfinder.model.team.TeamType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
 import uk.co.ogauthority.pathfinder.service.teammanagement.TeamManagementService;
@@ -33,18 +37,21 @@ public class TeamCreationService {
   private final TeamManagementService teamManagementService;
   private final StartProjectService startProjectService;
   private final PortalOrganisationAccessor portalOrganisationAccessor;
+  private final EnergyPortalServiceProviderTeamService energyPortalServiceProviderTeamService;
 
   @Autowired
   public TeamCreationService(ValidationService validationService,
                              PortalTeamAccessor portalTeamAccessor,
                              TeamManagementService teamManagementService,
                              StartProjectService startProjectService,
-                             PortalOrganisationAccessor portalOrganisationAccessor) {
+                             PortalOrganisationAccessor portalOrganisationAccessor,
+                             EnergyPortalServiceProviderTeamService energyPortalServiceProviderTeamService) {
     this.validationService = validationService;
     this.portalTeamAccessor = portalTeamAccessor;
     this.teamManagementService = teamManagementService;
     this.startProjectService = startProjectService;
     this.portalOrganisationAccessor = portalOrganisationAccessor;
+    this.energyPortalServiceProviderTeamService = energyPortalServiceProviderTeamService;
   }
 
   public BindingResult validate(NewTeamForm form,
@@ -72,8 +79,17 @@ public class TeamCreationService {
   }
 
   private Integer createOrganisationGroupTeam(PortalOrganisationGroup organisationGroup,
-                                             AuthenticatedUserAccount user) {
-    return portalTeamAccessor.createOrganisationGroupTeam(organisationGroup, user);
+                                              AuthenticatedUserAccount user) {
+    var teamId = portalTeamAccessor.createOrganisationGroupTeam(organisationGroup, user);
+
+    var serviceProviderTeam = new ServiceProviderTeamDto(
+        String.valueOf(teamId),
+        String.valueOf(organisationGroup.getOrgGrpId()),
+        ScopeType.ORGANISATION_GROUP,
+        TeamType.ORGANISATION.name()
+    );
+    energyPortalServiceProviderTeamService.publishTeam(serviceProviderTeam);
+    return teamId;
   }
 
   private Optional<PortalTeamDto> getOrganisationGroupTeam(PortalOrganisationGroup organisationGroup) {

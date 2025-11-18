@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
+import uk.co.fivium.energyportal.starter.accounts.EnergyPortalServiceAccessService;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.exception.team.PortalTeamNotFoundException;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalRoleDto;
@@ -22,6 +22,7 @@ import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalSystemPriv
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamMemberDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamPersonMembershipDto;
+import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamTypeRoleDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.PersonId;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
@@ -32,6 +33,7 @@ import uk.co.ogauthority.pathfinder.energyportal.model.entity.team.PortalTeamUsa
 import uk.co.ogauthority.pathfinder.energyportal.repository.team.PortalTeamRepository;
 import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
 import uk.co.ogauthority.pathfinder.model.team.TeamType;
+import uk.co.ogauthority.pathfinder.service.team.PersonTeamRoleDto;
 
 @Service
 public class PortalTeamAccessor {
@@ -153,6 +155,25 @@ public class PortalTeamAccessor {
         .getResultList();
   }
 
+  public List<PersonTeamRoleDto> getAllPersonTeamRoles() {
+    return entityManager.createQuery("""
+            SELECT new uk.co.ogauthority.pathfinder.service.team.PersonTeamRoleDto(
+              ptmr.portalTeamMember.personId,
+              ptmr.portalTeamMember.portalTeam.resId,
+              ptmr.portalTeamMember.portalTeam.portalTeamType.type,
+              ptmr.portalTeamTypeRole.name
+            )
+            FROM PortalTeamMemberRole ptmr
+            LEFT JOIN PortalTeamUsage ptu ON ptu.portalTeam = ptmr.portalTeamMember.portalTeam
+            WHERE (ptmr.portalTeamMember.portalTeam.portalTeamType.type IN (:industryTeamType, :regulatorTeamType))
+            AND (ptu.purpose = :usagePurpose OR ptu IS NULL)
+            """, PersonTeamRoleDto.class)
+        .setParameter("industryTeamType", TeamType.ORGANISATION.getPortalTeamType())
+        .setParameter("regulatorTeamType", TeamType.REGULATOR.getPortalTeamType())
+        .setParameter("usagePurpose", PortalTeamUsagePurpose.PRIMARY_DATA)
+        .getResultList();
+  }
+
   public List<PortalTeamDto> getPortalTeamsByPortalTeamType(String portalTeamType) {
 
     return entityManager.createQuery("" +
@@ -165,6 +186,26 @@ public class PortalTeamAccessor {
             "AND (ptu.purpose = :usagePurpose OR ptu IS NULL)",
         PortalTeamDto.class)
         .setParameter("portalTeamType", portalTeamType)
+        .setParameter("usagePurpose", PortalTeamUsagePurpose.PRIMARY_DATA)
+        .getResultList();
+  }
+
+  public List<PortalTeamDto> getAllPortalTeams() {
+    return entityManager.createQuery("""
+            SELECT new uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto(
+              pt.resId,
+              pt.name,
+              pt.description,
+              pt.portalTeamType.type,
+              ptu.uref
+            )
+            FROM PortalTeam pt
+            LEFT JOIN PortalTeamUsage ptu ON ptu.portalTeam = pt
+            WHERE (pt.portalTeamType.type IN (:industryTeamType, :regulatorTeamType))
+            AND (ptu.purpose = :usagePurpose OR ptu IS NULL)
+            """, PortalTeamDto.class)
+        .setParameter("industryTeamType", TeamType.ORGANISATION.getPortalTeamType())
+        .setParameter("regulatorTeamType", TeamType.REGULATOR.getPortalTeamType())
         .setParameter("usagePurpose", PortalTeamUsagePurpose.PRIMARY_DATA)
         .getResultList();
   }
@@ -383,6 +424,26 @@ public class PortalTeamAccessor {
             "WHERE pt.resId = :resId",
         PortalRoleDto.class)
         .setParameter("resId", resId)
+        .getResultList();
+  }
+
+  /**
+   * Get a list of all possible roles members of a given team type can have.
+   */
+  public List<PortalTeamTypeRoleDto> getAllPortalTeamTypeRoles() {
+    return entityManager.createQuery("""
+            SELECT new uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamTypeRoleDto(
+              pttr.portalTeamType.type,
+              pttr.name,
+              pttr.title,
+              pttr.description,
+              pttr.displaySeq
+            )
+            FROM PortalTeamTypeRole pttr
+            WHERE (pttr.portalTeamType.type IN (:industryTeamType, :regulatorTeamType))
+            """, PortalTeamTypeRoleDto.class)
+        .setParameter("industryTeamType", TeamType.ORGANISATION.getPortalTeamType())
+        .setParameter("regulatorTeamType", TeamType.REGULATOR.getPortalTeamType())
         .getResultList();
   }
 

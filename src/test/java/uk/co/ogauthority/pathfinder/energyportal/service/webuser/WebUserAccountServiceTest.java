@@ -195,4 +195,38 @@ class WebUserAccountServiceTest {
 
     assertThat(resultingWebUserAccount).isEmpty();
   }
+
+  @ParameterizedTest
+  @EnumSource(value = WebUserAccountStatus.class, mode = EnumSource.Mode.EXCLUDE, names = "ACTIVE")
+  void findAllByPersonIn(WebUserAccountStatus nonActiveWebUserAccountStatus) {
+    var person = UserTestingUtil.getPerson();
+
+    var activeWebUserAccount = new WebUserAccount(
+        1,
+        "title",
+        "forename",
+        "surname",
+        "email-address",
+        "loginId",
+        WebUserAccountStatus.ACTIVE,
+        person
+    );
+
+    var nonActiveWebUserAccount = new WebUserAccount(
+        2,
+        "title",
+        "forename",
+        "surname",
+        "email-address",
+        "loginId",
+        nonActiveWebUserAccountStatus,
+        person
+    );
+
+    when(webUserAccountRepository.findAllByPerson_IdIn(List.of(1)))
+        .thenReturn(List.of(activeWebUserAccount, nonActiveWebUserAccount));
+
+    assertThat(webUserAccountService.findAllByPersonIdIn(List.of(1)))
+        .isEqualTo(List.of(activeWebUserAccount));
+  }
 }

@@ -20,7 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-import uk.co.fivium.energyportal.accounts.starter.EnergyPortalServiceAccessService;
+import uk.co.fivium.energyportal.starter.accounts.EnergyPortalServiceAccessService;
 import uk.co.fivium.energyportalmessagequeue.sns.SnsService;
 import uk.co.fivium.energyportalmessagequeue.sqs.SqsService;
 import uk.co.ogauthority.pathfinder.energyportal.exception.team.PortalTeamNotFoundException;
@@ -30,6 +30,7 @@ import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamMemberDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamPersonMembershipDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamScopeDto;
+import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamTypeRoleDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.PersonId;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
@@ -39,6 +40,7 @@ import uk.co.ogauthority.pathfinder.energyportal.repository.team.PortalTeamRepos
 import uk.co.ogauthority.pathfinder.energyportal.service.team.PortalTeamAccessor;
 import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
 import uk.co.ogauthority.pathfinder.model.team.TeamType;
+import uk.co.ogauthority.pathfinder.service.team.PersonTeamRoleDto;
 import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -63,13 +65,14 @@ public class PortalTeamAccessorIntegrationTest {
   private final String NO_TEAMS_OF_PORTAL_TEAM_TYPE = "SOME_TEAM_TYPE_WITH_NO_TEAM_INSTANCES";
 
   private final int UNSCOPED_TEAM_RES_ID = 100;
-  private final String UNSCOPED_TEAM_PORTAL_TYPE = "UNSCOPED_TEAM_TYPE";
+  private final String UNSCOPED_TEAM_PORTAL_TYPE = TeamType.REGULATOR.getPortalTeamType();
   private final String UNSCOPED_TEAM_PORTAL_TYPE_TITLE = "RegulatorTeamTitle";
   private final String UNSCOPED_TEAM_PORTAL_TYPE_DESCRIPTION = "RegulatorTeamDescription";
   private final String UNSCOPED_TEAM_NAME = "RegulatorTeam";
   private final String UNSCOPED_TEAM_DESCRIPTION = "RegulatorTeamDescription";
 
-  private final PortalOrganisationGroup PORTAL_ORGANISATION_GROUP = TeamTestingUtil.generateOrganisationGroup(1, "name", "short name");
+  private final PortalOrganisationGroup PORTAL_ORGANISATION_GROUP = TeamTestingUtil.generateOrganisationGroup(1, "name",
+      "short name");
 
   private final String SCOPED_TEAM_PORTAL_TYPE = TeamType.ORGANISATION.getPortalTeamType();
   private final int SCOPED_TEAM_RES_ID = 200;
@@ -251,6 +254,45 @@ public class PortalTeamAccessorIntegrationTest {
 
   @Test
   @Transactional
+  public void getAllPersonTeamRoles() {
+    assertThat(portalTeamAccessor.getAllPersonTeamRoles()).isEqualTo(
+        List.of(
+            new PersonTeamRoleDto(
+                10,
+                100,
+                UNSCOPED_TEAM_PORTAL_TYPE,
+                ExampleTeamRole.ROLE_WITHOUT_PRIVILEGE.name()
+            ),
+            new PersonTeamRoleDto(
+                10,
+                100,
+                UNSCOPED_TEAM_PORTAL_TYPE,
+                ExampleTeamRole.ROLE_WITH_PRIVILEGE.name()
+            ),
+            new PersonTeamRoleDto(
+                20,
+                200,
+                SCOPED_TEAM_PORTAL_TYPE,
+                ExampleTeamRole.ROLE_WITHOUT_PRIVILEGE.name()
+            ),
+            new PersonTeamRoleDto(
+                20,
+                200,
+                SCOPED_TEAM_PORTAL_TYPE,
+                ExampleTeamRole.ROLE_WITH_PRIVILEGE.name()
+            ),
+            new PersonTeamRoleDto(
+                30,
+                200,
+                SCOPED_TEAM_PORTAL_TYPE,
+                ExampleTeamRole.ROLE_WITH_PRIVILEGE.name()
+            )
+        )
+    );
+  }
+
+  @Test
+  @Transactional
   public void getPortalTeamsByPortalTeamType_whenNoTeamsWithTypeFound() {
     assertThat(portalTeamAccessor.getPortalTeamsByPortalTeamType(NO_TEAMS_OF_PORTAL_TEAM_TYPE)).isEmpty();
   }
@@ -309,6 +351,37 @@ public class PortalTeamAccessorIntegrationTest {
         UNSCOPED_TEAM_DESCRIPTION
     );
 
+  }
+
+  @Test
+  @Transactional
+  public void getAllPortalTeams() {
+    assertThat(portalTeamAccessor.getAllPortalTeams())
+        .usingRecursiveComparison()
+        .isEqualTo(List.of(
+                new PortalTeamDto(
+                    SCOPED_TEAM_RES_ID,
+                    SCOPED_TEAM_NAME,
+                    SCOPED_TEAM_DESCRIPTION,
+                    SCOPED_TEAM_PORTAL_TYPE,
+                    SCOPED_TEAM_UREF
+                ),
+                new PortalTeamDto(
+                    NO_MEMBER_SCOPED_TEAM_RES_ID,
+                    NO_MEMBER_SCOPED_TEAM_NAME,
+                    NO_MEMBER_SCOPED_TEAM_DESCRIPTION,
+                    SCOPED_TEAM_PORTAL_TYPE,
+                    NO_MEMBER_SCOPED_TEAM_UREF
+                ),
+                new PortalTeamDto(
+                    UNSCOPED_TEAM_RES_ID,
+                    UNSCOPED_TEAM_NAME,
+                    UNSCOPED_TEAM_DESCRIPTION,
+                    UNSCOPED_TEAM_PORTAL_TYPE,
+                    null
+                )
+            )
+        );
   }
 
   @Test
@@ -439,21 +512,58 @@ public class PortalTeamAccessorIntegrationTest {
 
   @Test
   @Transactional
-  public void getAllPortalSystemPrivilegesForPerson_returnsExpectedSystemPrivs_whenPersonIsRoleWithPriv(){
-    List<PortalSystemPrivilegeDto> privilegeDtoList = portalTeamAccessor.getAllPortalSystemPrivilegesForPerson(unscopedTeamMemberPerson_2Roles);
+  public void getAllPortalTeamTypeRoles() {
+    assertThat(portalTeamAccessor.getAllPortalTeamTypeRoles())
+        .containsExactlyInAnyOrder(
+            new PortalTeamTypeRoleDto(
+                UNSCOPED_TEAM_PORTAL_TYPE,
+                ExampleTeamRole.ROLE_WITH_PRIVILEGE.name(),
+                ExampleTeamRole.ROLE_WITH_PRIVILEGE.getTitle(),
+                ExampleTeamRole.ROLE_WITH_PRIVILEGE.getDesc(),
+                0
+            ),
+            new PortalTeamTypeRoleDto(
+                UNSCOPED_TEAM_PORTAL_TYPE,
+                ExampleTeamRole.ROLE_WITHOUT_PRIVILEGE.name(),
+                ExampleTeamRole.ROLE_WITHOUT_PRIVILEGE.getTitle(),
+                ExampleTeamRole.ROLE_WITHOUT_PRIVILEGE.getDesc(),
+                1
+            ),
+            new PortalTeamTypeRoleDto(
+                SCOPED_TEAM_PORTAL_TYPE,
+                ExampleTeamRole.ROLE_WITH_PRIVILEGE.name(),
+                ExampleTeamRole.ROLE_WITH_PRIVILEGE.getTitle(),
+                ExampleTeamRole.ROLE_WITH_PRIVILEGE.getDesc(),
+                0
+            ),
+            new PortalTeamTypeRoleDto(
+                SCOPED_TEAM_PORTAL_TYPE,
+                ExampleTeamRole.ROLE_WITHOUT_PRIVILEGE.name(),
+                ExampleTeamRole.ROLE_WITHOUT_PRIVILEGE.getTitle(),
+                ExampleTeamRole.ROLE_WITHOUT_PRIVILEGE.getDesc(),
+                1
+            )
+        );
+  }
+
+  @Test
+  @Transactional
+  public void getAllPortalSystemPrivilegesForPerson_returnsExpectedSystemPrivs_whenPersonIsRoleWithPriv() {
+    List<PortalSystemPrivilegeDto> privilegeDtoList = portalTeamAccessor.getAllPortalSystemPrivilegesForPerson(
+        unscopedTeamMemberPerson_2Roles);
     assertThat(privilegeDtoList)
         .isNotEmpty()
         .allMatch(dto -> {
-            assertThat(dto.getRoleName()).isEqualTo(ExampleTeamRole.ROLE_WITH_PRIVILEGE.name());
-            assertThat(dto.getGrantedPrivilege()).isEqualTo(ExampleTeamRole.ROLE_WITH_PRIVILEGE.getExampleRolePrivilege());
-            assertThat(dto.getPortalTeamType()).isEqualTo(UNSCOPED_TEAM_PORTAL_TYPE);
-            return true;
+          assertThat(dto.getRoleName()).isEqualTo(ExampleTeamRole.ROLE_WITH_PRIVILEGE.name());
+          assertThat(dto.getGrantedPrivilege()).isEqualTo(ExampleTeamRole.ROLE_WITH_PRIVILEGE.getExampleRolePrivilege());
+          assertThat(dto.getPortalTeamType()).isEqualTo(UNSCOPED_TEAM_PORTAL_TYPE);
+          return true;
         });
   }
 
   @Test
   @Transactional
-  public void personIsAMemberOfTeam_returnsTrueWhenPersonIsMember(){
+  public void personIsAMemberOfTeam_returnsTrueWhenPersonIsMember() {
     assertThat(
         portalTeamAccessor.personIsAMemberOfTeam(UNSCOPED_TEAM_RES_ID, unscopedTeamMemberPerson_2Roles)
     ).isTrue();
@@ -462,7 +572,7 @@ public class PortalTeamAccessorIntegrationTest {
 
   @Test
   @Transactional
-  public void personIsAMemberOfTeam_returnsFalseWhenPersonIsNotMember(){
+  public void personIsAMemberOfTeam_returnsFalseWhenPersonIsNotMember() {
     assertThat(
         portalTeamAccessor.personIsAMemberOfTeam(NO_MEMBER_SCOPED_TEAM_RES_ID, unscopedTeamMemberPerson_2Roles)
     ).isFalse();
@@ -471,7 +581,7 @@ public class PortalTeamAccessorIntegrationTest {
 
   @Test
   @Transactional
-  public void getAllPortalRolesForTeam_getsAllExpectedRoles(){
+  public void getAllPortalRolesForTeam_getsAllExpectedRoles() {
     List<PortalRoleDto> roles = portalTeamAccessor.getAllPortalRolesForTeam(UNSCOPED_TEAM_RES_ID);
     assertThat(roles).hasSize(2);
   }

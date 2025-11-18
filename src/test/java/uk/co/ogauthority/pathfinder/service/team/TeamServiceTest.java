@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -21,11 +22,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderUserRolesService;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamMemberDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.service.team.PortalTeamAccessor;
+import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationRole;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
@@ -45,6 +48,12 @@ public class TeamServiceTest {
 
   @Mock
   private TeamDtoFactory teamDtoFactory;
+
+  @Mock
+  private WebUserAccountService webUserAccountService;
+
+  @Mock
+  private EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService;
 
   @Captor
   private ArgumentCaptor<List<String>> stringListCaptor;
@@ -67,7 +76,12 @@ public class TeamServiceTest {
     regulatorPerson = new Person(1, "reg", "person", "reg@person.com", "0");
     organisationPerson = new Person(2, "org", "person", "org@person.com", "0");
 
-    teamService = new TeamService(portalTeamAccessor, teamDtoFactory);
+    teamService = new TeamService(
+        portalTeamAccessor,
+        teamDtoFactory,
+        webUserAccountService,
+        energyPortalServiceProviderUserRolesService
+    );
 
     regulatorTeam = TeamTestingUtil.getRegulatorTeam();
     regulatorTeamAsPortalTeamDto = TeamTestingUtil.portalTeamDtoFrom(regulatorTeam);
@@ -269,16 +283,52 @@ public class TeamServiceTest {
   @Test
   public void addPersonToTeamInRoles_verifyServiceInteraction() {
     var roles = List.of("some_role_1", "some_role_2");
+    when(webUserAccountService.getWebUserAccount(organisationPerson.getId().asInt()))
+        .thenReturn(Optional.of(new WebUserAccount(10, regulatorPerson)));
+
     teamService.addPersonToTeamInRoles(regulatorTeam, organisationPerson, roles, someWebUserAccount);
 
     verify(portalTeamAccessor, times(1))
         .addPersonToTeamWithRoles(regulatorTeam.getId(), organisationPerson, roles, someWebUserAccount);
+
+    verify(energyPortalServiceProviderUserRolesService).publishUsersRolesForTeam(
+        10,
+        String.valueOf(regulatorTeam.getId()),
+        regulatorTeam.getType().name(),
+        roles
+    );
+  }
+
+  @Test
+  public void addPersonToTeamInRoles_whenCantResolveWebUserAccount_thenPublishNothing() {
+    var roles = List.of("some_role_1", "some_role_2");
+    when(webUserAccountService.getWebUserAccount(organisationPerson.getId().asInt()))
+        .thenReturn(Optional.empty());
+
+    teamService.addPersonToTeamInRoles(regulatorTeam, organisationPerson, roles, someWebUserAccount);
+
+    verify(portalTeamAccessor, times(1))
+        .addPersonToTeamWithRoles(regulatorTeam.getId(), organisationPerson, roles, someWebUserAccount);
+
+    verifyNoInteractions(energyPortalServiceProviderUserRolesService);
   }
 
   @Test
   public void removePersonFromTeam_verifyServiceInteraction() {
+    when(webUserAccountService.getWebUserAccount(regulatorPerson.getId().asInt()))
+        .thenReturn(Optional.of(new WebUserAccount(10, regulatorPerson)));
     teamService.removePersonFromTeam(regulatorTeam, regulatorPerson, someWebUserAccount);
     verify(portalTeamAccessor, times(1)).removePersonFromTeam(regulatorTeam.getId(), regulatorPerson, someWebUserAccount);
+    verify(energyPortalServiceProviderUserRolesService).publishRemoveUserFromTeam(10, String.valueOf(regulatorTeam.getId()));
+  }
+
+  @Test
+  public void removePersonFromTeam_whenCantResolveWebUserAccount_thenPublishNothing() {
+    when(webUserAccountService.getWebUserAccount(regulatorPerson.getId().asInt()))
+        .thenReturn(Optional.empty());
+    teamService.removePersonFromTeam(regulatorTeam, regulatorPerson, someWebUserAccount);
+    verify(portalTeamAccessor, times(1)).removePersonFromTeam(regulatorTeam.getId(), regulatorPerson, someWebUserAccount);
+    verifyNoInteractions(energyPortalServiceProviderUserRolesService);
   }
 
   @Test
@@ -292,7 +342,8 @@ public class TeamServiceTest {
     var mockRole = mock(Role.class);
     when(teamDtoFactory.createRole(any())).thenReturn(mockRole);
     when(portalTeamAccessor.getAllPortalRolesForTeam(regulatorTeam.getId()))
-        .thenReturn(List.of(TeamTestingUtil.getTeamAdminRoleDto(regulatorTeam), TeamTestingUtil.getTeamAdminRoleDto(regulatorTeam)));
+        .thenReturn(
+            List.of(TeamTestingUtil.getTeamAdminRoleDto(regulatorTeam), TeamTestingUtil.getTeamAdminRoleDto(regulatorTeam)));
 
     assertThat(teamService.getAllRolesForTeam(regulatorTeam)).containsExactly(mockRole, mockRole);
   }
@@ -316,14 +367,16 @@ public class TeamServiceTest {
 
   @Test
   public void isPersonMemberOfTeamType_whenNoTeamsWherePersonMemberOfTeamType() {
-    when(portalTeamAccessor.getNumberOfTeamsWherePersonMemberOfTeamType(organisationPerson, TeamType.ORGANISATION.getPortalTeamType())).thenReturn(0L);
+    when(portalTeamAccessor.getNumberOfTeamsWherePersonMemberOfTeamType(organisationPerson,
+        TeamType.ORGANISATION.getPortalTeamType())).thenReturn(0L);
 
     assertThat(teamService.isPersonMemberOfTeamType(organisationPerson, TeamType.ORGANISATION)).isFalse();
   }
 
   @Test
   public void isPersonMemberOfTeamType_whenTeamsWherePersonMemberOfTeamType() {
-    when(portalTeamAccessor.getNumberOfTeamsWherePersonMemberOfTeamType(organisationPerson, TeamType.ORGANISATION.getPortalTeamType())).thenReturn(1L);
+    when(portalTeamAccessor.getNumberOfTeamsWherePersonMemberOfTeamType(organisationPerson,
+        TeamType.ORGANISATION.getPortalTeamType())).thenReturn(1L);
 
     assertThat(teamService.isPersonMemberOfTeamType(organisationPerson, TeamType.ORGANISATION)).isTrue();
   }

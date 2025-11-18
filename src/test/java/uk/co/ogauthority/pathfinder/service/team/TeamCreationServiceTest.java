@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -15,6 +16,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
+import uk.co.fivium.energyportal.serviceproviders.epmq.ScopeType;
+import uk.co.fivium.energyportal.serviceproviders.epmq.messages.ServiceProviderTeamDto;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderTeamService;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.controller.team.PortalTeamManagementController;
@@ -27,6 +31,7 @@ import uk.co.ogauthority.pathfinder.model.form.teammanagement.NewTeamForm;
 import uk.co.ogauthority.pathfinder.model.form.useraction.ButtonType;
 import uk.co.ogauthority.pathfinder.model.form.useraction.LinkButton;
 import uk.co.ogauthority.pathfinder.model.form.useraction.UserActionType;
+import uk.co.ogauthority.pathfinder.model.team.TeamType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.StartProjectService;
 import uk.co.ogauthority.pathfinder.service.teammanagement.TeamManagementService;
@@ -52,6 +57,9 @@ public class TeamCreationServiceTest {
   @Mock
   private StartProjectService startProjectService;
 
+  @Mock
+  private EnergyPortalServiceProviderTeamService energyPortalServiceProviderTeamService;
+
   private TeamCreationService teamCreationService;
 
   private final AuthenticatedUserAccount authenticatedUserAccount = UserTestingUtil.getAuthenticatedUserAccount(
@@ -65,7 +73,8 @@ public class TeamCreationServiceTest {
         portalTeamAccessor,
         teamManagementService,
         startProjectService,
-        portalOrganisationAccessor
+        portalOrganisationAccessor,
+        energyPortalServiceProviderTeamService
     );
   }
 
@@ -99,6 +108,7 @@ public class TeamCreationServiceTest {
     assertThat(result).isEqualTo(portalTeamDto.getResId());
     verify(portalTeamAccessor, times(0)).createOrganisationGroupTeam(organisationGroup, authenticatedUserAccount);
     verify(startProjectService, times(0)).createForwardWorkPlanProject(authenticatedUserAccount, organisationGroup);
+    verifyNoInteractions(energyPortalServiceProviderTeamService);
   }
 
   @Test
@@ -108,6 +118,8 @@ public class TeamCreationServiceTest {
 
     when(portalOrganisationAccessor.getOrganisationGroupOrError(organisationGroup.getOrgGrpId())).thenReturn(organisationGroup);
     when(portalTeamAccessor.findPortalTeamByOrganisationGroup(organisationGroup)).thenReturn(Optional.empty());
+    when(portalTeamAccessor.createOrganisationGroupTeam(organisationGroup, authenticatedUserAccount))
+        .thenReturn(100);
 
     final var form = new AddOrganisationTeamForm(organisationGroup.getSelectionId());
 
@@ -116,6 +128,13 @@ public class TeamCreationServiceTest {
     assertThat(result).isNotNull();
     verify(portalTeamAccessor, times(1)).createOrganisationGroupTeam(organisationGroup, authenticatedUserAccount);
     verify(startProjectService, times(1)).createForwardWorkPlanProject(authenticatedUserAccount, organisationGroup);
+    var expectedServiceProviderTeamDto = new ServiceProviderTeamDto(
+        "100",
+        "1",
+        ScopeType.ORGANISATION_GROUP,
+        TeamType.ORGANISATION.name()
+    );
+    verify(energyPortalServiceProviderTeamService).publishTeam(expectedServiceProviderTeamDto);
   }
 
   @Test(expected = PathfinderEntityNotFoundException.class)

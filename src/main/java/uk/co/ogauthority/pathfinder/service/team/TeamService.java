@@ -5,8 +5,11 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderUserRolesService;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto;
@@ -14,6 +17,7 @@ import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.organisation.PortalOrganisationGroup;
 import uk.co.ogauthority.pathfinder.energyportal.service.team.PortalTeamAccessor;
+import uk.co.ogauthority.pathfinder.energyportal.service.webuser.WebUserAccountService;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationRole;
 import uk.co.ogauthority.pathfinder.model.team.OrganisationTeam;
@@ -27,14 +31,24 @@ import uk.co.ogauthority.pathfinder.model.team.TeamType;
 @Service
 public class TeamService {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(TeamService.class);
+
   private final PortalTeamAccessor portalTeamAccessor;
   private final TeamDtoFactory teamDtoFactory;
+  private final WebUserAccountService webUserAccountService;
+  private final EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService;
 
   @Autowired
-  public TeamService(PortalTeamAccessor portalTeamAccessor,
-                     TeamDtoFactory teamDtoFactory) {
+  public TeamService(
+      PortalTeamAccessor portalTeamAccessor,
+      TeamDtoFactory teamDtoFactory,
+      WebUserAccountService webUserAccountService,
+      EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService
+  ) {
     this.portalTeamAccessor = portalTeamAccessor;
     this.teamDtoFactory = teamDtoFactory;
+    this.webUserAccountService = webUserAccountService;
+    this.energyPortalServiceProviderUserRolesService = energyPortalServiceProviderUserRolesService;
   }
 
   /**
@@ -140,7 +154,7 @@ public class TeamService {
 
   public List<PortalOrganisationGroup> getOrganisationGroupsPersonInTeamFor(Person person) {
 
-    final var portalTeamDtoList =  portalTeamAccessor.getTeamsWherePersonMemberOfTeamType(
+    final var portalTeamDtoList = portalTeamAccessor.getTeamsWherePersonMemberOfTeamType(
         person,
         TeamType.ORGANISATION.getPortalTeamType()
     );
@@ -178,14 +192,39 @@ public class TeamService {
    */
   public void removePersonFromTeam(Team team, Person personToRemove, WebUserAccount actionPerformedBy) {
     portalTeamAccessor.removePersonFromTeam(team.getId(), personToRemove, actionPerformedBy);
-  }
 
+    var optionalWebUserAccount = webUserAccountService.getWebUserAccount(personToRemove.getId().asInt());
+
+    if (optionalWebUserAccount.isEmpty()) {
+      LOGGER.error("Can't resolve web user account from id {} when trying remove a user", personToRemove.getId().asInt());
+      return;
+    }
+
+    energyPortalServiceProviderUserRolesService.publishRemoveUserFromTeam(
+        optionalWebUserAccount.get().getWuaId(),
+        String.valueOf(team.getId())
+    );
+  }
 
   /**
    * Add (or update) the roles a given person in a team has.
    */
-  public void addPersonToTeamInRoles(Team team, Person personToAdd, Collection<String> roleNames, WebUserAccount actionPerformedBy) {
+  public void addPersonToTeamInRoles(Team team, Person personToAdd, Collection<String> roleNames,
+                                     WebUserAccount actionPerformedBy) {
     portalTeamAccessor.addPersonToTeamWithRoles(team.getId(), personToAdd, roleNames, actionPerformedBy);
+
+    var optionalWebUserAccount = webUserAccountService.getWebUserAccount(personToAdd.getId().asInt());
+
+    if (optionalWebUserAccount.isEmpty()) {
+      LOGGER.error("Can't resolve web user account from id {} when trying to update user roles", personToAdd.getId().asInt());
+      return;
+    }
+    energyPortalServiceProviderUserRolesService.publishUsersRolesForTeam(
+        optionalWebUserAccount.get().getWuaId(),
+        String.valueOf(team.getId()),
+        team.getType().name(),
+        roleNames
+    );
   }
 
   /**
@@ -216,10 +255,12 @@ public class TeamService {
   }
 
   //TODO PAT-685 make sure only one org is saved when user belongs to multiple ones
+
   /**
    * Get the PortalOrganisationGroup of an user account to save as a section item's portalOrganisationGroup
    * This is used to determine an item's owner and needs to return only one organisation even when a user belongs to
    * multiple ones.
+   *
    * @param userAccount The current user
    * @return The PortalOrganisationGroup who owns a section item
    */
