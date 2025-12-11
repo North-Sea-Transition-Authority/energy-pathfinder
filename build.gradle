@@ -50,6 +50,7 @@ dependencies {
   }
   implementation 'io.micrometer:micrometer-registry-statsd'
 
+  implementation 'org.flywaydb:flyway-core:9.5.1-FIVIUM'
   implementation 'com.oracle.database.jdbc:ojdbc11:21.9.0.0'
   implementation 'org.springframework.session:spring-session-jdbc'
   implementation 'uk.gov.service.notify:notifications-java-client:5.2.1-RELEASE'
