@@ -27,7 +27,7 @@ import uk.co.ogauthority.pathfinder.testutil.TeamTestingUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
 @RunWith(MockitoJUnitRunner.class)
-public class TeamManagementEmailServiceTest {
+public class GovNotifyTeamManagementEmailServiceTest {
 
   private static final Team REGULATOR_TEAM = TeamTestingUtil.getRegulatorTeam();
   private static final Team ORGANISATION_TEAM = TeamTestingUtil.getOrganisationTeam(ProjectOperatorTestUtil.ORG_GROUP);
@@ -43,11 +43,11 @@ public class TeamManagementEmailServiceTest {
   @Mock
   private LinkService linkService;
 
-  private TeamManagementEmailService teamManagementEmailService;
+  private GovNotifyTeamManagementEmailService teamManagementEmailService;
 
   @Before
   public void setup() {
-    teamManagementEmailService = new TeamManagementEmailService(emailService, linkService, SERVICE_NAME);
+    teamManagementEmailService = new GovNotifyTeamManagementEmailService(emailService, linkService, SERVICE_NAME);
 
     when(linkService.getWorkAreaUrl()).thenReturn(SERVICE_LOGIN_URL);
   }

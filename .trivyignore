@@ -14,10 +14,11 @@ CVE-2025-41234
 
 CVE-2025-49125
 
-# io.netty 
+# io.netty
 CVE-2025-58057
 CVE-2025-58056
 CVE-2025-55163
+CVE-2025-67735
 
 # org.apache.tomcat.embed
 CVE-2025-48989

@@ -15,7 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.co.ogauthority.pathfinder.energyportal.model.WebUserAccountStatus;
 import uk.co.ogauthority.pathfinder.energyportal.repository.PersonRepository;
 import uk.co.ogauthority.pathfinder.energyportal.repository.WebUserAccountRepository;
-import uk.co.ogauthority.pathfinder.service.email.TeamManagementEmailService;
+import uk.co.ogauthority.pathfinder.service.email.GovNotifyTeamManagementEmailService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 
 @RunWith(SpringRunner.class)
@@ -34,7 +34,7 @@ public class TeamManagementServiceIntegrationTest {
   private TeamService teamService;
 
   @Mock
-  private TeamManagementEmailService teamManagementEmailService;
+  private GovNotifyTeamManagementEmailService teamManagementEmailService;
 
   @Mock
   private PersonRepository personRepository;
