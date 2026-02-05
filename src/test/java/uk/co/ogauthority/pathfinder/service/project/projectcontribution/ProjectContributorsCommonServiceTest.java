@@ -28,6 +28,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.projectcontribution.Pro
 import uk.co.ogauthority.pathfinder.model.form.project.projectcontributor.ProjectContributorsForm;
 import uk.co.ogauthority.pathfinder.model.view.organisationgroup.OrganisationGroupView;
 import uk.co.ogauthority.pathfinder.repository.project.projectcontributor.ProjectContributorRepository;
+import uk.co.ogauthority.pathfinder.service.email.ProjectContributorMailService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectContributorTestUtil;
@@ -57,6 +58,9 @@ public class ProjectContributorsCommonServiceTest {
   @Mock
   private ContributorsAddedEventPublisher contributorsAddedEventPublisher;
 
+  @Mock
+  private ProjectContributorMailService projectContributorMailService;
+
   private ProjectContributorsCommonService projectContributorsCommonService;
 
   @Before
@@ -67,9 +71,10 @@ public class ProjectContributorsCommonServiceTest {
         portalOrganisationAccessor,
         regulatorSharedEmail,
         contributorsDeletedEventPublisher,
-        contributorsAddedEventPublisher);
+        contributorsAddedEventPublisher,
+        projectContributorMailService
+    );
   }
-
 
   @Test
   public void saveProjectContributors_verifyMethodCalls() {
@@ -105,6 +110,8 @@ public class ProjectContributorsCommonServiceTest {
 
     verify(contributorsAddedEventPublisher, times(1))
         .publishContributorsAddedEvent(savedProjectContributors, detail);
+
+    verify(projectContributorMailService, times(1)).sendContributorsRemovedEmail(List.of(), detail);
   }
 
   @Test
@@ -117,6 +124,7 @@ public class ProjectContributorsCommonServiceTest {
     verify(projectContributorRepository, never()).saveAll(any());
     verify(contributorsDeletedEventPublisher, never()).publishContributorsDeletedEvent(any(), any());
     verify(contributorsAddedEventPublisher, never()).publishContributorsAddedEvent(any(), any());
+    verify(projectContributorMailService, never()).sendContributorsRemovedEmail(any(), any());
   }
 
   @Test
@@ -141,6 +149,8 @@ public class ProjectContributorsCommonServiceTest {
         .publishContributorsDeletedEvent(argumentCaptor.capture(), eq(detail));
     var deletedContributors = (List<ProjectContributor>) argumentCaptor.getValue();
     assertThat(deletedContributors).containsExactlyInAnyOrder(removedProjectContributor);
+
+    verify(projectContributorMailService, times(1)).sendContributorsRemovedEmail(deletedContributors, detail);
   }
 
   @Test
@@ -166,6 +176,8 @@ public class ProjectContributorsCommonServiceTest {
         .publishContributorsAddedEvent(argumentCaptor.capture(), eq(detail));
     var newProjectContributor = (List<ProjectContributor>) argumentCaptor.getValue();
     assertThat(newProjectContributor).containsExactlyInAnyOrder(expectedNewProjectContributor);
+
+    verify(projectContributorMailService, times(1)).sendContributorsRemovedEmail(List.of(), detail);
   }
 
   @Test
@@ -257,7 +269,7 @@ public class ProjectContributorsCommonServiceTest {
 
     assertThat(modelAndView.getModel().get("alreadyAddedContributors"))
         .asList()
-        .isSortedAccordingTo(Comparator.comparing(o -> ((OrganisationGroupView)o).getName()));
+        .isSortedAccordingTo(Comparator.comparing(o -> ((OrganisationGroupView) o).getName()));
   }
 
   @Test
@@ -275,6 +287,8 @@ public class ProjectContributorsCommonServiceTest {
         .deleteAll(listOfContributors);
     verify(contributorsDeletedEventPublisher, times(1))
         .publishContributorsDeletedEvent(listOfContributors, detail);
+    verify(projectContributorMailService, times(1))
+        .sendContributorsRemovedEmail(listOfContributors, detail);
   }
 
   @Test

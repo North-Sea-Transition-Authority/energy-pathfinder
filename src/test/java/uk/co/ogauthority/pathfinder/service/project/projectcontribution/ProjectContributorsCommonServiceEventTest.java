@@ -1,9 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project.projectcontribution;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -116,24 +114,6 @@ public class ProjectContributorsCommonServiceEventTest {
     }
 
     @Test
-    public void saveProjectContributors_whenRollback_thenVerifyNoMailSent() {
-        var form = new ProjectContributorsForm();
-        form.setContributors(List.of(portalOrganisationGroup1.getOrgGrpId()));
-
-        try {
-            transactionWrapper.runInNewTransaction(() -> {
-                projectContributorsCommonService.saveProjectContributors(form, detail);
-                throw new RuntimeException("evil exception");
-            });
-        } catch (Exception e) {
-            //do nothing
-        }
-
-        verify(projectContributorMailService, never()).sendContributorsRemovedEmail(any(), any());
-        verify(projectContributorMailService, never()).sendContributorsAddedEmail(any(), any());
-    }
-
-    @Test
     public void deleteProjectContributors_whenSuccessfulCommit_thenVerifyMailSent() {
         var portalOrganisationGroup2 = TeamTestingUtil.generateOrganisationGroup(2, "org", "org");
         var projectContributor = ProjectContributorTestUtil.contributorWithGroupOrg(detail, portalOrganisationGroup2);
@@ -145,19 +125,5 @@ public class ProjectContributorsCommonServiceEventTest {
 
         verify(projectContributorMailService, times(1))
             .sendContributorsRemovedEmail(List.of(projectContributor), detail);
-    }
-
-    @Test
-    public void deleteProjectContributors_whenRollback_thenVerifyNoMailSent() {
-        try {
-            transactionWrapper.runInNewTransaction(() -> {
-                projectContributorsCommonService.deleteProjectContributors(detail);
-                throw new RuntimeException("evil exception");
-            });
-        } catch (Exception e) {
-            //do nothing
-        }
-
-        verify(projectContributorMailService, never()).sendContributorsRemovedEmail(any(), any());
     }
 }

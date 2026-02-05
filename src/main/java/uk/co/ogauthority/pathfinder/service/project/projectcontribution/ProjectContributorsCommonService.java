@@ -20,6 +20,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.projectcontribution.Pro
 import uk.co.ogauthority.pathfinder.model.form.project.projectcontributor.ProjectContributorsForm;
 import uk.co.ogauthority.pathfinder.model.view.organisationgroup.OrganisationGroupView;
 import uk.co.ogauthority.pathfinder.repository.project.projectcontributor.ProjectContributorRepository;
+import uk.co.ogauthority.pathfinder.service.email.ProjectContributorMailService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.ProjectTypeModelUtil;
 import uk.co.ogauthority.pathfinder.service.searchselector.SearchSelectorService;
@@ -34,6 +35,7 @@ public class ProjectContributorsCommonService {
   private final String regulatorSharedEmail;
   private final ContributorsDeletedEventPublisher contributorsDeletedEventPublisher;
   private final ContributorsAddedEventPublisher contributorsAddedEventPublisher;
+  private final ProjectContributorMailService projectContributorMailService;
 
   @Autowired
   public ProjectContributorsCommonService(
@@ -42,13 +44,16 @@ public class ProjectContributorsCommonService {
       PortalOrganisationAccessor portalOrganisationAccessor,
       @Value("${regulator.shared.email}") String regulatorSharedEmail,
       ContributorsDeletedEventPublisher contributorsDeletedEventPublisher,
-      ContributorsAddedEventPublisher contributorsAddedEventPublisher) {
+      ContributorsAddedEventPublisher contributorsAddedEventPublisher,
+      ProjectContributorMailService projectContributorMailService
+  ) {
     this.projectContributorRepository = projectContributorRepository;
     this.projectOperatorService = projectOperatorService;
     this.portalOrganisationAccessor = portalOrganisationAccessor;
     this.regulatorSharedEmail = regulatorSharedEmail;
     this.contributorsDeletedEventPublisher = contributorsDeletedEventPublisher;
     this.contributorsAddedEventPublisher = contributorsAddedEventPublisher;
+    this.projectContributorMailService = projectContributorMailService;
   }
 
   public void setContributorsInForm(ProjectContributorsForm form,
@@ -91,6 +96,7 @@ public class ProjectContributorsCommonService {
       contributorsAddedEventPublisher.publishContributorsAddedEvent(completelyNewContributors, projectDetail);
       projectContributorRepository.deleteAllByProjectDetail(projectDetail);
       projectContributorRepository.saveAll(projectContributorsInForm);
+      projectContributorMailService.sendContributorsRemovedEmail(deletedContributors, projectDetail);
     }
   }
 
@@ -99,6 +105,7 @@ public class ProjectContributorsCommonService {
     var projectContributorsToDelete = projectContributorRepository.findAllByProjectDetail(projectDetail);
     projectContributorRepository.deleteAll(projectContributorsToDelete);
     contributorsDeletedEventPublisher.publishContributorsDeletedEvent(projectContributorsToDelete, projectDetail);
+    projectContributorMailService.sendContributorsRemovedEmail(projectContributorsToDelete, projectDetail);
   }
 
   public void setModelAndViewCommonObjects(ModelAndView modelAndView,
