@@ -2,9 +2,10 @@ package uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure;
 
 import java.util.Arrays;
 import java.util.Map;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
-public enum SubseaStructureMass {
+public enum SubseaStructureMass implements Displayable {
 
   LESS_THAN_400_TONNES("Less than 400 metric tonnes"),
   GREATER_THAN_OR_EQUAL_400_TONNES("Greater than or equal to 400 metric tonnes");
@@ -15,6 +16,7 @@ public enum SubseaStructureMass {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

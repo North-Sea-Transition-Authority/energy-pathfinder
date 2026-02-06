@@ -2,8 +2,9 @@ package uk.co.ogauthority.pathfinder.model.enums.project.subseainfrastructure;
 
 import java.util.Collections;
 import java.util.Map;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 
-public enum SubseaInfrastructureType {
+public enum SubseaInfrastructureType implements Displayable {
   CONCRETE_MATTRESSES("Concrete mattresses"),
   SUBSEA_STRUCTURE("Subsea structure"),
   OTHER("Other");
@@ -14,6 +15,7 @@ public enum SubseaInfrastructureType {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

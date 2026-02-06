@@ -44,13 +44,14 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-freemarker'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   implementation 'org.springframework.boot:spring-boot-starter-validation'
+  implementation 'org.springframework.data:spring-data-envers'
   implementation ('org.springframework.boot:spring-boot-starter-quartz') {
     exclude group: 'com.zaxxer', module: 'HikariCP-java7'
     // workaround for https://github.com/spring-projects/spring-boot/issues/16489
   }
   implementation 'io.micrometer:micrometer-registry-statsd'
 
-  implementation 'org.flywaydb:flyway-core:9.5.1-FIVIUM'
+  implementation 'org.flywaydb:flyway-core'
   implementation 'com.oracle.database.jdbc:ojdbc11:21.9.0.0'
   implementation 'org.springframework.session:spring-session-jdbc'
   implementation 'uk.gov.service.notify:notifications-java-client:5.2.1-RELEASE'
@@ -59,6 +60,7 @@ dependencies {
   implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:v4.0.0'
   implementation 'uk.co.fivium.energyportal.accounts:energy-portal-accounts-spring-boot-starter:v3.0.0'
   implementation 'uk.co.fivium.energyportalmessagequeue:spring-boot-starter:v4.4.0'
+  implementation 'uk.co.fivium:digital-enum-materialisation-library-spring-boot-starter:v1.1.1'
 
   implementation 'com.google.guava:guava:33.2.1-jre'
   implementation 'org.apache.commons:commons-lang3:3.18.0'
@@ -90,7 +92,8 @@ dependencies {
       'com.squareup.okhttp3:mockwebserver:4.9.1',
       'com.squareup.okhttp3:okhttp:4.9.1', // Required otherwise MockWebServer gives ClassNotFoundException
       'org.junit.vintage:junit-vintage-engine',
-      'org.skyscreamer:jsonassert'
+      'org.skyscreamer:jsonassert',
+      'com.tngtech.archunit:archunit:1.4.1'
   )
 }
 

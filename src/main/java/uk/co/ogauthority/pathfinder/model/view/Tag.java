@@ -1,6 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.view;
 
-public enum Tag {
+import uk.co.ogauthority.pathfinder.util.Displayable;
+
+public enum Tag implements Displayable {
 
   NOT_FROM_LIST("NOT FROM LIST"),
   NONE("");
@@ -11,6 +13,7 @@ public enum Tag {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

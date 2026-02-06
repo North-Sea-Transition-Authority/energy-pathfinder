@@ -2,9 +2,10 @@ package uk.co.ogauthority.pathfinder.model.enums.project;
 
 import java.util.Arrays;
 import java.util.Map;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
-public enum FieldType {
+public enum FieldType implements Displayable {
 
   OIL("Oil"),
   GAS("Gas"),
@@ -19,6 +20,7 @@ public enum FieldType {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

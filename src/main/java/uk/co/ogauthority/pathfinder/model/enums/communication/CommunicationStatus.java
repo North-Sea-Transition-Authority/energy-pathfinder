@@ -1,6 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.enums.communication;
 
-public enum CommunicationStatus {
+import uk.co.ogauthority.pathfinder.util.Displayable;
+
+public enum CommunicationStatus implements Displayable {
   DRAFT("Draft"),
   SENDING("Sending"),
   SENT("Sent");
@@ -11,6 +13,7 @@ public enum CommunicationStatus {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

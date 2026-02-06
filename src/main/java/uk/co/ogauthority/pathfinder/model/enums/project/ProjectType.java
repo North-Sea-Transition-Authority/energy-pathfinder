@@ -1,6 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.enums.project;
 
-public enum ProjectType {
+import uk.co.ogauthority.pathfinder.util.Displayable;
+
+public enum ProjectType implements Displayable {
   INFRASTRUCTURE("Project"),
   FORWARD_WORK_PLAN("Forward work plan");
 
@@ -10,6 +12,7 @@ public enum ProjectType {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

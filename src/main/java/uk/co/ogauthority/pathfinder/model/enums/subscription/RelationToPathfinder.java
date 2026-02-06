@@ -2,8 +2,9 @@ package uk.co.ogauthority.pathfinder.model.enums.subscription;
 
 import java.util.Collections;
 import java.util.Map;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 
-public enum RelationToPathfinder {
+public enum RelationToPathfinder implements Displayable {
 
   DEVELOPER("Developer"),
   SUPPLY_CHAIN("Supply chain"),
@@ -16,6 +17,7 @@ public enum RelationToPathfinder {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

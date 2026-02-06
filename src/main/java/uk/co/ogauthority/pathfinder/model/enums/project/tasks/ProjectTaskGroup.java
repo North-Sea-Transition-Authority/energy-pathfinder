@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 
-public enum ProjectTaskGroup {
+public enum ProjectTaskGroup implements Displayable {
 
   OVERVIEW(
       ProjectTask.OVERVIEW.getDisplayName(),
@@ -103,6 +104,7 @@ public enum ProjectTaskGroup {
     this.displayOrder = displayOrder;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }
@@ -111,6 +113,7 @@ public enum ProjectTaskGroup {
     return tasks;
   }
 
+  @Override
   public int getDisplayOrder() {
     return displayOrder;
   }

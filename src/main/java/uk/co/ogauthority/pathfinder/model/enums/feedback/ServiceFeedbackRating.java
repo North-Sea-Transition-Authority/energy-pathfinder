@@ -2,9 +2,10 @@ package uk.co.ogauthority.pathfinder.model.enums.feedback;
 
 import java.util.Arrays;
 import java.util.Map;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
-public enum ServiceFeedbackRating {
+public enum ServiceFeedbackRating implements Displayable {
 
   VERY_SATISFIED("Very satisfied"),
   SATISFIED("Satisfied"),
@@ -18,6 +19,7 @@ public enum ServiceFeedbackRating {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

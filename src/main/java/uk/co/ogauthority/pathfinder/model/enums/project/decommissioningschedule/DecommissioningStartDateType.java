@@ -2,8 +2,9 @@ package uk.co.ogauthority.pathfinder.model.enums.project.decommissioningschedule
 
 import java.util.Collections;
 import java.util.Map;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 
-public enum DecommissioningStartDateType {
+public enum DecommissioningStartDateType implements Displayable {
 
   EXACT("I know the decommissioning work start date"),
   ESTIMATED("I have an estimated decommissioning work start date"),
@@ -15,6 +16,7 @@ public enum DecommissioningStartDateType {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

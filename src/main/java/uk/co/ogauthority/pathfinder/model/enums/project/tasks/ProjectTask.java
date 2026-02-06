@@ -53,11 +53,12 @@ import uk.co.ogauthority.pathfinder.service.project.tasks.ProjectFormSectionServ
 import uk.co.ogauthority.pathfinder.service.project.upcomingtender.UpcomingTenderService;
 import uk.co.ogauthority.pathfinder.service.project.workoplanprojectcontribution.ForwardWorkPlanProjectContributorFormSectionService;
 import uk.co.ogauthority.pathfinder.service.project.workplanupcomingtender.ForwardWorkPlanUpcomingTenderService;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 
 /**
  * An enum to encapsulate a task list section, to be used when generating the task list for a given project.
  */
-public enum ProjectTask implements GeneralPurposeProjectTask {
+public enum ProjectTask implements GeneralPurposeProjectTask, Displayable {
 
   OVERVIEW(
       OverviewController.PAGE_NAME,

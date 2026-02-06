@@ -6,9 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
-public enum FieldStage {
+public enum FieldStage implements Displayable {
   CARBON_CAPTURE_AND_STORAGE(
       "Carbon Capture and Storage (CCS)",
       Set.of(EnergyType.TRANSITION)
@@ -39,6 +40,7 @@ public enum FieldStage {
     this.energyType = energyType;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

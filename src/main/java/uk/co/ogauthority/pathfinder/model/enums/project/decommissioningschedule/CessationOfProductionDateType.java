@@ -2,8 +2,9 @@ package uk.co.ogauthority.pathfinder.model.enums.project.decommissioningschedule
 
 import java.util.Collections;
 import java.util.Map;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 
-public enum CessationOfProductionDateType {
+public enum CessationOfProductionDateType implements Displayable {
 
   EXACT("I know the CoP date"),
   ESTIMATED("I have an estimated CoP date"),
@@ -15,6 +16,7 @@ public enum CessationOfProductionDateType {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

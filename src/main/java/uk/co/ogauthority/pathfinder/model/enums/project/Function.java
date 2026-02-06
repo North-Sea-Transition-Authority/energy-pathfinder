@@ -4,9 +4,10 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import uk.co.ogauthority.pathfinder.model.searchselector.SearchSelectable;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
-public enum Function implements SearchSelectable {
+public enum Function implements SearchSelectable, Displayable {
   LOGISTICS("Logistics", Set.of(FunctionType.values())),
   FACILITIES_ONSHORE("Facilities (onshore)", Set.of(FunctionType.values())),
   FACILITIES_OFFSHORE("Facilities (offshore)", Set.of(FunctionType.values())),
@@ -30,6 +31,7 @@ public enum Function implements SearchSelectable {
     this.functionTypes = functionTypes;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

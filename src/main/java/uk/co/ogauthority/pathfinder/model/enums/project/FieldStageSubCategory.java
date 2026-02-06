@@ -6,9 +6,10 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
-public enum FieldStageSubCategory {
+public enum FieldStageSubCategory implements Displayable {
 
   CAPTURE_AND_ONSHORE("Capture and onshore", "Emitters and onshore pipelines", FieldStage.CARBON_CAPTURE_AND_STORAGE),
   TRANSPORTATION_AND_STORAGE("Transportation and storage",
@@ -44,6 +45,7 @@ public enum FieldStageSubCategory {
     this.description = "";
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

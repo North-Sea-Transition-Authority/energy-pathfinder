@@ -2,9 +2,10 @@ package uk.co.ogauthority.pathfinder.model.enums.project;
 
 import java.util.Arrays;
 import java.util.Map;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
-public enum UkcsArea {
+public enum UkcsArea implements Displayable  {
 
   WOS("West of Shetland (WOS)"),
   NNS("Northern North Sea (NNS)"),
@@ -19,6 +20,7 @@ public enum UkcsArea {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

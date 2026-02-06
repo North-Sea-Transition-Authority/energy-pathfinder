@@ -19,6 +19,7 @@ BEGIN
     FROM all_objects ao
     WHERE UPPER(ao.owner) = K_SOURCE_SCHEMA_USER
     AND UPPER(ao.object_type) IN('TABLE', 'VIEW')
+    AND UPPER(object_name) not like '%FLYWAY%' -- ignore flyway tables
   )
   LOOP
 

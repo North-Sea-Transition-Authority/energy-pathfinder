@@ -4,8 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import uk.co.ogauthority.pathfinder.model.form.forminput.selectableitem.SelectableItem;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 
-public enum PipelineRemovalPremise {
+public enum PipelineRemovalPremise implements Displayable {
 
   FULL_REMOVAL(
       "Full removal",
@@ -33,6 +34,7 @@ public enum PipelineRemovalPremise {
     this.hintText = hintText;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

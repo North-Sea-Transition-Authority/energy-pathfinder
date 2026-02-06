@@ -3,9 +3,10 @@ package uk.co.ogauthority.pathfinder.model.enums.project;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
-public enum ContractBand {
+public enum ContractBand implements Displayable {
   LESS_THAN_25M("Less than £25 million", Set.of(ProjectType.INFRASTRUCTURE)),
   GREATER_THAN_OR_EQUAL_TO_25M("£25 million or more", Set.of(ProjectType.INFRASTRUCTURE)),
   LESS_THAN_5M("Less than £5 million", Set.of(ProjectType.FORWARD_WORK_PLAN)),
@@ -19,6 +20,7 @@ public enum ContractBand {
     this.projectTypes = projectTypes;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

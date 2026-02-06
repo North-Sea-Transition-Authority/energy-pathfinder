@@ -4,9 +4,10 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
-public enum ProjectStatus {
+public enum ProjectStatus implements Displayable {
   DRAFT("Draft"),
   QA("QA"),
   PUBLISHED("Published"),
@@ -20,6 +21,7 @@ public enum ProjectStatus {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

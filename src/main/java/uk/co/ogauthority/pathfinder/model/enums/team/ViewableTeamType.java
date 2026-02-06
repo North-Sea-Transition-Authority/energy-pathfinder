@@ -5,11 +5,12 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 import uk.co.ogauthority.pathfinder.controller.team.PortalTeamManagementController;
 import uk.co.ogauthority.pathfinder.model.team.TeamType;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 
 /**
  * Enumeration of categories available inside 'Manage teams' screen.
  */
-public enum ViewableTeamType {
+public enum ViewableTeamType implements Displayable {
 
   REGULATOR_TEAM(
       "NSTA team",
@@ -47,6 +48,11 @@ public enum ViewableTeamType {
     return linkText;
   }
 
+  @Override
+  public String getDisplayName() {
+    return "%s (%s)".formatted(linkText, linkHint);
+  }
+
   public String getLinkHint() {
     return linkHint;
   }
@@ -55,6 +61,7 @@ public enum ViewableTeamType {
     return linkUrl;
   }
 
+  @Override
   public int getDisplayOrder() {
     return displayOrder;
   }

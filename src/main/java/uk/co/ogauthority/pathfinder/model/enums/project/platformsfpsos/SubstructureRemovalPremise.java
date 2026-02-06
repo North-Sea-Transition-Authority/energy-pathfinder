@@ -2,9 +2,10 @@ package uk.co.ogauthority.pathfinder.model.enums.project.platformsfpsos;
 
 import java.util.Arrays;
 import java.util.Map;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
-public enum SubstructureRemovalPremise {
+public enum SubstructureRemovalPremise implements Displayable {
   FULL("Full"),
   PARTIAL("Partial");
 
@@ -14,6 +15,7 @@ public enum SubstructureRemovalPremise {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

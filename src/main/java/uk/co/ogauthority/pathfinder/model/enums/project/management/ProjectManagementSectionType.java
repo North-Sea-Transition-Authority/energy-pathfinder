@@ -1,6 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.enums.project.management;
 
-public enum ProjectManagementSectionType {
+import uk.co.ogauthority.pathfinder.util.Displayable;
+
+public enum ProjectManagementSectionType implements Displayable {
 
   HEADING(10),
   PROJECT_DETAILS(20),
@@ -19,6 +21,7 @@ public enum ProjectManagementSectionType {
     this.displayOrder = displayOrder;
   }
 
+  @Override
   public int getDisplayOrder() {
     return displayOrder;
   }

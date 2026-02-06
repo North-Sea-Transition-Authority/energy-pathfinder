@@ -17,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +50,7 @@ import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 @AutoConfigureTestDatabase
 @AutoConfigureDataJpa
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@TestPropertySource(properties = "spring.autoconfigure.exclude=uk.co.fivium.digitalenummaterialisationlibrary.configuration.AutoConfiguration")
 @ActiveProfiles("integration-test")
 @SuppressWarnings({"SqlNoDataSourceInspection"}) // IJ seems to give spurious warnings when running with embedded H2
 public class PortalTeamAccessorIntegrationTest {

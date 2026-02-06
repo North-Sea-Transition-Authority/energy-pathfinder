@@ -1,6 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.enums.contact;
 
-public enum ServiceContactDetail {
+import uk.co.ogauthority.pathfinder.util.Displayable;
+
+public enum ServiceContactDetail implements Displayable {
 
   BUSINESS_SUPPORT(
       "Business support",
@@ -57,6 +59,7 @@ public enum ServiceContactDetail {
     this.displayOrder = displayOrder;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }
@@ -85,6 +88,7 @@ public enum ServiceContactDetail {
     return shownOnContactPage;
   }
 
+  @Override
   public int getDisplayOrder() {
     return displayOrder;
   }

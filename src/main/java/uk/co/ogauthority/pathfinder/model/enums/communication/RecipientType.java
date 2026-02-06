@@ -2,9 +2,10 @@ package uk.co.ogauthority.pathfinder.model.enums.communication;
 
 import java.util.Arrays;
 import java.util.Map;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
-public enum RecipientType {
+public enum RecipientType implements Displayable {
 
   OPERATORS("Operators/Developers"),
   SUBSCRIBERS("Subscribers");
@@ -15,6 +16,7 @@ public enum RecipientType {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

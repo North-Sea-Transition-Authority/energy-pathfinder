@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -26,6 +27,7 @@ import uk.co.ogauthority.pathfinder.service.validation.ValidationErrorOrderingSe
 @SpringBootTest
 @AutoConfigureTestDatabase
 @AutoConfigureDataJpa
+@TestPropertySource(properties = "spring.autoconfigure.exclude=uk.co.fivium.digitalenummaterialisationlibrary.configuration.AutoConfiguration")
 @ActiveProfiles("integration-test")
 public class ControllerHelperServiceTest {
 

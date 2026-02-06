@@ -7,6 +7,7 @@ import java.util.Set;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.project.FieldStageSubCategory;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 
 /**
  * An enum to manage which {@see ProjectTask}s are conditionally shown
@@ -14,7 +15,7 @@ import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
  * Each question has a yes or no answer in the form of a {@link TaskListSectionAnswer} this
  * is used to set out the form answer values for each individual question
  */
-public enum TaskListSectionQuestion {
+public enum TaskListSectionQuestion implements Displayable {
 
   UPCOMING_TENDERS(
       ProjectTask.UPCOMING_TENDERS,
@@ -184,6 +185,7 @@ public enum TaskListSectionQuestion {
     return projectTask;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

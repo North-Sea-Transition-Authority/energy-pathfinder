@@ -2,9 +2,10 @@ package uk.co.ogauthority.pathfinder.model.enums.project.integratedrig;
 
 import java.util.Arrays;
 import java.util.Map;
+import uk.co.ogauthority.pathfinder.util.Displayable;
 import uk.co.ogauthority.pathfinder.util.StreamUtil;
 
-public enum IntegratedRigIntentionToReactivate {
+public enum IntegratedRigIntentionToReactivate implements Displayable {
 
   YES("Yes"),
   NO("No"),
@@ -16,6 +17,7 @@ public enum IntegratedRigIntentionToReactivate {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }

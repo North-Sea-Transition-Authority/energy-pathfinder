@@ -1,6 +1,8 @@
 package uk.co.ogauthority.pathfinder.model.view;
 
-public enum SummaryLinkText {
+import uk.co.ogauthority.pathfinder.util.Displayable;
+
+public enum SummaryLinkText implements Displayable {
   EDIT("Change"),
   DELETE("Remove"),
   CONVERT_TO_AWARDED_CONTRACT("Convert to awarded contract");
@@ -11,6 +13,7 @@ public enum SummaryLinkText {
     this.displayName = displayName;
   }
 
+  @Override
   public String getDisplayName() {
     return displayName;
   }
