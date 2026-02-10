@@ -51,7 +51,7 @@ dependencies {
   }
   implementation 'io.micrometer:micrometer-registry-statsd'
 
-  implementation 'org.flywaydb:flyway-core'
+  implementation 'org.flywaydb:flyway-core:9.5.1-FIVIUM'
   implementation 'com.oracle.database.jdbc:ojdbc11:21.9.0.0'
   implementation 'org.springframework.session:spring-session-jdbc'
   implementation 'uk.gov.service.notify:notifications-java-client:5.2.1-RELEASE'
@@ -60,7 +60,7 @@ dependencies {
   implementation 'uk.co.fivium.digitalformlibrary:digital-form-library:v4.0.0'
   implementation 'uk.co.fivium.energyportal.accounts:energy-portal-accounts-spring-boot-starter:v3.0.0'
   implementation 'uk.co.fivium.energyportalmessagequeue:spring-boot-starter:v4.4.0'
-  implementation 'uk.co.fivium:digital-enum-materialisation-library-spring-boot-starter:v1.1.1'
+  implementation 'uk.co.fivium:digital-enum-materialisation-library-spring-boot-starter:v1.1.2'
 
   implementation 'com.google.guava:guava:33.2.1-jre'
   implementation 'org.apache.commons:commons-lang3:3.18.0'
