@@ -76,6 +76,7 @@
 | EPAS_LOGIN_URL                              | The url to the `EPAS_REDIRECT` Fox module                                                                      |
 | EPAS_LOGOUT_URL                             | The logout url of the new IDP e.g https://nsta.itportal.dev.fivium.co.uk/accounts/service-provider-sign-out    |
 | EPAS_REGISTRATION_URL                       | The registration URL of the new IDP e.g. https://nsta.itportal.dev.fivium.co.uk/accounts/register              |                                                                                                                                                                                                                          |
+| EPAS_SPRING_BOOT_STARTER_PRESHARED_KEY      | The preshared key that EPAS will use when calling out to this service                                          |
 
 ##### Debug profile (`debug`)
 Add the debug profile to enable hibernate SQL and descriptor output. You can look in the `application-debug.properties` file to enable other debug properties if requried.
