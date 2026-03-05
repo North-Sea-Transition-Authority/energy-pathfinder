@@ -135,6 +135,30 @@ steps:
       status:
         - success
 
+  - name: publish-ecr
+    image: plugins/ecr:21
+    settings:
+      repo: digital/energy-pathfinder
+      registry: 847993322739.dkr.ecr.eu-west-2.amazonaws.com
+      access_key: AKIA4K4CXHTZ7KAUZJWL
+      secret_key:
+        from_secret: ecr_secret_key
+      config:
+        from_secret: docker_config
+      region: eu-west-2
+      tags:
+        - ${DRONE_BRANCH//\//-}-${DRONE_BUILD_NUMBER}
+    when:
+      branch:
+        - develop
+        - main
+        - release/**
+        - hotfix/**
+        - publish-to-docker
+        - rebrand-to-nsta
+      status:
+        - success
+
   - name: sync-reports
     image: alpine:3.12.1
     commands:
@@ -336,4 +360,9 @@ kind: secret
 name: sync_ssh_key
 data: 7D+ABl8j6WFPOOdcPy9IRVZsJWS9CqLhUty8+MKL6vkzxg3USlu2DPtnJAQh1d/KxR074BFQvF0HYM7OwGOSHNFhL5neoTgz6kyZkvkw8GNZgwPYLYcj/TaqvwiVWJ7CEySE2y3UMu3kiJfEOWzY88JJ3N4hvVNSfttitmlLIanziQ8qQmW1ikOiv1t5rrLl/r+dxDIJKSD6d9u1+IOihjHKuS2YnC1d6XImSdRQFVRmnuEeSktAl+LBzIWh20rvMw7IFKAIFGwMBq8pIHVfreBkMIkyRa+EguuhPnWXNY2ftxrTTeKXgZ8vSmKVByvdtoa/fR/DIlE5xD3HuRT+pDkLpigmcnNnUmtZJKQWVqRGNeFcqZ5hMEfVstW/M28xU++Ho+he55s8KjW5xbBPrJVQjiDA7ClSv4UZh2ryqJx9hFn5/Rlfolb0rlmIEGQHof0r5SCKDmjU8FuMFzg2SO/IGUjXqRk79B9JqzwEQzS8jfOgMxgTjPxz/O7gn3fJpHM884qmMDAGz9TbYeKm+xAQ0p5H09ICc2VUZ9/uD9pzMab1FkshCluQLUuuf6EO/T/AlOgokladpm55elCE8KB008tiG6CqcShpCts=
 
+---
+
+kind: secret
+name: ecr_secret_key
+data: FBNS86b0bXPyPpPd/fcEi29op0ZEgrq4nQ4YDy6ZpxJlPgbwG9mxS0rEbLxf1N5zwm9UHPfVpJB4vrWbPxbnWi+ZF4Q=
 
