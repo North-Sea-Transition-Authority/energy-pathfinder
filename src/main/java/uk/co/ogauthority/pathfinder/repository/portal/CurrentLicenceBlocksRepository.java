@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.repository.portal;
 
+import java.util.Collection;
 import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -14,7 +15,6 @@ public interface CurrentLicenceBlocksRepository extends CrudRepository<LicenceBl
       String searchTerm
   );
 
-  List<LicenceBlock> findAllByCompositeKeyIn(List<String> ids);
+  List<LicenceBlock> findAllByCompositeKeyIn(Collection<String> ids);
 
-  boolean existsByCompositeKey(String compositeKey);
 }

@@ -1,11 +1,15 @@
 package uk.co.ogauthority.pathfinder.service.project.location;
 
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.co.ogauthority.pathfinder.model.entity.portal.LicenceBlock;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocation;
 import uk.co.ogauthority.pathfinder.model.entity.project.location.ProjectLocationBlock;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -18,16 +22,14 @@ import uk.co.ogauthority.pathfinder.service.portal.LicenceBlocksService;
 public class ProjectLocationBlocksService {
 
   private final LicenceBlocksService licenceBlocksService;
-  private final LicenceBlockValidatorService licenceBlockValidatorService;
   private final ProjectLocationBlockRepository projectLocationBlockRepository;
 
   @Autowired
-  public ProjectLocationBlocksService(LicenceBlocksService licenceBlocksService,
-                                      LicenceBlockValidatorService licenceBlockValidatorService,
-                                      ProjectLocationBlockRepository projectLocationBlockRepository
+  public ProjectLocationBlocksService(
+      LicenceBlocksService licenceBlocksService,
+      ProjectLocationBlockRepository projectLocationBlockRepository
   ) {
     this.licenceBlocksService = licenceBlocksService;
-    this.licenceBlockValidatorService = licenceBlockValidatorService;
     this.projectLocationBlockRepository = projectLocationBlockRepository;
   }
 
@@ -87,39 +89,56 @@ public class ProjectLocationBlocksService {
    */
   public ProjectLocationForm addBlocksToForm(ProjectLocationForm form, ProjectLocation projectLocation) {
     var existingBlocks = getBlocks(projectLocation);
-    form.setLicenceBlocks(existingBlocks.stream().map(ProjectLocationBlock::getCompositeKey)
-        .collect(Collectors.toList()));
+    form.setLicenceBlocks(existingBlocks.stream().map(ProjectLocationBlock::getCompositeKey).collect(Collectors.toList()));
     return form;
   }
 
   public List<ProjectLocationBlockView> getBlockViewsFromForm(ProjectLocationForm form, ValidationType validationType) {
-    return licenceBlocksService.findAllByCompositeKeyIn(form.getLicenceBlocks()).stream()
-        .map(plb -> new ProjectLocationBlockView(
-             plb,
-             isBlockReferenceValid(plb.getCompositeKey(), validationType)
-        )).collect(Collectors.toList());
+    var licenceBlocks = licenceBlocksService.findAllByCompositeKeyIn(form.getLicenceBlocks());
+    var compositeKeys = licenceBlocks.stream().map(LicenceBlock::getCompositeKey).toList();
+    var compositeKeysWhichExistInPortalData = getLicenceBlockCompositeKeysThatExistInPortalData(compositeKeys, validationType);
+
+    return licenceBlocks.stream()
+        .map(licenceBlock -> new ProjectLocationBlockView(
+            licenceBlock,
+            compositeKeysWhichExistInPortalData.contains(licenceBlock.getCompositeKey())
+        ))
+        .collect(Collectors.toList());
   }
 
-  public List<ProjectLocationBlockView> getBlockViewsByProjectLocationAndCompositeKeyIn(ProjectLocation location,
-                                                                                        List<String> compositeKeys,
-                                                                                        ValidationType validationType) {
-    return projectLocationBlockRepository.findAllByProjectLocation(location).stream()
+  public List<ProjectLocationBlockView> getBlockViewsByProjectLocationAndCompositeKeyIn(
+      ProjectLocation location,
+      List<String> compositeKeys,
+      ValidationType validationType
+  ) {
+    var projectLocationBlocks = projectLocationBlockRepository.findAllByProjectLocation(location);
+    var projectLocationBlockCompositeKeys = projectLocationBlocks.stream().map(ProjectLocationBlock::getCompositeKey).toList();
+    var compositeKeysWhichExistInPortalData =
+        getLicenceBlockCompositeKeysThatExistInPortalData(projectLocationBlockCompositeKeys, validationType);
+
+    return projectLocationBlocks.stream()
         .filter(plb -> compositeKeys.contains(plb.getCompositeKey()))
-        .map(plb -> new ProjectLocationBlockView(
-            plb,
-            isBlockReferenceValid(plb.getCompositeKey(), validationType)
-        )).collect(Collectors.toList());
+        .map(projectLocationBlock -> new ProjectLocationBlockView(
+            projectLocationBlock,
+            compositeKeysWhichExistInPortalData.contains(projectLocationBlock.getCompositeKey())
+        ))
+        .collect(Collectors.toList());
   }
 
 
   public List<ProjectLocationBlockView> getBlockViewsForLocation(ProjectLocation projectLocation, ValidationType validationType) {
-    return projectLocationBlockRepository.findAllByProjectLocation(projectLocation)
-        .stream()
+    var projectLocationBlocks = projectLocationBlockRepository.findAllByProjectLocation(projectLocation);
+    var projectLocationCompositeKeys = projectLocationBlocks.stream().map(ProjectLocationBlock::getCompositeKey).toList();
+    var compositeKeysWhichExistInPortalData =
+        getLicenceBlockCompositeKeysThatExistInPortalData(projectLocationCompositeKeys, validationType);
+
+    return projectLocationBlocks.stream()
         .sorted(Comparator.comparing(ProjectLocationBlock::getSortKey))
-        .map(plb -> new ProjectLocationBlockView(
-             plb,
-             isBlockReferenceValid(plb.getCompositeKey(), validationType)
-        )).collect(Collectors.toList());
+        .map(projectLocationBlock -> new ProjectLocationBlockView(
+             projectLocationBlock,
+            compositeKeysWhichExistInPortalData.contains(projectLocationBlock.getCompositeKey())
+        ))
+        .collect(Collectors.toList());
   }
 
   public List<ProjectLocationBlock> getBlocks(ProjectLocation projectLocation) {
@@ -133,14 +152,15 @@ public class ProjectLocationBlocksService {
     projectLocationBlockRepository.deleteAllByProjectLocation(projectLocation);
   }
 
-  /**
-   * Validate the licence block exists in the portal if the validation type is FULL.
-   * @param compositeKey key to search for
-   * @param validationType validation type - FULL if validating
-   * @return true if the validationType is FULL and the block exists in the portal data.
-   *       True if validationType is not FULL. False otherwise.
-   */
-  public boolean isBlockReferenceValid(String compositeKey, ValidationType validationType) {
-    return !validationType.equals(ValidationType.FULL) || licenceBlockValidatorService.existsInPortalData(compositeKey);
+  public Set<String> getLicenceBlockCompositeKeysThatExistInPortalData(
+      Collection<String> compositeKeys,
+      ValidationType validationType
+  ) {
+    if (validationType == ValidationType.FULL) {
+      return licenceBlocksService.getValidLicenceBlockCompositeKeys(compositeKeys);
+    }
+
+    return new HashSet<>(compositeKeys);
   }
+
 }

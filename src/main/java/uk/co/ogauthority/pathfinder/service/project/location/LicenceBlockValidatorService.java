@@ -17,25 +17,20 @@ public class LicenceBlockValidatorService {
     this.licenceBlocksService = licenceBlocksService;
   }
 
-
-  /**
-   * Return true if the block composite id matches current licence block data.
-   * @param compositeKey key to search for
-   * @return true if the block composite id matches current licence block data.
-   */
-  public boolean existsInPortalData(String compositeKey) {
-    return licenceBlocksService.blockExists(compositeKey);
-  }
-
   /**
    * Add an error to the provided fieldId if any of the blocks linked to it do not exist.
-   * @param licenceBlocks list of licenceBlock composite keys
+   * @param compositeKeys list of licenceBlock composite keys
    * @param errors errors to update
    * @param fieldId id of field to add the error to
    */
-  public void addErrorsForInvalidBlocks(List<String> licenceBlocks, Errors errors, String fieldId) {
-    if (licenceBlocks.stream().anyMatch(ck -> !existsInPortalData(ck))) {
-      errors.rejectValue(fieldId, fieldId + ".notPresent", BLOCK_NOT_FOUND);
+  public void addErrorsForInvalidBlocks(List<String> compositeKeys, Errors errors, String fieldId) {
+    var validLicenceBlocks = licenceBlocksService.getValidLicenceBlockCompositeKeys(compositeKeys);
+
+    for (var compositeKey : compositeKeys) {
+      if (!validLicenceBlocks.contains(compositeKey)) {
+        errors.rejectValue(fieldId, fieldId + ".notPresent", BLOCK_NOT_FOUND);
+        return;
+      }
     }
   }
 }

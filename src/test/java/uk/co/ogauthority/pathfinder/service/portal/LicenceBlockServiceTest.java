@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +21,7 @@ import uk.co.ogauthority.pathfinder.testutil.LicenceBlockTestUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LicenceBlockServiceTest {
-  private static final String COMPOSITE_KEY = "12/34a1234a111";
+
   /**
    * These blocks are intentionally in the wrong order, so we can verify that the
    * methods sort correctly. The correct sorted order is 9/25a, 12/5, 20/1
@@ -82,15 +83,16 @@ public class LicenceBlockServiceTest {
   }
 
   @Test
-  public void blockExists_whenNotExists() {
-    when(currentLicenceBlocksRepository.existsByCompositeKey(COMPOSITE_KEY)).thenReturn(false);
-    assertThat(licenceBlockService.blockExists(COMPOSITE_KEY)).isFalse();
-  }
+  public void getValidLicenceBlockCompositeKeys_whenInvalidCompositeKeysProvided() {
+    var licenceBlock = LicenceBlockTestUtil.getBlock();
+    var compositeKeys = Set.of(licenceBlock.getCompositeKey(), "invalid");
 
-  @Test
-  public void blockExists_whenExists() {
-    when(currentLicenceBlocksRepository.existsByCompositeKey(COMPOSITE_KEY)).thenReturn(true);
-    assertThat(licenceBlockService.blockExists(COMPOSITE_KEY)).isTrue();
+    var licenceBlocks = List.of(licenceBlock);
+    when(currentLicenceBlocksRepository.findAllByCompositeKeyIn(compositeKeys)).thenReturn(licenceBlocks);
+
+    assertThat(licenceBlockService.getValidLicenceBlockCompositeKeys(compositeKeys))
+        .contains(licenceBlock.getCompositeKey())
+        .doesNotContain("invalid");
   }
 
   private void assertSearchItemMatchesBlock(RestSearchItem searchItem, LicenceBlock block) {

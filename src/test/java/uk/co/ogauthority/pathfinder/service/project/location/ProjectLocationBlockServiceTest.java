@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.service.project.location;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,9 +53,6 @@ public class ProjectLocationBlockServiceTest {
   private LicenceBlocksService licenceBlocksService;
 
   @Mock
-  private LicenceBlockValidatorService licenceBlockValidatorService;
-
-  @Mock
   private ProjectLocationBlockRepository projectLocationBlockRepository;
 
   private ProjectLocationBlocksService projectLocationBlocksService;
@@ -77,7 +74,6 @@ public class ProjectLocationBlockServiceTest {
   public void setUp() throws Exception {
     projectLocationBlocksService = new ProjectLocationBlocksService(
         licenceBlocksService,
-        licenceBlockValidatorService,
         projectLocationBlockRepository
     );
   }
@@ -203,12 +199,17 @@ public class ProjectLocationBlockServiceTest {
 
   @Test
   public void getBlockViewsFromForm_withValidation_CorrectlyValid() {
-    when(licenceBlocksService.findAllByCompositeKeyIn(any())).thenReturn(
-        BLOCKS
-    );
-    when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(0).getCompositeKey())).thenReturn(false);
-    when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(1).getCompositeKey())).thenReturn(true);
-    when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(2).getCompositeKey())).thenReturn(false);
+    when(licenceBlocksService.findAllByCompositeKeyIn(any())).thenReturn(BLOCKS);
+    when(licenceBlocksService.getValidLicenceBlockCompositeKeys(
+        List.of(
+            BLOCKS.get(0).getCompositeKey(),
+            BLOCKS.get(1).getCompositeKey(),
+            BLOCKS.get(2).getCompositeKey()
+        )
+    )).thenReturn(Set.of(
+        BLOCKS.get(1).getCompositeKey()
+    ));
+
     var form = new ProjectLocationForm();
     var blockViews = projectLocationBlocksService.getBlockViewsFromForm(form, ValidationType.FULL);
     assertThat(blockViews.size()).isEqualTo(3);
@@ -222,7 +223,6 @@ public class ProjectLocationBlockServiceTest {
     when(projectLocationBlockRepository.findAllByProjectLocation(any())).thenReturn(
         PROJECT_LOCATION_BLOCKS
     );
-    var form = new ProjectLocationForm();
     var blockViews = projectLocationBlocksService.getBlockViewsForLocation(PROJECT_LOCATION, ValidationType.NO_VALIDATION);
     assertThat(blockViews.size()).isEqualTo(3);
     assertBlockViewMatchesProjectLocationBlock(blockViews.get(0), PROJECT_LOCATION_BLOCKS.get(2), true);
@@ -232,15 +232,21 @@ public class ProjectLocationBlockServiceTest {
 
   @Test
   public void getBlockViewsForLocation_withValidation_CorrectlyValid() {
-    when(projectLocationBlockRepository.findAllByProjectLocation(any())).thenReturn(
-        PROJECT_LOCATION_BLOCKS
-    );
-    when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(0).getCompositeKey())).thenReturn(false);
-    when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(1).getCompositeKey())).thenReturn(true);
-    when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(2).getCompositeKey())).thenReturn(false);
-    var form = new ProjectLocationForm();
+    when(projectLocationBlockRepository.findAllByProjectLocation(PROJECT_LOCATION))
+        .thenReturn(PROJECT_LOCATION_BLOCKS);
+
+    when(licenceBlocksService.getValidLicenceBlockCompositeKeys(
+        List.of(
+            BLOCKS.get(0).getCompositeKey(),
+            BLOCKS.get(1).getCompositeKey(),
+            BLOCKS.get(2).getCompositeKey()
+        )
+    )).thenReturn(Set.of(
+        BLOCKS.get(1).getCompositeKey()
+    ));
+
     var blockViews = projectLocationBlocksService.getBlockViewsForLocation(PROJECT_LOCATION, ValidationType.FULL);
-    assertThat(blockViews.size()).isEqualTo(3);
+    assertThat(blockViews).hasSize(3);
     assertBlockViewMatchesProjectLocationBlock(blockViews.get(0), PROJECT_LOCATION_BLOCKS.get(2), false);
     assertBlockViewMatchesProjectLocationBlock(blockViews.get(1), PROJECT_LOCATION_BLOCKS.get(0), false);
     assertBlockViewMatchesProjectLocationBlock(blockViews.get(2), PROJECT_LOCATION_BLOCKS.get(1), true);
@@ -248,18 +254,26 @@ public class ProjectLocationBlockServiceTest {
 
   @Test
   public void getBlockViewsByProjectLocationAndCompositeKeyIn_allFound() {
-    when(projectLocationBlockRepository.findAllByProjectLocation(PROJECT_LOCATION)).thenReturn(
-        PROJECT_LOCATION_BLOCKS
-    );
-    when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(0).getCompositeKey())).thenReturn(true);
-    when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(1).getCompositeKey())).thenReturn(true);
-    when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(2).getCompositeKey())).thenReturn(false);
-    var form = new ProjectLocationForm();
+    when(projectLocationBlockRepository.findAllByProjectLocation(PROJECT_LOCATION))
+        .thenReturn(PROJECT_LOCATION_BLOCKS);
+
+    when(licenceBlocksService.getValidLicenceBlockCompositeKeys(
+        List.of(
+            BLOCKS.get(0).getCompositeKey(),
+            BLOCKS.get(1).getCompositeKey(),
+            BLOCKS.get(2).getCompositeKey()
+        )
+    )).thenReturn(Set.of(
+        BLOCKS.get(0).getCompositeKey(),
+        BLOCKS.get(1).getCompositeKey()
+    ));
+
     var blockViews = projectLocationBlocksService.getBlockViewsByProjectLocationAndCompositeKeyIn(
         PROJECT_LOCATION,
         PROJECT_LOCATION_BLOCKS.stream().map(ProjectLocationBlock::getCompositeKey).collect(Collectors.toList()),
         ValidationType.FULL
     );
+
     assertThat(blockViews.size()).isEqualTo(3);
     assertBlockViewMatchesBlock(blockViews.get(0), BLOCKS.get(0), true);
     assertBlockViewMatchesBlock(blockViews.get(1), BLOCKS.get(1), true);
@@ -268,11 +282,19 @@ public class ProjectLocationBlockServiceTest {
 
   @Test
   public void getBlockViewsByProjectLocationAndCompositeKeyIn_oneNotFound() {
-    when(projectLocationBlockRepository.findAllByProjectLocation(PROJECT_LOCATION)).thenReturn(
-        PROJECT_LOCATION_BLOCKS
-    );
-    when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(0).getCompositeKey())).thenReturn(true);
-    when(licenceBlockValidatorService.existsInPortalData(BLOCKS.get(2).getCompositeKey())).thenReturn(false);
+    when(projectLocationBlockRepository.findAllByProjectLocation(PROJECT_LOCATION))
+        .thenReturn(PROJECT_LOCATION_BLOCKS);
+
+    when(licenceBlocksService.getValidLicenceBlockCompositeKeys(
+        List.of(
+            BLOCKS.get(0).getCompositeKey(),
+            BLOCKS.get(1).getCompositeKey(),
+            BLOCKS.get(2).getCompositeKey()
+        )
+    )).thenReturn(Set.of(
+        BLOCKS.get(0).getCompositeKey()
+    ));
+
     var blockViews = projectLocationBlocksService.getBlockViewsByProjectLocationAndCompositeKeyIn(
         PROJECT_LOCATION,
         List.of(PROJECT_LOCATION_BLOCKS.get(0).getCompositeKey(), PROJECT_LOCATION_BLOCKS.get(2).getCompositeKey()),
@@ -303,18 +325,6 @@ public class ProjectLocationBlockServiceTest {
     projectLocationBlocksService.deleteBlocks(PROJECT_LOCATION);
 
     verify(projectLocationBlockRepository).deleteAllByProjectLocation(PROJECT_LOCATION);
-  }
-
-  @Test
-  public void isBlockReferenceValid_fullValidation_existsInPortalData() {
-    when(licenceBlockValidatorService.existsInPortalData(anyString())).thenReturn(true);
-    assertThat(projectLocationBlocksService.isBlockReferenceValid(BLOCK_REF_1, ValidationType.FULL)).isTrue();
-  }
-
-  @Test
-  public void isBlockReferenceValid_fullValidation_doesNotExistInPortalData() {
-    when(licenceBlockValidatorService.existsInPortalData(anyString())).thenReturn(true);
-    assertThat(projectLocationBlocksService.isBlockReferenceValid(BLOCK_REF_1, ValidationType.FULL)).isTrue();
   }
 
   private void assertBlockViewMatchesProjectLocationBlock(ProjectLocationBlockView view, ProjectLocationBlock block, Boolean isValidExpectation) {

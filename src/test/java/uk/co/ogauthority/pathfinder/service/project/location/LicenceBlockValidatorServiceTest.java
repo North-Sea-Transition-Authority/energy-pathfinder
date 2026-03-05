@@ -2,9 +2,9 @@ package uk.co.ogauthority.pathfinder.service.project.location;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.Before;
@@ -40,18 +40,20 @@ public class LicenceBlockValidatorServiceTest {
 
   @Test
   public void addErrorsForInvalidBlocks_allFound_noErrors() {
-    when(licenceBlocksService.blockExists(any())).thenReturn(true);
+    when(licenceBlocksService.getValidLicenceBlockCompositeKeys(BLOCKS)).thenReturn(new HashSet<>(BLOCKS));
+
     var errors = new BeanPropertyBindingResult(form, "form");
+
     licenceBlockValidatorService.addErrorsForInvalidBlocks(BLOCKS, errors, FIELD_ID);
 
-    var fieldErrors = ValidatorTestingUtil.extractErrors(errors);
-
-    assertThat(fieldErrors).isEmpty();
+    assertThat(errors.hasErrors()).isFalse();
   }
 
   @Test
   public void addErrorsForInvalidBlocks_oneNotFound_errorsExist() {
-    when(licenceBlocksService.blockExists(BLOCKS.get(0))).thenReturn(false);
+    when(licenceBlocksService.getValidLicenceBlockCompositeKeys(BLOCKS))
+        .thenReturn(Set.of(BLOCKS.getFirst()));
+
     var errors = new BeanPropertyBindingResult(form, "form");
     licenceBlockValidatorService.addErrorsForInvalidBlocks(BLOCKS, errors, FIELD_ID);
 

@@ -1,7 +1,10 @@
 package uk.co.ogauthority.pathfinder.service.portal;
 
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,7 +46,10 @@ public class LicenceBlocksService {
     return licenceBlocksRepository.findAllByCompositeKeyIn(ids);
   }
 
-  public boolean blockExists(String compositeKey) {
-    return licenceBlocksRepository.existsByCompositeKey(compositeKey);
+  public Set<String> getValidLicenceBlockCompositeKeys(Collection<String> compositeKeys) {
+    return licenceBlocksRepository.findAllByCompositeKeyIn(new HashSet<>(compositeKeys)).stream()
+        .map(LicenceBlock::getCompositeKey)
+        .collect(Collectors.toSet());
   }
+
 }
