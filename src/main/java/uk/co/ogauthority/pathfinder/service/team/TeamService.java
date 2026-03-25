@@ -193,10 +193,10 @@ public class TeamService {
   public void removePersonFromTeam(Team team, Person personToRemove, WebUserAccount actionPerformedBy) {
     portalTeamAccessor.removePersonFromTeam(team.getId(), personToRemove, actionPerformedBy);
 
-    var optionalWebUserAccount = webUserAccountService.getWebUserAccount(personToRemove.getId().asInt());
+    var optionalWebUserAccount = webUserAccountService.findByPerson(personToRemove);
 
     if (optionalWebUserAccount.isEmpty()) {
-      LOGGER.error("Can't resolve web user account from id {} when trying remove a user", personToRemove.getId().asInt());
+      LOGGER.error("Can't resolve web user account from personId {} when trying remove a user", personToRemove.getId().asInt());
       return;
     }
 
@@ -213,10 +213,10 @@ public class TeamService {
                                      WebUserAccount actionPerformedBy) {
     portalTeamAccessor.addPersonToTeamWithRoles(team.getId(), personToAdd, roleNames, actionPerformedBy);
 
-    var optionalWebUserAccount = webUserAccountService.getWebUserAccount(personToAdd.getId().asInt());
+    var optionalWebUserAccount = webUserAccountService.findByPerson(personToAdd);
 
     if (optionalWebUserAccount.isEmpty()) {
-      LOGGER.error("Can't resolve web user account from id {} when trying to update user roles", personToAdd.getId().asInt());
+      LOGGER.error("Can't resolve web user account from personId {} when trying to update user roles", personToAdd.getId().asInt());
       return;
     }
     energyPortalServiceProviderUserRolesService.publishUsersRolesForTeam(

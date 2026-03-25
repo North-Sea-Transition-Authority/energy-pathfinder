@@ -283,7 +283,7 @@ public class TeamServiceTest {
   @Test
   public void addPersonToTeamInRoles_verifyServiceInteraction() {
     var roles = List.of("some_role_1", "some_role_2");
-    when(webUserAccountService.getWebUserAccount(organisationPerson.getId().asInt()))
+    when(webUserAccountService.findByPerson(organisationPerson))
         .thenReturn(Optional.of(new WebUserAccount(10, regulatorPerson)));
 
     teamService.addPersonToTeamInRoles(regulatorTeam, organisationPerson, roles, someWebUserAccount);
@@ -302,7 +302,7 @@ public class TeamServiceTest {
   @Test
   public void addPersonToTeamInRoles_whenCantResolveWebUserAccount_thenPublishNothing() {
     var roles = List.of("some_role_1", "some_role_2");
-    when(webUserAccountService.getWebUserAccount(organisationPerson.getId().asInt()))
+    when(webUserAccountService.findByPerson(organisationPerson))
         .thenReturn(Optional.empty());
 
     teamService.addPersonToTeamInRoles(regulatorTeam, organisationPerson, roles, someWebUserAccount);
@@ -315,7 +315,7 @@ public class TeamServiceTest {
 
   @Test
   public void removePersonFromTeam_verifyServiceInteraction() {
-    when(webUserAccountService.getWebUserAccount(regulatorPerson.getId().asInt()))
+    when(webUserAccountService.findByPerson(regulatorPerson))
         .thenReturn(Optional.of(new WebUserAccount(10, regulatorPerson)));
     teamService.removePersonFromTeam(regulatorTeam, regulatorPerson, someWebUserAccount);
     verify(portalTeamAccessor, times(1)).removePersonFromTeam(regulatorTeam.getId(), regulatorPerson, someWebUserAccount);
@@ -324,7 +324,7 @@ public class TeamServiceTest {
 
   @Test
   public void removePersonFromTeam_whenCantResolveWebUserAccount_thenPublishNothing() {
-    when(webUserAccountService.getWebUserAccount(regulatorPerson.getId().asInt()))
+    when(webUserAccountService.findByPerson(regulatorPerson))
         .thenReturn(Optional.empty());
     teamService.removePersonFromTeam(regulatorTeam, regulatorPerson, someWebUserAccount);
     verify(portalTeamAccessor, times(1)).removePersonFromTeam(regulatorTeam.getId(), regulatorPerson, someWebUserAccount);
