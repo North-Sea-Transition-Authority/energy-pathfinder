@@ -184,7 +184,7 @@ public class ProjectServiceTest {
     assertThat(newProjectDetail.getCreatedDatetime()).isNotNull();
     assertThat(newProjectDetail.getProjectType()).isEqualTo(fromProjectDetail.getProjectType());
 
-    verify(projectDetailsRepository, times(1)).save(fromProjectDetail);
+    verify(projectDetailsRepository, times(1)).saveAndFlush(fromProjectDetail);
     verify(projectDetailsRepository, times(1)).save(newProjectDetail);
   }
 
@@ -193,6 +193,8 @@ public class ProjectServiceTest {
     projectService.deleteProjectDetail(projectDetail);
 
     verify(projectDetailsRepository, times(1)).delete(projectDetail);
+    verify(projectDetailsRepository, times(1)).flush();
+
   }
 
   @Test

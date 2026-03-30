@@ -3,8 +3,8 @@ package uk.co.ogauthority.pathfinder.repository.project;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.co.ogauthority.pathfinder.model.dto.project.ProjectVersionDto;
@@ -12,7 +12,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 
 @Repository
-public interface ProjectDetailsRepository extends CrudRepository<ProjectDetail, Integer> {
+public interface ProjectDetailsRepository extends JpaRepository<ProjectDetail, Integer> {
 
   Optional<ProjectDetail> findByProjectIdAndIsCurrentVersionIsTrue(Integer projectId);
 

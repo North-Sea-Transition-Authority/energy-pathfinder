@@ -157,6 +157,8 @@ public class ProjectUpdateServiceTest {
     projectUpdateService.deleteProjectUpdate(projectUpdate);
 
     verify(projectUpdateRepository, times(1)).delete(projectUpdate);
+    verify(projectUpdateRepository, times(1)).flush();
+
   }
 
   @Test

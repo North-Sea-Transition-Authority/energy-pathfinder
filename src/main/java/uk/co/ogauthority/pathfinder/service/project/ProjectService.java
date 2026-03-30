@@ -90,7 +90,7 @@ public class ProjectService {
       newProjectDetail.setSubmittedInstant(Instant.now());
     }
 
-    projectDetailsRepository.save(fromDetail);
+    projectDetailsRepository.saveAndFlush(fromDetail);
     return projectDetailsRepository.save(newProjectDetail);
   }
 
@@ -106,6 +106,7 @@ public class ProjectService {
 
   public void deleteProjectDetail(ProjectDetail projectDetail) {
     projectDetailsRepository.delete(projectDetail);
+    projectDetailsRepository.flush();
   }
 
   public void deleteProject(Project project) {

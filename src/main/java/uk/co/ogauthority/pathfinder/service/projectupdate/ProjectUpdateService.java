@@ -58,6 +58,7 @@ public class ProjectUpdateService {
 
   public void deleteProjectUpdate(ProjectUpdate projectUpdate) {
     projectUpdateRepository.delete(projectUpdate);
+    projectUpdateRepository.flush();
   }
 
   @Transactional

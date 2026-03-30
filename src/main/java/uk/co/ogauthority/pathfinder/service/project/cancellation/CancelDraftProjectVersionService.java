@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.project.cancellation;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import uk.co.ogauthority.pathfinder.controller.project.TaskListController;
 import uk.co.ogauthority.pathfinder.exception.CancelDraftProjectException;
 import uk.co.ogauthority.pathfinder.exception.CancelProjectVersionImplementationException;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.entity.projectupdate.ProjectUpdate;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
 import uk.co.ogauthority.pathfinder.service.project.ProjectService;
@@ -67,14 +69,17 @@ public class CancelDraftProjectVersionService {
         .filter(projectFormSectionService -> projectFormSectionService.getSupportedProjectTypes().contains(projectDetail.getProjectType()))
         .forEach(projectFormSectionService -> projectFormSectionService.removeSectionData(projectDetail));
 
-    if (!projectDetail.isFirstVersion()) {
-      projectUpdateService.getByToDetail(projectDetail).ifPresent(projectUpdate -> {
-        projectUpdateService.deleteProjectUpdate(projectUpdate);
-        projectService.updateProjectDetailIsCurrentVersion(projectUpdate.getFromDetail(), true);
-      });
-    }
+    Optional<ProjectUpdate> projectUpdateOptional = !projectDetail.isFirstVersion()
+        ? projectUpdateService.getByToDetail(projectDetail)
+        : Optional.empty();
+
+    projectUpdateOptional.ifPresent(projectUpdateService::deleteProjectUpdate);
 
     projectService.deleteProjectDetail(projectDetail);
+
+    projectUpdateOptional.ifPresent(projectUpdate ->
+        projectService.updateProjectDetailIsCurrentVersion(projectUpdate.getFromDetail(), true)
+    );
 
     if (projectDetail.isFirstVersion()) {
       projectService.deleteProject(projectDetail.getProject());
