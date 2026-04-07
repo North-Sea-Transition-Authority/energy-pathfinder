@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -149,6 +150,27 @@ public class ProjectServiceTest {
     );
 
     projectService.getDetailOrError(PROJECT_ID, PROJECT_VERSION);
+  }
+
+  @Test
+  public void findAllLatestDetailByStatus_whenFound_thenReturned() {
+    var projectDetail1 = ProjectUtil.getProjectDetails();
+    var projectDetail2 = ProjectUtil.getProjectDetails();
+
+    when(projectDetailsRepository.findAllByStatusAndIsCurrentVersionIsTrue(ProjectStatus.PUBLISHED))
+        .thenReturn(List.of(projectDetail1, projectDetail2));
+
+    var result = projectService.findAllLatestDetailByStatus(ProjectStatus.PUBLISHED);
+    assertThat(result).containsExactly(projectDetail1, projectDetail2);
+  }
+
+  @Test
+  public void findAllLatestDetailByStatus_whenNoneFound_thenReturnEmpty() {
+    when(projectDetailsRepository.findAllByStatusAndIsCurrentVersionIsTrue(ProjectStatus.PUBLISHED))
+        .thenReturn(List.of());
+
+    var result = projectService.findAllLatestDetailByStatus(ProjectStatus.PUBLISHED);
+    assertThat(result).isEmpty();
   }
 
   @Test

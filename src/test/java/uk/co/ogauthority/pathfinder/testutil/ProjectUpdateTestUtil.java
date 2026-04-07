@@ -16,6 +16,8 @@ public class ProjectUpdateTestUtil {
 
   private static final String REGULATOR_UPDATE_REQUEST_UPDATE_REASON = "Update reason";
   private static final LocalDate REGULATOR_UPDATE_REQUEST_DEADLINE_DATE = LocalDate.now().plusMonths(1L);
+  private static final LocalDate OVERDUE_REGULATOR_UPDATE_REQUEST_DEADLINE_DATE = LocalDate.now().minusMonths(1L);
+
   private static final Integer REGULATOR_UPDATE_REQUEST_REQUESTED_BY_WUA_ID = 1;
 
   private ProjectUpdateTestUtil() {
@@ -43,6 +45,16 @@ public class ProjectUpdateTestUtil {
     regulatorUpdateRequest.setProjectDetail(ProjectUtil.getProjectDetails());
     regulatorUpdateRequest.setUpdateReason(REGULATOR_UPDATE_REQUEST_UPDATE_REASON);
     regulatorUpdateRequest.setDeadlineDate(REGULATOR_UPDATE_REQUEST_DEADLINE_DATE);
+    regulatorUpdateRequest.setRequestedByWuaId(REGULATOR_UPDATE_REQUEST_REQUESTED_BY_WUA_ID);
+    regulatorUpdateRequest.setRequestedInstant(Instant.now());
+    return regulatorUpdateRequest;
+  }
+
+  public static RegulatorUpdateRequest createOverDueRegulatorUpdateRequest() {
+    var regulatorUpdateRequest = new RegulatorUpdateRequest();
+    regulatorUpdateRequest.setProjectDetail(ProjectUtil.getProjectDetails());
+    regulatorUpdateRequest.setUpdateReason(REGULATOR_UPDATE_REQUEST_UPDATE_REASON);
+    regulatorUpdateRequest.setDeadlineDate(OVERDUE_REGULATOR_UPDATE_REQUEST_DEADLINE_DATE);
     regulatorUpdateRequest.setRequestedByWuaId(REGULATOR_UPDATE_REQUEST_REQUESTED_BY_WUA_ID);
     regulatorUpdateRequest.setRequestedInstant(Instant.now());
     return regulatorUpdateRequest;

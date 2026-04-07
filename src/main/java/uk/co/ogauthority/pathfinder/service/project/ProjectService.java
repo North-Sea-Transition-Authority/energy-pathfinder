@@ -1,6 +1,7 @@
 package uk.co.ogauthority.pathfinder.service.project;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -92,6 +93,10 @@ public class ProjectService {
 
     projectDetailsRepository.saveAndFlush(fromDetail);
     return projectDetailsRepository.save(newProjectDetail);
+  }
+
+  public List<ProjectDetail> findAllLatestDetailByStatus(ProjectStatus status) {
+    return projectDetailsRepository.findAllByStatusAndIsCurrentVersionIsTrue(status);
   }
 
   public void updateProjectDetailStatus(ProjectDetail projectDetail, ProjectStatus status) {

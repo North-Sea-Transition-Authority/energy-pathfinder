@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -162,6 +163,16 @@ public class ProjectAssessmentServiceTest {
     );
 
     assertThat(projectAssessmentService.hasProjectBeenAssessed(projectDetail)).isTrue();
+  }
+
+  @Test
+  public void countByProjectDetailIn() {
+    var projectDetails = List.of(projectDetail);
+    when(projectAssessmentRepository.countByProjectDetailIn(projectDetails)).thenReturn(1);
+
+    var result = projectAssessmentService.countByProjectDetailIn(projectDetails);
+
+    assertThat(result).isEqualTo(1);
   }
 
   @Test

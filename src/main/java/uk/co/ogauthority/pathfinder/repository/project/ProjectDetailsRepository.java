@@ -9,12 +9,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.co.ogauthority.pathfinder.model.dto.project.ProjectVersionDto;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 
 @Repository
 public interface ProjectDetailsRepository extends JpaRepository<ProjectDetail, Integer> {
 
   Optional<ProjectDetail> findByProjectIdAndIsCurrentVersionIsTrue(Integer projectId);
+
+  List<ProjectDetail> findAllByStatusAndIsCurrentVersionIsTrue(ProjectStatus status);
 
   Optional<ProjectDetail> findByProjectIdAndVersion(Integer projectId, Integer version);
 

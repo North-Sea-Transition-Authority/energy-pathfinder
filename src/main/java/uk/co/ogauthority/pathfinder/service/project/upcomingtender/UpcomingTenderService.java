@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.model.entity.project.upcomingtender.Upcoming
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.project.Function;
 import uk.co.ogauthority.pathfinder.model.enums.project.FunctionType;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectStatus;
 import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.enums.project.tasks.ProjectTask;
 import uk.co.ogauthority.pathfinder.model.form.fds.RestSearchItem;
@@ -266,6 +267,18 @@ public class UpcomingTenderService implements ProjectFormSectionService {
         .stream()
         .filter(ut -> ut.getEstimatedTenderDate().isBefore(currentDate))
         .collect(Collectors.toList());
+  }
+
+  public List<UpcomingTender> getPastUpcomingTendersForOrganisationGroupsIn(List<Integer> organisationGroupIds) {
+    var currentDate = LocalDate.now();
+
+    return upcomingTenderRepository
+        .findAllByAddedByOrganisationGroupInAndProjectDetail_IsCurrentVersionIsTrueAndProjectDetail_StatusNotIn(
+            organisationGroupIds,
+            Set.of(ProjectStatus.ARCHIVED, ProjectStatus.DRAFT)
+        ).stream()
+        .filter(upcomingTender -> upcomingTender.getEstimatedTenderDate().isBefore(currentDate))
+        .toList();
   }
 
   @Override

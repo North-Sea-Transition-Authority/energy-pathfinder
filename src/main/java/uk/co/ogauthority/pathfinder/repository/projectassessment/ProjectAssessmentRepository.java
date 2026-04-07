@@ -1,5 +1,6 @@
 package uk.co.ogauthority.pathfinder.repository.projectassessment;
 
+import java.util.Collection;
 import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -10,4 +11,6 @@ import uk.co.ogauthority.pathfinder.model.entity.projectassessment.ProjectAssess
 public interface ProjectAssessmentRepository extends CrudRepository<ProjectAssessment, Integer> {
 
   Optional<ProjectAssessment> findByProjectDetail(ProjectDetail projectDetail);
+
+  int countByProjectDetailIn(Collection<ProjectDetail> projectDetails);
 }

@@ -3,6 +3,7 @@ package uk.co.ogauthority.pathfinder.service.projectassessment;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -77,6 +78,10 @@ public class ProjectAssessmentService {
 
   public boolean hasProjectBeenAssessed(ProjectDetail projectDetail) {
     return getProjectAssessment(projectDetail).isPresent();
+  }
+
+  public int countByProjectDetailIn(Collection<ProjectDetail> projectDetails) {
+    return projectAssessmentRepository.countByProjectDetailIn(projectDetails);
   }
 
   public BindingResult validate(ProjectAssessmentForm form, BindingResult bindingResult, ProjectDetail projectDetail) {

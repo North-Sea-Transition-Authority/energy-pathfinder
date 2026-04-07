@@ -487,6 +487,44 @@ class UpcomingTenderServiceTest {
   }
 
   @Test
+  void getPastUpcomingTendersForOrganisationGroupsIn_whenFound_thenReturnOnlyPast() {
+    var currentDate = LocalDate.now();
+    var organisationGroupIds = List.of(1, 2);
+
+    var pastTender = mock(UpcomingTender.class);
+    when(pastTender.getEstimatedTenderDate()).thenReturn(currentDate.minusDays(1));
+
+    var futureTender = mock(UpcomingTender.class);
+    when(futureTender.getEstimatedTenderDate()).thenReturn(currentDate.plusDays(1));
+
+    var todayTender = mock(UpcomingTender.class);
+    when(todayTender.getEstimatedTenderDate()).thenReturn(currentDate);
+
+    when(upcomingTenderRepository
+        .findAllByAddedByOrganisationGroupInAndProjectDetail_IsCurrentVersionIsTrueAndProjectDetail_StatusNotIn(
+            organisationGroupIds, Set.of(ProjectStatus.ARCHIVED, ProjectStatus.DRAFT)))
+        .thenReturn(List.of(pastTender, futureTender, todayTender));
+
+    var result = upcomingTenderService.getPastUpcomingTendersForOrganisationGroupsIn(organisationGroupIds);
+
+    assertThat(result).containsOnly(pastTender);
+  }
+
+  @Test
+  void getPastUpcomingTendersForOrganisationGroupsIn_whenNoneFound_thenReturnEmptyList() {
+    var organisationGroupIds = List.of(1);
+
+    when(upcomingTenderRepository
+        .findAllByAddedByOrganisationGroupInAndProjectDetail_IsCurrentVersionIsTrueAndProjectDetail_StatusNotIn(
+            organisationGroupIds, Set.of(ProjectStatus.ARCHIVED, ProjectStatus.DRAFT)))
+        .thenReturn(Collections.emptyList());
+
+    var result = upcomingTenderService.getPastUpcomingTendersForOrganisationGroupsIn(organisationGroupIds);
+
+    assertThat(result).isEmpty();
+  }
+
+  @Test
   void getPastUpcomingTendersForRemindableProjects_whenNoneFound_thenReturnEmptyList() {
     var projectDetailIdList = List.of(1);
     when(upcomingTenderRepository.findAllByProjectDetail_IdIn(projectDetailIdList)).thenReturn(Collections.emptyList());
