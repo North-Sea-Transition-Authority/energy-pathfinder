@@ -82,7 +82,7 @@ public class NotifyCallbackServiceTest {
     notifyCallback.setId(failedNotification.getId().toString());
 
     final var expectedNotifyTemplate = new Template(getExampleTemplateJson());
-    final var expectedServiceTemplate = NotifyTemplate.ADDED_TO_TEAM;
+    final var expectedServiceTemplate = NotifyTemplate.PROJECT_UPDATE_REQUESTED;
 
     when(notificationClientMock.getNotificationById(anyString())).thenReturn(failedNotification);
     when(notificationClientMock.getTemplateById(anyString())).thenReturn(expectedNotifyTemplate);

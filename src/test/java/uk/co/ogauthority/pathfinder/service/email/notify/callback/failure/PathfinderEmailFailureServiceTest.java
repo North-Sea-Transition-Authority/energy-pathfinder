@@ -39,7 +39,7 @@ public class PathfinderEmailFailureServiceTest {
   public void processNotifyEmailDeliveryFailure_whenNoSupportedFailureHandler_thenVerifyDefaultHandlerInteraction() {
 
     final var supportedNotifyTemplate = NotifyTemplate.CUSTOM_COMMUNICATION;
-    final var unsupportedNotifyTemplate = NotifyTemplate.ADDED_TO_TEAM;
+    final var unsupportedNotifyTemplate = NotifyTemplate.PROJECT_UPDATE_SUBMITTED;
 
     when(testEmailFailureHandlerService.getSupportedTemplates()).thenReturn(Set.of(supportedNotifyTemplate));
 

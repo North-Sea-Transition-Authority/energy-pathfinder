@@ -39,7 +39,6 @@ import uk.co.ogauthority.pathfinder.model.team.TeamType;
 import uk.co.ogauthority.pathfinder.model.teammanagement.TeamMemberView;
 import uk.co.ogauthority.pathfinder.model.teammanagement.TeamRoleView;
 import uk.co.ogauthority.pathfinder.mvc.ReverseRouter;
-import uk.co.ogauthority.pathfinder.service.email.TeamManagementEmailService;
 import uk.co.ogauthority.pathfinder.service.team.TeamService;
 
 @Service
@@ -49,16 +48,13 @@ public class TeamManagementService {
   private static final Logger LOGGER = LoggerFactory.getLogger(TeamManagementService.class);
 
   private final TeamService teamService;
-  private final TeamManagementEmailService teamManagementEmailService;
   private final PersonRepository personRepository;
   private final WebUserAccountRepository webUserAccountRepository;
 
   public TeamManagementService(TeamService teamService,
-                               TeamManagementEmailService teamManagementEmailService,
                                PersonRepository personRepository,
                                WebUserAccountRepository webUserAccountRepository) {
     this.teamService = teamService;
-    this.teamManagementEmailService = teamManagementEmailService;
     this.personRepository = personRepository;
     this.webUserAccountRepository = webUserAccountRepository;
   }
@@ -275,13 +271,6 @@ public class TeamManagementService {
         .collect(Collectors.toList());
 
     teamService.addPersonToTeamInRoles(team, person, roleNames, actionPerformedBy);
-
-    if (!isAlreadyTeamMember) {
-      // Only send a notification email if the user was not already in the team
-      notifyNewTeamUser(team, person, selectedRoles, actionPerformedBy);
-    } else {
-      notifyTeamRolesUpdated(team, person, selectedRoles, actionPerformedBy);
-    }
   }
 
   /**
@@ -305,7 +294,6 @@ public class TeamManagementService {
         ));
       } else {
         teamService.removePersonFromTeam(teamToRemoveFrom, personToRemove, actionPerformedBy);
-        notifyTeamUserRemoved(teamToRemoveFrom, personToRemove, actionPerformedBy);
       }
     } else {
       throw new RuntimeException(String.format(
@@ -364,24 +352,6 @@ public class TeamManagementService {
         .map(TeamRoleView::createTeamRoleViewFrom)
         .sorted(Comparator.comparing(TeamRoleView::getDisplaySequence))
         .collect(Collectors.toList());
-  }
-
-  private String getStringTeamRoles(List<Role> selectedRoles) {
-    return selectedRoles.stream()
-        .map(Role::getTitle)
-        .collect(Collectors.joining(", "));
-  }
-
-  public void notifyNewTeamUser(Team team, Person person, List<Role> selectedRoles, WebUserAccount addedByUser) {
-    teamManagementEmailService.sendAddedToTeamEmail(team, person, getStringTeamRoles(selectedRoles), addedByUser);
-  }
-
-  public void notifyTeamRolesUpdated(Team team, Person person, List<Role> selectedRoles, WebUserAccount updatedByUser) {
-    teamManagementEmailService.sendTeamRolesUpdatedEmail(team, person, getStringTeamRoles(selectedRoles), updatedByUser);
-  }
-
-  public void notifyTeamUserRemoved(Team team, Person person, WebUserAccount removedByUser) {
-    teamManagementEmailService.sendRemovedFromTeamEmail(team, person, removedByUser);
   }
 
   /**

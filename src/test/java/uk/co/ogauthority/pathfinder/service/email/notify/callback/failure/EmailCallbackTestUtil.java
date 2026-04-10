@@ -7,7 +7,7 @@ import uk.co.ogauthority.pathfinder.service.email.notify.callback.EmailCallback;
 public class EmailCallbackTestUtil {
 
   private static final String NOTIFICATION_ID = "123-456";
-  private static final NotifyTemplate NOTIFY_TEMPLATE = NotifyTemplate.ADDED_TO_TEAM;
+  private static final NotifyTemplate NOTIFY_TEMPLATE = NotifyTemplate.PROJECT_UPDATE_SUBMITTED;
   private static final String RECIPIENT_EMAIL_ADDRESS = "someone@example.com";
   private static final String SUBJECT = "subject";
   private static final String BODY = "body";
