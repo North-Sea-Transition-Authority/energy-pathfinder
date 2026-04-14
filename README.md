@@ -158,3 +158,19 @@ You will be redirected to your local fox instance for authentication, and then r
 Pathfinder can log in either JSON or text mode.
 
 In order to turn on JSON logging, set the profile 'json-logging'. This will automatically include any MDC attributes.
+
+## Page not loading
+
+Accessing `http://localhost:8081/engedudev1/<CONTEXT_SUFFIX>/work-area` sometimes results in the page infinitely loading.
+
+This is normally because the docker network ips are overlapping with the oracle dev database.
+
+You should stop the pathfinder app and remove the pathfinder containers from your docker desktop before fixing.
+
+We can fix this by getting the ip of the oracle database with and checking it against ips on our local docker network with and removing any that overlap by using.
+
+Fix:
+
+    - "docker network inspect `docker network ls -q` | grep -C 20 172.25"
+    - identify the "Name" of the network
+    - "docker network rm <name>"
