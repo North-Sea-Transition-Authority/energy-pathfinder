@@ -39,6 +39,7 @@ import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.controller.TeamManagementContextAbstractControllerTest;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.WebUserAccount;
+import uk.co.ogauthority.pathfinder.energyportal.service.user.AllowedDomainService;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.form.teammanagement.AddOrganisationTeamForm;
@@ -74,6 +75,9 @@ public class PortalTeamManagementControllerTest extends TeamManagementContextAbs
 
   @MockitoBean
   private TeamCreationService teamCreationService;
+
+  @MockitoBean
+  private AllowedDomainService  allowedDomainService;
 
   protected TeamManagementContextService teamManagementContextService;
 
@@ -191,6 +195,48 @@ public class PortalTeamManagementControllerTest extends TeamManagementContextAbs
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(view().name("teamManagement/teamMembers"));
+  }
+
+  @Test
+  public void renderMemberRoles_shouldReflectAllowedDomainStatus_validDomain() throws Exception {
+
+    Person testRegTeamAdminPerson  = new Person(1, "Regulator", "Admin", "reg@admin.org", "0");
+
+    String email = testRegTeamAdminPerson.getEmailAddress();
+    when(allowedDomainService.isAllowedDomain(email, regulatorTeam)).thenReturn(true);
+
+    mockMvc.perform(
+            get("/team-management/teams/{resId}/member/{personId}/roles",
+                regulatorTeam.getId(),
+                testRegTeamAdminPerson.getId().asInt())
+                .param("userRoles", teamAdminRole.getRoleName())
+                .with(authenticatedUserAndSession(regulatorTeamAdmin)))
+        .andExpect(status().isOk())
+        .andExpect(view().name("teamManagement/memberRoles"))
+        .andExpect(model().attribute("userHasAllowedEmail", true));
+
+    verify(allowedDomainService).isAllowedDomain(email, regulatorTeam);
+  }
+
+  @Test
+  public void renderMemberRoles_shouldReflectAllowedDomainStatus_invalidDomain() throws Exception {
+
+    Person testRegTeamAdminPerson  = new Person(1, "Regulator", "Admin", "reg@admin.org", "0");
+
+    String email = testRegTeamAdminPerson.getEmailAddress();
+    when(allowedDomainService.isAllowedDomain(email, regulatorTeam)).thenReturn(false);
+
+    mockMvc.perform(
+            get("/team-management/teams/{resId}/member/{personId}/roles",
+                regulatorTeam.getId(),
+                testRegTeamAdminPerson.getId().asInt())
+                .param("userRoles", teamAdminRole.getRoleName())
+                .with(authenticatedUserAndSession(regulatorTeamAdmin)))
+        .andExpect(status().isOk())
+        .andExpect(view().name("teamManagement/memberRoles"))
+        .andExpect(model().attribute("userHasAllowedEmail", false));
+
+    verify(allowedDomainService).isAllowedDomain(email, regulatorTeam);
   }
 
   @Test

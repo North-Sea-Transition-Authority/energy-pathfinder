@@ -21,6 +21,7 @@ import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.rest.OrganisationGroupRestController;
 import uk.co.ogauthority.pathfinder.controller.team.annotation.TeamManagementPermissionCheck;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
+import uk.co.ogauthority.pathfinder.energyportal.service.user.AllowedDomainService;
 import uk.co.ogauthority.pathfinder.exception.AccessDeniedException;
 import uk.co.ogauthority.pathfinder.exception.PathfinderEntityNotFoundException;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -54,18 +55,21 @@ public class PortalTeamManagementController {
   private final EnergyPortalUrlService energyPortalUrlService;
   private final ControllerHelperService controllerHelperService;
   private final TeamCreationService teamCreationService;
+  private final AllowedDomainService allowedDomainService;
 
   @Autowired
   public PortalTeamManagementController(TeamManagementService teamManagementService,
                                         AddUserToTeamFormValidator addUserToTeamFormValidator,
                                         EnergyPortalUrlService energyPortalUrlService,
                                         ControllerHelperService controllerHelperService,
-                                        TeamCreationService teamCreationService) {
+                                        TeamCreationService teamCreationService,
+                                        AllowedDomainService allowedDomainService) {
     this.teamManagementService = teamManagementService;
     this.addUserToTeamFormValidator = addUserToTeamFormValidator;
     this.energyPortalUrlService = energyPortalUrlService;
     this.controllerHelperService = controllerHelperService;
     this.teamCreationService = teamCreationService;
+    this.allowedDomainService = allowedDomainService;
   }
 
   /**
@@ -339,6 +343,9 @@ public class PortalTeamManagementController {
 
   private ModelAndView getMemberRolesModelAndView(Team team, Person person, UserRolesForm form) {
     List<TeamRoleView> roles = teamManagementService.getRolesForTeam(team);
+
+    boolean userHasAllowedEmail = allowedDomainService.isAllowedDomain(person.getEmailAddress(), team);
+
     return new ModelAndView("teamManagement/memberRoles")
         .addObject("teamId", team.getId())
         .addObject("form", form)
@@ -346,6 +353,7 @@ public class PortalTeamManagementController {
         .addObject("teamName", team.getName())
         .addObject("userName", person.getFullName())
         .addObject("showTopNav", true)
+        .addObject("userHasAllowedEmail", userHasAllowedEmail)
         .addObject("cancelUrl", ReverseRouter.route(
             on(PortalTeamManagementController.class).renderTeamMembers(team.getId(), null))
         );

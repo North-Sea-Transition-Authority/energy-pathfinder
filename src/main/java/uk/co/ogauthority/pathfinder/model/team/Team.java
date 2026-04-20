@@ -32,4 +32,5 @@ public abstract class Team {
   public TeamType getType() {
     return type;
   }
+
 }

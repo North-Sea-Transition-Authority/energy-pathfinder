@@ -18,8 +18,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.fivium.energyportal.starter.accounts.EnergyPortalServiceAccessService;
+import uk.co.fivium.energyportal.starter.configuration.WellKnownOrganisationGroupsConfigurationProperties;
+import uk.co.fivium.energyportalapi.client.EnergyPortal;
+import uk.co.fivium.energyportalapi.client.organisation.OrganisationApi;
 import uk.co.fivium.energyportalmessagequeue.sns.SnsService;
 import uk.co.fivium.energyportalmessagequeue.sqs.SqsService;
+import uk.co.ogauthority.pathfinder.energyportal.epa.EnergyPortalApiConfig;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.organisationgroup.OrganisationGroupQueryService;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationErrorOrderingService;
 
@@ -42,6 +47,21 @@ public class ControllerHelperServiceTest {
 
   @MockitoBean
   private SnsService snsService;
+
+  @MockitoBean
+  private EnergyPortal energyPortal;
+
+  @MockitoBean
+  private EnergyPortalApiConfig energyPortalApiConfig;
+
+  @MockitoBean
+  private OrganisationApi organisationApi;
+
+  @MockitoBean
+  private OrganisationGroupQueryService organisationGroupQueryService;
+
+  @MockitoBean
+  private WellKnownOrganisationGroupsConfigurationProperties wellKnownOrganisationGroupsConfigurationProperties;
 
   private ControllerHelperService controllerHelperService;
 
@@ -104,6 +124,5 @@ public class ControllerHelperServiceTest {
             tuple(0, "integerField", "Invalid value"),
             tuple(1, "stringField", "Invalid string")
         );
-
   }
 }

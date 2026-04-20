@@ -34,7 +34,7 @@
 | Environment Variable                   | Description                                                                                                                                       |
 |----------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
 | DB_SCHEMA_NAME                         | Database schema to connect as. E.g. `PATHFINDER_XX` This schema will be created for you by Flyway                                                 |
-| CONTEXT_SUFFIX                         | A unique per developer suffix string to apply to the application context path. E.g. your initials                                                 |
+| CONTEXT_SUFFIX                         | A unique per developer suffix string to apply to the application context path. E.g. your initials in caps                                         |
 | PATHFINDER_GOVUK_NOTIFY_API_KEY        | API key for the environment. For local dev see [TPM](https://tpm.fivium.co.uk/index.php/pwd/view/1569)                                            |
 | PATHFINDER_TEST_EMAIL_RECIPIENT        | Email address to send all emails to when email.mode = "test"                                                                                      |
 | PATHFINDER_ANALYTICS_APP_API_SECRET    | API key to allow posting data to analytics endpoint for app metrics. For local dev see [TPM](https://tpm.fivium.co.uk/index.php/pwd/view/1856)    |
@@ -87,16 +87,16 @@ No environment variables need to be added when enabling the debug profile.
 
 See the [environments] (https://fivium.atlassian.net/wiki/spaces/PAT/pages/13402153/Environments) page to find the development database.
 
-This must be your DB_SCHEMA_NAME with '_flyway' appended to the end.
+This must be your DB_SCHEMA_NAME with '_FLYWAY' appended to the end.
 
 Run the script below as the `xviewmgr` user
 
 
 ```oraclesqlplus
-CREATE USER pathfinder_xx_flyway IDENTIFIED BY "dev1"
+CREATE USER PATHFINDER_XX_FLYWAY IDENTIFIED BY "dev1"
 /
 
-GRANT UNLIMITED TABLESPACE TO pathfinder_xx_flyway WITH ADMIN OPTION
+GRANT UNLIMITED TABLESPACE TO PATHFINDER_XX_FLYWAY WITH ADMIN OPTION
 /
 
 GRANT
@@ -118,13 +118,14 @@ GRANT
   SELECT ANY SEQUENCE,
   CREATE ANY PROCEDURE,
   GRANT ANY OBJECT PRIVILEGE
-TO pathfinder_xx_flyway WITH ADMIN OPTION
+TO PATHFINDER_XX_FLYWAY WITH ADMIN OPTION
 / 
 
-GRANT EXECUTE ON decmgr.contact TO pathfinder_xx_flyway
+GRANT EXECUTE ON decmgr.contact TO PATHFINDER_XX_FLYWAY
 /
 ```
 This user must be created before the app runs for the first time on a new DB. All migrations will be run by this flyway user.
+Note: When flyway creates the flyway_schema_history table, it treats the schema name as case sensitive so the environment variables should be set uppercase to avoid mismatching the schema created above.
 
 #### Set the active profile
 Set the profile to `development` in your run configuration

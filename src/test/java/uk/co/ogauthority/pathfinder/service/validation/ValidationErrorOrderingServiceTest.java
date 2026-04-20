@@ -18,8 +18,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.fivium.energyportal.starter.accounts.EnergyPortalServiceAccessService;
+import uk.co.fivium.energyportal.starter.configuration.WellKnownOrganisationGroupsConfigurationProperties;
+import uk.co.fivium.energyportalapi.client.EnergyPortal;
 import uk.co.fivium.energyportalmessagequeue.sns.SnsService;
 import uk.co.fivium.energyportalmessagequeue.sqs.SqsService;
+import uk.co.ogauthority.pathfinder.energyportal.epa.EnergyPortalApiConfig;
+import uk.co.ogauthority.pathfinder.energyportal.service.organisation.organisationgroup.OrganisationGroupQueryService;
 import uk.co.ogauthority.pathfinder.model.form.fds.ErrorItem;
 import uk.co.ogauthority.pathfinder.service.controller.FieldOrderTestForm;
 import uk.co.ogauthority.pathfinder.service.controller.ListTestForm;
@@ -47,6 +51,18 @@ public class ValidationErrorOrderingServiceTest {
 
   @MockitoBean
   private SnsService snsService;
+
+  @MockitoBean
+  private WellKnownOrganisationGroupsConfigurationProperties wellKnownOrganisationGroupsConfigurationProperties;
+
+  @MockitoBean
+  private OrganisationGroupQueryService organisationGroupQueryService;
+
+  @MockitoBean
+  private EnergyPortal energyPortal;
+
+  @MockitoBean
+  private EnergyPortalApiConfig energyPortalApiConfig;
 
   private ValidationErrorOrderingService validationErrorOrderingService;
 
