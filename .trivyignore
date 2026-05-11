@@ -1,23 +1,8 @@
-# io.netty:netty-codec-http
-CVE-2025-67735
-CVE-2026-33870
-# io.netty:netty-codec-http2
-CVE-2026-33871
-# ch.qos.logback:logback-core
-CVE-2026-1225
-# com.fasterxml.jackson.core:jackson-core
-GHSA-72hv-8253-57qq
-# org.springframework.security:spring-security-web
-CVE-2026-22732
-# org.springframework:spring-webmvc
-CVE-2026-22737
-CVE-2026-22735
-# tomcat
-CVE-2026-29145
-CVE-2026-29129
-CVE-2026-29146
-CVE-2026-34483
-CVE-2026-34487
-CVE-2026-25854
-CVE-2026-32990
-CVE-2026-34500
+CVE-2026-42583
+CVE-2026-42584
+CVE-2026-42587
+CVE-2026-41417
+CVE-2026-42580
+CVE-2026-42581
+CVE-2026-42585
+CVE-2026-42587
