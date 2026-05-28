@@ -1,6 +1,6 @@
 package uk.co.ogauthority.pathfinder.energyportal.service.user;
 
-import java.util.Optional;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.organisationgroup.OrganisationGroupDto;
 import uk.co.ogauthority.pathfinder.energyportal.service.organisation.organisationgroup.OrganisationGroupQueryService;
@@ -17,17 +17,15 @@ public class AllowedDomainService {
   }
 
   public boolean isAllowedDomain(String userEmail, Team team) {
-    Optional<OrganisationGroupDto> group;
-    switch (team.getType()) {
-      case TeamType.ORGANISATION -> group = organisationGroupQueryService
+    var group = switch (team.getType()) {
+      case TeamType.ORGANISATION -> organisationGroupQueryService
           .getOrganisationGroupById(team.getId());
-      case TeamType.REGULATOR -> group = organisationGroupQueryService.getRegulatorOrganisationGroup();
-      default -> throw new IllegalStateException("Unexpected value: " + team.getType());
-    }
+      case TeamType.REGULATOR -> organisationGroupQueryService.getRegulatorOrganisationGroup();
+    };
 
-    return group.stream()
-        .flatMap(orgGroup -> orgGroup.emailDomains().stream())
+    var lowerEmail = userEmail.toLowerCase();
+    return group.map(OrganisationGroupDto::emailDomains).orElse(List.of()).stream()
         .map(String::toLowerCase)
-        .anyMatch(domain -> userEmail.toLowerCase().endsWith('@' + domain));
+        .anyMatch(domain -> lowerEmail.endsWith("@" + domain));
   }
 }
