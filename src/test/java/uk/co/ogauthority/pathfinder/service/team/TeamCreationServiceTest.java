@@ -18,7 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.fivium.energyportal.serviceproviders.epmq.ScopeType;
 import uk.co.fivium.energyportal.serviceproviders.epmq.messages.ServiceProviderTeamDto;
-import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderTeamService;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalAccountsMessagePublishingService;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.controller.team.PortalTeamManagementController;
@@ -58,7 +58,7 @@ public class TeamCreationServiceTest {
   private StartProjectService startProjectService;
 
   @Mock
-  private EnergyPortalServiceProviderTeamService energyPortalServiceProviderTeamService;
+  private EnergyPortalAccountsMessagePublishingService energyPortalAccountsMessagePublishingService;
 
   private TeamCreationService teamCreationService;
 
@@ -74,7 +74,7 @@ public class TeamCreationServiceTest {
         teamManagementService,
         startProjectService,
         portalOrganisationAccessor,
-        energyPortalServiceProviderTeamService
+        energyPortalAccountsMessagePublishingService
     );
   }
 
@@ -108,7 +108,7 @@ public class TeamCreationServiceTest {
     assertThat(result).isEqualTo(portalTeamDto.getResId());
     verify(portalTeamAccessor, times(0)).createOrganisationGroupTeam(organisationGroup, authenticatedUserAccount);
     verify(startProjectService, times(0)).createForwardWorkPlanProject(authenticatedUserAccount, organisationGroup);
-    verifyNoInteractions(energyPortalServiceProviderTeamService);
+    verifyNoInteractions(energyPortalAccountsMessagePublishingService);
   }
 
   @Test
@@ -134,7 +134,7 @@ public class TeamCreationServiceTest {
         ScopeType.ORGANISATION_GROUP,
         TeamType.ORGANISATION.name()
     );
-    verify(energyPortalServiceProviderTeamService).publishTeam(expectedServiceProviderTeamDto);
+    verify(energyPortalAccountsMessagePublishingService).publishTeam(expectedServiceProviderTeamDto);
   }
 
   @Test(expected = PathfinderEntityNotFoundException.class)

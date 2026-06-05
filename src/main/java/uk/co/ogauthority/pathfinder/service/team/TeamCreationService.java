@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import uk.co.fivium.energyportal.serviceproviders.epmq.ScopeType;
 import uk.co.fivium.energyportal.serviceproviders.epmq.messages.ServiceProviderTeamDto;
-import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderTeamService;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalAccountsMessagePublishingService;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.controller.team.PortalTeamManagementController;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto;
@@ -37,7 +37,7 @@ public class TeamCreationService {
   private final TeamManagementService teamManagementService;
   private final StartProjectService startProjectService;
   private final PortalOrganisationAccessor portalOrganisationAccessor;
-  private final EnergyPortalServiceProviderTeamService energyPortalServiceProviderTeamService;
+  private final EnergyPortalAccountsMessagePublishingService energyPortalAccountsMessagePublishingService;
 
   @Autowired
   public TeamCreationService(ValidationService validationService,
@@ -45,13 +45,13 @@ public class TeamCreationService {
                              TeamManagementService teamManagementService,
                              StartProjectService startProjectService,
                              PortalOrganisationAccessor portalOrganisationAccessor,
-                             EnergyPortalServiceProviderTeamService energyPortalServiceProviderTeamService) {
+                             EnergyPortalAccountsMessagePublishingService energyPortalAccountsMessagePublishingService) {
     this.validationService = validationService;
     this.portalTeamAccessor = portalTeamAccessor;
     this.teamManagementService = teamManagementService;
     this.startProjectService = startProjectService;
     this.portalOrganisationAccessor = portalOrganisationAccessor;
-    this.energyPortalServiceProviderTeamService = energyPortalServiceProviderTeamService;
+    this.energyPortalAccountsMessagePublishingService = energyPortalAccountsMessagePublishingService;
   }
 
   public BindingResult validate(NewTeamForm form,
@@ -88,7 +88,7 @@ public class TeamCreationService {
         ScopeType.ORGANISATION_GROUP,
         TeamType.ORGANISATION.name()
     );
-    energyPortalServiceProviderTeamService.publishTeam(serviceProviderTeam);
+    energyPortalAccountsMessagePublishingService.publishTeam(serviceProviderTeam);
     return teamId;
   }
 

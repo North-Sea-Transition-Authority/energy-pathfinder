@@ -125,4 +125,11 @@ class EnergyPortalDataService implements EnergyPortalServiceProviderDataService 
         ))
         .collect(toSet());
   }
+
+  @Override
+  public boolean belongsToAnyTeam(long wuaId) {
+    return webUserAccountService.getWebUserAccount((int) wuaId)
+        .map(webUserAccount -> portalTeamAccessor.hasAccessToService(webUserAccount.getLinkedPerson()))
+        .orElse(false);
+  }
 }

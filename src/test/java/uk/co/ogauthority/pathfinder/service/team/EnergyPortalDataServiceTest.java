@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -237,6 +238,35 @@ class EnergyPortalDataServiceTest {
                 Set.of(nonAdminRole.getName())
             )
         );
+  }
+
+  @Test
+  void belongsToAnyTeam_returnsTrue_whenUserHasTeamRoles() {
+    var person = new Person(1, "forename", "surname", "emailAddress", "phone");
+    var webUserAccount = new WebUserAccount(300165, person);
+
+    when(webUserAccountService.getWebUserAccount(300165)).thenReturn(Optional.of(webUserAccount));
+    when(portalTeamAccessor.hasAccessToService(person)).thenReturn(true);
+
+    assertThat(energyPortalDataService.belongsToAnyTeam(300165L)).isTrue();
+  }
+
+  @Test
+  void belongsToAnyTeam_returnsFalse_whenUserHasNoTeamRoles() {
+    var person = new Person(1, "forename", "surname", "emailAddress", "phone");
+    var webUserAccount = new WebUserAccount(300165, person);
+
+    when(webUserAccountService.getWebUserAccount(300165)).thenReturn(Optional.of(webUserAccount));
+    when(portalTeamAccessor.hasAccessToService(person)).thenReturn(false);
+
+    assertThat(energyPortalDataService.belongsToAnyTeam(300165L)).isFalse();
+  }
+
+  @Test
+  void belongsToAnyTeam_returnsFalse_whenUserNotFound() {
+    when(webUserAccountService.getWebUserAccount(300165)).thenReturn(Optional.empty());
+
+    assertThat(energyPortalDataService.belongsToAnyTeam(300165L)).isFalse();
   }
 
   private ServiceProviderTeamTypeRoleDto createServiceRoleDto(PortalTeamTypeRoleDto role, boolean isAssessManager) {

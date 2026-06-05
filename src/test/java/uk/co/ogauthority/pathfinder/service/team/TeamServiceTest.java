@@ -22,7 +22,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderUserRolesService;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalAccountsMessagePublishingService;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamMemberDto;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
@@ -53,7 +53,7 @@ public class TeamServiceTest {
   private WebUserAccountService webUserAccountService;
 
   @Mock
-  private EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService;
+  private EnergyPortalAccountsMessagePublishingService energyPortalAccountsMessagePublishingService;
 
   @Captor
   private ArgumentCaptor<List<String>> stringListCaptor;
@@ -80,7 +80,7 @@ public class TeamServiceTest {
         portalTeamAccessor,
         teamDtoFactory,
         webUserAccountService,
-        energyPortalServiceProviderUserRolesService
+        energyPortalAccountsMessagePublishingService
     );
 
     regulatorTeam = TeamTestingUtil.getRegulatorTeam();
@@ -291,7 +291,7 @@ public class TeamServiceTest {
     verify(portalTeamAccessor, times(1))
         .addPersonToTeamWithRoles(regulatorTeam.getId(), organisationPerson, roles, someWebUserAccount);
 
-    verify(energyPortalServiceProviderUserRolesService).publishUsersRolesForTeam(
+    verify(energyPortalAccountsMessagePublishingService).publishUsersRolesForTeam(
         10,
         String.valueOf(regulatorTeam.getId()),
         regulatorTeam.getType().name(),
@@ -310,7 +310,7 @@ public class TeamServiceTest {
     verify(portalTeamAccessor, times(1))
         .addPersonToTeamWithRoles(regulatorTeam.getId(), organisationPerson, roles, someWebUserAccount);
 
-    verifyNoInteractions(energyPortalServiceProviderUserRolesService);
+    verifyNoInteractions(energyPortalAccountsMessagePublishingService);
   }
 
   @Test
@@ -319,7 +319,7 @@ public class TeamServiceTest {
         .thenReturn(Optional.of(new WebUserAccount(10, regulatorPerson)));
     teamService.removePersonFromTeam(regulatorTeam, regulatorPerson, someWebUserAccount);
     verify(portalTeamAccessor, times(1)).removePersonFromTeam(regulatorTeam.getId(), regulatorPerson, someWebUserAccount);
-    verify(energyPortalServiceProviderUserRolesService).publishRemoveUserFromTeam(10, String.valueOf(regulatorTeam.getId()));
+    verify(energyPortalAccountsMessagePublishingService).publishRemoveUserFromTeam(10, String.valueOf(regulatorTeam.getId()));
   }
 
   @Test
@@ -328,7 +328,7 @@ public class TeamServiceTest {
         .thenReturn(Optional.empty());
     teamService.removePersonFromTeam(regulatorTeam, regulatorPerson, someWebUserAccount);
     verify(portalTeamAccessor, times(1)).removePersonFromTeam(regulatorTeam.getId(), regulatorPerson, someWebUserAccount);
-    verifyNoInteractions(energyPortalServiceProviderUserRolesService);
+    verifyNoInteractions(energyPortalAccountsMessagePublishingService);
   }
 
   @Test

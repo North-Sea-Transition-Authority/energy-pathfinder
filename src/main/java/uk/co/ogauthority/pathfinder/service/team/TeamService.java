@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalServiceProviderUserRolesService;
+import uk.co.fivium.energyportal.starter.serviceproviders.EnergyPortalAccountsMessagePublishingService;
 import uk.co.ogauthority.pathfinder.auth.AuthenticatedUserAccount;
 import uk.co.ogauthority.pathfinder.auth.UserPrivilege;
 import uk.co.ogauthority.pathfinder.energyportal.model.dto.team.PortalTeamDto;
@@ -36,19 +36,19 @@ public class TeamService {
   private final PortalTeamAccessor portalTeamAccessor;
   private final TeamDtoFactory teamDtoFactory;
   private final WebUserAccountService webUserAccountService;
-  private final EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService;
+  private final EnergyPortalAccountsMessagePublishingService energyPortalAccountsMessagePublishingService;
 
   @Autowired
   public TeamService(
       PortalTeamAccessor portalTeamAccessor,
       TeamDtoFactory teamDtoFactory,
       WebUserAccountService webUserAccountService,
-      EnergyPortalServiceProviderUserRolesService energyPortalServiceProviderUserRolesService
+      EnergyPortalAccountsMessagePublishingService energyPortalAccountsMessagePublishingService
   ) {
     this.portalTeamAccessor = portalTeamAccessor;
     this.teamDtoFactory = teamDtoFactory;
     this.webUserAccountService = webUserAccountService;
-    this.energyPortalServiceProviderUserRolesService = energyPortalServiceProviderUserRolesService;
+    this.energyPortalAccountsMessagePublishingService = energyPortalAccountsMessagePublishingService;
   }
 
   /**
@@ -200,7 +200,7 @@ public class TeamService {
       return;
     }
 
-    energyPortalServiceProviderUserRolesService.publishRemoveUserFromTeam(
+    energyPortalAccountsMessagePublishingService.publishRemoveUserFromTeam(
         optionalWebUserAccount.get().getWuaId(),
         String.valueOf(team.getId())
     );
@@ -219,7 +219,7 @@ public class TeamService {
       LOGGER.error("Can't resolve web user account from personId {} when trying to update user roles", personToAdd.getId().asInt());
       return;
     }
-    energyPortalServiceProviderUserRolesService.publishUsersRolesForTeam(
+    energyPortalAccountsMessagePublishingService.publishUsersRolesForTeam(
         optionalWebUserAccount.get().getWuaId(),
         String.valueOf(team.getId()),
         team.getType().name(),
