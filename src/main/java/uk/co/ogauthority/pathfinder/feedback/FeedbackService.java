@@ -14,11 +14,15 @@ import org.springframework.validation.BindingResult;
 import uk.co.fivium.feedbackmanagementservice.client.CannotSendFeedbackException;
 import uk.co.fivium.feedbackmanagementservice.client.FeedbackClientService;
 import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
+import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
 import uk.co.ogauthority.pathfinder.model.enums.contact.ServiceContactDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.feedback.FeedbackForm;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.service.LinkService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 
@@ -32,6 +36,7 @@ public class FeedbackService {
   private final FeedbackClientService feedbackClientService;
   private final ProjectDetailsRepository projectDetailsRepository;
   private final ProjectInformationService projectInformationService;
+  private final ProjectOperatorService projectOperatorService;
   private final FeedbackEmailService feedbackEmailService;
   private final LinkService linkService;
   private final String serviceName;
@@ -44,6 +49,7 @@ public class FeedbackService {
                          FeedbackClientService feedbackClientService,
                          ProjectDetailsRepository projectDetailsRepository,
                          ProjectInformationService projectInformationService,
+                         ProjectOperatorService projectOperatorService,
                          FeedbackEmailService feedbackEmailService,
                          LinkService linkService,
                          @Qualifier("utcClock") Clock utcClock,
@@ -52,6 +58,7 @@ public class FeedbackService {
     this.feedbackClientService = feedbackClientService;
     this.projectDetailsRepository = projectDetailsRepository;
     this.projectInformationService = projectInformationService;
+    this.projectOperatorService = projectOperatorService;
     this.feedbackEmailService = feedbackEmailService;
     this.linkService = linkService;
     this.serviceName = serviceName;
@@ -80,7 +87,7 @@ public class FeedbackService {
       var project = projectDetail.getProject();
 
       feedback.setTransactionId(project.getId());
-      feedback.setTransactionReference(projectInformationService.getProjectTitle(projectDetail));
+      feedback.setTransactionReference(getTransactionReference(projectDetail));
       feedback.setTransactionLink(linkService.generateProjectManagementUrl(project));
     }
 
@@ -92,6 +99,17 @@ public class FeedbackService {
           ServiceContactDetail.TECHNICAL_SUPPORT.getEmailAddress(),
           ServiceContactDetail.TECHNICAL_SUPPORT.getServiceName());
     }
+  }
+
+  private String getTransactionReference(ProjectDetail projectDetail) {
+    if (ProjectService.isInfrastructureProject(projectDetail)) {
+      return projectInformationService.getProjectTitle(projectDetail);
+    }
+
+    return projectOperatorService.getProjectOperatorByProjectDetail(projectDetail)
+        .map(projectOperator ->
+            ProjectType.FORWARD_WORK_PLAN.getDisplayName() + ": " + projectOperator.getOrganisationGroup().getName()
+        ).orElse(ProjectType.FORWARD_WORK_PLAN.getDisplayName());
   }
 
   private String getFeedbackContent(Feedback feedback) {

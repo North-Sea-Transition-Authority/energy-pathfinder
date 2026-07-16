@@ -25,11 +25,14 @@ import uk.co.ogauthority.pathfinder.energyportal.model.entity.Person;
 import uk.co.ogauthority.pathfinder.model.entity.project.Project;
 import uk.co.ogauthority.pathfinder.model.entity.project.ProjectDetail;
 import uk.co.ogauthority.pathfinder.model.enums.contact.ServiceContactDetail;
+import uk.co.ogauthority.pathfinder.model.enums.project.ProjectType;
 import uk.co.ogauthority.pathfinder.model.form.feedback.FeedbackForm;
 import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.service.LinkService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
+import uk.co.ogauthority.pathfinder.testutil.ProjectOperatorTestUtil;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
 import uk.co.ogauthority.pathfinder.testutil.UserTestingUtil;
 
@@ -55,6 +58,9 @@ public class FeedbackServiceTest {
   private ProjectInformationService projectInformationService;
 
   @Mock
+  private ProjectOperatorService projectOperatorService;
+
+  @Mock
   private FeedbackClientService feedbackClientService;
 
   @Mock
@@ -76,6 +82,7 @@ public class FeedbackServiceTest {
         feedbackClientService,
         projectDetailsRepository,
         projectInformationService,
+        projectOperatorService,
         feedbackEmailService,
         linkService,
         fixedClock,
@@ -127,6 +134,51 @@ public class FeedbackServiceTest {
     assertThat(savedFeedback.getTransactionId()).isEqualTo(1);
     assertThat(savedFeedback.getTransactionReference()).isEqualTo(TITLE);
     assertThat(savedFeedback.getTransactionLink()).isEqualTo(PROJECT_LINK);
+  }
+
+  @Test
+  public void saveFeedback_whenForwardWorkPlanProjectDetailId_thenTransactionReferenceIsOperatorName() throws CannotSendFeedbackException {
+    var form = FeedbackTestUtil.getValidFeedbackFormWithProjectDetailId();
+    form.setProjectDetailId(PROJECT_DETAIL_ID);
+
+    var fwpProjectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
+    var projectOperator = ProjectOperatorTestUtil.getOperator(fwpProjectDetail);
+
+    when(projectDetailsRepository.findById(PROJECT_DETAIL_ID)).thenReturn(Optional.of(fwpProjectDetail));
+    when(projectOperatorService.getProjectOperatorByProjectDetail(fwpProjectDetail)).thenReturn(Optional.of(projectOperator));
+
+    ArgumentCaptor<Feedback> feedbackArgumentCaptor = ArgumentCaptor.forClass(Feedback.class);
+
+    feedbackService.saveFeedback(form, person);
+
+    verify(feedbackClientService, times(1)).saveFeedback(feedbackArgumentCaptor.capture());
+
+    var savedFeedback = feedbackArgumentCaptor.getValue();
+
+    assertThat(savedFeedback.getTransactionReference())
+        .isEqualTo(ProjectType.FORWARD_WORK_PLAN.getDisplayName() + ": " + ProjectOperatorTestUtil.ORG_GROUP_NAME);
+  }
+
+  @Test
+  public void saveFeedback_whenForwardWorkPlanProjectDetailIdAndNoOperator_thenTransactionReferenceIsDefault()
+      throws CannotSendFeedbackException {
+    var form = FeedbackTestUtil.getValidFeedbackFormWithProjectDetailId();
+    form.setProjectDetailId(PROJECT_DETAIL_ID);
+
+    var fwpProjectDetail = ProjectUtil.getProjectDetails(ProjectType.FORWARD_WORK_PLAN);
+
+    when(projectDetailsRepository.findById(PROJECT_DETAIL_ID)).thenReturn(Optional.of(fwpProjectDetail));
+    when(projectOperatorService.getProjectOperatorByProjectDetail(fwpProjectDetail)).thenReturn(Optional.empty());
+
+    ArgumentCaptor<Feedback> feedbackArgumentCaptor = ArgumentCaptor.forClass(Feedback.class);
+
+    feedbackService.saveFeedback(form, person);
+
+    verify(feedbackClientService, times(1)).saveFeedback(feedbackArgumentCaptor.capture());
+
+    var savedFeedback = feedbackArgumentCaptor.getValue();
+
+    assertThat(savedFeedback.getTransactionReference()).isEqualTo(ProjectType.FORWARD_WORK_PLAN.getDisplayName());
   }
 
   @Test(expected = EntityNotFoundException.class)

@@ -54,6 +54,7 @@ import uk.co.ogauthority.pathfinder.repository.project.ProjectDetailsRepository;
 import uk.co.ogauthority.pathfinder.service.LinkService;
 import uk.co.ogauthority.pathfinder.service.contact.SupportContactService;
 import uk.co.ogauthority.pathfinder.service.email.EmailService;
+import uk.co.ogauthority.pathfinder.service.project.ProjectOperatorService;
 import uk.co.ogauthority.pathfinder.service.project.projectinformation.ProjectInformationService;
 import uk.co.ogauthority.pathfinder.service.validation.ValidationService;
 import uk.co.ogauthority.pathfinder.testutil.ProjectUtil;
@@ -92,6 +93,9 @@ public class FeedbackIntegrationTest extends AbstractControllerTest {
 
   @MockitoBean
   ProjectInformationService projectInformationService;
+
+  @MockitoBean
+  ProjectOperatorService projectOperatorService;
 
   @MockitoBean
   EmailService emailService;
