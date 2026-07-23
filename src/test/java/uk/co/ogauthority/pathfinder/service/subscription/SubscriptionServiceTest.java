@@ -2,7 +2,6 @@ package uk.co.ogauthority.pathfinder.service.subscription;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -23,7 +22,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.validation.BeanPropertyBindingResult;
 import uk.co.ogauthority.pathfinder.config.ServiceProperties;
 import uk.co.ogauthority.pathfinder.controller.subscription.SubscriptionController;
-import uk.co.ogauthority.pathfinder.exception.SubscriberNotFoundException;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.Subscriber;
 import uk.co.ogauthority.pathfinder.model.entity.subscription.SubscriberFieldStage;
 import uk.co.ogauthority.pathfinder.model.enums.ValidationType;
@@ -89,11 +87,10 @@ class SubscriptionServiceTest {
   }
 
   @Test
-  void verifyIsSubscribed_whenInvalidUuid_thenError() {
+  void verifyIsSubscribed_whenInvalidUuid_thenReturnEmptyOptional() {
     var subscriberUuid = "invaliduuid";
 
-    assertThrows(SubscriberNotFoundException.class,
-        () -> subscriptionService.verifyIsSubscribed(subscriberUuid));
+    assertThat(subscriptionService.verifyIsSubscribed(subscriberUuid)).isEmpty();
 
     verify(subscriberRepository, never()).findByUuid(any());
   }

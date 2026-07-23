@@ -3,9 +3,9 @@
 <#assign pageHeading = "Already unsubscribed" />
 
 <@defaultPage htmlTitle=pageHeading pageHeading="" breadcrumbs=false topNavigation=false>
-    <@fdsFlash.flash flashTitle="You are already unsubscribed from the ${service.serviceName} newsletter"/>
+  <@fdsFlash.flash flashTitle="You are not subscribed to the ${service.serviceName} newsletter"/>
 
   <p class="govuk-body">
-    You can <@fdsAction.link linkText="resubscribe to the ${service.serviceName} newsletter" linkUrl=springUrl(resubscribeUrl) /> if you meant to subscribe.
+    <@fdsAction.link linkText="Subscribe to the ${service.serviceName} newsletter" linkUrl=springUrl(resubscribeUrl) />
   </p>
 </@defaultPage>

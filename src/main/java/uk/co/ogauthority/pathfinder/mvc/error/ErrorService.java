@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsConfigurationProperties;
 import uk.co.ogauthority.pathfinder.analytics.AnalyticsEventCategory;
@@ -55,7 +55,7 @@ public class ErrorService {
     }
 
     // don't log client errors
-    if (throwable instanceof ResponseStatusException exception && exception.getStatusCode().is4xxClientError()) {
+    if (throwable instanceof ErrorResponse errorResponse && errorResponse.getStatusCode().is4xxClientError()) {
       return;
     }
 

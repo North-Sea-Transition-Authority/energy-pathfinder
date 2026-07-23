@@ -83,7 +83,7 @@ public class SubscriptionService {
     try {
       uuid = UUID.fromString(subscriberUuid);
     } catch (IllegalArgumentException exception) {
-      throw new SubscriberNotFoundException(String.format("Unable to convert %s to UUID", subscriberUuid));
+      return Optional.empty();
     }
     return subscriberRepository.findByUuid(uuid);
   }
